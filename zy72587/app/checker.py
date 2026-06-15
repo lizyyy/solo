@@ -6,7 +6,34 @@ from .models import (
     CheckParameters,
     RecordStatus,
     ConflictResolution,
+    StatusChangeEvent,
 )
+
+
+def _append_status_history(
+    record: FeatureRecord,
+    from_status: RecordStatus,
+    to_status: RecordStatus,
+    reason: str,
+    parameters: CheckParameters,
+    triggered_by: str = "system",
+    trigger_step: str = "checker",
+    extra_info: str = None,
+) -> None:
+    if from_status == to_status:
+        return
+    record.status_history.append(
+        StatusChangeEvent(
+            event_time=datetime.now(),
+            from_status=from_status.value if from_status else None,
+            to_status=to_status.value,
+            triggered_by=triggered_by,
+            trigger_step=trigger_step,
+            reason=reason,
+            parameter_version=parameters.parameter_version,
+            extra_info=extra_info,
+        )
+    )
 
 
 def detect_time_leakage(
@@ -103,14 +130,41 @@ def detect_conflicts(
 def process_record_status(
     record: FeatureRecord,
     parameters: CheckParameters,
+    triggered_by: str = "system",
+    trigger_step: str = "step_unknown",
 ) -> FeatureRecord:
+    old_status = record.status
+    record.parameter_version_applied = parameters.parameter_version
+
+    if record.original_feature_value is None:
+        record.original_feature_value = record.feature_value
+
     if record.feature_value is None or record.default_value_used:
-        record.status = RecordStatus.FEATURE_MISSING_DEFAULT
-        record.notes = (
-            f"线上特征缺失，使用默认值填充。"
-            f"参数版本: {parameters.parameter_version}, "
-            f"填充策略: {parameters.default_fill_strategy}"
+        record.default_filled_value = parameters.default_fill_value
+        if record.feature_value is None:
+            record.feature_value = parameters.default_fill_value
+
+        explanation = (
+            f"【线上特征缺失→默认分填充】"
+            f"原始值={record.original_feature_value}, "
+            f"填充值={parameters.default_fill_value}, "
+            f"填充策略={parameters.default_fill_strategy}, "
+            f"参数版本={parameters.parameter_version}。"
+            f"结论依据：特征在时间窗内未回传，按{parameters.default_fill_strategy}策略补默认分，"
+            f"该记录暂不归正常，留待推荐负责人复核。"
         )
+        record.result_explanation = explanation
+
+        new_status = RecordStatus.FEATURE_MISSING_DEFAULT
+        _append_status_history(
+            record, old_status, new_status,
+            reason="线上特征缺失，按默认值填充",
+            parameters=parameters,
+            triggered_by=triggered_by,
+            trigger_step=trigger_step,
+            extra_info=f"填充策略={parameters.default_fill_strategy}, 填充值={parameters.default_fill_value}",
+        )
+        record.status = new_status
         record.is_leakage = None
         return record
 
@@ -118,11 +172,39 @@ def process_record_status(
     record.is_leakage = is_leakage
 
     if is_leakage:
-        record.status = RecordStatus.ABNORMAL
-        record.notes = f"{reason}。参数版本: {parameters.parameter_version}"
+        new_status = RecordStatus.ABNORMAL
+        explanation = (
+            f"【时间窗特征穿越→异常】{reason}。"
+            f"参数版本={parameters.parameter_version}，"
+            f"安全间隔={parameters.time_window_gap_hours}h。"
+            f"结论依据：特征产生时间落入标签时间窗的安全缓冲区内，存在穿越风险。"
+        )
+        record.result_explanation = explanation
+        _append_status_history(
+            record, old_status, new_status,
+            reason=reason,
+            parameters=parameters,
+            triggered_by=triggered_by,
+            trigger_step=trigger_step,
+        )
+        record.status = new_status
     else:
-        record.status = RecordStatus.NORMAL
-        record.notes = f"{reason}。参数版本: {parameters.parameter_version}"
+        new_status = RecordStatus.NORMAL
+        explanation = (
+            f"【正常】{reason}。"
+            f"参数版本={parameters.parameter_version}，"
+            f"安全间隔={parameters.time_window_gap_hours}h。"
+            f"结论依据：特征产生时间与标签时间窗满足安全间隔要求，无穿越风险。"
+        )
+        record.result_explanation = explanation
+        _append_status_history(
+            record, old_status, new_status,
+            reason=reason,
+            parameters=parameters,
+            triggered_by=triggered_by,
+            trigger_step=trigger_step,
+        )
+        record.status = new_status
 
     return record
 
@@ -131,19 +213,51 @@ def process_all_records(
     bucket_records: List[FeatureRecord],
     negative_records: List[FeatureRecord],
     parameters: CheckParameters,
+    triggered_by: str = "system",
+    trigger_step: str = "step_unknown",
 ) -> Tuple[List[FeatureRecord], List[FeatureRecord], List[ConflictEvidence]]:
-    processed_bucket = [process_record_status(r, parameters) for r in bucket_records]
-    processed_negative = [process_record_status(r, parameters) for r in negative_records]
+    processed_bucket = [
+        process_record_status(r, parameters, triggered_by, trigger_step)
+        for r in bucket_records
+    ]
+    processed_negative = [
+        process_record_status(r, parameters, triggered_by, trigger_step)
+        for r in negative_records
+    ]
     conflicts = detect_conflicts(processed_bucket, processed_negative)
 
     for conflict in conflicts:
         for rec in processed_bucket:
             if rec.sample_id == conflict.record_id:
+                old = rec.status
+                _append_status_history(
+                    rec, old, RecordStatus.CONFLICT,
+                    reason=f"与负样本列表存在冲突: {conflict.description}",
+                    parameters=parameters,
+                    triggered_by=triggered_by,
+                    trigger_step=f"{trigger_step}_conflict_check",
+                )
                 rec.status = RecordStatus.CONFLICT
-                rec.notes = f"与负样本列表存在冲突: {conflict.description}"
+                rec.result_explanation = (
+                    f"{rec.result_explanation or ''}。"
+                    f"【冲突警告】{conflict.description}。"
+                    f"需要人工确认或驳回，系统不自动拍板。"
+                ).strip("。")
         for rec in processed_negative:
             if rec.sample_id == conflict.record_id:
+                old = rec.status
+                _append_status_history(
+                    rec, old, RecordStatus.CONFLICT,
+                    reason=f"与线上实验桶存在冲突: {conflict.description}",
+                    parameters=parameters,
+                    triggered_by=triggered_by,
+                    trigger_step=f"{trigger_step}_conflict_check",
+                )
                 rec.status = RecordStatus.CONFLICT
-                rec.notes = f"与线上实验桶存在冲突: {conflict.description}"
+                rec.result_explanation = (
+                    f"{rec.result_explanation or ''}。"
+                    f"【冲突警告】{conflict.description}。"
+                    f"需要人工确认或驳回，系统不自动拍板。"
+                ).strip("。")
 
     return processed_bucket, processed_negative, conflicts

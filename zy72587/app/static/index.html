@@ -7,12 +7,14 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #333; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
         .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 24px; }
         .header h1 { font-size: 28px; margin-bottom: 8px; }
-        .header p { opacity: 0.9; }
+        .header p { opacity: 0.95; font-size: 14px; line-height: 1.6; }
+        .consistency-note { margin-top: 14px; background: rgba(255,255,255,0.15); padding: 10px 14px; border-radius: 8px; font-size: 12px; border-left: 3px solid #ffd700; }
         .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         .card h2 { font-size: 18px; margin-bottom: 16px; color: #1a1a2e; border-bottom: 2px solid #e8ecf1; padding-bottom: 12px; }
+        .card h3 { font-size: 15px; margin: 16px 0 8px; color: #4a5568; }
         .steps { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
         .step { flex: 1; min-width: 200px; padding: 16px; border-radius: 8px; text-align: center; background: #e8ecf1; position: relative; }
         .step.active { background: #667eea; color: white; }
@@ -29,48 +31,86 @@
         .btn-warning:hover { background: #dd6b20; }
         .btn-danger { background: #f56565; color: white; }
         .btn-danger:hover { background: #e53e3e; }
+        .btn-info { background: #4299e1; color: white; }
+        .btn-info:hover { background: #3182ce; }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; margin-bottom: 6px; font-weight: 500; color: #4a5568; }
         .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; }
-        .form-group textarea { min-height: 100px; resize: vertical; }
+        .form-group textarea { min-height: 100px; resize: vertical; font-family: monospace; }
         .status-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
         .status-normal { background: #c6f6d5; color: #22543d; }
         .status-abnormal { background: #fed7d7; color: #742a2a; }
         .status-feature-missing { background: #fefcbf; color: #744210; }
         .status-pending { background: #bee3f8; color: #2a4365; }
         .status-conflict { background: #feb2b2; color: #742a2a; }
-        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
-        th { background: #f7fafc; font-weight: 600; color: #4a5568; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+        th { background: #f7fafc; font-weight: 600; color: #4a5568; white-space: nowrap; position: sticky; top: 0; }
         tr:hover { background: #f7fafc; }
+        tr.row-missing { background: #fffbea; }
+        tr.row-missing:hover { background: #fff3cd; }
+        tr.row-pending { background: #ebf8ff; }
         .conflict-card { background: #fff5f5; border-left: 4px solid #f56565; padding: 16px; border-radius: 8px; margin-bottom: 12px; }
         .conflict-card h4 { color: #c53030; margin-bottom: 8px; }
-        .conflict-actions { display: flex; gap: 8px; margin-top: 12px; }
+        .conflict-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
         .param-info { background: #ebf8ff; border-left: 4px solid #4299e1; padding: 12px; border-radius: 8px; margin-bottom: 16px; }
         .param-info h4 { color: #2b6cb0; margin-bottom: 8px; }
-        .param-tag { display: inline-block; background: #bee3f8; color: #2c5282; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-right: 8px; }
+        .param-tag { display: inline-block; background: #bee3f8; color: #2c5282; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-right: 8px; margin-bottom: 4px; }
         .self-check-item { padding: 12px; border-radius: 8px; margin-bottom: 8px; }
         .self-check-pass { background: #f0fff4; border-left: 4px solid #48bb78; }
         .self-check-fail { background: #fff5f5; border-left: 4px solid #f56565; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 20px; }
-        .stat-card { background: #f7fafc; padding: 16px; border-radius: 8px; text-align: center; }
+        .stat-card { background: #f7fafc; padding: 16px; border-radius: 8px; text-align: center; border: 1px solid #e2e8f0; }
         .stat-value { font-size: 28px; font-weight: bold; color: #667eea; }
         .stat-label { font-size: 13px; color: #718096; margin-top: 4px; }
+        .stat-pending .stat-value { color: #3182ce; }
+        .stat-missing .stat-value { color: #d69e2e; }
+        .stat-conflict .stat-value { color: #e53e3e; }
         .hidden { display: none; }
         .alert { padding: 16px; border-radius: 8px; margin-bottom: 16px; }
         .alert-warning { background: #fffaf0; border-left: 4px solid #ed8936; color: #7c2d12; }
+        .alert-info { background: #ebf8ff; border-left: 4px solid #4299e1; color: #2a4365; }
+        .explanation-box { background: #f7fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 6px; margin-top: 4px; font-size: 12px; line-height: 1.6; max-width: 450px; }
+        .explanation-box .tag-cur { color: #d53f8c; font-weight: bold; }
+        .explanation-box .tag-result { color: #2b6cb0; font-weight: bold; }
+        .history-box { background: #fafafa; border: 1px dashed #cbd5e0; padding: 8px; border-radius: 6px; margin-top: 4px; font-size: 11px; max-width: 450px; line-height: 1.5; color: #4a5568; font-family: monospace; white-space: pre-wrap; }
+        .history-title { color: #718096; font-weight: bold; margin-bottom: 4px; }
+        .detail-expand { cursor: pointer; color: #4299e1; font-size: 12px; }
+        .detail-expand:hover { text-decoration: underline; }
+        .collapsed { max-height: 40px; overflow: hidden; text-overflow: ellipsis; }
+        .tabs { display: flex; gap: 2px; margin-bottom: 16px; border-bottom: 2px solid #e8ecf1; }
+        .tab { padding: 10px 18px; cursor: pointer; border-radius: 8px 8px 0 0; background: #e8ecf1; color: #4a5568; font-weight: 500; font-size: 13px; }
+        .tab.active { background: #667eea; color: white; }
+        .tab:hover:not(.active) { background: #e2e8f0; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+        .record-source-tag { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 4px; }
+        .source-bucket { background: #e6d3f4; color: #553c9a; }
+        .source-negative { background: #fce7f3; color: #97266d; }
+        .operation-log { background: #1a202c; color: #e2e8f0; padding: 14px; border-radius: 8px; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto; line-height: 1.7; }
+        .operation-log .op-time { color: #68d391; }
+        .operation-log .op-user { color: #fbd38d; }
+        .missing-focus-list { margin: 0; padding-left: 18px; }
+        .missing-focus-list li { margin-bottom: 6px; font-size: 13px; }
+        .review-required-hint { background: linear-gradient(90deg, #fff5f5 0%, #fffaf0 100%); border: 2px solid #fc8181; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-weight: 500; color: #c53030; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>⏱ 时间窗特征穿越检查系统</h1>
-            <p>线上实验桶与负样本列表一致性检查，特征穿越检测，专业结果可追溯</p>
+            <p>线上实验桶与负样本列表一致性检查 · 特征穿越检测 · 专业结果可追溯</p>
+            <div class="consistency-note">
+                🔐 <strong>三端数据一致性保证：</strong>本系统页面展示/API接口/Excel导出明细三者读取同一份结果源，
+                尤其是<strong>线上特征缺失却给了默认分</strong>的记录，三个展示渠道完全对齐，
+                不会出现"一个地方显示异常、另一个地方消失"的情况。所有状态变更均有完整历史留痕。
+            </div>
         </div>
 
         <div id="sessionInfo" class="card hidden">
-            <h2>会话信息</h2>
+            <h2>会话状态 & 统计</h2>
+            <div id="currentStepText" style="margin-bottom: 12px; color: #553c9a; font-weight: 500;"></div>
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-value" id="statTotal">-</div>
@@ -78,16 +118,27 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="statBucket">-</div>
-                    <div class="stat-label">实验桶记录</div>
+                    <div class="stat-label">线上实验桶</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="statNegative">-</div>
-                    <div class="stat-label">负样本记录</div>
+                    <div class="stat-label">负样本列表</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card stat-conflict">
                     <div class="stat-value" id="statConflict">-</div>
-                    <div class="stat-label">冲突数</div>
+                    <div class="stat-label">冲突证据</div>
                 </div>
+                <div class="stat-card stat-pending">
+                    <div class="stat-value" id="statPending">-</div>
+                    <div class="stat-label">待推荐负责人复核</div>
+                </div>
+                <div class="stat-card stat-missing">
+                    <div class="stat-value" id="statReviewed">-</div>
+                    <div class="stat-label">已复核特征缺失记录</div>
+                </div>
+            </div>
+            <div id="reviewRequiredHint" class="review-required-hint hidden">
+                ⚠️ 存在线上特征缺失给默认分的记录，结论暂不能直接发！请通知推荐负责人在步骤3填写复核人。
             </div>
         </div>
 
@@ -96,23 +147,26 @@
             <div class="steps">
                 <div class="step" id="step1">
                     <div class="step-number">1</div>
-                    <div>导入线上实验桶</div>
+                    <div>导入线上实验桶<br><small>(含穿越检测、自检)</small></div>
                 </div>
                 <div class="step" id="step2">
                     <div class="step-number">2</div>
-                    <div>补看负样本列表</div>
+                    <div>补看负样本列表<br><small>(冲突证据、人工选择)</small></div>
                 </div>
                 <div class="step" id="step3">
                     <div class="step-number">3</div>
-                    <div>更新可解释摘要</div>
+                    <div>更新可解释摘要<br><small>(负责人复核、流程锁定)</small></div>
                 </div>
+            </div>
+            <div class="alert alert-info" style="margin-top: 12px;">
+                📋 注意：按你的要求，流程停在"导出明细查看状态"时也可以查看完整状态变化、历史留痕、结果说明，不强制点下一步。
             </div>
         </div>
 
         <div class="card">
             <h2>开始检查</h2>
             <div class="form-group">
-                <label>操作人</label>
+                <label>操作人（评测运营）</label>
                 <input type="text" id="createdBy" value="xiaomeng" placeholder="评测运营小孟">
             </div>
             <button class="btn btn-primary" onclick="createSession()">创建新检查会话</button>
@@ -121,83 +175,129 @@
         <div id="step1Panel" class="card hidden">
             <h2>步骤1：导入线上实验桶</h2>
             <div class="param-info">
-                <h4>🔧 检查参数配置</h4>
+                <h4>🔧 检查参数配置（参数版本紧邻结果展示）</h4>
                 <div>
                     <span class="param-tag">参数版本: v1.0</span>
-                    <span class="param-tag">时间窗间隔: 24小时</span>
-                    <span class="param-tag">穿越阈值: 0.8</span>
-                    <span class="param-tag">填充策略: zero</span>
+                    <span class="param-tag">时间窗安全间隔: 24h</span>
+                    <span class="param-tag">穿越阈值比例: 0.8</span>
+                    <span class="param-tag">默认填充策略: zero (填0)</span>
+                    <span class="param-tag">默认填充值: 0.0</span>
                 </div>
                 <p style="margin-top: 8px; font-size: 13px; color: #2c5282;">
-                    <strong>取舍理由：</strong>基于历史实验数据，24小时间隔可有效避免特征穿越
+                    <strong>取舍理由：</strong>基于历史实验数据，24小时间隔可有效避免特征穿越；默认zero策略避免统计偏差，但特征缺失给默认分的记录需推荐负责人确认是否接受。
                 </p>
             </div>
             <div class="alert alert-warning">
-                ⚠️ 若检测到线上特征缺失却给了默认分，系统将标记为待复核，不会自动归为正常，需推荐负责人确认
+                ⚠️ 若检测到<strong>线上特征缺失却给了默认分</strong>，系统将立即标记为<strong>「待推荐负责人复核」</strong>，<strong>不会自动归为正常</strong>。
+                结论不能直接发，需等待推荐负责人填写复核人。
             </div>
             <div class="form-group">
-                <label>粘贴JSON格式的实验桶数据（或使用示例数据）</label>
-                <textarea id="bucketData" placeholder='[{"feature_id":"f001","feature_name":"用户点击量","bucket_id":"exp_01","sample_id":"s001","feature_value":100,"default_value_used":false,"time_window_start":"2024-01-01T00:00:00","time_window_end":"2024-01-02T00:00:00","feature_timestamp":"2024-01-01T12:00:00"}]'></textarea>
+                <label>粘贴JSON格式的线上实验桶数据</label>
+                <textarea id="bucketData" placeholder='[{"feature_id":"f001","feature_name":"..."}]'></textarea>
             </div>
-            <button class="btn btn-warning" onclick="fillSampleBucketData()">使用示例数据</button>
+            <button class="btn btn-warning" onclick="fillSampleBucketData()">使用「出问题样例」数据</button>
             <button class="btn btn-success" onclick="step1Import()" style="margin-left: 8px;">导入并检测</button>
         </div>
 
         <div id="step2Panel" class="card hidden">
             <h2>步骤2：补看负样本列表</h2>
             <div class="alert alert-warning">
-                ⚠️ 导入后系统将自动检测冲突。若线上实验桶和负样本列表互相矛盾，系统将列出冲突证据，请手动选择确认或驳回，系统不会替业务同事自动拍板
+                ⚠️ 导入后系统将自动检测冲突。若线上实验桶和负样本列表互相矛盾，<strong>系统仅列出冲突证据，不替业务同事自动拍板</strong>，
+                需由评测运营小孟手动选择<strong>「确认」（以线上为准）</strong>或<strong>「驳回」（判定异常）</strong>。
+                冲突处理完成后，特征缺失给默认分的记录仍维持<strong>待推荐负责人复核</strong>，不会自动归正常。
             </div>
             <div class="form-group">
                 <label>粘贴JSON格式的负样本数据</label>
-                <textarea id="negativeData" placeholder='[{"feature_id":"f001","feature_name":"用户点击量","bucket_id":"neg_01","sample_id":"s001","feature_value":150,"default_value_used":false,"time_window_start":"2024-01-01T00:00:00","time_window_end":"2024-01-02T00:00:00","feature_timestamp":"2024-01-01T12:00:00"}]'></textarea>
+                <textarea id="negativeData" placeholder='[{"feature_id":"f001","feature_name":"..."}]'></textarea>
             </div>
-            <button class="btn btn-warning" onclick="fillSampleNegativeData()">使用示例数据</button>
+            <button class="btn btn-warning" onclick="fillSampleNegativeData()">使用「出问题样例」数据</button>
             <button class="btn btn-success" onclick="step2Import()" style="margin-left: 8px;">导入负样本并检测冲突</button>
         </div>
 
         <div id="conflictsPanel" class="card hidden">
-            <h2>⚠️ 冲突证据列表（请人工确认或驳回）</h2>
+            <h2>⚠️ 冲突证据列表（仅列出，不替业务同事自动拍板）</h2>
             <div id="conflictsList"></div>
         </div>
 
         <div id="selfCheckPanel" class="card hidden">
-            <h2>✅ 自检结果</h2>
+            <h2>✅ 自检结果（覆盖重复导入/特征缺失默认分等易错点）</h2>
             <div id="selfCheckList"></div>
         </div>
 
         <div id="step3Panel" class="card hidden">
-            <h2>步骤3：更新可解释摘要</h2>
+            <h2>步骤3：更新可解释摘要（流程锁定前最后一步）</h2>
+            <div id="pendingReviewBox" class="missing-focus-list hidden" style="margin-bottom: 16px;">
+                <h3>📌 待推荐负责人复核 — 线上特征缺失给默认分（这些就是结论不敢直接发的原因）：</h3>
+                <ul id="pendingReviewList"></ul>
+            </div>
             <div class="form-group">
-                <label>推荐负责人（复核特征缺失记录时填写）</label>
+                <label>推荐负责人（存在特征缺失默认分记录时<strong style="color:#c53030;">必填</strong>，没有可不填）</label>
                 <input type="text" id="reviewer" placeholder="如：zhang_leader">
             </div>
             <div class="form-group">
-                <label>检查摘要</label>
-                <textarea id="summary" placeholder="本次检查的结论说明..."></textarea>
+                <label>检查摘要（给推荐负责人看的结论说明）</label>
+                <textarea id="summary" placeholder="本次检查结论说明..."></textarea>
             </div>
-            <button class="btn btn-success" onclick="step3Update()">完成检查并锁定</button>
+            <button class="btn btn-success" onclick="step3Update()">完成检查并锁定流程</button>
+        </div>
+
+        <div id="operationLogPanel" class="card hidden">
+            <h2>📜 完整操作流水（小孟的所有操作都留痕）</h2>
+            <div class="operation-log" id="operationLog"></div>
         </div>
 
         <div id="recordsPanel" class="card hidden">
-            <h2>📋 检查明细（页面/接口/导出使用同一份数据）</h2>
-            <button class="btn btn-primary" onclick="exportExcel()" style="margin-bottom: 12px;">导出Excel</button>
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>样本ID</th>
-                            <th>特征名称</th>
-                            <th>桶ID</th>
-                            <th>特征值</th>
-                            <th>用了默认值</th>
-                            <th>是否穿越</th>
-                            <th>状态</th>
-                            <th>备注</th>
-                        </tr>
-                    </thead>
-                    <tbody id="recordsTable"></tbody>
-                </table>
+            <h2>📋 导出明细预览（与页面/API/Excel同源 — 按你的要求停在此查看状态变化）</h2>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
+                <button class="btn btn-primary" onclick="exportExcel()">📥 导出完整Excel (7个Sheet)</button>
+                <button class="btn btn-info" onclick="switchTab('tab-records')">📊 完整检查明细</button>
+                <button class="btn btn-warning" onclick="switchTab('tab-missing')">⚠️ 特征缺失默认分重点</button>
+                <button class="btn btn-danger" onclick="switchTab('tab-consistency')">🔐 三端一致性声明</button>
+            </div>
+
+            <div class="tabs">
+                <div class="tab active" data-tab="tab-records" onclick="switchTab('tab-records')">📊 1-检查明细（22列完整）</div>
+                <div class="tab" data-tab="tab-missing" onclick="switchTab('tab-missing')">⚠️ 2-特征缺失默认分重点</div>
+                <div class="tab" data-tab="tab-consistency" onclick="switchTab('tab-consistency')">🔐 3-三端一致性 & 参数版本</div>
+            </div>
+
+            <div id="tab-records" class="tab-panel active">
+                <div style="overflow-x: auto; max-height: 700px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>来源</th>
+                                <th>样本ID</th>
+                                <th>特征名称</th>
+                                <th>原始值</th>
+                                <th>展示值</th>
+                                <th>默认分？</th>
+                                <th>穿越？</th>
+                                <th>最终状态</th>
+                                <th>结果说明（含参数版本）</th>
+                                <th>历史留痕（可展开）</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-missing" class="tab-panel">
+                <div id="missingListPanel"></div>
+            </div>
+
+            <div id="tab-consistency" class="tab-panel">
+                <div class="param-info">
+                    <h4>🔐 三端数据一致性声明</h4>
+                    <p id="consistencyNoteText" style="font-size: 13px;"></p>
+                </div>
+                <div class="param-info" style="border-left-color: #48bb78; background: #f0fff4;">
+                    <h4 style="color: #22543d;">🔧 本次检查应用的参数版本与取舍理由（紧邻结果展示）</h4>
+                    <div id="paramDisplay"></div>
+                </div>
+                <h3>页面/API/导出三端数据实时自检结果：</h3>
+                <div id="consistencyCheckResult"></div>
             </div>
         </div>
     </div>
@@ -205,6 +305,8 @@
     <script>
         let sessionId = null;
         let currentStep = null;
+        let cachedData = null;
+        let historyExpanded = {};
 
         const API_BASE = '/api';
 
@@ -227,41 +329,44 @@
             });
         }
 
-        function showElement(id) {
-            document.getElementById(id).classList.remove('hidden');
+        function showElement(id) { document.getElementById(id).classList.remove('hidden'); }
+        function hideElement(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function getStatusClass(statusEn) {
+            const m = { normal: 'status-normal', abnormal: 'status-abnormal',
+                feature_missing_default: 'status-feature-missing', pending_review: 'status-pending',
+                conflict: 'status-conflict' };
+            return m[statusEn] || 'status-normal';
         }
 
-        function getStatusClass(status) {
-            const map = {
-                'normal': 'status-normal',
-                'abnormal': 'status-abnormal',
-                'feature_missing_default': 'status-feature-missing',
-                'pending_review': 'status-pending',
-                'conflict': 'status-conflict'
-            };
-            return map[status] || 'status-normal';
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
         }
 
-        function getStatusText(status) {
-            const map = {
-                'normal': '正常',
-                'abnormal': '异常(穿越)',
-                'feature_missing_default': '特征缺失(默认分)',
-                'pending_review': '待复核',
-                'conflict': '冲突'
-            };
-            return map[status] || status;
+        async function checkConsistencyLive() {
+            try {
+                const r = await apiCall(`/sessions/${sessionId}/self-check/consistency`, { method: 'POST' });
+                const res = r.result;
+                document.getElementById('consistencyCheckResult').innerHTML = `
+                    <div class="self-check-item ${res.passed ? 'self-check-pass' : 'self-check-fail'}">
+                        <strong>页面展示 / API接口 / Excel导出 三端一致性实时检查：</strong>
+                        ${res.passed ? '✅ 完全通过（三者读取同一份数据源）' : '❌ 检测到不一致，请刷新后重试'}
+                        ${res.found_issues > 0 ? `（发现${res.found_issues}个问题）` : ''}
+                        <br><small>${res.details}</small>
+                    </div>`;
+            } catch (e) { /* ignore */ }
         }
 
         async function createSession() {
             const createdBy = document.getElementById('createdBy').value;
             const data = await apiCall(`/sessions?created_by=${encodeURIComponent(createdBy)}`, { method: 'POST' });
             sessionId = data.session_id;
-            alert(`会话创建成功: ${sessionId}`);
-            showElement('sessionInfo');
-            showElement('stepContainer');
-            showElement('step1Panel');
-            showElement('recordsPanel');
+            alert(`✅ 会话创建成功: ${sessionId}`);
+            ['sessionInfo', 'stepContainer', 'step1Panel', 'recordsPanel', 'operationLogPanel', 'selfCheckPanel']
+                .forEach(showElement);
             updateStepUI(0);
             await refreshSession();
         }
@@ -269,95 +374,88 @@
         async function refreshSession() {
             if (!sessionId) return;
             const data = await apiCall(`/sessions/${sessionId}`);
+            cachedData = data;
+
             document.getElementById('statTotal').textContent = data.total_records;
             document.getElementById('statBucket').textContent = data.bucket_count;
             document.getElementById('statNegative').textContent = data.negative_count;
             document.getElementById('statConflict').textContent = data.conflict_count;
+            document.getElementById('statPending').textContent = data.pending_review_count || 0;
+            document.getElementById('statReviewed').textContent = data.feature_missing_reviewed_count || 0;
+            document.getElementById('currentStepText').textContent = `📍 当前阶段：${data.current_step_text} ${data.is_locked ? '🔒 (已锁定)' : ''}`;
+
+            const hint = document.getElementById('reviewRequiredHint');
+            if ((data.pending_review_count || 0) > 0) {
+                showElement('reviewRequiredHint');
+                hint.innerHTML = `⚠️ 当前有 <strong>${data.pending_review_count}</strong> 条<strong>线上特征缺失给默认分</strong>的记录待推荐负责人复核，<strong>结论暂不能直接发！</strong>`;
+            } else hideElement('reviewRequiredHint');
 
             const stepMap = { 'step1_import': 0, 'step2_review_negatives': 1, 'step3_update_summary': 2 };
             updateStepUI(stepMap[data.current_step] || 0);
             currentStep = data.current_step;
 
-            if (data.self_check_results && data.self_check_results.length > 0) {
-                showElement('selfCheckPanel');
-                renderSelfCheck(data.self_check_results);
+            if (data.self_check_results && data.self_check_results.length > 0) renderSelfCheck(data.self_check_results);
+            if (currentStep === 'step2_review_negatives' || currentStep === 'step3_update_summary') showElement('step3Panel');
+
+            if ((data.pending_review_count || 0) > 0) {
+                showElement('pendingReviewBox');
+                document.getElementById('pendingReviewList').innerHTML =
+                    data.pending_review_details.map(d => `<li>${d}</li>`).join('');
             }
 
-            if (currentStep === 'step2_review_negatives' || currentStep === 'step3_update_summary') {
-                showElement('step3Panel');
+            if (data.operation_log && data.operation_log.length) {
+                document.getElementById('operationLog').innerHTML =
+                    data.operation_log.map(l => {
+                        const m = l.match(/\[操作\d+\]\s+(\S+)\s+(.*?)\s+by\s+(\S+)\s*\|\s*(.*)/);
+                        if (m) return `<div><span class="op-time">[${m[1]}]</span> <span class="op-user">@${m[3]}</span> ${m[2]} → ${m[4]}</div>`;
+                        return `<div>${l}</div>`;
+                    }).join('');
             }
+
+            document.getElementById('consistencyNoteText').textContent = data._data_consistency_note || '';
+            document.getElementById('paramDisplay').innerHTML =
+                Object.entries(data.parameters).map(([k, v]) =>
+                    `<span class="param-tag">${k}: ${v}</span>`).join('');
 
             await refreshRecords();
             await refreshConflicts();
+            checkConsistencyLive();
         }
 
         function renderSelfCheck(results) {
-            const html = results.map(r => `
+            document.getElementById('selfCheckList').innerHTML = results.map(r => `
                 <div class="self-check-item ${r.passed ? 'self-check-pass' : 'self-check-fail'}">
                     <strong>${r.check_type}:</strong> ${r.passed ? '✅ 通过' : '❌ 未通过'}
-                    ${r.found_issues > 0 ? ` (发现${r.found_issues}个问题)` : ''}
+                    ${r.found_issues > 0 ? `（发现${r.found_issues}个问题）` : ''}
                     <br><small>${r.details}</small>
+                    ${r.checked_at ? `<br><small style="color:#718096;">检查时间：${r.checked_at}</small>` : ''}
                 </div>
             `).join('');
-            document.getElementById('selfCheckList').innerHTML = html;
         }
 
         function fillSampleBucketData() {
             const sample = [
-                {
-                    feature_id: "f001", feature_name: "用户7天点击量", bucket_id: "exp_01",
-                    sample_id: "s001", feature_value: 120, default_value_used: false,
-                    time_window_start: "2024-01-01T00:00:00", time_window_end: "2024-01-08T00:00:00",
-                    feature_timestamp: "2024-01-05T12:00:00"
-                },
-                {
-                    feature_id: "f002", feature_name: "用户转化率", bucket_id: "exp_01",
-                    sample_id: "s002", feature_value: null, default_value_used: true,
-                    time_window_start: "2024-01-01T00:00:00", time_window_end: "2024-01-08T00:00:00",
-                    feature_timestamp: null
-                },
-                {
-                    feature_id: "f003", feature_name: "用户停留时长", bucket_id: "exp_01",
-                    sample_id: "s003", feature_value: 300, default_value_used: false,
-                    time_window_start: "2024-01-01T00:00:00", time_window_end: "2024-01-08T00:00:00",
-                    feature_timestamp: "2024-01-08T01:00:00"
-                },
-                {
-                    feature_id: "f001", feature_name: "用户7天点击量", bucket_id: "exp_01",
-                    sample_id: "s004", feature_value: 85, default_value_used: false,
-                    time_window_start: "2024-01-01T00:00:00", time_window_end: "2024-01-08T00:00:00",
-                    feature_timestamp: "2024-01-02T08:00:00"
-                }
+                { feature_id:"clk_7d", feature_name:"用户近7天点击量", bucket_id:"exp_prod_bucket", sample_id:"user_0001", feature_value:128, default_value_used:false, time_window_start:"2024-01-01T00:00:00", time_window_end:"2024-01-08T00:00:00", feature_timestamp:"2024-01-05T00:00:00" },
+                { feature_id:"clk_7d", feature_name:"用户近7天点击量", bucket_id:"exp_prod_bucket", sample_id:"user_0002", feature_value:null, default_value_used:true, time_window_start:"2024-01-01T00:00:00", time_window_end:"2024-01-08T00:00:00", feature_timestamp:null },
+                { feature_id:"clk_7d", feature_name:"用户近7天点击量", bucket_id:"exp_prod_bucket", sample_id:"user_0003", feature_value:56, default_value_used:false, time_window_start:"2024-01-01T00:00:00", time_window_end:"2024-01-08T00:00:00", feature_timestamp:"2024-01-07T14:00:00" },
+                { feature_id:"conv_rt", feature_name:"用户转化率", bucket_id:"exp_prod_bucket", sample_id:"user_0002", feature_value:null, default_value_used:true, time_window_start:"2024-01-01T00:00:00", time_window_end:"2024-01-08T00:00:00", feature_timestamp:null },
+                { feature_id:"clk_7d", feature_name:"用户近7天点击量", bucket_id:"exp_prod_bucket", sample_id:"user_0004", feature_value:201, default_value_used:false, time_window_start:"2024-01-01T00:00:00", time_window_end:"2024-01-08T00:00:00", feature_timestamp:"2024-01-06T00:00:00" },
+                { feature_id:"dwell_s", feature_name:"用户平均停留时长(s)", bucket_id:"exp_prod_bucket", sample_id:"user_0005", feature_value:null, default_value_used:true, time_window_start:"2024-01-01T00:00:00", time_window_end:"2024-01-08T00:00:00", feature_timestamp:null },
+                { feature_id:"clk_7d", feature_name:"用户近7天点击量", bucket_id:"exp_prod_bucket", sample_id:"user_0006", feature_value:87, default_value_used:false, time_window_start:"2024-01-01T00:00:00", time_window_end:"2024-01-08T00:00:00", feature_timestamp:"2024-01-07T22:00:00" }
             ];
             document.getElementById('bucketData').value = JSON.stringify(sample, null, 2);
         }
 
         function fillSampleNegativeData() {
             const sample = [
-                {
-                    feature_id: "f001", feature_name: "用户7天点击量", bucket_id: "neg_01",
-                    sample_id: "s001", feature_value: 120, default_value_used: false,
-                    time_window_start: "2024-01-01T00:00:00", time_window_end: "2024-01-08T00:00:00",
-                    feature_timestamp: "2024-01-05T12:00:00"
-                },
-                {
-                    feature_id: "f002", feature_name: "用户转化率", bucket_id: "neg_01",
-                    sample_id: "s002", feature_value: 0.05, default_value_used: false,
-                    time_window_start: "2024-01-01T00:00:00", time_window_end: "2024-01-08T00:00:00",
-                    feature_timestamp: "2024-01-03T10:00:00"
-                },
-                {
-                    feature_id: "f003", feature_name: "用户停留时长", bucket_id: "neg_01",
-                    sample_id: "s003", feature_value: 280, default_value_used: false,
-                    time_window_start: "2024-01-01T00:00:00", time_window_end: "2024-01-08T00:00:00",
-                    feature_timestamp: "2024-01-04T15:00:00"
-                },
-                {
-                    feature_id: "f005", feature_name: "新增特征", bucket_id: "neg_01",
-                    sample_id: "s005", feature_value: 50, default_value_used: false,
-                    time_window_start: "2024-01-01T00:00:00", time_window_end: "2024-01-08T00:00:00",
-                    feature_timestamp: "2024-01-03T09:00:00"
-                }
+                { feature_id:"clk_7d", feature_name:"用户近7天点击量", bucket_id:"neg_ref", sample_id:"user_0001", feature_value:128, default_value_used:false, time_window_start:"2024-01-01T00:00:00", time_window_end:"2024-01-08T00:00:00", feature_timestamp:"2024-01-05T00:00:00" },
+                { feature_id:"clk_7d", feature_name:"用户近7天点击量", bucket_id:"neg_ref", sample_id:"user_0002", feature_value:5, default_value_used:false, time_window_start:"2024-01-01T00:00:00", time_window_end:"2024-01-08T00:00:00", feature_timestamp:"2024-01-06T12:00:00" },
+                { feature_id:"clk_7d", feature_name:"用户近7天点击量", bucket_id:"neg_ref", sample_id:"user_0003", feature_value:56, default_value_used:false, time_window_start:"2024-01-01T00:00:00", time_window_end:"2024-01-08T00:00:00", feature_timestamp:"2024-01-07T14:00:00" },
+                { feature_id:"conv_rt", feature_name:"用户转化率", bucket_id:"neg_ref", sample_id:"user_0002", feature_value:null, default_value_used:true, time_window_start:"2024-01-01T00:00:00", time_window_end:"2024-01-08T00:00:00", feature_timestamp:null },
+                { feature_id:"clk_7d", feature_name:"用户近7天点击量", bucket_id:"neg_ref", sample_id:"user_0004", feature_value:199, default_value_used:false, time_window_start:"2024-01-01T00:00:00", time_window_end:"2024-01-08T00:00:00", feature_timestamp:"2024-01-06T00:00:00" },
+                { feature_id:"dwell_s", feature_name:"用户平均停留时长(s)", bucket_id:"neg_ref", sample_id:"user_0005", feature_value:null, default_value_used:true, time_window_start:"2024-01-01T00:00:00", time_window_end:"2024-01-08T00:00:00", feature_timestamp:null },
+                { feature_id:"clk_7d", feature_name:"用户近7天点击量", bucket_id:"neg_ref", sample_id:"user_0006", feature_value:87, default_value_used:false, time_window_start:"2024-01-01T00:00:00", time_window_end:"2024-01-08T00:00:00", feature_timestamp:"2024-01-07T22:00:00" },
+                { feature_id:"imp_7d", feature_name:"用户近7天曝光量", bucket_id:"neg_ref", sample_id:"user_0007", feature_value:450, default_value_used:false, time_window_start:"2024-01-01T00:00:00", time_window_end:"2024-01-08T00:00:00", feature_timestamp:"2024-01-05T12:00:00" }
             ];
             document.getElementById('negativeData').value = JSON.stringify(sample, null, 2);
         }
@@ -366,96 +464,184 @@
             try {
                 const records = JSON.parse(document.getElementById('bucketData').value);
                 const data = await apiCall(`/sessions/${sessionId}/step1/import`, {
-                    method: 'POST',
-                    body: JSON.stringify(records)
-                });
-                alert(data.message);
+                    method: 'POST', body: JSON.stringify(records) });
+                alert(`✅ ${data.message}\n\n📊 导入${data.session.bucket_count}条线上记录\n⚠️ ${data.session.pending_review_count}条特征缺失给默认分→待推荐负责人复核`);
                 showElement('step2Panel');
                 await refreshSession();
-            } catch (e) {
-                alert('导入失败: ' + e.message);
-            }
+            } catch (e) { alert('❌ 导入失败: ' + e.message); }
         }
 
         async function step2Import() {
             try {
                 const records = JSON.parse(document.getElementById('negativeData').value);
                 const data = await apiCall(`/sessions/${sessionId}/step2/negatives`, {
-                    method: 'POST',
-                    body: JSON.stringify(records)
-                });
-                alert(data.message);
+                    method: 'POST', body: JSON.stringify(records) });
+                alert(`✅ ${data.message}\n\n⚔️ 检测到${data.conflicts.length}个冲突，请人工选择确认/驳回\n📌 特征缺失默认分记录仍保持待推荐负责人复核状态`);
                 await refreshSession();
-            } catch (e) {
-                alert('导入失败: ' + e.message);
-            }
+            } catch (e) { alert('❌ 导入失败: ' + e.message); }
         }
 
         async function refreshRecords() {
             const data = await apiCall(`/sessions/${sessionId}/records`);
-            const html = data.records.map(r => `
-                <tr>
-                    <td>${r.sample_id}</td>
-                    <td>${r.feature_name}</td>
-                    <td>${r.bucket_id}</td>
-                    <td>${r.feature_value ?? 'NULL'}</td>
-                    <td>${r.default_value_used ? '是' : '否'}</td>
-                    <td>${r.is_leakage === null ? '未判定' : (r.is_leakage ? '是' : '否')}</td>
-                    <td><span class="status-badge ${getStatusClass(r.status)}">${getStatusText(r.status)}</span></td>
-                    <td><small>${r.notes || '-'}</small></td>
-                </tr>
-            `).join('');
+
+            const html = data.records.map((r, i) => {
+                const isMissing = /默认分/.test(String(r['是否使用了默认填充值']));
+                const isPending = r['最终状态(英文)'] === 'pending_review';
+                const rowClass = isMissing ? 'row-missing' : (isPending ? 'row-pending' : '');
+                const sourceClass = r['数据来源'] === '线上实验桶' ? 'source-bucket' : 'source-negative';
+                const historyKey = `h_${i}`;
+                const history = r['历史留痕(完整状态变更链)'] || '';
+                const isExpanded = historyExpanded[historyKey];
+
+                return `
+                <tr class="${rowClass}">
+                    <td><span class="record-source-tag ${sourceClass}">${r['数据来源']}</span></td>
+                    <td><strong>${r['样本ID']}</strong></td>
+                    <td>${r['特征名称']}<br><small style="color:#718096;">${r['特征ID']}</small></td>
+                    <td style="${r['特征原始值(线上回传)'] === null ? 'color:#c53030;' : ''}">
+                        ${r['特征原始值(线上回传)'] === null || r['特征原始值(线上回传)'] === undefined ? '<strong>缺失</strong>' : r['特征原始值(线上回传)']}
+                    </td>
+                    <td><strong>${r['特征当前展示值']}</strong></td>
+                    <td>${/默认分/.test(String(r['是否使用了默认填充值']))
+                        ? '<span style="color:#c53030;font-weight:bold;">是 ⚠️</span>' : '否'}</td>
+                    <td>${r['是否检测到时间窗穿越'] === '是' ? '是 ❌' : (r['是否检测到时间窗穿越'] === '否' ? '否 ✅' : '未判定')}</td>
+                    <td>
+                        <span class="status-badge ${getStatusClass(r['最终状态(英文)'])}">${r['最终状态(中文)']}</span>
+                        <br><small style="color:#718096;">参数 ${r['应用参数版本']}</small>
+                    </td>
+                    <td>
+                        <div class="explanation-box">
+                            ${r['结果说明(可解释)']}
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <span class="detail-expand" onclick="toggleHistory('${historyKey}')">
+                                ${isExpanded ? '▼ 收起历史' : '▶ 展开历史变更链'}
+                                (${history.split('[变更').length - 1 || 0}次变更)
+                            </span>
+                            <div class="history-box ${isExpanded ? '' : 'collapsed'}" id="${historyKey}_box">
+                                <div class="history-title">📜 完整状态变更链（参数版本紧邻）：</div>
+                                ${history ? history.replaceAll(' | ', '\n') : '暂无变更记录'}
+                            </div>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
             document.getElementById('recordsTable').innerHTML = html;
+
+            const missing = data.records.filter(r => /默认分/.test(String(r['是否使用了默认填充值'])));
+            if (missing.length === 0) {
+                document.getElementById('missingListPanel').innerHTML =
+                    '<div class="self-check-item self-check-pass"><strong>特征缺失默认分检查：</strong>✅ 无记录，所有特征正常回传。</div>';
+            } else {
+                document.getElementById('missingListPanel').innerHTML = `
+                    <div class="review-required-hint">
+                        📌 共 <strong>${missing.length}</strong> 条记录存在「线上特征缺失给默认分」情况 — 这就是推荐负责人催结论时小孟不敢直接发的原因
+                    </div>
+                    <table>
+                        <thead><tr>
+                            <th>序号</th><th>数据来源</th><th>样本ID</th><th>特征</th>
+                            <th>原始值→填充值</th><th>填充策略</th><th>最终状态</th>
+                            <th>推荐负责人复核情况</th><th>参数版本</th>
+                        </tr></thead>
+                        <tbody>
+                            ${missing.map((r, i) => `
+                            <tr class="row-missing">
+                                <td>${i + 1}</td>
+                                <td><span class="record-source-tag ${r['数据来源'] === '线上实验桶' ? 'source-bucket' : 'source-negative'}">${r['数据来源']}</span></td>
+                                <td><strong>${r['样本ID']}</strong></td>
+                                <td>${r['特征名称']}</td>
+                                <td><strong style="color:#c53030;">${r['特征原始值(线上回传)'] === null ? '缺失' : r['特征原始值(线上回传)']}
+                                    → ${r['默认填充数值']}</strong></td>
+                                <td>${r['填充策略'] || '-'}</td>
+                                <td><span class="status-badge ${getStatusClass(r['最终状态(英文)'])}">${r['最终状态(中文)']}</span></td>
+                                <td>${r['最终状态(英文)'] === 'pending_review'
+                                    ? '<strong style="color:#c53030;">⚠️ 待推荐负责人复核，结论不能直接发</strong>'
+                                    : '✅ 已复核通过'}</td>
+                                <td>${r['应用参数版本']}</td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>
+                    <h3 style="margin-top:16px;">每条特征缺失记录的详细结果说明：</h3>
+                    ${missing.map((r, i) => `
+                        <div class="param-info" style="margin-bottom:10px; background:${r['最终状态(英文)']==='pending_review'?'#fff5f5':'#f0fff4'}; border-left-color:${r['最终状态(英文)']==='pending_review'?'#f56565':'#48bb78'};">
+                            <h4 style="color:${r['最终状态(英文)']==='pending_review'?'#c53030':'#22543d'};">
+                                #${i + 1} ${r['数据来源']} · ${r['样本ID']} · ${r['特征名称']}
+                                [${r['最终状态(中文)']}]
+                            </h4>
+                            <div style="font-size:13px; line-height:1.7;">
+                                ${r['结果说明(可解释)']}
+                            </div>
+                        </div>
+                    `).join('')}
+                `;
+            }
+        }
+
+        function toggleHistory(key) {
+            historyExpanded[key] = !historyExpanded[key];
+            const box = document.getElementById(key + '_box');
+            if (historyExpanded[key]) box.classList.remove('collapsed');
+            else box.classList.add('collapsed');
+            refreshRecords();
         }
 
         async function refreshConflicts() {
             const data = await apiCall(`/sessions/${sessionId}/conflicts`);
-            if (data.conflicts.length === 0) {
-                document.getElementById('conflictsPanel').classList.add('hidden');
-                return;
-            }
+            if (data.conflicts.length === 0) { hideElement('conflictsPanel'); return; }
             showElement('conflictsPanel');
-            const html = data.conflicts.map(c => `
+            document.getElementById('conflictsList').innerHTML = data.conflicts.map(c => `
                 <div class="conflict-card">
-                    <h4>🔴 样本 ${c.record_id}</h4>
-                    <p>${c.description}</p>
-                    <p><strong>线上实验桶值:</strong> ${c.bucket_value ?? '缺失'} | <strong>负样本值:</strong> ${c.negative_value ?? '缺失'}</p>
-                    <p><strong>当前状态:</strong> ${c.resolution === 'pending' ? '⏳ 待处理' : (c.resolution === 'confirm' ? '✅ 已确认' : '❌ 已驳回')}</p>
-                    ${c.resolution === 'pending' ? `
+                    <h4>🔴 样本 ${c['样本ID']}</h4>
+                    <p style="margin-bottom:8px;"><strong>冲突描述：</strong>${c['冲突描述']}</p>
+                    <p style="font-size:13px; background:#fafafa; padding:8px; border-radius:4px;">
+                        <strong>📊 线上实验桶取值：</strong>${c['线上实验桶取值']} &nbsp;&nbsp;|&nbsp;&nbsp;
+                        <strong>📊 负样本列表取值：</strong>${c['负样本列表取值']}
+                    </p>
+                    <p><strong>处理状态：</strong>
+                        <span class="status-badge ${
+                            c['处理状态'].includes('已确认') ? 'status-normal' :
+                            c['处理状态'].includes('已驳回') ? 'status-abnormal' : 'status-conflict'
+                        }">${c['处理状态']}</span>
+                        ${c['处理人(评测运营)'] ? ` | 操作人：<strong>${c['处理人(评测运营)']}</strong>` : ''}
+                        ${c['处理时间'] ? ` | 时间：${c['处理时间']}` : ''}
+                    </p>
+                    ${c['冲突处理历史'] ? `
+                    <div class="history-box">
+                        <div class="history-title">冲突变更历史：</div>
+                        ${c['冲突处理历史'].replaceAll(' | ', '\n')}
+                    </div>` : ''}
+                    ${c['处理状态'].includes('待人工') ? `
                     <div class="conflict-actions">
-                        <button class="btn btn-success" onclick="resolveConflict('${c.record_id}', 'confirm')">确认冲突，以线上为准</button>
-                        <button class="btn btn-danger" onclick="resolveConflict('${c.record_id}', 'reject')">驳回，数据异常</button>
-                    </div>
-                    ` : ''}
+                        <button class="btn btn-success" onclick="resolveConflict('${c['样本ID']}', 'confirm')">
+                            ✅ 确认冲突（以线上实验桶为准）
+                        </button>
+                        <button class="btn btn-danger" onclick="resolveConflict('${c['样本ID']}', 'reject')">
+                            ❌ 驳回（判定数据异常）
+                        </button>
+                    </div>` : ''}
                 </div>
             `).join('');
-            document.getElementById('conflictsList').innerHTML = html;
         }
 
         async function resolveConflict(recordId, resolution) {
             const resolvedBy = document.getElementById('createdBy').value || 'xiaomeng';
             try {
-                await apiCall(`/sessions/${sessionId}/conflicts/${recordId}/resolve?resolution=${resolution}&resolved_by=${encodeURIComponent(resolvedBy)}`, {
-                    method: 'POST'
-                });
+                await apiCall(`/sessions/${sessionId}/conflicts/${recordId}/resolve?resolution=${resolution}&resolved_by=${encodeURIComponent(resolvedBy)}`, { method: 'POST' });
                 await refreshSession();
-            } catch (e) {
-                alert('处理失败: ' + e.message);
-            }
+            } catch (e) { alert('处理失败: ' + e.message); }
         }
 
         async function step3Update() {
             const summary = document.getElementById('summary').value;
-            const reviewer = document.getElementById('reviewer').value || null;
+            if (!summary.trim()) { alert('请填写检查摘要'); return; }
+            const reviewer = document.getElementById('reviewer').value.trim() || null;
             try {
-                const data = await apiCall(`/sessions/${sessionId}/step3/summary?summary=${encodeURIComponent(summary)}${reviewer ? `&reviewer=${encodeURIComponent(reviewer)}` : ''}`, {
-                    method: 'POST'
-                });
-                alert(data.message);
+                const data = await apiCall(`/sessions/${sessionId}/step3/summary?summary=${encodeURIComponent(summary)}${reviewer ? `&reviewer=${encodeURIComponent(reviewer)}` : ''}`, { method: 'POST' });
+                alert(`✅ ${data.message}\n\n🔒 流程已锁定，可导出完整Excel给推荐负责人`);
                 await refreshSession();
-            } catch (e) {
-                alert('更新失败: ' + e.message);
-            }
+            } catch (e) { alert('❌ 更新失败: ' + e.message); }
         }
 
         function exportExcel() {

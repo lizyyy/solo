@@ -119,8 +119,8 @@ class TestRecordProcessing:
         params = CheckParameters()
         result = process_record_status(record, params)
         assert result.status == RecordStatus.FEATURE_MISSING_DEFAULT
-        assert "默认值填充" in result.notes
-        assert "参数版本" in result.notes
+        assert "默认分填充" in result.result_explanation
+        assert "参数版本" in result.result_explanation
 
     def test_normal_record_no_leakage(self):
         record = create_test_record(hours_before_end=48)
