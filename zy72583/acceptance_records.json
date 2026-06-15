@@ -1,0 +1,51 @@
+{
+  "REC-D034E8FF": {
+    "record_id": "REC-D034E8FF",
+    "status": "待评测运营复核",
+    "assignee": "评测运营",
+    "next_step": "评测运营复核分桶差异原因",
+    "missing_materials": [
+      "离线线上分桶不一致，需复核口径"
+    ],
+    "created_at": "2026-06-15T13:31:36.186853",
+    "updated_at": "2026-06-15T13:32:08.325020",
+    "slice": {
+      "slice_id": "SLICE-LINK-001",
+      "name": "链路验证切片-差1桶",
+      "offline_score": 0.72,
+      "online_score": 0.58,
+      "query_count": 8888,
+      "imported_at": "2026-06-15T13:31:36.186809",
+      "tags": [
+        "链路验证",
+        "高优"
+      ]
+    },
+    "feature_snapshot": {
+      "snapshot_id": "FEAT-SNAP-LINK-20240615",
+      "slice_id": "SLICE-LINK-001",
+      "feature_version": "v3.3.0",
+      "indexed_at": "2026-06-15T13:32:08.325000",
+      "vector_dim": 1024,
+      "index_type": "HNSW",
+      "remark": "链路验证用，老唐补录"
+    },
+    "comparisons": [
+      {
+        "comparison_id": "CMP-F4AF9FC3",
+        "slice_id": "SLICE-LINK-001",
+        "feature_snapshot_id": "FEAT-SNAP-LINK-20240615",
+        "baseline_offline_score": 0.6839999999999999,
+        "baseline_online_score": 0.5626,
+        "current_offline_score": 0.72,
+        "current_online_score": 0.58,
+        "offline_delta": 0.03600000000000003,
+        "online_delta": 0.01739999999999997,
+        "conclusion": "评测切片[链路验证切片-差1桶]离线分桶=0.6-0.8，线上分桶=0.4-0.6 | ⚠️ 离线线上分桶差1个桶，需评测运营复核口径是否一致 | 可能原因：1) 离线评估口径与线上不一致；2) 特征快照版本不匹配；3) 索引构建参数有差异 | 下一步：先找评测运营确认分桶差异原因 | 特征快照[FEAT-SNAP-LINK-20240615]版本=v3.3.0",
+        "generated_at": "2026-06-15T13:32:08.325086",
+        "updated_at": "2026-06-15T13:32:08.325087"
+      }
+    ],
+    "correction_logs": []
+  }
+}

@@ -2,6 +2,17 @@ import argparse
 import sys
 from .engine import AcceptanceEngine
 from .demo_data import load_demo_data
+from .storage import load_records, save_records, clear_storage
+
+
+def _create_engine() -> AcceptanceEngine:
+    engine = AcceptanceEngine()
+    engine.records = load_records()
+    return engine
+
+
+def _save_engine(engine: AcceptanceEngine):
+    save_records(engine.records)
 
 
 def cmd_import(args, engine: AcceptanceEngine):
@@ -13,6 +24,7 @@ def cmd_import(args, engine: AcceptanceEngine):
         query_count=args.count,
         tags=args.tags.split(",") if args.tags else [],
     )
+    _save_engine(engine)
     print(f"✅ 导入成功，记录编号: {record.record_id}")
     print(f"   当前状态: {record.status.value}")
     print(f"   下一步: {record.next_step}")
@@ -29,9 +41,14 @@ def cmd_fill_feature(args, engine: AcceptanceEngine):
         index_type=args.index_type,
         remark=args.remark,
     )
+    _save_engine(engine)
     print(f"✅ 特征快照补录完成")
+    print(f"   快照编号: {record.feature_snapshot.snapshot_id}")
     print(f"   当前状态: {record.status.value}")
+    print(f"   负责人: {record.assignee or '未分配'}")
     print(f"   下一步: {record.next_step}")
+    if record.slice.has_bucket_mismatch:
+        print(f"   ⚠️  离线分桶={record.slice.offline_bucket.value}, 线上分桶={record.slice.online_bucket.value}，差{record.slice.bucket_diff}个桶 → 留给评测运营复核")
 
 
 def cmd_report(args, engine: AcceptanceEngine):
@@ -42,7 +59,7 @@ def cmd_report(args, engine: AcceptanceEngine):
 def cmd_list(args, engine: AcceptanceEngine):
     records = engine.list_records()
     if not records:
-        print("暂无验收记录")
+        print("暂无验收记录（用 import 命令导入第一条）")
         return
     print(f"{'记录ID':<14} {'切片名称':<25} {'状态':<12} {'负责人':<12} {'分桶差异':<8}")
     print("-" * 75)
@@ -58,6 +75,7 @@ def cmd_review(args, engine: AcceptanceEngine):
         reviewer=args.reviewer,
         comment=args.comment,
     )
+    _save_engine(engine)
     status = "通过" if args.passed else "驳回"
     print(f"✅ 复核{status}")
     print(f"   当前状态: {record.status.value}")
@@ -66,9 +84,12 @@ def cmd_review(args, engine: AcceptanceEngine):
 
 def cmd_rerun(args, engine: AcceptanceEngine):
     record = engine.re_run(record_id=args.record_id, operator=args.operator)
+    _save_engine(engine)
     print(f"✅ 已重跑")
     print(f"   当前状态: {record.status.value}")
     print(f"   下一步: {record.next_step}")
+    if record.slice.has_bucket_mismatch:
+        print(f"   ⚠️  仍有分桶差异，留给评测运营复核")
 
 
 def cmd_correct(args, engine: AcceptanceEngine):
@@ -80,6 +101,7 @@ def cmd_correct(args, engine: AcceptanceEngine):
         after=args.after,
         reason=args.reason,
     )
+    _save_engine(engine)
     print(f"✅ 已记录人工修正")
     print(f"   当前状态: {record.status.value}")
 
@@ -87,6 +109,7 @@ def cmd_correct(args, engine: AcceptanceEngine):
 def cmd_demo(args, engine: AcceptanceEngine):
     print("🎬 加载演示数据...")
     demo_records = load_demo_data(engine)
+    _save_engine(engine)
     print(f"   已加载 {len(demo_records)} 条演示记录")
     print()
     print("📋 演示记录列表:")
@@ -94,6 +117,11 @@ def cmd_demo(args, engine: AcceptanceEngine):
     print()
     print("📄 查看分桶不一致的记录详情:")
     cmd_report(argparse.Namespace(record_id=demo_records["bucket_mismatch_record"].record_id), engine)
+
+
+def cmd_clear(args, engine: AcceptanceEngine):
+    clear_storage()
+    print("🧹 已清空所有验收记录")
 
 
 def main():
@@ -109,7 +137,7 @@ def main():
     p_import.add_argument("--tags", default="", help="标签，逗号分隔")
 
     p_fill = subparsers.add_parser("fill-feature", help="补录特征快照编号")
-    p_fill.add_argument("--record-id", required=True, help="验收记录ID")
+    p_fill.add_argument("--record-id", required=True, help="验收记录ID (import命令生成的REC-XXXX)")
     p_fill.add_argument("--snapshot-id", required=True, help="特征快照编号")
     p_fill.add_argument("--version", default="v1.0.0", help="特征版本")
     p_fill.add_argument("--dim", type=int, default=768, help="向量维度")
@@ -140,9 +168,10 @@ def main():
     p_correct.add_argument("--reason", required=True, help="修正原因")
 
     subparsers.add_parser("demo", help="加载并运行演示数据")
+    subparsers.add_parser("clear", help="清空所有验收记录")
 
     args = parser.parse_args()
-    engine = AcceptanceEngine()
+    engine = _create_engine()
 
     if args.command == "import":
         cmd_import(args, engine)
@@ -160,6 +189,8 @@ def main():
         cmd_correct(args, engine)
     elif args.command == "demo":
         cmd_demo(args, engine)
+    elif args.command == "clear":
+        cmd_clear(args, engine)
     else:
         parser.print_help()
 
