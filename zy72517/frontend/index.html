@@ -61,6 +61,7 @@
               </div>
             </div>
             <div class="batch-actions">
+              <button id="renameBatchBtn" class="btn btn-secondary">✏️ 重命名批次</button>
               <button id="recheckBtn" class="btn btn-secondary">🔄 补录后重算</button>
               <button id="exportBtn" class="btn btn-secondary">📥 导出明细</button>
               <button id="checkBtn" class="btn btn-primary">🔍 运行自检</button>
@@ -100,6 +101,14 @@
                 <div class="stat-value" id="statPending">0</div>
                 <div class="stat-label">待处理</div>
               </div>
+              <div class="stat-card stat-info">
+                <div class="stat-value" id="statInitial">0</div>
+                <div class="stat-label">首次导入</div>
+              </div>
+              <div class="stat-card stat-success">
+                <div class="stat-value" id="statIncremental">0</div>
+                <div class="stat-label">增量导入</div>
+              </div>
             </div>
             <div id="exportCheck" class="export-check"></div>
             <div id="issueList" class="issue-list"></div>
@@ -125,6 +134,7 @@
                 <tr>
                   <th width="40"><input type="checkbox" id="selectAll"></th>
                   <th width="80">原始行号</th>
+                  <th width="90">导入来源</th>
                   <th width="100">用户ID</th>
                   <th>问题文本</th>
                   <th width="120">当前状态</th>
@@ -163,12 +173,39 @@
           </div>
           <div class="form-group">
             <label>操作人</label>
-            <input type="text" id="operatorName" value="老唐">
+            <input type="text" id="operator" value="老唐">
           </div>
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" onclick="closeModal('createBatchModal')">取消</button>
-          <button class="btn btn-primary" id="confirmCreateBatch">确认导入</button>
+          <button class="btn btn-primary" id="confirmCreateBatchBtn">确认导入</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="renameBatchModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>重命名批次</h3>
+          <button class="modal-close" onclick="closeModal('renameBatchModal')">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>当前批次名称</label>
+            <input type="text" id="currentBatchName" disabled>
+          </div>
+          <div class="form-group">
+            <label>新批次名称</label>
+            <input type="text" id="newBatchNameInput" placeholder="请输入新的批次名称">
+          </div>
+          <div class="form-group">
+            <label>操作人</label>
+            <input type="text" id="renameOperatorName" value="老唐">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeModal('renameBatchModal')">取消</button>
+          <button class="btn btn-primary" id="confirmRenameBtn">确认重命名</button>
         </div>
       </div>
     </div>
@@ -179,13 +216,17 @@
           <h3>记录详情 - 证据回放</h3>
           <button class="modal-close" onclick="closeModal('recordDetailModal')">×</button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body" id="recordDetailBody">
           <div class="detail-grid">
             <div class="detail-section">
               <h4>原始数据</h4>
               <div class="detail-item">
                 <label>原始行号：</label>
                 <span id="detailLineNumber"></span>
+              </div>
+              <div class="detail-item">
+                <label>导入来源：</label>
+                <span id="detailImportSource"></span>
               </div>
               <div class="detail-item">
                 <label>用户ID：</label>
@@ -251,19 +292,19 @@
       </div>
     </div>
 
-    <div id="mergeModal" class="modal" style="display: none;">
+    <div id="mergeTargetModal" class="modal" style="display: none;">
       <div class="modal-content">
         <div class="modal-header">
           <h3>选择归并目标主记录</h3>
-          <button class="modal-close" onclick="closeModal('mergeModal')">×</button>
+          <button class="modal-close" onclick="closeModal('mergeTargetModal')">×</button>
         </div>
         <div class="modal-body">
           <p class="merge-tip">选择一条作为主记录，其他选中记录将归并到该记录下：</p>
           <div id="mergeTargetList" class="merge-target-list"></div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="closeModal('mergeModal')">取消</button>
-          <button class="btn btn-primary" id="confirmMergeBtn">确认归并</button>
+          <button class="btn btn-secondary" onclick="closeModal('mergeTargetModal')">取消</button>
+          <button class="btn btn-primary" id="confirmMerge">确认归并</button>
         </div>
       </div>
     </div>

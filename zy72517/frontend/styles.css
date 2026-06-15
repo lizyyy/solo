@@ -276,7 +276,22 @@ body {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 12px;
+  margin-bottom: 12px;
+}
+
+.stats-import-group {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
   margin-bottom: 16px;
+}
+
+.stats-group-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 8px;
+  grid-column: 1 / -1;
 }
 
 .stat-card {
@@ -309,6 +324,10 @@ body {
 
 .stat-danger .stat-value {
   color: #ff4d4f;
+}
+
+.stat-success .stat-value {
+  color: #52c41a;
 }
 
 .export-check {
