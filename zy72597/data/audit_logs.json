@@ -1,0 +1,38 @@
+[
+  {
+    "record_id": "f0b11d0e-3da1-4293-a714-2b1e72006da6",
+    "action": "import_snapshot",
+    "actor": "数据平台",
+    "log_id": "437d3ecd-d457-48c0-8892-15b173337f53",
+    "timestamp": "2026-06-15T14:02:59.738556",
+    "old_status": "pending",
+    "new_status": "imported",
+    "details": {
+      "original_line_number": 56,
+      "main_flow": "用户注册→特征计算→模型A→风控决策"
+    }
+  },
+  {
+    "record_id": "f0b11d0e-3da1-4293-a714-2b1e72006da6",
+    "action": "review_training_logs",
+    "actor": "林姐",
+    "log_id": "4080880d-8420-46e3-ad22-50e9c0eeb4ef",
+    "timestamp": "2026-06-15T14:03:16.155110",
+    "old_status": "imported",
+    "new_status": "logs_reviewed",
+    "details": {
+      "log_id": "c6007f4d-125a-4775-a434-e97c5e0244d9",
+      "reviewer_notes": "训练过程正常，特征分布一致"
+    }
+  },
+  {
+    "record_id": "f0b11d0e-3da1-4293-a714-2b1e72006da6",
+    "action": "update_tier_metrics",
+    "actor": "林姐",
+    "log_id": "6155d7cc-daab-4dde-91b2-f3ba2c29449f",
+    "timestamp": "2026-06-15T14:03:16.211335",
+    "old_status": "logs_reviewed",
+    "new_status": "metrics_updated",
+    "details": {}
+  }
+]

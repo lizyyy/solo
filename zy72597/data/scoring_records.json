@@ -1,0 +1,77 @@
+[
+  {
+    "record_id": "f0b11d0e-3da1-4293-a714-2b1e72006da6",
+    "snapshot_id": "SNAP-FLOW-001",
+    "online_score": 0.91,
+    "offline_score": 0.88,
+    "difference": 0.030000000000000027,
+    "percent_diff": 3.4090909090909123,
+    "current_status": "metrics_updated",
+    "feature_snapshot": {
+      "snapshot_id": "SNAP-FLOW-001",
+      "original_line_number": 56,
+      "main_flow": "用户注册→特征计算→模型A→风控决策",
+      "raw_data": {},
+      "import_timestamp": "2026-06-15T14:02:59.738229",
+      "source_file": null,
+      "sheet_name": null
+    },
+    "training_logs": [
+      {
+        "log_id": "c6007f4d-125a-4775-a434-e97c5e0244d9",
+        "snapshot_id": "SNAP-FLOW-001",
+        "on_site_statement": "训练曲线收敛，AUC稳定在0.88左右，无异常波动，现场说法确认一致",
+        "curve_data": {
+          "epoch": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "train_auc": [
+            0.71,
+            0.77,
+            0.82,
+            0.86,
+            0.88
+          ],
+          "val_auc": [
+            0.69,
+            0.75,
+            0.8,
+            0.84,
+            0.87
+          ]
+        },
+        "review_timestamp": "2026-06-15T14:03:16.155097",
+        "reviewed_by": "林姐",
+        "reviewer_notes": "训练过程正常，特征分布一致"
+      }
+    ],
+    "threshold_changes": [],
+    "manual_changes": [],
+    "tier_metrics": {
+      "overall": {
+        "precision": 0.9,
+        "recall": 0.79,
+        "f1": 0.84
+      },
+      "tier_high_value": {
+        "precision": 0.93,
+        "recall": 0.73,
+        "f1": 0.82
+      },
+      "tier_new_user": {
+        "precision": 0.87,
+        "recall": 0.83,
+        "f1": 0.85
+      }
+    },
+    "tier_metrics_updated_by": "林姐",
+    "tier_metrics_updated_at": "2026-06-15T14:03:16.211292",
+    "data_scientist_notes": null,
+    "created_at": "2026-06-15T14:02:59.738272",
+    "updated_at": "2026-06-15T14:03:16.211300"
+  }
+]

@@ -1,43 +1,15 @@
+Metadata-Version: 2.4
+Name: online-offline-diff
+Version: 1.0.0
+Summary: 线上离线打分差异分析工具 - 支持复盘记录和可重跑命令
+Author: 数据科学团队
+License: MIT
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+
 # 线上离线打分差异分析工具
-
-## 快速开始
-
-### 1. 安装（项目根目录执行一次即可）
-```bash
-pip3 install -e .
-```
-
-### 2. 查看边界规则
-```bash
-python3 -m online_offline_diff boundary-rules
-```
-
-### 3. 完整三步流程
-```bash
-# 步骤1: 导入特征快照
-python3 -m online_offline_diff import \
-  --snapshot-id SNAP-001 \
-  --line-number 42 \
-  --main-flow "用户注册→风控A→决策B" \
-  --online-score 0.85 \
-  --offline-score 0.82
-
-# 记录输出的 record_id，步骤2和3要用到
-
-# 步骤2: 林姐补看训练日志曲线
-python3 -m online_offline_diff review-logs \
-  --record-id <上一步输出的record_id> \
-  --on-site-statement "现场确认曲线符合预期" \
-  --reviewed-by "林姐"
-
-# 步骤3: 分层指标更新
-python3 -m online_offline_diff update-metrics \
-  --record-id <上一步输出的record_id> \
-  --tier-metrics '{"precision@top100": 0.92}' \
-  --updated-by "林姐"
-```
-
----
 
 ## 概述
 
@@ -129,16 +101,14 @@ python3 -m online_offline_diff update-metrics \
 
 ## 命令行使用
 
-> 所有命令均在项目根目录直接执行，不需额外修改环境路径。首次使用前请执行 `pip3 install -e .`。
-
 ### 查看边界规则
 ```bash
-python3 -m online_offline_diff boundary-rules
+python -m online_offline_diff boundary-rules
 ```
 
 ### 步骤1: 导入特征快照
 ```bash
-python3 -m online_offline_diff import \
+python -m online_offline_diff import \
   --snapshot-id SNAP-001 \
   --line-number 42 \
   --main-flow "用户注册→风控A→决策B" \
@@ -150,7 +120,7 @@ python3 -m online_offline_diff import \
 
 ### 步骤2: 审核训练日志
 ```bash
-python3 -m online_offline_diff review-logs \
+python -m online_offline_diff review-logs \
   --record-id <记录ID> \
   --on-site-statement "现场确认曲线符合预期" \
   --curve-data '{"auc": [0.8, 0.82, 0.85], "loss": [0.3, 0.25, 0.2]}' \
@@ -160,7 +130,7 @@ python3 -m online_offline_diff review-logs \
 
 ### 步骤3: 更新分层指标
 ```bash
-python3 -m online_offline_diff update-metrics \
+python -m online_offline_diff update-metrics \
   --record-id <记录ID> \
   --tier-metrics '{"precision@top100": 0.92, "recall@top100": 0.45}' \
   --updated-by "林姐"
@@ -168,7 +138,7 @@ python3 -m online_offline_diff update-metrics \
 
 ### 记录阈值变更（报告仍显示旧值）
 ```bash
-python3 -m online_offline_diff add-threshold-change \
+python -m online_offline_diff add-threshold-change \
   --record-id <记录ID> \
   --field-name "score_threshold" \
   --old-value 0.8 \
@@ -180,7 +150,7 @@ python3 -m online_offline_diff add-threshold-change \
 
 ### 数据科学家确认
 ```bash
-python3 -m online_offline_diff confirm \
+python -m online_offline_diff confirm \
   --record-id <记录ID> \
   --status normal \
   --confirmed-by "林姐" \
@@ -189,23 +159,23 @@ python3 -m online_offline_diff confirm \
 
 ### 查看记录列表
 ```bash
-python3 -m online_offline_diff list
-python3 -m online_offline_diff list --status threshold_mismatch
+python -m online_offline_diff list
+python -m online_offline_diff list --status threshold_mismatch
 ```
 
 ### 查看记录详情和审计日志
 ```bash
-python3 -m online_offline_diff show --record-id <记录ID>
+python -m online_offline_diff show --record-id <记录ID>
 ```
 
 ### 导出明细
 ```bash
-python3 -m online_offline_diff export --output ./export/2024-01-01.json
+python -m online_offline_diff export --output ./export/2024-01-01.json
 ```
 
 ### 回滚状态
 ```bash
-python3 -m online_offline_diff rollback \
+python -m online_offline_diff rollback \
   --record-id <记录ID> \
   --target-status imported \
   --rolled-back-by "林姐" \
@@ -214,7 +184,7 @@ python3 -m online_offline_diff rollback \
 
 ### 查看汇总统计
 ```bash
-python3 -m online_offline_diff summary
+python -m online_offline_diff summary
 ```
 
 ## 数据结构
@@ -229,7 +199,7 @@ python3 -m online_offline_diff summary
 ### 复盘
 使用 `show` 命令查看完整的记录详情和审计日志，可追溯每一步操作：
 ```bash
-python3 -m online_offline_diff show --record-id <记录ID>
+python -m online_offline_diff show --record-id <记录ID>
 ```
 
 ### 重跑

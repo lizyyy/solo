@@ -31,7 +31,8 @@ def cmd_import(args):
         imported_by=args.imported_by,
     )
     print(f"导入成功: record_id={record.record_id}, status={record.current_status.value}")
-    print(f"可重新执行命令: python -m online_offline_diff import --snapshot-id {args.snapshot_id} --line-number {args.line_number} --main-flow '{args.main_flow}' --online-score {args.online_score} --offline-score {args.offline_score}")
+    print(f"记录步骤2和3需要使用: --record-id {record.record_id}")
+    print(f"可重新执行命令: python3 -m online_offline_diff import --snapshot-id {args.snapshot_id} --line-number {args.line_number} --main-flow '{args.main_flow}' --online-score {args.online_score} --offline-score {args.offline_score}")
 
 
 def cmd_review_logs(args):
