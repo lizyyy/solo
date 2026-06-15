@@ -233,6 +233,7 @@ class SynonymGovernor:
                     after=rec.model_dump(), batch_id=batch_id
                 )
 
+        report.overridden_keywords = overridden_records
         report.remarks = UserMessages.BATCH_RUN_COMPLETE.format(
             total=report.total_records,
             new=report.new_records,
@@ -255,6 +256,9 @@ class SynonymGovernor:
 
         manual_count = 0
         overridden = 0
+        overridden_keys = []
+        supplemented = 0
+        supplemented_keys = []
         conflicts = []
 
         for rec in self.records.values():
@@ -263,12 +267,19 @@ class SynonymGovernor:
                 manual_count += 1
             if rec.is_overridden:
                 overridden += 1
+                overridden_keys.append(rec.keyword)
+            if rec.status == RecordStatus.SUPPLEMENTED:
+                supplemented += 1
+                supplemented_keys.append(rec.keyword)
             conflict = self._check_conflict(rec)
             if conflict:
                 conflicts.append(conflict)
 
         report.manual_modified_count = manual_count
         report.overridden_count = overridden
+        report.overridden_keywords = overridden_keys
+        report.supplemented_count = supplemented
+        report.supplemented_keywords = supplemented_keys
         report.conflict_count = len(conflicts)
         report.conflict_items = conflicts
 
@@ -284,17 +295,62 @@ class SynonymGovernor:
         issues = []
         batch_id = report.batch_run_id
 
-        batch_history = [h for h in self.history if h.batch_run_id == batch_id]
-        hist_overridden = sum(1 for h in batch_history if h.remarks and "覆盖" in h.remarks)
-        hist_conflicts = sum(1 for h in batch_history if h.after_value and h.after_value.get("status") == "conflict")
+        is_batch_report = report.new_records > 0 or report.updated_records > 0
+        if is_batch_report:
+            history_scope = [h for h in self.history if h.batch_run_id == batch_id]
+            scope_desc = f"批次{batch_id}"
+        else:
+            history_scope = self.history
+            scope_desc = "全量"
+
+        hist_overridden = sum(1 for h in history_scope if h.remarks and "覆盖" in h.remarks)
+        hist_overridden_keys = list(set([
+            h.after_value["keyword"] for h in history_scope
+            if h.remarks and "覆盖" in h.remarks and h.after_value
+        ]))
+        hist_new = sum(1 for h in history_scope if h.operation_type == OperationType.IMPORT)
+        hist_updated = sum(1 for h in history_scope if h.operation_type == OperationType.BATCH_RUN and not (h.remarks and "覆盖" in h.remarks))
+        hist_supplemented = sum(1 for h in history_scope if h.operation_type == OperationType.SUPPLEMENT)
+        hist_supplemented_keys = list(set([
+            h.after_value["keyword"] for h in history_scope
+            if h.operation_type == OperationType.SUPPLEMENT and h.after_value
+        ]))
+
+        current_conflicts = sum(1 for rec in self.records.values() if rec.status == RecordStatus.CONFLICT)
+        current_overridden = sum(1 for rec in self.records.values() if rec.is_overridden)
+        current_overridden_keys = [rec.keyword for rec in self.records.values() if rec.is_overridden]
+        current_supplemented = sum(1 for rec in self.records.values() if rec.status == RecordStatus.SUPPLEMENTED)
+        current_supplemented_keys = [rec.keyword for rec in self.records.values() if rec.status == RecordStatus.SUPPLEMENTED]
+
+        if is_batch_report:
+            if hist_new != report.new_records:
+                issues.append(UserMessages.HISTORY_MISMATCH.format(
+                    batch_id=batch_id, field=f"new_records(报告{report.new_records} vs {scope_desc}历史{hist_new})"
+                ))
+            if hist_updated != report.updated_records:
+                issues.append(UserMessages.HISTORY_MISMATCH.format(
+                    batch_id=batch_id, field=f"updated_records(报告{report.updated_records} vs {scope_desc}历史{hist_updated})"
+                ))
 
         if hist_overridden != report.overridden_count:
             issues.append(UserMessages.HISTORY_MISMATCH.format(
-                batch_id=batch_id, field="overridden_count"
+                batch_id=batch_id, field=f"overridden_count(报告{report.overridden_count} vs {scope_desc}历史{hist_overridden}, 当前实际{current_overridden})"
             ))
-        if hist_conflicts != report.conflict_count:
+        if set(hist_overridden_keys) != set(report.overridden_keywords):
             issues.append(UserMessages.HISTORY_MISMATCH.format(
-                batch_id=batch_id, field="conflict_count"
+                batch_id=batch_id, field=f"overridden_keywords(报告{report.overridden_keywords} vs {scope_desc}历史{hist_overridden_keys}, 当前实际{current_overridden_keys})"
+            ))
+        if current_conflicts != report.conflict_count:
+            issues.append(UserMessages.HISTORY_MISMATCH.format(
+                batch_id=batch_id, field=f"conflict_count(报告{report.conflict_count} vs 当前实际{current_conflicts})"
+            ))
+        if current_supplemented != report.supplemented_count:
+            issues.append(UserMessages.HISTORY_MISMATCH.format(
+                batch_id=batch_id, field=f"supplemented_count(报告{report.supplemented_count} vs {scope_desc}历史{hist_supplemented}, 当前实际{current_supplemented})"
+            ))
+        if set(current_supplemented_keys) != set(report.supplemented_keywords):
+            issues.append(UserMessages.HISTORY_MISMATCH.format(
+                batch_id=batch_id, field=f"supplemented_keywords(报告{report.supplemented_keywords} vs {scope_desc}历史{hist_supplemented_keys}, 当前实际{current_supplemented_keys})"
             ))
 
         return len(issues) == 0, issues

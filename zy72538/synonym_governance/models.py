@@ -72,10 +72,12 @@ class EvaluationReport(BaseModel):
     updated_records: int = 0
     manual_modified_count: int = 0
     overridden_count: int = 0
+    overridden_keywords: List[str] = Field(default_factory=list)
     conflict_count: int = 0
     conflict_items: List[ConflictItem] = Field(default_factory=list)
     duplicate_count: int = 0
     supplemented_count: int = 0
+    supplemented_keywords: List[str] = Field(default_factory=list)
     remarks: Optional[str] = None
 
 
