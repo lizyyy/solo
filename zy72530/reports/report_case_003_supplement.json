@@ -1,6 +1,6 @@
 {
-  "report_id": "REPORT_BATCH_003_20260605_20260607124033",
-  "generated_at": "2026-06-07T12:40:33.697705",
+  "report_id": "REPORT_BATCH_003_20260605_20260615084607",
+  "generated_at": "2026-06-15T08:46:07.686105",
   "batch_id": "BATCH_003_20260605",
   "model_version": "v2.0.5",
   "batch_status": "supplemented",
@@ -12,8 +12,11 @@
     "total_abs_score_diff": 0,
     "has_overwrites": false,
     "has_supplements": true,
-    "needs_safety_review": false
+    "needs_safety_review": false,
+    "overwrites_original_batch": null,
+    "records_with_overwritten_manual_judgment": 0
   },
+  "overwrite_context": null,
   "records": [
     {
       "record_id": "REC_003_001",
@@ -21,6 +24,7 @@
       "model_score": 60,
       "model_judgment": "错误",
       "has_manual_judgment": true,
+      "has_overwritten_manual_judgment": false,
       "manual_score": 60,
       "manual_judgment": "错误",
       "agree_with_model": true,
@@ -32,7 +36,7 @@
   ],
   "history_snapshot": [
     {
-      "timestamp": "2026-06-07T12:40:33.697516",
+      "timestamp": "2026-06-15T08:46:07.685470",
       "action": "IMPORT_MODEL_OUTPUT",
       "details": {
         "batch_id": "BATCH_003_20260605",
@@ -41,7 +45,7 @@
       }
     },
     {
-      "timestamp": "2026-06-07T12:40:33.697686",
+      "timestamp": "2026-06-15T08:46:07.686066",
       "action": "APPLY_SUPPLEMENT",
       "details": {
         "batch_id": "BATCH_003_20260605",

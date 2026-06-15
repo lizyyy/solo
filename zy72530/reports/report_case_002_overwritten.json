@@ -1,6 +1,6 @@
 {
-  "report_id": "REPORT_BATCH_002_20260607_V2_20260607124033",
-  "generated_at": "2026-06-07T12:40:33.697036",
+  "report_id": "REPORT_BATCH_002_20260607_V2_20260615084607",
+  "generated_at": "2026-06-15T08:46:07.682823",
   "batch_id": "BATCH_002_20260607_V2",
   "model_version": "v2.2.0",
   "batch_status": "pending_safety_review",
@@ -12,7 +12,16 @@
     "total_abs_score_diff": 0,
     "has_overwrites": false,
     "has_supplements": false,
-    "needs_safety_review": true
+    "needs_safety_review": true,
+    "overwrites_original_batch": "BATCH_002_20260607_V1",
+    "records_with_overwritten_manual_judgment": 1
+  },
+  "overwrite_context": {
+    "overwrites_original_batch": "BATCH_002_20260607_V1",
+    "overwrite_details": [],
+    "safety_conflicts_count": 1,
+    "original_status_before_overwrite": "has_manual_modifications",
+    "original_manual_judgments_count": 1
   },
   "records": [
     {
@@ -20,12 +29,21 @@
       "question_id": "CHN_2026_045",
       "model_score": 80,
       "model_judgment": "良好",
-      "has_manual_judgment": false
+      "has_manual_judgment": false,
+      "has_overwritten_manual_judgment": true,
+      "overwritten_manual_judgment": {
+        "manual_score": 90,
+        "manual_judgment": "优秀",
+        "agree_with_model_before": false,
+        "judgment_status_before": "modified",
+        "manual_comment_before": "学生概括简洁到位，原文确实只要求概括中心思想，不需要过度展开。模型打分偏低，已修正。"
+      },
+      "overwritten_score_diff": 10
     }
   ],
   "history_snapshot": [
     {
-      "timestamp": "2026-06-07T12:40:33.696735",
+      "timestamp": "2026-06-15T08:46:07.682351",
       "action": "IMPORT_MODEL_OUTPUT",
       "details": {
         "batch_id": "BATCH_002_20260607_V1",
@@ -34,7 +52,7 @@
       }
     },
     {
-      "timestamp": "2026-06-07T12:40:33.696882",
+      "timestamp": "2026-06-15T08:46:07.682548",
       "action": "APPLY_MANUAL_JUDGMENT",
       "details": {
         "batch_id": "BATCH_002_20260607_V1",
@@ -44,7 +62,7 @@
       }
     },
     {
-      "timestamp": "2026-06-07T12:40:33.697020",
+      "timestamp": "2026-06-15T08:46:07.682805",
       "action": "BATCH_OVERWRITE_DETECTED",
       "details": {
         "original_batch_id": "BATCH_002_20260607_V1",

@@ -180,17 +180,36 @@ class ReviewEngine:
         modified_count = 0
         confirmed_count = 0
         
+        safety_conflicts = state.get("safety_conflicts", [])
+        safety_conflicts_map = {}
+        for c in safety_conflicts:
+            safety_conflicts_map[c["record_id"]] = c
+        
         for record in model_output.get("records", []):
             rec_id = record["record_id"]
             judgment = manual_judgments.get(rec_id)
+            conflict = safety_conflicts_map.get(rec_id)
             
             rec_report = {
                 "record_id": rec_id,
                 "question_id": record["question_id"],
                 "model_score": record["model_score"],
                 "model_judgment": record["model_judgment"],
-                "has_manual_judgment": judgment is not None
+                "has_manual_judgment": judgment is not None,
+                "has_overwritten_manual_judgment": conflict is not None
             }
+            
+            if conflict:
+                ov = conflict["original_manual_judgment"]
+                rec_report["overwritten_manual_judgment"] = {
+                    "manual_score": ov["manual_score"],
+                    "manual_judgment": ov["manual_judgment"],
+                    "agree_with_model_before": ov["agree_with_model"],
+                    "judgment_status_before": ov["status"],
+                    "manual_comment_before": ov.get("manual_comment", "")
+                }
+                new_model = conflict.get("new_model_output") or record
+                rec_report["overwritten_score_diff"] = ov["manual_score"] - new_model["model_score"]
             
             if judgment:
                 rec_report.update({
@@ -213,6 +232,20 @@ class ReviewEngine:
             
             records_report.append(rec_report)
         
+        overwrite_context = None
+        original_batch_id = state.get("overwrites_original")
+        if original_batch_id:
+            overwrite_context = {
+                "overwrites_original_batch": original_batch_id,
+                "overwrite_details": state.get("overwrites", []),
+                "safety_conflicts_count": len(safety_conflicts),
+                "original_status_before_overwrite": None
+            }
+            if original_batch_id in self.current_state:
+                orig = self.current_state[original_batch_id]
+                overwrite_context["original_status_before_overwrite"] = orig.get("status")
+                overwrite_context["original_manual_judgments_count"] = len(orig.get("manual_judgments", {}))
+        
         report = {
             "report_id": f"REPORT_{batch_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}",
             "generated_at": datetime.now().isoformat(),
@@ -227,8 +260,11 @@ class ReviewEngine:
                 "total_abs_score_diff": total_score_diff,
                 "has_overwrites": len(state.get("overwrites", [])) > 0,
                 "has_supplements": len(state.get("supplements", [])) > 0,
-                "needs_safety_review": state.get("status") == "pending_safety_review"
+                "needs_safety_review": state.get("status") == "pending_safety_review",
+                "overwrites_original_batch": state.get("overwrites_original"),
+                "records_with_overwritten_manual_judgment": len(safety_conflicts_map)
             },
+            "overwrite_context": overwrite_context,
             "records": records_report,
             "history_snapshot": self.history.copy()
         }
@@ -257,3 +293,92 @@ class ReviewEngine:
 
     def get_state(self) -> Dict[str, Any]:
         return self.current_state
+
+    @staticmethod
+    def check_alignment(report_file: str, history_file: str) -> Dict[str, Any]:
+        report_path = REPORTS_DIR / report_file
+        history_path = HISTORY_DIR / history_file
+        
+        if not report_path.exists():
+            return {"pass": False, "error": f"报告文件不存在: {report_file}"}
+        if not history_path.exists():
+            return {"pass": False, "error": f"历史文件不存在: {history_file}"}
+        
+        with open(report_path, 'r', encoding='utf-8') as f:
+            report = json.load(f)
+        with open(history_path, 'r', encoding='utf-8') as f:
+            history_data = json.load(f)
+        
+        results = {
+            "pass": True,
+            "checks": [],
+            "details": {}
+        }
+        
+        history_actions = history_data.get("actions", [])
+        report_history = report.get("history_snapshot", [])
+        
+        check_name = "步骤1: 模型输出片段第一次导入"
+        import_in_report = any(a["action"] == "IMPORT_MODEL_OUTPUT" for a in report_history)
+        import_in_history = any(a["action"] == "IMPORT_MODEL_OUTPUT" for a in history_actions)
+        passed = import_in_report and import_in_history
+        results["checks"].append({"name": check_name, "pass": passed, "detail": f"报告中有:{import_in_report} 历史中有:{import_in_history}"})
+        if not passed: results["pass"] = False
+        
+        check_name = "步骤2: 小孟补看人工改判表"
+        judge_in_report = any(a["action"] in ("APPLY_MANUAL_JUDGMENT", "APPLY_SUPPLEMENT") for a in report_history)
+        judge_in_history = any(a["action"] in ("APPLY_MANUAL_JUDGMENT", "APPLY_SUPPLEMENT") for a in history_actions)
+        passed = judge_in_report and judge_in_history
+        results["checks"].append({"name": check_name, "pass": passed, "detail": f"报告中有(含补录):{judge_in_report} 历史中有(含补录):{judge_in_history}"})
+        if not passed: results["pass"] = False
+        
+        check_name = "步骤3: 评测报告更新"
+        gen_in_history = any(a["action"] == "GENERATE_REPORT" for a in history_actions)
+        report_has_snapshot = len(report_history) > 0
+        passed = gen_in_history and report_has_snapshot
+        results["checks"].append({"name": check_name, "pass": passed, "detail": f"独立历史有GENERATE_REPORT:{gen_in_history} 报告内嵌history_snapshot有记录:{report_has_snapshot}(注：快照在生成报告前拍摄，不含GENERATE_REPORT自身)"})
+        if not passed: results["pass"] = False
+        
+        overwrite_in_history = any(a["action"] == "BATCH_OVERWRITE_DETECTED" for a in history_actions)
+        overwrite_in_report_ctx = report.get("overwrite_context") is not None
+        summary_overwrite = report.get("summary", {}).get("overwrites_original_batch") is not None
+        needs_safety = report.get("summary", {}).get("needs_safety_review", False)
+        
+        if overwrite_in_history:
+            check_name = "覆盖场景: 覆盖检测在报告与历史一致"
+            passed = overwrite_in_report_ctx and summary_overwrite
+            results["checks"].append({"name": check_name, "pass": passed, "detail": f"历史有覆盖记录:{overwrite_in_history} 报告有overwrite_context:{overwrite_in_report_ctx} summary.overwrites_original_batch:{summary_overwrite}"})
+            if not passed: results["pass"] = False
+            
+            check_name = "覆盖场景: 被覆盖的人工改判痕迹在报告中可见"
+            overwritten_in_records = any(
+                r.get("has_overwritten_manual_judgment") for r in report.get("records", [])
+            )
+            passed = overwritten_in_records
+            results["checks"].append({"name": check_name, "pass": passed, "detail": f"记录中带overwritten痕迹:{overwritten_in_records}"})
+            if not passed: results["pass"] = False
+            
+            check_name = "覆盖场景: 状态=待安全审核（不归正常）"
+            passed = needs_safety and report.get("batch_status") == "pending_safety_review"
+            results["checks"].append({"name": check_name, "pass": passed, "detail": f"summary.needs_safety_review:{needs_safety} batch_status:{report.get('batch_status')}"})
+            if not passed: results["pass"] = False
+        
+        supplement_in_history = any(a["action"] == "APPLY_SUPPLEMENT" for a in history_actions)
+        if supplement_in_history:
+            check_name = "补录场景: 补录标记在报告中可见"
+            supplement_record = any(r.get("is_supplement") for r in report.get("records", []))
+            has_supp = report.get("summary", {}).get("has_supplements", False)
+            passed = supplement_record and has_supp
+            results["checks"].append({"name": check_name, "pass": passed, "detail": f"记录中带supplement:{supplement_record} summary.has_supplements:{has_supp}"})
+            if not passed: results["pass"] = False
+        
+        results["details"] = {
+            "report_id": report.get("report_id"),
+            "history_scenario": history_data.get("scenario"),
+            "action_count_report": len(report_history),
+            "action_count_history": len(history_actions),
+            "history_actions": [a["action"] for a in history_actions],
+            "report_actions_in_snapshot": [a["action"] for a in report_history]
+        }
+        
+        return results
