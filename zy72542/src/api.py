@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -6,7 +7,7 @@ from sqlmodel import Session, select
 from typing import List, Optional
 from pydantic import BaseModel
 
-from .database import create_db_and_tables, get_session
+from .database import create_db_and_tables, get_session, engine
 from .models import QARecord, OperationLog, CheckResult
 from .checker import (
     import_qa_records,
@@ -18,9 +19,11 @@ from .checker import (
 
 app = FastAPI(title="法律问答免责声明检查")
 
+_templates_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
 try:
-    templates = Jinja2Templates(directory="src/templates")
-except:
+    templates = Jinja2Templates(directory=_templates_dir)
+except Exception as e:
+    print(f"模板加载失败: {e}, 路径: {_templates_dir}")
     templates = None
 
 

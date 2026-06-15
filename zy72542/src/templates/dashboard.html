@@ -3,27 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>法律问答免责声明检查 - 小看板</title>
+    <title>法律问答免责声明检查 - 冲突样本小看板</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px 32px; }
-        .header h1 { font-size: 24px; margin-bottom: 8px; }
-        .header p { opacity: 0.9; font-size: 14px; }
-        .container { max-width: 1400px; margin: 24px auto; padding: 0 24px; }
-        .stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-bottom: 24px; }
-        .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .stat-card .label { font-size: 13px; color: #666; margin-bottom: 8px; }
-        .stat-card .value { font-size: 28px; font-weight: 600; }
-        .stat-card.total .value { color: #333; }
-        .stat-card.pending .value { color: #f59e0b; }
-        .stat-card.passed .value { color: #10b981; }
-        .stat-card.failed .value { color: #ef4444; }
-        .stat-card.conflict .value { color: #f97316; }
-        .stat-card.manual_fixed .value { color: #8b5cf6; }
-        .section { background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; color: #1f2937; }
+        .header { background: linear-gradient(135deg, #1e40af 0%, #8b5cf6 100%); color: white; padding: 28px 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+        .header p { opacity: 0.92; font-size: 14px; line-height: 1.6; }
+        .container { max-width: 1600px; margin: 28px auto; padding: 0 28px; }
+
+        .process-timeline { background: white; border-radius: 14px; padding: 24px 28px; margin-bottom: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-left: 5px solid #6366f1; }
+        .process-timeline h3 { font-size: 15px; font-weight: 600; margin-bottom: 14px; color: #4338ca; display: flex; align-items: center; gap: 8px; }
+        .steps { display: flex; gap: 0; align-items: stretch; }
+        .step { flex: 1; padding: 14px 16px; background: #f5f3ff; border-radius: 8px; position: relative; }
+        .step + .step::before { content: '→'; position: absolute; left: -18px; top: 50%; transform: translateY(-50%); color: #a5b4fc; font-size: 18px; font-weight: 700; }
+        .step-num { display: inline-block; width: 24px; height: 24px; background: #6366f1; color: white; border-radius: 50%; text-align: center; line-height: 24px; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        .step-title { font-size: 13px; font-weight: 600; color: #4338ca; margin-bottom: 3px; }
+        .step-desc { font-size: 12px; color: #6b7280; line-height: 1.5; }
+
+        .stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-bottom: 24px; }
+        .stat-card { background: white; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-top: 3px solid transparent; transition: transform 0.15s; }
+        .stat-card:hover { transform: translateY(-2px); }
+        .stat-card .label { font-size: 13px; color: #6b7280; margin-bottom: 8px; font-weight: 500; }
+        .stat-card .value { font-size: 30px; font-weight: 700; letter-spacing: -0.5px; }
+        .stat-card.total { border-top-color: #64748b; } .stat-card.total .value { color: #1e293b; }
+        .stat-card.pending { border-top-color: #f59e0b; } .stat-card.pending .value { color: #b45309; }
+        .stat-card.passed { border-top-color: #10b981; } .stat-card.passed .value { color: #047857; }
+        .stat-card.failed { border-top-color: #ef4444; } .stat-card.failed .value { color: #b91c1c; }
+        .stat-card.conflict { border-top-color: #f97316; } .stat-card.conflict .value { color: #c2410c; }
+        .stat-card.manual_fixed { border-top-color: #8b5cf6; } .stat-card.manual_fixed .value { color: #6d28d9; }
+
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
         .badge-pending { background: #fef3c7; color: #92400e; }
         .badge-passed { background: #d1fae5; color: #065f46; }
         .badge-failed { background: #fee2e2; color: #991b1b; }
@@ -32,214 +42,388 @@
         .badge-pm { background: #dbeafe; color: #1e40af; }
         .badge-editor { background: #dcfce7; color: #166534; }
         .badge-complete { background: #f3f4f6; color: #374151; }
+        .badge-desens { background: #fae8ff; color: #86198f; }
+        .badge-url-ok { background: #dcfce7; color: #166534; }
+        .badge-url-fail { background: #fee2e2; color: #991b1b; }
+
+        .section { background: white; border-radius: 14px; padding: 24px 28px; margin-bottom: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid #f1f5f9; }
+        .section-title { font-size: 17px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 10px; }
+        .section-title .subtitle { font-size: 12px; color: #94a3b8; font-weight: 400; }
+        .section-actions { display: flex; gap: 8px; }
+
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
-        th { background: #f9fafb; font-weight: 600; color: #555; }
-        tr:hover { background: #f9fafb; }
-        .btn { padding: 6px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
-        .btn-primary { background: #667eea; color: white; }
-        .btn-primary:hover { background: #5a67d8; }
-        .btn-warning { background: #f59e0b; color: white; }
-        .btn-warning:hover { background: #d97706; }
-        .btn-success { background: #10b981; color: white; }
-        .btn-success:hover { background: #059669; }
-        .btn-sm { padding: 4px 10px; font-size: 12px; }
-        .action-btns { display: flex; gap: 6px; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-        .modal-content { background: white; margin: 5% auto; padding: 28px; border-radius: 12px; width: 90%; max-width: 700px; max-height: 80vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
-        .modal-header h3 { font-size: 18px; }
-        .close { color: #999; font-size: 24px; cursor: pointer; }
-        .close:hover { color: #333; }
-        .detail-row { display: flex; padding: 10px 0; border-bottom: 1px solid #f5f5f5; }
-        .detail-label { width: 120px; color: #666; flex-shrink: 0; }
-        .detail-value { flex: 1; }
-        .log-item { padding: 12px; background: #f9fafb; border-radius: 8px; margin-bottom: 8px; }
-        .log-time { font-size: 12px; color: #999; margin-bottom: 4px; }
-        .log-content { font-size: 14px; }
-        .log-content strong { color: #667eea; }
-        .highlight-conflict { background: #fff7ed; border-left: 3px solid #f97316; }
+        th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid #f1f5f9; font-size: 13.5px; vertical-align: top; }
+        th { background: #f8fafc; font-weight: 600; color: #475569; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.3px; position: sticky; top: 0; }
+        tbody tr { transition: background 0.12s; }
+        tbody tr:hover { background: #f8fafc; }
+        tbody tr.row-conflict { background: #fff7ed; border-left: 4px solid #f97316; }
+        tbody tr.row-conflict:hover { background: #ffedd5; }
+        tbody tr.row-failed { background: #fef2f2; border-left: 4px solid #ef4444; }
+        tbody tr.row-failed:hover { background: #fee2e2; }
+        tbody tr.row-manual { background: #faf5ff; border-left: 4px solid #8b5cf6; }
+        tbody tr.row-manual:hover { background: #f3e8ff; }
+
+        .col-id { width: 50px; font-weight: 700; color: #475569; }
+        .col-status { width: 90px; }
+        .col-question { width: 200px; max-width: 200px; }
+        .col-question .q-text { line-height: 1.5; color: #0f172a; }
+        .col-question .a-text { margin-top: 4px; font-size: 11.5px; color: #64748b; line-height: 1.5; max-height: 48px; overflow: hidden; }
+        .col-desens { width: 160px; }
+        .col-desens .d-box { padding: 8px 10px; background: #fae8ff; border-radius: 6px; font-size: 12px; color: #86198f; line-height: 1.5; border: 1px solid #f0abfc; }
+        .col-desens .d-none { font-size: 12px; color: #cbd5e1; font-style: italic; }
+        .col-check { width: 180px; }
+        .col-check .check-item { margin-bottom: 5px; font-size: 12px; display: flex; align-items: center; gap: 5px; }
+        .col-gray { width: 100px; }
+        .col-gray .g-set { font-weight: 600; color: #4338ca; background: #eef2ff; padding: 3px 8px; border-radius: 4px; display: inline-block; font-size: 12px; }
+        .col-gray .g-none { color: #94a3b8; font-size: 12px; font-style: italic; }
+        .col-reason { width: 220px; }
+        .col-reason .reason-title { font-size: 12px; font-weight: 700; color: #7c2d12; margin-bottom: 3px; }
+        .col-reason .reason-body { font-size: 12px; color: #431407; line-height: 1.55; }
+        .col-reason .missing { margin-top: 6px; padding-top: 6px; border-top: 1px dashed #fdba74; }
+        .col-reason .missing-label { font-size: 11px; font-weight: 600; color: #9a3412; }
+        .col-reason .missing-body { font-size: 11.5px; color: #78350f; margin-top: 2px; }
+        .col-next { width: 120px; }
+        .col-action { width: 200px; }
+
+        .btn { padding: 7px 14px; border-radius: 7px; border: none; cursor: pointer; font-size: 12.5px; font-weight: 600; transition: all 0.15s; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-primary { background: #4f46e5; color: white; } .btn-primary:hover { background: #4338ca; }
+        .btn-warning { background: #f59e0b; color: white; } .btn-warning:hover { background: #d97706; }
+        .btn-success { background: #10b981; color: white; } .btn-success:hover { background: #059669; }
+        .btn-ghost { background: #f1f5f9; color: #475569; } .btn-ghost:hover { background: #e2e8f0; }
+        .btn-sm { padding: 4px 10px; font-size: 11.5px; }
+
+        .action-row { display: flex; flex-direction: column; gap: 5px; }
+        .action-row .act-btns { display: flex; gap: 5px; flex-wrap: wrap; }
+        .history-count { font-size: 11px; color: #6366f1; font-weight: 600; margin-top: 2px; background: #eef2ff; padding: 2px 6px; border-radius: 4px; display: inline-block; }
+
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.55); backdrop-filter: blur(2px); }
+        .modal-content { background: white; margin: 3% auto; padding: 0; border-radius: 14px; width: 92%; max-width: 820px; max-height: 88vh; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.25); display: flex; flex-direction: column; }
+        .modal-header { padding: 22px 28px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #f8fafc, #ffffff); }
+        .modal-header h3 { font-size: 19px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 10px; }
+        .modal-header h3 .rec-id { background: #4f46e5; color: white; font-size: 14px; padding: 3px 10px; border-radius: 5px; }
+        .close { color: #94a3b8; font-size: 26px; cursor: pointer; line-height: 1; padding: 2px 6px; border-radius: 5px; transition: all 0.1s; }
+        .close:hover { background: #f1f5f9; color: #475569; }
+        .modal-body { padding: 26px 28px; overflow-y: auto; flex: 1; }
+        .modal-footer { padding: 16px 28px; border-top: 1px solid #f1f5f9; background: #f8fafc; display: flex; gap: 10px; justify-content: flex-end; }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; margin-bottom: 22px; }
+        .info-item { display: flex; flex-direction: column; gap: 4px; }
+        .info-item.full { grid-column: 1 / -1; }
+        .info-label { font-size: 11.5px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; }
+        .info-value { font-size: 14px; color: #0f172a; line-height: 1.6; }
+        .info-value.qa-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; line-height: 1.7; }
+
+        .panel { border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 18px; overflow: hidden; }
+        .panel-header { padding: 12px 16px; background: #f8fafc; font-size: 13px; font-weight: 700; color: #334155; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #e2e8f0; }
+        .panel-header.conflict-h { background: #fff7ed; color: #7c2d12; border-bottom-color: #fed7aa; }
+        .panel-header.logs-h { background: #eef2ff; color: #3730a3; border-bottom-color: #c7d2fe; }
+        .panel-header.check-h { background: #ecfdf5; color: #065f46; border-bottom-color: #a7f3d0; }
+        .panel-body { padding: 16px; }
+
+        .kv-row { display: flex; padding: 8px 0; border-bottom: 1px dashed #f1f5f9; font-size: 13px; }
+        .kv-row:last-child { border-bottom: none; }
+        .kv-label { width: 110px; flex-shrink: 0; color: #64748b; font-weight: 500; }
+        .kv-value { flex: 1; color: #0f172a; line-height: 1.6; }
+
+        .log-item { padding: 12px 14px; background: #f8fafc; border-radius: 8px; margin-bottom: 9px; border-left: 3px solid #6366f1; position: relative; }
+        .log-item.import-log { border-left-color: #64748b; background: #f8fafc; }
+        .log-item.check-log { border-left-color: #10b981; background: #ecfdf5; }
+        .log-item.gray-log { border-left-color: #f59e0b; background: #fffbeb; }
+        .log-item.fix-log { border-left-color: #8b5cf6; background: #faf5ff; }
+        .log-time { font-size: 11.5px; color: #94a3b8; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+        .log-op { background: #475569; color: white; padding: 1px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+        .log-type { background: #6366f1; color: white; padding: 1px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+        .log-content { font-size: 13px; color: #0f172a; line-height: 1.6; }
+        .log-reason { margin-top: 4px; color: #475569; font-size: 12.5px; }
+        .log-change { margin-top: 4px; padding: 5px 8px; background: white; border-radius: 4px; font-size: 12px; border: 1px solid #e2e8f0; }
+        .log-change .field { color: #7c3aed; font-weight: 600; }
+        .log-change .arrow { color: #94a3b8; margin: 0 4px; }
+        .log-change .old { color: #dc2626; text-decoration: line-through; }
+        .log-change .new { color: #059669; font-weight: 600; }
+
+        .check-block { padding: 10px 12px; border-radius: 7px; margin-bottom: 7px; font-size: 12.5px; }
+        .check-block.pass { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+        .check-block.fail { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+
         .input-group { margin-bottom: 16px; }
-        .input-group label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500; }
-        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
-        .input-group textarea { min-height: 80px; resize: vertical; }
-        .demo-note { background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; font-size: 14px; }
+        .input-group label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #334155; }
+        .input-group label .req { color: #dc2626; margin-left: 3px; }
+        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 7px; font-size: 13.5px; font-family: inherit; transition: border-color 0.12s, box-shadow 0.12s; }
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
+        .input-group textarea { min-height: 90px; resize: vertical; }
+        .input-help { font-size: 11.5px; color: #94a3b8; margin-top: 4px; }
+
+        .flag { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 4px; font-size: 10.5px; font-weight: 600; }
+        .flag-alert { background: #fee2e2; color: #b91c1c; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>⚖️ 法律问答免责声明检查</h1>
-        <p>冲突样本表 · 灰度批次跟踪 · 复核流程管理</p>
+        <h1>⚖️ 法律问答免责声明检查 · 冲突样本小看板</h1>
+        <p>承载脱敏规则备注跟踪、灰度批次补录、引用链接复核、人工修正留痕、重跑结果对比 — 给知识库编辑小乔和产品经理共同使用</p>
     </div>
+
     <div class="container">
-        <div class="demo-note">
-            <strong>📌 演示提示：</strong>本系统包含演示数据，可查看完整流程：脱敏规则备注导入 → 链接404标记冲突 → 补录灰度批次 → 人工修正 → 重跑验证
+        <div class="process-timeline">
+            <h3>📌 核心三步流程（当前演示走到：补录灰度批次后查看状态）</h3>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-title">第一次导入</div>
+                    <div class="step-desc">录入问答 + 脱敏规则备注，状态：待检查</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-title">自动检查</div>
+                    <div class="step-desc">链接404仍被判通过 → 标记「冲突」待产品经理</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-title">小乔补录灰度</div>
+                    <div class="step-desc">冲突说明强化、缺少材料明确、样本表自动更新</div>
+                </div>
+            </div>
         </div>
 
         <div class="stats">
-            <div class="stat-card total">
-                <div class="label">总记录数</div>
-                <div class="value">{{ stats.total }}</div>
-            </div>
-            <div class="stat-card pending">
-                <div class="label">待检查</div>
-                <div class="value">{{ stats.pending }}</div>
-            </div>
-            <div class="stat-card passed">
-                <div class="label">通过</div>
-                <div class="value">{{ stats.passed }}</div>
-            </div>
-            <div class="stat-card failed">
-                <div class="label">未通过</div>
-                <div class="value">{{ stats.failed }}</div>
-            </div>
-            <div class="stat-card conflict">
-                <div class="label">冲突待复核</div>
-                <div class="value">{{ stats.conflict }}</div>
-            </div>
-            <div class="stat-card manual_fixed">
-                <div class="label">人工修正</div>
-                <div class="value">{{ stats.manual_fixed }}</div>
-            </div>
+            <div class="stat-card total"><div class="label">总样本数</div><div class="value">{{ stats.total }}</div></div>
+            <div class="stat-card pending"><div class="label">待检查</div><div class="value">{{ stats.pending }}</div></div>
+            <div class="stat-card passed"><div class="label">通过</div><div class="value">{{ stats.passed }}</div></div>
+            <div class="stat-card failed"><div class="label">未通过</div><div class="value">{{ stats.failed }}</div></div>
+            <div class="stat-card conflict"><div class="label">⚠️ 冲突待复核</div><div class="value">{{ stats.conflict }}</div></div>
+            <div class="stat-card manual_fixed"><div class="label">已人工修正</div><div class="value">{{ stats.manual_fixed }}</div></div>
         </div>
 
         <div class="section">
-            <div class="section-title">
-                <span>📋 冲突样本表</span>
-                <button class="btn btn-primary btn-sm" onclick="runBatchCheck()">重新执行批量检查</button>
+            <div class="section-header">
+                <div>
+                    <div class="section-title">
+                        📋 冲突样本表
+                        <span class="subtitle">重点列：脱敏规则备注 / 冲突原因与缺材 / 灰度批次 / 历史留痕</span>
+                    </div>
+                </div>
+                <div class="section-actions">
+                    <button class="btn btn-ghost" onclick="location.reload()">🔄 刷新</button>
+                    <button class="btn btn-primary" onclick="runBatchCheck()">▶️ 重新批量检查</button>
+                </div>
             </div>
+
+            <div style="overflow-x: auto;">
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>状态</th>
-                        <th>问题摘要</th>
-                        <th>免责声明</th>
-                        <th>链接状态</th>
-                        <th>灰度批次</th>
-                        <th>脱敏备注</th>
-                        <th>冲突原因</th>
-                        <th>下一步</th>
-                        <th>操作</th>
+                        <th class="col-id">#</th>
+                        <th class="col-status">状态</th>
+                        <th class="col-question">问题 / 回答摘要</th>
+                        <th class="col-desens">🔒 脱敏规则备注</th>
+                        <th class="col-check">免责声明 / 引用链接</th>
+                        <th class="col-gray">🎯 灰度批次</th>
+                        <th class="col-reason">❓ 为什么被留下 / 缺什么 / 找谁</th>
+                        <th class="col-next">下一步</th>
+                        <th class="col-action">操作 & 历史</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for r in records %}
-                    <tr class="{% if r.status == 'conflict' %}highlight-conflict{% endif %}">
-                        <td>{{ r.id }}</td>
-                        <td>
-                            {% if r.status == 'pending' %}<span class="badge badge-pending">待检查</span>
-                            {% elif r.status == 'passed' %}<span class="badge badge-passed">通过</span>
-                            {% elif r.status == 'failed' %}<span class="badge badge-failed">未通过</span>
-                            {% elif r.status == 'conflict' %}<span class="badge badge-conflict">冲突</span>
-                            {% elif r.status == 'manual_fixed' %}<span class="badge badge-manual_fixed">人工修正</span>
+                    {% set row_cls = '' %}
+                    {% if r.status == 'conflict' %}{% set row_cls = 'row-conflict' %}
+                    {% elif r.status == 'failed' %}{% set row_cls = 'row-failed' %}
+                    {% elif r.status == 'manual_fixed' %}{% set row_cls = 'row-manual' %}{% endif %}
+                    <tr class="{{ row_cls }}">
+                        <td class="col-id">{{ r.id }}</td>
+                        <td class="col-status">
+                            {% if r.status == 'pending' %}<span class="badge badge-pending">⏳ 待检查</span>
+                            {% elif r.status == 'passed' %}<span class="badge badge-passed">✅ 通过</span>
+                            {% elif r.status == 'failed' %}<span class="badge badge-failed">❌ 未通过</span>
+                            {% elif r.status == 'conflict' %}<span class="badge badge-conflict">⚠️ 冲突</span>
+                            {% elif r.status == 'manual_fixed' %}<span class="badge badge-manual_fixed">🔧 人工修正</span>
                             {% endif %}
                         </td>
-                        <td style="max-width: 200px;">{{ r.question[:30] }}{% if r.question|length > 30 %}...{% endif %}</td>
-                        <td>{% if r.has_disclaimer %}✅ 有{% else %}❌ 无{% endif %}</td>
-                        <td>
+                        <td class="col-question">
+                            <div class="q-text"><strong>{{ r.question[:42] }}</strong>{% if r.question|length > 42 %}...{% endif %}</div>
+                            <div class="a-text">{{ r.answer[:70].replace('\n',' ') }}...</div>
+                        </td>
+                        <td class="col-desens">
+                            {% if r.desensitization_notes %}
+                                <div class="d-box">
+                                    <span class="badge badge-desens" style="margin-bottom:4px;">已脱敏</span><br>
+                                    {{ r.desensitization_notes }}
+                                </div>
+                            {% else %}
+                                <div class="d-none">— 无备注 —</div>
+                            {% endif %}
+                        </td>
+                        <td class="col-check">
+                            <div class="check-item">
+                                {% if r.has_disclaimer %}✅{% else %}❌{% endif %}
+                                <span>免责声明：{% if r.has_disclaimer %}已包含{% else %}<strong style="color:#b91c1c;">缺失</strong>{% endif %}</span>
+                            </div>
                             {% if r.reference_url %}
-                                {% if r.url_status == 'valid' %}✅ 正常
-                                {% elif r.url_status == 'invalid' %}❌ {{ r.url_error }}
-                                {% else %}⏳ 未检查{% endif %}
-                            {% else %}-{% endif %}
+                            <div class="check-item">
+                                {% if r.url_status == 'valid' %}<span class="badge badge-url-ok">链接正常</span>
+                                {% elif r.url_status == 'invalid' %}<span class="badge badge-url-fail">链接失效</span>
+                                    {% if '404' in (r.url_error or '') %}<span class="flag flag-alert">404</span>{% endif %}
+                                {% else %}<span class="badge badge-pending">未检查</span>{% endif %}
+                            </div>
+                            {% if r.url_error %}
+                            <div class="check-item" style="color:#7c2d12; font-size:11.5px; padding-left:4px;">
+                                错误：{{ r.url_error }}
+                            </div>
+                            {% endif %}
+                            {% else %}
+                            <div class="check-item" style="color:#94a3b8;">（无引用链接）</div>
+                            {% endif %}
                         </td>
-                        <td>{{ r.gray_batch or '-' }}</td>
-                        <td style="max-width: 100px; font-size: 12px;">{{ r.desensitization_notes or '-' }}</td>
-                        <td style="max-width: 200px; font-size: 12px;">{{ r.conflict_reason or '-' }}</td>
-                        <td>
-                            {% if r.next_action == 'pm_review' %}<span class="badge badge-pm">产品经理复核</span>
-                            {% elif r.next_action == 'editor_review' %}<span class="badge badge-editor">知识库编辑</span>
-                            {% elif r.next_action == 'complete' %}<span class="badge badge-complete">已完成</span>
-                            {% else %}-{% endif %}
+                        <td class="col-gray">
+                            {% if r.gray_batch %}
+                                <span class="g-set">{{ r.gray_batch }}</span>
+                            {% else %}
+                                <span class="g-none">未补录</span>
+                            {% endif %}
                         </td>
-                        <td>
-                            <div class="action-btns">
-                                <button class="btn btn-primary btn-sm" onclick="showDetail({{ r.id }})">详情</button>
-                                {% if not r.gray_batch and r.status == 'conflict' %}
-                                <button class="btn btn-warning btn-sm" onclick="showSetGray({{ r.id }})">补录灰度</button>
+                        <td class="col-reason">
+                            {% if r.conflict_reason or r.status == 'failed' or r.status == 'conflict' %}
+                                <div class="reason-title">为什么被留下：</div>
+                                <div class="reason-body">
+                                    {% if r.conflict_reason %}{{ r.conflict_reason }}{% elif r.status == 'failed' %}未包含法律免责声明，需补充{% endif %}
+                                </div>
+                                {% if r.missing_materials %}
+                                <div class="missing">
+                                    <div class="missing-label">📎 缺少的材料：</div>
+                                    <div class="missing-body">{{ r.missing_materials }}</div>
+                                </div>
                                 {% endif %}
-                                {% if r.status in ['conflict', 'failed'] %}
-                                <button class="btn btn-success btn-sm" onclick="showFix({{ r.id }})">人工修正</button>
-                                {% endif %}
+                            {% elif r.status == 'passed' %}
+                                <div style="font-size:12px; color:#047857;"><strong>✓ 检查结果：</strong>免责声明完整、链接有效，无需复核</div>
+                            {% else %}
+                                <div style="font-size:12px; color:#94a3b8;">— 等待检查结果 —</div>
+                            {% endif %}
+                        </td>
+                        <td class="col-next">
+                            {% if r.next_action == 'pm_review' %}<span class="badge badge-pm">👔 产品经理复核</span>
+                            {% elif r.next_action == 'editor_review' %}<span class="badge badge-editor">📝 知识库编辑</span>
+                            {% elif r.next_action == 'complete' %}<span class="badge badge-complete">✅ 流程结束</span>
+                            {% else %}<span style="color:#cbd5e1; font-size:12px;">—</span>{% endif %}
+                        </td>
+                        <td class="col-action">
+                            <div class="action-row">
+                                <div class="act-btns">
+                                    <button class="btn btn-primary btn-sm" onclick="showDetail({{ r.id }})">查看详情</button>
+                                    {% if not r.gray_batch and (r.status == 'conflict' or r.status == 'failed' or r.status == 'pending') %}
+                                    <button class="btn btn-warning btn-sm" onclick="showSetGray({{ r.id }})">补录灰度</button>
+                                    {% endif %}
+                                    {% if r.status in ['conflict', 'failed'] %}
+                                    <button class="btn btn-success btn-sm" onclick="showFix({{ r.id }})">人工修正</button>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <span class="history-count" onclick="showDetail({{ r.id }})" style="cursor:pointer;">📜 操作历史</span>
+                                </div>
                             </div>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 
+    <!-- 详情弹窗 -->
     <div id="detailModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>记录详情</h3>
+                <h3>📄 样本详情 & 全流程追溯 <span class="rec-id" id="detailRecId">#1</span></h3>
                 <span class="close" onclick="closeModal('detailModal')">&times;</span>
             </div>
-            <div id="detailBody"></div>
+            <div id="detailBody" class="modal-body"></div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('detailModal')">关闭</button>
+                <button class="btn btn-primary" id="detailRerunBtn" onclick="detailRerun()">▶️ 重跑该样本检查</button>
+            </div>
         </div>
     </div>
 
+    <!-- 补录灰度弹窗 -->
     <div id="grayModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 520px;">
             <div class="modal-header">
-                <h3>补录灰度批次</h3>
+                <h3>🎯 补录灰度批次信息 <span class="rec-id" id="grayRecId">#</span></h3>
                 <span class="close" onclick="closeModal('grayModal')">&times;</span>
             </div>
-            <div class="input-group">
-                <label>灰度批次名称</label>
-                <input type="text" id="grayBatch" placeholder="例如：gray_202406_w1">
+            <div class="modal-body">
+                <div style="padding: 12px; background: #fffbeb; border-radius: 8px; margin-bottom: 18px; font-size: 13px; color: #92400e; line-height: 1.6;">
+                    💡 <strong>知识库编辑小乔请注意：</strong>补录灰度批次后，冲突样本表会自动更新——<br>
+                    冲突原因会强化说明，缺少材料会指向产品经理确认，不会把链接404的冲突直接归为正常。
+                </div>
+                <div class="input-group">
+                    <label>灰度批次名称 <span class="req">*</span></label>
+                    <input type="text" id="grayBatch" placeholder="例如：gray_202406_w2_v1、law_qa_gray_06">
+                    <div class="input-help">建议格式：gray_年月_周次_版本，便于回溯</div>
+                </div>
+                <div class="input-group">
+                    <label>操作人 <span class="req">*</span></label>
+                    <input type="text" id="grayOperator" value="小乔">
+                </div>
+                <div class="input-group">
+                    <label>补录原因 / 备注</label>
+                    <input type="text" id="grayReason" placeholder="例如：该批次为法务问答专项灰度，与知识库v2.3同步">
+                </div>
             </div>
-            <div class="input-group">
-                <label>操作人</label>
-                <input type="text" id="grayOperator" value="小乔">
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('grayModal')">取消</button>
+                <button class="btn btn-warning" onclick="submitGray()">确认补录灰度</button>
             </div>
-            <div class="input-group">
-                <label>备注（可选）</label>
-                <input type="text" id="grayReason" placeholder="变更原因说明">
-            </div>
-            <button class="btn btn-primary" onclick="submitGray()">确认提交</button>
         </div>
     </div>
 
+    <!-- 人工修正弹窗 -->
     <div id="fixModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 580px;">
             <div class="modal-header">
-                <h3>人工修正</h3>
+                <h3>🔧 人工复核修正 <span class="rec-id" id="fixRecId">#</span></h3>
                 <span class="close" onclick="closeModal('fixModal')">&times;</span>
             </div>
-            <div class="input-group">
-                <label>设置状态</label>
-                <select id="fixStatus">
-                    <option value="">不修改</option>
-                    <option value="manual_fixed">人工修正</option>
-                    <option value="passed">标记通过</option>
-                    <option value="failed">标记未通过</option>
-                </select>
+            <div class="modal-body">
+                <div style="padding: 12px; background: #faf5ff; border-radius: 8px; margin-bottom: 18px; font-size: 13px; color: #5b21b6; line-height: 1.6;">
+                    📋 <strong>复核要求：</strong>必须写清「为什么这么改」，系统会完整记录操作人和变更前后状态，确保可追溯。
+                </div>
+                <div class="input-group">
+                    <label>设置样本状态</label>
+                    <select id="fixStatus">
+                        <option value="">（不修改）</option>
+                        <option value="manual_fixed">🔧 人工修正（保留已复核痕迹）</option>
+                        <option value="passed">✅ 直接标记通过</option>
+                        <option value="failed">❌ 退回未通过</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>复核意见</label>
+                    <textarea id="fixComment" placeholder="例如：经核查链接失效但内容为最新法规，免责声明完整，合规风险低；通知编辑替换新链接后即可结案"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>下一步流向</label>
+                    <select id="fixNext">
+                        <option value="">（不修改）</option>
+                        <option value="pm_review">👔 转给产品经理复核规则</option>
+                        <option value="editor_review">📝 转给知识库编辑修复</option>
+                        <option value="complete">✅ 流程结束</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>操作人 <span class="req">*</span></label>
+                    <input type="text" id="fixOperator" placeholder="请输入姓名：张经理 / 小乔">
+                </div>
+                <div class="input-group">
+                    <label>修正原因 <span class="req">*</span></label>
+                    <input type="text" id="fixReason" placeholder="例如：链接为旧版文档不影响内容、需灰度批次对比后再定、人工核实免责声明完整">
+                </div>
             </div>
-            <div class="input-group">
-                <label>复核意见</label>
-                <textarea id="fixComment" placeholder="输入复核意见..."></textarea>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('fixModal')">取消</button>
+                <button class="btn btn-success" onclick="submitFix()">确认提交复核</button>
             </div>
-            <div class="input-group">
-                <label>下一步流向</label>
-                <select id="fixNext">
-                    <option value="">不修改</option>
-                    <option value="pm_review">转给产品经理复核</option>
-                    <option value="editor_review">转给知识库编辑</option>
-                    <option value="complete">流程结束</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>操作人 *</label>
-                <input type="text" id="fixOperator" placeholder="请输入操作人姓名">
-            </div>
-            <div class="input-group">
-                <label>修正原因</label>
-                <input type="text" id="fixReason" placeholder="为什么做此修改">
-            </div>
-            <button class="btn btn-success" onclick="submitFix()">确认修正</button>
         </div>
     </div>
 
@@ -247,74 +431,157 @@
         let currentRecordId = null;
 
         function showDetail(id) {
+            currentRecordId = id;
+            document.getElementById('detailRecId').textContent = '#' + id;
             fetch(`/api/records/${id}`)
                 .then(r => r.json())
                 .then(data => {
                     const r = data.record;
-                    const statusMap = { pending: '待检查', passed: '通过', failed: '未通过', conflict: '冲突', manual_fixed: '人工修正' };
-                    const nextMap = { pm_review: '产品经理复核', editor_review: '知识库编辑', complete: '已完成' };
-                    const urlStatusMap = { valid: '正常', invalid: '异常', unknown: '未检查' };
+                    const statusMap = { pending: '⏳ 待检查', passed: '✅ 通过', failed: '❌ 未通过', conflict: '⚠️ 冲突', manual_fixed: '🔧 人工修正' };
+                    const nextMap = { pm_review: '👔 产品经理复核', editor_review: '📝 知识库编辑', complete: '✅ 流程结束' };
+                    const urlStatusMap = { valid: '✅ 链接正常', invalid: '❌ 链接异常', unknown: '⏳ 未检查' };
+                    const badgeMap = { pending: 'badge-pending', passed: 'badge-passed', failed: 'badge-failed', conflict: 'badge-conflict', manual_fixed: 'badge-manual_fixed' };
 
                     let html = `
-                        <div class="detail-row"><div class="detail-label">记录ID</div><div class="detail-value">${r.id}</div></div>
-                        <div class="detail-row"><div class="detail-label">当前状态</div><div class="detail-value">${statusMap[r.status] || r.status}</div></div>
-                        <div class="detail-row"><div class="detail-label">来源批次</div><div class="detail-value">${r.source_batch || '-'}</div></div>
-                        <div class="detail-row"><div class="detail-label">灰度批次</div><div class="detail-value">${r.gray_batch || '-'}</div></div>
-                        <div class="detail-row"><div class="detail-label">脱敏规则备注</div><div class="detail-value">${r.desensitization_notes || '-'}</div></div>
-                        <div class="detail-row"><div class="detail-label">问题</div><div class="detail-value">${r.question}</div></div>
-                        <div class="detail-row"><div class="detail-label">回答</div><div class="detail-value" style="white-space: pre-wrap;">${r.answer}</div></div>
-                        <div class="detail-row"><div class="detail-label">免责声明</div><div class="detail-value">${r.has_disclaimer ? '✅ 包含' : '❌ 不包含'} (${r.disclaimer_text || '-'})</div></div>
-                        <div class="detail-row"><div class="detail-label">引用链接</div><div class="detail-value">${r.reference_url ? `<a href="${r.reference_url}" target="_blank">${r.reference_url}</a>` : '-'}</div></div>
-                        <div class="detail-row"><div class="detail-label">链接状态</div><div class="detail-value">${r.url_status ? urlStatusMap[r.url_status] : '-' } (${r.url_error || '-'})</div></div>
-                        <div class="detail-row"><div class="detail-label">冲突原因</div><div class="detail-value">${r.conflict_reason || '-'}</div></div>
-                        <div class="detail-row"><div class="detail-label">缺少材料</div><div class="detail-value">${r.missing_materials || '-'}</div></div>
-                        <div class="detail-row"><div class="detail-label">下一步</div><div class="detail-value">${nextMap[r.next_action] || '-'}</div></div>
-                        <div class="detail-row"><div class="detail-label">复核人</div><div class="detail-value">${r.reviewer || '-'}</div></div>
-                        <div class="detail-row"><div class="detail-label">复核意见</div><div class="detail-value">${r.review_comment || '-'}</div></div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">当前状态</div>
+                                <div class="info-value"><span class="badge ${badgeMap[r.status] || ''}">${statusMap[r.status] || r.status}</span></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">下一步流向</div>
+                                <div class="info-value">${nextMap[r.next_action] || '— 未指定 —'}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">来源批次</div>
+                                <div class="info-value">${r.source_batch || '—'}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">灰度批次</div>
+                                <div class="info-value">${r.gray_batch ? '<span class="g-set" style="font-weight:600;color:#4338ca;background:#eef2ff;padding:2px 8px;border-radius:4px;">' + r.gray_batch + '</span>' : '<span style="color:#94a3b8;font-style:italic;">未补录</span>'}</div>
+                            </div>
+                            <div class="info-item full">
+                                <div class="info-label">🔒 脱敏规则备注</div>
+                                <div class="info-value">${r.desensitization_notes ? '<div class="d-box" style="padding:10px 12px;background:#fae8ff;border-radius:6px;border:1px solid #f0abfc;color:#86198f;line-height:1.6;"><span class="badge badge-desens">已处理</span> ' + r.desensitization_notes + '</div>' : '<span style="color:#94a3b8;font-style:italic;">无备注</span>'}</div>
+                            </div>
+                        </div>
+
+                        <div class="info-item full" style="margin-bottom:16px;">
+                            <div class="info-label">❓ 用户问题</div>
+                            <div class="info-value qa-box" style="font-weight:600;">${r.question}</div>
+                        </div>
+                        <div class="info-item full" style="margin-bottom:18px;">
+                            <div class="info-label">💬 AI 回答内容</div>
+                            <div class="info-value qa-box">${r.answer.replace(/\n/g, '<br>')}</div>
+                        </div>
+
+                        <div class="panel">
+                            <div class="panel-header check-h">🔍 系统自动检查结果</div>
+                            <div class="panel-body">
+                                <div class="check-block ${r.has_disclaimer ? 'pass' : 'fail'}">
+                                    <strong>免责声明检查：</strong>${r.has_disclaimer ? '✅ 检测到关键词：' + r.disclaimer_text : '❌ 未检测到任何免责声明关键词，需补充'}
+                                </div>
+                                ${r.reference_url ? `
+                                    <div class="check-block ${r.url_status === 'valid' ? 'pass' : 'fail'}">
+                                        <strong>引用链接检查：</strong>
+                                        ${r.url_status === 'valid' ? '✅ 可正常访问' : '❌ ' + (r.url_error || '异常')}
+                                        <div style="margin-top:5px; font-size:11.5px; word-break: break-all;">
+                                            <a href="${r.reference_url}" target="_blank" style="color:${r.url_status === 'valid' ? '#065f46' : '#991b1b'};">${r.reference_url}</a>
+                                        </div>
+                                    </div>
+                                ` : '<div style="color:#94a3b8;font-size:12.5px;">（本条回答无引用链接）</div>'}
+                            </div>
+                        </div>
+
+                        ${(r.conflict_reason || r.missing_materials) ? `
+                        <div class="panel">
+                            <div class="panel-header conflict-h">⚠️ 冲突 / 复核说明（样本表为什么留下这一条）</div>
+                            <div class="panel-body">
+                                <div class="kv-row">
+                                    <div class="kv-label">冲突原因</div>
+                                    <div class="kv-value">${r.conflict_reason || '—'}</div>
+                                </div>
+                                <div class="kv-row">
+                                    <div class="kv-label">缺少的材料</div>
+                                    <div class="kv-value">${r.missing_materials || '—'}</div>
+                                </div>
+                                <div class="kv-row">
+                                    <div class="kv-label">复核人</div>
+                                    <div class="kv-value">${r.reviewer || '尚未有人工复核'}</div>
+                                </div>
+                                <div class="kv-row">
+                                    <div class="kv-label">复核意见</div>
+                                    <div class="kv-value">${r.review_comment || '—'}</div>
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        <div class="panel">
+                            <div class="panel-header logs-h">📜 全流程操作历史（谁改了什么、为什么改、改完影响）</div>
+                            <div class="panel-body">
                     `;
 
                     if (data.logs && data.logs.length > 0) {
-                        html += '<div class="detail-row" style="margin-top: 16px;"><div class="detail-label"><strong>操作历史</strong></div><div class="detail-value"></div></div>';
-                        data.logs.forEach(log => {
-                            let change = '';
-                            if (log.old_value || log.new_value) {
-                                change = `<br>字段: ${log.field_name || '-'} | ${log.old_value || '-'} → ${log.new_value || '-'}`;
+                        data.logs.forEach((log, idx) => {
+                            const typeCls = { import: 'import-log', check_run: 'check-log', field_update: 'gray-log', manual_fix: 'fix-log' }[log.operation_type] || '';
+                            const typeLabel = { import: '📥 导入', check_run: '▶️ 执行检查', field_update: '🎯 灰度批次更新', manual_fix: '🔧 人工修正' }[log.operation_type] || log.operation_type;
+
+                            let changeHtml = '';
+                            if (log.field_name) {
+                                const fieldLabel = { status: '样本状态', gray_batch: '灰度批次', next_action: '下一步流向', review_comment: '复核意见' }[log.field_name] || log.field_name;
+                                changeHtml = `<div class="log-change"><span class="field">${fieldLabel}</span>：<span class="old">${log.old_value || '（空）'}</span><span class="arrow">→</span><span class="new">${log.new_value || '（空）'}</span></div>`;
                             }
-                            html += `<div class="log-item">
-                                <div class="log-time">${new Date(log.created_at).toLocaleString('zh-CN')} · ${log.operator}</div>
-                                <div class="log-content"><strong>[${log.operation_type}]</strong> ${log.reason || ''}${change}</div>
+
+                            html += `<div class="log-item ${typeCls}">
+                                <div class="log-time">
+                                    <span class="log-op">${log.operator}</span>
+                                    <span class="log-type">${typeLabel}</span>
+                                    ${new Date(log.created_at).toLocaleString('zh-CN')}
+                                </div>
+                                ${log.reason ? `<div class="log-reason"><strong>原因：</strong>${log.reason}</div>` : ''}
+                                ${changeHtml}
                             </div>`;
                         });
+                    } else {
+                        html += '<div style="color:#94a3b8; font-size:13px; padding:10px;">暂无操作记录</div>';
                     }
 
-                    html += `<div style="margin-top: 20px; display: flex; gap: 10px;">
-                        <button class="btn btn-primary" onclick="runSingleCheck(${r.id})">重新执行检查</button>
-                    </div>`;
-
+                    html += '</div></div>';
                     document.getElementById('detailBody').innerHTML = html;
                     document.getElementById('detailModal').style.display = 'block';
                 });
         }
 
+        function detailRerun() {
+            if (!currentRecordId) return;
+            fetch(`/api/records/${currentRecordId}/check`, { method: 'POST' })
+                .then(r => r.json()).then(() => {
+                    closeModal('detailModal');
+                    location.reload();
+                });
+        }
+
         function showSetGray(id) {
             currentRecordId = id;
+            document.getElementById('grayRecId').textContent = '#' + id;
+            document.getElementById('grayBatch').value = '';
+            document.getElementById('grayReason').value = '';
             document.getElementById('grayModal').style.display = 'block';
         }
 
         function submitGray() {
-            const grayBatch = document.getElementById('grayBatch').value;
-            const operator = document.getElementById('grayOperator').value;
-            const reason = document.getElementById('grayReason').value;
+            const grayBatch = document.getElementById('grayBatch').value.trim();
+            const operator = document.getElementById('grayOperator').value.trim();
+            const reason = document.getElementById('grayReason').value.trim();
 
-            if (!grayBatch) {
-                alert('请输入灰度批次');
-                return;
-            }
+            if (!grayBatch) { alert('请输入灰度批次名称'); return; }
+            if (!operator) { alert('请输入操作人'); return; }
 
             fetch(`/api/records/${currentRecordId}/gray`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ gray_batch: grayBatch, operator, reason })
+                body: JSON.stringify({ gray_batch: grayBatch, operator, reason: reason || undefined })
             }).then(r => r.json()).then(() => {
                 closeModal('grayModal');
                 location.reload();
@@ -323,20 +590,24 @@
 
         function showFix(id) {
             currentRecordId = id;
+            document.getElementById('fixRecId').textContent = '#' + id;
+            document.getElementById('fixStatus').value = '';
+            document.getElementById('fixComment').value = '';
+            document.getElementById('fixNext').value = '';
+            document.getElementById('fixOperator').value = '';
+            document.getElementById('fixReason').value = '';
             document.getElementById('fixModal').style.display = 'block';
         }
 
         function submitFix() {
             const newStatus = document.getElementById('fixStatus').value;
-            const comment = document.getElementById('fixComment').value;
+            const comment = document.getElementById('fixComment').value.trim();
             const nextAction = document.getElementById('fixNext').value;
-            const operator = document.getElementById('fixOperator').value;
-            const reason = document.getElementById('fixReason').value;
+            const operator = document.getElementById('fixOperator').value.trim();
+            const reason = document.getElementById('fixReason').value.trim();
 
-            if (!operator) {
-                alert('请输入操作人');
-                return;
-            }
+            if (!operator) { alert('请输入操作人姓名'); return; }
+            if (!reason) { alert('请填写修正原因，确保操作可追溯'); return; }
 
             fetch(`/api/records/${currentRecordId}/fix`, {
                 method: 'POST',
@@ -346,7 +617,7 @@
                     review_comment: comment || null,
                     next_action: nextAction || null,
                     operator,
-                    reason: reason || null
+                    reason
                 })
             }).then(r => r.json()).then(() => {
                 closeModal('fixModal');
@@ -354,13 +625,8 @@
             });
         }
 
-        function runSingleCheck(id) {
-            fetch(`/api/records/${id}/check`, { method: 'POST' })
-                .then(r => r.json()).then(() => location.reload());
-        }
-
         function runBatchCheck() {
-            if (confirm('确认要重新执行所有记录的检查吗？')) {
+            if (confirm('确认重新执行所有样本的检查？将重新检测免责声明和链接有效性。')) {
                 fetch('/api/check/batch', { method: 'POST' })
                     .then(r => r.json()).then(data => {
                         alert('批量检查完成，run_id: ' + data.run_id);
