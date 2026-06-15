@@ -15,6 +15,10 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 db = SQLAlchemy(app)
 
 
+def build_record_key(batch_id, sample_id, original_row_number):
+    return f"{batch_id}:::{sample_id}:::{original_row_number}"
+
+
 class BoundaryRule:
     MODEL_VERSION_CHANGED_SAMPLE_SAME = 'model_version_changed_sample_same'
     NORMAL = 'normal'
@@ -29,7 +33,9 @@ class BoundaryRule:
 
 class ManualJudgment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    import_id = db.Column(db.Integer)
     batch_id = db.Column(db.String(100), nullable=False)
+    record_key = db.Column(db.String(300), nullable=False, index=True)
     original_row_number = db.Column(db.Integer, nullable=False)
     sample_id = db.Column(db.String(100), nullable=False)
     model_version = db.Column(db.String(100))
@@ -39,6 +45,7 @@ class ManualJudgment(db.Model):
     manual_changes = db.Column(db.Text)
     remarks = db.Column(db.Text)
     processing_status = db.Column(db.String(50), default='imported')
+    status_note = db.Column(db.Text)
     reviewer = db.Column(db.String(100))
     review_time = db.Column(db.DateTime)
     boundary_status = db.Column(db.String(50), default='normal')
@@ -46,13 +53,16 @@ class ManualJudgment(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     content_hash = db.Column(db.String(64))
+    version_number = db.Column(db.Integer, default=1)
     workflow_step = db.Column(db.String(50), default='step1_imported')
     is_latest = db.Column(db.Boolean, default=True)
 
     def to_dict(self):
         return {
             'id': self.id,
+            'import_id': self.import_id,
             'batch_id': self.batch_id,
+            'record_key': self.record_key,
             'original_row_number': self.original_row_number,
             'sample_id': self.sample_id,
             'model_version': self.model_version,
@@ -62,12 +72,14 @@ class ManualJudgment(db.Model):
             'manual_changes': self.manual_changes,
             'remarks': self.remarks,
             'processing_status': self.processing_status,
+            'status_note': self.status_note,
             'reviewer': self.reviewer,
             'review_time': self.review_time.isoformat() if self.review_time else None,
             'boundary_status': self.boundary_status,
             'boundary_note': self.boundary_note,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat(),
+            'version_number': self.version_number,
             'workflow_step': self.workflow_step,
             'is_latest': self.is_latest
         }
@@ -75,36 +87,43 @@ class ManualJudgment(db.Model):
 
 class VersionHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    manual_judgment_id = db.Column(db.Integer, db.ForeignKey('manual_judgment.id'))
+    record_key = db.Column(db.String(300), nullable=False, index=True)
+    from_record_id = db.Column(db.Integer)
+    to_record_id = db.Column(db.Integer)
     version_number = db.Column(db.Integer, nullable=False)
     field_name = db.Column(db.String(100))
     old_value = db.Column(db.Text)
     new_value = db.Column(db.Text)
     changed_by = db.Column(db.String(100))
     change_reason = db.Column(db.Text)
+    change_type = db.Column(db.String(50), default='update')
     changed_at = db.Column(db.DateTime, default=datetime.utcnow)
-    full_snapshot = db.Column(db.Text)
-
-    manual_judgment = db.relationship('ManualJudgment', backref=db.backref('versions', lazy=True))
+    full_snapshot_before = db.Column(db.Text)
+    full_snapshot_after = db.Column(db.Text)
 
     def to_dict(self):
         return {
             'id': self.id,
-            'manual_judgment_id': self.manual_judgment_id,
+            'record_key': self.record_key,
+            'from_record_id': self.from_record_id,
+            'to_record_id': self.to_record_id,
             'version_number': self.version_number,
             'field_name': self.field_name,
             'old_value': self.old_value,
             'new_value': self.new_value,
             'changed_by': self.changed_by,
             'change_reason': self.change_reason,
+            'change_type': self.change_type,
             'changed_at': self.changed_at.isoformat(),
-            'full_snapshot': json.loads(self.full_snapshot) if self.full_snapshot else None
+            'full_snapshot_before': json.loads(self.full_snapshot_before) if self.full_snapshot_before else None,
+            'full_snapshot_after': json.loads(self.full_snapshot_after) if self.full_snapshot_after else None
         }
 
 
 class ImportBatch(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    batch_id = db.Column(db.String(100), unique=True, nullable=False)
+    import_id = db.Column(db.String(100), unique=True, nullable=False)
+    batch_id = db.Column(db.String(100), nullable=False)
     file_name = db.Column(db.String(255))
     imported_by = db.Column(db.String(100))
     imported_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -112,10 +131,13 @@ class ImportBatch(db.Model):
     new_count = db.Column(db.Integer, default=0)
     updated_count = db.Column(db.Integer, default=0)
     duplicate_count = db.Column(db.Integer, default=0)
+    boundary_alert_count = db.Column(db.Integer, default=0)
+    import_note = db.Column(db.Text)
 
     def to_dict(self):
         return {
             'id': self.id,
+            'import_id': self.import_id,
             'batch_id': self.batch_id,
             'file_name': self.file_name,
             'imported_by': self.imported_by,
@@ -123,7 +145,9 @@ class ImportBatch(db.Model):
             'record_count': self.record_count,
             'new_count': self.new_count,
             'updated_count': self.updated_count,
-            'duplicate_count': self.duplicate_count
+            'duplicate_count': self.duplicate_count,
+            'boundary_alert_count': self.boundary_alert_count,
+            'import_note': self.import_note
         }
 
 
@@ -132,34 +156,63 @@ def calculate_content_hash(row_data):
     return hashlib.sha256(content.encode('utf-8')).hexdigest()
 
 
-def get_existing_record(sample_id, batch_id, original_row_number):
+def get_latest_record(record_key):
     return ManualJudgment.query.filter_by(
-        sample_id=sample_id,
-        batch_id=batch_id,
-        original_row_number=original_row_number,
+        record_key=record_key,
         is_latest=True
     ).first()
 
 
-def create_version_record(old_record, new_record, field_name, changed_by='system', change_reason=''):
+def get_record_versions(record_key):
+    return ManualJudgment.query.filter_by(
+        record_key=record_key
+    ).order_by(ManualJudgment.version_number.asc()).all()
+
+
+def get_version_history(record_key):
+    return VersionHistory.query.filter_by(
+        record_key=record_key
+    ).order_by(VersionHistory.version_number.asc()).all()
+
+
+def get_next_version_number(record_key):
+    records = get_record_versions(record_key)
+    if not records:
+        return 1
+    return max(r.version_number for r in records) + 1
+
+
+def create_version_record(record_key, old_record, new_record, field_name, 
+                         changed_by='system', change_reason='', change_type='update'):
     version = VersionHistory()
-    version.manual_judgment_id = old_record.id
+    version.record_key = record_key
+    version.from_record_id = old_record.id if old_record else None
+    version.to_record_id = new_record.id if new_record else None
     version.field_name = field_name
-    version.old_value = getattr(old_record, field_name)
-    version.new_value = getattr(new_record, field_name)
+    version.old_value = getattr(old_record, field_name) if old_record else ''
+    version.new_value = getattr(new_record, field_name) if new_record else ''
     version.changed_by = changed_by
     version.change_reason = change_reason
-    version.full_snapshot = json.dumps(old_record.to_dict(), ensure_ascii=False)
-    max_version = VersionHistory.query.filter_by(manual_judgment_id=old_record.id).count()
-    version.version_number = max_version + 1
+    version.change_type = change_type
+    version.full_snapshot_before = json.dumps(old_record.to_dict(), ensure_ascii=False) if old_record else None
+    version.full_snapshot_after = json.dumps(new_record.to_dict(), ensure_ascii=False) if new_record else None
+    
+    history_count = VersionHistory.query.filter_by(record_key=record_key).count()
+    version.version_number = history_count + 1
+    
     db.session.add(version)
+    return version
 
 
-def process_boundary_rule(existing, new_data):
+def process_boundary_rule(existing, new_data, record_key):
     if existing and existing.model_version != new_data.get('model_version'):
         new_data['boundary_status'] = BoundaryRule.NEEDS_REVIEW
-        new_data['boundary_note'] = f'模型版本从 {existing.model_version} 变为 {new_data.get("model_version")}，但样本编号 {new_data.get("sample_id")} 未变，需要运营复核人复核'
+        new_data['boundary_note'] = (
+            f'【边界规则触发】模型版本从 {existing.model_version} 变为 {new_data.get("model_version")}，'
+            f'但样本编号 {new_data.get("sample_id")} 未变。系统不自动归为正常，留待运营复核人复核。'
+        )
         new_data['processing_status'] = 'pending_review'
+        new_data['status_note'] = '模型版本变更，待运营复核'
     return new_data
 
 
@@ -178,8 +231,9 @@ def import_file():
 
     batch_id = request.form.get('batch_id', datetime.now().strftime('%Y%m%d%H%M%S'))
     imported_by = request.form.get('imported_by', 'system')
+    import_id = f"IMP{datetime.now().strftime('%Y%m%d%H%M%S%f')}"
 
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{batch_id}_{file.filename}")
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{import_id}_{file.filename}")
     file.save(file_path)
 
     df = pd.read_excel(file_path) if file.filename.endswith('.xlsx') else pd.read_csv(file_path)
@@ -187,12 +241,16 @@ def import_file():
     new_count = 0
     updated_count = 0
     duplicate_count = 0
+    boundary_alert_count = 0
 
     for idx, row in df.iterrows():
+        original_row_number = idx + 2
+        sample_id = str(row.get('样本编号', row.get('sample_id', '')))
+        
         row_data = {
             'batch_id': batch_id,
-            'original_row_number': idx + 2,
-            'sample_id': str(row.get('样本编号', row.get('sample_id', ''))),
+            'original_row_number': original_row_number,
+            'sample_id': sample_id,
             'model_version': str(row.get('模型版本', row.get('model_version', ''))),
             'prompt_version': str(row.get('提示词版本', row.get('prompt_version', ''))),
             'original_answer': str(row.get('原始回答', row.get('original_answer', ''))),
@@ -200,57 +258,94 @@ def import_file():
             'manual_changes': str(row.get('人工改动说明', row.get('manual_changes', ''))),
             'remarks': str(row.get('备注', row.get('remarks', ''))),
         }
+        
+        record_key = build_record_key(batch_id, sample_id, original_row_number)
+        row_data['record_key'] = record_key
         row_data['content_hash'] = calculate_content_hash(row_data)
 
-        existing = get_existing_record(
-            row_data['sample_id'],
-            batch_id,
-            row_data['original_row_number']
-        )
+        existing = get_latest_record(record_key)
 
         if existing:
             if existing.content_hash == row_data['content_hash']:
                 duplicate_count += 1
                 continue
             else:
-                row_data = process_boundary_rule(existing, row_data)
+                row_data = process_boundary_rule(existing, row_data, record_key)
+                
+                if row_data.get('boundary_status') == BoundaryRule.NEEDS_REVIEW:
+                    boundary_alert_count += 1
+                
                 existing.is_latest = False
-                for field in ['model_version', 'prompt_version', 'original_answer', 
-                            'manual_answer', 'manual_changes', 'remarks', 'content_hash']:
-                    if getattr(existing, field) != row_data.get(field):
-                        create_version_record(existing, type('obj', (object,), row_data)(), field, 
-                                           changed_by=imported_by, change_reason='重新导入更新')
+                
+                new_version_num = get_next_version_number(record_key)
                 new_record = ManualJudgment(**row_data)
-                new_record.processing_status = existing.processing_status
+                new_record.import_id = ImportBatch.query.count() + 1
+                new_record.version_number = new_version_num
+                new_record.processing_status = row_data.get('processing_status', existing.processing_status)
                 new_record.workflow_step = existing.workflow_step
                 new_record.reviewer = existing.reviewer
                 new_record.review_time = existing.review_time
+                new_record.status_note = row_data.get('status_note', existing.status_note)
+                
+                if row_data.get('boundary_status') == BoundaryRule.NEEDS_REVIEW:
+                    if new_record.workflow_step == 'step3_reviewed':
+                        new_record.workflow_step = 'step2_prompt_updated'
+                
                 db.session.add(new_record)
+                
+                for field in ['model_version', 'prompt_version', 'original_answer', 
+                            'manual_answer', 'manual_changes', 'remarks']:
+                    if getattr(existing, field) != row_data.get(field):
+                        create_version_record(
+                            record_key, existing, new_record, field,
+                            changed_by=imported_by, 
+                            change_reason='重新导入更新',
+                            change_type='import_update'
+                        )
+                
                 updated_count += 1
         else:
             row_data['boundary_status'] = BoundaryRule.NORMAL
+            row_data['processing_status'] = 'imported'
+            row_data['status_note'] = '首次导入'
             new_record = ManualJudgment(**row_data)
+            new_record.import_id = ImportBatch.query.count() + 1
+            new_record.version_number = 1
+            
+            create_version_record(
+                record_key, None, new_record, 'initial',
+                changed_by=imported_by,
+                change_reason='首次导入创建记录',
+                change_type='create'
+            )
+            
             db.session.add(new_record)
             new_count += 1
 
     batch = ImportBatch(
+        import_id=import_id,
         batch_id=batch_id,
         file_name=file.filename,
         imported_by=imported_by,
         record_count=len(df),
         new_count=new_count,
         updated_count=updated_count,
-        duplicate_count=duplicate_count
+        duplicate_count=duplicate_count,
+        boundary_alert_count=boundary_alert_count,
+        import_note=f'第 {ImportBatch.query.filter_by(batch_id=batch_id).count() + 1} 次导入批次 {batch_id}'
     )
     db.session.add(batch)
     db.session.commit()
 
     return jsonify({
+        'import_id': import_id,
         'batch_id': batch_id,
         'total': len(df),
         'new': new_count,
         'updated': updated_count,
-        'duplicate': duplicate_count
+        'duplicate': duplicate_count,
+        'boundary_alert': boundary_alert_count,
+        'note': f'导入完成。同批次已有 {ImportBatch.query.filter_by(batch_id=batch_id).count()} 次导入记录'
     })
 
 
@@ -261,6 +356,7 @@ def get_records():
     status = request.args.get('status', '')
     boundary = request.args.get('boundary', '')
     workflow = request.args.get('workflow', '')
+    batch_id = request.args.get('batch_id', '')
 
     query = ManualJudgment.query.filter_by(is_latest=True)
     if status:
@@ -269,6 +365,8 @@ def get_records():
         query = query.filter_by(boundary_status=boundary)
     if workflow:
         query = query.filter_by(workflow_step=workflow)
+    if batch_id:
+        query = query.filter_by(batch_id=batch_id)
 
     pagination = query.order_by(ManualJudgment.updated_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
     
@@ -283,10 +381,13 @@ def get_records():
 @app.route('/api/record/<int:record_id>')
 def get_record(record_id):
     record = ManualJudgment.query.get_or_404(record_id)
-    versions = VersionHistory.query.filter_by(manual_judgment_id=record_id).order_by(VersionHistory.version_number.desc()).all()
+    versions = get_record_versions(record.record_key)
+    history = get_version_history(record.record_key)
     return jsonify({
         'record': record.to_dict(),
-        'versions': [v.to_dict() for v in versions]
+        'all_versions': [v.to_dict() for v in versions],
+        'version_history': [v.to_dict() for v in history],
+        'latest_version_number': max(v.version_number for v in versions) if versions else 0
     })
 
 
@@ -298,30 +399,53 @@ def update_prompt_version(record_id):
     new_prompt = data.get('prompt_version', '')
     changed_by = data.get('changed_by', '小孟')
 
-    if old_prompt != new_prompt:
-        record.is_latest = False
-        new_record_data = record.to_dict()
-        del new_record_data['id']
-        new_record_data['prompt_version'] = new_prompt
-        new_record_data['is_latest'] = True
-        new_record_data['workflow_step'] = 'step2_prompt_updated'
-        new_record = ManualJudgment(**new_record_data)
-        new_record.content_hash = calculate_content_hash(new_record_data)
-        db.session.add(new_record)
+    if old_prompt == new_prompt:
+        return jsonify({'success': True, 'message': '提示词版本未变化', 'unchanged': True})
+    
+    if not record.is_latest:
+        return jsonify({'error': '只能修改最新版本的记录'}), 400
 
-        version = VersionHistory()
-        version.manual_judgment_id = record.id
-        version.version_number = VersionHistory.query.filter_by(manual_judgment_id=record.id).count() + 1
-        version.field_name = 'prompt_version'
-        version.old_value = old_prompt
-        version.new_value = new_prompt
-        version.changed_by = changed_by
-        version.change_reason = '模型评测同事补看提示词版本号'
-        version.full_snapshot = json.dumps(record.to_dict(), ensure_ascii=False)
-        db.session.add(version)
-        db.session.commit()
-        return jsonify({'success': True, 'new_record_id': new_record.id})
-    return jsonify({'success': True, 'message': '提示词版本未变化'})
+    record.is_latest = False
+    
+    new_record_data = record.to_dict()
+    del new_record_data['id']
+    new_record_data['prompt_version'] = new_prompt
+    new_record_data['is_latest'] = True
+    new_record_data['workflow_step'] = 'step2_prompt_updated'
+    new_record_data['version_number'] = get_next_version_number(record.record_key)
+    new_record_data['content_hash'] = calculate_content_hash(new_record_data)
+    
+    prev_status = record.processing_status
+    if record.boundary_status == BoundaryRule.NEEDS_REVIEW:
+        new_record_data['processing_status'] = 'pending_review'
+        new_record_data['status_note'] = record.status_note or '边界待复核'
+    else:
+        new_record_data['processing_status'] = 'prompt_updated'
+        new_record_data['status_note'] = '模型评测同事已补全提示词版本号'
+    
+    new_record = ManualJudgment(**new_record_data)
+    db.session.add(new_record)
+
+    create_version_record(
+        record.record_key, record, new_record, 'prompt_version',
+        changed_by=changed_by,
+        change_reason='模型评测同事补看/修改提示词版本号',
+        change_type='prompt_update'
+    )
+    
+    db.session.commit()
+    
+    return jsonify({
+        'success': True, 
+        'new_record_id': new_record.id,
+        'version_number': new_record.version_number,
+        'workflow_step': new_record.workflow_step,
+        'processing_status': new_record.processing_status,
+        'status_note': new_record.status_note,
+        'old_value': old_prompt,
+        'new_value': new_prompt,
+        'result_note': f'提示词版本号已更新，版本号从 {old_prompt or "(空)"} 变为 {new_prompt}。工作流推进到步骤2（提示词已更新）。'
+    })
 
 
 @app.route('/api/record/<int:record_id>/review', methods=['POST'])
@@ -330,24 +454,43 @@ def review_record(record_id):
     data = request.json
     action = data.get('action', 'approve')
     reviewer = data.get('reviewer', '运营复核人')
+    note = data.get('note', '')
+
+    if not record.is_latest:
+        return jsonify({'error': '只能复核最新版本的记录'}), 400
 
     if action == 'approve':
         record.boundary_status = BoundaryRule.NORMAL
         record.processing_status = 'reviewed'
-        record.boundary_note = data.get('note', '')
+        record.status_note = f'复核通过：{note}' if note else '复核通过'
+        record.boundary_note = note
+        result_note = '复核通过：边界异常已确认正常，记录进入已复核状态。'
     elif action == 'reject':
         record.processing_status = 'rejected'
-        record.boundary_note = data.get('note', '复核不通过：' + data.get('note', ''))
+        record.status_note = f'复核打回：{note}'
+        record.boundary_note = f'复核不通过：{note}'
+        result_note = '复核打回：记录被退回，需要模型评测同事重新处理。'
     elif action == 'rollback':
         record.boundary_status = BoundaryRule.NORMAL
         record.processing_status = 'rollback'
-        record.boundary_note = '已回滚：' + data.get('note', '')
+        record.status_note = f'已回滚：{note}'
+        record.boundary_note = f'已回滚至上一版本：{note}'
+        result_note = '已回滚：边界变更已撤销，恢复为正常状态。'
 
     record.reviewer = reviewer
     record.review_time = datetime.utcnow()
     record.workflow_step = 'step3_reviewed'
     db.session.commit()
-    return jsonify({'success': True})
+    
+    return jsonify({
+        'success': True,
+        'action': action,
+        'workflow_step': record.workflow_step,
+        'processing_status': record.processing_status,
+        'boundary_status': record.boundary_status,
+        'status_note': record.status_note,
+        'result_note': f'{result_note} 工作流推进到步骤3（已复核）。复核人：{reviewer}'
+    })
 
 
 @app.route('/api/record/<int:record_id>/update_remark', methods=['POST'])
@@ -358,29 +501,55 @@ def update_remark(record_id):
     new_remark = data.get('remarks', '')
     changed_by = data.get('changed_by', '小孟')
 
-    if old_remark != new_remark:
-        record.is_latest = False
-        new_record_data = record.to_dict()
-        del new_record_data['id']
-        new_record_data['remarks'] = new_remark
-        new_record_data['is_latest'] = True
-        new_record = ManualJudgment(**new_record_data)
-        new_record.content_hash = calculate_content_hash(new_record_data)
-        db.session.add(new_record)
+    if old_remark == new_remark:
+        return jsonify({'success': True, 'message': '备注未变化', 'unchanged': True})
+    
+    if not record.is_latest:
+        return jsonify({'error': '只能修改最新版本的记录'}), 400
 
-        version = VersionHistory()
-        version.manual_judgment_id = record.id
-        version.version_number = VersionHistory.query.filter_by(manual_judgment_id=record.id).count() + 1
-        version.field_name = 'remarks'
-        version.old_value = old_remark
-        version.new_value = new_remark
-        version.changed_by = changed_by
-        version.change_reason = '修改备注'
-        version.full_snapshot = json.dumps(record.to_dict(), ensure_ascii=False)
-        db.session.add(version)
-        db.session.commit()
-        return jsonify({'success': True, 'new_record_id': new_record.id})
-    return jsonify({'success': True, 'message': '备注未变化'})
+    record.is_latest = False
+    
+    new_record_data = record.to_dict()
+    del new_record_data['id']
+    new_record_data['remarks'] = new_remark
+    new_record_data['is_latest'] = True
+    new_record_data['version_number'] = get_next_version_number(record.record_key)
+    new_record_data['content_hash'] = calculate_content_hash(new_record_data)
+    
+    if record.boundary_status == BoundaryRule.NEEDS_REVIEW:
+        new_record_data['processing_status'] = 'pending_review'
+        new_record_data['status_note'] = record.status_note or '边界待复核'
+    else:
+        new_record_data['status_note'] = record.status_note or ''
+    
+    new_record = ManualJudgment(**new_record_data)
+    db.session.add(new_record)
+
+    create_version_record(
+        record.record_key, record, new_record, 'remarks',
+        changed_by=changed_by,
+        change_reason='修改备注信息',
+        change_type='remark_update'
+    )
+    
+    db.session.commit()
+    
+    return jsonify({
+        'success': True, 
+        'new_record_id': new_record.id,
+        'version_number': new_record.version_number,
+        'old_value': old_remark,
+        'new_value': new_remark,
+        'processing_status': new_record.processing_status,
+        'workflow_step': new_record.workflow_step,
+        'result_note': (
+            f'备注已修改，版本号升至 v{new_record.version_number}。\n'
+            f'修改前：{old_remark or "(空)"}\n'
+            f'修改后：{new_remark or "(空)"}\n'
+            f'当前工作流：{new_record.workflow_step}\n'
+            f'当前处理状态：{new_record.processing_status}'
+        )
+    })
 
 
 @app.route('/api/batches')
@@ -396,6 +565,15 @@ def get_statistics():
     step1 = ManualJudgment.query.filter_by(workflow_step='step1_imported', is_latest=True).count()
     step2 = ManualJudgment.query.filter_by(workflow_step='step2_prompt_updated', is_latest=True).count()
     step3 = ManualJudgment.query.filter_by(workflow_step='step3_reviewed', is_latest=True).count()
+    
+    status_breakdown = {
+        'imported': ManualJudgment.query.filter_by(processing_status='imported', is_latest=True).count(),
+        'prompt_updated': ManualJudgment.query.filter_by(processing_status='prompt_updated', is_latest=True).count(),
+        'pending_review': ManualJudgment.query.filter_by(processing_status='pending_review', is_latest=True).count(),
+        'reviewed': ManualJudgment.query.filter_by(processing_status='reviewed', is_latest=True).count(),
+        'rejected': ManualJudgment.query.filter_by(processing_status='rejected', is_latest=True).count(),
+    }
+    
     return jsonify({
         'total': total,
         'needs_review': needs_review,
@@ -403,7 +581,9 @@ def get_statistics():
             'step1_imported': step1,
             'step2_prompt_updated': step2,
             'step3_reviewed': step3
-        }
+        },
+        'status_breakdown': status_breakdown,
+        'import_count': ImportBatch.query.count()
     })
 
 
@@ -422,9 +602,11 @@ def export_batch(batch_id):
             '人工改动说明': r.manual_changes,
             '备注': r.remarks,
             '处理状态': r.processing_status,
+            '状态说明': r.status_note,
             '边界状态': r.boundary_status,
             '边界说明': r.boundary_note,
             '工作流步骤': r.workflow_step,
+            '版本号': r.version_number,
             '复核人': r.reviewer,
             '复核时间': r.review_time
         })

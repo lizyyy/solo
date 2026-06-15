@@ -14,6 +14,7 @@
         .stat-card h3 { color: #666; font-size: 14px; margin-bottom: 8px; }
         .stat-card .number { font-size: 28px; font-weight: bold; color: #1976d2; }
         .stat-card.warning .number { color: #f57c00; }
+        .stat-card.success .number { color: #2e7d32; }
         .sections { display: grid; grid-template-columns: 400px 1fr; gap: 20px; }
         .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
         .card h2 { font-size: 16px; margin-bottom: 15px; color: #333; border-bottom: 1px solid #eee; padding-bottom: 10px; }
@@ -26,6 +27,10 @@
         button.secondary:hover { background: #616161; }
         button.warning { background: #f57c00; }
         button.warning:hover { background: #ef6c00; }
+        button.success { background: #2e7d32; }
+        button.success:hover { background: #1b5e20; }
+        button.danger { background: #c62828; }
+        button.danger:hover { background: #b71c1c; }
         .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
@@ -37,27 +42,68 @@
         .badge-step1 { background: #e3f2fd; color: #1565c0; }
         .badge-step2 { background: #f3e5f5; color: #7b1fa2; }
         .badge-step3 { background: #e8f5e9; color: #2e7d32; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { background: white; margin: 50px auto; padding: 25px; border-radius: 8px; max-width: 900px; max-height: 80vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto; }
+        .modal-content { background: white; margin: 30px auto; padding: 25px; border-radius: 8px; max-width: 1000px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #1976d2; }
+        .modal-header h3 { color: #1976d2; }
         .close { font-size: 24px; cursor: pointer; color: #999; }
         .close:hover { color: #333; }
-        .detail-section { margin-bottom: 20px; }
-        .detail-section h4 { margin-bottom: 10px; color: #333; }
+        .detail-section { margin-bottom: 25px; }
+        .detail-section h4 { margin-bottom: 12px; color: #333; font-size: 15px; padding-left: 8px; border-left: 4px solid #1976d2; }
         .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .detail-item { padding: 10px; background: #fafafa; border-radius: 4px; }
-        .detail-item label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; }
-        .detail-item .value { font-size: 14px; color: #333; word-break: break-all; }
-        .version-item { padding: 15px; border-left: 3px solid #1976d2; background: #fafafa; margin-bottom: 10px; }
-        .version-item .meta { font-size: 12px; color: #666; margin-bottom: 8px; }
-        .version-item .diff { font-family: monospace; font-size: 13px; }
-        .version-item .diff .old { color: #d32f2f; text-decoration: line-through; }
-        .version-item .diff .new { color: #2e7d32; }
+        .detail-item { padding: 12px; background: #fafafa; border-radius: 4px; border-left: 3px solid #e0e0e0; }
+        .detail-item.highlight { border-left-color: #1976d2; background: #e3f2fd; }
+        .detail-item.warning { border-left-color: #f57c00; background: #fff3e0; }
+        .detail-item label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; font-weight: 500; }
+        .detail-item .value { font-size: 14px; color: #333; word-break: break-all; line-height: 1.5; }
+        .status-box { padding: 12px; border-radius: 6px; margin-bottom: 15px; }
+        .status-box.info { background: #e3f2fd; border-left: 4px solid #1976d2; }
+        .status-box.warning { background: #fff3e0; border-left: 4px solid #f57c00; }
+        .status-box.success { background: #e8f5e9; border-left: 4px solid #2e7d32; }
+        .status-box .title { font-weight: 600; font-size: 14px; margin-bottom: 5px; }
+        .status-box .desc { font-size: 13px; line-height: 1.6; }
+        .version-timeline { position: relative; padding-left: 30px; }
+        .version-timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: #e0e0e0; }
+        .version-item { position: relative; padding: 15px; background: #fafafa; border-radius: 6px; margin-bottom: 15px; }
+        .version-item::before { content: ''; position: absolute; left: -25px; top: 20px; width: 12px; height: 12px; border-radius: 50%; background: #1976d2; border: 2px solid white; box-shadow: 0 0 0 2px #1976d2; }
+        .version-item.current { background: #e3f2fd; border: 1px solid #1976d2; }
+        .version-item.current::before { background: #1976d2; }
+        .version-item .meta { font-size: 12px; color: #666; margin-bottom: 8px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .version-item .meta .ver-num { font-weight: 600; color: #1976d2; }
+        .version-item .field { font-size: 13px; color: #555; margin-bottom: 6px; }
+        .version-item .diff { font-family: 'SF Mono', Monaco, monospace; font-size: 12px; background: white; padding: 10px; border-radius: 4px; line-height: 1.6; }
+        .version-item .diff .old { color: #c62828; text-decoration: line-through; }
+        .version-item .diff .new { color: #2e7d32; font-weight: 500; }
+        .version-item .reason { font-size: 12px; color: #666; margin-top: 8px; font-style: italic; }
+        .version-item .snapshot { margin-top: 10px; }
+        .version-item .snapshot summary { cursor: pointer; font-size: 12px; color: #1976d2; }
+        .version-item .snapshot pre { font-size: 11px; background: white; padding: 10px; border-radius: 4px; margin-top: 8px; max-height: 200px; overflow: auto; }
+        .action-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; padding: 15px; background: #f5f5f5; border-radius: 6px; }
+        .action-bar .action-title { font-size: 13px; font-weight: 600; color: #555; width: 100%; margin-bottom: 8px; }
         .pagination { display: flex; gap: 5px; justify-content: center; margin-top: 15px; align-items: center; }
         .pagination button { padding: 5px 10px; font-size: 13px; }
         .pagination span { font-size: 13px; color: #666; }
         .action-btns { display: flex; gap: 5px; }
         .action-btns button { padding: 5px 10px; font-size: 12px; }
+        .batch-item { padding: 12px; border-bottom: 1px solid #eee; }
+        .batch-item:last-child { border-bottom: none; }
+        .batch-item .batch-title { font-weight: 500; font-size: 14px; color: #333; }
+        .batch-item .batch-meta { font-size: 12px; color: #666; margin-top: 5px; }
+        .batch-item .batch-counts { font-size: 12px; margin-top: 5px; }
+        .batch-item .batch-counts span { margin-right: 10px; }
+        .batch-item .batch-note { font-size: 12px; color: #1976d2; margin-top: 5px; font-style: italic; }
+        .result-note { padding: 12px; background: #e8f5e9; border-radius: 6px; margin-top: 10px; font-size: 13px; line-height: 1.6; white-space: pre-line; }
+        .workflow-steps { display: flex; gap: 5px; margin-bottom: 15px; }
+        .workflow-step { flex: 1; text-align: center; padding: 10px; background: #f5f5f5; border-radius: 6px; font-size: 12px; position: relative; }
+        .workflow-step.active { background: #1976d2; color: white; }
+        .workflow-step.done { background: #2e7d32; color: white; }
+        .workflow-step .step-num { font-weight: 600; font-size: 16px; display: block; margin-bottom: 3px; }
+        .workflow-step .step-label { font-size: 11px; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; background: #e0e0e0; color: #555; }
+        .tag.create { background: #e3f2fd; color: #1565c0; }
+        .tag.prompt_update { background: #f3e5f5; color: #7b1fa2; }
+        .tag.remark_update { background: #fff8e1; color: #f57f17; }
+        .tag.import_update { background: #ffe0b2; color: #e65100; }
     </style>
 </head>
 <body>
@@ -74,10 +120,10 @@
                 <div class="number" id="stat-review">0</div>
             </div>
             <div class="stat-card">
-                <h3>步骤1：已导入</h3>
-                <div class="number" id="stat-step1">0</div>
+                <h3>步骤2：提示词已补</h3>
+                <div class="number" id="stat-step2">0</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card success">
                 <h3>步骤3：已复核</h3>
                 <div class="number" id="stat-step3">0</div>
             </div>
@@ -88,8 +134,8 @@
                 <div class="card">
                     <h2>📥 导入人工改判表</h2>
                     <div class="form-group">
-                        <label>批次号（可选，留空自动生成）</label>
-                        <input type="text" id="batch-id" placeholder="例如：202401_batch01">
+                        <label>业务批次号（同批次可重复导入，会自动去重/更新）</label>
+                        <input type="text" id="batch-id" placeholder="例如：BATCH001">
                     </div>
                     <div class="form-group">
                         <label>操作人</label>
@@ -100,10 +146,13 @@
                         <input type="file" id="import-file" accept=".xlsx,.csv">
                     </div>
                     <button onclick="importFile()">开始导入</button>
+                    <div style="font-size:12px; color:#666; margin-top:10px;">
+                        💡 同批次号重复导入不会翻倍，相同内容跳过，不同内容生成新版本
+                    </div>
                 </div>
 
                 <div class="card">
-                    <h2>📋 导入批次历史</h2>
+                    <h2>📋 导入历史</h2>
                     <div id="batch-list"></div>
                 </div>
             </div>
@@ -123,6 +172,14 @@
                             <option value="step2_prompt_updated">步骤2：提示词已更新</option>
                             <option value="step3_reviewed">步骤3：已复核</option>
                         </select>
+                        <select id="filter-status">
+                            <option value="">全部处理状态</option>
+                            <option value="imported">已导入</option>
+                            <option value="prompt_updated">提示词已更新</option>
+                            <option value="pending_review">待复核</option>
+                            <option value="reviewed">已复核</option>
+                            <option value="rejected">已打回</option>
+                        </select>
                         <button class="secondary" onclick="loadRecords()">刷新</button>
                     </div>
                     <table>
@@ -132,6 +189,7 @@
                                 <th>样本编号</th>
                                 <th>模型版本</th>
                                 <th>提示词版本</th>
+                                <th>版本号</th>
                                 <th>边界状态</th>
                                 <th>工作流</th>
                                 <th>操作</th>
@@ -148,7 +206,7 @@
     <div id="detail-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>记录详情与版本历史</h3>
+                <h3>📋 记录详情 & 版本历史</h3>
                 <span class="close" onclick="closeModal()">&times;</span>
             </div>
             <div id="detail-content"></div>
@@ -165,7 +223,7 @@
                 .then(data => {
                     document.getElementById('stat-total').textContent = data.total;
                     document.getElementById('stat-review').textContent = data.needs_review;
-                    document.getElementById('stat-step1').textContent = data.workflow_steps.step1_imported;
+                    document.getElementById('stat-step2').textContent = data.workflow_steps.step2_prompt_updated;
                     document.getElementById('stat-step3').textContent = data.workflow_steps.step3_reviewed;
                 });
         }
@@ -175,11 +233,17 @@
                 .then(r => r.json())
                 .then(batches => {
                     const html = batches.map(b => `
-                        <div style="padding:10px; border-bottom:1px solid #eee; font-size:13px;">
-                            <div style="font-weight:500;">${b.batch_id}</div>
-                            <div style="color:#666;">${b.file_name} | 新增${b.new_count} 更新${b.updated_count} 重复${b.duplicate_count}</div>
-                            <div style="color:#999; font-size:12px;">${b.imported_at}</div>
-                            <button class="secondary" style="margin-top:5px; padding:3px 8px; font-size:12px;" onclick="exportBatch('${b.batch_id}')">导出</button>
+                        <div class="batch-item">
+                            <div class="batch-title">${b.batch_id}</div>
+                            <div class="batch-meta">${b.file_name} | ${b.imported_by} | ${b.imported_at}</div>
+                            <div class="batch-counts">
+                                <span style="color:#2e7d32;">新增 ${b.new_count}</span>
+                                <span style="color:#1976d2;">更新 ${b.updated_count}</span>
+                                <span style="color:#757575;">重复 ${b.duplicate_count}</span>
+                                ${b.boundary_alert_count > 0 ? `<span style="color:#f57c00;">边界 ${b.boundary_alert_count}</span>` : ''}
+                            </div>
+                            <div class="batch-note">${b.import_note || ''}</div>
+                            <button class="secondary" style="margin-top:8px; padding:3px 8px; font-size:12px;" onclick="exportBatch('${b.batch_id}')">导出</button>
                         </div>
                     `).join('');
                     document.getElementById('batch-list').innerHTML = html;
@@ -189,9 +253,11 @@
         function loadRecords() {
             const boundary = document.getElementById('filter-boundary').value;
             const workflow = document.getElementById('filter-workflow').value;
+            const status = document.getElementById('filter-status').value;
             let url = `/api/records?page=${currentPage}&per_page=${perPage}`;
             if (boundary) url += `&boundary=${boundary}`;
             if (workflow) url += `&workflow=${workflow}`;
+            if (status) url += `&status=${status}`;
             
             fetch(url)
                 .then(r => r.json())
@@ -211,6 +277,7 @@
                                 <td>${r.sample_id}</td>
                                 <td>${r.model_version || '-'}</td>
                                 <td>${r.prompt_version || '-'}</td>
+                                <td>v${r.version_number}</td>
                                 <td>${boundaryBadge}</td>
                                 <td>${stepBadge}</td>
                                 <td class="action-btns">
@@ -248,7 +315,15 @@
             fetch('/api/import', { method: 'POST', body: formData })
                 .then(r => r.json())
                 .then(data => {
-                    alert(`导入完成！总计${data.total}条，新增${data.new}条，更新${data.updated}条，重复${data.duplicate}条`);
+                    alert(
+                        `导入完成！\n` +
+                        `总计：${data.total}条\n` +
+                        `新增：${data.new}条\n` +
+                        `更新：${data.updated}条\n` +
+                        `重复：${data.duplicate}条\n` +
+                        `边界告警：${data.boundary_alert}条\n\n` +
+                        `${data.note}`
+                    );
                     loadStats();
                     loadBatches();
                     loadRecords();
@@ -260,14 +335,57 @@
                 .then(r => r.json())
                 .then(data => {
                     const r = data.record;
-                    let html = '<div class="detail-section"><h4>📌 基本信息</h4>';
+                    
+                    let step1Class = r.workflow_step === 'step1_imported' ? 'active' : 
+                                    (['step2_prompt_updated', 'step3_reviewed'].includes(r.workflow_step) ? 'done' : '');
+                    let step2Class = r.workflow_step === 'step2_prompt_updated' ? 'active' :
+                                    (r.workflow_step === 'step3_reviewed' ? 'done' : '');
+                    let step3Class = r.workflow_step === 'step3_reviewed' ? 'active' : '';
+                    
+                    let statusBox = '';
+                    if (r.boundary_status === 'needs_review') {
+                        statusBox = `
+                            <div class="status-box warning">
+                                <div class="title">⚠️ 边界规则触发 - 待运营复核</div>
+                                <div class="desc">${r.boundary_note || ''}</div>
+                            </div>
+                        `;
+                    } else if (r.processing_status === 'reviewed') {
+                        statusBox = `
+                            <div class="status-box success">
+                                <div class="title">✅ 已复核通过</div>
+                                <div class="desc">复核人：${r.reviewer || '-'} | 复核时间：${r.review_time || '-'}</div>
+                            </div>
+                        `;
+                    }
+                    
+                    let html = '';
+                    
+                    html += '<div class="workflow-steps">';
+                    html += `<div class="workflow-step ${step1Class}"><span class="step-num">1</span><span class="step-label">首次导入</span></div>`;
+                    html += `<div class="workflow-step ${step2Class}"><span class="step-num">2</span><span class="step-label">补提示词版本</span></div>`;
+                    html += `<div class="workflow-step ${step3Class}"><span class="step-num">3</span><span class="step-label">运营复核</span></div>`;
+                    html += '</div>';
+                    
+                    html += statusBox;
+                    
+                    if (r.status_note) {
+                        html += `
+                            <div class="status-box info">
+                                <div class="title">📝 当前状态说明</div>
+                                <div class="desc">${r.status_note}</div>
+                            </div>
+                        `;
+                    }
+                    
+                    html += '<div class="detail-section"><h4>📌 基本信息</h4>';
                     html += '<div class="detail-grid">';
-                    html += `<div class="detail-item"><label>原始行号</label><div class="value">${r.original_row_number}</div></div>`;
+                    html += `<div class="detail-item"><label>原始行号</label><div class="value">第 ${r.original_row_number} 行</div></div>`;
                     html += `<div class="detail-item"><label>样本编号</label><div class="value">${r.sample_id}</div></div>`;
-                    html += `<div class="detail-item"><label>模型版本</label><div class="value">${r.model_version || '-'}</div></div>`;
-                    html += `<div class="detail-item"><label>提示词版本</label><div class="value">${r.prompt_version || '-'}</div></div>`;
+                    html += `<div class="detail-item highlight"><label>模型版本</label><div class="value">${r.model_version || '-'}</div></div>`;
+                    html += `<div class="detail-item highlight"><label>提示词版本</label><div class="value">${r.prompt_version || '(未填写)'}</div></div>`;
                     html += `<div class="detail-item"><label>处理状态</label><div class="value">${r.processing_status}</div></div>`;
-                    html += `<div class="detail-item"><label>边界状态</label><div class="value">${r.boundary_status}</div></div>`;
+                    html += `<div class="detail-item"><label>当前版本</label><div class="value">v${r.version_number}（共 ${data.latest_version_number} 个版本）</div></div>`;
                     html += '</div></div>';
                     
                     html += '<div class="detail-section"><h4>📝 内容详情</h4>';
@@ -275,36 +393,75 @@
                     html += `<div class="detail-item"><label>原始回答</label><div class="value">${r.original_answer || '-'}</div></div>`;
                     html += `<div class="detail-item"><label>人工改判回答</label><div class="value">${r.manual_answer || '-'}</div></div>`;
                     html += `<div class="detail-item"><label>人工改动说明</label><div class="value">${r.manual_changes || '-'}</div></div>`;
-                    html += `<div class="detail-item"><label>备注</label><div class="value">${r.remarks || '-'}</div></div>`;
-                    if (r.boundary_note) html += `<div class="detail-item"><label style="color:#ef6c00;">边界说明</label><div class="value" style="color:#ef6c00;">${r.boundary_note}</div></div>`;
+                    html += `<div class="detail-item warning"><label>⚠️ 备注（小孟的重要说明）</label><div class="value">${r.remarks || '(无)'}</div></div>`;
                     html += '</div></div>';
                     
-                    html += '<div class="detail-section"><h4>🔧 操作</h4>';
-                    html += `<div style="display:flex; gap:10px; flex-wrap:wrap;">`;
-                    html += `<button onclick="updatePromptVersion(${r.id}, '${r.prompt_version}')">补全/修改提示词版本号</button>`;
-                    html += `<button onclick="updateRemark(${r.id}, '${r.remarks}')">修改备注</button>`;
-                    html += '</div></div>';
+                    html += '<div class="detail-section"><h4>🔧 操作区</h4>';
+                    html += '<div class="action-bar">';
+                    html += '<div class="action-title">模型评测同事操作</div>';
+                    html += `<button onclick="updatePromptVersion(${r.id}, '${r.prompt_version || ''}')">补全/修改提示词版本号</button>`;
+                    html += `<button class="secondary" onclick="updateRemark(${r.id}, '${(r.remarks||'').replace(/'/g, "\\'")}')">修改备注</button>`;
+                    html += '</div>';
                     
-                    html += '<div class="detail-section"><h4>📜 版本历史</h4>';
-                    if (data.versions.length === 0) {
+                    if (r.boundary_status === 'needs_review') {
+                        html += '<div class="action-bar" style="background:#fff3e0;">';
+                        html += '<div class="action-title" style="color:#ef6c00;">运营复核人操作</div>';
+                        html += `<button class="success" onclick="reviewAction(${r.id}, 'approve')">复核通过</button>`;
+                        html += `<button class="danger" onclick="reviewAction(${r.id}, 'reject')">打回</button>`;
+                        html += `<button class="secondary" onclick="reviewAction(${r.id}, 'rollback')">回滚</button>`;
+                        html += '</div>';
+                    }
+                    html += '</div>';
+                    
+                    html += '<div class="detail-section"><h4>📜 版本历史时间线（完整留痕）</h4>';
+                    if (data.version_history.length === 0) {
                         html += '<p style="color:#999;">暂无版本历史</p>';
                     } else {
-                        html += data.versions.map(v => `
-                            <div class="version-item">
-                                <div class="meta">版本 ${v.version_number} | ${v.field_name} | 由 ${v.changed_by} 修改 | ${v.changed_at}</div>
-                                <div class="meta">原因：${v.change_reason || '-'}</div>
-                                <div class="diff">
-                                    <span class="old">- ${v.old_value || '(空)'}</span><br>
-                                    <span class="new">+ ${v.new_value || '(空)'}</span>
+                        html += '<div class="version-timeline">';
+                        const history = [...data.version_history].reverse();
+                        history.forEach((v, idx) => {
+                            const isCurrent = idx === 0 && r.is_latest;
+                            const tagClass = v.change_type || 'update';
+                            html += `
+                                <div class="version-item ${isCurrent ? 'current' : ''}">
+                                    <div class="meta">
+                                        <span class="ver-num">版本 #${v.version_number}</span>
+                                        <span class="tag ${tagClass}">${getChangeTypeLabel(v.change_type)}</span>
+                                        <span>${v.changed_by}</span>
+                                        <span>${v.changed_at}</span>
+                                    </div>
+                                    <div class="field">字段：${v.field_name}</div>
+                                    <div class="diff">
+                                        <span class="old">- ${v.old_value || '(空)'}</span><br>
+                                        <span class="new">+ ${v.new_value || '(空)'}</span>
+                                    </div>
+                                    <div class="reason">原因：${v.change_reason || '-'}</div>
+                                    ${v.full_snapshot_after ? `
+                                        <details class="snapshot">
+                                            <summary>查看完整快照 →</summary>
+                                            <pre>${JSON.stringify(v.full_snapshot_after, null, 2)}</pre>
+                                        </details>
+                                    ` : ''}
                                 </div>
-                            </div>
-                        `).join('');
+                            `;
+                        });
+                        html += '</div>';
                     }
                     html += '</div>';
                     
                     document.getElementById('detail-content').innerHTML = html;
                     document.getElementById('detail-modal').style.display = 'block';
                 });
+        }
+
+        function getChangeTypeLabel(type) {
+            const map = {
+                'create': '首次创建',
+                'prompt_update': '提示词更新',
+                'remark_update': '备注更新',
+                'import_update': '导入更新'
+            };
+            return map[type] || type;
         }
 
         function updatePromptVersion(id, current) {
@@ -315,8 +472,9 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ prompt_version: newVer, changed_by: '小孟' })
             }).then(r => r.json()).then(d => {
-                alert('更新成功！');
-                closeModal();
+                if (d.result_note) alert(d.result_note);
+                else alert('更新成功！');
+                viewDetail(d.new_record_id || id);
                 loadRecords();
                 loadStats();
             });
@@ -330,21 +488,29 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ remarks: newRemark, changed_by: '小孟' })
             }).then(r => r.json()).then(d => {
-                alert('备注已更新，版本历史已记录！');
-                closeModal();
+                if (d.result_note) alert(d.result_note);
+                else alert('备注已更新！');
+                viewDetail(d.new_record_id || id);
                 loadRecords();
             });
         }
 
         function reviewRecord(id) {
-            const action = confirm('确认通过复核吗？取消则打回') ? 'approve' : 'reject';
+            const action = confirm('确认通过复核吗？\n确定=通过，取消=打回') ? 'approve' : 'reject';
             const note = prompt('请输入复核意见：');
+            reviewAction(id, action, note);
+        }
+
+        function reviewAction(id, action, note) {
+            if (note === undefined) note = prompt('请输入复核意见：');
+            if (note === null) return;
             fetch(`/api/record/${id}/review`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: action, reviewer: '运营复核人', note: note })
             }).then(r => r.json()).then(d => {
-                alert('复核完成！');
+                alert(d.result_note);
+                viewDetail(id);
                 loadRecords();
                 loadStats();
             });
