@@ -1,0 +1,74 @@
+{
+  "生成时间": "2026-06-15T09:03:09.259128",
+  "统计概览": {
+    "总记录数": 3,
+    "标注员留言数": 3,
+    "模型输出片段数": 1,
+    "冲突样本数": 1,
+    "已解决冲突数": 1,
+    "状态分布": {
+      "正常通过": 1,
+      "产品经理复核通过": 1,
+      "已补录修正": 1
+    },
+    "待产品经理复核数": 0,
+    "人工修正次数": 1,
+    "重跑执行次数": 1,
+    "工作流步骤": 5,
+    "当前操作人": "周姐"
+  },
+  "记录明细": [
+    {
+      "id": "7579364b",
+      "keyword": "保健品螺旋藻片",
+      "status": "正常通过",
+      "source": "标注员留言",
+      "link_404": false,
+      "reference_url": "https://example.com/good/rules-001",
+      "annotator": "小明",
+      "rerun_count": 0,
+      "has_conflict": false,
+      "confirm_reason": "引用的规则链接有效，保健食品确实不能宣传疗效，与官方口径一致",
+      "reject_reason": null
+    },
+    {
+      "id": "c39b3fc8",
+      "keyword": "美白祛斑霜特效版",
+      "status": "产品经理复核通过",
+      "source": "标注员留言",
+      "link_404": true,
+      "reference_url": "https://example.com/404-old-training-2023",
+      "annotator": "小李",
+      "rerun_count": 0,
+      "has_conflict": false,
+      "confirm_reason": "经核实最新Q3口径，美白祛斑类产品仍需禁推，虽然旧培训链接失效，但禁推结论仍然成立，确认通过",
+      "reject_reason": null
+    },
+    {
+      "id": "71a0491f",
+      "keyword": "七天长高营养液",
+      "status": "已补录修正",
+      "source": "标注员留言",
+      "link_404": false,
+      "reference_url": null,
+      "annotator": "小王",
+      "rerun_count": 1,
+      "has_conflict": true,
+      "confirm_reason": "标注群讨论过增高产品确实需要禁推，先过但稍后补看模型片段确认口径",
+      "reject_reason": null
+    }
+  ],
+  "冲突样本表": [
+    {
+      "id": "a3a8be4c",
+      "forbidden_record_id": "71a0491f",
+      "type": "发现旧口径",
+      "old_content": "七天长高营养液",
+      "new_content": "模型输出片段：经检索历史标注记录，\"七天长高营养液\"属于旧口径，最新口径应为\"强效生长激素口服液\"，注意旧口径已在Q2更新中废弃",
+      "resolved": true,
+      "resolution_note": "确认废弃旧口径，启用新口径关键词，与Q2口径更新文档一致",
+      "resolved_by": "周姐",
+      "confirm_reason": "模型输出显示'七天长高营养液'已在Q2更新中废弃，最新口径为'强效生长激素口服液'"
+    }
+  ]
+}

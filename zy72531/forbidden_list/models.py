@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 from enum import Enum
 
 
@@ -12,18 +12,39 @@ class ForbiddenStatus(Enum):
     CONFLICT = "口径冲突"
     SUPPLEMENTED = "已补录修正"
     REJECTED = "已驳回"
+    PM_APPROVED = "产品经理复核通过"
+    PM_REJECTED = "产品经理驳回"
+    RERUN = "已重跑"
 
 
 class RecordSource(Enum):
     ANNOTATOR_COMMENT = "标注员留言"
     MODEL_OUTPUT = "模型输出片段"
     MANUAL_CORRECTION = "人工修正"
+    PM_REVIEW = "产品经理复核"
+    RERUN = "重跑结果"
 
 
 class ConflictType(Enum):
     OLD_CALIBER_FOUND = "发现旧口径"
     LINK_BROKEN = "链接失效"
     CONTENT_MISMATCH = "内容不一致"
+
+
+class ActionType(Enum):
+    CREATE = "创建记录"
+    LINK_CHECK = "链接检查"
+    LEAD_REVIEW_PASS = "负责人复核通过"
+    LEAD_REVIEW_PM = "负责人转PM复核"
+    LEAD_REVIEW_REJECT = "负责人驳回"
+    SUPPLEMENT_MODEL = "补录模型输出"
+    CONFLICT_DETECTED = "检测到口径冲突"
+    MANUAL_CORRECT = "人工修正"
+    CONFLICT_RESOLVED = "冲突已解决"
+    PM_APPROVE = "产品经理复核通过"
+    PM_REJECT = "产品经理驳回"
+    RERUN_EXECUTE = "执行重跑"
+    RERUN_RESULT = "重跑结果生效"
 
 
 @dataclass
@@ -48,6 +69,18 @@ class ModelOutputFragment:
 
 
 @dataclass
+class OperationDetail:
+    action: str
+    operator: str
+    before_status: Optional[str] = None
+    after_status: Optional[str] = None
+    confirm_reason: Optional[str] = None
+    reject_reason: Optional[str] = None
+    note: Optional[str] = None
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
 class ForbiddenRecord:
     id: str
     keyword: str
@@ -61,15 +94,40 @@ class ForbiddenRecord:
     link_404: bool = False
     conflict_note: Optional[str] = None
     pm_review_note: Optional[str] = None
+    reject_reason: Optional[str] = None
+    confirm_reason: Optional[str] = None
+    rerun_count: int = 0
+    last_rerun_at: Optional[datetime] = None
+    resolved_keyword: Optional[str] = None
     history: List[Dict] = field(default_factory=list)
 
-    def add_history(self, action: str, operator: str, note: str = ""):
-        self.history.append({
+    def add_history(
+        self,
+        action: str,
+        operator: str,
+        note: str = "",
+        before_status: Optional[str] = None,
+        after_status: Optional[str] = None,
+        confirm_reason: Optional[str] = None,
+        reject_reason: Optional[str] = None,
+        **kwargs
+    ):
+        entry = {
             "action": action,
             "operator": operator,
             "note": note,
-            "timestamp": datetime.now().isoformat()
-        })
+            "timestamp": datetime.now().isoformat(),
+        }
+        if before_status:
+            entry["before_status"] = before_status
+        if after_status:
+            entry["after_status"] = after_status
+        if confirm_reason:
+            entry["confirm_reason"] = confirm_reason
+        if reject_reason:
+            entry["reject_reason"] = reject_reason
+        entry.update(kwargs)
+        self.history.append(entry)
         self.updated_at = datetime.now()
 
 
@@ -85,6 +143,8 @@ class ConflictSample:
     resolved_by: Optional[str] = None
     resolved_at: Optional[datetime] = None
     resolution_note: Optional[str] = None
+    confirm_reason: Optional[str] = None
+    reject_reason: Optional[str] = None
 
 
 @dataclass
@@ -94,3 +154,5 @@ class WorkflowState:
     records_processed: int = 0
     conflicts_found: int = 0
     pm_review_needed: int = 0
+    rerun_executed: int = 0
+    manual_corrections: int = 0
