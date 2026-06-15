@@ -9,7 +9,7 @@ interface NoteEditorProps {
 }
 
 export const NoteEditor = ({ existingNote, experimentId }: NoteEditorProps) => {
-  const { saveParamNote } = useExperimentStore();
+  const saveParamNote = useExperimentStore((s) => s.saveParamNote);
   const [isEditing, setIsEditing] = useState(!existingNote);
   const [thresholds, setThresholds] = useState<ThresholdItem[]>(
     existingNote?.thresholds || [

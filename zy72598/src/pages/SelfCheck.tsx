@@ -1,19 +1,29 @@
 import { useExperimentStore } from '@/store/useExperimentStore';
 import { CheckItemCard } from '@/components/SelfCheck/CheckItemCard';
-import { CheckSquare, Play, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { CheckSquare, Play, AlertCircle, CheckCircle2, Download, Eye } from 'lucide-react';
+import { generateExportReport, downloadExportReport } from '@/utils/exporter';
+import { useState } from 'react';
 
 export const SelfCheckPage = () => {
-  const {
-    experiments,
-    currentExperimentId,
-    setCurrentExperiment,
-    runSelfCheckForExperiment,
-    getCurrentSelfCheck,
-    getCurrentExperiment,
-  } = useExperimentStore();
+  const experiments = useExperimentStore((s) => s.experiments);
+  const currentExperimentId = useExperimentStore((s) => s.currentExperimentId);
+  const selfCheckResults = useExperimentStore((s) => s.selfCheckResults);
+  const trainingLogs = useExperimentStore((s) => s.trainingLogs);
+  const paramNotes = useExperimentStore((s) => s.paramNotes);
+  const summariesMap = useExperimentStore((s) => s.summaries);
+  const conflictsMap = useExperimentStore((s) => s.conflicts);
+  const setCurrentExperiment = useExperimentStore((s) => s.setCurrentExperiment);
+  const runSelfCheckForExperiment = useExperimentStore((s) => s.runSelfCheckForExperiment);
+  const addHistoryRecord = useExperimentStore((s) => s.addHistoryRecord);
 
-  const selfCheckResult = getCurrentSelfCheck();
-  const currentExperiment = getCurrentExperiment();
+  const selfCheckResult = currentExperimentId ? selfCheckResults[currentExperimentId] || null : null;
+  const currentExperiment = experiments.find((e) => e.id === currentExperimentId) || null;
+  const currentLog = currentExperimentId ? trainingLogs[currentExperimentId] || null : null;
+  const currentNote = currentExperimentId ? paramNotes[currentExperimentId] || null : null;
+  const summaries = currentExperimentId ? summariesMap[currentExperimentId] || [] : [];
+  const conflicts = currentExperimentId ? conflictsMap[currentExperimentId] || [] : [];
+
+  const [showPreview, setShowPreview] = useState(false);
 
   const handleRunCheck = () => {
     if (currentExperimentId) {
@@ -24,6 +34,30 @@ export const SelfCheckPage = () => {
   const allPassed = selfCheckResult ? Object.values(selfCheckResult).every((r) => r.passed) : false;
   const passedCount = selfCheckResult ? Object.values(selfCheckResult).filter((r) => r.passed).length : 0;
   const totalCount = selfCheckResult ? Object.keys(selfCheckResult).length : 4;
+
+  const handleExport = () => {
+    if (!currentExperiment || !currentExperimentId) return;
+    const report = generateExportReport(
+      currentExperiment,
+      currentLog,
+      currentNote,
+      summaries,
+      conflicts,
+      selfCheckResult
+    );
+    const filename = `导出一致性报告_${currentExperiment.name}_${new Date().toISOString().slice(0, 10)}.json`;
+    downloadExportReport(report, filename);
+    addHistoryRecord(currentExperimentId, '导出一致性报告', '阿越', { filename });
+  };
+
+  const handlePreview = () => {
+    setShowPreview(!showPreview);
+  };
+
+  const getExportPreview = () => {
+    if (!currentExperiment) return '';
+    return generateExportReport(currentExperiment, currentLog, currentNote, summaries, conflicts, selfCheckResult);
+  };
 
   return (
     <div className="p-8">
@@ -83,7 +117,7 @@ export const SelfCheckPage = () => {
             ) : (
               <AlertCircle className="w-10 h-10 text-amber-500" />
             )}
-            <div>
+            <div className="flex-1">
               <h3
                 className={`text-lg font-semibold ${allPassed ? 'text-green-900' : 'text-amber-900'}`}
                 style={{ fontFamily: "'Source Serif Pro', serif" }}
@@ -96,7 +130,37 @@ export const SelfCheckPage = () => {
                   : '请关注未通过的自检项，必要时请推荐负责人复核'}
               </p>
             </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handlePreview}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  showPreview ? 'bg-gray-200 text-gray-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <Eye className="w-4 h-4" />
+                {showPreview ? '收起预览' : '预览报告'}
+              </button>
+              <button
+                onClick={handleExport}
+                className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                下载导出报告
+              </button>
+            </div>
           </div>
+
+          {showPreview && currentExperiment && (
+            <div className="bg-white rounded-xl border border-gray-200 mb-6 overflow-hidden">
+              <div className="p-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+                <h3 className="font-medium text-gray-900">导出一致性报告预览</h3>
+                <span className="text-xs text-gray-500">JSON 格式</span>
+              </div>
+              <pre className="p-4 text-xs text-gray-700 overflow-auto max-h-96">
+                {getExportPreview()}
+              </pre>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             {Object.entries(selfCheckResult).map(([key, value]) => (

@@ -3,10 +3,12 @@ import { HistoryTimeline } from '@/components/History/HistoryTimeline';
 import { History, Clock } from 'lucide-react';
 
 export const HistoryPage = () => {
-  const { experiments, currentExperimentId, setCurrentExperiment, getCurrentHistory } =
-    useExperimentStore();
+  const experiments = useExperimentStore((s) => s.experiments);
+  const currentExperimentId = useExperimentStore((s) => s.currentExperimentId);
+  const historyMap = useExperimentStore((s) => s.history);
+  const setCurrentExperiment = useExperimentStore((s) => s.setCurrentExperiment);
 
-  const historyRecords = getCurrentHistory();
+  const historyRecords = currentExperimentId ? historyMap[currentExperimentId] || [] : [];
 
   return (
     <div className="p-8">

@@ -34,6 +34,7 @@ interface ExperimentState {
 
   initMockData: () => void;
   setCurrentExperiment: (id: string | null) => void;
+  createExperiment: (name: string) => string;
 
   importTrainingLog: (experimentId: string, log: Omit<TrainingLog, 'id' | 'experimentId' | 'importedAt'>) => void;
   saveParamNote: (experimentId: string, note: Omit<ParamNote, 'id' | 'experimentId' | 'recordedAt'>) => void;
@@ -126,6 +127,25 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   },
 
   setCurrentExperiment: (id) => set({ currentExperimentId: id }),
+
+  createExperiment: (name) => {
+    const id = `exp-${Date.now()}`;
+    const newExperiment: Experiment = {
+      id,
+      name,
+      status: 'draft',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    set((state) => {
+      const newExperiments = [...state.experiments, newExperiment];
+      const newState = { ...state, experiments: newExperiments, currentExperimentId: id };
+      saveToStorage(newState);
+      return newState;
+    });
+    get().addHistoryRecord(id, '创建实验', '阿越', { experimentName: name });
+    return id;
+  },
 
   importTrainingLog: (experimentId, logData) => {
     const newLog: TrainingLog = {

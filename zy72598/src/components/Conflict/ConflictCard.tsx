@@ -14,7 +14,8 @@ interface ConflictCardProps {
 }
 
 export const ConflictCard = ({ conflict }: ConflictCardProps) => {
-  const { resolveConflict, currentExperimentId } = useExperimentStore();
+  const resolveConflict = useExperimentStore((s) => s.resolveConflict);
+  const currentExperimentId = useExperimentStore((s) => s.currentExperimentId);
 
   const handleResolve = (status: 'confirmed' | 'rejected') => {
     if (currentExperimentId) {

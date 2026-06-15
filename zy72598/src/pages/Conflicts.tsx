@@ -3,10 +3,12 @@ import { ConflictCard } from '@/components/Conflict/ConflictCard';
 import { AlertTriangle, AlertCircle } from 'lucide-react';
 
 export const ConflictsPage = () => {
-  const { experiments, currentExperimentId, setCurrentExperiment, getCurrentConflicts } =
-    useExperimentStore();
+  const experiments = useExperimentStore((s) => s.experiments);
+  const currentExperimentId = useExperimentStore((s) => s.currentExperimentId);
+  const conflictsMap = useExperimentStore((s) => s.conflicts);
+  const setCurrentExperiment = useExperimentStore((s) => s.setCurrentExperiment);
 
-  const conflicts = getCurrentConflicts();
+  const conflicts = currentExperimentId ? conflictsMap[currentExperimentId] || [] : [];
   const pendingCount = conflicts.filter((c) => c.status === 'pending').length;
 
   return (

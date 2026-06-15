@@ -3,17 +3,14 @@ import { SummaryView } from '@/components/Summary/SummaryView';
 import { FileText, RefreshCw } from 'lucide-react';
 
 export const SummaryPage = () => {
-  const {
-    experiments,
-    currentExperimentId,
-    setCurrentExperiment,
-    getCurrentSummaries,
-    regenerateSummary,
-    getCurrentExperiment,
-  } = useExperimentStore();
+  const experiments = useExperimentStore((s) => s.experiments);
+  const currentExperimentId = useExperimentStore((s) => s.currentExperimentId);
+  const summariesMap = useExperimentStore((s) => s.summaries);
+  const setCurrentExperiment = useExperimentStore((s) => s.setCurrentExperiment);
+  const regenerateSummary = useExperimentStore((s) => s.regenerateSummary);
 
-  const summaries = getCurrentSummaries();
-  const currentExperiment = getCurrentExperiment();
+  const summaries = currentExperimentId ? summariesMap[currentExperimentId] || [] : [];
+  const currentExperiment = experiments.find((e) => e.id === currentExperimentId) || null;
 
   const handleRegenerate = () => {
     if (currentExperimentId) {
