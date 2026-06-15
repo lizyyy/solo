@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { Button, Tag, message } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { Button, Tag, message, Space } from 'antd';
+import { ArrowLeftOutlined, DatabaseOutlined, ExperimentOutlined } from '@ant-design/icons';
 import { Bar } from '@ant-design/charts';
 import { useAppStore } from '../store';
 import type { EntityMergeRecord } from '../types';
 
 interface Props {
   onRecordClick: (record: EntityMergeRecord) => void;
+  onCloseDrillDown?: () => void;
 }
 
-export const ChartView: React.FC<Props> = ({ onRecordClick }) => {
-  const { mergeRecords, getBucketById } = useAppStore();
+export const ChartView: React.FC<Props> = ({ onRecordClick, onCloseDrillDown }) => {
+  const { mergeRecords, getBucketById, navigateToBucket, navigateToNegativeSamples, getNegativeSamplesByRecord } = useAppStore();
   const [drillDownRecord, setDrillDownRecord] = useState<EntityMergeRecord | null>(null);
 
   const chartData = mergeRecords.map(r => ({
@@ -98,12 +99,44 @@ export const ChartView: React.FC<Props> = ({ onRecordClick }) => {
             ))}
           </div>
           <div style={{ marginTop: 16 }}>
-            <Button type="primary" onClick={() => onRecordClick(drillDownRecord)}>
-              查看完整详情
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={() => message.info('已导航到负样本列表')}>
-              查看关联负样本
-            </Button>
+            <Space wrap>
+              <Button type="primary" onClick={() => {
+                setDrillDownRecord(null);
+                onRecordClick(drillDownRecord);
+              }}>
+                查看完整详情
+              </Button>
+              <Button
+                icon={<ExperimentOutlined />}
+                onClick={() => {
+                  const relatedSamples = getNegativeSamplesByRecord(drillDownRecord.id);
+                  navigateToNegativeSamples(
+                    drillDownRecord.bucketIds[0] || null,
+                    relatedSamples.map(s => s.id)
+                  );
+                  setDrillDownRecord(null);
+                  onCloseDrillDown?.();
+                  message.success(`已定位到负样本列表，筛选了${relatedSamples.length}条关联样本`);
+                }}
+              >
+                查看关联负样本
+              </Button>
+              <Button
+                icon={<DatabaseOutlined />}
+                onClick={() => {
+                  navigateToBucket(drillDownRecord.bucketIds[0]);
+                  setDrillDownRecord(null);
+                  onCloseDrillDown?.();
+                  message.success(`已定位到线上实验桶：${getBucketById(drillDownRecord.bucketIds[0])?.name || drillDownRecord.bucketIds[0]}`);
+                }}
+              >
+                回到线上实验桶
+              </Button>
+            </Space>
+            <div style={{ marginTop: 12, fontSize: 12, color: '#8c8c8c' }}>
+              <strong>结果说明：</strong>该记录特征缺失，使用了默认评分，已标记为"复核中"。
+              请推荐负责人确认是否可在特征缺失情况下合并，或返回负样本列表补充材料后再处理。
+            </div>
           </div>
         </div>
       </div>

@@ -231,3 +231,22 @@ body {
 .threed-link.warning {
   background: #fa8c16;
 }
+
+.highlight-row {
+  animation: highlight-pulse 2s ease-in-out;
+  background: #fffbe6 !important;
+  border-left: 3px solid #faad14 !important;
+}
+
+@keyframes highlight-pulse {
+  0%, 100% {
+    background: #fffbe6;
+  }
+  50% {
+    background: #fff1b8;
+  }
+}
+
+.highlight-row:hover {
+  background: #fff1b8 !important;
+}

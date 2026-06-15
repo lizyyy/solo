@@ -166,10 +166,14 @@ export const MergeRecordPanel: React.FC = () => {
     },
   ];
 
+  const handleCloseDrillDown = () => {
+    // 关闭chart drill-down时不需要特别处理
+  };
+
   const renderContent = () => {
     switch (viewMode) {
       case 'chart':
-        return <ChartView onRecordClick={handleRowClick} />;
+        return <ChartView onRecordClick={handleRowClick} onCloseDrillDown={handleCloseDrillDown} />;
       case '3d':
         return <ThreeDView onRecordClick={handleRowClick} />;
       default:
@@ -190,7 +194,7 @@ export const MergeRecordPanel: React.FC = () => {
   };
 
   return (
-    <div className="panel">
+    <div className="panel" id="merge-record-panel">
       <div className="panel-title">
         <span>
           实体合并记录

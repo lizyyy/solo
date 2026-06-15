@@ -1,12 +1,10 @@
-import React from 'react';
-import { Steps, Alert } from 'antd';
-import { BucketImportPanel } from './components/BucketImportPanel';
-import { NegativeSamplePanel } from './components/NegativeSamplePanel';
+import React, { useRef, useEffect } from 'react';
+import { Steps, Alert, message } from 'antd';
+import { BucketImportPanel, type BucketImportPanelRef } from './components/BucketImportPanel';
+import { NegativeSamplePanel, type NegativeSamplePanelRef } from './components/NegativeSamplePanel';
 import { MergeRecordPanel } from './components/MergeRecordPanel';
 import { useAppStore } from './store';
 import type { WorkflowStep } from './types';
-
-const { Step } = Steps;
 
 const steps: { key: WorkflowStep; title: string; description: string }[] = [
   { key: 'import_bucket', title: '第一步：导入线上实验桶', description: '导入并选择要处理的线上实验桶' },
@@ -18,13 +16,62 @@ const steps: { key: WorkflowStep; title: string; description: string }[] = [
 const stepOrder: WorkflowStep[] = ['import_bucket', 'review_negative', 'update_summary', 'completed'];
 
 function App() {
-  const { currentStep, setCurrentStep, mergeRecords } = useAppStore();
+  const {
+    currentStep,
+    setCurrentStep,
+    mergeRecords,
+    scrollTarget,
+    setScrollTarget,
+    highlightBucketId,
+    highlightSampleIds,
+  } = useAppStore();
+
+  const bucketPanelRef = useRef<BucketImportPanelRef>(null);
+  const negativePanelRef = useRef<NegativeSamplePanelRef>(null);
+  const mergePanelRef = useRef<HTMLDivElement>(null);
 
   const currentStepIndex = stepOrder.indexOf(currentStep);
+
+  useEffect(() => {
+    if (scrollTarget) {
+      if (scrollTarget === 'bucket' && highlightBucketId) {
+        setTimeout(() => {
+          const row = document.querySelector(`[data-bucket-id="${highlightBucketId}"]`);
+          if (row) {
+            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setScrollTarget(null);
+          } else {
+            bucketPanelRef.current?.scrollToBucket(highlightBucketId);
+            setScrollTarget(null);
+          }
+        }, 200);
+      } else if (scrollTarget === 'negative') {
+        setTimeout(() => {
+          if (highlightSampleIds.length > 0 && highlightSampleIds[0]) {
+            negativePanelRef.current?.scrollToSample(highlightSampleIds[0]);
+            setScrollTarget(null);
+          } else {
+            const panel = document.getElementById('negative-sample-panel');
+            if (panel) {
+              panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            setScrollTarget(null);
+          }
+        }, 200);
+      } else if (scrollTarget === 'merge') {
+        const panel = document.getElementById('merge-record-panel');
+        if (panel) {
+          panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        setScrollTarget(null);
+      }
+    }
+  }, [scrollTarget, highlightBucketId, highlightSampleIds, setScrollTarget]);
 
   const handleStepChange = (index: number) => {
     const targetStep = stepOrder[index];
     if (targetStep === 'review_negative' && mergeRecords.length === 0) {
+      message.warning('请先生成实体合并记录');
       return;
     }
     setCurrentStep(targetStep);
@@ -56,11 +103,17 @@ function App() {
         />
       )}
 
-      <BucketImportPanel />
+      <div ref={mergePanelRef}>
+        <MergeRecordPanel />
+      </div>
 
-      <MergeRecordPanel />
+      <div id="bucket-panel">
+        <BucketImportPanel ref={bucketPanelRef} />
+      </div>
 
-      <NegativeSamplePanel />
+      <div id="negative-sample-panel">
+        <NegativeSamplePanel ref={negativePanelRef} />
+      </div>
     </div>
   );
 }

@@ -1,18 +1,54 @@
-import React from 'react';
-import { Table, Button, Space, Tag, message, Popconfirm, Select } from 'antd';
-import { EyeOutlined } from '@ant-design/icons';
+import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import { Table, Button, Space, Tag, message, Popconfirm, Alert } from 'antd';
+import { EyeOutlined, FilterOutlined, HighlightOutlined, CloseOutlined } from '@ant-design/icons';
 import { useAppStore } from '../store';
 import type { ColumnsType } from 'antd/es/table';
 import type { NegativeSample } from '../types';
 
-const { Option } = Select;
-
-interface Props {
-  bucketFilter?: string;
+export interface NegativeSamplePanelRef {
+  scrollToSample: (sampleId: string) => void;
 }
 
-export const NegativeSamplePanel: React.FC<Props> = ({ bucketFilter }) => {
-  const { negativeSamples, updateNegativeSampleReview, addNegativeSamples, currentStep, setCurrentStep, getBucketById, selectedBucketIds } = useAppStore();
+export const NegativeSamplePanel = forwardRef<NegativeSamplePanelRef>((_, ref) => {
+  const {
+    negativeSamples,
+    updateNegativeSampleReview,
+    addNegativeSamples,
+    currentStep,
+    setCurrentStep,
+    getBucketById,
+    selectedBucketIds,
+    selectedBucketForNegativeFilter,
+    setSelectedBucketForNegativeFilter,
+    highlightSampleIds,
+    setHighlightSampleIds,
+    buckets,
+  } = useAppStore();
+
+  useImperativeHandle(ref, () => ({
+    scrollToSample: (sampleId: string) => {
+      setTimeout(() => {
+        const row = document.querySelector(`[data-sample-id="${sampleId}"]`);
+        if (row) {
+          row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          row.classList.add('highlight-row');
+          setTimeout(() => row.classList.remove('highlight-row'), 3000);
+        }
+      }, 100);
+    },
+  }));
+
+  useEffect(() => {
+    if (highlightSampleIds.length > 0) {
+      setTimeout(() => {
+        const firstId = highlightSampleIds[0];
+        const row = document.querySelector(`[data-sample-id="${firstId}"]`);
+        if (row) {
+          row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 500);
+    }
+  }, [highlightSampleIds]);
 
   const handleImportDemo = () => {
     if (selectedBucketIds.length === 0) {
@@ -34,9 +70,20 @@ export const NegativeSamplePanel: React.FC<Props> = ({ bucketFilter }) => {
     message.success('复核完成');
   };
 
-  const filteredSamples = bucketFilter
-    ? negativeSamples.filter(s => s.bucketId === bucketFilter)
+  const clearFilter = () => {
+    setSelectedBucketForNegativeFilter(null);
+    setHighlightSampleIds([]);
+  };
+
+  const filteredSamples = selectedBucketForNegativeFilter
+    ? negativeSamples.filter(s => s.bucketId === selectedBucketForNegativeFilter)
     : negativeSamples;
+
+  const filterBucketName = selectedBucketForNegativeFilter
+    ? getBucketById(selectedBucketForNegativeFilter)?.name || selectedBucketForNegativeFilter
+    : null;
+
+  const filterBucket = buckets.find(b => b.bucketId === selectedBucketForNegativeFilter);
 
   const columns: ColumnsType<NegativeSample> = [
     {
@@ -44,15 +91,23 @@ export const NegativeSamplePanel: React.FC<Props> = ({ bucketFilter }) => {
       dataIndex: 'entityName',
       key: 'entityName',
       width: 150,
+      render: (text, record) => (
+        <Space>
+          {highlightSampleIds.includes(record.id) && <HighlightOutlined style={{ color: '#fa8c16' }} />}
+          <span>{text}</span>
+        </Space>
+      ),
     },
     {
       title: '所属桶',
       dataIndex: 'bucketId',
       key: 'bucketId',
-      width: 150,
+      width: 180,
       render: (text) => {
         const bucket = getBucketById(text);
-        return bucket ? bucket.name : <code>{text}</code>;
+        return bucket ? (
+          <Tag color="blue">{bucket.name}</Tag>
+        ) : <code>{text}</code>;
       },
     },
     {
@@ -136,17 +191,38 @@ export const NegativeSamplePanel: React.FC<Props> = ({ bucketFilter }) => {
           >
             <Button size="small">需复核</Button>
           </Popconfirm>
-          <Button size="small" danger>拒绝</Button>
+          <Button size="small" danger onClick={() => handleReview(record.id, 'rejected')}>拒绝</Button>
         </Space>
       ),
     },
   ];
 
   return (
-    <div className="panel">
+    <div className="panel" id="negative-sample-panel">
       <div className="panel-title">
-        <span>负样本列表 {filteredSamples.some(s => s.featureMissing && s.defaultScoreUsed) && <span className="badge-warning">含特征缺失默认分</span>}</span>
         <Space>
+          <span>
+            负样本列表
+            {filteredSamples.some(s => s.featureMissing && s.defaultScoreUsed) && (
+              <span className="badge-warning" style={{ marginLeft: 8 }}>含特征缺失默认分</span>
+            )}
+            {highlightSampleIds.length > 0 && (
+              <span className="badge-info" style={{ marginLeft: 8 }}>高亮 {highlightSampleIds.length} 条</span>
+            )}
+          </span>
+        </Space>
+        <Space wrap>
+          {selectedBucketForNegativeFilter && (
+            <Tag
+              color="blue"
+              closable
+              onClose={clearFilter}
+              icon={<FilterOutlined />}
+              style={{ marginRight: 8 }}
+            >
+              筛选：{filterBucketName}
+            </Tag>
+          )}
           <Button icon={<EyeOutlined />} onClick={handleImportDemo}>
             导入演示负样本
           </Button>
@@ -157,14 +233,44 @@ export const NegativeSamplePanel: React.FC<Props> = ({ bucketFilter }) => {
           )}
         </Space>
       </div>
+
+      {selectedBucketForNegativeFilter && (
+        <Alert
+          message={
+            <Space>
+              <FilterOutlined />
+              <span>当前仅显示实验桶「{filterBucketName}」的负样本，共 {filteredSamples.length} 条</span>
+              {highlightSampleIds.length > 0 && (
+                <span>，其中 {highlightSampleIds.length} 条为关联样本已高亮</span>
+              )}
+              <Button type="link" size="small" icon={<CloseOutlined />} onClick={clearFilter}>
+                清除筛选
+              </Button>
+            </Space>
+          }
+          type="info"
+          showIcon={false}
+          style={{ marginBottom: 16 }}
+        />
+      )}
+
       <Table
         columns={columns}
         dataSource={filteredSamples}
         rowKey="id"
         size="small"
         pagination={{ pageSize: 5 }}
-        rowClassName={(record) => record.featureMissing && record.defaultScoreUsed ? 'feature-missing-row' : 'clickable-row'}
+        rowClassName={(record) => {
+          let className = record.featureMissing && record.defaultScoreUsed ? 'feature-missing-row' : 'clickable-row';
+          if (highlightSampleIds.includes(record.id)) {
+            className += ' highlight-row';
+          }
+          return className;
+        }}
+        onRow={(record) => ({
+          'data-sample-id': record.id,
+        } as any)}
       />
     </div>
   );
-};
+});

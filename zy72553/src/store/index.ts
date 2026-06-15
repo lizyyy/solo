@@ -11,6 +11,9 @@ import type {
   ModelParams,
 } from '../types';
 
+export type ScrollTarget = 'bucket' | 'negative' | 'merge' | null;
+export type DrawerTabKey = 'basic' | 'summary' | 'history' | 'samples';
+
 interface AppState {
   buckets: OnlineExperimentBucket[];
   negativeSamples: NegativeSample[];
@@ -21,11 +24,17 @@ interface AppState {
   selectedRecordId: string | null;
   currentUser: string;
   selectedNegativeSampleIds: string[];
+  selectedBucketForNegativeFilter: string | null;
+  scrollTarget: ScrollTarget;
+  highlightBucketId: string | null;
+  highlightSampleIds: string[];
+  drawerActiveTab: DrawerTabKey;
+  lastUpdatedHistoryId: string | null;
 
   importBuckets: (buckets: Omit<OnlineExperimentBucket, 'id' | 'importTime' | 'importBatchId' | 'importedBy'>[]) => { added: number; skipped: number };
   addNegativeSamples: (samples: Omit<NegativeSample, 'id'>[]) => void;
   updateNegativeSampleReview: (sampleId: string, status: NegativeSample['reviewStatus'], note?: string) => void;
-  updateMergeRemark: (recordId: string, newRemark: string, reason?: string) => void;
+  updateMergeRemark: (recordId: string, newRemark: string, reason?: string) => string | null;
   setViewMode: (mode: ViewMode) => void;
   setCurrentStep: (step: WorkflowStep) => void;
   selectBucket: (bucketId: string) => void;
@@ -41,6 +50,14 @@ interface AppState {
   getNegativeSamplesByBucket: (bucketId: string) => NegativeSample[];
   getNegativeSamplesByRecord: (recordId: string) => NegativeSample[];
   getRecordsByBucket: (bucketId: string) => EntityMergeRecord[];
+  setSelectedBucketForNegativeFilter: (bucketId: string | null) => void;
+  setScrollTarget: (target: ScrollTarget) => void;
+  setHighlightBucketId: (bucketId: string | null) => void;
+  setHighlightSampleIds: (sampleIds: string[]) => void;
+  setDrawerActiveTab: (tab: DrawerTabKey) => void;
+  clearLastUpdatedHistoryId: () => void;
+  navigateToBucket: (bucketId: string) => void;
+  navigateToNegativeSamples: (bucketId: string | null, sampleIds?: string[]) => void;
 }
 
 const defaultModelParams: ModelParams = {
@@ -63,6 +80,12 @@ export const useAppStore = create<AppState>((set, get) => ({
   selectedRecordId: null,
   currentUser: '林姐',
   selectedNegativeSampleIds: [],
+  selectedBucketForNegativeFilter: null,
+  scrollTarget: null,
+  highlightBucketId: null,
+  highlightSampleIds: [],
+  drawerActiveTab: 'basic',
+  lastUpdatedHistoryId: null,
 
   importBuckets: (newBuckets) => {
     const state = get();
@@ -124,7 +147,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   updateMergeRemark: (recordId, newRemark, reason) => {
     const state = get();
     const record = state.mergeRecords.find(r => r.id === recordId);
-    if (!record) return;
+    if (!record) return null;
+    if (newRemark === record.remark) return null;
 
     const historyEntry: VersionHistory = {
       id: uuidv4(),
@@ -143,7 +167,11 @@ export const useAppStore = create<AppState>((set, get) => ({
           ? { ...r, remark: newRemark, versionHistory: [...r.versionHistory, historyEntry] }
           : r
       ),
+      drawerActiveTab: 'history',
+      lastUpdatedHistoryId: historyEntry.id,
     });
+
+    return historyEntry.id;
   },
 
   setViewMode: (mode) => set({ viewMode: mode }),
@@ -262,4 +290,29 @@ export const useAppStore = create<AppState>((set, get) => ({
     return get().negativeSamples.filter(s => record.negativeSampleIds.includes(s.id));
   },
   getRecordsByBucket: (bucketId) => get().mergeRecords.filter(r => r.bucketIds.includes(bucketId)),
+
+  setSelectedBucketForNegativeFilter: (bucketId) => set({ selectedBucketForNegativeFilter: bucketId }),
+  setScrollTarget: (target) => set({ scrollTarget: target }),
+  setHighlightBucketId: (bucketId) => set({ highlightBucketId: bucketId }),
+  setHighlightSampleIds: (sampleIds) => set({ highlightSampleIds: sampleIds }),
+  setDrawerActiveTab: (tab) => set({ drawerActiveTab: tab }),
+  clearLastUpdatedHistoryId: () => set({ lastUpdatedHistoryId: null }),
+
+  navigateToBucket: (bucketId) => {
+    set({
+      scrollTarget: 'bucket',
+      highlightBucketId: bucketId,
+      selectedBucketForNegativeFilter: null,
+      highlightSampleIds: [],
+    });
+  },
+
+  navigateToNegativeSamples: (bucketId, sampleIds) => {
+    set({
+      scrollTarget: 'negative',
+      selectedBucketForNegativeFilter: bucketId,
+      highlightSampleIds: sampleIds || [],
+      highlightBucketId: null,
+    });
+  },
 }));

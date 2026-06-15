@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Tag, Drawer } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { Button, Tag, Drawer, message } from 'antd';
+import { ArrowLeftOutlined, DatabaseOutlined, ExperimentOutlined } from '@ant-design/icons';
 import { useAppStore } from '../store';
 import type { EntityMergeRecord } from '../types';
 
@@ -14,7 +14,7 @@ interface NodePosition {
 }
 
 export const ThreeDView: React.FC<Props> = ({ onRecordClick }) => {
-  const { mergeRecords, getBucketById } = useAppStore();
+  const { mergeRecords, getBucketById, navigateToBucket, navigateToNegativeSamples, getNegativeSamplesByRecord } = useAppStore();
   const [selectedNode, setSelectedNode] = useState<EntityMergeRecord | null>(null);
   const [nodePositions, setNodePositions] = useState<Record<string, NodePosition>>({});
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -145,18 +145,49 @@ export const ThreeDView: React.FC<Props> = ({ onRecordClick }) => {
                 </div>
               </div>
             </div>
-            <div style={{ width: 200 }}>
+            <div style={{ width: 220 }}>
               <h4 style={{ marginBottom: 12 }}>快速导航</h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <Button type="primary" onClick={() => { setDrawerOpen(false); onRecordClick(selectedNode); }}>
+                <Button type="primary" onClick={() => {
+                  setDrawerOpen(false);
+                  onRecordClick(selectedNode);
+                }}>
                   查看完整详情
                 </Button>
-                <Button onClick={() => { setDrawerOpen(false); }}>
+                <Button
+                  icon={<DatabaseOutlined />}
+                  onClick={() => {
+                    navigateToBucket(selectedNode.bucketIds[0]);
+                    setDrawerOpen(false);
+                    message.success(
+                      `已定位到线上实验桶：${getBucketById(selectedNode.bucketIds[0])?.name || selectedNode.bucketIds[0]}，` +
+                      `该桶关联了 ${getNegativeSamplesByRecord(selectedNode.id).length} 条负样本`
+                    );
+                  }}
+                >
                   回到线上实验桶
                 </Button>
-                <Button onClick={() => { setDrawerOpen(false); }}>
+                <Button
+                  icon={<ExperimentOutlined />}
+                  onClick={() => {
+                    const relatedSamples = getNegativeSamplesByRecord(selectedNode.id);
+                    navigateToNegativeSamples(
+                      selectedNode.bucketIds[0] || null,
+                      relatedSamples.map(s => s.id)
+                    );
+                    setDrawerOpen(false);
+                    message.success(
+                      `已定位到负样本列表，筛选了${relatedSamples.length}条关联样本，` +
+                      `这些样本都使用了默认评分，请推荐负责人复核`
+                    );
+                  }}
+                >
                   查看负样本列表
                 </Button>
+              </div>
+              <div style={{ marginTop: 12, padding: 8, background: '#fff7e6', borderRadius: 4, fontSize: 12, color: '#fa8c16' }}>
+                <strong>结果说明：</strong>该记录特征缺失使用默认分，已标记为"复核中"。
+                别急着归正常，请推荐负责人在负样本列表中确认或补充材料。
               </div>
             </div>
           </div>
