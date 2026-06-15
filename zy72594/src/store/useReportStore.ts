@@ -15,7 +15,7 @@ import {
   mockAnomalies,
   mockParams,
 } from '../utils/mockData';
-import { generateHash, generateId } from '../utils/hash';
+import { generateContentFingerprint, generateId } from '../utils/hash';
 
 interface ReportState {
   buckets: ExperimentBucket[];
@@ -49,14 +49,14 @@ export const useReportStore = create<ReportState>((set, get) => ({
   selectedReportId: null,
 
   importBucket: (name, data, importUser) => {
-    const hash = generateHash(data);
-    const existingBucket = get().buckets.find(b => b.hash === hash);
+    const fingerprint = generateContentFingerprint(name, data);
+    const existingBucket = get().buckets.find(b => b.hash === fingerprint);
     
     if (existingBucket) {
       const existingReport = get().reports.find(r => r.bucketId === existingBucket.id);
       return {
         success: false,
-        message: `该实验桶已存在（${existingBucket.name}），导入时间：${existingBucket.importTime}`,
+        message: `该实验桶已存在（${existingBucket.name}），导入时间：${existingBucket.importTime}，不会重复创建报告`,
         report: existingReport,
       };
     }
@@ -70,7 +70,7 @@ export const useReportStore = create<ReportState>((set, get) => ({
       name,
       importTime: now,
       importUser,
-      hash,
+      hash: fingerprint,
       data,
     };
 
@@ -135,6 +135,15 @@ export const useReportStore = create<ReportState>((set, get) => ({
 
     const hasTimeWindowIssue = newRemark.includes('时间窗') || newRemark.includes('跨天');
 
+    let statusChangeDesc = '';
+    if (oldRemark === newRemark) {
+      statusChangeDesc = '备注未变更';
+    } else if (hasTimeWindowIssue && report.status !== 'pending_review') {
+      statusChangeDesc = '状态由「正常」变为「待复核」：备注中提及时间窗/跨天问题，需实验平台负责人复核';
+    } else if (hasTimeWindowIssue && report.status === 'pending_review') {
+      statusChangeDesc = '状态保持「待复核」：备注中仍提及时间窗/跨天问题';
+    }
+
     set(state => ({
       negativeSamples: state.negativeSamples.map(s =>
         s.id === sampleId ? { ...s, remark: newRemark } : s
@@ -151,7 +160,16 @@ export const useReportStore = create<ReportState>((set, get) => ({
             }
           : r
       ),
-      versions: [...state.versions, newVersion],
+      versions: [...state.versions, newVersion, ...(statusChangeDesc ? [{
+        id: `ver-status-${generateId()}`,
+        reportId,
+        version: newVersionStr,
+        remarkBefore: '',
+        remarkAfter: statusChangeDesc,
+        modifyUser: '系统',
+        modifyTime: now,
+        diff: '状态变化说明',
+      }] : [])],
     }));
   },
 
@@ -184,6 +202,19 @@ export const useReportStore = create<ReportState>((set, get) => ({
       diff: approved ? '复核通过' : '复核驳回',
     };
 
+    const statusDesc: ReportVersion = {
+      id: `ver-status-${generateId()}`,
+      reportId,
+      version: newVersionStr,
+      remarkBefore: '',
+      remarkAfter: approved
+        ? '状态由「待复核」变为「已复核」：实验平台负责人确认时间窗问题无误，报告可继续流转'
+        : '状态保持「待复核」：实验平台负责人驳回，需重新统计后再提交',
+      modifyUser: '系统',
+      modifyTime: now,
+      diff: '状态变化说明',
+    };
+
     set(state => ({
       reports: state.reports.map(r =>
         r.id === reportId
@@ -196,7 +227,7 @@ export const useReportStore = create<ReportState>((set, get) => ({
             }
           : r
       ),
-      versions: [...state.versions, newVersion],
+      versions: [...state.versions, newVersion, statusDesc],
     }));
   },
 

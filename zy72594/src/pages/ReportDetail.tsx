@@ -84,15 +84,27 @@ export function ReportDetail() {
       </div>
 
       {report.hasTimeWindowIssue && (
-        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start justify-between">
-          <div className="flex items-start gap-3">
-            <AlertTriangle size={20} className="text-amber-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-medium text-amber-800">存在时间窗穿越问题</p>
-              <p className="text-sm text-amber-700">检测到数据采集存在跨天统计，可能导致效果虚高，请实验平台负责人复核</p>
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+          <div className="flex items-start justify-between mb-3">
+            <div className="flex items-start gap-3">
+              <AlertTriangle size={20} className="text-amber-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-medium text-amber-800">存在时间窗穿越问题</p>
+                <p className="text-sm text-amber-700">检测到数据采集存在跨天统计，可能导致效果虚高，请实验平台负责人复核</p>
+              </div>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="ml-8 p-3 bg-amber-100/60 rounded-lg mb-3">
+            <p className="text-xs text-amber-800">
+              <span className="font-medium">当前状态：</span>
+              {report.status === 'pending_review'
+                ? '待实验平台负责人复核，暂不归为正常。复核通过后状态将变为「已复核」，驳回则需重新统计。'
+                : report.status === 'reviewed'
+                ? '已由实验平台负责人复核通过，时间窗问题确认无误。'
+                : '正常'}
+            </p>
+          </div>
+          <div className="flex gap-2 ml-8">
             <button
               onClick={() => handleReview(false)}
               className="px-3 py-1.5 text-sm border border-amber-300 text-amber-700 rounded-lg hover:bg-amber-100 transition-colors"

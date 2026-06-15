@@ -14,7 +14,7 @@ export const mockBuckets: ExperimentBucket[] = [
     name: '推荐算法A/B测试-2024Q2-实验组A',
     importTime: '2024-06-01 10:30:00',
     importUser: '推荐策略老唐',
-    hash: 'a1b2c3d4',
+    hash: '648822ad',
     data: { algorithm: 'v2.1', sampleCount: 10000, clickRate: 0.125 },
   },
   {
@@ -22,7 +22,7 @@ export const mockBuckets: ExperimentBucket[] = [
     name: '冷启动策略验证-对照组B',
     importTime: '2024-06-03 14:20:00',
     importUser: '推荐策略老唐',
-    hash: 'e5f6g7h8',
+    hash: '2baca9ea',
     data: { algorithm: 'baseline', sampleCount: 8500, clickRate: 0.112 },
   },
 ];

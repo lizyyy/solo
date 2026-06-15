@@ -22,7 +22,6 @@ export function ImportPage() {
     const data = {
       algorithm: algorithm || 'default',
       sampleCount: parseInt(sampleCount) || 1000,
-      timestamp: Date.now(),
     };
 
     const importResult = importBucket(bucketName, data, '推荐策略老唐');

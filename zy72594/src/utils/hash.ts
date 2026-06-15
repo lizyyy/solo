@@ -1,8 +1,15 @@
-export function generateHash(data: unknown): string {
-  const str = JSON.stringify(data);
+export function generateContentFingerprint(name: string, data: Record<string, unknown>): string {
+  const stable: Record<string, unknown> = {};
+  const transientKeys = new Set(['timestamp', 'importTime', 'createdAt', 'updatedAt']);
+  for (const key of Object.keys(data).sort()) {
+    if (!transientKeys.has(key)) {
+      stable[key] = data[key];
+    }
+  }
+  const raw = JSON.stringify({ name, ...stable });
   let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
+  for (let i = 0; i < raw.length; i++) {
+    const char = raw.charCodeAt(i);
     hash = ((hash << 5) - hash) + char;
     hash = hash & hash;
   }
