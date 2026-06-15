@@ -1,11 +1,11 @@
 {
-  "track_4083eef6": {
-    "track_id": "track_4083eef6",
+  "track_b7eb82e2": {
+    "track_id": "track_b7eb82e2",
     "snapshot_id": "snap_20260601_001",
     "feature_snapshot": {
       "snapshot_id": "snap_20260601_001",
       "version": "v2.3.1",
-      "create_time": "2026-06-01T16:57:49.778330",
+      "create_time": "2026-06-09T14:04:32.540925",
       "weight_threshold": 0.65,
       "weight_threshold_version": "caliber_2026_q2",
       "features": {
@@ -18,7 +18,7 @@
     "training_log": {
       "log_id": "log_20260601_001",
       "snapshot_id": "snap_20260601_001",
-      "train_time": "2026-06-01T16:57:49.778343",
+      "train_time": "2026-06-09T14:04:32.540940",
       "metric_name": "weight_curve",
       "metric_values": [
         0.45,
@@ -50,7 +50,7 @@
         "value": 0.72,
         "confidence": 0.95,
         "caliber": "caliber_2026_q2",
-        "update_time": "2026-06-07T16:57:49.778346",
+        "update_time": "2026-06-15T14:04:32.540946",
         "source": "feature_snapshot"
       },
       {
@@ -59,7 +59,7 @@
         "value": 0.61,
         "confidence": 0.92,
         "caliber": "caliber_2026_q2",
-        "update_time": "2026-06-07T16:57:49.778348",
+        "update_time": "2026-06-15T14:04:32.540949",
         "source": "feature_snapshot"
       },
       {
@@ -68,7 +68,7 @@
         "value": 0.48,
         "confidence": 0.88,
         "caliber": "caliber_2026_q2",
-        "update_time": "2026-06-07T16:57:49.778349",
+        "update_time": "2026-06-15T14:04:32.540959",
         "source": "feature_snapshot"
       }
     ],
@@ -78,21 +78,21 @@
         "action": "导入特征快照",
         "operator": "data_engineer",
         "detail": "导入特征快照 snap_20260601_001 (版本 v2.3.1)，阈值版本 caliber_2026_q2",
-        "time": "2026-06-07T16:57:49.778405"
+        "time": "2026-06-15T14:04:32.541023"
       },
       {
         "step": "step2_check_training_log",
         "action": "补看训练日志曲线",
         "operator": "推荐策略老唐",
         "detail": "关联训练日志 log_20260601_001，权重口径 caliber_2026_q2",
-        "time": "2026-06-07T16:57:49.778593"
+        "time": "2026-06-15T14:04:32.541187"
       },
       {
         "step": "step3_update_stratified_metrics",
         "action": "更新分层指标",
         "operator": "system",
         "detail": "更新 3 条分层指标，口径：caliber_2026_q2",
-        "time": "2026-06-07T16:57:49.778723"
+        "time": "2026-06-15T14:04:32.541303"
       }
     ],
     "conflicts": [],
@@ -100,16 +100,16 @@
     "reviewer": null,
     "review_time": null,
     "review_comment": "",
-    "create_time": "2026-06-07T16:57:49.778403",
-    "update_time": "2026-06-07T16:57:49.778727"
+    "create_time": "2026-06-15T14:04:32.541021",
+    "update_time": "2026-06-15T14:04:32.541304"
   },
-  "track_ffd0ab90": {
-    "track_id": "track_ffd0ab90",
+  "track_84958483": {
+    "track_id": "track_84958483",
     "snapshot_id": "snap_20260603_002",
     "feature_snapshot": {
       "snapshot_id": "snap_20260603_002",
       "version": "v2.3.1",
-      "create_time": "2026-06-03T16:57:49.779159",
+      "create_time": "2026-06-11T14:04:32.542001",
       "weight_threshold": 0.7,
       "weight_threshold_version": "caliber_2026_q2_v2",
       "features": {
@@ -122,7 +122,7 @@
     "training_log": {
       "log_id": "log_20260603_002",
       "snapshot_id": "snap_20260603_002",
-      "train_time": "2026-06-03T16:57:49.779162",
+      "train_time": "2026-06-11T14:04:32.542006",
       "metric_name": "weight_curve",
       "metric_values": [
         0.48,
@@ -154,7 +154,7 @@
         "value": 0.76,
         "confidence": 0.94,
         "caliber": "caliber_2026_q2_v2",
-        "update_time": "2026-06-07T16:57:49.779164",
+        "update_time": "2026-06-15T14:04:32.542008",
         "source": "feature_snapshot"
       },
       {
@@ -163,7 +163,7 @@
         "value": 0.67,
         "confidence": 0.91,
         "caliber": "caliber_2026_q2_v2",
-        "update_time": "2026-06-07T16:57:49.779165",
+        "update_time": "2026-06-15T14:04:32.542009",
         "source": "feature_snapshot"
       },
       {
@@ -172,7 +172,7 @@
         "value": 0.52,
         "confidence": 0.87,
         "caliber": "caliber_2026_q2_v2",
-        "update_time": "2026-06-07T16:57:49.779165",
+        "update_time": "2026-06-15T14:04:32.542010",
         "source": "feature_snapshot"
       }
     ],
@@ -182,35 +182,35 @@
         "action": "导入特征快照",
         "operator": "data_engineer",
         "detail": "导入特征快照 snap_20260603_002 (版本 v2.3.1)，阈值版本 caliber_2026_q2_v2",
-        "time": "2026-06-07T16:57:49.779178"
+        "time": "2026-06-15T14:04:32.542024"
       },
       {
         "step": "step2_check_training_log",
         "action": "补看训练日志曲线",
         "operator": "推荐策略老唐",
         "detail": "关联训练日志 log_20260603_002，权重口径 caliber_2026_q2",
-        "time": "2026-06-07T16:57:49.779360"
+        "time": "2026-06-15T14:04:32.542178"
       },
       {
         "step": "step2_check_training_log",
         "action": "检测到冲突，待人工确认",
         "operator": "推荐策略老唐",
         "detail": "发现 2 处冲突，请推荐策略老唐确认或驳回",
-        "time": "2026-06-07T16:57:49.779373"
+        "time": "2026-06-15T14:04:32.542189"
       },
       {
         "step": "conflict_resolution",
         "action": "确认阈值改报告旧值状态",
         "operator": "数据科学家A",
         "detail": "数据科学家确认：阈值改过但报告仍写旧值，留档待复核。备注：确认阈值版本不匹配为报告同步延迟导致",
-        "time": "2026-06-07T16:57:49.779601"
+        "time": "2026-06-15T14:04:32.542366"
       },
       {
         "step": "step3_update_stratified_metrics",
         "action": "更新分层指标",
         "operator": "system",
         "detail": "更新 3 条分层指标，口径：caliber_2026_q2_v2",
-        "time": "2026-06-07T16:57:49.779801"
+        "time": "2026-06-15T14:04:32.542527"
       }
     ],
     "conflicts": [
@@ -229,18 +229,18 @@
     ],
     "review_decision": "confirm",
     "reviewer": "数据科学家A",
-    "review_time": "2026-06-07T16:57:49.779600",
+    "review_time": "2026-06-15T14:04:32.542365",
     "review_comment": "确认阈值版本不匹配为报告同步延迟导致",
-    "create_time": "2026-06-07T16:57:49.779176",
-    "update_time": "2026-06-07T16:57:49.779803"
+    "create_time": "2026-06-15T14:04:32.542023",
+    "update_time": "2026-06-15T14:04:32.542528"
   },
-  "track_5f156a36": {
-    "track_id": "track_5f156a36",
+  "track_f15eb2aa": {
+    "track_id": "track_f15eb2aa",
     "snapshot_id": "snap_20260525_003",
     "feature_snapshot": {
       "snapshot_id": "snap_20260525_003",
       "version": "v2.3.0",
-      "create_time": "2026-05-25T16:57:49.780180",
+      "create_time": "2026-06-02T14:04:32.542900",
       "weight_threshold": 0.6,
       "weight_threshold_version": "caliber_2026_q1",
       "features": {
@@ -253,7 +253,7 @@
     "training_log": {
       "log_id": "log_20260525_003",
       "snapshot_id": "snap_20260525_003",
-      "train_time": "2026-05-25T16:57:49.780184",
+      "train_time": "2026-06-02T14:04:32.542903",
       "metric_name": "weight_curve",
       "metric_values": [
         0.42,
@@ -285,7 +285,7 @@
         "value": 0.68,
         "confidence": 0.9,
         "caliber": "caliber_2026_q1",
-        "update_time": "2026-06-07T16:57:49.780185",
+        "update_time": "2026-06-15T14:04:32.542905",
         "source": "training_log_backfill"
       },
       {
@@ -294,7 +294,7 @@
         "value": 0.58,
         "confidence": 0.87,
         "caliber": "caliber_2026_q1",
-        "update_time": "2026-06-07T16:57:49.780186",
+        "update_time": "2026-06-15T14:04:32.542905",
         "source": "training_log_backfill"
       },
       {
@@ -303,7 +303,7 @@
         "value": 0.45,
         "confidence": 0.82,
         "caliber": "caliber_2026_q1",
-        "update_time": "2026-06-07T16:57:49.780187",
+        "update_time": "2026-06-15T14:04:32.542906",
         "source": "training_log_backfill"
       }
     ],
@@ -313,35 +313,35 @@
         "action": "导入特征快照",
         "operator": "data_engineer",
         "detail": "导入特征快照 snap_20260525_003 (版本 v2.3.0)，阈值版本 caliber_2026_q1",
-        "time": "2026-06-07T16:57:49.780200"
+        "time": "2026-06-15T14:04:32.542917"
       },
       {
         "step": "step2_check_training_log",
         "action": "补看训练日志曲线",
         "operator": "推荐策略老唐",
         "detail": "关联训练日志 log_20260525_003，权重口径 caliber_2026_q1",
-        "time": "2026-06-07T16:57:49.780448"
+        "time": "2026-06-15T14:04:32.543149"
       },
       {
         "step": "step2_check_training_log",
         "action": "检测到冲突，待人工确认",
         "operator": "推荐策略老唐",
         "detail": "发现 1 处冲突，请推荐策略老唐确认或驳回",
-        "time": "2026-06-07T16:57:49.780463"
+        "time": "2026-06-15T14:04:32.543156"
       },
       {
         "step": "conflict_resolution",
         "action": "确认从训练日志补录",
         "operator": "数据科学家B",
         "detail": "数据科学家确认：从训练日志曲线补录的旧口径数据。备注：确认从TensorBoard回溯补录，口径与当时一致",
-        "time": "2026-06-07T16:57:49.780771"
+        "time": "2026-06-15T14:04:32.543408"
       },
       {
         "step": "step3_update_stratified_metrics",
         "action": "更新分层指标",
         "operator": "system",
         "detail": "更新 3 条分层指标，口径：caliber_2026_q1",
-        "time": "2026-06-07T16:57:49.781029"
+        "time": "2026-06-15T14:04:32.543648"
       }
     ],
     "conflicts": [
@@ -354,9 +354,9 @@
     ],
     "review_decision": "confirm",
     "reviewer": "数据科学家B",
-    "review_time": "2026-06-07T16:57:49.780769",
+    "review_time": "2026-06-15T14:04:32.543406",
     "review_comment": "确认从TensorBoard回溯补录，口径与当时一致",
-    "create_time": "2026-06-07T16:57:49.780199",
-    "update_time": "2026-06-07T16:57:49.781031"
+    "create_time": "2026-06-15T14:04:32.542916",
+    "update_time": "2026-06-15T14:04:32.543649"
   }
 }

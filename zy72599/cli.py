@@ -1,5 +1,6 @@
 import argparse
 import sys
+import os
 from datetime import datetime
 
 from models import ReviewDecision
@@ -10,9 +11,16 @@ from sample_data import (
     create_training_log_supplement_sample,
 )
 
+DEFAULT_STORAGE = "track_records.json"
+
+
+def _get_tracker(args) -> WeightTracker:
+    storage = getattr(args, "storage", DEFAULT_STORAGE)
+    return WeightTracker(storage_path=storage)
+
 
 def cmd_import_snapshot(args):
-    tracker = WeightTracker()
+    tracker = _get_tracker(args)
     from models import FeatureSnapshot
     snapshot = FeatureSnapshot(
         snapshot_id=args.snapshot_id,
@@ -24,13 +32,14 @@ def cmd_import_snapshot(args):
         source=args.source,
     )
     record = tracker.step1_import_snapshot(snapshot, args.operator)
+    print(f"TRACK_ID={record.track_id}")
     print(f"✅ 导入成功，追踪ID: {record.track_id}")
     print(f"   快照ID: {record.snapshot_id}")
     print(f"   阈值版本: {record.feature_snapshot.weight_threshold_version}")
 
 
 def cmd_check_log(args):
-    tracker = WeightTracker()
+    tracker = _get_tracker(args)
     from models import TrainingLogCurve
     log = TrainingLogCurve(
         log_id=args.log_id,
@@ -55,7 +64,7 @@ def cmd_check_log(args):
 
 
 def cmd_resolve(args):
-    tracker = WeightTracker()
+    tracker = _get_tracker(args)
     decision = ReviewDecision(args.decision)
     record = tracker.resolve_conflict(args.track_id, decision, args.reviewer, args.comment)
     print(f"✅ 复核完成")
@@ -64,7 +73,7 @@ def cmd_resolve(args):
 
 
 def cmd_update_metrics(args):
-    tracker = WeightTracker()
+    tracker = _get_tracker(args)
     from models import StratifiedMetric
     metrics = [
         StratifiedMetric(
@@ -105,7 +114,7 @@ def cmd_update_metrics(args):
 
 
 def cmd_show(args):
-    tracker = WeightTracker()
+    tracker = _get_tracker(args)
     record = tracker.get_record(args.track_id)
     if not record:
         print(f"❌ 追踪记录不存在: {args.track_id}")
@@ -114,21 +123,23 @@ def cmd_show(args):
 
 
 def cmd_replay(args):
-    tracker = WeightTracker()
-    commands = tracker.export_replay_commands(args.track_id)
+    tracker = _get_tracker(args)
+    storage = getattr(args, "storage", DEFAULT_STORAGE)
+    commands = tracker.export_replay_commands(args.track_id, storage_path=storage)
     print("\n".join(commands))
 
 
 def cmd_run_samples(args):
+    storage = getattr(args, "storage", DEFAULT_STORAGE)
     print("=" * 60)
     print("样本权重异常追踪 - 三种场景演示")
+    print(f"存储文件: {storage}")
     print("=" * 60)
     print()
 
-    tracker = WeightTracker(storage_path="sample_records.json")
-    import os
-    if os.path.exists("sample_records.json"):
-        os.remove("sample_records.json")
+    if os.path.exists(storage):
+        os.remove(storage)
+    tracker = WeightTracker(storage_path=storage)
 
     scenarios = [
         ("【场景一】正常记录", create_normal_sample, "normal"),
@@ -202,9 +213,10 @@ def cmd_run_samples(args):
             f.write(review_text)
         print(f"  复盘记录: review_{tag}.txt")
 
-        replay_cmds = tracker.export_replay_commands(track_id)
+        replay_cmds = tracker.export_replay_commands(track_id, storage_path=storage)
         with open(f"replay_{tag}.sh", "w", encoding="utf-8") as f:
             f.write("\n".join(replay_cmds))
+        os.chmod(f"replay_{tag}.sh", 0o755)
         print(f"  重跑命令: replay_{tag}.sh")
 
         print()
@@ -226,12 +238,24 @@ def cmd_run_samples(args):
     print("查看详情命令:")
     for i, (name, _, tag) in enumerate(scenarios):
         tid = track_ids[i]
-        print(f"  {name}: python cli.py show --track-id {tid}")
+        print(f"  {name}: python3 cli.py show --track-id {tid} --storage {storage}")
     print()
     print("导出重跑命令:")
     for i, (name, _, tag) in enumerate(scenarios):
         tid = track_ids[i]
-        print(f"  {name}: python cli.py replay --track-id {tid}")
+        print(f"  {name}: python3 cli.py replay --track-id {tid} --storage {storage}")
+    print()
+    print("生成的追踪编号列表:")
+    for i, (name, _, tag) in enumerate(scenarios):
+        print(f"  {name} -> {track_ids[i]}")
+
+
+def _add_storage_arg(parser):
+    parser.add_argument(
+        "--storage",
+        default=DEFAULT_STORAGE,
+        help=f"追踪记录存储文件 (默认: {DEFAULT_STORAGE})"
+    )
 
 
 def main():
@@ -245,6 +269,7 @@ def main():
     p_import.add_argument("--threshold-version", required=True, help="阈值版本")
     p_import.add_argument("--source", default="feature_platform", help="来源")
     p_import.add_argument("--operator", required=True, help="操作人")
+    _add_storage_arg(p_import)
 
     p_check = subparsers.add_parser("check-log", help="补看训练日志曲线")
     p_check.add_argument("--track-id", required=True, help="追踪ID")
@@ -253,27 +278,37 @@ def main():
     p_check.add_argument("--final-weight", type=float, required=True, help="最终权重")
     p_check.add_argument("--remarks", default="", help="备注")
     p_check.add_argument("--operator", required=True, help="操作人")
+    _add_storage_arg(p_check)
 
     p_resolve = subparsers.add_parser("resolve", help="冲突复核")
     p_resolve.add_argument("--track-id", required=True, help="追踪ID")
     p_resolve.add_argument("--decision", required=True, choices=["confirm", "reject"], help="决策")
     p_resolve.add_argument("--reviewer", required=True, help="复核人")
     p_resolve.add_argument("--comment", default="", help="复核意见")
+    _add_storage_arg(p_resolve)
 
     p_metrics = subparsers.add_parser("update-metrics", help="更新分层指标")
     p_metrics.add_argument("--track-id", required=True, help="追踪ID")
     p_metrics.add_argument("--caliber", required=True, help="口径")
     p_metrics.add_argument("--operator", required=True, help="操作人")
+    _add_storage_arg(p_metrics)
 
     p_show = subparsers.add_parser("show", help="查看追踪记录")
     p_show.add_argument("--track-id", required=True, help="追踪ID")
+    _add_storage_arg(p_show)
 
     p_replay = subparsers.add_parser("replay", help="导出重跑命令")
     p_replay.add_argument("--track-id", required=True, help="追踪ID")
+    _add_storage_arg(p_replay)
 
-    subparsers.add_parser("run-samples", help="运行三种样例场景")
+    p_samples = subparsers.add_parser("run-samples", help="运行三种样例场景")
+    _add_storage_arg(p_samples)
 
     args = parser.parse_args()
+
+    if not args.command:
+        parser.print_help()
+        return
 
     if args.command == "import-snapshot":
         cmd_import_snapshot(args)
@@ -289,8 +324,6 @@ def main():
         cmd_replay(args)
     elif args.command == "run-samples":
         cmd_run_samples(args)
-    else:
-        parser.print_help()
 
 
 if __name__ == "__main__":

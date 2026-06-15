@@ -351,60 +351,79 @@ class WeightTracker:
     def get_all_records(self) -> List[WeightTrackRecord]:
         return list(self.records.values())
 
-    def export_replay_commands(self, track_id: str) -> List[str]:
+    def export_replay_commands(self, track_id: str, storage_path: str = "track_records.json") -> List[str]:
         if track_id not in self.records:
             raise ValueError(f"追踪记录 {track_id} 不存在")
 
         record = self.records[track_id]
         commands = []
 
+        commands.append("#!/bin/bash")
         commands.append(f"# 样本权重异常追踪 - 记录 {record.track_id} 重跑命令")
         commands.append(f"# 快照ID: {record.snapshot_id}")
-        commands.append(f"# 状态: {record.status.value}")
+        commands.append(f"# 原始状态: {record.status.value}")
+        commands.append("set -e")
         commands.append("")
+        commands.append(f'STORAGE_FILE="{storage_path}"')
+        commands.append('')
 
         if record.feature_snapshot:
             s = record.feature_snapshot
-            commands.append("# Step 1: 导入特征快照")
-            commands.append(f"python cli.py import-snapshot \\")
+            commands.append("# Step 1: 导入特征快照（生成新的追踪编号）")
+            commands.append('echo "=== Step 1: 导入特征快照 ==="')
+            commands.append("TRACK_ID=$(python3 cli.py import-snapshot \\")
             commands.append(f"  --snapshot-id {s.snapshot_id} \\")
             commands.append(f"  --version {s.version} \\")
             commands.append(f"  --threshold {s.weight_threshold} \\")
             commands.append(f"  --threshold-version {s.weight_threshold_version} \\")
             commands.append(f"  --source {s.source} \\")
-            commands.append(f"  --operator system")
+            commands.append(f"  --operator system \\")
+            commands.append(f'  --storage "$STORAGE_FILE" \\')
+            commands.append("  | grep '^TRACK_ID=' | cut -d= -f2)")
+            commands.append('echo "新生成追踪编号: $TRACK_ID"')
             commands.append("")
 
         if record.training_log:
             l = record.training_log
             commands.append("# Step 2: 补看训练日志曲线")
-            commands.append(f"python cli.py check-log \\")
-            commands.append(f"  --track-id {record.track_id} \\")
+            commands.append('echo "=== Step 2: 补看训练日志曲线 ==="')
+            commands.append("python3 cli.py check-log \\")
+            commands.append('  --track-id "$TRACK_ID" \\')
             commands.append(f"  --log-id {l.log_id} \\")
             commands.append(f"  --caliber {l.weight_caliber} \\")
             commands.append(f"  --final-weight {l.final_weight} \\")
-            commands.append(f"  --operator 推荐策略老唐")
+            commands.append(f'  --remarks "{l.remarks}" \\')
+            commands.append(f"  --operator 推荐策略老唐 \\")
+            commands.append(f'  --storage "$STORAGE_FILE"')
             commands.append("")
 
         if record.conflicts and record.review_decision != ReviewDecision.PENDING:
-            commands.append("# 冲突处理")
-            commands.append(f"python cli.py resolve \\")
-            commands.append(f"  --track-id {record.track_id} \\")
+            commands.append("# Step 2.5: 冲突复核")
+            commands.append('echo "=== Step 2.5: 冲突复核 ==="')
+            commands.append("python3 cli.py resolve \\")
+            commands.append('  --track-id "$TRACK_ID" \\')
             commands.append(f"  --decision {record.review_decision.value} \\")
             commands.append(f"  --reviewer {record.reviewer or 'unknown'} \\")
-            commands.append(f"  --comment \"{record.review_comment}\"")
+            commands.append(f'  --comment "{record.review_comment}" \\')
+            commands.append(f'  --storage "$STORAGE_FILE"')
             commands.append("")
 
         if record.stratified_metrics:
             commands.append("# Step 3: 更新分层指标")
-            commands.append(f"python cli.py update-metrics \\")
-            commands.append(f"  --track-id {record.track_id} \\")
+            commands.append('echo "=== Step 3: 更新分层指标 ==="')
+            commands.append("python3 cli.py update-metrics \\")
+            commands.append('  --track-id "$TRACK_ID" \\')
             commands.append(f"  --caliber {record.stratified_metrics[0].caliber} \\")
-            commands.append(f"  --operator system")
+            commands.append(f"  --operator system \\")
+            commands.append(f'  --storage "$STORAGE_FILE"')
             commands.append("")
 
-        commands.append("# 查看追踪记录")
-        commands.append(f"python cli.py show --track-id {record.track_id}")
+        commands.append("# 查看最终追踪记录")
+        commands.append('echo "=== 最终复盘记录 ==="')
+        commands.append('python3 cli.py show --track-id "$TRACK_ID" --storage "$STORAGE_FILE"')
+        commands.append("")
+        commands.append('echo ""')
+        commands.append('echo "重跑完成，追踪编号: $TRACK_ID"')
 
         return commands
 
