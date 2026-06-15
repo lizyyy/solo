@@ -64,10 +64,19 @@ class FewShotEval {
           comment: `发现 ${diffs.length} 条记录存在离线和线上分数差一个桶，需要评测运营复核`,
           diffDetails: diffs
         });
+      } else {
+        this.status = EVAL_STATUS.NORMAL;
       }
     } else if (nextStep === WORKFLOW_STEP.COMPARISON_UPDATED) {
       if (this.workflowStep !== WORKFLOW_STEP.ONLINE_BUCKET_REVIEWED) {
         throw new Error('INVALID_WORKFLOW_ORDER');
+      }
+      const pendingDiffs = this.checkBucketDiffsAfterReview();
+      if (pendingDiffs.length > 0) {
+        throw new Error('UNREVIEWED_BUCKET_DIFF');
+      }
+      if (this.status === EVAL_STATUS.NEEDS_RECHECK) {
+        this.status = EVAL_STATUS.NORMAL;
       }
     }
     this.workflowStep = nextStep;
@@ -76,8 +85,8 @@ class FewShotEval {
   }
 
   approveBucketDiff(noteId, reviewer, decision, comment) {
-    const idx = this.reviewComments.find(c => c.diffDetails && c.diffDetails.some(d => d.noteId === noteId));
-    if (idx) {
+    const hasDiff = this.reviewComments.some(c => c.diffDetails && c.diffDetails.some(d => d.noteId === noteId));
+    if (hasDiff) {
       this.reviewComments.push({
         timestamp: new Date().toISOString(),
         reviewer,
@@ -85,10 +94,6 @@ class FewShotEval {
         decision,
         noteId
       });
-      const pendingDiffs = this.checkBucketDiffsAfterReview();
-      if (pendingDiffs.length === 0 && this.status === EVAL_STATUS.NEEDS_RECHECK) {
-        this.status = EVAL_STATUS.NORMAL;
-      }
     }
     this.updatedAt = new Date().toISOString();
     return this;

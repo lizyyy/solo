@@ -113,6 +113,15 @@ class EvalService {
           requestedStep: nextStep
         });
       }
+      if (e.message === 'UNREVIEWED_BUCKET_DIFF') {
+        const pendingDiffs = evalObj.checkBucketDiffsAfterReview();
+        throw new FriendlyError('UNREVIEWED_BUCKET_DIFF', {
+          pendingCount: pendingDiffs.length,
+          pendingNoteIds: pendingDiffs.map(d => d.noteId),
+          currentStep: evalObj.workflowStep,
+          requestedStep: nextStep
+        });
+      }
       throw e;
     }
     

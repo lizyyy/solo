@@ -44,6 +44,11 @@ const ERROR_MESSAGES = {
     message: '存在离线和线上分数差一个桶的记录，需要评测运营复核',
     suggestion: '请不要急着归为正常，先通知评测运营进行人工复核'
   },
+  UNREVIEWED_BUCKET_DIFF: {
+    code: 'UNREVIEWED_BUCKET_DIFF',
+    message: '还有未复核的"离线和线上分数差了一个桶"记录，不能推进到实验对比更新',
+    suggestion: '请先让评测运营逐条复核所有差一个桶的记录，全部复核通过后才能继续'
+  },
   ROLLBACK_STEP_INVALID: {
     code: 'ROLLBACK_STEP_INVALID',
     message: '回滚的目标步骤不合法',

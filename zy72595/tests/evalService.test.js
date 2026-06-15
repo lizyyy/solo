@@ -148,16 +148,13 @@ describe('小样本 few-shot 评测系统', () => {
       expect(evalObj.checkBucketDiffsAfterReview().length).toBeGreaterThan(0);
     });
 
-    test('评测运营复核后状态变更', () => {
+    test('评测运营复核后记录意见，状态仍为 NEEDS_RECHECK 直到推进', () => {
       service.advanceWorkflow(evalId, WORKFLOW_STEP.ONLINE_BUCKET_REVIEWED, '推荐策略老唐');
       
-      const result = service.reviewBucketDiff(evalId, noteIds[0], '评测运营小王', 'normal', '确认正常');
-      
-      expect(result.reviewedNote.decision).toBe('normal');
-      expect(result.allReviewed).toBe(true);
+      service.reviewBucketDiff(evalId, noteIds[0], '评测运营小王', 'normal', '确认正常');
       
       const evalObj = service.getEval(evalId);
-      expect(evalObj.status).toBe(EVAL_STATUS.NORMAL);
+      expect(evalObj.status).toBe(EVAL_STATUS.NEEDS_RECHECK);
     });
 
     test('不能跳过步骤推进', () => {
@@ -241,22 +238,224 @@ describe('小样本 few-shot 评测系统', () => {
     });
   });
 
-  describe('8. 完整三步工作流场景', () => {
-    test('走完导入→补看线上实验桶→实验对比更新，差一个桶留待复核', () => {
-      service.addOnlineBucket({ bucketName: '一般', experimentId: 'EXP-001' });
-      service.addOnlineBucket({ bucketName: '优秀', experimentId: 'EXP-002' });
+  describe('8. 核心修复：差一个桶未复核时不能推进到实验对比更新', () => {
+    test('未复核差一个桶记录时，推进到 COMPARISON_UPDATED 被拦截', () => {
+      service.advanceWorkflow(evalId, WORKFLOW_STEP.ONLINE_BUCKET_REVIEWED, '推荐策略老唐');
       
-      expect(service.getEval(evalId).workflowStep).toBe(WORKFLOW_STEP.IMPORTED);
+      expect(() => {
+        service.advanceWorkflow(evalId, WORKFLOW_STEP.COMPARISON_UPDATED, '推荐策略老唐');
+      }).toThrow(FriendlyError);
       
-      const step2Result = service.advanceWorkflow(evalId, WORKFLOW_STEP.ONLINE_BUCKET_REVIEWED, '推荐策略老唐');
-      expect(step2Result.needsReview).toBe(true);
-      expect(step2Result.eval.status).toBe(EVAL_STATUS.NEEDS_RECHECK);
+      try {
+        service.advanceWorkflow(evalId, WORKFLOW_STEP.COMPARISON_UPDATED, '推荐策略老唐');
+      } catch (e) {
+        const friendly = wrapError(e);
+        expect(friendly.code).toBe('UNREVIEWED_BUCKET_DIFF');
+        expect(friendly.message).toContain('未复核');
+        expect(friendly.message).toContain('差了一个桶');
+        expect(friendly.suggestion).toContain('评测运营');
+      }
+    });
+
+    test('未复核时推进被拦截，工作流步骤停在 ONLINE_BUCKET_REVIEWED', () => {
+      service.advanceWorkflow(evalId, WORKFLOW_STEP.ONLINE_BUCKET_REVIEWED, '推荐策略老唐');
       
+      try {
+        service.advanceWorkflow(evalId, WORKFLOW_STEP.COMPARISON_UPDATED, '推荐策略老唐');
+      } catch (e) {}
+      
+      const evalObj = service.getEval(evalId);
+      expect(evalObj.workflowStep).toBe(WORKFLOW_STEP.ONLINE_BUCKET_REVIEWED);
+      expect(evalObj.status).toBe(EVAL_STATUS.NEEDS_RECHECK);
+    });
+
+    test('全部复核后才能推进到 COMPARISON_UPDATED，状态变为 NORMAL', () => {
+      service.advanceWorkflow(evalId, WORKFLOW_STEP.ONLINE_BUCKET_REVIEWED, '推荐策略老唐');
+      service.reviewBucketDiff(evalId, noteIds[0], '评测运营小王', 'normal', '正常波动');
+      
+      const result = service.advanceWorkflow(evalId, WORKFLOW_STEP.COMPARISON_UPDATED, '推荐策略老唐');
+      expect(result.eval.workflowStep).toBe(WORKFLOW_STEP.COMPARISON_UPDATED);
+      expect(result.eval.status).toBe(EVAL_STATUS.NORMAL);
+    });
+
+    test('部分复核仍不能推进（多条差一个桶记录只复核了一条）', () => {
+      const batchData = [
+        {
+          thresholds: { click: 0.3 },
+          remark: '配置C',
+          offlineBucket: '优秀',
+          onlineBucket: '良好'
+        }
+      ];
+      service.importThresholdBatch(evalId, 'BATCH-TEST-002', batchData, '推荐策略老唐');
+      service.advanceWorkflow(evalId, WORKFLOW_STEP.ONLINE_BUCKET_REVIEWED, '推荐策略老唐');
+      
+      service.reviewBucketDiff(evalId, noteIds[0], '评测运营小王', 'normal', '正常');
+      
+      expect(() => {
+        service.advanceWorkflow(evalId, WORKFLOW_STEP.COMPARISON_UPDATED, '推荐策略老唐');
+      }).toThrow(FriendlyError);
+    });
+  });
+
+  describe('9. 出问题样例全流程：离线良好/线上一般，停在差一个桶处', () => {
+    let step2Result;
+    let evalObj;
+
+    beforeEach(() => {
+      step2Result = service.advanceWorkflow(evalId, WORKFLOW_STEP.ONLINE_BUCKET_REVIEWED, '推荐策略老唐');
+      evalObj = service.getEval(evalId);
+    });
+
+    test('停在差一个桶处：工作流步骤是 online_bucket_reviewed', () => {
+      expect(evalObj.workflowStep).toBe(WORKFLOW_STEP.ONLINE_BUCKET_REVIEWED);
+    });
+
+    test('停在差一个桶处：状态是 needs_recheck，不是 normal', () => {
+      expect(evalObj.status).toBe(EVAL_STATUS.NEEDS_RECHECK);
+      expect(evalObj.status).not.toBe(EVAL_STATUS.NORMAL);
+    });
+
+    test('停在差一个桶处：reviewComments 记录了谁发现的、发现了什么', () => {
+      const autoComment = evalObj.reviewComments.find(c => c.diffDetails && c.diffDetails.length > 0);
+      expect(autoComment).toBeTruthy();
+      expect(autoComment.reviewer).toBe('推荐策略老唐');
+      expect(autoComment.comment).toContain('差一个桶');
+      expect(autoComment.diffDetails.length).toBe(1);
+      expect(autoComment.diffDetails[0].offlineBucket).toBe('良好');
+      expect(autoComment.diffDetails[0].onlineBucket).toBe('一般');
+      expect(autoComment.diffDetails[0].needsReview).toBe(true);
+    });
+
+    test('停在差一个桶处：待复核记录清单可以查到', () => {
+      const pending = evalObj.checkBucketDiffsAfterReview();
+      expect(pending.length).toBe(1);
+      expect(pending[0].offlineBucket).toBe('良好');
+      expect(pending[0].onlineBucket).toBe('一般');
+    });
+
+    test('停在差一个桶处：推荐策略老唐改备注能看出改前改后', () => {
+      const remarkResult = service.updateNoteRemark(noteIds[0], '需要再看线上数据', '推荐策略老唐');
+      
+      expect(remarkResult.oldRemark).toBe('配置A');
+      expect(remarkResult.newRemark).toBe('需要再看线上数据');
+      expect(remarkResult.version).toBe(2);
+      
+      const v1 = remarkResult.history[0];
+      const v2 = remarkResult.history[1];
+      expect(v1.changeType).toBe('create');
+      expect(v2.changeType).toBe('remark_update');
+      expect(v2.oldRemark).toBe('配置A');
+      expect(v2.remark).toBe('需要再看线上数据');
+    });
+
+    test('停在差一个桶处：评测运营复核后留下意见', () => {
+      service.reviewBucketDiff(evalId, noteIds[0], '评测运营小王', 'normal', '确认是正常波动，线上样本量较小');
+      
+      const reviewComment = evalObj.reviewComments.find(c => c.decision === 'normal' && c.noteId === noteIds[0]);
+      expect(reviewComment).toBeTruthy();
+      expect(reviewComment.reviewer).toBe('评测运营小王');
+      expect(reviewComment.comment).toContain('正常波动');
+      expect(reviewComment.decision).toBe('normal');
+    });
+
+    test('停在差一个桶处：复核后但未推进，状态仍是 needs_recheck', () => {
+      service.reviewBucketDiff(evalId, noteIds[0], '评测运营小王', 'normal', '确认正常');
+      
+      expect(evalObj.status).toBe(EVAL_STATUS.NEEDS_RECHECK);
+      expect(evalObj.workflowStep).toBe(WORKFLOW_STEP.ONLINE_BUCKET_REVIEWED);
+    });
+
+    test('从差一个桶处复核通过后推进：状态流正常完结', () => {
       service.reviewBucketDiff(evalId, noteIds[0], '评测运营小王', 'normal', '正常波动');
       
       const step3Result = service.advanceWorkflow(evalId, WORKFLOW_STEP.COMPARISON_UPDATED, '推荐策略老唐');
       expect(step3Result.eval.workflowStep).toBe(WORKFLOW_STEP.COMPARISON_UPDATED);
       expect(step3Result.eval.status).toBe(EVAL_STATUS.NORMAL);
+    });
+
+    test('从差一个桶处复核不通过：回滚到导入步骤', () => {
+      service.reviewBucketDiff(evalId, noteIds[0], '评测运营小王', 'abnormal', '数据异常需要重新导入');
+      
+      const rollbackResult = service.rollbackWorkflow(evalId, WORKFLOW_STEP.IMPORTED, '评测运营小王', '差一个桶复核不通过，需重新导入');
+      
+      expect(rollbackResult.eval.workflowStep).toBe(WORKFLOW_STEP.IMPORTED);
+      expect(rollbackResult.eval.status).toBe(EVAL_STATUS.ROLLBACK);
+      expect(rollbackResult.rollbackRecord.reason).toContain('不通过');
+    });
+
+    test('停在差一个桶处的完整状态变化链', () => {
+      const stateChain = [];
+      
+      stateChain.push({
+        step: 'imported',
+        workflowStep: evalObj.workflowStep,
+        status: evalObj.status
+      });
+      
+      const remarkResult = service.updateNoteRemark(noteIds[0], '需要再看线上数据', '推荐策略老唐');
+      stateChain.push({
+        step: 'remark_updated',
+        noteVersion: remarkResult.version,
+        oldRemark: remarkResult.oldRemark,
+        newRemark: remarkResult.newRemark
+      });
+      
+      service.reviewBucketDiff(evalId, noteIds[0], '评测运营小王', 'normal', '正常波动');
+      stateChain.push({
+        step: 'reviewed',
+        reviewedDecision: 'normal',
+        status: evalObj.status,
+        workflowStep: evalObj.workflowStep
+      });
+      
+      const step3Result = service.advanceWorkflow(evalId, WORKFLOW_STEP.COMPARISON_UPDATED, '推荐策略老唐');
+      stateChain.push({
+        step: 'comparison_updated',
+        status: step3Result.eval.status,
+        workflowStep: step3Result.eval.workflowStep
+      });
+      
+      expect(stateChain[0]).toEqual({
+        step: 'imported',
+        workflowStep: 'online_bucket_reviewed',
+        status: 'needs_recheck'
+      });
+      
+      expect(stateChain[1]).toEqual({
+        step: 'remark_updated',
+        noteVersion: 2,
+        oldRemark: '配置A',
+        newRemark: '需要再看线上数据'
+      });
+      
+      expect(stateChain[2]).toEqual({
+        step: 'reviewed',
+        reviewedDecision: 'normal',
+        status: 'needs_recheck',
+        workflowStep: 'online_bucket_reviewed'
+      });
+      
+      expect(stateChain[3]).toEqual({
+        step: 'comparison_updated',
+        status: 'normal',
+        workflowStep: 'comparison_updated'
+      });
+    });
+  });
+
+  describe('10. 无差一个桶时工作流自动标记 NORMAL', () => {
+    test('所有笔记分桶一致时，推进到 ONLINE_BUCKET_REVIEWED 后状态为 normal', () => {
+      const cleanService = new EvalService();
+      const cleanEval = cleanService.createEval('全部一致测试', '推荐策略老唐');
+      
+      cleanService.importThresholdBatch(cleanEval.id, 'BATCH-CLEAN', [
+        { thresholds: {}, remark: '测试', offlineBucket: '优秀', onlineBucket: '优秀' }
+      ], '推荐策略老唐');
+      
+      const result = cleanService.advanceWorkflow(cleanEval.id, WORKFLOW_STEP.ONLINE_BUCKET_REVIEWED, '推荐策略老唐');
+      expect(result.eval.status).toBe(EVAL_STATUS.NORMAL);
+      expect(result.needsReview).toBe(false);
     });
   });
 });
