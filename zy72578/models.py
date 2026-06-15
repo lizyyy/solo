@@ -77,6 +77,32 @@ class SelfCheckResult:
 
 
 @dataclass
+class ThresholdChangeRecord:
+    change_id: str
+    model_name: str
+    old_threshold: Optional[float]
+    new_threshold: float
+    old_minority_threshold: Optional[float] = None
+    new_minority_threshold: Optional[float] = None
+    change_source: str = ""
+    change_reason: str = ""
+    operator: str = ""
+    changed_at: datetime = field(default_factory=datetime.now)
+    affected_items: List[str] = field(default_factory=list)
+    batch_number: int = 0
+
+
+@dataclass
+class MaterialBatch:
+    material_id: str
+    batch_number: int
+    material_type: MaterialType
+    imported_at: datetime
+    threshold_notes: List[ThresholdNote] = field(default_factory=list)
+    experiment_buckets: List[OnlineExperimentBucket] = field(default_factory=list)
+
+
+@dataclass
 class VotingResult:
     model_name: str
     final_threshold: float
@@ -87,3 +113,7 @@ class VotingResult:
     conflict_evidences: List[ConflictEvidence] = field(default_factory=list)
     self_check_results: List[SelfCheckResult] = field(default_factory=list)
     workflow_step: WorkflowStep = WorkflowStep.STEP1_THRESHOLD_IMPORT
+    material_batches: List[MaterialBatch] = field(default_factory=list)
+    change_history: List[ThresholdChangeRecord] = field(default_factory=list)
+    current_batch: int = 0
+    export_trace_id: str = ""
