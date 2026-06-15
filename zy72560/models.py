@@ -18,6 +18,7 @@ class ScoreBucketDiff(Enum):
 
 @dataclass
 class ParameterYAML:
+    import_id: str
     experiment_id: str
     experiment_name: str
     version: str
@@ -26,7 +27,9 @@ class ParameterYAML:
     metrics: Dict[str, float]
     conclusion: str
     raw_content: str
+    content_hash: str
     is_valid: bool = True
+    is_latest: bool = True
 
 
 @dataclass
@@ -95,4 +98,8 @@ class WorkflowState:
     parameters_imported: bool
     slice_reviewed: bool
     comparison_updated: bool
+    exported: bool = False
+    archived: bool = False
+    last_export_time: Optional[datetime] = None
     pending_review_items: List[str] = field(default_factory=list)
+    status_description: str = ""
