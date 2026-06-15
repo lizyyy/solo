@@ -1,8 +1,10 @@
 import uuid
+import json
 import yaml
 import pandas as pd
 from typing import List, Optional, Tuple
 from pathlib import Path
+from datetime import datetime
 
 from .models import (
     RecallCandidate,
@@ -15,6 +17,49 @@ from .models import (
     SampleStatus,
     NextAction,
 )
+
+
+DEFAULT_WORKSPACE = Path(".trial_runs")
+
+
+def save_trial_run(trial_run: TrialRun, workspace: Optional[Path] = None) -> Path:
+    ws = workspace or DEFAULT_WORKSPACE
+    ws.mkdir(parents=True, exist_ok=True)
+    file_path = ws / f"{trial_run.run_id}.json"
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(trial_run.model_dump(mode="json"), f, ensure_ascii=False, indent=2)
+    return file_path
+
+
+def load_trial_run(run_id: str, workspace: Optional[Path] = None) -> TrialRun:
+    ws = workspace or DEFAULT_WORKSPACE
+    file_path = ws / f"{run_id}.json"
+    if not file_path.exists():
+        raise FileNotFoundError(f"试算运行 {run_id} 不存在，请先运行 run 命令")
+    with open(file_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    return TrialRun(**data)
+
+
+def list_trial_runs(workspace: Optional[Path] = None) -> List[dict]:
+    ws = workspace or DEFAULT_WORKSPACE
+    if not ws.exists():
+        return []
+    runs = []
+    for fp in sorted(ws.glob("*.json"), key=lambda p: p.stat().st_mtime, reverse=True):
+        try:
+            with open(fp, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            runs.append({
+                "run_id": data["run_id"],
+                "timestamp": data.get("timestamp", ""),
+                "is_manual_correction": data.get("is_manual_correction", False),
+                "result_summary": f"通过{sum(1 for r in data.get('results', []) if r.get('passed'))}/{len(data.get('results', []))}",
+                "minority_masked": sum(1 for r in data.get("results", []) if r.get("status") == "minority_masked"),
+            })
+        except Exception:
+            pass
+    return runs
 
 
 def load_candidates_from_csv(file_path: str) -> List[RecallCandidate]:
@@ -137,29 +182,57 @@ def apply_manual_correction(
 ) -> TrialRun:
     new_results = []
     affected = []
+    field_logs = []
     
     for result in trial_run.results:
         if result.sample_id == sample_id:
             updated = result.model_copy(deep=True)
-            if new_status:
+            if new_status and new_status != result.status:
+                field_logs.append(AuditLog(
+                    operator=operator,
+                    action="manual_correction",
+                    field_changed="status",
+                    old_value=result.status,
+                    new_value=new_status,
+                    reason=reason,
+                    affected_samples=[sample_id],
+                ))
                 updated.status = new_status
-            if new_next_action:
+            if new_next_action and new_next_action != result.next_action:
+                field_logs.append(AuditLog(
+                    operator=operator,
+                    action="manual_correction",
+                    field_changed="next_action",
+                    old_value=result.next_action,
+                    new_value=new_next_action,
+                    reason=reason,
+                    affected_samples=[sample_id],
+                ))
                 updated.next_action = new_next_action
-            if custom_why_kept:
+            if custom_why_kept and custom_why_kept != result.why_kept:
+                field_logs.append(AuditLog(
+                    operator=operator,
+                    action="manual_correction",
+                    field_changed="why_kept",
+                    old_value=result.why_kept,
+                    new_value=custom_why_kept,
+                    reason=reason,
+                    affected_samples=[sample_id],
+                ))
                 updated.why_kept = custom_why_kept
             new_results.append(updated)
             affected.append(sample_id)
         else:
             new_results.append(result)
 
-    audit_log = AuditLog(
+    summary_log = AuditLog(
         operator=operator,
         action="manual_correction",
         reason=reason,
         affected_samples=affected,
     )
 
-    new_audit_logs = trial_run.audit_logs + [audit_log]
+    new_audit_logs = trial_run.audit_logs + [summary_log] + field_logs
     
     return TrialRun(
         run_id=f"{trial_run.run_id}_corrected",
@@ -177,6 +250,22 @@ def rerun_with_new_params(
     operator: str,
     reason: str,
 ) -> TrialRun:
+    old_params = trial_run.params
+    param_field_logs = []
+    for field_name in ["dedup_threshold", "minority_weight", "overall_metric_weight", "minority_boost_enabled", "min_minority_ratio"]:
+        old_val = getattr(old_params, field_name)
+        new_val = getattr(new_params, field_name)
+        if old_val != new_val:
+            param_field_logs.append(AuditLog(
+                operator=operator,
+                action="param_change",
+                field_changed=field_name,
+                old_value=old_val,
+                new_value=new_val,
+                reason=reason,
+                affected_samples=[c.sample_id for c in trial_run.candidates],
+            ))
+
     new_run = run_threshold_trial(
         candidates=trial_run.candidates,
         params=new_params,
@@ -184,7 +273,7 @@ def rerun_with_new_params(
         reason=reason,
     )
     
-    all_audits = trial_run.audit_logs + new_run.audit_logs
+    all_audits = trial_run.audit_logs + param_field_logs + new_run.audit_logs
     
     return TrialRun(
         run_id=f"rerun_{uuid.uuid4().hex[:8]}",

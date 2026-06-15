@@ -1,0 +1,209 @@
+{
+  "run_id": "run_46237c2c_corrected",
+  "timestamp": "2026-06-15T13:40:37.975603",
+  "params": {
+    "dedup_threshold": 0.85,
+    "minority_weight": 1.2,
+    "overall_metric_weight": 1.0,
+    "minority_boost_enabled": true,
+    "min_minority_ratio": 0.4
+  },
+  "candidates": [
+    {
+      "sample_id": "S001",
+      "content": "如何使用Python进行数据分析？",
+      "semantic_score": 0.92,
+      "category": "编程开发",
+      "is_minority": false,
+      "status": "normal",
+      "why_kept": null,
+      "missing_materials": [],
+      "next_action": "无需处理"
+    },
+    {
+      "sample_id": "S002",
+      "content": "机器学习入门教程推荐",
+      "semantic_score": 0.88,
+      "category": "人工智能",
+      "is_minority": false,
+      "status": "normal",
+      "why_kept": null,
+      "missing_materials": [],
+      "next_action": "无需处理"
+    },
+    {
+      "sample_id": "S003",
+      "content": "量子计算在密码学中的应用",
+      "semantic_score": 0.72,
+      "category": "量子计算",
+      "is_minority": true,
+      "status": "normal",
+      "why_kept": null,
+      "missing_materials": [],
+      "next_action": "无需处理"
+    },
+    {
+      "sample_id": "S004",
+      "content": "前端框架Vue和React对比",
+      "semantic_score": 0.86,
+      "category": "前端开发",
+      "is_minority": false,
+      "status": "normal",
+      "why_kept": null,
+      "missing_materials": [],
+      "next_action": "无需处理"
+    },
+    {
+      "sample_id": "S005",
+      "content": "生物信息学中的序列比对算法",
+      "semantic_score": 0.7,
+      "category": "生物信息",
+      "is_minority": true,
+      "status": "normal",
+      "why_kept": null,
+      "missing_materials": [],
+      "next_action": "无需处理"
+    },
+    {
+      "sample_id": "S006",
+      "content": "数据库索引优化最佳实践",
+      "semantic_score": 0.9,
+      "category": "数据库",
+      "is_minority": false,
+      "status": "normal",
+      "why_kept": null,
+      "missing_materials": [],
+      "next_action": "无需处理"
+    }
+  ],
+  "results": [
+    {
+      "sample_id": "S001",
+      "original_score": 0.92,
+      "adjusted_score": 0.92,
+      "passed": true,
+      "status": "normal",
+      "why_kept": "语义相似度得分0.920 ≥ 阈值0.85，通过去重检测",
+      "missing_materials": [],
+      "next_action": "无需处理",
+      "is_minority": false
+    },
+    {
+      "sample_id": "S002",
+      "original_score": 0.88,
+      "adjusted_score": 0.88,
+      "passed": true,
+      "status": "normal",
+      "why_kept": "语义相似度得分0.880 ≥ 阈值0.85，通过去重检测",
+      "missing_materials": [],
+      "next_action": "无需处理",
+      "is_minority": false
+    },
+    {
+      "sample_id": "S003",
+      "original_score": 0.72,
+      "adjusted_score": 0.864,
+      "passed": true,
+      "status": "need_algo_review",
+      "why_kept": "评测运营小孟人工复核：量子计算领域内容稀缺，虽得分低但建议保留，由算法工程师最终确认",
+      "missing_materials": [
+        "补充该类别标注样本量数据",
+        "确认少数类加权策略合理性"
+      ],
+      "next_action": "算法工程师",
+      "is_minority": true
+    },
+    {
+      "sample_id": "S004",
+      "original_score": 0.86,
+      "adjusted_score": 0.86,
+      "passed": true,
+      "status": "normal",
+      "why_kept": "语义相似度得分0.860 ≥ 阈值0.85，通过去重检测",
+      "missing_materials": [],
+      "next_action": "无需处理",
+      "is_minority": false
+    },
+    {
+      "sample_id": "S005",
+      "original_score": 0.7,
+      "adjusted_score": 0.84,
+      "passed": false,
+      "status": "minority_masked",
+      "why_kept": "少数类样本（生物信息），当前少数类占比33.3%低于阈值40.0%，应用加权系数1.2提升得分",
+      "missing_materials": [
+        "补充该类别标注样本量数据",
+        "确认少数类加权策略合理性"
+      ],
+      "next_action": "算法工程师",
+      "is_minority": true
+    },
+    {
+      "sample_id": "S006",
+      "original_score": 0.9,
+      "adjusted_score": 0.9,
+      "passed": true,
+      "status": "normal",
+      "why_kept": "语义相似度得分0.900 ≥ 阈值0.85，通过去重检测",
+      "missing_materials": [],
+      "next_action": "无需处理",
+      "is_minority": false
+    }
+  ],
+  "audit_logs": [
+    {
+      "timestamp": "2026-06-15T13:40:22.329215",
+      "operator": "评测运营小孟",
+      "action": "run_trial",
+      "field_changed": null,
+      "old_value": null,
+      "new_value": null,
+      "reason": "初始阈值试算",
+      "affected_samples": [
+        "S001",
+        "S002",
+        "S003",
+        "S004",
+        "S005",
+        "S006"
+      ]
+    },
+    {
+      "timestamp": "2026-06-15T13:40:37.975599",
+      "operator": "评测运营小孟",
+      "action": "manual_correction",
+      "field_changed": null,
+      "old_value": null,
+      "new_value": null,
+      "reason": "S003是量子计算稀有领域样本，业务价值高，不能简单过滤",
+      "affected_samples": [
+        "S003"
+      ]
+    },
+    {
+      "timestamp": "2026-06-15T13:40:37.975568",
+      "operator": "评测运营小孟",
+      "action": "manual_correction",
+      "field_changed": "status",
+      "old_value": "minority_masked",
+      "new_value": "need_algo_review",
+      "reason": "S003是量子计算稀有领域样本，业务价值高，不能简单过滤",
+      "affected_samples": [
+        "S003"
+      ]
+    },
+    {
+      "timestamp": "2026-06-15T13:40:37.975593",
+      "operator": "评测运营小孟",
+      "action": "manual_correction",
+      "field_changed": "why_kept",
+      "old_value": "少数类样本（量子计算），当前少数类占比33.3%低于阈值40.0%，应用加权系数1.2提升得分",
+      "new_value": "评测运营小孟人工复核：量子计算领域内容稀缺，虽得分低但建议保留，由算法工程师最终确认",
+      "reason": "S003是量子计算稀有领域样本，业务价值高，不能简单过滤",
+      "affected_samples": [
+        "S003"
+      ]
+    }
+  ],
+  "is_manual_correction": true
+}
