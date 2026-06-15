@@ -5,8 +5,9 @@ import { HistoryTimeline } from './HistoryTimeline';
 import { ActionPanel } from './ActionPanel';
 
 export function DetailPanel() {
-  const getSelectedRecord = useRecordStore((state) => state.getSelectedRecord);
-  const record = getSelectedRecord();
+  const records = useRecordStore((state) => state.records);
+  const selectedRecordId = useRecordStore((state) => state.selectedRecordId);
+  const record = records.find((r) => r.id === selectedRecordId) || null;
 
   if (!record) {
     return (
