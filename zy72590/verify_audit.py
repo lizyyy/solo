@@ -272,7 +272,7 @@ def run_normal_material_test():
 
 def run_wrong_caliber_test():
     print("\n" + "▓" * 70)
-    print("  第二轮：错口径材料跑一遍（模拟重复训练场景）")
+    print("  第二轮：错口径材料跑一遍（重复训练场景）")
     print("▓" * 70)
 
     data = create_demo_data()
@@ -286,12 +286,58 @@ def run_wrong_caliber_test():
         "SLICE-002-DUP": data["records"]["SLICE-002-DUP"],
     })
 
+    print("\n  --- 阶段1：处理首条记录 SLICE-002（正常流程） ---")
     engine.check_snapshot_by_xiaoqiao("SLICE-002", "SNAP-003")
     engine.update_feature_version_table("SLICE-002")
     engine.complete_record("SLICE-002")
+    print(f"  SLICE-002 最终状态: {engine.records['SLICE-002'].current_status.value}")
 
+    print("\n  --- 阶段2：处理重复记录 SLICE-002-DUP（三步核心流程） ---")
+    print("  步骤1：评测切片已导入（初始状态）")
+    print(f"  步骤2：算法工程师小乔补看特征快照编号...")
     engine.check_snapshot_by_xiaoqiao("SLICE-002-DUP", "SNAP-003")
+    record_dup = engine.records["SLICE-002-DUP"]
+    print(f"  快照核验后状态: {record_dup.current_status.value}")
+    print(f"  是否重复训练: {record_dup.is_duplicate_training}")
+
+    print("\n  步骤3：尝试更新特征版本表（预期被拦截）...")
+    success, msg = engine.update_feature_version_table("SLICE-002-DUP")
+    print(f"  版本表更新结果: {msg}")
+    print(f"  拦截后状态: {record_dup.current_status.value}")
+
+    print("\n  --- 阶段3：停在策略产品复核中查看状态 ---")
+    print(f"  当前状态: {record_dup.current_status.value}")
+    print(f"  重复训练标记: {record_dup.is_duplicate_training}")
+    print(f"  是否已复核: {record_dup.duplicate_reviewed}")
+    print(f"  关联版本数: {len(record_dup.feature_versions)}")
+    print(f"  历史记录数: {len(record_dup.history)}")
+    print("  " + "-" * 50)
+    print("  历史留痕:")
+    for i, h in enumerate(record_dup.history, 1):
+        status_flow = f"→ {h.after_status.value}" if h.after_status else ""
+        print(f"    {i}. {h.operation} {status_flow}")
+        if h.remark:
+            print(f"       备注: {h.remark}")
+    print("  " + "-" * 50)
+
+    print("\n  尝试标记完成（预期失败）...")
+    success_complete, msg_complete = engine.complete_record("SLICE-002-DUP")
+    print(f"  标记完成结果: {msg_complete}")
+
+    print("\n  --- 阶段4：策略产品复核通过 ---")
+    engine.product_review_duplicate("SLICE-002-DUP", approve=True)
+    print(f"  复核通过后状态: {record_dup.current_status.value}")
+    print(f"  是否已复核: {record_dup.duplicate_reviewed}")
+    print(f"  复核结果: {record_dup.duplicate_approved}")
+
+    print("\n  --- 阶段5：复核通过后再次更新版本表 ---")
     engine.update_feature_version_table("SLICE-002-DUP")
+    print(f"  版本表更新后状态: {record_dup.current_status.value}")
+    print(f"  关联版本数: {len(record_dup.feature_versions)}")
+
+    print("\n  --- 阶段6：标记完成 ---")
+    engine.complete_record("SLICE-002-DUP")
+    print(f"  最终状态: {record_dup.current_status.value}")
 
     verifier = AuditVerifier(engine)
     result = verifier.run_full_verification("重复训练场景", ["SLICE-002", "SLICE-002-DUP"])

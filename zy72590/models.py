@@ -94,4 +94,6 @@ class AuditRecord:
     feature_versions: List[FeatureVersion] = field(default_factory=list)
     is_duplicate_training: bool = False
     duplicate_with_slice: Optional[str] = None
+    duplicate_reviewed: bool = False
+    duplicate_approved: Optional[bool] = None
     supplement_from_snapshot: Optional[str] = None

@@ -190,18 +190,19 @@ class SparseFeatureAuditEngine:
                 existing_version = v
                 break
 
-        if record.is_duplicate_training:
+        if record.is_duplicate_training and not record.duplicate_reviewed:
             self._add_history(
                 record,
-                operation="跳过版本表更新",
+                operation="拦截版本表更新",
                 operator="system",
                 before_status=before_status,
                 after_status=AuditStatus.PRODUCT_REVIEW,
                 detail={
                     "snapshot_id": snapshot.snapshot_id,
-                    "reason": "重复训练待策略产品复核"
+                    "reason": "重复训练待策略产品复核",
+                    "duplicate_with": record.duplicate_with_slice
                 },
-                remark="重复训练数据暂不更新版本表，待产品确认"
+                remark="重复训练数据暂不更新版本表，待产品确认后再更新"
             )
             return True, "重复训练数据暂不更新版本表，已转策略产品复核"
 
@@ -334,24 +335,36 @@ class SparseFeatureAuditEngine:
         before_status = record.current_status
 
         if approve:
+            record.duplicate_reviewed = True
+            record.duplicate_approved = True
             self._add_history(
                 record,
                 operation="策略产品复核通过",
                 operator=operator,
                 before_status=before_status,
                 after_status=AuditStatus.NORMAL,
-                detail={"duplicate_approved": True, "duplicate_with": record.duplicate_with_slice},
-                remark="重复训练经产品确认有效，归入正常"
+                detail={
+                    "duplicate_approved": True,
+                    "duplicate_with": record.duplicate_with_slice,
+                    "duplicate_reviewed": True
+                },
+                remark="重复训练经产品确认有效，归入正常，可继续更新版本表"
             )
-            return True, "策略产品复核通过，重复训练数据归入正常"
+            return True, "策略产品复核通过，重复训练数据归入正常，可继续更新版本表"
         else:
+            record.duplicate_reviewed = True
+            record.duplicate_approved = False
             self._add_history(
                 record,
                 operation="策略产品复核驳回",
                 operator=operator,
                 before_status=before_status,
                 after_status=AuditStatus.WRONG_CALIBER,
-                detail={"duplicate_rejected": True, "duplicate_with": record.duplicate_with_slice},
+                detail={
+                    "duplicate_rejected": True,
+                    "duplicate_with": record.duplicate_with_slice,
+                    "duplicate_reviewed": True
+                },
                 remark="重复训练数据被驳回，标记为口径错误"
             )
             return True, "策略产品复核驳回，标记为口径错误"

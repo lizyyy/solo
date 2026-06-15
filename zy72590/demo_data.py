@@ -121,14 +121,14 @@ def create_demo_data():
         slice_name="618搜索排序评测-0602-重跑",
         data_batch_id="BATCH-20260602-B",
         import_time=base_time + timedelta(days=2, hours=9),
-        feature_snapshot_id="SNAP-003",
-        caliber_version="v1.5",
+        feature_snapshot_id=None,
+        caliber_version=None,
         raw_data={
             "feature": "user_category_prefer_score",
             "sample_count": 8000,
             "default_ratio": 0.015,
             "check_result": "pass",
-            "note": "同一批数据重复训练"
+            "note": "同一批数据重复训练，快照信息待核验"
         }
     )
     
@@ -137,9 +137,9 @@ def create_demo_data():
         eval_slice=slice_002_dup,
         current_status=AuditStatus.IMPORTED,
         source=RecordSource.NORMAL_IMPORT,
-        feature_snapshots=[feature_snapshots["SNAP-003"]],
-        is_duplicate_training=True,
-        duplicate_with_slice="SLICE-002",
+        feature_snapshots=[],
+        is_duplicate_training=False,
+        duplicate_with_slice=None,
         history=[
             AuditHistory(
                 history_id="HIST-002D-001",
@@ -148,7 +148,7 @@ def create_demo_data():
                 operator="system",
                 operate_time=base_time + timedelta(days=2, hours=9),
                 after_status=AuditStatus.IMPORTED,
-                detail={"batch_id": "BATCH-20260602-B", "source": "评测系统自动同步", "duplicate_detected": True}
+                detail={"batch_id": "BATCH-20260602-B", "source": "评测系统自动同步"}
             )
         ]
     )
