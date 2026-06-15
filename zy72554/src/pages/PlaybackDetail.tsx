@@ -15,11 +15,14 @@ import {
   X,
   RotateCcw,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Minus,
+  Plus
 } from 'lucide-react';
 import { useAppStore } from '../store';
-import { getStatusLabel, getStatusColor, getStepLabel } from '../utils';
+import { getStatusLabel, getStatusColor, getStepLabel, checkThresholdConsistency } from '../utils';
 import { dataScientist } from '../data/mockData';
+import type { ThresholdItem } from '../types';
 
 export const PlaybackDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -81,10 +84,27 @@ export const PlaybackDetailPage = () => {
     addToast('success', result === 'confirmed_normal' ? '已确认正常' : '已标记需修改');
   };
 
-  const handleRollback = (versionId: string) => {
+  const handleRollback = (versionId: string, fieldName: string, oldValue: string) => {
     if (playback.id) {
       rollbackToVersion(playback.id, versionId);
-      addToast('success', '已回滚到指定版本');
+
+      if (fieldName === 'thresholds') {
+        const oldThresholds = parseThresholds(oldValue);
+        if (oldThresholds) {
+          const hasInconsistent = oldThresholds.some(
+            t => !checkThresholdConsistency(t.thresholdValue, t.reportValue)
+          );
+          if (hasInconsistent) {
+            addToast('warning', '回滚完成，检测到阈值与报告不一致，已标记为待复核');
+          } else {
+            addToast('success', '回滚完成，所有阈值与报告一致');
+          }
+        } else {
+          addToast('success', '已回滚到指定版本');
+        }
+      } else {
+        addToast('success', '已回滚到指定版本');
+      }
     }
   };
 
@@ -95,6 +115,116 @@ export const PlaybackDetailPage = () => {
       'record': '记录'
     };
     return labels[fieldName] || fieldName;
+  };
+
+  const parseThresholds = (value: string): ThresholdItem[] | null => {
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed) && parsed.length > 0 && 'metricName' in parsed[0]) {
+        return parsed;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
+  const renderThresholdDiff = (oldValue: string, newValue: string) => {
+    const oldThresholds = parseThresholds(oldValue);
+    const newThresholds = parseThresholds(newValue);
+
+    if (!oldThresholds || !newThresholds) {
+      return (
+        <div className="mt-4 grid grid-cols-2 gap-4">
+          <div className="p-3 bg-red-50 rounded-lg">
+            <p className="text-xs text-red-600 font-medium mb-1">修改前</p>
+            <p className="text-sm text-gray-700 font-mono break-all">{oldValue || '(空)'}</p>
+          </div>
+          <div className="p-3 bg-green-50 rounded-lg">
+            <p className="text-xs text-green-600 font-medium mb-1">修改后</p>
+            <p className="text-sm text-gray-700 font-mono break-all">{newValue || '(空)'}</p>
+          </div>
+        </div>
+      );
+    }
+
+    const allMetrics = Array.from(
+      new Set([...oldThresholds.map(t => t.metricName), ...newThresholds.map(t => t.metricName)])
+    );
+
+    return (
+      <div className="mt-4 space-y-2">
+        {allMetrics.map(metricName => {
+          const oldT = oldThresholds.find(t => t.metricName === metricName);
+          const newT = newThresholds.find(t => t.metricName === metricName);
+          const changed = JSON.stringify(oldT) !== JSON.stringify(newT);
+
+          return (
+            <div
+              key={metricName}
+              className={`p-3 rounded-lg border ${changed ? 'bg-gray-50 border-gray-200' : 'bg-gray-50/50 border-gray-100'}`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-medium text-gray-800 text-sm">{metricName}</span>
+                {changed && (
+                  <span className="text-xs px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded">
+                    已变更
+                  </span>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-xs">
+                <div>
+                  <p className="text-gray-500 mb-1">修改前</p>
+                  {oldT ? (
+                    <div className="space-y-1">
+                      <p className="font-mono">
+                        阈值: <span className="text-gray-700">{oldT.thresholdValue}</span>
+                      </p>
+                      <p className="font-mono">
+                        报告值: <span className={!checkThresholdConsistency(oldT.thresholdValue, oldT.reportValue) ? 'text-orange-600' : 'text-gray-700'}>
+                          {oldT.reportValue}
+                        </span>
+                      </p>
+                      {!checkThresholdConsistency(oldT.thresholdValue, oldT.reportValue) && (
+                        <p className="text-orange-600 flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3" />
+                          阈值与报告不一致
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-gray-400">(新增)</p>
+                  )}
+                </div>
+                <div>
+                  <p className="text-gray-500 mb-1">修改后</p>
+                  {newT ? (
+                    <div className="space-y-1">
+                      <p className="font-mono">
+                        阈值: <span className="text-gray-700">{newT.thresholdValue}</span>
+                      </p>
+                      <p className="font-mono">
+                        报告值: <span className={!checkThresholdConsistency(newT.thresholdValue, newT.reportValue) ? 'text-orange-600' : 'text-gray-700'}>
+                          {newT.reportValue}
+                        </span>
+                      </p>
+                      {!checkThresholdConsistency(newT.thresholdValue, newT.reportValue) && (
+                        <p className="text-orange-600 flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3" />
+                          阈值与报告不一致
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-gray-400">(删除)</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
   };
 
   return (
@@ -323,24 +453,29 @@ export const PlaybackDetailPage = () => {
                     </button>
                     {expandedVersion === version.id && (
                       <div className="px-4 pb-4 border-t border-gray-100">
-                        <div className="mt-4 grid grid-cols-2 gap-4">
-                          <div className="p-3 bg-red-50 rounded-lg">
-                            <p className="text-xs text-red-600 font-medium mb-1">修改前</p>
-                            <p className="text-sm text-gray-700 font-mono break-all">
-                              {version.oldValue || '(空)'}
-                            </p>
-                          </div>
-                          <div className="p-3 bg-green-50 rounded-lg">
-                            <p className="text-xs text-green-600 font-medium mb-1">修改后</p>
-                            <p className="text-sm text-gray-700 font-mono break-all">
-                              {version.newValue || '(空)'}
-                            </p>
-                          </div>
-                        </div>
-                        {version.changeType !== 'rollback' && (
+                        {version.fieldName === 'thresholds'
+                          ? renderThresholdDiff(version.oldValue, version.newValue)
+                          : (
+                            <div className="mt-4 grid grid-cols-2 gap-4">
+                              <div className="p-3 bg-red-50 rounded-lg">
+                                <p className="text-xs text-red-600 font-medium mb-1">修改前</p>
+                                <p className="text-sm text-gray-700 break-all">
+                                  {version.oldValue || '(空)'}
+                                </p>
+                              </div>
+                              <div className="p-3 bg-green-50 rounded-lg">
+                                <p className="text-xs text-green-600 font-medium mb-1">修改后</p>
+                                <p className="text-sm text-gray-700 break-all">
+                                  {version.newValue || '(空)'}
+                                </p>
+                              </div>
+                            </div>
+                          )
+                        }
+                        {version.changeType !== 'rollback' && version.fieldName !== 'record' && (
                           <button
-                            onClick={() => handleRollback(version.id)}
-                            className="mt-3 inline-flex items-center gap-1 px-3 py-1.5 text-sm text-yellow-700 bg-yellow-50 hover:bg-yellow-100 rounded-lg transition-colors"
+                            onClick={() => handleRollback(version.id, version.fieldName, version.oldValue)}
+                            className="mt-4 inline-flex items-center gap-1 px-3 py-1.5 text-sm text-yellow-700 bg-yellow-50 hover:bg-yellow-100 rounded-lg transition-colors"
                           >
                             <RotateCcw className="w-4 h-4" />
                             回滚到此版本

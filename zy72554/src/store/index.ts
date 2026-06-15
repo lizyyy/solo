@@ -18,7 +18,8 @@ import {
   mergePlaybackRecord,
   createVersionHistory,
   hasAnyAnomaly,
-  detectAnomalies
+  detectAnomalies,
+  syncAnomaliesWithThresholds
 } from '../utils';
 import { currentUser } from '../data/mockData';
 
@@ -360,13 +361,32 @@ export const useAppStore = create<AppState>((set, get) => ({
       }
       if (versionHistory.fieldName === 'thresholds') {
         try {
-          const oldThresholds = JSON.parse(versionHistory.oldValue) as ThresholdItem[];
+          const oldThresholdsRaw = JSON.parse(versionHistory.oldValue) as ThresholdItem[];
+          const detectedThresholds = detectAnomalies(oldThresholdsRaw);
+          const hasAnomaly = hasAnyAnomaly(detectedThresholds);
+
+          const updatedAnomalies = syncAnomaliesWithThresholds(
+            playbackId,
+            state.anomalies,
+            detectedThresholds
+          );
+
+          const otherAnomalies = state.anomalies.filter(a => a.playbackId !== playbackId);
+          const allAnomalies = [...otherAnomalies, ...updatedAnomalies];
+
           return {
             playbackRecords: state.playbackRecords.map(r =>
               r.id === playbackId
-                ? { ...r, thresholds: oldThresholds, updatedAt: formatDateTime(new Date()) }
+                ? {
+                    ...r,
+                    thresholds: detectedThresholds,
+                    hasAnomaly,
+                    status: hasAnomaly ? 'pending_review' : 'normal',
+                    updatedAt: formatDateTime(new Date())
+                  }
                 : r
             ),
+            anomalies: allAnomalies,
             versionHistories: [...state.versionHistories, newVersion]
           };
         } catch {

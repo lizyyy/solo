@@ -136,27 +136,90 @@ export const mockLayerMetrics: LayerMetric[] = [
   }
 ];
 
+const createV1Thresholds = () => [
+  { metricName: 'CTR阈值', thresholdValue: 0.05, reportValue: 0.05, isConsistent: true },
+  { metricName: 'CVR阈值', thresholdValue: 0.02, reportValue: 0.02, isConsistent: true },
+  { metricName: '曝光阈值', thresholdValue: 1000, reportValue: 1000, isConsistent: true },
+  { metricName: '点击阈值', thresholdValue: 50, reportValue: 50, isConsistent: true }
+];
+
+const createV2Thresholds = () => [
+  { metricName: 'CTR阈值', thresholdValue: 0.06, reportValue: 0.05, isConsistent: false },
+  { metricName: 'CVR阈值', thresholdValue: 0.025, reportValue: 0.02, isConsistent: false },
+  { metricName: '曝光阈值', thresholdValue: 1000, reportValue: 1000, isConsistent: true },
+  { metricName: '点击阈值', thresholdValue: 50, reportValue: 50, isConsistent: true }
+];
+
 export const mockVersionHistories: VersionHistory[] = [
+  {
+    id: generateId(),
+    playbackId: mockPlaybackRecords[1].id,
+    version: 1,
+    fieldName: 'record',
+    oldValue: '',
+    newValue: '创建记录',
+    modifiedBy: '小孟',
+    modifiedAt: '2024-06-03 14:00:00',
+    changeType: 'create'
+  },
+  {
+    id: generateId(),
+    playbackId: mockPlaybackRecords[1].id,
+    version: 2,
+    fieldName: 'thresholds',
+    oldValue: JSON.stringify(createV1Thresholds()),
+    newValue: JSON.stringify(createV2Thresholds()),
+    modifiedBy: '小孟',
+    modifiedAt: '2024-06-03 14:15:00',
+    changeType: 'update'
+  },
+  {
+    id: generateId(),
+    playbackId: mockPlaybackRecords[1].id,
+    version: 3,
+    fieldName: 'remark',
+    oldValue: '6月3日活动调参',
+    newValue: '6月3日活动调参，阈值已更新但报告写了旧值',
+    modifiedBy: '小孟',
+    modifiedAt: '2024-06-03 14:20:00',
+    changeType: 'update'
+  },
   {
     id: generateId(),
     playbackId: mockPlaybackRecords[2].id,
     version: 1,
-    fieldName: 'remark',
-    oldValue: '6月5日调参',
-    newValue: '6月5日调参，已修正备注',
+    fieldName: 'record',
+    oldValue: '',
+    newValue: '创建记录',
     modifiedBy: '小孟',
-    modifiedAt: '2024-06-05 11:00:00',
-    changeType: 'update'
+    modifiedAt: '2024-06-05 09:15:00',
+    changeType: 'create'
   },
   {
     id: generateId(),
     playbackId: mockPlaybackRecords[2].id,
     version: 2,
     fieldName: 'thresholds',
-    oldValue: '[{"metricName":"CTR阈值","thresholdValue":0.055}]',
-    newValue: '[{"metricName":"CTR阈值","thresholdValue":0.05}]',
+    oldValue: JSON.stringify([
+      { metricName: 'CTR阈值', thresholdValue: 0.055, reportValue: 0.05, isConsistent: false },
+      { metricName: 'CVR阈值', thresholdValue: 0.02, reportValue: 0.02, isConsistent: true },
+      { metricName: '曝光阈值', thresholdValue: 1000, reportValue: 1000, isConsistent: true },
+      { metricName: '点击阈值', thresholdValue: 50, reportValue: 50, isConsistent: true }
+    ]),
+    newValue: JSON.stringify(createMockThresholds()),
     modifiedBy: '小孟',
     modifiedAt: '2024-06-05 10:30:00',
+    changeType: 'update'
+  },
+  {
+    id: generateId(),
+    playbackId: mockPlaybackRecords[2].id,
+    version: 3,
+    fieldName: 'remark',
+    oldValue: '6月5日调参',
+    newValue: '6月5日调参，已修正备注',
+    modifiedBy: '小孟',
+    modifiedAt: '2024-06-05 11:00:00',
     changeType: 'update'
   }
 ];

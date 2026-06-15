@@ -1,4 +1,4 @@
-import type { ThresholdItem, PlaybackRecord, ImportResult, VersionHistory } from '../types';
+import type { ThresholdItem, PlaybackRecord, ImportResult, VersionHistory, Anomaly } from '../types';
 
 export const generateId = (): string => {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
@@ -129,6 +129,45 @@ export const parseThresholdNote = (fileContent: string): {
   } catch {
     return null;
   }
+};
+
+export const syncAnomaliesWithThresholds = (
+  playbackId: string,
+  existingAnomalies: Anomaly[],
+  thresholds: ThresholdItem[]
+): Anomaly[] => {
+  const result: Anomaly[] = [];
+  const inconsistentMetrics = thresholds.filter(t => !t.isConsistent);
+
+  inconsistentMetrics.forEach(t => {
+    const existing = existingAnomalies.find(
+      a => a.playbackId === playbackId && a.metricName === t.metricName
+    );
+    if (existing) {
+      const valueChanged =
+        existing.thresholdValue !== t.thresholdValue ||
+        existing.reportValue !== t.reportValue;
+      result.push({
+        ...existing,
+        thresholdValue: t.thresholdValue,
+        reportValue: t.reportValue,
+        reviewResult: valueChanged ? undefined : existing.reviewResult,
+        reviewedBy: valueChanged ? undefined : existing.reviewedBy,
+        reviewedAt: valueChanged ? undefined : existing.reviewedAt
+      });
+    } else {
+      result.push({
+        id: generateId(),
+        playbackId,
+        metricName: t.metricName,
+        thresholdValue: t.thresholdValue,
+        reportValue: t.reportValue,
+        detectedAt: formatDateTime(new Date())
+      });
+    }
+  });
+
+  return result;
 };
 
 export const mergePlaybackRecord = (
