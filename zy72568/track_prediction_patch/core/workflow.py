@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 from enum import Enum
 
-from ..models.candidate_table import CandidateTable, CandidateRecord
+from ..models.candidate_table import CandidateTable, CandidateRecord, ImportBatchInfo
 from ..models.param_yaml import ParamYAML
 from ..models.patch_record import PatchRecord, PatchStatus, PatchIssue
 from ..models.unified_result import UnifiedResult
@@ -28,6 +28,9 @@ class WorkflowState:
     step_history: List[Dict] = field(default_factory=list)
     can_proceed: bool = False
     blocking_issues: List[str] = field(default_factory=list)
+    latest_import_batch: Optional[ImportBatchInfo] = None
+    status_message: str = ""
+    result_summary: Dict = field(default_factory=dict)
 
 
 class PatchWorkflow:
@@ -66,6 +69,8 @@ class PatchWorkflow:
         """
         第一步：召回候选表第一次导入
 
+        关键修复：先检测重复再添加，避免首次导入被误判为重复
+
         Args:
             candidate_records: 候选记录列表
             table_name: 候选表名称
@@ -74,35 +79,74 @@ class PatchWorkflow:
         Returns:
             工作流状态、自检结果、冲突证据（如果有YAML的话）
         """
-        self.candidate_table = CandidateTable(
-            name=table_name,
-            created_by=self.created_by,
-            import_batch=import_batch,
-        )
-        added_ids = self.candidate_table.add_records(candidate_records)
+        is_first_import = self.candidate_table is None
 
-        self.patch_record.candidate_table_id = self.candidate_table.table_id
-        self.patch_record.update_status(PatchStatus.IMPORTED, self.created_by)
+        if is_first_import:
+            self.candidate_table = CandidateTable(
+                name=table_name,
+                created_by=self.created_by,
+                import_batch=import_batch,
+            )
+            self.patch_record.candidate_table_id = self.candidate_table.table_id
+
+        before_count = len(self.candidate_table.records)
+
+        batch_info = self.candidate_table.add_records(
+            candidate_records, imported_by=self.created_by
+        )
+
+        self.state.latest_import_batch = batch_info
+
+        if is_first_import:
+            self.patch_record.update_status(PatchStatus.IMPORTED, self.created_by)
+            reason = "召回候选表第一次导入"
+        else:
+            reason = f"追加导入候选记录（批次: {import_batch}）"
+
+        self.state.status_message = (
+            f"导入完成：共{batch_info.total_count}条，"
+            f"新增{batch_info.new_count}条，"
+            f"重复{batch_info.duplicate_count}条"
+        )
+
+        self.state.result_summary = {
+            "total_count": batch_info.total_count,
+            "new_count": batch_info.new_count,
+            "duplicate_count": batch_info.duplicate_count,
+            "duplicate_track_ids": batch_info.duplicate_track_ids,
+            "new_track_ids": batch_info.new_track_ids,
+            "before_count": before_count,
+            "after_count": len(self.candidate_table.records),
+            "is_first_import": is_first_import,
+        }
 
         self.reviewer.log_operation(
             operation_type=OperationType.IMPORT_CANDIDATES,
             operator=self.created_by,
             patch_id=self.patch_record.patch_id,
             details={
-                "table_name": table_name,
+                "table_name": table_name or self.candidate_table.name,
                 "import_batch": import_batch,
-                "added_count": len(added_ids),
+                "batch_id": batch_info.batch_id,
+                "total_count": batch_info.total_count,
+                "new_count": batch_info.new_count,
+                "duplicate_count": batch_info.duplicate_count,
+                "duplicate_track_ids": batch_info.duplicate_track_ids,
                 "total_records": len(self.candidate_table.records),
             },
+            before_state={"record_count": before_count},
             after_state={"record_count": len(self.candidate_table.records)},
-            reason="召回候选表第一次导入",
+            reason=reason,
         )
 
-        check_results = self.self_checker.check_duplicate_import(
-            self.candidate_table, candidate_records
-        )
+        check_results = []
 
-        for result in [check_results]:
+        dup_check = self.self_checker.check_duplicate_import_from_batch(
+            batch_info, candidate_records
+        )
+        check_results.append(dup_check)
+
+        for result in check_results:
             for issue in result.issues:
                 self.patch_record.add_issue(issue)
 
@@ -115,10 +159,42 @@ class PatchWorkflow:
                 issue = self.conflict_detector.generate_issue_from_conflict(conflict)
                 self.patch_record.add_issue(issue)
 
-        self._record_step(WorkflowStep.STEP_1_IMPORT, "候选表导入完成")
+        self._record_step(
+            WorkflowStep.STEP_1_IMPORT,
+            self.state.status_message,
+            extra={
+                "batch_id": batch_info.batch_id,
+                "new_count": batch_info.new_count,
+                "duplicate_count": batch_info.duplicate_count,
+            }
+        )
         self._update_can_proceed()
 
-        return self.state, [check_results], conflicts
+        return self.state, check_results, conflicts
+
+    def append_candidates(
+        self,
+        candidate_records: List[CandidateRecord],
+        import_batch: str = "",
+    ) -> Tuple[WorkflowState, List[CheckResult], List[ConflictEvidence]]:
+        """
+        追加导入候选记录（非首次导入）
+
+        Args:
+            candidate_records: 候选记录列表
+            import_batch: 导入批次号
+
+        Returns:
+            工作流状态、自检结果、冲突证据
+        """
+        if self.candidate_table is None:
+            raise ValueError("请先调用 step_1_import_candidates 完成首次导入")
+
+        return self.step_1_import_candidates(
+            candidate_records,
+            table_name=self.candidate_table.name,
+            import_batch=import_batch,
+        )
 
     def step_2_review_params(
         self,
@@ -173,6 +249,8 @@ class PatchWorkflow:
             conflicts = self.conflict_detector.detect_conflicts(
                 self.candidate_table, self.param_yaml
             )
+            unresolved_count = sum(1 for c in conflicts if not c.resolved)
+
             for conflict in conflicts:
                 if not conflict.resolved:
                     self.patch_record.update_status(
@@ -182,7 +260,17 @@ class PatchWorkflow:
                     )
                     break
 
-        self._record_step(WorkflowStep.STEP_2_REVIEW_PARAMS, "参数YAML补看完成")
+            self.state.status_message = (
+                f"参数YAML补看完成，检测到{len(conflicts)}处阈值冲突，"
+                f"其中{unresolved_count}处待确认"
+            )
+        else:
+            self.state.status_message = "参数YAML补看完成（暂无可比对的候选表）"
+
+        self._record_step(
+            WorkflowStep.STEP_2_REVIEW_PARAMS,
+            self.state.status_message,
+        )
         self._update_can_proceed()
 
         return self.state, check_results, conflicts
@@ -244,7 +332,8 @@ class PatchWorkflow:
             for issue in recalc_check.issues:
                 self.patch_record.add_issue(issue)
 
-        self._record_step(WorkflowStep.STEP_3_UPDATE_METRICS, "分层指标更新完成")
+        unresolved_issues = self.patch_record.get_unresolved_issues()
+        tier_count = len(tier_metrics)
 
         if self.reviewer.needs_data_scientist_review(self.patch_record):
             self.patch_record.update_status(
@@ -252,6 +341,20 @@ class PatchWorkflow:
                 self.created_by,
                 "存在阈值旧值问题，需要数据科学家复核",
             )
+            self.state.status_message = (
+                f"分层指标更新完成（{tier_count}个分层），"
+                f"存在{len(unresolved_issues)}个未解决问题，需数据科学家复核"
+            )
+        else:
+            self.state.status_message = (
+                f"分层指标更新完成（{tier_count}个分层），"
+                f"共{len(self.patch_record.issues)}个问题，已全部解决"
+            )
+
+        self._record_step(
+            WorkflowStep.STEP_3_UPDATE_METRICS,
+            self.state.status_message,
+        )
 
         self._update_can_proceed()
 
@@ -301,6 +404,38 @@ class PatchWorkflow:
                 if issue.track_id == evidence.track_id and not issue.resolved:
                     self.patch_record.resolve_issue(issue.issue_id, resolved_by)
 
+            total_conflicts = len(self.conflict_detector.conflicts)
+            unresolved_conflicts = len(self.conflict_detector.get_unresolved_conflicts())
+            resolution_text = "确认" if resolution == "confirmed" else "驳回"
+            self.state.status_message = (
+                f"已{resolution_text}冲突: 轨迹[{evidence.track_id}]，"
+                f"剩余{unresolved_conflicts}/{total_conflicts}处冲突待处理"
+            )
+
+            if self.unified_result and self.unified_result.track_details:
+                issues_summary = self._build_issues_summary()
+                track_details = self._build_track_details()
+                self.unified_result.update_data(
+                    self.patch_record.tier_metrics,
+                    track_details,
+                    issues_summary,
+                )
+                self.unified_result.generated_by = resolved_by
+
+            if unresolved_conflicts == 0:
+                if self.reviewer.needs_data_scientist_review(self.patch_record):
+                    self.patch_record.update_status(
+                        PatchStatus.NEEDS_REVIEW,
+                        resolved_by,
+                        "阈值冲突已处理，但需数据科学家复核",
+                    )
+                else:
+                    self.patch_record.update_status(
+                        PatchStatus.PARAMS_REVIEWED,
+                        resolved_by,
+                        "所有阈值冲突已处理完成",
+                    )
+
             self._update_can_proceed()
 
         return evidence
@@ -346,20 +481,30 @@ class PatchWorkflow:
 
     def get_workflow_summary(self) -> Dict:
         """获取工作流摘要"""
-        return {
+        summary = {
             "patch_id": self.patch_record.patch_id,
             "current_step": self.state.current_step,
             "status": self.patch_record.status,
+            "status_message": self.state.status_message,
             "created_by": self.created_by,
             "candidate_table_id": self.patch_record.candidate_table_id,
             "param_yaml_id": self.patch_record.param_yaml_id,
             "candidate_count": len(self.candidate_table.records) if self.candidate_table else 0,
+            "import_history_count": len(self.candidate_table.import_history) if self.candidate_table else 0,
             "conflict_summary": self.conflict_detector.get_conflict_summary(),
             "check_summary": self.self_checker.get_check_summary(),
             "review_summary": self.reviewer.get_review_summary(self.patch_record),
             "step_history": self.state.step_history,
             "can_proceed": self.state.can_proceed,
+            "blocking_issues": self.state.blocking_issues,
+            "result_summary": self.state.result_summary,
+            "issues_summary": {
+                "total": len(self.patch_record.issues),
+                "resolved": sum(1 for i in self.patch_record.issues if i.resolved),
+                "unresolved": sum(1 for i in self.patch_record.issues if not i.resolved),
+            },
         }
+        return summary
 
     def _build_track_details(self) -> List[Dict]:
         """构建轨迹详情"""
@@ -413,15 +558,18 @@ class PatchWorkflow:
             ),
         }
 
-    def _record_step(self, step: WorkflowStep, description: str):
+    def _record_step(self, step: WorkflowStep, description: str, extra: Dict = None):
         """记录步骤历史"""
         self.state.current_step = step
-        self.state.step_history.append({
+        entry = {
             "step": step,
             "timestamp": get_current_time().isoformat(),
             "description": description,
             "operator": self.created_by,
-        })
+        }
+        if extra:
+            entry.update(extra)
+        self.state.step_history.append(entry)
 
     def _update_can_proceed(self):
         """更新是否可以进入下一步"""

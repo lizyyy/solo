@@ -126,12 +126,14 @@ class Reviewer:
         return impact
 
     def needs_data_scientist_review(self, patch_record: PatchRecord) -> bool:
-        """判断是否需要数据科学家复核"""
+        """判断是否需要数据科学家复核（只看未解决的问题）"""
         for issue in patch_record.issues:
+            if issue.resolved:
+                continue
             evidence = issue.evidence or {}
             if evidence.get("needs_data_scientist_review", False):
                 return True
-            if issue.issue_type == "threshold_mismatch" and not issue.resolved:
+            if issue.issue_type == "threshold_mismatch":
                 return True
         return False
 

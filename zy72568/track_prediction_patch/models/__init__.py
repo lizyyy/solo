@@ -2,7 +2,7 @@
 数据模型层
 """
 
-from .candidate_table import CandidateTable, CandidateRecord
+from .candidate_table import CandidateTable, CandidateRecord, ImportBatchInfo, CandidateStatus
 from .param_yaml import ParamYAML, ThresholdConfig
 from .patch_record import PatchRecord, PatchStatus
 from .audit_log import AuditLog, OperationType

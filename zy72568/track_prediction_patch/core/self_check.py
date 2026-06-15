@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Callable
 from enum import Enum
 
-from ..models.candidate_table import CandidateTable, CandidateRecord
+from ..models.candidate_table import CandidateTable, CandidateRecord, ImportBatchInfo
 from ..models.param_yaml import ParamYAML
 from ..models.patch_record import PatchRecord, PatchIssue, PatchIssueType
 from ..models.unified_result import UnifiedResult
@@ -96,6 +96,58 @@ class SelfChecker:
             description=f"检测到{len(duplicates)}条重复导入记录" if not passed else "无重复导入",
             issues=issues,
             details={"duplicate_count": len(duplicates)},
+        )
+
+    def check_duplicate_import_from_batch(
+        self,
+        batch_info: ImportBatchInfo,
+        new_records: List[CandidateRecord],
+    ) -> CheckResult:
+        """
+        基于导入批次信息检查重复导入
+        避免先写入再检查导致的误判问题
+        """
+        issues = []
+        record_map = {r.track_id: r for r in new_records}
+
+        for track_id in batch_info.duplicate_track_ids:
+            record = record_map.get(track_id)
+            import_hash = record.import_hash if record else ""
+            issue = PatchIssue(
+                issue_type=PatchIssueType.DUPLICATE_IMPORT,
+                description=f"轨迹[{track_id}]已存在，属于重复导入",
+                severity="warning",
+                track_id=track_id,
+                evidence={
+                    "import_hash": import_hash,
+                    "batch_id": batch_info.batch_id,
+                    "duplicate_source": "table_existing",
+                },
+            )
+            issues.append(issue)
+
+        passed = batch_info.duplicate_count == 0
+        desc_parts = []
+        if batch_info.duplicate_count > 0:
+            desc_parts.append(f"检测到{batch_info.duplicate_count}条重复导入记录")
+        if batch_info.new_count > 0:
+            desc_parts.append(f"新增{batch_info.new_count}条记录")
+        if not desc_parts:
+            desc_parts.append("无记录变更")
+
+        return CheckResult(
+            check_item=CheckItem.DUPLICATE_IMPORT,
+            passed=passed,
+            description="，".join(desc_parts),
+            issues=issues,
+            details={
+                "duplicate_count": batch_info.duplicate_count,
+                "new_count": batch_info.new_count,
+                "total_count": batch_info.total_count,
+                "batch_id": batch_info.batch_id,
+                "duplicate_track_ids": batch_info.duplicate_track_ids,
+                "new_track_ids": batch_info.new_track_ids,
+            },
         )
 
     def check_old_threshold_report(
