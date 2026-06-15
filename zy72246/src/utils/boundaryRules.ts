@@ -31,6 +31,26 @@ export const BOUNDARY_RULES: BoundaryRule[] = [
     codeReference: 'src/utils/stateMachine.ts',
     status: 'ACTIVE',
   },
+  {
+    id: 'RULE_004',
+    name: '柜台流水尾号备注对齐',
+    description: '补看柜台流水尾号时，尾号信息应追加到当前备注末尾，保持备注和尾号一致',
+    condition: 'counterTailNumber有值但备注中未包含该尾号',
+    action: '自动将"柜台尾号XXX"追加到当前备注，创建版本记录',
+    rollbackMethod: '回滚备注到上一版本',
+    codeReference: 'src/utils/boundaryRules.ts#alignCounterTailRemark',
+    status: 'ACTIVE',
+  },
+  {
+    id: 'RULE_005',
+    name: '冲正记录流转限制',
+    description: '金额为0且备注含冲正的记录，不得直接进入余额更新或摘要更新，必须先经风控复核通过',
+    condition: 'amount===0 && remark含冲正 && processingStatus===REVERSAL_PENDING_REVIEW && 目标状态不是NORMAL或REJECTED',
+    action: '拒绝状态变更，提示需先经风控复核',
+    rollbackMethod: '无（前置校验不通过）',
+    codeReference: 'src/utils/boundaryRules.ts#checkBalanceUpdatePrerequisite',
+    status: 'ACTIVE',
+  },
 ];
 
 export function checkReversalRule(amount: number, remark: string): boolean {
@@ -75,4 +95,47 @@ export function detectFieldChanges(
 
 export function getBoundaryRules(): BoundaryRule[] {
   return BOUNDARY_RULES.filter(rule => rule.status === 'ACTIVE');
+}
+
+export function alignCounterTailRemark(currentRemark: string, counterTailNumber: string): string {
+  if (!counterTailNumber) return currentRemark;
+  if (currentRemark.includes(counterTailNumber)) return currentRemark;
+  const suffix = ` 柜台尾号${counterTailNumber}`;
+  if (currentRemark.includes('柜台尾号')) {
+    return currentRemark.replace(/柜台尾号\S*/, `柜台尾号${counterTailNumber}`);
+  }
+  return currentRemark + suffix;
+}
+
+export interface BalanceCheckResult {
+  canProceed: boolean;
+  reason: string;
+  ruleId?: string;
+}
+
+export function checkBalanceUpdatePrerequisite(taxNote: TaxNote): BalanceCheckResult {
+  if (taxNote.processingStatus === ProcessingStatus.REVERSAL_PENDING_REVIEW
+      && taxNote.currentAmount === 0
+      && (taxNote.originalRemark.includes('冲正') || taxNote.currentRemark.includes('冲正'))) {
+    return {
+      canProceed: false,
+      reason: '该记录为冲正待复核状态，需先经风控复核通过后方可继续后续流程',
+      ruleId: 'RULE_005',
+    };
+  }
+
+  if (!taxNote.counterTailNumber) {
+    return {
+      canProceed: false,
+      reason: '该记录尚未补看柜台流水尾号，请先完成补看流水步骤',
+      ruleId: 'RULE_004',
+    };
+  }
+
+  return { canProceed: true, reason: '' };
+}
+
+export function isReversalRecord(taxNote: TaxNote): boolean {
+  return taxNote.currentAmount === 0
+    && (taxNote.originalRemark.includes('冲正') || taxNote.currentRemark.includes('冲正'));
 }

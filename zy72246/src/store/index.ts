@@ -1,24 +1,18 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { useShallow } from "zustand/react/shallow";
 import {
-  AppState,
-  TaxNote,
-  TaxNoteVersion,
-  StatusHistory,
-  ReviewRecord,
-  ProcessingStatus,
-  ProcessStep,
-  ActionType,
-} from '@/types';
+  AppState, TaxNote, TaxNoteVersion, StatusHistory,
+  ReviewRecord, BalanceChangeRecord, DuplicateResolution,
+  ProcessingStatus, ProcessStep, ActionType,
+} from "@/types";
 import {
-  mockTaxNotes,
-  mockVersions,
-  mockStatusHistories,
-  mockReviewRecords,
-} from '@/data/mockData';
-import { createVersionRecord, createStatusHistoryRecord, generateUUID } from '@/utils/versionControl';
-import { canTransitionStatus, canTransitionStep } from '@/utils/stateMachine';
-import { detectFieldChanges } from '@/utils/boundaryRules';
+  mockTaxNotes, mockVersions, mockStatusHistories,
+  mockReviewRecords, mockBalanceChanges,
+} from "@/data/mockData";
+import { createVersionRecord, createStatusHistoryRecord, generateUUID } from "@/utils/versionControl";
+import { canTransitionStatus, canTransitionStep } from "@/utils/stateMachine";
+import { detectFieldChanges, checkBalanceUpdatePrerequisite, alignCounterTailRemark } from "@/utils/boundaryRules";
 
 interface AppStore extends AppState {
   dispatch: (action: ActionType) => void;
@@ -26,12 +20,9 @@ interface AppStore extends AppState {
 }
 
 const initialState: AppState = {
-  taxNotes: [],
-  versions: [],
-  statusHistories: [],
-  reviewRecords: [],
-  currentUser: '小周',
-  filter: {},
+  taxNotes: [], versions: [], statusHistories: [],
+  reviewRecords: [], balanceChanges: [],
+  currentUser: "小周", filter: {},
 };
 
 function reducer(state: AppState, action: ActionType): AppState {
@@ -40,92 +31,137 @@ function reducer(state: AppState, action: ActionType): AppState {
       return { ...state, ...action.payload };
 
     case 'IMPORT_DATA': {
-      const existingIds = new Set(state.taxNotes.map(t => t.id));
-      const newTaxNotes = [
-        ...state.taxNotes.filter(t => !action.payload.taxNotes.find(n => n.id === t.id)),
-        ...action.payload.taxNotes,
-      ];
+      const { taxNotes, versions, statusHistories } = action.payload;
+      const mergedTaxNotes = [...state.taxNotes];
+      const newVersions = [...state.versions, ...versions];
+      const newStatusHistories = [...state.statusHistories, ...statusHistories];
+
+      for (const note of taxNotes) {
+        const existingIndex = mergedTaxNotes.findIndex(n => n.id === note.id);
+        if (existingIndex >= 0) {
+          mergedTaxNotes[existingIndex] = {
+            ...mergedTaxNotes[existingIndex],
+            ...note,
+            version: Math.max(mergedTaxNotes[existingIndex].version, note.version),
+          };
+        } else {
+          mergedTaxNotes.push(note);
+        }
+      }
+
       return {
         ...state,
-        taxNotes: newTaxNotes,
-        versions: [...state.versions, ...action.payload.versions],
-        statusHistories: [...state.statusHistories, ...action.payload.statusHistories],
+        taxNotes: mergedTaxNotes,
+        versions: newVersions,
+        statusHistories: newStatusHistories,
       };
     }
 
     case 'UPDATE_TAX_NOTE': {
       const { id, updates, reason } = action.payload;
-      const taxNoteIndex = state.taxNotes.findIndex(t => t.id === id);
+      const taxNoteIndex = state.taxNotes.findIndex(n => n.id === id);
       if (taxNoteIndex === -1) return state;
 
-      const existingNote = state.taxNotes[taxNoteIndex];
-      const changes = detectFieldChanges(existingNote, updates);
+      const existing = state.taxNotes[taxNoteIndex];
+      let alignedUpdates = { ...updates };
 
-      if (changes.length === 0) return state;
-
-      const newVersions: TaxNoteVersion[] = [];
-      const newVersionNumber = existingNote.version + 1;
-
-      for (const change of changes) {
-        newVersions.push(
-          createVersionRecord(
-            id,
-            newVersionNumber,
-            change.field,
-            change.oldValue,
-            change.newValue,
-            state.currentUser,
-            reason
-          )
+      if (updates.counterTailNumber && updates.counterTailNumber !== existing.counterTailNumber) {
+        const alignedRemark = alignCounterTailRemark(
+          updates.currentRemark || existing.currentRemark,
+          updates.counterTailNumber
         );
+        if (alignedRemark !== (updates.currentRemark || existing.currentRemark)) {
+          alignedUpdates.currentRemark = alignedRemark;
+        }
       }
 
-      const updatedNote: TaxNote = {
-        ...existingNote,
-        ...updates,
-        version: newVersionNumber,
+      const fieldChanges = detectFieldChanges(existing, alignedUpdates);
+      if (fieldChanges.length === 0) return state;
+
+      const newVersion = existing.version + 1;
+      const updatedTaxNote: TaxNote = {
+        ...existing,
+        ...alignedUpdates,
+        version: newVersion,
         updatedBy: state.currentUser,
         updatedAt: new Date().toISOString(),
       };
 
+      const versionRecords: TaxNoteVersion[] = fieldChanges.map(change =>
+        createVersionRecord(
+          id,
+          newVersion,
+          change.field,
+          change.oldValue,
+          change.newValue,
+          state.currentUser,
+          reason
+        )
+      );
+
       const newTaxNotes = [...state.taxNotes];
-      newTaxNotes[taxNoteIndex] = updatedNote;
+      newTaxNotes[taxNoteIndex] = updatedTaxNote;
 
       return {
         ...state,
         taxNotes: newTaxNotes,
-        versions: [...state.versions, ...newVersions],
+        versions: [...state.versions, ...versionRecords],
       };
     }
 
     case 'CHANGE_STATUS': {
       const { id, toStatus, remark } = action.payload;
-      const taxNoteIndex = state.taxNotes.findIndex(t => t.id === id);
+      const taxNoteIndex = state.taxNotes.findIndex(n => n.id === id);
       if (taxNoteIndex === -1) return state;
 
-      const existingNote = state.taxNotes[taxNoteIndex];
+      const taxNote = state.taxNotes[taxNoteIndex];
 
-      if (!canTransitionStatus(existingNote.processingStatus, toStatus)) {
-        console.error(`无法从 ${existingNote.processingStatus} 转换到 ${toStatus}`);
+      if (!canTransitionStatus(taxNote.processingStatus, toStatus)) {
+        console.error(`状态流转被拒绝: ${taxNote.processingStatus} → ${toStatus}`);
         return state;
       }
 
-      let newStep = existingNote.currentStep;
-      if (toStatus === ProcessingStatus.SUPPLEMENT_COMPLETED) {
-        if (canTransitionStep(existingNote.currentStep, ProcessStep.STEP_2_SUPPLEMENT)) {
-          newStep = ProcessStep.STEP_2_SUPPLEMENT;
+      if (toStatus === ProcessingStatus.BALANCE_UPDATED) {
+        const check = checkBalanceUpdatePrerequisite(taxNote);
+        if (!check.canProceed) {
+          console.error(`余额更新前置检查未通过: ${check.reason} (规则: ${check.ruleId})`);
+          return state;
         }
-      } else if (toStatus === ProcessingStatus.PENDING_APPROVAL || toStatus === ProcessingStatus.COMPLETED) {
-        if (canTransitionStep(existingNote.currentStep, ProcessStep.STEP_3_SUMMARY)) {
-          newStep = ProcessStep.STEP_3_SUMMARY;
-        }
-      } else if (toStatus === ProcessingStatus.PENDING) {
-        newStep = ProcessStep.STEP_1_IMPORT;
       }
+
+      const newVersion = taxNote.version + 1;
+      let newStep = taxNote.currentStep;
+
+      switch (toStatus) {
+        case ProcessingStatus.SUPPLEMENT_COMPLETED:
+          newStep = ProcessStep.STEP_2_SUPPLEMENT;
+          break;
+        case ProcessingStatus.BALANCE_UPDATED:
+          newStep = ProcessStep.STEP_3_BALANCE;
+          break;
+        case ProcessingStatus.PENDING_APPROVAL:
+        case ProcessingStatus.COMPLETED:
+          newStep = ProcessStep.STEP_4_SUMMARY;
+          break;
+        case ProcessingStatus.PENDING:
+          newStep = ProcessStep.STEP_1_IMPORT;
+          break;
+        default:
+          break;
+      }
+
+      const updatedTaxNote: TaxNote = {
+        ...taxNote,
+        processingStatus: toStatus,
+        currentStep: newStep,
+        version: newVersion,
+        updatedBy: state.currentUser,
+        updatedAt: new Date().toISOString(),
+      };
 
       const statusHistory = createStatusHistoryRecord(
         id,
-        existingNote.processingStatus,
+        taxNote.processingStatus,
         toStatus,
         state.currentUser,
         remark
@@ -133,25 +169,16 @@ function reducer(state: AppState, action: ActionType): AppState {
 
       const versionRecord = createVersionRecord(
         id,
-        existingNote.version + 1,
+        newVersion,
         'processingStatus',
-        existingNote.processingStatus,
+        taxNote.processingStatus,
         toStatus,
         state.currentUser,
         remark
       );
 
-      const updatedNote: TaxNote = {
-        ...existingNote,
-        processingStatus: toStatus,
-        currentStep: newStep,
-        version: existingNote.version + 1,
-        updatedBy: state.currentUser,
-        updatedAt: new Date().toISOString(),
-      };
-
       const newTaxNotes = [...state.taxNotes];
-      newTaxNotes[taxNoteIndex] = updatedNote;
+      newTaxNotes[taxNoteIndex] = updatedTaxNote;
 
       return {
         ...state,
@@ -163,10 +190,11 @@ function reducer(state: AppState, action: ActionType): AppState {
 
     case 'REVIEW_RECORD': {
       const { id, result, opinion } = action.payload;
-      const taxNoteIndex = state.taxNotes.findIndex(t => t.id === id);
+      const taxNoteIndex = state.taxNotes.findIndex(n => n.id === id);
       if (taxNoteIndex === -1) return state;
 
-      const existingNote = state.taxNotes[taxNoteIndex];
+      const taxNote = state.taxNotes[taxNoteIndex];
+      const newVersion = taxNote.version + 1;
 
       const reviewRecord: ReviewRecord = {
         id: generateUUID(),
@@ -178,41 +206,46 @@ function reducer(state: AppState, action: ActionType): AppState {
         isReversed: false,
       };
 
-      const newStatus = result === 'APPROVED' ? ProcessingStatus.NORMAL : ProcessingStatus.REJECTED;
+      const newStatus = result === 'APPROVED'
+        ? ProcessingStatus.NORMAL
+        : ProcessingStatus.REJECTED;
 
-      if (!canTransitionStatus(existingNote.processingStatus, newStatus)) {
-        console.error(`无法从 ${existingNote.processingStatus} 转换到 ${newStatus}`);
+      if (!canTransitionStatus(taxNote.processingStatus, newStatus)) {
         return state;
       }
 
-      const statusHistory = createStatusHistoryRecord(
-        id,
-        existingNote.processingStatus,
-        newStatus,
-        state.currentUser,
-        `风控复核${result === 'APPROVED' ? '通过' : '驳回'}: ${opinion}`
-      );
-
-      const versionRecord = createVersionRecord(
-        id,
-        existingNote.version + 1,
-        'processingStatus',
-        existingNote.processingStatus,
-        newStatus,
-        state.currentUser,
-        `风控复核${result === 'APPROVED' ? '通过' : '驳回'}`
-      );
-
-      const updatedNote: TaxNote = {
-        ...existingNote,
+      const updatedTaxNote: TaxNote = {
+        ...taxNote,
         processingStatus: newStatus,
-        version: existingNote.version + 1,
+        version: newVersion,
         updatedBy: state.currentUser,
         updatedAt: new Date().toISOString(),
       };
 
+      const statusHistory = createStatusHistoryRecord(
+        id,
+        taxNote.processingStatus,
+        newStatus,
+        state.currentUser,
+        result === 'APPROVED'
+          ? `风控复核通过: ${opinion}`
+          : `风控复核驳回: ${opinion}`
+      );
+
+      const versionRecord = createVersionRecord(
+        id,
+        newVersion,
+        'processingStatus',
+        taxNote.processingStatus,
+        newStatus,
+        state.currentUser,
+        result === 'APPROVED'
+          ? `风控复核通过: ${opinion}`
+          : `风控复核驳回: ${opinion}`
+      );
+
       const newTaxNotes = [...state.taxNotes];
-      newTaxNotes[taxNoteIndex] = updatedNote;
+      newTaxNotes[taxNoteIndex] = updatedTaxNote;
 
       return {
         ...state,
@@ -225,31 +258,56 @@ function reducer(state: AppState, action: ActionType): AppState {
 
     case 'ROLLBACK_STATUS': {
       const { id, reason } = action.payload;
-      const statusHistoriesForNote = state.statusHistories
+      const taxNoteIndex = state.taxNotes.findIndex(n => n.id === id);
+      if (taxNoteIndex === -1) return state;
+
+      const taxNote = state.taxNotes[taxNoteIndex];
+      const historiesForNote = state.statusHistories
         .filter(h => h.taxNoteId === id)
         .sort((a, b) => new Date(b.operatedAt).getTime() - new Date(a.operatedAt).getTime());
 
-      if (statusHistoriesForNote.length < 2) {
-        console.error('没有足够的历史记录进行回滚');
-        return state;
+      if (historiesForNote.length === 0) return state;
+
+      const lastHistory = historiesForNote[0];
+      if (!lastHistory.fromStatus) return state;
+
+      const previousStatus = lastHistory.fromStatus;
+      const newVersion = taxNote.version + 1;
+
+      let newStep = taxNote.currentStep;
+      switch (previousStatus) {
+        case ProcessingStatus.PENDING:
+          newStep = ProcessStep.STEP_1_IMPORT;
+          break;
+        case ProcessingStatus.SUPPLEMENT_COMPLETED:
+          newStep = ProcessStep.STEP_2_SUPPLEMENT;
+          break;
+        case ProcessingStatus.BALANCE_UPDATED:
+          newStep = ProcessStep.STEP_3_BALANCE;
+          break;
+        case ProcessingStatus.PENDING_APPROVAL:
+        case ProcessingStatus.COMPLETED:
+          newStep = ProcessStep.STEP_4_SUMMARY;
+          break;
+        case ProcessingStatus.REVERSAL_PENDING_REVIEW:
+        case ProcessingStatus.NORMAL:
+        case ProcessingStatus.REJECTED:
+        default:
+          break;
       }
 
-      const currentHistory = statusHistoriesForNote[0];
-      const previousStatus = currentHistory.fromStatus;
-
-      if (!previousStatus) {
-        console.error('无法回滚到初始状态之前');
-        return state;
-      }
-
-      const taxNoteIndex = state.taxNotes.findIndex(t => t.id === id);
-      if (taxNoteIndex === -1) return state;
-
-      const existingNote = state.taxNotes[taxNoteIndex];
+      const updatedTaxNote: TaxNote = {
+        ...taxNote,
+        processingStatus: previousStatus,
+        currentStep: newStep,
+        version: newVersion,
+        updatedBy: state.currentUser,
+        updatedAt: new Date().toISOString(),
+      };
 
       const statusHistory = createStatusHistoryRecord(
         id,
-        existingNote.processingStatus,
+        taxNote.processingStatus,
         previousStatus,
         state.currentUser,
         `回滚: ${reason}`
@@ -257,46 +315,72 @@ function reducer(state: AppState, action: ActionType): AppState {
 
       const versionRecord = createVersionRecord(
         id,
-        existingNote.version + 1,
+        newVersion,
         'processingStatus',
-        existingNote.processingStatus,
+        taxNote.processingStatus,
         previousStatus,
         state.currentUser,
         `回滚: ${reason}`
       );
 
-      const reviewRecordIndex = state.reviewRecords.findIndex(
-        r => r.taxNoteId === id && !r.isReversed
-      );
-      let newReviewRecords = state.reviewRecords;
-      if (reviewRecordIndex !== -1) {
-        newReviewRecords = [...state.reviewRecords];
-        newReviewRecords[reviewRecordIndex] = {
-          ...newReviewRecords[reviewRecordIndex],
-          isReversed: true,
-          reversedBy: state.currentUser,
-          reversedAt: new Date().toISOString(),
-        };
-      }
-
-      const updatedNote: TaxNote = {
-        ...existingNote,
-        processingStatus: previousStatus,
-        version: existingNote.version + 1,
-        updatedBy: state.currentUser,
-        updatedAt: new Date().toISOString(),
-      };
-
       const newTaxNotes = [...state.taxNotes];
-      newTaxNotes[taxNoteIndex] = updatedNote;
+      newTaxNotes[taxNoteIndex] = updatedTaxNote;
 
       return {
         ...state,
         taxNotes: newTaxNotes,
         statusHistories: [...state.statusHistories, statusHistory],
         versions: [...state.versions, versionRecord],
-        reviewRecords: newReviewRecords,
       };
+    }
+
+    case 'GENERATE_BALANCE_CHANGE': {
+      const { balanceChange, taxNoteUpdates } = action.payload;
+      let newState: AppState = {
+        ...state,
+        balanceChanges: [...state.balanceChanges, balanceChange],
+      };
+
+      if (taxNoteUpdates) {
+        const { id: updateId, updates, reason } = taxNoteUpdates;
+        const updateIndex = newState.taxNotes.findIndex(n => n.id === updateId);
+        if (updateIndex !== -1) {
+          const existing = newState.taxNotes[updateIndex];
+          const fieldChanges = detectFieldChanges(existing, updates);
+          const newVersion = existing.version + 1;
+
+          const updatedTaxNote: TaxNote = {
+            ...existing,
+            ...updates,
+            version: newVersion,
+            updatedBy: state.currentUser,
+            updatedAt: new Date().toISOString(),
+          };
+
+          const versionRecords: TaxNoteVersion[] = fieldChanges.map(change =>
+            createVersionRecord(
+              updateId,
+              newVersion,
+              change.field,
+              change.oldValue,
+              change.newValue,
+              state.currentUser,
+              reason
+            )
+          );
+
+          const newTaxNotes = [...newState.taxNotes];
+          newTaxNotes[updateIndex] = updatedTaxNote;
+
+          newState = {
+            ...newState,
+            taxNotes: newTaxNotes,
+            versions: [...newState.versions, ...versionRecords],
+          };
+        }
+      }
+
+      return newState;
     }
 
     case 'SET_FILTER':
@@ -312,18 +396,21 @@ function reducer(state: AppState, action: ActionType): AppState {
 
 export const useAppStore = create<AppStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       ...initialState,
+
       dispatch: (action: ActionType) => {
-        set(state => reducer(state, action));
+        set((state) => reducer(state, action));
       },
+
       resetToMockData: () => {
         set({
           taxNotes: mockTaxNotes,
           versions: mockVersions,
           statusHistories: mockStatusHistories,
           reviewRecords: mockReviewRecords,
-          currentUser: '小周',
+          balanceChanges: mockBalanceChanges,
+          currentUser: "小周",
           filter: {},
         });
       },
@@ -336,61 +423,60 @@ export const useAppStore = create<AppStore>()(
           state.versions = mockVersions;
           state.statusHistories = mockStatusHistories;
           state.reviewRecords = mockReviewRecords;
+          state.balanceChanges = mockBalanceChanges;
         }
       },
     }
   )
 );
 
-export function useFilteredTaxNotes() {
-  const { taxNotes, filter } = useAppStore();
-
+export function useFilteredTaxNotes(): TaxNote[] {
+  const { taxNotes, filter } = useAppStore(
+    useShallow((state) => ({ taxNotes: state.taxNotes, filter: state.filter }))
+  );
   return taxNotes.filter(note => {
     if (filter.status && note.processingStatus !== filter.status) return false;
     if (filter.step && note.currentStep !== filter.step) return false;
     if (filter.keyword) {
-      const keyword = filter.keyword.toLowerCase();
-      return (
-        note.stockCode.toLowerCase().includes(keyword) ||
-        note.stockName.toLowerCase().includes(keyword) ||
-        note.currentRemark.toLowerCase().includes(keyword) ||
-        note.originalRemark.toLowerCase().includes(keyword) ||
-        note.serialNumber.toLowerCase().includes(keyword)
-      );
+      const kw = filter.keyword.toLowerCase();
+      const matchesKeyword =
+        note.stockName.toLowerCase().includes(kw) ||
+        note.stockCode.includes(kw) ||
+        note.serialNumber.toLowerCase().includes(kw) ||
+        note.currentRemark.toLowerCase().includes(kw) ||
+        note.originalRemark.toLowerCase().includes(kw);
+      if (!matchesKeyword) return false;
     }
     return true;
-  }).sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+  });
 }
 
-export function useTaxNoteById(id: string) {
-  const taxNotes = useAppStore(state => state.taxNotes);
-  return taxNotes.find(t => t.id === id);
+export function useTaxNoteById(id: string): TaxNote | undefined {
+  return useAppStore((state) => state.taxNotes.find(n => n.id === id));
 }
 
-export function useVersionsByTaxNoteId(id: string) {
-  const versions = useAppStore(state => state.versions);
+export function useVersionsByTaxNoteId(taxNoteId: string): TaxNoteVersion[] {
+  const versions = useAppStore(useShallow((state) => state.versions));
   return versions
-    .filter(v => v.taxNoteId === id)
+    .filter(v => v.taxNoteId === taxNoteId)
     .sort((a, b) => new Date(b.changedAt).getTime() - new Date(a.changedAt).getTime());
 }
 
-export function useStatusHistoryByTaxNoteId(id: string) {
-  const statusHistories = useAppStore(state => state.statusHistories);
+export function useStatusHistoryByTaxNoteId(taxNoteId: string): StatusHistory[] {
+  const statusHistories = useAppStore(useShallow((state) => state.statusHistories));
   return statusHistories
-    .filter(h => h.taxNoteId === id)
+    .filter(h => h.taxNoteId === taxNoteId)
     .sort((a, b) => new Date(b.operatedAt).getTime() - new Date(a.operatedAt).getTime());
 }
 
-export function useReviewRecordsByTaxNoteId(id: string) {
-  const reviewRecords = useAppStore(state => state.reviewRecords);
-  return reviewRecords
-    .filter(r => r.taxNoteId === id)
-    .sort((a, b) => new Date(b.reviewedAt).getTime() - new Date(a.reviewedAt).getTime());
+export function usePendingReviewNotes(): TaxNote[] {
+  const taxNotes = useAppStore(useShallow((state) => state.taxNotes));
+  return taxNotes.filter(n => n.processingStatus === ProcessingStatus.REVERSAL_PENDING_REVIEW);
 }
 
-export function usePendingReviewNotes() {
-  const taxNotes = useAppStore(state => state.taxNotes);
-  return taxNotes
-    .filter(n => n.processingStatus === ProcessingStatus.REVERSAL_PENDING_REVIEW)
-    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+export function useReviewRecordsByTaxNoteId(taxNoteId: string): ReviewRecord[] {
+  const reviewRecords = useAppStore(useShallow((state) => state.reviewRecords));
+  return reviewRecords
+    .filter(r => r.taxNoteId === taxNoteId)
+    .sort((a, b) => new Date(b.reviewedAt).getTime() - new Date(a.reviewedAt).getTime());
 }

@@ -1,4 +1,5 @@
-import { TaxNote, ImportRowData, ImportResult, ImportDetail, ProcessingStatus, ProcessStep, DuplicateAction, DuplicateResolution } from '@/types';
+#!/usr/bin/env python3
+content = r"""import { TaxNote, ImportRowData, ImportResult, ImportDetail, ProcessingStatus, ProcessStep, DuplicateAction, DuplicateResolution } from '@/types';
 import { generateBusinessKey, determineInitialStatus, detectFieldChanges, checkReversalRule } from './boundaryRules';
 import { createVersionRecord, createStatusHistoryRecord, generateUUID } from './versionControl';
 
@@ -293,3 +294,11 @@ function createNewTaxNote(rowData: ImportRowData, currentUser: string): TaxNote 
 }
 
 export { generateUUID };
+"""
+
+with open('/Users/lzy/pro/solo/workspaces/zy72246/src/utils/deduplication.ts', 'w') as f:
+    f.write(content)
+
+import os
+size = os.path.getsize('/Users/lzy/pro/solo/workspaces/zy72246/src/utils/deduplication.ts')
+print(f'File written successfully. Size: {size} bytes')

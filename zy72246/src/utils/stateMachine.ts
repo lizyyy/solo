@@ -8,6 +8,7 @@ export const STATUS_TRANSITIONS: Record<ProcessingStatus, ProcessingStatus[]> = 
   [ProcessingStatus.REVERSAL_PENDING_REVIEW]: [
     ProcessingStatus.NORMAL,
     ProcessingStatus.REJECTED,
+    ProcessingStatus.SUPPLEMENT_COMPLETED,
   ],
   [ProcessingStatus.NORMAL]: [
     ProcessingStatus.SUPPLEMENT_COMPLETED,
@@ -18,14 +19,21 @@ export const STATUS_TRANSITIONS: Record<ProcessingStatus, ProcessingStatus[]> = 
     ProcessingStatus.NORMAL,
   ],
   [ProcessingStatus.SUPPLEMENT_COMPLETED]: [
+    ProcessingStatus.BALANCE_UPDATED,
     ProcessingStatus.PENDING_APPROVAL,
     ProcessingStatus.REJECTED,
     ProcessingStatus.PENDING,
+  ],
+  [ProcessingStatus.BALANCE_UPDATED]: [
+    ProcessingStatus.PENDING_APPROVAL,
+    ProcessingStatus.REJECTED,
+    ProcessingStatus.SUPPLEMENT_COMPLETED,
   ],
   [ProcessingStatus.PENDING_APPROVAL]: [
     ProcessingStatus.COMPLETED,
     ProcessingStatus.REJECTED,
     ProcessingStatus.SUPPLEMENT_COMPLETED,
+    ProcessingStatus.BALANCE_UPDATED,
   ],
   [ProcessingStatus.COMPLETED]: [
     ProcessingStatus.PENDING_APPROVAL,
@@ -37,11 +45,15 @@ export const STEP_TRANSITIONS: Record<ProcessStep, ProcessStep[]> = {
     ProcessStep.STEP_2_SUPPLEMENT,
   ],
   [ProcessStep.STEP_2_SUPPLEMENT]: [
-    ProcessStep.STEP_3_SUMMARY,
+    ProcessStep.STEP_3_BALANCE,
     ProcessStep.STEP_1_IMPORT,
   ],
-  [ProcessStep.STEP_3_SUMMARY]: [
+  [ProcessStep.STEP_3_BALANCE]: [
+    ProcessStep.STEP_4_SUMMARY,
     ProcessStep.STEP_2_SUPPLEMENT,
+  ],
+  [ProcessStep.STEP_4_SUMMARY]: [
+    ProcessStep.STEP_3_BALANCE,
   ],
 };
 
@@ -78,6 +90,7 @@ export function getStatusDisplayName(status: ProcessingStatus): string {
     [ProcessingStatus.NORMAL]: '正常',
     [ProcessingStatus.REJECTED]: '已驳回',
     [ProcessingStatus.SUPPLEMENT_COMPLETED]: '补看完成',
+    [ProcessingStatus.BALANCE_UPDATED]: '余额已更新',
     [ProcessingStatus.PENDING_APPROVAL]: '待负责人审阅',
     [ProcessingStatus.COMPLETED]: '已完成',
   };
@@ -88,7 +101,8 @@ export function getStepDisplayName(step: ProcessStep): string {
   const displayNames: Record<ProcessStep, string> = {
     [ProcessStep.STEP_1_IMPORT]: '第一步：导入',
     [ProcessStep.STEP_2_SUPPLEMENT]: '第二步：补看流水',
-    [ProcessStep.STEP_3_SUMMARY]: '第三步：摘要更新',
+    [ProcessStep.STEP_3_BALANCE]: '第三步：余额更新',
+    [ProcessStep.STEP_4_SUMMARY]: '第四步：摘要更新',
   };
   return displayNames[step] || step;
 }
@@ -100,6 +114,7 @@ export function getStatusColor(status: ProcessingStatus): string {
     [ProcessingStatus.NORMAL]: 'bg-green-100 text-green-800 border-green-300',
     [ProcessingStatus.REJECTED]: 'bg-red-100 text-red-800 border-red-300',
     [ProcessingStatus.SUPPLEMENT_COMPLETED]: 'bg-blue-100 text-blue-800 border-blue-300',
+    [ProcessingStatus.BALANCE_UPDATED]: 'bg-cyan-100 text-cyan-800 border-cyan-400',
     [ProcessingStatus.PENDING_APPROVAL]: 'bg-purple-100 text-purple-800 border-purple-300',
     [ProcessingStatus.COMPLETED]: 'bg-emerald-100 text-emerald-800 border-emerald-300',
   };
@@ -113,6 +128,7 @@ export function getStatusTextColor(status: ProcessingStatus): string {
     [ProcessingStatus.NORMAL]: 'text-green-600',
     [ProcessingStatus.REJECTED]: 'text-red-600',
     [ProcessingStatus.SUPPLEMENT_COMPLETED]: 'text-blue-600',
+    [ProcessingStatus.BALANCE_UPDATED]: 'text-cyan-600',
     [ProcessingStatus.PENDING_APPROVAL]: 'text-purple-600',
     [ProcessingStatus.COMPLETED]: 'text-emerald-600',
   };

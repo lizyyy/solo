@@ -49,7 +49,7 @@ export default function RulesPage() {
               <div className="flex items-center space-x-2 text-xs text-slate-500">
                 <Code className="w-3.5 h-3.5" />
                 <a
-                  href={`vscode://file/${process.cwd()}/${rule.codeReference}`}
+                  href={`vscode://file/${rule.codeReference}`}
                   className="text-blue-600 hover:underline font-mono"
                 >
                   {rule.codeReference}

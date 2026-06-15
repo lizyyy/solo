@@ -10,7 +10,7 @@ interface ProcessStepIndicatorProps {
 const steps = [
   ProcessStep.STEP_1_IMPORT,
   ProcessStep.STEP_2_SUPPLEMENT,
-  ProcessStep.STEP_3_SUMMARY,
+  ProcessStep.STEP_4_SUMMARY,
 ];
 
 export function ProcessStepIndicator({ currentStep, className = '' }: ProcessStepIndicatorProps) {

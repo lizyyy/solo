@@ -1,4 +1,6 @@
-export enum ProcessingStatus {
+import os
+
+content = """export enum ProcessingStatus {
   PENDING = 'PENDING',
   REVERSAL_PENDING_REVIEW = 'REVERSAL_PENDING_REVIEW',
   NORMAL = 'NORMAL',
@@ -165,3 +167,10 @@ export type ActionType =
   | { type: 'GENERATE_BALANCE_CHANGE'; payload: { balanceChange: BalanceChangeRecord; taxNoteUpdates?: { id: string; updates: Partial<TaxNote>; reason: string } } }
   | { type: 'SET_FILTER'; payload: Partial<AppState['filter']> }
   | { type: 'LOAD_STATE'; payload: Partial<AppState> };
+"""
+
+os.makedirs('/Users/lzy/pro/solo/workspaces/zy72246/src/types', exist_ok=True)
+with open('/Users/lzy/pro/solo/workspaces/zy72246/src/types/index.ts', 'w') as f:
+    f.write(content)
+size = os.path.getsize('/Users/lzy/pro/solo/workspaces/zy72246/src/types/index.ts')
+print(f'File size: {size} bytes')
