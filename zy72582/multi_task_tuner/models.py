@@ -42,6 +42,16 @@ class TrainingLogCurve:
 
 
 @dataclass
+class StatusHistoryItem:
+    from_status: str
+    to_status: str
+    action: str
+    timestamp: datetime
+    note: Optional[str] = None
+    actor: Optional[str] = None
+
+
+@dataclass
 class AnomalySample:
     sample_id: str
     snapshot_id: str
@@ -54,6 +64,7 @@ class AnomalySample:
     review_note: Optional[str] = None
     corrected_by: Optional[str] = None
     corrected_at: Optional[datetime] = None
+    status_history: List[StatusHistoryItem] = field(default_factory=list)
 
 
 @dataclass

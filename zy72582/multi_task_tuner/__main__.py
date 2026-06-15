@@ -13,7 +13,33 @@ def cmd_demo(args):
 
 def cmd_import_snapshot(args):
     tuner = MultiTaskTuner(data_dir=args.data_dir)
-    features = json.loads(args.features) if args.features else {}
+    
+    if args.demo_pattern:
+        demo_features = {
+            "SNAP-2026-001": {
+                "feature_version": "v3.2.1",
+                "task_weights": {"task_a": 0.6, "task_b": 0.4},
+                "expected_metrics": {"auc": 0.82, "f1": 0.76, "task_a_acc": 0.85, "task_b_acc": 0.78}
+            },
+            "SNAP-2026-002": {
+                "feature_version": "v3.2.1",
+                "task_weights": {"task_a": 0.7, "task_b": 0.3},
+                "expected_metrics": {"auc": 0.91, "f1": 0.88, "task_a_acc": 0.94, "task_b_acc": 0.72}
+            },
+            "SNAP-2026-003": {
+                "feature_version": "v3.1.0",
+                "task_weights": {"task_a": 0.5, "task_b": 0.5},
+                "expected_metrics": {"auc": 0.78, "f1": 0.71, "task_a_acc": 0.80, "task_b_acc": 0.73}
+            }
+        }
+        if args.id not in demo_features:
+            print(f"错误: 未知的演示快照模式 {args.id}，可用: {list(demo_features.keys())}")
+            sys.exit(1)
+        features = demo_features[args.id]
+        print(f"  使用演示模式: {args.id}，任务权重: {features['task_weights']}")
+    else:
+        features = json.loads(args.features) if args.features else {}
+    
     snapshot = tuner.import_feature_snapshot(
         snapshot_id=args.id,
         features=features,
@@ -26,7 +52,48 @@ def cmd_import_snapshot(args):
 
 def cmd_import_log(args):
     tuner = MultiTaskTuner(data_dir=args.data_dir)
-    points = json.loads(args.points) if args.points else []
+    
+    if args.demo_pattern:
+        from datetime import datetime, timedelta
+        now = datetime(2026, 6, 7, 15, 0, 0)
+        demo_logs = {
+            "LOG-2026-001": {
+                "base_time": now - timedelta(days=2),
+                "epochs": 20,
+                "task_weights": {"task_a": 0.6, "task_b": 0.4}
+            },
+            "LOG-2026-002": {
+                "base_time": now - timedelta(hours=12),
+                "epochs": 20,
+                "task_weights": {"task_a": 0.7, "task_b": 0.3}
+            },
+            "LOG-2026-003": {
+                "base_time": now - timedelta(days=80),
+                "epochs": 15,
+                "task_weights": {"task_a": 0.5, "task_b": 0.5}
+            }
+        }
+        
+        if args.id not in demo_logs:
+            print(f"错误: 未知的演示日志模式 {args.id}，可用: {list(demo_logs.keys())}")
+            sys.exit(1)
+        
+        cfg = demo_logs[args.id]
+        points = []
+        for epoch in range(1, cfg["epochs"] + 1):
+            points.append({
+                "timestamp": (cfg["base_time"] + timedelta(minutes=epoch * 5)).isoformat(),
+                "epoch": epoch,
+                "loss": 0.85 - epoch * 0.03,
+                "metrics": {
+                    "auc": 0.70 + epoch * 0.006,
+                    "f1": 0.62 + epoch * 0.007
+                },
+                "task_weights": cfg["task_weights"]
+            })
+    else:
+        points = json.loads(args.points) if args.points else []
+    
     log = tuner.import_training_log(
         log_id=args.id,
         experiment_name=args.experiment,
@@ -34,12 +101,19 @@ def cmd_import_log(args):
         data_source=args.source
     )
     print(f"已导入训练日志: {log.log_id} (包含 {len(log.points)} 个点)")
+    if args.demo_pattern:
+        print(f"  使用演示模式: {args.id}，任务权重: {cfg['task_weights']}")
 
 
 def cmd_create_anomaly(args):
     tuner = MultiTaskTuner(data_dir=args.data_dir)
     ref_time = datetime.fromisoformat(args.ref_time) if args.ref_time else None
-    sample = tuner.create_anomaly_from_snapshot(args.snapshot, args.log, ref_time)
+    sample = tuner.create_anomaly_from_snapshot(
+        args.snapshot, 
+        args.log, 
+        ref_time,
+        sample_id=args.sample_id
+    )
     print(f"已创建异常样本: {sample.sample_id}")
     print(f"  状态: {sample.status.value}")
     print(f"  说明: {sample.review_note}")
@@ -133,6 +207,13 @@ def cmd_retrospective(args):
             print(f"    备注: {samp['review_note']}")
         if samp["corrected_by"]:
             print(f"    修正人: {samp['corrected_by']} @ {samp['corrected_at']}")
+        if "status_history" in samp and samp["status_history"]:
+            print(f"    状态历史:")
+            for i, h in enumerate(samp["status_history"]):
+                actor = f" by {h['actor']}" if h['actor'] else ""
+                print(f"      [{i+1}] {h['from_status']} → {h['to_status']} | {h['action']}{actor} | {h['timestamp']}")
+                if h["note"]:
+                    print(f"          说明: {h['note']}")
     print()
     
     print("【操作日志】")
@@ -157,12 +238,14 @@ def cmd_rerun(args):
     weights = json.loads(args.weights)
     snapshots = args.snapshots.split(",") if args.snapshots else []
     logs = args.logs.split(",") if args.logs else []
-    run = tuner.rerun_experiment(args.type, weights, snapshots, logs, args.notes)
+    samples = args.samples.split(",") if args.samples else None
+    run = tuner.rerun_experiment(args.type, weights, snapshots, logs, sample_ids=samples, notes=args.notes)
     print(f"已创建重跑实验: {run.run_id}")
     print(f"  类型: {run.run_type}")
     print(f"  任务权重: {run.task_weights}")
     print(f"  关联快照: {run.feature_snapshots}")
     print(f"  关联日志: {run.training_logs}")
+    print(f"  关联样本: {run.anomaly_samples}")
 
 
 def main():
@@ -183,6 +266,7 @@ def main():
     snap_parser.add_argument("--end", required=True, help="数据范围结束时间 (ISO格式)")
     snap_parser.add_argument("--features", default="{}", help="特征JSON")
     snap_parser.add_argument("--source", default="main_flow", help="数据来源")
+    snap_parser.add_argument("--demo-pattern", action="store_true", help="使用预设演示数据填充features")
     snap_parser.set_defaults(func=cmd_import_snapshot)
     
     log_parser = subparsers.add_parser("import-log", help="导入训练日志曲线")
@@ -190,12 +274,14 @@ def main():
     log_parser.add_argument("--experiment", required=True, help="实验名称")
     log_parser.add_argument("--points", default="[]", help="日志点JSON数组")
     log_parser.add_argument("--source", default="on_site", help="数据来源")
+    log_parser.add_argument("--demo-pattern", action="store_true", help="使用预设演示数据生成日志点")
     log_parser.set_defaults(func=cmd_import_log)
     
     anomaly_parser = subparsers.add_parser("create-anomaly", help="从快照创建异常样本")
     anomaly_parser.add_argument("--snapshot", required=True, help="快照编号")
     anomaly_parser.add_argument("--log", default=None, help="日志编号(可选)")
     anomaly_parser.add_argument("--ref-time", default=None, help="参考时间(ISO格式)")
+    anomaly_parser.add_argument("--sample-id", default=None, help="指定样本ID(可选，默认自动生成)")
     anomaly_parser.set_defaults(func=cmd_create_anomaly)
     
     supp_parser = subparsers.add_parser("supplement-log", help="补录训练日志到异常样本")
@@ -223,6 +309,7 @@ def main():
     rerun_parser.add_argument("--weights", required=True, help="任务权重JSON")
     rerun_parser.add_argument("--snapshots", default="", help="快照编号,逗号分隔")
     rerun_parser.add_argument("--logs", default="", help="日志编号,逗号分隔")
+    rerun_parser.add_argument("--samples", default="", help="异常样本ID,逗号分隔(关联现有样本)")
     rerun_parser.add_argument("--notes", default="", help="备注")
     rerun_parser.set_defaults(func=cmd_rerun)
     

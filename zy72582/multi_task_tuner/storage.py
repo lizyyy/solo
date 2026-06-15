@@ -4,7 +4,8 @@ from datetime import datetime
 from typing import List, Dict, Optional
 from .models import (
     FeatureSnapshot, TrainingLogCurve, TrainingLogPoint,
-    AnomalySample, ExperimentRun, ReviewRecord, RecordStatus
+    AnomalySample, ExperimentRun, ReviewRecord, RecordStatus,
+    StatusHistoryItem
 )
 
 
@@ -14,6 +15,8 @@ class DateTimeEncoder(json.JSONEncoder):
             return obj.isoformat()
         if isinstance(obj, RecordStatus):
             return obj.value
+        if isinstance(obj, StatusHistoryItem):
+            return obj.__dict__
         return super().default(obj)
 
 
@@ -95,6 +98,14 @@ class DataStore:
         with open(path, 'r') as f:
             data = json.load(f, object_hook=datetime_decoder)
         data['status'] = RecordStatus(data['status'])
+        history_data = data.pop('status_history', [])
+        history = []
+        for item in history_data:
+            if isinstance(item, dict):
+                history.append(StatusHistoryItem(**item))
+            else:
+                history.append(item)
+        data['status_history'] = history
         return AnomalySample(**data)
 
     def list_anomalies(self) -> List[str]:

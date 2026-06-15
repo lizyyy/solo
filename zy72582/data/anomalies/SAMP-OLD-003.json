@@ -1,0 +1,43 @@
+{
+  "sample_id": "SAMP-OLD-003",
+  "snapshot_id": "SNAP-2026-003",
+  "log_id": "LOG-2026-003",
+  "detected_at": "2026-06-15T13:40:43.934044",
+  "status": "old_metric",
+  "metrics": {
+    "auc": 0.78,
+    "f1": 0.71,
+    "task_a_acc": 0.8,
+    "task_b_acc": 0.73
+  },
+  "original_metrics": {
+    "auc": 0.78,
+    "f1": 0.71,
+    "task_a_acc": 0.8,
+    "task_b_acc": 0.73
+  },
+  "flags": [
+    "old_metric"
+  ],
+  "review_note": "\u8bad\u7ec3\u65e5\u5fd7\u8d77\u59cb\u65f6\u95f4 2026-03-19 \u65e9\u4e8e\u53c2\u8003\u65f6\u95f4 2026-06-07 \u8d85\u8fc730\u5929\uff08\u95f4\u9694 79 \u5929\uff09\uff0c\u5c5e\u4e8e\u65e7\u53e3\u5f84\u6570\u636e",
+  "corrected_by": null,
+  "corrected_at": null,
+  "status_history": [
+    {
+      "from_status": "none",
+      "to_status": "pending",
+      "action": "create_from_snapshot",
+      "timestamp": "2026-06-15T13:40:43.934053",
+      "note": "\u4ece\u7279\u5f81\u5feb\u7167 SNAP-2026-003 \u521b\u5efa\u5f02\u5e38\u6837\u672c",
+      "actor": null
+    },
+    {
+      "from_status": "pending",
+      "to_status": "old_metric",
+      "action": "supplement_log",
+      "timestamp": "2026-06-15T13:40:44.147528",
+      "note": "\u8865\u5f55\u8bad\u7ec3\u65e5\u5fd7 LOG-2026-003\uff0c\u8bad\u7ec3\u65e5\u5fd7\u8d77\u59cb\u65f6\u95f4 2026-03-19 \u65e9\u4e8e\u53c2\u8003\u65f6\u95f4 2026-06-07 \u8d85\u8fc730\u5929\uff08\u95f4\u9694 79 \u5929\uff09\uff0c\u5c5e\u4e8e\u65e7\u53e3\u5f84\u6570\u636e",
+      "actor": null
+    }
+  ]
+}

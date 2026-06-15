@@ -1,0 +1,61 @@
+{
+  "sample_id": "SAMP-LEAK-002",
+  "snapshot_id": "SNAP-2026-002",
+  "log_id": "LOG-2026-002",
+  "detected_at": "2026-06-15T13:40:43.870776",
+  "status": "rerun",
+  "metrics": {
+    "auc": 0.91,
+    "f1": 0.88,
+    "task_a_acc": 0.94,
+    "task_b_acc": 0.72
+  },
+  "original_metrics": {
+    "auc": 0.91,
+    "f1": 0.88,
+    "task_a_acc": 0.94,
+    "task_b_acc": 0.72
+  },
+  "flags": [
+    "time_window_leak",
+    "inflated_performance",
+    "reviewer_flagged"
+  ],
+  "review_note": "\u786e\u8ba4\u5b58\u5728\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff0c\u8bad\u7ec3\u6570\u636e\u6cc4\u9732\u4e86\u6d4b\u8bd5\u671f\u4fe1\u606f\uff0c\u6548\u679c\u865a\u9ad8\uff0c\u9700\u8981\u91cd\u65b0\u5212\u5206\u6570\u636e\u96c6\u540e\u91cd\u8dd1\u3002",
+  "corrected_by": null,
+  "corrected_at": null,
+  "status_history": [
+    {
+      "from_status": "none",
+      "to_status": "pending",
+      "action": "create_from_snapshot",
+      "timestamp": "2026-06-15T13:40:43.870785",
+      "note": "\u4ece\u7279\u5f81\u5feb\u7167 SNAP-2026-002 \u521b\u5efa\u5f02\u5e38\u6837\u672c",
+      "actor": null
+    },
+    {
+      "from_status": "pending",
+      "to_status": "time_window_leak",
+      "action": "supplement_log",
+      "timestamp": "2026-06-15T13:40:44.060946",
+      "note": "\u8865\u5f55\u8bad\u7ec3\u65e5\u5fd7 LOG-2026-002\uff0c\u8bad\u7ec3\u65e5\u5fd7\u6700\u540e\u65f6\u95f4 2026-06-07 04:40 \u665a\u4e8e\u7279\u5f81\u5feb\u7167\u6570\u636e\u622a\u6b62\u65f6\u95f4 2026-06-02 15:00\uff0c\u7a7f\u8d8a\u65f6\u957f 4 days, 13:40:00",
+      "actor": null
+    },
+    {
+      "from_status": "time_window_leak",
+      "to_status": "need_review",
+      "action": "review:confirm_leak",
+      "timestamp": "2026-06-15T13:40:44.446992",
+      "note": "\u786e\u8ba4\u5b58\u5728\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff0c\u8bad\u7ec3\u6570\u636e\u6cc4\u9732\u4e86\u6d4b\u8bd5\u671f\u4fe1\u606f\uff0c\u6548\u679c\u865a\u9ad8\uff0c\u9700\u8981\u91cd\u65b0\u5212\u5206\u6570\u636e\u96c6\u540e\u91cd\u8dd1\u3002",
+      "actor": "\u963f\u8d8a"
+    },
+    {
+      "from_status": "need_review",
+      "to_status": "rerun",
+      "action": "rerun",
+      "timestamp": "2026-06-15T13:40:44.735404",
+      "note": "\u91cd\u8dd1\u5b9e\u9a8c\uff0c\u4f7f\u7528\u65b0\u6743\u91cd {'task_a': 0.55, 'task_b': 0.45}",
+      "actor": null
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "sample_id": "SAMP-NORMAL-001",
+  "snapshot_id": "SNAP-2026-001",
+  "log_id": "LOG-2026-001",
+  "detected_at": "2026-06-15T13:40:43.795359",
+  "status": "corrected",
+  "metrics": {
+    "auc": 0.82,
+    "f1": 0.76,
+    "task_a_acc": 0.85,
+    "task_b_acc": 0.78
+  },
+  "original_metrics": {
+    "auc": 0.82,
+    "f1": 0.76,
+    "task_a_acc": 0.85,
+    "task_b_acc": 0.78
+  },
+  "flags": [],
+  "review_note": "\u4eba\u5de5\u786e\u8ba4\u6570\u636e\u6b63\u5e38\uff0c\u4efb\u52a1\u6743\u91cd\u8c03\u4f18\u540e\u6548\u679c\u7b26\u5408\u9884\u671f\uff0c\u6807\u8bb0\u4e3a\u5df2\u4fee\u6b63\u3002",
+  "corrected_by": "\u963f\u8d8a",
+  "corrected_at": "2026-06-15T13:40:44.538455",
+  "status_history": [
+    {
+      "from_status": "none",
+      "to_status": "normal",
+      "action": "create_from_snapshot",
+      "timestamp": "2026-06-15T13:40:43.795376",
+      "note": "\u4ece\u7279\u5f81\u5feb\u7167 SNAP-2026-001 \u521b\u5efa\u5f02\u5e38\u6837\u672c",
+      "actor": null
+    },
+    {
+      "from_status": "normal",
+      "to_status": "corrected",
+      "action": "review:correct",
+      "timestamp": "2026-06-15T13:40:44.538461",
+      "note": "\u4eba\u5de5\u786e\u8ba4\u6570\u636e\u6b63\u5e38\uff0c\u4efb\u52a1\u6743\u91cd\u8c03\u4f18\u540e\u6548\u679c\u7b26\u5408\u9884\u671f\uff0c\u6807\u8bb0\u4e3a\u5df2\u4fee\u6b63\u3002",
+      "actor": "\u963f\u8d8a"
+    }
+  ]
+}

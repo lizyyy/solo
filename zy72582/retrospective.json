@@ -1,32 +1,31 @@
 {
-  "generated_at": "2026-06-07T16:35:56.581934",
+  "generated_at": "2026-06-15T13:40:44.892376",
   "summary": {
     "status_distribution": {
-      "pending": 1,
       "old_metric": 1,
-      "need_review": 1,
+      "rerun": 1,
       "corrected": 1
     },
-    "total_samples": 4,
+    "total_samples": 3,
     "total_snapshots": 3,
     "total_logs": 3
   },
   "feature_snapshots": [
     {
       "snapshot_id": "SNAP-2026-001",
-      "created_at": "2026-06-06T13:00:00",
+      "created_at": "2026-06-15T13:40:43.406296",
       "data_range": "2026-05-08T15:00:00 ~ 2026-06-06T15:00:00",
       "source": "main_flow"
     },
     {
       "snapshot_id": "SNAP-2026-003",
-      "created_at": "2026-04-13T15:00:00",
+      "created_at": "2026-06-15T13:40:43.541385",
       "data_range": "2026-03-09T15:00:00 ~ 2026-04-08T15:00:00",
       "source": "main_flow"
     },
     {
       "snapshot_id": "SNAP-2026-002",
-      "created_at": "2026-06-03T15:00:00",
+      "created_at": "2026-06-15T13:40:43.478835",
       "data_range": "2026-05-13T15:00:00 ~ 2026-06-02T15:00:00",
       "source": "main_flow"
     }
@@ -53,35 +52,7 @@
   ],
   "anomaly_samples": [
     {
-      "sample_id": "samp_6604fd5f",
-      "snapshot_id": "SNAP-2026-002",
-      "log_id": null,
-      "status": "pending",
-      "status_label": "等待补录",
-      "metrics": {
-        "auc": 0.91,
-        "f1": 0.88,
-        "task_a_acc": 0.94,
-        "task_b_acc": 0.72
-      },
-      "original_metrics": {
-        "auc": 0.91,
-        "f1": 0.88,
-        "task_a_acc": 0.94,
-        "task_b_acc": 0.72
-      },
-      "flags": [
-        "awaiting_log"
-      ],
-      "review_note": "等待补录训练日志曲线",
-      "snapshot_created": "2026-06-03T15:00:00",
-      "log_points_count": 0,
-      "detected_at": "2026-06-07T16:35:45.866374",
-      "corrected_by": null,
-      "corrected_at": null
-    },
-    {
-      "sample_id": "samp_07283751",
+      "sample_id": "SAMP-OLD-003",
       "snapshot_id": "SNAP-2026-003",
       "log_id": "LOG-2026-003",
       "status": "old_metric",
@@ -102,18 +73,36 @@
         "old_metric"
       ],
       "review_note": "训练日志起始时间 2026-03-19 早于参考时间 2026-06-07 超过30天（间隔 79 天），属于旧口径数据",
-      "snapshot_created": "2026-04-13T15:00:00",
+      "snapshot_created": "2026-06-15T13:40:43.541385",
       "log_points_count": 15,
-      "detected_at": "2026-06-07T16:35:45.865414",
+      "detected_at": "2026-06-15T13:40:43.934044",
       "corrected_by": null,
-      "corrected_at": null
+      "corrected_at": null,
+      "status_history": [
+        {
+          "from_status": "none",
+          "to_status": "pending",
+          "action": "create_from_snapshot",
+          "timestamp": "2026-06-15T13:40:43.934053",
+          "note": "从特征快照 SNAP-2026-003 创建异常样本",
+          "actor": null
+        },
+        {
+          "from_status": "pending",
+          "to_status": "old_metric",
+          "action": "supplement_log",
+          "timestamp": "2026-06-15T13:40:44.147528",
+          "note": "补录训练日志 LOG-2026-003，训练日志起始时间 2026-03-19 早于参考时间 2026-06-07 超过30天（间隔 79 天），属于旧口径数据",
+          "actor": null
+        }
+      ]
     },
     {
-      "sample_id": "samp_80db2bcb",
+      "sample_id": "SAMP-LEAK-002",
       "snapshot_id": "SNAP-2026-002",
       "log_id": "LOG-2026-002",
-      "status": "need_review",
-      "status_label": "待复核",
+      "status": "rerun",
+      "status_label": "已重跑",
       "metrics": {
         "auc": 0.91,
         "f1": 0.88,
@@ -132,14 +121,48 @@
         "reviewer_flagged"
       ],
       "review_note": "确认存在时间窗穿越，训练数据泄露了测试期信息，效果虚高，需要重新划分数据集后重跑。",
-      "snapshot_created": "2026-06-03T15:00:00",
+      "snapshot_created": "2026-06-15T13:40:43.478835",
       "log_points_count": 20,
-      "detected_at": "2026-06-07T16:35:45.865289",
+      "detected_at": "2026-06-15T13:40:43.870776",
       "corrected_by": null,
-      "corrected_at": null
+      "corrected_at": null,
+      "status_history": [
+        {
+          "from_status": "none",
+          "to_status": "pending",
+          "action": "create_from_snapshot",
+          "timestamp": "2026-06-15T13:40:43.870785",
+          "note": "从特征快照 SNAP-2026-002 创建异常样本",
+          "actor": null
+        },
+        {
+          "from_status": "pending",
+          "to_status": "time_window_leak",
+          "action": "supplement_log",
+          "timestamp": "2026-06-15T13:40:44.060946",
+          "note": "补录训练日志 LOG-2026-002，训练日志最后时间 2026-06-07 04:40 晚于特征快照数据截止时间 2026-06-02 15:00，穿越时长 4 days, 13:40:00",
+          "actor": null
+        },
+        {
+          "from_status": "time_window_leak",
+          "to_status": "need_review",
+          "action": "review:confirm_leak",
+          "timestamp": "2026-06-15T13:40:44.446992",
+          "note": "确认存在时间窗穿越，训练数据泄露了测试期信息，效果虚高，需要重新划分数据集后重跑。",
+          "actor": "阿越"
+        },
+        {
+          "from_status": "need_review",
+          "to_status": "rerun",
+          "action": "rerun",
+          "timestamp": "2026-06-15T13:40:44.735404",
+          "note": "重跑实验，使用新权重 {'task_a': 0.55, 'task_b': 0.45}",
+          "actor": null
+        }
+      ]
     },
     {
-      "sample_id": "samp_6501d034",
+      "sample_id": "SAMP-NORMAL-001",
       "snapshot_id": "SNAP-2026-001",
       "log_id": "LOG-2026-001",
       "status": "corrected",
@@ -158,25 +181,64 @@
       },
       "flags": [],
       "review_note": "人工确认数据正常，任务权重调优后效果符合预期，标记为已修正。",
-      "snapshot_created": "2026-06-06T13:00:00",
+      "snapshot_created": "2026-06-15T13:40:43.406296",
       "log_points_count": 20,
-      "detected_at": "2026-06-07T16:35:45.865155",
+      "detected_at": "2026-06-15T13:40:43.795359",
       "corrected_by": "阿越",
-      "corrected_at": "2026-06-07T16:35:45.866253"
+      "corrected_at": "2026-06-15T13:40:44.538455",
+      "status_history": [
+        {
+          "from_status": "none",
+          "to_status": "normal",
+          "action": "create_from_snapshot",
+          "timestamp": "2026-06-15T13:40:43.795376",
+          "note": "从特征快照 SNAP-2026-001 创建异常样本",
+          "actor": null
+        },
+        {
+          "from_status": "normal",
+          "to_status": "corrected",
+          "action": "review:correct",
+          "timestamp": "2026-06-15T13:40:44.538461",
+          "note": "人工确认数据正常，任务权重调优后效果符合预期，标记为已修正。",
+          "actor": "阿越"
+        }
+      ]
     }
   ],
   "action_log": [],
   "replay_commands": [
-    "python -m multi_task_tuner import-snapshot --id SNAP-2026-001 --start '2026-05-08T15:00:00' --end '2026-06-06T15:00:00'",
-    "python -m multi_task_tuner import-snapshot --id SNAP-2026-002 --start '2026-05-13T15:00:00' --end '2026-06-02T15:00:00'",
-    "python -m multi_task_tuner import-snapshot --id SNAP-2026-003 --start '2026-03-09T15:00:00' --end '2026-04-08T15:00:00'",
-    "python -m multi_task_tuner import-log --id LOG-2026-001 --experiment 'baseline_run_normal'",
-    "python -m multi_task_tuner import-log --id LOG-2026-002 --experiment 'weighted_run_leaked'",
-    "python -m multi_task_tuner import-log --id LOG-2026-003 --experiment 'old_metric_run'",
-    "python -m multi_task_tuner supplement-log --sample samp_07283751 --log LOG-2026-003",
-    "python -m multi_task_tuner supplement-log --sample samp_6501d034 --log LOG-2026-001",
-    "python -m multi_task_tuner supplement-log --sample samp_80db2bcb --log LOG-2026-002",
-    "python -m multi_task_tuner anomaly-page",
-    "python -m multi_task_tuner retrospective"
+    "# ===== 第一步：导入基础数据 =====",
+    "# 特征快照 - 主流程数据",
+    "python3 -m multi_task_tuner import-snapshot --id SNAP-2026-001 --start '2026-05-08T15:00:00' --end '2026-06-06T15:00:00' --demo-pattern",
+    "python3 -m multi_task_tuner import-snapshot --id SNAP-2026-002 --start '2026-05-13T15:00:00' --end '2026-06-02T15:00:00' --demo-pattern",
+    "python3 -m multi_task_tuner import-snapshot --id SNAP-2026-003 --start '2026-03-09T15:00:00' --end '2026-04-08T15:00:00' --demo-pattern",
+    "",
+    "# 训练日志曲线 - 现场说法",
+    "python3 -m multi_task_tuner import-log --id LOG-2026-001 --experiment 'baseline_run_normal' --demo-pattern",
+    "python3 -m multi_task_tuner import-log --id LOG-2026-002 --experiment 'weighted_run_leaked' --demo-pattern",
+    "python3 -m multi_task_tuner import-log --id LOG-2026-003 --experiment 'old_metric_run' --demo-pattern",
+    "",
+    "# ===== 第二步：特征快照第一次导入，生成初始异常样本 =====",
+    "# 从特征快照创建异常样本",
+    "python3 -m multi_task_tuner create-anomaly --snapshot SNAP-2026-001 --ref-time 2026-06-07T15:00:00 --sample-id SAMP-NORMAL-001 --log LOG-2026-001",
+    "python3 -m multi_task_tuner create-anomaly --snapshot SNAP-2026-002 --ref-time 2026-06-07T15:00:00 --sample-id SAMP-LEAK-002",
+    "python3 -m multi_task_tuner create-anomaly --snapshot SNAP-2026-003 --ref-time 2026-06-07T15:00:00 --sample-id SAMP-OLD-003",
+    "",
+    "# ===== 第三步：实验平台负责人阿越补看训练日志曲线 =====",
+    "# 补录训练日志曲线，异常样本页自动更新",
+    "python3 -m multi_task_tuner supplement-log --sample SAMP-LEAK-002 --log LOG-2026-002 --ref-time 2026-06-07T15:00:00",
+    "python3 -m multi_task_tuner supplement-log --sample SAMP-OLD-003 --log LOG-2026-003 --ref-time 2026-06-07T15:00:00",
+    "",
+    "# ===== 第四步：时间窗穿越不急着归正常，留给阿越复核 =====",
+    "python3 -m multi_task_tuner review --sample SAMP-NORMAL-001 --reviewer '阿越' --action correct --note \"人工确认数据正常，任务权重调优后效果符合预期，标记为已修正。\"",
+    "python3 -m multi_task_tuner review --sample SAMP-LEAK-002 --reviewer '阿越' --action confirm_leak --note \"确认存在时间窗穿越，训练数据泄露了测试期信息，效果虚高，需要重新划分数据集后重跑。\"",
+    "",
+    "# ===== 第五步：一次重跑（使用调整后的权重） =====",
+    "python3 -m multi_task_tuner rerun --type post_review_rerun --weights '{\"task_a\": 0.55, \"task_b\": 0.45}' --snapshots SNAP-2026-002 --samples SAMP-LEAK-002 --notes \"时间窗穿越问题修复后重跑，使用新的数据集划分\"",
+    "",
+    "# ===== 查看结果 =====",
+    "python3 -m multi_task_tuner anomaly-page",
+    "python3 -m multi_task_tuner retrospective --output retrospective.json"
   ]
 }

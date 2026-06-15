@@ -130,11 +130,23 @@ def run_demo_workflow(data_dir: str = "./data"):
     
     print(">>> 第一步: 特征快照第一次导入，生成初始异常样本")
     print("-" * 60)
-    sample1 = tuner.create_anomaly_from_snapshot("SNAP-2026-001", "LOG-2026-001", reference_time=now)
-    sample2 = tuner.create_anomaly_from_snapshot("SNAP-2026-002", None, reference_time=now)
-    sample3 = tuner.create_anomaly_from_snapshot("SNAP-2026-003", None, reference_time=now)
+    sample1 = tuner.create_anomaly_from_snapshot(
+        "SNAP-2026-001", "LOG-2026-001", 
+        reference_time=now,
+        sample_id="SAMP-NORMAL-001"
+    )
+    sample2 = tuner.create_anomaly_from_snapshot(
+        "SNAP-2026-002", None, 
+        reference_time=now,
+        sample_id="SAMP-LEAK-002"
+    )
+    sample3 = tuner.create_anomaly_from_snapshot(
+        "SNAP-2026-003", None, 
+        reference_time=now,
+        sample_id="SAMP-OLD-003"
+    )
     
-    print(f"  创建异常样本: {sample1.sample_id} ({sample1.status.value})")
+    print(f"  创建异常样本: {sample1.sample_id} ({sample1.status.value}) - 顺利记录")
     print(f"  创建异常样本: {sample2.sample_id} ({sample2.status.value}) - 等待补录日志")
     print(f"  创建异常样本: {sample3.sample_id} ({sample3.status.value}) - 等待补录日志")
     print()
@@ -167,9 +179,9 @@ def run_demo_workflow(data_dir: str = "./data"):
     print(f"  复核意见: {review1.note}")
     print()
     
-    print(">>> 第四步: 一次人工修正")
+    print(">>> 第四步: 一次人工修正（顺利记录确认正常）")
     print("-" * 60)
-    print("  阿越修正 SNAP-2026-001 的任务权重参数...")
+    print("  阿越确认 SNAP-2026-001 数据正常，标记为已修正...")
     
     sample1_corrected, review2 = tuner.review_anomaly(
         sample1.sample_id,
@@ -181,23 +193,30 @@ def run_demo_workflow(data_dir: str = "./data"):
     print(f"  修正人: {sample1_corrected.corrected_by}")
     print()
     
-    print(">>> 第五步: 一次重跑（使用调整后的权重）")
+    print(">>> 第五步: 一次重跑（使用调整后的权重，关联到时间窗穿越样本）")
     print("-" * 60)
     rerun = tuner.rerun_experiment(
         run_type="post_review_rerun",
         task_weights={"task_a": 0.55, "task_b": 0.45},
         snapshot_ids=["SNAP-2026-002"],
         log_ids=[],
+        sample_ids=[sample2.sample_id],
         notes="时间窗穿越问题修复后重跑，使用新的数据集划分"
     )
     print(f"  重跑实验 ID: {rerun.run_id}")
     print(f"  重跑类型: {rerun.run_type}")
     print(f"  任务权重: {rerun.task_weights}")
+    print(f"  关联样本: {rerun.anomaly_samples}")
     print()
     
     print("=" * 60)
     print("演示流程执行完成！")
     print("=" * 60)
+    print()
+    print("当前各样本状态：")
+    print(f"  1. {sample1.sample_id}: 顺利记录，已修正 - 数据时间对齐正常")
+    print(f"  2. {sample2.sample_id}: 时间窗穿越，待复核 - 训练日志晚于数据截止时间，效果虚高")
+    print(f"  3. {sample3.sample_id}: 旧口径数据 - 79天前的训练日志")
     print()
     
     return tuner
