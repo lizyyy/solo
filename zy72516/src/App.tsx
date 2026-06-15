@@ -6,6 +6,7 @@ import Workbench from "@/pages/Workbench";
 import Conflicts from "@/pages/Conflicts";
 import Export from "@/pages/Export";
 import Rules from "@/pages/Rules";
+import Report from "@/pages/Report";
 
 export default function App() {
   return (

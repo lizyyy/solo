@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { Upload, FileText, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import { parseCsvFile } from '../utils/csvParser';
 import { useRecordStore } from '../store/useRecordStore';
-import { AnnotationRecord } from '../types';
+import { AnnotationRecord, ModelOutput } from '../types';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { AbnormalTypeBadge } from '../components/common/AbnormalTypeBadge';
 import { generateSampleCsvContent } from '../utils/mockData';
@@ -63,6 +63,8 @@ export default function Import() {
   const abnormalCount = previewRecords.filter(r =>
     !r.urlStatus && r.robotJudgment === '通过'
   ).length;
+
+  const modelOutputMissingCount = previewRecords.filter(r => r.modelOutputMissing).length;
 
   return (
     <div className="space-y-6">
@@ -134,10 +136,20 @@ export default function Import() {
               <span className="text-sm text-slate-500">
                 共 {previewRecords.length} 条记录
               </span>
+              {modelOutputMissingCount > 0 && (
+                <span className="text-sm text-slate-500">
+                  · 暂无模型输出 <span className="font-semibold text-amber-600">{modelOutputMissingCount}</span> 条
+                </span>
+              )}
               {abnormalCount > 0 && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-amber-100 text-amber-700 text-sm font-medium">
                   <AlertTriangle className="w-4 h-4" />
                   检测到 {abnormalCount} 条引用链接404仍被判通过，将自动标记为待产品经理复核
+                </span>
+              )}
+              {modelOutputMissingCount > 0 && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-violet-100 text-violet-700 text-sm font-medium">
+                  检测到 {modelOutputMissingCount} 条暂无模型输出数据，需在质检工作台补录
                 </span>
               )}
             </div>
@@ -169,6 +181,9 @@ export default function Import() {
                     机器人判断
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                    模型输出
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                     导入后状态
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
@@ -179,10 +194,18 @@ export default function Import() {
               <tbody className="divide-y divide-slate-100">
                 {previewRecords.map((record, idx) => {
                   const willBeAbnormal = !record.urlStatus && record.robotJudgment === '通过';
+                  const _modelOutput: ModelOutput | undefined = record.modelOutput;
+                  const modelOutputText = _modelOutput?.outputSnippet
+                    ? (_modelOutput.outputSnippet.length > 30 ? _modelOutput.outputSnippet.slice(0, 30) + "…" : _modelOutput.outputSnippet)
+                    : record.modelOutputMissing ? "暂无" : "-";
                   return (
                     <tr
                       key={idx}
-                      className={willBeAbnormal ? 'bg-amber-50' : 'hover:bg-slate-50'}
+                      className={`${
+                        record.modelOutputMissing ? 'bg-amber-50' :
+                        willBeAbnormal ? 'bg-amber-50' :
+                        'hover:bg-slate-50'
+                      }`}
                     >
                       <td className="px-4 py-3 text-sm text-slate-900 font-mono">
                         {record.originalLineNumber}
@@ -204,6 +227,9 @@ export default function Import() {
                       </td>
                       <td className="px-4 py-3 text-sm text-slate-700">
                         {record.robotJudgment}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-slate-700 max-w-xs">
+                        <p className="truncate">{modelOutputText}</p>
                       </td>
                       <td className="px-4 py-3">
                         <StatusBadge

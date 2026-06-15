@@ -4,6 +4,7 @@ import {
   FileUp,
   ClipboardCheck,
   AlertTriangle,
+  BarChart3,
   Download,
   BookOpen
 } from 'lucide-react';
@@ -12,7 +13,8 @@ const navItems = [
   { path: '/', label: '首页', icon: Home },
   { path: '/import', label: '标注导入', icon: FileUp },
   { path: '/workbench', label: '质检工作台', icon: ClipboardCheck },
-  { path: '/conflicts', label: '冲突样本表', icon: AlertTriangle },
+  { path: "/conflicts", label: "冲突样本表", icon: AlertTriangle },
+  { path: "/report", label: "复盘报告", icon: BarChart3 },
   { path: '/export', label: '数据导出', icon: Download },
   { path: '/rules', label: '边界规则', icon: BookOpen }
 ];

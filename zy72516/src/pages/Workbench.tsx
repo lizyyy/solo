@@ -9,18 +9,28 @@ import {
   Bot,
   User,
   MessageSquare,
-  Link as LinkIcon
+  Link as LinkIcon,
+  Plus,
+  RotateCcw,
+  Eye,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { useRecordStore } from '../store/useRecordStore';
-import { AnnotationRecord, RecordStatus } from '../types';
+import { AnnotationRecord, RecordStatus, LogAction, LogActionLabelMap, StatusLabelMap, ContentSnapshot } from '../types';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { AbnormalTypeBadge } from '../components/common/AbnormalTypeBadge';
 
 export default function Workbench() {
-  const { records, updateRecordStatus, currentOperator } = useRecordStore();
+  const { records, updateRecordStatus, currentOperator, fillModelOutput, rollbackToLog } = useRecordStore();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [remark, setRemark] = useState('');
   const [showHistory, setShowHistory] = useState(false);
+  const [showFillModal, setShowFillModal] = useState(false);
+  const [fillModelName, setFillModelName] = useState('');
+  const [fillOutputSnippet, setFillOutputSnippet] = useState('');
+  const [fillConfidence, setFillConfidence] = useState(0.8);
+  const [expandedSnapshot, setExpandedSnapshot] = useState<Record<string, 'from' | 'to' | null>>({});
 
   const pendingRecords = records.filter(r =>
     r.currentStatus === RecordStatus.PENDING ||

@@ -8,7 +8,8 @@ import {
   BookOpen,
   BarChart3,
   CheckCircle2,
-  Clock
+  Clock,
+  FileQuestion
 } from 'lucide-react';
 import { useRecordStore } from '../store/useRecordStore';
 import { StatusBadge } from '../components/common/StatusBadge';
@@ -29,7 +30,8 @@ export default function Home() {
       r.currentStatus === RecordStatus.REVIEW_PASSED
     ).length,
     conflicts: getConflictSamples().length,
-    url404: records.filter(r => r.abnormalType === AbnormalType.URL_404_PASSED).length
+    url404: records.filter(r => r.abnormalType === AbnormalType.URL_404_PASSED).length,
+    modelOutputMissing: records.filter(r => r.modelOutputMissing).length
   };
 
   const quickActions = [
@@ -89,7 +91,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-6 gap-4">
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
@@ -145,6 +147,17 @@ export default function Home() {
             </div>
           </div>
         </div>
+        <div className="bg-gradient-to-br from-violet-500 to-purple-500 rounded-xl shadow-lg p-5 text-white">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
+              <FileQuestion className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-sm text-white/80">暂无模型输出</p>
+              <p className="text-2xl font-bold">{stats.modelOutputMissing}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-4 gap-4">
@@ -189,9 +202,16 @@ export default function Home() {
                   {record.originalLineNumber}
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-slate-900 line-clamp-1 max-w-xl">
-                    {record.annotatorMessage}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium text-slate-900 line-clamp-1 max-w-xl">
+                      {record.annotatorMessage}
+                    </p>
+                    {record.modelOutputMissing && (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-violet-100 text-violet-700">
+                        待补录
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-slate-400 mt-0.5">
                     导入时间：{new Date(record.createdAt).toLocaleString('zh-CN')}
                   </p>

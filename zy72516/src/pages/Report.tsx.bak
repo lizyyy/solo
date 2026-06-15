@@ -1,0 +1,516 @@
+import { useState, useMemo } from 'react';
+import {
+  BarChart3,
+  PieChart,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  FileText,
+  Download,
+  History,
+  Link as LinkIcon,
+  FileQuestion,
+  RefreshCw,
+  ChevronDown,
+  ChevronRight
+} from 'lucide-react';
+import { useRecordStore } from '../store/useRecordStore';
+import {
+  RecordStatus,
+  AbnormalType,
+  StatusLabelMap,
+  AbnormalTypeLabelMap,
+  LogActionLabelMap,
+  ContentSnapshot
+} from '../types';
+import { StatusBadge } from '../components/common/StatusBadge';
+import { AbnormalTypeBadge } from '../components/common/AbnormalTypeBadge';
+import {
+  exportDetailedReport,
+  exportToCsv,
+  exportToJson,
+  defaultExportFields
+} from '../utils/exportUtil';
+
+type TabKey = 'overview' | 'alignment' | 'history' | 'original';
+
+interface ConsistencyIssue {
+  recordId: string;
+  lineNumber: number;
+  issue: string;
+  type: 'status_mismatch' | 'model_output_mismatch' | 'url_404_state';
+}
+
+function SnapshotCompare({ from, to }: { from?: ContentSnapshot; to?: ContentSnapshot }) {
+  if (!from || !to) {
+    return <p className="text-sm text-slate-400 text-center py-4">无快照数据</p>;
+  }
+
+  const fields = [
+    { label: "状态", from: StatusLabelMap[from.status], to: StatusLabelMap[to.status] },
+    { label: "异常类型", from: AbnormalTypeLabelMap[from.abnormalType], to: AbnormalTypeLabelMap[to.abnormalType] },
+    { label: "标注员留言", from: from.annotatorMessage.slice(0, 40), to: to.annotatorMessage.slice(0, 40) },
+    { label: "引用链接", from: from.referenceUrl.slice(0, 30), to: to.referenceUrl.slice(0, 30) },
+    { label: "机器人判断", from: from.robotJudgment, to: to.robotJudgment },
+    { label: "模型输出", from: from.modelOutputSnippet?.slice(0, 25) || "暂无", to: to.modelOutputSnippet?.slice(0, 25) || "暂无" }
+  ];
+
+  return (
+    <div className="space-y-1">
+      <div className="grid grid-cols-2 gap-2 text-xs text-slate-400 pb-1 border-b border-slate-100">
+        <span>改前</span>
+        <span>改后</span>
+      </div>
+      {fields.map((field) => {
+        const changed = field.from !== field.to;
+        return (
+          <div key={field.label} className="py-1 border-b border-slate-50 last:border-b-0">
+            <p className="text-xs text-slate-500 mb-0.5">{field.label}</p>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <span className={changed ? "bg-rose-50 text-rose-700 rounded px-1.5 py-0.5" : "text-slate-600"}>
+                {field.from}
+              </span>
+              <span className={changed ? "bg-emerald-50 text-emerald-700 rounded px-1.5 py-0.5" : "text-slate-600"}>
+                {field.to}
+              </span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+export default function Report() {
+  const { records, clearAll, initMockData } = useRecordStore();
+  const [activeTab, setActiveTab] = useState<TabKey>("overview");
+  const [expandedRecords, setExpandedRecords] = useState<Set<string>>(new Set());
+
+  const stats = useMemo(() => {
+    const total = records.length;
+    const statusCounts: Record<string, number> = {};
+    const abnormalCounts: Record<string, number> = {};
+    let missingModelOutput = 0;
+    let url404Count = 0;
+    let hasLogsCount = 0;
+    let totalOperations = 0;
+    let passedCount = 0;
+
+    records.forEach(record => {
+      statusCounts[record.currentStatus] = (statusCounts[record.currentStatus] || 0) + 1;
+      abnormalCounts[record.abnormalType] = (abnormalCounts[record.abnormalType] || 0) + 1;
+      if (record.modelOutputMissing) missingModelOutput++;
+      if (!record.urlStatus) url404Count++;
+      if (record.judgmentLogs.length > 0) hasLogsCount++;
+      totalOperations += record.judgmentLogs.length;
+    });
+
+    if (record.currentStatus === RecordStatus.REVIEW_PASSED || record.currentStatus === RecordStatus.PM_REVIEW) {
+      passedCount++;
+    }
+
+    const passRate = total > 0 ? ((passedCount / total) * 100).toFixed(1) : "0";
+    const avgOperations = total > 0 ? (totalOperations / total).toFixed(1) : "0";
+
+    return {
+      total,
+      statusCounts,
+      abnormalCounts,
+      missingModelOutput,
+      url404Count,
+      hasLogsCount,
+      avgOperations,
+      passRate,
+      pendingReview: statusCounts[RecordStatus.PENDING_REVIEW] || 0
+    };
+  }, [records]);
+  const alignmentCheck = useMemo(() => {
+    const issues: ConsistencyIssue[] = [];
+
+    records.forEach((record) => {
+      const lastLog = record.judgmentLogs[record.judgmentLogs.length - 1];
+      const lastSnapshot = lastLog?.afterSnapshot || record.originalSnapshot;
+      if (lastSnapshot && lastSnapshot.status !== record.currentStatus) {
+        issues.push({
+          recordId: record.id,
+          lineNumber: record.originalLineNumber,
+          issue: "当前状态(" + StatusLabelMap[record.currentStatus] + ")与最后操作快照状态(" + StatusLabelMap[lastSnapshot.status] + ")不一致",
+          type: "status_mismatch"
+        });
+      }
+
+      if (record.originalSnapshot.modelOutputSnippet && record.modelOutputMissing) {
+        issues.push({
+          recordId: record.id,
+          lineNumber: record.originalLineNumber,
+          issue: "原始快照有模型输出但标记为缺失",
+          type: "model_output_mismatch"
+        });
+      }
+      if (record.abnormalType === AbnormalType.URL_404_PASSED &&
+          record.currentStatus !== RecordStatus.PM_REVIEW &&
+          record.currentStatus !== RecordStatus.REVIEW_PASSED &&
+          record.currentStatus !== RecordStatus.REVIEW_REJECTED) {
+        issues.push({
+          recordId: record.id,
+          lineNumber: record.originalLineNumber,
+          issue: "URL_404_PASSED异常但状态为" + StatusLabelMap[record.currentStatus],
+          type: "url_404_state"
+        });
+      }
+    });
+
+    const totalChecks = records.length * 3;
+    const passedChecks = totalChecks - issues.length;
+    const consistencyRate = totalChecks > 0 ? ((passedChecks / totalChecks) * 100).toFixed(1) : "0";
+
+    return {
+      totalChecks,
+      passedChecks,
+      issueCount: issues.length,
+      consistencyRate,
+      issues
+    };
+  }, [records]);
+
+  const toggleRecord = (recordId: string) => {
+    const next = new Set(expandedRecords);
+    if (next.has(recordId)) {
+      next.delete(recordId);
+    } else {
+      next.add(recordId);
+    }
+    setExpandedRecords(next);
+  };
+
+  const handleReset = () => {
+    if (window.confirm("确定要重置所有数据吗？此操作不可撤销。")) {
+      clearAll();
+      initMockData();
+    }
+  };
+
+  const tabs = [
+    { key: "overview" as const, label: "总览", icon: PieChart },
+    { key: "alignment" as const, label: "数据一致性核对", icon: BarChart3 },
+    { key: "history" as const, label: "改前改后历史", icon: History },
+    { key: "original" as const, label: "原始材料追溯", icon: FileText }
+  ];
+
+  const statusColors: Record<string, string> = {
+    [RecordStatus.ANNOTATED]: "bg-slate-400",
+    [RecordStatus.PENDING_REVIEW]: "bg-amber-500",
+    [RecordStatus.REVIEW_PASSED]: "bg-emerald-500",
+    [RecordStatus.REVIEW_REJECTED]: "bg-rose-500",
+    [RecordStatus.PM_REVIEW]: "bg-blue-500",
+    [RecordStatus.REVIEWED]: "bg-purple-500"
+  };
+
+  const abnormalColors: Record<string, string> = {
+    [AbnormalType.NORMAL]: "bg-slate-400",
+    [AbnormalType.URL_404_PASSED]: "bg-amber-500",
+    [AbnormalType.DISPUTED_JUDGMENT]: "bg-rose-500",
+    [AbnormalType.MODEL_OUTPUT_MISSING]: "bg-purple-500"
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">复盘报告</h1>
+          <p className="text-sm text-slate-500 mt-1">数据质量分析与原始材料追溯</p>
+        </div>
+        <button
+          onClick={handleReset}
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition-colors"
+        >
+          <RefreshCw className="w-4 h-4" />
+          重置数据
+        </button>
+      </div>
+
+      <div className="grid grid-cols-6 gap-4">
+        <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+          <p className="text-sm text-slate-500 mb-1">总记录数</p>
+          <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
+        </div>
+        <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+          <p className="text-sm text-slate-500 mb-1">通过率</p>
+          <p className="text-2xl font-bold text-emerald-600">{stats.passRate}%</p>
+        </div>
+        <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+          <p className="text-sm text-slate-500 mb-1">待复核</p>
+          <p className="text-2xl font-bold text-amber-600">{stats.pendingReview}</p>
+        </div>
+        <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+          <p className="text-sm text-slate-500 mb-1">链接404异常</p>
+          <p className="text-2xl font-bold text-rose-600">{stats.url404Count}</p>
+        </div>
+        <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+          <p className="text-sm text-slate-500 mb-1">暂无模型输出</p>
+          <p className="text-2xl font-bold text-purple-600">{stats.missingModelOutput}</p>
+        </div>
+        <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+          <p className="text-sm text-slate-500 mb-1">平均操作次数</p>
+          <p className="text-2xl font-bold text-slate-900">{stats.avgOperations}</p>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="flex border-b border-slate-100">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={}
+              >
+                <Icon className="w-4 h-4" />
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="p-6">
+          {activeTab === "overview" && (
+            <div className="space-y-6">
+              <div className="bg-slate-50 rounded-xl p-5">
+                <h3 className="text-sm font-semibold text-slate-700 mb-3">状态分布</h3>
+                <div className="space-y-2">
+                  {Object.entries(stats.statusCounts).map(([status, count]) => (
+                    <div key={status} className="flex items-center gap-3">
+                      <span className="text-xs text-slate-600 w-24">{StatusLabelMap[status as RecordStatus]}</span>
+                      <div className="flex-1 h-6 bg-slate-200 rounded-full overflow-hidden">
+                        <div
+                          className={}
+                          style={{ width:  }}
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-slate-700 w-12 text-right">{count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-slate-50 rounded-xl p-5">
+                <h3 className="text-sm font-semibold text-slate-700 mb-3">异常类型分布</h3>
+                <div className="space-y-2">
+                  {Object.entries(stats.abnormalCounts).map(([type, count]) => (
+                    <div key={type} className="flex items-center gap-3">
+                      <span className="text-xs text-slate-600 w-28">{AbnormalTypeLabelMap[type as AbnormalType]}</span>
+                      <div className="flex-1 h-6 bg-slate-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full 
++
+abnormalColors[type]
++
+ bg-slate-400 transition-all duration-500"
+                          style={{ width: (stats.total > 0 ? (count / stats.total) * 100 : 0) + "%" }}
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-slate-700 w-12 text-right">{count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-rose-50 rounded-xl p-5 border border-rose-100">
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertTriangle className="w-5 h-5 text-rose-600" />
+                    <h3 className="text-sm font-semibold text-rose-700">404专项复核</h3>
+                  </div>
+                  <p className="text-3xl font-bold text-rose-600 mb-2">{stats.url404Count}</p>
+                  <p className="text-xs text-rose-500">条链接返回404需重点复核</p>
+                </div>
+              </div>
+              {alignmentCheck.issues.length > 0 && (
+                <div className="bg-rose-50 rounded-xl p-5 border border-rose-100">
+                  <h3 className="text-sm font-semibold text-rose-700 mb-3 flex items-center gap-2">
+                    <XCircle className="w-4 h-4" />
+                    不一致问题列表
+                  </h3>
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {alignmentCheck.issues.map((issue, idx) => (
+                      <div key={idx} className="flex items-start gap-3 bg-white rounded-lg p-3 border border-rose-100">
+                        <span className="text-xs font-mono text-slate-400 w-16">第{issue.lineNumber}行</span>
+                        <span className="text-sm text-rose-700">{issue.issue}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {alignmentCheck.issues.length === 0 && (
+                <div className="bg-emerald-50 rounded-xl p-8 border border-emerald-100 text-center">
+                  <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
+                  <p className="text-lg font-semibold text-emerald-700">数据一致性检查通过</p>
+                  <p className="text-sm text-emerald-600 mt-1">所有数据项均符合一致性要求</p>
+                </div>
+              )}
+
+              <div className="bg-slate-50 rounded-xl p-5">
+                <h3 className="text-sm font-semibold text-slate-700 mb-3">数据源说明</h3>
+                <ul className="space-y-2 text-sm text-slate-600">
+                  <li className="flex items-start gap-2">
+                    <span className="text-slate-400 mt-0.5">1.</span>
+                    <span><strong>单一数据源</strong>：所有数据均来自本地 Zustand store，确保数据一致性</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-slate-400 mt-0.5">2.</span>
+                    <span><strong>状态快照</strong>：每次操作均生成 ContentSnapshot 快照，用于追溯和校验</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-slate-400 mt-0.5">3.</span>
+                    <span><strong>原始材料</strong>：originalSnapshot 为导入时的只读快照，不可修改</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-slate-400 mt-0.5">4.</span>
+                    <span><strong>本地持久化</strong>：数据通过 Zustand persist 中间件保存至 localStorage</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "history" && (
+            <div className="space-y-3">
+              <p className="text-sm text-slate-500">显示最近20条记录，点击展开查看操作历史时间线</p>
+              {stats.recordsWithLogs.slice(0, 20).map((record, idx) => (
+                <div key={record.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                  <button
+                    onClick={() => toggleRecord(record.id)}
+                    className="w-full px-5 py-4 flex items-center gap-4 hover:bg-slate-50 transition-colors"
+                  >
+                    <ChevronDown
+                      className={"w-5 h-5 text-slate-400 transition-transform " + (expandedRecords.has(record.id) ? "rotate-180" : "")}
+                    />
+                    <span className="text-sm font-mono text-slate-400 w-12">#{idx + 1}</span>
+                    <div className="flex-1 text-left">
+                      <p className="text-sm font-medium text-slate-800 line-clamp-1">{record.originalAnnotatorComment || "无标注员留言"}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        {record.logs.length} 次操作 · 最后操作：{new Date(record.lastUpdatedAt).toLocaleString("zh-CN")}
+                      </p>
+                    </div>
+                    <StatusBadge status={record.status} />
+                  </button>
+                  {expandedRecords.has(record.id) && (
+                    <div className="border-t border-slate-100 px-5 py-4 bg-slate-50">
+                      <div className="space-y-4">
+                        {record.logs.map((log, logIdx) => (
+                          <div key={log.id} className="relative pl-6">
+                            {logIdx < record.logs.length - 1 && (
+                              <div className="absolute left-2.5 top-6 bottom-0 w-px bg-slate-300" />
+                            )}
+                            <div className="absolute left-0 top-1 w-5 h-5 rounded-full bg-white border-2 border-slate-300 flex items-center justify-center">
+                              <div className="w-2 h-2 rounded-full bg-slate-400" />
+                            </div>
+                            <div className="bg-white rounded-lg p-4 border border-slate-200">
+                              <div className="flex items-center gap-2 mb-2">
+                                <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                                  {LogActionLabelMap[log.action]}
+                                </span>
+                                <span className="text-xs text-slate-500">{log.operator}</span>
+                                <span className="text-xs text-slate-400">
+                                  {new Date(log.timestamp).toLocaleString("zh-CN")}
+                                </span>
+                              </div>
+                              {log.diffLabel && (
+                                <span className="inline-block text-xs font-medium px-2 py-0.5 rounded bg-amber-100 text-amber-700 mb-3">
+                                  {log.diffLabel}
+                                </span>
+                              )}
+                              {log.beforeSnapshot && log.afterSnapshot && (
+                                <SnapshotCompare before={log.beforeSnapshot} after={log.afterSnapshot} />
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === "original" && (
+            <div className="space-y-6">
+              <div className="flex gap-3">
+                <button
+                  onClick={() => exportToCsv(records)}
+                  className="px-4 py-2 bg-slate-800 text-white text-sm rounded-lg hover:bg-slate-700 transition-colors flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  导出CSV
+                </button>
+                <button
+                  onClick={() => exportToJson(records)}
+                  className="px-4 py-2 bg-slate-800 text-white text-sm rounded-lg hover:bg-slate-700 transition-colors flex items-center gap-2"
+                >
+                  <FileJson className="w-4 h-4" />
+                  导出JSON
+                </button>
+                <button
+                  onClick={() => exportDetailedReport(records)}
+                  className="px-4 py-2 bg-emerald-600 text-white text-sm rounded-lg hover:bg-emerald-500 transition-colors flex items-center gap-2"
+                >
+                  <FileText className="w-4 h-4" />
+                  完整变更报告
+                </button>
+              </div>
+
+              <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-slate-50">
+                      <tr className="text-xs text-slate-600">
+                        <th className="px-3 py-3 text-left font-medium w-16">行号</th>
+                        <th className="px-3 py-3 text-left font-medium">原始标注员留言</th>
+                        <th className="px-3 py-3 text-left font-medium">原始引用链接</th>
+                        <th className="px-3 py-3 text-left font-medium w-28">原始链接状态</th>
+                        <th className="px-3 py-3 text-left font-medium w-40">原始模型输出</th>
+                        <th className="px-3 py-3 text-left font-medium w-28">当前状态</th>
+                        <th className="px-3 py-3 text-center font-medium w-20">操作次数</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {records.map((record, idx) => (
+                        <tr key={record.id} className="hover:bg-slate-50">
+                          <td className="px-3 py-3 text-sm text-slate-400 font-mono">{idx + 1}</td>
+                          <td className="px-3 py-3 text-sm text-slate-700 max-w-xs truncate">
+                            {record.originalAnnotatorComment || "-"}
+                          </td>
+                          <td className="px-3 py-3 text-sm text-slate-500 max-w-xs truncate">
+                            {record.originalReferenceUrl ? (
+                              <a href={record.originalReferenceUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                                {record.originalReferenceUrl}
+                              </a>
+                            ) : (
+                              "-"
+                            )}
+                          </td>
+                          <td className="px-3 py-3">
+                            <span className={
++
+"text-xs px-2 py-0.5 rounded-full " + (record.originalLinkStatus === "200_OK" ? "bg-emerald-100 text-emerald-700" : record.originalLinkStatus === "404_NOT_FOUND" ? "bg-rose-100 text-rose-700" : "bg-slate-100 text-slate-600")">
+                              {record.originalLinkStatus || "-"}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3 text-sm text-slate-500 max-w-xs truncate">
+                            {record.originalModelOutput || "-"}
+                          </td>
+                          <td className="px-3 py-3">
+                            <StatusBadge status={record.status} />
+                          </td>
+                          <td className="px-3 py-3 text-sm text-slate-600 text-center">
+                            {record.logs.length}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
