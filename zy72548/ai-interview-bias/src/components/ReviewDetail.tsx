@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { getConflictTypeName, getStatusName, getRoleName } from '../utils/storage';
+import { getRelatedRecords } from '../utils/business';
 import type { ReviewRecord, PromptVersion } from '../types';
 import { generateId } from '../utils/storage';
 
@@ -23,13 +24,13 @@ const ReviewDetail: React.FC<Props> = ({ record, onBack }) => {
 
   const unresolvedConflicts = record.conflicts.filter(c => !c.resolved);
   const resolvedConflicts = record.conflicts.filter(c => c.resolved);
-  const hasModelVersionConflict = unresolvedConflicts.some(c => c.type === 'model_version_changed');
+  const relatedRecords = getRelatedRecords(record, state.reviewRecords);
 
   const handleResolveConflict = (conflictId: string, resolution: 'confirm' | 'reject' | 'operation_review') => {
     dispatch({
       type: 'RESOLVE_CONFLICT',
       payload: {
-        sampleId: record.sampleId,
+        recordId: record.recordId,
         conflictId,
         resolution,
         operator: state.currentUser,
@@ -40,7 +41,7 @@ const ReviewDetail: React.FC<Props> = ({ record, onBack }) => {
   const handlePMConfirm = () => {
     dispatch({
       type: 'PM_CONFIRM',
-      payload: { sampleId: record.sampleId, operator: state.currentUser },
+      payload: { recordId: record.recordId, operator: state.currentUser },
     });
   };
 
@@ -52,7 +53,7 @@ const ReviewDetail: React.FC<Props> = ({ record, onBack }) => {
     dispatch({
       type: 'PM_REJECT',
       payload: {
-        sampleId: record.sampleId,
+        recordId: record.recordId,
         operator: state.currentUser,
         reason: rejectReason,
       },
@@ -64,7 +65,7 @@ const ReviewDetail: React.FC<Props> = ({ record, onBack }) => {
   const handleOperationApprove = () => {
     dispatch({
       type: 'OPERATION_APPROVE',
-      payload: { sampleId: record.sampleId, operator: state.currentUser },
+      payload: { recordId: record.recordId, operator: state.currentUser },
     });
   };
 
@@ -76,7 +77,7 @@ const ReviewDetail: React.FC<Props> = ({ record, onBack }) => {
     dispatch({
       type: 'OPERATION_REJECT',
       payload: {
-        sampleId: record.sampleId,
+        recordId: record.recordId,
         operator: state.currentUser,
         reason: rejectReason,
       },
@@ -88,7 +89,7 @@ const ReviewDetail: React.FC<Props> = ({ record, onBack }) => {
   const handleFinalize = () => {
     dispatch({
       type: 'FINALIZE_RECORD',
-      payload: { sampleId: record.sampleId, operator: state.currentUser },
+      payload: { recordId: record.recordId, operator: state.currentUser },
     });
   };
 
@@ -100,7 +101,7 @@ const ReviewDetail: React.FC<Props> = ({ record, onBack }) => {
     }
     dispatch({
       type: 'APPLY_PROMPT_VERSION',
-      payload: { sampleId: record.sampleId, promptVersion: pv },
+      payload: { recordId: record.recordId, promptVersion: pv },
     });
     setSelectedPromptVersion('');
   };
@@ -121,7 +122,7 @@ const ReviewDetail: React.FC<Props> = ({ record, onBack }) => {
     dispatch({ type: 'ADD_PROMPT_VERSION', payload: pv });
     dispatch({
       type: 'APPLY_PROMPT_VERSION',
-      payload: { sampleId: record.sampleId, promptVersion: pv },
+      payload: { recordId: record.recordId, promptVersion: pv },
     });
     setNewPromptVersion({ versionNumber: '', description: '', effectiveDate: '' });
     setShowAddPrompt(false);
@@ -130,7 +131,6 @@ const ReviewDetail: React.FC<Props> = ({ record, onBack }) => {
   const getConflictColor = (type: string) => {
     switch (type) {
       case 'prompt_version_mismatch': return 'bg-orange-100 border-orange-300 text-orange-800';
-      case 'model_version_changed': return 'bg-purple-100 border-purple-300 text-purple-800';
       case 'duplicate_import': return 'bg-red-100 border-red-300 text-red-800';
       case 'conclusion_inconsistent': return 'bg-yellow-100 border-yellow-300 text-yellow-800';
       default: return 'bg-gray-100 border-gray-300 text-gray-800';
@@ -165,6 +165,7 @@ const ReviewDetail: React.FC<Props> = ({ record, onBack }) => {
         }`}>
           {getStatusName(record.status)}
         </span>
+        <span className="text-xs text-gray-400 font-mono">ID: {record.recordId.slice(-8)}</span>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -204,6 +205,35 @@ const ReviewDetail: React.FC<Props> = ({ record, onBack }) => {
               </div>
             </div>
           </div>
+
+          {relatedRecords.length > 0 && (
+            <div className="border rounded-lg p-4 border-orange-200 bg-orange-50">
+              <h3 className="font-semibold mb-3 text-orange-800">关联记录（同样本编号，不同模型版本）</h3>
+              <p className="text-xs text-orange-700 mb-3">
+                样本编号 {record.sampleId} 在不同模型版本下存在 {relatedRecords.length} 条独立记录。
+                每条记录独立审核，产品经理确认后转运营复核，不可自动归为正常。
+              </p>
+              <div className="space-y-2">
+                {relatedRecords.map(related => (
+                  <div key={related.recordId} className="flex items-center gap-3 p-2 bg-white rounded border text-sm">
+                    <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs">
+                      {related.interview.modelVersion}
+                    </span>
+                    <span>AI评分：{related.interview.aiScore}</span>
+                    {related.correction && <span>人工评分：{related.correction.humanScore}</span>}
+                    <span className={`px-2 py-0.5 rounded text-xs ${
+                      related.status === 'finalized' ? 'bg-gray-200 text-gray-700' :
+                      related.status === 'pending_operation' ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-blue-50 text-blue-700'
+                    }`}>
+                      {getStatusName(related.status)}
+                    </span>
+                    <span className="text-gray-400 text-xs font-mono">ID: {related.recordId.slice(-8)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {record.correction && (
             <div className="border rounded-lg p-4">
@@ -321,7 +351,7 @@ const ReviewDetail: React.FC<Props> = ({ record, onBack }) => {
 
           {unresolvedConflicts.length > 0 && (
             <div className="border rounded-lg p-4 border-red-300 bg-red-50">
-              <h3 className="font-semibold mb-3 text-red-800">⚠️ 待处理冲突 ({unresolvedConflicts.length})</h3>
+              <h3 className="font-semibold mb-3 text-red-800">待处理冲突 ({unresolvedConflicts.length})</h3>
               <div className="space-y-3">
                 {unresolvedConflicts.map(conflict => (
                   <div key={conflict.conflictId} className={`border rounded p-3 ${getConflictColor(conflict.type)}`}>
@@ -361,14 +391,6 @@ const ReviewDetail: React.FC<Props> = ({ record, onBack }) => {
                           >
                             驳回
                           </button>
-                          {conflict.type === 'model_version_changed' && (
-                            <button
-                              onClick={() => handleResolveConflict(conflict.conflictId, 'operation_review')}
-                              className="px-3 py-1 bg-purple-500 text-white text-xs rounded hover:bg-purple-600"
-                            >
-                              转运营复核
-                            </button>
-                          )}
                         </div>
                       )}
                     </div>
@@ -449,6 +471,11 @@ const ReviewDetail: React.FC<Props> = ({ record, onBack }) => {
                   >
                     AI产品经理确认
                   </button>
+                  {relatedRecords.length > 0 && (
+                    <p className="text-xs text-orange-600 bg-orange-50 p-2 rounded">
+                      提示：同样本编号存在不同模型版本记录，确认后将自动转运营复核，不可自动归正常
+                    </p>
+                  )}
                   {!showRejectInput ? (
                     <button
                       onClick={() => setShowRejectInput(true)}
@@ -481,16 +508,14 @@ const ReviewDetail: React.FC<Props> = ({ record, onBack }) => {
                       </div>
                     </div>
                   )}
-                  {hasModelVersionConflict && (
-                    <p className="text-xs text-purple-600">
-                      提示：存在模型版本变更，确认后将自动转运营复核
-                    </p>
-                  )}
                 </div>
               )}
 
               {canOperationReview && (
                 <div className="space-y-2">
+                  <p className="text-xs text-orange-700 bg-orange-50 p-2 rounded">
+                    运营复核原因：样本编号 {record.sampleId} 存在多个模型版本记录，需确认当前记录（{record.interview.modelVersion}）的结论是否正确
+                  </p>
                   <button
                     onClick={handleOperationApprove}
                     className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
@@ -583,6 +608,16 @@ const ReviewDetail: React.FC<Props> = ({ record, onBack }) => {
                       <p className="text-xs text-gray-600 mt-1 bg-gray-50 p-1.5 rounded">
                         {h.remark}
                       </p>
+                    )}
+                    {h.before && Object.keys(h.before).length > 0 && (
+                      <div className="mt-1 text-xs text-red-500">
+                        变更前：<code className="bg-red-50 px-1 rounded">{JSON.stringify(h.before)}</code>
+                      </div>
+                    )}
+                    {h.after && Object.keys(h.after).length > 0 && (
+                      <div className="mt-0.5 text-xs text-green-500">
+                        变更后：<code className="bg-green-50 px-1 rounded">{JSON.stringify(h.after)}</code>
+                      </div>
                     )}
                   </div>
                 </div>

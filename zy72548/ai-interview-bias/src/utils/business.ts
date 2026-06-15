@@ -38,22 +38,23 @@ export const detectConflicts = (
     }
   }
 
-  const sameSampleDifferentModel = allRecords.filter(
+  const sameSampleSameModelAndCorrection = allRecords.filter(
     r => r.sampleId === record.sampleId && 
-         r.interview.modelVersion !== record.interview.modelVersion
+         r.interview.modelVersion === record.interview.modelVersion &&
+         r.recordId !== record.recordId
   );
   
-  if (sameSampleDifferentModel.length > 0) {
-    const otherRecord = sameSampleDifferentModel[0];
+  if (sameSampleSameModelAndCorrection.length > 0) {
+    const otherRecord = sameSampleSameModelAndCorrection[0];
     conflicts.push({
       conflictId: generateId('conflict'),
-      type: 'model_version_changed',
+      type: 'duplicate_import',
       sampleId: record.sampleId,
-      description: '样本编号相同但模型版本不同，需运营复核',
-      fieldA: '已有模型版本',
-      valueA: otherRecord.interview.modelVersion,
-      fieldB: '当前模型版本',
-      valueB: record.interview.modelVersion,
+      description: '同样本编号+同模型版本已存在记录，可能是重复导入',
+      fieldA: '已有记录ID',
+      valueA: otherRecord.recordId,
+      fieldB: '当前记录ID',
+      valueB: record.recordId,
       detectedAt: now,
     });
   }
@@ -61,6 +62,7 @@ export const detectConflicts = (
   const duplicateImport = allRecords.filter(
     r => r.correction?.batchId === record.correction?.batchId &&
          r.sampleId === record.sampleId &&
+         r.interview.modelVersion === record.interview.modelVersion &&
          r.correction?.correctionId !== record.correction?.correctionId
   );
   
@@ -102,7 +104,17 @@ export const detectConflicts = (
   return conflicts;
 };
 
+export const getRelatedRecords = (
+  record: ReviewRecord,
+  allRecords: ReviewRecord[]
+): ReviewRecord[] => {
+  return allRecords.filter(
+    r => r.sampleId === record.sampleId && r.recordId !== record.recordId
+  );
+};
+
 export const createHistoryRecord = (
+  recordId: string,
   sampleId: string,
   action: string,
   operator: string,
@@ -112,6 +124,7 @@ export const createHistoryRecord = (
   remark?: string
 ): HistoryRecord => ({
   historyId: generateId('history'),
+  recordId,
   sampleId,
   action,
   operator,
@@ -129,14 +142,17 @@ export const createReviewRecord = (
   role: Role = 'admin'
 ): ReviewRecord => {
   const now = new Date().toISOString();
+  const recordId = generateId('rec');
   return {
+    recordId,
     sampleId: interview.sampleId,
     interview,
     correction,
-    status: correction ? 'pending_review' : 'pending_review',
+    status: 'pending_review',
     conflicts: [],
     history: [
       createHistoryRecord(
+        recordId,
         interview.sampleId,
         correction ? '创建记录并导入人工改判' : '创建面试记录',
         operator,
@@ -155,15 +171,16 @@ export const runSelfCheck = (records: ReviewRecord[]): SelfCheckResult[] => {
   const results: SelfCheckResult[] = [];
   const now = new Date().toISOString();
 
-  const sampleMap = new Map<string, ReviewRecord[]>();
+  const keyMap = new Map<string, ReviewRecord[]>();
   records.forEach(r => {
-    const existing = sampleMap.get(r.sampleId) || [];
-    sampleMap.set(r.sampleId, [...existing, r]);
+    const key = `${r.sampleId}@${r.interview.modelVersion}`;
+    const existing = keyMap.get(key) || [];
+    keyMap.set(key, [...existing, r]);
   });
   
-  const duplicateSamples = Array.from(sampleMap.entries())
+  const duplicateSamples = Array.from(keyMap.entries())
     .filter(([_, recs]) => recs.length > 1)
-    .map(([sampleId, recs]) => `${sampleId} (${recs.length}条记录)`);
+    .map(([key, recs]) => `${key} (${recs.length}条记录)`);
   
   results.push({
     checkId: generateId('check'),
@@ -176,22 +193,28 @@ export const runSelfCheck = (records: ReviewRecord[]): SelfCheckResult[] => {
     checkedAt: now,
   });
 
-  const modelVersionIssues: string[] = [];
+  const sampleMap = new Map<string, ReviewRecord[]>();
+  records.forEach(r => {
+    const existing = sampleMap.get(r.sampleId) || [];
+    sampleMap.set(r.sampleId, [...existing, r]);
+  });
+
+  const modelVersionNotes: string[] = [];
   sampleMap.forEach((recs, sampleId) => {
     const modelVersions = new Set(recs.map(r => r.interview.modelVersion));
     if (modelVersions.size > 1) {
-      modelVersionIssues.push(`${sampleId}: ${Array.from(modelVersions).join(' vs ')}`);
+      modelVersionNotes.push(`${sampleId}: 存在 ${Array.from(modelVersions).join('、')} 多个模型版本，共 ${recs.length} 条独立记录`);
     }
   });
   
   results.push({
     checkId: generateId('check'),
-    checkName: '模型版本一致性检测',
-    passed: modelVersionIssues.length === 0,
-    message: modelVersionIssues.length === 0 
-      ? '样本编号与模型版本一致' 
-      : `发现 ${modelVersionIssues.length} 个版本不一致样本`,
-    details: modelVersionIssues,
+    checkName: '模型版本多版本检测',
+    passed: modelVersionNotes.length === 0,
+    message: modelVersionNotes.length === 0 
+      ? '未发现样本编号跨模型版本' 
+      : `发现 ${modelVersionNotes.length} 个样本编号存在多模型版本（每条独立记录正常）`,
+    details: modelVersionNotes,
     checkedAt: now,
   });
 
@@ -200,7 +223,7 @@ export const runSelfCheck = (records: ReviewRecord[]): SelfCheckResult[] => {
     if (r.promptVersion && r.correction && r.finalScore !== undefined) {
       const expectedScore = r.correction.humanScore;
       if (r.finalScore !== expectedScore) {
-        recalcIssues.push(`${r.sampleId}: 最终分数${r.finalScore}≠人工分数${expectedScore}`);
+        recalcIssues.push(`${r.sampleId}@${r.interview.modelVersion}: 最终分数${r.finalScore}≠人工分数${expectedScore}`);
       }
     }
   });
@@ -222,7 +245,7 @@ export const runSelfCheck = (records: ReviewRecord[]): SelfCheckResult[] => {
       const scorePass = (r.finalScore ?? r.correction.humanScore) >= 60;
       const conclusionPass = r.finalConclusion.includes('通过');
       if (scorePass !== conclusionPass) {
-        exportConsistencyIssues.push(`${r.sampleId}: 分数与结论不一致`);
+        exportConsistencyIssues.push(`${r.sampleId}@${r.interview.modelVersion}: 分数与结论不一致`);
       }
     }
   });

@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { getRoleName } from '../utils/storage';
+import { getRoleName, getStatusName } from '../utils/storage';
+import { getRelatedRecords } from '../utils/business';
 import type { ReviewRecord } from '../types';
 
 const ReplayPage: React.FC = () => {
   const { state } = useApp();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
 
   const finalizedRecords = state.reviewRecords.filter(r => r.status === 'finalized');
-  const selectedRecord = selectedId 
-    ? state.reviewRecords.find(r => r.sampleId === selectedId) 
+  const selectedRecord = selectedRecordId 
+    ? state.reviewRecords.find(r => r.recordId === selectedRecordId) 
     : null;
 
   const stats = {
@@ -17,6 +18,11 @@ const ReplayPage: React.FC = () => {
     finalized: finalizedRecords.length,
     hasConflict: state.reviewRecords.filter(r => r.conflicts.length > 0).length,
     withPrompt: state.reviewRecords.filter(r => r.promptVersion).length,
+    multiModel: new Set(
+      state.reviewRecords
+        .filter(r => getRelatedRecords(r, state.reviewRecords).length > 0)
+        .map(r => r.sampleId)
+    ).size,
     avgAiScore: state.reviewRecords.length > 0 
       ? (state.reviewRecords.reduce((sum, r) => sum + r.interview.aiScore, 0) / state.reviewRecords.length).toFixed(1)
       : '0',
@@ -25,60 +31,84 @@ const ReplayPage: React.FC = () => {
       : '0',
   };
 
-  const renderHistoryTimeline = (record: ReviewRecord) => (
-    <div className="space-y-4">
-      <h4 className="font-semibold text-gray-700 mb-3">历史追溯（证据链）</h4>
-      <div className="relative">
-        {[...record.history].reverse().map((h, idx) => (
-          <div key={h.historyId} className="relative pl-8 pb-6 last:pb-0">
-            {idx < record.history.length - 1 && (
-              <div className="absolute left-3 top-3 bottom-0 w-0.5 bg-gray-200" />
-            )}
-            <div className="absolute left-0 top-1 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold">
-              {record.history.length - idx}
-            </div>
-            <div className="bg-gray-50 rounded-lg p-3">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-medium">{h.action}</span>
-                <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">
-                  {getRoleName(h.role)}
-                </span>
-              </div>
-              <p className="text-xs text-gray-500">
-                操作人：{h.operator} · {h.timestamp}
-              </p>
-              {h.remark && (
-                <p className="text-sm text-gray-700 mt-2 p-2 bg-white rounded border">
-                  {h.remark}
-                </p>
-              )}
-              {h.before && Object.keys(h.before).length > 0 && (
-                <div className="mt-2 text-xs">
-                  <span className="text-red-500">变更前：</span>
-                  <code className="bg-red-50 px-1 rounded">{JSON.stringify(h.before)}</code>
+  const renderHistoryTimeline = (record: ReviewRecord) => {
+    const related = getRelatedRecords(record, state.reviewRecords);
+    return (
+      <div className="space-y-4">
+        <h4 className="font-semibold text-gray-700 mb-3">历史追溯（证据链）</h4>
+        {related.length > 0 && (
+          <div className="p-3 bg-orange-50 border border-orange-200 rounded text-sm mb-4">
+            <p className="font-medium text-orange-800 mb-1">关联记录提示</p>
+            <p className="text-orange-700 text-xs">
+              样本编号 {record.sampleId} 在不同模型版本下共 {related.length + 1} 条独立记录。
+              当前展示的是模型版本 {record.interview.modelVersion} 的记录。
+            </p>
+            <div className="mt-2 space-y-1">
+              {related.map(r => (
+                <div key={r.recordId} className="text-xs text-orange-600">
+                  → 另一条记录：{r.interview.modelVersion}，AI评分 {r.interview.aiScore}，状态 {getStatusName(r.status)}
                 </div>
-              )}
-              {h.after && Object.keys(h.after).length > 0 && (
-                <div className="mt-1 text-xs">
-                  <span className="text-green-500">变更后：</span>
-                  <code className="bg-green-50 px-1 rounded">{JSON.stringify(h.after)}</code>
-                </div>
-              )}
+              ))}
             </div>
           </div>
-        ))}
+        )}
+        <div className="relative">
+          {[...record.history].reverse().map((h, idx) => (
+            <div key={h.historyId} className="relative pl-8 pb-6 last:pb-0">
+              {idx < record.history.length - 1 && (
+                <div className="absolute left-3 top-3 bottom-0 w-0.5 bg-gray-200" />
+              )}
+              <div className="absolute left-0 top-1 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold">
+                {record.history.length - idx}
+              </div>
+              <div className="bg-gray-50 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-medium">{h.action}</span>
+                  <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">
+                    {getRoleName(h.role)}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500">
+                  操作人：{h.operator} · {h.timestamp}
+                </p>
+                {h.remark && (
+                  <p className="text-sm text-gray-700 mt-2 p-2 bg-white rounded border">
+                    {h.remark}
+                  </p>
+                )}
+                {h.before && Object.keys(h.before).length > 0 && (
+                  <div className="mt-2 text-xs">
+                    <span className="text-red-500">变更前：</span>
+                    <code className="bg-red-50 px-1 rounded">{JSON.stringify(h.before)}</code>
+                  </div>
+                )}
+                {h.after && Object.keys(h.after).length > 0 && (
+                  <div className="mt-1 text-xs">
+                    <span className="text-green-500">变更后：</span>
+                    <code className="bg-green-50 px-1 rounded">{JSON.stringify(h.after)}</code>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   if (selectedRecord) {
     return (
       <div className="p-6 max-w-5xl mx-auto">
         <div className="flex items-center gap-4 mb-6">
-          <button onClick={() => setSelectedId(null)} className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
+          <button onClick={() => setSelectedRecordId(null)} className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
             ← 返回复盘列表
           </button>
-          <h2 className="text-2xl font-bold">复盘详情 - {selectedRecord.sampleId}</h2>
+          <h2 className="text-2xl font-bold">
+            复盘详情 - {selectedRecord.sampleId}
+            <span className="text-sm font-normal text-gray-500 ml-2">
+              @{selectedRecord.interview.modelVersion}
+            </span>
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -152,6 +182,9 @@ const ReplayPage: React.FC = () => {
                 }`}>
                   {selectedRecord.finalConclusion || '待定'}
                 </span>
+                <p className="text-xs text-gray-500 mt-2">
+                  样本编号 {selectedRecord.sampleId} · 模型版本 {selectedRecord.interview.modelVersion}
+                </p>
               </div>
             </div>
           </div>
@@ -168,7 +201,7 @@ const ReplayPage: React.FC = () => {
     <div className="p-6 max-w-7xl mx-auto">
       <h2 className="text-2xl font-bold mb-6">产品复盘页</h2>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4 mb-6">
         <div className="border rounded-lg p-4">
           <p className="text-sm text-gray-500">总记录数</p>
           <p className="text-2xl font-bold">{stats.total}</p>
@@ -184,6 +217,10 @@ const ReplayPage: React.FC = () => {
         <div className="border rounded-lg p-4">
           <p className="text-sm text-gray-500">已补录提示词</p>
           <p className="text-2xl font-bold text-blue-600">{stats.withPrompt}</p>
+        </div>
+        <div className="border rounded-lg p-4">
+          <p className="text-sm text-gray-500">跨模型版本</p>
+          <p className="text-2xl font-bold text-orange-600">{stats.multiModel}</p>
         </div>
         <div className="border rounded-lg p-4">
           <p className="text-sm text-gray-500">平均AI评分</p>
@@ -220,8 +257,11 @@ const ReplayPage: React.FC = () => {
             </thead>
             <tbody className="divide-y">
               {finalizedRecords.map(record => (
-                <tr key={record.sampleId} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-mono">{record.sampleId}</td>
+                <tr key={record.recordId} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 font-mono">
+                    {record.sampleId}
+                    <span className="text-xs text-gray-400 ml-1">@{record.interview.modelVersion}</span>
+                  </td>
                   <td className="px-4 py-3">{record.interview.candidateName}</td>
                   <td className="px-4 py-3 text-center">
                     <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs">
@@ -250,7 +290,7 @@ const ReplayPage: React.FC = () => {
                   </td>
                   <td className="px-4 py-3 text-center">
                     <button
-                      onClick={() => setSelectedId(record.sampleId)}
+                      onClick={() => setSelectedRecordId(record.recordId)}
                       className="px-3 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
                     >
                       追溯证据链
@@ -270,6 +310,7 @@ const ReplayPage: React.FC = () => {
           <li>• 历史记录不可篡改，每一步操作均有时间戳和操作人</li>
           <li>• 冲突处理过程透明，确认/驳回均留痕</li>
           <li>• 产品复盘页与历史记录数据一致，不会出现「结论看着很满，追证据时断在半路」</li>
+          <li>• 同样本编号不同模型版本 = 多条独立记录，每条独立审核，不自动归正常</li>
         </ul>
       </div>
     </div>

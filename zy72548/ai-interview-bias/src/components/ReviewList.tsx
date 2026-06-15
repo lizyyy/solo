@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { getStatusName } from '../utils/storage';
+import { getRelatedRecords } from '../utils/business';
 import ReviewDetail from './ReviewDetail';
 import type { RecordStatus } from '../types';
 
 const ReviewList: React.FC = () => {
   const { state } = useApp();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<RecordStatus | 'all'>('all');
   const [searchText, setSearchText] = useState('');
 
@@ -18,12 +19,12 @@ const ReviewList: React.FC = () => {
     return matchStatus && matchSearch;
   });
 
-  const selectedRecord = selectedId 
-    ? state.reviewRecords.find(r => r.sampleId === selectedId) 
+  const selectedRecord = selectedRecordId 
+    ? state.reviewRecords.find(r => r.recordId === selectedRecordId) 
     : null;
 
   if (selectedRecord) {
-    return <ReviewDetail record={selectedRecord} onBack={() => setSelectedId(null)} />;
+    return <ReviewDetail record={selectedRecord} onBack={() => setSelectedRecordId(null)} />;
   }
 
   const statusCounts = state.reviewRecords.reduce((acc, r) => {
@@ -87,6 +88,7 @@ const ReviewList: React.FC = () => {
                 <th className="px-4 py-3 text-right font-medium">AI评分</th>
                 <th className="px-4 py-3 text-right font-medium">人工评分</th>
                 <th className="px-4 py-3 text-center font-medium">提示词版本</th>
+                <th className="px-4 py-3 text-center font-medium">关联记录</th>
                 <th className="px-4 py-3 text-center font-medium">状态</th>
                 <th className="px-4 py-3 text-center font-medium">冲突</th>
                 <th className="px-4 py-3 text-center font-medium">操作</th>
@@ -95,8 +97,9 @@ const ReviewList: React.FC = () => {
             <tbody className="divide-y">
               {filteredRecords.map(record => {
                 const unresolvedCount = record.conflicts.filter(c => !c.resolved).length;
+                const related = getRelatedRecords(record, state.reviewRecords);
                 return (
-                  <tr key={record.sampleId} className="hover:bg-gray-50">
+                  <tr key={record.recordId} className="hover:bg-gray-50">
                     <td className="px-4 py-3 font-mono">{record.sampleId}</td>
                     <td className="px-4 py-3">{record.interview.candidateName}</td>
                     <td className="px-4 py-3 text-gray-600">{record.interview.position}</td>
@@ -121,6 +124,15 @@ const ReviewList: React.FC = () => {
                       )}
                     </td>
                     <td className="px-4 py-3 text-center">
+                      {related.length > 0 ? (
+                        <span className="px-2 py-0.5 bg-orange-100 text-orange-700 rounded text-xs" title={related.map(r => `${r.sampleId}@${r.interview.modelVersion}`).join('\n')}>
+                          {related.length}条
+                        </span>
+                      ) : (
+                        <span className="text-gray-400 text-xs">无</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-center">
                       <span className={`px-2 py-1 rounded-full text-xs border ${getStatusBadgeColor(record.status)}`}>
                         {getStatusName(record.status)}
                       </span>
@@ -136,7 +148,7 @@ const ReviewList: React.FC = () => {
                     </td>
                     <td className="px-4 py-3 text-center">
                       <button
-                        onClick={() => setSelectedId(record.sampleId)}
+                        onClick={() => setSelectedRecordId(record.recordId)}
                         className="px-3 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
                       >
                         查看详情

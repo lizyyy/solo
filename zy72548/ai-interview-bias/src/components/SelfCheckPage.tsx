@@ -23,6 +23,7 @@ const SelfCheckPage: React.FC = () => {
       exportTime: new Date().toISOString(),
       exportedBy: state.currentUser,
       records: state.reviewRecords.map(r => ({
+        recordId: r.recordId,
         sampleId: r.sampleId,
         candidateName: r.interview.candidateName,
         position: r.interview.position,

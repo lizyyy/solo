@@ -63,6 +63,7 @@ export interface ConflictEvidence {
 
 export interface HistoryRecord {
   historyId: string;
+  recordId: string;
   sampleId: string;
   action: string;
   operator: string;
@@ -74,6 +75,7 @@ export interface HistoryRecord {
 }
 
 export interface ReviewRecord {
+  recordId: string;
   sampleId: string;
   interview: InterviewSample;
   correction?: ManualCorrection;
@@ -101,6 +103,6 @@ export interface AppState {
   currentUser: string;
   reviewRecords: ReviewRecord[];
   promptVersions: PromptVersion[];
-  selectedSampleId?: string;
+  selectedRecordId?: string;
   activeTab: 'import' | 'review' | 'replay' | 'selfcheck';
 }
