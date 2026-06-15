@@ -2,128 +2,164 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>序列推荐负采样检查 - 检查报告</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 20px; background: #f5f5f5; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { color: #333; border-bottom: 3px solid #007bff; padding-bottom: 10px; }
-        h2 { color: #007bff; margin-top: 30px; border-left: 4px solid #007bff; padding-left: 10px; }
-        h3 { color: #555; }
-        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
-        .summary-card { background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 4px solid #007bff; }
-        .summary-card.warning { border-left-color: #ffc107; }
-        .summary-card.error { border-left-color: #dc3545; }
-        .summary-card.success { border-left-color: #28a745; }
-        .card-title { font-size: 0.9em; color: #666; margin-bottom: 5px; }
-        .card-value { font-size: 1.5em; font-weight: bold; color: #333; }
-        .step-section { margin: 20px 0; padding: 20px; background: #fafafa; border-radius: 6px; }
-        .check-item { margin: 15px 0; padding: 15px; background: white; border-radius: 4px; border: 1px solid #e0e0e0; }
-        .check-item.passed { border-left: 4px solid #28a745; }
-        .check-item.warning { border-left: 4px solid #ffc107; }
-        .check-item.error { border-left: 4px solid #dc3545; }
-        .check-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .check-name { font-weight: bold; font-size: 1.1em; }
-        .badge { padding: 4px 10px; border-radius: 12px; font-size: 0.85em; font-weight: bold; }
-        .badge.passed { background: #d4edda; color: #155724; }
-        .badge.warning { background: #fff3cd; color: #856404; }
-        .badge.error { background: #f8d7da; color: #721c24; }
-        .badge.pending { background: #e2e3e5; color: #383d41; }
-        .suggestion { margin-top: 10px; padding: 10px; background: #fff3cd; border-radius: 4px; color: #856404; }
-        .conflict-item { margin: 10px 0; padding: 12px; background: #fff5f5; border-radius: 4px; border: 1px solid #feb2b2; }
-        .conflict-header { font-weight: bold; color: #c53030; margin-bottom: 8px; }
-        .conflict-data { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .conflict-side { padding: 8px; background: white; border-radius: 4px; }
-        .resolution-buttons { margin-top: 10px; }
-        .resolution-buttons button { padding: 6px 12px; margin-right: 8px; border: none; border-radius: 4px; cursor: pointer; }
-        .btn-confirm { background: #28a745; color: white; }
-        .btn-reject { background: #dc3545; color: white; }
-        .details-box { margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 4px; font-family: monospace; font-size: 0.9em; overflow-x: auto; }
-        .meta-info { color: #666; font-size: 0.9em; margin-bottom: 20px; }
-        .history-section { margin-top: 30px; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #e0e0e0; }
-        th { background: #f8f9fa; font-weight: bold; }
-        .warning-note { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 4px; margin: 20px 0; }
-        .warning-note h4 { color: #856404; margin-top: 0; }
-    </style>
+<meta charset="UTF-8">
+<title>序列推荐负采样检查 - 检查报告</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;margin:20px;background:#f5f5f5;color:#333}
+.container{max-width:1280px;margin:0 auto;background:#fff;padding:30px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+h1{color:#1f2937;border-bottom:3px solid #2563eb;padding-bottom:10px}
+h2{color:#1d4ed8;margin-top:30px;border-left:4px solid #2563eb;padding-left:10px}
+h3{color:#374151;margin-top:20px}
+.meta-info{color:#6b7280;font-size:.9em;margin-bottom:20px;line-height:1.7}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:20px 0}
+.summary-card{background:#f8fafc;padding:15px;border-radius:6px;border-left:4px solid #2563eb}
+.summary-card.warning{border-left-color:#d97706;background:#fffbeb}
+.summary-card.error{border-left-color:#dc2626;background:#fef2f2}
+.summary-card.success{border-left-color:#059669;background:#f0fdf4}
+.card-title{font-size:.85em;color:#6b7280;margin-bottom:6px}
+.card-value{font-size:1.6em;font-weight:700;color:#1f2937}
+.card-sub{font-size:.75em;color:#9ca3af;margin-top:4px}
+.step-section{margin:20px 0;padding:20px;background:#fafafa;border-radius:6px;border:1px solid #e5e7eb}
+.check-item{margin:14px 0;padding:14px;background:#fff;border-radius:4px;border:1px solid #e5e7eb}
+.check-item.passed{border-left:4px solid #059669}
+.check-item.warning{border-left:4px solid #d97706}
+.check-item.error{border-left:4px solid #dc2626}
+.check-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:12px;flex-wrap:wrap}
+.check-name{font-weight:600;font-size:1.05em}
+.check-meta{font-size:.75em;color:#9ca3af}
+.badge{padding:4px 10px;border-radius:12px;font-size:.8em;font-weight:600;white-space:nowrap;display:inline-block}
+.badge.passed{background:#d1fae5;color:#065f46}
+.badge.warning{background:#fef3c7;color:#92400e}
+.badge.error{background:#fee2e2;color:#991b1b}
+.badge.pending{background:#e5e7eb;color:#374151}
+.suggestion{margin-top:10px;padding:10px 12px;background:#fef3c7;border-radius:4px;color:#92400e;font-size:.92em;line-height:1.5}
+.guide{margin-top:8px;padding:8px 10px;background:#eff6ff;border-radius:4px;color:#1e40af;font-size:.85em}
+.details-box{margin-top:10px;padding:10px;background:#f8fafc;border-radius:4px;font-family:Menlo,Consolas,monospace;font-size:.82em;overflow-x:auto;max-height:360px;overflow-y:auto}
+.details-box summary{cursor:pointer;color:#2563eb}
+.conflict-item{margin:12px 0;padding:14px;background:#fff7ed;border-radius:4px;border:1px solid #fed7aa}
+.conflict-header{font-weight:600;color:#9a3412;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.conflict-meta{font-size:.75em;color:#9a3412}
+.conflict-data{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.conflict-side{padding:10px;background:#fff;border-radius:4px;border:1px solid #fed7aa;word-break:break-all}
+.conflict-side h5{margin:0 0 6px 0;font-size:.9em;color:#374151}
+.resolution-block{margin-top:10px;padding:10px;background:#ecfdf5;border-radius:4px;border:1px solid #a7f3d0}
+.resolution-block.rejected{background:#fef2f2;border-color:#fecaca}
+.resolution-block.pending{background:#fffbeb;border-color:#fde68a}
+.resolution-meta{font-size:.8em;color:#6b7280;margin-top:4px}
+.reason-box{margin-top:6px;padding:6px 8px;background:#fff;border:1px dashed #d1d5db;border-radius:4px;font-size:.85em;font-style:italic}
+.batch-section{margin-top:30px}
+table{width:100%;border-collapse:collapse;margin:10px 0;background:#fff}
+th,td{padding:9px 10px;text-align:left;border-bottom:1px solid #e5e7eb;font-size:.9em;vertical-align:top}
+th{background:#f1f5f9;font-weight:600;color:#374151;white-space:nowrap}
+tr:hover td{background:#f8fafc}
+.trace-id{font-family:Menlo,Consolas,monospace;font-size:.82em;background:#eef2ff;color:#3730a3;padding:1px 4px;border-radius:3px;cursor:pointer}
+.batch-id{font-family:Menlo,Consolas,monospace;font-size:.82em;background:#ecfeff;color:#0e7490;padding:1px 4px;border-radius:3px}
+.mini-note{font-size:.75em;color:#6b7280;margin-top:4px}
+.history-diff{color:#dc2626;font-weight:600}
+.history-match{color:#059669;font-weight:600}
+.trace-lookup{margin-top:20px;padding:16px;background:#f1f5f9;border-radius:6px}
+.trace-lookup input{padding:8px 12px;border:1px solid #cbd5e1;border-radius:4px;font-family:Menlo,Consolas,monospace;margin-right:8px;width:360px;max-width:100%}
+.trace-lookup button{padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:4px;cursor:pointer}
+.trace-lookup-result{margin-top:10px;padding:12px;background:#fff;border-radius:4px;display:none}
+.warning-note{background:#fef3c7;border:1px solid #fde68a;padding:15px;border-radius:4px;margin:20px 0}
+.warning-note h4{color:#92400e;margin-top:0;margin-bottom:8px}
+.warning-note ul{margin:8px 0;padding-left:22px;line-height:1.7}
+.ops-nav{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.ops-nav button{padding:8px 14px;background:#1d4ed8;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:.9em}
+.ops-nav button.alt{background:#6b7280}
+.ops-nav button.warn{background:#b45309}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:768px){.conflict-data,.grid-2{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>序列推荐负采样检查</h1>
-        <div class="meta-info">
-            <p><strong>报告生成时间：</strong>2026-06-07 16:00:48</p>
-            <p><strong>版本：</strong>1.0.0</p>
-            <p><strong>当前阈值：</strong>0.5</p>
-        </div>
+<div class="container">
+<h1>序列推荐负采样检查 <span style="font-size:.5em;color:#6b7280">v1.0.0</span></h1>
+<div class="meta-info">
+  <p><strong>报告生成时间：</strong>2026-06-15 13:11:50 ｜
+     <strong>当前阈值：</strong>0.5 ｜
+     <strong>导出目录：</strong><code>/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports</code></p>
+  <p><strong>批次总数：</strong>1 ｜
+     <strong>历史记录：</strong>7 条 ｜
+     <strong>导出记录：</strong>1 次</p>
+</div>
 
-        <h2>概览</h2>
-        <div class="summary-grid">
-            <div class="summary-card success">
-                <div class="card-title">步骤总数</div>
-                <div class="card-value">3</div>
-            </div>
-            <div class="summary-card success">
-                <div class="card-title">已完成步骤</div>
-                <div class="card-value">3</div>
-            </div>
-            <div class="summary-card warning">
-                <div class="card-title">警告数</div>
-                <div class="card-value">0</div>
-            </div>
-            <div class="summary-card error">
-                <div class="card-title">错误数</div>
-                <div class="card-value">0</div>
-            </div>
-            <div class="summary-card warning">
-                <div class="card-title">待处理冲突</div>
-                <div class="card-value">0</div>
-            </div>
-        </div>
 
+
+<h2>概览</h2>
+<div class="summary-grid">
+  <div class="summary-card success"><div class="card-title">步骤总数</div><div class="card-value">4</div><div class="card-sub">完成 4 个</div></div>
+  <div class="summary-card success"><div class="card-title">通过检查项</div><div class="card-value">7</div><div class="card-sub">共 7 项检查</div></div>
+  <div class="summary-card warning"><div class="card-title">警告数</div><div class="card-value">0</div><div class="card-sub">需人工复核</div></div>
+  <div class="summary-card error"><div class="card-title">错误数</div><div class="card-value">0</div><div class="card-sub">阻塞导出</div></div>
+  <div class="summary-card warning"><div class="card-title">待处理冲突</div><div class="card-value">0</div><div class="card-sub">已确认 0 / 驳回 0</div></div>
+  <div class="summary-card success"><div class="card-title">导出一致</div><div class="card-value">✅</div><div class="card-sub">一致</div></div>
+</div>
+
+<div class="ops-nav">
+  <button onclick="document.getElementById('history-section').scrollIntoView({behavior:'smooth'})">📜 历史记录</button>
+  <button onclick="document.getElementById('batch-section').scrollIntoView({behavior:'smooth'})">📦 批次管理</button>
+  <button onclick="document.getElementById('export-section').scrollIntoView({behavior:'smooth'})">📤 导出与一致性</button>
+  <button class="alt" onclick="document.getElementById('trace-section').scrollIntoView({behavior:'smooth'})">🔍 Trace反查</button>
+  <button class="warn" onclick="document.getElementById('conflicts-all').scrollIntoView({behavior:'smooth'})">⚔️ 冲突证据</button>
+</div>
+
+<div class="trace-lookup" id="trace-section">
+  <h3 style="margin-top:0">🔍 通过 trace_id 反查同一条样例</h3>
+  <p class="mini-note">同一记录的 <span class="trace-id">trace_id</span> 在列表、详情、历史、导出CSV中完全一致，可交叉验证。</p>
+  <input id="trace-input" placeholder="粘贴 trace_id，例如 rec_0123456789abcdef"/>
+  <button onclick="findTrace()">反查</button>
+  <div id="trace-result" class="trace-lookup-result"></div>
+</div>
+
+
+<div class="step-section" id="step-1">
+  <h2>步骤1：负样本列表导入
+    <span class="badge passed">已完成</span>
+  </h2>
+  <p class="mini-note">
+    批次：<span class="batch-id">batch_20260615131150_07650d</span>　
+    数据版本：initial
+    
+  </p>
+
+  
+  <h3>检查结果（2 项）</h3>
+  
+  <div class="check-item info">
+    <div class="check-header">
+      <div>
+        <span class="check-name">重复导入检查</span>
+        <span class="check-meta">｜check_id: chk_78929ede</span>
         
-
-        
-        <div class="step-section">
-            <h2>步骤1：负样本列表导入 
-                <span class="badge passed">
-                    completed
-                </span>
-            </h2>
-            <p><small>数据版本：initial</small></p>
-
-            
-            <h3>检查结果</h3>
-            
-            <div class="check-item info">
-                <div class="check-header">
-                    <span class="check-name">重复导入检查</span>
-                    <span class="badge passed">
-                        通过
-                    </span>
-                </div>
-                
-                <details class="details-box">
-                    <summary>查看详情</summary>
-                    <pre>{
+      </div>
+      <span class="badge passed">通过</span>
+    </div>
+    
+    
+    <details class="details-box">
+      <summary>查看 JSON 详情</summary>
+      <pre>{
   "total_rows": 20,
   "duplicate_count": 0
 }</pre>
-                </details>
-            </div>
-            
-            <div class="check-item info">
-                <div class="check-header">
-                    <span class="check-name">少数类样本被总指标盖住检查</span>
-                    <span class="badge passed">
-                        通过
-                    </span>
-                </div>
-                
-                <details class="details-box">
-                    <summary>查看详情</summary>
-                    <pre>{
+    </details>
+  </div>
+  
+  <div class="check-item info">
+    <div class="check-header">
+      <div>
+        <span class="check-name">少数类样本被总指标盖住检查</span>
+        <span class="check-meta">｜check_id: chk_a790f038</span>
+        
+      </div>
+      <span class="badge passed">通过</span>
+    </div>
+    
+    
+    <details class="details-box">
+      <summary>查看 JSON 详情</summary>
+      <pre>{
   "label_distribution": {
     "0": 0.65,
     "1": 0.35
@@ -134,168 +170,413 @@
   },
   "minority_labels": []
 }</pre>
-                </details>
-            </div>
-            
-            
+    </details>
+  </div>
+  
+  
 
-            
-        </div>
+  
+</div>
+
+<div class="step-section" id="step-2">
+  <h2>步骤2：召回候选表对比
+    <span class="badge passed">已完成</span>
+  </h2>
+  <p class="mini-note">
+    批次：<span class="batch-id">batch_20260615131150_463c85</span>　
+    数据版本：initial
+    
+  </p>
+
+  
+  <h3>检查结果（1 项）</h3>
+  
+  <div class="check-item info">
+    <div class="check-header">
+      <div>
+        <span class="check-name">负样本与召回候选表一致性检查</span>
+        <span class="check-meta">｜check_id: chk_1ed639c4</span>
         
-        <div class="step-section">
-            <h2>步骤2：召回候选表对比 
-                <span class="badge passed">
-                    completed
-                </span>
-            </h2>
-            <p><small>数据版本：initial</small></p>
-
-            
-            <h3>检查结果</h3>
-            
-            <div class="check-item info">
-                <div class="check-header">
-                    <span class="check-name">负样本与召回候选表一致性检查</span>
-                    <span class="badge passed">
-                        通过
-                    </span>
-                </div>
-                
-                <details class="details-box">
-                    <summary>查看详情</summary>
-                    <pre>{
-  "message": "未检测到标签冲突"
-}</pre>
-                </details>
-            </div>
-            
-            
-
-            
-        </div>
-        
-        <div class="step-section">
-            <h2>步骤3：阈值回放更新 
-                <span class="badge passed">
-                    completed
-                </span>
-            </h2>
-            <p><small>数据版本：N/A</small></p>
-
-            
-            <h3>检查结果</h3>
-            
-            <div class="check-item info">
-                <div class="check-header">
-                    <span class="check-name">阈值回放检查</span>
-                    <span class="badge passed">
-                        通过
-                    </span>
-                </div>
-                
-                <details class="details-box">
-                    <summary>查看详情</summary>
-                    <pre>{
-  "old_threshold": 0.5,
-  "new_threshold": 0.5,
-  "current_metrics": {
-    "threshold": 0.5,
-    "precision": 1.0,
-    "recall": 1.0,
-    "positive_count": 7,
-    "negative_count": 13
-  },
-  "history_count": 2,
-  "history_metrics": [
-    {
-      "timestamp": "2026-06-07 16:00:48",
-      "threshold": 0.5,
-      "metrics": {
-        "threshold": 0.5,
-        "precision": 1.0,
-        "recall": 1.0,
-        "positive_count": 7,
-        "negative_count": 13
-      }
-    },
-    {
-      "timestamp": "2026-06-07 16:00:48",
-      "threshold": 0.5,
-      "metrics": {
-        "threshold": 0.5,
-        "precision": 1.0,
-        "recall": 1.0,
-        "positive_count": 7,
-        "negative_count": 13
-      }
-    }
-  ],
-  "minority_sample_count": 0,
-  "minority_samples": []
-}</pre>
-                </details>
-            </div>
-            
-            
-
-            
-        </div>
-        
-
-        
-        <div class="history-section">
-            <h2>历史记录</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>时间</th>
-                        <th>数据源</th>
-                        <th>阈值</th>
-                        <th>Precision</th>
-                        <th>Recall</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    
-                    <tr>
-                        <td>2026-06-07 16:00:48</td>
-                        <td>/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv</td>
-                        <td>0.5</td>
-                        <td>1.0</td>
-                        <td>1.0</td>
-                    </tr>
-                    
-                    <tr>
-                        <td>2026-06-07 16:00:48</td>
-                        <td>/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/recall_candidates.csv</td>
-                        <td>0.5</td>
-                        <td>1.0</td>
-                        <td>1.0</td>
-                    </tr>
-                    
-                    <tr>
-                        <td>2026-06-07 16:00:48</td>
-                        <td>threshold_0.5</td>
-                        <td>0.5</td>
-                        <td>1.0</td>
-                        <td>1.0</td>
-                    </tr>
-                    
-                </tbody>
-            </table>
-        </div>
-        
+      </div>
+      <span class="badge passed">通过</span>
     </div>
-    <script>
-        document.querySelectorAll('.btn-confirm, .btn-reject').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const isConfirm = this.classList.contains('btn-confirm');
-                const badge = this.closest('.conflict-item').querySelector('.badge');
-                badge.textContent = isConfirm ? '已确认' : '已驳回';
-                badge.className = 'badge passed';
-                this.parentElement.remove();
-            });
-        });
-    </script>
+    
+    
+    <details class="details-box">
+      <summary>查看 JSON 详情</summary>
+      <pre>{
+  "total_rows": 20,
+  "duplicate_count": 0
+}</pre>
+    </details>
+  </div>
+  
+  
+
+  
+</div>
+
+<div class="step-section" id="step-3">
+  <h2>步骤3：阈值回放更新
+    <span class="badge passed">已完成</span>
+  </h2>
+  <p class="mini-note">
+    
+    数据版本：N/A
+    
+  </p>
+
+  
+  <h3>检查结果（2 项）</h3>
+  
+  <div class="check-item info">
+    <div class="check-header">
+      <div>
+        <span class="check-name">阈值回放检查</span>
+        <span class="check-meta">｜check_id: chk_f874d0fa</span>
+        
+      </div>
+      <span class="badge passed">通过</span>
+    </div>
+    
+    
+    <div class="guide">
+      🔗 通过 trace_id 可在报告、历史、导出中反查同一条记录
+      
+      
+      
+      
+    </div>
+    
+    <details class="details-box">
+      <summary>查看 JSON 详情</summary>
+      <pre>{
+  "total_rows": 20,
+  "duplicate_count": 0
+}</pre>
+    </details>
+  </div>
+  
+  <div class="check-item info">
+    <div class="check-header">
+      <div>
+        <span class="check-name">阈值回放检查</span>
+        <span class="check-meta">｜check_id: chk_9a379671</span>
+        
+      </div>
+      <span class="badge passed">通过</span>
+    </div>
+    
+    
+    <div class="guide">
+      🔗 通过 trace_id 可在报告、历史、导出中反查同一条记录
+      
+      
+      
+      
+    </div>
+    
+    <details class="details-box">
+      <summary>查看 JSON 详情</summary>
+      <pre>{
+  "label_distribution": {
+    "0": 0.65,
+    "1": 0.35
+  },
+  "total_metrics": {
+    "click_rate": 0.22749999999999995,
+    "conversion_rate": 0.07949999999999999
+  },
+  "minority_labels": []
+}</pre>
+    </details>
+  </div>
+  
+  
+
+  
+</div>
+
+<div class="step-section" id="step-4">
+  <h2>步骤4：导出与一致性核验
+    <span class="badge passed">已完成</span>
+  </h2>
+  <p class="mini-note">
+    
+    数据版本：N/A
+    　导出文件：<code>/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports/export_normal.csv</code>
+  </p>
+
+  
+  <h3>检查结果（2 项）</h3>
+  
+  <div class="check-item info">
+    <div class="check-header">
+      <div>
+        <span class="check-name">导出一致性检查</span>
+        <span class="check-meta">｜check_id: chk_59104477</span>
+        
+      </div>
+      <span class="badge passed">通过</span>
+    </div>
+    
+    
+    <div class="guide">
+      
+      
+      🔍 通过 _trace_id 可在报告、历史、内存数据中反查到同一条原始记录；通过 _batch_id 可反查导入批次
+      
+      
+    </div>
+    
+    <details class="details-box">
+      <summary>查看 JSON 详情</summary>
+      <pre>{
+  "total_rows": 20,
+  "duplicate_count": 0
+}</pre>
+    </details>
+  </div>
+  
+  <div class="check-item info">
+    <div class="check-header">
+      <div>
+        <span class="check-name">导出校验和生成</span>
+        <span class="check-meta">｜check_id: chk_770f49e7</span>
+        
+      </div>
+      <span class="badge passed">通过</span>
+    </div>
+    
+    
+    <div class="guide">
+      
+      
+      
+      🛡️ 下次导出会对比历史校验和，防止数据漂移
+      
+    </div>
+    
+    <details class="details-box">
+      <summary>查看 JSON 详情</summary>
+      <pre>{
+  "label_distribution": {
+    "0": 0.65,
+    "1": 0.35
+  },
+  "total_metrics": {
+    "click_rate": 0.22749999999999995,
+    "conversion_rate": 0.07949999999999999
+  },
+  "minority_labels": []
+}</pre>
+    </details>
+  </div>
+  
+  
+
+  
+</div>
+
+
+<h2 class="batch-section" id="export-section">📤 导出与一致性核验</h2>
+
+<p style="color:#9ca3af">尚未执行导出步骤。在批量模式下会自动导出；交互模式下在步骤3后按提示选择导出。</p>
+
+
+<h3>导出历史</h3>
+
+<table>
+  <thead><tr><th>export_id</th><th>时间</th><th>文件</th><th>条数</th><th>批次来源</th><th>校验和</th><th>导出者</th></tr></thead>
+  <tbody>
+  
+  <tr>
+    <td class="batch-id">exp_26ed65a16018</td>
+    <td>2026-06-15 13:11:50</td>
+    <td><code>/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports/export_normal.csv</code></td>
+    <td>20</td>
+    <td><span class="batch-id">batch_20260615131150_07650d</span><br/></td>
+    <td style="font-family:Menlo,monospace;font-size:.8em">2e9f02b043f14d0f7739d79190cf5aa1</td>
+    <td>system</td>
+  </tr>
+  
+  </tbody>
+</table>
+<p class="mini-note">💡 每一次导出都生成独立校验和，可用于对比复跑前后是否一致。导出CSV中 <code>_trace_id</code> 与报告中 100% 对应，反查同一条样例。</p>
+
+
+<h2 class="batch-section" id="batch-section">📦 批次管理（区分本次导入 vs 历史批次）</h2>
+
+<table>
+  <thead><tr><th>batch_id</th><th>类型</th><th>来源</th><th>创建时间</th><th>记录范围</th><th>条数</th><th>父批次</th><th>备注</th></tr></thead>
+  <tbody>
+  
+  <tr style="background:#eff6ff">
+    <td class="batch-id">batch_20260615131150_07650d</td>
+    <td>首次导入</td>
+    <td><code>/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv</code></td>
+    <td>2026-06-15 13:11:50</td>
+    <td>0 — 20</td>
+    <td>20</td>
+    <td>-</td>
+    <td>batch.normal.初始导入</td>
+  </tr>
+  
+  </tbody>
+</table>
+<p class="mini-note">💡 高亮行 = 最近一次批次。重复导入是在所有历史批次（蓝底行 + 白底行）联合范围内检查，而非只看本批次。</p>
+
+
+<h2 id="history-section">📜 阈值回放与历史记录（可反查同一条样例）</h2>
+
+<table>
+  <thead>
+    <tr><th>run_id</th><th>时间</th><th>数据源 / 事件</th><th>阈值</th><th>Precision</th><th>Recall</th><th>条数</th><th>批次</th><th>少数类样例trace_id</th><th>备注</th></tr>
+  </thead>
+  <tbody>
+  
+  <tr>
+    <td class="batch-id">run_1_4e2a02</td>
+    <td>2026-06-15 13:11:50</td>
+    <td><code>/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv</code></td>
+    <td>0.5</td>
+    <td>1.0</td>
+    <td>1.0</td>
+    <td>20</td>
+    <td style="font-family:Menlo,monospace;font-size:.78em;line-height:1.4">
+      batch_20260615131150_07650d<br/>
+    </td>
+    <td style="font-family:Menlo,monospace;font-size:.78em;line-height:1.4;max-width:200px">
+      -
+    </td>
+    <td>导入批次 batch_20260615131150_07650d</td>
+  </tr>
+  
+  <tr>
+    <td class="batch-id">run_2_a5a4b4</td>
+    <td>2026-06-15 13:11:50</td>
+    <td><code>/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/recall_candidates.csv</code></td>
+    <td>0.5</td>
+    <td>1.0</td>
+    <td>1.0</td>
+    <td>20</td>
+    <td style="font-family:Menlo,monospace;font-size:.78em;line-height:1.4">
+      batch_20260615131150_07650d<br/>
+    </td>
+    <td style="font-family:Menlo,monospace;font-size:.78em;line-height:1.4;max-width:200px">
+      -
+    </td>
+    <td>召回对比批次 batch_20260615131150_463c85</td>
+  </tr>
+  
+  <tr>
+    <td class="batch-id">run_3_d77a21</td>
+    <td>2026-06-15 13:11:50</td>
+    <td><code>threshold_0.5</code></td>
+    <td>0.5</td>
+    <td>1.0</td>
+    <td>1.0</td>
+    <td>20</td>
+    <td style="font-family:Menlo,monospace;font-size:.78em;line-height:1.4">
+      batch_20260615131150_07650d<br/>
+    </td>
+    <td style="font-family:Menlo,monospace;font-size:.78em;line-height:1.4;max-width:200px">
+      -
+    </td>
+    <td>阈值回放 0.5→0.5</td>
+  </tr>
+  
+  <tr>
+    <td class="batch-id">run_4_2b32ae</td>
+    <td>2026-06-15 13:11:50</td>
+    <td><code>snapshot</code></td>
+    <td>0.5</td>
+    <td>1.0</td>
+    <td>1.0</td>
+    <td>20</td>
+    <td style="font-family:Menlo,monospace;font-size:.78em;line-height:1.4">
+      batch_20260615131150_07650d<br/>
+    </td>
+    <td style="font-family:Menlo,monospace;font-size:.78em;line-height:1.4;max-width:200px">
+      -
+    </td>
+    <td>batch.normal.完成补录后</td>
+  </tr>
+  
+  <tr>
+    <td class="batch-id">run_5_974faa</td>
+    <td>2026-06-15 13:11:50</td>
+    <td><code>threshold_0.5</code></td>
+    <td>0.5</td>
+    <td>1.0</td>
+    <td>1.0</td>
+    <td>20</td>
+    <td style="font-family:Menlo,monospace;font-size:.78em;line-height:1.4">
+      batch_20260615131150_07650d<br/>
+    </td>
+    <td style="font-family:Menlo,monospace;font-size:.78em;line-height:1.4;max-width:200px">
+      -
+    </td>
+    <td>阈值回放 0.5→0.5</td>
+  </tr>
+  
+  <tr>
+    <td class="batch-id">run_6_423249</td>
+    <td>2026-06-15 13:11:50</td>
+    <td><code>refresh_results</code></td>
+    <td>0.5</td>
+    <td>1.0</td>
+    <td>1.0</td>
+    <td>20</td>
+    <td style="font-family:Menlo,monospace;font-size:.78em;line-height:1.4">
+      batch_20260615131150_07650d<br/>
+    </td>
+    <td style="font-family:Menlo,monospace;font-size:.78em;line-height:1.4;max-width:200px">
+      -
+    </td>
+    <td>刷新结果</td>
+  </tr>
+  
+  <tr>
+    <td class="batch-id">run_7_60b03a</td>
+    <td>2026-06-15 13:11:50</td>
+    <td><code>/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports/export_normal.csv</code></td>
+    <td>0.5</td>
+    <td>1.0</td>
+    <td>1.0</td>
+    <td>20</td>
+    <td style="font-family:Menlo,monospace;font-size:.78em;line-height:1.4">
+      batch_20260615131150_07650d<br/>
+    </td>
+    <td style="font-family:Menlo,monospace;font-size:.78em;line-height:1.4;max-width:200px">
+      -
+    </td>
+    <td>导出 exp_26ed65a16018</td>
+  </tr>
+  
+  </tbody>
+</table>
+<p class="mini-note">
+💡 历史中的阈值、precision、recall 可与当前步骤3结果对比，如果不同会在步骤3中高亮提示。<br/>
+💡 少数类样例 trace_id 与报告正文、导出文件完全一致，点击即可复制反查。
+</p>
+
+
+<h2 id="all-minority">🪤 少数类样本清单（被总指标盖住的样例）</h2>
+
+<p class="mini-note">未检测到少数类，或少数类与总指标差异在正常范围内。</p>
+
+
+<div class="meta-info" style="margin-top:40px;border-top:1px solid #e5e7eb;padding-top:15px">
+  <p>📄 本报告由工具自动生成。建议配合 <code>main.py --mode interactive</code> 使用，走完 导入→对比→阈值→保存→导出 全流程。</p>
+</div>
+</div>
+
+<script>
+window._allRecords = {"rec_c03a62c4cbef06c0": {"record": {"user_id": 1001, "item_id": 2001, "timestamp": 1717209600, "label": 0, "score": 0.32, "click_rate": 0.12, "conversion_rate": 0.02}, "trace_id": "rec_c03a62c4cbef06c0", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 0}, "rec_a67779a2329b9880": {"record": {"user_id": 1001, "item_id": 2002, "timestamp": 1717209700, "label": 0, "score": 0.28, "click_rate": 0.1, "conversion_rate": 0.01}, "trace_id": "rec_a67779a2329b9880", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 1}, "rec_8b4e5aa53c9add52": {"record": {"user_id": 1001, "item_id": 2003, "timestamp": 1717209800, "label": 1, "score": 0.76, "click_rate": 0.45, "conversion_rate": 0.18}, "trace_id": "rec_8b4e5aa53c9add52", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 2}, "rec_25963e346e4ecd16": {"record": {"user_id": 1002, "item_id": 2001, "timestamp": 1717210000, "label": 0, "score": 0.35, "click_rate": 0.11, "conversion_rate": 0.03}, "trace_id": "rec_25963e346e4ecd16", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 3}, "rec_6c0b60dc0f360429": {"record": {"user_id": 1002, "item_id": 2004, "timestamp": 1717210100, "label": 0, "score": 0.41, "click_rate": 0.15, "conversion_rate": 0.04}, "trace_id": "rec_6c0b60dc0f360429", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 4}, "rec_5eee336c8a6365de": {"record": {"user_id": 1002, "item_id": 2005, "timestamp": 1717210200, "label": 1, "score": 0.82, "click_rate": 0.52, "conversion_rate": 0.22}, "trace_id": "rec_5eee336c8a6365de", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 5}, "rec_807fd7d14eeef32b": {"record": {"user_id": 1003, "item_id": 2002, "timestamp": 1717210500, "label": 0, "score": 0.22, "click_rate": 0.08, "conversion_rate": 0.01}, "trace_id": "rec_807fd7d14eeef32b", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 6}, "rec_e4b285fa94709072": {"record": {"user_id": 1003, "item_id": 2006, "timestamp": 1717210600, "label": 1, "score": 0.69, "click_rate": 0.38, "conversion_rate": 0.15}, "trace_id": "rec_e4b285fa94709072", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 7}, "rec_c32450e0d8adcb5b": {"record": {"user_id": 1003, "item_id": 2007, "timestamp": 1717210700, "label": 0, "score": 0.3, "click_rate": 0.09, "conversion_rate": 0.02}, "trace_id": "rec_c32450e0d8adcb5b", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 8}, "rec_4a899c483264e405": {"record": {"user_id": 1004, "item_id": 2003, "timestamp": 1717211000, "label": 0, "score": 0.38, "click_rate": 0.13, "conversion_rate": 0.03}, "trace_id": "rec_4a899c483264e405", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 9}, "rec_60df2dbf7e2d6768": {"record": {"user_id": 1004, "item_id": 2008, "timestamp": 1717211100, "label": 1, "score": 0.71, "click_rate": 0.41, "conversion_rate": 0.17}, "trace_id": "rec_60df2dbf7e2d6768", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 10}, "rec_92edc6f3f3a63678": {"record": {"user_id": 1004, "item_id": 2009, "timestamp": 1717211200, "label": 0, "score": 0.25, "click_rate": 0.07, "conversion_rate": 0.01}, "trace_id": "rec_92edc6f3f3a63678", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 11}, "rec_054f26635b3fc7bf": {"record": {"user_id": 1005, "item_id": 2004, "timestamp": 1717211500, "label": 1, "score": 0.85, "click_rate": 0.58, "conversion_rate": 0.25}, "trace_id": "rec_054f26635b3fc7bf", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 12}, "rec_46555a1a7efc99d3": {"record": {"user_id": 1005, "item_id": 2010, "timestamp": 1717211600, "label": 0, "score": 0.33, "click_rate": 0.11, "conversion_rate": 0.02}, "trace_id": "rec_46555a1a7efc99d3", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 13}, "rec_f4c8c7be152d068b": {"record": {"user_id": 1005, "item_id": 2011, "timestamp": 1717211700, "label": 0, "score": 0.29, "click_rate": 0.09, "conversion_rate": 0.02}, "trace_id": "rec_f4c8c7be152d068b", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 14}, "rec_09caf5bc9ed7a53c": {"record": {"user_id": 1006, "item_id": 2005, "timestamp": 1717212000, "label": 0, "score": 0.36, "click_rate": 0.12, "conversion_rate": 0.03}, "trace_id": "rec_09caf5bc9ed7a53c", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 15}, "rec_9b9b8e77b50bff83": {"record": {"user_id": 1006, "item_id": 2012, "timestamp": 1717212100, "label": 1, "score": 0.78, "click_rate": 0.44, "conversion_rate": 0.19}, "trace_id": "rec_9b9b8e77b50bff83", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 16}, "rec_c5df7d141e7eeec7": {"record": {"user_id": 1006, "item_id": 2013, "timestamp": 1717212200, "label": 0, "score": 0.27, "click_rate": 0.08, "conversion_rate": 0.01}, "trace_id": "rec_c5df7d141e7eeec7", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 17}, "rec_6c6c6939460a69d4": {"record": {"user_id": 1007, "item_id": 2006, "timestamp": 1717212500, "label": 0, "score": 0.31, "click_rate": 0.1, "conversion_rate": 0.02}, "trace_id": "rec_6c6c6939460a69d4", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 18}, "rec_3fe7df912794aab2": {"record": {"user_id": 1007, "item_id": 2014, "timestamp": 1717212600, "label": 1, "score": 0.73, "click_rate": 0.42, "conversion_rate": 0.16}, "trace_id": "rec_3fe7df912794aab2", "batch_id": "batch_20260615131150_07650d", "batch_info": {"batch_id": "batch_20260615131150_07650d", "batch_type": "initial_import", "created_at": "2026-06-15 13:11:50", "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv", "note": "batch.normal.初始导入"}, "row_idx": 19}};
+function copyText(t){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);showToast('已复制: '+t);}
+function showToast(msg){const t=document.createElement('div');t.style.cssText='position:fixed;top:20px;right:20px;background:#1f2937;color:#fff;padding:10px 18px;border-radius:6px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.3);font-size:.9em';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),1800);}
+function findTrace(){const input=document.getElementById('trace-input').value.trim();const result=document.getElementById('trace-result');if(!input){alert('请输入 trace_id');return;}const rec=window._allRecords[input];if(!rec){result.style.display='block';result.innerHTML='<p style="color:#dc2626">❌ 未找到该 trace_id，请注意：只包含本次运行内存中的负样本记录；导出CSV中的 trace_id 则可脱离程序离线保留。</p>';return;}result.style.display='block';result.innerHTML='<p><strong>✅ 找到记录</strong> <span class="trace-id">'+input+'</span></p><div class="grid-2"><div class="conflict-side"><h5>记录字段</h5><pre>'+JSON.stringify(rec.record,null,2)+'</pre></div><div class="conflict-side"><h5>批次信息</h5><pre>'+JSON.stringify(rec.batch_info||{'none':true},null,2)+'</pre><p class="mini-note">行号: '+rec.row_idx+' | 所属批次: <span class="batch-id">'+rec.batch_id+'</span></p></div></div>';}
+</script>
 </body>
 </html>

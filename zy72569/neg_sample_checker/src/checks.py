@@ -188,12 +188,29 @@ def check_conflict_between_neg_and_recall(
     label_mismatch = merged[merged[f"{label_field}_neg"] != merged[f"{label_field}_recall"]]
     
     for idx, row in label_mismatch.iterrows():
-        key_values = {k: row[k] for k in key_fields}
+        key_values = {k: (row[k].item() if hasattr(row[k], 'item') else row[k]) for k in key_fields}
+        neg_full = {k: row[k] for k in key_fields}
+        neg_full[label_field] = row[f"{label_field}_neg"]
+        recall_full = {k: row[k] for k in key_fields}
+        recall_full[label_field] = row[f"{label_field}_recall"]
+
+        def _scalar(v):
+            if hasattr(v, 'item'):
+                try:
+                    return v.item()
+                except Exception:
+                    return v
+            return v
+
+        neg_full = {k: _scalar(v) for k, v in neg_full.items()}
+        recall_full = {k: _scalar(v) for k, v in recall_full.items()}
+        key_values = {k: _scalar(v) for k, v in key_values.items()}
+
         conflict = ConflictEvidence(
-            conflict_id=f"conflict_{idx}",
+            conflict_id=f"conflict_{len(conflicts) + 1}",
             description=f"标签冲突：{key_values}",
-            neg_sample_data={label_field: row[f"{label_field}_neg"]},
-            recall_candidate_data={label_field: row[f"{label_field}_recall"]},
+            neg_sample_data=neg_full,
+            recall_candidate_data=recall_full,
             field=label_field
         )
         conflicts.append(conflict)
