@@ -21,6 +21,16 @@ import {
   checkBoundaryRules,
 } from '../utils/boundaryRules';
 
+function statusLabel(status: ReviewStatus): string {
+  const labels: Record<ReviewStatus, string> = {
+    pending_review: '待复核',
+    needs_knowledge_review: '需知识库复核',
+    confirmed: '已确认',
+    rolled_back: '已回滚',
+  };
+  return labels[status] || status;
+}
+
 interface ImportSampleInput {
   sampleKey: string;
   params: Record<string, number>;
@@ -196,19 +206,52 @@ export const reviewService = {
     }
 
     const now = Date.now();
+    const oldRemark = sample.remark || '';
+    const newRemark = input.newRemark;
+
+    const updatedSample: ProcessParamSample = {
+      ...sample,
+      remark: newRemark,
+      updatedAt: now,
+    };
+    sampleDao.update(updatedSample);
 
     reviewHistoryDao.insert({
       sampleId: sample.id,
       stage: 'manual_confirm',
       action: 'remark_updated',
       operator: input.operator,
-      oldRemark: undefined,
-      newRemark: input.newRemark,
-      remark: '备注已修改',
+      oldRemark,
+      newRemark,
+      remark: oldRemark === '' ? '首次添加备注' : '备注已修改',
       timestamp: now,
     });
 
-    return { success: true };
+    const currentHistory = reviewHistoryDao.findBySample(sample.id);
+    const remarkChanges = reviewHistoryDao.findRemarkHistoryBySample(sample.id);
+
+    return {
+      sample: updatedSample,
+      statusChange: {
+        previousRemark: oldRemark,
+        currentRemark: newRemark,
+        remarkChanged: oldRemark !== newRemark,
+        statusRemained: sample.status,
+      },
+      historyTrail: {
+        totalEvents: currentHistory.length,
+        remarkChangeCount: remarkChanges.length,
+        latestRemarkChange: {
+          from: oldRemark,
+          to: newRemark,
+          operator: input.operator,
+          at: now,
+        },
+      },
+      explanation: oldRemark === ''
+        ? `样本 ${sample.sampleKey} 首次添加备注，当前状态为「${statusLabel(sample.status)}」`
+        : `样本 ${sample.sampleKey} 备注已从「${oldRemark}」改为「${newRemark}」，当前状态为「${statusLabel(sample.status)}」`,
+    };
   },
 
   updateStatus(input: UpdateStatusInput) {
@@ -231,6 +274,7 @@ export const reviewService = {
       );
     }
 
+    const oldStatus = sample.status;
     const updatedSample: ProcessParamSample = {
       ...sample,
       status: input.newStatus,
@@ -247,7 +291,23 @@ export const reviewService = {
       timestamp: Date.now(),
     });
 
-    return updatedSample;
+    const currentHistory = reviewHistoryDao.findBySample(sample.id);
+
+    return {
+      sample: updatedSample,
+      statusChange: {
+        from: oldStatus,
+        to: input.newStatus,
+        fromLabel: statusLabel(oldStatus),
+        toLabel: statusLabel(input.newStatus),
+      },
+      historyTrail: {
+        totalEvents: currentHistory.length,
+        latestAction: `状态从「${statusLabel(oldStatus)}」变为「${statusLabel(input.newStatus)}」`,
+        operator: input.operator,
+      },
+      explanation: `样本 ${sample.sampleKey} 状态从「${statusLabel(oldStatus)}」变为「${statusLabel(input.newStatus)}」，操作人: ${input.operator}`,
+    };
   },
 
   getSampleWithTrace(sampleId: string) {

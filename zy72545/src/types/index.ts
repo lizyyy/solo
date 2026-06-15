@@ -38,6 +38,7 @@ export interface ProcessParamSample {
   };
   isMaskedByAvg: boolean;
   status: ReviewStatus;
+  remark?: string;
   createdAt: number;
   updatedAt: number;
 }

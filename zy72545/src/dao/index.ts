@@ -1,4 +1,4 @@
-import { getDb } from '../database';
+import { getDb, scheduleSave } from '../database';
 import { 
   PromptVersion, 
   ProcessParamSample, 
@@ -15,6 +15,7 @@ export const promptVersionDao = {
     const id = randomUUID();
     const record: PromptVersion = { ...version, id };
     db.promptVersions.set(id, record);
+    scheduleSave();
     return record;
   },
 
@@ -44,12 +45,14 @@ export const sampleDao = {
     const id = randomUUID();
     const record: ProcessParamSample = { ...sample, id };
     db.samples.set(id, record);
+    scheduleSave();
     return record;
   },
 
   update(sample: ProcessParamSample): void {
     const db = getDb();
-    db.samples.set(sample.id, sample);
+    db.samples.set(sample.id, { ...sample, updatedAt: Date.now() });
+    scheduleSave();
   },
 
   findByPromptAndKey(promptVersionId: string, sampleKey: string): ProcessParamSample | null {
@@ -97,6 +100,7 @@ export const knowledgeLinkDao = {
     const id = randomUUID();
     const record: KnowledgeLink = { ...link, id };
     db.knowledgeLinks.set(id, record);
+    scheduleSave();
     return record;
   },
 
@@ -119,6 +123,7 @@ export const reviewHistoryDao = {
     const id = randomUUID();
     const record: ReviewHistory = { ...history, id };
     db.reviewHistory.set(id, record);
+    scheduleSave();
     return record;
   },
 
@@ -141,6 +146,13 @@ export const reviewHistoryDao = {
       .filter(h => sampleIds.has(h.sampleId))
       .sort((a, b) => a.timestamp - b.timestamp);
   },
+
+  findRemarkHistoryBySample(sampleId: string): ReviewHistory[] {
+    const db = getDb();
+    return Array.from(db.reviewHistory.values())
+      .filter(h => h.sampleId === sampleId && h.action === 'remark_updated')
+      .sort((a, b) => a.timestamp - b.timestamp);
+  },
 };
 
 export const modelVersionDao = {
@@ -149,6 +161,7 @@ export const modelVersionDao = {
     const id = randomUUID();
     const record: ModelVersion = { ...version, id };
     db.modelVersions.set(id, record);
+    scheduleSave();
     return record;
   },
 

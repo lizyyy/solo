@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { importService, reviewService, modelService } from '../services';
 import { AppError } from '../utils/errors';
 import { ReviewStatus } from '../types';
+import { reviewHistoryDao } from '../dao';
 
 const router = Router();
 
@@ -196,6 +197,15 @@ router.get('/model-versions', (req: Request, res: Response) => {
     }
     const versions = modelService.getModelVersions(promptVersionId);
     res.json(versions);
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+router.get('/samples/:id/remark-history', (req: Request, res: Response) => {
+  try {
+    const remarkHistory = reviewHistoryDao.findRemarkHistoryBySample(req.params.id);
+    res.json(remarkHistory);
   } catch (error) {
     handleError(res, error);
   }

@@ -1,0 +1,189 @@
+{
+  "promptVersions": [
+    [
+      "a3bdf489-b99a-41f7-8bfa-6c904bddf635",
+      {
+        "version": "v2.1.0",
+        "importedAt": 1781485564113,
+        "importedBy": "老唐",
+        "description": "工艺参数推荐v2.1",
+        "id": "a3bdf489-b99a-41f7-8bfa-6c904bddf635"
+      }
+    ]
+  ],
+  "samples": [
+    [
+      "80758ccf-735b-426b-aa08-01a83ba694dc",
+      {
+        "promptVersionId": "a3bdf489-b99a-41f7-8bfa-6c904bddf635",
+        "sampleKey": "S-A01",
+        "params": {
+          "temperature": 185,
+          "pressure": 2.6
+        },
+        "confidence": "high",
+        "confidenceScore": 0.91,
+        "metrics": {
+          "avgIndex": 186,
+          "rawValue": 185
+        },
+        "isMaskedByAvg": false,
+        "status": "pending_review",
+        "createdAt": 1781485564113,
+        "updatedAt": 1781485564113,
+        "id": "80758ccf-735b-426b-aa08-01a83ba694dc"
+      }
+    ],
+    [
+      "9b5146af-964a-4a91-8e6b-8bd63922e0b9",
+      {
+        "promptVersionId": "a3bdf489-b99a-41f7-8bfa-6c904bddf635",
+        "sampleKey": "S-B02",
+        "params": {
+          "temperature": 195,
+          "pressure": 2.9
+        },
+        "confidence": "low",
+        "confidenceScore": 0.33,
+        "metrics": {
+          "avgIndex": 196,
+          "rawValue": 195
+        },
+        "isMaskedByAvg": true,
+        "status": "needs_knowledge_review",
+        "createdAt": 1781485564113,
+        "updatedAt": 1781485625815,
+        "id": "9b5146af-964a-4a91-8e6b-8bd63922e0b9",
+        "remark": "已核对知识库v2.1，温度偏差在可接受范围"
+      }
+    ]
+  ],
+  "knowledgeLinks": [
+    [
+      "e9985f5e-7fde-4bbc-ad9b-22ac5ef1c749",
+      {
+        "promptVersionId": "a3bdf489-b99a-41f7-8bfa-6c904bddf635",
+        "url": "https://wiki.internal/process-v2.1/ref",
+        "title": "工艺参数v2.1知识库",
+        "addedAt": 1781485572803,
+        "addedBy": "老唐",
+        "id": "e9985f5e-7fde-4bbc-ad9b-22ac5ef1c749"
+      }
+    ]
+  ],
+  "reviewHistory": [
+    [
+      "c30e8256-7ba4-41a7-99ee-cd5698505d18",
+      {
+        "sampleId": "80758ccf-735b-426b-aa08-01a83ba694dc",
+        "stage": "prompt_import",
+        "action": "sample_created",
+        "operator": "老唐",
+        "remark": "提示词版本导入时创建样本",
+        "timestamp": 1781485564113,
+        "id": "c30e8256-7ba4-41a7-99ee-cd5698505d18"
+      }
+    ],
+    [
+      "73564981-3999-4ed6-9796-17b4e7bc35aa",
+      {
+        "sampleId": "9b5146af-964a-4a91-8e6b-8bd63922e0b9",
+        "stage": "prompt_import",
+        "action": "sample_created",
+        "operator": "老唐",
+        "remark": "提示词版本导入时创建样本",
+        "timestamp": 1781485564113,
+        "id": "73564981-3999-4ed6-9796-17b4e7bc35aa"
+      }
+    ],
+    [
+      "9fcd21fb-8e85-45b3-90b0-889061dcfb7e",
+      {
+        "sampleId": "80758ccf-735b-426b-aa08-01a83ba694dc",
+        "stage": "knowledge_link",
+        "action": "knowledge_link_added",
+        "operator": "老唐",
+        "remark": "知识库链接已补充: 工艺参数v2.1知识库",
+        "timestamp": 1781485572803,
+        "id": "9fcd21fb-8e85-45b3-90b0-889061dcfb7e"
+      }
+    ],
+    [
+      "93e0b2ba-eba6-44cf-a5ee-6484ee9fde1c",
+      {
+        "sampleId": "9b5146af-964a-4a91-8e6b-8bd63922e0b9",
+        "stage": "knowledge_link",
+        "action": "knowledge_link_added",
+        "operator": "老唐",
+        "remark": "知识库链接已补充: 工艺参数v2.1知识库",
+        "timestamp": 1781485572803,
+        "id": "93e0b2ba-eba6-44cf-a5ee-6484ee9fde1c"
+      }
+    ],
+    [
+      "a0ba5a36-9775-43be-824c-114e4f1105d3",
+      {
+        "sampleId": "80758ccf-735b-426b-aa08-01a83ba694dc",
+        "stage": "manual_confirm",
+        "action": "model_compared",
+        "operator": "老唐",
+        "remark": "模型版本对比: model-v3.0",
+        "timestamp": 1781485586404,
+        "id": "a0ba5a36-9775-43be-824c-114e4f1105d3"
+      }
+    ],
+    [
+      "a2e9b31f-087f-4dc4-b3fe-0991d43820fb",
+      {
+        "sampleId": "9b5146af-964a-4a91-8e6b-8bd63922e0b9",
+        "stage": "manual_confirm",
+        "action": "model_compared",
+        "operator": "老唐",
+        "remark": "模型版本对比: model-v3.0",
+        "timestamp": 1781485586404,
+        "id": "a2e9b31f-087f-4dc4-b3fe-0991d43820fb"
+      }
+    ],
+    [
+      "4568b7b7-2b5d-4e5c-8e31-ec052510401e",
+      {
+        "sampleId": "9b5146af-964a-4a91-8e6b-8bd63922e0b9",
+        "stage": "manual_confirm",
+        "action": "remark_updated",
+        "operator": "老唐",
+        "oldRemark": "",
+        "newRemark": "此样本温度偏差较大，需复核知识库引用",
+        "remark": "首次添加备注",
+        "timestamp": 1781485610482,
+        "id": "4568b7b7-2b5d-4e5c-8e31-ec052510401e"
+      }
+    ],
+    [
+      "005bee2b-81dd-4caf-b523-0575d4f34e3b",
+      {
+        "sampleId": "9b5146af-964a-4a91-8e6b-8bd63922e0b9",
+        "stage": "manual_confirm",
+        "action": "remark_updated",
+        "operator": "老唐",
+        "oldRemark": "此样本温度偏差较大，需复核知识库引用",
+        "newRemark": "已核对知识库v2.1，温度偏差在可接受范围",
+        "remark": "备注已修改",
+        "timestamp": 1781485625815,
+        "id": "005bee2b-81dd-4caf-b523-0575d4f34e3b"
+      }
+    ]
+  ],
+  "modelVersions": [
+    [
+      "200f4204-2332-4622-8af4-f5af377cf064",
+      {
+        "version": "model-v3.0",
+        "promptVersionId": "a3bdf489-b99a-41f7-8bfa-6c904bddf635",
+        "comparedAt": 1781485586404,
+        "comparedBy": "老唐",
+        "changeSummary": "温度参数范围收窄，压力阈值上调",
+        "id": "200f4204-2332-4622-8af4-f5af377cf064"
+      }
+    ]
+  ]
+}
