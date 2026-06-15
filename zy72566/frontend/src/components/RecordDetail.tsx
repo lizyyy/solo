@@ -14,6 +14,7 @@ import {
   Divider,
   Card,
   Alert,
+  Select,
 } from 'antd'
 import {
   CheckCircleOutlined,
@@ -123,9 +124,11 @@ function RecordDetail({ recordId, visible, onClose }: RecordDetailProps) {
 
   if (!record) return null
 
-  const canAddFeature = record.status === 'step1_imported' || record.status === 'rollback'
-  const canUpdateThreshold = record.status === 'step2_feature_added' || record.status === 'step1_imported'
+  const canAddFeature = record.status === 'step1_imported' || record.status === 'rollback' || record.status === 'pending_review'
+  const canUpdateThreshold = ['step1_imported', 'step2_feature_added', 'pending_review', 'rollback'].includes(record.status)
   const canReview = record.status === 'pending_review'
+  const hasFeatureSnapshot = !!record.feature_snapshot_id
+  const hasThreshold = record.threshold_value !== undefined && record.threshold_value !== null
 
   const actionLabels: Record<string, string> = {
     import: '导入评测切片',
@@ -223,55 +226,73 @@ function RecordDetail({ recordId, visible, onClose }: RecordDetailProps) {
       label: '三步操作',
       children: (
         <Space direction="vertical" style={{ width: '100%' }} size={16}>
-          <Card size="small" title="第二步: 补看特征快照编号" type={canAddFeature ? '' : 'inner'}>
+          <Card size="small" title="第二步: 补看特征快照编号" type={!hasFeatureSnapshot ? '' : 'inner'}>
             {canAddFeature ? (
-              <Form form={featureForm} layout="inline" onFinish={handleAddFeature}>
-                <Form.Item
-                  name="feature_snapshot_id"
-                  rules={[{ required: true, message: '请输入特征快照编号' }]}
-                >
-                  <Input placeholder="例如: FEAT-20260607-001" style={{ width: 200 }} />
-                </Form.Item>
-                <Form.Item name="operator" initialValue="阿越">
-                  <Input placeholder="操作人" style={{ width: 100 }} />
-                </Form.Item>
-                <Form.Item name="note">
-                  <Input placeholder="备注(可选)" style={{ width: 150 }} />
-                </Form.Item>
-                <Form.Item>
-                  <Button type="primary" htmlType="submit">确认提交</Button>
-                </Form.Item>
-              </Form>
+              <>
+                {hasFeatureSnapshot && (
+                  <div style={{ color: '#52c41a', marginBottom: 12 }}>
+                    ✓ 当前特征快照: {record.feature_snapshot_id} (可更新)
+                  </div>
+                )}
+                <Form form={featureForm} layout="inline" onFinish={handleAddFeature}>
+                  <Form.Item
+                    name="feature_snapshot_id"
+                    rules={[{ required: true, message: '请输入特征快照编号' }]}
+                  >
+                    <Input placeholder="例如: FEAT-20260607-001" style={{ width: 200 }} />
+                  </Form.Item>
+                  <Form.Item name="operator" initialValue="阿越">
+                    <Input placeholder="操作人" style={{ width: 100 }} />
+                  </Form.Item>
+                  <Form.Item name="note">
+                    <Input placeholder="备注(可选)" style={{ width: 150 }} />
+                  </Form.Item>
+                  <Form.Item>
+                    <Button type="primary" htmlType="submit">
+                      {hasFeatureSnapshot ? '更新快照' : '确认提交'}
+                    </Button>
+                  </Form.Item>
+                </Form>
+              </>
             ) : (
               <div style={{ color: '#52c41a' }}>✓ 已完成: {record.feature_snapshot_id}</div>
             )}
           </Card>
 
-          <Card size="small" title="第三步: 阈值回放更新" type={canUpdateThreshold ? '' : 'inner'}>
-            {canUpdateThreshold || record.status === 'pending_review' ? (
-              <Form form={thresholdForm} layout="inline" onFinish={handleUpdateThreshold}>
-                <Form.Item
-                  name="threshold_value"
-                  rules={[{ required: true, message: '请输入阈值' }]}
-                >
-                  <InputNumber placeholder="阈值" min={0} max={1} step={0.01} style={{ width: 120 }} />
-                </Form.Item>
-                <Form.Item
-                  name="threshold_replay_result"
-                  rules={[{ required: true, message: '请输入回放结果' }]}
-                >
-                  <Input placeholder="回放结果" style={{ width: 150 }} />
-                </Form.Item>
-                <Form.Item name="operator" initialValue="阿越">
-                  <Input placeholder="操作人" style={{ width: 100 }} />
-                </Form.Item>
-                <Form.Item name="note">
-                  <Input placeholder="备注(可选)" style={{ width: 120 }} />
-                </Form.Item>
-                <Form.Item>
-                  <Button type="primary" htmlType="submit">确认更新</Button>
-                </Form.Item>
-              </Form>
+          <Card size="small" title="第三步: 阈值回放更新" type={!hasThreshold ? '' : 'inner'}>
+            {canUpdateThreshold ? (
+              <>
+                {hasThreshold && (
+                  <div style={{ color: '#52c41a', marginBottom: 12 }}>
+                    ✓ 当前: 阈值={record.threshold_value}, 结果={record.threshold_replay_result} (可更新)
+                  </div>
+                )}
+                <Form form={thresholdForm} layout="inline" onFinish={handleUpdateThreshold}>
+                  <Form.Item
+                    name="threshold_value"
+                    rules={[{ required: true, message: '请输入阈值' }]}
+                  >
+                    <InputNumber placeholder="阈值" min={0} max={1} step={0.01} style={{ width: 120 }} />
+                  </Form.Item>
+                  <Form.Item
+                    name="threshold_replay_result"
+                    rules={[{ required: true, message: '请输入回放结果' }]}
+                  >
+                    <Input placeholder="回放结果" style={{ width: 150 }} />
+                  </Form.Item>
+                  <Form.Item name="operator" initialValue="阿越">
+                    <Input placeholder="操作人" style={{ width: 100 }} />
+                  </Form.Item>
+                  <Form.Item name="note">
+                    <Input placeholder="备注(可选)" style={{ width: 120 }} />
+                  </Form.Item>
+                  <Form.Item>
+                    <Button type="primary" htmlType="submit">
+                      {hasThreshold ? '更新阈值' : '确认更新'}
+                    </Button>
+                  </Form.Item>
+                </Form>
+              </>
             ) : (
               <div style={{ color: '#52c41a' }}>
                 ✓ 已完成: 阈值={record.threshold_value}, 结果={record.threshold_replay_result}

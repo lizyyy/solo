@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from datetime import datetime
 import pandas as pd
 import io
 
@@ -289,6 +290,8 @@ def export_records(
     导出对账明细（Excel格式）
 
     关键保证: 导出的明细与页面展示、接口返回使用同一份数据源
+
+    导出字段与页面严格对齐，尤其是少数类样本被总指标盖住的记录
     """
     from fastapi.responses import StreamingResponse
 
@@ -300,32 +303,88 @@ def export_records(
         raise HTTPException(status_code=404, detail="评测切片不存在")
 
     rules = BoundaryRules()
+
+    all_total_metrics = [r.total_metric for r in records if r.total_metric is not None]
+    slice_avg_metric = sum(all_total_metrics) / len(all_total_metrics) if all_total_metrics else None
+
     data = []
     for record in records:
+        minority_reasons = []
+        mask_reasons = []
+
+        is_min_calc, min_reason = rules.is_minority_sample(
+            record.sample_type, record.recall_rate, None
+        )
+        if record.is_minority:
+            minority_reasons.append(min_reason)
+
+        is_mask_calc, mask_reason = rules.is_masked_by_total_metric(
+            record.is_minority, record.total_metric, slice_avg_metric
+        )
+        if record.is_masked_by_total:
+            mask_reasons.append(mask_reason)
+
+        status_label = rules.get_status_description(record.status)
+
+        result_description = []
+        if record.is_masked_by_total:
+            result_description.append("⚠️ 少数类样本被总指标盖住，待算法工程师复核")
+        if record.status == "confirmed_normal":
+            result_description.append("已确认正常")
+        if record.status == "confirmed_abnormal":
+            result_description.append("已确认异常")
+        if record.status == "pending_review" and not record.is_masked_by_total:
+            result_description.append("待算法工程师复核")
+        if record.status in ["step1_imported", "step2_feature_added", "step3_threshold_updated"]:
+            result_description.append("流程进行中")
+
         data.append({
             "原始行号": record.original_row_number,
-            "样本ID": record.sample_id,
-            "样本类型": record.sample_type,
+            "样本ID": record.sample_id or "-",
+            "样本类型标签": record.sample_type or "-",
             "是否少数类": "是" if record.is_minority else "否",
-            "召回率": record.recall_rate,
-            "准确率": record.precision_rate,
-            "总指标": record.total_metric,
-            "是否被总指标盖住": "是" if record.is_masked_by_total else "否",
-            "特征快照编号": record.feature_snapshot_id,
-            "特征快照补看人": record.feature_snapshot_added_by,
-            "回放阈值": record.threshold_value,
-            "阈值回放结果": record.threshold_replay_result,
-            "当前状态": rules.get_status_description(record.status),
-            "人工备注": record.manual_note,
-            "复核人": record.reviewed_by,
-            "创建时间": record.created_at,
-            "更新时间": record.updated_at,
+            "少数类判定依据": "；".join(minority_reasons) if minority_reasons else "-",
+            "召回率": f"{(record.recall_rate * 100):.1f}%" if record.recall_rate is not None else "-",
+            "准确率": f"{(record.precision_rate * 100):.1f}%" if record.precision_rate is not None else "-",
+            "总指标": f"{(record.total_metric * 100):.1f}%" if record.total_metric is not None else "-",
+            "是否被总指标盖住": "是 ⚠️" if record.is_masked_by_total else "否",
+            "总指标盖住判定依据": "；".join(mask_reasons) if mask_reasons else "-",
+            "处理状态码": record.status,
+            "处理状态描述": status_label,
+            "特征快照编号": record.feature_snapshot_id or "-",
+            "特征快照补看人": record.feature_snapshot_added_by or "-",
+            "特征快照补看时间": record.feature_snapshot_added_time.strftime("%Y-%m-%d %H:%M") if record.feature_snapshot_added_time else "-",
+            "阈值回放阈值": record.threshold_value if record.threshold_value is not None else "-",
+            "阈值回放结果": record.threshold_replay_result or "-",
+            "阈值回放更新人": record.threshold_updated_by or "-",
+            "阈值回放更新时间": record.threshold_updated_time.strftime("%Y-%m-%d %H:%M") if record.threshold_updated_time else "-",
+            "复核人": record.reviewed_by or "-",
+            "复核时间": record.reviewed_time.strftime("%Y-%m-%d %H:%M") if record.reviewed_time else "-",
+            "结果说明": "；".join(result_description) if result_description else "-",
+            "人工备注及判定依据": record.manual_note or "-",
+            "创建时间": record.created_at.strftime("%Y-%m-%d %H:%M") if record.created_at else "-",
+            "最后更新时间": record.updated_at.strftime("%Y-%m-%d %H:%M") if record.updated_at else "-",
         })
 
     df = pd.DataFrame(data)
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
         df.to_excel(writer, index=False, sheet_name="对账明细")
+
+        summary_rows = [
+            ["切片名称", slice_obj.slice_name],
+            ["导出时间", datetime.now().strftime("%Y-%m-%d %H:%M")],
+            ["切片总记录数", len(records)],
+            ["少数类样本数", sum(1 for r in records if r.is_minority)],
+            ["被总指标盖住数", sum(1 for r in records if r.is_masked_by_total)],
+            ["待复核数", sum(1 for r in records if r.status == "pending_review")],
+            ["已确认正常数", sum(1 for r in records if r.status == "confirmed_normal")],
+            ["已确认异常数", sum(1 for r in records if r.status == "confirmed_abnormal")],
+            ["切片平均总指标", f"{(slice_avg_metric * 100):.1f}%" if slice_avg_metric else "-"],
+        ]
+        pd.DataFrame(summary_rows, columns=["项目", "数值"]).to_excel(
+            writer, index=False, sheet_name="汇总说明"
+        )
 
     output.seek(0)
     return StreamingResponse(
