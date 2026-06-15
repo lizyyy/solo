@@ -17,16 +17,27 @@
    - 只有标注负责人（如"周姐"）可以改判风险状态
    - 每次改判必须记录：改前值、改后值、改判人、时间、备注
    - 改判不删除原始模型输出，仅新增一条变更记录
+   - 支持只改备注不改风险标记（REMARK_EDIT 类型）
 
 规则4：汇总数一致性
    - 重复导入不会导致 risk_count 翻倍
    - 只有首次导入或状态真实变更时才更新汇总表
    - 汇总表按 (sample_id, model_version) 唯一键约束
+   - 汇总数从 fragment 的 processing_status 真实统计，不硬编码
 
 规则5：回滚规则
    - 支持按变更ID回滚到任意历史状态
    - 回滚本身也会生成一条 ROLLBACK 类型的变更记录
    - 回滚后需要重新触发运营复核流程
+
+状态流转图：
+  pending_import  ──导入──→  needs_recheck  ──运营复核──→  confirmed_risk / normal
+       │                          ↑
+       │                          │ 模型版本变更
+       └──────────────────────────┘
+  (首次导入同一样本新版本时，状态置为 needs_recheck)
+
+  needs_recheck / pending_import  ──人工改判──→  confirmed_risk / normal
 ========================================================================
 """
 
@@ -82,12 +93,29 @@ def detect_model_version_change(session: Session, sample_id: str,
     return (len(old_versions) > 0, old_versions)
 
 
+def _snapshot_fragment(fragment: ModelOutputFragment) -> Dict:
+    """拍摄片段当前状态快照，用于变更日志的 before/after"""
+    return {
+        "sample_id": fragment.sample_id,
+        "model_version": fragment.model_version,
+        "original_line_number": fragment.original_line_number,
+        "is_auto_reply_risk": fragment.is_auto_reply_risk,
+        "original_is_auto_reply_risk": fragment.original_is_auto_reply_risk,
+        "processing_status": fragment.processing_status,
+        "current_remark": fragment.current_remark,
+    }
+
+
 def log_change(session: Session, fragment: ModelOutputFragment,
                change_type: ChangeType, changed_by: str,
-               before_data: Dict, after_data: Dict,
+               before_data: Optional[Dict],
+               after_data: Optional[Dict],
                remark: Optional[str] = None,
                batch_id: Optional[str] = None) -> RiskChangeLog:
-    """记录变更日志 - 所有状态变更必须经过此函数"""
+    """记录变更日志 - 所有状态变更必须经过此函数
+    
+    before_data / after_data 格式同 _snapshot_fragment 返回值
+    """
     
     log = RiskChangeLog(
         fragment_id=fragment.id,
@@ -100,8 +128,8 @@ def log_change(session: Session, fragment: ModelOutputFragment,
         model_version_after=after_data.get("model_version") if after_data else None,
         is_risk_before=before_data.get("is_auto_reply_risk") if before_data else None,
         is_risk_after=after_data.get("is_auto_reply_risk") if after_data else None,
-        status_before=before_data.get("status") if before_data else None,
-        status_after=after_data.get("status") if after_data else None,
+        status_before=before_data.get("processing_status") if before_data else None,
+        status_after=after_data.get("processing_status") if after_data else None,
         remark=remark,
         batch_id=batch_id
     )
@@ -111,7 +139,11 @@ def log_change(session: Session, fragment: ModelOutputFragment,
 
 def update_summary(session: Session, sample_id: str, model_version: str,
                    updated_by: str):
-    """更新风险汇总表 - 确保汇总数与明细一致"""
+    """更新风险汇总表 - 从 fragment 真实统计，确保汇总数与明细一致
+    
+    各状态数量从 ModelOutputFragment.processing_status 字段统计，
+    不再硬编码，产品复盘页直接读这个表。
+    """
     fragments = session.query(ModelOutputFragment).filter(
         ModelOutputFragment.sample_id == sample_id,
         ModelOutputFragment.model_version == model_version
@@ -120,6 +152,14 @@ def update_summary(session: Session, sample_id: str, model_version: str,
     total = len(fragments)
     risk_count = sum(1 for f in fragments if f.is_auto_reply_risk)
     normal_count = sum(1 for f in fragments if not f.is_auto_reply_risk)
+    pending_count = sum(1 for f in fragments
+                        if f.processing_status == RiskStatus.PENDING_IMPORT.value)
+    needs_recheck_count = sum(1 for f in fragments
+                              if f.processing_status == RiskStatus.NEEDS_RECHECK.value)
+    confirmed_risk_count = sum(1 for f in fragments
+                               if f.processing_status == RiskStatus.CONFIRMED_RISK.value)
+    confirmed_normal_count = sum(1 for f in fragments
+                                 if f.processing_status == RiskStatus.NORMAL.value)
     
     summary = session.query(RiskSummary).filter(
         RiskSummary.sample_id == sample_id,
@@ -133,8 +173,8 @@ def update_summary(session: Session, sample_id: str, model_version: str,
             total_fragments=total,
             risk_count=risk_count,
             normal_count=normal_count,
-            pending_count=0,
-            needs_recheck_count=0,
+            pending_count=pending_count,
+            needs_recheck_count=needs_recheck_count,
             last_updated_by=updated_by
         )
         session.add(summary)
@@ -142,7 +182,11 @@ def update_summary(session: Session, sample_id: str, model_version: str,
         summary.total_fragments = total
         summary.risk_count = risk_count
         summary.normal_count = normal_count
+        summary.pending_count = pending_count
+        summary.needs_recheck_count = needs_recheck_count
         summary.last_updated_by = updated_by
+    
+    return summary
 
 
 def import_model_outputs(session: Session, records: List[Dict],
@@ -158,9 +202,14 @@ def import_model_outputs(session: Session, records: List[Dict],
     3. 逐条处理记录：
        - 检查是否重复片段
        - 检测模型版本变更
-       - 确定初始状态
+       - 确定初始状态（写进 processing_status 字段）
        - 记录变更日志
     4. 更新汇总表
+    
+    关键字段落地：
+    - original_is_auto_reply_risk: 模型原始判断，永不改变
+    - is_auto_reply_risk: 当前生效判断，可能被人工改判覆盖
+    - processing_status: 当前处理状态，产品复盘直接读
     
     参数 records 格式：
     [
@@ -189,7 +238,13 @@ def import_model_outputs(session: Session, records: List[Dict],
             "total_records": 0,
             "new_records": 0,
             "updated_records": 0,
-            "duplicate_skipped": len(records)
+            "duplicate_skipped": len(records),
+            "replay_command": (
+                f"python -m email_auto_reply_risk.cli import "
+                f"--file {source_file} --model-version {model_version} "
+                f"--by {imported_by} --batch-id {batch_id}"
+                if source_file else ""
+            )
         }
     
     new_count = 0
@@ -199,6 +254,7 @@ def import_model_outputs(session: Session, records: List[Dict],
     for record in records:
         sample_id = record["sample_id"]
         original_line_number = record["original_line_number"]
+        is_risk = record["is_auto_reply_risk"]
         
         existing = check_duplicate_fragment(
             session, sample_id, model_version, original_line_number
@@ -212,42 +268,40 @@ def import_model_outputs(session: Session, records: List[Dict],
             session, sample_id, model_version
         )
         
-        initial_status = RiskStatus.PENDING_IMPORT.value
         if has_version_change:
             initial_status = RiskStatus.NEEDS_RECHECK.value
+            status_remark = (f"检测到模型版本变更：旧版本={old_versions}, "
+                             f"新版本={model_version}，状态置为 NEEDS_RECHECK，"
+                             f"待运营复核人确认，不急着归正常")
+        else:
+            initial_status = RiskStatus.PENDING_IMPORT.value
+            status_remark = None
         
         fragment = ModelOutputFragment(
             sample_id=sample_id,
             model_version=model_version,
             original_line_number=original_line_number,
             raw_content=record["raw_content"],
-            is_auto_reply_risk=record["is_auto_reply_risk"],
+            original_is_auto_reply_risk=is_risk,
+            is_auto_reply_risk=is_risk,
             risk_score=record.get("risk_score"),
-            import_batch_id=batch_id
+            processing_status=initial_status,
+            current_remark=status_remark if has_version_change else None,
+            import_batch_id=batch_id,
+            last_updated_by=imported_by
         )
         session.add(fragment)
         session.flush()
         
-        before_data = None
-        after_data = {
-            "sample_id": sample_id,
-            "model_version": model_version,
-            "original_line_number": original_line_number,
-            "is_auto_reply_risk": record["is_auto_reply_risk"],
-            "status": initial_status
-        }
+        after_data = _snapshot_fragment(fragment)
         
-        change_remark = None
         if has_version_change:
-            change_remark = (f"检测到模型版本变更：旧版本={old_versions}, "
-                             f"新版本={model_version}，状态置为 NEEDS_RECHECK，"
-                             f"待运营复核人确认")
             log_change(session, fragment, ChangeType.MODEL_VERSION_CHANGE,
-                       imported_by, before_data, after_data,
-                       remark=change_remark, batch_id=batch_id)
+                       imported_by, None, after_data,
+                       remark=status_remark, batch_id=batch_id)
         
         log_change(session, fragment, ChangeType.IMPORT,
-                   imported_by, before_data, after_data,
+                   imported_by, None, after_data,
                    remark=remark, batch_id=batch_id)
         
         new_count += 1
@@ -273,75 +327,103 @@ def import_model_outputs(session: Session, records: List[Dict],
         "total_records": len(records),
         "new_records": new_count,
         "updated_records": update_count,
-        "duplicate_skipped": duplicate_count
+        "duplicate_skipped": duplicate_count,
+        "model_version_change_detected": None,
+        "replay_command": (
+            f"python -m email_auto_reply_risk.cli import "
+            f"--file {source_file} --model-version {model_version} "
+            f"--by {imported_by} --batch-id {batch_id}"
+            if source_file else ""
+        )
     }
 
 
 def apply_manual_review(session: Session, fragment_id: int,
-                        reviewer: str, reviewed_is_risk: bool,
+                        reviewer: str, reviewed_is_risk: Optional[bool] = None,
                         reviewed_status: Optional[str] = None,
                         remark: Optional[str] = None,
+                        only_edit_remark: bool = False,
                         review_batch_id: Optional[str] = None) -> Dict:
     """人工改判 - 标注负责人周姐补看人工改判表
     
+    支持两种模式：
+    1. 完整改判（改风险标记 + 改状态 + 改备注）
+    2. 只改备注（only_edit_remark=True）— 周姐只改了一条备注的场景
+    
     规则：
     - 改判不删除原始记录
+    - original_is_auto_reply_risk 永不改变
     - 完整记录改前改后的值
     - 触发变更日志
+    - 更新 fragment.processing_status 和 current_remark
     - 更新汇总表
     """
     fragment = session.query(ModelOutputFragment).get(fragment_id)
     if fragment is None:
         raise ValueError(f"片段 {fragment_id} 不存在")
     
-    original_is_risk = fragment.is_auto_reply_risk
+    before_data = _snapshot_fragment(fragment)
     
-    if reviewed_status is None:
-        reviewed_status = (RiskStatus.CONFIRMED_RISK.value
-                          if reviewed_is_risk
-                          else RiskStatus.NORMAL.value)
+    original_is_risk = fragment.is_auto_reply_risk
+    original_status = fragment.processing_status
+    original_remark = fragment.current_remark
+    
+    if only_edit_remark:
+        change_type = ChangeType.REMARK_EDIT
+        fragment.current_remark = remark
+        change_remark = f"仅修改备注：{original_remark} → {remark}"
+        reviewed_is_risk_val = original_is_risk
+        reviewed_status_val = original_status
+    else:
+        if reviewed_is_risk is None:
+            raise ValueError("非仅改备注模式下，reviewed_is_risk 不能为空")
+        
+        change_type = ChangeType.MANUAL_EDIT
+        fragment.is_auto_reply_risk = reviewed_is_risk
+        
+        if reviewed_status is None:
+            reviewed_status = (RiskStatus.CONFIRMED_RISK.value
+                              if reviewed_is_risk
+                              else RiskStatus.NORMAL.value)
+        
+        fragment.processing_status = reviewed_status
+        fragment.current_remark = remark
+        change_remark = remark
+        reviewed_is_risk_val = reviewed_is_risk
+        reviewed_status_val = reviewed_status
+    
+    fragment.last_updated_by = reviewer
     
     review = ManualReview(
         fragment_id=fragment_id,
         reviewer=reviewer,
         original_is_risk=original_is_risk,
-        reviewed_is_risk=reviewed_is_risk,
-        original_status="",
-        reviewed_status=reviewed_status,
-        remark=remark,
+        reviewed_is_risk=reviewed_is_risk_val,
+        original_status=original_status,
+        reviewed_status=reviewed_status_val,
+        remark=remark if not only_edit_remark else f"[仅改备注] {remark}",
         review_batch_id=review_batch_id
     )
     session.add(review)
     
-    before_data = {
-        "sample_id": fragment.sample_id,
-        "model_version": fragment.model_version,
-        "original_line_number": fragment.original_line_number,
-        "is_auto_reply_risk": original_is_risk,
-        "status": fragment.import_batch_id
-    }
+    after_data = _snapshot_fragment(fragment)
     
-    fragment.is_auto_reply_risk = reviewed_is_risk
-    
-    after_data = {
-        "sample_id": fragment.sample_id,
-        "model_version": fragment.model_version,
-        "original_line_number": fragment.original_line_number,
-        "is_auto_reply_risk": reviewed_is_risk,
-        "status": reviewed_status
-    }
-    
-    log_change(session, fragment, ChangeType.MANUAL_EDIT,
+    log_change(session, fragment, change_type,
                reviewer, before_data, after_data,
-               remark=remark, batch_id=review_batch_id)
+               remark=change_remark, batch_id=review_batch_id)
     
     update_summary(session, fragment.sample_id, fragment.model_version, reviewer)
     session.commit()
     
     return {
         "fragment_id": fragment_id,
+        "change_type": change_type.value,
         "original_is_risk": original_is_risk,
-        "reviewed_is_risk": reviewed_is_risk,
+        "reviewed_is_risk": reviewed_is_risk_val,
+        "original_status": original_status,
+        "reviewed_status": reviewed_status_val,
+        "original_remark": original_remark,
+        "reviewed_remark": fragment.current_remark,
         "reviewer": reviewer,
         "review_time": datetime.utcnow().isoformat()
     }
@@ -349,20 +431,22 @@ def apply_manual_review(session: Session, fragment_id: int,
 
 def update_status(session: Session, fragment_id: int, new_status: str,
                   changed_by: str, remark: Optional[str] = None) -> Dict:
-    """更新风险状态"""
+    """更新风险状态
+    
+    运营复核人确认时调用，或者运营流程中状态变更时调用。
+    只改状态，不改风险标记。
+    """
     fragment = session.query(ModelOutputFragment).get(fragment_id)
     if fragment is None:
         raise ValueError(f"片段 {fragment_id} 不存在")
     
-    before_data = {
-        "sample_id": fragment.sample_id,
-        "model_version": fragment.model_version,
-        "original_line_number": fragment.original_line_number,
-        "is_auto_reply_risk": fragment.is_auto_reply_risk,
-    }
+    before_data = _snapshot_fragment(fragment)
+    original_status = fragment.processing_status
     
-    after_data = before_data.copy()
-    after_data["status"] = new_status
+    fragment.processing_status = new_status
+    fragment.last_updated_by = changed_by
+    
+    after_data = _snapshot_fragment(fragment)
     
     log_change(session, fragment, ChangeType.STATUS_CHANGE,
                changed_by, before_data, after_data,
@@ -373,13 +457,44 @@ def update_status(session: Session, fragment_id: int, new_status: str,
     
     return {
         "fragment_id": fragment_id,
+        "original_status": original_status,
         "new_status": new_status,
         "changed_by": changed_by
     }
 
 
+def get_fragment_current_state(session: Session, fragment_id: int) -> Dict:
+    """获取单条片段的当前状态 - 产品复盘页直接用
+    
+    返回包含：当前处理状态、当前风险标记、当前备注、原始行号等
+    """
+    fragment = session.query(ModelOutputFragment).get(fragment_id)
+    if fragment is None:
+        raise ValueError(f"片段 {fragment_id} 不存在")
+    
+    return {
+        "fragment_id": fragment.id,
+        "sample_id": fragment.sample_id,
+        "model_version": fragment.model_version,
+        "original_line_number": fragment.original_line_number,
+        "raw_content": fragment.raw_content,
+        "original_is_auto_reply_risk": fragment.original_is_auto_reply_risk,
+        "current_is_auto_reply_risk": fragment.is_auto_reply_risk,
+        "risk_score": fragment.risk_score,
+        "processing_status": fragment.processing_status,
+        "current_remark": fragment.current_remark,
+        "import_batch_id": fragment.import_batch_id,
+        "imported_at": fragment.imported_at.isoformat(),
+        "last_updated_at": fragment.last_updated_at.isoformat(),
+        "last_updated_by": fragment.last_updated_by,
+    }
+
+
 def get_fragment_history(session: Session, fragment_id: int) -> List[Dict]:
-    """获取单条片段的完整变更历史 - 用于运营复核人追问时回溯"""
+    """获取单条片段的完整变更历史 - 用于运营复核人追问时回溯
+    
+    按时间正序排列，第一条是最早的导入记录，最后一条是最新状态。
+    """
     logs = session.query(RiskChangeLog).filter(
         RiskChangeLog.fragment_id == fragment_id
     ).order_by(RiskChangeLog.changed_at.asc()).all()
@@ -399,19 +514,30 @@ def get_fragment_history(session: Session, fragment_id: int) -> List[Dict]:
             "status_before": log.status_before,
             "status_after": log.status_after,
             "remark": log.remark,
-            "batch_id": log.batch_id
+            "batch_id": log.batch_id,
+            "before_snapshot": json.loads(log.before_data) if log.before_data else None,
+            "after_snapshot": json.loads(log.after_data) if log.after_data else None,
         })
     return result
 
 
 def get_sample_risk_timeline(session: Session, sample_id: str) -> Dict:
-    """获取单样本的完整风险时间线 - 用于产品复盘"""
+    """获取单样本的完整风险时间线 - 用于产品复盘
+    
+    返回：
+    - 各片段的当前状态
+    - 所有变更的时间线
+    - 各模型版本的汇总
+    - 可重跑命令
+    """
     fragments = session.query(ModelOutputFragment).filter(
         ModelOutputFragment.sample_id == sample_id
     ).order_by(ModelOutputFragment.imported_at.asc()).all()
     
+    fragment_states = []
     all_logs = []
     for fragment in fragments:
+        fragment_states.append(get_fragment_current_state(session, fragment.id))
         logs = get_fragment_history(session, fragment.id)
         all_logs.extend(logs)
     
@@ -421,10 +547,71 @@ def get_sample_risk_timeline(session: Session, sample_id: str) -> Dict:
         RiskSummary.sample_id == sample_id
     ).order_by(RiskSummary.last_updated.asc()).all()
     
+    model_versions = list(set(f.model_version for f in fragments))
+    
+    status_breakdown = {}
+    for f in fragment_states:
+        s = f["processing_status"]
+        status_breakdown[s] = status_breakdown.get(s, 0) + 1
+    
+    risk_breakdown = {}
+    for f in fragment_states:
+        v = f["model_version"]
+        if v not in risk_breakdown:
+            risk_breakdown[v] = {"risk": 0, "normal": 0, "total": 0}
+        risk_breakdown[v]["total"] += 1
+        if f["current_is_auto_reply_risk"]:
+            risk_breakdown[v]["risk"] += 1
+        else:
+            risk_breakdown[v]["normal"] += 1
+    
+    import_batches = list(set(f.import_batch_id for f in fragments))
+    
+    replay_commands = []
+    if import_batches:
+        first_batch = import_batches[0]
+        batch_record = session.query(ImportBatch).filter(
+            ImportBatch.batch_id == first_batch
+        ).first()
+        if batch_record and batch_record.source_file:
+            replay_commands.append({
+                "step": "step1_import",
+                "description": "步骤1：导入模型输出",
+                "command": (
+                    f"python -m email_auto_reply_risk.cli import "
+                    f"--file {batch_record.source_file} "
+                    f"--model-version {batch_record.model_version} "
+                    f"--by {batch_record.imported_by} "
+                    f"--batch-id {first_batch}"
+                )
+            })
+    
+    replay_commands.append({
+        "step": "step_check_status",
+        "description": "查看当前处理状态",
+        "command": (
+            f"python -m email_auto_reply_risk.cli sample-timeline "
+            f"--sample-id {sample_id}"
+        )
+    })
+    
+    replay_commands.append({
+        "step": "step3_review",
+        "description": "步骤3：生成产品复盘报告",
+        "command": (
+            f"python -m email_auto_reply_risk.cli product-review "
+            f"--sample-id {sample_id} "
+            f"--export data/review_{sample_id}.json"
+        )
+    })
+    
     return {
         "sample_id": sample_id,
         "fragments_count": len(fragments),
-        "model_versions": list(set(f.model_version for f in fragments)),
+        "model_versions": sorted(model_versions),
+        "current_status_breakdown": status_breakdown,
+        "risk_breakdown_by_version": risk_breakdown,
+        "fragments_current_state": fragment_states,
         "change_history": all_logs,
         "summary_history": [
             {
@@ -438,5 +625,68 @@ def get_sample_risk_timeline(session: Session, sample_id: str) -> Dict:
                 "last_updated_by": s.last_updated_by
             }
             for s in summaries
-        ]
+        ],
+        "replay_commands": replay_commands,
+        "result_explanation": _generate_result_explanation(sample_id, fragment_states, all_logs)
     }
+
+
+def _generate_result_explanation(sample_id: str,
+                                 fragment_states: List[Dict],
+                                 change_history: List[Dict]) -> str:
+    """生成结果说明文字 - 产品复盘页直接展示
+    
+    运营复核人追问时，这段文字解释"为什么前后不一致"
+    """
+    lines = []
+    lines.append(f"样本 {sample_id} 邮件自动回复风险结果说明：")
+    lines.append("")
+    
+    lines.append(f"一、基本情况")
+    lines.append(f"  共 {len(fragment_states)} 个模型输出片段")
+    versions = sorted(set(f["model_version"] for f in fragment_states))
+    lines.append(f"  涉及模型版本：{', '.join(versions)}")
+    lines.append("")
+    
+    if len(versions) > 1:
+        lines.append(f"二、模型版本变更提示（重点关注）")
+        lines.append(f"  检测到同一样本存在 {len(versions)} 个不同模型版本的输出。")
+        lines.append(f"  根据边界规则：模型版本换了但样本编号没变时，")
+        lines.append(f"  状态置为 NEEDS_RECHECK，不急着归正常，留给运营复核人复核。")
+        lines.append("")
+    
+    lines.append(f"三、当前处理状态分布")
+    status_counts = {}
+    for f in fragment_states:
+        s = f["processing_status"]
+        status_counts[s] = status_counts.get(s, 0) + 1
+    for status, count in status_counts.items():
+        lines.append(f"  {status}: {count} 条")
+    lines.append("")
+    
+    lines.append(f"四、变更历史概览")
+    type_counts = {}
+    for log in change_history:
+        t = log["change_type"]
+        type_counts[t] = type_counts.get(t, 0) + 1
+    for ctype, count in type_counts.items():
+        lines.append(f"  {ctype}: {count} 次")
+    lines.append("")
+    
+    manual_changes = [l for l in change_history if l["change_type"] in ("manual_edit", "remark_edit")]
+    if manual_changes:
+        lines.append(f"五、人工改判记录")
+        for m in manual_changes:
+            lines.append(f"  - {m['changed_at']} {m['changed_by']} "
+                        f"[{m['change_type']}] "
+                        f"风险: {m['is_risk_before']} → {m['is_risk_after']}")
+            if m["remark"]:
+                lines.append(f"    备注: {m['remark']}")
+        lines.append("")
+    
+    lines.append(f"六、可追溯证据")
+    lines.append(f"  所有变更均保留原始行号、改前改后快照。")
+    lines.append(f"  查看单条片段详情：python -m email_auto_reply_risk.cli fragment-history --fragment-id <id>")
+    lines.append("")
+    
+    return "\n".join(lines)

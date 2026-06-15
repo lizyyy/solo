@@ -1,6 +1,7 @@
 {
   "step": "step3_product_review",
-  "timestamp": "2026-06-07T04:31:55.304993",
+  "step_name": "步骤3：产品复盘",
+  "timestamp": "2026-06-15T00:46:25.100440",
   "generated_by": "system",
   "sample_id": "S001",
   "timeline": {
@@ -10,12 +11,95 @@
       "v1.0",
       "v2.0"
     ],
+    "current_status_breakdown": {
+      "normal": 1,
+      "pending_import": 1,
+      "needs_recheck": 2
+    },
+    "risk_breakdown_by_version": {
+      "v1.0": {
+        "risk": 0,
+        "normal": 2,
+        "total": 2
+      },
+      "v2.0": {
+        "risk": 1,
+        "normal": 1,
+        "total": 2
+      }
+    },
+    "fragments_current_state": [
+      {
+        "fragment_id": 1,
+        "sample_id": "S001",
+        "model_version": "v1.0",
+        "original_line_number": 15,
+        "raw_content": "您好，感谢您的来信。我是自动回复助手，您的邮件已收到，我们会尽快处理。",
+        "original_is_auto_reply_risk": true,
+        "current_is_auto_reply_risk": false,
+        "risk_score": 85,
+        "processing_status": "normal",
+        "current_remark": "周姐人工确认：这不是自动回复，是客户真实回复，语气有差异",
+        "import_batch_id": "batch_v1_001",
+        "imported_at": "2026-06-15T00:46:25.034401",
+        "last_updated_at": "2026-06-15T00:46:25.082339",
+        "last_updated_by": "周姐"
+      },
+      {
+        "fragment_id": 2,
+        "sample_id": "S001",
+        "model_version": "v1.0",
+        "original_line_number": 23,
+        "raw_content": "关于您咨询的产品问题，详细说明如下：...",
+        "original_is_auto_reply_risk": false,
+        "current_is_auto_reply_risk": false,
+        "risk_score": 20,
+        "processing_status": "pending_import",
+        "current_remark": null,
+        "import_batch_id": "batch_v1_001",
+        "imported_at": "2026-06-15T00:46:25.048523",
+        "last_updated_at": "2026-06-15T00:46:25.048526",
+        "last_updated_by": "系统导入"
+      },
+      {
+        "fragment_id": 4,
+        "sample_id": "S001",
+        "model_version": "v2.0",
+        "original_line_number": 15,
+        "raw_content": "您好，感谢您的来信。我是自动回复助手，您的邮件已收到，我们会尽快处理。",
+        "original_is_auto_reply_risk": false,
+        "current_is_auto_reply_risk": false,
+        "risk_score": 35,
+        "processing_status": "needs_recheck",
+        "current_remark": "检测到模型版本变更：旧版本=['v1.0'], 新版本=v2.0，状态置为 NEEDS_RECHECK，待运营复核人确认，不急着归正常",
+        "import_batch_id": "batch_v2_001",
+        "imported_at": "2026-06-15T00:46:25.074829",
+        "last_updated_at": "2026-06-15T00:46:25.074831",
+        "last_updated_by": "系统导入"
+      },
+      {
+        "fragment_id": 5,
+        "sample_id": "S001",
+        "model_version": "v2.0",
+        "original_line_number": 45,
+        "raw_content": "新的邮件片段内容...",
+        "original_is_auto_reply_risk": true,
+        "current_is_auto_reply_risk": true,
+        "risk_score": 78,
+        "processing_status": "needs_recheck",
+        "current_remark": "检测到模型版本变更：旧版本=['v1.0'], 新版本=v2.0，状态置为 NEEDS_RECHECK，待运营复核人确认，不急着归正常",
+        "import_batch_id": "batch_v2_001",
+        "imported_at": "2026-06-15T00:46:25.079080",
+        "last_updated_at": "2026-06-15T00:46:25.079081",
+        "last_updated_by": "系统导入"
+      }
+    ],
     "change_history": [
       {
         "change_id": 1,
         "change_type": "import",
         "changed_by": "系统导入",
-        "changed_at": "2026-06-07T04:31:55.257490",
+        "changed_at": "2026-06-15T00:46:25.039832",
         "original_line_number": 15,
         "model_version_before": null,
         "model_version_after": "v1.0",
@@ -24,13 +108,23 @@
         "status_before": null,
         "status_after": "pending_import",
         "remark": "首次导入模型v1.0输出",
-        "batch_id": "batch_v1_001"
+        "batch_id": "batch_v1_001",
+        "before_snapshot": null,
+        "after_snapshot": {
+          "sample_id": "S001",
+          "model_version": "v1.0",
+          "original_line_number": 15,
+          "is_auto_reply_risk": true,
+          "original_is_auto_reply_risk": true,
+          "processing_status": "pending_import",
+          "current_remark": null
+        }
       },
       {
         "change_id": 2,
         "change_type": "import",
         "changed_by": "系统导入",
-        "changed_at": "2026-06-07T04:31:55.262677",
+        "changed_at": "2026-06-15T00:46:25.049052",
         "original_line_number": 23,
         "model_version_before": null,
         "model_version_after": "v1.0",
@@ -39,13 +133,23 @@
         "status_before": null,
         "status_after": "pending_import",
         "remark": "首次导入模型v1.0输出",
-        "batch_id": "batch_v1_001"
+        "batch_id": "batch_v1_001",
+        "before_snapshot": null,
+        "after_snapshot": {
+          "sample_id": "S001",
+          "model_version": "v1.0",
+          "original_line_number": 23,
+          "is_auto_reply_risk": false,
+          "original_is_auto_reply_risk": false,
+          "processing_status": "pending_import",
+          "current_remark": null
+        }
       },
       {
         "change_id": 4,
         "change_type": "model_version_change",
         "changed_by": "系统导入",
-        "changed_at": "2026-06-07T04:31:55.275357",
+        "changed_at": "2026-06-15T00:46:25.077503",
         "original_line_number": 15,
         "model_version_before": null,
         "model_version_after": "v2.0",
@@ -53,14 +157,24 @@
         "is_risk_after": false,
         "status_before": null,
         "status_after": "needs_recheck",
-        "remark": "检测到模型版本变更：旧版本=['v1.0'], 新版本=v2.0，状态置为 NEEDS_RECHECK，待运营复核人确认",
-        "batch_id": "batch_v2_001"
+        "remark": "检测到模型版本变更：旧版本=['v1.0'], 新版本=v2.0，状态置为 NEEDS_RECHECK，待运营复核人确认，不急着归正常",
+        "batch_id": "batch_v2_001",
+        "before_snapshot": null,
+        "after_snapshot": {
+          "sample_id": "S001",
+          "model_version": "v2.0",
+          "original_line_number": 15,
+          "is_auto_reply_risk": false,
+          "original_is_auto_reply_risk": false,
+          "processing_status": "needs_recheck",
+          "current_remark": "检测到模型版本变更：旧版本=['v1.0'], 新版本=v2.0，状态置为 NEEDS_RECHECK，待运营复核人确认，不急着归正常"
+        }
       },
       {
         "change_id": 5,
         "change_type": "import",
         "changed_by": "系统导入",
-        "changed_at": "2026-06-07T04:31:55.275360",
+        "changed_at": "2026-06-15T00:46:25.077505",
         "original_line_number": 15,
         "model_version_before": null,
         "model_version_after": "v2.0",
@@ -69,13 +183,23 @@
         "status_before": null,
         "status_after": "needs_recheck",
         "remark": "导入模型v2.0输出，同一样本编号S001",
-        "batch_id": "batch_v2_001"
+        "batch_id": "batch_v2_001",
+        "before_snapshot": null,
+        "after_snapshot": {
+          "sample_id": "S001",
+          "model_version": "v2.0",
+          "original_line_number": 15,
+          "is_auto_reply_risk": false,
+          "original_is_auto_reply_risk": false,
+          "processing_status": "needs_recheck",
+          "current_remark": "检测到模型版本变更：旧版本=['v1.0'], 新版本=v2.0，状态置为 NEEDS_RECHECK，待运营复核人确认，不急着归正常"
+        }
       },
       {
         "change_id": 6,
         "change_type": "model_version_change",
         "changed_by": "系统导入",
-        "changed_at": "2026-06-07T04:31:55.280065",
+        "changed_at": "2026-06-15T00:46:25.079493",
         "original_line_number": 45,
         "model_version_before": null,
         "model_version_after": "v2.0",
@@ -83,14 +207,24 @@
         "is_risk_after": true,
         "status_before": null,
         "status_after": "needs_recheck",
-        "remark": "检测到模型版本变更：旧版本=['v1.0'], 新版本=v2.0，状态置为 NEEDS_RECHECK，待运营复核人确认",
-        "batch_id": "batch_v2_001"
+        "remark": "检测到模型版本变更：旧版本=['v1.0'], 新版本=v2.0，状态置为 NEEDS_RECHECK，待运营复核人确认，不急着归正常",
+        "batch_id": "batch_v2_001",
+        "before_snapshot": null,
+        "after_snapshot": {
+          "sample_id": "S001",
+          "model_version": "v2.0",
+          "original_line_number": 45,
+          "is_auto_reply_risk": true,
+          "original_is_auto_reply_risk": true,
+          "processing_status": "needs_recheck",
+          "current_remark": "检测到模型版本变更：旧版本=['v1.0'], 新版本=v2.0，状态置为 NEEDS_RECHECK，待运营复核人确认，不急着归正常"
+        }
       },
       {
         "change_id": 7,
         "change_type": "import",
         "changed_by": "系统导入",
-        "changed_at": "2026-06-07T04:31:55.280067",
+        "changed_at": "2026-06-15T00:46:25.079493",
         "original_line_number": 45,
         "model_version_before": null,
         "model_version_after": "v2.0",
@@ -99,22 +233,50 @@
         "status_before": null,
         "status_after": "needs_recheck",
         "remark": "导入模型v2.0输出，同一样本编号S001",
-        "batch_id": "batch_v2_001"
+        "batch_id": "batch_v2_001",
+        "before_snapshot": null,
+        "after_snapshot": {
+          "sample_id": "S001",
+          "model_version": "v2.0",
+          "original_line_number": 45,
+          "is_auto_reply_risk": true,
+          "original_is_auto_reply_risk": true,
+          "processing_status": "needs_recheck",
+          "current_remark": "检测到模型版本变更：旧版本=['v1.0'], 新版本=v2.0，状态置为 NEEDS_RECHECK，待运营复核人确认，不急着归正常"
+        }
       },
       {
         "change_id": 8,
         "change_type": "manual_edit",
         "changed_by": "周姐",
-        "changed_at": "2026-06-07T04:31:55.301241",
+        "changed_at": "2026-06-15T00:46:25.083982",
         "original_line_number": 15,
         "model_version_before": "v1.0",
         "model_version_after": "v1.0",
         "is_risk_before": true,
         "is_risk_after": false,
-        "status_before": "batch_v1_001",
+        "status_before": "pending_import",
         "status_after": "normal",
-        "remark": "周姐人工确认：这不是自动回复，是客户真实回复，语气和之前有差异",
-        "batch_id": "review_batch_001"
+        "remark": "周姐人工确认：这不是自动回复，是客户真实回复，语气有差异",
+        "batch_id": "review_batch_001",
+        "before_snapshot": {
+          "sample_id": "S001",
+          "model_version": "v1.0",
+          "original_line_number": 15,
+          "is_auto_reply_risk": true,
+          "original_is_auto_reply_risk": true,
+          "processing_status": "pending_import",
+          "current_remark": null
+        },
+        "after_snapshot": {
+          "sample_id": "S001",
+          "model_version": "v1.0",
+          "original_line_number": 15,
+          "is_auto_reply_risk": false,
+          "original_is_auto_reply_risk": true,
+          "processing_status": "normal",
+          "current_remark": "周姐人工确认：这不是自动回复，是客户真实回复，语气有差异"
+        }
       }
     ],
     "summary_history": [
@@ -124,8 +286,8 @@
         "risk_count": 1,
         "normal_count": 1,
         "pending_count": 0,
-        "needs_recheck_count": 0,
-        "last_updated": "2026-06-07T04:31:55.289199",
+        "needs_recheck_count": 2,
+        "last_updated": "2026-06-15T00:46:25.080265",
         "last_updated_by": "系统导入"
       },
       {
@@ -133,11 +295,124 @@
         "total_fragments": 2,
         "risk_count": 0,
         "normal_count": 2,
-        "pending_count": 0,
+        "pending_count": 1,
         "needs_recheck_count": 0,
-        "last_updated": "2026-06-07T04:31:55.302143",
+        "last_updated": "2026-06-15T00:46:25.086394",
         "last_updated_by": "周姐"
       }
-    ]
-  }
+    ],
+    "replay_commands": [
+      {
+        "step": "step1_import",
+        "description": "步骤1：导入模型输出",
+        "command": "python -m email_auto_reply_risk.cli import --file /Users/lzy/pro/solo/workspaces/zy72525/examples/sample_data/model_output_v1.0.json --model-version v1.0 --by 系统导入 --batch-id batch_v1_001"
+      },
+      {
+        "step": "step_check_status",
+        "description": "查看当前处理状态",
+        "command": "python -m email_auto_reply_risk.cli sample-timeline --sample-id S001"
+      },
+      {
+        "step": "step3_review",
+        "description": "步骤3：生成产品复盘报告",
+        "command": "python -m email_auto_reply_risk.cli product-review --sample-id S001 --export data/review_S001.json"
+      }
+    ],
+    "result_explanation": "样本 S001 邮件自动回复风险结果说明：\n\n一、基本情况\n  共 4 个模型输出片段\n  涉及模型版本：v1.0, v2.0\n\n二、模型版本变更提示（重点关注）\n  检测到同一样本存在 2 个不同模型版本的输出。\n  根据边界规则：模型版本换了但样本编号没变时，\n  状态置为 NEEDS_RECHECK，不急着归正常，留给运营复核人复核。\n\n三、当前处理状态分布\n  normal: 1 条\n  pending_import: 1 条\n  needs_recheck: 2 条\n\n四、变更历史概览\n  import: 4 次\n  model_version_change: 2 次\n  manual_edit: 1 次\n\n五、人工改判记录\n  - 2026-06-15T00:46:25.083982 周姐 [manual_edit] 风险: True → False\n    备注: 周姐人工确认：这不是自动回复，是客户真实回复，语气有差异\n\n六、可追溯证据\n  所有变更均保留原始行号、改前改后快照。\n  查看单条片段详情：python -m email_auto_reply_risk.cli fragment-history --fragment-id <id>\n"
+  },
+  "current_status_breakdown": {
+    "normal": 1,
+    "pending_import": 1,
+    "needs_recheck": 2
+  },
+  "fragments_count": 4,
+  "model_versions": [
+    "v1.0",
+    "v2.0"
+  ],
+  "change_history_count": 7,
+  "result_explanation": "样本 S001 邮件自动回复风险结果说明：\n\n一、基本情况\n  共 4 个模型输出片段\n  涉及模型版本：v1.0, v2.0\n\n二、模型版本变更提示（重点关注）\n  检测到同一样本存在 2 个不同模型版本的输出。\n  根据边界规则：模型版本换了但样本编号没变时，\n  状态置为 NEEDS_RECHECK，不急着归正常，留给运营复核人复核。\n\n三、当前处理状态分布\n  normal: 1 条\n  pending_import: 1 条\n  needs_recheck: 2 条\n\n四、变更历史概览\n  import: 4 次\n  model_version_change: 2 次\n  manual_edit: 1 次\n\n五、人工改判记录\n  - 2026-06-15T00:46:25.083982 周姐 [manual_edit] 风险: True → False\n    备注: 周姐人工确认：这不是自动回复，是客户真实回复，语气有差异\n\n六、可追溯证据\n  所有变更均保留原始行号、改前改后快照。\n  查看单条片段详情：python -m email_auto_reply_risk.cli fragment-history --fragment-id <id>\n",
+  "replay_commands": [
+    {
+      "step": "step1_import",
+      "description": "步骤1：导入模型输出",
+      "command": "python -m email_auto_reply_risk.cli import --file /Users/lzy/pro/solo/workspaces/zy72525/examples/sample_data/model_output_v1.0.json --model-version v1.0 --by 系统导入 --batch-id batch_v1_001"
+    },
+    {
+      "step": "step_check_status",
+      "description": "查看当前处理状态",
+      "command": "python -m email_auto_reply_risk.cli sample-timeline --sample-id S001"
+    },
+    {
+      "step": "step3_review",
+      "description": "步骤3：生成产品复盘报告",
+      "command": "python -m email_auto_reply_risk.cli product-review --sample-id S001 --export data/review_S001.json"
+    }
+  ],
+  "fragments_current_state": [
+    {
+      "fragment_id": 1,
+      "sample_id": "S001",
+      "model_version": "v1.0",
+      "original_line_number": 15,
+      "raw_content": "您好，感谢您的来信。我是自动回复助手，您的邮件已收到，我们会尽快处理。",
+      "original_is_auto_reply_risk": true,
+      "current_is_auto_reply_risk": false,
+      "risk_score": 85,
+      "processing_status": "normal",
+      "current_remark": "周姐人工确认：这不是自动回复，是客户真实回复，语气有差异",
+      "import_batch_id": "batch_v1_001",
+      "imported_at": "2026-06-15T00:46:25.034401",
+      "last_updated_at": "2026-06-15T00:46:25.082339",
+      "last_updated_by": "周姐"
+    },
+    {
+      "fragment_id": 2,
+      "sample_id": "S001",
+      "model_version": "v1.0",
+      "original_line_number": 23,
+      "raw_content": "关于您咨询的产品问题，详细说明如下：...",
+      "original_is_auto_reply_risk": false,
+      "current_is_auto_reply_risk": false,
+      "risk_score": 20,
+      "processing_status": "pending_import",
+      "current_remark": null,
+      "import_batch_id": "batch_v1_001",
+      "imported_at": "2026-06-15T00:46:25.048523",
+      "last_updated_at": "2026-06-15T00:46:25.048526",
+      "last_updated_by": "系统导入"
+    },
+    {
+      "fragment_id": 4,
+      "sample_id": "S001",
+      "model_version": "v2.0",
+      "original_line_number": 15,
+      "raw_content": "您好，感谢您的来信。我是自动回复助手，您的邮件已收到，我们会尽快处理。",
+      "original_is_auto_reply_risk": false,
+      "current_is_auto_reply_risk": false,
+      "risk_score": 35,
+      "processing_status": "needs_recheck",
+      "current_remark": "检测到模型版本变更：旧版本=['v1.0'], 新版本=v2.0，状态置为 NEEDS_RECHECK，待运营复核人确认，不急着归正常",
+      "import_batch_id": "batch_v2_001",
+      "imported_at": "2026-06-15T00:46:25.074829",
+      "last_updated_at": "2026-06-15T00:46:25.074831",
+      "last_updated_by": "系统导入"
+    },
+    {
+      "fragment_id": 5,
+      "sample_id": "S001",
+      "model_version": "v2.0",
+      "original_line_number": 45,
+      "raw_content": "新的邮件片段内容...",
+      "original_is_auto_reply_risk": true,
+      "current_is_auto_reply_risk": true,
+      "risk_score": 78,
+      "processing_status": "needs_recheck",
+      "current_remark": "检测到模型版本变更：旧版本=['v1.0'], 新版本=v2.0，状态置为 NEEDS_RECHECK，待运营复核人确认，不急着归正常",
+      "import_batch_id": "batch_v2_001",
+      "imported_at": "2026-06-15T00:46:25.079080",
+      "last_updated_at": "2026-06-15T00:46:25.079081",
+      "last_updated_by": "系统导入"
+    }
+  ]
 }

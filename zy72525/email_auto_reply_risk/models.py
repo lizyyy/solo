@@ -32,11 +32,12 @@ class RiskStatus(str, Enum):
 
 class ChangeType(str, Enum):
     """变更类型"""
-    IMPORT = "import"                   
-    MANUAL_EDIT = "manual_edit"         
-    STATUS_CHANGE = "status_change"     
-    ROLLBACK = "rollback"               
-    REIMPORT_SAME_MODEL = "reimport_same_model"  
+    IMPORT = "import"                    
+    MANUAL_EDIT = "manual_edit"          
+    STATUS_CHANGE = "status_change"      
+    REMARK_EDIT = "remark_edit"          
+    ROLLBACK = "rollback"                
+    REIMPORT_SAME_MODEL = "reimport_same_model"   
     MODEL_VERSION_CHANGE = "model_version_change"  
 
 
@@ -44,6 +45,12 @@ class ModelOutputFragment(Base):
     """模型输出片段原始记录
     
     保留模型输出的原始信息，用于后续追溯和核对
+    
+    关键字段说明：
+    - processing_status: 当前处理状态（产品复盘直接读这个字段，不用倒推）
+    - current_remark: 当前备注（周姐只改备注时存在这）
+    - original_is_auto_reply_risk: 模型原始判断（永不改变，人工改判不覆盖）
+    - is_auto_reply_risk: 当前生效的风险判断（可能被人工改判覆盖）
     """
     __tablename__ = "model_output_fragments"
     
@@ -52,13 +59,19 @@ class ModelOutputFragment(Base):
     model_version = Column(String(64), nullable=False, index=True)
     original_line_number = Column(Integer, nullable=False)
     raw_content = Column(Text, nullable=False)
+    original_is_auto_reply_risk = Column(Boolean, nullable=False)
     is_auto_reply_risk = Column(Boolean, nullable=False)
     risk_score = Column(Integer, nullable=True)
+    processing_status = Column(String(32), nullable=False, default="pending_import")
+    current_remark = Column(Text, nullable=True)
     import_batch_id = Column(String(64), nullable=False, index=True)
     imported_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    last_updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    last_updated_by = Column(String(64), nullable=True)
     
     __table_args__ = (
         Index("idx_sample_model", "sample_id", "model_version"),
+        Index("idx_status", "processing_status"),
     )
     
     change_history = relationship("RiskChangeLog", back_populates="fragment")
