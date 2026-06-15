@@ -250,6 +250,14 @@ class CheckService:
             if cross_leak_check:
                 results.append(cross_leak_check)
 
+        for cr in results:
+            if cr.id is None:
+                self.db.add(cr)
+        if results:
+            self.db.flush()
+            for cr in results:
+                self.db.refresh(cr)
+
         return results
 
     def get_check_results(

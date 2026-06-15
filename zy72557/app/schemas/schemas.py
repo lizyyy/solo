@@ -85,11 +85,42 @@ class WorkflowStepResponse(BaseModel):
 
 class ManualChangeCreate(BaseModel):
     evaluation_slice_id: int
+    check_result_id: Optional[int] = None
     field_name: str
     old_value: Optional[str] = None
     new_value: str
     changed_by: Optional[str] = None
     change_reason: Optional[str] = None
+
+
+class ManualChangeResponse(BaseModel):
+    id: int
+    evaluation_slice_id: int
+    check_result_id: Optional[int]
+    field_name: str
+    old_value: Optional[str]
+    new_value: str
+    changed_by: Optional[str]
+    change_time: datetime
+    change_reason: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+
+class StatusHistoryResponse(BaseModel):
+    id: int
+    evaluation_slice_id: int
+    check_result_id: Optional[int]
+    old_status: Optional[str]
+    new_status: str
+    changed_by: Optional[str]
+    change_reason: Optional[str]
+    change_time: datetime
+    step_context: Optional[Dict[str, Any]]
+
+    class Config:
+        from_attributes = True
 
 
 class ThresholdUpdate(BaseModel):

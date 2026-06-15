@@ -24,6 +24,7 @@ class EvaluationSlice(Base):
     check_results = relationship("CheckResult", back_populates="evaluation_slice")
     manual_changes = relationship("ManualChange", back_populates="evaluation_slice")
     workflow_steps = relationship("WorkflowStep", back_populates="evaluation_slice")
+    status_histories = relationship("StatusHistory", back_populates="evaluation_slice")
 
 
 class FeatureSnapshot(Base):
@@ -118,6 +119,7 @@ class ManualChange(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     evaluation_slice_id = Column(Integer, ForeignKey("evaluation_slices.id"))
+    check_result_id = Column(Integer, ForeignKey("check_results.id"), nullable=True, comment="关联的检查结果ID")
     field_name = Column(String, nullable=False, comment="改动的字段名")
     old_value = Column(Text, comment="旧值")
     new_value = Column(Text, comment="新值")
@@ -127,3 +129,20 @@ class ManualChange(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     evaluation_slice = relationship("EvaluationSlice", back_populates="manual_changes")
+
+
+class StatusHistory(Base):
+    __tablename__ = "status_histories"
+
+    id = Column(Integer, primary_key=True, index=True)
+    evaluation_slice_id = Column(Integer, ForeignKey("evaluation_slices.id"))
+    check_result_id = Column(Integer, ForeignKey("check_results.id"), nullable=True)
+    old_status = Column(String, comment="旧状态")
+    new_status = Column(String, comment="新状态")
+    changed_by = Column(String)
+    change_reason = Column(Text, comment="状态变更原因")
+    change_time = Column(DateTime(timezone=True), server_default=func.now())
+    step_context = Column(JSON, comment="状态变更时的上下文数据")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    evaluation_slice = relationship("EvaluationSlice", back_populates="status_histories")

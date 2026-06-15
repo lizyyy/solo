@@ -6,6 +6,7 @@ from .models import (
     WorkflowStep,
     ExportRecord,
     ManualChange,
+    StatusHistory,
 )
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "WorkflowStep",
     "ExportRecord",
     "ManualChange",
+    "StatusHistory",
 ]

@@ -5,7 +5,7 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime
 from sqlalchemy.orm import Session
 import pandas as pd
-from app.models import CheckResult, ExportRecord, EvaluationSlice, FeatureSnapshot
+from app.models import CheckResult, ExportRecord, EvaluationSlice, FeatureSnapshot, ManualChange, StatusHistory
 from app.schemas import ExportRequest
 
 
@@ -14,6 +14,12 @@ class ExportService:
         self.db = db
         self.export_dir = "./exports"
         os.makedirs(self.export_dir, exist_ok=True)
+        self._all_manual_changes: List[ManualChange] = []
+        self._all_status_history: List[StatusHistory] = []
+
+    def _load_all_history(self):
+        self._all_manual_changes = self.db.query(ManualChange).order_by(ManualChange.change_time.desc()).all()
+        self._all_status_history = self.db.query(StatusHistory).order_by(StatusHistory.change_time.desc()).all()
 
     def _query_check_results(
         self,
@@ -30,11 +36,47 @@ class ExportService:
         results = query.order_by(CheckResult.created_at.desc()).all()
         return results
 
+    def _get_slice_manual_changes(self, slice_id: int) -> List[Dict[str, Any]]:
+        return [
+            {
+                "id": mc.id,
+                "field_name": mc.field_name,
+                "old_value": mc.old_value,
+                "new_value": mc.new_value,
+                "changed_by": mc.changed_by,
+                "change_time": mc.change_time.strftime("%Y-%m-%d %H:%M:%S") if mc.change_time else "",
+                "change_reason": mc.change_reason,
+            }
+            for mc in self._all_manual_changes if mc.evaluation_slice_id == slice_id
+        ]
+
+    def _get_slice_status_history(self, slice_id: int) -> List[Dict[str, Any]]:
+        return [
+            {
+                "id": sh.id,
+                "old_status": sh.old_status,
+                "new_status": sh.new_status,
+                "changed_by": sh.changed_by,
+                "change_reason": sh.change_reason,
+                "change_time": sh.change_time.strftime("%Y-%m-%d %H:%M:%S") if sh.change_time else "",
+            }
+            for sh in self._all_status_history if sh.evaluation_slice_id == slice_id
+        ]
+
     def _flatten_result(self, cr: CheckResult) -> Dict[str, Any]:
         result_detail = cr.result_detail or {}
         evidence_chain = cr.evidence_chain or {}
         main_process = evidence_chain.get("main_process_summary", {})
         feature_snap = evidence_chain.get("feature_snapshot", {})
+
+        manual_changes = self._get_slice_manual_changes(cr.evaluation_slice_id)
+        status_history = self._get_slice_status_history(cr.evaluation_slice_id)
+
+        status_guidance = result_detail.get("status_guidance", "")
+        alignment_status = result_detail.get("alignment_status", "")
+        diff_value = result_detail.get("diff_value", "")
+        threshold_record_id = result_detail.get("threshold_record_id", "")
+        is_applied_in_report = result_detail.get("is_applied_in_report", "")
 
         return {
             "检查结果ID": cr.id,
@@ -56,6 +98,15 @@ class ExportService:
             "阈值旧值": cr.threshold_old_value,
             "阈值新值": cr.threshold_new_value,
             "报告显示阈值": cr.report_threshold_value,
+            "阈值差值": diff_value,
+            "是否应用到报告": "是" if is_applied_in_report == True else ("否" if is_applied_in_report == False else ""),
+            "对齐状态": alignment_status,
+            "处理指引": status_guidance,
+            "阈值变更记录ID": threshold_record_id,
+            "人工改动次数": len(manual_changes),
+            "人工改动历史": json.dumps(manual_changes, ensure_ascii=False),
+            "状态变更次数": len(status_history),
+            "状态变化轨迹": json.dumps(status_history, ensure_ascii=False),
             "详细信息": result_detail.get("message", ""),
             "详细结果JSON": json.dumps(result_detail, ensure_ascii=False),
             "证据链JSON": json.dumps(evidence_chain, ensure_ascii=False),
@@ -101,6 +152,8 @@ class ExportService:
         self,
         export_request: ExportRequest,
     ) -> Dict[str, Any]:
+        self._load_all_history()
+
         results = self._query_check_results(
             check_status_filter=export_request.check_status_filter,
             check_type_filter=export_request.check_type_filter,
@@ -170,5 +223,6 @@ class ExportService:
         check_status_filter: Optional[List[str]] = None,
         check_type_filter: Optional[List[str]] = None,
     ) -> List[Dict[str, Any]]:
+        self._load_all_history()
         results = self._query_check_results(check_status_filter, check_type_filter)
         return [self._flatten_result(r) for r in results]
