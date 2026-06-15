@@ -22,12 +22,18 @@ class DuplicateDetector:
             if len(indices) > 1:
                 dup_samples = [samples[i] for i in indices]
                 group_key = f"batch_{batch_id}_item_{item_id}"
+                default_remark = (
+                    f"检测到同一批数据重复训练：批次{batch_id}，商品{item_id}，"
+                    f"共出现{len(indices)}次。待策略产品复核"
+                )
                 for i in indices:
-                    samples[i].status = DataStatus.DUPLICATE
-                    samples[i].remarks = (
-                        f"检测到同一批数据重复训练：批次{batch_id}，商品{item_id}，"
-                        f"共出现{len(indices)}次。待策略产品复核"
-                    )
+                    if samples[i].status not in (
+                        DataStatus.STRATEGY_REVIEW,
+                        DataStatus.DUPLICATE,
+                    ):
+                        samples[i].status = DataStatus.DUPLICATE
+                    if not samples[i].remarks or samples[i].remarks == "nan":
+                        samples[i].remarks = default_remark
 
                 duplicates_info.append(
                     {
@@ -57,12 +63,18 @@ class DuplicateDetector:
             if len(indices) > 1:
                 dup_candidates = [candidates[i] for i in indices]
                 group_key = f"batch_{batch_id}_item_{item_id}"
+                default_remark = (
+                    f"检测到同一批数据重复训练：批次{batch_id}，商品{item_id}，"
+                    f"共出现{len(indices)}次。待策略产品复核"
+                )
                 for i in indices:
-                    candidates[i].status = DataStatus.DUPLICATE
-                    candidates[i].remarks = (
-                        f"检测到同一批数据重复训练：批次{batch_id}，商品{item_id}，"
-                        f"共出现{len(indices)}次。待策略产品复核"
-                    )
+                    if candidates[i].status not in (
+                        DataStatus.STRATEGY_REVIEW,
+                        DataStatus.DUPLICATE,
+                    ):
+                        candidates[i].status = DataStatus.DUPLICATE
+                    if not candidates[i].remarks or candidates[i].remarks == "nan":
+                        candidates[i].remarks = default_remark
 
                 duplicates_info.append(
                     {
@@ -97,22 +109,53 @@ class DuplicateDetector:
         all_keys = set(sample_keys.keys()) | set(candidate_keys.keys())
         for key in all_keys:
             batch_id, item_id = key
-            sample_count = len(sample_keys.get(key, []))
-            candidate_count = len(candidate_keys.get(key, []))
+            matched_samples = sample_keys.get(key, [])
+            matched_candidates = candidate_keys.get(key, [])
+            sample_count = len(matched_samples)
+            candidate_count = len(matched_candidates)
             total = sample_count + candidate_count
 
             if total > 1:
-                cross_duplicates.append(
-                    {
-                        "batch_id": batch_id,
-                        "item_id": item_id,
-                        "negative_sample_count": sample_count,
-                        "recall_candidate_count": candidate_count,
-                        "total_count": total,
-                        "sample_ids": [s.sample_id for s in sample_keys.get(key, [])],
-                        "candidate_ids": [c.candidate_id for c in candidate_keys.get(key, [])],
-                    }
+                dup_source_parts = []
+                if sample_count > 0:
+                    dup_source_parts.append(f"负样本{sample_count}次")
+                if candidate_count > 0:
+                    dup_source_parts.append(f"召回候选{candidate_count}次")
+                dup_source_desc = "、".join(dup_source_parts)
+                default_remark = (
+                    f"检测到同一批数据重复训练（交叉）：批次{batch_id}，商品{item_id}，"
+                    f"共出现{total}次（{dup_source_desc}）。待策略产品复核"
                 )
+
+                for s in matched_samples:
+                    if s.status not in (DataStatus.STRATEGY_REVIEW, DataStatus.DUPLICATE):
+                        s.status = DataStatus.DUPLICATE
+                    if not s.remarks or s.remarks == "nan":
+                        s.remarks = default_remark
+
+                for c in matched_candidates:
+                    if c.status not in (DataStatus.STRATEGY_REVIEW, DataStatus.DUPLICATE):
+                        c.status = DataStatus.DUPLICATE
+                    if not c.remarks or c.remarks == "nan":
+                        c.remarks = default_remark
+
+                group_key = f"batch_{batch_id}_item_{item_id}"
+                group_info = {
+                    "group_key": group_key,
+                    "batch_id": batch_id,
+                    "item_id": item_id,
+                    "count": total,
+                    "negative_sample_count": sample_count,
+                    "recall_candidate_count": candidate_count,
+                    "sample_ids": [s.sample_id for s in matched_samples],
+                    "candidate_ids": [c.candidate_id for c in matched_candidates],
+                    "is_cross": True,
+                }
+                self.duplicate_groups[group_key] = group_info
+
+                cross_duplicates.append(group_info)
+
+        _, _ = self.mark_for_strategy_review(samples, candidates)
 
         return cross_duplicates
 

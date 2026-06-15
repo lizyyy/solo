@@ -190,6 +190,17 @@ def report(ctx, no_charts):
         workflow.step_completed["step3_update_feature"] = True
         step_results["step3"] = {"total_versions": len(workflow.feature_versions)}
 
+    if workflow.negative_samples and workflow.recall_candidates:
+        workflow.detector.detect_in_negative_samples(workflow.negative_samples)
+        workflow.detector.detect_in_recall_candidates(workflow.recall_candidates)
+        workflow.detector.detect_cross_duplicates(
+            workflow.negative_samples, workflow.recall_candidates
+        )
+    elif workflow.negative_samples:
+        workflow.detector.detect_in_negative_samples(workflow.negative_samples)
+    elif workflow.recall_candidates:
+        workflow.detector.detect_in_recall_candidates(workflow.recall_candidates)
+
     click.echo("📊 生成评估报告...")
 
     summary = workflow.get_workflow_summary()

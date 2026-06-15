@@ -171,25 +171,54 @@ class ReportGenerator:
 
         dup_groups = dup_summary.get("duplicate_groups", [])
         if dup_groups:
+            table_dups = [g for g in dup_groups if not g.get("is_cross", False)]
+            cross_dups = [g for g in dup_groups if g.get("is_cross", False)]
+
             lines.append("### 🔴 检测到的重复训练分组")
             lines.append("")
-            lines.append("| 批次ID | 商品ID | 重复次数 | 状态 |")
-            lines.append("|--------|--------|----------|------|")
-            for g in dup_groups:
+            if table_dups:
+                lines.append("#### 表内重复（单表内同一批数据重复训练两次及以上）")
+                lines.append("")
+                lines.append("| 批次ID | 商品ID | 重复次数 | 样本/候选ID | 状态 |")
+                lines.append("|--------|--------|----------|-------------|------|")
+                for g in table_dups:
+                    ids = g.get("sample_ids") or g.get("candidate_ids") or []
+                    lines.append(
+                        f"| {g['batch_id']} | {g['item_id']} | {g['count']} | {', '.join(ids)} | 待策略产品复核 |"
+                    )
+                lines.append("")
+
+            if cross_dups:
+                lines.append("#### 🔗 跨表交叉重复（负样本+召回候选组合起来同一批数据重复训练）")
+                lines.append("")
                 lines.append(
-                    f"| {g['batch_id']} | {g['item_id']} | {g['count']} | 待策略产品复核 |"
+                    "| 批次ID | 商品ID | 负样本次数 | 召回候选次数 | 总次数 | 负样本ID | 召回候选ID | 状态 |"
                 )
-            lines.append("")
-            lines.append("> ⚠️ **重要提示**: 以上数据检测到同一批数据重复训练两次，")
+                lines.append(
+                    "|--------|--------|------------|--------------|--------|----------|------------|------|"
+                )
+                for g in cross_dups:
+                    lines.append(
+                        f"| {g['batch_id']} | {g['item_id']} | "
+                        f"{g.get('negative_sample_count', 0)} | "
+                        f"{g.get('recall_candidate_count', 0)} | "
+                        f"{g['count']} | "
+                        f"{', '.join(g.get('sample_ids', []))} | "
+                        f"{', '.join(g.get('candidate_ids', []))} | "
+                        f"待策略产品复核 |"
+                    )
+                lines.append("")
+
+            lines.append("> ⚠️ **重要提示**: 以上数据检测到同一批数据重复训练两次（含表内重复和跨表交叉重复），")
             lines.append("> 已自动标记为「待策略产品复核」状态，")
             lines.append("> **请勿自动归为正常**，请转交策略产品进行人工复核。")
             lines.append("")
             lines.append("#### 数据追溯方式")
             lines.append("")
-            lines.append("点击图表中的数据点，可追溯到：")
-            lines.append("- 负样本列表原始记录")
-            lines.append("- 召回候选表原始记录")
-            lines.append("- 特征版本表对应条目")
+            lines.append("通过以下字段可追溯原始记录：")
+            lines.append("- 负样本列表：通过 `sample_id` 查找 `negative_samples_processed.csv`")
+            lines.append("- 召回候选表：通过 `candidate_id` 查找 `recall_candidates_processed.csv`")
+            lines.append("- 特征版本表：通过 `linked_sample_id` / `linked_candidate_id` 双向关联")
             lines.append("")
         else:
             lines.append("✅ 未检测到重复训练数据")
@@ -293,11 +322,71 @@ class ReportGenerator:
             """
 
         alert_html = ""
+        dup_detail_html = ""
         if dup_groups:
+            table_dups = [g for g in dup_groups if not g.get("is_cross", False)]
+            cross_dups = [g for g in dup_groups if g.get("is_cross", False)]
+
             alert_html = f"""
             <div class="alert alert-danger">
                 <strong>⚠️ 检测到 {len(dup_groups)} 组重复训练数据！</strong>
-                <p>共涉及 {dup_summary.get('total_duplicate_items', 0)} 条记录，已标记为「待策略产品复核」，请勿自动归为正常。</p>
+                <p>共涉及 {dup_summary.get('total_duplicate_items', 0)} 条记录（表内重复 {len(table_dups)} 组、跨表交叉重复 {len(cross_dups)} 组），
+                已自动标记为「待策略产品复核」，<strong>请勿自动归为正常</strong>，请转交策略产品人工复核。</p>
+            </div>
+            """
+
+            dup_rows_html = ""
+            if cross_dups:
+                for g in cross_dups:
+                    dup_rows_html += f"""
+                    <tr class="dup-row cross">
+                        <td><span class="badge badge-cross">交叉重复</span></td>
+                        <td>{g['batch_id']}</td>
+                        <td>{g['item_id']}</td>
+                        <td>{g.get('negative_sample_count', 0)}（负样本） + {g.get('recall_candidate_count', 0)}（召回候选） = <strong>{g['count']}</strong></td>
+                        <td>
+                            <div>负样本ID: {', '.join(g.get('sample_ids', [])) or '—'}</div>
+                            <div>召回候选ID: {', '.join(g.get('candidate_ids', [])) or '—'}</div>
+                        </td>
+                        <td><span class="status-badge pending-strategy">待策略产品复核</span></td>
+                        <td><a href="negative_samples_processed.csv" target="_blank">负样本表</a> · <a href="recall_candidates_processed.csv" target="_blank">召回候选表</a> · <a href="feature_versions_updated.csv" target="_blank">特征版本表</a></td>
+                    </tr>
+                    """
+            if table_dups:
+                for g in table_dups:
+                    ids = g.get("sample_ids") or g.get("candidate_ids") or []
+                    dup_rows_html += f"""
+                    <tr class="dup-row table">
+                        <td><span class="badge badge-table">表内重复</span></td>
+                        <td>{g['batch_id']}</td>
+                        <td>{g['item_id']}</td>
+                        <td><strong>{g['count']}</strong></td>
+                        <td>{', '.join(ids)}</td>
+                        <td><span class="status-badge pending-strategy">待策略产品复核</span></td>
+                        <td><a href="negative_samples_processed.csv" target="_blank">负样本表</a> · <a href="recall_candidates_processed.csv" target="_blank">召回候选表</a> · <a href="feature_versions_updated.csv" target="_blank">特征版本表</a></td>
+                    </tr>
+                    """
+
+            dup_detail_html = f"""
+            <div class="section">
+                <h2>🔴 重复训练明细（历史留痕）</h2>
+                <div class="dup-hint">⚠️ 所有检测到的同一批数据重复训练两次及以上的数据，都会留痕在此页面，不急着归正常，留给策略产品复核。</div>
+                <table class="dup-table">
+                    <thead>
+                        <tr>
+                            <th>类型</th>
+                            <th>批次ID</th>
+                            <th>商品ID</th>
+                            <th>重复次数</th>
+                            <th>关联ID（追溯路径）</th>
+                            <th>当前状态</th>
+                            <th>数据追溯</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {dup_rows_html}
+                    </tbody>
+                </table>
             </div>
             """
 
@@ -345,6 +434,17 @@ class ReportGenerator:
         .chart-links a:hover {{ text-decoration: underline; }}
         .data-files {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }}
         .file-item {{ padding: 16px; background: #f8f9fa; border-radius: 8px; font-family: monospace; }}
+        .dup-hint {{ background: #fff4e5; border-left: 4px solid #ffa500; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; color: #8a5a00; }}
+        .dup-table {{ width: 100%; border-collapse: collapse; font-size: 14px; }}
+        .dup-table th, .dup-table td {{ padding: 12px; text-align: left; border-bottom: 1px solid #eee; }}
+        .dup-table th {{ background: #f8f9fa; font-weight: 600; color: #333; }}
+        .dup-row.cross td {{ background: #fff5f5; }}
+        .dup-row.table td {{ background: #fffaf0; }}
+        .badge {{ display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; color: white; }}
+        .badge-cross {{ background: #ef553b; }}
+        .badge-table {{ background: #ffa500; }}
+        .status-badge {{ display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }}
+        .status-badge.pending-strategy {{ background: #ef553b; color: white; }}
     </style>
 </head>
 <body>
@@ -381,6 +481,8 @@ class ReportGenerator:
                 {steps_html}
             </div>
         </div>
+
+        {dup_detail_html}
 
         <div class="section">
             <h2>📈 可视化图表</h2>

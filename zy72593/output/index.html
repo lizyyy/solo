@@ -42,19 +42,31 @@
         .chart-links a:hover { text-decoration: underline; }
         .data-files { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
         .file-item { padding: 16px; background: #f8f9fa; border-radius: 8px; font-family: monospace; }
+        .dup-hint { background: #fff4e5; border-left: 4px solid #ffa500; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; color: #8a5a00; }
+        .dup-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .dup-table th, .dup-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        .dup-table th { background: #f8f9fa; font-weight: 600; color: #333; }
+        .dup-row.cross td { background: #fff5f5; }
+        .dup-row.table td { background: #fffaf0; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; color: white; }
+        .badge-cross { background: #ef553b; }
+        .badge-table { background: #ffa500; }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .status-badge.pending-strategy { background: #ef553b; color: white; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>📊 候选集截断影响评估报告</h1>
-            <p class="subtitle">生成时间: 2026-06-07 17:01:42</p>
+            <p class="subtitle">生成时间: 2026-06-15 14:00:34</p>
         </header>
 
         
             <div class="alert alert-danger">
-                <strong>⚠️ 检测到 6 组重复训练数据！</strong>
-                <p>共涉及 15 条记录，已标记为「待策略产品复核」，请勿自动归为正常。</p>
+                <strong>⚠️ 检测到 7 组重复训练数据！</strong>
+                <p>共涉及 20 条记录（表内重复 0 组、跨表交叉重复 7 组），
+                已自动标记为「待策略产品复核」，<strong>请勿自动归为正常</strong>，请转交策略产品人工复核。</p>
             </div>
             
 
@@ -72,7 +84,7 @@
                 <div class="stat-label">特征版本总数</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number danger">15</div>
+                <div class="stat-number danger">20</div>
                 <div class="stat-label">重复训练条数</div>
             </div>
         </div>
@@ -110,6 +122,120 @@
             
             </div>
         </div>
+
+        
+            <div class="section">
+                <h2>🔴 重复训练明细（历史留痕）</h2>
+                <div class="dup-hint">⚠️ 所有检测到的同一批数据重复训练两次及以上的数据，都会留痕在此页面，不急着归正常，留给策略产品复核。</div>
+                <table class="dup-table">
+                    <thead>
+                        <tr>
+                            <th>类型</th>
+                            <th>批次ID</th>
+                            <th>商品ID</th>
+                            <th>重复次数</th>
+                            <th>关联ID（追溯路径）</th>
+                            <th>当前状态</th>
+                            <th>数据追溯</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                    <tr class="dup-row cross">
+                        <td><span class="badge badge-cross">交叉重复</span></td>
+                        <td>B002</td>
+                        <td>ITEM0107</td>
+                        <td>2（负样本） + 0（召回候选） = <strong>2</strong></td>
+                        <td>
+                            <div>负样本ID: S0002, S0005</div>
+                            <div>召回候选ID: —</div>
+                        </td>
+                        <td><span class="status-badge pending-strategy">待策略产品复核</span></td>
+                        <td><a href="negative_samples_processed.csv" target="_blank">负样本表</a> · <a href="recall_candidates_processed.csv" target="_blank">召回候选表</a> · <a href="feature_versions_updated.csv" target="_blank">特征版本表</a></td>
+                    </tr>
+                    
+                    <tr class="dup-row cross">
+                        <td><span class="badge badge-cross">交叉重复</span></td>
+                        <td>B001</td>
+                        <td>ITEM0117</td>
+                        <td>3（负样本） + 0（召回候选） = <strong>3</strong></td>
+                        <td>
+                            <div>负样本ID: S0003, S0006, S0014</div>
+                            <div>召回候选ID: —</div>
+                        </td>
+                        <td><span class="status-badge pending-strategy">待策略产品复核</span></td>
+                        <td><a href="negative_samples_processed.csv" target="_blank">负样本表</a> · <a href="recall_candidates_processed.csv" target="_blank">召回候选表</a> · <a href="feature_versions_updated.csv" target="_blank">特征版本表</a></td>
+                    </tr>
+                    
+                    <tr class="dup-row cross">
+                        <td><span class="badge badge-cross">交叉重复</span></td>
+                        <td>B001</td>
+                        <td>ITEM0105</td>
+                        <td>2（负样本） + 3（召回候选） = <strong>5</strong></td>
+                        <td>
+                            <div>负样本ID: S0004, S0008</div>
+                            <div>召回候选ID: C0003, C0004, C0010</div>
+                        </td>
+                        <td><span class="status-badge pending-strategy">待策略产品复核</span></td>
+                        <td><a href="negative_samples_processed.csv" target="_blank">负样本表</a> · <a href="recall_candidates_processed.csv" target="_blank">召回候选表</a> · <a href="feature_versions_updated.csv" target="_blank">特征版本表</a></td>
+                    </tr>
+                    
+                    <tr class="dup-row cross">
+                        <td><span class="badge badge-cross">交叉重复</span></td>
+                        <td>B003</td>
+                        <td>ITEM0112</td>
+                        <td>3（负样本） + 0（召回候选） = <strong>3</strong></td>
+                        <td>
+                            <div>负样本ID: S0011, S0016, S0019</div>
+                            <div>召回候选ID: —</div>
+                        </td>
+                        <td><span class="status-badge pending-strategy">待策略产品复核</span></td>
+                        <td><a href="negative_samples_processed.csv" target="_blank">负样本表</a> · <a href="recall_candidates_processed.csv" target="_blank">召回候选表</a> · <a href="feature_versions_updated.csv" target="_blank">特征版本表</a></td>
+                    </tr>
+                    
+                    <tr class="dup-row cross">
+                        <td><span class="badge badge-cross">交叉重复</span></td>
+                        <td>B001</td>
+                        <td>ITEM0108</td>
+                        <td>0（负样本） + 2（召回候选） = <strong>2</strong></td>
+                        <td>
+                            <div>负样本ID: —</div>
+                            <div>召回候选ID: C0001, C0025</div>
+                        </td>
+                        <td><span class="status-badge pending-strategy">待策略产品复核</span></td>
+                        <td><a href="negative_samples_processed.csv" target="_blank">负样本表</a> · <a href="recall_candidates_processed.csv" target="_blank">召回候选表</a> · <a href="feature_versions_updated.csv" target="_blank">特征版本表</a></td>
+                    </tr>
+                    
+                    <tr class="dup-row cross">
+                        <td><span class="badge badge-cross">交叉重复</span></td>
+                        <td>B002</td>
+                        <td>ITEM0108</td>
+                        <td>1（负样本） + 2（召回候选） = <strong>3</strong></td>
+                        <td>
+                            <div>负样本ID: S0020</div>
+                            <div>召回候选ID: C0013, C0021</div>
+                        </td>
+                        <td><span class="status-badge pending-strategy">待策略产品复核</span></td>
+                        <td><a href="negative_samples_processed.csv" target="_blank">负样本表</a> · <a href="recall_candidates_processed.csv" target="_blank">召回候选表</a> · <a href="feature_versions_updated.csv" target="_blank">特征版本表</a></td>
+                    </tr>
+                    
+                    <tr class="dup-row cross">
+                        <td><span class="badge badge-cross">交叉重复</span></td>
+                        <td>B001</td>
+                        <td>ITEM0100</td>
+                        <td>1（负样本） + 1（召回候选） = <strong>2</strong></td>
+                        <td>
+                            <div>负样本ID: S0001</div>
+                            <div>召回候选ID: C0024</div>
+                        </td>
+                        <td><span class="status-badge pending-strategy">待策略产品复核</span></td>
+                        <td><a href="negative_samples_processed.csv" target="_blank">负样本表</a> · <a href="recall_candidates_processed.csv" target="_blank">召回候选表</a> · <a href="feature_versions_updated.csv" target="_blank">特征版本表</a></td>
+                    </tr>
+                    
+                    </tbody>
+                </table>
+            </div>
+            
 
         <div class="section">
             <h2>📈 可视化图表</h2>

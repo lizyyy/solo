@@ -145,6 +145,9 @@ class EvaluationWorkflow:
         if auto_link:
             self._link_samples_and_candidates()
 
+        negative_output_path = self.output_dir / "negative_samples_processed.csv"
+        DataLoader.save_data(self.negative_samples, str(negative_output_path))
+
         output_path = self.output_dir / "recall_candidates_processed.csv"
         DataLoader.save_data(self.recall_candidates, str(output_path))
 
@@ -155,6 +158,7 @@ class EvaluationWorkflow:
             "duplicate_groups": len(dup_info),
             "duplicate_items": sum(d["count"] for d in dup_info),
             "cross_duplicates": len(cross_dups),
+            "negative_output_path": str(negative_output_path),
             "output_path": str(output_path),
             "duplicates": dup_info,
             "cross_duplicate_details": cross_dups,
@@ -208,73 +212,120 @@ class EvaluationWorkflow:
         }
 
     def _sync_from_samples_and_candidates(self):
-        existing_keys = {
-            (v.batch_id, v.item_id, v.version_id) for v in self.feature_versions
-        }
+        samples_by_key: Dict[Tuple[str, str], NegativeSample] = {}
+        for s in self.negative_samples:
+            key = (s.batch_id, s.item_id)
+            if key not in samples_by_key:
+                samples_by_key[key] = s
+
+        candidates_by_key: Dict[Tuple[str, str], RecallCandidate] = {}
+        for c in self.recall_candidates:
+            key = (c.batch_id, c.item_id)
+            if key not in candidates_by_key:
+                candidates_by_key[key] = c
+
+        existing_by_key: Dict[Tuple[str, str], FeatureVersion] = {}
+        for v in self.feature_versions:
+            existing_by_key[(v.batch_id, v.item_id)] = v
+
         version_counter = len(self.feature_versions) + 1
+        all_keys = set(samples_by_key.keys()) | set(candidates_by_key.keys())
 
-        for sample in self.negative_samples:
-            key = (sample.batch_id, sample.item_id, f"v{version_counter}")
-            if (sample.batch_id, sample.item_id) not in {
-                (v.batch_id, v.item_id) for v in self.feature_versions
-            }:
-                status = sample.status
-                reason = self._generate_reason_kept(sample, None)
-                missing = self._determine_missing_materials(sample, None)
-                next_owner = self._determine_next_owner(status, missing)
+        for key in all_keys:
+            batch_id, item_id = key
+            sample = samples_by_key.get(key)
+            candidate = candidates_by_key.get(key)
+            existing = existing_by_key.get(key)
 
-                version = FeatureVersion(
-                    version_id=f"v{version_counter}",
-                    feature_name=f"特征_{sample.feature_version}",
-                    batch_id=sample.batch_id,
-                    item_id=sample.item_id,
-                    reason_kept=reason,
-                    missing_materials=missing,
-                    next_owner=next_owner,
-                    status=status,
-                    linked_sample_id=sample.sample_id,
-                    remarks=f"来源：负样本列表。{sample.remarks}",
-                )
-                self.feature_versions.append(version)
-                version_counter += 1
+            status = self._merge_status(sample, candidate)
+            reason = self._generate_reason_kept(sample, candidate)
+            missing = self._determine_missing_materials(sample, candidate)
+            next_owner = self._determine_next_owner(status, missing)
+            remarks_parts = self._build_remarks(sample, candidate)
 
-        for candidate in self.recall_candidates:
-            existing_versions_for_item = [
-                v
-                for v in self.feature_versions
-                if v.batch_id == candidate.batch_id and v.item_id == candidate.item_id
-            ]
-
-            if existing_versions_for_item:
-                for v in existing_versions_for_item:
-                    if not v.linked_candidate_id:
-                        v.linked_candidate_id = candidate.candidate_id
-                    v.updated_at = datetime.now()
-                    if candidate.status == DataStatus.STRATEGY_REVIEW:
-                        v.status = DataStatus.STRATEGY_REVIEW
-                        recall_msg = f" 召回候选表状态：{candidate.remarks}"
-                        if recall_msg not in v.remarks:
-                            v.remarks += recall_msg
+            if existing:
+                existing.status = status
+                existing.reason_kept = reason
+                existing.missing_materials = missing
+                existing.next_owner = next_owner
+                existing.updated_at = datetime.now()
+                if sample and not existing.linked_sample_id:
+                    existing.linked_sample_id = sample.sample_id
+                if candidate and not existing.linked_candidate_id:
+                    existing.linked_candidate_id = candidate.candidate_id
+                merged_remarks = " ".join(remarks_parts)
+                if merged_remarks and merged_remarks not in existing.remarks:
+                    if existing.remarks and existing.remarks not in ("", "nan"):
+                        existing.remarks = existing.remarks + " " + merged_remarks
+                    else:
+                        existing.remarks = merged_remarks
             else:
-                status = candidate.status
-                reason = self._generate_reason_kept(None, candidate)
-                missing = self._determine_missing_materials(None, candidate)
-                next_owner = self._determine_next_owner(status, missing)
-
+                feature_name = self._build_feature_name(sample, candidate)
                 version = FeatureVersion(
                     version_id=f"v{version_counter}",
-                    feature_name=f"特征_recall_{candidate.recall_strategy}",
-                    batch_id=candidate.batch_id,
-                    item_id=candidate.item_id,
+                    feature_name=feature_name,
+                    batch_id=batch_id,
+                    item_id=item_id,
                     reason_kept=reason,
                     missing_materials=missing,
                     next_owner=next_owner,
                     status=status,
-                    linked_candidate_id=candidate.candidate_id,
-                    remarks=f"来源：召回候选表。{candidate.remarks}",
+                    linked_sample_id=sample.sample_id if sample else None,
+                    linked_candidate_id=candidate.candidate_id if candidate else None,
+                    remarks=" ".join(remarks_parts),
                 )
                 self.feature_versions.append(version)
+                existing_by_key[key] = version
                 version_counter += 1
+
+    def _merge_status(
+        self,
+        sample: Optional[NegativeSample],
+        candidate: Optional[RecallCandidate],
+    ) -> DataStatus:
+        statuses: List[DataStatus] = []
+        if sample:
+            statuses.append(sample.status)
+        if candidate:
+            statuses.append(candidate.status)
+        priority_order = [
+            DataStatus.STRATEGY_REVIEW,
+            DataStatus.DUPLICATE,
+            DataStatus.NEEDS_MORE_INFO,
+            DataStatus.PENDING,
+            DataStatus.NORMAL,
+            DataStatus.CONFIRMED,
+        ]
+        for s in priority_order:
+            if s in statuses:
+                return s
+        return DataStatus.PENDING
+
+    def _build_feature_name(
+        self,
+        sample: Optional[NegativeSample],
+        candidate: Optional[RecallCandidate],
+    ) -> str:
+        parts = []
+        if sample:
+            parts.append(f"特征_{sample.feature_version}")
+        if candidate:
+            parts.append(f"recall_{candidate.recall_strategy}")
+        return "+".join(parts) if parts else "特征_未知"
+
+    def _build_remarks(
+        self,
+        sample: Optional[NegativeSample],
+        candidate: Optional[RecallCandidate],
+    ) -> List[str]:
+        parts = []
+        if sample:
+            src_note = f"来源：负样本列表。{sample.remarks if sample.remarks and sample.remarks != 'nan' else ''}"
+            parts.append(src_note.strip())
+        if candidate:
+            src_note = f"来源：召回候选表。{candidate.remarks if candidate.remarks and candidate.remarks != 'nan' else ''}"
+            parts.append(src_note.strip())
+        return [p for p in parts if p]
 
     def _generate_reason_kept(
         self, sample: Optional[NegativeSample], candidate: Optional[RecallCandidate]
@@ -287,10 +338,9 @@ class EvaluationWorkflow:
                 f"召回策略：{candidate.recall_strategy}，排名：{candidate.rank}"
             )
 
-        if sample and sample.status == DataStatus.STRATEGY_REVIEW:
-            reasons.append("存在重复训练风险，待策略产品复核")
-        elif candidate and candidate.status == DataStatus.STRATEGY_REVIEW:
-            reasons.append("存在重复训练风险，待策略产品复核")
+        merged_status = self._merge_status(sample, candidate)
+        if merged_status == DataStatus.STRATEGY_REVIEW:
+            reasons.append("存在重复训练风险（含表内或跨表交叉重复），待策略产品复核")
         else:
             reasons.append("初检正常，待进一步确认")
 
@@ -300,13 +350,13 @@ class EvaluationWorkflow:
         self, sample: Optional[NegativeSample], candidate: Optional[RecallCandidate]
     ) -> List[str]:
         missing = []
-        if sample and not sample.feature_version:
+        if sample and (not sample.feature_version or sample.feature_version == "nan"):
             missing.append("特征版本号")
         if candidate and candidate.recall_score == 0:
             missing.append("召回分数确认")
-        if (sample and sample.status == DataStatus.STRATEGY_REVIEW) or (
-            candidate and candidate.status == DataStatus.STRATEGY_REVIEW
-        ):
+
+        merged_status = self._merge_status(sample, candidate)
+        if merged_status in (DataStatus.STRATEGY_REVIEW, DataStatus.DUPLICATE):
             missing.append("策略产品复核结论")
         return missing
 
@@ -315,7 +365,7 @@ class EvaluationWorkflow:
     ) -> NextOwner:
         if "策略产品复核结论" in missing_materials:
             return NextOwner.STRATEGY_PM
-        if status == DataStatus.STRATEGY_REVIEW:
+        if status in (DataStatus.STRATEGY_REVIEW, DataStatus.DUPLICATE):
             return NextOwner.STRATEGY_PM
         return NextOwner.EXPERIMENT_PLATFORM
 
