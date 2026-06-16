@@ -283,14 +283,21 @@ elif page == "⚖️ 冲突检测":
             with st.spinner("正在分析..."):
                 st.session_state.conflict_detector.clear_conflicts()
                 
-                parsed_records = st.session_state.conflict_detector.parse_wechat_text(wechat_text)
+                ref_date = ConflictDetector.infer_reference_date_from_data(
+                    df, data_time_col if data_time_col != '(无)' else None
+                )
+                
+                parsed_records = st.session_state.conflict_detector.parse_wechat_text(
+                    wechat_text, reference_date=ref_date
+                )
                 
                 for rec in parsed_records:
                     st.session_state.conflict_detector.add_wechat_record(
                         timestamp=rec.get('timestamp', ''),
                         content=rec.get('content', ''),
                         distance=rec.get('distance'),
-                        direction=rec.get('direction')
+                        direction=rec.get('direction'),
+                        operator=rec.get('speaker')
                     )
                 
                 conflicts = st.session_state.conflict_detector.compare_distance(
@@ -307,33 +314,129 @@ elif page == "⚖️ 冲突检测":
                     )
                     conflicts.extend(dir_conflicts)
                 
-                summary = st.session_state.conflict_detector.get_conflict_summary()
-                
-                if summary['total_conflicts'] > 0:
-                    st.error(f"⚖️ 发现 {summary['total_conflicts']} 处数据冲突")
-                    
-                    st.subheader("冲突详情")
-                    for c in summary['conflicts']:
-                        severity_icon = "🔴" if c.severity == 'high' else "🟡"
-                        with st.expander(f"{severity_icon} {c.conflict_type} - 差异: {c.discrepancy:.2f} mm ({c.discrepancy_percent:.1f}%)"):
-                            col1, col2 = st.columns(2)
-                            with col1:
-                                st.write("**实验数据**")
-                                st.info(f"数值: {c.data_value:.2f} mm")
-                            with col2:
-                                st.write("**微信群记录**")
-                                st.warning(f"数值: {c.wechat_value:.2f} mm")
-                                st.code(c.wechat_record, language=None)
-                            
-                            st.write("**建议动作**")
-                            st.success(c.suggestion)
+                st.session_state.last_conflicts_parsed = parsed_records
+                st.session_state.last_conflicts_summary = st.session_state.conflict_detector.get_conflict_summary()
+        
+        if 'last_conflicts_summary' in st.session_state:
+            summary = st.session_state.last_conflicts_summary
+            report = summary.get('detection_report', {})
+            
+            st.subheader("检测统计")
+            stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4)
+            stat_col1.metric("微信记录", report.get('wechat_records_count', 0))
+            stat_col2.metric("含距离记录", report.get('distance_wechat_records', 0))
+            stat_col3.metric("含方向记录", report.get('directional_wechat_records', 0))
+            stat_col4.metric("时间匹配成功", report.get('time_matches', 0))
+            
+            pending = summary.get('pending_conflicts', 0)
+            total = summary.get('total_conflicts', 0)
+            resolved = summary.get('resolved_conflicts', 0)
+            ignored = summary.get('ignored_conflicts', 0)
+            
+            sc1, sc2, sc3, sc4 = st.columns(4)
+            sc1.metric("待处理冲突", pending, delta=None)
+            sc2.metric("已解决冲突", resolved, delta=None)
+            sc3.metric("已忽略冲突", ignored, delta=None)
+            sc4.metric("冲突总数", total, delta=None)
+            
+            if report.get('parse_errors'):
+                with st.expander(f"⚠️ 解析/匹配异常 {len(report['parse_errors'])} 条"):
+                    for e in report['parse_errors'][:10]:
+                        st.warning(e)
+            
+            if pending > 0:
+                st.error(f"⚖️ 存在 {pending} 个未处理冲突，建议先处理再继续校准")
+            elif total > 0:
+                st.success(f"✅ {total} 个冲突已全部处理（已解决 {resolved}，已忽略 {ignored}），可以继续校准")
+            else:
+                if report.get('direction_checked') or report.get('distance_checked'):
+                    st.success("✅ 已执行冲突检测，未发现冲突，可以继续校准")
                 else:
-                    st.success("✅ 未检测到数据冲突")
+                    st.warning("⚠️ 检测未完整执行，请确认列选择正确（特别是时间列）")
+            
+            if total > 0:
+                st.subheader("冲突处理")
                 
-                st.divider()
-                st.subheader("建议动作")
-                actions = st.session_state.conflict_detector.get_suggested_actions()
-                for action in actions:
+                filter_status = st.radio(
+                    "筛选状态",
+                    options=['待处理', '已解决', '已忽略', '全部'],
+                    horizontal=True,
+                    key='conflict_filter'
+                )
+                
+                display_conflicts = []
+                for c in summary['conflicts']:
+                    if filter_status == '待处理' and c.status == 'pending':
+                        display_conflicts.append(c)
+                    elif filter_status == '已解决' and c.status == 'resolved':
+                        display_conflicts.append(c)
+                    elif filter_status == '已忽略' and c.status == 'ignored':
+                        display_conflicts.append(c)
+                    elif filter_status == '全部':
+                        display_conflicts.append(c)
+                
+                for idx, c in enumerate(display_conflicts):
+                    status_label = {'pending': '🟡 待处理', 'resolved': '✅ 已解决', 'ignored': '⚪ 已忽略'}[c.status]
+                    severity_icon = "🔴" if c.severity == 'high' else "🟡"
+                    
+                    with st.expander(f"{status_label} {severity_icon} {c.conflict_type} - "
+                                     f"差异: {c.discrepancy:.2f} mm ({c.discrepancy_percent:.1f}%)"
+                                     f"{' | ' + c.resolution_note if c.resolution_note else ''}"):
+                        col_a, col_b = st.columns(2)
+                        with col_a:
+                            st.write("**实验数据**")
+                            if c.conflict_type.startswith('数值'):
+                                st.info(f"数值: {c.data_value:.2f} mm")
+                            else:
+                                st.info("(方向冲突，无数值)")
+                            st.caption(f"时间: {c.timestamp}")
+                        with col_b:
+                            st.write("**微信群记录**")
+                            if c.conflict_type.startswith('数值'):
+                                st.warning(f"数值: {c.wechat_value:.2f} mm")
+                            else:
+                                st.warning("(方向冲突，无数值)")
+                            st.code(c.wechat_record, language=None)
+                        
+                        st.write("**建议动作**")
+                        st.success(c.suggestion)
+                        
+                        if c.status == 'pending':
+                            note = st.text_input("处理说明（可选）", key=f"note_{c.conflict_id}_{idx}")
+                            bcol1, bcol2 = st.columns(2)
+                            with bcol1:
+                                if st.button("✅ 标记为已解决", key=f"resolve_{c.conflict_id}_{idx}"):
+                                    st.session_state.conflict_detector.mark_resolved(c.conflict_id, note)
+                                    st.session_state.last_conflicts_summary = st.session_state.conflict_detector.get_conflict_summary()
+                                    st.rerun()
+                            with bcol2:
+                                if st.button("⚪ 标记为已忽略", key=f"ignore_{c.conflict_id}_{idx}"):
+                                    st.session_state.conflict_detector.mark_ignored(c.conflict_id, note)
+                                    st.session_state.last_conflicts_summary = st.session_state.conflict_detector.get_conflict_summary()
+                                    st.rerun()
+                        else:
+                            st.info(f"当前状态: {c.status} | 处理说明: {c.resolution_note or '无'}")
+                            if st.button("↩️ 撤销处理（恢复为待处理）", key=f"reopen_{c.conflict_id}_{idx}"):
+                                c.status = 'pending'
+                                c.resolution_note = ''
+                                if c.conflict_id in st.session_state.conflict_detector._resolved_keys:
+                                    st.session_state.conflict_detector._resolved_keys.discard(c.conflict_id)
+                                if c.conflict_id in st.session_state.conflict_detector._ignored_keys:
+                                    st.session_state.conflict_detector._ignored_keys.discard(c.conflict_id)
+                                st.session_state.last_conflicts_summary = st.session_state.conflict_detector.get_conflict_summary()
+                                st.rerun()
+            
+            st.divider()
+            st.subheader("建议动作")
+            actions = st.session_state.conflict_detector.get_suggested_actions()
+            for action in actions:
+                if action.startswith("⚠️"):
+                    st.warning(action)
+                elif action.startswith("✅"):
+                    st.success(action)
+                elif action.startswith("【"):
+                    st.write(f"**{action}**")
+                else:
                     st.write(f"• {action}")
 
 
