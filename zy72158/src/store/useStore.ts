@@ -4,11 +4,19 @@ import { OutdoorStall, ApprovalStatus, ImportData, ApprovalRecord } from '@/type
 import { sampleStalls } from '@/data/sampleData';
 import { generateId } from '@/utils/timeUtils';
 import { runFullCheck } from '@/services/conflictDetector';
+import { findBestMatch } from '@/utils/matchStall';
+
+export interface MergeResult {
+  merged: boolean;
+  stallId: string;
+  stallName: string;
+  reasons?: string[];
+}
 
 interface AppState {
   stalls: OutdoorStall[];
   currentOperator: string;
-  addStall: (data: ImportData) => void;
+  addStall: (data: ImportData) => MergeResult;
   updateStallStatus: (id: string, status: ApprovalStatus, remark?: string) => void;
   addApprovalRecord: (stallId: string, record: Omit<ApprovalRecord, 'id' | 'createdAt'>) => void;
   deleteStall: (id: string) => void;
@@ -18,14 +26,76 @@ interface AppState {
   getStatusCount: (status: ApprovalStatus) => number;
 }
 
+function namesMatch(a: string, b: string): boolean {
+  const normalize = (s: string) => s.replace(/[\s（）()]/g, '').toLowerCase();
+  const na = normalize(a);
+  const nb = normalize(b);
+  return na === nb || na.includes(nb) || nb.includes(na);
+}
+
 export const useStore = create<AppState>()(
   persist(
     (set, get) => ({
       stalls: sampleStalls,
       currentOperator: '市政设计师 老曹',
 
-      addStall: (data: ImportData) => {
+      addStall: (data: ImportData): MergeResult => {
+        const state = get();
         const now = new Date().toISOString();
+
+        const match = findBestMatch(data, state.stalls);
+
+        if (match) {
+          const existing = match.stall;
+          const newSource = {
+            id: generateId(),
+            sourceType: data.sourceType,
+            sourceName: data.sourceName,
+            importTime: now,
+            rawData: data.rawData,
+          };
+
+          const reasonDesc = match.reasons
+            .filter(r => r.type !== 'combined')
+            .map(r => r.description)
+            .join('；');
+
+          const updated = {
+            ...existing,
+            updatedAt: now,
+            sources: [...existing.sources, newSource],
+            area: data.area > 0 ? data.area : existing.area,
+            timePeriod: data.timePeriod || existing.timePeriod,
+            location: data.location || existing.location,
+            contact: data.contact || existing.contact,
+            phone: data.phone || existing.phone,
+            lat: data.lat ?? existing.lat,
+            lng: data.lng ?? existing.lng,
+            approvalRecords: [
+              ...existing.approvalRecords,
+              {
+                id: generateId(),
+                type: 'manual_review' as const,
+                result: 'pass' as const,
+                description: `补充材料：从「${data.sourceName}」归并追加来源（${data.sourceType === 'street_form' ? '街道表格' : data.sourceType === 'site_photo' ? '现场照片' : data.sourceType === 'approval_record' ? '审批记录' : 'GIS点位'}）。归并依据：${reasonDesc || '匹配成功'}。原有审批状态保持不变。`,
+                createdAt: now,
+                operator: '系统归并',
+              },
+            ],
+          };
+
+          set((s) => ({
+            stalls: s.stalls.map(st => st.id === existing.id ? updated : st),
+          }));
+
+          return {
+            merged: true,
+            stallId: existing.id,
+            stallName: existing.name,
+            reasons: match.reasons.map(r => r.description),
+          };
+        }
+
         const newStall: OutdoorStall = {
           id: generateId(),
           name: data.name,
@@ -53,6 +123,8 @@ export const useStore = create<AppState>()(
         };
         set((state) => ({ stalls: [...state.stalls, newStall] }));
         setTimeout(() => get().runAutoCheck(newStall.id), 100);
+
+        return { merged: false, stallId: newStall.id, stallName: newStall.name };
       },
 
       updateStallStatus: (id: string, status: ApprovalStatus, remark?: string) => {
