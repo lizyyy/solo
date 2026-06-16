@@ -1,57 +1,191 @@
-# React + TypeScript + Vite
+# 音乐教师课时核销工具
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+面向厂牌运营小孟的前端单页工具，用于处理音乐教师课时核销Excel，识别脏数据、授权过期、时码错位、重复曲目，支持备注补录和历史追溯，导出清单与当前筛选严格一致。
 
-Currently, two official plugins are available:
+## 一、业务场景
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+每日运营场景：运营小孟收到"音乐教师课时核销"原始Excel（表头经常半中文半英文，数据质量参差），需要：
+1. 自动识别中英文表头，导入曲目、教师、授权、时码、课时、备注
+2. 自动校验出授权过期、时码错位、重复曲目、脏数据四类问题
+3. 针对每条记录人工补录备注（如续期情况、曲目确认、课时修正），每条备注修改要留痕
+4. 按状态/教师/曲目/日期筛选后，导出的Excel必须和筛选结果完全一致
+5. 下次打开时，历史标注和备注不能丢；交接给下一个运营时，能看到改前/改后/为什么改
 
-## Expanding the ESLint configuration
+## 二、快速开始
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```bash
+# 安装依赖
+npm install
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+# 本地开发
+npm run dev
+# 默认访问 http://localhost:5173/
+
+# 类型检查
+npm run check
+
+# 代码规范
+npm run lint
+
+# 生产构建
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 三、操作流程
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 3.1 导入数据
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+两种方式二选一：
+
+- **加载样例**：点击顶部「加载样例」，内置17条真实感数据，覆盖所有校验场景，用于快速演练。
+- **导入Excel**：点击顶部「导入Excel」，选择本地 `.xlsx` / `.xls` 文件。
+
+支持的表头自动识别（中英文均可，半中文半英文也可）：
+
+| 字段 | 识别关键词 |
+|------|-----------|
+| 教师姓名 | 教师姓名、teacher、老师、姓名、instructor |
+| 曲目名称 | 曲目名称、曲目、title、song、track、歌曲名称、作品 |
+| 授权开始日期 | 授权开始日期、start date、开始时间、start、开始日期、生效日期 |
+| 授权结束日期 | 授权结束日期、end date、结束时间、end、结束日期、到期日期 |
+| 开始时码 | 开始时码、入点、start tc、tc in、start timecode、开始码、in |
+| 结束时码 | 结束时码、出点、end tc、tc out、end timecode、结束码、out |
+| 课时 | 课时、时长、duration、minutes、分钟、时间 |
+| 备注 | 备注、remark、note、说明、注释 |
+
+> 备注：表头会做归一化（去空格、统一标点、全半角），匹配度>0.3即建立映射，不要求严格一致。
+
+### 3.2 查看校验结果
+
+数据导入后，页面会按校验状态自动分Tab：
+
+| 状态 | 说明 | 自动判定规则 |
+|------|------|-------------|
+| 正常 | 数据完整且校验通过 | 所有字段合规，无重复 |
+| 授权过期 | 授权结束日期早于当前 | `authEnd < 今天` 且非空 |
+| 时码错位 | 时码格式错误或入点≥出点 | 非HH:MM:SS格式或 `tcIn >= tcOut` |
+| 重复曲目 | 同一教师+同曲目名出现多次 | 教师姓名+曲目名称规范化后复合键重复 |
+| 脏数据 | 关键字段缺失或异常 | 教师/曲目/日期为空，或日期格式无法解析 |
+
+每条记录右侧「问题详情」会给出具体错误说明。
+
+### 3.3 编辑备注与查看历史
+
+- 点击每条记录的「备注」列，进入编辑模式，输入新备注后点击「保存」。
+- 修改备注后，该记录会出现「查看历史记录」按钮，点击可展开所有修改痕迹：
+  - 修改时间
+  - 修改前文本
+  - 修改后文本
+  - 变更差异说明（如"新增: \"续期申请已提交\""、"删除: \"已过期\""）
+
+> 刷新页面后，所有记录、筛选条件、备注历史均通过 localStorage 持久化保留。
+
+### 3.4 筛选
+
+页面中部提供5个筛选项，可任意组合：
+
+| 筛选条件 | 说明 |
+|---------|------|
+| 状态Tab | 全部 / 正常 / 授权过期 / 时码错位 / 重复曲目 / 脏数据 |
+| 教师姓名 | 模糊匹配（忽略大小写）|
+| 曲目名称 | 模糊匹配（忽略大小写）|
+| 授权开始日期从 | `YYYY-MM-DD`，只显示授权开始 ≥ 该日期的记录 |
+| 授权结束日期至 | `YYYY-MM-DD`，只显示授权结束 ≤ 该日期的记录 |
+
+> 筛选结果会实时刷新，导出时严格按当前筛选结果输出，**不会多一条也不会少一条**。
+
+### 3.5 导出Excel
+
+点击顶部「导出Excel」，生成文件名：`音乐教师课时核销_YYYY-MM-DD_HHMM.xlsx`。
+
+导出文件包含**三个独立工作表**：
+
+#### Sheet 1：核销结果
+当前筛选条件下的全部记录，共 17 列：
+
+| 列号 | 列名 | 说明 |
+|-----|------|------|
+| 1 | 序号 | 按筛选结果的顺序编号，从1开始 |
+| 2 | 教师姓名 | - |
+| 3 | 曲目名称 | - |
+| 4 | 授权开始日期 | `YYYY-MM-DD` |
+| 5 | 授权结束日期 | `YYYY-MM-DD` |
+| 6 | 开始时码 | `HH:MM:SS` |
+| 7 | 结束时码 | `HH:MM:SS` |
+| 8 | 课时(分钟) | - |
+| 9 | 当前备注 | 最新版本的备注文本 |
+| 10 | 备注修改次数 | ≥0 |
+| 11 | 最近一次备注修改 | `YYYY-MM-DD HH:MM:SS`，无修改则为空 |
+| 12 | 校验状态 | 正常 / 授权过期 / 时码错位 / 重复曲目 / 脏数据 |
+| 13 | 问题详情 | 多条以「；」分隔 |
+| 14 | 原始来源文件 | 导入的Excel文件名 |
+| 15 | 导入时间 | `YYYY-MM-DD HH:MM:SS` |
+| 16 | 数据最后修改时间 | `YYYY-MM-DD HH:MM:SS` |
+| 17 | 记录唯一ID | UUID，用于跨批次追踪同一条记录 |
+
+#### Sheet 2：备注修改历史
+按"记录ID × 修改序号"展开的逐条变更，共 8 列：
+
+| 列号 | 列名 | 说明 |
+|-----|------|------|
+| 1 | 记录ID | 对应Sheet1的记录唯一ID |
+| 2 | 教师姓名 | - |
+| 3 | 曲目名称 | - |
+| 4 | 修改序号 | 从1开始；未修改过显示「-」 |
+| 5 | 修改时间 | `YYYY-MM-DD HH:MM:SS` |
+| 6 | 修改前文本 | 无则显示「(空)」 |
+| 7 | 修改后文本 | 无则显示「(空)」 |
+| 8 | 变更差异说明 | 字符级diff，例如"新增: \"续期\"；删除: \"过期\"" |
+
+#### Sheet 3：导出报告
+触发导出时的上下文快照，用于后续复核和交接，共 2 列：
+
+| 行 | 项目 | 说明 |
+|----|------|------|
+| 1 | 标题 | 音乐教师课时核销 — 导出报告 |
+| 2 | 表头 | 项目 / 值 |
+| 3 | 导出时间 | `YYYY-MM-DD HH:MM:SS` |
+| 4 | 导出记录数 | 筛选后的记录数（即Sheet1的数据行数） |
+| 5 | 总记录数(含未筛选) | 系统内全部记录数，用于审计 |
+| 6 | 筛选条件说明 | 人类可读的筛选条件自然语言 |
+| 7 | 状态筛选 | 全部/正常/授权过期/时码错位/重复曲目/脏数据 |
+| 8 | 教师姓名搜索 | 空则显示「(未设置)」 |
+| 9 | 曲目名称搜索 | 空则显示「(未设置)」 |
+| 10 | 授权开始日期从 | 空则显示「(未设置)」 |
+| 11 | 授权结束日期至 | 空则显示「(未设置)」 |
+| 12 | 涉及原始文件 | 多个文件以「；」分隔 |
+| 13 | 备注 | 交接说明（三个工作表的用途） |
+
+## 四、技术栈与关键实现
+
+- **前端框架**：React 18 + TypeScript 5.7 + Vite 6
+- **状态管理**：Zustand v5（persist中间件持久化到localStorage，key: `music-teacher-track-verification`）
+- **Excel处理**：SheetJS (xlsx 0.18.5)
+- **样式**：TailwindCSS 3
+- **图标**：Lucide React
+
+关键设计：
+- 表头匹配采用归一化+关键词评分（>0.3阈值）
+- 重复曲目检测：教师姓名+曲目名称复合键（全角→半角、去特殊字符、转小写）
+- 备注diff：逐字符LCS算法生成差异说明
+- 导出严格绑定筛选状态：`getFilteredRecords()`结果作为导出唯一数据源
+
+## 五、工程验证清单
+
+交付前必须确认以下全部通过：
+
+```bash
+npm run lint    # ESLint 无报错
+npm run check   # tsc 类型检查无报错
+npm run build   # 生产构建成功
 ```
+
+端到端走查：
+1. 打开首页 → 点击「加载样例」→ 确认17条记录导入并分类
+2. 点击「授权过期」Tab → 确认显示3条
+3. 对第一条记录编辑备注（如"续期申请已提交"）→ 保存 → 确认出现「查看历史记录」
+4. 点击「查看历史记录」→ 确认显示改前、改后、差异说明
+5. 点击「导出Excel」→ 下载文件后打开：
+   - Sheet1 共 3 行数据，与筛选结果一致
+   - Sheet2 至少 1 条修改记录
+   - Sheet3 导出记录数为3、状态为授权过期、包含涉及原始文件

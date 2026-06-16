@@ -108,7 +108,7 @@ function parseDate(value: unknown): string {
     return `${cnMatch[1]}-${String(cnMatch[2]).padStart(2, '0')}-${String(cnMatch[3]).padStart(2, '0')}`;
   }
 
-  const dotMatch = strValue.match(/^(\d{4})\.(\d{1,2})\.(\d{1,2})/);
+  const dotMatch = strValue.match(/^(\d{4})[.](\d{1,2})[.](\d{1,2})/);
   if (dotMatch) {
     return `${dotMatch[1]}-${String(dotMatch[2]).padStart(2, '0')}-${String(dotMatch[3]).padStart(2, '0')}`;
   }
@@ -120,7 +120,7 @@ function parseTimecode(value: unknown): string {
   if (!value) return '';
   const str = String(value).trim();
 
-  const match = str.match(/(\d{1,2})[:\.](\d{2})[:\.](\d{2})/);
+  const match = str.match(/(\d{1,2})[:.](\d{2})[:.](\d{2})/);
   if (match) {
     return `${String(match[1]).padStart(2, '0')}:${match[2]}:${match[3]}`;
   }
@@ -312,21 +312,24 @@ function buildRemarkHistorySheetData(records: TrackRecord[]) {
   return rows;
 }
 
-function buildReportSheetData(ctx: ExportContext): Array<Array<Record<string, unknown>>> {
-  const rows: Array<Array<Record<string, unknown>>> = [];
-  rows.push([{ '核销导出报告': '音乐教师课时核销 — 导出报告' }]);
-  rows.push([{ '项目': '值' }]);
-  rows.push([{ '导出时间': formatTimestamp(ctx.exportedAt) }]);
-  rows.push([{ '导出记录数': ctx.filteredRecordsCount }]);
-  rows.push([{ '总记录数(含未筛选)': ctx.totalRecordsCount }]);
-  rows.push([{ '筛选条件说明': describeFilters(ctx.filters) }]);
-  rows.push([{ '状态筛选': STATUS_LABELS[ctx.filters.status] }]);
-  rows.push([{ '教师姓名搜索': ctx.filters.teacherName || '(未设置)' }]);
-  rows.push([{ '曲目名称搜索': ctx.filters.trackName || '(未设置)' }]);
-  rows.push([{ '授权开始日期从': ctx.filters.dateFrom || '(未设置)' }]);
-  rows.push([{ '授权结束日期至': ctx.filters.dateTo || '(未设置)' }]);
-  rows.push([{ '涉及原始文件': ctx.sourceFiles.join('； ') }]);
-  rows.push([{ '备注': '本Excel包含三个工作表：【核销结果】当前筛选清单、【备注修改历史】逐条改前改后差异、【导出报告】触发导出时的筛选条件与统计信息，便于后续复核与交接。' }]);
+function buildReportSheetData(ctx: ExportContext): unknown[][] {
+  const rows: unknown[][] = [];
+  rows.push(['音乐教师课时核销 — 导出报告']);
+  rows.push(['项目', '值']);
+  rows.push(['导出时间', formatTimestamp(ctx.exportedAt)]);
+  rows.push(['导出记录数', ctx.filteredRecordsCount]);
+  rows.push(['总记录数(含未筛选)', ctx.totalRecordsCount]);
+  rows.push(['筛选条件说明', describeFilters(ctx.filters)]);
+  rows.push(['状态筛选', STATUS_LABELS[ctx.filters.status]]);
+  rows.push(['教师姓名搜索', ctx.filters.teacherName || '(未设置)']);
+  rows.push(['曲目名称搜索', ctx.filters.trackName || '(未设置)']);
+  rows.push(['授权开始日期从', ctx.filters.dateFrom || '(未设置)']);
+  rows.push(['授权结束日期至', ctx.filters.dateTo || '(未设置)']);
+  rows.push(['涉及原始文件', ctx.sourceFiles.join('； ')]);
+  rows.push([
+    '备注',
+    '本Excel包含三个工作表：【核销结果】当前筛选清单、【备注修改历史】逐条改前改后差异、【导出报告】触发导出时的筛选条件与统计信息，便于后续复核与交接。',
+  ]);
 
   return rows;
 }

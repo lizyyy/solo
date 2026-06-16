@@ -34,7 +34,7 @@ export interface TrackRecord {
   validationStatus: ValidationStatus;
   validationErrors: ValidationError[];
   modifyHistory: ModifyHistory[];
-  rawData: Record<string, any>;
+  rawData: Record<string, unknown>;
   duplicateGroupId?: string;
 }
 
