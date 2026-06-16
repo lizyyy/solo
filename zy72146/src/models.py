@@ -88,9 +88,14 @@ class ProcessResult:
 class BatchSummary:
     total_tracks: int = 0
     matched_tracks: int = 0
+    matched_with_valid_audio: int = 0
+    matched_with_corrupted_audio: int = 0
     unmatched_tracks: int = 0
     error_tracks: int = 0
     conflict_tracks: int = 0
+    total_audio_files: int = 0
+    valid_audio_count: int = 0
+    corrupted_audio_count: int = 0
     total_anomalies: int = 0
     anomaly_counts: Dict[AnomalyType, int] = field(default_factory=dict)
     process_time: float = 0.0

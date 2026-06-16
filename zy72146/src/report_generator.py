@@ -121,9 +121,18 @@ class ReportGenerator:
         lines.append("-" * 60)
         lines.append(f"总曲目数: {summary.total_tracks}")
         lines.append(f"  - 已匹配: {summary.matched_tracks}")
+        lines.append(f"    - 可用音频: {summary.matched_with_valid_audio}")
+        lines.append(f"    - 损坏音频: {summary.matched_with_corrupted_audio}")
         lines.append(f"  - 未匹配: {summary.unmatched_tracks}")
         lines.append(f"  - 处理失败: {summary.error_tracks}")
         lines.append(f"  - 数据冲突: {summary.conflict_tracks}")
+        lines.append("")
+        lines.append("-" * 60)
+        lines.append("音频文件统计")
+        lines.append("-" * 60)
+        lines.append(f"总音频数: {summary.total_audio_files}")
+        lines.append(f"  - 可用音频: {summary.valid_audio_count}")
+        lines.append(f"  - 损坏音频: {summary.corrupted_audio_count}")
         lines.append("")
         lines.append("-" * 60)
         lines.append("异常统计")
@@ -249,6 +258,14 @@ class ReportGenerator:
                 <div class="number">{summary.matched_tracks}</div>
                 <div class="label">已匹配</div>
             </div>
+            <div class="stat-card">
+                <div class="number">{summary.matched_with_valid_audio}</div>
+                <div class="label">可用音频匹配</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="number">{summary.matched_with_corrupted_audio}</div>
+                <div class="label">损坏音频匹配</div>
+            </div>
             <div class="stat-card warning">
                 <div class="number">{summary.unmatched_tracks}</div>
                 <div class="label">未匹配</div>
@@ -260,6 +277,20 @@ class ReportGenerator:
             <div class="stat-card info">
                 <div class="number">{summary.total_anomalies}</div>
                 <div class="label">异常数</div>
+            </div>
+        </div>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="number">{summary.total_audio_files}</div>
+                <div class="label">总音频文件</div>
+            </div>
+            <div class="stat-card success">
+                <div class="number">{summary.valid_audio_count}</div>
+                <div class="label">可用音频</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="number">{summary.corrupted_audio_count}</div>
+                <div class="label">损坏音频</div>
             </div>
         </div>
 """

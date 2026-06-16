@@ -43,9 +43,14 @@ def run_pipeline(excel_path: str, audio_dir: str, report_name: str = None,
     audio_files = scanner.scan_files()
     print(f"   扫描到 {len(audio_files)} 个音频文件")
 
+    total_audio = len(audio_files)
+    valid_audio = sum(1 for af in audio_files if af.is_valid)
+    corrupted_audio = sum(1 for af in audio_files if not af.is_valid)
+    print(f"   可用音频: {valid_audio} 个, 损坏音频: {corrupted_audio} 个")
+
     invalid_files = [af for af in audio_files if not af.is_valid]
     if invalid_files:
-        print(f"   ⚠️ 发现 {len(invalid_files)} 个损坏的音频文件")
+        print(f"   ⚠️ 损坏音频列表:")
         for af in invalid_files:
             print(f"      - {af.file_name}: {af.error_message}")
 
@@ -54,8 +59,13 @@ def run_pipeline(excel_path: str, audio_dir: str, report_name: str = None,
     print(f"\n[3/6] 匹配曲目与音频文件...")
     matcher = TrackMatcher(working_tracks, audio_files)
     matched_tracks = matcher.match_all()
-    matched_count = sum(1 for t in matched_tracks if t.status.value == "已匹配")
+    matched_count = sum(1 for t in matched_tracks if t.audio_file)
+    matched_valid_count = sum(1 for t in matched_tracks if t.audio_file and not any(
+        a.value == "文件损坏" for a in t.anomalies))
+    matched_corrupted_count = sum(1 for t in matched_tracks if t.audio_file and any(
+        a.value == "文件损坏" for a in t.anomalies))
     print(f"   成功匹配 {matched_count}/{len(matched_tracks)} 条曲目")
+    print(f"   其中可用音频: {matched_valid_count} 条, 损坏音频: {matched_corrupted_count} 条")
 
     print(f"\n[4/6] 检测异常情况...")
     detector = AnomalyDetector(matched_tracks)
@@ -96,6 +106,13 @@ def run_pipeline(excel_path: str, audio_dir: str, report_name: str = None,
     print(f"\n[6/6] 生成报告...")
     batch_processor = BatchProcessor(error_isolation=True)
     summary = batch_processor.process_batch(detected_tracks, lambda t: None)
+
+    summary.total_audio_files = total_audio
+    summary.valid_audio_count = valid_audio
+    summary.corrupted_audio_count = corrupted_audio
+    summary.matched_tracks = matched_count
+    summary.matched_with_valid_audio = matched_valid_count
+    summary.matched_with_corrupted_audio = matched_corrupted_count
 
     report_gen = ReportGenerator(str(OUTPUT_DIR))
     report_paths = report_gen.generate_full_report(
@@ -139,9 +156,12 @@ def show_summary(result):
     print("\n📋 处理摘要:")
     print(f"   总曲目: {summary.total_tracks}")
     print(f"   已匹配: {summary.matched_tracks}")
+    print(f"     其中可用音频: {summary.matched_with_valid_audio}")
+    print(f"     其中损坏音频: {summary.matched_with_corrupted_audio}")
     print(f"   未匹配: {summary.unmatched_tracks}")
     print(f"   处理失败: {summary.error_tracks}")
     print(f"   异常总数: {summary.total_anomalies}")
+    print(f"   音频文件: 共{summary.total_audio_files}个（可用{summary.valid_audio_count}个，损坏{summary.corrupted_audio_count}个）")
 
     need_attention = [t for t in tracks if t.anomalies or t.status.value in ["待审核", "数据冲突", "处理失败"]]
     if need_attention:

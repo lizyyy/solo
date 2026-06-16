@@ -37,7 +37,7 @@
 <body>
     <div class="container">
         <h1>🥁 少儿打击乐课堂评分报告</h1>
-        <p class="timestamp">生成时间: 2026-06-08 16:39:47</p>
+        <p class="timestamp">生成时间: 2026-06-16 22:56:20</p>
 
         <h2>📊 处理概览</h2>
         <div class="stats">
@@ -46,8 +46,16 @@
                 <div class="label">总曲目</div>
             </div>
             <div class="stat-card success">
-                <div class="number">4</div>
+                <div class="number">9</div>
                 <div class="label">已匹配</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">5</div>
+                <div class="label">可用音频匹配</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="number">4</div>
+                <div class="label">损坏音频匹配</div>
             </div>
             <div class="stat-card warning">
                 <div class="number">2</div>
@@ -58,62 +66,48 @@
                 <div class="label">处理失败</div>
             </div>
             <div class="stat-card info">
-                <div class="number">20</div>
+                <div class="number">15</div>
                 <div class="label">异常数</div>
+            </div>
+        </div>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="number">10</div>
+                <div class="label">总音频文件</div>
+            </div>
+            <div class="stat-card success">
+                <div class="number">6</div>
+                <div class="label">可用音频</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="number">4</div>
+                <div class="label">损坏音频</div>
             </div>
         </div>
 
         <h2>⚠️ 异常分布</h2>
         <table>
             <tr><th>异常类型</th><th>数量</th></tr>
-<tr><td>文件损坏</td><td>9</td></tr>
+<tr><td>文件损坏</td><td>4</td></tr>
 <tr><td>重复曲目</td><td>4</td></tr>
 <tr><td>旧版母带</td><td>2</td></tr>
-<tr><td>名称不匹配</td><td>2</td></tr>
 <tr><td>缺失音频</td><td>2</td></tr>
+<tr><td>未授权</td><td>1</td></tr>
+<tr><td>名称不匹配</td><td>1</td></tr>
 <tr><td>人工改名</td><td>1</td></tr>
-</table>
-<h2>📝 补录备注</h2>
-<div class="note">
-<h3>TRK003 - 森林鼓点 (小明)</h3>
-<p>[2026-06-08 16:39:46] 旧版母带已确认可用，无需重新录制</p>
-</div>
-<div class="note">
-<h3>TRK005 - 小星星变奏曲 (小红)</h3>
-<p>[2026-06-08 16:39:46] 家长已补交授权签字文件</p>
-</div>
-<h2>🔀 数据冲突（需人工确认）</h2>
-<div class="conflict">
-<h3>TRK005 - 小星星变奏曲</h3>
-<div class="evidence">
-<strong>授权状态</strong><br>
-📋 Excel记录: <code>未授权</code><br>
-📥 导入数据: <code>已授权</code><br>
-💡 建议: 建议确认授权状态后手动更新
-</div>
-</div>
-<h2>� 补录差异</h2>
-<table>
-            <tr><th>曲目编号</th><th>变更类型</th><th>字段</th><th>旧值</th><th></th><th>新值</th></tr>
-<tr><td>TRK005</td><td><span class='badge badge-warning'>修改</span></td><td>已授权</td><td>否</td><td class='arrow'>→</td><td>是</td></tr>
-<tr><td>TRK005</td><td><span class='badge badge-success'>新增</span></td><td>补录备注</td><td>(空)</td><td class='arrow'>→</td><td>[2026-06-08 16:39:46] 家长已补交授权签字文件</td></tr>
-<tr><td>TRK005</td><td><span class='badge badge-warning'>修改</span></td><td>状态</td><td>待审核</td><td class='arrow'>→</td><td>数据冲突</td></tr>
-<tr><td>TRK005</td><td><span class='badge badge-success'>新增异常</span></td><td>异常类型</td><td>(空)</td><td class='arrow'>→</td><td>名称不匹配</td></tr>
-<tr><td>TRK005</td><td><span class='badge badge-danger'>移除异常</span></td><td>异常类型</td><td>未授权</td><td class='arrow'>→</td><td>(空)</td></tr>
-<tr><td>TRK003</td><td><span class='badge badge-success'>新增</span></td><td>补录备注</td><td>(空)</td><td class='arrow'>→</td><td>[2026-06-08 16:39:46] 旧版母带已确认可用，无需重新录制</td></tr>
 </table>
 
         <h2>📋 曲目明细</h2>
         <table>
             <tr><th>曲目编号</th><th>名称</th><th>学生</th><th>状态</th><th>补录备注</th><th>异常</th></tr>
-<tr><td>TRK001</td><td>小星星变奏曲</td><td>小明</td><td><span class='badge badge-success'>已匹配</span></td><td></td><td><span class="badge badge-danger">文件损坏</span></td></tr>
-<tr><td>TRK002</td><td>童年记忆</td><td>小红</td><td><span class='badge badge-success'>已匹配</span></td><td></td><td><span class="badge badge-danger">文件损坏</span></td></tr>
-<tr><td>TRK003</td><td>森林鼓点</td><td>小明</td><td><span class='badge badge-warning'>待审核</span></td><td>[2026-06-08 16:39:46] 旧版母带已确认可...</td><td><span class="badge badge-danger">文件损坏</span><span class="badge badge-danger">旧版母带</span><span class="badge badge-danger">旧版母带</span></td></tr>
-<tr><td>TRK004</td><td>小星星变奏曲</td><td>小明</td><td><span class='badge badge-success'>已匹配</span></td><td></td><td><span class="badge badge-danger">文件损坏</span></td></tr>
-<tr><td>TRK005</td><td>小星星变奏曲</td><td>小红</td><td><span class='badge badge-danger'>数据冲突</span></td><td>[2026-06-08 16:39:46] 家长已补交授权签...</td><td><span class="badge badge-danger">文件损坏</span><span class="badge badge-danger">名称不匹配</span></td></tr>
-<tr><td>TRK006</td><td>快乐节拍</td><td>小强</td><td><span class='badge badge-success'>已匹配</span></td><td></td><td><span class="badge badge-danger">文件损坏</span></td></tr>
+<tr><td>TRK001</td><td>小星星变奏曲</td><td>小明</td><td><span class='badge badge-success'>已匹配</span></td><td></td><td></td></tr>
+<tr><td>TRK002</td><td>童年记忆</td><td>小红</td><td><span class='badge badge-success'>已匹配</span></td><td></td><td></td></tr>
+<tr><td>TRK003</td><td>森林鼓点</td><td>小明</td><td><span class='badge badge-warning'>待审核</span></td><td></td><td><span class="badge badge-danger">文件损坏</span><span class="badge badge-danger">旧版母带</span><span class="badge badge-danger">旧版母带</span></td></tr>
+<tr><td>TRK004</td><td>小星星变奏曲</td><td>小明</td><td><span class='badge badge-success'>已匹配</span></td><td></td><td></td></tr>
+<tr><td>TRK005</td><td>小星星变奏曲</td><td>小红</td><td><span class='badge badge-warning'>待审核</span></td><td></td><td><span class="badge badge-danger">文件损坏</span><span class="badge badge-danger">未授权</span></td></tr>
+<tr><td>TRK006</td><td>快乐节拍</td><td>小强</td><td><span class='badge badge-success'>已匹配</span></td><td></td><td></td></tr>
 <tr><td>TRK007</td><td>跳跃的音符</td><td>小强</td><td><span class='badge badge-warning'>待审核</span></td><td></td><td><span class="badge badge-danger">重复曲目</span><span class="badge badge-danger">文件损坏</span><span class="badge badge-danger">名称不匹配</span><span class="badge badge-danger">重复曲目</span></td></tr>
-<tr><td>TRK008</td><td>欢快的节奏</td><td>小明</td><td><span class='badge badge-warning'>待审核</span></td><td></td><td><span class="badge badge-danger">文件损坏</span><span class="badge badge-danger">人工改名</span></td></tr>
+<tr><td>TRK008</td><td>欢快的节奏</td><td>小明</td><td><span class='badge badge-warning'>待审核</span></td><td></td><td><span class="badge badge-danger">人工改名</span></td></tr>
 <tr><td>TRK009</td><td>跳跃的音符</td><td>小华</td><td><span class='badge badge-danger'>未匹配</span></td><td></td><td><span class="badge badge-danger">缺失音频</span></td></tr>
 <tr><td>TRK010</td><td>森林鼓点</td><td>小华</td><td><span class='badge badge-danger'>未匹配</span></td><td></td><td><span class="badge badge-danger">缺失音频</span></td></tr>
 <tr><td>TRK007</td><td>快乐节拍</td><td>小华</td><td><span class='badge badge-warning'>待审核</span></td><td></td><td><span class="badge badge-danger">重复曲目</span><span class="badge badge-danger">文件损坏</span><span class="badge badge-danger">重复曲目</span></td></tr>
