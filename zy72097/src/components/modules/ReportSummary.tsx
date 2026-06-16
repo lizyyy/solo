@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import type { FittingResult, ProcessedData } from '../../types';
 import { formatNumber, formatScientific } from '../../utils/format';
+import { predictLife } from '../../services/fittingAlgorithm';
 import { cn } from '../../lib/utils';
 
 interface WeightClosureStatus {
@@ -63,15 +64,7 @@ const ReportSummary: React.FC<ReportSummaryProps> = ({
     if (isNaN(stress) || stress <= 0) return null;
 
     const { model, parameters } = fittingResult;
-    let predictedLife = 0;
-
-    if (model === 'power') {
-      predictedLife = parameters.a * Math.pow(stress, parameters.b);
-    } else if (model === 'exponential') {
-      predictedLife = parameters.a * Math.exp(parameters.b * stress);
-    } else if (model === 'basquin') {
-      predictedLife = parameters.a * Math.pow(stress, parameters.b);
-    }
+    const predictedLife = predictLife(stress, model, parameters);
 
     const r2 = parameters.r2;
     const errorMargin = (1 - r2) * 0.5;
