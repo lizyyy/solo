@@ -1,57 +1,164 @@
-# React + TypeScript + Vite
+# 海上浮标系泊受力计算看板
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+为训练教练老唐及后续接手人员提供海上浮标系泊受力的物理近似计算、单位换算、安全阈值判断与可追溯报告的一体化工具。解决传感器日志中单位混写、采样缺口和超限判断留痕的痛点。
 
-Currently, two official plugins are available:
+> 核心价值：让"海上浮标系泊受力"的每次判断都有来源、有依据、可回溯。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 快速开始
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 1. 安装依赖
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. 启动开发服务器
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm run dev
 ```
+
+启动后访问 `http://localhost:5173/`（具体端口以终端输出为准）。
+
+### 3. 加载样例数据
+
+进入页面后，系统会自动加载 5 条样例数据。若未自动加载，点击顶部 **"加载样例"** 按钮手动加载。
+
+样例加载完成后，左侧列表将显示 5 条记录，覆盖三种判断结果、四种单位：
+
+| 编号 | 场景 | 峰值 | 原始单位 | 采样缺口 | 判断结果 |
+|------|------|------|----------|----------|----------|
+| REC-001 | 顺利记录 | 12.50 kN | kN | 无 | 通过（41.7%） |
+| REC-002 | 人工确认 | 26.80 kN | kN | 第3-4点缺失 | 需人工确认（89.3%） |
+| REC-003 | 旧口径补录 | 5.80 kN | N | 第5点缺失 | 通过（19.3%） |
+| REC-004 | 超限记录 | 35.14 kN | lbf | 第2点缺失 | 超限告警（117.1%） |
+| REC-005 | 单位混写 | 10.59 kN | kgf | 第6点缺失 | 通过（35.3%） |
+
+默认安全阈值：**30 kN**（v1.0 版本）
+
+---
+
+## 核心功能
+
+### 查看记录详情
+
+点击左侧任意记录卡片，右侧将显示该记录的完整信息：
+
+- **系泊力计算结果**：仪表盘显示实测峰值，附带理论分解（水流力/波浪力/风力）和计算公式展开
+- **判断溯源链**：从数据来源 → 采样处理 → 阈值判断 → 阈值版本 → 判断时间，每步都留痕
+- **采样数据明细**：表格展示每个采样点的原始值、单位、换算值、插值状态
+
+### 阈值管理
+
+点击顶部 **"阈值管理"** 链接进入阈值管理页面：
+
+1. **调整阈值**：输入新的阈值（kN）和变更原因，点击"保存新版本"
+2. **版本历史**：下方列出所有历史版本，含版本号、阈值、变更时间、变更原因
+3. **自动重算**：保存新阈值后，所有记录自动重新判断，溯源链中保留所用阈值版本号
+
+修改阈值后点击 **"返回看板"** 回到主页面，可看到所有记录的判断已更新。
+
+### 查看失败原因 / 判断溯源
+
+每条记录的判断原因可通过以下方式查看：
+
+1. **左侧卡片**：直接看到判断标签（通过/需人工确认/超限告警）
+2. **右侧详情 - 判断溯源链**：
+   - 数据来源（手动录入/传感器日志/旧口径补录）
+   - 采样处理情况（采样点数、缺口插值数量）
+   - 阈值判断结果与占比
+   - 所用阈值版本号与阈值
+   - 判断时间戳
+   - 完整原因文字说明
+
+判断原因文字中始终包含"海上浮标系泊受力"字样，便于交接时快速识别判断对象。
+
+### 导出报告
+
+点击顶部 **"导出报告"** 按钮，下载 JSON 格式的完整报告。
+
+报告包含：
+- `reportId`：报告唯一标识
+- `generatedAt`：报告生成时间
+- `thresholdAtGeneration`：导出时使用的阈值版本（版本号、阈值、变更原因、变更时间）
+- `records`：所有记录的完整数据，每条包含：
+  - 原始采样数据（含缺口标记）
+  - 处理后数据（含插值标记）
+  - 系泊力计算结果（实测值+理论分解）
+  - 判断结果（状态、原因、阈值版本、占比、判断时间）
+
+报告与页面明细数据完全一致，无两套说法。
+
+---
+
+## 样例数据说明
+
+五条样例覆盖了以下场景：
+
+| 验证点 | 涉及记录 | 说明 |
+|--------|----------|------|
+| 采样缺口 | REC-002/003/004/005 | 除 REC-001 外均有缺口，自动线性插值并标注 |
+| 单位混写 | REC-001~005 | 覆盖 kN、N、lbf、kgf 四种单位 |
+| 通过判断 | REC-001/003/005 | 低于阈值 80% |
+| 人工确认 | REC-002 | 阈值 80%~100% 区间 |
+| 超限告警 | REC-004 | 超过阈值 100% |
+| 旧口径补录 | REC-003 | 来源标记 + 原因说明包含"旧口径补录" |
+| 传感器日志 | REC-004/005 | 来源标记 + 原因说明包含"传感器日志直接采集" |
+
+---
+
+## 技术栈
+
+- **框架**：React 18 + TypeScript + Vite
+- **样式**：Tailwind CSS 3
+- **状态管理**：Zustand（持久化到 localStorage）
+- **图标**：Lucide React
+- **路由**：React Router DOM
+
+### 项目结构
+
+```
+src/
+├── components/        # UI 组件
+│   ├── DataTable.tsx       # 采样数据表格
+│   ├── ForceGauge.tsx      # 系泊力仪表盘
+│   ├── JudgmentTrace.tsx   # 判断溯源链
+│   ├── RecordCard.tsx      # 记录卡片
+│   ├── StatusBadge.tsx     # 判断状态徽章
+│   └── ThresholdBar.tsx    # 顶部阈值状态栏
+├── pages/             # 页面
+│   ├── Dashboard.tsx        # 受力计算看板主页
+│   └── ThresholdManagement.tsx  # 阈值管理页面
+├── store/             # 状态管理
+│   └── useAppStore.ts       # Zustand store
+├── types/             # TypeScript 类型定义
+│   └── index.ts
+├── utils/             # 工具函数
+│   ├── calculation.ts       # 物理近似计算
+│   ├── report.ts            # 报告导出
+│   ├── sampleData.ts        # 样例数据生成
+│   └── unitConversion.ts    # 单位换算与插值
+└── App.tsx            # 应用入口与路由
+```
+
+---
+
+## 常用命令
+
+```bash
+npm run dev      # 启动开发服务器
+npm run build    # 构建生产版本
+npm run check    # TypeScript 类型检查
+```
+
+---
+
+## 判断规则
+
+- **通过**：实测峰值 ≤ 阈值 × 80%
+- **需人工确认**：阈值 × 80% < 实测峰值 ≤ 阈值 × 100%
+- **超限告警**：实测峰值 > 阈值 × 100%
+
+判断基于**实测峰值力**，物理近似计算作为理论参考对照。
