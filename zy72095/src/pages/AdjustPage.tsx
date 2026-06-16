@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { useStore } from "@/store/useStore"
 import { calculateSpeedBand, calculateOptimizations } from "@/lib/calculator"
 import type { ManualAdjustment, IntersectionData } from "@/lib/types"
-import { ArrowLeft, Pencil, Download, Trash2, RefreshCw, Filter } from "lucide-react"
+import { ArrowLeft, Pencil, Download, Trash2, RefreshCw, Filter, GitCompare, FileText } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 type EditableField = "offset" | "greenRatio" | "cycle"
@@ -341,6 +341,23 @@ export default function AdjustPage() {
             </div>
           </div>
         )}
+
+        <div className="flex items-center gap-3 pt-4">
+          <button
+            onClick={() => navigate("/diff")}
+            className="flex items-center gap-2 px-4 py-2 bg-[#0D7377]/20 hover:bg-[#0D7377]/30 text-[#0D7377] rounded-lg transition-colors text-sm font-medium"
+          >
+            <GitCompare className="w-4 h-4" />
+            差异对比
+          </button>
+          <button
+            onClick={() => navigate("/report")}
+            className="flex items-center gap-2 px-4 py-2 bg-[#D4A017]/20 hover:bg-[#D4A017]/30 text-[#D4A017] rounded-lg transition-colors text-sm font-medium"
+          >
+            <FileText className="w-4 h-4" />
+            查看报告
+          </button>
+        </div>
       </div>
     </div>
   )

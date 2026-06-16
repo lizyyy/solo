@@ -19,13 +19,15 @@ interface StoreState {
   conflictChoices: ConflictChoice[]
   commonCycle: number
   direction: '上行' | '下行'
-  activeFilter: '全部' | '上行' | '下行'
+  activeFilter: '上行' | '下行' | '全部'
   anomaliesIncluded: boolean
+  annotations: Record<string, string>
 }
 
 interface StoreActions {
   setRawText: (text: string) => void
   setIntersections: (data: IntersectionData[]) => void
+  setIntersectionsAndMerge: (data: IntersectionData[]) => void
   setValidationResults: (results: ValidationResult[]) => void
   setSpeedBandResults: (results: SpeedBandResult[]) => void
   setOptimizationSuggestions: (suggestions: OptimizationSuggestion[]) => void
@@ -36,6 +38,7 @@ interface StoreActions {
   setDirection: (dir: '上行' | '下行') => void
   setActiveFilter: (filter: '全部' | '上行' | '下行') => void
   setAnomaliesIncluded: (included: boolean) => void
+  setAnnotation: (id: string, annotation: string) => void
   resetCalculation: () => void
   getFilteredIntersections: () => IntersectionData[]
 }
@@ -54,9 +57,27 @@ export const useStore = create<StoreState & StoreActions>()(
       direction: '上行',
       activeFilter: '全部',
       anomaliesIncluded: true,
+      annotations: {},
 
       setRawText: (text) => set({ rawText: text }),
       setIntersections: (data) => set({ intersections: data }),
+      setIntersectionsAndMerge: (data) => {
+        const { manualAdjustments } = get()
+        const merged = data.map((item) => {
+          const matching = manualAdjustments.filter(
+            (adj) => adj.intersectionId === item.id
+          )
+          if (matching.length === 0) return item
+          const updated = { ...item }
+          for (const adj of matching) {
+            if (adj.field in updated) {
+              (updated as Record<string, unknown>)[adj.field] = adj.adjustedValue
+            }
+          }
+          return updated
+        })
+        set({ intersections: merged })
+      },
       setValidationResults: (results) => set({ validationResults: results }),
       setSpeedBandResults: (results) => set({ speedBandResults: results }),
       setOptimizationSuggestions: (suggestions) => set({ optimizationSuggestions: suggestions }),
@@ -79,6 +100,16 @@ export const useStore = create<StoreState & StoreActions>()(
       setDirection: (dir) => set({ direction: dir }),
       setActiveFilter: (filter) => set({ activeFilter: filter }),
       setAnomaliesIncluded: (included) => set({ anomaliesIncluded: included }),
+      setAnnotation: (id, annotation) =>
+        set((state) => {
+          const updated = { ...state.annotations }
+          if (annotation === '') {
+            delete updated[id]
+          } else {
+            updated[id] = annotation
+          }
+          return { annotations: updated }
+        }),
       resetCalculation: () =>
         set((state) => ({
           rawText: '',
@@ -89,6 +120,7 @@ export const useStore = create<StoreState & StoreActions>()(
           conflictChoices: [],
           commonCycle: 120,
           manualAdjustments: state.manualAdjustments,
+          annotations: state.annotations,
         })),
       getFilteredIntersections: () => {
         const { intersections, activeFilter } = get()

@@ -41,7 +41,7 @@ export default function ImportPage() {
   const [results, setResults] = useState<ValidationResult[]>([])
   const [choices, setChoices] = useState<ConflictChoice[]>([])
 
-  const storeSetIntersections = useStore((s) => s.setIntersections)
+  const storeSetIntersectionsAndMerge = useStore((s) => s.setIntersectionsAndMerge)
   const storeSetValidationResults = useStore((s) => s.setValidationResults)
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -144,7 +144,7 @@ export default function ImportPage() {
   const handleConfirm = () => {
     const resolved = resolveConflicts(mappedRows, choices)
     const { validData } = validateData(resolved)
-    storeSetIntersections(validData)
+    storeSetIntersectionsAndMerge(validData)
     navigate("/calculate")
   }
 
