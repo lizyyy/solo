@@ -1,27 +1,27 @@
 {
-  "version_id": "v853ccefc",
-  "surface_id": "VOL_50ETF_20260530_4cad",
+  "version_id": "v997fbf83",
+  "surface_id": "VOL_50ETF_20260530_4af3",
   "underlying": "50ETF",
   "trade_date": "2026-05-30T00:00:00",
-  "generated_at": "2026-06-07T23:03:57.329544",
-  "status": "pending_review",
+  "generated_at": "2026-06-16T20:17:19.511629",
+  "status": "conflict",
   "status_display": {
-    "text": "待人工确认",
-    "class": "warning",
-    "icon": "⚠"
+    "text": "存在冲突",
+    "class": "danger",
+    "icon": "✗"
   },
-  "comments": "多源导入曲面 - 讲义+业务表+截图",
+  "comments": "多源导入曲面 - 讲义+业务表+截图发现 1 个冲突待处理；",
   "summary": {
     "original_points": 18,
-    "cleaned_points": 18,
-    "outliers_removed": 6,
+    "cleaned_points": 24,
+    "outliers_removed": 0,
     "interpolated_points": 6,
-    "conflicts": 0,
-    "processing_time": 0.029,
+    "conflicts": 1,
+    "processing_time": 0.037,
     "high_confidence": 6,
     "medium_confidence": 6,
     "low_confidence": 12,
-    "needs_review": 6,
+    "needs_review": 7,
     "legacy_points": 0
   },
   "data_sources": [
@@ -29,9 +29,9 @@
       "source_type": "lecture_note",
       "source_name": "金融工程讲义-第7章",
       "source_path": null,
-      "import_time": "2026-06-07T23:03:57.251893",
+      "import_time": "2026-06-16T20:17:19.409679",
       "field_mapping": {
-        "期限": "maturity",
+        "期限": "tenor",
         "行权价": "strike",
         "隐含波动率": "implied_vol"
       },
@@ -41,8 +41,9 @@
       "source_type": "business_table",
       "source_name": "期权做市系统导出_20260530",
       "source_path": null,
-      "import_time": "2026-06-07T23:03:57.251963",
+      "import_time": "2026-06-16T20:17:19.409855",
       "field_mapping": {
+        "到期日": "maturity",
         "执行价": "strike",
         "IV": "implied_vol",
         "期权类型": "option_type"
@@ -53,14 +54,13 @@
       "source_type": "screenshot",
       "source_name": "彭博终端截图_15:30",
       "source_path": null,
-      "import_time": "2026-06-07T23:03:57.252193",
+      "import_time": "2026-06-16T20:17:19.410399",
       "field_mapping": {
         "tenor": "tenor",
-        "strike": "strike",
         "implied_vol": "implied_vol",
-        "maturity": "maturity"
+        "strike": "strike"
       },
-      "raw_data_hash": "47bdc1e61e85a8265b751fb3e82a3ac5"
+      "raw_data_hash": "1bc67b4c8c4e7a454b8e12b91a0df036"
     }
   ],
   "parameters_used": [
@@ -85,7 +85,12 @@
         "VOL_50ETF_20260529_781a",
         "VOL_50ETF_20260527_ffc9",
         "VOL_50ETF_20260530_4cad",
-        "VOL_50ETF_20260528_cda5"
+        "VOL_50ETF_20260528_cda5",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_9c06",
+        "VOL_50ETF_20260527_0a9c",
+        "VOL_50ETF_20260530_4af3",
+        "VOL_50ETF_20260528_d794"
       ]
     },
     {
@@ -109,7 +114,12 @@
         "VOL_50ETF_20260529_781a",
         "VOL_50ETF_20260527_ffc9",
         "VOL_50ETF_20260530_4cad",
-        "VOL_50ETF_20260528_cda5"
+        "VOL_50ETF_20260528_cda5",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_9c06",
+        "VOL_50ETF_20260527_0a9c",
+        "VOL_50ETF_20260530_4af3",
+        "VOL_50ETF_20260528_d794"
       ]
     },
     {
@@ -133,7 +143,12 @@
         "VOL_50ETF_20260529_781a",
         "VOL_50ETF_20260527_ffc9",
         "VOL_50ETF_20260530_4cad",
-        "VOL_50ETF_20260528_cda5"
+        "VOL_50ETF_20260528_cda5",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_9c06",
+        "VOL_50ETF_20260527_0a9c",
+        "VOL_50ETF_20260530_4af3",
+        "VOL_50ETF_20260528_d794"
       ]
     },
     {
@@ -157,7 +172,12 @@
         "VOL_50ETF_20260529_781a",
         "VOL_50ETF_20260527_ffc9",
         "VOL_50ETF_20260530_4cad",
-        "VOL_50ETF_20260528_cda5"
+        "VOL_50ETF_20260528_cda5",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_9c06",
+        "VOL_50ETF_20260527_0a9c",
+        "VOL_50ETF_20260530_4af3",
+        "VOL_50ETF_20260528_d794"
       ]
     },
     {
@@ -181,7 +201,12 @@
         "VOL_50ETF_20260529_781a",
         "VOL_50ETF_20260527_ffc9",
         "VOL_50ETF_20260530_4cad",
-        "VOL_50ETF_20260528_cda5"
+        "VOL_50ETF_20260528_cda5",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_9c06",
+        "VOL_50ETF_20260527_0a9c",
+        "VOL_50ETF_20260530_4af3",
+        "VOL_50ETF_20260528_d794"
       ]
     },
     {
@@ -205,7 +230,12 @@
         "VOL_50ETF_20260529_781a",
         "VOL_50ETF_20260527_ffc9",
         "VOL_50ETF_20260530_4cad",
-        "VOL_50ETF_20260528_cda5"
+        "VOL_50ETF_20260528_cda5",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_9c06",
+        "VOL_50ETF_20260527_0a9c",
+        "VOL_50ETF_20260530_4af3",
+        "VOL_50ETF_20260528_d794"
       ]
     },
     {
@@ -229,7 +259,12 @@
         "VOL_50ETF_20260529_781a",
         "VOL_50ETF_20260527_ffc9",
         "VOL_50ETF_20260530_4cad",
-        "VOL_50ETF_20260528_cda5"
+        "VOL_50ETF_20260528_cda5",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_9c06",
+        "VOL_50ETF_20260527_0a9c",
+        "VOL_50ETF_20260530_4af3",
+        "VOL_50ETF_20260528_d794"
       ]
     },
     {
@@ -263,7 +298,12 @@
         "VOL_50ETF_20260529_781a",
         "VOL_50ETF_20260527_ffc9",
         "VOL_50ETF_20260530_4cad",
-        "VOL_50ETF_20260528_cda5"
+        "VOL_50ETF_20260528_cda5",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_9c06",
+        "VOL_50ETF_20260527_0a9c",
+        "VOL_50ETF_20260530_4af3",
+        "VOL_50ETF_20260528_d794"
       ]
     },
     {
@@ -287,7 +327,12 @@
         "VOL_50ETF_20260529_781a",
         "VOL_50ETF_20260527_ffc9",
         "VOL_50ETF_20260530_4cad",
-        "VOL_50ETF_20260528_cda5"
+        "VOL_50ETF_20260528_cda5",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_9c06",
+        "VOL_50ETF_20260527_0a9c",
+        "VOL_50ETF_20260530_4af3",
+        "VOL_50ETF_20260528_d794"
       ]
     },
     {
@@ -329,7 +374,12 @@
         "VOL_50ETF_20260529_781a",
         "VOL_50ETF_20260527_ffc9",
         "VOL_50ETF_20260530_4cad",
-        "VOL_50ETF_20260528_cda5"
+        "VOL_50ETF_20260528_cda5",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_9c06",
+        "VOL_50ETF_20260527_0a9c",
+        "VOL_50ETF_20260530_4af3",
+        "VOL_50ETF_20260528_d794"
       ]
     }
   ],
@@ -337,10 +387,10 @@
     "surface": [
       {
         "x": 2.8,
-        "y": 0.0,
+        "y": 0.08333333333333333,
         "z": 0.185,
-        "tenor": "T0",
-        "point_id": "23e3eb2f",
+        "tenor": "1M",
+        "point_id": "318795d2",
         "confidence": 0.36,
         "is_interpolated": false,
         "data_source": "lecture_note",
@@ -348,10 +398,10 @@
       },
       {
         "x": 3.0,
-        "y": 0.0,
+        "y": 0.08333333333333333,
         "z": 0.162,
-        "tenor": "T1",
-        "point_id": "ad15b8db",
+        "tenor": "1M",
+        "point_id": "68330c82",
         "confidence": 0.36,
         "is_interpolated": false,
         "data_source": "lecture_note",
@@ -359,10 +409,10 @@
       },
       {
         "x": 3.2,
-        "y": 0.0,
+        "y": 0.08333333333333333,
         "z": 0.17800000000000002,
-        "tenor": "T2",
-        "point_id": "386bed94",
+        "tenor": "1M",
+        "point_id": "24d21042",
         "confidence": 0.36,
         "is_interpolated": false,
         "data_source": "lecture_note",
@@ -370,10 +420,10 @@
       },
       {
         "x": 2.8,
-        "y": 0.0,
+        "y": 0.25,
         "z": 0.195,
-        "tenor": "T3",
-        "point_id": "faa13417",
+        "tenor": "3M",
+        "point_id": "c5ab6430",
         "confidence": 0.36,
         "is_interpolated": false,
         "data_source": "lecture_note",
@@ -381,21 +431,21 @@
       },
       {
         "x": 3.0,
-        "y": 0.0,
+        "y": 0.25,
         "z": 0.17,
-        "tenor": "T4",
-        "point_id": "b9b3ed55",
-        "confidence": 0.36,
+        "tenor": "3M",
+        "point_id": "dd7cc931",
+        "confidence": 0.252,
         "is_interpolated": false,
         "data_source": "lecture_note",
-        "review_comment": ""
+        "review_comment": "与汇总页冲突: 导入=0.1700, 汇总=0.2000, 差异=15.0%"
       },
       {
         "x": 3.2,
-        "y": 0.0,
+        "y": 0.25,
         "z": 0.188,
-        "tenor": "T5",
-        "point_id": "7c2518e2",
+        "tenor": "3M",
+        "point_id": "b0962d20",
         "confidence": 0.36,
         "is_interpolated": false,
         "data_source": "lecture_note",
@@ -403,10 +453,10 @@
       },
       {
         "x": 2.8,
-        "y": 1.0,
+        "y": 0.5,
         "z": 0.205,
         "tenor": "T0",
-        "point_id": "9f94dbfb",
+        "point_id": "1979d391",
         "confidence": 0.81,
         "is_interpolated": false,
         "data_source": "business_table",
@@ -414,10 +464,10 @@
       },
       {
         "x": 3.0,
-        "y": 1.0,
+        "y": 0.5,
         "z": 0.18,
         "tenor": "T1",
-        "point_id": "a0c3f8de",
+        "point_id": "fd3a123a",
         "confidence": 0.81,
         "is_interpolated": false,
         "data_source": "business_table",
@@ -425,10 +475,10 @@
       },
       {
         "x": 3.2,
-        "y": 1.0,
+        "y": 0.5,
         "z": 0.2,
         "tenor": "T2",
-        "point_id": "351459fb",
+        "point_id": "d9ee33a6",
         "confidence": 0.81,
         "is_interpolated": false,
         "data_source": "business_table",
@@ -439,7 +489,7 @@
         "y": 1.0,
         "z": 0.215,
         "tenor": "T3",
-        "point_id": "b210044e",
+        "point_id": "e687bb3f",
         "confidence": 0.81,
         "is_interpolated": false,
         "data_source": "business_table",
@@ -450,7 +500,7 @@
         "y": 1.0,
         "z": 0.19,
         "tenor": "T4",
-        "point_id": "4aff9afd",
+        "point_id": "dc60f4a9",
         "confidence": 0.81,
         "is_interpolated": false,
         "data_source": "business_table",
@@ -461,90 +511,178 @@
         "y": 1.0,
         "z": 0.21,
         "tenor": "T5",
-        "point_id": "89f6386e",
+        "point_id": "52c66a52",
         "confidence": 0.81,
         "is_interpolated": false,
         "data_source": "business_table",
         "review_comment": ""
       },
       {
-        "x": 2.86,
-        "y": 0.08333333333333333,
-        "z": 0.1796,
-        "tenor": "1M",
-        "point_id": "5e07080d",
-        "confidence": 0.56,
-        "is_interpolated": true,
-        "data_source": "interpolation_engine",
-        "review_comment": "自动补充缺失的1M期限点"
+        "x": 2.5,
+        "y": 2.0,
+        "z": 0.265,
+        "tenor": "2Y",
+        "point_id": "4cc4a67b",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": ""
       },
       {
         "x": 3.0,
-        "y": 0.08333333333333333,
-        "z": 0.16349999999999998,
-        "tenor": "1M",
-        "point_id": "05b053fc",
-        "confidence": 0.56,
-        "is_interpolated": true,
-        "data_source": "interpolation_engine",
-        "review_comment": "自动补充缺失的1M期限点"
+        "y": 2.0,
+        "z": 0.2,
+        "tenor": "2Y",
+        "point_id": "4de0cf28",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": ""
       },
       {
-        "x": 3.14,
-        "y": 0.08333333333333333,
-        "z": 0.1747,
-        "tenor": "1M",
-        "point_id": "c45ff01e",
-        "confidence": 0.56,
-        "is_interpolated": true,
-        "data_source": "interpolation_engine",
-        "review_comment": "自动补充缺失的1M期限点"
+        "x": 3.5,
+        "y": 2.0,
+        "z": 0.28,
+        "tenor": "2Y",
+        "point_id": "c7afb163",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": ""
       },
       {
-        "x": 2.86,
-        "y": 0.25,
-        "z": 0.18259999999999998,
-        "tenor": "3M",
-        "point_id": "bcb26f69",
-        "confidence": 0.56,
-        "is_interpolated": true,
-        "data_source": "interpolation_engine",
-        "review_comment": "自动补充缺失的3M期限点"
+        "x": 2.5,
+        "y": 3.0,
+        "z": 0.275,
+        "tenor": "3Y",
+        "point_id": "f4b6cfca",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": ""
       },
       {
         "x": 3.0,
-        "y": 0.25,
-        "z": 0.16649999999999998,
-        "tenor": "3M",
-        "point_id": "0e6a53a9",
-        "confidence": 0.56,
-        "is_interpolated": true,
-        "data_source": "interpolation_engine",
-        "review_comment": "自动补充缺失的3M期限点"
+        "y": 3.0,
+        "z": 0.21,
+        "tenor": "3Y",
+        "point_id": "c21fa554",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": ""
       },
       {
-        "x": 3.14,
-        "y": 0.25,
-        "z": 0.1777,
-        "tenor": "3M",
-        "point_id": "988da2a2",
+        "x": 3.5,
+        "y": 3.0,
+        "z": 0.29,
+        "tenor": "3Y",
+        "point_id": "35d3b4fe",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": ""
+      },
+      {
+        "x": 2.82,
+        "y": 0.5,
+        "z": 0.20249999999999999,
+        "tenor": "6M",
+        "point_id": "d03960a3",
         "confidence": 0.56,
         "is_interpolated": true,
         "data_source": "interpolation_engine",
-        "review_comment": "自动补充缺失的3M期限点"
+        "review_comment": "自动补充缺失的6M期限点"
+      },
+      {
+        "x": 3.0,
+        "y": 0.5,
+        "z": 0.18,
+        "tenor": "6M",
+        "point_id": "bb249ef0",
+        "confidence": 0.56,
+        "is_interpolated": true,
+        "data_source": "interpolation_engine",
+        "review_comment": "自动补充缺失的6M期限点"
+      },
+      {
+        "x": 3.1799999999999997,
+        "y": 0.5,
+        "z": 0.19799999999999998,
+        "tenor": "6M",
+        "point_id": "a109a69f",
+        "confidence": 0.56,
+        "is_interpolated": true,
+        "data_source": "interpolation_engine",
+        "review_comment": "自动补充缺失的6M期限点"
+      },
+      {
+        "x": 2.82,
+        "y": 1.0,
+        "z": 0.2125,
+        "tenor": "1Y",
+        "point_id": "74c672b0",
+        "confidence": 0.56,
+        "is_interpolated": true,
+        "data_source": "interpolation_engine",
+        "review_comment": "自动补充缺失的1Y期限点"
+      },
+      {
+        "x": 3.0,
+        "y": 1.0,
+        "z": 0.19,
+        "tenor": "1Y",
+        "point_id": "3d09651c",
+        "confidence": 0.56,
+        "is_interpolated": true,
+        "data_source": "interpolation_engine",
+        "review_comment": "自动补充缺失的1Y期限点"
+      },
+      {
+        "x": 3.1799999999999997,
+        "y": 1.0,
+        "z": 0.20799999999999996,
+        "tenor": "1Y",
+        "point_id": "33dd3839",
+        "confidence": 0.56,
+        "is_interpolated": true,
+        "data_source": "interpolation_engine",
+        "review_comment": "自动补充缺失的1Y期限点"
       }
     ],
     "smile_curves": {
       "1M": {
         "strikes": [
-          2.86,
+          2.8,
           3.0,
-          3.14
+          3.2
         ],
         "vols": [
-          0.1796,
-          0.16349999999999998,
-          0.1747
+          0.185,
+          0.162,
+          0.17800000000000002
+        ],
+        "confidence": [
+          0.36,
+          0.36,
+          0.36
+        ],
+        "point_ids": [
+          "318795d2",
+          "68330c82",
+          "24d21042"
+        ]
+      },
+      "1Y": {
+        "strikes": [
+          2.82,
+          3.0,
+          3.1799999999999997
+        ],
+        "vols": [
+          0.2125,
+          0.19,
+          0.20799999999999996
         ],
         "confidence": [
           0.56,
@@ -552,21 +690,87 @@
           0.56
         ],
         "point_ids": [
-          "5e07080d",
-          "05b053fc",
-          "c45ff01e"
+          "74c672b0",
+          "3d09651c",
+          "33dd3839"
+        ]
+      },
+      "2Y": {
+        "strikes": [
+          2.5,
+          3.0,
+          3.5
+        ],
+        "vols": [
+          0.265,
+          0.2,
+          0.28
+        ],
+        "confidence": [
+          0.16,
+          0.16,
+          0.16
+        ],
+        "point_ids": [
+          "4cc4a67b",
+          "4de0cf28",
+          "c7afb163"
         ]
       },
       "3M": {
         "strikes": [
-          2.86,
+          2.8,
           3.0,
-          3.14
+          3.2
         ],
         "vols": [
-          0.18259999999999998,
-          0.16649999999999998,
-          0.1777
+          0.195,
+          0.17,
+          0.188
+        ],
+        "confidence": [
+          0.36,
+          0.252,
+          0.36
+        ],
+        "point_ids": [
+          "c5ab6430",
+          "dd7cc931",
+          "b0962d20"
+        ]
+      },
+      "3Y": {
+        "strikes": [
+          2.5,
+          3.0,
+          3.5
+        ],
+        "vols": [
+          0.275,
+          0.21,
+          0.29
+        ],
+        "confidence": [
+          0.16,
+          0.16,
+          0.16
+        ],
+        "point_ids": [
+          "f4b6cfca",
+          "c21fa554",
+          "35d3b4fe"
+        ]
+      },
+      "6M": {
+        "strikes": [
+          2.82,
+          3.0,
+          3.1799999999999997
+        ],
+        "vols": [
+          0.20249999999999999,
+          0.18,
+          0.19799999999999998
         ],
         "confidence": [
           0.56,
@@ -574,173 +778,177 @@
           0.56
         ],
         "point_ids": [
-          "bcb26f69",
-          "0e6a53a9",
-          "988da2a2"
+          "d03960a3",
+          "bb249ef0",
+          "a109a69f"
         ]
       },
       "T0": {
         "strikes": [
-          2.8,
           2.8
         ],
         "vols": [
-          0.185,
           0.205
         ],
         "confidence": [
-          0.36,
           0.81
         ],
         "point_ids": [
-          "23e3eb2f",
-          "9f94dbfb"
+          "1979d391"
         ]
       },
       "T1": {
         "strikes": [
-          3.0,
           3.0
         ],
         "vols": [
-          0.162,
           0.18
         ],
         "confidence": [
-          0.36,
           0.81
         ],
         "point_ids": [
-          "ad15b8db",
-          "a0c3f8de"
+          "fd3a123a"
         ]
       },
       "T2": {
         "strikes": [
-          3.2,
           3.2
         ],
         "vols": [
-          0.17800000000000002,
           0.2
         ],
         "confidence": [
-          0.36,
           0.81
         ],
         "point_ids": [
-          "386bed94",
-          "351459fb"
+          "d9ee33a6"
         ]
       },
       "T3": {
         "strikes": [
-          2.8,
           2.8
         ],
         "vols": [
-          0.195,
           0.215
         ],
         "confidence": [
-          0.36,
           0.81
         ],
         "point_ids": [
-          "faa13417",
-          "b210044e"
+          "e687bb3f"
         ]
       },
       "T4": {
         "strikes": [
-          3.0,
           3.0
         ],
         "vols": [
-          0.17,
           0.19
         ],
         "confidence": [
-          0.36,
           0.81
         ],
         "point_ids": [
-          "b9b3ed55",
-          "4aff9afd"
+          "dc60f4a9"
         ]
       },
       "T5": {
         "strikes": [
-          3.2,
           3.2
         ],
         "vols": [
-          0.188,
           0.21
         ],
         "confidence": [
-          0.36,
           0.81
         ],
         "point_ids": [
-          "7c2518e2",
-          "89f6386e"
+          "52c66a52"
         ]
       }
     },
     "term_structure": {
       "1M": {
         "maturity": 0.08333333333333333,
-        "atm_vol": 0.16349999999999998,
+        "atm_vol": 0.162,
+        "confidence": 0.36,
+        "point_id": "68330c82"
+      },
+      "1Y": {
+        "maturity": 1.0,
+        "atm_vol": 0.19,
         "confidence": 0.56,
-        "point_id": "05b053fc"
+        "point_id": "3d09651c"
+      },
+      "2Y": {
+        "maturity": 2.0,
+        "atm_vol": 0.2,
+        "confidence": 0.16,
+        "point_id": "4de0cf28"
       },
       "3M": {
         "maturity": 0.25,
-        "atm_vol": 0.16649999999999998,
+        "atm_vol": 0.17,
+        "confidence": 0.252,
+        "point_id": "dd7cc931"
+      },
+      "3Y": {
+        "maturity": 3.0,
+        "atm_vol": 0.21,
+        "confidence": 0.16,
+        "point_id": "c21fa554"
+      },
+      "6M": {
+        "maturity": 0.5,
+        "atm_vol": 0.18,
         "confidence": 0.56,
-        "point_id": "0e6a53a9"
+        "point_id": "bb249ef0"
       },
       "T0": {
-        "maturity": 0.0,
-        "atm_vol": 0.185,
-        "confidence": 0.36,
-        "point_id": "23e3eb2f"
+        "maturity": 0.5,
+        "atm_vol": 0.205,
+        "confidence": 0.81,
+        "point_id": "1979d391"
       },
       "T1": {
-        "maturity": 0.0,
-        "atm_vol": 0.162,
-        "confidence": 0.36,
-        "point_id": "ad15b8db"
+        "maturity": 0.5,
+        "atm_vol": 0.18,
+        "confidence": 0.81,
+        "point_id": "fd3a123a"
       },
       "T2": {
-        "maturity": 0.0,
-        "atm_vol": 0.17800000000000002,
-        "confidence": 0.36,
-        "point_id": "386bed94"
+        "maturity": 0.5,
+        "atm_vol": 0.2,
+        "confidence": 0.81,
+        "point_id": "d9ee33a6"
       },
       "T3": {
-        "maturity": 0.0,
-        "atm_vol": 0.195,
-        "confidence": 0.36,
-        "point_id": "faa13417"
+        "maturity": 1.0,
+        "atm_vol": 0.215,
+        "confidence": 0.81,
+        "point_id": "e687bb3f"
       },
       "T4": {
-        "maturity": 0.0,
-        "atm_vol": 0.17,
-        "confidence": 0.36,
-        "point_id": "b9b3ed55"
+        "maturity": 1.0,
+        "atm_vol": 0.19,
+        "confidence": 0.81,
+        "point_id": "dc60f4a9"
       },
       "T5": {
-        "maturity": 0.0,
-        "atm_vol": 0.188,
-        "confidence": 0.36,
-        "point_id": "7c2518e2"
+        "maturity": 1.0,
+        "atm_vol": 0.21,
+        "confidence": 0.81,
+        "point_id": "52c66a52"
       }
     },
     "tenors": [
       "1M",
+      "1Y",
+      "2Y",
       "3M",
+      "3Y",
+      "6M",
       "T0",
       "T1",
       "T2",
@@ -749,272 +957,22 @@
       "T5"
     ],
     "strikes": [
+      2.5,
       2.8,
-      2.86,
+      2.82,
       3.0,
-      3.14,
-      3.2
+      3.1799999999999997,
+      3.2,
+      3.5
     ],
     "atm_strike": 3.0
   },
   "points_detail": [
     {
-      "point_id": "5e07080d",
+      "point_id": "318795d2",
       "tenor": "1M",
-      "strike": 2.86,
-      "maturity": 0.08333333333333333,
-      "option_type": "call",
-      "raw_value": null,
-      "implied_vol": 0.1796,
-      "data_source": "interpolation_engine",
-      "confidence": 0.56,
-      "status": "插值补全",
-      "status_class": "warning",
-      "is_outlier": false,
-      "is_interpolated": true,
-      "outlier_reason": "",
-      "review_comment": "自动补充缺失的1M期限点",
-      "tags": [
-        "synthetic_point",
-        "interpolated"
-      ]
-    },
-    {
-      "point_id": "05b053fc",
-      "tenor": "1M",
-      "strike": 3.0,
-      "maturity": 0.08333333333333333,
-      "option_type": "call",
-      "raw_value": null,
-      "implied_vol": 0.16349999999999998,
-      "data_source": "interpolation_engine",
-      "confidence": 0.56,
-      "status": "插值补全",
-      "status_class": "warning",
-      "is_outlier": false,
-      "is_interpolated": true,
-      "outlier_reason": "",
-      "review_comment": "自动补充缺失的1M期限点",
-      "tags": [
-        "synthetic_point",
-        "interpolated"
-      ]
-    },
-    {
-      "point_id": "c45ff01e",
-      "tenor": "1M",
-      "strike": 3.14,
-      "maturity": 0.08333333333333333,
-      "option_type": "call",
-      "raw_value": null,
-      "implied_vol": 0.1747,
-      "data_source": "interpolation_engine",
-      "confidence": 0.56,
-      "status": "插值补全",
-      "status_class": "warning",
-      "is_outlier": false,
-      "is_interpolated": true,
-      "outlier_reason": "",
-      "review_comment": "自动补充缺失的1M期限点",
-      "tags": [
-        "synthetic_point",
-        "interpolated"
-      ]
-    },
-    {
-      "point_id": "cbac305c",
-      "tenor": "2Y",
-      "strike": 2.0,
-      "maturity": 26.5,
-      "option_type": "call",
-      "raw_value": 2.5,
-      "implied_vol": 2.5,
-      "data_source": "screenshot",
-      "confidence": 0.1,
-      "status": "异常值",
-      "status_class": "danger",
-      "is_outlier": true,
-      "is_interpolated": false,
-      "outlier_reason": "波动率超出有效范围 [0.01, 2.0]",
-      "review_comment": "",
-      "tags": [
-        "screenshot_ocr",
-        "low_confidence"
-      ]
-    },
-    {
-      "point_id": "274acbde",
-      "tenor": "2Y",
-      "strike": 2.0,
-      "maturity": 20.0,
-      "option_type": "call",
-      "raw_value": 3.0,
-      "implied_vol": 3.0,
-      "data_source": "screenshot",
-      "confidence": 0.1,
-      "status": "异常值",
-      "status_class": "danger",
-      "is_outlier": true,
-      "is_interpolated": false,
-      "outlier_reason": "波动率超出有效范围 [0.01, 2.0]",
-      "review_comment": "",
-      "tags": [
-        "screenshot_ocr",
-        "low_confidence"
-      ]
-    },
-    {
-      "point_id": "17e235b3",
-      "tenor": "2Y",
-      "strike": 2.0,
-      "maturity": 28.0,
-      "option_type": "call",
-      "raw_value": 3.5,
-      "implied_vol": 3.5,
-      "data_source": "screenshot",
-      "confidence": 0.1,
-      "status": "异常值",
-      "status_class": "danger",
-      "is_outlier": true,
-      "is_interpolated": false,
-      "outlier_reason": "波动率超出有效范围 [0.01, 2.0]",
-      "review_comment": "",
-      "tags": [
-        "screenshot_ocr",
-        "low_confidence"
-      ]
-    },
-    {
-      "point_id": "bcb26f69",
-      "tenor": "3M",
-      "strike": 2.86,
-      "maturity": 0.25,
-      "option_type": "call",
-      "raw_value": null,
-      "implied_vol": 0.18259999999999998,
-      "data_source": "interpolation_engine",
-      "confidence": 0.56,
-      "status": "插值补全",
-      "status_class": "warning",
-      "is_outlier": false,
-      "is_interpolated": true,
-      "outlier_reason": "",
-      "review_comment": "自动补充缺失的3M期限点",
-      "tags": [
-        "synthetic_point",
-        "interpolated"
-      ]
-    },
-    {
-      "point_id": "0e6a53a9",
-      "tenor": "3M",
-      "strike": 3.0,
-      "maturity": 0.25,
-      "option_type": "call",
-      "raw_value": null,
-      "implied_vol": 0.16649999999999998,
-      "data_source": "interpolation_engine",
-      "confidence": 0.56,
-      "status": "插值补全",
-      "status_class": "warning",
-      "is_outlier": false,
-      "is_interpolated": true,
-      "outlier_reason": "",
-      "review_comment": "自动补充缺失的3M期限点",
-      "tags": [
-        "synthetic_point",
-        "interpolated"
-      ]
-    },
-    {
-      "point_id": "988da2a2",
-      "tenor": "3M",
-      "strike": 3.14,
-      "maturity": 0.25,
-      "option_type": "call",
-      "raw_value": null,
-      "implied_vol": 0.1777,
-      "data_source": "interpolation_engine",
-      "confidence": 0.56,
-      "status": "插值补全",
-      "status_class": "warning",
-      "is_outlier": false,
-      "is_interpolated": true,
-      "outlier_reason": "",
-      "review_comment": "自动补充缺失的3M期限点",
-      "tags": [
-        "synthetic_point",
-        "interpolated"
-      ]
-    },
-    {
-      "point_id": "fb2a0a32",
-      "tenor": "3Y",
-      "strike": 3.0,
-      "maturity": 27.5,
-      "option_type": "call",
-      "raw_value": 2.5,
-      "implied_vol": 2.5,
-      "data_source": "screenshot",
-      "confidence": 0.1,
-      "status": "异常值",
-      "status_class": "danger",
-      "is_outlier": true,
-      "is_interpolated": false,
-      "outlier_reason": "波动率超出有效范围 [0.01, 2.0]",
-      "review_comment": "",
-      "tags": [
-        "screenshot_ocr",
-        "low_confidence"
-      ]
-    },
-    {
-      "point_id": "0e360498",
-      "tenor": "3Y",
-      "strike": 3.0,
-      "maturity": 21.0,
-      "option_type": "call",
-      "raw_value": 3.0,
-      "implied_vol": 3.0,
-      "data_source": "screenshot",
-      "confidence": 0.1,
-      "status": "异常值",
-      "status_class": "danger",
-      "is_outlier": true,
-      "is_interpolated": false,
-      "outlier_reason": "波动率超出有效范围 [0.01, 2.0]",
-      "review_comment": "",
-      "tags": [
-        "screenshot_ocr",
-        "low_confidence"
-      ]
-    },
-    {
-      "point_id": "6cfc5077",
-      "tenor": "3Y",
-      "strike": 3.0,
-      "maturity": 29.0,
-      "option_type": "call",
-      "raw_value": 3.5,
-      "implied_vol": 3.5,
-      "data_source": "screenshot",
-      "confidence": 0.1,
-      "status": "异常值",
-      "status_class": "danger",
-      "is_outlier": true,
-      "is_interpolated": false,
-      "outlier_reason": "波动率超出有效范围 [0.01, 2.0]",
-      "review_comment": "",
-      "tags": [
-        "screenshot_ocr",
-        "low_confidence"
-      ]
-    },
-    {
-      "point_id": "23e3eb2f",
-      "tenor": "T0",
       "strike": 2.8,
-      "maturity": 0.0,
+      "maturity": 0.08333333333333333,
       "option_type": "call",
       "raw_value": 0.185,
       "implied_vol": 0.185,
@@ -1031,10 +989,363 @@
       ]
     },
     {
-      "point_id": "9f94dbfb",
+      "point_id": "68330c82",
+      "tenor": "1M",
+      "strike": 3.0,
+      "maturity": 0.08333333333333333,
+      "option_type": "call",
+      "raw_value": 0.162,
+      "implied_vol": 0.162,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "24d21042",
+      "tenor": "1M",
+      "strike": 3.2,
+      "maturity": 0.08333333333333333,
+      "option_type": "call",
+      "raw_value": 0.17800000000000002,
+      "implied_vol": 0.17800000000000002,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "74c672b0",
+      "tenor": "1Y",
+      "strike": 2.82,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": null,
+      "implied_vol": 0.2125,
+      "data_source": "interpolation_engine",
+      "confidence": 0.56,
+      "status": "插值补全",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": true,
+      "outlier_reason": "",
+      "review_comment": "自动补充缺失的1Y期限点",
+      "tags": [
+        "synthetic_point",
+        "interpolated"
+      ]
+    },
+    {
+      "point_id": "3d09651c",
+      "tenor": "1Y",
+      "strike": 3.0,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": null,
+      "implied_vol": 0.19,
+      "data_source": "interpolation_engine",
+      "confidence": 0.56,
+      "status": "插值补全",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": true,
+      "outlier_reason": "",
+      "review_comment": "自动补充缺失的1Y期限点",
+      "tags": [
+        "synthetic_point",
+        "interpolated"
+      ]
+    },
+    {
+      "point_id": "33dd3839",
+      "tenor": "1Y",
+      "strike": 3.1799999999999997,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": null,
+      "implied_vol": 0.20799999999999996,
+      "data_source": "interpolation_engine",
+      "confidence": 0.56,
+      "status": "插值补全",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": true,
+      "outlier_reason": "",
+      "review_comment": "自动补充缺失的1Y期限点",
+      "tags": [
+        "synthetic_point",
+        "interpolated"
+      ]
+    },
+    {
+      "point_id": "4cc4a67b",
+      "tenor": "2Y",
+      "strike": 2.5,
+      "maturity": 2.0,
+      "option_type": "call",
+      "raw_value": 0.265,
+      "implied_vol": 0.265,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "screenshot_ocr",
+        "low_confidence"
+      ]
+    },
+    {
+      "point_id": "4de0cf28",
+      "tenor": "2Y",
+      "strike": 3.0,
+      "maturity": 2.0,
+      "option_type": "call",
+      "raw_value": 0.2,
+      "implied_vol": 0.2,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "screenshot_ocr",
+        "low_confidence"
+      ]
+    },
+    {
+      "point_id": "c7afb163",
+      "tenor": "2Y",
+      "strike": 3.5,
+      "maturity": 2.0,
+      "option_type": "call",
+      "raw_value": 0.28,
+      "implied_vol": 0.28,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "screenshot_ocr",
+        "low_confidence"
+      ]
+    },
+    {
+      "point_id": "c5ab6430",
+      "tenor": "3M",
+      "strike": 2.8,
+      "maturity": 0.25,
+      "option_type": "call",
+      "raw_value": 0.195,
+      "implied_vol": 0.195,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "dd7cc931",
+      "tenor": "3M",
+      "strike": 3.0,
+      "maturity": 0.25,
+      "option_type": "call",
+      "raw_value": 0.17,
+      "implied_vol": 0.17,
+      "data_source": "lecture_note",
+      "confidence": 0.252,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "与汇总页冲突: 导入=0.1700, 汇总=0.2000, 差异=15.0%",
+      "tags": [
+        "lecture_import",
+        "conflict_flag"
+      ]
+    },
+    {
+      "point_id": "b0962d20",
+      "tenor": "3M",
+      "strike": 3.2,
+      "maturity": 0.25,
+      "option_type": "call",
+      "raw_value": 0.188,
+      "implied_vol": 0.188,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "f4b6cfca",
+      "tenor": "3Y",
+      "strike": 2.5,
+      "maturity": 3.0,
+      "option_type": "call",
+      "raw_value": 0.275,
+      "implied_vol": 0.275,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "screenshot_ocr",
+        "low_confidence"
+      ]
+    },
+    {
+      "point_id": "c21fa554",
+      "tenor": "3Y",
+      "strike": 3.0,
+      "maturity": 3.0,
+      "option_type": "call",
+      "raw_value": 0.21,
+      "implied_vol": 0.21,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "screenshot_ocr",
+        "low_confidence"
+      ]
+    },
+    {
+      "point_id": "35d3b4fe",
+      "tenor": "3Y",
+      "strike": 3.5,
+      "maturity": 3.0,
+      "option_type": "call",
+      "raw_value": 0.29,
+      "implied_vol": 0.29,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "screenshot_ocr",
+        "low_confidence"
+      ]
+    },
+    {
+      "point_id": "d03960a3",
+      "tenor": "6M",
+      "strike": 2.82,
+      "maturity": 0.5,
+      "option_type": "call",
+      "raw_value": null,
+      "implied_vol": 0.20249999999999999,
+      "data_source": "interpolation_engine",
+      "confidence": 0.56,
+      "status": "插值补全",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": true,
+      "outlier_reason": "",
+      "review_comment": "自动补充缺失的6M期限点",
+      "tags": [
+        "synthetic_point",
+        "interpolated"
+      ]
+    },
+    {
+      "point_id": "bb249ef0",
+      "tenor": "6M",
+      "strike": 3.0,
+      "maturity": 0.5,
+      "option_type": "call",
+      "raw_value": null,
+      "implied_vol": 0.18,
+      "data_source": "interpolation_engine",
+      "confidence": 0.56,
+      "status": "插值补全",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": true,
+      "outlier_reason": "",
+      "review_comment": "自动补充缺失的6M期限点",
+      "tags": [
+        "synthetic_point",
+        "interpolated"
+      ]
+    },
+    {
+      "point_id": "a109a69f",
+      "tenor": "6M",
+      "strike": 3.1799999999999997,
+      "maturity": 0.5,
+      "option_type": "call",
+      "raw_value": null,
+      "implied_vol": 0.19799999999999998,
+      "data_source": "interpolation_engine",
+      "confidence": 0.56,
+      "status": "插值补全",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": true,
+      "outlier_reason": "",
+      "review_comment": "自动补充缺失的6M期限点",
+      "tags": [
+        "synthetic_point",
+        "interpolated"
+      ]
+    },
+    {
+      "point_id": "1979d391",
       "tenor": "T0",
       "strike": 2.8,
-      "maturity": 1.0,
+      "maturity": 0.5,
       "option_type": "call",
       "raw_value": 0.205,
       "implied_vol": 0.205,
@@ -1052,30 +1363,10 @@
       ]
     },
     {
-      "point_id": "ad15b8db",
+      "point_id": "fd3a123a",
       "tenor": "T1",
       "strike": 3.0,
-      "maturity": 0.0,
-      "option_type": "call",
-      "raw_value": 0.162,
-      "implied_vol": 0.162,
-      "data_source": "lecture_note",
-      "confidence": 0.36,
-      "status": "正常",
-      "status_class": "success",
-      "is_outlier": false,
-      "is_interpolated": false,
-      "outlier_reason": "",
-      "review_comment": "",
-      "tags": [
-        "lecture_import"
-      ]
-    },
-    {
-      "point_id": "a0c3f8de",
-      "tenor": "T1",
-      "strike": 3.0,
-      "maturity": 1.0,
+      "maturity": 0.5,
       "option_type": "call",
       "raw_value": 0.18,
       "implied_vol": 0.18,
@@ -1093,30 +1384,10 @@
       ]
     },
     {
-      "point_id": "386bed94",
+      "point_id": "d9ee33a6",
       "tenor": "T2",
       "strike": 3.2,
-      "maturity": 0.0,
-      "option_type": "call",
-      "raw_value": 0.17800000000000002,
-      "implied_vol": 0.17800000000000002,
-      "data_source": "lecture_note",
-      "confidence": 0.36,
-      "status": "正常",
-      "status_class": "success",
-      "is_outlier": false,
-      "is_interpolated": false,
-      "outlier_reason": "",
-      "review_comment": "",
-      "tags": [
-        "lecture_import"
-      ]
-    },
-    {
-      "point_id": "351459fb",
-      "tenor": "T2",
-      "strike": 3.2,
-      "maturity": 1.0,
+      "maturity": 0.5,
       "option_type": "call",
       "raw_value": 0.2,
       "implied_vol": 0.2,
@@ -1134,27 +1405,7 @@
       ]
     },
     {
-      "point_id": "faa13417",
-      "tenor": "T3",
-      "strike": 2.8,
-      "maturity": 0.0,
-      "option_type": "call",
-      "raw_value": 0.195,
-      "implied_vol": 0.195,
-      "data_source": "lecture_note",
-      "confidence": 0.36,
-      "status": "正常",
-      "status_class": "success",
-      "is_outlier": false,
-      "is_interpolated": false,
-      "outlier_reason": "",
-      "review_comment": "",
-      "tags": [
-        "lecture_import"
-      ]
-    },
-    {
-      "point_id": "b210044e",
+      "point_id": "e687bb3f",
       "tenor": "T3",
       "strike": 2.8,
       "maturity": 1.0,
@@ -1175,27 +1426,7 @@
       ]
     },
     {
-      "point_id": "b9b3ed55",
-      "tenor": "T4",
-      "strike": 3.0,
-      "maturity": 0.0,
-      "option_type": "call",
-      "raw_value": 0.17,
-      "implied_vol": 0.17,
-      "data_source": "lecture_note",
-      "confidence": 0.36,
-      "status": "正常",
-      "status_class": "success",
-      "is_outlier": false,
-      "is_interpolated": false,
-      "outlier_reason": "",
-      "review_comment": "",
-      "tags": [
-        "lecture_import"
-      ]
-    },
-    {
-      "point_id": "4aff9afd",
+      "point_id": "dc60f4a9",
       "tenor": "T4",
       "strike": 3.0,
       "maturity": 1.0,
@@ -1216,27 +1447,7 @@
       ]
     },
     {
-      "point_id": "7c2518e2",
-      "tenor": "T5",
-      "strike": 3.2,
-      "maturity": 0.0,
-      "option_type": "call",
-      "raw_value": 0.188,
-      "implied_vol": 0.188,
-      "data_source": "lecture_note",
-      "confidence": 0.36,
-      "status": "正常",
-      "status_class": "success",
-      "is_outlier": false,
-      "is_interpolated": false,
-      "outlier_reason": "",
-      "review_comment": "",
-      "tags": [
-        "lecture_import"
-      ]
-    },
-    {
-      "point_id": "89f6386e",
+      "point_id": "52c66a52",
       "tenor": "T5",
       "strike": 3.2,
       "maturity": 1.0,
@@ -1257,369 +1468,321 @@
       ]
     }
   ],
-  "conflicts": [],
+  "conflicts": [
+    {
+      "conflict_id": "c5e9c094",
+      "surface_id": "VOL_50ETF_20260530_4af3",
+      "point_id": "dd7cc931",
+      "summary_page_value": 0.2,
+      "imported_value": 0.17,
+      "summary_page_source": "老板看的汇总页",
+      "imported_source": "lecture_note",
+      "difference": 15.0,
+      "suggested_action": "差异15.0%，建议核对原始数据后确认",
+      "timestamp": "2026-06-16T20:17:19.420960",
+      "resolved": false,
+      "resolution": "",
+      "resolved_by": "",
+      "resolved_at": null
+    }
+  ],
   "decision_paths": {
-    "23e3eb2f": [
+    "318795d2": [
       "1. 原始值导入: 0.1850 (来源: lecture_note)",
       "2. 最终值: 0.1850 (置信度: 0.360)"
     ],
-    "ad15b8db": [
+    "68330c82": [
       "1. 原始值导入: 0.1620 (来源: lecture_note)",
       "2. 最终值: 0.1620 (置信度: 0.360)"
     ],
-    "386bed94": [
+    "24d21042": [
       "1. 原始值导入: 0.1780 (来源: lecture_note)",
       "2. 最终值: 0.1780 (置信度: 0.360)"
     ],
-    "faa13417": [
+    "c5ab6430": [
       "1. 原始值导入: 0.1950 (来源: lecture_note)",
       "2. 最终值: 0.1950 (置信度: 0.360)"
     ],
-    "b9b3ed55": [
+    "dd7cc931": [
       "1. 原始值导入: 0.1700 (来源: lecture_note)",
-      "2. 最终值: 0.1700 (置信度: 0.360)"
+      "2. 冲突检测: 0.1700 → 0.2000 (与汇总页差异15.0%)",
+      "3. 最终值: 0.1700 (置信度: 0.252)"
     ],
-    "7c2518e2": [
+    "b0962d20": [
       "1. 原始值导入: 0.1880 (来源: lecture_note)",
       "2. 最终值: 0.1880 (置信度: 0.360)"
     ],
-    "9f94dbfb": [
+    "1979d391": [
       "1. 原始值导入: 0.2050 (来源: business_table)",
       "2. 最终值: 0.2050 (置信度: 0.810)"
     ],
-    "a0c3f8de": [
+    "fd3a123a": [
       "1. 原始值导入: 0.1800 (来源: business_table)",
       "2. 最终值: 0.1800 (置信度: 0.810)"
     ],
-    "351459fb": [
+    "d9ee33a6": [
       "1. 原始值导入: 0.2000 (来源: business_table)",
       "2. 最终值: 0.2000 (置信度: 0.810)"
     ],
-    "b210044e": [
+    "e687bb3f": [
       "1. 原始值导入: 0.2150 (来源: business_table)",
       "2. 最终值: 0.2150 (置信度: 0.810)"
     ],
-    "4aff9afd": [
+    "dc60f4a9": [
       "1. 原始值导入: 0.1900 (来源: business_table)",
       "2. 最终值: 0.1900 (置信度: 0.810)"
     ],
-    "89f6386e": [
+    "52c66a52": [
       "1. 原始值导入: 0.2100 (来源: business_table)",
       "2. 最终值: 0.2100 (置信度: 0.810)"
     ],
-    "cbac305c": [
-      "1. 原始值导入: 2.5000 (来源: screenshot)",
-      "2. 范围校验标记: 检查值 2.5000 - 波动率超出有效范围 [0.01, 2.0]",
-      "3. 最终值: 2.5000 (置信度: 0.100)"
+    "4cc4a67b": [
+      "1. 原始值导入: 0.2650 (来源: screenshot)",
+      "2. 最终值: 0.2650 (置信度: 0.160)"
     ],
-    "274acbde": [
-      "1. 原始值导入: 3.0000 (来源: screenshot)",
-      "2. 范围校验标记: 检查值 3.0000 - 波动率超出有效范围 [0.01, 2.0]",
-      "3. 最终值: 3.0000 (置信度: 0.100)"
+    "4de0cf28": [
+      "1. 原始值导入: 0.2000 (来源: screenshot)",
+      "2. 最终值: 0.2000 (置信度: 0.160)"
     ],
-    "17e235b3": [
-      "1. 原始值导入: 3.5000 (来源: screenshot)",
-      "2. 范围校验标记: 检查值 3.5000 - 波动率超出有效范围 [0.01, 2.0]",
-      "3. 最终值: 3.5000 (置信度: 0.100)"
+    "c7afb163": [
+      "1. 原始值导入: 0.2800 (来源: screenshot)",
+      "2. 最终值: 0.2800 (置信度: 0.160)"
     ],
-    "fb2a0a32": [
-      "1. 原始值导入: 2.5000 (来源: screenshot)",
-      "2. 范围校验标记: 检查值 2.5000 - 波动率超出有效范围 [0.01, 2.0]",
-      "3. 最终值: 2.5000 (置信度: 0.100)"
+    "f4b6cfca": [
+      "1. 原始值导入: 0.2750 (来源: screenshot)",
+      "2. 最终值: 0.2750 (置信度: 0.160)"
     ],
-    "0e360498": [
-      "1. 原始值导入: 3.0000 (来源: screenshot)",
-      "2. 范围校验标记: 检查值 3.0000 - 波动率超出有效范围 [0.01, 2.0]",
-      "3. 最终值: 3.0000 (置信度: 0.100)"
+    "c21fa554": [
+      "1. 原始值导入: 0.2100 (来源: screenshot)",
+      "2. 最终值: 0.2100 (置信度: 0.160)"
     ],
-    "6cfc5077": [
-      "1. 原始值导入: 3.5000 (来源: screenshot)",
-      "2. 范围校验标记: 检查值 3.5000 - 波动率超出有效范围 [0.01, 2.0]",
-      "3. 最终值: 3.5000 (置信度: 0.100)"
+    "35d3b4fe": [
+      "1. 原始值导入: 0.2900 (来源: screenshot)",
+      "2. 最终值: 0.2900 (置信度: 0.160)"
     ],
-    "5e07080d": [
+    "d03960a3": [
       "1. 数据来源: interpolation_engine (无原始值记录)",
-      "2. 补充期限点: 补充缺失期限 1M",
-      "3. 最终值: 0.1796 (置信度: 0.560)"
+      "2. 补充期限点: 补充缺失期限 6M",
+      "3. 最终值: 0.2025 (置信度: 0.560)"
     ],
-    "05b053fc": [
+    "bb249ef0": [
       "1. 数据来源: interpolation_engine (无原始值记录)",
-      "2. 补充期限点: 补充缺失期限 1M",
-      "3. 最终值: 0.1635 (置信度: 0.560)"
+      "2. 补充期限点: 补充缺失期限 6M",
+      "3. 最终值: 0.1800 (置信度: 0.560)"
     ],
-    "c45ff01e": [
+    "a109a69f": [
       "1. 数据来源: interpolation_engine (无原始值记录)",
-      "2. 补充期限点: 补充缺失期限 1M",
-      "3. 最终值: 0.1747 (置信度: 0.560)"
+      "2. 补充期限点: 补充缺失期限 6M",
+      "3. 最终值: 0.1980 (置信度: 0.560)"
     ],
-    "bcb26f69": [
+    "74c672b0": [
       "1. 数据来源: interpolation_engine (无原始值记录)",
-      "2. 补充期限点: 补充缺失期限 3M",
-      "3. 最终值: 0.1826 (置信度: 0.560)"
+      "2. 补充期限点: 补充缺失期限 1Y",
+      "3. 最终值: 0.2125 (置信度: 0.560)"
     ],
-    "0e6a53a9": [
+    "3d09651c": [
       "1. 数据来源: interpolation_engine (无原始值记录)",
-      "2. 补充期限点: 补充缺失期限 3M",
-      "3. 最终值: 0.1665 (置信度: 0.560)"
+      "2. 补充期限点: 补充缺失期限 1Y",
+      "3. 最终值: 0.1900 (置信度: 0.560)"
     ],
-    "988da2a2": [
+    "33dd3839": [
       "1. 数据来源: interpolation_engine (无原始值记录)",
-      "2. 补充期限点: 补充缺失期限 3M",
-      "3. 最终值: 0.1777 (置信度: 0.560)"
+      "2. 补充期限点: 补充缺失期限 1Y",
+      "3. 最终值: 0.2080 (置信度: 0.560)"
     ]
   },
   "audit_trail": [
     {
-      "log_id": "673087a7",
-      "timestamp": "2026-06-07T23:03:57.264000",
-      "action": "范围校验标记",
-      "surface_id": "VOL_50ETF_20260530_4cad",
-      "point_id": "cbac305c",
-      "old_value": 2.5,
-      "new_value": null,
+      "log_id": "6c9f5a37",
+      "timestamp": "2026-06-16T20:17:19.420981",
+      "action": "冲突检测",
+      "surface_id": "VOL_50ETF_20260530_4af3",
+      "point_id": "dd7cc931",
+      "old_value": 0.17,
+      "new_value": 0.2,
       "operator": "system",
-      "reason": "波动率超出有效范围 [0.01, 2.0]",
+      "reason": "与汇总页差异15.0%",
       "parameters_used": {
-        "vol_min": 0.01,
-        "vol_max": 2.0
+        "tolerance_pct": 3.0,
+        "summary_value": 0.2,
+        "difference_pct": 15.0
       }
     },
     {
-      "log_id": "2968172c",
-      "timestamp": "2026-06-07T23:03:57.273776",
-      "action": "范围校验标记",
-      "surface_id": "VOL_50ETF_20260530_4cad",
-      "point_id": "274acbde",
-      "old_value": 3.0,
-      "new_value": null,
-      "operator": "system",
-      "reason": "波动率超出有效范围 [0.01, 2.0]",
-      "parameters_used": {
-        "vol_min": 0.01,
-        "vol_max": 2.0
-      }
-    },
-    {
-      "log_id": "074f2442",
-      "timestamp": "2026-06-07T23:03:57.274967",
-      "action": "范围校验标记",
-      "surface_id": "VOL_50ETF_20260530_4cad",
-      "point_id": "17e235b3",
-      "old_value": 3.5,
-      "new_value": null,
-      "operator": "system",
-      "reason": "波动率超出有效范围 [0.01, 2.0]",
-      "parameters_used": {
-        "vol_min": 0.01,
-        "vol_max": 2.0
-      }
-    },
-    {
-      "log_id": "5b9ca61a",
-      "timestamp": "2026-06-07T23:03:57.276014",
-      "action": "范围校验标记",
-      "surface_id": "VOL_50ETF_20260530_4cad",
-      "point_id": "fb2a0a32",
-      "old_value": 2.5,
-      "new_value": null,
-      "operator": "system",
-      "reason": "波动率超出有效范围 [0.01, 2.0]",
-      "parameters_used": {
-        "vol_min": 0.01,
-        "vol_max": 2.0
-      }
-    },
-    {
-      "log_id": "27a4b14b",
-      "timestamp": "2026-06-07T23:03:57.277574",
-      "action": "范围校验标记",
-      "surface_id": "VOL_50ETF_20260530_4cad",
-      "point_id": "0e360498",
-      "old_value": 3.0,
-      "new_value": null,
-      "operator": "system",
-      "reason": "波动率超出有效范围 [0.01, 2.0]",
-      "parameters_used": {
-        "vol_min": 0.01,
-        "vol_max": 2.0
-      }
-    },
-    {
-      "log_id": "d311c94f",
-      "timestamp": "2026-06-07T23:03:57.279233",
-      "action": "范围校验标记",
-      "surface_id": "VOL_50ETF_20260530_4cad",
-      "point_id": "6cfc5077",
-      "old_value": 3.5,
-      "new_value": null,
-      "operator": "system",
-      "reason": "波动率超出有效范围 [0.01, 2.0]",
-      "parameters_used": {
-        "vol_min": 0.01,
-        "vol_max": 2.0
-      }
-    },
-    {
-      "log_id": "32fa7d94",
-      "timestamp": "2026-06-07T23:03:57.280868",
+      "log_id": "aa2c413e",
+      "timestamp": "2026-06-16T20:17:19.425590",
       "action": "补充期限点",
-      "surface_id": "VOL_50ETF_20260530_4cad",
-      "point_id": "5e07080d",
+      "surface_id": "VOL_50ETF_20260530_4af3",
+      "point_id": "d03960a3",
       "old_value": null,
-      "new_value": 0.1796,
+      "new_value": 0.20249999999999999,
       "operator": "system",
-      "reason": "补充缺失期限 1M",
+      "reason": "补充缺失期限 6M",
       "parameters_used": {
         "method": "linear",
-        "tenor": "1M"
+        "tenor": "6M"
       }
     },
     {
-      "log_id": "ae17f8a2",
-      "timestamp": "2026-06-07T23:03:57.282274",
+      "log_id": "bc625e9a",
+      "timestamp": "2026-06-16T20:17:19.430854",
       "action": "补充期限点",
-      "surface_id": "VOL_50ETF_20260530_4cad",
-      "point_id": "05b053fc",
+      "surface_id": "VOL_50ETF_20260530_4af3",
+      "point_id": "bb249ef0",
       "old_value": null,
-      "new_value": 0.16349999999999998,
+      "new_value": 0.18,
       "operator": "system",
-      "reason": "补充缺失期限 1M",
+      "reason": "补充缺失期限 6M",
       "parameters_used": {
         "method": "linear",
-        "tenor": "1M"
+        "tenor": "6M"
       }
     },
     {
-      "log_id": "afe9a858",
-      "timestamp": "2026-06-07T23:03:57.283509",
+      "log_id": "658b1b7d",
+      "timestamp": "2026-06-16T20:17:19.434474",
       "action": "补充期限点",
-      "surface_id": "VOL_50ETF_20260530_4cad",
-      "point_id": "c45ff01e",
+      "surface_id": "VOL_50ETF_20260530_4af3",
+      "point_id": "a109a69f",
       "old_value": null,
-      "new_value": 0.1747,
+      "new_value": 0.19799999999999998,
       "operator": "system",
-      "reason": "补充缺失期限 1M",
+      "reason": "补充缺失期限 6M",
       "parameters_used": {
         "method": "linear",
-        "tenor": "1M"
+        "tenor": "6M"
       }
     },
     {
-      "log_id": "dfa03f5c",
-      "timestamp": "2026-06-07T23:03:57.284759",
+      "log_id": "48c820dd",
+      "timestamp": "2026-06-16T20:17:19.441265",
       "action": "补充期限点",
-      "surface_id": "VOL_50ETF_20260530_4cad",
-      "point_id": "bcb26f69",
+      "surface_id": "VOL_50ETF_20260530_4af3",
+      "point_id": "74c672b0",
       "old_value": null,
-      "new_value": 0.18259999999999998,
+      "new_value": 0.2125,
       "operator": "system",
-      "reason": "补充缺失期限 3M",
+      "reason": "补充缺失期限 1Y",
       "parameters_used": {
         "method": "linear",
-        "tenor": "3M"
+        "tenor": "1Y"
       }
     },
     {
-      "log_id": "06d64a5f",
-      "timestamp": "2026-06-07T23:03:57.286189",
+      "log_id": "a26bfa09",
+      "timestamp": "2026-06-16T20:17:19.447653",
       "action": "补充期限点",
-      "surface_id": "VOL_50ETF_20260530_4cad",
-      "point_id": "0e6a53a9",
+      "surface_id": "VOL_50ETF_20260530_4af3",
+      "point_id": "3d09651c",
       "old_value": null,
-      "new_value": 0.16649999999999998,
+      "new_value": 0.19,
       "operator": "system",
-      "reason": "补充缺失期限 3M",
+      "reason": "补充缺失期限 1Y",
       "parameters_used": {
         "method": "linear",
-        "tenor": "3M"
+        "tenor": "1Y"
       }
     },
     {
-      "log_id": "a46218a7",
-      "timestamp": "2026-06-07T23:03:57.287678",
+      "log_id": "5ca24929",
+      "timestamp": "2026-06-16T20:17:19.450857",
       "action": "补充期限点",
-      "surface_id": "VOL_50ETF_20260530_4cad",
-      "point_id": "988da2a2",
+      "surface_id": "VOL_50ETF_20260530_4af3",
+      "point_id": "33dd3839",
       "old_value": null,
-      "new_value": 0.1777,
+      "new_value": 0.20799999999999996,
       "operator": "system",
-      "reason": "补充缺失期限 3M",
+      "reason": "补充缺失期限 1Y",
       "parameters_used": {
         "method": "linear",
-        "tenor": "3M"
+        "tenor": "1Y"
       }
     }
   ],
   "by_tenor_summary": {
-    "T0": {
-      "count": 2,
-      "valid_count": 2,
-      "avg_vol": 0.195,
-      "min_vol": 0.185,
-      "max_vol": 0.205
-    },
-    "T1": {
-      "count": 2,
-      "valid_count": 2,
-      "avg_vol": 0.171,
-      "min_vol": 0.162,
-      "max_vol": 0.18
-    },
-    "T2": {
-      "count": 2,
-      "valid_count": 2,
-      "avg_vol": 0.189,
-      "min_vol": 0.178,
-      "max_vol": 0.2
-    },
-    "T3": {
-      "count": 2,
-      "valid_count": 2,
-      "avg_vol": 0.205,
-      "min_vol": 0.195,
-      "max_vol": 0.215
-    },
-    "T4": {
-      "count": 2,
-      "valid_count": 2,
-      "avg_vol": 0.18,
-      "min_vol": 0.17,
-      "max_vol": 0.19
-    },
-    "T5": {
-      "count": 2,
-      "valid_count": 2,
-      "avg_vol": 0.199,
-      "min_vol": 0.188,
-      "max_vol": 0.21
-    },
-    "2Y": {
-      "count": 3,
-      "valid_count": 0,
-      "avg_vol": 0.0,
-      "min_vol": 0.0,
-      "max_vol": 0.0
-    },
-    "3Y": {
-      "count": 3,
-      "valid_count": 0,
-      "avg_vol": 0.0,
-      "min_vol": 0.0,
-      "max_vol": 0.0
-    },
     "1M": {
       "count": 3,
       "valid_count": 3,
-      "avg_vol": 0.1726,
-      "min_vol": 0.1635,
-      "max_vol": 0.1796
+      "avg_vol": 0.175,
+      "min_vol": 0.162,
+      "max_vol": 0.185
     },
     "3M": {
       "count": 3,
       "valid_count": 3,
-      "avg_vol": 0.1756,
-      "min_vol": 0.1665,
-      "max_vol": 0.1826
+      "avg_vol": 0.1843,
+      "min_vol": 0.17,
+      "max_vol": 0.195
+    },
+    "T0": {
+      "count": 1,
+      "valid_count": 1,
+      "avg_vol": 0.205,
+      "min_vol": 0.205,
+      "max_vol": 0.205
+    },
+    "T1": {
+      "count": 1,
+      "valid_count": 1,
+      "avg_vol": 0.18,
+      "min_vol": 0.18,
+      "max_vol": 0.18
+    },
+    "T2": {
+      "count": 1,
+      "valid_count": 1,
+      "avg_vol": 0.2,
+      "min_vol": 0.2,
+      "max_vol": 0.2
+    },
+    "T3": {
+      "count": 1,
+      "valid_count": 1,
+      "avg_vol": 0.215,
+      "min_vol": 0.215,
+      "max_vol": 0.215
+    },
+    "T4": {
+      "count": 1,
+      "valid_count": 1,
+      "avg_vol": 0.19,
+      "min_vol": 0.19,
+      "max_vol": 0.19
+    },
+    "T5": {
+      "count": 1,
+      "valid_count": 1,
+      "avg_vol": 0.21,
+      "min_vol": 0.21,
+      "max_vol": 0.21
+    },
+    "2Y": {
+      "count": 3,
+      "valid_count": 3,
+      "avg_vol": 0.2483,
+      "min_vol": 0.2,
+      "max_vol": 0.28
+    },
+    "3Y": {
+      "count": 3,
+      "valid_count": 3,
+      "avg_vol": 0.2583,
+      "min_vol": 0.21,
+      "max_vol": 0.29
+    },
+    "6M": {
+      "count": 3,
+      "valid_count": 3,
+      "avg_vol": 0.1935,
+      "min_vol": 0.18,
+      "max_vol": 0.2025
+    },
+    "1Y": {
+      "count": 3,
+      "valid_count": 3,
+      "avg_vol": 0.2035,
+      "min_vol": 0.19,
+      "max_vol": 0.2125
     }
   }
 }

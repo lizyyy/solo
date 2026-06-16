@@ -1990,5 +1990,927 @@
     "parameters_used": {
       "processing_time": 0.0023500919342041016
     }
+  },
+  {
+    "log_id": "1890294b",
+    "timestamp": "2026-06-16T20:17:19.140696",
+    "action": "开始清洗",
+    "surface_id": "VOL_50ETF_20260528_516c",
+    "point_id": "",
+    "old_value": null,
+    "new_value": null,
+    "operator": "system",
+    "reason": "开始处理曲面 50ETF @ 2026-05-28 00:00:00",
+    "parameters_used": {
+      "outlier_zscore_threshold": 2.5,
+      "outlier_iqr_factor": 1.5,
+      "vol_min_valid": 0.01,
+      "vol_max_valid": 2.0,
+      "arbitrage_max_spread": 0.05,
+      "interpolation_method": "cubic",
+      "smoothness_lambda": 0.1,
+      "confidence_weight_source": {
+        "lecture_note": 0.6,
+        "business_table": 0.9,
+        "screenshot": 0.4,
+        "summary_page": 0.8
+      },
+      "conflict_tolerance_pct": 3.0,
+      "tenor_order": [
+        "1M",
+        "3M",
+        "6M",
+        "1Y",
+        "2Y",
+        "3Y",
+        "5Y",
+        "10Y"
+      ]
+    }
+  },
+  {
+    "log_id": "2312823d",
+    "timestamp": "2026-06-16T20:17:19.160689",
+    "action": "清洗完成",
+    "surface_id": "VOL_50ETF_20260528_516c",
+    "point_id": "",
+    "old_value": null,
+    "new_value": null,
+    "operator": "system",
+    "reason": "处理完成，耗时 0.02s",
+    "parameters_used": {
+      "processing_time": 0.01998305320739746
+    }
+  },
+  {
+    "log_id": "e0eaf375",
+    "timestamp": "2026-06-16T20:17:19.168086",
+    "action": "开始清洗",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "",
+    "old_value": null,
+    "new_value": null,
+    "operator": "system",
+    "reason": "开始处理曲面 50ETF @ 2026-05-29 00:00:00",
+    "parameters_used": {
+      "outlier_zscore_threshold": 2.5,
+      "outlier_iqr_factor": 1.5,
+      "vol_min_valid": 0.01,
+      "vol_max_valid": 2.0,
+      "arbitrage_max_spread": 0.05,
+      "interpolation_method": "cubic",
+      "smoothness_lambda": 0.1,
+      "confidence_weight_source": {
+        "lecture_note": 0.6,
+        "business_table": 0.9,
+        "screenshot": 0.4,
+        "summary_page": 0.8
+      },
+      "conflict_tolerance_pct": 3.0,
+      "tenor_order": [
+        "1M",
+        "3M",
+        "6M",
+        "1Y",
+        "2Y",
+        "3Y",
+        "5Y",
+        "10Y"
+      ]
+    }
+  },
+  {
+    "log_id": "9f9aa268",
+    "timestamp": "2026-06-16T20:17:19.173020",
+    "action": "范围校验标记",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "c6bbec23",
+    "old_value": 2.5,
+    "new_value": null,
+    "operator": "system",
+    "reason": "波动率超出有效范围 [0.01, 2.0]",
+    "parameters_used": {
+      "vol_min": 0.01,
+      "vol_max": 2.0
+    }
+  },
+  {
+    "log_id": "7577605c",
+    "timestamp": "2026-06-16T20:17:19.175722",
+    "action": "Z-score异常检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "e422618e",
+    "old_value": 0.8,
+    "new_value": null,
+    "operator": "system",
+    "reason": "Z-score=3.16 > 阈值=2.5",
+    "parameters_used": {
+      "zscore_threshold": 2.5,
+      "zscore": 3.162029263356207
+    }
+  },
+  {
+    "log_id": "336b7cb7",
+    "timestamp": "2026-06-16T20:17:19.177391",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "0ac3f9b2",
+    "old_value": 0.157,
+    "new_value": 0.225,
+    "operator": "system",
+    "reason": "与汇总页差异30.2%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.225,
+      "difference_pct": 30.22222222222222
+    }
+  },
+  {
+    "log_id": "14e2e67c",
+    "timestamp": "2026-06-16T20:17:19.178822",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "8d29e2a1",
+    "old_value": 0.1563,
+    "new_value": 0.185,
+    "operator": "system",
+    "reason": "与汇总页差异15.5%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.185,
+      "difference_pct": 15.513513513513516
+    }
+  },
+  {
+    "log_id": "2ae8ef18",
+    "timestamp": "2026-06-16T20:17:19.187289",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "c74596fe",
+    "old_value": 0.1493,
+    "new_value": 0.16,
+    "operator": "system",
+    "reason": "与汇总页差异6.7%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.16,
+      "difference_pct": 6.687500000000009
+    }
+  },
+  {
+    "log_id": "f1978d28",
+    "timestamp": "2026-06-16T20:17:19.190210",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "74cd4c65",
+    "old_value": 0.1513,
+    "new_value": 0.18,
+    "operator": "system",
+    "reason": "与汇总页差异15.9%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.18,
+      "difference_pct": 15.944444444444446
+    }
+  },
+  {
+    "log_id": "7e2abbd6",
+    "timestamp": "2026-06-16T20:17:19.192269",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "09758f9b",
+    "old_value": 0.1475,
+    "new_value": 0.24,
+    "operator": "system",
+    "reason": "与汇总页差异38.5%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.24,
+      "difference_pct": 38.54166666666667
+    }
+  },
+  {
+    "log_id": "7c9d6b08",
+    "timestamp": "2026-06-16T20:17:19.193983",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "5b273f56",
+    "old_value": 0.1642,
+    "new_value": 0.235,
+    "operator": "system",
+    "reason": "与汇总页差异30.1%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.235,
+      "difference_pct": 30.127659574468073
+    }
+  },
+  {
+    "log_id": "f022e599",
+    "timestamp": "2026-06-16T20:17:19.195545",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "7504e676",
+    "old_value": 0.1565,
+    "new_value": 0.195,
+    "operator": "system",
+    "reason": "与汇总页差异19.7%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.195,
+      "difference_pct": 19.743589743589745
+    }
+  },
+  {
+    "log_id": "634413bd",
+    "timestamp": "2026-06-16T20:17:19.199500",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "2696ea92",
+    "old_value": 0.157,
+    "new_value": 0.2,
+    "operator": "system",
+    "reason": "与汇总页差异21.5%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.2,
+      "difference_pct": 21.500000000000004
+    }
+  },
+  {
+    "log_id": "91fb89f4",
+    "timestamp": "2026-06-16T20:17:19.208430",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "1bebc16a",
+    "old_value": 0.1563,
+    "new_value": 0.19,
+    "operator": "system",
+    "reason": "与汇总页差异17.7%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.19,
+      "difference_pct": 17.73684210526316
+    }
+  },
+  {
+    "log_id": "1b475911",
+    "timestamp": "2026-06-16T20:17:19.209941",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "8a44e6ef",
+    "old_value": 0.1582,
+    "new_value": 0.25,
+    "operator": "system",
+    "reason": "与汇总页差异36.7%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.25,
+      "difference_pct": 36.72
+    }
+  },
+  {
+    "log_id": "d0de4e11",
+    "timestamp": "2026-06-16T20:17:19.211400",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "eab347fe",
+    "old_value": 0.1756,
+    "new_value": 0.245,
+    "operator": "system",
+    "reason": "与汇总页差异28.3%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.245,
+      "difference_pct": 28.326530612244895
+    }
+  },
+  {
+    "log_id": "3c0bc3b4",
+    "timestamp": "2026-06-16T20:17:19.212799",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "403ed843",
+    "old_value": 0.1704,
+    "new_value": 0.18,
+    "operator": "system",
+    "reason": "与汇总页差异5.3%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.18,
+      "difference_pct": 5.333333333333332
+    }
+  },
+  {
+    "log_id": "e634dfe0",
+    "timestamp": "2026-06-16T20:17:19.214474",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "d4598217",
+    "old_value": 0.1687,
+    "new_value": 0.2,
+    "operator": "system",
+    "reason": "与汇总页差异15.7%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.2,
+      "difference_pct": 15.650000000000011
+    }
+  },
+  {
+    "log_id": "4002e6bb",
+    "timestamp": "2026-06-16T20:17:19.217456",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "51da2cca",
+    "old_value": 0.1689,
+    "new_value": 0.26,
+    "operator": "system",
+    "reason": "与汇总页差异35.0%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.26,
+      "difference_pct": 35.03846153846154
+    }
+  },
+  {
+    "log_id": "2dff8b97",
+    "timestamp": "2026-06-16T20:17:19.219317",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "de09dae9",
+    "old_value": 0.1845,
+    "new_value": 0.255,
+    "operator": "system",
+    "reason": "与汇总页差异27.6%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.255,
+      "difference_pct": 27.647058823529413
+    }
+  },
+  {
+    "log_id": "03c7ad05",
+    "timestamp": "2026-06-16T20:17:19.223589",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "1ce13843",
+    "old_value": 0.1819,
+    "new_value": 0.215,
+    "operator": "system",
+    "reason": "与汇总页差异15.4%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.215,
+      "difference_pct": 15.3953488372093
+    }
+  },
+  {
+    "log_id": "58214321",
+    "timestamp": "2026-06-16T20:17:19.227255",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "4b1158f8",
+    "old_value": 0.1787,
+    "new_value": 0.22,
+    "operator": "system",
+    "reason": "与汇总页差异18.8%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.22,
+      "difference_pct": 18.772727272727273
+    }
+  },
+  {
+    "log_id": "028af6db",
+    "timestamp": "2026-06-16T20:17:19.231398",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "000bc72f",
+    "old_value": 0.1786,
+    "new_value": 0.27,
+    "operator": "system",
+    "reason": "与汇总页差异33.9%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.27,
+      "difference_pct": 33.851851851851855
+    }
+  },
+  {
+    "log_id": "a9c82585",
+    "timestamp": "2026-06-16T20:17:19.236626",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "75324528",
+    "old_value": 0.1837,
+    "new_value": 0.265,
+    "operator": "system",
+    "reason": "与汇总页差异30.7%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.265,
+      "difference_pct": 30.67924528301887
+    }
+  },
+  {
+    "log_id": "1f33039b",
+    "timestamp": "2026-06-16T20:17:19.239981",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "fba24611",
+    "old_value": 0.1759,
+    "new_value": 0.2,
+    "operator": "system",
+    "reason": "与汇总页差异12.1%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.2,
+      "difference_pct": 12.050000000000004
+    }
+  },
+  {
+    "log_id": "d477651b",
+    "timestamp": "2026-06-16T20:17:19.268101",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "349e91a3",
+    "old_value": 0.1971,
+    "new_value": 0.28,
+    "operator": "system",
+    "reason": "与汇总页差异29.6%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.28,
+      "difference_pct": 29.607142857142865
+    }
+  },
+  {
+    "log_id": "9bc22dbf",
+    "timestamp": "2026-06-16T20:17:19.271654",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "9f855e6d",
+    "old_value": 0.213,
+    "new_value": 0.275,
+    "operator": "system",
+    "reason": "与汇总页差异22.5%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.275,
+      "difference_pct": 22.545454545454554
+    }
+  },
+  {
+    "log_id": "e1d0c001",
+    "timestamp": "2026-06-16T20:17:19.274431",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "d46f99ec",
+    "old_value": 0.1962,
+    "new_value": 0.21,
+    "operator": "system",
+    "reason": "与汇总页差异6.6%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.21,
+      "difference_pct": 6.571428571428561
+    }
+  },
+  {
+    "log_id": "3d5d2478",
+    "timestamp": "2026-06-16T20:17:19.277191",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "75195c65",
+    "old_value": 0.2097,
+    "new_value": 0.29,
+    "operator": "system",
+    "reason": "与汇总页差异27.7%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.29,
+      "difference_pct": 27.68965517241379
+    }
+  },
+  {
+    "log_id": "5e9f4ee9",
+    "timestamp": "2026-06-16T20:17:19.281085",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "b1b79dcd",
+    "old_value": 0.1554,
+    "new_value": 0.185,
+    "operator": "system",
+    "reason": "与汇总页差异16.0%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.185,
+      "difference_pct": 15.999999999999995
+    }
+  },
+  {
+    "log_id": "e533f94e",
+    "timestamp": "2026-06-16T20:17:19.283669",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "d0c8bf5e",
+    "old_value": 0.155,
+    "new_value": 0.16,
+    "operator": "system",
+    "reason": "与汇总页差异3.1%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.16,
+      "difference_pct": 3.1250000000000027
+    }
+  },
+  {
+    "log_id": "31441765",
+    "timestamp": "2026-06-16T20:17:19.291994",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "cbd4a61b",
+    "old_value": 0.1554,
+    "new_value": 0.18,
+    "operator": "system",
+    "reason": "与汇总页差异13.7%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.18,
+      "difference_pct": 13.666666666666657
+    }
+  },
+  {
+    "log_id": "652633e3",
+    "timestamp": "2026-06-16T20:17:19.296114",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "21a57644",
+    "old_value": 0.1754,
+    "new_value": 0.195,
+    "operator": "system",
+    "reason": "与汇总页差异10.1%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.195,
+      "difference_pct": 10.051282051282055
+    }
+  },
+  {
+    "log_id": "552d79ba",
+    "timestamp": "2026-06-16T20:17:19.303966",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "f7e59c6d",
+    "old_value": 0.175,
+    "new_value": 0.2,
+    "operator": "system",
+    "reason": "与汇总页差异12.5%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.2,
+      "difference_pct": 12.50000000000001
+    }
+  },
+  {
+    "log_id": "288112d5",
+    "timestamp": "2026-06-16T20:17:19.309207",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "6fb37819",
+    "old_value": 0.1754,
+    "new_value": 0.19,
+    "operator": "system",
+    "reason": "与汇总页差异7.7%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.19,
+      "difference_pct": 7.68421052631579
+    }
+  },
+  {
+    "log_id": "1b1ffc7a",
+    "timestamp": "2026-06-16T20:17:19.319451",
+    "action": "清洗完成",
+    "surface_id": "VOL_50ETF_20260529_9c06",
+    "point_id": "",
+    "old_value": null,
+    "new_value": null,
+    "operator": "system",
+    "reason": "处理完成，耗时 0.15s",
+    "parameters_used": {
+      "processing_time": 0.14921975135803223
+    }
+  },
+  {
+    "log_id": "5723cdac",
+    "timestamp": "2026-06-16T20:17:19.327817",
+    "action": "开始清洗",
+    "surface_id": "VOL_50ETF_20260527_0a9c",
+    "point_id": "",
+    "old_value": null,
+    "new_value": null,
+    "operator": "system",
+    "reason": "开始处理曲面 50ETF @ 2026-05-27 00:00:00",
+    "parameters_used": {
+      "outlier_zscore_threshold": 2.5,
+      "outlier_iqr_factor": 1.5,
+      "vol_min_valid": 0.01,
+      "vol_max_valid": 2.0,
+      "arbitrage_max_spread": 0.05,
+      "interpolation_method": "cubic",
+      "smoothness_lambda": 0.1,
+      "confidence_weight_source": {
+        "lecture_note": 0.6,
+        "business_table": 0.9,
+        "screenshot": 0.4,
+        "summary_page": 0.8
+      },
+      "conflict_tolerance_pct": 3.0,
+      "tenor_order": [
+        "1M",
+        "3M",
+        "6M",
+        "1Y",
+        "2Y",
+        "3Y",
+        "5Y",
+        "10Y"
+      ]
+    }
+  },
+  {
+    "log_id": "5b01ab23",
+    "timestamp": "2026-06-16T20:17:19.343422",
+    "action": "清洗完成",
+    "surface_id": "VOL_50ETF_20260527_0a9c",
+    "point_id": "",
+    "old_value": null,
+    "new_value": null,
+    "operator": "system",
+    "reason": "处理完成，耗时 0.02s",
+    "parameters_used": {
+      "processing_time": 0.015619039535522461
+    }
+  },
+  {
+    "log_id": "98ef7acb",
+    "timestamp": "2026-06-16T20:17:19.418351",
+    "action": "开始清洗",
+    "surface_id": "VOL_50ETF_20260530_4af3",
+    "point_id": "",
+    "old_value": null,
+    "new_value": null,
+    "operator": "system",
+    "reason": "开始处理曲面 50ETF @ 2026-05-30 00:00:00",
+    "parameters_used": {
+      "outlier_zscore_threshold": 2.5,
+      "outlier_iqr_factor": 1.5,
+      "vol_min_valid": 0.01,
+      "vol_max_valid": 2.0,
+      "arbitrage_max_spread": 0.05,
+      "interpolation_method": "cubic",
+      "smoothness_lambda": 0.1,
+      "confidence_weight_source": {
+        "lecture_note": 0.6,
+        "business_table": 0.9,
+        "screenshot": 0.4,
+        "summary_page": 0.8
+      },
+      "conflict_tolerance_pct": 3.0,
+      "tenor_order": [
+        "1M",
+        "3M",
+        "6M",
+        "1Y",
+        "2Y",
+        "3Y",
+        "5Y",
+        "10Y"
+      ]
+    }
+  },
+  {
+    "log_id": "6c9f5a37",
+    "timestamp": "2026-06-16T20:17:19.420981",
+    "action": "冲突检测",
+    "surface_id": "VOL_50ETF_20260530_4af3",
+    "point_id": "dd7cc931",
+    "old_value": 0.17,
+    "new_value": 0.2,
+    "operator": "system",
+    "reason": "与汇总页差异15.0%",
+    "parameters_used": {
+      "tolerance_pct": 3.0,
+      "summary_value": 0.2,
+      "difference_pct": 15.0
+    }
+  },
+  {
+    "log_id": "aa2c413e",
+    "timestamp": "2026-06-16T20:17:19.425590",
+    "action": "补充期限点",
+    "surface_id": "VOL_50ETF_20260530_4af3",
+    "point_id": "d03960a3",
+    "old_value": null,
+    "new_value": 0.20249999999999999,
+    "operator": "system",
+    "reason": "补充缺失期限 6M",
+    "parameters_used": {
+      "method": "linear",
+      "tenor": "6M"
+    }
+  },
+  {
+    "log_id": "bc625e9a",
+    "timestamp": "2026-06-16T20:17:19.430854",
+    "action": "补充期限点",
+    "surface_id": "VOL_50ETF_20260530_4af3",
+    "point_id": "bb249ef0",
+    "old_value": null,
+    "new_value": 0.18,
+    "operator": "system",
+    "reason": "补充缺失期限 6M",
+    "parameters_used": {
+      "method": "linear",
+      "tenor": "6M"
+    }
+  },
+  {
+    "log_id": "658b1b7d",
+    "timestamp": "2026-06-16T20:17:19.434474",
+    "action": "补充期限点",
+    "surface_id": "VOL_50ETF_20260530_4af3",
+    "point_id": "a109a69f",
+    "old_value": null,
+    "new_value": 0.19799999999999998,
+    "operator": "system",
+    "reason": "补充缺失期限 6M",
+    "parameters_used": {
+      "method": "linear",
+      "tenor": "6M"
+    }
+  },
+  {
+    "log_id": "48c820dd",
+    "timestamp": "2026-06-16T20:17:19.441265",
+    "action": "补充期限点",
+    "surface_id": "VOL_50ETF_20260530_4af3",
+    "point_id": "74c672b0",
+    "old_value": null,
+    "new_value": 0.2125,
+    "operator": "system",
+    "reason": "补充缺失期限 1Y",
+    "parameters_used": {
+      "method": "linear",
+      "tenor": "1Y"
+    }
+  },
+  {
+    "log_id": "a26bfa09",
+    "timestamp": "2026-06-16T20:17:19.447653",
+    "action": "补充期限点",
+    "surface_id": "VOL_50ETF_20260530_4af3",
+    "point_id": "3d09651c",
+    "old_value": null,
+    "new_value": 0.19,
+    "operator": "system",
+    "reason": "补充缺失期限 1Y",
+    "parameters_used": {
+      "method": "linear",
+      "tenor": "1Y"
+    }
+  },
+  {
+    "log_id": "5ca24929",
+    "timestamp": "2026-06-16T20:17:19.450857",
+    "action": "补充期限点",
+    "surface_id": "VOL_50ETF_20260530_4af3",
+    "point_id": "33dd3839",
+    "old_value": null,
+    "new_value": 0.20799999999999996,
+    "operator": "system",
+    "reason": "补充缺失期限 1Y",
+    "parameters_used": {
+      "method": "linear",
+      "tenor": "1Y"
+    }
+  },
+  {
+    "log_id": "2f6f9af6",
+    "timestamp": "2026-06-16T20:17:19.455243",
+    "action": "清洗完成",
+    "surface_id": "VOL_50ETF_20260530_4af3",
+    "point_id": "",
+    "old_value": null,
+    "new_value": null,
+    "operator": "system",
+    "reason": "处理完成，耗时 0.04s",
+    "parameters_used": {
+      "processing_time": 0.03689002990722656
+    }
+  },
+  {
+    "log_id": "16bc6cfc",
+    "timestamp": "2026-06-16T20:17:19.471868",
+    "action": "开始清洗",
+    "surface_id": "VOL_50ETF_20260528_d794",
+    "point_id": "",
+    "old_value": null,
+    "new_value": null,
+    "operator": "system",
+    "reason": "开始处理曲面 50ETF @ 2026-05-28 00:00:00",
+    "parameters_used": {
+      "outlier_zscore_threshold": 2.5,
+      "outlier_iqr_factor": 1.5,
+      "vol_min_valid": 0.01,
+      "vol_max_valid": 2.0,
+      "arbitrage_max_spread": 0.05,
+      "interpolation_method": "cubic",
+      "smoothness_lambda": 0.1,
+      "confidence_weight_source": {
+        "lecture_note": 0.6,
+        "business_table": 0.9,
+        "screenshot": 0.4,
+        "summary_page": 0.8
+      },
+      "conflict_tolerance_pct": 3.0,
+      "tenor_order": [
+        "1M",
+        "3M",
+        "6M",
+        "1Y",
+        "2Y",
+        "3Y",
+        "5Y",
+        "10Y"
+      ]
+    }
+  },
+  {
+    "log_id": "86264296",
+    "timestamp": "2026-06-16T20:17:19.477221",
+    "action": "清洗完成",
+    "surface_id": "VOL_50ETF_20260528_d794",
+    "point_id": "",
+    "old_value": null,
+    "new_value": null,
+    "operator": "system",
+    "reason": "处理完成，耗时 0.01s",
+    "parameters_used": {
+      "processing_time": 0.005364894866943359
+    }
+  },
+  {
+    "log_id": "3294d8cc",
+    "timestamp": "2026-06-16T20:17:19.491036",
+    "action": "开始清洗",
+    "surface_id": "VOL_50ETF_20260528_d794",
+    "point_id": "",
+    "old_value": null,
+    "new_value": null,
+    "operator": "system",
+    "reason": "开始处理曲面 50ETF @ 2026-05-28 00:00:00",
+    "parameters_used": {
+      "outlier_zscore_threshold": 2.5,
+      "outlier_iqr_factor": 1.5,
+      "vol_min_valid": 0.01,
+      "vol_max_valid": 2.0,
+      "arbitrage_max_spread": 0.05,
+      "interpolation_method": "cubic",
+      "smoothness_lambda": 0.1,
+      "confidence_weight_source": {
+        "lecture_note": 0.6,
+        "business_table": 0.9,
+        "screenshot": 0.4,
+        "summary_page": 0.8
+      },
+      "conflict_tolerance_pct": 3.0,
+      "tenor_order": [
+        "1M",
+        "3M",
+        "6M",
+        "1Y",
+        "2Y",
+        "3Y",
+        "5Y",
+        "10Y"
+      ]
+    }
+  },
+  {
+    "log_id": "a413fafa",
+    "timestamp": "2026-06-16T20:17:19.496656",
+    "action": "清洗完成",
+    "surface_id": "VOL_50ETF_20260528_d794",
+    "point_id": "",
+    "old_value": null,
+    "new_value": null,
+    "operator": "system",
+    "reason": "处理完成，耗时 0.01s",
+    "parameters_used": {
+      "processing_time": 0.005639076232910156
+    }
   }
 ]

@@ -10,9 +10,9 @@ from core.models import VolatilityPoint, DataSource, DataSourceType
 class BaseImporter(ABC):
     FIELD_MAPPINGS = {
         "strike": ["行权价", "执行价", "strike", "K", "履约价"],
-        "maturity": ["期限", "到期时间", "maturity", "T", "到期期限", "剩余期限"],
-        "tenor": ["期限代码", "tenor", "品种", "合约代码"],
-        "implied_vol": ["隐含波动率", "IV", "波动率", "vol", "implied_vol", "波动率值"],
+        "maturity": ["到期时间", "maturity", "到期期限", "剩余期限", "到期日"],
+        "tenor": ["期限", "期限代码", "tenor", "品种", "合约代码", "T", "Expiry", "到期月份"],
+        "implied_vol": ["隐含波动率", "IV", "波动率", "vol", "implied_vol", "波动率值", "Vol"],
         "option_type": ["期权类型", "type", "看涨看跌", "call_put", "类型"],
         "raw_value": ["原始值", "原始波动率", "raw"]
     }
