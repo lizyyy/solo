@@ -20,6 +20,7 @@ export default function BusStopDetail() {
 
   const [remark, setRemark] = useState('');
   const [showRemarkInput, setShowRemarkInput] = useState(false);
+  const [pendingAction, setPendingAction] = useState<'confirm' | 'exception' | null>(null);
   const [noteText, setNoteText] = useState('');
 
   const busStop = busStops.find((b) => b.id === selectedBusStopId);
@@ -288,7 +289,11 @@ export default function BusStopDetail() {
             <div className="grid grid-cols-2 gap-2">
               {busStop.status !== 'confirmed' && (
                 <button
-                  onClick={() => setShowRemarkInput(true)}
+                  onClick={() => {
+                    setPendingAction('confirm');
+                    setRemark('');
+                    setShowRemarkInput(true);
+                  }}
                   className="flex items-center justify-center gap-2 py-2 px-3 bg-emerald-500 hover:bg-emerald-600 text-white text-sm rounded-lg transition-colors"
                 >
                   <CheckCircle className="w-4 h-4" /> 确认
@@ -297,8 +302,9 @@ export default function BusStopDetail() {
               {busStop.status !== 'exception' && (
                 <button
                   onClick={() => {
+                    setPendingAction('exception');
+                    setRemark('');
                     setShowRemarkInput(true);
-                    setRemark('标记为例外');
                   }}
                   className="flex items-center justify-center gap-2 py-2 px-3 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg transition-colors"
                 >
@@ -317,15 +323,27 @@ export default function BusStopDetail() {
               />
               <div className="grid grid-cols-2 gap-2">
                 <button
-                  onClick={remark.includes('例外') ? handleMarkException : handleConfirm}
-                  className="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg transition-colors"
+                  onClick={() => {
+                    if (pendingAction === 'exception') {
+                      handleMarkException();
+                    } else {
+                      handleConfirm();
+                    }
+                    setPendingAction(null);
+                  }}
+                  className={`py-2 px-3 text-white text-sm rounded-lg transition-colors ${
+                    pendingAction === 'exception'
+                      ? 'bg-red-500 hover:bg-red-600'
+                      : 'bg-emerald-500 hover:bg-emerald-600'
+                  }`}
                 >
-                  确认操作
+                  确认{pendingAction === 'exception' ? '标记为例外' : '点位'}
                 </button>
                 <button
                   onClick={() => {
                     setShowRemarkInput(false);
                     setRemark('');
+                    setPendingAction(null);
                   }}
                   className="py-2 px-3 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm rounded-lg transition-colors"
                 >
