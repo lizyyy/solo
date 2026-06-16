@@ -16,6 +16,7 @@ interface AppState {
   updateMaterial: (id: string, updates: Partial<AudioMaterial>) => void;
   resolveException: (materialId: string, exceptionType: ExceptionType) => void;
   addMaterial: (material: Omit<AudioMaterial, 'id' | 'processedAt'>) => void;
+  addMaterials: (materials: Array<Omit<AudioMaterial, 'id' | 'processedAt'>>) => void;
   setFilter: (filter: Partial<FilterState>) => void;
   resetFilter: () => void;
   toggleExceptionPanel: () => void;
@@ -108,6 +109,21 @@ export const useStore = create<AppState>((set, get) => ({
         processedAt: new Date().toISOString(),
       };
       const materials = [...state.materials, newMaterial];
+      const detected = detectAllExceptions(materials);
+      saveMaterials(detected);
+      return { materials: detected };
+    });
+  },
+
+  addMaterials: (newMaterials) => {
+    set((state) => {
+      const now = new Date().toISOString();
+      const added = newMaterials.map((m) => ({
+        ...m,
+        id: generateId(),
+        processedAt: now,
+      }));
+      const materials = [...state.materials, ...added];
       const detected = detectAllExceptions(materials);
       saveMaterials(detected);
       return { materials: detected };
