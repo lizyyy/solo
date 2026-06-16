@@ -1,7 +1,7 @@
 [
   {
-    "entry_id": "3552b8d9-c254-4d22-8d4d-d1770dbb414c",
-    "timestamp": "2026-06-08T16:24:33.744844",
+    "entry_id": "493c0fbb-bdc6-4dee-aa96-8a22d533224d",
+    "timestamp": "2026-06-16T22:14:21.149046",
     "operator": "林老师",
     "action": "导入曲目表",
     "track_id": null,
@@ -12,8 +12,8 @@
     "source": "sample_data/track_list.xlsx"
   },
   {
-    "entry_id": "770ae6dd-b3f9-4fb7-9b97-5d81f6d928ad",
-    "timestamp": "2026-06-08T16:24:33.866114",
+    "entry_id": "aac56139-4fd7-45de-992d-1b327eb1ff04",
+    "timestamp": "2026-06-16T22:14:21.242316",
     "operator": "林老师",
     "action": "导入完成",
     "track_id": null,
@@ -24,8 +24,8 @@
     "source": "sample_data/track_list.xlsx"
   },
   {
-    "entry_id": "e8a7835a-3a66-41e8-b7e9-ba97d9888d43",
-    "timestamp": "2026-06-08T16:24:33.866453",
+    "entry_id": "d5f57e07-1c70-4795-9991-e270ded268e7",
+    "timestamp": "2026-06-16T22:14:21.242605",
     "operator": "林老师",
     "action": "扫描音频目录",
     "track_id": null,
@@ -36,8 +36,8 @@
     "source": "sample_data/audio"
   },
   {
-    "entry_id": "df6994ac-98b4-404c-9865-962fd4d25203",
-    "timestamp": "2026-06-08T16:24:33.867394",
+    "entry_id": "c449e5f7-61ac-4748-a001-913436616b6d",
+    "timestamp": "2026-06-16T22:14:21.243401",
     "operator": "林老师",
     "action": "扫描完成",
     "track_id": null,
@@ -48,8 +48,8 @@
     "source": "sample_data/audio"
   },
   {
-    "entry_id": "1dc2ac57-b6d3-4015-940a-81c154265a96",
-    "timestamp": "2026-06-08T16:24:33.867604",
+    "entry_id": "cc8ed9e5-9bac-4e35-b965-e6daeda9175d",
+    "timestamp": "2026-06-16T22:14:21.243570",
     "operator": "林老师",
     "action": "开始匹配",
     "track_id": null,
@@ -60,8 +60,8 @@
     "source": "匹配器"
   },
   {
-    "entry_id": "17eeb2d9-3edf-4280-ab26-ae9a49b8e10e",
-    "timestamp": "2026-06-08T16:24:33.870422",
+    "entry_id": "8dd1ef2e-927b-47a9-abb2-c497dc6389a0",
+    "timestamp": "2026-06-16T22:14:21.246142",
     "operator": "林老师",
     "action": "匹配完成",
     "track_id": null,
@@ -72,8 +72,32 @@
     "source": "匹配器"
   },
   {
-    "entry_id": "1e147f04-f525-4f1b-8093-55712a28cef6",
-    "timestamp": "2026-06-08T16:24:33.896402",
+    "entry_id": "1f4e075e-bb13-4b5a-aae0-e1fb2734764b",
+    "timestamp": "2026-06-16T22:14:21.246467",
+    "operator": "林老师",
+    "action": "检测冲突",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "开始检测冲突，新导入 10 条曲目",
+    "source": "冲突检测器"
+  },
+  {
+    "entry_id": "b312e79f-b70e-458e-a40f-6d40c2d16904",
+    "timestamp": "2026-06-16T22:14:21.247063",
+    "operator": "林老师",
+    "action": "冲突检测完成",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "检测到 10 个冲突",
+    "source": "冲突检测器"
+  },
+  {
+    "entry_id": "aa9826d7-400d-4b4f-9c39-d566d861bc3b",
+    "timestamp": "2026-06-16T22:14:21.270478",
     "operator": "林老师",
     "action": "生成报告",
     "track_id": null,
@@ -82,5 +106,221 @@
     "new_value": null,
     "reason": "生成HTML报告: output/report.html",
     "source": "output/report.html"
+  },
+  {
+    "entry_id": "c5f85ebc-e907-426c-8077-536ff9ac531d",
+    "timestamp": "2026-06-16T22:15:02.679816",
+    "operator": "系统",
+    "action": "导入曲目表",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "开始导入文件: track_list.xlsx",
+    "source": "sample_data/track_list.xlsx"
+  },
+  {
+    "entry_id": "0731ec63-35d9-452c-aed2-7fb3e1fec4c6",
+    "timestamp": "2026-06-16T22:15:02.764717",
+    "operator": "系统",
+    "action": "导入完成",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "成功导入 10 条曲目记录",
+    "source": "sample_data/track_list.xlsx"
+  },
+  {
+    "entry_id": "fd659c09-3b8e-413d-b196-c1c3b22451b5",
+    "timestamp": "2026-06-16T22:15:02.765087",
+    "operator": "系统",
+    "action": "扫描音频目录",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "开始扫描目录: sample_data/audio",
+    "source": "sample_data/audio"
+  },
+  {
+    "entry_id": "8e4ac512-68a0-4347-9a51-f1b8a65e0829",
+    "timestamp": "2026-06-16T22:15:02.767355",
+    "operator": "系统",
+    "action": "扫描完成",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "扫描完成，共发现 9 个音频文件",
+    "source": "sample_data/audio"
+  },
+  {
+    "entry_id": "0032231c-54e7-471c-bcde-03f241740345",
+    "timestamp": "2026-06-16T22:15:02.767655",
+    "operator": "校验",
+    "action": "开始匹配",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "开始匹配 10 条曲目与 9 个音频文件",
+    "source": "匹配器"
+  },
+  {
+    "entry_id": "489b1174-4dd2-42ae-87fe-888c939ed252",
+    "timestamp": "2026-06-16T22:15:02.770320",
+    "operator": "校验",
+    "action": "匹配完成",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "匹配完成: 成功匹配 2 条, 异常 8 条",
+    "source": "匹配器"
+  },
+  {
+    "entry_id": "33e15a81-5d5e-48d8-9ec9-ae28f09867a4",
+    "timestamp": "2026-06-16T22:15:23.115422",
+    "operator": "系统",
+    "action": "导入曲目表",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "开始导入文件: track_list.xlsx",
+    "source": "sample_data/track_list.xlsx"
+  },
+  {
+    "entry_id": "cfd7e3f7-d01d-4560-b2bc-288f5cbfd2bd",
+    "timestamp": "2026-06-16T22:15:23.214062",
+    "operator": "系统",
+    "action": "导入完成",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "成功导入 10 条曲目记录",
+    "source": "sample_data/track_list.xlsx"
+  },
+  {
+    "entry_id": "a2d81600-c1b9-4d8d-b5cf-9eca6609843e",
+    "timestamp": "2026-06-16T22:15:23.214621",
+    "operator": "系统",
+    "action": "扫描音频目录",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "开始扫描目录: sample_data/audio",
+    "source": "sample_data/audio"
+  },
+  {
+    "entry_id": "e4e95a78-6d2a-4839-b3fc-53f6c73631c0",
+    "timestamp": "2026-06-16T22:15:23.217053",
+    "operator": "系统",
+    "action": "扫描完成",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "扫描完成，共发现 9 个音频文件",
+    "source": "sample_data/audio"
+  },
+  {
+    "entry_id": "0dedcfd0-2d47-4df5-af7e-d8dc94d9fadc",
+    "timestamp": "2026-06-16T22:15:23.217463",
+    "operator": "校验",
+    "action": "开始匹配",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "开始匹配 10 条曲目与 9 个音频文件",
+    "source": "匹配器"
+  },
+  {
+    "entry_id": "9b60f2bd-cf82-4bd9-a780-17644650b0c8",
+    "timestamp": "2026-06-16T22:15:23.220639",
+    "operator": "校验",
+    "action": "匹配完成",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "匹配完成: 成功匹配 2 条, 异常 8 条",
+    "source": "匹配器"
+  },
+  {
+    "entry_id": "7e259084-974c-42d2-899b-b548e8c67817",
+    "timestamp": "2026-06-16T22:15:45.245866",
+    "operator": "系统",
+    "action": "导入曲目表",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "开始导入文件: track_list.xlsx",
+    "source": "sample_data/track_list.xlsx"
+  },
+  {
+    "entry_id": "d10ee2e5-3594-4aa7-9933-6d9f115ab8e8",
+    "timestamp": "2026-06-16T22:15:45.342103",
+    "operator": "系统",
+    "action": "导入完成",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "成功导入 10 条曲目记录",
+    "source": "sample_data/track_list.xlsx"
+  },
+  {
+    "entry_id": "fdece20a-7a39-4e7c-9a18-3c8d8736f48f",
+    "timestamp": "2026-06-16T22:15:45.342688",
+    "operator": "系统",
+    "action": "扫描音频目录",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "开始扫描目录: sample_data/audio",
+    "source": "sample_data/audio"
+  },
+  {
+    "entry_id": "64593507-64b1-47af-99c5-910ff9b69b31",
+    "timestamp": "2026-06-16T22:15:45.347293",
+    "operator": "系统",
+    "action": "扫描完成",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "扫描完成，共发现 9 个音频文件",
+    "source": "sample_data/audio"
+  },
+  {
+    "entry_id": "82123947-2b09-4e02-8a1d-29530739b843",
+    "timestamp": "2026-06-16T22:15:45.347845",
+    "operator": "校验",
+    "action": "开始匹配",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "开始匹配 10 条曲目与 9 个音频文件",
+    "source": "匹配器"
+  },
+  {
+    "entry_id": "5aaa3224-4238-4d19-8998-d75277b5d9dc",
+    "timestamp": "2026-06-16T22:15:45.351339",
+    "operator": "校验",
+    "action": "匹配完成",
+    "track_id": null,
+    "file_path": null,
+    "old_value": null,
+    "new_value": null,
+    "reason": "匹配完成: 成功匹配 2 条, 异常 8 条",
+    "source": "匹配器"
   }
 ]

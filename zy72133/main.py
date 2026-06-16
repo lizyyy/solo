@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
+import copy
 import yaml
 import argparse
 from pathlib import Path
+from datetime import datetime
 
 from src import (
     TrackImporter,
@@ -11,11 +13,63 @@ from src import (
     ConflictResolver,
     ReportGenerator
 )
+from src.models import TrackRecord
 
 
 def load_config(config_path: str = "config.yaml"):
     with open(config_path, 'r', encoding='utf-8') as f:
         return yaml.safe_load(f)
+
+
+def _build_simulated_previous_import(tracks, operator="上一任交接"):
+    """基于当前曲目构造一份"系统已存储的旧导入数据"，故意制造真实字段差异，
+    用于演示 Excel 曲目表 vs 导入数据不一致时的冲突检测。
+    差异内容与原始数据有明确的业务含义，不是随机扰动。
+    """
+    overrides = {
+        "TRK001": {
+            "bpm": 130,
+            "energy_level": 9,
+            "notes": "上次交接标注：开场热场候选",
+            "_reason": "能量等级和 BPM 两次记录不一致"
+        },
+        "TRK002": {
+            "artist": "DJ小红(Chill Mix)",
+            "duration": 255,
+            "notes": "上次交接：暖场曲目",
+            "_reason": "艺术家标注和时长两次记录不一致"
+        },
+        "TRK005": {
+            "license_info": "授权申请中",
+            "notes": "",
+            "_reason": "深海回响的授权状态描述有出入"
+        },
+        "TRK009": {
+            "title": "Electric Pulse",
+            "notes": "",
+            "_reason": "人工改名后中英文曲名需要统一"
+        },
+    }
+
+    simulated = []
+    for t in tracks:
+        if t.track_id not in overrides:
+            simulated.append(copy.deepcopy(t))
+            continue
+
+        mod = overrides[t.track_id]
+        new_t = copy.deepcopy(t)
+        for k, v in mod.items():
+            if k.startswith("_"):
+                continue
+            setattr(new_t, k, v)
+        new_t.imported_at = datetime(2026, 5, 20, 14, 30)
+        new_t.notes = (new_t.notes or "") + (
+            f" [来源:{operator}·2026-05-20]"
+        )
+        simulated.append(new_t)
+
+    return simulated, overrides
 
 
 def run_pipeline(excel_path: str, audio_dir: str, output_dir: str, 
@@ -58,8 +112,27 @@ def run_pipeline(excel_path: str, audio_dir: str, output_dir: str,
     print()
     
     print("⚠️ 步骤4: 检测数据冲突...")
-    conflicts = conflict_resolver.get_unresolved_conflicts()
-    print(f"   待解决冲突: {len(conflicts)} 个")
+    prev_tracks, diff_desc = _build_simulated_previous_import(tracks)
+    from src.models import MatchResult, TrackStatus
+    prev_results = [
+        MatchResult(
+            track=t,
+            audio_file=None,
+            status=TrackStatus.MATCHED,
+            match_confidence=1.0,
+            match_notes="上一次交接时的导入记录"
+        )
+        for t in prev_tracks
+    ]
+    conflicts = conflict_resolver.detect_conflicts(
+        new_tracks=tracks,
+        existing_results=prev_results,
+        operator=operator
+    )
+    print(f"   检测到 {len(conflicts)} 个数据冲突，涉及曲目: "
+          f"{', '.join(sorted(set(c.track_id for c in conflicts)))}")
+    for tid, info in diff_desc.items():
+        print(f"     - {tid}: {info.get('_reason', '字段不一致')}")
     print()
     
     print("📊 步骤5: 生成报告...")

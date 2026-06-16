@@ -141,16 +141,18 @@ HTML_TEMPLATE = """
         }
         .conflict-row {
             display: grid;
-            grid-template-columns: 1fr 1fr 2fr;
+            grid-template-columns: 1fr 2fr 2fr 2.5fr;
             gap: 12px;
             padding: 8px 0;
             font-size: 13px;
             border-bottom: 1px dashed #fca5a5;
+            align-items: start;
         }
         .conflict-row:last-child { border-bottom: none; }
         .conflict-val { background: white; padding: 6px 10px; border-radius: 4px; }
         .conflict-val.excel { border-left: 3px solid #007aff; }
         .conflict-val.old { border-left: 3px solid #ff9500; }
+        .conflict-suggestion { color: #7f1d1d; font-weight: 500; }
         .audit-box {
             background: #f0f0f5;
             border-radius: 6px;
@@ -401,33 +403,59 @@ class ReportGenerator:
     
     def _generate_conflict_list(self, conflicts: List[Conflict], 
                                results: List[MatchResult]) -> str:
+        from collections import defaultdict
+
         html_parts = []
-        
-        for conflict in conflicts:
-            if conflict.resolved:
-                continue
-                
-            result = next((r for r in results if r.track.track_id == conflict.track_id), None)
-            track_title = result.track.title if result else conflict.track_id
-            
+        unresolved = [c for c in conflicts if not c.resolved]
+
+        if not unresolved:
+            return ""
+
+        by_track = defaultdict(list)
+        for c in unresolved:
+            by_track[c.track_id].append(c)
+
+        for track_id in sorted(by_track.keys()):
+            track_conflicts = by_track[track_id]
+            result = next((r for r in results if r.track.track_id == track_id), None)
+            track_title = result.track.title if result else track_id
+
+            rows_html = []
+            for c in track_conflicts:
+                rows_html.append(f'''
+                <div class="conflict-row">
+                    <div style="font-weight:600;">{c.field_name}</div>
+                    <div class="conflict-val excel" style="font-size:12px;">
+                        <div style="color:#007aff;font-size:11px;margin-bottom:2px;">本次Excel</div>
+                        {c.excel_value}
+                    </div>
+                    <div class="conflict-val old" style="font-size:12px;">
+                        <div style="color:#ff9500;font-size:11px;margin-bottom:2px;">系统记录</div>
+                        {c.import_value}
+                    </div>
+                    <div class="conflict-suggestion" style="font-size:12px;">
+                        💡 {c.suggested_action}
+                    </div>
+                </div>
+                ''')
+
             html = f'''
             <div class="conflict-box">
-                <h4>🎵 曲目: {track_title} (ID: {conflict.track_id})</h4>
-                <div class="conflict-row">
-                    <div><strong>字段</strong></div>
-                    <div><strong>Excel值</strong></div>
-                    <div><strong>系统值</strong></div>
+                <h4>🎵 曲目: {track_title} &nbsp;&nbsp;<span style="font-weight:normal;color:#991b1b;">(ID: {track_id})</span></h4>
+                <div style="font-size:12px;color:#666;margin-bottom:8px;">
+                   该曲目共检测到 <strong>{len(track_conflicts)}</strong> 处数据不一致，请人工核对后决定以哪边为准
                 </div>
-                <div class="conflict-row">
-                    <div>{conflict.field_name}</div>
-                    <div class="conflict-val excel">{conflict.excel_value or "(空)"}</div>
-                    <div class="conflict-val old">{conflict.import_value or "(空)"}</div>
+                <div class="conflict-row" style="font-weight:600;color:#991b1b;border-bottom:1px solid #fca5a5;">
+                    <div>字段</div>
+                    <div>本次Excel导入值</div>
+                    <div>上次系统记录值</div>
+                    <div>建议动作</div>
                 </div>
-                <p style="margin-top: 10px; color: #991b1b;">💡 建议: {conflict.suggested_action}</p>
+                {''.join(rows_html)}
             </div>
             '''
             html_parts.append(html)
-            
+
         return "\n".join(html_parts)
     
     def _get_item_class(self, status: TrackStatus) -> str:

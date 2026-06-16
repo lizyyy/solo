@@ -52,6 +52,40 @@ class ConflictResolver:
         
         return conflicts
     
+    def _normalize_value(self, value):
+        if value is None:
+            return ""
+        if isinstance(value, float):
+            if value != value:
+                return ""
+            if value.is_integer():
+                return str(int(value))
+            return str(value)
+        text = str(value).strip()
+        if text.lower() in ("nan", "none", ""):
+            return ""
+        return text
+
+    def _values_equal(self, a, b) -> bool:
+        norm_a = self._normalize_value(a)
+        norm_b = self._normalize_value(b)
+        if norm_a == norm_b:
+            return True
+        try:
+            fa = float(norm_a)
+            fb = float(norm_b)
+            if abs(fa - fb) < 1e-6:
+                return True
+        except (ValueError, TypeError):
+            pass
+        return False
+
+    def _format_for_display(self, value) -> str:
+        text = self._normalize_value(value)
+        if text == "":
+            return "(未填写)"
+        return text
+
     def _compare_tracks(self, new_track: TrackRecord, 
                         old_track: TrackRecord) -> List[Conflict]:
         conflicts = []
@@ -71,13 +105,13 @@ class ConflictResolver:
             new_value = getattr(new_track, field_name)
             old_value = getattr(old_track, field_name)
             
-            if str(new_value).strip() != str(old_value).strip():
+            if not self._values_equal(new_value, old_value):
                 conflict = Conflict(
                     conflict_id=str(uuid.uuid4()),
                     track_id=new_track.track_id,
                     field_name=display_name,
-                    excel_value=str(new_value) if new_value else "",
-                    import_value=str(old_value) if old_value else "",
+                    excel_value=self._format_for_display(new_value),
+                    import_value=self._format_for_display(old_value),
                     suggested_action=self._get_suggested_action(field_name, new_value, old_value)
                 )
                 conflicts.append(conflict)

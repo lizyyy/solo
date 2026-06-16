@@ -131,16 +131,18 @@
         }
         .conflict-row {
             display: grid;
-            grid-template-columns: 1fr 1fr 2fr;
+            grid-template-columns: 1fr 2fr 2fr 2.5fr;
             gap: 12px;
             padding: 8px 0;
             font-size: 13px;
             border-bottom: 1px dashed #fca5a5;
+            align-items: start;
         }
         .conflict-row:last-child { border-bottom: none; }
         .conflict-val { background: white; padding: 6px 10px; border-radius: 4px; }
         .conflict-val.excel { border-left: 3px solid #007aff; }
         .conflict-val.old { border-left: 3px solid #ff9500; }
+        .conflict-suggestion { color: #7f1d1d; font-weight: 500; }
         .audit-box {
             background: #f0f0f5;
             border-radius: 6px;
@@ -179,7 +181,7 @@
     <div class="container">
         <div class="header">
             <h1>🎧 DJ曲库能量排序</h1>
-            <p>曲目匹配与异常检测报告 · 生成时间: 2026-06-08 16:24:33</p>
+            <p>曲目匹配与异常检测报告 · 生成时间: 2026-06-16 22:14:21</p>
         </div>
         
         <div class="summary">
@@ -196,7 +198,7 @@
                 <div class="label">需关注</div>
             </div>
             <div class="stat-card conflict">
-                <div class="number">0</div>
+                <div class="number">10</div>
                 <div class="label">数据冲突</div>
             </div>
         </div>
@@ -536,9 +538,224 @@
         </div>
         
         
+        <div class="section">
+            <h2>⚠️ 数据冲突</h2>
+            <p style="color: #666; margin-bottom: 16px;">以下曲目Excel表数据与系统记录不一致，请人工核对确认</p>
+            
+            <div class="conflict-box">
+                <h4>🎵 曲目: 午夜节拍 &nbsp;&nbsp;<span style="font-weight:normal;color:#991b1b;">(ID: TRK001)</span></h4>
+                <div style="font-size:12px;color:#666;margin-bottom:8px;">
+                   该曲目共检测到 <strong>3</strong> 处数据不一致，请人工核对后决定以哪边为准
+                </div>
+                <div class="conflict-row" style="font-weight:600;color:#991b1b;border-bottom:1px solid #fca5a5;">
+                    <div>字段</div>
+                    <div>本次Excel导入值</div>
+                    <div>上次系统记录值</div>
+                    <div>建议动作</div>
+                </div>
+                
+                <div class="conflict-row">
+                    <div style="font-weight:600;">BPM</div>
+                    <div class="conflict-val excel" style="font-size:12px;">
+                        <div style="color:#007aff;font-size:11px;margin-bottom:2px;">本次Excel</div>
+                        128
+                    </div>
+                    <div class="conflict-val old" style="font-size:12px;">
+                        <div style="color:#ff9500;font-size:11px;margin-bottom:2px;">系统记录</div>
+                        130
+                    </div>
+                    <div class="conflict-suggestion" style="font-size:12px;">
+                        💡 建议使用专业工具重新检测BPM
+                    </div>
+                </div>
+                
+                <div class="conflict-row">
+                    <div style="font-weight:600;">能量等级</div>
+                    <div class="conflict-val excel" style="font-size:12px;">
+                        <div style="color:#007aff;font-size:11px;margin-bottom:2px;">本次Excel</div>
+                        8
+                    </div>
+                    <div class="conflict-val old" style="font-size:12px;">
+                        <div style="color:#ff9500;font-size:11px;margin-bottom:2px;">系统记录</div>
+                        9
+                    </div>
+                    <div class="conflict-suggestion" style="font-size:12px;">
+                        💡 请确认能量等级的评级标准是否一致
+                    </div>
+                </div>
+                
+                <div class="conflict-row">
+                    <div style="font-weight:600;">备注</div>
+                    <div class="conflict-val excel" style="font-size:12px;">
+                        <div style="color:#007aff;font-size:11px;margin-bottom:2px;">本次Excel</div>
+                        主打曲目
+                    </div>
+                    <div class="conflict-val old" style="font-size:12px;">
+                        <div style="color:#ff9500;font-size:11px;margin-bottom:2px;">系统记录</div>
+                        上次交接标注：开场热场候选 [来源:上一任交接·2026-05-20]
+                    </div>
+                    <div class="conflict-suggestion" style="font-size:12px;">
+                        💡 建议合并两边的备注信息
+                    </div>
+                </div>
+                
+            </div>
+            
+
+            <div class="conflict-box">
+                <h4>🎵 曲目: 星空漫步 &nbsp;&nbsp;<span style="font-weight:normal;color:#991b1b;">(ID: TRK002)</span></h4>
+                <div style="font-size:12px;color:#666;margin-bottom:8px;">
+                   该曲目共检测到 <strong>3</strong> 处数据不一致，请人工核对后决定以哪边为准
+                </div>
+                <div class="conflict-row" style="font-weight:600;color:#991b1b;border-bottom:1px solid #fca5a5;">
+                    <div>字段</div>
+                    <div>本次Excel导入值</div>
+                    <div>上次系统记录值</div>
+                    <div>建议动作</div>
+                </div>
+                
+                <div class="conflict-row">
+                    <div style="font-weight:600;">艺术家</div>
+                    <div class="conflict-val excel" style="font-size:12px;">
+                        <div style="color:#007aff;font-size:11px;margin-bottom:2px;">本次Excel</div>
+                        DJ小红
+                    </div>
+                    <div class="conflict-val old" style="font-size:12px;">
+                        <div style="color:#ff9500;font-size:11px;margin-bottom:2px;">系统记录</div>
+                        DJ小红(Chill Mix)
+                    </div>
+                    <div class="conflict-suggestion" style="font-size:12px;">
+                        💡 请核对艺术家名称是否正确
+                    </div>
+                </div>
+                
+                <div class="conflict-row">
+                    <div style="font-weight:600;">时长</div>
+                    <div class="conflict-val excel" style="font-size:12px;">
+                        <div style="color:#007aff;font-size:11px;margin-bottom:2px;">本次Excel</div>
+                        260
+                    </div>
+                    <div class="conflict-val old" style="font-size:12px;">
+                        <div style="color:#ff9500;font-size:11px;margin-bottom:2px;">系统记录</div>
+                        255
+                    </div>
+                    <div class="conflict-suggestion" style="font-size:12px;">
+                        💡 以音频文件实际时长为准，建议重新测量
+                    </div>
+                </div>
+                
+                <div class="conflict-row">
+                    <div style="font-weight:600;">备注</div>
+                    <div class="conflict-val excel" style="font-size:12px;">
+                        <div style="color:#007aff;font-size:11px;margin-bottom:2px;">本次Excel</div>
+                        (未填写)
+                    </div>
+                    <div class="conflict-val old" style="font-size:12px;">
+                        <div style="color:#ff9500;font-size:11px;margin-bottom:2px;">系统记录</div>
+                        上次交接：暖场曲目 [来源:上一任交接·2026-05-20]
+                    </div>
+                    <div class="conflict-suggestion" style="font-size:12px;">
+                        💡 建议合并两边的备注信息
+                    </div>
+                </div>
+                
+            </div>
+            
+
+            <div class="conflict-box">
+                <h4>🎵 曲目: 深海回响 &nbsp;&nbsp;<span style="font-weight:normal;color:#991b1b;">(ID: TRK005)</span></h4>
+                <div style="font-size:12px;color:#666;margin-bottom:8px;">
+                   该曲目共检测到 <strong>2</strong> 处数据不一致，请人工核对后决定以哪边为准
+                </div>
+                <div class="conflict-row" style="font-weight:600;color:#991b1b;border-bottom:1px solid #fca5a5;">
+                    <div>字段</div>
+                    <div>本次Excel导入值</div>
+                    <div>上次系统记录值</div>
+                    <div>建议动作</div>
+                </div>
+                
+                <div class="conflict-row">
+                    <div style="font-weight:600;">授权信息</div>
+                    <div class="conflict-val excel" style="font-size:12px;">
+                        <div style="color:#007aff;font-size:11px;margin-bottom:2px;">本次Excel</div>
+                        (未填写)
+                    </div>
+                    <div class="conflict-val old" style="font-size:12px;">
+                        <div style="color:#ff9500;font-size:11px;margin-bottom:2px;">系统记录</div>
+                        授权申请中
+                    </div>
+                    <div class="conflict-suggestion" style="font-size:12px;">
+                        💡 请仔细核对版权授权信息，确保使用合规
+                    </div>
+                </div>
+                
+                <div class="conflict-row">
+                    <div style="font-weight:600;">备注</div>
+                    <div class="conflict-val excel" style="font-size:12px;">
+                        <div style="color:#007aff;font-size:11px;margin-bottom:2px;">本次Excel</div>
+                        授权待确认
+                    </div>
+                    <div class="conflict-val old" style="font-size:12px;">
+                        <div style="color:#ff9500;font-size:11px;margin-bottom:2px;">系统记录</div>
+                        [来源:上一任交接·2026-05-20]
+                    </div>
+                    <div class="conflict-suggestion" style="font-size:12px;">
+                        💡 建议合并两边的备注信息
+                    </div>
+                </div>
+                
+            </div>
+            
+
+            <div class="conflict-box">
+                <h4>🎵 曲目: 电子脉冲 &nbsp;&nbsp;<span style="font-weight:normal;color:#991b1b;">(ID: TRK009)</span></h4>
+                <div style="font-size:12px;color:#666;margin-bottom:8px;">
+                   该曲目共检测到 <strong>2</strong> 处数据不一致，请人工核对后决定以哪边为准
+                </div>
+                <div class="conflict-row" style="font-weight:600;color:#991b1b;border-bottom:1px solid #fca5a5;">
+                    <div>字段</div>
+                    <div>本次Excel导入值</div>
+                    <div>上次系统记录值</div>
+                    <div>建议动作</div>
+                </div>
+                
+                <div class="conflict-row">
+                    <div style="font-weight:600;">曲名</div>
+                    <div class="conflict-val excel" style="font-size:12px;">
+                        <div style="color:#007aff;font-size:11px;margin-bottom:2px;">本次Excel</div>
+                        电子脉冲
+                    </div>
+                    <div class="conflict-val old" style="font-size:12px;">
+                        <div style="color:#ff9500;font-size:11px;margin-bottom:2px;">系统记录</div>
+                        Electric Pulse
+                    </div>
+                    <div class="conflict-suggestion" style="font-size:12px;">
+                        💡 请确认哪个曲名是正确的，注意区分不同版本
+                    </div>
+                </div>
+                
+                <div class="conflict-row">
+                    <div style="font-weight:600;">备注</div>
+                    <div class="conflict-val excel" style="font-size:12px;">
+                        <div style="color:#007aff;font-size:11px;margin-bottom:2px;">本次Excel</div>
+                        人工改名确认
+                    </div>
+                    <div class="conflict-val old" style="font-size:12px;">
+                        <div style="color:#ff9500;font-size:11px;margin-bottom:2px;">系统记录</div>
+                        [来源:上一任交接·2026-05-20]
+                    </div>
+                    <div class="conflict-suggestion" style="font-size:12px;">
+                        💡 建议合并两边的备注信息
+                    </div>
+                </div>
+                
+            </div>
+            
+        </div>
+        
         
         <div class="footer">
-            <p>DJ曲库能量排序工具 · 本次处理由 林老师 执行 · 报告编号: RPT-20260608162433</p>
+            <p>DJ曲库能量排序工具 · 本次处理由 林老师 执行 · 报告编号: RPT-20260616221421</p>
             <p style="margin-top: 8px;">提示：点击曲目可查看详细处理历史，有疑问请联系音乐老师</p>
         </div>
     </div>
