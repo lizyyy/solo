@@ -32,6 +32,24 @@ def normalize_column_name(col: str) -> str:
     return col
 
 
+NUMERIC_FIELDS = ["参演人数", "餐补标准"]
+
+
+def _coerce_to_int_str(val) -> str:
+    if val is None:
+        return ""
+    s = str(val).strip()
+    if s == "" or s == "nan" or s == "None":
+        return ""
+    try:
+        f = float(s)
+        if f == int(f):
+            return str(int(f))
+        return s
+    except (ValueError, TypeError):
+        return s
+
+
 class DataSource:
     def __init__(self, file_path: str, source_name: str = ""):
         self.file_path = file_path
@@ -93,6 +111,9 @@ class DataSource:
                     final_mapping[src_col] = tgt_col
         rename_dict = {src: tgt for src, tgt in final_mapping.items() if src != tgt}
         self.normalized_df = self.raw_df.rename(columns=rename_dict)
+        for col in NUMERIC_FIELDS:
+            if col in self.normalized_df.columns:
+                self.normalized_df[col] = self.normalized_df[col].apply(_coerce_to_int_str)
         self.normalized_df["_来源文件"] = self.source_name
         self.normalized_df["_来源行号"] = range(2, len(self.normalized_df) + 2)
         return self.normalized_df
@@ -154,6 +175,9 @@ class TourMealAllowanceChecker:
                         col_mapping[col] = normalized
                 if col_mapping:
                     self.df = self.df.rename(columns=col_mapping)
+                for col in NUMERIC_FIELDS:
+                    if col in self.df.columns:
+                        self.df[col] = self.df[col].apply(_coerce_to_int_str)
                 self._ensure_columns()
                 return True
             except Exception as e:
@@ -475,16 +499,22 @@ class TourMealAllowanceChecker:
                 status = "可发放"
                 confirmed_count += 1
 
-            people_count = int(people) if people and people.isdigit() else 0
-            standard_amount = int(standard) if standard and standard.isdigit() else 0
+            try:
+                people_count = int(float(people)) if people else 0
+            except (ValueError, TypeError):
+                people_count = 0
+            try:
+                standard_amount = int(float(standard)) if standard else 0
+            except (ValueError, TypeError):
+                standard_amount = 0
             total = people_count * standard_amount
 
             export_data.append({
                 "曲目编号": track_id,
                 "曲目名称": track_name,
                 "演出地点": location,
-                "参演人数": people,
-                "餐补标准": standard,
+                "参演人数": people_count if people_count else "",
+                "餐补标准": standard_amount if standard_amount else "",
                 "预计餐补总额": total if total > 0 else "",
                 "状态": status,
                 "备注": remarks,
