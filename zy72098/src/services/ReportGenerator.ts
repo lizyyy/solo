@@ -1,11 +1,12 @@
-import type { CalculationRecord, Sample, ReportSection, Batch, Remark } from '@/types';
+import type { CalculationRecord, Sample, ReportSection, Batch, Remark, ParamVersion } from '@/types';
 
 export class ReportGenerator {
   generateReport(
     batch: Batch,
     records: CalculationRecord[],
     samples: Sample[],
-    remarks: Remark[]
+    remarks: Remark[],
+    paramVersion?: ParamVersion
   ): {
     sections: ReportSection[];
     summary: string;
@@ -19,6 +20,21 @@ export class ReportGenerator {
       type: 'summary',
       content: '本批次"' + batch.name + '"共处理' + batch.totalSamples + '个样本，其中：\n• 顺利完成：' + batch.successCount + '个\n• 待人工确认：' + batch.pendingCount + '个\n• 历史口径补录：' + batch.legacyCount + '个\n• 异常记录：' + batch.errorCount + '个\n\n计算时间：' + new Date(batch.createdAt).toLocaleString('zh-CN'),
     });
+
+    if (paramVersion) {
+      const paramLines = Object.entries(paramVersion.parameters)
+        .map(([key, val]) => {
+          const v = val as { value: number | string; unit: string; description?: string };
+          return '• ' + key + '：' + v.value + (v.unit ? ' ' + v.unit : '') + (v.description ? '（' + v.description + '）' : '');
+        })
+        .join('\n');
+
+      sections.push({
+        title: '📋 参数表',
+        type: 'detail',
+        content: '参数版本：' + paramVersion.version + '\n参数表名称：' + paramVersion.name + '\n创建人：' + paramVersion.createdBy + '\n\n参数明细：\n' + paramLines + '\n\n【说明】本批次所有计算均使用上述参数，图神经网络社区解释算法全程参与判断。',
+      });
+    }
 
     const successRecords = records.filter((r) => r.type === 'success');
     if (successRecords.length > 0) {
@@ -103,12 +119,12 @@ export class ReportGenerator {
       content: '1. 所有计算过程已保留完整步骤，点击记录可追溯\n2. 异常样本未自动过滤，均在本表中列明\n3. 图神经网络社区解释算法参与了所有记录的判断\n4. 如需复查：可从图表点击跳转至对应明细\n5. 后续交接：新接手人员可通过本系统查看历史记录',
     });
 
-    const summary = this.generateSummary(batch, records, samples);
+    const summary = this.generateSummary(batch);
 
     return { sections, summary, actionItems };
   }
 
-  private generateSummary(batch: Batch, records: CalculationRecord[], samples: Sample[]): string {
+  private generateSummary(batch: Batch): string {
     const successRate = ((batch.successCount / batch.totalSamples) * 100).toFixed(1);
     const hasIssues = batch.pendingCount + batch.errorCount > 0;
 

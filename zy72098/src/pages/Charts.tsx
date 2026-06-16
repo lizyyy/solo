@@ -4,11 +4,39 @@ import { BarChart3, MousePointer, Info, ChevronRight } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
 import { useNavigate } from 'react-router-dom';
 
+interface BarChartDataItem {
+  name: string;
+  value: number;
+  recordId: string;
+  sampleId: string;
+  type: string;
+  itemStyle: { color: string };
+}
+
+type ScatterDataPoint = [number, number, number, string, string];
+
+interface BarClickParams {
+  name: string;
+  value: number;
+  data: BarChartDataItem;
+}
+
+interface ScatterClickParams {
+  data: ScatterDataPoint;
+}
+
+interface TooltipFormatterParams {
+  name: string;
+  value: number;
+  data: BarChartDataItem | ScatterDataPoint;
+  dataIndex: number;
+  seriesName: string;
+}
+
 export function Charts() {
   const navigate = useNavigate();
-  const { getCurrentRecords, getCurrentSamples, selectRecord } = useAppStore();
+  const { getCurrentRecords, selectRecord } = useAppStore();
   const records = getCurrentRecords();
-  const samples = getCurrentSamples();
 
   const barChartRef = useRef<HTMLDivElement>(null);
   const scatterChartRef = useRef<HTMLDivElement>(null);
@@ -43,14 +71,14 @@ export function Charts() {
       tooltip: {
         trigger: 'axis',
         axisPointer: { type: 'shadow' },
-        formatter: (params: any) => {
-          const data = params[0];
-          const record = records.find((r) => r.id === data.data.recordId);
+        formatter: (params) => {
+          const data = (params as unknown as TooltipFormatterParams[])[0];
+          const itemData = data.data as BarChartDataItem;
           return `
             <div style="padding: 8px;">
               <div style="font-weight: bold; margin-bottom: 4px;">${data.name.replace('\n', '-')}</div>
               <div>模块度: ${data.value}</div>
-              <div>类型: ${data.data.type === 'success' ? '顺利' : data.data.type === 'pending' ? '待确认' : '旧口径'}</div>
+              <div>类型: ${itemData.type === 'success' ? '顺利' : itemData.type === 'pending' ? '待确认' : '旧口径'}</div>
               <div style="margin-top: 4px; color: #666; font-size: 12px;">点击查看计算详情</div>
             </div>
           `;
@@ -93,14 +121,15 @@ export function Charts() {
 
     chart.setOption(option);
 
-    chart.on('click', (params: any) => {
-      if (params.data?.recordId) {
+    chart.on('click', (params) => {
+      const p = params as unknown as BarClickParams;
+      if (p.data?.recordId) {
         setSelectedData({
-          name: params.name.replace('\n', '-'),
-          value: params.value,
-          recordId: params.data.recordId,
+          name: p.name.replace('\n', '-'),
+          value: p.value,
+          recordId: p.data.recordId,
         });
-        useAppStore.getState().selectRecord(params.data.recordId);
+        useAppStore.getState().selectRecord(p.data.recordId);
         navigate('/calculation');
       }
     });
@@ -129,8 +158,9 @@ export function Charts() {
 
     const option: echarts.EChartsOption = {
       tooltip: {
-        formatter: (params: any) => {
-          const [communityCount, modularity, stability, name] = params.data;
+        formatter: (params) => {
+          const data = (params as unknown as TooltipFormatterParams).data as ScatterDataPoint;
+          const [communityCount, modularity, stability, name] = data;
           return `
             <div style="padding: 8px;">
               <div style="font-weight: bold; margin-bottom: 4px;">${name}</div>
@@ -159,10 +189,11 @@ export function Charts() {
         {
           type: 'scatter',
           data: scatterData,
-          symbolSize: (data: any) => data[2] * 40 + 10,
+          symbolSize: (data) => (data as unknown as ScatterDataPoint)[2] * 40 + 10,
           itemStyle: {
-            color: (params: any) => {
-              const record = records.find((r) => r.id === params.data[4]);
+            color: (params) => {
+              const data = (params as unknown as TooltipFormatterParams).data as ScatterDataPoint;
+              const record = records.find((r) => r.id === data[4]);
               return record?.type === 'success'
                 ? '#10b981'
                 : record?.type === 'pending'
@@ -183,14 +214,15 @@ export function Charts() {
 
     chart.setOption(option);
 
-    chart.on('click', (params: any) => {
-      if (params.data?.[4]) {
+    chart.on('click', (params) => {
+      const p = params as unknown as ScatterClickParams;
+      if (p.data?.[4]) {
         setSelectedData({
-          name: params.data[3],
-          value: params.data[1],
-          recordId: params.data[4],
+          name: p.data[3],
+          value: p.data[1],
+          recordId: p.data[4],
         });
-        useAppStore.getState().selectRecord(params.data[4]);
+        useAppStore.getState().selectRecord(p.data[4]);
         navigate('/calculation');
       }
     });

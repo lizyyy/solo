@@ -5,6 +5,7 @@ import type {
   Sample,
   ParamVersion,
   Remark,
+  ImportResult,
 } from '@/types';
 import {
   mockBatch,
@@ -14,6 +15,7 @@ import {
   mockRemarks,
 } from '@/data/mockData';
 import { calculationEngine } from '@/engine/CalculationEngine';
+import { materialPackageParser } from '@/engine/MaterialPackageParser';
 
 const STORAGE_KEY = 'gnn-community-explainer-store';
 
@@ -22,6 +24,9 @@ interface PersistedState {
   calculationRecords: CalculationRecord[];
   samples: Sample[];
   batches: Batch[];
+  paramVersions: ParamVersion[];
+  currentBatchId: string | null;
+  selectedRecordId: string | null;
 }
 
 function loadPersistedState(): PersistedState | null {
@@ -37,7 +42,9 @@ function loadPersistedState(): PersistedState | null {
 function savePersistedState(state: PersistedState) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {}
+  } catch {
+    // ignore
+  }
 }
 
 const persisted = loadPersistedState();
@@ -63,6 +70,8 @@ interface AppState {
   runCalculation: () => Promise<void>;
   recalculateRecord: (recordId: string) => void;
   resetToDefaults: () => void;
+
+  importMaterialPackage: (jsonText: string) => { result: ImportResult | null; errors: string[]; warnings: string[] };
 }
 
 function getPersistableState(state: AppState): PersistedState {
@@ -71,17 +80,20 @@ function getPersistableState(state: AppState): PersistedState {
     calculationRecords: state.calculationRecords,
     samples: state.samples,
     batches: state.batches,
+    paramVersions: state.paramVersions,
+    currentBatchId: state.currentBatchId,
+    selectedRecordId: state.selectedRecordId,
   };
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
   batches: persisted?.batches ?? [mockBatch],
-  currentBatchId: persisted?.batches?.[0]?.id ?? mockBatch.id,
+  currentBatchId: persisted?.currentBatchId ?? mockBatch.id,
   calculationRecords: persisted?.calculationRecords ?? mockCalculationRecords,
   samples: persisted?.samples ?? mockSamples,
-  paramVersions: mockParamVersions,
+  paramVersions: persisted?.paramVersions ?? mockParamVersions,
   remarks: persisted?.remarks ?? mockRemarks,
-  selectedRecordId: null,
+  selectedRecordId: persisted?.selectedRecordId ?? null,
   isLoading: false,
 
   getCurrentBatch: () => {
@@ -105,16 +117,24 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   setCurrentBatch: (batchId: string) => {
-    set({ currentBatchId: batchId });
+    set((state) => {
+      const updated = { currentBatchId: batchId };
+      savePersistedState({ ...getPersistableState(state), ...updated });
+      return updated;
+    });
   },
 
   selectRecord: (recordId: string | null) => {
-    set({ selectedRecordId: recordId });
+    set((state) => {
+      const updated = { selectedRecordId: recordId };
+      savePersistedState({ ...getPersistableState(state), ...updated });
+      return updated;
+    });
   },
 
   addRemark: (recordId: string, content: string, addedBy: string) => {
     const newRemark: Remark = {
-      id: 'remark-' + Date.now(),
+      id: 'remark-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
       recordId,
       content,
       addedBy,
@@ -123,10 +143,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     };
     set((state) => {
       const updated = { remarks: [...state.remarks, newRemark] };
-      savePersistedState({
-        ...getPersistableState(state),
-        ...updated,
-      });
+      savePersistedState({ ...getPersistableState(state), ...updated });
       return updated;
     });
   },
@@ -183,10 +200,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         isLoading: false,
         batches: updatedBatches,
       };
-      savePersistedState({
-        ...getPersistableState(state),
-        ...updated,
-      });
+      savePersistedState({ ...getPersistableState(state), ...updated });
       return updated;
     });
   },
@@ -210,29 +224,52 @@ export const useAppStore = create<AppState>((set, get) => ({
           r.id === recordId ? { ...result.record, id: recordId } : r
         ),
       };
-      savePersistedState({
-        ...getPersistableState(state),
-        ...updated,
-      });
+      savePersistedState({ ...getPersistableState(state), ...updated });
       return updated;
     });
   },
 
+  importMaterialPackage: (jsonText: string) => {
+    const parsed = materialPackageParser.parse(jsonText);
+    if (!parsed.package) {
+      return { result: null, errors: parsed.errors, warnings: parsed.warnings };
+    }
+
+    const processed = materialPackageParser.processMaterialPackage(parsed.package);
+    const result = materialPackageParser.toImportResult(parsed.package, processed);
+
+    set((state) => {
+      const newParamVersions = processed.paramVersion
+        ? [...state.paramVersions, processed.paramVersion]
+        : state.paramVersions;
+
+      const updated = {
+        batches: [...state.batches, processed.batch],
+        currentBatchId: processed.batch.id,
+        samples: [...state.samples, ...processed.samples],
+        calculationRecords: [...state.calculationRecords, ...processed.records],
+        remarks: [...state.remarks, ...processed.remarks],
+        paramVersions: newParamVersions,
+        selectedRecordId: null,
+      };
+      savePersistedState({ ...getPersistableState(state), ...updated });
+      return updated;
+    });
+
+    return { result, errors: [], warnings: parsed.warnings };
+  },
+
   resetToDefaults: () => {
-    const defaults: PersistedState = {
-      remarks: mockRemarks,
-      calculationRecords: mockCalculationRecords,
-      samples: mockSamples,
-      batches: [mockBatch],
-    };
     localStorage.removeItem(STORAGE_KEY);
     set({
-      batches: defaults.batches,
+      batches: [mockBatch],
       currentBatchId: mockBatch.id,
-      calculationRecords: defaults.calculationRecords,
-      samples: defaults.samples,
-      remarks: defaults.remarks,
+      calculationRecords: mockCalculationRecords,
+      samples: mockSamples,
+      paramVersions: mockParamVersions,
+      remarks: mockRemarks,
       selectedRecordId: null,
+      isLoading: false,
     });
   },
 }));

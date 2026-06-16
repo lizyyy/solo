@@ -1,0 +1,113 @@
+{
+  "batchName": "2024年第25周-图神经网络社区解释-周姐提交",
+  "createdBy": "调度主管-周姐",
+  "paramVersion": "V2.1-周姐版",
+  "paramVersionName": "周姐提交的参数表（2024第25周）",
+  "source": "周姐交来的参数表+历史记录+人工备注+异常样本包",
+  "description": "周姐从复盘图表里整理出来的材料包，包含参数表、历史记录、人工备注和明显越界的样本",
+  "parameters": {
+    "threshold": {
+      "value": 0.6,
+      "unit": "模块度",
+      "description": "社区划分阈值，低于该值视为待确认"
+    },
+    "minCommunitySize": {
+      "value": 3,
+      "unit": "个节点",
+      "description": "最小社区规模"
+    },
+    "maxIterations": {
+      "value": 100,
+      "unit": "次",
+      "description": "最大迭代次数"
+    },
+    "resolution": {
+      "value": 1.0,
+      "unit": "系数",
+      "description": "社区发现分辨率参数"
+    },
+    "edgeWeightThreshold": {
+      "value": 0.5,
+      "unit": "权重",
+      "description": "边权重阈值"
+    }
+  },
+  "samples": [
+    {
+      "id": "IMP-001",
+      "name": "社区A-核心骨干网",
+      "nodeCount": 28,
+      "edgeCount": 87,
+      "avgDegree": 6.2,
+      "expectedRange": { "min": 0.6, "max": 0.95 },
+      "status": "normal",
+      "remark": "周姐备注：这是核心社区，结构一直很稳定"
+    },
+    {
+      "id": "IMP-002",
+      "name": "社区B-过渡重叠区",
+      "nodeCount": 19,
+      "edgeCount": 42,
+      "avgDegree": 4.4,
+      "expectedRange": { "min": 0.6, "max": 0.95 },
+      "status": "manual",
+      "remark": "周姐备注：边界节点有点模糊，上次交接也是待确认"
+    },
+    {
+      "id": "IMP-003",
+      "name": "社区D-异常离群点",
+      "nodeCount": 5,
+      "edgeCount": 3,
+      "avgDegree": 1.2,
+      "expectedRange": { "min": 0.6, "max": 0.95 },
+      "isOutOfBounds": true,
+      "status": "abnormal",
+      "remark": "周姐备注：明显越界，节点太少结构不稳定"
+    },
+    {
+      "id": "IMP-004",
+      "name": "社区E-单位不一致",
+      "nodeCount": 15,
+      "edgeCount": "52条",
+      "avgDegree": 5.0,
+      "expectedRange": { "min": 0.6, "max": 0.95 },
+      "status": "abnormal",
+      "remark": "周姐备注：参数表里edgeCount写了'条'字，单位乱了"
+    },
+    {
+      "id": "IMP-005",
+      "name": "社区F-数据缺失",
+      "nodeCount": 0,
+      "edgeCount": 0,
+      "avgDegree": 0,
+      "expectedRange": { "min": 0.6, "max": 0.95 },
+      "status": "abnormal",
+      "remark": "周姐备注：这周这个社区的数据没补上，算不出来"
+    }
+  ],
+  "remarks": [
+    {
+      "sampleId": "IMP-001",
+      "content": "周姐补注：社区A本周和上周对比基本没变，可以直接用",
+      "addedBy": "调度主管-周姐",
+      "addedAt": "2024-06-17T09:30:00.000Z"
+    },
+    {
+      "sampleId": "IMP-002",
+      "content": "周姐补注：社区B的边界节点建议人工复核一下，上次和上上次都是老李判的",
+      "addedBy": "调度主管-周姐",
+      "addedAt": "2024-06-17T09:35:00.000Z"
+    }
+  ],
+  "legacyRecords": [
+    {
+      "id": "IMP-LEGACY-001",
+      "name": "社区C-历史遗留数据",
+      "source": "2023年复盘图表（旧口径）",
+      "modularity": 0.72,
+      "communityCount": 4,
+      "stability": 0.82,
+      "remark": "2023年口径算的，和现在参数不一样，仅供对比"
+    }
+  ]
+}

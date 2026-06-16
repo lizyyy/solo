@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   Database,
   CheckCircle,
@@ -11,16 +11,33 @@ import {
   ChevronUp,
   AlertOctagon,
   History,
+  Upload,
+  FileJson,
+  X,
+  Download,
 } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
-import type { Sample, CalculationRecord } from '@/types';
+import type { CalculationRecord, SampleStatus } from '@/types';
 
 export function Samples() {
-  const { getCurrentSamples, getCurrentRecords, getRecordRemarks, addRemark } = useAppStore();
+  const {
+    getCurrentSamples,
+    getCurrentRecords,
+    getRecordRemarks,
+    addRemark,
+    importMaterialPackage,
+    resetToDefaults,
+  } = useAppStore();
   const samples = getCurrentSamples();
   const records = getCurrentRecords();
   const [expandedSample, setExpandedSample] = useState<string | null>(null);
   const [remarkInput, setRemarkInput] = useState<Record<string, string>>({});
+  const [showImport, setShowImport] = useState(false);
+  const [importText, setImportText] = useState('');
+  const [importErrors, setImportErrors] = useState<string[]>([]);
+  const [importWarnings, setImportWarnings] = useState<string[]>([]);
+  const [importSuccess, setImportSuccess] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const getStatusInfo = (status: string) => {
     switch (status) {
@@ -49,6 +66,58 @@ export function Samples() {
     }
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = ev.target?.result as string;
+      setImportText(text);
+      setImportErrors([]);
+      setImportWarnings([]);
+      setImportSuccess(false);
+    };
+    reader.readAsText(file);
+  };
+
+  const handleImport = () => {
+    if (!importText.trim()) {
+      setImportErrors(['请粘贴JSON内容或选择文件']);
+      return;
+    }
+
+    const { result, errors, warnings } = importMaterialPackage(importText);
+    setImportErrors(errors);
+    setImportWarnings(warnings);
+
+    if (result) {
+      setImportSuccess(true);
+      setShowImport(false);
+      setImportText('');
+      setTimeout(() => setImportSuccess(false), 5000);
+    }
+  };
+
+  const loadSamplePackage = () => {
+    fetch('/sample-material-package.json')
+      .then((res) => res.text())
+      .then((text) => {
+        setImportText(text);
+        setImportErrors([]);
+        setImportWarnings([]);
+      })
+      .catch(() => {
+        setImportErrors(['加载样例材料包失败，请手动粘贴']);
+      });
+  };
+
+  const handleReset = () => {
+    if (window.confirm('确定要恢复到默认数据吗？所有导入和备注都会清空。')) {
+      resetToDefaults();
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -57,19 +126,142 @@ export function Samples() {
           <p className="text-slate-500 mt-1">管理和查看图神经网络社区解释样本</p>
         </div>
         <div className="flex gap-3">
-          <span className="flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg text-sm">
-            <CheckCircle className="w-4 h-4" />
-            正常: {samples.filter((s) => s.status === 'normal').length}
-          </span>
-          <span className="flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-700 rounded-lg text-sm">
-            <AlertTriangle className="w-4 h-4" />
-            待确认: {samples.filter((s) => s.status === 'manual').length}
-          </span>
-          <span className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm">
+          <button
+            onClick={() => setShowImport(!showImport)}
+            className="flex items-center gap-2 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors"
+          >
+            <Upload className="w-4 h-4" />
+            导入材料包
+          </button>
+          <button
+            onClick={handleReset}
+            className="flex items-center gap-2 px-4 py-2 border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors"
+          >
             <XCircle className="w-4 h-4" />
-            异常: {samples.filter((s) => s.status === 'abnormal').length}
-          </span>
+            恢复默认
+          </button>
         </div>
+      </div>
+
+      {importSuccess && (
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-center gap-3">
+          <CheckCircle className="w-5 h-5 text-emerald-600" />
+          <p className="text-emerald-700">材料包导入成功！已切换到新批次。</p>
+        </div>
+      )}
+
+      {showImport && (
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-cyan-200">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 bg-cyan-100 rounded-xl flex items-center justify-center">
+                <FileJson className="w-5 h-5 text-cyan-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-800">导入材料包</h3>
+                <p className="text-sm text-slate-500">支持JSON格式，包含参数表、历史记录、人工备注、异常样本</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowImport(false)}
+              className="text-slate-400 hover:text-slate-600"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="flex gap-3 mb-4">
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-slate-200 rounded-xl hover:border-cyan-300 hover:bg-cyan-50 transition-colors"
+            >
+              <Upload className="w-5 h-5 text-slate-400" />
+              <span className="text-slate-600">选择JSON文件</span>
+            </button>
+            <button
+              onClick={loadSamplePackage}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-cyan-200 bg-cyan-50 rounded-xl hover:bg-cyan-100 transition-colors"
+            >
+              <Download className="w-5 h-5 text-cyan-600" />
+              <span className="text-cyan-700">加载样例材料包</span>
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              或粘贴JSON内容
+            </label>
+            <textarea
+              value={importText}
+              onChange={(e) => setImportText(e.target.value)}
+              placeholder='{"batchName":"测试批次","samples":[{"id":"s1","name":"样本1","nodeCount":10,"edgeCount":20}]}'
+              className="w-full h-48 px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent font-mono text-sm resize-none"
+            />
+          </div>
+
+          {importErrors.length > 0 && (
+            <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-4">
+              <p className="font-medium text-red-800 mb-2">导入错误：</p>
+              <ul className="text-sm text-red-700 space-y-1">
+                {importErrors.map((err, i) => (
+                  <li key={i}>• {err}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {importWarnings.length > 0 && (
+            <div className="mb-4 bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <p className="font-medium text-amber-800 mb-2">注意事项：</p>
+              <ul className="text-sm text-amber-700 space-y-1">
+                {importWarnings.map((w, i) => (
+                  <li key={i}>• {w}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={() => setShowImport(false)}
+              className="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors"
+            >
+              取消
+            </button>
+            <button
+              onClick={handleImport}
+              className="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors"
+            >
+              确认导入
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="flex gap-3 flex-wrap">
+        <span className="flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg text-sm">
+          <CheckCircle className="w-4 h-4" />
+          正常: {samples.filter((s) => s.status === ('normal' as SampleStatus)).length}
+        </span>
+        <span className="flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-700 rounded-lg text-sm">
+          <AlertTriangle className="w-4 h-4" />
+          待确认: {samples.filter((s) => s.status === ('manual' as SampleStatus)).length}
+        </span>
+        <span className="flex items-center gap-2 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-sm">
+          <History className="w-4 h-4" />
+          旧口径: {samples.filter((s) => s.status === ('legacy' as SampleStatus)).length}
+        </span>
+        <span className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm">
+          <XCircle className="w-4 h-4" />
+          异常: {samples.filter((s) => s.status === ('abnormal' as SampleStatus)).length}
+        </span>
       </div>
 
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
@@ -104,7 +296,9 @@ export function Samples() {
                 >
                   <div className="flex items-center gap-4">
                     <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center ${statusInfo.color.replace('text-', 'bg-').split(' ')[0]}`}
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center ${statusInfo.color
+                        .replace('text-', 'bg-')
+                        .split(' ')[0]}`}
                     >
                       <StatusIcon className={`w-5 h-5 ${statusInfo.color.split(' ')[1]}`} />
                     </div>

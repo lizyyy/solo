@@ -102,3 +102,58 @@ export interface ReportSection {
   type: 'summary' | 'warning' | 'advice' | 'detail';
   highlight?: boolean;
 }
+
+export interface MaterialPackageSample {
+  id: string;
+  name: string;
+  nodeCount: number | string;
+  edgeCount: number | string;
+  avgDegree?: number;
+  expectedRange?: { min: number; max: number };
+  isOutOfBounds?: boolean;
+  status?: 'normal' | 'abnormal' | 'manual' | 'legacy';
+  remark?: string;
+  legacySource?: string;
+}
+
+export interface MaterialPackageParam {
+  value: number;
+  unit: string;
+  description?: string;
+}
+
+export interface MaterialPackage {
+  batchName: string;
+  createdBy?: string;
+  paramVersion?: string;
+  paramVersionName?: string;
+  parameters?: Record<string, MaterialPackageParam>;
+  samples: MaterialPackageSample[];
+  remarks?: {
+    sampleId: string;
+    content: string;
+    addedBy?: string;
+    addedAt?: string;
+  }[];
+  legacyRecords?: {
+    id: string;
+    name: string;
+    source: string;
+    modularity: number;
+    communityCount: number;
+    stability: number;
+    remark?: string;
+  }[];
+  source?: string;
+  description?: string;
+}
+
+export interface ImportResult {
+  success: boolean;
+  batchId: string;
+  sampleCount: number;
+  remarkCount: number;
+  legacyCount: number;
+  errors: string[];
+  warnings: string[];
+}

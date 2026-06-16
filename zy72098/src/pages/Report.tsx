@@ -15,16 +15,21 @@ import { useAppStore } from '@/store/appStore';
 import { reportGenerator } from '@/services/ReportGenerator';
 
 export function Report() {
-  const { getCurrentBatch, getCurrentRecords, getCurrentSamples, remarks } = useAppStore();
+  const { getCurrentBatch, getCurrentRecords, getCurrentSamples, remarks, paramVersions } = useAppStore();
   const batch = getCurrentBatch();
   const records = getCurrentRecords();
   const samples = getCurrentSamples();
   const [expandedSections, setExpandedSections] = useState<Set<number>>(new Set([0, 1, 2]));
 
+  const currentParamVersion = useMemo(() => {
+    if (!batch) return undefined;
+    return paramVersions.find((p) => p.id === batch.paramVersionId);
+  }, [batch, paramVersions]);
+
   const report = useMemo(() => {
     if (!batch) return null;
-    return reportGenerator.generateReport(batch, records, samples, remarks);
-  }, [batch, records, samples, remarks]);
+    return reportGenerator.generateReport(batch, records, samples, remarks, currentParamVersion);
+  }, [batch, records, samples, remarks, currentParamVersion]);
 
   const toggleSection = (index: number) => {
     const newSet = new Set(expandedSections);

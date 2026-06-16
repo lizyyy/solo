@@ -2,7 +2,7 @@ import type { CalculationStep, CalculationRecord, RecordType } from '@/types';
 import { unitValidator } from './UnitValidator';
 
 interface CalculationInput {
-  nodeCount: number | null;
+  nodeCount: number | string | null;
   edgeCount: number | string | null;
   avgDegree?: number | null;
   sampleId: string;
@@ -34,16 +34,21 @@ export class CalculationEngine {
         ? unitValidator.extractUnit(input.edgeCount).numericValue
         : input.edgeCount;
 
+    const numericNodeCount =
+      typeof input.nodeCount === 'string'
+        ? unitValidator.extractUnit(input.nodeCount).numericValue
+        : input.nodeCount;
+
     steps.push({
       step: 1,
       name: '节点度数计算',
       formula: 'k_i = Σ_j A_ij',
       input: { adjacencyMatrix: 1 },
-      output: input.avgDegree ?? this.calculateAvgDegree(input.nodeCount, numericEdgeCount),
+      output: input.avgDegree ?? this.calculateAvgDegree(numericNodeCount ?? 0, numericEdgeCount ?? 0),
       unit: '度/节点',
     });
 
-    if (!input.nodeCount || !numericEdgeCount) {
+    if (!numericNodeCount || !numericEdgeCount) {
       const avgDegreeStep = steps.find((s) => s.step === 1);
       if (avgDegreeStep) {
         avgDegreeStep.remark = '❌ 关键数据缺失，无法继续计算';
@@ -71,7 +76,7 @@ export class CalculationEngine {
       steps[0].remark = '⚠️ 单位不一致：部分参数带有单位标识';
     }
 
-    const normalizedWeight = this.normalizeEdgeWeight(numericEdgeCount, input.nodeCount);
+    const normalizedWeight = this.normalizeEdgeWeight(numericEdgeCount ?? 0, numericNodeCount ?? 0);
     steps.push({
       step: 2,
       name: '边权重标准化',
@@ -81,7 +86,7 @@ export class CalculationEngine {
       unit: '',
     });
 
-    const communityCount = this.calculateCommunityCount(input.nodeCount, normalizedWeight);
+    const communityCount = this.calculateCommunityCount(numericNodeCount ?? 0, normalizedWeight);
     steps.push({
       step: 3,
       name: '社区初始划分',
@@ -89,18 +94,18 @@ export class CalculationEngine {
       input: { weightedMatrix: normalizedWeight, threshold: 0.8 },
       output: communityCount,
       unit: '个社区',
-      remark: this.getCommunityRemark(communityCount, input.nodeCount),
+      remark: this.getCommunityRemark(communityCount, numericNodeCount ?? 0),
     });
 
-    const modularity = this.calculateModularity(communityCount, numericEdgeCount, input.nodeCount);
+    const modularity = this.calculateModularity(communityCount, numericEdgeCount ?? 0, numericNodeCount ?? 0);
     steps.push({
       step: 4,
       name: '模块度计算',
       formula: 'Q = Σ_c (L_c / m) - (D_c / 2m)²',
-      input: { communities: communityCount, edges: numericEdgeCount },
+      input: { communities: communityCount, edges: numericEdgeCount ?? 0 },
       output: modularity,
       unit: '模块度',
-      remark: this.getModularityRemark(modularity, communityCount, input.nodeCount),
+      remark: this.getModularityRemark(modularity),
     });
 
     const stability = this.calculateStability(modularity, communityCount);
@@ -171,7 +176,7 @@ export class CalculationEngine {
     return undefined;
   }
 
-  private getModularityRemark(modularity: number, communityCount: number, nodeCount: number): string {
+  private getModularityRemark(modularity: number): string {
     const base = '图神经网络社区解释算法参与判断：';
 
     if (modularity >= 0.8) {
@@ -202,7 +207,7 @@ export class CalculationEngine {
     const now = new Date().toISOString();
 
     return {
-      id: `REC-${Date.now()}`,
+      id: `REC-${input.sampleId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       batchId: input.batchId,
       sampleId: input.sampleId,
       sampleName: input.sampleName,
