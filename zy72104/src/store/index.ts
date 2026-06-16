@@ -3,9 +3,62 @@ import { persist } from 'zustand/middleware'
 import type { CalcBatch, SensorRecord, EquipmentParams, FieldNote, ManualCorrection, ConflictRecord } from '@/types'
 import { calculatePumpHead, detectConflicts } from '@/utils/pumpCalc'
 import { checkThresholds, generateSuggestions } from '@/utils/thresholdCheck'
+import { convertToSI } from '@/utils/unitConversion'
+
+function toSI(value: number, unit: string, category?: string): number {
+  const result = convertToSI(value, unit, category)
+  return result.convertedValue ?? value
+}
 
 function uid(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+}
+
+const EQUIPMENT_FIELD_MAP: Record<string, { valueKey: keyof EquipmentParams; unitKey?: keyof EquipmentParams; category: string }> = {
+  '额定扬程': { valueKey: 'ratedHead', unitKey: 'ratedHeadUnit', category: 'length' },
+  '额定流量': { valueKey: 'ratedFlow', unitKey: 'ratedFlowUnit', category: 'flow' },
+  '管径': { valueKey: 'pipeDiameter', unitKey: 'pipeDiameterUnit', category: 'diameter' },
+  '管长': { valueKey: 'pipeLength', unitKey: 'pipeLengthUnit', category: 'length' },
+  '粗糙度': { valueKey: 'roughness', category: 'roughness' },
+  '吸入压力': { valueKey: 'suctionPressure', unitKey: 'suctionPressureUnit', category: 'pressure' },
+  '排出压力': { valueKey: 'dischargePressure', unitKey: 'dischargePressureUnit', category: 'pressure' },
+  '流体密度': { valueKey: 'fluidDensity', unitKey: 'fluidDensityUnit', category: 'dimensionless' },
+  '高程差': { valueKey: 'elevationDiff', unitKey: 'elevationDiffUnit', category: 'length' },
+  '局部损失系数': { valueKey: 'localLossCoeff', category: 'dimensionless' },
+  '效率': { valueKey: 'efficiency', category: 'dimensionless' },
+  '泵效率': { valueKey: 'efficiency', category: 'dimensionless' },
+}
+
+const SENSOR_FIELD_MAP: Record<string, { paramKey: string; unitKey?: string }> = {
+  '流量': { paramKey: '流量' },
+  '进口压力': { paramKey: '进口压力' },
+  '吸入压力': { paramKey: '进口压力' },
+  '出口压力': { paramKey: '出口压力' },
+  '排出压力': { paramKey: '出口压力' },
+  '温度': { paramKey: '温度' },
+  '振动值': { paramKey: '振动值' },
+}
+
+const STANDARD_UNIT_MAP: Record<string, string> = {
+  pressure: 'Pa',
+  flow: 'm³/s',
+  temperature: 'K',
+  velocity: 'm/s',
+  length: 'm',
+  diameter: 'm',
+  roughness: 'm',
+  dimensionless: '',
+}
+
+function getCategoryByParamName(paramName: string): string {
+  if (paramName.includes('压力')) return 'pressure'
+  if (paramName.includes('流量')) return 'flow'
+  if (paramName.includes('温度')) return 'temperature'
+  if (paramName.includes('振动') || paramName.includes('速度')) return 'velocity'
+  if (paramName.includes('管径')) return 'diameter'
+  if (paramName.includes('管长') || paramName.includes('扬程') || paramName.includes('高程')) return 'length'
+  if (paramName.includes('粗糙')) return 'roughness'
+  return 'dimensionless'
 }
 
 const DEFAULT_PARAMS: EquipmentParams = {
@@ -198,10 +251,66 @@ export const useStore = create<StoreState>()(
         const batch = state.batches.find((b) => b.id === batchId)
         if (!batch) return
 
-        const result = calculatePumpHead(batch.equipmentParams, batch.sensorRecords)
+        let effectiveParams: EquipmentParams = { ...batch.equipmentParams }
+        let effectiveRecords: SensorRecord[] = batch.sensorRecords.map((r) => ({ ...r }))
+
+        batch.corrections.forEach((corr) => {
+          const eqMap = EQUIPMENT_FIELD_MAP[corr.fieldName]
+          if (eqMap) {
+            ;(effectiveParams as unknown as Record<string, unknown>)[eqMap.valueKey as string] = corr.correctedValue
+            if (eqMap.unitKey && corr.correctedUnit) {
+              ;(effectiveParams as unknown as Record<string, unknown>)[eqMap.unitKey as string] = corr.correctedUnit
+            }
+          } else {
+            const sensorMap = SENSOR_FIELD_MAP[corr.fieldName]
+            if (sensorMap) {
+              const idx = effectiveRecords.findIndex((r) => r.parameterName === sensorMap.paramKey)
+              if (idx !== -1) {
+                const category = getCategoryByParamName(sensorMap.paramKey)
+                const standardVal = toSI(corr.correctedValue, corr.correctedUnit || effectiveRecords[idx].rawUnit, category)
+                const standardUnit = STANDARD_UNIT_MAP[category] || effectiveRecords[idx].standardUnit
+                effectiveRecords[idx] = {
+                  ...effectiveRecords[idx],
+                  rawValue: corr.correctedValue,
+                  rawUnit: corr.correctedUnit || effectiveRecords[idx].rawUnit,
+                  standardValue: standardVal,
+                  standardUnit,
+                }
+              }
+            }
+          }
+        })
+
+        batch.conflicts.forEach((c) => {
+          if (!c.resolved || !c.chosenSide) return
+          if (c.fieldName === '吸入压力' || c.fieldName === '排出压力') {
+            const eqMap = EQUIPMENT_FIELD_MAP[c.fieldName]
+            if (!eqMap) return
+            const recordKey = c.fieldName === '吸入压力' ? '进口压力' : '出口压力'
+            const record = effectiveRecords.find((r) => r.parameterName === recordKey)
+            if (c.chosenSide === 'inspection') {
+              // nothing to do, already using params
+            } else if (c.chosenSide === 'imported' && record) {
+              ;(effectiveParams as unknown as Record<string, unknown>)[eqMap.valueKey as string] = record.rawValue
+              if (eqMap.unitKey) {
+                ;(effectiveParams as unknown as Record<string, unknown>)[eqMap.unitKey as string] = record.rawUnit
+              }
+            }
+          }
+        })
+
+        const result = calculatePumpHead(effectiveParams, effectiveRecords)
         const alerts = checkThresholds(result)
         const suggestions = generateSuggestions(result, alerts)
-        const conflicts = detectConflicts(batch.equipmentParams, batch.sensorRecords)
+        const conflicts = detectConflicts(effectiveParams, effectiveRecords)
+
+        const resolvedMap = new Map(batch.conflicts.filter((c) => c.resolved).map((c) => [c.fieldName, c]))
+        const mergedConflicts = conflicts.map((nc) => {
+          const old = resolvedMap.get(nc.fieldName)
+          if (old) return { ...nc, resolved: true, chosenSide: old.chosenSide }
+          return nc
+        })
+        const oldUnmatched = batch.conflicts.filter((c) => !conflicts.some((nc) => nc.fieldName === c.fieldName))
 
         set((s) => ({
           batches: s.batches.map((b) =>
@@ -211,7 +320,7 @@ export const useStore = create<StoreState>()(
                   result,
                   alerts,
                   suggestions,
-                  conflicts: [...b.conflicts.filter((c) => !conflicts.some((nc) => nc.fieldName === c.fieldName)), ...conflicts],
+                  conflicts: [...oldUnmatched, ...mergedConflicts],
                   processTime: new Date().toISOString(),
                 }
               : b

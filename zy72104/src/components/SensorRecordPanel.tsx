@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useStore } from '@/store'
-import { getAllUnits, convertToSI, validateDirection } from '@/utils/unitConversion'
+import { getAllUnits, convertToSI, validateDirection, validateTimeInterval } from '@/utils/unitConversion'
 import type { SensorRecord } from '@/types'
-import { Plus, Trash2, AlertTriangle, CheckCircle, ChevronDown, ChevronUp } from 'lucide-react'
+import { Plus, Trash2, AlertTriangle, CheckCircle, ChevronDown, ChevronUp, Clock } from 'lucide-react'
 
 const UNIT_OPTIONS = getAllUnits()
 
@@ -17,6 +17,11 @@ export default function SensorRecordPanel() {
   if (!batchId || !batch) return null
 
   const records = batch.sensorRecords
+
+  const timeValidation = useMemo(() => {
+    const timestamps = records.map((r) => r.timestamp).filter(Boolean)
+    return validateTimeInterval(timestamps)
+  }, [records])
 
   const handleAdd = () => {
     const r: SensorRecord = {
@@ -167,6 +172,23 @@ export default function SensorRecordPanel() {
                   {r.parameterName || '未命名'}: {r.validationMessage}
                 </div>
               ))}
+            </div>
+          )}
+          {timeValidation.message && (
+            <div
+              className={`mt-2 text-[11px] flex items-center gap-1 px-2 py-1.5 rounded border ${
+                timeValidation.valid
+                  ? 'text-[#a8d8ea]/60 border-[#0f3460]/30 bg-[#0f3460]/20'
+                  : 'text-[#f08c00] border-[#f08c00]/30 bg-[#f08c00]/10'
+              }`}
+            >
+              <Clock size={12} className={timeValidation.valid ? 'text-[#a8d8ea]/50' : 'text-[#f08c00]'} />
+              {timeValidation.message}
+              {!timeValidation.valid && timeValidation.intervals.length > 0 && (
+                <span className="ml-1 font-mono opacity-70">
+                  (间隔: {timeValidation.intervals.map((s) => `${s}s`).join(', ')})
+                </span>
+              )}
             </div>
           )}
           <button
