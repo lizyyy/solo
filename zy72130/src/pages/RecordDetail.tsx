@@ -134,7 +134,7 @@ export default function RecordDetail() {
           <div className="relative">
             <div className="absolute left-[15px] top-2 bottom-2 w-px bg-gradient-to-b from-neon/40 via-muted/20 to-transparent" />
             <div className="space-y-4">
-              {judgments.map((j, i) => {
+              {judgments.map((j) => {
                 const Icon = JUDGMENT_ICONS[j.type]
                 const colors = JUDGMENT_COLORS[j.type]
                 return (
