@@ -38,13 +38,15 @@ class TidalFileImporter:
         else:
             raise ValueError(f"不支持的文件格式: {ext}")
 
+        column_warnings = self._check_column_consistency(filepath, ext, len(df.columns))
+
         source_columns = list(df.columns)
         sample_data = df.head(5).to_dict('records')
         suggested_mappings = self.normalizer.generate_suggested_mappings(source_columns)
 
         raw_preview = df.head(3).to_string(index=False)
 
-        return ImportPreview(
+        preview = ImportPreview(
             filename=filename,
             total_rows=len(df),
             total_columns=len(source_columns),
@@ -53,6 +55,33 @@ class TidalFileImporter:
             suggested_mappings=suggested_mappings,
             raw_preview=raw_preview
         )
+        preview.column_warnings = column_warnings
+
+        return preview
+
+    def _check_column_consistency(self, filepath: str, ext: str, expected_columns: int) -> List[str]:
+        warnings = []
+
+        if ext == '.csv':
+            try:
+                with open(filepath, 'r', encoding='utf-8-sig') as f:
+                    reader = csv.reader(f)
+                    header_row = next(reader, None)
+                    if header_row:
+                        expected = len(header_row)
+                        for i, row in enumerate(reader, start=2):
+                            actual = len(row)
+                            if actual != expected:
+                                warnings.append(
+                                    f"第{i}行列数异常: 表头{expected}列，该行{actual}列，可能导致字段错位"
+                                )
+                            if len(warnings) >= 10:
+                                warnings.append(f"... 最多显示10条警告，实际可能更多")
+                                break
+            except Exception:
+                pass
+
+        return warnings
 
     def _safe_parse_number(self, value) -> Optional[float]:
         if value is None or (isinstance(value, float) and pd.isna(value)):

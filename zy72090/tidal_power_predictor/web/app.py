@@ -333,32 +333,177 @@ def diff_view():
                 session['baseline_preview'] = {
                     'filename': baseline_preview.filename,
                     'total_rows': baseline_preview.total_rows,
+                    'total_columns': baseline_preview.total_columns,
                     'source_columns': baseline_preview.source_columns,
+                    'sample_data': baseline_preview.sample_data,
+                    'suggested_mappings': [
+                        {
+                            'source_column': m.source_column,
+                            'target_column': m.target_column,
+                            'confidence': m.confidence,
+                            'is_custom': m.is_custom,
+                        }
+                        for m in baseline_preview.suggested_mappings
+                    ],
+                    'column_warnings': getattr(baseline_preview, 'column_warnings', []),
                 }
-                return redirect(url_for('diff_result'))
+                return redirect(url_for('diff_mapping'))
             except Exception as e:
                 return render_template('diff.html', error=f"基线文件读取失败: {str(e)}")
     
     return render_template('diff.html')
 
 
-@app.route('/diff/result')
-def diff_result():
-    if 'calculated_results' not in session or 'baseline_filepath' not in session:
+@app.route('/diff/mapping', methods=['GET', 'POST'])
+def diff_mapping():
+    if 'baseline_preview' not in session:
         return redirect(url_for('diff_view'))
     
-    baseline_preview = session.get('baseline_preview', {})
+    preview = session['baseline_preview']
+    
+    if request.method == 'POST':
+        mappings = []
+        for source_col in preview['source_columns']:
+            target = request.form.get(f"mapping_{source_col}", "")
+            if target:
+                mappings.append({
+                    'source_column': source_col,
+                    'target_column': target,
+                    'confidence': 1.0,
+                    'is_custom': True,
+                })
+        
+        try:
+            from tidal_power_predictor.importer.column_mapper import ColumnMapping
+            mapping_objs = [
+                ColumnMapping(
+                    source_column=m['source_column'],
+                    target_column=m['target_column'],
+                    confidence=m['confidence'],
+                    is_custom=m['is_custom'],
+                )
+                for m in mappings
+            ]
+            
+            import_result = importer.import_file(
+                session['baseline_filepath'],
+                mapping_objs
+            )
+            
+            if import_result.success:
+                baseline_records = [serialize_record(r) for r in import_result.records]
+                session['baseline_records'] = baseline_records
+                
+                baseline_inputs = [deserialize_record(r) for r in baseline_records]
+                baseline_results, baseline_summary = processor.process_batch(baseline_inputs)
+                
+                session['baseline_calculated'] = [
+                    {
+                        'record_id': r.record_id,
+                        'station_name': r.station_name,
+                        'timestamp': r.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+                        'predicted_power': round(r.predicted_power, 2) if r.predicted_power else None,
+                        'status': r.status,
+                    }
+                    for r in baseline_results
+                ]
+                
+                return redirect(url_for('diff_result'))
+            else:
+                return render_template('diff_mapping.html',
+                                     preview=preview,
+                                     target_columns=list(TARGET_COLUMN_LABELS.items()),
+                                     error="; ".join(import_result.errors))
+        except Exception as e:
+            return render_template('diff_mapping.html',
+                                 preview=preview,
+                                 target_columns=list(TARGET_COLUMN_LABELS.items()),
+                                 error=f"基线导入失败: {str(e)}")
+    
+    return render_template('diff_mapping.html',
+                         preview=preview,
+                         target_columns=list(TARGET_COLUMN_LABELS.items()))
+
+
+@app.route('/diff/result')
+def diff_result():
+    if 'calculated_results' not in session or 'baseline_calculated' not in session:
+        return redirect(url_for('diff_view'))
+    
     current_results = session['calculated_results']
+    baseline_results = session['baseline_calculated']
+    
+    diff_items = []
+    
+    for curr in current_results:
+        baseline = None
+        for bl in baseline_results:
+            if (bl['station_name'] and bl['station_name'] == curr['station_name']) or bl['record_id'] == curr['record_id']:
+                baseline = bl
+                break
+        
+        diff_item = {
+            'record_id': curr['record_id'],
+            'station_name': curr['station_name'],
+            'current_power': curr['predicted_power'],
+            'baseline_power': baseline['predicted_power'] if baseline else None,
+            'current_status': curr['status'],
+            'baseline_status': baseline['status'] if baseline else None,
+            'diff_power': None,
+            'diff_percent': None,
+            'has_diff': False,
+            'is_new': baseline is None,
+            'status_diff': baseline is not None and curr['status'] != baseline['status'],
+        }
+        
+        if curr['predicted_power'] is not None and baseline and baseline['predicted_power'] is not None:
+            diff_item['diff_power'] = round(curr['predicted_power'] - baseline['predicted_power'], 2)
+            if baseline['predicted_power'] != 0:
+                diff_item['diff_percent'] = round(
+                    (curr['predicted_power'] - baseline['predicted_power']) / abs(baseline['predicted_power']) * 100, 2
+                )
+            
+            if abs(diff_item['diff_percent'] or 0) > 5:
+                diff_item['has_diff'] = True
+        
+        if diff_item['status_diff'] or diff_item['is_new']:
+            diff_item['has_diff'] = True
+        
+        diff_items.append(diff_item)
+    
+    for bl in baseline_results:
+        found = False
+        for curr in current_results:
+            if (curr['station_name'] and curr['station_name'] == bl['station_name']) or curr['record_id'] == bl['record_id']:
+                found = True
+                break
+        if not found:
+            diff_items.append({
+                'record_id': bl['record_id'],
+                'station_name': bl['station_name'],
+                'current_power': None,
+                'baseline_power': bl['predicted_power'],
+                'current_status': 'missing',
+                'baseline_status': bl['status'],
+                'diff_power': None,
+                'diff_percent': None,
+                'has_diff': True,
+                'is_missing': True,
+                'status_diff': True,
+            })
+    
+    diff_count = sum(1 for d in diff_items if d['has_diff'])
     
     diff_summary = {
         'current_count': len(current_results),
-        'baseline_file': baseline_preview.get('filename', ''),
-        'baseline_count': baseline_preview.get('total_rows', 0),
+        'baseline_count': len(baseline_results),
+        'diff_count': diff_count,
+        'baseline_file': session['baseline_preview'].get('filename', ''),
     }
     
     return render_template('diff_result.html',
                          diff_summary=diff_summary,
-                         current_results=current_results)
+                         diff_items=diff_items)
 
 
 @app.route('/generate_report')

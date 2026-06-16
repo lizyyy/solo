@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}基线数据映射 - 潮汐发电功率预测{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>🔗 基线数据列名映射</h2>
+    
+    <div class="alert alert-info">
+        <strong>基线文件：</strong>{{ preview.filename }}
+        <br>
+        <strong>共 {{ preview.total_rows }} 行，{{ preview.total_columns }} 列</strong>
+        <br>
+        将老板汇总页的旧口径数据列映射到标准字段，用于差异对比
+    </div>
+    
+    {% if preview.column_warnings and preview.column_warnings|length > 0 %}
+    <div class="alert alert-error">
+        <strong>⚠️ 检测到列数不一致问题:</strong>
+        <ul style="margin-top: 10px; padding-left: 20px;">
+            {% for warning in preview.column_warnings %}
+            <li>{{ warning }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    
+    {% if error %}
+    <div class="alert alert-error">
+        {{ error }}
+    </div>
+    {% endif %}
+    
+    <form method="POST">
+        <table>
+            <thead>
+                <tr>
+                    <th>原始列名</th>
+                    <th>样例数据</th>
+                    <th>映射到标准字段</th>
+                    <th>匹配度</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mapping in preview.suggested_mappings %}
+                <tr>
+                    <td><code>{{ mapping.source_column }}</code></td>
+                    <td style="color: #6b7280; font-size: 0.85rem;">
+                        {% if preview.sample_data and preview.sample_data[0] %}
+                            {{ preview.sample_data[0].get(mapping.source_column, '-') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <select name="mapping_{{ mapping.source_column }}">
+                            <option value="">-- 不映射 --</option>
+                            {% for key, label in target_columns %}
+                            <option value="{{ key }}" {% if mapping.target_column == key %}selected{% endif %}>
+                                {{ label }} ({{ key }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        {% if mapping.confidence > 0 %}
+                            {% if mapping.confidence == 1.0 %}
+                                <span style="color: #10b981;">✓ 精确匹配</span>
+                            {% elif mapping.confidence >= 0.7 %}
+                                <span style="color: #f59e0b;">~ {{ (mapping.confidence * 100) | round(0) }}%</span>
+                            {% else %}
+                                <span style="color: #6b7280;">低</span>
+                            {% endif %}
+                        {% else %}
+                            <span style="color: #9ca3af;">未匹配</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">确认映射并对比</button>
+            <a href="{{ url_for('diff_view') }}" class="btn btn-secondary">返回重新上传</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

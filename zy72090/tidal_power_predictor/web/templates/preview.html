@@ -107,28 +107,39 @@
                            class="btn btn-sm btn-warning">编辑/补录</a>
                     </td>
                 </tr>
-                {% if item.issues %}
                 <tr>
-                    <td colspan="8" style="background: #fefce8; padding: 10px 20px;">
+                    <td colspan="8" style="background: #f9fafb; padding: 10px 20px; font-size: 0.9rem;">
                         <details>
-                            <summary style="cursor: pointer; color: #92400e;">查看问题详情</summary>
-                            <ul style="margin: 10px 0 0 20px;">
-                                {% for issue in item.issues %}
-                                <li style="margin-bottom: 5px;">
-                                    <strong style="color: {{ '#ef4444' if issue.level == 'error' else '#f59e0b' }};">
-                                        [{{ '错误' if issue.level == 'error' else '警告' }}] {{ issue.field }}:
-                                    </strong>
-                                    {{ issue.message }}
-                                    {% if issue.suggestion %}
-                                    <br><span style="color: #6b7280; font-size: 0.9rem;">💡 建议: {{ issue.suggestion }}</span>
-                                    {% endif %}
-                                </li>
-                                {% endfor %}
-                            </ul>
+                            <summary style="cursor: pointer; color: #374151;">查看完整信息</summary>
+                            <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px;">
+                                <div><strong>数据来源：</strong>{{ item.record.data_source or '-' }}</div>
+                                <div><strong>备注：</strong>{{ item.record.notes or '-' }}</div>
+                                <div><strong>观测时间：</strong>{{ item.record.timestamp or '-' }}</div>
+                                <div><strong>水轮机效率：</strong>{{ item.record.turbine_efficiency or '-' }}</div>
+                                <div><strong>流速：</strong>{{ item.record.water_velocity or '-' }} {{ item.record.water_velocity_unit or '' }}</div>
+                                <div><strong>过水面积：</strong>{{ item.record.cross_sectional_area or '-' }} {{ item.record.cross_sectional_area_unit or '' }}</div>
+                            </div>
+                            {% if item.issues %}
+                            <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #e5e7eb;">
+                                <strong style="color: #92400e;">问题详情：</strong>
+                                <ul style="margin: 8px 0 0 20px;">
+                                    {% for issue in item.issues %}
+                                    <li style="margin-bottom: 5px;">
+                                        <strong style="color: {{ '#ef4444' if issue.level == 'error' else '#f59e0b' }};">
+                                            [{{ '错误' if issue.level == 'error' else '警告' }}] {{ issue.field }}:
+                                        </strong>
+                                        {{ issue.message }}
+                                        {% if issue.suggestion %}
+                                        <br><span style="color: #6b7280; font-size: 0.85rem;">💡 建议: {{ issue.suggestion }}</span>
+                                        {% endif %}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
                         </details>
                     </td>
                 </tr>
-                {% endif %}
                 {% endfor %}
             </tbody>
         </table>

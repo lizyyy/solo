@@ -9,60 +9,123 @@
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-value">{{ diff_summary.current_count }}</div>
-            <div class="stat-label">当前数据记录数</div>
+            <div class="stat-label">当前数据记录</div>
         </div>
         <div class="stat-card">
             <div class="stat-value">{{ diff_summary.baseline_count }}</div>
-            <div class="stat-label">基线数据记录数</div>
+            <div class="stat-label">基线数据记录</div>
         </div>
         <div class="stat-card">
-            <div class="stat-value" style="color: #3b82f6;">{{ diff_summary.baseline_file }}</div>
+            <div class="stat-value" style="color: {{ '#ef4444' if diff_summary.diff_count > 0 else '#10b981' }};">
+                {{ diff_summary.diff_count }}
+            </div>
+            <div class="stat-label">差异记录数</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="font-size: 1rem; color: #6b7280;">
+                {{ diff_summary.baseline_file }}
+            </div>
             <div class="stat-label">基线文件</div>
         </div>
     </div>
     
     <div class="alert alert-info">
-        💡 将基线文件（老板汇总页旧数据）导入后，会和当前计算结果进行逐条比对。
-        如果同测站同时间的记录在两份数据中功率差异超过阈值，会标黄提醒。
+        💡 <strong>说明：</strong>
+        <ul style="margin-top: 10px; padding-left: 20px;">
+            <li><span style="background: #fef3c7; padding: 2px 6px; border-radius: 3px;">黄色</span> 标记：功率差异超过5%，或状态不一致，或记录只存在于一侧</li>
+            <li>对比依据：测站名称相同则视为同一条记录</li>
+            <li>差异百分比 = (当前值 - 基线值) / |基线值| × 100%</li>
+        </ul>
     </div>
 </div>
 
 <div class="card">
-    <h2>📋 当前计算结果明细</h2>
+    <h2>📋 逐条对比明细</h2>
     
     <div style="overflow-x: auto;">
         <table>
             <thead>
                 <tr>
                     <th>记录ID</th>
-                    <th>测站</th>
-                    <th>时间</th>
-                    <th>预测功率</th>
-                    <th>状态</th>
-                    <th>置信度</th>
-                    <th>处理备注</th>
+                    <th>测站名称</th>
+                    <th>当前功率 (kW)</th>
+                    <th>基线功率 (kW)</th>
+                    <th>差异 (kW)</th>
+                    <th>差异比例</th>
+                    <th>当前状态</th>
+                    <th>基线状态</th>
+                    <th>说明</th>
                 </tr>
             </thead>
             <tbody>
-                {% for result in current_results %}
-                <tr>
-                    <td><strong>{{ result.record_id }}</strong></td>
-                    <td>{{ result.station_name or '-' }}</td>
-                    <td>{{ result.timestamp }}</td>
+                {% for item in diff_items %}
+                <tr style="background: {{ '#fef3c7' if item.has_diff else 'white' }};">
+                    <td><strong>{{ item.record_id }}</strong></td>
+                    <td>{{ item.station_name or '-' }}</td>
                     <td>
-                        {% if result.predicted_power %}
-                            {{ result.predicted_power }} {{ result.power_unit }}
+                        {% if item.current_power is not none %}
+                            {{ item.current_power }}
                         {% else %}
-                            N/A
+                            <span style="color: #9ca3af;">-</span>
                         {% endif %}
                     </td>
                     <td>
-                        <span class="status-badge {{ result.status }}">
-                            {{ result.status_text }}
+                        {% if item.baseline_power is not none %}
+                            {{ item.baseline_power }}
+                        {% else %}
+                            <span style="color: #9ca3af;">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.diff_power is not none %}
+                            <span style="color: {{ '#ef4444' if item.diff_power > 0 else '#10b981' }};">
+                                {{ '+' if item.diff_power > 0 else '' }}{{ item.diff_power }}
+                            </span>
+                        {% else %}
+                            <span style="color: #9ca3af;">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.diff_percent is not none %}
+                            <span style="color: {{ '#ef4444' if item.diff_percent > 5 else '#10b981' if item.diff_percent > -5 else '#ef4444' }};">
+                                {{ '+' if item.diff_percent > 0 else '' }}{{ item.diff_percent }}%
+                            </span>
+                        {% else %}
+                            <span style="color: #9ca3af;">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="status-badge {{ item.current_status }}">
+                            {% if item.current_status == 'success' %}计算成功
+                            {% elif item.current_status == 'needs_review' %}待人工确认
+                            {% elif item.current_status == 'failed' %}计算失败
+                            {% elif item.current_status == 'missing' %}已缺失
+                            {% else %}{{ item.current_status }}
+                            {% endif %}
                         </span>
                     </td>
-                    <td>{{ result.confidence_score }}%</td>
-                    <td style="font-size: 0.85rem;">{{ result.processing_notes or '-' }}</td>
+                    <td>
+                        <span class="status-badge {{ item.baseline_status }}">
+                            {% if item.baseline_status == 'success' %}计算成功
+                            {% elif item.baseline_status == 'needs_review' %}待人工确认
+                            {% elif item.baseline_status == 'failed' %}计算失败
+                            {% else %}{{ item.baseline_status }}
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td style="font-size: 0.85rem; color: #6b7280;">
+                        {% if item.is_new %}
+                            <span style="color: #3b82f6;">🆕 仅当前有，基线中无</span>
+                        {% elif item.is_missing %}
+                            <span style="color: #ef4444;">❌ 基线有，当前已缺失</span>
+                        {% elif item.status_diff %}
+                            <span style="color: #f59e0b;">⚠️ 状态不一致</span>
+                        {% elif item.has_diff %}
+                            <span style="color: #f59e0b;">⚠️ 功率差异超过5%</span>
+                        {% else %}
+                            <span style="color: #10b981;">✓ 一致</span>
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
