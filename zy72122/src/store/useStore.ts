@@ -10,6 +10,85 @@ import { DEFAULT_CONFIG } from '@/types'
 import { validateRecord, determineRecordStatus, validateAll } from '@/utils/validator'
 import { generateId, nowISO } from '@/utils/helpers'
 import { generateSampleData } from '@/utils/sampleData'
+import { convertValue } from '@/utils/unitConverter'
+
+function normalizeRecordUnits(
+  partial: Omit<ExperimentRecord, 'id' | 'processedAt' | 'status'>,
+  config: ValidationConfig
+): {
+  record: Omit<ExperimentRecord, 'id' | 'processedAt' | 'status'>
+  converted: boolean
+  conversionNote: string
+} {
+  const conversions: string[] = []
+  const originalValues: ExperimentRecord['originalValues'] = {}
+  const result = { ...partial }
+
+  if (partial.displacementUnit !== config.expectedDisplacementUnit) {
+    const converted = convertValue(
+      partial.displacement,
+      partial.displacementUnit,
+      config.expectedDisplacementUnit,
+      'displacement'
+    )
+    if (converted !== null) {
+      originalValues.displacement = partial.displacement
+      originalValues.displacementUnit = partial.displacementUnit
+      result.displacement = converted
+      result.displacementUnit = config.expectedDisplacementUnit
+      conversions.push(
+        `位移 ${partial.displacement}${partial.displacementUnit} → ${converted.toFixed(2)}${config.expectedDisplacementUnit}`
+      )
+    }
+  }
+
+  if (partial.forceUnit !== config.expectedForceUnit) {
+    const converted = convertValue(
+      partial.force,
+      partial.forceUnit,
+      config.expectedForceUnit,
+      'force'
+    )
+    if (converted !== null) {
+      originalValues.force = partial.force
+      originalValues.forceUnit = partial.forceUnit
+      result.force = converted
+      result.forceUnit = config.expectedForceUnit
+      conversions.push(
+        `力 ${partial.force}${partial.forceUnit} → ${converted.toFixed(2)}${config.expectedForceUnit}`
+      )
+    }
+  }
+
+  if (partial.stiffnessUnit !== config.expectedStiffnessUnit) {
+    const converted = convertValue(
+      partial.springStiffness,
+      partial.stiffnessUnit,
+      config.expectedStiffnessUnit,
+      'stiffness'
+    )
+    if (converted !== null) {
+      originalValues.springStiffness = partial.springStiffness
+      originalValues.stiffnessUnit = partial.stiffnessUnit
+      result.springStiffness = converted
+      result.stiffnessUnit = config.expectedStiffnessUnit
+      conversions.push(
+        `刚度 ${partial.springStiffness}${partial.stiffnessUnit} → ${converted.toFixed(2)}${config.expectedStiffnessUnit}`
+      )
+    }
+  }
+
+  const converted = conversions.length > 0
+  if (converted && Object.keys(originalValues).length > 0) {
+    ;(result as ExperimentRecord).originalValues = originalValues
+  }
+
+  return {
+    record: result,
+    converted,
+    conversionNote: conversions.join('；'),
+  }
+}
 
 interface LabStore {
   records: ExperimentRecord[]
@@ -35,11 +114,16 @@ export const useStore = create<LabStore>()(
       validationResults: [],
 
       addRecord: (partial) => {
+        const config = get().config
+        const normalized = normalizeRecordUnits(partial, config)
         const record: ExperimentRecord = {
-          ...partial,
+          ...normalized.record,
           id: generateId(),
           processedAt: nowISO(),
           status: 'passed',
+        }
+        if (normalized.converted) {
+          record.amendedFrom = normalized.conversionNote
         }
 
         const sorted = [...get().records, record].sort(
@@ -48,16 +132,18 @@ export const useStore = create<LabStore>()(
         const idx = sorted.findIndex((r) => r.id === record.id)
         const prev = idx > 0 ? sorted[idx - 1] : null
 
-        const vr = validateRecord(record, prev, get().config)
+        const vr = validateRecord(record, prev, config)
         record.status = determineRecordStatus(vr, record.source.type)
 
         const auditEntry: AuditEntry = {
           id: generateId(),
           recordId: record.id,
-          action: 'created',
+          action: normalized.converted ? 'amended' : 'created',
           timestamp: nowISO(),
           operator: '项目助理',
-          details: `录入记录：力=${record.force}${record.forceUnit}，位移=${record.displacement}${record.displacementUnit}，来源=${record.source.type === 'photo' ? '现场照片' : record.source.type === 'manual' ? '手工记录' : '旧口径'}(${record.source.reference})`,
+          details: normalized.converted
+            ? `录入记录并换算单位：${normalized.conversionNote}，来源=${record.source.type === 'photo' ? '现场照片' : record.source.type === 'manual' ? '手工记录' : '旧口径'}(${record.source.reference})`
+            : `录入记录：力=${record.force}${record.forceUnit}，位移=${record.displacement}${record.displacementUnit}，来源=${record.source.type === 'photo' ? '现场照片' : record.source.type === 'manual' ? '手工记录' : '旧口径'}(${record.source.reference})`,
           newStatus: record.status,
         }
 
@@ -81,15 +167,20 @@ export const useStore = create<LabStore>()(
       },
 
       addRecords: (partials) => {
+        const config = get().config
         const newRecords: ExperimentRecord[] = []
         const newAudit: AuditEntry[] = []
 
         for (const partial of partials) {
+          const normalized = normalizeRecordUnits(partial, config)
           const record: ExperimentRecord = {
-            ...partial,
+            ...normalized.record,
             id: generateId(),
             processedAt: nowISO(),
             status: 'passed',
+          }
+          if (normalized.converted) {
+            record.amendedFrom = normalized.conversionNote
           }
           newRecords.push(record)
         }
@@ -101,16 +192,19 @@ export const useStore = create<LabStore>()(
         for (const record of newRecords) {
           const idx = allRecords.findIndex((r) => r.id === record.id)
           const prev = idx > 0 ? allRecords[idx - 1] : null
-          const vr = validateRecord(record, prev, get().config)
+          const vr = validateRecord(record, prev, config)
           record.status = determineRecordStatus(vr, record.source.type)
 
+          const hasConversion = !!record.amendedFrom
           newAudit.push({
             id: generateId(),
             recordId: record.id,
-            action: 'appended',
+            action: hasConversion ? 'amended' : 'appended',
             timestamp: nowISO(),
             operator: '项目助理',
-            details: `批量录入：力=${record.force}${record.forceUnit}，位移=${record.displacement}${record.displacementUnit}`,
+            details: hasConversion
+              ? `批量录入并换算单位：${record.amendedFrom}`
+              : `批量录入：力=${record.force}${record.forceUnit}，位移=${record.displacement}${record.displacementUnit}`,
             newStatus: record.status,
           })
         }
@@ -171,8 +265,27 @@ export const useStore = create<LabStore>()(
       initSampleData: () => {
         const { records, audit } = generateSampleData()
         const config = get().config
-        const vr = validateAll(records, config)
-        const updatedRecords = records.map((r) => {
+        const normalizedRecords = records.map((r) => {
+          const { id, processedAt, status, ...rest } = r
+          const normalized = normalizeRecordUnits(rest, config)
+          const result: ExperimentRecord = {
+            ...normalized.record,
+            id,
+            processedAt,
+            status,
+          }
+          if (normalized.converted) {
+            result.amendedFrom = normalized.conversionNote
+          } else if (r.amendedFrom) {
+            result.amendedFrom = r.amendedFrom
+          }
+          if (r.originalValues) {
+            result.originalValues = r.originalValues
+          }
+          return result
+        })
+        const vr = validateAll(normalizedRecords, config)
+        const updatedRecords = normalizedRecords.map((r) => {
           const result = vr.find((v) => v.recordId === r.id)
           const computedStatus = result ? determineRecordStatus(result, r.source.type) : r.status
           return { ...r, status: computedStatus }

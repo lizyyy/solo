@@ -46,13 +46,19 @@ export function generateSampleData(): {
     stiffnessUnit: 'N/cm',
     displacement: 1.52,
     displacementUnit: 'cm',
-    force: 1.52 * 25.5,
+    force: 38.76,
     forceUnit: 'N',
     direction: '+',
     source: { type: 'legacy', reference: '旧报告R-2026-003附照片IMG_20260515_007' },
     processedAt: '2026-05-20T11:00:00',
     status: 'legacy_amended',
-    amendedFrom: '旧口径（cm/N/cm），已转换为mm/N/N/mm',
+    amendedFrom: '旧口径（cm/N/cm），已转换为mm/N/mm',
+    originalValues: {
+      displacement: 1.52,
+      displacementUnit: 'cm',
+      springStiffness: 2.55,
+      stiffnessUnit: 'N/cm',
+    },
   }
 
   const audit: AuditEntry[] = [

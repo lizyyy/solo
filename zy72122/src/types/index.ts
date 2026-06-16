@@ -23,6 +23,14 @@ export interface ExperimentRecord {
   status: RecordStatus
   reviewNote?: string
   amendedFrom?: string
+  originalValues?: {
+    displacement?: number
+    displacementUnit?: string
+    force?: number
+    forceUnit?: string
+    springStiffness?: number
+    stiffnessUnit?: string
+  }
 }
 
 export interface CheckResult {
@@ -84,8 +92,13 @@ export const UNIT_ALIASES: Record<string, string> = {
   'newton': 'N',
   'kN': 'kN',
   'N/m': 'N/m',
+  'n/m': 'N/m',
   'N/mm': 'N/mm',
+  'n/mm': 'N/mm',
+  'N/cm': 'N/cm',
+  'n/cm': 'N/cm',
   'kN/m': 'kN/m',
+  'kn/m': 'kN/m',
 }
 
 export const UNIT_CONVERSION: Record<string, Record<string, number>> = {
@@ -100,6 +113,7 @@ export const UNIT_CONVERSION: Record<string, Record<string, number>> = {
   },
   stiffness: {
     'N/m': 1,
+    'N/cm': 100,
     'N/mm': 1000,
     'kN/m': 1000,
   },

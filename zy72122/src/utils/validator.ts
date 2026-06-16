@@ -232,8 +232,9 @@ export function determineRecordStatus(
   )
   if (thresholdFailed) return 'needs_review'
 
+  if (sourceType === 'legacy') return 'legacy_amended'
+
   const anyFailed = validationResult.checks.some((c) => !c.passed)
-  if (anyFailed && sourceType === 'legacy') return 'legacy_amended'
   if (anyFailed) return 'needs_review'
 
   return 'passed'

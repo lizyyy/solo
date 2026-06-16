@@ -86,6 +86,7 @@ export default function RecordForm() {
               className="rounded-lg border border-slate-600 bg-slate-800 px-2 py-2 text-sm text-slate-200"
             >
               <option value="N/mm">N/mm</option>
+              <option value="N/cm">N/cm</option>
               <option value="N/m">N/m</option>
               <option value="kN/m">kN/m</option>
             </select>

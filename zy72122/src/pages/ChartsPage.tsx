@@ -7,6 +7,16 @@ export default function ChartsPage() {
   const updateConfig = useStore((s) => s.updateConfig)
   const runValidation = useStore((s) => s.runValidation)
   const records = useStore((s) => s.records)
+  const validationResults = useStore((s) => s.validationResults)
+
+  const validRecords = records.filter((r) => {
+    const vr = validationResults.find((v) => v.recordId === r.id)
+    return vr ? vr.status !== 'error' : true
+  })
+  const overThresholdIds = validationResults
+    .filter((v) => v.status === 'error')
+    .map((v) => v.recordId)
+  const overThresholdCount = overThresholdIds.length
 
   return (
     <div className="space-y-6">
@@ -137,7 +147,14 @@ export default function ChartsPage() {
       </div>
 
       <div className="rounded-xl border border-slate-700/50 bg-slate-800/30 p-5">
-        <h3 className="mb-3 text-sm font-medium text-slate-300">数据统计</h3>
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-sm font-medium text-slate-300">数据统计</h3>
+          {overThresholdCount > 0 && (
+            <p className="text-[10px] text-orange-400">
+              已排除 {overThresholdCount} 条超阈值记录，不参与均值计算
+            </p>
+          )}
+        </div>
         <div className="grid grid-cols-4 gap-3 text-center">
           <div className="rounded-lg bg-slate-800/50 p-3">
             <p className="text-lg font-bold text-slate-200">{records.length}</p>
@@ -145,9 +162,9 @@ export default function ChartsPage() {
           </div>
           <div className="rounded-lg bg-slate-800/50 p-3">
             <p className="text-lg font-bold text-slate-200">
-              {records.length > 0
+              {validRecords.length > 0
                 ? (
-                    records.reduce((s, r) => s + r.force, 0) / records.length
+                    validRecords.reduce((s, r) => s + r.force, 0) / validRecords.length
                   ).toFixed(1)
                 : '0'}
             </p>
