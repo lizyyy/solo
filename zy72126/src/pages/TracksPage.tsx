@@ -103,7 +103,28 @@ export const TracksPage = () => {
     columnHelper.accessor('status', {
       header: '状态',
       cell: (info) => <StatusBadge status={info.getValue()} />,
-      size: 120,
+      size: 100,
+    }),
+    columnHelper.display({
+      id: 'resolution',
+      header: '处理记录',
+      cell: (info) => {
+        const t = info.row.original;
+        if (!t.resolutionNote && !t.resolvedBy) {
+          return <span className="text-xs text-olive-400">—</span>;
+        }
+        const label = t.resolvedBy ? `${t.resolvedBy}处理` : '已处理';
+        return (
+          <span
+            className="text-xs text-moss-700 bg-moss-50 px-2 py-0.5 rounded"
+            title={t.resolutionNote || ''}
+          >
+            {label}
+          </span>
+        );
+      },
+      size: 100,
+      enableSorting: false,
     }),
     columnHelper.display({
       id: 'actions',

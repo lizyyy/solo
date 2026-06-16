@@ -159,13 +159,18 @@ export const ImportPage = () => {
             addConflict({
               id: generateId(),
               trackId,
+              channelEntryId: matched.id,
+              conflictType: 'value_mismatch',
               sourceA: '舞台通道表',
               sourceB: '导入文件',
               field: c.field,
               valueA: c.valueA,
               valueB: c.valueB,
+              originalValueA: c.valueA,
+              originalValueB: c.valueB,
               status: 'pending',
               suggestedAction: c.suggestedAction,
+              createdAt: now,
             });
           }
         }
@@ -174,13 +179,17 @@ export const ImportPage = () => {
         addConflict({
           id: generateId(),
           trackId,
+          conflictType: 'extra_file',
           sourceA: '舞台通道表',
           sourceB: '导入文件',
           field: 'trackName',
           valueA: '无匹配记录',
           valueB: parsedData.trackName,
+          originalValueA: '无匹配记录',
+          originalValueB: parsedData.trackName,
           status: 'pending',
           suggestedAction: `文件"${fileItem.file.name}"在舞台通道表中找不到匹配项。可能是多余文件，或通道表尚未录入，建议人工确认`,
+          createdAt: now,
         });
       }
 
@@ -210,6 +219,7 @@ export const ImportPage = () => {
 
     const allTracks = useAppStore.getState().tracks;
     const missing = findMissingEntries(channelTable, allTracks);
+    const nowOuter = new Date().toISOString();
     for (const entry of missing) {
       const alreadyFlagged = useAppStore.getState().conflicts.some(
         (c) => c.valueA === entry.trackName && c.field === 'trackName' && c.sourceA === '缺失检测'
@@ -217,14 +227,18 @@ export const ImportPage = () => {
       if (!alreadyFlagged) {
         addConflict({
           id: generateId(),
-          trackId: '',
+          channelEntryId: entry.id,
+          conflictType: 'missing_file',
           sourceA: '缺失检测',
           sourceB: '舞台通道表',
           field: 'trackName',
           valueA: entry.trackName,
           valueB: '未找到对应文件',
+          originalValueA: entry.trackName,
+          originalValueB: '未找到对应文件',
           status: 'pending',
           suggestedAction: `通道表第${entry.channelNo}通道"${entry.trackName}"没有对应的导入文件。可能漏传文件，或文件名无法匹配，建议人工确认`,
+          createdAt: nowOuter,
         });
       }
     }

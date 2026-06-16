@@ -33,9 +33,17 @@ const getImportStatusText = (status: string): string => ({
   success: '成功', failed: '失败', skipped: '跳过', processing: '处理中',
 }[status] || status);
 
-const getResolutionText = (resolution: string): string => ({
+const getResolutionText = (r: string): string => ({
   A: '采用数据源A', B: '采用数据源B', manual: '人工输入',
-}[resolution] || resolution);
+  ignore: '确认无对应文件/暂忽略', delete_track: '已从通道表移除',
+  add_to_channel: '已补录到通道表',
+}[r] || r);
+
+const getConflictTypeText = (t: string): string => ({
+  value_mismatch: '字段值冲突',
+  extra_file: '多余文件（通道表无对应条目）',
+  missing_file: '缺失文件（通道表有条目但无文件）',
+}[t] || t);
 
 export const generateReport = (
   tracks: Track[],
@@ -46,25 +54,35 @@ export const generateReport = (
   options: ExportOptions
 ) => {
   return tracks.map((track) => {
-    const trackAnnotations = annotations.filter((a) => a.trackId === track.id);
     const trackConflicts = conflicts.filter((c) => c.trackId === track.id);
+    const trackAnnotations = annotations.filter((a) => a.trackId === track.id);
     const importRecord = importRecords.find((r) => r.trackId === track.id);
     const channelEntry = track.channelTableId
       ? channelTable.find((e) => e.id === track.channelTableId)
       : undefined;
 
+    const resolvedConflicts = trackConflicts.filter((c) => c.status === 'resolved');
+    const pendingConflicts = trackConflicts.filter((c) => c.status === 'pending');
+
     const row: Record<string, any> = {
-      '舞台通道号': track.channelNo,
+      '曲目ID': track.id,
+      '舞台通道号': track.channelNo || '-',
       '曲目名称': track.trackName,
       '艺术家': track.artist || '-',
       '时长': track.duration || '-',
       '原始文件名': track.fileName,
       '文件大小': track.fileSize ? formatFileSize(track.fileSize) : '-',
+      '通道表匹配': channelEntry
+        ? `第${channelEntry.channelNo}通道 · ${channelEntry.trackName}`
+        : '未匹配',
+      '通道表来源': channelEntry?.source || '-',
       '状态': getStatusText(track.status),
-      '通道表匹配': channelEntry ? `第${channelEntry.channelNo}通道 - ${channelEntry.trackName}` : '未匹配',
-      '异常原因': track.status === 'error'
-        ? (importRecord?.errorReason || (channelEntry ? '-' : '通道表无匹配记录'))
-        : '-',
+      '待处理冲突数': pendingConflicts.length,
+      '已裁决冲突数': resolvedConflicts.length,
+      '处理人': track.resolvedBy || '-',
+      '处理备注': track.resolutionNote || '-',
+      '导入状态': importRecord ? getImportStatusText(importRecord.status) : '-',
+      '导入异常原因': importRecord?.errorReason || '-',
       '创建时间': formatDate(track.createdAt),
       '更新时间': formatDate(track.updatedAt),
     };
@@ -76,20 +94,22 @@ export const generateReport = (
         : '-';
     }
 
-    if (options.includeConflicts) {
-      const pendingConflicts = trackConflicts.filter((c) => c.status === 'pending');
-      row['待处理冲突'] = pendingConflicts.length;
-      if (pendingConflicts.length > 0) {
-        row['冲突详情'] = pendingConflicts
-          .map((c) => `${c.field}: ${c.sourceA}="${c.valueA}" vs ${c.sourceB}="${c.valueB}"`)
-          .join('; ');
-      } else {
-        row['冲突详情'] = '-';
-      }
-    }
-
-    if (options.includeImportRecords) {
-      row['导入状态'] = importRecord ? getImportStatusText(importRecord.status) : '-';
+    if (options.includeConflicts && resolvedConflicts.length > 0) {
+      row['裁决证据链'] = resolvedConflicts
+        .map((c) =>
+          `[${getConflictTypeText(c.conflictType)}] ${c.field}: ${c.sourceA}="${c.originalValueA}" vs ${c.sourceB}="${c.originalValueB}" → ${getResolutionText(c.resolution || '')}` +
+          (c.manualValue ? `（人工值: ${c.manualValue}）` : '') +
+          (c.resolvedBy ? ` · 处理人:${c.resolvedBy}` : '') +
+          (c.resolutionReason ? ` · 原因:${c.resolutionReason}` : '') +
+          (c.resolvedAt ? ` · 时间:${formatDate(c.resolvedAt)}` : '')
+        )
+        .join(' || ');
+    } else {
+      row['裁决证据链'] = pendingConflicts.length > 0
+        ? pendingConflicts
+            .map((c) => `[${getConflictTypeText(c.conflictType)}] ${c.field}: ${c.originalValueA} vs ${c.originalValueB}`)
+            .join(' || ')
+        : '-';
     }
 
     return row;
@@ -109,22 +129,60 @@ export const exportToExcel = (
   const wb = XLSX.utils.book_new();
 
   const ws = XLSX.utils.json_to_sheet(trackData);
-  ws['!cols'] = Object.keys(trackData[0] || {}).map(() => ({ wch: 18 }));
-  XLSX.utils.book_append_sheet(wb, ws, '曲目台账');
-
-  const channelData = channelTable.map((e) => ({
-    '通道号': e.channelNo,
-    '曲目名称': e.trackName,
-    '艺术家': e.artist || '-',
-    '时长': e.duration || '-',
-    '来源': e.source || '-',
-    '备注': e.note || '-',
-    '是否已匹配文件': tracks.some((t) => t.channelTableId === e.id) ? '是' : '否',
-    '录入时间': formatDate(e.createdAt),
+  ws['!cols'] = Object.keys(trackData[0] || {}).map((k) => ({
+    wch: k.length > 8 ? Math.min(k.length * 2, 32) : 16,
   }));
+  XLSX.utils.book_append_sheet(wb, ws, '曲目台账（报告）');
+
+  const channelData = channelTable.map((e) => {
+    const matched = tracks.find((t) => t.channelTableId === e.id);
+    return {
+      '通道号': e.channelNo,
+      '曲目名称': e.trackName,
+      '艺术家': e.artist || '-',
+      '时长': e.duration || '-',
+      '来源': e.source || '-',
+      '备注': e.note || '-',
+      '是否已匹配文件': matched ? '是' : '否',
+      '匹配的文件名': matched?.fileName || '-',
+      '录入时间': formatDate(e.createdAt),
+    };
+  });
   const wsChannel = XLSX.utils.json_to_sheet(channelData);
-  wsChannel['!cols'] = Object.keys(channelData[0] || {}).map(() => ({ wch: 16 }));
-  XLSX.utils.book_append_sheet(wb, wsChannel, '舞台通道表');
+  wsChannel['!cols'] = [{ wch: 10 }, { wch: 20 }, { wch: 16 }, { wch: 10 }, { wch: 16 }, { wch: 24 }, { wch: 14 }, { wch: 32 }, { wch: 18 }];
+  XLSX.utils.book_append_sheet(wb, wsChannel, '舞台通道表（原始）');
+
+  if (options.includeConflicts) {
+    const conflictData = conflicts.map((c) => ({
+      '冲突ID': c.id,
+      '冲突类型': getConflictTypeText(c.conflictType),
+      '关联曲目': c.trackId
+        ? tracks.find((t) => t.id === c.trackId)?.trackName || '已删除曲目'
+        : '—',
+      '关联通道条目': c.channelEntryId
+        ? (() => {
+            const e = channelTable.find((x) => x.id === c.channelEntryId);
+            return e ? `第${e.channelNo}通道·${e.trackName}` : '已删除通道条目';
+          })()
+        : '—',
+      '冲突字段': c.field,
+      '数据源A': c.sourceA,
+      'A原始值': c.originalValueA,
+      '数据源B': c.sourceB,
+      'B原始值': c.originalValueB,
+      '系统建议动作': c.suggestedAction,
+      '状态': c.status === 'pending' ? '待裁决' : '已裁决',
+      '裁决动作': c.resolution ? getResolutionText(c.resolution) : '-',
+      '人工输入值': c.manualValue || '-',
+      '处理人': c.resolvedBy || '-',
+      '处理原因': c.resolutionReason || '-',
+      '裁决时间': c.resolvedAt ? formatDate(c.resolvedAt) : '-',
+      '证据链': `[${c.field}] ${c.sourceA}="${c.originalValueA}" vs ${c.sourceB}="${c.originalValueB}" → ${c.resolution ? getResolutionText(c.resolution) : '待裁决'}`,
+      '创建时间': formatDate(c.createdAt),
+    }));
+    const wsConflicts = XLSX.utils.json_to_sheet(conflictData);
+    XLSX.utils.book_append_sheet(wb, wsConflicts, '冲突记录（明细）');
+  }
 
   if (options.includeAnnotations) {
     const annotationData = annotations.map((a) => ({
@@ -136,22 +194,6 @@ export const exportToExcel = (
       '创建时间': formatDate(a.createdAt),
     }));
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(annotationData), '批注记录');
-  }
-
-  if (options.includeConflicts) {
-    const conflictData = conflicts.map((c) => ({
-      '关联曲目': c.trackId ? (tracks.find((t) => t.id === c.trackId)?.trackName || '未关联曲目') : '未关联曲目',
-      '冲突字段': c.field,
-      '数据源A': c.sourceA,
-      'A值': String(c.valueA),
-      '数据源B': c.sourceB,
-      'B值': String(c.valueB),
-      '建议动作': c.suggestedAction,
-      '状态': c.status === 'pending' ? '待处理' : '已解决',
-      '裁决结果': c.resolution ? getResolutionText(c.resolution) : '-',
-      '解决时间': c.resolvedAt ? formatDate(c.resolvedAt) : '-',
-    }));
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(conflictData), '冲突记录');
   }
 
   if (options.includeImportRecords) {
@@ -187,8 +229,11 @@ export const exportToJSON = (
       normalTracks: tracks.filter((t) => t.status === 'normal').length,
       conflictTracks: tracks.filter((t) => t.status === 'conflict').length,
       errorTracks: tracks.filter((t) => t.status === 'error').length,
+      pendingConflicts: conflicts.filter((c) => c.status === 'pending').length,
+      resolvedConflicts: conflicts.filter((c) => c.status === 'resolved').length,
     },
     channelTable,
+    report: generateReport(tracks, annotations, conflicts, importRecords, channelTable, options),
     tracks,
   };
 

@@ -15,6 +15,7 @@ export const generateMockData = (): {
   const ch3 = generateId();
   const ch4 = generateId();
   const ch5 = generateId();
+  const ch6 = generateId();
 
   const channelTable: ChannelTableEntry[] = [
     { id: ch1, channelNo: '1', trackName: '夜曲', artist: '周杰伦', duration: '3:45', source: '微信聊天记录', createdAt: now, updatedAt: now },
@@ -22,6 +23,7 @@ export const generateMockData = (): {
     { id: ch3, channelNo: '3', trackName: '晴天', artist: '周杰伦', duration: '4:29', createdAt: now, updatedAt: now },
     { id: ch4, channelNo: '4', trackName: '七里香', artist: '周杰伦', duration: '4:59', createdAt: now, updatedAt: now },
     { id: ch5, channelNo: '5', trackName: '青花瓷', artist: '周杰伦', duration: '3:52', source: '邮件附件', note: '春晚版本', createdAt: now, updatedAt: now },
+    { id: ch6, channelNo: '6', trackName: '双截棍', artist: '周杰伦', duration: '3:20', source: '短信记录', note: '待补传文件', createdAt: now, updatedAt: now },
   ];
 
   const trackId1 = generateId();
@@ -88,25 +90,41 @@ export const generateMockData = (): {
     },
     {
       id: generateId(), trackId: trackId6,
-      content: '此文件在通道表中找不到对应记录，可能是额外加入的曲目。',
+      content: '此文件在通道表中找不到对应记录，可能是额外加入的曲目或命名不一致。',
       author: '林老师', createdAt: now, version: 1,
     },
   ];
 
   const conflicts: Conflict[] = [
     {
-      id: generateId(), trackId: trackId3,
+      id: generateId(), trackId: trackId3, channelEntryId: ch3,
+      conflictType: 'value_mismatch',
       sourceA: '舞台通道表', sourceB: '导入文件',
       field: 'artist', valueA: '周杰伦', valueB: 'Jay Chou',
+      originalValueA: '周杰伦', originalValueB: 'Jay Chou',
       status: 'pending',
       suggestedAction: '艺术家名写法不同（通道表: 周杰伦, 文件: Jay Chou），疑似同一人，建议统一',
+      createdAt: now,
     },
     {
       id: generateId(), trackId: trackId6,
+      conflictType: 'extra_file',
       sourceA: '舞台通道表', sourceB: '导入文件',
       field: 'trackName', valueA: '无匹配记录', valueB: '告白气球',
+      originalValueA: '无匹配记录', originalValueB: '告白气球',
       status: 'pending',
       suggestedAction: '文件"告白气球.mp3"在舞台通道表中找不到匹配项。可能是多余文件，或通道表尚未录入，建议人工确认',
+      createdAt: now,
+    },
+    {
+      id: generateId(), channelEntryId: ch6,
+      conflictType: 'missing_file',
+      sourceA: '缺失检测', sourceB: '舞台通道表',
+      field: 'trackName', valueA: '双截棍', valueB: '未找到对应文件',
+      originalValueA: '双截棍', originalValueB: '未找到对应文件',
+      status: 'pending',
+      suggestedAction: '通道表第6通道"双截棍"没有对应的导入文件。可能漏传文件，或文件名无法匹配，建议人工确认',
+      createdAt: now,
     },
   ];
 

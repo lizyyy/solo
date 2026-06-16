@@ -4,7 +4,9 @@ export type ImportStatus = 'success' | 'failed' | 'skipped' | 'processing';
 
 export type ConflictStatus = 'pending' | 'resolved';
 
-export type ConflictResolution = 'A' | 'B' | 'manual';
+export type ConflictResolution = 'A' | 'B' | 'manual' | 'ignore' | 'delete_track' | 'add_to_channel';
+
+export type ConflictType = 'value_mismatch' | 'extra_file' | 'missing_file';
 
 export interface ChannelTableEntry {
   id: string;
@@ -30,6 +32,8 @@ export interface Track {
   fileHash?: string;
   metadata: Record<string, any>;
   channelTableId?: string;
+  resolutionNote?: string;
+  resolvedBy?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -46,17 +50,24 @@ export interface Annotation {
 
 export interface Conflict {
   id: string;
-  trackId: string;
+  trackId?: string;
+  channelEntryId?: string;
+  conflictType: ConflictType;
   sourceA: string;
   sourceB: string;
   field: string;
   valueA: any;
   valueB: any;
+  originalValueA: any;
+  originalValueB: any;
   status: ConflictStatus;
   resolution?: ConflictResolution;
   manualValue?: any;
+  resolvedBy?: string;
+  resolutionReason?: string;
   suggestedAction: string;
   resolvedAt?: string;
+  createdAt: string;
 }
 
 export interface ImportRecord {
@@ -93,7 +104,11 @@ export interface AppState {
   deleteTrack: (id: string) => void;
   addAnnotation: (annotation: Annotation) => void;
   addConflict: (conflict: Conflict) => void;
-  resolveConflict: (id: string, resolution: ConflictResolution, manualValue?: any) => void;
+  resolveConflict: (
+    id: string,
+    resolution: ConflictResolution,
+    options?: { manualValue?: any; resolvedBy?: string; resolutionReason?: string }
+  ) => void;
   addImportRecord: (record: ImportRecord) => void;
   updateImportRecord: (id: string, updates: Partial<ImportRecord>) => void;
   setCurrentPage: (page: string) => void;
