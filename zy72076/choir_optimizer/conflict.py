@@ -205,6 +205,8 @@ class ConflictDetector:
 
     def get_conflict_summary(self) -> Dict[str, Any]:
         """获取冲突汇总"""
+        if not self.conflicts:
+            self._load_conflicts_from_db()
         fields = {}
         for c in self.conflicts:
             f = c["field_name"]
@@ -221,6 +223,27 @@ class ConflictDetector:
             "by_field": fields,
             "details": self.conflicts
         }
+
+    def _load_conflicts_from_db(self):
+        """从数据库加载冲突数据到内存"""
+        cursor = self.db.conn.cursor()
+        cursor.execute(f"SELECT * FROM {CONFLICTS_TABLE} WHERE batch_id = ? ORDER BY created_at", (self.batch_id,))
+        rows = cursor.fetchall()
+        self.conflicts = []
+        for row in rows:
+            self.conflicts.append({
+                "id": row["id"],
+                "field_name": row["field_name"],
+                "source_a": row["source_a"],
+                "source_b": row["source_b"],
+                "value_a": row["value_a"],
+                "value_b": row["value_b"],
+                "evidence_a": row["evidence_a"],
+                "evidence_b": row["evidence_b"],
+                "suggested_action": row["suggested_action"],
+                "is_resolved": row["is_resolved"],
+                "resolution": row["resolution"]
+            })
 
     def resolve_conflict(self, conflict_id: str, resolution: str,
                          operator: str = "周姐") -> Dict[str, Any]:

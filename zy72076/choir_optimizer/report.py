@@ -1,5 +1,6 @@
 """报告生成模块 - 面向非技术用户，报告与明细一致，可从图表点回明细"""
 import json
+import uuid
 import pandas as pd
 from datetime import datetime
 from pathlib import Path
@@ -7,7 +8,7 @@ from typing import Dict, List, Optional, Any
 from copy import deepcopy
 
 from .config import REPORTS_DIR, EXPORTS_DIR
-from .database import get_db, RAW_RECORDS_TABLE, CALCULATIONS_TABLE, CALC_STEPS_TABLE
+from .database import get_db, RAW_RECORDS_TABLE, CALCULATIONS_TABLE, CALC_STEPS_TABLE, ANOMALIES_TABLE, CONFLICTS_TABLE, SUPPLEMENTS_TABLE
 from .charts import ChartGenerator
 
 
@@ -48,6 +49,228 @@ class ReportGenerator:
         """确保图表数据已加载（从数据库）"""
         if not self.chart_generator.charts:
             self.chart_generator.load_charts_from_db()
+
+    def _load_personal_df_from_db(self) -> pd.DataFrame:
+        """从数据库加载本批次的个人数据（含计算结果）"""
+        cursor = self.db.conn.cursor()
+        cursor.execute(
+            f"SELECT id, normalized_data, member_name, section FROM {RAW_RECORDS_TABLE} WHERE batch_id = ?",
+            (self.batch_id,)
+        )
+        rows = cursor.fetchall()
+        records = []
+        for row in rows:
+            data = json.loads(row["normalized_data"])
+            data["_record_id"] = row["id"]
+            records.append(data)
+        df = pd.DataFrame(records) if records else pd.DataFrame()
+        if not df.empty and "人员" in df.columns:
+            df = df[df["人员"].notna() & (df["人员"] != "")].copy()
+        calc_cursor = self.db.conn.cursor()
+        calc_cursor.execute(
+            f"SELECT record_id, result_value FROM {CALCULATIONS_TABLE} WHERE batch_id = ? AND calc_type = '个人综合分'",
+            (self.batch_id,)
+        )
+        calc_map = {}
+        for r in calc_cursor.fetchall():
+            calc_map[r["record_id"]] = r["result_value"]
+        if not df.empty and "_record_id" in df.columns:
+            df["个人综合分"] = df["_record_id"].map(calc_map)
+        return df
+
+    def _load_anomalies_from_db(self) -> List[Dict]:
+        """从数据库加载本批次的异常数据"""
+        cursor = self.db.conn.cursor()
+        cursor.execute(f"SELECT * FROM {ANOMALIES_TABLE} WHERE batch_id = ? ORDER BY created_at", (self.batch_id,))
+        rows = cursor.fetchall()
+        from .config import ANOMALY_TYPES
+        anomalies = []
+        for row in rows:
+            anomalies.append({
+                "id": row["id"],
+                "anomaly_type": row["anomaly_type"],
+                "anomaly_name": ANOMALY_TYPES.get(row["anomaly_type"], row["anomaly_type"]),
+                "description": row["anomaly_description"],
+                "severity": row["severity"],
+                "values": json.loads(row["anomaly_values"]) if row["anomaly_values"] else {},
+                "record_id": row["record_id"],
+                "is_resolved": row["is_resolved"],
+                "resolution_note": row["resolution_note"]
+            })
+        return anomalies
+
+    def _load_conflicts_from_db(self) -> List[Dict]:
+        """从数据库加载本批次的冲突数据"""
+        cursor = self.db.conn.cursor()
+        cursor.execute(f"SELECT * FROM {CONFLICTS_TABLE} WHERE batch_id = ? ORDER BY created_at", (self.batch_id,))
+        rows = cursor.fetchall()
+        conflicts = []
+        for row in rows:
+            conflicts.append({
+                "id": row["id"],
+                "field_name": row["field_name"],
+                "source_a": row["source_a"],
+                "source_b": row["source_b"],
+                "value_a": row["value_a"],
+                "value_b": row["value_b"],
+                "evidence_a": row["evidence_a"],
+                "evidence_b": row["evidence_b"],
+                "suggested_action": row["suggested_action"],
+                "is_resolved": row["is_resolved"],
+                "resolution": row["resolution"]
+            })
+        return conflicts
+
+    def _load_supplements_from_db(self) -> List[Dict]:
+        """从数据库加载本批次的补录数据"""
+        cursor = self.db.conn.cursor()
+        cursor.execute(f"SELECT * FROM {SUPPLEMENTS_TABLE} WHERE batch_id = ? ORDER BY created_at", (self.batch_id,))
+        rows = cursor.fetchall()
+        supplements = []
+        for row in rows:
+            supplements.append({
+                "id": row["id"],
+                "target_record_id": row["target_record_id"],
+                "supplement_type": row["supplement_type"],
+                "field_name": row["field_name"],
+                "old_value": row["old_value"],
+                "new_value": row["new_value"],
+                "remark": row["remark"],
+                "operator": row["operator"],
+                "created_at": row["created_at"]
+            })
+        return supplements
+
+    def _load_calc_audit_from_db(self, record_id: str) -> List[Dict]:
+        """从数据库加载指定记录的计算步骤"""
+        cursor = self.db.conn.cursor()
+        cursor.execute(
+            f"SELECT id, calc_type, result_value, param_version FROM {CALCULATIONS_TABLE} WHERE record_id = ? AND batch_id = ?",
+            (record_id, self.batch_id)
+        )
+        calcs = cursor.fetchall()
+        results = []
+        for calc in calcs:
+            step_cursor = self.db.conn.cursor()
+            step_cursor.execute(
+                f"SELECT step_order, step_name, formula, output_value FROM {CALC_STEPS_TABLE} WHERE calc_id = ? ORDER BY step_order",
+                (calc["id"],)
+            )
+            steps = []
+            for s in step_cursor.fetchall():
+                steps.append({
+                    "step_order": s["step_order"],
+                    "step_name": s["step_name"],
+                    "formula": s["formula"],
+                    "output_value": s["output_value"]
+                })
+            results.append({
+                "id": calc["id"],
+                "calc_type": calc["calc_type"],
+                "result_value": calc["result_value"],
+                "param_version": calc["param_version"],
+                "steps": steps
+            })
+        return results
+
+    def _build_drilldown_section(self, chart: Dict, personal_df: pd.DataFrame,
+                                 anomaly_list: List[Dict]) -> str:
+        """根据图表类型生成对应的真实下钻明细HTML"""
+        drilldown = chart.get("drilldown_config", {})
+        d_type = drilldown.get("type", "")
+        chart_id = chart["id"]
+        html_parts = []
+
+        if d_type == "by_section":
+            for section in personal_df["声部"].unique():
+                sec_df = personal_df[personal_df["声部"] == section].sort_values("个人综合分", ascending=False)
+                sec_id = f"drill_{chart_id}_{section}"
+                html_parts.append(f'''
+        <div style="margin:5px 0;">
+            <span class="drilldown-link" onclick="toggleDetail('{sec_id}')">▸ {section}（{len(sec_df)}人）</span>
+            <div id="{sec_id}" class="detail-section">
+                <table><tr><th>人员</th><th>综合分</th><th>音准</th><th>节奏</th><th>合声</th><th>音量</th><th>情感</th><th>出勤</th></tr>''')
+                for _, p in sec_df.iterrows():
+                    html_parts.append(f'<tr><td>{p.get("人员","")}</td><td><strong>{self._format_value(p.get("个人综合分",0))}</strong></td><td>{self._format_value(p.get("音准得分",0))}</td><td>{self._format_value(p.get("节奏得分",0))}</td><td>{self._format_value(p.get("合声得分",0))}</td><td>{self._format_value(p.get("音量平衡",0))}</td><td>{self._format_value(p.get("情感表达",0))}</td><td>{p.get("出勤状态","")}</td></tr>')
+                html_parts.append('</table></div></div>')
+
+        elif d_type == "by_category":
+            categories = ["音准得分", "节奏得分", "合声得分", "音量平衡", "情感表达"]
+            for cat in categories:
+                if cat not in personal_df.columns:
+                    continue
+                cat_id = f"drill_{chart_id}_{cat}"
+                sorted_df = personal_df[["声部", "人员", cat]].sort_values(cat, ascending=False)
+                html_parts.append(f'''
+        <div style="margin:5px 0;">
+            <span class="drilldown-link" onclick="toggleDetail('{cat_id}')">▸ {cat}排名</span>
+            <div id="{cat_id}" class="detail-section">
+                <table><tr><th>排名</th><th>声部</th><th>人员</th><th>{cat}</th></tr>''')
+                for rank, (_, p) in enumerate(sorted_df.iterrows(), 1):
+                    html_parts.append(f'<tr><td>{rank}</td><td>{p.get("声部","")}</td><td>{p.get("人员","")}</td><td>{self._format_value(p.get(cat,0))}</td></tr>')
+                html_parts.append('</table></div></div>')
+
+        elif d_type == "by_record":
+            for section in personal_df["声部"].unique():
+                sec_df = personal_df[personal_df["声部"] == section].sort_values("个人综合分", ascending=False)
+                sec_id = f"drill_{chart_id}_{section}"
+                html_parts.append(f'''
+        <div style="margin:5px 0;">
+            <span class="drilldown-link" onclick="toggleDetail('{sec_id}')">▸ {section} 人员得分</span>
+            <div id="{sec_id}" class="detail-section">
+                <table><tr><th>人员</th><th>综合分</th><th>音准</th><th>节奏</th><th>合声</th><th>音量</th><th>情感</th><th>记录ID</th></tr>''')
+                for _, p in sec_df.iterrows():
+                    rid = p.get("_record_id", "")
+                    html_parts.append(f'<tr><td>{p.get("人员","")}</td><td><strong>{self._format_value(p.get("个人综合分",0))}</strong></td><td>{self._format_value(p.get("音准得分",0))}</td><td>{self._format_value(p.get("节奏得分",0))}</td><td>{self._format_value(p.get("合声得分",0))}</td><td>{self._format_value(p.get("音量平衡",0))}</td><td>{self._format_value(p.get("情感表达",0))}</td><td><span class="record-id" onclick="toggleDetail(\'calc_{rid}\')">{rid[:8]}...</span></td></tr>')
+                html_parts.append('</table></div></div>')
+
+        elif d_type == "by_anomaly_type":
+            from .config import ANOMALY_TYPES
+            by_type = {}
+            for a in anomaly_list:
+                t = a["anomaly_type"]
+                if t not in by_type:
+                    by_type[t] = []
+                by_type[t].append(a)
+            for atype, items in by_type.items():
+                type_id = f"drill_{chart_id}_{atype}"
+                name = ANOMALY_TYPES.get(atype, atype)
+                sev_counts = {"high": 0, "medium": 0, "low": 0}
+                for item in items:
+                    if item["severity"] in sev_counts:
+                        sev_counts[item["severity"]] += 1
+                html_parts.append(f'''
+        <div style="margin:5px 0;">
+            <span class="drilldown-link" onclick="toggleDetail('{type_id}')">▸ {name}（{len(items)}个: 高{sev_counts["high"]} 中{sev_counts["medium"]} 低{sev_counts["low"]}）</span>
+            <div id="{type_id}" class="detail-section">
+                <table><tr><th>严重程度</th><th>描述</th><th>相关数值</th><th>异常ID</th></tr>''')
+                for item in items:
+                    sev_label = {"high": "高", "medium": "中", "low": "低"}.get(item["severity"], "")
+                    val_str = json.dumps(item.get("values", {}), ensure_ascii=False) if item.get("values") else "-"
+                    html_parts.append(f'<tr><td class="severity-{item["severity"]}">{sev_label}</td><td>{item["description"]}</td><td><small>{val_str}</small></td><td><span class="record-id">{item["id"][:8]}...</span></td></tr>')
+                html_parts.append('</table></div></div>')
+
+        elif d_type == "by_date_section":
+            if "排练日期" in personal_df.columns:
+                for date in personal_df["排练日期"].dropna().unique():
+                    date_str = str(date)
+                    date_df = personal_df[personal_df["排练日期"] == date]
+                    date_id = f"drill_{chart_id}_{date_str}"
+                    html_parts.append(f'''
+        <div style="margin:5px 0;">
+            <span class="drilldown-link" onclick="toggleDetail('{date_id}')">▸ {date_str}（{len(date_df)}人）</span>
+            <div id="{date_id}" class="detail-section">
+                <table><tr><th>声部</th><th>人员</th><th>综合分</th></tr>''')
+                    for _, p in date_df.sort_values("个人综合分", ascending=False).iterrows():
+                        html_parts.append(f'<tr><td>{p.get("声部","")}</td><td>{p.get("人员","")}</td><td>{self._format_value(p.get("个人综合分",0))}</td></tr>')
+                    html_parts.append('</table></div></div>')
+            else:
+                html_parts.append('<p><em>无排练日期数据</em></p>')
+
+        if not html_parts:
+            html_parts.append(f'<p><strong>图表ID:</strong> <span class="record-id">{chart_id}</span></p>')
+
+        return "\n".join(html_parts)
 
     def generate_text_report(self, calc_results: Dict[str, Any],
                             anomaly_summary: Dict,
@@ -301,9 +524,12 @@ class ReportGenerator:
     <h2>📈 分析图表</h2>
     <p><em>点击图表或链接可查看对应明细</em></p>
 """
+        drilldown_df = personal_df if not personal_df.empty else self._load_personal_df_from_db()
+        drilldown_anomalies = anomaly_summary.get("details", []) if anomaly_summary.get("details") else self._load_anomalies_from_db()
         for chart in self.chart_generator.charts:
             chart_path = Path(chart["file_path"])
             drilldown = chart["drilldown_config"]
+            drilldown_html = self._build_drilldown_section(chart, drilldown_df, drilldown_anomalies)
             html += f'''
     <div class="chart-container">
         <h3>{chart["chart_title"]}</h3>
@@ -313,8 +539,7 @@ class ReportGenerator:
             🔍 点击查看{drilldown.get("click_field", "")}明细
         </p>
         <div id="detail_{chart["id"]}" class="detail-section">
-            <p><strong>下钻说明:</strong> 点击{drilldown.get("click_field", "")}后可筛选对应人员明细</p>
-            <p><strong>图表ID:</strong> <span class="record-id">{chart["id"]}</span></p>
+            {drilldown_html}
         </div>
     </div>
 '''

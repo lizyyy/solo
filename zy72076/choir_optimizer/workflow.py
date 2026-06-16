@@ -13,7 +13,7 @@ from .conflict import ConflictDetector
 from .supplement import SupplementManager
 from .charts import ChartGenerator
 from .report import ReportGenerator
-from .database import get_db
+from .database import get_db, RAW_RECORDS_TABLE, CALCULATIONS_TABLE, CALC_STEPS_TABLE
 
 
 class ChoirOptimizationWorkflow:
@@ -297,11 +297,84 @@ class ChoirOptimizationWorkflow:
         """标记异常为已解决"""
         self.anomaly_detector.resolve_anomaly(anomaly_id, resolution_note, operator)
 
+    def _load_calc_results_from_db(self) -> Dict[str, Any]:
+        """从数据库加载计算结果"""
+        cursor = self.db.conn.cursor()
+        cursor.execute(
+            f"SELECT record_id, result_value FROM {CALCULATIONS_TABLE} WHERE batch_id = ? AND calc_type = '个人综合分'",
+            (self.batch_id,)
+        )
+        calc_map = {r["record_id"]: r["result_value"] for r in cursor.fetchall()}
+        rec_cursor = self.db.conn.cursor()
+        rec_cursor.execute(
+            f"SELECT id, normalized_data FROM {RAW_RECORDS_TABLE} WHERE batch_id = ?",
+            (self.batch_id,)
+        )
+        records = []
+        for row in rec_cursor.fetchall():
+            data = json.loads(row["normalized_data"])
+            data["_record_id"] = row["id"]
+            records.append(data)
+        personal_df = pd.DataFrame(records) if records else pd.DataFrame()
+        if not personal_df.empty and "人员" in personal_df.columns:
+            personal_df = personal_df[personal_df["人员"].notna() & (personal_df["人员"] != "")].copy()
+        if not personal_df.empty and "_record_id" in personal_df.columns:
+            personal_df["个人综合分"] = personal_df["_record_id"].map(calc_map)
+        from .calculator import CalculationEngine
+        engine = CalculationEngine(self.batch_id)
+        section_df = engine.calculate_section_metrics(personal_df) if not personal_df.empty else pd.DataFrame()
+        return {
+            "personal_scores": personal_df,
+            "section_metrics": section_df,
+            "param_version": self.param_manager.get_current_version_tag(),
+            "weights_used": engine.weights,
+            "thresholds_used": engine.thresholds
+        }
+
+    def _load_anomaly_summary_from_db(self) -> Dict[str, Any]:
+        """从数据库加载异常摘要"""
+        return self.anomaly_detector.get_anomaly_summary()
+
+    def _load_conflict_summary_from_db(self) -> Dict[str, Any]:
+        """从数据库加载冲突摘要"""
+        return self.conflict_detector.get_conflict_summary()
+
+    def _load_supplement_summary_from_db(self) -> Dict[str, Any]:
+        """从数据库加载补录摘要"""
+        return self.supplement_manager.get_supplement_summary()
+
     def export_all(self, output_dir: Optional[str] = None) -> Dict[str, Any]:
         """导出所有可复查数据"""
         from .config import EXPORTS_DIR
         if output_dir is None:
             output_dir = str(EXPORTS_DIR)
+        calc_results = self._calc_results if self._calc_results is not None else self._load_calc_results_from_db()
+        anomaly_summary = self._anomaly_summary if self._anomaly_summary is not None else self._load_anomaly_summary_from_db()
+        conflict_summary = self._conflict_summary if self._conflict_summary is not None else self._load_conflict_summary_from_db()
+        supplement_summary = self._supplement_summary if self._supplement_summary is not None else self._load_supplement_summary_from_db()
+        personal_df = calc_results.get("personal_scores", pd.DataFrame())
+        section_df = calc_results.get("section_metrics", pd.DataFrame())
+        calc_audit_cursor = self.db.conn.cursor()
+        calc_audit_cursor.execute(
+            f"SELECT c.id, c.record_id, c.calc_type, c.result_value, c.param_version, "
+            f"s.step_order, s.step_name, s.formula, s.output_value "
+            f"FROM {CALCULATIONS_TABLE} c LEFT JOIN {CALC_STEPS_TABLE} s ON c.id = s.calc_id "
+            f"WHERE c.batch_id = ? ORDER BY c.id, s.step_order",
+            (self.batch_id,)
+        )
+        calc_audit = []
+        for r in calc_audit_cursor.fetchall():
+            calc_audit.append({
+                "计算ID": r["id"],
+                "记录ID": r["record_id"],
+                "计算类型": r["calc_type"],
+                "结果值": r["result_value"],
+                "参数版本": r["param_version"],
+                "步骤序号": r["step_order"],
+                "步骤名称": r["step_name"],
+                "计算公式": r["formula"],
+                "步骤输出": r["output_value"]
+            })
         export_data = {
             "batch_id": self.batch_id,
             "exported_at": datetime.now().isoformat(),
@@ -311,14 +384,29 @@ class ChoirOptimizationWorkflow:
                 "diff_from_default": self.param_manager.compare_with_defaults()
             },
             "sources": self.importer.get_sources(),
-            "calculation_results": self._calc_results,
-            "anomalies": self._anomaly_summary,
-            "conflicts": self._conflict_summary,
-            "supplements": self._supplement_summary
+            "calculation_results": {
+                "personal_scores": personal_df.to_dict(orient="records") if not personal_df.empty else [],
+                "section_metrics": section_df.to_dict(orient="records") if not section_df.empty else [],
+                "param_version": calc_results.get("param_version", ""),
+                "weights_used": calc_results.get("weights_used", {}),
+                "thresholds_used": calc_results.get("thresholds_used", {}),
+                "total_people": len(personal_df),
+                "avg_score": round(float(personal_df["个人综合分"].mean()), 2) if not personal_df.empty and "个人综合分" in personal_df.columns else None,
+                "pass_rate": round(float((personal_df["个人综合分"] >= 80).mean() * 100), 2) if not personal_df.empty and "个人综合分" in personal_df.columns else None
+            },
+            "calc_audit": calc_audit,
+            "anomalies": anomaly_summary,
+            "conflicts": conflict_summary,
+            "supplements": supplement_summary
         }
         export_path = Path(output_dir) / f"{self.batch_id}_完整导出.json"
         with open(export_path, 'w', encoding='utf-8') as f:
             json.dump(export_data, f, ensure_ascii=False, indent=2, default=str)
+        self.db.log_audit(
+            "export_all",
+            {"export_path": str(export_path)},
+            batch_id=self.batch_id
+        )
         return {
             "export_path": str(export_path),
             "exported_at": datetime.now().isoformat()

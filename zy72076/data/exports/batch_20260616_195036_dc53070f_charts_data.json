@@ -1,0 +1,101 @@
+{
+  "batch_id": "batch_20260616_195036_dc53070f",
+  "generated_at": "2026-06-16T19:50:37.841793",
+  "charts": [
+    {
+      "id": "3116092a-3f97-4812-a8cf-d7bb99cddaed",
+      "type": "bar",
+      "title": "各声部排练综合得分对比",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy72076/output/charts/batch_20260616_195036_dc53070f_section_scores_195036.png",
+      "drilldown_config": {
+        "type": "by_section",
+        "click_field": "声部",
+        "query": "SELECT 人员, 个人综合分, 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达 FROM personal_df WHERE 声部 = ?",
+        "detail_columns": [
+          "人员",
+          "个人综合分",
+          "音准得分",
+          "节奏得分",
+          "合声得分",
+          "音量平衡",
+          "情感表达"
+        ]
+      }
+    },
+    {
+      "id": "ac31b0f0-b742-4d9a-b468-ad1965c5086a",
+      "type": "radar",
+      "title": "各声部能力维度雷达图",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy72076/output/charts/batch_20260616_195036_dc53070f_radar_195036.png",
+      "drilldown_config": {
+        "type": "by_category",
+        "click_field": "能力维度",
+        "query": "SELECT 声部, 人员, {field} FROM personal_df ORDER BY {field} DESC",
+        "detail_columns": [
+          "声部",
+          "人员",
+          "{field}"
+        ]
+      }
+    },
+    {
+      "id": "dbdd9143-1c8d-4059-a8e4-48df577e9194",
+      "type": "scatter",
+      "title": "个人综合得分分布",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy72076/output/charts/batch_20260616_195036_dc53070f_personal_scatter_195037.png",
+      "drilldown_config": {
+        "type": "by_record",
+        "click_field": "人员",
+        "query": "SELECT * FROM personal_df WHERE 人员 = ? AND 声部 = ?",
+        "record_id_field": "_record_id"
+      }
+    },
+    {
+      "id": "35eac5f5-70a1-493d-a24f-04eb0a051159",
+      "type": "stacked_bar",
+      "title": "各声部出勤情况",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy72076/output/charts/batch_20260616_195036_dc53070f_attendance_195037.png",
+      "drilldown_config": {
+        "type": "by_section",
+        "click_field": "声部",
+        "query": "SELECT 人员, 出勤状态 FROM personal_df WHERE 声部 = ?",
+        "detail_columns": [
+          "人员",
+          "出勤状态"
+        ]
+      }
+    },
+    {
+      "id": "65e06fe1-c65a-4b21-bd37-9d547242a7b3",
+      "type": "line",
+      "title": "各声部排练得分趋势",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy72076/output/charts/batch_20260616_195036_dc53070f_trend_195037.png",
+      "drilldown_config": {
+        "type": "by_date_section",
+        "click_field": "日期+声部",
+        "query": "SELECT 人员, 个人综合分 FROM personal_df WHERE 排练日期 = ? AND 声部 = ?",
+        "detail_columns": [
+          "人员",
+          "个人综合分"
+        ]
+      }
+    },
+    {
+      "id": "a3ab910a-c4b4-45e8-827c-b8c6900b0c77",
+      "type": "pie",
+      "title": "异常检测汇总",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy72076/output/charts/batch_20260616_195036_dc53070f_anomalies_195037.png",
+      "drilldown_config": {
+        "type": "by_anomaly_type",
+        "click_field": "异常类型",
+        "query": "SELECT anomaly_type, severity, description, anomaly_values FROM anomalies WHERE anomaly_type = ?",
+        "detail_columns": [
+          "异常类型",
+          "严重程度",
+          "描述",
+          "相关数值"
+        ]
+      }
+    }
+  ]
+}

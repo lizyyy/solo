@@ -1,0 +1,330 @@
+{
+  "total": 9,
+  "by_severity": {
+    "high": 0,
+    "medium": 0,
+    "low": 9
+  },
+  "by_type": {
+    "boundary_sample": {
+      "count": 9,
+      "name": "边界样本（接近阈值）",
+      "items": [
+        {
+          "id": "6b27b2a5-e67f-45e0-97df-87c9504bd516",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "女高音 - 王芳芳 得分80.45高于达标线80仅0.5分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 80.45,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "高于",
+            "distance": 0.45000000000000284,
+            "section": "女高音",
+            "member": "王芳芳"
+          },
+          "record_id": "b228b19b-3e8d-45cd-a475-91e6f69b294b"
+        },
+        {
+          "id": "7d75e56b-9c30-42d8-b156-ca8357652447",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "女低音 - 赵丽娟 得分79.8低于达标线80仅0.2分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 79.8,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "低于",
+            "distance": 0.20000000000000284,
+            "section": "女低音",
+            "member": "赵丽娟"
+          },
+          "record_id": "83b03e6e-4ffc-4b9a-841d-819aa1f2be1c"
+        },
+        {
+          "id": "692927bb-611e-49d1-891a-e591cf7c4950",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "女低音 - 黄静怡 得分77.4低于达标线80仅2.6分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 77.4,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "低于",
+            "distance": 2.5999999999999943,
+            "section": "女低音",
+            "member": "黄静怡"
+          },
+          "record_id": "cf541dfa-232e-4bb0-b0a8-8f167e188b42"
+        },
+        {
+          "id": "7549f236-6be8-42dd-b549-6dac715c545a",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "女低音 - 吴秀兰 得分78.35低于达标线80仅1.7分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 78.35,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "低于",
+            "distance": 1.6500000000000057,
+            "section": "女低音",
+            "member": "吴秀兰"
+          },
+          "record_id": "2c198b31-cbe6-4f79-ae89-e7d89ce1e4fb"
+        },
+        {
+          "id": "7209896a-f2ac-4987-83ea-1037675139ef",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "女低音 - 郑春梅 得分82.55高于达标线80仅2.5分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 82.55,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "高于",
+            "distance": 2.549999999999997,
+            "section": "女低音",
+            "member": "郑春梅"
+          },
+          "record_id": "3fbb7f36-84a9-471f-9799-eb699c6dc11d"
+        },
+        {
+          "id": "0b578b8e-7b77-4064-ae2b-f640c0f12944",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "男高音 - 吴明辉 得分82.2高于达标线80仅2.2分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 82.2,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "高于",
+            "distance": 2.200000000000003,
+            "section": "男高音",
+            "member": "吴明辉"
+          },
+          "record_id": "ea839ad3-3126-44a1-97bd-150c2ea7158b"
+        },
+        {
+          "id": "0c6e135a-9780-4f22-a6b0-9941e4461ea8",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "男低音 - 马晓东 得分79.05低于达标线80仅1.0分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 79.05,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "低于",
+            "distance": 0.9500000000000028,
+            "section": "男低音",
+            "member": "马晓东"
+          },
+          "record_id": "e810b669-0cd6-4ee6-92f6-0c8f9e893c07"
+        },
+        {
+          "id": "f837f2b2-98d2-47ee-bb66-6a2b841a1959",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "男低音 - 杜文斌 得分77.75低于达标线80仅2.2分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 77.75,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "低于",
+            "distance": 2.25,
+            "section": "男低音",
+            "member": "杜文斌"
+          },
+          "record_id": "5905bb17-3c76-4584-bf38-b032874a59ec"
+        },
+        {
+          "id": "2201b205-87f8-41c0-91f3-7f91ba0d1522",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "男低音 - 许鹏飞 得分79.95低于达标线80仅0.0分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 79.95,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "低于",
+            "distance": 0.04999999999999716,
+            "section": "男低音",
+            "member": "许鹏飞"
+          },
+          "record_id": "87059211-51a5-4985-bd8c-ad5ab2c87ca8"
+        }
+      ]
+    }
+  },
+  "sections_affected": [
+    "男高音",
+    "男低音",
+    "女低音",
+    "女高音"
+  ],
+  "details": [
+    {
+      "id": "6b27b2a5-e67f-45e0-97df-87c9504bd516",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "女高音 - 王芳芳 得分80.45高于达标线80仅0.5分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 80.45,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "高于",
+        "distance": 0.45000000000000284,
+        "section": "女高音",
+        "member": "王芳芳"
+      },
+      "record_id": "b228b19b-3e8d-45cd-a475-91e6f69b294b"
+    },
+    {
+      "id": "7d75e56b-9c30-42d8-b156-ca8357652447",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "女低音 - 赵丽娟 得分79.8低于达标线80仅0.2分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 79.8,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "低于",
+        "distance": 0.20000000000000284,
+        "section": "女低音",
+        "member": "赵丽娟"
+      },
+      "record_id": "83b03e6e-4ffc-4b9a-841d-819aa1f2be1c"
+    },
+    {
+      "id": "692927bb-611e-49d1-891a-e591cf7c4950",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "女低音 - 黄静怡 得分77.4低于达标线80仅2.6分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 77.4,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "低于",
+        "distance": 2.5999999999999943,
+        "section": "女低音",
+        "member": "黄静怡"
+      },
+      "record_id": "cf541dfa-232e-4bb0-b0a8-8f167e188b42"
+    },
+    {
+      "id": "7549f236-6be8-42dd-b549-6dac715c545a",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "女低音 - 吴秀兰 得分78.35低于达标线80仅1.7分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 78.35,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "低于",
+        "distance": 1.6500000000000057,
+        "section": "女低音",
+        "member": "吴秀兰"
+      },
+      "record_id": "2c198b31-cbe6-4f79-ae89-e7d89ce1e4fb"
+    },
+    {
+      "id": "7209896a-f2ac-4987-83ea-1037675139ef",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "女低音 - 郑春梅 得分82.55高于达标线80仅2.5分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 82.55,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "高于",
+        "distance": 2.549999999999997,
+        "section": "女低音",
+        "member": "郑春梅"
+      },
+      "record_id": "3fbb7f36-84a9-471f-9799-eb699c6dc11d"
+    },
+    {
+      "id": "0b578b8e-7b77-4064-ae2b-f640c0f12944",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "男高音 - 吴明辉 得分82.2高于达标线80仅2.2分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 82.2,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "高于",
+        "distance": 2.200000000000003,
+        "section": "男高音",
+        "member": "吴明辉"
+      },
+      "record_id": "ea839ad3-3126-44a1-97bd-150c2ea7158b"
+    },
+    {
+      "id": "0c6e135a-9780-4f22-a6b0-9941e4461ea8",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "男低音 - 马晓东 得分79.05低于达标线80仅1.0分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 79.05,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "低于",
+        "distance": 0.9500000000000028,
+        "section": "男低音",
+        "member": "马晓东"
+      },
+      "record_id": "e810b669-0cd6-4ee6-92f6-0c8f9e893c07"
+    },
+    {
+      "id": "f837f2b2-98d2-47ee-bb66-6a2b841a1959",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "男低音 - 杜文斌 得分77.75低于达标线80仅2.2分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 77.75,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "低于",
+        "distance": 2.25,
+        "section": "男低音",
+        "member": "杜文斌"
+      },
+      "record_id": "5905bb17-3c76-4584-bf38-b032874a59ec"
+    },
+    {
+      "id": "2201b205-87f8-41c0-91f3-7f91ba0d1522",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "男低音 - 许鹏飞 得分79.95低于达标线80仅0.0分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 79.95,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "低于",
+        "distance": 0.04999999999999716,
+        "section": "男低音",
+        "member": "许鹏飞"
+      },
+      "record_id": "87059211-51a5-4985-bd8c-ad5ab2c87ca8"
+    }
+  ]
+}

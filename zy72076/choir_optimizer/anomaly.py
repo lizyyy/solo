@@ -286,6 +286,8 @@ class AnomalyDetector:
 
     def get_anomaly_summary(self) -> Dict[str, Any]:
         """获取异常汇总，确保例外不会在汇总数字里消失"""
+        if not self.anomalies:
+            self._load_anomalies_from_db()
         summary = {
             "total": len(self.anomalies),
             "by_severity": {
@@ -311,6 +313,25 @@ class AnomalyDetector:
                 sections.add(a["values"]["section"])
         summary["sections_affected"] = list(sections)
         return summary
+
+    def _load_anomalies_from_db(self):
+        """从数据库加载异常数据到内存"""
+        cursor = self.db.conn.cursor()
+        cursor.execute(f"SELECT * FROM {ANOMALIES_TABLE} WHERE batch_id = ? ORDER BY created_at", (self.batch_id,))
+        rows = cursor.fetchall()
+        self.anomalies = []
+        for row in rows:
+            self.anomalies.append({
+                "id": row["id"],
+                "anomaly_type": row["anomaly_type"],
+                "anomaly_name": ANOMALY_TYPES.get(row["anomaly_type"], row["anomaly_type"]),
+                "description": row["anomaly_description"],
+                "severity": row["severity"],
+                "values": json.loads(row["anomaly_values"]) if row["anomaly_values"] else {},
+                "record_id": row["record_id"],
+                "is_resolved": row["is_resolved"],
+                "resolution_note": row["resolution_note"]
+            })
 
     def resolve_anomaly(self, anomaly_id: str, resolution_note: str, operator: str = "周姐"):
         """标记异常为已解决"""
