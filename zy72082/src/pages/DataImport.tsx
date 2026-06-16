@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
+import * as XLSX from 'xlsx'
 import {
   Upload,
   MapPin,
@@ -9,6 +10,7 @@ import {
   RefreshCw,
   Save,
   Trash2,
+  FileUp,
 } from 'lucide-react'
 import { useStore } from '@/store'
 import {
@@ -85,6 +87,9 @@ export default function DataImport() {
   const [importMessage, setImportMessage] = useState<string | null>(null)
   const [editingRecordId, setEditingRecordId] = useState<number | null>(null)
   const [editForm, setEditForm] = useState<Partial<UnifiedRecord>>({})
+  const [isDragging, setIsDragging] = useState(false)
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     loadData()
@@ -111,14 +116,19 @@ export default function DataImport() {
     })
   }
 
-  const handleImport = async () => {
-    if (!csvText.trim()) {
-      setImportMessage('请先输入或粘贴 CSV 数据')
-      return
-    }
-    const { headers, rows } = parseCSV(csvText)
+  const parseExcel = (buffer: ArrayBuffer) => {
+    const workbook = XLSX.read(buffer, { type: 'array' })
+    const firstSheet = workbook.Sheets[workbook.SheetNames[0]]
+    const data = XLSX.utils.sheet_to_json(firstSheet, { header: 1 }) as string[][]
+    if (data.length < 2) return { headers: [], rows: [] }
+    const headers = data[0].map((h) => String(h || '').trim())
+    const rows = data.slice(1).map((row) => row.map((c) => String(c || '').trim()))
+    return { headers, rows }
+  }
+
+  const processParsedData = useCallback(async (headers: string[], rows: string[][], fileName: string) => {
     if (headers.length === 0) {
-      setImportMessage('CSV 解析失败，请检查格式')
+      setImportMessage('文件解析失败，请检查格式')
       return
     }
 
@@ -144,7 +154,7 @@ export default function DataImport() {
     setFieldMap(defaultMap)
     setUnitConvs(defaultUnits)
 
-    const name = sourceName || SOURCE_TYPE_LABELS[sourceType]
+    const name = sourceName || fileName || SOURCE_TYPE_LABELS[sourceType]
     const dsId = await addDataSource({
       type: sourceType,
       name,
@@ -215,6 +225,87 @@ export default function DataImport() {
     const inserted = await addRecords(recs)
     setImportMessage(`成功导入 ${inserted.length} 条记录，来源：${name}`)
     setTimeout(() => setImportMessage(null), 5000)
+  }, [sourceType, sourceName, addDataSource, addRecords, parseHeaders])
+
+  const handleFileUpload = useCallback(async (file: File) => {
+    const ext = file.name.split('.').pop()?.toLowerCase()
+    const validExts = ['csv', 'xlsx', 'xls']
+
+    if (!ext || !validExts.includes(ext)) {
+      setImportMessage('不支持的文件格式，请上传 CSV 或 Excel 文件')
+      setTimeout(() => setImportMessage(null), 5000)
+      return
+    }
+
+    setSelectedFileName(file.name)
+    setSourceName(file.name.replace(/\.(csv|xlsx|xls)$/i, ''))
+
+    try {
+      const buffer = await file.arrayBuffer()
+      let headers: string[] = []
+      let rows: string[][] = []
+
+      if (ext === 'csv') {
+        const text = new TextDecoder('utf-8').decode(buffer)
+        const result = parseCSV(text)
+        headers = result.headers
+        rows = result.rows
+        setCsvText(text)
+      } else {
+        const result = parseExcel(buffer)
+        headers = result.headers
+        rows = result.rows
+        const csvContent = [
+          headers.join(','),
+          ...rows.map((r) => r.join(','))
+        ].join('\n')
+        setCsvText(csvContent)
+      }
+
+      processParsedData(headers, rows, file.name)
+    } catch (e) {
+      setImportMessage('文件解析失败：' + (e as Error).message)
+      setTimeout(() => setImportMessage(null), 5000)
+    }
+  }, [processParsedData])
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }, [])
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+  }, [])
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    const files = e.dataTransfer.files
+    if (files.length > 0) {
+      handleFileUpload(files[0])
+    }
+  }, [handleFileUpload])
+
+  const handleFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (files && files.length > 0) {
+      handleFileUpload(files[0])
+    }
+  }, [handleFileUpload])
+
+  const triggerFileInput = useCallback(() => {
+    fileInputRef.current?.click()
+  }, [])
+
+  const handleImport = async () => {
+    if (!csvText.trim()) {
+      setImportMessage('请先输入或粘贴 CSV 数据，或上传文件')
+      return
+    }
+    const { headers, rows } = parseCSV(csvText)
+    await processParsedData(headers, rows, selectedFileName || SOURCE_TYPE_LABELS[sourceType])
   }
 
   const handleSaveMapping = async () => {
@@ -291,6 +382,11 @@ export default function DataImport() {
       setFieldMap({})
       setUnitConvs({})
       setCurrentSourceId(null)
+      setSelectedFileName(null)
+      setIsDragging(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
       setImportMessage('所有数据已清空')
       setTimeout(() => setImportMessage(null), 3000)
     }
@@ -374,8 +470,48 @@ export default function DataImport() {
           <h3 className="font-semibold text-teal-900 flex items-center gap-2">
             <FileSpreadsheet className="w-4 h-4" /> 数据源录入
           </h3>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv,.xlsx,.xls"
+            className="hidden"
+            onChange={handleFileInputChange}
+          />
+          <div
+            className={`border-2 border-dashed rounded-lg p-4 text-center transition-all cursor-pointer ${
+              isDragging
+                ? 'border-teal-500 bg-teal-50'
+                : 'border-slate-300 hover:border-teal-400 hover:bg-slate-50'
+            }`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={triggerFileInput}
+          >
+            <FileUp className="w-8 h-8 mx-auto text-slate-400 mb-2" />
+            <p className="text-sm text-slate-600">
+              拖拽文件到此处，或<span className="text-teal-600 font-medium">点击选择文件</span>
+            </p>
+            <p className="text-xs text-slate-400 mt-1">
+              支持 CSV、Excel（.xlsx/.xls）格式
+            </p>
+            {selectedFileName && (
+              <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 bg-teal-100 text-teal-800 rounded-full text-xs">
+                <FileSpreadsheet className="w-3 h-3" />
+                {selectedFileName}
+              </div>
+            )}
+          </div>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-200"></div>
+            </div>
+            <div className="relative flex justify-center">
+              <span className="px-2 bg-white text-xs text-slate-400">或粘贴 CSV 文本</span>
+            </div>
+          </div>
           <textarea
-            className="input-field min-h-[140px] font-mono text-xs"
+            className="input-field min-h-[100px] font-mono text-xs"
             placeholder="粘贴 CSV 数据，第一行为表头..."
             value={csvText}
             onChange={(e) => setCsvText(e.target.value)}
