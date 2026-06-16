@@ -12,24 +12,20 @@ const ExportPage: React.FC = () => {
   const { session } = useAnalysisStore();
   const [exportingFormat, setExportingFormat] = useState<string | null>(null);
 
-  const dataPoints = session?.dataPoints ?? [];
+  const dataPoints = useMemo(() => session?.dataPoints ?? [], [session?.dataPoints]);
   const stats = useMemo(() => calculateStatistics(dataPoints), [dataPoints]);
-  const metadata = session?.metadata ?? { source: '', processedAt: 0, processor: '', remarks: '' };
-  const anomalyConfig = session?.anomalyConfig ?? { method: 'iqr' as const, iqrMultiplier: 1.5, zscoreThreshold: 3.0 };
-  const hasSupplementaryNote = session?.hasSupplementaryNote ?? false;
-  const dataBeforeSupplementary = session?.dataBeforeSupplementary;
 
   const report: ExportReport = useMemo(() => ({
     title: session?.name ?? '',
     exportedAt: Date.now(),
-    metadata,
-    anomalyConfig,
+    metadata: session?.metadata ?? { source: '', processedAt: 0, processor: '', remarks: '' },
+    anomalyConfig: session?.anomalyConfig ?? { method: 'iqr' as const, iqrMultiplier: 1.5, zscoreThreshold: 3.0 },
     statistics: stats,
     dataPoints,
-    supplementaryNote: metadata.supplementaryNote,
-    hasSupplementaryNote,
-    dataBeforeSupplementary
-  }), [session, stats, metadata, anomalyConfig, dataPoints, hasSupplementaryNote, dataBeforeSupplementary]);
+    supplementaryNote: session?.metadata?.supplementaryNote,
+    hasSupplementaryNote: session?.hasSupplementaryNote ?? false,
+    dataBeforeSupplementary: session?.dataBeforeSupplementary
+  }), [session, stats, dataPoints]);
 
   if (!session || session.dataPoints.length === 0) {
     return (

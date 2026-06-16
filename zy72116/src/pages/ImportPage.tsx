@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Upload, FileText, Play, AlertCircle, CheckCircle, Info } from 'lucide-react';
 import { useAnalysisStore } from '../store/analysisStore';
 import { parseCSV } from '../utils/csvParser';
-import { generateSampleData, sampleDataCSV, dirtyDataCSV } from '../utils/sampleData';
+import { generateSampleData, dirtyDataCSV } from '../utils/sampleData';
 
 const ImportPage: React.FC = () => {
   const navigate = useNavigate();

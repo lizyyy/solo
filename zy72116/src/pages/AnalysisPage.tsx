@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, 
+  Line, XAxis, YAxis, CartesianGrid, 
   Tooltip, Legend, ResponsiveContainer, Scatter,
-  ComposedChart, Bar, Cell
+  ComposedChart, Cell
 } from 'recharts';
 import { 
   AlertTriangle, CheckCircle, XCircle, Settings, 
@@ -22,7 +22,7 @@ const AnalysisPage: React.FC = () => {
   const [supplementaryNote, setSupplementaryNote] = useState('');
   const [showDataTable, setShowDataTable] = useState(true);
 
-  const dataPoints = session?.dataPoints ?? [];
+  const dataPoints = useMemo(() => session?.dataPoints ?? [], [session?.dataPoints]);
   const stats = useMemo(() => calculateStatistics(dataPoints), [dataPoints]);
   const movingAvg = useMemo(() => calculateMovingAverage(dataPoints, 3), [dataPoints]);
 
