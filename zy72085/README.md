@@ -26,10 +26,11 @@ pip3 install -r requirements.txt
 python3 cli.py generate-examples
 ```
 
-会在 `examples/` 目录下生成 `sample_data.csv`，包含8条测试数据：
+会在 `examples/` 目录下生成 `sample_data.csv`，包含9条测试数据：
 - 第1-3条：正常计算示例
-- 第4条：与讲义冲突示例
-- 第5-8条：越界错误示例
+- 第4条：与讲义冲突示例 - 利润率60%
+- 第5条：与讲义冲突示例 - 动态调整75%
+- 第6-9条：越界错误示例
 
 ### 3. 单条计算
 
@@ -185,12 +186,19 @@ python3 cli.py calculate -pc 5000 -ea 1000 -pm 0.2 -d 10 -tsr 0.7
 ```
 预期：计算失败，提示"制作成本低于最小值10000CNY"
 
-### 场景3：与讲义冲突
+### 场景3：与讲义冲突（利润率60%）
 
 ```bash
 python3 cli.py calculate -pc 50000 -ea 200 -pm 0.6 -d 45 -tsr 0.5
 ```
 预期：计算成功，但标记"需人工审核"，提示利润率超出讲义建议范围
+
+### 场景4：与讲义冲突（动态调整75%）
+
+```bash
+python3 cli.py calculate -pc 600000 -ea 3000 -pm 0.3 -d 0 -tsr 1.0 -wf 1
+```
+预期：计算成功，但标记"需人工审核"，提示动态调整75%超出讲义建议的±50%范围
 
 ## 后续处理建议
 

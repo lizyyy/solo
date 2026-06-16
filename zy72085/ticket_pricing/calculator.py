@@ -105,6 +105,19 @@ class TicketPricingCalculator:
                     suggestion="建议确认利润率是否合理，超出讲义建议范围"
                 ))
         
+        dynamic_multiplier = inputs.get("dynamic_multiplier")
+        if dynamic_multiplier:
+            dm_value = dynamic_multiplier[0]
+            adjustment_pct = (dm_value - 1.0) * 100
+            if abs(adjustment_pct) > 50:
+                direction = "上调" if adjustment_pct > 0 else "下调"
+                conflicts.append(ConflictNote(
+                    item="dynamic_multiplier",
+                    lecture_says=self.config.lecture_notes["dynamic_adjustment"],
+                    data_says=f"实际动态调整为 {direction} {abs(adjustment_pct):.1f}% (倍率={dm_value:.4f}x)",
+                    suggestion="建议确认动态调整幅度是否合理，超出讲义建议的±50%范围"
+                ))
+        
         return conflicts
     
     def calculate(self, 
@@ -199,6 +212,11 @@ class TicketPricingCalculator:
                 result=dynamic_multiplier,
                 result_unit="x"
             ))
+            
+            dm_conflicts = self._check_conflicts({
+                "dynamic_multiplier": (dynamic_multiplier, "x")
+            })
+            result.conflicts.extend(dm_conflicts)
             
             formula = self.config.formulas["final_price"]
             final_price = self._safe_eval(
