@@ -4,18 +4,17 @@ import { exportReportCSV, exportDetailCSV, downloadCSV } from '@/utils/export';
 import { Download, CheckCircle2 } from 'lucide-react';
 
 export default function ExportPanel() {
-  const { filteredSamples, filteredChains } = useFilteredData();
-  const issues = useStore((s) => s.issues);
+  const { filteredSamples, filteredChains, filteredIssues } = useFilteredData();
   const reviews = useStore((s) => s.reviews);
   const caliberLabel = useStore((s) => s.caliberLabel);
 
   const handleExportReport = () => {
-    const content = exportReportCSV(filteredSamples, filteredChains, issues, reviews, caliberLabel);
+    const content = exportReportCSV(filteredSamples, filteredChains, filteredIssues, reviews, caliberLabel);
     downloadCSV(content, `发车间隔优化报告_${new Date().toLocaleDateString('zh-CN')}.csv`);
   };
 
   const handleExportDetail = () => {
-    const content = exportDetailCSV(filteredSamples, filteredChains, issues, caliberLabel);
+    const content = exportDetailCSV(filteredSamples, filteredChains, filteredIssues, caliberLabel);
     downloadCSV(content, `发车间隔优化明细_${new Date().toLocaleDateString('zh-CN')}.csv`);
   };
 

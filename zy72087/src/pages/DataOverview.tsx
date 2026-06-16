@@ -10,7 +10,6 @@ import { useNavigate } from 'react-router-dom';
 
 export default function DataOverview() {
   const { filteredSamples } = useFilteredData();
-  const { filteredChains } = useFilteredData();
   const caliberLabel = useStore((s) => s.caliberLabel);
   const totalSamples = useStore((s) => s.samples.length);
   const importHistory = useStore((s) => s.importHistory);

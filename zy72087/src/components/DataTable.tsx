@@ -1,7 +1,6 @@
-import { useStore } from '@/store/useStore';
 import { useFilteredData } from '@/hooks/useFilteredData';
 import { isDuplicate, getSampleIssues, formatInterval } from '@/engine/validator';
-import { ISSUE_TYPE_LABELS, SUGGESTION_LEVEL_LABELS, type IssueType } from '@/types';
+import { ISSUE_TYPE_LABELS, type IssueType } from '@/types';
 import { cn } from '@/lib/utils';
 
 const QUALITY_BADGE: Record<
@@ -47,14 +46,13 @@ const COLUMNS = [
 ] as const;
 
 export default function DataTable() {
-  const { filteredSamples, filteredChains } = useFilteredData();
-  const issues = useStore((s) => s.issues);
+  const { filteredSamples, filteredChains, filteredIssues } = useFilteredData();
 
   const chainMap = new Map(filteredChains.map((c) => [c.sampleId, c]));
 
   function getQualityBadges(sampleId: string) {
-    const sampleIssues = getSampleIssues(sampleId, issues);
-    const dup = isDuplicate(sampleId, issues);
+    const sampleIssues = getSampleIssues(sampleId, filteredIssues);
+    const dup = isDuplicate(sampleId, filteredIssues);
     const badges: { type: IssueType; label: string; cls: string }[] = [];
 
     for (const issue of sampleIssues) {

@@ -26,7 +26,9 @@ export function exportReportCSV(
     weight_unclosed: '权重未闭合',
   };
   for (const t of issueTypes) {
-    const count = issues.filter((i) => i.type === t).length;
+    const count = issues
+      .filter((i) => i.type === t)
+      .reduce((sum, i) => sum + i.sampleIds.length, 0);
     rows.push(`${typeLabels[t]},${count}条`);
   }
   rows.push(``);

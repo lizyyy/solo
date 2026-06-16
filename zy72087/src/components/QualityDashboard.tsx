@@ -1,5 +1,5 @@
 import { AlertTriangle, AlertCircle, Info } from 'lucide-react';
-import { useStore } from '@/store/useStore';
+import { useFilteredData } from '@/hooks/useFilteredData';
 import { getIssueSummary } from '@/engine/validator';
 import { ISSUE_TYPE_LABELS, type IssueType } from '@/types';
 import { cn } from '@/lib/utils';
@@ -57,8 +57,8 @@ function getIconColor(count: number, severity: 'error' | 'warning' | 'info') {
 }
 
 export default function QualityDashboard() {
-  const issues = useStore((s) => s.issues);
-  const summary = getIssueSummary(issues);
+  const { filteredIssues } = useFilteredData();
+  const summary = getIssueSummary(filteredIssues);
 
   return (
     <div>

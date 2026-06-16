@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '@/store/useStore';
-import { useFilteredData, useReviewForSample, useSampleById } from '@/hooks/useFilteredData';
+import { useFilteredData } from '@/hooks/useFilteredData';
 import ReasoningChain from '@/components/ReasoningChain';
 import ManualReview from '@/components/ManualReview';
 import OldCaliberCard from '@/components/OldCaliberCard';
@@ -89,7 +89,7 @@ export default function Optimize() {
 
         {isExpanded && (
           <div className="px-4 pb-4 space-y-4">
-            <ReasoningChain chain={chain} sample={sample} />
+            <ReasoningChain chain={chain} />
             {chain.needsManualReview && (
               <ManualReview sampleId={chain.sampleId} />
             )}

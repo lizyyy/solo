@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Filter, RotateCcw } from 'lucide-react';
 import { useStore } from '@/store/useStore';
-import { ISSUE_TYPE_LABELS, type IssueType } from '@/types';
+import { ISSUE_TYPE_LABELS } from '@/types';
 
 const TIME_PERIODS = ['早高峰', '平峰', '晚高峰'];
 const SOURCES = ['调度系统', '人工记录', '旧台账'];

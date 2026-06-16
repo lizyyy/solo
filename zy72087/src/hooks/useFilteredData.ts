@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useStore } from '@/store/useStore';
-import type { HistoricalSample, ReasoningChain, ManualReview } from '@/types';
+import type { HistoricalSample, ReasoningChain, ManualReview, QualityIssue } from '@/types';
 import { isDuplicate } from '@/engine/validator';
 
 export function useFilteredData() {
@@ -34,7 +34,26 @@ export function useFilteredData() {
     return chains.filter((c) => filteredIds.has(c.sampleId));
   }, [filteredSamples, chains]);
 
-  return { filteredSamples, filteredChains };
+  const filteredIssues = useMemo(() => {
+    const filteredIds = new Set(filteredSamples.map((s) => s.id));
+    const result: QualityIssue[] = [];
+    for (const issue of issues) {
+      if (issue.type === 'weight_unclosed') {
+        result.push(issue);
+      } else {
+        const inScopeIds = issue.sampleIds.filter((id) => filteredIds.has(id));
+        if (inScopeIds.length > 0) {
+          result.push({
+            ...issue,
+            sampleIds: inScopeIds,
+          });
+        }
+      }
+    }
+    return result;
+  }, [filteredSamples, issues]);
+
+  return { filteredSamples, filteredChains, filteredIssues };
 }
 
 export function useReviewForSample(sampleId: string): ManualReview | undefined {

@@ -1,4 +1,4 @@
-import type { ReasoningChain, HistoricalSample, StepType, SuggestionLevel } from '@/types';
+import type { ReasoningChain, StepType, SuggestionLevel } from '@/types';
 import { cn } from '@/lib/utils';
 import { CheckCircle2, AlertTriangle, XCircle, ArrowRight } from 'lucide-react';
 
@@ -47,10 +47,9 @@ const LevelIcon = ({ level }: { level: SuggestionLevel }) => {
 
 interface ReasoningChainProps {
   chain: ReasoningChain;
-  sample: HistoricalSample;
 }
 
-export default function ReasoningChainPanel({ chain, sample }: ReasoningChainProps) {
+export default function ReasoningChainPanel({ chain }: ReasoningChainProps) {
   return (
     <div className="flex gap-4">
       <div className="flex flex-col items-center">
