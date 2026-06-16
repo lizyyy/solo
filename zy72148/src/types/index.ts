@@ -30,6 +30,7 @@ export interface Version {
   changeNote: string;
   createdAt: string;
   recordCount: number;
+  records: RoomAllocation[];
 }
 
 export interface ChangeLog {

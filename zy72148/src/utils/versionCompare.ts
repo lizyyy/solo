@@ -1,5 +1,5 @@
 import type { RoomAllocation } from '@/types';
-import { generateRecordHash } from './dataQuality';
+import { generateIdentityHash } from './dataQuality';
 
 export interface VersionDiff {
   type: 'added' | 'removed' | 'modified';
@@ -21,12 +21,12 @@ export const compareVersions = (
   const newMap = new Map<string, RoomAllocation>();
   
   oldRecords.forEach(record => {
-    const hash = generateRecordHash(record);
+    const hash = generateIdentityHash(record);
     oldMap.set(hash, record);
   });
   
   newRecords.forEach(record => {
-    const hash = generateRecordHash(record);
+    const hash = generateIdentityHash(record);
     newMap.set(hash, record);
   });
   

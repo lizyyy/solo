@@ -19,7 +19,7 @@ const FIELD_LABELS: Record<string, string> = {
 
 export const VersionManage = () => {
   const versions = useAllocationStore(state => state.versions);
-  const allocations = useAllocationStore(state => state.allocations);
+  const getVersionAllocations = useAllocationStore(state => state.getVersionAllocations);
   const [selectedVersionId, setSelectedVersionId] = useState<string | null>(null);
   const [compareVersionId, setCompareVersionId] = useState<string | null>(null);
 
@@ -40,10 +40,10 @@ export const VersionManage = () => {
 
   const diff: VersionDiff[] = useMemo(() => {
     if (!selectedVersionId || !compareVersionId) return [];
-    const oldRecords = allocations.filter(a => a.versionId === compareVersionId);
-    const newRecords = allocations.filter(a => a.versionId === selectedVersionId);
+    const oldRecords = getVersionAllocations(compareVersionId);
+    const newRecords = getVersionAllocations(selectedVersionId);
     return compareVersions(oldRecords, newRecords);
-  }, [allocations, selectedVersionId, compareVersionId]);
+  }, [getVersionAllocations, selectedVersionId, compareVersionId]);
 
   const diffStats = getDiffStats(diff);
 

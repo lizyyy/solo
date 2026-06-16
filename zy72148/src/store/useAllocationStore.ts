@@ -103,7 +103,15 @@ export const useAllocationStore = create<AllocationState>()(
       initSampleData: () => {
         const now = new Date().toISOString();
         const versionId = generateId();
-        
+
+        const allocationsWithVersion = sampleAllocations.map(a => ({
+          ...a,
+          id: generateId(),
+          versionId,
+          createdAt: now,
+          updatedAt: now,
+        }));
+
         const initialVersion: Version = {
           id: versionId,
           versionName: 'v1 - 初始版本',
@@ -113,15 +121,8 @@ export const useAllocationStore = create<AllocationState>()(
           changeNote: '导入初始房型分配数据',
           createdAt: now,
           recordCount: sampleAllocations.length,
+          records: allocationsWithVersion,
         };
-
-        const allocationsWithVersion = sampleAllocations.map(a => ({
-          ...a,
-          id: generateId(),
-          versionId,
-          createdAt: now,
-          updatedAt: now,
-        }));
 
         const sourceTraces = allocationsWithVersion.map(a => ({
           id: generateId(),
@@ -366,17 +367,6 @@ export const useAllocationStore = create<AllocationState>()(
           ? Math.max(...versions.map(v => v.versionNumber)) + 1
           : 1;
 
-        const newVersion: Version = {
-          id: versionId,
-          versionName: `v${nextVersionNumber} - ${sourceInfo.changeNote || '版本导入'}`,
-          versionNumber: nextVersionNumber,
-          sourceFile: sourceInfo.fileName,
-          operator: sourceInfo.operator || operator,
-          changeNote: sourceInfo.changeNote || '版本导入',
-          createdAt: now,
-          recordCount: pendingRecords.length,
-        };
-
         const existingHashMap = new Map<string, RoomAllocation>();
         allocations.forEach(a => {
           existingHashMap.set(generateIdentityHash(a), a);
@@ -385,6 +375,7 @@ export const useAllocationStore = create<AllocationState>()(
         const updatedAllocations = [...allocations];
         const trulyNewRecords: RoomAllocation[] = [];
         const newChangeLogs: ChangeLog[] = [];
+        const newSourceTraces: SourceTrace[] = [];
 
         pendingRecords.forEach(pendingRecord => {
           const hash = generateIdentityHash(pendingRecord);
@@ -419,23 +410,45 @@ export const useAllocationStore = create<AllocationState>()(
                 updatedAt: now,
                 manualTag: updatedAllocations[index].manualTag,
               };
+
+              newSourceTraces.push({
+                id: generateId(),
+                recordId: updatedAllocations[index].id,
+                fileName: sourceInfo.fileName,
+                importedAt: now,
+                operator: sourceInfo.operator || operator,
+                rawData: JSON.stringify(updatedAllocations[index]),
+              });
             }
           } else {
             trulyNewRecords.push(pendingRecord);
+            newSourceTraces.push({
+              id: generateId(),
+              recordId: pendingRecord.id,
+              fileName: sourceInfo.fileName,
+              importedAt: now,
+              operator: sourceInfo.operator || operator,
+              rawData: JSON.stringify(pendingRecord),
+            });
           }
         });
 
-        const newSourceTraces = pendingRecords.map(a => ({
-          id: generateId(),
-          recordId: a.id,
-          fileName: sourceInfo.fileName,
-          importedAt: now,
+        const finalAllocations = [...updatedAllocations, ...trulyNewRecords];
+
+        const newVersion: Version = {
+          id: versionId,
+          versionName: `v${nextVersionNumber} - ${sourceInfo.changeNote || '版本导入'}`,
+          versionNumber: nextVersionNumber,
+          sourceFile: sourceInfo.fileName,
           operator: sourceInfo.operator || operator,
-          rawData: JSON.stringify(a),
-        }));
+          changeNote: sourceInfo.changeNote || '版本导入',
+          createdAt: now,
+          recordCount: finalAllocations.length,
+          records: finalAllocations,
+        };
 
         set({
-          allocations: [...updatedAllocations, ...trulyNewRecords],
+          allocations: finalAllocations,
           versions: [...versions, newVersion],
           sourceTraces: [...sourceTraces, ...newSourceTraces],
           changeLogs: [...changeLogs, ...newChangeLogs],
@@ -481,8 +494,9 @@ export const useAllocationStore = create<AllocationState>()(
       },
 
       getVersionAllocations: (versionId) => {
-        const { allocations } = get();
-        return allocations.filter(a => a.versionId === versionId);
+        const { versions } = get();
+        const version = versions.find(v => v.id === versionId);
+        return version?.records || [];
       },
 
       exportCurrent: (format) => {

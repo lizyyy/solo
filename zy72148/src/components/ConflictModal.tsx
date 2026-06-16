@@ -25,9 +25,9 @@ export const ConflictModal = ({ isOpen, conflicts: initialConflicts, versionId, 
   const allocations = useAllocationStore(state => state.allocations);
   const storeConflicts = useAllocationStore(state => state.conflicts);
 
-  const conflicts = storeConflicts.length > 0 ? storeConflicts : initialConflicts;
+  const conflicts = storeConflicts;
   const groupedConflicts = groupConflictsByRecord(conflicts);
-  const remainingCount = conflicts.length;
+  const remainingCount = storeConflicts.length;
 
   const handleResolve = (
     recordId: string,
