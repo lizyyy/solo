@@ -1,4 +1,5 @@
 import type { Anomaly, RawPipeData, EstimationRecord } from '../types';
+import { UnitConverter } from './unitConverter';
 
 export class AnomalyDetector {
   private parameterRanges = {
@@ -31,20 +32,44 @@ export class AnomalyDetector {
     return anomalies;
   }
 
-  detectDuplicates(records: EstimationRecord[], currentRecord: EstimationRecord): Anomaly[] {
+  detectDuplicates(
+    records: EstimationRecord[],
+    currentRecord: EstimationRecord,
+    normalizedValues?: {
+      pipeDiameter?: number;
+      rainfallIntensity?: number;
+    }
+  ): Anomaly[] {
     const anomalies: Anomaly[] = [];
-    const duplicates = records.filter(r =>
-      r.id !== currentRecord.id &&
-      r.area === currentRecord.area &&
-      r.calculationDate === currentRecord.calculationDate &&
-      r.rawData.pipeDiameter === currentRecord.rawData.pipeDiameter
-    );
+    const currentPipeLength = currentRecord.rawData.pipeLength;
+    const currentPipeDiameter = normalizedValues?.pipeDiameter ?? currentRecord.rawData.pipeDiameter;
+    const currentRainfall = normalizedValues?.rainfallIntensity ?? currentRecord.rawData.rainfallIntensity;
+    const currentDate = currentRecord.calculationDate;
+
+    const duplicates = records.filter(r => {
+      if (r.id === currentRecord.id) return false;
+      if (r.calculationDate !== currentDate) return false;
+      if (r.rawData.pipeLength !== currentPipeLength) return false;
+
+      const rPipeDiameter = (r.rawData.pipeDiameter !== undefined && r.rawData.pipeDiameterUnit)
+        ? UnitConverter.normalizeToStandard(r.rawData.pipeDiameter, r.rawData.pipeDiameterUnit).value
+        : r.rawData.pipeDiameter;
+      if (rPipeDiameter !== currentPipeDiameter) return false;
+
+      const rRainfall = (r.rawData.rainfallIntensity !== undefined && r.rawData.rainfallUnit)
+        ? UnitConverter.normalizeToStandard(r.rawData.rainfallIntensity, r.rawData.rainfallUnit).value
+        : r.rawData.rainfallIntensity;
+      if (rRainfall !== currentRainfall) return false;
+
+      return true;
+    });
 
     if (duplicates.length > 0) {
+      const duplicateNos = duplicates.map(d => d.recordNo).join(', ');
       anomalies.push({
         type: 'duplicate',
         field: 'record',
-        description: `存在重复记录: 相同区域(${currentRecord.area})、日期(${currentRecord.calculationDate})和管径`,
+        description: `存在重复记录: 管长(${currentPipeLength}m)、管径(${currentPipeDiameter}m)、降雨强度(${currentRainfall}mm/h)、日期(${currentDate})均相同。关联记录: ${duplicateNos}`,
         severity: 'medium'
       });
     }

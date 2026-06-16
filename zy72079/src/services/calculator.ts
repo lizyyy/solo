@@ -124,31 +124,69 @@ export class PipeCapacityCalculator {
   }
 
   processRecord(record: EstimationRecord, allRecords: EstimationRecord[]): EstimationRecord {
+    let normalizedPipeDiameter = record.rawData.pipeDiameter;
+    let normalizedRainfall = record.rawData.rainfallIntensity;
+    if (record.rawData.pipeDiameter !== undefined && record.rawData.pipeDiameterUnit) {
+      normalizedPipeDiameter = UnitConverter.normalizeToStandard(
+        record.rawData.pipeDiameter,
+        record.rawData.pipeDiameterUnit
+      ).value;
+    }
+    if (record.rawData.rainfallIntensity !== undefined && record.rawData.rainfallUnit) {
+      normalizedRainfall = UnitConverter.normalizeToStandard(
+        record.rawData.rainfallIntensity,
+        record.rawData.rainfallUnit
+      ).value;
+    }
+
     const { result, steps, anomalies, failureReason } = this.calculateCapacity(record.rawData);
+
+    const duplicateAnomalies = this.anomalyDetector.detectDuplicates(allRecords, record, {
+      pipeDiameter: normalizedPipeDiameter,
+      rainfallIntensity: normalizedRainfall,
+    });
+
+    const duplicateSteps: CalculationStep[] = [];
+    if (duplicateAnomalies.length > 0) {
+      duplicateSteps.push({
+        stepId: 'step-dup-check',
+        description: '重复点核验',
+        input: {
+          pipeLength: record.rawData.pipeLength,
+          pipeDiameter: normalizedPipeDiameter,
+          rainfallIntensity: normalizedRainfall,
+          calculationDate: record.calculationDate,
+        },
+        output: { duplicateDetected: true, count: duplicateAnomalies.length },
+        formula: `检查所有记录: 管长=${record.rawData.pipeLength}, 管径=${normalizedPipeDiameter}m, 降雨=${normalizedRainfall}mm/h, 日期=${record.calculationDate}`,
+      });
+    }
 
     const allAnomalies = [
       ...anomalies,
-      ...this.anomalyDetector.detectDuplicates(allRecords, record),
+      ...duplicateAnomalies,
       ...this.anomalyDetector.detectUnitMismatch(record.rawData),
       ...this.anomalyDetector.detectBoundary(record.rawData),
     ];
 
     const hasBoundaryAnomaly = allAnomalies.some(a => a.type === 'boundary');
     const hasHighSeverity = allAnomalies.some(a => a.severity === 'high');
+    const hasDuplicateAnomaly = allAnomalies.some(a => a.type === 'duplicate');
+    const hasMediumSeverity = allAnomalies.some(a => a.severity === 'medium');
 
     let status: EstimationRecord['status'] = 'success';
     if (record.source === 'legacy') {
       status = 'legacy';
     } else if (failureReason) {
       status = 'error';
-    } else if (hasBoundaryAnomaly || hasHighSeverity) {
+    } else if (hasBoundaryAnomaly || hasHighSeverity || hasDuplicateAnomaly || hasMediumSeverity) {
       status = 'pending';
     }
 
     return {
       ...record,
       calculatedResult: result ? { capacity: result, unit: 'm³/h' } : undefined,
-      calculationSteps: steps,
+      calculationSteps: [...steps, ...duplicateSteps],
       anomalies: allAnomalies,
       status,
       failureReason,
