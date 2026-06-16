@@ -1,6 +1,6 @@
 import { useFilteredRecords } from "@/hooks/useDerived";
 import { useStore } from "@/store/useStore";
-import StatusBadge, { IssueBadge } from "./StatusBadge";
+import { IssueBadge } from "./StatusBadge";
 import { Edit3, Check, X, AlertTriangle, FileWarning } from "lucide-react";
 import { useState, useCallback } from "react";
 import type { SampleRecord } from "@/types";

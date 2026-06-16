@@ -1,5 +1,5 @@
 import { useStore } from "@/store/useStore";
-import { History, X, ChevronUp, ChevronDown, Tag } from "lucide-react";
+import { History, ChevronUp, ChevronDown, Tag } from "lucide-react";
 
 const OP_LABELS: Record<string, { label: string; color: string }> = {
   import: { label: "导入", color: "text-emerald-400" },

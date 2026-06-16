@@ -1,7 +1,7 @@
 import { useStore } from "@/store/useStore";
-import { sampleData } from "@/data/sampleData";
+import { sampleData, REAL_FILE_NAMES } from "@/data/sampleData";
 import { parseFilesToRecords } from "@/utils/parseFiles";
-import { Upload, FolderOpen, Database } from "lucide-react";
+import { Upload, FolderOpen, Database, FileAudio } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 
 export default function ImportArea() {
@@ -43,6 +43,30 @@ export default function ImportArea() {
     setRecords(sampleData.map((r) => ({ ...r })));
   }, [records.length, setRecords]);
 
+  const simulateRealImport = useCallback(() => {
+    if (records.length > 0) {
+      const confirmed = window.confirm(
+        "将通过真实导入链路模拟一批文件名，是否先清空当前记录？\n\n取消 = 追加到现有记录（用于测试增量）\n确定 = 清空后重新导入"
+      );
+      if (confirmed) {
+        useStore.getState().clearAll();
+      }
+    }
+    setImporting(true);
+    setTimeout(() => {
+      const fakeFiles: File[] = REAL_FILE_NAMES.map(
+        (name) =>
+          new File([new ArrayBuffer(0)], name, {
+            type: "audio/wav",
+            lastModified: Date.now(),
+          })
+      );
+      const dt = new DataTransfer();
+      for (const f of fakeFiles) dt.items.add(f);
+      handleFiles(dt.files);
+    }, 300);
+  }, [records.length, handleFiles]);
+
   return (
     <div className="mb-6">
       <div
@@ -82,7 +106,7 @@ export default function ImportArea() {
         </div>
       </div>
 
-      <div className="flex gap-3 mt-3">
+      <div className="flex gap-2 mt-3 flex-wrap">
         <button
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-800 border border-zinc-600 text-zinc-300 text-sm hover:bg-zinc-700 hover:border-zinc-500 transition-colors"
           onClick={() => {
@@ -106,7 +130,17 @@ export default function ImportArea() {
           <Database className="w-4 h-4" />
           加载样例数据
         </button>
+        <button
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-400/10 border border-amber-400/40 text-amber-300 text-sm hover:bg-amber-400/20 transition-colors"
+          onClick={simulateRealImport}
+        >
+          <FileAudio className="w-4 h-4" />
+          模拟真实文件导入
+        </button>
       </div>
+      <p className="text-[10px] text-zinc-600 mt-2">
+        「模拟真实文件导入」走 parseFilesToRecords 完整链路，验证时码解析、重复检测、授权推断
+      </p>
     </div>
   );
 }

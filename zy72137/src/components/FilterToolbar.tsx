@@ -1,6 +1,6 @@
 import { useStore } from "@/store/useStore";
 import { Search, X, RotateCcw } from "lucide-react";
-import type { FilterState, IssueType } from "@/types";
+import type { IssueType } from "@/types";
 
 const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: "valid", label: "有效" },
