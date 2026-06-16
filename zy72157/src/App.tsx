@@ -2,6 +2,7 @@ import { AppProvider, useApp } from './context/AppContext';
 import { Layout } from './components/Layout';
 import { DataImportPage } from './pages/DataImportPage';
 import { PointMergePage } from './pages/PointMergePage';
+import { DiffResolutionPage } from './pages/DiffResolutionPage';
 import { ManualReviewPage } from './pages/ManualReviewPage';
 import { PublicExportPage } from './pages/PublicExportPage';
 
@@ -14,6 +15,8 @@ function AppContent() {
         return <DataImportPage />;
       case 'merge':
         return <PointMergePage />;
+      case 'diff':
+        return <DiffResolutionPage />;
       case 'review':
         return <ManualReviewPage />;
       case 'export':

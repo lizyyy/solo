@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
-import { MealPoint, MergeSuggestion, AppState, AppContextType, AuditRecord } from '../types';
+import { MealPoint, MergeSuggestion, AppState, AppContextType, AuditRecord, DiffRecord, FieldDiff } from '../types';
 import { saveToLocalStorage, loadFromLocalStorage, clearLocalStorage, generateId } from '../utils/storage';
 import { calculateSimilarity, getMergeReason, SIMILARITY_THRESHOLDS } from '../utils/similarity';
 import { sampleMealPoints } from '../data/sampleData';
@@ -7,6 +7,7 @@ import { sampleMealPoints } from '../data/sampleData';
 const initialState: AppState = {
   points: [],
   suggestions: [],
+  diffs: [],
   currentStep: 'import',
 };
 
@@ -17,6 +18,8 @@ type Action =
   | { type: 'REMOVE_POINT'; payload: string }
   | { type: 'SET_SUGGESTIONS'; payload: MergeSuggestion[] }
   | { type: 'UPDATE_SUGGESTION'; payload: MergeSuggestion }
+  | { type: 'SET_DIFFS'; payload: DiffRecord[] }
+  | { type: 'UPDATE_DIFF'; payload: DiffRecord }
   | { type: 'CLEAR_ALL' }
   | { type: 'SET_STEP'; payload: AppState['currentStep'] };
 
@@ -47,6 +50,15 @@ function appReducer(state: AppState, action: Action): AppState {
           s.id === action.payload.id ? action.payload : s
         ),
       };
+    case 'SET_DIFFS':
+      return { ...state, diffs: action.payload };
+    case 'UPDATE_DIFF':
+      return {
+        ...state,
+        diffs: state.diffs.map((d) =>
+          d.id === action.payload.id ? action.payload : d
+        ),
+      };
     case 'CLEAR_ALL':
       return initialState;
     case 'SET_STEP':
@@ -69,6 +81,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         payload: {
           points: saved.points,
           suggestions: saved.suggestions,
+          diffs: saved.diffs || [],
           currentStep: saved.currentStep,
         },
       });
@@ -76,14 +89,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (state.points.length > 0) {
-      saveToLocalStorage({
-        points: state.points,
-        suggestions: state.suggestions,
-        currentStep: state.currentStep,
-      });
-    }
-  }, [state.points, state.suggestions, state.currentStep]);
+    saveToLocalStorage({
+      points: state.points,
+      suggestions: state.suggestions,
+      diffs: state.diffs,
+      currentStep: state.currentStep,
+    });
+  }, [state.points, state.suggestions, state.diffs, state.currentStep]);
 
   const addAuditRecord = (point: MealPoint, action: AuditRecord['action'], remark: string, operator: string = '老曹'): MealPoint => {
     const newRecord: AuditRecord = {
@@ -248,26 +260,140 @@ export function AppProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'SET_STEP', payload: step });
   };
 
+  const detectDiffs = () => {
+    const { points } = state;
+    const diffs: DiffRecord[] = [];
+    const processedPairs = new Set<string>();
+
+    const compareFields: Array<{ key: keyof MealPoint; label: string }> = [
+      { key: 'name', label: '点位名称' },
+      { key: 'address', label: '详细地址' },
+      { key: 'lat', label: '纬度' },
+      { key: 'lng', label: '经度' },
+      { key: 'source', label: '数据来源' },
+      { key: 'notes', label: '备注' },
+    ];
+
+    for (let i = 0; i < points.length; i++) {
+      for (let j = i + 1; j < points.length; j++) {
+        const p1 = points[i];
+        const p2 = points[j];
+        const pairKey = [p1.id, p2.id].sort().join('-');
+        if (processedPairs.has(pairKey)) continue;
+
+        const similarity = calculateSimilarity(
+          p1.name, p1.address, p1.lat, p1.lng,
+          p2.name, p2.address, p2.lat, p2.lng
+        );
+
+        if (similarity.overall >= SIMILARITY_THRESHOLDS.MANUAL_REVIEW * 0.6 && similarity.breakdown.distance > 0.3) {
+          const diffFields: FieldDiff[] = [];
+          for (const f of compareFields) {
+            const v1 = String(p1[f.key] ?? '').trim();
+            const v2 = String(p2[f.key] ?? '').trim();
+            if (v1 !== v2 && (v1 || v2)) {
+              diffFields.push({ field: f.label, valueA: v1 || '(空)', valueB: v2 || '(空)' });
+            }
+          }
+          if (diffFields.length > 0) {
+            diffs.push({
+              id: generateId(),
+              pointIds: [p1.id, p2.id],
+              diffFields,
+              status: 'pending',
+              detectedAt: new Date(),
+            });
+            processedPairs.add(pairKey);
+          }
+        }
+      }
+    }
+    dispatch({ type: 'SET_DIFFS', payload: diffs });
+  };
+
+  const resolveDiff = (diffId: string, resolvedFields: FieldDiff[], note?: string) => {
+    const diff = state.diffs.find((d) => d.id === diffId);
+    if (!diff) return;
+
+    const updatedDiff: DiffRecord = {
+      ...diff,
+      diffFields: resolvedFields,
+      status: 'resolved',
+      resolvedAt: new Date(),
+      resolvedNote: note,
+    };
+    dispatch({ type: 'UPDATE_DIFF', payload: updatedDiff });
+
+    const [p1Id, p2Id] = diff.pointIds;
+    const p1 = state.points.find((p) => p.id === p1Id);
+    const p2 = state.points.find((p) => p.id === p2Id);
+    if (p1) {
+      const labels: Record<string, keyof MealPoint> = {
+        '点位名称': 'name', '详细地址': 'address', '纬度': 'lat', '经度': 'lng', '数据来源': 'source', '备注': 'notes',
+      };
+      const mergedPoint: any = { ...p1 };
+      for (const f of resolvedFields) {
+        const key = labels[f.field];
+        if (!key) continue;
+        if (f.chosen === 'A') mergedPoint[key] = p1[key];
+        else if (f.chosen === 'B' && p2) mergedPoint[key] = p2[key];
+        else if (f.chosen === 'custom' && f.customValue) mergedPoint[key] = f.customValue;
+      }
+      dispatch({
+        type: 'UPDATE_POINT',
+        payload: addAuditRecord(mergedPoint as MealPoint, 'diffResolve', `补录差异已处理，涉及${resolvedFields.length}个字段${note ? '：' + note : ''}`),
+      });
+    }
+  };
+
+  const skipDiff = (diffId: string) => {
+    const diff = state.diffs.find((d) => d.id === diffId);
+    if (!diff) return;
+    dispatch({
+      type: 'UPDATE_DIFF',
+      payload: { ...diff, status: 'skipped', resolvedAt: new Date() },
+    });
+  };
+
   const exportToCSV = (): string => {
-    const headers = ['点位名称', '地址', '纬度', '经度', '数据来源', '状态', '类型', '备注', '来源文件', '原始行号', '原始行数据', '审核记录数'];
-    const rows = state.points.map((p) => [
-      p.name || '(空)',
-      p.address,
-      p.lat,
-      p.lng,
-      p.source,
-      p.status,
-      p.type,
-      p.notes,
-      p.fileName,
-      p.sourceRowNumber,
-      Object.entries(p.sourceRow).map(([k, v]) => `${k}=${v}`).join('; '),
-      p.auditTrail.length,
-    ]);
+    const headers = ['点位名称', '地址', '纬度', '经度', '数据来源', '状态', '类型', '备注', '来源文件', '原始行号', '原始行数据', '审核记录数', '涉及补录差异数'];
+    const rows = state.points.map((p) => {
+      const relatedDiffs = state.diffs.filter((d) => d.pointIds.includes(p.id));
+      return [
+        p.name || '(空)',
+        p.address,
+        p.lat,
+        p.lng,
+        p.source,
+        p.status,
+        p.type,
+        p.notes,
+        p.fileName,
+        p.sourceRowNumber,
+        Object.entries(p.sourceRow).map(([k, v]) => `${k}=${v}`).join('; '),
+        p.auditTrail.length,
+        relatedDiffs.length,
+      ];
+    });
 
     const csvContent = [headers, ...rows]
       .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
       .join('\n');
+
+    if (state.diffs.length > 0) {
+      return csvContent + '\n\n===补录差异记录===\n' +
+        ['差异ID', '涉及点位ID', '差异字段数', '状态', '处理备注', '检测时间', '处理时间']
+          .map((c) => `"${c}"`).join(',') + '\n' +
+        state.diffs.map((d) => [
+          d.id,
+          d.pointIds.join('|'),
+          d.diffFields.length,
+          d.status,
+          d.resolvedNote || '',
+          new Date(d.detectedAt).toLocaleString('zh-CN'),
+          d.resolvedAt ? new Date(d.resolvedAt).toLocaleString('zh-CN') : '',
+        ].map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+    }
 
     return csvContent;
   };
@@ -285,6 +411,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     clearAllData,
     setCurrentStep,
     exportToCSV,
+    detectDiffs,
+    resolveDiff,
+    skipDiff,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

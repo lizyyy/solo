@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import { Download, FileText, MapPin, CheckCircle, XCircle, Clock, BarChart3, RefreshCw } from 'lucide-react';
+import { Download, FileText, MapPin, CheckCircle, XCircle, Clock, BarChart3, RefreshCw, GitCompare } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { StatusBadge } from '../components/StatusBadge';
 import 'leaflet/dist/leaflet.css';
@@ -17,12 +17,16 @@ const customIcon = new L.Icon({
 });
 
 export function PublicExportPage() {
-  const { points, exportToCSV, clearAllData, loadSampleData, setCurrentStep } = useApp();
-  const [activeTab, setActiveTab] = useState<'map' | 'list' | 'stats'>('map');
+  const { points, diffs, exportToCSV, clearAllData, loadSampleData, setCurrentStep } = useApp();
+  const [activeTab, setActiveTab] = useState<'map' | 'list' | 'stats' | 'diff'>('map');
 
   const confirmedPoints = points.filter((p) => p.status === 'confirmed');
   const rejectedPoints = points.filter((p) => p.status === 'rejected');
   const pendingPoints = points.filter((p) => p.status === 'pending' || p.status === 'merged');
+
+  const resolvedDiffs = diffs.filter((d) => d.status === 'resolved');
+  const pendingDiffs = diffs.filter((d) => d.status === 'pending');
+  const skippedDiffs = diffs.filter((d) => d.status === 'skipped');
 
   const handleExportCSV = () => {
     const csv = exportToCSV();
@@ -152,6 +156,17 @@ export function PublicExportPage() {
             >
               <BarChart3 className="w-4 h-4 inline mr-2" />
               统计分析
+            </button>
+            <button
+              onClick={() => setActiveTab('diff')}
+              className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'diff'
+                  ? 'border-primary-600 text-primary-600 bg-primary-50'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              <GitCompare className="w-4 h-4 inline mr-2" />
+              补录差异核对
             </button>
           </nav>
         </div>
@@ -357,6 +372,117 @@ export function PublicExportPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          )}
+
+          {activeTab === 'diff' && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                      <Clock className="w-5 h-5 text-amber-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-amber-700">待处理差异</p>
+                      <p className="text-2xl font-bold text-amber-700">{pendingDiffs.length}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                      <CheckCircle className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-green-700">已处理</p>
+                      <p className="text-2xl font-bold text-green-700">{resolvedDiffs.length}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                      <XCircle className="w-5 h-5 text-gray-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">已跳过</p>
+                      <p className="text-2xl font-bold text-gray-600">{skippedDiffs.length}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {diffs.length > 0 ? (
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+                    <h3 className="font-semibold text-gray-700">补录差异核对明细（报告内容核对）</h3>
+                    <span className="text-sm text-gray-500">共 {diffs.length} 组差异，已处理 {resolvedDiffs.length} 组</span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">状态</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">点位A</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">来源A</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">点位B</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">来源B</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">差异字段</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">确认取值</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">备注</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {diffs.map((d) => {
+                          const pa = points.find((p) => p.id === d.pointIds[0]);
+                          const pb = points.find((p) => p.id === d.pointIds[1]);
+                          return (
+                            <tr key={d.id} className="hover:bg-gray-50">
+                              <td className="px-4 py-3">
+                                <span className={`px-2 py-0.5 text-xs rounded-full ${
+                                  d.status === 'resolved' ? 'bg-green-100 text-green-700' :
+                                  d.status === 'skipped' ? 'bg-gray-100 text-gray-600' :
+                                  'bg-amber-100 text-amber-700'
+                                }`}>
+                                  {d.status === 'resolved' ? '已处理' : d.status === 'skipped' ? '已跳过' : '待处理'}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 text-gray-800 font-medium">{pa?.name || '-'}</td>
+                              <td className="px-4 py-3 text-gray-500 text-xs">
+                                {pa?.fileName || '-'} L{pa?.sourceRowNumber || '-'}
+                              </td>
+                              <td className="px-4 py-3 text-gray-800 font-medium">{pb?.name || '-'}</td>
+                              <td className="px-4 py-3 text-gray-500 text-xs">
+                                {pb?.fileName || '-'} L{pb?.sourceRowNumber || '-'}
+                              </td>
+                              <td className="px-4 py-3 text-gray-600 text-xs">
+                                {d.diffFields.map((f) => f.field).join('、')}
+                              </td>
+                              <td className="px-4 py-3 text-gray-700 text-xs">
+                                {d.status === 'resolved'
+                                  ? d.diffFields.filter((f) => f.chosen).map((f) =>
+                                      `${f.field}=${f.chosen === 'A' ? 'A值' : f.chosen === 'B' ? 'B值' : '自定义'}`
+                                    ).join(', ')
+                                  : '-'}
+                              </td>
+                              <td className="px-4 py-3 text-gray-500 text-xs max-w-xs truncate">
+                                {d.resolvedNote || '-'}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
+                  <GitCompare className="w-12 h-12 mx-auto text-gray-300 mb-3" />
+                  <p className="text-gray-500">暂无补录差异记录</p>
+                  <p className="text-xs text-gray-400 mt-1">导入多来源台账后将自动检测同点位字段差异</p>
+                </div>
+              )}
             </div>
           )}
         </div>

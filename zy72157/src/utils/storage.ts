@@ -1,10 +1,11 @@
-import { MealPoint, MergeSuggestion, AppState } from '../types';
+import { MealPoint, MergeSuggestion, AppState, DiffRecord } from '../types';
 
 const STORAGE_KEY = 'meal_delivery_points';
 
 interface StoredData {
   points: MealPoint[];
   suggestions: MergeSuggestion[];
+  diffs: DiffRecord[];
   currentStep: AppState['currentStep'];
   savedAt: string;
 }
@@ -38,6 +39,11 @@ export function loadFromLocalStorage(): StoredData | null {
       data.suggestions = data.suggestions.map((s) => ({
         ...s,
         suggestedAt: new Date(s.suggestedAt),
+      }));
+      data.diffs = (data.diffs || []).map((d) => ({
+        ...d,
+        detectedAt: new Date(d.detectedAt),
+        resolvedAt: d.resolvedAt ? new Date(d.resolvedAt) : undefined,
       }));
       return data;
     }

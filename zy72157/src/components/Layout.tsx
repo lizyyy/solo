@@ -1,5 +1,5 @@
 import React from 'react';
-import { Database, GitMerge, CheckSquare, FileText, MapPin } from 'lucide-react';
+import { Database, GitMerge, CheckSquare, FileText, MapPin, GitCompare } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 interface LayoutProps {
@@ -9,6 +9,7 @@ interface LayoutProps {
 const steps = [
   { key: 'import', label: '数据导入', icon: Database, description: '导入GIS点位和相关数据' },
   { key: 'merge', label: '点位归并', icon: GitMerge, description: '智能识别重复点位' },
+  { key: 'diff', label: '补录差异', icon: GitCompare, description: '多来源记录对照确认' },
   { key: 'review', label: '人工复核', icon: CheckSquare, description: '人工审核决策留痕' },
   { key: 'export', label: '公示导出', icon: FileText, description: '导出公示清单' },
 ] as const;

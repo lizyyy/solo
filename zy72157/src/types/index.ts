@@ -6,7 +6,7 @@ export type PointType = 'smooth' | 'review' | 'legacy' | 'boundary' | 'duplicate
 
 export type SuggestionStatus = 'pending' | 'approved' | 'rejected';
 
-export type AuditAction = 'import' | 'merge' | 'confirm' | 'reject' | 'note' | 'split';
+export type AuditAction = 'import' | 'merge' | 'confirm' | 'reject' | 'note' | 'split' | 'diff' | 'diffResolve';
 
 export interface AuditRecord {
   id: string;
@@ -52,10 +52,31 @@ export interface MergeSuggestion {
   suggestedAt: Date;
 }
 
+export interface FieldDiff {
+  field: 'name' | 'address' | 'lat' | 'lng' | 'source' | 'notes' | string;
+  valueA: string;
+  valueB: string;
+  chosen?: 'A' | 'B' | 'custom';
+  customValue?: string;
+}
+
+export type DiffStatus = 'pending' | 'resolved' | 'skipped';
+
+export interface DiffRecord {
+  id: string;
+  pointIds: string[];
+  diffFields: FieldDiff[];
+  status: DiffStatus;
+  resolvedAt?: Date;
+  resolvedNote?: string;
+  detectedAt: Date;
+}
+
 export interface AppState {
   points: MealPoint[];
   suggestions: MergeSuggestion[];
-  currentStep: 'import' | 'merge' | 'review' | 'export';
+  diffs: DiffRecord[];
+  currentStep: 'import' | 'merge' | 'review' | 'diff' | 'export';
 }
 
 export interface ColumnMapping {
@@ -101,6 +122,9 @@ export interface AppContextType extends AppState {
   generateSuggestions: () => void;
   loadSampleData: () => void;
   clearAllData: () => void;
-  setCurrentStep: (step: 'import' | 'merge' | 'review' | 'export') => void;
+  setCurrentStep: (step: 'import' | 'merge' | 'review' | 'diff' | 'export') => void;
   exportToCSV: () => string;
+  detectDiffs: () => void;
+  resolveDiff: (diffId: string, resolvedFields: FieldDiff[], note?: string) => void;
+  skipDiff: (diffId: string) => void;
 }

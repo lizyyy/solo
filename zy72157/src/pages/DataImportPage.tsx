@@ -1,10 +1,11 @@
 import React, { useState, useCallback } from 'react';
-import { Upload, FileText, Database, Trash2, ChevronRight, Info, ArrowRight, Check, AlertTriangle } from 'lucide-react';
+import { Upload, FileText, Database, Trash2, ChevronRight, Info, ArrowRight, Check, AlertTriangle, Sheet } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { StatusBadge } from '../components/StatusBadge';
 import { MealPoint, ColumnMapping, SYSTEM_FIELDS, SOURCE_ALIASES, PointSource } from '../types';
 import { generateId } from '../utils/storage';
 import Papa from 'papaparse';
+import * as XLSX from 'xlsx';
 
 type ImportStep = 'upload' | 'mapping' | 'preview' | 'done';
 
@@ -77,27 +78,66 @@ export function DataImportPage() {
 
   const parseFile = (file: File) => {
     if (!file.name.match(/\.(csv|xlsx|xls)$/i)) {
-      setImportMessage('仅支持CSV格式文件，请上传.csv文件');
+      setImportMessage('仅支持 CSV 或 Excel 格式文件（.csv/.xlsx/.xls）');
       return;
     }
     setFileName(file.name);
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      complete: (results) => {
-        const headers = results.meta.fields || [];
-        const rows = results.data as Record<string, string>[];
-        setRawHeaders(headers);
-        setRawRows(rows);
-        const detected = autoDetectMapping(headers);
-        setMapping(detected);
-        setStep('mapping');
-        setImportMessage('');
-      },
-      error: () => {
-        setImportMessage('文件解析失败，请检查文件格式');
-      },
-    });
+    const ext = file.name.split('.').pop()?.toLowerCase() || '';
+
+    if (ext === 'csv') {
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          const headers = results.meta.fields || [];
+          const rows = (results.data as Record<string, any>[]).map((r) => {
+            const clean: Record<string, string> = {};
+            for (const [k, v] of Object.entries(r)) clean[k] = v == null ? '' : String(v);
+            return clean;
+          });
+          setRawHeaders(headers);
+          setRawRows(rows);
+          const detected = autoDetectMapping(headers);
+          setMapping(detected);
+          setStep('mapping');
+          setImportMessage('');
+        },
+        error: () => {
+          setImportMessage('CSV 文件解析失败，请检查文件格式');
+        },
+      });
+    } else {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheet];
+          const json = XLSX.utils.sheet_to_json<any>(worksheet, { defval: '', raw: false });
+          if (json.length === 0) {
+            setImportMessage('Excel 工作表为空，请检查文件内容');
+            return;
+          }
+          const headers = Object.keys(json[0]);
+          const rows = json.map((r: Record<string, any>) => {
+            const clean: Record<string, string> = {};
+            for (const [k, v] of Object.entries(r)) clean[k] = v == null ? '' : String(v);
+            return clean;
+          });
+          setRawHeaders(headers);
+          setRawRows(rows);
+          const detected = autoDetectMapping(headers);
+          setMapping(detected);
+          setStep('mapping');
+          setImportMessage('');
+        } catch {
+          setImportMessage('Excel 文件解析失败，请检查文件格式');
+        }
+      };
+      reader.onerror = () => setImportMessage('读取文件失败');
+      reader.readAsArrayBuffer(file);
+    }
   };
 
   const applyMapping = () => {
@@ -215,34 +255,48 @@ export function DataImportPage() {
             }`}
           >
             <Upload className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-            <p className="text-lg font-medium text-gray-700 mb-2">拖拽CSV文件到此处</p>
+            <p className="text-lg font-medium text-gray-700 mb-2">拖拽 CSV / Excel 文件到此处</p>
             <p className="text-sm text-gray-500 mb-4">或点击下方按钮选择文件</p>
-            <label className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg cursor-pointer hover:bg-primary-700 transition-colors">
-              <FileText className="w-4 h-4 mr-2" />
-              选择CSV文件
-              <input type="file" accept=".csv" onChange={handleFileSelect} className="hidden" />
-            </label>
-            <p className="mt-4 text-xs text-gray-400">支持.csv格式 · 任意列名，下一步可映射</p>
+            <div className="flex items-center justify-center gap-3">
+              <label className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg cursor-pointer hover:bg-primary-700 transition-colors">
+                <FileText className="w-4 h-4 mr-2" />
+                选择 CSV
+                <input type="file" accept=".csv" onChange={handleFileSelect} className="hidden" />
+              </label>
+              <label className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg cursor-pointer hover:bg-emerald-700 transition-colors">
+                <Sheet className="w-4 h-4 mr-2" />
+                选择 Excel
+                <input type="file" accept=".xlsx,.xls" onChange={handleFileSelect} className="hidden" />
+              </label>
+            </div>
+            <p className="mt-4 text-xs text-gray-400">支持 .csv / .xlsx / .xls · 任意列名，下一步可映射</p>
           </div>
 
           <div className="bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl p-6 text-white">
             <h3 className="text-lg font-semibold mb-4 flex items-center">
               <Info className="w-5 h-5 mr-2" />
-              CSV台账格式说明
+              多源台账格式说明
             </h3>
             <div className="space-y-3 text-sm text-primary-100">
-              <p>• 上传CSV后进入<strong className="text-white">列名映射</strong>步骤</p>
+              <p>• 上传 CSV 或 Excel 后进入<strong className="text-white">列名映射</strong>步骤</p>
               <p>• 系统自动识别常见列名（点位名称/地址/纬度/经度）</p>
               <p>• 未匹配的列可手动指定对应关系</p>
               <p>• 原始行数据完整保留，可在复核和报告中查看</p>
               <p>• 数据来源自动归一（GIS点位→GIS、居民反馈→feedback）</p>
+              <p>• 可多次导入不同来源台账，后续在补录差异中对照</p>
             </div>
-            <div className="mt-4 p-3 bg-white/10 rounded-lg">
-              <p className="text-xs text-primary-200 mb-1">可下载样例CSV体验完整流程：</p>
-              <a href="/sample.csv" download="社区养老助餐配送台账样例.csv" className="inline-flex items-center px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded text-white text-sm transition-colors">
-                <Download className="w-4 h-4 mr-1" />
-                下载样例CSV
-              </a>
+            <div className="mt-4 p-3 bg-white/10 rounded-lg space-y-2">
+              <p className="text-xs text-primary-200">可下载样例文件体验完整流程：</p>
+              <div className="flex flex-wrap gap-2">
+                <a href="/sample.csv" download="社区养老助餐配送台账样例.csv" className="inline-flex items-center px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded text-white text-sm transition-colors">
+                  <Download className="w-4 h-4 mr-1" />
+                  下载样例CSV
+                </a>
+                <a href="/sample.xlsx" download="社区养老助餐配送台账样例.xlsx" className="inline-flex items-center px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded text-white text-sm transition-colors">
+                  <Download className="w-4 h-4 mr-1" />
+                  下载样例Excel
+                </a>
+              </div>
             </div>
           </div>
         </div>
