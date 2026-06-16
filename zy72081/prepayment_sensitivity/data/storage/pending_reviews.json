@@ -1,228 +1,314 @@
 [
   {
-    "sample_id": "SAMP_20260601225945523_d7e98bb1",
-    "run_id": "RUN_20260601225945524",
-    "status": "pending",
-    "review_note": "",
-    "created_at": "2026-06-01T22:59:45.524151"
-  },
-  {
-    "sample_id": "SAMP_20260601225945523_97cf52a2",
-    "run_id": "RUN_20260601225945524",
-    "status": "pending",
-    "review_note": "",
-    "created_at": "2026-06-01T22:59:45.524226"
-  },
-  {
-    "conflict_id": "CONFLICT_20260601225945524",
+    "sample_id": "SAMP_20260616200338808_d7e98bb1",
     "loan_id": "LOAN-002",
-    "run_id": "RUN_20260601225945524",
+    "run_id": "RUN_20260616200338809",
     "status": "pending",
-    "review_note": "",
-    "created_at": "2026-06-01T22:59:45.524637"
+    "review_note": "经核对，LOAN-002为历史遗留测试数据，异常字段不影响本次分析。",
+    "review_status": "approved",
+    "reviewed_by": "QA测试员",
+    "reviewed_at": "2026-06-16T20:03:38.809061",
+    "created_at": "2026-06-16T20:03:38.808820"
   },
   {
-    "conflict_id": "CONFLICT_20260601225945524",
-    "loan_id": "LOAN-002",
-    "run_id": "RUN_20260601225945524",
-    "status": "pending",
-    "review_note": "",
-    "created_at": "2026-06-01T22:59:45.524637"
-  },
-  {
-    "conflict_id": "CONFLICT_20260601225945524",
-    "loan_id": "LOAN-002",
-    "run_id": "RUN_20260601225945524",
-    "status": "pending",
-    "review_note": "",
-    "created_at": "2026-06-01T22:59:45.524637"
-  },
-  {
-    "conflict_id": "CONFLICT_20260601225945524",
-    "loan_id": "LOAN-003",
-    "run_id": "RUN_20260601225945524",
-    "status": "pending",
-    "review_note": "",
-    "created_at": "2026-06-01T22:59:45.524637"
-  },
-  {
-    "conflict_id": "CONFLICT_20260601225945524",
-    "loan_id": "LOAN-003",
-    "run_id": "RUN_20260601225945524",
-    "status": "pending",
-    "review_note": "",
-    "created_at": "2026-06-01T22:59:45.524637"
-  },
-  {
-    "conflict_id": "CONFLICT_20260601225945524",
-    "loan_id": "LOAN-006",
-    "run_id": "RUN_20260601225945524",
-    "status": "pending",
-    "review_note": "",
-    "created_at": "2026-06-01T22:59:45.524637"
-  },
-  {
-    "conflict_id": "CONFLICT_20260601225945524",
-    "loan_id": "LOAN-006",
-    "run_id": "RUN_20260601225945524",
-    "status": "pending",
-    "review_note": "",
-    "created_at": "2026-06-01T22:59:45.524637"
-  },
-  {
-    "sample_id": "SAMP_20260607222337259_d7e98bb1",
-    "loan_id": "LOAN-002",
-    "run_id": "RUN_20260607222337262",
-    "status": "pending",
-    "review_note": "",
-    "review_status": "pending",
-    "reviewed_by": "",
-    "reviewed_at": "",
-    "created_at": "2026-06-07T22:23:37.260413"
-  },
-  {
-    "sample_id": "SAMP_20260607222337259_97cf52a2",
+    "sample_id": "SAMP_20260616200338808_97cf52a2",
     "loan_id": "LOAN-005",
-    "run_id": "RUN_20260607222337262",
+    "run_id": "RUN_20260616200338809",
     "status": "pending",
     "review_note": "",
     "review_status": "pending",
     "reviewed_by": "",
     "reviewed_at": "",
-    "created_at": "2026-06-07T22:23:37.260639"
+    "created_at": "2026-06-16T20:03:38.808897"
   },
   {
-    "conflict_id": "CONFLICT_20260607222337260",
+    "conflict_id": "CONFLICT_20260616200338808_4ce88a64",
     "loan_id": "LOAN-002",
-    "run_id": "RUN_20260607222337262",
+    "run_id": "RUN_20260616200338809",
     "status": "pending",
     "review_note": "",
-    "created_at": "2026-06-07T22:23:37.262672"
+    "created_at": "2026-06-16T20:03:38.809073"
   },
   {
-    "conflict_id": "CONFLICT_20260607222337260",
+    "conflict_id": "CONFLICT_20260616200338808_a88d60b9",
     "loan_id": "LOAN-002",
-    "run_id": "RUN_20260607222337262",
+    "run_id": "RUN_20260616200338809",
     "status": "pending",
     "review_note": "",
-    "created_at": "2026-06-07T22:23:37.262672"
+    "created_at": "2026-06-16T20:03:38.809073"
   },
   {
-    "conflict_id": "CONFLICT_20260607222337260",
+    "conflict_id": "CONFLICT_20260616200338808_0937e860",
     "loan_id": "LOAN-002",
-    "run_id": "RUN_20260607222337262",
+    "run_id": "RUN_20260616200338809",
     "status": "pending",
     "review_note": "",
-    "created_at": "2026-06-07T22:23:37.262672"
+    "created_at": "2026-06-16T20:03:38.809073"
   },
   {
-    "conflict_id": "CONFLICT_20260607222337260",
+    "conflict_id": "CONFLICT_20260616200338808_621adab5",
     "loan_id": "LOAN-003",
-    "run_id": "RUN_20260607222337262",
+    "run_id": "RUN_20260616200338809",
     "status": "pending",
     "review_note": "",
-    "created_at": "2026-06-07T22:23:37.262672"
+    "created_at": "2026-06-16T20:03:38.809073"
   },
   {
-    "conflict_id": "CONFLICT_20260607222337260",
+    "conflict_id": "CONFLICT_20260616200338808_02e457a2",
     "loan_id": "LOAN-003",
-    "run_id": "RUN_20260607222337262",
+    "run_id": "RUN_20260616200338809",
     "status": "pending",
     "review_note": "",
-    "created_at": "2026-06-07T22:23:37.262672"
+    "created_at": "2026-06-16T20:03:38.809073"
   },
   {
-    "conflict_id": "CONFLICT_20260607222337260",
+    "conflict_id": "CONFLICT_20260616200338808_834aec46",
     "loan_id": "LOAN-006",
-    "run_id": "RUN_20260607222337262",
+    "run_id": "RUN_20260616200338809",
     "status": "pending",
     "review_note": "",
-    "created_at": "2026-06-07T22:23:37.262672"
+    "created_at": "2026-06-16T20:03:38.809073"
   },
   {
-    "conflict_id": "CONFLICT_20260607222337260",
+    "conflict_id": "CONFLICT_20260616200338808_f5f66926",
     "loan_id": "LOAN-006",
-    "run_id": "RUN_20260607222337262",
+    "run_id": "RUN_20260616200338809",
     "status": "pending",
     "review_note": "",
-    "created_at": "2026-06-07T22:23:37.262672"
+    "created_at": "2026-06-16T20:03:38.809073"
   },
   {
-    "sample_id": "SAMP_20260607222432412_d7e98bb1",
+    "sample_id": "SAMP_20260616200338817_d7e98bb1",
     "loan_id": "LOAN-002",
-    "run_id": "RUN_20260607222432413",
+    "run_id": "RUN_20260616200338818",
     "status": "pending",
-    "review_note": "",
-    "review_status": "pending",
-    "reviewed_by": "",
-    "reviewed_at": "",
-    "created_at": "2026-06-07T22:24:32.412249"
+    "review_note": "经核对，LOAN-002为历史遗留测试数据，异常字段不影响本次分析。",
+    "review_status": "approved",
+    "reviewed_by": "QA测试员",
+    "reviewed_at": "2026-06-16T20:03:38.809061",
+    "created_at": "2026-06-16T20:03:38.817940"
   },
   {
-    "sample_id": "SAMP_20260607222432412_97cf52a2",
+    "sample_id": "SAMP_20260616200338817_97cf52a2",
     "loan_id": "LOAN-005",
-    "run_id": "RUN_20260607222432413",
+    "run_id": "RUN_20260616200338818",
     "status": "pending",
     "review_note": "",
     "review_status": "pending",
     "reviewed_by": "",
     "reviewed_at": "",
-    "created_at": "2026-06-07T22:24:32.412324"
+    "created_at": "2026-06-16T20:03:38.818019"
   },
   {
-    "conflict_id": "CONFLICT_20260607222432412",
+    "conflict_id": "CONFLICT_20260616200338818_4ce88a64",
     "loan_id": "LOAN-002",
-    "run_id": "RUN_20260607222432413",
+    "run_id": "RUN_20260616200338818",
     "status": "pending",
     "review_note": "",
-    "created_at": "2026-06-07T22:24:32.413586"
+    "created_at": "2026-06-16T20:03:38.818902"
   },
   {
-    "conflict_id": "CONFLICT_20260607222432412",
+    "conflict_id": "CONFLICT_20260616200338818_a88d60b9",
     "loan_id": "LOAN-002",
-    "run_id": "RUN_20260607222432413",
+    "run_id": "RUN_20260616200338818",
     "status": "pending",
     "review_note": "",
-    "created_at": "2026-06-07T22:24:32.413586"
+    "created_at": "2026-06-16T20:03:38.818902"
   },
   {
-    "conflict_id": "CONFLICT_20260607222432412",
+    "conflict_id": "CONFLICT_20260616200338818_0937e860",
     "loan_id": "LOAN-002",
-    "run_id": "RUN_20260607222432413",
+    "run_id": "RUN_20260616200338818",
     "status": "pending",
     "review_note": "",
-    "created_at": "2026-06-07T22:24:32.413586"
+    "created_at": "2026-06-16T20:03:38.818902"
   },
   {
-    "conflict_id": "CONFLICT_20260607222432412",
+    "conflict_id": "CONFLICT_20260616200338818_621adab5",
     "loan_id": "LOAN-003",
-    "run_id": "RUN_20260607222432413",
+    "run_id": "RUN_20260616200338818",
     "status": "pending",
     "review_note": "",
-    "created_at": "2026-06-07T22:24:32.413586"
+    "created_at": "2026-06-16T20:03:38.818902"
   },
   {
-    "conflict_id": "CONFLICT_20260607222432412",
+    "conflict_id": "CONFLICT_20260616200338818_02e457a2",
     "loan_id": "LOAN-003",
-    "run_id": "RUN_20260607222432413",
+    "run_id": "RUN_20260616200338818",
     "status": "pending",
     "review_note": "",
-    "created_at": "2026-06-07T22:24:32.413586"
+    "created_at": "2026-06-16T20:03:38.818902"
   },
   {
-    "conflict_id": "CONFLICT_20260607222432412",
+    "conflict_id": "CONFLICT_20260616200338818_834aec46",
     "loan_id": "LOAN-006",
-    "run_id": "RUN_20260607222432413",
+    "run_id": "RUN_20260616200338818",
     "status": "pending",
     "review_note": "",
-    "created_at": "2026-06-07T22:24:32.413586"
+    "created_at": "2026-06-16T20:03:38.818902"
   },
   {
-    "conflict_id": "CONFLICT_20260607222432412",
+    "conflict_id": "CONFLICT_20260616200338818_f5f66926",
     "loan_id": "LOAN-006",
-    "run_id": "RUN_20260607222432413",
+    "run_id": "RUN_20260616200338818",
     "status": "pending",
     "review_note": "",
-    "created_at": "2026-06-07T22:24:32.413586"
+    "created_at": "2026-06-16T20:03:38.818902"
+  },
+  {
+    "sample_id": "SAMP_20260616200455132_d7e98bb1",
+    "loan_id": "LOAN-002",
+    "run_id": "RUN_20260616200455133",
+    "status": "pending",
+    "review_note": "经核对，LOAN-002为历史遗留测试数据，异常字段不影响本次分析。",
+    "review_status": "approved",
+    "reviewed_by": "QA测试员",
+    "reviewed_at": "2026-06-16T20:03:38.809061",
+    "created_at": "2026-06-16T20:04:55.132458"
+  },
+  {
+    "sample_id": "SAMP_20260616200455132_97cf52a2",
+    "loan_id": "LOAN-005",
+    "run_id": "RUN_20260616200455133",
+    "status": "pending",
+    "review_note": "",
+    "review_status": "pending",
+    "reviewed_by": "",
+    "reviewed_at": "",
+    "created_at": "2026-06-16T20:04:55.132535"
+  },
+  {
+    "conflict_id": "CONFLICT_20260616200455132_4311bdc1",
+    "loan_id": "LOAN-002",
+    "run_id": "RUN_20260616200455133",
+    "status": "pending",
+    "review_note": "",
+    "created_at": "2026-06-16T20:04:55.133894"
+  },
+  {
+    "conflict_id": "CONFLICT_20260616200455132_a88d60b9",
+    "loan_id": "LOAN-002",
+    "run_id": "RUN_20260616200455133",
+    "status": "pending",
+    "review_note": "",
+    "created_at": "2026-06-16T20:04:55.133894"
+  },
+  {
+    "conflict_id": "CONFLICT_20260616200455132_0937e860",
+    "loan_id": "LOAN-002",
+    "run_id": "RUN_20260616200455133",
+    "status": "pending",
+    "review_note": "",
+    "created_at": "2026-06-16T20:04:55.133894"
+  },
+  {
+    "conflict_id": "CONFLICT_20260616200455132_3daeac09",
+    "loan_id": "LOAN-003",
+    "run_id": "RUN_20260616200455133",
+    "status": "pending",
+    "review_note": "",
+    "created_at": "2026-06-16T20:04:55.133894"
+  },
+  {
+    "conflict_id": "CONFLICT_20260616200455132_02e457a2",
+    "loan_id": "LOAN-003",
+    "run_id": "RUN_20260616200455133",
+    "status": "pending",
+    "review_note": "",
+    "created_at": "2026-06-16T20:04:55.133894"
+  },
+  {
+    "conflict_id": "CONFLICT_20260616200455132_197441fb",
+    "loan_id": "LOAN-006",
+    "run_id": "RUN_20260616200455133",
+    "status": "pending",
+    "review_note": "",
+    "created_at": "2026-06-16T20:04:55.133894"
+  },
+  {
+    "conflict_id": "CONFLICT_20260616200455132_f5f66926",
+    "loan_id": "LOAN-006",
+    "run_id": "RUN_20260616200455133",
+    "status": "pending",
+    "review_note": "",
+    "created_at": "2026-06-16T20:04:55.133894"
+  },
+  {
+    "sample_id": "SAMP_20260616200836902_d7e98bb1",
+    "loan_id": "LOAN-002",
+    "run_id": "RUN_20260616200836904",
+    "status": "pending",
+    "review_note": "经核对，LOAN-002为历史遗留测试数据，异常字段不影响本次分析。",
+    "review_status": "approved",
+    "reviewed_by": "QA测试员",
+    "reviewed_at": "2026-06-16T20:03:38.809061",
+    "created_at": "2026-06-16T20:08:36.902467"
+  },
+  {
+    "sample_id": "SAMP_20260616200836902_97cf52a2",
+    "loan_id": "LOAN-005",
+    "run_id": "RUN_20260616200836904",
+    "status": "pending",
+    "review_note": "",
+    "review_status": "pending",
+    "reviewed_by": "",
+    "reviewed_at": "",
+    "created_at": "2026-06-16T20:08:36.902540"
+  },
+  {
+    "conflict_id": "CONFLICT_20260616200836902_4311bdc1",
+    "loan_id": "LOAN-002",
+    "run_id": "RUN_20260616200836904",
+    "status": "pending",
+    "review_note": "",
+    "created_at": "2026-06-16T20:08:36.904682"
+  },
+  {
+    "conflict_id": "CONFLICT_20260616200836902_a88d60b9",
+    "loan_id": "LOAN-002",
+    "run_id": "RUN_20260616200836904",
+    "status": "pending",
+    "review_note": "",
+    "created_at": "2026-06-16T20:08:36.904682"
+  },
+  {
+    "conflict_id": "CONFLICT_20260616200836902_0937e860",
+    "loan_id": "LOAN-002",
+    "run_id": "RUN_20260616200836904",
+    "status": "pending",
+    "review_note": "",
+    "created_at": "2026-06-16T20:08:36.904682"
+  },
+  {
+    "conflict_id": "CONFLICT_20260616200836902_3daeac09",
+    "loan_id": "LOAN-003",
+    "run_id": "RUN_20260616200836904",
+    "status": "pending",
+    "review_note": "",
+    "created_at": "2026-06-16T20:08:36.904682"
+  },
+  {
+    "conflict_id": "CONFLICT_20260616200836902_02e457a2",
+    "loan_id": "LOAN-003",
+    "run_id": "RUN_20260616200836904",
+    "status": "pending",
+    "review_note": "",
+    "created_at": "2026-06-16T20:08:36.904682"
+  },
+  {
+    "conflict_id": "CONFLICT_20260616200836902_197441fb",
+    "loan_id": "LOAN-006",
+    "run_id": "RUN_20260616200836904",
+    "status": "pending",
+    "review_note": "",
+    "created_at": "2026-06-16T20:08:36.904682"
+  },
+  {
+    "conflict_id": "CONFLICT_20260616200836902_f5f66926",
+    "loan_id": "LOAN-006",
+    "run_id": "RUN_20260616200836904",
+    "status": "pending",
+    "review_note": "",
+    "created_at": "2026-06-16T20:08:36.904682"
   }
 ]

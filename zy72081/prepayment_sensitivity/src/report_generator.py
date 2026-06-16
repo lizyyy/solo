@@ -224,8 +224,35 @@ class ReportGenerator:
             <h2 class="section-title">数据冲突检测（复盘图表 vs 导入数据）</h2>
             <div style="margin-bottom: 16px;">
                 <strong>待处理冲突:</strong> {conflict_summary.get('unresolved_conflicts', 0)} 项
+                &nbsp;&nbsp;|&nbsp;&nbsp;
+                <strong>已解决:</strong> {conflict_summary.get('resolved_conflicts', 0)} 项
+                &nbsp;&nbsp;|&nbsp;&nbsp;
+                <strong>共 {conflict_summary.get('total_conflicts', 0)} 项
             </div>
-            {self._generate_conflict_sections(conflicts)}
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 16px;">
+                💡 点击表格行跳转到对应贷款明细，点击冲突ID可定位到具体冲突证据卡片
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>冲突追踪ID</th>
+                        <th>贷款ID</th>
+                        <th>冲突字段</th>
+                        <th>系统计算值</th>
+                        <th>复盘图表值</th>
+                        <th>差异</th>
+                        <th>处理状态</th>
+                        <th>建议动作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {self._generate_conflict_table(conflicts, results)}
+                </tbody>
+            </table>
+            <div style="margin-top: 24px;">
+                <h3 style="margin-bottom: 16px; color: #374151;">📋 逐条冲突证据（可独立追踪）</h3>
+                {self._generate_conflict_sections(conflicts, results)}
+            </div>
         </div>
 
         <div id="parameters" class="section">
@@ -323,12 +350,25 @@ class ReportGenerator:
                 const offsetTop = element.offsetTop - 60;
                 try {{
                     element.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
-                }} catch(e) {{
-                    window.scrollTo({{ top: offsetTop, behavior: 'smooth' }});
-                }}
-                if (window.innerHeight <= 0) {{
+                }} catch(e) {{}}
+                window.setTimeout(function() {{
                     window.scrollTo(0, offsetTop);
-                }}
+                }}, 80);
+            }}
+        }}
+
+        function scrollToConflict(conflictId) {{
+            const element = document.getElementById('conflict-' + conflictId);
+            if (element) {{
+                const offsetTop = element.offsetTop - 60;
+                let scrolled = false;
+                try {{
+                    element.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
+                    scrolled = true;
+                }} catch(e) {{}}
+                window.setTimeout(function() {{
+                    window.scrollTo(0, offsetTop);
+                }}, 80);
             }}
         }}
 
@@ -341,6 +381,9 @@ class ReportGenerator:
             if (hash && hash.startsWith('sample-')) {{
                 const sampleId = hash.replace('sample-', '');
                 setTimeout(() => scrollToSample(sampleId), 100);
+            }} else if (hash && hash.startsWith('conflict-')) {{
+                const conflictId = hash.replace('conflict-', '');
+                setTimeout(() => scrollToConflict(conflictId), 100);
             }}
         }});
     </script>
@@ -404,7 +447,7 @@ class ReportGenerator:
                 rows.append(f"""
                     <tr onclick="scrollToSample('{result.sample_id}')" style="cursor: pointer;">
                         <td>{result.sample_id[-12:]}</td>
-                        <td>{anomaly.sample_id[:12] if len(anomaly.sample_id) > 12 else anomaly.sample_id}</td>
+                        <td>{result.loan_id}</td>
                         <td><strong>{anomaly.field_name}</strong></td>
                         <td>{anomaly.expected_range}</td>
                         <td style="color: #dc2626; font-weight: 600;">{anomaly.actual_value}</td>
@@ -414,11 +457,19 @@ class ReportGenerator:
                 """)
         return "\n".join(rows) if rows else '<tr><td colspan="7" style="text-align: center; color: #64748b;">暂无异常数据</td></tr>'
 
-    def _generate_conflict_sections(self, conflicts: List[DataConflict]) -> str:
+    def _generate_conflict_table(
+        self,
+        conflicts: List[DataConflict],
+        results: List[SensitivityResult],
+    ) -> str:
         if not conflicts:
-            return '<div style="color: #64748b; text-align: center; padding: 24px;">暂无数据冲突</div>'
+            return '<tr><td colspan="8" style="text-align: center; color: #64748b;">暂无数据冲突</td></tr>'
 
-        sections = []
+        loan_id_to_sample = {}
+        for r in results:
+            loan_id_to_sample[r.loan_id] = r.sample_id
+
+        rows = []
         for conflict in conflicts:
             field_label = {
                 "sensitivity_score": "敏感性得分",
@@ -443,11 +494,106 @@ class ReportGenerator:
                 else str(conflict.chart_value)
             )
 
+            diff_str = (
+                f"{conflict.difference:.2f}%"
+                if conflict.difference > 0
+                else "等级差异"
+            )
+
+            conflict_id_short = conflict.conflict_id[-16:] if len(conflict.conflict_id) > 16 else conflict.conflict_id
+            sample_id = loan_id_to_sample.get(conflict.loan_id, "")
+
+            rows.append(f"""
+                <tr onclick="scrollToSample('{sample_id}')" style="cursor: pointer;">
+                    <td onclick="event.stopPropagation(); scrollToConflict('{conflict.conflict_id}'); return false;"
+                        style="cursor: pointer; font-family: monospace; font-size: 11px; color: #3b82f6; text-decoration: underline;"
+                        title="点击定位到冲突证据">
+                        {conflict_id_short}
+                    </td>
+                    <td><strong>{conflict.loan_id}</strong></td>
+                    <td>{field_label}</td>
+                    <td style="color: #1e40af;">{sample_value_str}</td>
+                    <td style="color: #7c2d12;">{chart_value_str}</td>
+                    <td style="color: #dc2626; font-weight: 600;">{diff_str}</td>
+                    <td>{status_badge}</td>
+                    <td style="font-size: 12px; color: #64748b; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{conflict.suggested_action}">{conflict.suggested_action}</td>
+                </tr>
+            """)
+        return "\n".join(rows)
+
+    def _generate_conflict_sections(
+        self,
+        conflicts: List[DataConflict],
+        results: List[SensitivityResult],
+    ) -> str:
+        if not conflicts:
+            return '<div style="color: #64748b; text-align: center; padding: 24px;">暂无数据冲突</div>'
+
+        loan_id_to_sample = {}
+        for r in results:
+            loan_id_to_sample[r.loan_id] = r.sample_id
+
+        sections = []
+        for idx, conflict in enumerate(conflicts):
+            field_label = {
+                "sensitivity_score": "敏感性得分",
+                "risk_level": "风险等级",
+                "principal": "贷款本金",
+            }.get(conflict.field_name, conflict.field_name)
+
+            status_badge = (
+                '<span class="badge badge-low">已解决</span>'
+                if conflict.resolved
+                else '<span class="badge badge-review">待处理</span>'
+            )
+
+            sample_value_str = (
+                f"{conflict.sample_value:.4f}"
+                if isinstance(conflict.sample_value, float)
+                else str(conflict.sample_value)
+            )
+            chart_value_str = (
+                f"{conflict.chart_value:.4f}"
+                if isinstance(conflict.chart_value, float)
+                else str(conflict.chart_value)
+            )
+
+            sample_id = loan_id_to_sample.get(conflict.loan_id, "")
+            conflict_id_short = conflict.conflict_id[-16:] if len(conflict.conflict_id) > 16 else conflict.conflict_id
+            diff_str = (
+                f"{conflict.difference:.2f}%"
+                if conflict.difference > 0
+                else "等级差异"
+            )
+
+            diff_html = ""
+            if conflict.difference > 0:
+                diff_html = f'<span style="font-size: 12px; color: #dc2626;"><strong>差异:</strong> {diff_str}</span>'
+
+            button_html = ""
+            if sample_id:
+                button_html = (
+                    '<button onclick="scrollToSample(&#39;' + sample_id + '&#39;)" '
+                    'style="background: #3b82f6; color: white; border: none; padding: 4px 10px; '
+                    'border-radius: 4px; cursor: pointer; font-size: 11px;">📋 查看贷款明细</button>'
+                )
+
             sections.append(f"""
-                <div class="conflict-item">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <strong>字段: {field_label}</strong>
-                        {status_badge}
+                <div id="conflict-{conflict.conflict_id}" class="conflict-item" style="position: relative;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <strong style="font-size: 13px; color: #374151;">
+                                #{idx + 1} {conflict.loan_id} · {field_label}
+                            </strong>
+                            <code style="background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 11px; color: #475569;">
+                                ID: {conflict_id_short}
+                            </code>
+                            {status_badge}
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            {diff_html}
+                            {button_html}
+                        </div>
                     </div>
                     <div class="conflict-evidence">
                         <div class="evidence-box">
@@ -461,11 +607,18 @@ class ReportGenerator:
                             <div style="font-size: 12px; color: #64748b; margin-top: 4px;">{conflict.chart_source}</div>
                         </div>
                     </div>
-                    {f'<div style="margin-bottom: 12px;"><strong>差异:</strong> <span style="color: #dc2626;">{conflict.difference:.2f}%</span></div>' if conflict.difference > 0 else ''}
                     <div class="suggestion">
                         <strong>💡 建议动作：</strong>{conflict.suggested_action}
                     </div>
                     {f'<div class="history-note" style="margin-top: 12px;"><strong>✅ 处理结果：</strong>{conflict.resolution_note}</div>' if conflict.resolution_note else ''}
+                    <div style="margin-top: 12px; padding-top: 8px; border-top: 1px dashed #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <span style="font-size: 11px; color: #94a3b8;">
+                            🔗 追溯锚点：<code style="background: #f1f5f9; padding: 2px 6px; border-radius: 3px;">#conflict-{conflict.conflict_id}</code>
+                        </span>
+                        <span style="font-size: 11px; color: #94a3b8;">
+                            补材料继续处理：状态保留，不被默认值覆盖
+                        </span>
+                    </div>
                 </div>
             """)
 

@@ -1,6 +1,6 @@
 [
   {
-    "version_id": "PARAM_20260616200338808",
+    "version_id": "PARAM_20260601225945521",
     "parameters": {
       "rate_sensitivity": {
         "name": "rate_sensitivity",
@@ -8,7 +8,7 @@
         "weight": 0.3,
         "description": "利率变动对提前还款的影响系数",
         "source": "default",
-        "last_modified": "2026-06-16T20:03:38.808158",
+        "last_modified": "2026-06-01T22:59:45.521786",
         "modified_by": "system"
       },
       "term_sensitivity": {
@@ -17,7 +17,7 @@
         "weight": 0.2,
         "description": "剩余期限对提前还款的影响系数",
         "source": "default",
-        "last_modified": "2026-06-16T20:03:38.808166",
+        "last_modified": "2026-06-01T22:59:45.521806",
         "modified_by": "system"
       },
       "fico_sensitivity": {
@@ -26,7 +26,7 @@
         "weight": 0.15,
         "description": "FICO评分对提前还款的影响系数",
         "source": "default",
-        "last_modified": "2026-06-16T20:03:38.808167",
+        "last_modified": "2026-06-01T22:59:45.521809",
         "modified_by": "system"
       },
       "dti_sensitivity": {
@@ -35,7 +35,7 @@
         "weight": 0.15,
         "description": "DTI比率对提前还款的影响系数",
         "source": "default",
-        "last_modified": "2026-06-16T20:03:38.808168",
+        "last_modified": "2026-06-01T22:59:45.521812",
         "modified_by": "system"
       },
       "ltv_sensitivity": {
@@ -44,7 +44,7 @@
         "weight": 0.1,
         "description": "LTV比率对提前还款的影响系数",
         "source": "default",
-        "last_modified": "2026-06-16T20:03:38.808169",
+        "last_modified": "2026-06-01T22:59:45.521815",
         "modified_by": "system"
       },
       "history_sensitivity": {
@@ -53,7 +53,7 @@
         "weight": 0.1,
         "description": "提前还款历史的影响系数",
         "source": "default",
-        "last_modified": "2026-06-16T20:03:38.808170",
+        "last_modified": "2026-06-01T22:59:45.521817",
         "modified_by": "system"
       },
       "age_sensitivity": {
@@ -62,7 +62,7 @@
         "weight": 0.1,
         "description": "借款人年龄对提前还款的影响系数",
         "source": "default",
-        "last_modified": "2026-06-16T20:03:38.808171",
+        "last_modified": "2026-06-01T22:59:45.521819",
         "modified_by": "system"
       },
       "high_risk_threshold": {
@@ -71,7 +71,7 @@
         "weight": 0.0,
         "description": "高风险判定阈值",
         "source": "default",
-        "last_modified": "2026-06-16T20:03:38.808172",
+        "last_modified": "2026-06-01T22:59:45.521821",
         "modified_by": "system"
       },
       "medium_risk_threshold": {
@@ -80,17 +80,17 @@
         "weight": 0.0,
         "description": "中风险判定阈值",
         "source": "default",
-        "last_modified": "2026-06-16T20:03:38.808173",
+        "last_modified": "2026-06-01T22:59:45.521824",
         "modified_by": "system"
       }
     },
-    "created_at": "2026-06-16T20:03:38.808193",
+    "created_at": "2026-06-01T22:59:45.521873",
     "created_by": "system",
     "note": "初始默认参数版本",
     "is_active": false
   },
   {
-    "version_id": "PARAM_20260616200455131",
+    "version_id": "PARAM_20260601225945522",
     "parameters": {
       "rate_sensitivity": {
         "name": "rate_sensitivity",
@@ -98,7 +98,7 @@
         "weight": 0.35,
         "description": "利率变动对提前还款的影响系数",
         "source": "manual",
-        "last_modified": "2026-06-16T20:04:55.131450",
+        "last_modified": "2026-06-01T22:59:45.522582",
         "modified_by": "小岑"
       },
       "term_sensitivity": {
@@ -107,7 +107,7 @@
         "weight": 0.2,
         "description": "剩余期限对提前还款的影响系数",
         "source": "default",
-        "last_modified": "2026-06-16T20:03:38.808166",
+        "last_modified": "2026-06-01T22:59:45.521806",
         "modified_by": "system"
       },
       "fico_sensitivity": {
@@ -116,7 +116,7 @@
         "weight": 0.2,
         "description": "FICO评分对提前还款的影响系数",
         "source": "manual",
-        "last_modified": "2026-06-16T20:04:55.131454",
+        "last_modified": "2026-06-01T22:59:45.522589",
         "modified_by": "小岑"
       },
       "dti_sensitivity": {
@@ -125,7 +125,7 @@
         "weight": 0.15,
         "description": "DTI比率对提前还款的影响系数",
         "source": "default",
-        "last_modified": "2026-06-16T20:03:38.808168",
+        "last_modified": "2026-06-01T22:59:45.521812",
         "modified_by": "system"
       },
       "ltv_sensitivity": {
@@ -134,7 +134,7 @@
         "weight": 0.1,
         "description": "LTV比率对提前还款的影响系数",
         "source": "default",
-        "last_modified": "2026-06-16T20:03:38.808169",
+        "last_modified": "2026-06-01T22:59:45.521815",
         "modified_by": "system"
       },
       "history_sensitivity": {
@@ -143,7 +143,7 @@
         "weight": 0.1,
         "description": "提前还款历史的影响系数",
         "source": "default",
-        "last_modified": "2026-06-16T20:03:38.808170",
+        "last_modified": "2026-06-01T22:59:45.521817",
         "modified_by": "system"
       },
       "age_sensitivity": {
@@ -152,7 +152,7 @@
         "weight": 0.1,
         "description": "借款人年龄对提前还款的影响系数",
         "source": "default",
-        "last_modified": "2026-06-16T20:03:38.808171",
+        "last_modified": "2026-06-01T22:59:45.521819",
         "modified_by": "system"
       },
       "high_risk_threshold": {
@@ -161,7 +161,7 @@
         "weight": 0.0,
         "description": "高风险判定阈值",
         "source": "default",
-        "last_modified": "2026-06-16T20:03:38.808172",
+        "last_modified": "2026-06-01T22:59:45.521821",
         "modified_by": "system"
       },
       "medium_risk_threshold": {
@@ -170,11 +170,11 @@
         "weight": 0.0,
         "description": "中风险判定阈值",
         "source": "default",
-        "last_modified": "2026-06-16T20:03:38.808173",
+        "last_modified": "2026-06-01T22:59:45.521824",
         "modified_by": "system"
       }
     },
-    "created_at": "2026-06-16T20:04:55.131470",
+    "created_at": "2026-06-01T22:59:45.522609",
     "created_by": "小岑",
     "note": "2026Q2 权重调整：利率和FICO权重上调，历史人工调整记录",
     "is_active": true

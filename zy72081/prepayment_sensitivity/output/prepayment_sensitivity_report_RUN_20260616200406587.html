@@ -1,0 +1,2736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贷款提前还款敏感性分析报告</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+        .header { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; padding: 32px; border-radius: 12px; margin-bottom: 24px; }
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header .meta { opacity: 0.9; font-size: 14px; }
+        .section { background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .section-title { font-size: 20px; font-weight: 600; margin-bottom: 16px; color: #1e293b; display: flex; align-items: center; gap: 8px; }
+        .section-title::before { content: ''; width: 4px; height: 20px; background: #3b82f6; border-radius: 2px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .kpi-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 4px solid #3b82f6; }
+        .kpi-card .label { font-size: 13px; color: #64748b; margin-bottom: 8px; }
+        .kpi-card .value { font-size: 28px; font-weight: 700; color: #1e293b; }
+        .kpi-card.high { border-left-color: #dc2626; }
+        .kpi-card.medium { border-left-color: #f59e0b; }
+        .kpi-card.low { border-left-color: #10b981; }
+        .kpi-card.review { border-left-color: #8b5cf6; }
+        .chart-container { position: relative; height: 350px; margin: 24px 0; }
+        .bar-chart { display: flex; align-items: flex-end; justify-content: space-around; height: 280px; padding: 20px; background: #f8fafc; border-radius: 8px; }
+        .bar { width: 50px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.3s; position: relative; }
+        .bar:hover { transform: translateY(-4px); }
+        .bar-fill { width: 100%; border-radius: 4px 4px 0 0; transition: all 0.3s; }
+        .bar-label { margin-top: 8px; font-size: 11px; color: #64748b; text-align: center; }
+        .bar-value { position: absolute; top: -24px; font-size: 12px; font-weight: 600; }
+        .bar-tooltip { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 8px 12px; border-radius: 6px; font-size: 12px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 10; }
+        .bar:hover .bar-tooltip { opacity: 1; }
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f1f5f9; font-weight: 600; color: #475569; font-size: 13px; }
+        tr:hover { background: #f8fafc; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge-high { background: #fef2f2; color: #dc2626; }
+        .badge-medium { background: #fffbeb; color: #f59e0b; }
+        .badge-low { background: #f0fdf4; color: #10b981; }
+        .badge-review { background: #faf5ff; color: #8b5cf6; }
+        .badge-critical { background: #fef2f2; color: #dc2626; }
+        .badge-warning { background: #fffbeb; color: #f59e0b; }
+        .detail-section { margin-top: 32px; padding-top: 24px; border-top: 1px solid #e2e8f0; }
+        .detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; cursor: pointer; padding: 12px; background: #f1f5f9; border-radius: 8px; }
+        .detail-header:hover { background: #e2e8f0; }
+        .detail-content { display: none; padding: 16px; background: #f8fafc; border-radius: 8px; margin-top: 8px; }
+        .detail-content.active { display: block; }
+        .calc-step { background: white; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #3b82f6; }
+        .calc-step .step-name { font-weight: 600; color: #1e40af; margin-bottom: 4px; }
+        .calc-step .formula { font-family: 'Courier New', monospace; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; font-size: 13px; }
+        .calc-step .result { font-weight: 600; color: #059669; }
+        .anomaly-item { padding: 12px; background: #fef2f2; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #dc2626; }
+        .anomaly-item.warning { background: #fffbeb; border-left-color: #f59e0b; }
+        .conflict-item { padding: 16px; background: #faf5ff; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #8b5cf6; }
+        .conflict-evidence { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 12px 0; }
+        .evidence-box { background: white; padding: 12px; border-radius: 6px; }
+        .evidence-label { font-size: 12px; color: #64748b; margin-bottom: 4px; }
+        .evidence-value { font-weight: 600; }
+        .suggestion { background: #eff6ff; padding: 12px; border-radius: 6px; border-left: 3px solid #3b82f6; }
+        .note-item { padding: 8px 12px; background: #fef3c7; border-radius: 6px; margin-bottom: 6px; font-size: 13px; border-left: 3px solid #f59e0b; }
+        .params-table { font-size: 13px; }
+        .params-table td { padding: 8px 12px; }
+        .param-modified { background: #fef3c7; }
+        .expand-icon { transition: transform 0.3s; }
+        .expand-icon.active { transform: rotate(90deg); }
+        .nav-links { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
+        .nav-link { color: #3b82f6; text-decoration: none; font-size: 14px; cursor: pointer; }
+        .nav-link:hover { text-decoration: underline; }
+        .history-note { background: #f0fdf4; padding: 12px; border-radius: 6px; margin-top: 12px; border-left: 3px solid #10b981; font-size: 13px; }
+        .sample-type { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-left: 8px; }
+        .type-smooth { background: #d1fae5; color: #065f46; }
+        .type-review { background: #fef3c7; color: #92400e; }
+        .type-old { background: #e0e7ff; color: #3730a3; }
+        .scroll-top { position: fixed; bottom: 24px; right: 24px; width: 48px; height: 48px; background: #3b82f6; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏦 贷款提前还款敏感性分析报告</h1>
+            <div class="meta">
+                运行ID: RUN_20260616200406587 | 运行时间: 2026-06-16T20:04:06.587895 | 参数版本: PARAM_20260616200406587
+            </div>
+            <div class="nav-links">
+                <a class="nav-link" href="#summary">📊 概览</a>
+                <a class="nav-link" href="#distribution">📈 风险分布</a>
+                <a class="nav-link" href="#anomalies">⚠️ 异常检测</a>
+                <a class="nav-link" href="#conflicts">⚔️ 数据冲突</a>
+                <a class="nav-link" href="#parameters">⚙️ 参数版本</a>
+                <a class="nav-link" href="#details">📋 明细数据</a>
+                <a class="nav-link" href="#history">📜 历史记录</a>
+            </div>
+        </div>
+
+        <div id="summary" class="kpi-grid">
+            <div class="kpi-card">
+                <div class="label">总样本数</div>
+                <div class="value">6</div>
+            </div>
+            <div class="kpi-card high">
+                <div class="label">高风险</div>
+                <div class="value">0</div>
+            </div>
+            <div class="kpi-card medium">
+                <div class="label">中风险</div>
+                <div class="value">0</div>
+            </div>
+            <div class="kpi-card low">
+                <div class="label">低风险</div>
+                <div class="value">6</div>
+            </div>
+            <div class="kpi-card review">
+                <div class="label">需人工复核</div>
+                <div class="value">2</div>
+            </div>
+            <div class="kpi-card">
+                <div class="label">异常检测数</div>
+                <div class="value">16</div>
+            </div>
+            <div class="kpi-card">
+                <div class="label">数据冲突数</div>
+                <div class="value">7</div>
+            </div>
+            <div class="kpi-card">
+                <div class="label">历史运行次数</div>
+                <div class="value">1</div>
+            </div>
+        </div>
+
+        <div id="distribution" class="section">
+            <h2 class="section-title">敏感性得分分布图（点击柱子跳转到对应明细）</h2>
+            <div class="chart-container">
+                <div class="bar-chart">
+                    
+                <div class="bar" onclick="scrollToSample('SAMP_20260616200406587_2b18a796')">
+                    <span class="bar-value" style="color: #10b981;">0.084</span>
+                    <div class="bar-tooltip">贷款ID: 2b18a796\n敏感性得分: 0.0840\n风险等级: 低风险\n点击查看详细计算过程</div>
+                    <div class="bar-fill" style="height: 21px; background: #10b981;"></div>
+                    <div class="bar-label">2b18a796</div>
+                </div>
+            
+
+                <div class="bar" onclick="scrollToSample('SAMP_20260616200406587_d7e98bb1')">
+                    <span class="bar-value" style="color: #10b981;">0.189</span>
+                    <div class="bar-tooltip">贷款ID: d7e98bb1\n敏感性得分: 0.1891\n风险等级: 低风险, 8个异常\n点击查看详细计算过程</div>
+                    <div class="bar-fill" style="height: 47px; background: #10b981;"></div>
+                    <div class="bar-label">d7e98bb1<span class="sample-type type-review">待复核</span></div>
+                </div>
+            
+
+                <div class="bar" onclick="scrollToSample('SAMP_20260616200406587_65e9d105')">
+                    <span class="bar-value" style="color: #10b981;">0.138</span>
+                    <div class="bar-tooltip">贷款ID: 65e9d105\n敏感性得分: 0.1378\n风险等级: 低风险\n点击查看详细计算过程</div>
+                    <div class="bar-fill" style="height: 34px; background: #10b981;"></div>
+                    <div class="bar-label">65e9d105</div>
+                </div>
+            
+
+                <div class="bar" onclick="scrollToSample('SAMP_20260616200406587_83a7fa02')">
+                    <span class="bar-value" style="color: #10b981;">0.069</span>
+                    <div class="bar-tooltip">贷款ID: 83a7fa02\n敏感性得分: 0.0686\n风险等级: 低风险\n点击查看详细计算过程</div>
+                    <div class="bar-fill" style="height: 17px; background: #10b981;"></div>
+                    <div class="bar-label">83a7fa02</div>
+                </div>
+            
+
+                <div class="bar" onclick="scrollToSample('SAMP_20260616200406587_97cf52a2')">
+                    <span class="bar-value" style="color: #10b981;">0.113</span>
+                    <div class="bar-tooltip">贷款ID: 97cf52a2\n敏感性得分: 0.1128\n风险等级: 低风险, 8个异常\n点击查看详细计算过程</div>
+                    <div class="bar-fill" style="height: 28px; background: #10b981;"></div>
+                    <div class="bar-label">97cf52a2<span class="sample-type type-review">待复核</span></div>
+                </div>
+            
+
+                <div class="bar" onclick="scrollToSample('SAMP_20260616200406587_3de645af')">
+                    <span class="bar-value" style="color: #10b981;">0.141</span>
+                    <div class="bar-tooltip">贷款ID: 3de645af\n敏感性得分: 0.1414\n风险等级: 低风险\n点击查看详细计算过程</div>
+                    <div class="bar-fill" style="height: 35px; background: #10b981;"></div>
+                    <div class="bar-label">3de645af</div>
+                </div>
+            
+                </div>
+            </div>
+            <p style="font-size: 13px; color: #64748b; text-align: center;">
+                💡 提示：将鼠标悬停在柱子上可查看详情，点击跳转到对应样本的完整计算明细
+            </p>
+        </div>
+
+        <div id="anomalies" class="section">
+            <h2 class="section-title">异常检测结果</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                <div><strong>异常样本率:</strong> 33.33%</div>
+                <div><strong>严重异常:</strong> <span style="color: #dc2626;">10</span> 个</div>
+                <div><strong>警告异常:</strong> <span style="color: #f59e0b;">6</span> 个</div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>样本ID</th>
+                        <th>贷款ID</th>
+                        <th>异常字段</th>
+                        <th>期望值范围</th>
+                        <th>实际值</th>
+                        <th>严重程度</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    <tr onclick="scrollToSample('SAMP_20260616200406587_d7e98bb1')" style="cursor: pointer;">
+                        <td>587_d7e98bb1</td>
+                        <td>LOAN-002</td>
+                        <td><strong>principal</strong></td>
+                        <td>10,000 - 2,000,000</td>
+                        <td style="color: #dc2626; font-weight: 600;">2800000.0</td>
+                        <td><span class="badge badge-critical">严重</span></td>
+                        <td>贷款本金应在合理范围内</td>
+                    </tr>
+                
+
+                    <tr onclick="scrollToSample('SAMP_20260616200406587_d7e98bb1')" style="cursor: pointer;">
+                        <td>587_d7e98bb1</td>
+                        <td>LOAN-002</td>
+                        <td><strong>interest_rate</strong></td>
+                        <td>0.5% - 15.0%</td>
+                        <td style="color: #dc2626; font-weight: 600;">18.5</td>
+                        <td><span class="badge badge-critical">严重</span></td>
+                        <td>利率应在合理范围内</td>
+                    </tr>
+                
+
+                    <tr onclick="scrollToSample('SAMP_20260616200406587_d7e98bb1')" style="cursor: pointer;">
+                        <td>587_d7e98bb1</td>
+                        <td>LOAN-002</td>
+                        <td><strong>remaining_term</strong></td>
+                        <td>1 - 360个月</td>
+                        <td style="color: #dc2626; font-weight: 600;">480</td>
+                        <td><span class="badge badge-critical">严重</span></td>
+                        <td>剩余期限应在1-360个月之间</td>
+                    </tr>
+                
+
+                    <tr onclick="scrollToSample('SAMP_20260616200406587_d7e98bb1')" style="cursor: pointer;">
+                        <td>587_d7e98bb1</td>
+                        <td>LOAN-002</td>
+                        <td><strong>borrower_age</strong></td>
+                        <td>18 - 100岁</td>
+                        <td style="color: #dc2626; font-weight: 600;">152</td>
+                        <td><span class="badge badge-warning">警告</span></td>
+                        <td>借款人年龄应在合理范围内</td>
+                    </tr>
+                
+
+                    <tr onclick="scrollToSample('SAMP_20260616200406587_d7e98bb1')" style="cursor: pointer;">
+                        <td>587_d7e98bb1</td>
+                        <td>LOAN-002</td>
+                        <td><strong>fico_score</strong></td>
+                        <td>300 - 850</td>
+                        <td style="color: #dc2626; font-weight: 600;">250</td>
+                        <td><span class="badge badge-critical">严重</span></td>
+                        <td>FICO评分应在300-850之间</td>
+                    </tr>
+                
+
+                    <tr onclick="scrollToSample('SAMP_20260616200406587_d7e98bb1')" style="cursor: pointer;">
+                        <td>587_d7e98bb1</td>
+                        <td>LOAN-002</td>
+                        <td><strong>dti_ratio</strong></td>
+                        <td>0 - 80%</td>
+                        <td style="color: #dc2626; font-weight: 600;">95.0</td>
+                        <td><span class="badge badge-warning">警告</span></td>
+                        <td>DTI比率通常不超过80%</td>
+                    </tr>
+                
+
+                    <tr onclick="scrollToSample('SAMP_20260616200406587_d7e98bb1')" style="cursor: pointer;">
+                        <td>587_d7e98bb1</td>
+                        <td>LOAN-002</td>
+                        <td><strong>ltv_ratio</strong></td>
+                        <td>0 - 125%</td>
+                        <td style="color: #dc2626; font-weight: 600;">140.0</td>
+                        <td><span class="badge badge-warning">警告</span></td>
+                        <td>LTV比率通常不超过125%</td>
+                    </tr>
+                
+
+                    <tr onclick="scrollToSample('SAMP_20260616200406587_d7e98bb1')" style="cursor: pointer;">
+                        <td>587_d7e98bb1</td>
+                        <td>LOAN-002</td>
+                        <td><strong>overall</strong></td>
+                        <td>最多2个严重异常</td>
+                        <td style="color: #dc2626; font-weight: 600;">4个严重异常</td>
+                        <td><span class="badge badge-critical">严重</span></td>
+                        <td>样本存在多个严重异常，建议人工复核完整数据来源</td>
+                    </tr>
+                
+
+                    <tr onclick="scrollToSample('SAMP_20260616200406587_97cf52a2')" style="cursor: pointer;">
+                        <td>587_97cf52a2</td>
+                        <td>LOAN-005</td>
+                        <td><strong>principal</strong></td>
+                        <td>10,000 - 2,000,000</td>
+                        <td style="color: #dc2626; font-weight: 600;">9500000.0</td>
+                        <td><span class="badge badge-critical">严重</span></td>
+                        <td>贷款本金应在合理范围内</td>
+                    </tr>
+                
+
+                    <tr onclick="scrollToSample('SAMP_20260616200406587_97cf52a2')" style="cursor: pointer;">
+                        <td>587_97cf52a2</td>
+                        <td>LOAN-005</td>
+                        <td><strong>interest_rate</strong></td>
+                        <td>0.5% - 15.0%</td>
+                        <td style="color: #dc2626; font-weight: 600;">0.1</td>
+                        <td><span class="badge badge-critical">严重</span></td>
+                        <td>利率应在合理范围内</td>
+                    </tr>
+                
+
+                    <tr onclick="scrollToSample('SAMP_20260616200406587_97cf52a2')" style="cursor: pointer;">
+                        <td>587_97cf52a2</td>
+                        <td>LOAN-005</td>
+                        <td><strong>remaining_term</strong></td>
+                        <td>1 - 360个月</td>
+                        <td style="color: #dc2626; font-weight: 600;">0</td>
+                        <td><span class="badge badge-critical">严重</span></td>
+                        <td>剩余期限应在1-360个月之间</td>
+                    </tr>
+                
+
+                    <tr onclick="scrollToSample('SAMP_20260616200406587_97cf52a2')" style="cursor: pointer;">
+                        <td>587_97cf52a2</td>
+                        <td>LOAN-005</td>
+                        <td><strong>borrower_age</strong></td>
+                        <td>18 - 100岁</td>
+                        <td style="color: #dc2626; font-weight: 600;">105</td>
+                        <td><span class="badge badge-warning">警告</span></td>
+                        <td>借款人年龄应在合理范围内</td>
+                    </tr>
+                
+
+                    <tr onclick="scrollToSample('SAMP_20260616200406587_97cf52a2')" style="cursor: pointer;">
+                        <td>587_97cf52a2</td>
+                        <td>LOAN-005</td>
+                        <td><strong>fico_score</strong></td>
+                        <td>300 - 850</td>
+                        <td style="color: #dc2626; font-weight: 600;">900</td>
+                        <td><span class="badge badge-critical">严重</span></td>
+                        <td>FICO评分应在300-850之间</td>
+                    </tr>
+                
+
+                    <tr onclick="scrollToSample('SAMP_20260616200406587_97cf52a2')" style="cursor: pointer;">
+                        <td>587_97cf52a2</td>
+                        <td>LOAN-005</td>
+                        <td><strong>dti_ratio</strong></td>
+                        <td>0 - 80%</td>
+                        <td style="color: #dc2626; font-weight: 600;">150.0</td>
+                        <td><span class="badge badge-warning">警告</span></td>
+                        <td>DTI比率通常不超过80%</td>
+                    </tr>
+                
+
+                    <tr onclick="scrollToSample('SAMP_20260616200406587_97cf52a2')" style="cursor: pointer;">
+                        <td>587_97cf52a2</td>
+                        <td>LOAN-005</td>
+                        <td><strong>ltv_ratio</strong></td>
+                        <td>0 - 125%</td>
+                        <td style="color: #dc2626; font-weight: 600;">200.0</td>
+                        <td><span class="badge badge-warning">警告</span></td>
+                        <td>LTV比率通常不超过125%</td>
+                    </tr>
+                
+
+                    <tr onclick="scrollToSample('SAMP_20260616200406587_97cf52a2')" style="cursor: pointer;">
+                        <td>587_97cf52a2</td>
+                        <td>LOAN-005</td>
+                        <td><strong>overall</strong></td>
+                        <td>最多2个严重异常</td>
+                        <td style="color: #dc2626; font-weight: 600;">4个严重异常</td>
+                        <td><span class="badge badge-critical">严重</span></td>
+                        <td>样本存在多个严重异常，建议人工复核完整数据来源</td>
+                    </tr>
+                
+                </tbody>
+            </table>
+        </div>
+
+        <div id="conflicts" class="section">
+            <h2 class="section-title">数据冲突检测（复盘图表 vs 导入数据）</h2>
+            <div style="margin-bottom: 16px;">
+                <strong>待处理冲突:</strong> 7 项
+                &nbsp;&nbsp;|&nbsp;&nbsp;
+                <strong>已解决:</strong> 0 项
+                &nbsp;&nbsp;|&nbsp;&nbsp;
+                <strong>共 7 项
+            </div>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 16px;">
+                💡 点击表格行跳转到对应贷款明细，点击冲突ID可定位到具体冲突证据卡片
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>冲突追踪ID</th>
+                        <th>贷款ID</th>
+                        <th>冲突字段</th>
+                        <th>系统计算值</th>
+                        <th>复盘图表值</th>
+                        <th>差异</th>
+                        <th>处理状态</th>
+                        <th>建议动作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                <tr onclick="scrollToSample('SAMP_20260616200406587_d7e98bb1')" style="cursor: pointer;">
+                    <td onclick="event.stopPropagation(); scrollToConflict('CONFLICT_20260616200406587_4ce88a64'); return false;"
+                        style="cursor: pointer; font-family: monospace; font-size: 11px; color: #3b82f6; text-decoration: underline;"
+                        title="点击定位到冲突证据">
+                        0406587_4ce88a64
+                    </td>
+                    <td><strong>LOAN-002</strong></td>
+                    <td>敏感性得分</td>
+                    <td style="color: #1e40af;">0.1891</td>
+                    <td style="color: #7c2d12;">0.4500</td>
+                    <td style="color: #dc2626; font-weight: 600;">26.09%</td>
+                    <td><span class="badge badge-review">待处理</span></td>
+                    <td style="font-size: 12px; color: #64748b; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="建议：新系统计算值(0.1891)低于复盘图表值(0.4500)，差异26.09%。请核对样本数据是否有更新，或确认复盘图表是否为人工调整值。">建议：新系统计算值(0.1891)低于复盘图表值(0.4500)，差异26.09%。请核对样本数据是否有更新，或确认复盘图表是否为人工调整值。</td>
+                </tr>
+            
+
+                <tr onclick="scrollToSample('SAMP_20260616200406587_d7e98bb1')" style="cursor: pointer;">
+                    <td onclick="event.stopPropagation(); scrollToConflict('CONFLICT_20260616200406587_a88d60b9'); return false;"
+                        style="cursor: pointer; font-family: monospace; font-size: 11px; color: #3b82f6; text-decoration: underline;"
+                        title="点击定位到冲突证据">
+                        0406587_a88d60b9
+                    </td>
+                    <td><strong>LOAN-002</strong></td>
+                    <td>风险等级</td>
+                    <td style="color: #1e40af;">low</td>
+                    <td style="color: #7c2d12;">medium</td>
+                    <td style="color: #dc2626; font-weight: 600;">等级差异</td>
+                    <td><span class="badge badge-review">待处理</span></td>
+                    <td style="font-size: 12px; color: #64748b; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="风险等级不一致：系统判定low，复盘图表记录medium。请核对风险阈值参数或是否存在人工调整记录。">风险等级不一致：系统判定low，复盘图表记录medium。请核对风险阈值参数或是否存在人工调整记录。</td>
+                </tr>
+            
+
+                <tr onclick="scrollToSample('SAMP_20260616200406587_d7e98bb1')" style="cursor: pointer;">
+                    <td onclick="event.stopPropagation(); scrollToConflict('CONFLICT_20260616200406587_0937e860'); return false;"
+                        style="cursor: pointer; font-family: monospace; font-size: 11px; color: #3b82f6; text-decoration: underline;"
+                        title="点击定位到冲突证据">
+                        0406587_0937e860
+                    </td>
+                    <td><strong>LOAN-002</strong></td>
+                    <td>贷款本金</td>
+                    <td style="color: #1e40af;">2800000.0000</td>
+                    <td style="color: #7c2d12;">280000.0000</td>
+                    <td style="color: #dc2626; font-weight: 600;">900.00%</td>
+                    <td><span class="badge badge-review">待处理</span></td>
+                    <td style="font-size: 12px; color: #64748b; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="本金不一致：样本2,800,000，复盘图表280,000，差异900.00%。请以最新数据为准。">本金不一致：样本2,800,000，复盘图表280,000，差异900.00%。请以最新数据为准。</td>
+                </tr>
+            
+
+                <tr onclick="scrollToSample('SAMP_20260616200406587_65e9d105')" style="cursor: pointer;">
+                    <td onclick="event.stopPropagation(); scrollToConflict('CONFLICT_20260616200406587_621adab5'); return false;"
+                        style="cursor: pointer; font-family: monospace; font-size: 11px; color: #3b82f6; text-decoration: underline;"
+                        title="点击定位到冲突证据">
+                        0406587_621adab5
+                    </td>
+                    <td><strong>LOAN-003</strong></td>
+                    <td>敏感性得分</td>
+                    <td style="color: #1e40af;">0.1378</td>
+                    <td style="color: #7c2d12;">0.3800</td>
+                    <td style="color: #dc2626; font-weight: 600;">24.22%</td>
+                    <td><span class="badge badge-review">待处理</span></td>
+                    <td style="font-size: 12px; color: #64748b; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="建议：新系统计算值(0.1378)低于复盘图表值(0.3800)，差异24.22%。请核对样本数据是否有更新，或确认复盘图表是否为人工调整值。">建议：新系统计算值(0.1378)低于复盘图表值(0.3800)，差异24.22%。请核对样本数据是否有更新，或确认复盘图表是否为人工调整值。</td>
+                </tr>
+            
+
+                <tr onclick="scrollToSample('SAMP_20260616200406587_65e9d105')" style="cursor: pointer;">
+                    <td onclick="event.stopPropagation(); scrollToConflict('CONFLICT_20260616200406587_02e457a2'); return false;"
+                        style="cursor: pointer; font-family: monospace; font-size: 11px; color: #3b82f6; text-decoration: underline;"
+                        title="点击定位到冲突证据">
+                        0406587_02e457a2
+                    </td>
+                    <td><strong>LOAN-003</strong></td>
+                    <td>贷款本金</td>
+                    <td style="color: #1e40af;">420000.0000</td>
+                    <td style="color: #7c2d12;">450000.0000</td>
+                    <td style="color: #dc2626; font-weight: 600;">6.67%</td>
+                    <td><span class="badge badge-review">待处理</span></td>
+                    <td style="font-size: 12px; color: #64748b; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="本金不一致：样本420,000，复盘图表450,000，差异6.67%。请以最新数据为准。">本金不一致：样本420,000，复盘图表450,000，差异6.67%。请以最新数据为准。</td>
+                </tr>
+            
+
+                <tr onclick="scrollToSample('SAMP_20260616200406587_3de645af')" style="cursor: pointer;">
+                    <td onclick="event.stopPropagation(); scrollToConflict('CONFLICT_20260616200406587_834aec46'); return false;"
+                        style="cursor: pointer; font-family: monospace; font-size: 11px; color: #3b82f6; text-decoration: underline;"
+                        title="点击定位到冲突证据">
+                        0406587_834aec46
+                    </td>
+                    <td><strong>LOAN-006</strong></td>
+                    <td>敏感性得分</td>
+                    <td style="color: #1e40af;">0.1414</td>
+                    <td style="color: #7c2d12;">0.5200</td>
+                    <td style="color: #dc2626; font-weight: 600;">37.86%</td>
+                    <td><span class="badge badge-review">待处理</span></td>
+                    <td style="font-size: 12px; color: #64748b; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="建议：新系统计算值(0.1414)低于复盘图表值(0.5200)，差异37.86%。请核对样本数据是否有更新，或确认复盘图表是否为人工调整值。">建议：新系统计算值(0.1414)低于复盘图表值(0.5200)，差异37.86%。请核对样本数据是否有更新，或确认复盘图表是否为人工调整值。</td>
+                </tr>
+            
+
+                <tr onclick="scrollToSample('SAMP_20260616200406587_3de645af')" style="cursor: pointer;">
+                    <td onclick="event.stopPropagation(); scrollToConflict('CONFLICT_20260616200406587_f5f66926'); return false;"
+                        style="cursor: pointer; font-family: monospace; font-size: 11px; color: #3b82f6; text-decoration: underline;"
+                        title="点击定位到冲突证据">
+                        0406587_f5f66926
+                    </td>
+                    <td><strong>LOAN-006</strong></td>
+                    <td>风险等级</td>
+                    <td style="color: #1e40af;">low</td>
+                    <td style="color: #7c2d12;">medium</td>
+                    <td style="color: #dc2626; font-weight: 600;">等级差异</td>
+                    <td><span class="badge badge-review">待处理</span></td>
+                    <td style="font-size: 12px; color: #64748b; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="风险等级不一致：系统判定low，复盘图表记录medium。请核对风险阈值参数或是否存在人工调整记录。">风险等级不一致：系统判定low，复盘图表记录medium。请核对风险阈值参数或是否存在人工调整记录。</td>
+                </tr>
+            
+                </tbody>
+            </table>
+            <div style="margin-top: 24px;">
+                <h3 style="margin-bottom: 16px; color: #374151;">📋 逐条冲突证据（可独立追踪）</h3>
+                
+                <div id="conflict-CONFLICT_20260616200406587_4ce88a64" class="conflict-item" style="position: relative;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <strong style="font-size: 13px; color: #374151;">
+                                #1 LOAN-002 · 敏感性得分
+                            </strong>
+                            <code style="background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 11px; color: #475569;">
+                                ID: 0406587_4ce88a64
+                            </code>
+                            <span class="badge badge-review">待处理</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 12px; color: #dc2626;"><strong>差异:</strong> 26.09%</span>
+                            <button onclick="scrollToSample(&#39;SAMP_20260616200406587_d7e98bb1&#39;)" style="background: #3b82f6; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">📋 查看贷款明细</button>
+                        </div>
+                    </div>
+                    <div class="conflict-evidence">
+                        <div class="evidence-box">
+                            <div class="evidence-label">📊 系统计算结果</div>
+                            <div class="evidence-value" style="color: #1e40af;">0.1891</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">样本ID: SAMP_20260616200406587_d7e98bb1, 来源: manual_input_data_entry</div>
+                        </div>
+                        <div class="evidence-box">
+                            <div class="evidence-label">📈 复盘图表记录</div>
+                            <div class="evidence-value" style="color: #7c2d12;">0.4500</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">复盘图表, 报告期: 2026-Q1, 来源: manual_review_excel</div>
+                        </div>
+                    </div>
+                    <div class="suggestion">
+                        <strong>💡 建议动作：</strong>建议：新系统计算值(0.1891)低于复盘图表值(0.4500)，差异26.09%。请核对样本数据是否有更新，或确认复盘图表是否为人工调整值。
+                    </div>
+                    
+                    <div style="margin-top: 12px; padding-top: 8px; border-top: 1px dashed #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <span style="font-size: 11px; color: #94a3b8;">
+                            🔗 追溯锚点：<code style="background: #f1f5f9; padding: 2px 6px; border-radius: 3px;">#conflict-CONFLICT_20260616200406587_4ce88a64</code>
+                        </span>
+                        <span style="font-size: 11px; color: #94a3b8;">
+                            补材料继续处理：状态保留，不被默认值覆盖
+                        </span>
+                    </div>
+                </div>
+            
+
+                <div id="conflict-CONFLICT_20260616200406587_a88d60b9" class="conflict-item" style="position: relative;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <strong style="font-size: 13px; color: #374151;">
+                                #2 LOAN-002 · 风险等级
+                            </strong>
+                            <code style="background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 11px; color: #475569;">
+                                ID: 0406587_a88d60b9
+                            </code>
+                            <span class="badge badge-review">待处理</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            
+                            <button onclick="scrollToSample(&#39;SAMP_20260616200406587_d7e98bb1&#39;)" style="background: #3b82f6; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">📋 查看贷款明细</button>
+                        </div>
+                    </div>
+                    <div class="conflict-evidence">
+                        <div class="evidence-box">
+                            <div class="evidence-label">📊 系统计算结果</div>
+                            <div class="evidence-value" style="color: #1e40af;">low</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">样本ID: SAMP_20260616200406587_d7e98bb1, 来源: manual_input_data_entry</div>
+                        </div>
+                        <div class="evidence-box">
+                            <div class="evidence-label">📈 复盘图表记录</div>
+                            <div class="evidence-value" style="color: #7c2d12;">medium</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">复盘图表, 报告期: 2026-Q1, 来源: manual_review_excel</div>
+                        </div>
+                    </div>
+                    <div class="suggestion">
+                        <strong>💡 建议动作：</strong>风险等级不一致：系统判定low，复盘图表记录medium。请核对风险阈值参数或是否存在人工调整记录。
+                    </div>
+                    
+                    <div style="margin-top: 12px; padding-top: 8px; border-top: 1px dashed #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <span style="font-size: 11px; color: #94a3b8;">
+                            🔗 追溯锚点：<code style="background: #f1f5f9; padding: 2px 6px; border-radius: 3px;">#conflict-CONFLICT_20260616200406587_a88d60b9</code>
+                        </span>
+                        <span style="font-size: 11px; color: #94a3b8;">
+                            补材料继续处理：状态保留，不被默认值覆盖
+                        </span>
+                    </div>
+                </div>
+            
+
+                <div id="conflict-CONFLICT_20260616200406587_0937e860" class="conflict-item" style="position: relative;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <strong style="font-size: 13px; color: #374151;">
+                                #3 LOAN-002 · 贷款本金
+                            </strong>
+                            <code style="background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 11px; color: #475569;">
+                                ID: 0406587_0937e860
+                            </code>
+                            <span class="badge badge-review">待处理</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 12px; color: #dc2626;"><strong>差异:</strong> 900.00%</span>
+                            <button onclick="scrollToSample(&#39;SAMP_20260616200406587_d7e98bb1&#39;)" style="background: #3b82f6; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">📋 查看贷款明细</button>
+                        </div>
+                    </div>
+                    <div class="conflict-evidence">
+                        <div class="evidence-box">
+                            <div class="evidence-label">📊 系统计算结果</div>
+                            <div class="evidence-value" style="color: #1e40af;">2800000.0000</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">样本ID: SAMP_20260616200406587_d7e98bb1, 来源: manual_input_data_entry</div>
+                        </div>
+                        <div class="evidence-box">
+                            <div class="evidence-label">📈 复盘图表记录</div>
+                            <div class="evidence-value" style="color: #7c2d12;">280000.0000</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">复盘图表备注, 报告期: 2026-Q1</div>
+                        </div>
+                    </div>
+                    <div class="suggestion">
+                        <strong>💡 建议动作：</strong>本金不一致：样本2,800,000，复盘图表280,000，差异900.00%。请以最新数据为准。
+                    </div>
+                    
+                    <div style="margin-top: 12px; padding-top: 8px; border-top: 1px dashed #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <span style="font-size: 11px; color: #94a3b8;">
+                            🔗 追溯锚点：<code style="background: #f1f5f9; padding: 2px 6px; border-radius: 3px;">#conflict-CONFLICT_20260616200406587_0937e860</code>
+                        </span>
+                        <span style="font-size: 11px; color: #94a3b8;">
+                            补材料继续处理：状态保留，不被默认值覆盖
+                        </span>
+                    </div>
+                </div>
+            
+
+                <div id="conflict-CONFLICT_20260616200406587_621adab5" class="conflict-item" style="position: relative;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <strong style="font-size: 13px; color: #374151;">
+                                #4 LOAN-003 · 敏感性得分
+                            </strong>
+                            <code style="background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 11px; color: #475569;">
+                                ID: 0406587_621adab5
+                            </code>
+                            <span class="badge badge-review">待处理</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 12px; color: #dc2626;"><strong>差异:</strong> 24.22%</span>
+                            <button onclick="scrollToSample(&#39;SAMP_20260616200406587_65e9d105&#39;)" style="background: #3b82f6; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">📋 查看贷款明细</button>
+                        </div>
+                    </div>
+                    <div class="conflict-evidence">
+                        <div class="evidence-box">
+                            <div class="evidence-label">📊 系统计算结果</div>
+                            <div class="evidence-value" style="color: #1e40af;">0.1378</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">样本ID: SAMP_20260616200406587_65e9d105, 来源: historical_backfill_2025</div>
+                        </div>
+                        <div class="evidence-box">
+                            <div class="evidence-label">📈 复盘图表记录</div>
+                            <div class="evidence-value" style="color: #7c2d12;">0.3800</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">复盘图表, 报告期: 2025-Q4, 来源: historical_review</div>
+                        </div>
+                    </div>
+                    <div class="suggestion">
+                        <strong>💡 建议动作：</strong>建议：新系统计算值(0.1378)低于复盘图表值(0.3800)，差异24.22%。请核对样本数据是否有更新，或确认复盘图表是否为人工调整值。
+                    </div>
+                    
+                    <div style="margin-top: 12px; padding-top: 8px; border-top: 1px dashed #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <span style="font-size: 11px; color: #94a3b8;">
+                            🔗 追溯锚点：<code style="background: #f1f5f9; padding: 2px 6px; border-radius: 3px;">#conflict-CONFLICT_20260616200406587_621adab5</code>
+                        </span>
+                        <span style="font-size: 11px; color: #94a3b8;">
+                            补材料继续处理：状态保留，不被默认值覆盖
+                        </span>
+                    </div>
+                </div>
+            
+
+                <div id="conflict-CONFLICT_20260616200406587_02e457a2" class="conflict-item" style="position: relative;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <strong style="font-size: 13px; color: #374151;">
+                                #5 LOAN-003 · 贷款本金
+                            </strong>
+                            <code style="background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 11px; color: #475569;">
+                                ID: 0406587_02e457a2
+                            </code>
+                            <span class="badge badge-review">待处理</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 12px; color: #dc2626;"><strong>差异:</strong> 6.67%</span>
+                            <button onclick="scrollToSample(&#39;SAMP_20260616200406587_65e9d105&#39;)" style="background: #3b82f6; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">📋 查看贷款明细</button>
+                        </div>
+                    </div>
+                    <div class="conflict-evidence">
+                        <div class="evidence-box">
+                            <div class="evidence-label">📊 系统计算结果</div>
+                            <div class="evidence-value" style="color: #1e40af;">420000.0000</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">样本ID: SAMP_20260616200406587_65e9d105, 来源: historical_backfill_2025</div>
+                        </div>
+                        <div class="evidence-box">
+                            <div class="evidence-label">📈 复盘图表记录</div>
+                            <div class="evidence-value" style="color: #7c2d12;">450000.0000</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">复盘图表备注, 报告期: 2025-Q4</div>
+                        </div>
+                    </div>
+                    <div class="suggestion">
+                        <strong>💡 建议动作：</strong>本金不一致：样本420,000，复盘图表450,000，差异6.67%。请以最新数据为准。
+                    </div>
+                    
+                    <div style="margin-top: 12px; padding-top: 8px; border-top: 1px dashed #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <span style="font-size: 11px; color: #94a3b8;">
+                            🔗 追溯锚点：<code style="background: #f1f5f9; padding: 2px 6px; border-radius: 3px;">#conflict-CONFLICT_20260616200406587_02e457a2</code>
+                        </span>
+                        <span style="font-size: 11px; color: #94a3b8;">
+                            补材料继续处理：状态保留，不被默认值覆盖
+                        </span>
+                    </div>
+                </div>
+            
+
+                <div id="conflict-CONFLICT_20260616200406587_834aec46" class="conflict-item" style="position: relative;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <strong style="font-size: 13px; color: #374151;">
+                                #6 LOAN-006 · 敏感性得分
+                            </strong>
+                            <code style="background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 11px; color: #475569;">
+                                ID: 0406587_834aec46
+                            </code>
+                            <span class="badge badge-review">待处理</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 12px; color: #dc2626;"><strong>差异:</strong> 37.86%</span>
+                            <button onclick="scrollToSample(&#39;SAMP_20260616200406587_3de645af&#39;)" style="background: #3b82f6; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">📋 查看贷款明细</button>
+                        </div>
+                    </div>
+                    <div class="conflict-evidence">
+                        <div class="evidence-box">
+                            <div class="evidence-label">📊 系统计算结果</div>
+                            <div class="evidence-value" style="color: #1e40af;">0.1414</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">样本ID: SAMP_20260616200406587_3de645af, 来源: core_system_2026q2</div>
+                        </div>
+                        <div class="evidence-box">
+                            <div class="evidence-label">📈 复盘图表记录</div>
+                            <div class="evidence-value" style="color: #7c2d12;">0.5200</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">复盘图表, 报告期: 2026-Q1, 来源: quarterly_review</div>
+                        </div>
+                    </div>
+                    <div class="suggestion">
+                        <strong>💡 建议动作：</strong>建议：新系统计算值(0.1414)低于复盘图表值(0.5200)，差异37.86%。请核对样本数据是否有更新，或确认复盘图表是否为人工调整值。
+                    </div>
+                    
+                    <div style="margin-top: 12px; padding-top: 8px; border-top: 1px dashed #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <span style="font-size: 11px; color: #94a3b8;">
+                            🔗 追溯锚点：<code style="background: #f1f5f9; padding: 2px 6px; border-radius: 3px;">#conflict-CONFLICT_20260616200406587_834aec46</code>
+                        </span>
+                        <span style="font-size: 11px; color: #94a3b8;">
+                            补材料继续处理：状态保留，不被默认值覆盖
+                        </span>
+                    </div>
+                </div>
+            
+
+                <div id="conflict-CONFLICT_20260616200406587_f5f66926" class="conflict-item" style="position: relative;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <strong style="font-size: 13px; color: #374151;">
+                                #7 LOAN-006 · 风险等级
+                            </strong>
+                            <code style="background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 11px; color: #475569;">
+                                ID: 0406587_f5f66926
+                            </code>
+                            <span class="badge badge-review">待处理</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            
+                            <button onclick="scrollToSample(&#39;SAMP_20260616200406587_3de645af&#39;)" style="background: #3b82f6; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">📋 查看贷款明细</button>
+                        </div>
+                    </div>
+                    <div class="conflict-evidence">
+                        <div class="evidence-box">
+                            <div class="evidence-label">📊 系统计算结果</div>
+                            <div class="evidence-value" style="color: #1e40af;">low</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">样本ID: SAMP_20260616200406587_3de645af, 来源: core_system_2026q2</div>
+                        </div>
+                        <div class="evidence-box">
+                            <div class="evidence-label">📈 复盘图表记录</div>
+                            <div class="evidence-value" style="color: #7c2d12;">medium</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">复盘图表, 报告期: 2026-Q1, 来源: quarterly_review</div>
+                        </div>
+                    </div>
+                    <div class="suggestion">
+                        <strong>💡 建议动作：</strong>风险等级不一致：系统判定low，复盘图表记录medium。请核对风险阈值参数或是否存在人工调整记录。
+                    </div>
+                    
+                    <div style="margin-top: 12px; padding-top: 8px; border-top: 1px dashed #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <span style="font-size: 11px; color: #94a3b8;">
+                            🔗 追溯锚点：<code style="background: #f1f5f9; padding: 2px 6px; border-radius: 3px;">#conflict-CONFLICT_20260616200406587_f5f66926</code>
+                        </span>
+                        <span style="font-size: 11px; color: #94a3b8;">
+                            补材料继续处理：状态保留，不被默认值覆盖
+                        </span>
+                    </div>
+                </div>
+            
+            </div>
+        </div>
+
+        <div id="parameters" class="section">
+            <h2 class="section-title">参数版本详情 (版本号: PARAM_20260616200406587)</h2>
+            <p style="margin-bottom: 16px; color: #64748b;">
+                创建时间: 2026-06-16T20:04:06.587125 | 创建人: system | 备注: 初始默认参数版本
+            </p>
+            <table class="params-table">
+                <thead>
+                    <tr>
+                        <th>参数名称</th>
+                        <th>参数值</th>
+                        <th>权重</th>
+                        <th>说明</th>
+                        <th>来源</th>
+                        <th>最后修改</th>
+                        <th>修改人</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                <tr class="">
+                    <td><strong>rate_sensitivity</strong></td>
+                    <td>0.3500</td>
+                    <td>0.3000</td>
+                    <td>利率变动对提前还款的影响系数</td>
+                    <td><span class="badge badge-low">系统默认</span></td>
+                    <td>2026-06-16T20:04:06.587105</td>
+                    <td>system</td>
+                </tr>
+            
+
+                <tr class="">
+                    <td><strong>term_sensitivity</strong></td>
+                    <td>0.2500</td>
+                    <td>0.2000</td>
+                    <td>剩余期限对提前还款的影响系数</td>
+                    <td><span class="badge badge-low">系统默认</span></td>
+                    <td>2026-06-16T20:04:06.587109</td>
+                    <td>system</td>
+                </tr>
+            
+
+                <tr class="">
+                    <td><strong>fico_sensitivity</strong></td>
+                    <td>0.2000</td>
+                    <td>0.1500</td>
+                    <td>FICO评分对提前还款的影响系数</td>
+                    <td><span class="badge badge-low">系统默认</span></td>
+                    <td>2026-06-16T20:04:06.587110</td>
+                    <td>system</td>
+                </tr>
+            
+
+                <tr class="">
+                    <td><strong>dti_sensitivity</strong></td>
+                    <td>0.1500</td>
+                    <td>0.1500</td>
+                    <td>DTI比率对提前还款的影响系数</td>
+                    <td><span class="badge badge-low">系统默认</span></td>
+                    <td>2026-06-16T20:04:06.587111</td>
+                    <td>system</td>
+                </tr>
+            
+
+                <tr class="">
+                    <td><strong>ltv_sensitivity</strong></td>
+                    <td>0.1000</td>
+                    <td>0.1000</td>
+                    <td>LTV比率对提前还款的影响系数</td>
+                    <td><span class="badge badge-low">系统默认</span></td>
+                    <td>2026-06-16T20:04:06.587112</td>
+                    <td>system</td>
+                </tr>
+            
+
+                <tr class="">
+                    <td><strong>history_sensitivity</strong></td>
+                    <td>0.3000</td>
+                    <td>0.1000</td>
+                    <td>提前还款历史的影响系数</td>
+                    <td><span class="badge badge-low">系统默认</span></td>
+                    <td>2026-06-16T20:04:06.587113</td>
+                    <td>system</td>
+                </tr>
+            
+
+                <tr class="">
+                    <td><strong>age_sensitivity</strong></td>
+                    <td>0.1500</td>
+                    <td>0.1000</td>
+                    <td>借款人年龄对提前还款的影响系数</td>
+                    <td><span class="badge badge-low">系统默认</span></td>
+                    <td>2026-06-16T20:04:06.587114</td>
+                    <td>system</td>
+                </tr>
+            
+
+                <tr class="">
+                    <td><strong>high_risk_threshold</strong></td>
+                    <td>0.7000</td>
+                    <td>0.0000</td>
+                    <td>高风险判定阈值</td>
+                    <td><span class="badge badge-low">系统默认</span></td>
+                    <td>2026-06-16T20:04:06.587115</td>
+                    <td>system</td>
+                </tr>
+            
+
+                <tr class="">
+                    <td><strong>medium_risk_threshold</strong></td>
+                    <td>0.4000</td>
+                    <td>0.0000</td>
+                    <td>中风险判定阈值</td>
+                    <td><span class="badge badge-low">系统默认</span></td>
+                    <td>2026-06-16T20:04:06.587116</td>
+                    <td>system</td>
+                </tr>
+            
+                </tbody>
+            </table>
+            <div class="history-note">
+                <strong>📌 版本追溯：</strong>所有参数修改都会创建新版本，历史版本永不覆盖。
+                如需查看参数变更历史，请联系系统管理员或查看 <code>parameter_versions.json</code> 文件。
+            </div>
+        </div>
+
+        <div id="details" class="section">
+            <h2 class="section-title">样本计算明细</h2>
+            <p style="color: #64748b; margin-bottom: 16px;">
+                👇 点击任意样本展开查看完整计算过程、异常标记和人工备注
+            </p>
+            
+                <div id="detail-SAMP_20260616200406587_2b18a796" class="detail-section">
+                    <div class="detail-header" onclick="toggleDetail('SAMP_20260616200406587_2b18a796')">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span id="icon-SAMP_20260616200406587_2b18a796" class="expand-icon">▶</span>
+                            <strong>样本 587_2b18a796</strong>
+                            
+                            <span class="badge badge-low">低风险</span>
+                            
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <span>得分: <strong style="color: #10b981;">0.0840</strong></span>
+                            <span style="font-size: 12px; color: #64748b;">2026-06-16T20:04:06.587630</span>
+                        </div>
+                    </div>
+                    <div id="content-SAMP_20260616200406587_2b18a796" class="detail-content">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                            <div><strong>贷款ID:</strong> LOAN-001</div>
+                            <div><strong>参数版本:</strong> PARAM_20260616200406587</div>
+                            <div><strong>数据来源:</strong> SAMP_20260616200406587_2b18a796</div>
+                            <div><strong>计算时间:</strong> 2026-06-16T20:04:06.587630</div>
+                        </div>
+
+                        <h4 style="color: #374151; margin: 16px 0 8px 0;">📊 成分贡献度</h4>
+                        <div style="max-width: 400px;">
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>利率</span>
+                        <span>48.3%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 48.268398268398265%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>期限</span>
+                        <span>18.1%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 18.073593073593074%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>FICO</span>
+                        <span>7.7%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 7.683982683982683%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>DTI</span>
+                        <span>13.0%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 12.987012987012985%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>LTV</span>
+                        <span>8.1%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 8.116883116883116%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>年龄</span>
+                        <span>4.9%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 4.870129870129869%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>还款历史</span>
+                        <span>0.0%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 0.0%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            </div>
+
+                        
+                    <div style="margin-top: 16px;">
+                        <h4 style="color: #1e40af; margin-bottom: 12px;">🔢 完整计算过程 (16步)</h4>
+                        
+                        <div class="calc-step">
+                            <div class="step-name">rate_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_rate=4.25, normalized_rate=0.425</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: rate_sensitivity_value=0.35</div>
+                            <div class="formula">公式: normalized_rate * rate_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.148700</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">rate_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: rate_component_score=0.1487</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: rate_sensitivity_weight=0.3</div>
+                            <div class="formula">公式: rate_component_score * rate_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.044600</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">term_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_term=240, normalized_term=0.3333</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: term_sensitivity_value=0.25</div>
+                            <div class="formula">公式: normalized_term * term_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.083300</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">term_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: term_component_score=0.0833</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: term_sensitivity_weight=0.2</div>
+                            <div class="formula">公式: term_component_score * term_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.016700</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">fico_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_fico=720, normalized_fico=0.2364</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: fico_sensitivity_value=0.2</div>
+                            <div class="formula">公式: normalized_fico * fico_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.047300</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">fico_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: fico_component_score=0.0473</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: fico_sensitivity_weight=0.15</div>
+                            <div class="formula">公式: fico_component_score * fico_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.007100</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">dti_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_dti=32.0, normalized_dti=0.5333</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: dti_sensitivity_value=0.15</div>
+                            <div class="formula">公式: normalized_dti * dti_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.080000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">dti_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: dti_component_score=0.08</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: dti_sensitivity_weight=0.15</div>
+                            <div class="formula">公式: dti_component_score * dti_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.012000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">ltv_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_ltv=75.0, normalized_ltv=0.75</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: ltv_sensitivity_value=0.1</div>
+                            <div class="formula">公式: normalized_ltv * ltv_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.075000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">ltv_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: ltv_component_score=0.075</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: ltv_sensitivity_weight=0.1</div>
+                            <div class="formula">公式: ltv_component_score * ltv_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.007500</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">age_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_age=38, normalized_age=0.3</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: age_sensitivity_value=0.15</div>
+                            <div class="formula">公式: normalized_age * age_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.045000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">age_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: age_component_score=0.045</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: age_sensitivity_weight=0.1</div>
+                            <div class="formula">公式: age_component_score * age_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.004500</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">history_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_history=False, normalized_history=0.0</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: history_sensitivity_value=0.3</div>
+                            <div class="formula">公式: normalized_history * history_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.000000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">history_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: history_component_score=0.0</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: history_sensitivity_weight=0.1</div>
+                            <div class="formula">公式: history_component_score * history_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.000000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">final_aggregation</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: rate_weighted=0.0446, term_weighted=0.0167, fico_weighted=0.0071, dti_weighted=0.012, ltv_weighted=0.0075, age_weighted=0.0045, history_weighted=0.0, total_weight=1.1</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: 无</div>
+                            <div class="formula">公式: sum(weighted_scores) / total_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.084000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">risk_level_determination</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: final_score=0.084, high_threshold=0.7, medium_threshold=0.4</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: high_risk_threshold_value=0.7, medium_risk_threshold_value=0.4</div>
+                            <div class="formula">公式: if score >= high_threshold: 'high' elif score >= medium_threshold: 'medium' else 'low'</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.000000</span></div>
+                        </div>
+                    
+                    </div>
+                
+                        
+                        
+                        
+                        
+
+                        <div class="history-note" style="margin-top: 16px;">
+                            <strong>🔗 追溯链接：</strong>
+                            可分享此链接直接定位到该样本：
+                            <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 12px;">
+                                #sample-SAMP_20260616200406587_2b18a796
+                            </code>
+                        </div>
+                    </div>
+                </div>
+            
+
+                <div id="detail-SAMP_20260616200406587_d7e98bb1" class="detail-section">
+                    <div class="detail-header" onclick="toggleDetail('SAMP_20260616200406587_d7e98bb1')">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span id="icon-SAMP_20260616200406587_d7e98bb1" class="expand-icon">▶</span>
+                            <strong>样本 587_d7e98bb1</strong>
+                            <span class="sample-type type-review">需人工确认</span>
+                            <span class="badge badge-low">低风险</span>
+                            <span class="badge" style="background: #059669; color: white;">✅ 已复核</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <span>得分: <strong style="color: #10b981;">0.1891</strong></span>
+                            <span style="font-size: 12px; color: #64748b;">2026-06-16T20:04:06.587659</span>
+                        </div>
+                    </div>
+                    <div id="content-SAMP_20260616200406587_d7e98bb1" class="detail-content">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                            <div><strong>贷款ID:</strong> LOAN-002</div>
+                            <div><strong>参数版本:</strong> PARAM_20260616200406587</div>
+                            <div><strong>数据来源:</strong> SAMP_20260616200406587_d7e98bb1</div>
+                            <div><strong>计算时间:</strong> 2026-06-16T20:04:06.587659</div>
+                        </div>
+
+                        <h4 style="color: #374151; margin: 16px 0 8px 0;">📊 成分贡献度</h4>
+                        <div style="max-width: 400px;">
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>利率</span>
+                        <span>50.5%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 50.480769230769226%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>期限</span>
+                        <span>0.0%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 0.0%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>FICO</span>
+                        <span>14.4%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 14.423076923076922%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>DTI</span>
+                        <span>10.8%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 10.817307692307692%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>LTV</span>
+                        <span>4.8%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 4.8076923076923075%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>年龄</span>
+                        <span>5.0%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 5.048076923076923%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>还款历史</span>
+                        <span>14.4%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 14.423076923076922%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            </div>
+
+                        
+                    <div style="margin-top: 16px;">
+                        <h4 style="color: #1e40af; margin-bottom: 12px;">🔢 完整计算过程 (16步)</h4>
+                        
+                        <div class="calc-step">
+                            <div class="step-name">rate_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_rate=18.5, normalized_rate=1.0</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: rate_sensitivity_value=0.35</div>
+                            <div class="formula">公式: normalized_rate * rate_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.350000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">rate_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: rate_component_score=0.35</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: rate_sensitivity_weight=0.3</div>
+                            <div class="formula">公式: rate_component_score * rate_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.105000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">term_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_term=480, normalized_term=0.0</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: term_sensitivity_value=0.25</div>
+                            <div class="formula">公式: normalized_term * term_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.000000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">term_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: term_component_score=0.0</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: term_sensitivity_weight=0.2</div>
+                            <div class="formula">公式: term_component_score * term_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.000000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">fico_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_fico=250, normalized_fico=1.0</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: fico_sensitivity_value=0.2</div>
+                            <div class="formula">公式: normalized_fico * fico_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.200000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">fico_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: fico_component_score=0.2</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: fico_sensitivity_weight=0.15</div>
+                            <div class="formula">公式: fico_component_score * fico_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.030000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">dti_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_dti=95.0, normalized_dti=1.0</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: dti_sensitivity_value=0.15</div>
+                            <div class="formula">公式: normalized_dti * dti_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.150000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">dti_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: dti_component_score=0.15</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: dti_sensitivity_weight=0.15</div>
+                            <div class="formula">公式: dti_component_score * dti_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.022500</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">ltv_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_ltv=140.0, normalized_ltv=1.0</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: ltv_sensitivity_value=0.1</div>
+                            <div class="formula">公式: normalized_ltv * ltv_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.100000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">ltv_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: ltv_component_score=0.1</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: ltv_sensitivity_weight=0.1</div>
+                            <div class="formula">公式: ltv_component_score * ltv_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.010000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">age_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_age=152, normalized_age=0.7</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: age_sensitivity_value=0.15</div>
+                            <div class="formula">公式: normalized_age * age_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.105000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">age_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: age_component_score=0.105</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: age_sensitivity_weight=0.1</div>
+                            <div class="formula">公式: age_component_score * age_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.010500</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">history_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_history=True, normalized_history=1.0</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: history_sensitivity_value=0.3</div>
+                            <div class="formula">公式: normalized_history * history_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.300000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">history_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: history_component_score=0.3</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: history_sensitivity_weight=0.1</div>
+                            <div class="formula">公式: history_component_score * history_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.030000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">final_aggregation</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: rate_weighted=0.105, term_weighted=0.0, fico_weighted=0.03, dti_weighted=0.0225, ltv_weighted=0.01, age_weighted=0.0105, history_weighted=0.03, total_weight=1.1</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: 无</div>
+                            <div class="formula">公式: sum(weighted_scores) / total_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.189100</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">risk_level_determination</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: final_score=0.1891, high_threshold=0.7, medium_threshold=0.4</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: high_risk_threshold_value=0.7, medium_risk_threshold_value=0.4</div>
+                            <div class="formula">公式: if score >= high_threshold: 'high' elif score >= medium_threshold: 'medium' else 'low'</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.000000</span></div>
+                        </div>
+                    
+                    </div>
+                
+                        
+                    <div style="margin-top: 16px;">
+                        <h4 style="color: #dc2626; margin-bottom: 12px;">⚠️ 异常标记 (8项)</h4>
+                        
+                        <div class="anomaly-item ">
+                            <strong>principal</strong>: 期望值范围 10,000 - 2,000,000，实际值 <span style="color: #dc2626; font-weight: 600;">2800000.0</span>
+                            <br><span style="font-size: 12px; color: #64748b;">贷款本金应在合理范围内</span>
+                        </div>
+                    
+                        <div class="anomaly-item ">
+                            <strong>interest_rate</strong>: 期望值范围 0.5% - 15.0%，实际值 <span style="color: #dc2626; font-weight: 600;">18.5</span>
+                            <br><span style="font-size: 12px; color: #64748b;">利率应在合理范围内</span>
+                        </div>
+                    
+                        <div class="anomaly-item ">
+                            <strong>remaining_term</strong>: 期望值范围 1 - 360个月，实际值 <span style="color: #dc2626; font-weight: 600;">480</span>
+                            <br><span style="font-size: 12px; color: #64748b;">剩余期限应在1-360个月之间</span>
+                        </div>
+                    
+                        <div class="anomaly-item warning">
+                            <strong>borrower_age</strong>: 期望值范围 18 - 100岁，实际值 <span style="color: #dc2626; font-weight: 600;">152</span>
+                            <br><span style="font-size: 12px; color: #64748b;">借款人年龄应在合理范围内</span>
+                        </div>
+                    
+                        <div class="anomaly-item ">
+                            <strong>fico_score</strong>: 期望值范围 300 - 850，实际值 <span style="color: #dc2626; font-weight: 600;">250</span>
+                            <br><span style="font-size: 12px; color: #64748b;">FICO评分应在300-850之间</span>
+                        </div>
+                    
+                        <div class="anomaly-item warning">
+                            <strong>dti_ratio</strong>: 期望值范围 0 - 80%，实际值 <span style="color: #dc2626; font-weight: 600;">95.0</span>
+                            <br><span style="font-size: 12px; color: #64748b;">DTI比率通常不超过80%</span>
+                        </div>
+                    
+                        <div class="anomaly-item warning">
+                            <strong>ltv_ratio</strong>: 期望值范围 0 - 125%，实际值 <span style="color: #dc2626; font-weight: 600;">140.0</span>
+                            <br><span style="font-size: 12px; color: #64748b;">LTV比率通常不超过125%</span>
+                        </div>
+                    
+                        <div class="anomaly-item ">
+                            <strong>overall</strong>: 期望值范围 最多2个严重异常，实际值 <span style="color: #dc2626; font-weight: 600;">4个严重异常</span>
+                            <br><span style="font-size: 12px; color: #64748b;">样本存在多个严重异常，建议人工复核完整数据来源</span>
+                        </div>
+                    
+                    </div>
+                
+                        
+                    <div style="margin-top: 16px;">
+                        <h4 style="color: #8b5cf6; margin-bottom: 12px;">⚔️ 数据冲突 (3项)</h4>
+                        
+                        <div class="conflict-item" style="padding: 12px; margin-bottom: 8px;">
+                            <strong>敏感性得分</strong> 冲突
+                            <div style="font-size: 13px; margin-top: 8px;">
+                                系统: 0.1891 vs 复盘: 0.45
+                            </div>
+                            <div class="suggestion" style="margin-top: 8px; font-size: 12px;">
+                                建议：新系统计算值(0.1891)低于复盘图表值(0.4500)，差异26.09%。请核对样本数据是否有更新，或确认复盘图表是否为人工调整值。
+                            </div>
+                        </div>
+                    
+                        <div class="conflict-item" style="padding: 12px; margin-bottom: 8px;">
+                            <strong>风险等级</strong> 冲突
+                            <div style="font-size: 13px; margin-top: 8px;">
+                                系统: low vs 复盘: medium
+                            </div>
+                            <div class="suggestion" style="margin-top: 8px; font-size: 12px;">
+                                风险等级不一致：系统判定low，复盘图表记录medium。请核对风险阈值参数或是否存在人工调整记录。
+                            </div>
+                        </div>
+                    
+                        <div class="conflict-item" style="padding: 12px; margin-bottom: 8px;">
+                            <strong>贷款本金</strong> 冲突
+                            <div style="font-size: 13px; margin-top: 8px;">
+                                系统: 2800000.0 vs 复盘: 280000.0
+                            </div>
+                            <div class="suggestion" style="margin-top: 8px; font-size: 12px;">
+                                本金不一致：样本2,800,000，复盘图表280,000，差异900.00%。请以最新数据为准。
+                            </div>
+                        </div>
+                    
+                    </div>
+                
+                        
+                    <div style="margin-top: 16px;">
+                        <h4 style="color: #92400e; margin-bottom: 12px;">📝 历史人工备注 (3条)</h4>
+                        <div class="note-item">📝 2026-05-15 小岑：本金280万疑似多打了一个零，实际应为28万</div><div class="note-item">📝 2026-05-16 小张：已核实原始合同，本金确认为280,000</div><div class="note-item">📝 2026-05-17 复核：利率18.5%不符合常规产品，建议核实</div>
+                    </div>
+                
+                        
+                    <div class="history-note" style="margin-top: 16px;">
+                        <h4 style="color: #065f46; margin-bottom: 8px;">✅ 上次复核记录</h4>
+                        <div style="font-size: 13px; line-height: 1.8;">
+                            <strong>复核状态：</strong>已通过<br><strong>复核人：</strong>QA测试员<br><strong>复核时间：</strong>2026-06-16T20:04:06.587884<br><strong>复核意见：</strong>经核对，LOAN-002为历史遗留测试数据，异常字段不影响本次分析。
+                        </div>
+                    </div>
+                
+
+                        <div class="history-note" style="margin-top: 16px;">
+                            <strong>🔗 追溯链接：</strong>
+                            可分享此链接直接定位到该样本：
+                            <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 12px;">
+                                #sample-SAMP_20260616200406587_d7e98bb1
+                            </code>
+                        </div>
+                    </div>
+                </div>
+            
+
+                <div id="detail-SAMP_20260616200406587_65e9d105" class="detail-section">
+                    <div class="detail-header" onclick="toggleDetail('SAMP_20260616200406587_65e9d105')">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span id="icon-SAMP_20260616200406587_65e9d105" class="expand-icon">▶</span>
+                            <strong>样本 587_65e9d105</strong>
+                            
+                            <span class="badge badge-low">低风险</span>
+                            
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <span>得分: <strong style="color: #10b981;">0.1378</strong></span>
+                            <span style="font-size: 12px; color: #64748b;">2026-06-16T20:04:06.587683</span>
+                        </div>
+                    </div>
+                    <div id="content-SAMP_20260616200406587_65e9d105" class="detail-content">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                            <div><strong>贷款ID:</strong> LOAN-003</div>
+                            <div><strong>参数版本:</strong> PARAM_20260616200406587</div>
+                            <div><strong>数据来源:</strong> SAMP_20260616200406587_65e9d105</div>
+                            <div><strong>计算时间:</strong> 2026-06-16T20:04:06.587683</div>
+                        </div>
+
+                        <h4 style="color: #374151; margin: 16px 0 8px 0;">📊 成分贡献度</h4>
+                        <div style="max-width: 400px;">
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>利率</span>
+                        <span>39.8%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 39.84168865435356%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>期限</span>
+                        <span>16.5%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 16.490765171503956%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>FICO</span>
+                        <span>6.1%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 6.134564643799472%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>DTI</span>
+                        <span>9.4%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 9.366754617414248%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>LTV</span>
+                        <span>5.4%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 5.408970976253298%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>年龄</span>
+                        <span>3.0%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 2.968337730870712%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>还款历史</span>
+                        <span>19.8%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 19.788918205804748%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            </div>
+
+                        
+                    <div style="margin-top: 16px;">
+                        <h4 style="color: #1e40af; margin-bottom: 12px;">🔢 完整计算过程 (16步)</h4>
+                        
+                        <div class="calc-step">
+                            <div class="step-name">rate_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_rate=5.75, normalized_rate=0.575</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: rate_sensitivity_value=0.35</div>
+                            <div class="formula">公式: normalized_rate * rate_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.201200</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">rate_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: rate_component_score=0.2012</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: rate_sensitivity_weight=0.3</div>
+                            <div class="formula">公式: rate_component_score * rate_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.060400</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">term_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_term=180, normalized_term=0.5</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: term_sensitivity_value=0.25</div>
+                            <div class="formula">公式: normalized_term * term_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.125000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">term_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: term_component_score=0.125</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: term_sensitivity_weight=0.2</div>
+                            <div class="formula">公式: term_component_score * term_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.025000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">fico_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_fico=680, normalized_fico=0.3091</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: fico_sensitivity_value=0.2</div>
+                            <div class="formula">公式: normalized_fico * fico_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.061800</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">fico_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: fico_component_score=0.0618</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: fico_sensitivity_weight=0.15</div>
+                            <div class="formula">公式: fico_component_score * fico_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.009300</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">dti_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_dti=38.0, normalized_dti=0.6333</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: dti_sensitivity_value=0.15</div>
+                            <div class="formula">公式: normalized_dti * dti_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.095000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">dti_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: dti_component_score=0.095</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: dti_sensitivity_weight=0.15</div>
+                            <div class="formula">公式: dti_component_score * dti_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.014200</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">ltv_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_ltv=82.0, normalized_ltv=0.82</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: ltv_sensitivity_value=0.1</div>
+                            <div class="formula">公式: normalized_ltv * ltv_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.082000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">ltv_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: ltv_component_score=0.082</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: ltv_sensitivity_weight=0.1</div>
+                            <div class="formula">公式: ltv_component_score * ltv_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.008200</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">age_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_age=45, normalized_age=0.3</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: age_sensitivity_value=0.15</div>
+                            <div class="formula">公式: normalized_age * age_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.045000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">age_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: age_component_score=0.045</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: age_sensitivity_weight=0.1</div>
+                            <div class="formula">公式: age_component_score * age_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.004500</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">history_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_history=True, normalized_history=1.0</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: history_sensitivity_value=0.3</div>
+                            <div class="formula">公式: normalized_history * history_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.300000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">history_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: history_component_score=0.3</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: history_sensitivity_weight=0.1</div>
+                            <div class="formula">公式: history_component_score * history_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.030000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">final_aggregation</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: rate_weighted=0.0604, term_weighted=0.025, fico_weighted=0.0093, dti_weighted=0.0142, ltv_weighted=0.0082, age_weighted=0.0045, history_weighted=0.03, total_weight=1.1</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: 无</div>
+                            <div class="formula">公式: sum(weighted_scores) / total_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.137800</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">risk_level_determination</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: final_score=0.1378, high_threshold=0.7, medium_threshold=0.4</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: high_risk_threshold_value=0.7, medium_risk_threshold_value=0.4</div>
+                            <div class="formula">公式: if score >= high_threshold: 'high' elif score >= medium_threshold: 'medium' else 'low'</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.000000</span></div>
+                        </div>
+                    
+                    </div>
+                
+                        
+                        
+                    <div style="margin-top: 16px;">
+                        <h4 style="color: #8b5cf6; margin-bottom: 12px;">⚔️ 数据冲突 (2项)</h4>
+                        
+                        <div class="conflict-item" style="padding: 12px; margin-bottom: 8px;">
+                            <strong>敏感性得分</strong> 冲突
+                            <div style="font-size: 13px; margin-top: 8px;">
+                                系统: 0.1378 vs 复盘: 0.38
+                            </div>
+                            <div class="suggestion" style="margin-top: 8px; font-size: 12px;">
+                                建议：新系统计算值(0.1378)低于复盘图表值(0.3800)，差异24.22%。请核对样本数据是否有更新，或确认复盘图表是否为人工调整值。
+                            </div>
+                        </div>
+                    
+                        <div class="conflict-item" style="padding: 12px; margin-bottom: 8px;">
+                            <strong>贷款本金</strong> 冲突
+                            <div style="font-size: 13px; margin-top: 8px;">
+                                系统: 420000.0 vs 复盘: 450000.0
+                            </div>
+                            <div class="suggestion" style="margin-top: 8px; font-size: 12px;">
+                                本金不一致：样本420,000，复盘图表450,000，差异6.67%。请以最新数据为准。
+                            </div>
+                        </div>
+                    
+                    </div>
+                
+                        
+                    <div style="margin-top: 16px;">
+                        <h4 style="color: #92400e; margin-bottom: 12px;">📝 历史人工备注 (3条)</h4>
+                        <div class="note-item">📝 2025-12-20 历史补录：使用2025年Q1方法学计算</div><div class="note-item">📝 2026-01-10 小岑：与系统计算值差异较大，需确认参数版本</div><div class="note-item">📝 2026-03-05 备注：旧口径中rate权重为0.25，现版本为0.30</div>
+                    </div>
+                
+                        
+
+                        <div class="history-note" style="margin-top: 16px;">
+                            <strong>🔗 追溯链接：</strong>
+                            可分享此链接直接定位到该样本：
+                            <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 12px;">
+                                #sample-SAMP_20260616200406587_65e9d105
+                            </code>
+                        </div>
+                    </div>
+                </div>
+            
+
+                <div id="detail-SAMP_20260616200406587_83a7fa02" class="detail-section">
+                    <div class="detail-header" onclick="toggleDetail('SAMP_20260616200406587_83a7fa02')">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span id="icon-SAMP_20260616200406587_83a7fa02" class="expand-icon">▶</span>
+                            <strong>样本 587_83a7fa02</strong>
+                            
+                            <span class="badge badge-low">低风险</span>
+                            
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <span>得分: <strong style="color: #10b981;">0.0686</strong></span>
+                            <span style="font-size: 12px; color: #64748b;">2026-06-16T20:04:06.587709</span>
+                        </div>
+                    </div>
+                    <div id="content-SAMP_20260616200406587_83a7fa02" class="detail-content">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                            <div><strong>贷款ID:</strong> LOAN-004</div>
+                            <div><strong>参数版本:</strong> PARAM_20260616200406587</div>
+                            <div><strong>数据来源:</strong> SAMP_20260616200406587_83a7fa02</div>
+                            <div><strong>计算时间:</strong> 2026-06-16T20:04:06.587709</div>
+                        </div>
+
+                        <h4 style="color: #374151; margin: 16px 0 8px 0;">📊 成分贡献度</h4>
+                        <div style="max-width: 400px;">
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>利率</span>
+                        <span>53.6%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 53.580901856763916%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>期限</span>
+                        <span>11.0%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 11.007957559681698%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>FICO</span>
+                        <span>6.5%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 6.49867374005305%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>DTI</span>
+                        <span>13.9%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 13.925729442970821%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>LTV</span>
+                        <span>9.0%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 9.018567639257293%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>年龄</span>
+                        <span>6.0%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 5.9681697612732085%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>还款历史</span>
+                        <span>0.0%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 0.0%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            </div>
+
+                        
+                    <div style="margin-top: 16px;">
+                        <h4 style="color: #1e40af; margin-bottom: 12px;">🔢 完整计算过程 (16步)</h4>
+                        
+                        <div class="calc-step">
+                            <div class="step-name">rate_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_rate=3.85, normalized_rate=0.385</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: rate_sensitivity_value=0.35</div>
+                            <div class="formula">公式: normalized_rate * rate_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.134700</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">rate_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: rate_component_score=0.1347</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: rate_sensitivity_weight=0.3</div>
+                            <div class="formula">公式: rate_component_score * rate_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.040400</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">term_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_term=300, normalized_term=0.1667</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: term_sensitivity_value=0.25</div>
+                            <div class="formula">公式: normalized_term * term_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.041700</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">term_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: term_component_score=0.0417</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: term_sensitivity_weight=0.2</div>
+                            <div class="formula">公式: term_component_score * term_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.008300</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">fico_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_fico=760, normalized_fico=0.1636</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: fico_sensitivity_value=0.2</div>
+                            <div class="formula">公式: normalized_fico * fico_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.032700</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">fico_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: fico_component_score=0.0327</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: fico_sensitivity_weight=0.15</div>
+                            <div class="formula">公式: fico_component_score * fico_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.004900</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">dti_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_dti=28.0, normalized_dti=0.4667</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: dti_sensitivity_value=0.15</div>
+                            <div class="formula">公式: normalized_dti * dti_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.070000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">dti_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: dti_component_score=0.07</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: dti_sensitivity_weight=0.15</div>
+                            <div class="formula">公式: dti_component_score * dti_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.010500</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">ltv_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_ltv=68.0, normalized_ltv=0.68</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: ltv_sensitivity_value=0.1</div>
+                            <div class="formula">公式: normalized_ltv * ltv_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.068000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">ltv_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: ltv_component_score=0.068</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: ltv_sensitivity_weight=0.1</div>
+                            <div class="formula">公式: ltv_component_score * ltv_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.006800</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">age_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_age=42, normalized_age=0.3</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: age_sensitivity_value=0.15</div>
+                            <div class="formula">公式: normalized_age * age_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.045000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">age_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: age_component_score=0.045</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: age_sensitivity_weight=0.1</div>
+                            <div class="formula">公式: age_component_score * age_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.004500</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">history_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_history=False, normalized_history=0.0</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: history_sensitivity_value=0.3</div>
+                            <div class="formula">公式: normalized_history * history_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.000000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">history_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: history_component_score=0.0</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: history_sensitivity_weight=0.1</div>
+                            <div class="formula">公式: history_component_score * history_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.000000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">final_aggregation</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: rate_weighted=0.0404, term_weighted=0.0083, fico_weighted=0.0049, dti_weighted=0.0105, ltv_weighted=0.0068, age_weighted=0.0045, history_weighted=0.0, total_weight=1.1</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: 无</div>
+                            <div class="formula">公式: sum(weighted_scores) / total_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.068600</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">risk_level_determination</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: final_score=0.0686, high_threshold=0.7, medium_threshold=0.4</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: high_risk_threshold_value=0.7, medium_risk_threshold_value=0.4</div>
+                            <div class="formula">公式: if score >= high_threshold: 'high' elif score >= medium_threshold: 'medium' else 'low'</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.000000</span></div>
+                        </div>
+                    
+                    </div>
+                
+                        
+                        
+                        
+                        
+
+                        <div class="history-note" style="margin-top: 16px;">
+                            <strong>🔗 追溯链接：</strong>
+                            可分享此链接直接定位到该样本：
+                            <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 12px;">
+                                #sample-SAMP_20260616200406587_83a7fa02
+                            </code>
+                        </div>
+                    </div>
+                </div>
+            
+
+                <div id="detail-SAMP_20260616200406587_97cf52a2" class="detail-section">
+                    <div class="detail-header" onclick="toggleDetail('SAMP_20260616200406587_97cf52a2')">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span id="icon-SAMP_20260616200406587_97cf52a2" class="expand-icon">▶</span>
+                            <strong>样本 587_97cf52a2</strong>
+                            <span class="sample-type type-review">需人工确认</span>
+                            <span class="badge badge-low">低风险</span>
+                            <span class="badge badge-review">需人工复核</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <span>得分: <strong style="color: #10b981;">0.1128</strong></span>
+                            <span style="font-size: 12px; color: #64748b;">2026-06-16T20:04:06.587735</span>
+                        </div>
+                    </div>
+                    <div id="content-SAMP_20260616200406587_97cf52a2" class="detail-content">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                            <div><strong>贷款ID:</strong> LOAN-005</div>
+                            <div><strong>参数版本:</strong> PARAM_20260616200406587</div>
+                            <div><strong>数据来源:</strong> SAMP_20260616200406587_97cf52a2</div>
+                            <div><strong>计算时间:</strong> 2026-06-16T20:04:06.587735</div>
+                        </div>
+
+                        <h4 style="color: #374151; margin: 16px 0 8px 0;">📊 成分贡献度</h4>
+                        <div style="max-width: 400px;">
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>利率</span>
+                        <span>0.8%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 0.8064516129032258%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>期限</span>
+                        <span>40.3%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 40.322580645161295%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>FICO</span>
+                        <span>0.0%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 0.0%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>DTI</span>
+                        <span>18.1%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 18.14516129032258%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>LTV</span>
+                        <span>8.1%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 8.064516129032258%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>年龄</span>
+                        <span>8.5%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 8.467741935483872%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>还款历史</span>
+                        <span>24.2%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 24.193548387096772%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            </div>
+
+                        
+                    <div style="margin-top: 16px;">
+                        <h4 style="color: #1e40af; margin-bottom: 12px;">🔢 完整计算过程 (16步)</h4>
+                        
+                        <div class="calc-step">
+                            <div class="step-name">rate_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_rate=0.1, normalized_rate=0.01</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: rate_sensitivity_value=0.35</div>
+                            <div class="formula">公式: normalized_rate * rate_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.003500</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">rate_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: rate_component_score=0.0035</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: rate_sensitivity_weight=0.3</div>
+                            <div class="formula">公式: rate_component_score * rate_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.001000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">term_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_term=0, normalized_term=1.0</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: term_sensitivity_value=0.25</div>
+                            <div class="formula">公式: normalized_term * term_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.250000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">term_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: term_component_score=0.25</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: term_sensitivity_weight=0.2</div>
+                            <div class="formula">公式: term_component_score * term_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.050000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">fico_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_fico=900, normalized_fico=0.0</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: fico_sensitivity_value=0.2</div>
+                            <div class="formula">公式: normalized_fico * fico_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.000000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">fico_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: fico_component_score=0.0</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: fico_sensitivity_weight=0.15</div>
+                            <div class="formula">公式: fico_component_score * fico_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.000000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">dti_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_dti=150.0, normalized_dti=1.0</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: dti_sensitivity_value=0.15</div>
+                            <div class="formula">公式: normalized_dti * dti_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.150000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">dti_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: dti_component_score=0.15</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: dti_sensitivity_weight=0.15</div>
+                            <div class="formula">公式: dti_component_score * dti_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.022500</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">ltv_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_ltv=200.0, normalized_ltv=1.0</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: ltv_sensitivity_value=0.1</div>
+                            <div class="formula">公式: normalized_ltv * ltv_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.100000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">ltv_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: ltv_component_score=0.1</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: ltv_sensitivity_weight=0.1</div>
+                            <div class="formula">公式: ltv_component_score * ltv_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.010000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">age_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_age=105, normalized_age=0.7</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: age_sensitivity_value=0.15</div>
+                            <div class="formula">公式: normalized_age * age_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.105000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">age_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: age_component_score=0.105</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: age_sensitivity_weight=0.1</div>
+                            <div class="formula">公式: age_component_score * age_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.010500</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">history_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_history=True, normalized_history=1.0</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: history_sensitivity_value=0.3</div>
+                            <div class="formula">公式: normalized_history * history_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.300000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">history_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: history_component_score=0.3</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: history_sensitivity_weight=0.1</div>
+                            <div class="formula">公式: history_component_score * history_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.030000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">final_aggregation</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: rate_weighted=0.001, term_weighted=0.05, fico_weighted=0.0, dti_weighted=0.0225, ltv_weighted=0.01, age_weighted=0.0105, history_weighted=0.03, total_weight=1.1</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: 无</div>
+                            <div class="formula">公式: sum(weighted_scores) / total_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.112800</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">risk_level_determination</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: final_score=0.1128, high_threshold=0.7, medium_threshold=0.4</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: high_risk_threshold_value=0.7, medium_risk_threshold_value=0.4</div>
+                            <div class="formula">公式: if score >= high_threshold: 'high' elif score >= medium_threshold: 'medium' else 'low'</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.000000</span></div>
+                        </div>
+                    
+                    </div>
+                
+                        
+                    <div style="margin-top: 16px;">
+                        <h4 style="color: #dc2626; margin-bottom: 12px;">⚠️ 异常标记 (8项)</h4>
+                        
+                        <div class="anomaly-item ">
+                            <strong>principal</strong>: 期望值范围 10,000 - 2,000,000，实际值 <span style="color: #dc2626; font-weight: 600;">9500000.0</span>
+                            <br><span style="font-size: 12px; color: #64748b;">贷款本金应在合理范围内</span>
+                        </div>
+                    
+                        <div class="anomaly-item ">
+                            <strong>interest_rate</strong>: 期望值范围 0.5% - 15.0%，实际值 <span style="color: #dc2626; font-weight: 600;">0.1</span>
+                            <br><span style="font-size: 12px; color: #64748b;">利率应在合理范围内</span>
+                        </div>
+                    
+                        <div class="anomaly-item ">
+                            <strong>remaining_term</strong>: 期望值范围 1 - 360个月，实际值 <span style="color: #dc2626; font-weight: 600;">0</span>
+                            <br><span style="font-size: 12px; color: #64748b;">剩余期限应在1-360个月之间</span>
+                        </div>
+                    
+                        <div class="anomaly-item warning">
+                            <strong>borrower_age</strong>: 期望值范围 18 - 100岁，实际值 <span style="color: #dc2626; font-weight: 600;">105</span>
+                            <br><span style="font-size: 12px; color: #64748b;">借款人年龄应在合理范围内</span>
+                        </div>
+                    
+                        <div class="anomaly-item ">
+                            <strong>fico_score</strong>: 期望值范围 300 - 850，实际值 <span style="color: #dc2626; font-weight: 600;">900</span>
+                            <br><span style="font-size: 12px; color: #64748b;">FICO评分应在300-850之间</span>
+                        </div>
+                    
+                        <div class="anomaly-item warning">
+                            <strong>dti_ratio</strong>: 期望值范围 0 - 80%，实际值 <span style="color: #dc2626; font-weight: 600;">150.0</span>
+                            <br><span style="font-size: 12px; color: #64748b;">DTI比率通常不超过80%</span>
+                        </div>
+                    
+                        <div class="anomaly-item warning">
+                            <strong>ltv_ratio</strong>: 期望值范围 0 - 125%，实际值 <span style="color: #dc2626; font-weight: 600;">200.0</span>
+                            <br><span style="font-size: 12px; color: #64748b;">LTV比率通常不超过125%</span>
+                        </div>
+                    
+                        <div class="anomaly-item ">
+                            <strong>overall</strong>: 期望值范围 最多2个严重异常，实际值 <span style="color: #dc2626; font-weight: 600;">4个严重异常</span>
+                            <br><span style="font-size: 12px; color: #64748b;">样本存在多个严重异常，建议人工复核完整数据来源</span>
+                        </div>
+                    
+                    </div>
+                
+                        
+                        
+                        
+
+                        <div class="history-note" style="margin-top: 16px;">
+                            <strong>🔗 追溯链接：</strong>
+                            可分享此链接直接定位到该样本：
+                            <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 12px;">
+                                #sample-SAMP_20260616200406587_97cf52a2
+                            </code>
+                        </div>
+                    </div>
+                </div>
+            
+
+                <div id="detail-SAMP_20260616200406587_3de645af" class="detail-section">
+                    <div class="detail-header" onclick="toggleDetail('SAMP_20260616200406587_3de645af')">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span id="icon-SAMP_20260616200406587_3de645af" class="expand-icon">▶</span>
+                            <strong>样本 587_3de645af</strong>
+                            
+                            <span class="badge badge-low">低风险</span>
+                            
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <span>得分: <strong style="color: #10b981;">0.1414</strong></span>
+                            <span style="font-size: 12px; color: #64748b;">2026-06-16T20:04:06.587759</span>
+                        </div>
+                    </div>
+                    <div id="content-SAMP_20260616200406587_3de645af" class="detail-content">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                            <div><strong>贷款ID:</strong> LOAN-006</div>
+                            <div><strong>参数版本:</strong> PARAM_20260616200406587</div>
+                            <div><strong>数据来源:</strong> SAMP_20260616200406587_3de645af</div>
+                            <div><strong>计算时间:</strong> 2026-06-16T20:04:06.587759</div>
+                        </div>
+
+                        <h4 style="color: #374151; margin: 16px 0 8px 0;">📊 成分贡献度</h4>
+                        <div style="max-width: 400px;">
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>利率</span>
+                        <span>42.2%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 42.159383033419026%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>期限</span>
+                        <span>12.5%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 12.467866323907455%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>FICO</span>
+                        <span>7.4%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 7.3907455012853465%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>DTI</span>
+                        <span>10.2%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 10.154241645244216%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>LTV</span>
+                        <span>5.7%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 5.655526992287918%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>年龄</span>
+                        <span>2.9%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 2.8920308483290484%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            
+                <div style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
+                        <span>还款历史</span>
+                        <span>19.3%</span>
+                    </div>
+                    <div style="height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; width: 19.280205655526988%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 10px;"></div>
+                    </div>
+                </div>
+            </div>
+
+                        
+                    <div style="margin-top: 16px;">
+                        <h4 style="color: #1e40af; margin-bottom: 12px;">🔢 完整计算过程 (16步)</h4>
+                        
+                        <div class="calc-step">
+                            <div class="step-name">rate_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_rate=6.25, normalized_rate=0.625</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: rate_sensitivity_value=0.35</div>
+                            <div class="formula">公式: normalized_rate * rate_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.218800</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">rate_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: rate_component_score=0.2188</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: rate_sensitivity_weight=0.3</div>
+                            <div class="formula">公式: rate_component_score * rate_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.065600</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">term_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_term=220, normalized_term=0.3889</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: term_sensitivity_value=0.25</div>
+                            <div class="formula">公式: normalized_term * term_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.097200</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">term_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: term_component_score=0.0972</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: term_sensitivity_weight=0.2</div>
+                            <div class="formula">公式: term_component_score * term_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.019400</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">fico_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_fico=640, normalized_fico=0.3818</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: fico_sensitivity_value=0.2</div>
+                            <div class="formula">公式: normalized_fico * fico_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.076400</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">fico_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: fico_component_score=0.0764</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: fico_sensitivity_weight=0.15</div>
+                            <div class="formula">公式: fico_component_score * fico_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.011500</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">dti_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_dti=42.0, normalized_dti=0.7</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: dti_sensitivity_value=0.15</div>
+                            <div class="formula">公式: normalized_dti * dti_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.105000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">dti_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: dti_component_score=0.105</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: dti_sensitivity_weight=0.15</div>
+                            <div class="formula">公式: dti_component_score * dti_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.015800</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">ltv_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_ltv=88.0, normalized_ltv=0.88</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: ltv_sensitivity_value=0.1</div>
+                            <div class="formula">公式: normalized_ltv * ltv_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.088000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">ltv_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: ltv_component_score=0.088</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: ltv_sensitivity_weight=0.1</div>
+                            <div class="formula">公式: ltv_component_score * ltv_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.008800</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">age_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_age=52, normalized_age=0.3</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: age_sensitivity_value=0.15</div>
+                            <div class="formula">公式: normalized_age * age_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.045000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">age_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: age_component_score=0.045</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: age_sensitivity_weight=0.1</div>
+                            <div class="formula">公式: age_component_score * age_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.004500</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">history_component</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: raw_history=True, normalized_history=1.0</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: history_sensitivity_value=0.3</div>
+                            <div class="formula">公式: normalized_history * history_sensitivity_value</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.300000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">history_weighted</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: history_component_score=0.3</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: history_sensitivity_weight=0.1</div>
+                            <div class="formula">公式: history_component_score * history_sensitivity_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.030000</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">final_aggregation</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: rate_weighted=0.0656, term_weighted=0.0194, fico_weighted=0.0115, dti_weighted=0.0158, ltv_weighted=0.0088, age_weighted=0.0045, history_weighted=0.03, total_weight=1.1</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: 无</div>
+                            <div class="formula">公式: sum(weighted_scores) / total_weight</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.141400</span></div>
+                        </div>
+                    
+                        <div class="calc-step">
+                            <div class="step-name">risk_level_determination</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">输入: final_score=0.1414, high_threshold=0.7, medium_threshold=0.4</div>
+                            <div style="font-size: 12px; color: #64748b; margin: 4px 0;">参数: high_risk_threshold_value=0.7, medium_risk_threshold_value=0.4</div>
+                            <div class="formula">公式: if score >= high_threshold: 'high' elif score >= medium_threshold: 'medium' else 'low'</div>
+                            <div style="margin-top: 4px;">结果: <span class="result">0.000000</span></div>
+                        </div>
+                    
+                    </div>
+                
+                        
+                        
+                    <div style="margin-top: 16px;">
+                        <h4 style="color: #8b5cf6; margin-bottom: 12px;">⚔️ 数据冲突 (2项)</h4>
+                        
+                        <div class="conflict-item" style="padding: 12px; margin-bottom: 8px;">
+                            <strong>敏感性得分</strong> 冲突
+                            <div style="font-size: 13px; margin-top: 8px;">
+                                系统: 0.1414 vs 复盘: 0.52
+                            </div>
+                            <div class="suggestion" style="margin-top: 8px; font-size: 12px;">
+                                建议：新系统计算值(0.1414)低于复盘图表值(0.5200)，差异37.86%。请核对样本数据是否有更新，或确认复盘图表是否为人工调整值。
+                            </div>
+                        </div>
+                    
+                        <div class="conflict-item" style="padding: 12px; margin-bottom: 8px;">
+                            <strong>风险等级</strong> 冲突
+                            <div style="font-size: 13px; margin-top: 8px;">
+                                系统: low vs 复盘: medium
+                            </div>
+                            <div class="suggestion" style="margin-top: 8px; font-size: 12px;">
+                                风险等级不一致：系统判定low，复盘图表记录medium。请核对风险阈值参数或是否存在人工调整记录。
+                            </div>
+                        </div>
+                    
+                    </div>
+                
+                        
+                    <div style="margin-top: 16px;">
+                        <h4 style="color: #92400e; margin-bottom: 12px;">📝 历史人工备注 (2条)</h4>
+                        <div class="note-item">📝 2026-04-01 复盘：一季度风险等级人工上调为medium</div><div class="note-item">📝 2026-05-20 小张：FICO评分近期有更新，从620升至640</div>
+                    </div>
+                
+                        
+
+                        <div class="history-note" style="margin-top: 16px;">
+                            <strong>🔗 追溯链接：</strong>
+                            可分享此链接直接定位到该样本：
+                            <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 12px;">
+                                #sample-SAMP_20260616200406587_3de645af
+                            </code>
+                        </div>
+                    </div>
+                </div>
+            
+        </div>
+
+        <div id="history" class="section">
+            <h2 class="section-title">历史处理记录</h2>
+            <div class="history-note">
+                <strong>📜 处理追踪：</strong>本系统保留完整的处理历史，包括：
+                <ul style="margin-top: 8px; padding-left: 20px;">
+                    <li>所有参数版本及其变更记录（永不覆盖）</li>
+                    <li>每次运行的完整计算结果</li>
+                    <li>所有人工备注和复核意见</li>
+                    <li>待处理事项列表</li>
+                </ul>
+            </div>
+            <table style="margin-top: 16px;">
+                <thead>
+                    <tr>
+                        <th>统计项</th>
+                        <th>数值</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>累计运行次数</td><td>1</td></tr>
+                    <tr><td>累计处理样本</td><td>6</td></tr>
+                    <tr><td>累计检测异常</td><td>16</td></tr>
+                    <tr><td>累计检测冲突</td><td>7</td></tr>
+                    <tr><td>待人工复核</td><td><span class="badge badge-review">9</span></td></tr>
+                    <tr><td>已完成复核</td><td>0</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">使用说明</h2>
+            <div style="background: #f0fdf4; padding: 20px; border-radius: 8px; border-left: 4px solid #10b981;">
+                <p style="margin-bottom: 8px;"><strong>🔄 重复运行：</strong>再次运行时，系统会自动保留之前的人工备注和复核状态，不会被默认值覆盖。</p>
+                <p style="margin-bottom: 8px;"><strong>🔍 计算追溯：</strong>每笔样本的计算过程完整记录，包括使用的参数、公式、每一步结果，可直接复核。</p>
+                <p style="margin-bottom: 8px;"><strong>⚔️ 冲突处理：</strong>当复盘图表与导入数据冲突时，系统仅展示证据和建议，不替您做决定。</p>
+                <p><strong>📝 交接友好：</strong>所有人工备注完整保留，后续接手的同事可以看到每笔样本之前是如何判断的。</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="scroll-top" onclick="scrollToTop()" title="返回顶部">↑</div>
+
+    <script>
+        function toggleDetail(id) {
+            const content = document.getElementById('content-' + id);
+            const icon = document.getElementById('icon-' + id);
+            content.classList.toggle('active');
+            icon.classList.toggle('active');
+        }
+
+        function scrollToSample(sampleId) {
+            const element = document.getElementById('detail-' + sampleId);
+            if (element) {
+                const content = document.getElementById('content-' + sampleId);
+                const icon = document.getElementById('icon-' + sampleId);
+                content.classList.add('active');
+                icon.classList.add('active');
+                const offsetTop = element.offsetTop - 60;
+                try {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } catch(e) {
+                    window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+                }
+                if (window.innerHeight <= 0) {
+                    window.scrollTo(0, offsetTop);
+                }
+            }
+        }
+
+        function scrollToConflict(conflictId) {
+            const element = document.getElementById('conflict-' + conflictId);
+            if (element) {
+                const offsetTop = element.offsetTop - 60;
+                try {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } catch(e) {
+                    window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+                }
+                if (window.innerHeight <= 0) {
+                    window.scrollTo(0, offsetTop);
+                }
+            }
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const hash = window.location.hash.substring(1);
+            if (hash && hash.startsWith('sample-')) {
+                const sampleId = hash.replace('sample-', '');
+                setTimeout(() => scrollToSample(sampleId), 100);
+            } else if (hash && hash.startsWith('conflict-')) {
+                const conflictId = hash.replace('conflict-', '');
+                setTimeout(() => scrollToConflict(conflictId), 100);
+            }
+        });
+    </script>
+</body>
+</html>

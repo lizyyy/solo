@@ -116,7 +116,8 @@ class Exporter:
         filepath = os.path.join(self.output_dir, filename)
 
         headers = [
-            "冲突ID",
+            "冲突追踪ID(完整)",
+            "冲突ID(显示用)",
             "贷款ID",
             "冲突字段",
             "系统计算值",
@@ -127,6 +128,8 @@ class Exporter:
             "建议动作",
             "是否已解决",
             "处理说明",
+            "追溯锚点URL",
+            "独立追踪KEY",
         ]
 
         with open(filepath, "w", newline="", encoding="utf-8-sig") as f:
@@ -134,8 +137,13 @@ class Exporter:
             writer.writerow(headers)
 
             for conflict in conflicts:
+                conflict_id_short = conflict.conflict_id[-16:] if len(conflict.conflict_id) > 16 else conflict.conflict_id
+                trace_anchor = f"#conflict-{conflict.conflict_id}"
+                trace_key = f"{conflict.loan_id}_{conflict.field_name}"
+
                 writer.writerow([
                     conflict.conflict_id,
+                    conflict_id_short,
                     conflict.loan_id,
                     self._field_label(conflict.field_name),
                     conflict.sample_value,
@@ -146,6 +154,8 @@ class Exporter:
                     conflict.suggested_action,
                     "是" if conflict.resolved else "否",
                     conflict.resolution_note,
+                    trace_anchor,
+                    trace_key,
                 ])
 
         return filepath

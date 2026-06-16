@@ -6,6 +6,7 @@ import os
 import sys
 import shutil
 import json
+import csv
 from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -219,6 +220,74 @@ def main():
         match = actual_critical == expected_critical
         print(f"   {'✅' if match else '❌'} 严重异常: 页面={expected_critical}, 导出={actual_critical}")
         if not match:
+            passed = False
+
+    conflicts_file = run2["export_files"].get("conflicts", "")
+    if os.path.exists(conflicts_file) and run2["conflicts"]:
+        print(f"\n⚔️  冲突追踪ID验证:")
+        expected_conflict_count = len(run2["conflicts"])
+        with open(conflicts_file, "r", encoding="utf-8-sig") as f:
+            reader = csv.reader(f)
+            header = next(reader, [])
+            conflict_rows = list(reader)
+
+        print(f"   - 冲突条数: 页面={expected_conflict_count}, 导出={len(conflict_rows)}")
+        match_count = expected_conflict_count == len(conflict_rows)
+        print(f"   {'✅' if match_count else '❌'} 冲突条数一致")
+        if not match_count:
+            passed = False
+
+        expected_headers = [
+            "冲突追踪ID(完整)", "冲突ID(显示用)", "贷款ID", "冲突字段",
+            "系统计算值", "复盘图表值", "差异(%)", "系统数据来源",
+            "图表数据来源", "建议动作", "是否已解决", "处理说明",
+            "追溯锚点URL", "独立追踪KEY"
+        ]
+        headers_match = len(header) >= 14 and header[0] == expected_headers[0]
+        print(f"   {'✅' if headers_match else '❌'} 导出表头包含追踪字段(共{len(header)}列)")
+        if not headers_match:
+            passed = False
+
+        page_keys = set()
+        for c in run2["conflicts"]:
+            key = f"{c.loan_id}_{c.field_name}"
+            page_keys.add(key)
+
+        export_keys = set()
+        has_complete_ids = True
+        has_anchors = True
+        for row in conflict_rows:
+            if len(row) >= 14:
+                full_id = row[0]
+                short_id = row[1]
+                loan_id = row[2]
+                field_raw = row[3]
+                anchor = row[12]
+                trace_key = row[13]
+
+                if "CONFLICT_" not in full_id or "_" not in full_id.split("CONFLICT_")[1]:
+                    has_complete_ids = False
+                if not anchor.startswith("#conflict-CONFLICT_"):
+                    has_anchors = False
+
+                field_key_map = {
+                    "敏感性得分": "sensitivity_score",
+                    "风险等级": "risk_level",
+                    "贷款本金": "principal",
+                }
+                field_name = field_key_map.get(field_raw, field_raw)
+                export_keys.add(f"{loan_id}_{field_name}")
+
+        print(f"   {'✅' if has_complete_ids else '❌'} 冲突ID包含绑定信息(贷款+字段)")
+        print(f"   {'✅' if has_anchors else '❌'} 追溯锚点格式正确(#conflict-CONFLICT_xxx)")
+        if not has_complete_ids or not has_anchors:
+            passed = False
+
+        keys_match = page_keys == export_keys
+        print(f"   {'✅' if keys_match else '❌'} 页面/导出 独立追踪KEY完全匹配")
+        print(f"      - 页面KEY: {sorted(page_keys)}")
+        print(f"      - 导出KEY: {sorted(export_keys)}")
+        if not keys_match:
             passed = False
 
     print()

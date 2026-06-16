@@ -47,8 +47,9 @@ class ConflictDetector:
                         f"请核对样本数据是否有更新，或确认复盘图表是否为人工调整值。"
                     )
 
+                id_content = f"{sample.loan_id}_sensitivity_score_{calculated_score:.4f}_{chart_record.reported_sensitivity:.4f}"
                 conflicts.append(DataConflict(
-                    conflict_id=generate_id("CONFLICT"),
+                    conflict_id=generate_id("CONFLICT", id_content),
                     loan_id=sample.loan_id,
                     sample_value=calculated_score,
                     chart_value=chart_record.reported_sensitivity,
@@ -63,8 +64,9 @@ class ConflictDetector:
 
             calculated_risk = self._score_to_risk(calculated_score)
             if calculated_risk != chart_record.reported_risk:
+                id_content = f"{sample.loan_id}_risk_level_{calculated_risk}_{chart_record.reported_risk}"
                 conflicts.append(DataConflict(
-                    conflict_id=generate_id("CONFLICT"),
+                    conflict_id=generate_id("CONFLICT", id_content),
                     loan_id=sample.loan_id,
                     sample_value=calculated_risk,
                     chart_value=chart_record.reported_risk,
@@ -89,8 +91,9 @@ class ConflictDetector:
                     )
                     principal_diff_pct = abs(sample.principal - chart_principal) / chart_principal * 100
                     if principal_diff_pct > self.tolerance_pct:
+                        id_content = f"{sample.loan_id}_principal_{sample.principal:.0f}_{chart_principal:.0f}"
                         conflicts.append(DataConflict(
-                            conflict_id=generate_id("CONFLICT"),
+                            conflict_id=generate_id("CONFLICT", id_content),
                             loan_id=sample.loan_id,
                             sample_value=sample.principal,
                             chart_value=chart_principal,
