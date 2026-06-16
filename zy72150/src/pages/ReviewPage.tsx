@@ -217,6 +217,36 @@ export function ReviewPage() {
                     </div>
                   )}
 
+                  {selectedPoint.conflicts.filter((c) => c.resolved).length > 0 && (
+                    <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
+                      <h3 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
+                        <CheckCircle className="w-5 h-5" />
+                        冲突处理结论 ({selectedPoint.conflicts.filter((c) => c.resolved).length} 项已处理)
+                      </h3>
+                      <div className="space-y-2">
+                        {selectedPoint.conflicts
+                          .filter((c) => c.resolved)
+                          .map((conflict, idx) => (
+                            <div key={idx} className="p-3 bg-white rounded-lg border border-green-200">
+                              <p className="text-sm">
+                                <span className="font-medium text-gray-700">
+                                  {conflict.type === 'name' && '点位名称：'}
+                                  {conflict.type === 'address' && '地址信息：'}
+                                  {conflict.type === 'category' && '类别信息：'}
+                                </span>
+                                <span className="text-green-700">
+                                  {conflict.resolution === 'use_gis' && '采用GIS数据 → '}
+                                  {conflict.resolution === 'use_import' && '采用导入数据 → '}
+                                  {conflict.resolution === 'custom' && '手动处理 → '}
+                                  <span className="font-semibold">{conflict.resolvedValue}</span>
+                                </span>
+                              </p>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-2 gap-6">
                     <div>
                       <label className="text-sm font-medium text-gray-700 block mb-2">类别</label>
@@ -231,7 +261,7 @@ export function ReviewPage() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium text-gray-700 block mb-2">描述信息</label>
+                    <label className="text-sm font-medium text-gray-700 block mb-2">描述与备注（各来源整合）</label>
                     <div className="p-4 bg-gray-50 rounded-lg text-gray-700 whitespace-pre-wrap">
                       {selectedPoint.description || '暂无描述'}
                     </div>
@@ -346,7 +376,16 @@ export function ReviewPage() {
                           {record.action === 'status_change' &&
                             `状态变更: ${getStatusLabel(record.oldValue as any)} → ${getStatusLabel(record.newValue as any)}`}
                           {record.action === 'remark' && '添加备注'}
-                          {record.action === 'update' && '更新信息'}
+                          {record.action === 'update' && record.field && (
+                            <>
+                              {record.field === 'name' && '更新点位名称'}
+                              {record.field === 'address' && '更新地址'}
+                              {record.field === 'category' && '更新类别'}
+                              {record.field === 'description' && '更新描述'}
+                              {record.oldValue && record.newValue && `：${record.oldValue} → ${record.newValue}`}
+                            </>
+                          )}
+                          {record.action === 'update' && !record.field && '更新信息'}
                         </p>
                         {record.remark && <p className="text-sm text-gray-500 mt-1">{record.remark}</p>}
                       </div>

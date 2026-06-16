@@ -5,6 +5,11 @@ import { PointStatus } from '../types';
 import { exportToExcel, exportToCSV } from '../utils/export';
 import { cn, getStatusColor, getStatusLabel, getSourceColor, getSourceLabel } from '../lib/utils';
 
+function truncate(str: string, max: number) {
+  if (!str) return '';
+  return str.length > max ? str.substring(0, max) + '...' : str;
+}
+
 export function ExportPage() {
   const { points } = useAppStore();
   const [activeFilter, setActiveFilter] = useState<PointStatus | 'all'>('all');
@@ -30,6 +35,21 @@ export function ExportPage() {
   const handleExportByStatus = (status: PointStatus) => {
     const statusPoints = points.filter((p) => p.status === status);
     exportToExcel(statusPoints, `${getStatusLabel(status)}_${new Date().toLocaleDateString('zh-CN')}`);
+  };
+
+  const summary = (point: typeof points[0]) => {
+    const feedbacks = point.feedbacks.map(f => `[${f.source}] ${f.content}`).join('；');
+    const photos = point.photos.map(p => p.description || '无说明').join('；');
+    const resolutionLabel: Record<string, string> = { use_gis: '采用GIS数据', use_import: '采用导入数据', custom: '手动处理' };
+    const fieldLabel: Record<string, string> = { name: '名称', address: '地址', category: '类别' };
+    const conflicts = point.conflicts
+      .filter(c => c.resolved)
+      .map(c => `${fieldLabel[c.type]}：${resolutionLabel[c.resolution || '']} → ${c.resolvedValue || ''}`)
+      .join('；');
+    const history = point.history
+      .map(h => `[${h.operator}] ${h.remark || (h.action === 'status_change' ? '状态变更' : h.action === 'remark' ? '备注' : h.action === 'merge' ? '归并' : h.action === 'update' ? '更新' : '导入')}`)
+      .join(' | ');
+    return { feedbacks, photos, conflicts, history };
   };
 
   return (
@@ -162,26 +182,39 @@ export function ExportPage() {
                   <th className="text-left py-3 px-4 font-medium text-gray-600">类别</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-600">来源</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-600">状态</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">描述/备注</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">反馈</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">照片说明</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">冲突处理</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">历史记录</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredPoints.slice(0, 20).map((point) => (
-                  <tr key={point.id} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="py-3 px-4 text-gray-900">{point.name}</td>
-                    <td className="py-3 px-4 text-gray-600">{point.address}</td>
-                    <td className="py-3 px-4 text-gray-600">{point.category}</td>
-                    <td className="py-3 px-4">
-                      <span className={cn('px-2 py-1 text-xs rounded-full', getSourceColor(point.source))}>
-                        {getSourceLabel(point.source)}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className={cn('px-2 py-1 text-xs rounded-full', getStatusColor(point.status))}>
-                        {getStatusLabel(point.status)}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {filteredPoints.slice(0, 20).map((point) => {
+                  const s = summary(point);
+                  return (
+                    <tr key={point.id} className="border-b border-gray-100 hover:bg-gray-50 align-top">
+                      <td className="py-3 px-4 text-gray-900">{point.name}</td>
+                      <td className="py-3 px-4 text-gray-600">{point.address}</td>
+                      <td className="py-3 px-4 text-gray-600">{point.category}</td>
+                      <td className="py-3 px-4">
+                        <span className={cn('px-2 py-1 text-xs rounded-full whitespace-nowrap', getSourceColor(point.source))}>
+                          {getSourceLabel(point.source)}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className={cn('px-2 py-1 text-xs rounded-full whitespace-nowrap', getStatusColor(point.status))}>
+                          {getStatusLabel(point.status)}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600 max-w-xs">{truncate(point.description, 100)}</td>
+                      <td className="py-3 px-4 text-gray-600 max-w-xs">{truncate(s.feedbacks, 100)}</td>
+                      <td className="py-3 px-4 text-gray-600 max-w-xs">{truncate(s.photos, 80)}</td>
+                      <td className="py-3 px-4 text-gray-600 max-w-xs">{truncate(s.conflicts, 100)}</td>
+                      <td className="py-3 px-4 text-gray-600 max-w-xs">{truncate(s.history, 120)}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
             {filteredPoints.length > 20 && (
@@ -199,7 +232,7 @@ export function ExportPage() {
           <li>• <strong>已处理</strong>：信息完整、无冲突、可直接用于公示的点位</li>
           <li>• <strong>待核实</strong>：存在数据冲突或信息不完整，需要进一步核对的点位</li>
           <li>• <strong>需要现场复看</strong>：位置或情况存疑，需要现场确认的点位</li>
-          <li>• 导出文件包含点位名称、地址、坐标、来源、类别、状态、描述等完整信息</li>
+          <li>• 导出文件包含：点位名称、地址、坐标、来源、类别、状态、描述、反馈记录、照片说明、冲突处理结果、历史意见等完整信息</li>
           <li>• Excel格式支持在Office中进一步编辑和排版</li>
         </ul>
       </div>

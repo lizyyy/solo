@@ -6,6 +6,10 @@ import {
   normalizeAddress,
 } from './similarity';
 
+function genId(prefix: string): string {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 export interface MatchResult {
   point1: Point;
   point2: Point;
@@ -80,7 +84,7 @@ export function findMergeGroups(
       const primaryPoint = groupPoints.find((p) => p.source === 'gis') || groupPoints[0];
 
       groups.push({
-        id: `group-${Date.now()}-${i}`,
+        id: genId(`group-${i}`),
         points: groupPoints,
         similarity: groupPoints.reduce((acc, _, idx) => {
           if (idx === 0) return 0;
@@ -108,6 +112,7 @@ export function mergePoints(
   mergedName: string,
   mergedAddress: string
 ): Point {
+  const mergedId = genId('merged');
   const gisPoint = group.points.find((p) => p.source === 'gis');
   const primaryPoint = gisPoint || group.points[0];
 
@@ -115,26 +120,57 @@ export function mergePoints(
   const allPhotos = group.points.flatMap((p) => p.photos);
   const allHistory = group.points.flatMap((p) => p.history);
 
+  const sourceLabels: Record<string, string> = {
+    gis: 'GIS点位',
+    resident: '居民反馈',
+    inspection: '巡检记录',
+    street: '街道备注',
+  };
+
+  const descriptionParts = group.points
+    .filter((p) => p.description && p.description.trim())
+    .map(
+      (p) =>
+        `【${sourceLabels[p.source] || p.source}】${p.name}：${p.description}`
+    );
+  const mergedDescription = descriptionParts.join('\n\n');
+
   const conflicts = detectConflicts(group.points);
 
   return {
     ...primaryPoint,
-    id: `merged-${Date.now()}`,
+    id: mergedId,
     name: mergedName,
     address: mergedAddress,
     status: 'pending' as const,
+    description: mergedDescription,
     feedbacks: allFeedbacks,
     photos: allPhotos,
     history: [
       ...allHistory,
       {
-        id: `hist-${Date.now()}`,
-        pointId: `merged-${Date.now()}`,
+        id: genId('hist-merge'),
+        pointId: mergedId,
         action: 'merge',
         operator: '系统',
         timestamp: new Date().toISOString(),
-        remark: `归并了 ${group.points.length} 个点位: ${group.points.map((p) => p.name).join(', ')}`,
+        remark: `归并了 ${group.points.length} 个点位: ${group.points
+          .map((p) => `[${sourceLabels[p.source] || p.source}] ${p.name}`)
+          .join('、')}`,
       },
+      ...group.points
+        .filter((p) => p.description && p.description.trim() && p.source !== 'gis')
+        .map((p) => ({
+          id: genId(`hist-desc-${p.id}`),
+          pointId: mergedId,
+          action: 'update' as const,
+          field: 'description',
+          oldValue: '',
+          newValue: p.description,
+          operator: sourceLabels[p.source] || p.source,
+          timestamp: new Date().toISOString(),
+          remark: `归并整合来源描述（${p.name}）`,
+        })),
     ],
     conflicts,
     createdAt: new Date().toISOString(),

@@ -53,6 +53,7 @@ export interface ConflictInfo {
   resolved: boolean;
   resolution?: 'use_gis' | 'use_import' | 'custom';
   customValue?: string;
+  resolvedValue?: string;
 }
 
 export interface Feedback {

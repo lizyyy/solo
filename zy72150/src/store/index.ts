@@ -4,6 +4,10 @@ import { Point, MergeGroup, PointStatus, HistoryRecord, Photo } from '../types';
 import { findMergeGroups, mergePoints } from '../utils/matching';
 import { generateSampleData, generateSmoothCaseData, generateReworkCaseData } from '../data/sampleData';
 
+function genId(prefix: string): string {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 interface AppState {
   points: Point[];
   mergeGroups: MergeGroup[];
@@ -90,7 +94,7 @@ export const useAppStore = create<AppState & AppActions>()(
           if (!point) return state;
 
           const newHistory: HistoryRecord = {
-            id: `hist-${Date.now()}`,
+            id: genId('hist-status'),
             pointId: id,
             action: 'status_change',
             oldValue: point.status,
@@ -118,7 +122,7 @@ export const useAppStore = create<AppState & AppActions>()(
       addRemark: (id, remark) => {
         set((state) => {
           const newHistory: HistoryRecord = {
-            id: `hist-${Date.now()}`,
+            id: genId('hist-remark'),
             pointId: id,
             action: 'remark',
             operator: '周姐',
@@ -261,19 +265,67 @@ export const useAppStore = create<AppState & AppActions>()(
 
             const newConflicts = [...p.conflicts];
             const conflict = newConflicts[conflictIndex];
+            if (!conflict) return p;
 
-            if (conflict) {
-              newConflicts[conflictIndex] = {
-                ...conflict,
-                resolved: true,
-                resolution,
-                customValue,
-              };
+            let resolvedValue = '';
+            let oldValue = '';
+            const fieldLabel: Record<string, string> = {
+              name: '点位名称',
+              address: '地址',
+              category: '类别',
+            };
+            const resolutionLabel: Record<string, string> = {
+              use_gis: '采用GIS数据',
+              use_import: '采用导入数据',
+              custom: '手动处理',
+            };
+
+            if (resolution === 'use_gis') {
+              resolvedValue = conflict.gisValue;
+            } else if (resolution === 'use_import') {
+              resolvedValue = conflict.importValue;
+            } else if (resolution === 'custom') {
+              resolvedValue = customValue || conflict.gisValue;
             }
+
+            if (conflict.type === 'name') {
+              oldValue = p.name;
+            } else if (conflict.type === 'address') {
+              oldValue = p.address;
+            } else if (conflict.type === 'category') {
+              oldValue = p.category;
+            }
+
+            newConflicts[conflictIndex] = {
+              ...conflict,
+              resolved: true,
+              resolution,
+              customValue,
+              resolvedValue,
+            };
+
+            const fieldUpdate: Partial<Point> = {};
+            if (conflict.type === 'name') fieldUpdate.name = resolvedValue;
+            if (conflict.type === 'address') fieldUpdate.address = resolvedValue;
+            if (conflict.type === 'category') fieldUpdate.category = resolvedValue;
+
+            const newHistory: HistoryRecord = {
+              id: genId('hist-conflict'),
+              pointId,
+              action: 'update',
+              field: conflict.type,
+              oldValue,
+              newValue: resolvedValue,
+              operator: '周姐',
+              timestamp: new Date().toISOString(),
+              remark: `解决${fieldLabel[conflict.type]}冲突：${resolutionLabel[resolution]}（${oldValue} → ${resolvedValue}）`,
+            };
 
             return {
               ...p,
+              ...fieldUpdate,
               conflicts: newConflicts,
+              history: [...p.history, newHistory],
               updatedAt: new Date().toISOString(),
             };
           }),
@@ -290,7 +342,7 @@ export const useAppStore = create<AppState & AppActions>()(
                     ...p.history,
                     {
                       ...record,
-                      id: `hist-${Date.now()}`,
+                      id: genId('hist'),
                       pointId,
                       timestamp: new Date().toISOString(),
                     },

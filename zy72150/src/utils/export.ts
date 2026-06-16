@@ -1,6 +1,54 @@
 import * as XLSX from 'xlsx';
 import { Point, PointStatus } from '../types';
 
+function getResolutionsSummary(point: Point): string {
+  const resolutionLabel: Record<string, string> = {
+    use_gis: '采用GIS数据',
+    use_import: '采用导入数据',
+    custom: '手动处理',
+  };
+  const fieldLabel: Record<string, string> = {
+    name: '名称',
+    address: '地址',
+    category: '类别',
+  };
+  return point.conflicts
+    .filter((c) => c.resolved)
+    .map(
+      (c) =>
+        `${fieldLabel[c.type]}：${resolutionLabel[c.resolution || '']} → ${c.resolvedValue || ''}`
+    )
+    .join('；');
+}
+
+function getFeedbacksSummary(point: Point): string {
+  return point.feedbacks
+    .map((fb) => `[${fb.source}] ${fb.content}`)
+    .join('；');
+}
+
+function getPhotosSummary(point: Point): string {
+  return point.photos
+    .map((ph) => ph.description || '无说明')
+    .join('；');
+}
+
+function getHistorySummary(point: Point): string {
+  return point.history
+    .map((h) => {
+      const parts: string[] = [];
+      parts.push(`[${h.operator}]`);
+      if (h.action === 'status_change') parts.push('状态变更');
+      if (h.action === 'remark') parts.push('备注');
+      if (h.action === 'merge') parts.push('归并');
+      if (h.action === 'update') parts.push('更新');
+      if (h.action === 'import') parts.push('导入');
+      if (h.remark) parts.push(h.remark);
+      return parts.join(' ');
+    })
+    .join(' | ');
+}
+
 export function exportToExcel(points: Point[], filename: string): void {
   const data = points.map((point) => ({
     '点位名称': point.name,
@@ -11,6 +59,10 @@ export function exportToExcel(points: Point[], filename: string): void {
     '类别': point.category,
     '状态': getStatusLabel(point.status),
     '描述': point.description,
+    '反馈记录': getFeedbacksSummary(point),
+    '照片说明': getPhotosSummary(point),
+    '冲突处理结果': getResolutionsSummary(point),
+    '历史意见': getHistorySummary(point),
     '创建时间': point.createdAt,
     '更新时间': point.updatedAt,
   }));
@@ -27,7 +79,11 @@ export function exportToExcel(points: Point[], filename: string): void {
     { wch: 10 },
     { wch: 15 },
     { wch: 15 },
+    { wch: 40 },
+    { wch: 40 },
+    { wch: 20 },
     { wch: 30 },
+    { wch: 40 },
     { wch: 20 },
     { wch: 20 },
   ];
@@ -45,6 +101,10 @@ export function exportToCSV(points: Point[], filename: string): void {
     '类别',
     '状态',
     '描述',
+    '反馈记录',
+    '照片说明',
+    '冲突处理结果',
+    '历史意见',
   ];
 
   const rows = points.map((point) => [
@@ -55,7 +115,11 @@ export function exportToCSV(points: Point[], filename: string): void {
     `"${getSourceLabel(point.source)}"`,
     `"${point.category}"`,
     `"${getStatusLabel(point.status)}"`,
-    `"${point.description}"`,
+    `"${(point.description || '').replace(/"/g, '""')}"`,
+    `"${getFeedbacksSummary(point).replace(/"/g, '""')}"`,
+    `"${getPhotosSummary(point).replace(/"/g, '""')}"`,
+    `"${getResolutionsSummary(point).replace(/"/g, '""')}"`,
+    `"${getHistorySummary(point).replace(/"/g, '""')}"`,
   ]);
 
   const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
