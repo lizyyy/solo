@@ -4,7 +4,7 @@ import { statusLabels, sourceLabels, type RecordStatus, type RecordSource } from
 import { useEffect, useState } from 'react';
 
 export function FilterBar() {
-  const { filters, setFilters } = useRecordStore();
+  const { filters, setFilters, fetchRecords } = useRecordStore();
   const [searchInput, setSearchInput] = useState(filters.searchKeyword || '');
 
   useEffect(() => {
@@ -13,6 +13,10 @@ export function FilterBar() {
     }, 300);
     return () => clearTimeout(timer);
   }, [searchInput, setFilters]);
+
+  useEffect(() => {
+    fetchRecords();
+  }, [filters, fetchRecords]);
 
   const handleStatusChange = (status: RecordStatus | undefined) => {
     setFilters({ status });

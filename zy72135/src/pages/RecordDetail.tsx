@@ -9,7 +9,7 @@ import { statusLabels, type RecordStatus } from '../../shared/types';
 export default function RecordDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { currentRecord, versionHistories, loading, saveStatus, fetchRecord, updateRecordNote, updateRecordStatus, clearSaveStatus } = useRecordStore();
+  const { currentRecord, versionHistories, loading, saveStatus, fetchRecord, fetchVersionHistory, updateRecordNote, updateRecordStatus, clearSaveStatus } = useRecordStore();
   
   const [note, setNote] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<RecordStatus | ''>('');
@@ -17,9 +17,10 @@ export default function RecordDetail() {
   useEffect(() => {
     if (id) {
       fetchRecord(id);
+      fetchVersionHistory(id);
     }
     return () => clearSaveStatus();
-  }, [id, fetchRecord, clearSaveStatus]);
+  }, [id, fetchRecord, fetchVersionHistory, clearSaveStatus]);
 
   useEffect(() => {
     if (currentRecord) {

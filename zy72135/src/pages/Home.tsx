@@ -7,11 +7,11 @@ import { useRecordStore } from '../store/useRecordStore';
 
 export default function Home() {
   const navigate = useNavigate();
-  const { exportCsv, initializeRecords } = useRecordStore();
+  const { exportCsv, fetchRecords } = useRecordStore();
 
   useEffect(() => {
-    initializeRecords();
-  }, [initializeRecords]);
+    fetchRecords();
+  }, [fetchRecords]);
 
   const handleExport = () => {
     exportCsv();

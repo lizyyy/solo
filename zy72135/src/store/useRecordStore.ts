@@ -1,16 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { TrackCleanupRecord, FilterState, VersionHistory, RecordStatus } from '../../shared/types';
+import type { TrackCleanupRecord, FilterState, VersionHistory } from '../../shared/types';
 import { statusLabels as allStatusLabels } from '../../shared/types';
 import { mockRecords, mockVersionHistory } from '../data/mockData';
-
-function nowISOString(): string {
-  return new Date().toISOString().replace('T', ' ').slice(0, 19);
-}
-
-function generateId(): string {
-  return `ver_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-}
+import * as api from '../api/client';
 
 function applyFilters(
   records: TrackCleanupRecord[],
@@ -44,14 +37,16 @@ interface RecordState {
   loading: boolean;
   error: string | null;
   saveStatus: 'idle' | 'saving' | 'saved' | 'error';
+  backendAvailable: boolean;
 
   setFilters: (filters: Partial<FilterState>) => void;
-  initializeRecords: () => void;
-  fetchRecord: (id: string) => void;
-  updateRecordNote: (id: string, note: string, modifiedBy?: string) => void;
-  updateRecordStatus: (id: string, status: TrackCleanupRecord['status'], modifiedBy?: string) => void;
-  supplementRecord: (id: string, oldChannelInfo: string, modifiedBy?: string) => void;
-  exportCsv: () => void;
+  fetchRecords: () => Promise<void>;
+  fetchRecord: (id: string) => Promise<void>;
+  fetchVersionHistory: (id: string) => Promise<void>;
+  updateRecordNote: (id: string, note: string, modifiedBy?: string) => Promise<void>;
+  updateRecordStatus: (id: string, status: TrackCleanupRecord['status'], modifiedBy?: string) => Promise<void>;
+  supplementRecord: (id: string, oldChannelInfo: string, modifiedBy?: string) => Promise<void>;
+  exportCsv: () => Promise<void>;
   clearSaveStatus: () => void;
 }
 
@@ -66,6 +61,7 @@ export const useRecordStore = create<RecordState>()(
       loading: false,
       error: null,
       saveStatus: 'idle',
+      backendAvailable: false,
 
       setFilters: (filters) => {
         set((state) => {
@@ -77,44 +73,99 @@ export const useRecordStore = create<RecordState>()(
         });
       },
 
-      initializeRecords: () => {
-        const { allRecords } = get();
-        if (allRecords.length > 0) {
+      fetchRecords: async () => {
+        set({ loading: true, error: null });
+        try {
           const { filters } = get();
-          set({ records: applyFilters(allRecords, filters) });
-          return;
+          const records = await api.getRecords(filters);
+          set({
+            allRecords: records,
+            records: applyFilters(records, filters),
+            loading: false,
+            backendAvailable: true,
+          });
+        } catch {
+          const { allRecords, filters } = get();
+          if (allRecords.length === 0) {
+            set({
+              allRecords: [...mockRecords],
+              records: applyFilters(mockRecords, filters),
+              versionHistories: {
+                rec_001: [...mockVersionHistory.filter((v) => v.recordId === 'rec_001')],
+              },
+            });
+          } else {
+            set({ records: applyFilters(allRecords, filters) });
+          }
+          set({ loading: false, backendAvailable: false });
         }
-        const { filters } = get();
-        set({
-          allRecords: [...mockRecords],
-          records: applyFilters(mockRecords, filters),
-          versionHistories: {
-            rec_001: [...mockVersionHistory.filter((v) => v.recordId === 'rec_001')],
-          },
-        });
       },
 
-      fetchRecord: (id: string) => {
-        const { allRecords } = get();
-        const record = allRecords.find((r) => r.id === id);
-        set({ currentRecord: record || null });
+      fetchRecord: async (id: string) => {
+        set({ loading: true, error: null });
+        try {
+          const record = await api.getRecord(id);
+          set({ currentRecord: record, loading: false, backendAvailable: true });
+        } catch {
+          const { allRecords } = get();
+          const record = allRecords.find((r) => r.id === id) || mockRecords.find((r) => r.id === id);
+          set({ currentRecord: record || null, loading: false, backendAvailable: false });
+        }
       },
 
-      updateRecordNote: (id: string, note: string, modifiedBy: string = '小孟') => {
-        set((state) => {
-          const current = state.allRecords.find((r) => r.id === id);
-          if (!current) return state;
+      fetchVersionHistory: async (id: string) => {
+        try {
+          const history = await api.getRecordVersions(id);
+          set((state) => ({
+            versionHistories: { ...state.versionHistories, [id]: history },
+            backendAvailable: true,
+          }));
+        } catch {
+          const { versionHistories } = get();
+          if (!versionHistories[id]) {
+            const history = mockVersionHistory.filter((v) => v.recordId === id);
+            set((state) => ({
+              versionHistories: { ...state.versionHistories, [id]: history },
+            }));
+          }
+          set({ backendAvailable: false });
+        }
+      },
+
+      updateRecordNote: async (id: string, note: string, modifiedBy: string = '小孟') => {
+        set({ saveStatus: 'saving' });
+        try {
+          const updated = await api.updateRecord(id, {
+            currentNote: note,
+            latestHandler: modifiedBy,
+            latestHandleTime: new Date().toISOString().replace('T', ' ').slice(0, 19),
+            modifiedBy,
+          });
+          await get().fetchVersionHistory(id);
+          set((state) => {
+            const newAllRecords = state.allRecords.map((r) => (r.id === id ? updated : r));
+            return {
+              saveStatus: 'saved',
+              allRecords: newAllRecords,
+              records: applyFilters(newAllRecords, state.filters),
+              currentRecord: state.currentRecord?.id === id ? updated : state.currentRecord,
+              backendAvailable: true,
+            };
+          });
+        } catch {
+          const { allRecords, currentRecord, versionHistories, filters } = get();
+          const current = currentRecord || allRecords.find((r) => r.id === id);
+          if (!current) { set({ saveStatus: 'error' }); return; }
 
           const updated: TrackCleanupRecord = {
             ...current,
             currentNote: note,
             latestHandler: modifiedBy,
-            latestHandleTime: nowISOString(),
+            latestHandleTime: new Date().toISOString().replace('T', ' ').slice(0, 19),
             updatedAt: new Date().toISOString(),
           };
-
           const versionEntry: VersionHistory = {
-            id: generateId(),
+            id: `ver_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
             recordId: id,
             fieldName: '备注',
             oldValue: current.currentNote || '(空)',
@@ -122,42 +173,57 @@ export const useRecordStore = create<RecordState>()(
             modifiedBy,
             modifiedAt: new Date().toISOString(),
           };
-
-          const existingHistory = state.versionHistories[id] || [];
-          const newAllRecords = state.allRecords.map((r) => (r.id === id ? updated : r));
-
-          return {
+          const existingHistory = versionHistories[id] || [];
+          const newAllRecords = allRecords.map((r) => (r.id === id ? updated : r));
+          set({
             saveStatus: 'saved',
             allRecords: newAllRecords,
-            records: applyFilters(newAllRecords, state.filters),
-            currentRecord: state.currentRecord?.id === id ? updated : state.currentRecord,
-            versionHistories: {
-              ...state.versionHistories,
-              [id]: [versionEntry, ...existingHistory],
-            },
-          };
-        });
+            records: applyFilters(newAllRecords, filters),
+            currentRecord: currentRecord?.id === id ? updated : currentRecord,
+            versionHistories: { ...versionHistories, [id]: [versionEntry, ...existingHistory] },
+            backendAvailable: false,
+          });
+        }
       },
 
-      updateRecordStatus: (
+      updateRecordStatus: async (
         id: string,
         status: TrackCleanupRecord['status'],
         modifiedBy: string = '小孟'
       ) => {
-        set((state) => {
-          const current = state.allRecords.find((r) => r.id === id);
-          if (!current) return state;
+        set({ saveStatus: 'saving' });
+        try {
+          const updated = await api.updateRecord(id, {
+            status,
+            latestHandler: modifiedBy,
+            latestHandleTime: new Date().toISOString().replace('T', ' ').slice(0, 19),
+            modifiedBy,
+          });
+          await get().fetchVersionHistory(id);
+          set((state) => {
+            const newAllRecords = state.allRecords.map((r) => (r.id === id ? updated : r));
+            return {
+              saveStatus: 'saved',
+              allRecords: newAllRecords,
+              records: applyFilters(newAllRecords, state.filters),
+              currentRecord: state.currentRecord?.id === id ? updated : state.currentRecord,
+              backendAvailable: true,
+            };
+          });
+        } catch {
+          const { allRecords, currentRecord, versionHistories, filters } = get();
+          const current = currentRecord || allRecords.find((r) => r.id === id);
+          if (!current) { set({ saveStatus: 'error' }); return; }
 
           const updated: TrackCleanupRecord = {
             ...current,
             status,
             latestHandler: modifiedBy,
-            latestHandleTime: nowISOString(),
+            latestHandleTime: new Date().toISOString().replace('T', ' ').slice(0, 19),
             updatedAt: new Date().toISOString(),
           };
-
           const versionEntry: VersionHistory = {
-            id: generateId(),
+            id: `ver_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
             recordId: id,
             fieldName: '状态',
             oldValue: allStatusLabels[current.status] || current.status,
@@ -165,43 +231,52 @@ export const useRecordStore = create<RecordState>()(
             modifiedBy,
             modifiedAt: new Date().toISOString(),
           };
-
-          const existingHistory = state.versionHistories[id] || [];
-          const newAllRecords = state.allRecords.map((r) => (r.id === id ? updated : r));
-
-          return {
+          const existingHistory = versionHistories[id] || [];
+          const newAllRecords = allRecords.map((r) => (r.id === id ? updated : r));
+          set({
             saveStatus: 'saved',
             allRecords: newAllRecords,
-            records: applyFilters(newAllRecords, state.filters),
-            currentRecord: state.currentRecord?.id === id ? updated : state.currentRecord,
-            versionHistories: {
-              ...state.versionHistories,
-              [id]: [versionEntry, ...existingHistory],
-            },
-          };
-        });
+            records: applyFilters(newAllRecords, filters),
+            currentRecord: currentRecord?.id === id ? updated : currentRecord,
+            versionHistories: { ...versionHistories, [id]: [versionEntry, ...existingHistory] },
+            backendAvailable: false,
+          });
+        }
       },
 
-      supplementRecord: (id: string, oldChannelInfo: string, modifiedBy: string = '小孟') => {
-        set((state) => {
-          const current = state.allRecords.find((r) => r.id === id);
-          if (!current) return state;
+      supplementRecord: async (id: string, oldChannelInfo: string, modifiedBy: string = '小孟') => {
+        set({ saveStatus: 'saving' });
+        try {
+          const updated = await api.supplementRecord(id, oldChannelInfo, modifiedBy);
+          await get().fetchVersionHistory(id);
+          set((state) => {
+            const newAllRecords = state.allRecords.map((r) => (r.id === id ? updated : r));
+            return {
+              saveStatus: 'saved',
+              allRecords: newAllRecords,
+              records: applyFilters(newAllRecords, state.filters),
+              currentRecord: state.currentRecord?.id === id ? updated : state.currentRecord,
+              backendAvailable: true,
+            };
+          });
+        } catch {
+          const { allRecords, currentRecord, versionHistories, filters } = get();
+          const current = currentRecord || allRecords.find((r) => r.id === id);
+          if (!current) { set({ saveStatus: 'error' }); return; }
 
           const newNote = current.currentNote
             ? `${current.currentNote}\n\n【补充材料 - 舞台通道表旧口径】\n${oldChannelInfo}`
             : `【补充材料 - 舞台通道表旧口径】\n${oldChannelInfo}`;
-
           const updated: TrackCleanupRecord = {
             ...current,
             currentNote: newNote,
             source: 'imported_old',
             latestHandler: modifiedBy,
-            latestHandleTime: nowISOString(),
+            latestHandleTime: new Date().toISOString().replace('T', ' ').slice(0, 19),
             updatedAt: new Date().toISOString(),
           };
-
           const versionEntry: VersionHistory = {
-            id: generateId(),
+            id: `ver_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
             recordId: id,
             fieldName: '补充材料',
             oldValue: current.currentNote || '(空)',
@@ -209,48 +284,37 @@ export const useRecordStore = create<RecordState>()(
             modifiedBy,
             modifiedAt: new Date().toISOString(),
           };
-
-          const existingHistory = state.versionHistories[id] || [];
-          const newAllRecords = state.allRecords.map((r) => (r.id === id ? updated : r));
-
-          return {
+          const existingHistory = versionHistories[id] || [];
+          const newAllRecords = allRecords.map((r) => (r.id === id ? updated : r));
+          set({
             saveStatus: 'saved',
             allRecords: newAllRecords,
-            records: applyFilters(newAllRecords, state.filters),
-            currentRecord: state.currentRecord?.id === id ? updated : state.currentRecord,
-            versionHistories: {
-              ...state.versionHistories,
-              [id]: [versionEntry, ...existingHistory],
-            },
-          };
-        });
+            records: applyFilters(newAllRecords, filters),
+            currentRecord: currentRecord?.id === id ? updated : currentRecord,
+            versionHistories: { ...versionHistories, [id]: [versionEntry, ...existingHistory] },
+            backendAvailable: false,
+          });
+        }
       },
 
-      exportCsv: () => {
+      exportCsv: async () => {
+        const { filters, backendAvailable } = get();
+        try {
+          if (backendAvailable) {
+            await api.exportRecordsCsv(filters);
+            return;
+          }
+        } catch {}
         const { records } = get();
         const statusLabels: Record<string, string> = {
-          pending: '待确认',
-          approved: '已通过',
-          needs_supplement: '需补充',
-          obsolete: '已作废',
+          pending: '待确认', approved: '已通过', needs_supplement: '需补充', obsolete: '已作废',
         };
         const sourceLabels: Record<string, string> = {
-          stage_channel: '舞台通道表',
-          manual: '人工补录',
-          imported_old: '导入旧记录',
+          stage_channel: '舞台通道表', manual: '人工补录', imported_old: '导入旧记录',
         };
-
         const headers = [
-          '曲目名称',
-          '艺人/学生',
-          '状态',
-          '来源',
-          '特殊标记',
-          '处理备注',
-          '最后处理人',
-          '最后处理时间',
-          '原始来源',
-          '原始处理时间',
+          '曲目名称', '艺人/学生', '状态', '来源', '特殊标记',
+          '处理备注', '最后处理人', '最后处理时间', '原始来源', '原始处理时间',
         ];
         const rows = records.map((r) => {
           const flags: string[] = [];
@@ -259,21 +323,11 @@ export const useRecordStore = create<RecordState>()(
           if (!r.hasAuthorization) flags.push('缺授权');
           if (r.isRenamed) flags.push(`人工改名(原:${r.originalTrackName})`);
           return [
-            r.trackName,
-            r.artistName,
-            statusLabels[r.status],
-            sourceLabels[r.source],
-            flags.join('、') || '无',
-            r.currentNote.replace(/\n/g, ' '),
-            r.latestHandler,
-            r.latestHandleTime,
-            r.originalSource,
-            r.originalHandleTime,
-          ]
-            .map((v) => `"${v.replace(/"/g, '""')}"`)
-            .join(',');
+            r.trackName, r.artistName, statusLabels[r.status], sourceLabels[r.source],
+            flags.join('、') || '无', r.currentNote.replace(/\n/g, ' '),
+            r.latestHandler, r.latestHandleTime, r.originalSource, r.originalHandleTime,
+          ].map((v) => `"${v.replace(/"/g, '""')}"`).join(',');
         });
-
         const csv = '\uFEFF' + [headers.join(','), ...rows].join('\n');
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
         const url = URL.createObjectURL(blob);

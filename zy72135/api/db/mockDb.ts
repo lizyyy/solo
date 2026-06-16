@@ -1,13 +1,59 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import type { TrackCleanupRecord, VersionHistory, FilterState } from '../../shared/types';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const DATA_DIR = path.resolve(__dirname, '../../data');
+const RECORDS_FILE = path.join(DATA_DIR, 'records.json');
+const VERSIONS_FILE = path.join(DATA_DIR, 'version_history.json');
 
 let records: TrackCleanupRecord[] = [];
 let versionHistory: VersionHistory[] = [];
+
+function ensureDataDir() {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+}
+
+function loadFromDisk() {
+  try {
+    if (fs.existsSync(RECORDS_FILE)) {
+      const raw = fs.readFileSync(RECORDS_FILE, 'utf-8');
+      records = JSON.parse(raw);
+    }
+    if (fs.existsSync(VERSIONS_FILE)) {
+      const raw = fs.readFileSync(VERSIONS_FILE, 'utf-8');
+      versionHistory = JSON.parse(raw);
+    }
+  } catch (e) {
+    console.error('Failed to load data from disk, starting fresh:', e);
+    records = [];
+    versionHistory = [];
+  }
+}
+
+function saveToDisk() {
+  ensureDataDir();
+  try {
+    fs.writeFileSync(RECORDS_FILE, JSON.stringify(records, null, 2), 'utf-8');
+    fs.writeFileSync(VERSIONS_FILE, JSON.stringify(versionHistory, null, 2), 'utf-8');
+  } catch (e) {
+    console.error('Failed to save data to disk:', e);
+  }
+}
 
 function generateId(prefix: string): string {
   return prefix + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
 }
 
 export function initMockDatabase() {
+  ensureDataDir();
+  loadFromDisk();
+
   if (records.length > 0) return;
 
   const now = new Date().toISOString();
@@ -142,6 +188,20 @@ export function initMockDatabase() {
     createdAt: now,
     updatedAt: now,
   }));
+
+  versionHistory = [
+    {
+      id: generateId('ver'),
+      recordId: records[0].id,
+      fieldName: '备注',
+      oldValue: '初始提交',
+      newValue: records[0].currentNote,
+      modifiedBy: '小孟',
+      modifiedAt: '2026-05-28T14:30:00.000Z',
+    },
+  ];
+
+  saveToDisk();
 }
 
 export function findAllRecords(filters?: FilterState): TrackCleanupRecord[] {
@@ -163,10 +223,10 @@ export function findAllRecords(filters?: FilterState): TrackCleanupRecord[] {
     );
   }
   if (filters?.dateFrom) {
-    result = result.filter((r) => r.latestHandleTime >= filters.dateFrom);
+    result = result.filter((r) => r.latestHandleTime >= filters.dateFrom!);
   }
   if (filters?.dateTo) {
-    result = result.filter((r) => r.latestHandleTime <= filters.dateTo);
+    result = result.filter((r) => r.latestHandleTime <= filters.dateTo!);
   }
 
   return result.sort((a, b) => b.latestHandleTime.localeCompare(a.latestHandleTime));
@@ -189,6 +249,7 @@ export function updateRecord(
     updatedAt: new Date().toISOString(),
   };
 
+  saveToDisk();
   return records[index];
 }
 
@@ -215,5 +276,6 @@ export function createVersionHistory(
     modifiedAt: new Date().toISOString(),
   };
   versionHistory.push(version);
+  saveToDisk();
   return version;
 }

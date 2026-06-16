@@ -8,8 +8,12 @@ import type { TrackCleanupRecord } from '../../shared/types';
 
 export default function ExportPreview() {
   const navigate = useNavigate();
-  const { records, filters, exportCsv } = useRecordStore();
+  const { records, filters, exportCsv, fetchRecords } = useRecordStore();
   const [previewRecords, setPreviewRecords] = useState<TrackCleanupRecord[]>([]);
+
+  useEffect(() => {
+    fetchRecords();
+  }, [fetchRecords]);
 
   useEffect(() => {
     setPreviewRecords(records);
@@ -32,7 +36,7 @@ export default function ExportPreview() {
     window.print();
   };
 
-  if (previewRecords.length === 0) {
+  if (previewRecords.length === 0 && records.length === 0) {
     return (
       <div className="min-h-screen bg-warm-50 flex items-center justify-center">
         <div className="animate-pulse-soft text-slate-500">加载中...</div>
