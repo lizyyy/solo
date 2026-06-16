@@ -308,6 +308,13 @@ export const seedConflicts: ConflictRecord[] = [
     resolvedBy: '排班管理员-李明',
     createdAt: '2026-06-11T16:45:00+08:00',
     resolvedAt: '2026-06-12T11:00:00+08:00',
+    importedScheduleData: {
+      volunteerName: '刘浩然',
+      role: '接待组',
+      timeSlot: '08:00-12:00',
+      date: '2026-06-15',
+    },
+    isNewSchedule: false,
   },
   {
     id: 'conflict-002',
@@ -320,5 +327,12 @@ export const seedConflicts: ConflictRecord[] = [
     resolvedBy: null,
     createdAt: '2026-06-11T17:00:00+08:00',
     resolvedAt: null,
+    importedScheduleData: {
+      volunteerName: '黄俊杰',
+      role: '接待组',
+      timeSlot: '16:00-20:00',
+      date: '2026-06-16',
+    },
+    isNewSchedule: false,
   },
 ];

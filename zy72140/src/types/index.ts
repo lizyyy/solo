@@ -50,6 +50,8 @@ export interface ConflictRecord {
   resolvedBy: string | null;
   createdAt: string;
   resolvedAt: string | null;
+  importedScheduleData: Partial<Schedule> | null;
+  isNewSchedule: boolean;
 }
 
 export interface ImportResult {

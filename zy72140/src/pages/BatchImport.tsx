@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 import {
   Upload,
   FileUp,
@@ -9,6 +9,7 @@ import {
   ArrowLeft,
   GitMerge,
   RefreshCw,
+  Clock,
 } from 'lucide-react';
 import { useImportStore } from '@/stores/importStore';
 import { useScheduleStore } from '@/stores/scheduleStore';
@@ -21,7 +22,6 @@ import type { Schedule, ImportResult } from '@/types';
 export default function BatchImport() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [successRows, setSuccessRows] = useState<string[][]>([]);
 
   const { importResult, isImporting, startImport, setImportResult, clearImportResult, resolveConflict } =
     useImportStore();
@@ -44,37 +44,64 @@ export default function BatchImport() {
           remark: row[5] || '',
         }));
         const conflicts = detectConflicts(partialSchedules, schedules, materials);
-        const result: ImportResult = {
-          total: data.length + errors.length,
-          succeeded: data.length,
-          failed: errors,
-          conflicts,
-        };
-        setImportResult(result);
-        setSuccessRows(data);
+
+        const conflictScheduleIds = new Set(conflicts.map((c) => c.scheduleId));
+        const conflictVolunteerNames = new Set(
+          conflicts
+            .map((c) => c.importedScheduleData?.volunteerName)
+            .filter(Boolean) as string[]
+        );
+
+        const cleanRows: string[][] = [];
+        const cleanPartials: Partial<Schedule>[] = [];
+        data.forEach((row, idx) => {
+          const partial = partialSchedules[idx];
+          const hasConflict = conflicts.some((c) => {
+            if (c.scheduleId && schedules.some((s) => s.id === c.scheduleId && s.volunteerName === partial.volunteerName)) {
+              return true;
+            }
+            return partial.volunteerName && conflictVolunteerNames.has(partial.volunteerName);
+          });
+          if (!hasConflict) {
+            cleanRows.push(row);
+            cleanPartials.push(partial);
+          }
+        });
+
         const now = new Date().toISOString();
-        data.forEach((row) => {
+        cleanPartials.forEach((partial) => {
           addSchedule({
             id: crypto.randomUUID(),
-            volunteerName: row[0],
-            role: row[1],
-            timeSlot: row[2],
-            date: row[3],
-            status: (row[4] as Schedule['status']) || 'pending',
-            remark: row[5] || '',
+            volunteerName: partial.volunteerName || '',
+            role: partial.role || '',
+            timeSlot: partial.timeSlot || '',
+            date: partial.date || '',
+            status: (partial.status as Schedule['status']) || 'pending',
+            remark: partial.remark || '',
             remarkHistory: [],
             createdAt: now,
             updatedAt: now,
           });
         });
-        addLog({
-          scheduleId: 'batch',
-          action: 'import_success',
-          beforeValue: '',
-          afterValue: `${data.length}条记录`,
-          evidence: file.name,
-          suggestion: '',
-        });
+
+        const result: ImportResult = {
+          total: data.length + errors.length,
+          succeeded: cleanPartials.length,
+          failed: errors,
+          conflicts,
+        };
+        setImportResult(result);
+
+        if (cleanPartials.length > 0) {
+          addLog({
+            scheduleId: 'batch',
+            action: 'import_success',
+            beforeValue: '',
+            afterValue: `${cleanPartials.length}条记录入库`,
+            evidence: file.name,
+            suggestion: '',
+          });
+        }
         if (errors.length > 0) {
           addLog({
             scheduleId: 'batch',
@@ -90,9 +117,9 @@ export default function BatchImport() {
             scheduleId: 'batch',
             action: 'conflict_detected',
             beforeValue: '',
-            afterValue: `${conflicts.length}个冲突`,
+            afterValue: `${conflicts.length}个冲突待处理`,
             evidence: file.name,
-            suggestion: '请逐条处理冲突',
+            suggestion: '请逐条处理冲突，处理完成后的数据才会进入排班总览',
           });
         }
       } catch {
@@ -132,28 +159,62 @@ export default function BatchImport() {
       if (!importResult) return;
       const conflict = importResult.conflicts.find((c) => c.id === conflictId);
       if (!conflict) return;
+      if (conflict.resolution) return;
 
-      const schedule = schedules.find((s) => s.id === conflict.scheduleId);
-      const beforeValue = schedule ? `${conflict.field}: ${schedule[conflict.field as keyof Schedule] ?? ''}` : '';
+      const existingSchedule = schedules.find((s) => s.id === conflict.scheduleId);
+      const beforeValue = existingSchedule
+        ? `${conflict.field}: ${existingSchedule[conflict.field as keyof Schedule] ?? ''}`
+        : '';
       let afterValue = '';
 
-      if (resolution === 'keep_contract') {
-        const update: Partial<Schedule> = {
-          [conflict.field]: conflict.contractValue,
-          status: 'confirmed',
-        };
-        updateSchedule(conflict.scheduleId, update);
-        afterValue = `${conflict.field}: ${conflict.contractValue} (采纳合同值)`;
-      } else if (resolution === 'keep_import') {
-        const update: Partial<Schedule> = {
-          [conflict.field]: conflict.importValue,
-          status: 'confirmed',
-        };
-        updateSchedule(conflict.scheduleId, update);
-        afterValue = `${conflict.field}: ${conflict.importValue} (采纳导入值)`;
+      if (conflict.isNewSchedule || !existingSchedule) {
+        const imported = conflict.importedScheduleData;
+        if (!imported) return;
+
+        let finalValue = '';
+        if (resolution === 'keep_contract') {
+          finalValue = conflict.contractValue;
+          afterValue = `${conflict.field}: ${conflict.contractValue} (采纳合同值，已入库)`;
+        } else if (resolution === 'keep_import') {
+          finalValue = conflict.importValue;
+          afterValue = `${conflict.field}: ${conflict.importValue} (采纳导入值，已入库)`;
+        } else {
+          finalValue = conflict.importValue;
+          afterValue = '手动合并，已入库待确认';
+        }
+
+        const now = new Date().toISOString();
+        addSchedule({
+          id: conflict.scheduleId || crypto.randomUUID(),
+          volunteerName: imported.volunteerName || '',
+          role: imported.role || '',
+          timeSlot: conflict.field === 'timeSlot' ? finalValue : imported.timeSlot || '',
+          date: imported.date || '',
+          status: resolution === 'manual_merge' ? 'pending' : 'confirmed',
+          remark: imported.remark || '',
+          remarkHistory: [],
+          createdAt: now,
+          updatedAt: now,
+        });
       } else {
-        updateSchedule(conflict.scheduleId, { status: 'pending' });
-        afterValue = '手动合并，请在排班总览中编辑';
+        if (resolution === 'keep_contract') {
+          const update: Partial<Schedule> = {
+            [conflict.field]: conflict.contractValue,
+            status: 'confirmed',
+          };
+          updateSchedule(conflict.scheduleId, update);
+          afterValue = `${conflict.field}: ${conflict.contractValue} (采纳合同值)`;
+        } else if (resolution === 'keep_import') {
+          const update: Partial<Schedule> = {
+            [conflict.field]: conflict.importValue,
+            status: 'confirmed',
+          };
+          updateSchedule(conflict.scheduleId, update);
+          afterValue = `${conflict.field}: ${conflict.importValue} (采纳导入值)`;
+        } else {
+          updateSchedule(conflict.scheduleId, { status: 'pending' });
+          afterValue = '手动合并，请在排班总览中编辑';
+        }
       }
 
       resolveConflict(conflictId, resolution, 'batch_import');
@@ -165,22 +226,32 @@ export default function BatchImport() {
         evidence: conflict.contractEvidence,
         suggestion: resolution === 'manual_merge'
           ? '已标记为待确认，请在排班总览中手动编辑后确认'
-          : '',
+          : '处理完成，数据已同步到排班总览',
       });
     },
-    [importResult, schedules, resolveConflict, updateSchedule, addLog],
+    [importResult, schedules, resolveConflict, updateSchedule, addSchedule, addLog],
   );
 
   const handleReset = useCallback(() => {
     clearImportResult();
-    setSuccessRows([]);
     if (fileInputRef.current) fileInputRef.current.value = '';
   }, [clearImportResult]);
+
+  const pendingConflicts = useMemo(
+    () => importResult?.conflicts.filter((c) => !c.resolution) ?? [],
+    [importResult],
+  );
+  const resolvedConflicts = useMemo(
+    () => importResult?.conflicts.filter((c) => c.resolution) ?? [],
+    [importResult],
+  );
+
+  const successCount = importResult ? importResult.succeeded : 0;
 
   if (!importResult) {
     return (
       <div className="max-w-3xl mx-auto p-6">
-        <h1 className="text-2xl font-bold text-gray-900">批量导入</h1>
+        <h1 className="font-display text-2xl font-bold text-gray-900">批量导入</h1>
         <p className="mt-1 text-sm text-gray-500">上传排班数据文件，支持 CSV 和 JSON 格式</p>
         <div
           onDragOver={onDragOver}
@@ -201,6 +272,9 @@ export default function BatchImport() {
               <Upload className="mx-auto h-12 w-12 text-gray-400" />
               <p className="mt-4 text-gray-600">拖拽文件到此处，或点击选择文件</p>
               <p className="mt-1 text-sm text-gray-400">支持 .csv 和 .json 格式</p>
+              <p className="mt-2 text-xs text-amber-600">
+                有冲突的数据暂不入库，人工处理后才会进入排班总览
+              </p>
             </>
           )}
           <input
@@ -215,13 +289,13 @@ export default function BatchImport() {
     );
   }
 
-  const { total, succeeded, failed, conflicts } = importResult;
+  const { total, failed, conflicts } = importResult;
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-5xl mx-auto p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">批量导入</h1>
+          <h1 className="font-display text-2xl font-bold text-gray-900">批量导入</h1>
           <p className="mt-1 text-sm text-gray-500">上传排班数据文件，支持 CSV 和 JSON 格式</p>
         </div>
         <button
@@ -235,25 +309,38 @@ export default function BatchImport() {
 
       <div className="mt-6 flex gap-6 rounded-lg bg-gray-50 p-4 text-sm">
         <span className="text-gray-700">共{total}条</span>
-        <span className="text-green-600 font-medium">成功{succeeded}条</span>
+        <span className="text-green-600 font-medium">已入库{successCount}条</span>
         <span className="text-amber-600 font-medium">失败{failed.length}条</span>
-        <span className="text-red-600 font-medium">冲突{conflicts.length}条</span>
+        <span className="text-red-600 font-medium">待处理冲突{pendingConflicts.length}条</span>
+        <span className="text-blue-600 font-medium">已解决{resolvedConflicts.length}条</span>
       </div>
 
-      {successRows.length > 0 && (
+      {successCount > 0 && (
         <div className="mt-6">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-green-700">
             <CheckCircle className="h-5 w-5" />
-            导入成功
+            已入库 ({successCount}条)
           </h2>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            {successRows.map((row, i) => (
-              <div key={i} className="flex items-center gap-2 rounded bg-green-50 px-3 py-2 text-sm">
-                <FileUp className="h-4 w-4 text-green-500" />
-                <span className="font-medium text-gray-800">{row[0]}</span>
-                <span className="text-gray-500">· {row[1]}</span>
-              </div>
-            ))}
+          <p className="mt-1 text-xs text-gray-500">无冲突的记录已直接进入排班总览</p>
+          <div className="mt-3 grid grid-cols-2 md:grid-cols-3 gap-2">
+            {importResult &&
+              Array.from({ length: successCount }).map((_, i) => {
+                const conflictScheduleIds = new Set(conflicts.map((c) => c.scheduleId));
+                const schedule = schedules.filter(
+                  (s) => !conflictScheduleIds.has(s.id)
+                )[i];
+                if (!schedule) return null;
+                return (
+                  <div
+                    key={schedule.id}
+                    className="flex items-center gap-2 rounded bg-green-50 px-3 py-2 text-sm"
+                  >
+                    <FileUp className="h-4 w-4 text-green-500 flex-shrink-0" />
+                    <span className="font-medium text-gray-800">{schedule.volunteerName}</span>
+                    <span className="text-gray-500">· {schedule.role}</span>
+                  </div>
+                );
+              })}
           </div>
         </div>
       )}
@@ -262,7 +349,7 @@ export default function BatchImport() {
         <div className="mt-6">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-amber-700">
             <XCircle className="h-5 w-5" />
-            导入失败
+            导入失败 ({failed.length}条)
           </h2>
           <div className="mt-3 overflow-x-auto rounded-lg border">
             <table className="w-full text-sm">
@@ -300,23 +387,28 @@ export default function BatchImport() {
         </div>
       )}
 
-      {conflicts.length > 0 && (
-        <div className="mt-6">
+      {pendingConflicts.length > 0 && (
+        <div className="mt-8">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-red-700">
             <AlertTriangle className="h-5 w-5" />
-            冲突检测
+            待处理冲突 ({pendingConflicts.length}条)
           </h2>
+          <p className="mt-1 text-xs text-gray-500">
+            有冲突的数据暂不入库，请人工决策后才会进入排班总览和导出
+          </p>
           <div className="mt-3 space-y-4">
-            {conflicts.map((conflict) => (
+            {pendingConflicts.map((conflict) => (
               <div
                 key={conflict.id}
-                className="overflow-hidden rounded-lg border border-red-200 bg-white"
+                className="overflow-hidden rounded-lg border border-red-200 bg-white shadow-sm"
               >
                 <div className="grid grid-cols-2 divide-x">
                   <div className="p-4">
                     <h3 className="mb-2 text-sm font-semibold text-gray-700">合同扫描件证据</h3>
                     {conflict.contractEvidence && (
-                      <p className="mb-2 text-xs text-gray-500">{conflict.contractEvidence}</p>
+                      <p className="mb-3 text-xs text-gray-500 leading-relaxed">
+                        {conflict.contractEvidence}
+                      </p>
                     )}
                     <div className="rounded border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-medium text-blue-800">
                       {conflict.contractValue}
@@ -324,8 +416,15 @@ export default function BatchImport() {
                   </div>
                   <div className="p-4">
                     <h3 className="mb-2 text-sm font-semibold text-gray-700">导入数据</h3>
+                    <p className="mb-3 text-xs text-gray-400">
+                      字段: {conflict.field}
+                    </p>
                     <div className="rounded border border-orange-200 bg-orange-50 px-3 py-2 text-sm font-medium text-orange-800">
                       {conflict.importValue}
+                    </div>
+                    <div className="mt-3 flex items-center gap-1 text-xs text-gray-400">
+                      <Clock className="h-3 w-3" />
+                      <span>待人工决策</span>
                     </div>
                   </div>
                 </div>
@@ -339,41 +438,66 @@ export default function BatchImport() {
                         : '数据与合同记录不一致，请确认正确值'}
                   </p>
                   <div className="flex gap-2">
-                    {conflict.resolution ? (
-                      <span className="text-sm text-gray-500">
-                        已解决：
-                        {conflict.resolution === 'keep_contract'
-                          ? '采纳合同值'
-                          : conflict.resolution === 'keep_import'
-                            ? '采纳导入值'
-                            : '手动合并'}
-                      </span>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => handleResolve(conflict.id, 'keep_contract')}
-                          className="flex items-center gap-1 rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
-                        >
-                          <ArrowLeft className="h-3.5 w-3.5" />
-                          采纳合同值
-                        </button>
-                        <button
-                          onClick={() => handleResolve(conflict.id, 'keep_import')}
-                          className="flex items-center gap-1 rounded bg-orange-600 px-3 py-1.5 text-sm text-white hover:bg-orange-700"
-                        >
-                          采纳导入值
-                          <ArrowRight className="h-3.5 w-3.5" />
-                        </button>
-                        <button
-                          onClick={() => handleResolve(conflict.id, 'manual_merge')}
-                          className="flex items-center gap-1 rounded bg-gray-600 px-3 py-1.5 text-sm text-white hover:bg-gray-700"
-                        >
-                          <GitMerge className="h-3.5 w-3.5" />
-                          手动合并
-                        </button>
-                      </>
-                    )}
+                    <button
+                      onClick={() => handleResolve(conflict.id, 'keep_contract')}
+                      className="flex items-center gap-1 rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700 transition-colors"
+                    >
+                      <ArrowLeft className="h-3.5 w-3.5" />
+                      采纳合同值
+                    </button>
+                    <button
+                      onClick={() => handleResolve(conflict.id, 'keep_import')}
+                      className="flex items-center gap-1 rounded bg-orange-600 px-3 py-1.5 text-sm text-white hover:bg-orange-700 transition-colors"
+                    >
+                      采纳导入值
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handleResolve(conflict.id, 'manual_merge')}
+                      className="flex items-center gap-1 rounded bg-gray-600 px-3 py-1.5 text-sm text-white hover:bg-gray-700 transition-colors"
+                    >
+                      <GitMerge className="h-3.5 w-3.5" />
+                      手动合并
+                    </button>
                   </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {resolvedConflicts.length > 0 && (
+        <div className="mt-8">
+          <h2 className="flex items-center gap-2 text-lg font-semibold text-blue-700">
+            <CheckCircle className="h-5 w-5" />
+            已解决 ({resolvedConflicts.length}条)
+          </h2>
+          <p className="mt-1 text-xs text-gray-500">
+            处理完成的冲突已同步到排班总览，数据可导出
+          </p>
+          <div className="mt-3 space-y-3">
+            {resolvedConflicts.map((conflict) => (
+              <div
+                key={conflict.id}
+                className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3"
+              >
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  <span className="text-sm text-gray-700">
+                    字段 <code className="bg-white px-1.5 py-0.5 rounded text-xs">{conflict.field}</code>
+                    {' → '}
+                    <span className="font-medium">
+                      {conflict.resolution === 'keep_contract'
+                        ? '采纳合同值'
+                        : conflict.resolution === 'keep_import'
+                          ? '采纳导入值'
+                          : '手动合并'}
+                    </span>
+                  </span>
+                </div>
+                <div className="text-xs text-gray-400">
+                  {conflict.contractValue} ↔ {conflict.importValue}
                 </div>
               </div>
             ))}

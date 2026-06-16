@@ -75,6 +75,8 @@ export function detectConflicts(
           resolvedBy: null,
           createdAt: new Date().toISOString(),
           resolvedAt: null,
+          importedScheduleData: imported,
+          isNewSchedule: false,
         });
       }
 
@@ -102,6 +104,8 @@ export function detectConflicts(
           resolvedBy: null,
           createdAt: new Date().toISOString(),
           resolvedAt: null,
+          importedScheduleData: imported,
+          isNewSchedule: false,
         });
       }
     }
@@ -130,6 +134,8 @@ export function detectConflicts(
           resolvedBy: null,
           createdAt: new Date().toISOString(),
           resolvedAt: null,
+          importedScheduleData: imported,
+          isNewSchedule: false,
         });
       }
     }
