@@ -38,6 +38,7 @@ class KanbanHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
     def do_POST(self):
+        global engine
         parsed = urlparse(self.path)
         content_length = int(self.headers.get('Content-Length', 0))
         body = self.rfile.read(content_length).decode('utf-8')
@@ -64,7 +65,6 @@ class KanbanHandler(BaseHTTPRequestHandler):
             )
             self.send_json({"message": result, "success": True})
         elif parsed.path == "/api/reset":
-            global engine
             engine = DefrostReplayEngine()
             engine.import_sampling_interval(create_demo_sampling_interval())
             engine.import_defrost_records(create_demo_defrost_records_initial())
