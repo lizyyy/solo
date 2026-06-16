@@ -523,54 +523,47 @@ function toggleLock(key) {
 
 function reRunAnalysis() {
   var params = loadParams();
-  var unlockedCount = 0;
+  var adjustedKeys = [];
+  var defaultKeys = [];
   var lockedCount = 0;
-  var adjustedUnlocked = [];
 
   for (var key in params) {
-    if (!params[key].locked) {
-      if (params[key].manually_adjusted) {
-        adjustedUnlocked.push(key + '(' + params[key].value + '→' + params[key].default_value + ')');
-      }
-      unlockedCount++;
+    if (params[key].locked) lockedCount++;
+    if (params[key].manually_adjusted) {
+      adjustedKeys.push(key + '=' + params[key].value);
     } else {
-      lockedCount++;
+      defaultKeys.push(key);
     }
   }
-
-  if (adjustedUnlocked.length > 0) {
-    var proceed = confirm('以下参数已手动调整但未锁定，重新运行将恢复为默认值：\n\n' + adjustedUnlocked.join('\n') + '\n\n如需保留请先锁定，或点"取消"返回锁定。');
-    if (!proceed) return;
-  }
-
-  for (var key2 in params) {
-    if (!params[key2].locked) {
-      params[key2].value = params[key2].default_value;
-      params[key2].manually_adjusted = false;
-      params[key2].note = '';
-    }
-  }
-
-  saveParams(params);
-  renderParams();
 
   var records = loadData();
+  var beforeExceptions = records.filter(function(r){ return isException(r, params); }).length;
+
   records.forEach(function(r) {
     r.processing_history.push({
       timestamp: now(),
       operator: '系统',
       action: 'rerun',
-      detail: '重新运行分析' + (lockedCount > 0 ? '，锁定参数保持：' + Object.keys(params).filter(function(k){return params[k].locked;}).join(', ') : '') + (adjustedUnlocked.length > 0 ? '，未锁定调整参数已恢复默认：' + adjustedUnlocked.join(', ') : '')
+      detail: '使用当前参数口径重新运行分析' +
+        (adjustedKeys.length > 0 ? '，手动调整参数保留：' + adjustedKeys.join(', ') : '') +
+        (lockedCount > 0 ? '（' + lockedCount + '个参数已锁定防误改）' : '')
     });
     r.last_processed_at = now();
   });
   saveData(records);
 
+  var afterExceptions = records.filter(function(r){ return isException(r, params); }).length;
+
+  saveParams(params);
+  renderParams();
   renderSummary();
   renderChart();
   renderTable();
 
-  showToast('重新运行完成：' + lockedCount + ' 个参数保持锁定，' + unlockedCount + ' 个恢复默认');
+  var msg = '重新运行完成：使用当前参数口径';
+  if (adjustedKeys.length > 0) msg += '，' + adjustedKeys.length + ' 个手动调整参数已保留';
+  if (beforeExceptions !== afterExceptions) msg += '，越界记录 ' + beforeExceptions + '→' + afterExceptions;
+  showToast(msg);
 }
 
 function openDetail(id) {
