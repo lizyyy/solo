@@ -139,12 +139,29 @@ class FractalCLI:
         print(f"  总记录数: {summary['total_records']}")
         print(f"  例外记录数: {summary['total_exceptions']}")
         print(f"  人工覆盖数: {summary['manual_overrides']}")
+
+        high_risk = summary.get('high_risk_metrics', {})
+        if high_risk and any(v > 0 for v in high_risk.values()):
+            print(f"\n  高风险指标:")
+            if high_risk.get('high_complexity', 0) > 0:
+                print(f"    ⚠️  高复杂度 (>85): {high_risk['high_complexity']} 条")
+            if high_risk.get('high_dimension', 0) > 0:
+                print(f"    ⚠️  高维度 (>2.5): {high_risk['high_dimension']} 条")
+            if high_risk.get('duplicates', 0) > 0:
+                print(f"    ⚠️  重复参数: {high_risk['duplicates']} 条")
+
         print(f"\n  按状态分布:")
         for status, count in summary['by_status'].items():
-            print(f"    {status}: {count}")
+            mark = "⚠️ " if status != 'success' else "  "
+            print(f"    {mark}{status}: {count}")
+
         print(f"\n  按来源分布:")
         for source, count in summary['by_source'].items():
-            print(f"    {source}: {count}")
+            print(f"      {source}: {count}")
+
+        exception_ids = summary.get('exception_ids', [])
+        if exception_ids:
+            print(f"\n  例外记录ID: {', '.join(exception_ids)}")
 
     def show_formulas(self):
         print("\n计算公式说明:")

@@ -112,12 +112,13 @@ class FractalValidator:
                 severity=ValidationSeverity.ERROR,
                 suggestion=f"请调整至 {min_val}-{max_val} 之间，典型值如 1.26（科赫曲线）、1.89（曼德博集合）"
             ))
-        elif value < 1.1 or value > 2.9:
+        elif value < 1.2 or value > 2.5:
+            severity = ValidationSeverity.WARNING if value > 2.7 else ValidationSeverity.INFO
             self.issues.append(ValidationIssue(
                 field='fractal_dimension',
-                message=f"分形维度 {value} 接近边界值",
-                severity=ValidationSeverity.WARNING,
-                suggestion="边界样本请特别注意验证结果合理性"
+                message=f"分形维度 {value} {'接近上边界' if value > 2.5 else '接近下边界'}，属于高风险范围",
+                severity=severity,
+                suggestion="高维度样本生成复杂度高，建议人工复核结果合理性"
             ))
 
     def _validate_iterations(self, value):
@@ -140,6 +141,13 @@ class FractalValidator:
                 message=f"迭代次数 {value} 超出有效范围 [{min_val}, {max_val}]",
                 severity=ValidationSeverity.ERROR,
                 suggestion=f"请调整至 {min_val}-{max_val} 次之间，推荐值为 5-10 次"
+            ))
+        elif value > 12:
+            self.issues.append(ValidationIssue(
+                field='iterations',
+                message=f"迭代次数 {value} 较高，生成耗时和复杂度将显著增加",
+                severity=ValidationSeverity.INFO,
+                suggestion="高迭代次数可能导致性能问题，建议确认是否必要"
             ))
 
     def _validate_scale_factor(self, value):
@@ -257,6 +265,14 @@ class FractalValidator:
                 message=f"复杂度评分 {value} 超出有效范围 [{min_val}, {max_val}]",
                 severity=ValidationSeverity.WARNING,
                 suggestion="评分将被截断至有效范围"
+            ))
+        elif value > 80:
+            severity = ValidationSeverity.WARNING if value > 90 else ValidationSeverity.INFO
+            self.issues.append(ValidationIssue(
+                field='complexity_score',
+                message=f"复杂度评分 {value} 较高，生成结果可能不稳定",
+                severity=severity,
+                suggestion="高复杂度纹样建议人工复核，参考课堂讲义第7章异常样本处理"
             ))
 
     def _check_unit_consistency(self, pattern: FractalPattern, raw: dict):

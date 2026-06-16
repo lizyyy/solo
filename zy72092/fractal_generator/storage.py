@@ -144,7 +144,9 @@ class RecordStorage:
         records = self.get_all_records()
         by_status: Dict[str, int] = {}
         by_source: Dict[str, int] = {}
+        by_issue_type: Dict[str, int] = {}
 
+        exception_records = []
         for record in records:
             status = record.status.value
             by_status[status] = by_status.get(status, 0) + 1
@@ -152,17 +154,44 @@ class RecordStorage:
             source = record.source
             by_source[source] = by_source.get(source, 0) + 1
 
-        total_exceptions = sum(
+            is_exception = (
+                record.status != FractalStatus.SUCCESS
+                or len(record.validation_issues) > 0
+            )
+            if is_exception:
+                exception_records.append(record)
+                if record.status != FractalStatus.SUCCESS:
+                    by_issue_type[f"status_{status}"] = by_issue_type.get(f"status_{status}", 0) + 1
+                for issue in record.validation_issues:
+                    issue_key = f"issue_{issue.field}_{issue.severity}"
+                    by_issue_type[issue_key] = by_issue_type.get(issue_key, 0) + 1
+
+        high_complexity_count = sum(
             1 for r in records
-            if len(r.validation_issues) > 0 or r.status != FractalStatus.SUCCESS
+            if r.pattern.complexity_score is not None and r.pattern.complexity_score > 85
+        )
+        high_dimension_count = sum(
+            1 for r in records
+            if r.pattern.fractal_dimension is not None and r.pattern.fractal_dimension > 2.5
+        )
+        duplicate_count = sum(
+            1 for r in records
+            if any(i.field == '_duplicate' for i in r.validation_issues)
         )
 
         return {
             'total_records': len(records),
             'by_status': by_status,
             'by_source': by_source,
-            'total_exceptions': total_exceptions,
-            'manual_overrides': sum(1 for r in records if r.manual_override)
+            'by_issue_type': by_issue_type,
+            'total_exceptions': len(exception_records),
+            'manual_overrides': sum(1 for r in records if r.manual_override),
+            'high_risk_metrics': {
+                'high_complexity': high_complexity_count,
+                'high_dimension': high_dimension_count,
+                'duplicates': duplicate_count
+            },
+            'exception_ids': [r.record_id for r in exception_records]
         }
 
     def export_records(self, filepath: str, status_filter: str = None) -> str:

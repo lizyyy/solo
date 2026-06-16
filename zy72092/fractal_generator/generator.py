@@ -43,10 +43,13 @@ class FractalGenerator:
 
             has_errors = any(i.severity == ValidationSeverity.ERROR for i in validation_issues)
             has_warnings = any(i.severity == ValidationSeverity.WARNING for i in validation_issues)
+            complexity = pattern.complexity_score
 
             if has_errors:
                 status = FractalStatus.NEEDS_REVIEW
-            elif has_warnings and pattern.complexity_score and pattern.complexity_score > 80:
+            elif complexity is not None and complexity > 85:
+                status = FractalStatus.NEEDS_REVIEW
+            elif has_warnings and complexity is not None and complexity > 80:
                 status = FractalStatus.NEEDS_REVIEW
             else:
                 status = FractalStatus.SUCCESS
