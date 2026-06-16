@@ -56,6 +56,42 @@ export const extractDirectionFromRawLog = (rawLog: string): Direction | null => 
   return null;
 };
 
+const conflictDeduplicationKey = (c: ConflictRecord): string => {
+  switch (c.type) {
+    case 'unit_mismatch':
+      return `unit_mismatch|${c.sensorData.unit}|${c.importData.unit}`;
+    case 'direction_error': {
+      const sensorDirMatch = c.sensorData.rawLog?.match(/DIR=(CCW|CW)/i);
+      const sensorDir = sensorDirMatch ? sensorDirMatch[1].toUpperCase() : 'UNKNOWN';
+      let importDir = c.importData.direction;
+      if (!importDir) {
+        const importDirMatch = c.suggestedAction?.match(/导入数据为(CCW|CW)/i);
+        if (importDirMatch) {
+          importDir = importDirMatch[1].toUpperCase();
+        }
+      }
+      return `direction_error|${sensorDir}|${importDir || 'UNKNOWN'}`;
+    }
+    case 'timegap_error':
+      return `timegap_error|${c.sensorData.timestamp}|${c.importData.timestamp}`;
+    case 'value_conflict':
+      return `value_conflict|${c.sensorData.unit}|${c.importData.unit}|${c.sensorData.timestamp}|${c.importData.timestamp}`;
+    default:
+      return c.id;
+  }
+};
+
+const deduplicateConflicts = (conflicts: ConflictRecord[]): ConflictRecord[] => {
+  const seen = new Map<string, ConflictRecord>();
+  for (const conflict of conflicts) {
+    const key = conflictDeduplicationKey(conflict);
+    if (!seen.has(key)) {
+      seen.set(key, conflict);
+    }
+  }
+  return Array.from(seen.values());
+};
+
 export const detectConflicts = (
   dataPoints: DataPoint[],
   sensorLogs: SensorLogEntry[],
@@ -122,6 +158,7 @@ export const detectConflicts = (
               unit: importPoint.unit,
               timestamp: importPoint.timestamp,
               source: importPoint.source,
+              direction: importPoint.direction,
             },
             suggestedAction: `方向符号冲突：传感器记录${sensorDir}(${sensorDir === 'CCW' ? '逆时针' : '顺时针'})，导入数据为${importPoint.direction}(${importPoint.direction === 'CCW' ? '逆时针' : '顺时针'})。请核实旋翼旋转方向。`,
           });
@@ -194,7 +231,7 @@ export const detectConflicts = (
     }
   }
 
-  return conflicts;
+  return deduplicateConflicts(conflicts);
 };
 
 export const detectAnomalies = (

@@ -96,6 +96,7 @@ export interface ConflictRecord {
     unit: Unit;
     timestamp: number;
     source: string;
+    direction?: Direction;
   };
   suggestedAction: string;
   resolution?: ResolutionType;
