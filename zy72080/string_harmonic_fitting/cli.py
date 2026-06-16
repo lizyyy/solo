@@ -123,6 +123,12 @@ def cmd_note(args):
     historical = load_csv(args.historical, "historical") if args.historical else []
     existing_notes = load_csv(args.notes, "note") if args.notes else []
 
+    for n in existing_notes:
+        if n.note_id == args.note_id:
+            print(f"\n⚠ 备注 {args.note_id} 已存在，跳过重复追加")
+            print(f"  已有内容: {n.note_text} (作者={n.author}, 时间={n.timestamp})")
+            return
+
     trace_log = TraceLog()
     weight_mgr = WeightManager()
     boundary_chk = BoundaryChecker()
@@ -164,10 +170,16 @@ def cmd_note(args):
     print(f"\n{'='*50}")
     print(f"备注补录: [{new_note.note_id}] {new_note.note_text}")
     print(f"  作者: {new_note.author}  时间: {new_note.timestamp}")
+    if new_note.weight_action:
+        print(f"  权重动作: {new_note.weight_action} (泛音 n={new_note.harmonic_number})")
     print(f"\n  补录前拟合:")
     print(f"    f1 = {result_before.fitted_f1:.4f} Hz, B = {result_before.fitted_B:.8f}")
+    for n in sorted(result_before.residuals.keys()):
+        print(f"    残差 n={n}: {result_before.residuals[n]:+.6f} Hz (权重={result_before.weights_used.get(n, 0):.4f})")
     print(f"\n  补录后拟合:")
     print(f"    f1 = {result_after.fitted_f1:.4f} Hz, B = {result_after.fitted_B:.8f}")
+    for n in sorted(result_after.residuals.keys()):
+        print(f"    残差 n={n}: {result_after.residuals[n]:+.6f} Hz (权重={result_after.weights_used.get(n, 0):.4f})")
     print(f"\n  差异说明:")
     print(note_mgr.format_diffs())
 
@@ -177,7 +189,6 @@ def cmd_note(args):
     with open(os.path.join(out_dir, "note_diffs.txt"), "w", encoding="utf-8") as f:
         f.write(note_mgr.format_diffs())
 
-    all_notes.append(new_note)
     save_csv(os.path.join(out_dir, "notes_updated.csv"), all_notes)
 
     trace_log.add(
@@ -194,59 +205,82 @@ def cmd_note(args):
 
 
 def cmd_check(args):
-    params = load_csv(args.params, "parameter")
+    if not args.params and not args.out_of_bounds:
+        print("错误: 至少需要 --params 或 --out-of-bounds 之一")
+        return
+
+    from .units import UnitConverter
+    uc = UnitConverter()
     boundary_chk = BoundaryChecker()
 
     anomalies = []
-    for e in params:
-        inst_range = boundary_chk.freq_ranges.get(e.instrument)
-        if inst_range and e.string_index in inst_range:
-            low, high = inst_range[e.string_index]
-            for n_mult in [e.harmonic_number]:
-                expected_low = n_mult * low
-                expected_high = n_mult * high
-                freq_hz = boundary_chk.__class__.__module__
-                from .units import UnitConverter
-                uc = UnitConverter()
+
+    if args.params:
+        params = load_csv(args.params, "parameter")
+        for e in params:
+            inst_range = boundary_chk.freq_ranges.get(e.instrument)
+            if inst_range and e.string_index in inst_range:
+                low, high = inst_range[e.string_index]
+                expected_low = e.harmonic_number * low
+                expected_high = e.harmonic_number * high
                 freq_hz = uc.to_hz(e.observed_freq, e.unit)
-                oob = OutOfBoundsSample(
-                    sample_id=f"chk_{e.instrument}_s{e.string_index}_n{e.harmonic_number}",
-                    instrument=e.instrument,
-                    string_index=e.string_index,
-                    harmonic_number=e.harmonic_number,
-                    observed_freq=freq_hz,
-                    expected_low=expected_low,
-                    expected_high=expected_high,
-                    deviation_pct=0.0,
-                    unit="Hz",
-                    source=e.source,
-                    timestamp=e.timestamp,
-                )
-                if freq_hz < expected_low:
-                    oob.deviation_pct = (freq_hz - expected_low) / expected_low * 100
-                    anomalies.append(oob)
-                elif freq_hz > expected_high:
-                    oob.deviation_pct = (freq_hz - expected_high) / expected_high * 100
+                is_oob, msg = boundary_chk.check_out_of_bounds(freq_hz, expected_low, expected_high)
+                if is_oob:
+                    dev_pct = 0.0
+                    if freq_hz < expected_low:
+                        dev_pct = (freq_hz - expected_low) / expected_low * 100
+                    elif freq_hz > expected_high:
+                        dev_pct = (freq_hz - expected_high) / expected_high * 100
+                    oob = OutOfBoundsSample(
+                        sample_id=f"chk_{e.instrument}_s{e.string_index}_n{e.harmonic_number}",
+                        instrument=e.instrument,
+                        string_index=e.string_index,
+                        harmonic_number=e.harmonic_number,
+                        observed_freq=freq_hz,
+                        expected_low=expected_low,
+                        expected_high=expected_high,
+                        deviation_pct=round(dev_pct, 2),
+                        unit="Hz",
+                        source=e.source,
+                        timestamp=e.timestamp,
+                    )
                     anomalies.append(oob)
 
+    if args.out_of_bounds:
+        oob_samples = load_csv(args.out_of_bounds, "out_of_bounds")
+        for s in oob_samples:
+            is_oob, msg = boundary_chk.check_out_of_bounds(
+                s.observed_freq, s.expected_low, s.expected_high
+            )
+            if is_oob:
+                anomalies.append(s)
+
+    total_checked = 0
+    if args.params:
+        total_checked += len(load_csv(args.params, "parameter"))
+    if args.out_of_bounds:
+        total_checked += len(load_csv(args.out_of_bounds, "out_of_bounds"))
+
     print(f"\n{'='*50}")
-    print(f"异常检查: 共 {len(params)} 条参数，发现 {len(anomalies)} 条异常")
+    print(f"异常检查: 共 {total_checked} 条，发现 {len(anomalies)} 条异常")
     if anomalies:
         for a in anomalies:
             print(f"\n  ⚠ [{a.sample_id}]")
-            print(f"    观测: {a.observed_freq:.4f} {a.unit} (泛音 n={a.harmonic_number})")
+            print(f"    乐器: {a.instrument} 第{a.string_index}弦 泛音 n={a.harmonic_number}")
+            print(f"    观测: {a.observed_freq:.4f} {a.unit}")
             print(f"    预期范围: [{a.expected_low:.4f}, {a.expected_high:.4f}] Hz")
             print(f"    偏差: {a.deviation_pct:+.2f}%")
             print(f"    来源: {a.source} @ {a.timestamp}")
     else:
-        print("  ✓ 所有参数在参考范围内")
+        print("  ✓ 所有数据在参考范围内")
 
     out_dir = args.out or "."
     _ensure_dir(out_dir)
     if anomalies:
         save_csv(os.path.join(out_dir, "anomalies.csv"), anomalies)
-
-    print(f"\n异常清单已导出到: {out_dir}/anomalies.csv (如有异常)")
+        print(f"\n异常清单已导出到: {out_dir}/anomalies.csv")
+    else:
+        print(f"\n无异常，未生成 anomalies.csv")
 
 
 def cmd_trace(args):
@@ -279,8 +313,9 @@ def main():
     p_note.add_argument("--notes", help="已有备注 CSV 文件路径")
     p_note.add_argument("--out", default="output", help="输出目录 (默认: output)")
 
-    p_check = sub.add_parser("check", help="检查参数表中的异常")
-    p_check.add_argument("--params", required=True, help="参数表 CSV 文件路径")
+    p_check = sub.add_parser("check", help="检查参数表或越界样本中的异常")
+    p_check.add_argument("--params", help="参数表 CSV 文件路径")
+    p_check.add_argument("--out-of-bounds", help="越界样本 CSV 文件路径 (out_of_bounds_samples.csv)")
     p_check.add_argument("--out", default="output", help="输出目录 (默认: output)")
 
     p_trace = sub.add_parser("trace", help="查看追踪日志")

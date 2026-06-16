@@ -80,6 +80,36 @@ class HarmonicFitter:
             )
 
         weights = self.weight_manager.get_weights(instrument, string_index, harmonics.keys())
+
+        for note in (notes or []):
+            if note.instrument == instrument and note.string_index == string_index:
+                note_refs.append(note.note_id)
+                reasoning.append(
+                    f"人工备注[{note.note_id}]: {note.note_text} (作者={note.author}, 时间={note.timestamp})"
+                )
+                if note.weight_action and note.harmonic_number in weights:
+                    old_w = weights[note.harmonic_number]
+                    action_label = note.weight_action
+                    if action_label == "reduce":
+                        weights[note.harmonic_number] = old_w * 0.5
+                    elif action_label == "increase":
+                        weights[note.harmonic_number] = old_w * 1.5
+                    elif action_label == "exclude":
+                        weights[note.harmonic_number] = 0.0
+                    new_w = weights[note.harmonic_number]
+                    reasoning.append(
+                        f"备注权重调整[{note.note_id}]: 泛音 n={note.harmonic_number} "
+                        f"权重 {old_w:.4f} -> {new_w:.4f} (动作={action_label}, "
+                        f"原因={note.note_text})"
+                    )
+
+        total_w = sum(weights.values())
+        if total_w > 0 and abs(total_w - 1.0) > 1e-10:
+            weights = {n: w / total_w for n, w in weights.items()}
+            reasoning.append(
+                f"权重归一化: 备注调整后权重之和={total_w:.4f}, 归一化到1.0"
+            )
+
         weight_warnings = self.weight_manager.check_closure(weights)
         if weight_warnings:
             reasoning.append(f"权重闭合检查: {'; '.join(weight_warnings)}")
@@ -88,13 +118,6 @@ class HarmonicFitter:
             reasoning.append(
                 f"权重变更历史: 共 {len(weight_change_log)} 次变更，最近一次: {weight_change_log[-1]}"
             )
-
-        for note in (notes or []):
-            if note.instrument == instrument and note.string_index == string_index:
-                note_refs.append(note.note_id)
-                reasoning.append(
-                    f"人工备注[{note.note_id}]: {note.note_text} (作者={note.author}, 时间={note.timestamp})"
-                )
 
         n_list = sorted(harmonics.keys())
         y2_list = []

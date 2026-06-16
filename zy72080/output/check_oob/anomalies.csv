@@ -1,0 +1,3 @@
+sample_id,instrument,string_index,harmonic_number,observed_freq,expected_low,expected_high,deviation_pct,unit,source,timestamp
+oob_001,violin,1,7,2250.3,1372.0,2100.0,7.16,Hz,out_of_bounds_sample,2026-05-25T11:00:00
+oob_002,violin,2,8,3880.5,2352.0,3600.0,7.79,Hz,out_of_bounds_sample,2026-05-25T11:00:00

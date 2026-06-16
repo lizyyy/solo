@@ -6,19 +6,30 @@
 
 ```bash
 # 1. 运行拟合（基于参数表）
-python -m string_harmonic_fitting fit \
+python3 -m string_harmonic_fitting fit \
   --params examples/parameter_table.csv \
   --historical examples/historical_records.csv \
   --notes examples/manual_notes.csv \
   --out output
 
 # 2. 检查参数表中的异常
-python -m string_harmonic_fitting check \
+python3 -m string_harmonic_fitting check \
   --params examples/parameter_table.csv \
   --out output
 
-# 3. 补录人工备注并查看拟合差异
-python -m string_harmonic_fitting note \
+# 3. 检查越界样本中的异常
+python3 -m string_harmonic_fitting check \
+  --out-of-bounds examples/out_of_bounds_samples.csv \
+  --out output
+
+# 4. 同时检查参数表和越界样本
+python3 -m string_harmonic_fitting check \
+  --params examples/parameter_table.csv \
+  --out-of-bounds examples/out_of_bounds_samples.csv \
+  --out output
+
+# 5. 补录人工备注并查看拟合差异
+python3 -m string_harmonic_fitting note \
   --params examples/parameter_table.csv \
   --note-id note_003 \
   --instrument violin \
@@ -28,8 +39,8 @@ python -m string_harmonic_fitting note \
   --author 老叶 \
   --out output
 
-# 4. 查看追踪日志
-python -m string_harmonic_fitting trace \
+# 6. 查看追踪日志
+python3 -m string_harmonic_fitting trace \
   --trace-file output/trace_log.json
 ```
 
@@ -76,6 +87,9 @@ python -m string_harmonic_fitting trace \
 | author | 作者 | 老叶 |
 | source | 来源标识 | manual_note_by_老叶 |
 | timestamp | 时间 | 2026-05-22T09:15:00 |
+| weight_action | 权重动作（可空，自动解析） | reduce, increase, exclude |
+
+备注内容中如包含"降权/减少权重/降低权重"等关键词，系统自动识别为 `reduce`（权重减半）；包含"增权/增加权重/提高权重"识别为 `increase`（权重×1.5）；包含"排除/移除/剔除/忽略"识别为 `exclude`（权重置零）。识别后会自动归一化权重使其闭合。
 
 ### 越界样本 (out_of_bounds_samples.csv)
 
@@ -93,6 +107,8 @@ python -m string_harmonic_fitting trace \
 | source | 来源 | out_of_bounds_sample |
 | timestamp | 时间 | 2026-05-25T11:00:00 |
 
+通过 `check --out-of-bounds` 命令可直接检查此文件，无需手动转换格式。
+
 ## 输出说明
 
 ### 拟合结果 (fitting_results.txt)
@@ -103,7 +119,7 @@ python -m string_harmonic_fitting trace \
 - **拟合模型**: f_n = n × f1 × sqrt(1 + B × n²)
 - **判断依据**: 编号列表，说明每个拟合判断的原因，可追溯到具体来源
 - **各泛音残差**: 观测值 - 拟合值
-- **权重**: 每个泛音使用的权重
+- **权重**: 每个泛音使用的权重（含备注调整后的权重和归一化结果）
 - **边界阈值告警**: ✓/⚠ 标记，附具体阈值和来源
 - **单位换算记录**: 如有非Hz单位，记录换算过程
 - **原始来源**: 每个数据点的来源标识和时间戳
@@ -115,23 +131,40 @@ python -m string_harmonic_fitting trace \
 按时间顺序记录所有操作:
 
 ```
-[2026-05-20T10:00:00] fit [system]: 拟合完成: f1=293.6600Hz, B=0.00012000, 泛音数=6, 告警=2 | 来源=parameter_table_row1,...
-[2026-05-22T09:15:00] add_note [老叶]: 补录备注: 第3泛音测量环境温度偏低可能影响频率 | 来源=manual_note_by_老叶 (note_id=note_001)
+[2026-06-16T19:58:48] fit: 拟合完成: f1=293.1174Hz, B=0.00127988, 泛音数=6, 告警=2 | 来源=parameter_table_row1,...
 ```
 
 ### 备注补录差异 (note_diffs.txt)
 
-补录备注后，展示前后拟合的变化:
+补录备注后，展示前后拟合的变化。备注中的"降权"等关键词会真实修改拟合权重，导致 f1、B 和残差变化:
 
 ```
 ── 备注补录差异 [note_003] ──
   字段: fitted_f1
-  变更前: 293.6600 Hz
-  变更后: 293.5420 Hz
+  变更前: 293.1174 Hz
+  变更后: 293.1435 Hz
   原因: 备注[note_003]补录后重新拟合: 第4泛音换弦后需降权
   操作者: 老叶
-  时间: 2026-05-22T10:30:00
+  时间: 2026-06-16T19:59:03
+
+── 备注补录差异 [note_003] ──
+  字段: fitted_B
+  变更前: 0.00127988
+  变更后: 0.00129001
+  原因: 备注[note_003]补录后重新拟合: 第4泛音换弦后需降权
+  操作者: 老叶
+  时间: 2026-06-16T19:59:03
+
+── 备注补录差异 [note_003] ──
+  字段: residuals
+  变更前: see_before_result
+  变更后: see_after_result
+  原因: 备注[note_003]补录后残差变化: n=1: 0.355074 → 0.327517; n=4: -2.113769 → -2.31313; ...
+  操作者: 老叶
+  时间: 2026-06-16T19:59:03
 ```
+
+备注补录时系统会自动检测重复: 如果 `--notes` 传入的已有备注中包含同一 note_id，会提示跳过，不会重复追加。
 
 ### 异常清单 (anomalies.csv)
 
@@ -150,17 +183,24 @@ python -m string_harmonic_fitting trace \
 4. 每条异常的 `source` 和 `timestamp` 列可追溯原始数据
 5. 处理后用 `note` 命令补录备注，差异会自动记录到 `note_diffs.txt`
 
+`check` 命令支持两种输入:
+- `--params`: 检查参数表中的观测频率是否超出参考范围
+- `--out-of-bounds`: 检查越界样本 CSV 中的观测频率是否超出其声明的预期范围
+- 两者可同时使用，结果合并输出
+
 ## 判断溯源
 
 每条拟合结果都自带 `reasoning` 字段（判断依据），包含:
 
-1. **权重闭合检查**: 权重之和是否为1.0，容差±0.02
-2. **权重变更历史**: 谁在什么时候改了权重，原因是什么
-3. **人工备注关联**: 老叶补录的备注直接参与判断，备注ID和内容都记录
-4. **拟合回归过程**: 加权最小二乘的截距a和斜率b，以及如何推导f1和B
-5. **残差预警**: 哪些泛音的残差绝对值 > 2 Hz
-6. **边界阈值告警**: f1和B是否在乐器参考范围内，附具体阈值来源
-7. **历史记录对比**: 与最近一次历史记录的f1、B差值
+1. **人工备注关联**: 老叶补录的备注直接参与判断，备注ID和内容都记录
+2. **备注权重调整**: 如果备注含"降权/增权/排除"等关键词，会实际修改权重并记录调整前后值
+3. **权重归一化**: 备注调整后权重自动归一化到1.0，记录归一化前的原始和
+4. **权重闭合检查**: 归一化后权重之和是否为1.0，容差±0.02
+5. **权重变更历史**: 谁在什么时候改了权重，原因是什么
+6. **拟合回归过程**: 加权最小二乘的截距a和斜率b，以及如何推导f1和B
+7. **残差预警**: 哪些泛音的残差绝对值 > 2 Hz
+8. **边界阈值告警**: f1和B是否在乐器参考范围内，附具体阈值来源
+9. **历史记录对比**: 与最近一次历史记录的f1、B差值
 
 换人处理时，看 `fitting_results.txt` 的"判断依据"部分即可理解上一次怎么判的。
 
@@ -189,12 +229,14 @@ f_n = n × f_1 × sqrt(1 + B × n²)
 
 权重变更会自动记录到追踪日志，包含操作者、变更前后值和原因。
 
+备注中的权重动作（降权/增权/排除）会在拟合时实时调整权重，调整后自动归一化使权重闭合。归一化过程也会记录在判断依据中。
+
 ## 单位换算提醒
 
 当参数表中使用非Hz单位时，系统会记录换算过程:
 
 ```
-单位换算: 泛音n=1: 0.2937 kHz → 293.7000 Hz (换算系数=1000.0)
+单位换算: 泛音n=1: 0.2937 kHz -> 293.7000 Hz (换算系数=1000.0)
 ```
 
 导出时也会带上换算记录，不会只在页面上闪一下。

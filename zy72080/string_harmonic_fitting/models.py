@@ -92,12 +92,26 @@ class ManualNote:
     author: str = ""
     source: str = ""
     timestamp: str = ""
+    weight_action: str = ""
 
     def __post_init__(self):
         if not self.timestamp:
             self.timestamp = _now_iso()
         if not self.source:
             self.source = f"manual_note_by_{self.author}" if self.author else "manual_note"
+        if not self.weight_action:
+            self.weight_action = self._parse_weight_action()
+
+    def _parse_weight_action(self):
+        import re
+        text = self.note_text
+        if re.search(r"降权|减少权重|降低权重|减权", text):
+            return "reduce"
+        if re.search(r"增权|增加权重|提高权重|加权", text):
+            return "increase"
+        if re.search(r"排除|移除|去掉|剔除|忽略", text):
+            return "exclude"
+        return ""
 
     def to_dict(self):
         return asdict(self)
@@ -113,6 +127,7 @@ class ManualNote:
             author=str(d.get("author", "")),
             source=str(d.get("source", "manual_note")),
             timestamp=str(d.get("timestamp", "")),
+            weight_action=str(d.get("weight_action", "")),
         )
 
 
