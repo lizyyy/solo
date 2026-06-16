@@ -37,7 +37,7 @@ const sourceTypeOptions: { value: SourceType; label: string; icon: typeof FileTe
 export default function Form() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getNotification, addNotification, updateNotification, addSource } = useStore();
+  const { getNotification, addNotification, updateNotification } = useStore();
   const isEdit = !!id;
 
   const [formData, setFormData] = useState({
@@ -96,9 +96,6 @@ export default function Form() {
       navigate(`/notification/${id}`);
     } else {
       const newId = addNotification(formData, sources);
-      sources.forEach(source => {
-        addSource(newId, source);
-      });
       navigate(`/notification/${newId}`);
     }
   };

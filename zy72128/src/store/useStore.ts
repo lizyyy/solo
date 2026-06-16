@@ -81,11 +81,23 @@ export const useStore = create<AppState>()(
       isInitialized: false,
 
       initializeWithSamples: () => {
+        const existingIds = new Set(get().notifications.map(n => n.id));
+        const newNotifications = sampleNotifications.filter(n => !existingIds.has(n.id));
+        const newVersions: Record<string, Version[]> = {};
+        const newSources: Record<string, Source[]> = {};
+        const newComments: Record<string, Comment[]> = {};
+        
+        newNotifications.forEach(n => {
+          if (sampleVersions[n.id]) newVersions[n.id] = sampleVersions[n.id];
+          if (sampleSources[n.id]) newSources[n.id] = sampleSources[n.id];
+          if (sampleComments[n.id]) newComments[n.id] = sampleComments[n.id];
+        });
+
         set({
-          notifications: [...get().notifications, ...sampleNotifications],
-          versions: { ...get().versions, ...sampleVersions },
-          sources: { ...get().sources, ...sampleSources },
-          comments: { ...get().comments, ...sampleComments },
+          notifications: [...get().notifications, ...newNotifications],
+          versions: { ...get().versions, ...newVersions },
+          sources: { ...get().sources, ...newSources },
+          comments: { ...get().comments, ...newComments },
           isInitialized: true
         });
       },
@@ -211,6 +223,13 @@ export const useStore = create<AppState>()(
       },
 
       addSource: (notificationId, source) => {
+        const existingSources = get().sources[notificationId] || [];
+        const duplicateKey = `${source.type}-${source.name}-${source.reference}`;
+        const isDuplicate = existingSources.some(
+          s => `${s.type}-${s.name}-${s.reference}` === duplicateKey
+        );
+        if (isDuplicate) return;
+
         const newSource: Source = {
           id: generateId(),
           notificationId,
@@ -236,7 +255,14 @@ export const useStore = create<AppState>()(
       },
 
       getSources: (notificationId) => {
-        return get().sources[notificationId] || [];
+        const sources = get().sources[notificationId] || [];
+        const seen = new Set<string>();
+        return sources.filter(s => {
+          const key = `${s.type}-${s.name}-${s.reference}`;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
       },
 
       getComments: (notificationId) => {
@@ -260,7 +286,7 @@ export const useStore = create<AppState>()(
         return {
           notification,
           versions: state.versions[notificationId] || [],
-          sources: state.sources[notificationId] || [],
+          sources: state.getSources(notificationId),
           comments: state.comments[notificationId] || []
         };
       }

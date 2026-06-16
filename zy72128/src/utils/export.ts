@@ -18,7 +18,15 @@ interface ExportData {
 }
 
 export function exportToMarkdown(data: ExportData): string {
-  const { notification, versions, sources, comments } = data;
+  const { notification, versions, comments } = data;
+  
+  const seenSources = new Set<string>();
+  const sources = data.sources.filter(s => {
+    const key = `${s.type}-${s.name}-${s.reference}`;
+    if (seenSources.has(key)) return false;
+    seenSources.add(key);
+    return true;
+  });
   const createdAt = format(new Date(notification.createdAt), 'yyyy年MM月dd日 HH:mm', { locale: zhCN });
   const updatedAt = format(new Date(notification.updatedAt), 'yyyy年MM月dd日 HH:mm', { locale: zhCN });
 
