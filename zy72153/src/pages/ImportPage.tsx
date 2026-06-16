@@ -57,7 +57,7 @@ function DropZone({ onFile, dragOver, onDragOver, onDragLeave, onDrop, label }: 
       <Upload className="mx-auto mb-2 text-stone-400" size={32} />
       <p className="text-stone-500 text-sm">{label}</p>
       <input ref={inputRef} type="file" accept=".csv" className="hidden"
-        onChange={e => e.target.files?.[0] && onFile(e.target.files[0])} />
+        onChange={e => { if (e.target.files?.[0]) onFile(e.target.files[0]) }} />
     </div>
   )
 }
@@ -126,7 +126,7 @@ export default function ImportPage() {
         <DropZone onFile={handlePointFile} dragOver={dragOver.point}
           onDragOver={e => { onDragOver(e); setDragOver(d => ({ ...d, point: true })) }}
           onDragLeave={() => setDragOver(d => ({ ...d, point: false }))}
-          onDrop={e => { e.preventDefault(); setDragOver(d => ({ ...d, point: false })); e.dataTransfer.files[0] && handlePointFile(e.dataTransfer.files[0]) }}
+          onDrop={e => { e.preventDefault(); setDragOver(d => ({ ...d, point: false })); if (e.dataTransfer.files[0]) handlePointFile(e.dataTransfer.files[0]) }}
           label="拖拽CSV文件到此处，或点击选择文件" />
         {previewPoints.length > 0 && <>
           <PreviewTable rows={previewPoints as Record<string, unknown>[]} cols={Object.keys(POINT_COL_MAP)} />
@@ -143,7 +143,7 @@ export default function ImportPage() {
         <DropZone onFile={handleApprovalFile} dragOver={dragOver.approval}
           onDragOver={e => { onDragOver(e); setDragOver(d => ({ ...d, approval: true })) }}
           onDragLeave={() => setDragOver(d => ({ ...d, approval: false }))}
-          onDrop={e => { e.preventDefault(); setDragOver(d => ({ ...d, approval: false })); e.dataTransfer.files[0] && handleApprovalFile(e.dataTransfer.files[0]) }}
+          onDrop={e => { e.preventDefault(); setDragOver(d => ({ ...d, approval: false })); if (e.dataTransfer.files[0]) handleApprovalFile(e.dataTransfer.files[0]) }}
           label="拖拽CSV文件到此处，或点击选择文件" />
         {previewApprovals.length > 0 && <>
           <PreviewTable rows={previewApprovals as Record<string, unknown>[]} cols={Object.keys(APPROVAL_COL_MAP)} />
