@@ -248,10 +248,13 @@ def save_supplements(supplements):
 def load_state():
     if os.path.exists(STATE_FILE):
         with open(STATE_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+            state = json.load(f)
+            if "resolved_issues" not in state or not isinstance(state["resolved_issues"], dict):
+                state["resolved_issues"] = {}
+            return state
     return {
         "processed_channels": [],
-        "resolved_issues": [],
+        "resolved_issues": {},
         "notes": {},
         "last_updated": None,
     }
@@ -261,6 +264,202 @@ def save_state(state):
     state["last_updated"] = TODAY.isoformat()
     with open(STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(state, f, ensure_ascii=False, indent=2)
+
+
+def issue_key(issue_type, channel, detail=""):
+    """生成问题唯一标识，用于追踪解决状态"""
+    key = f"{issue_type}:{channel}"
+    if detail:
+        key += f":{detail}"
+    return key
+
+
+def parse_note_for_actions(note, channel, stage_records, check_records):
+    """
+    解析备注中的智能关键词，返回需要自动应用的变更动作
+    返回: (supplement_actions, resolve_issue_keys, summary)
+    """
+    supplement_actions = []  # (data_type, field, value)
+    resolve_keys = []
+    summary = []
+
+    note_lower = note.lower()
+    stage = stage_records.get(channel, {})
+    checks = check_records.get(channel, [])
+
+    if "母带为最新版" in note or "母带升级" in note or "2025_master" in note:
+        for i, check in enumerate(checks):
+            if check.get("version_tag") and check["version_tag"] != "2025_master":
+                supplement_actions.append(("check", i, "version_tag", "2025_master"))
+                old_ver = check["version_tag"]
+                summary.append(f"母带 {old_ver} → 2025_master（检查记录 {i+1}）")
+                resolve_keys.append(issue_key("old_master", channel, check["file_name"]))
+                resolve_keys.append(issue_key("conflict", channel, f"version:{check['file_name']}"))
+
+    if "时码已对齐" in note or "时码同步" in note:
+        for i, check in enumerate(checks):
+            if stage and (stage.get("tc_in") or stage.get("tc_out")):
+                if check.get("tc_in") != stage.get("tc_in") and stage.get("tc_in"):
+                    supplement_actions.append(("check", i, "tc_in", stage["tc_in"]))
+                    summary.append(f"入点 {check.get('tc_in','?')} → {stage['tc_in']}（检查记录 {i+1}）")
+                    resolve_keys.append(issue_key("timecode", channel, f"in:{check['file_name']}"))
+                    resolve_keys.append(issue_key("conflict", channel, f"tc_in:{check['file_name']}"))
+                if check.get("tc_out") != stage.get("tc_out") and stage.get("tc_out"):
+                    supplement_actions.append(("check", i, "tc_out", stage["tc_out"]))
+                    summary.append(f"出点 {check.get('tc_out','?')} → {stage['tc_out']}（检查记录 {i+1}）")
+                    resolve_keys.append(issue_key("timecode", channel, f"out:{check['file_name']}"))
+                    resolve_keys.append(issue_key("conflict", channel, f"tc_out:{check['file_name']}"))
+
+    if "文件已确认" in note or "文件名一致" in note:
+        for i, check in enumerate(checks):
+            stage_file = os.path.basename(stage.get("file_path", "")) if stage else ""
+            if stage_file and check.get("file_name") and stage_file != check["file_name"]:
+                if not check.get("manual_rename"):
+                    resolve_keys.append(issue_key("conflict", channel, f"file:{check['file_name']}"))
+                    summary.append(f"文件名差异已确认（检查记录 {i+1}）")
+
+    if "授权已续签" in note or "授权已续" in note:
+        match = re.search(r"20\d{2}", note)
+        new_end_year = match.group() if match else "2027"
+        old_remark = stage.get("contract_remark", "")
+        pattern = r"授权期限[:：]\s*(\d{4}-\d{2}-\d{2})\s*[至到\-]\s*(\d{4}-\d{2}-\d{2})"
+        new_remark = re.sub(pattern, lambda m: f"授权期限:{m.group(1)} 至 {new_end_year}-12-31", old_remark)
+        if new_remark != old_remark:
+            supplement_actions.append(("stage", None, "contract_remark", new_remark))
+            summary.append(f"授权续签到 {new_end_year}-12-31")
+            resolve_keys.append(issue_key("auth", channel, "expired"))
+
+    if "授权已确认" in note:
+        resolve_keys.append(issue_key("auth", channel, "expired"))
+        resolve_keys.append(issue_key("auth", channel, "missing"))
+        summary.append("授权状态已确认")
+
+    return supplement_actions, resolve_keys, summary
+
+
+def apply_supplement_actions(actions, channel):
+    """应用补录动作到 supplements.json"""
+    supplements = load_supplements()
+
+    for data_type, rec_idx, field, value in actions:
+        internal_field = resolve_supplement_field(field)
+        bucket = supplements.setdefault(data_type, {})
+
+        if data_type == "stage":
+            patches = bucket.setdefault(channel, {})
+            patches[internal_field] = value
+        else:
+            if channel not in bucket:
+                bucket[channel] = [{}]
+            if not isinstance(bucket[channel], list):
+                bucket[channel] = [bucket[channel]]
+            while len(bucket[channel]) <= rec_idx:
+                bucket[channel].append({})
+            bucket[channel][rec_idx][internal_field] = value
+
+    save_supplements(supplements)
+
+
+def collect_all_issue_keys(channel, stage_records, check_records):
+    """收集某通道所有问题的 key，用于标记全部解决"""
+    keys = []
+    stage = stage_records.get(channel, {})
+    checks = check_records.get(channel, [])
+
+    for check in checks:
+        ver_ok, _ = check_master_version(stage, check)
+        if not ver_ok:
+            keys.append(issue_key("old_master", channel, check["file_name"]))
+        tc_issues = check_timecode_alignment(stage, check)
+        if tc_issues:
+            if any("入点" in t for t in tc_issues):
+                keys.append(issue_key("timecode", channel, f"in:{check['file_name']}"))
+                keys.append(issue_key("conflict", channel, f"tc_in:{check['file_name']}"))
+            if any("出点" in t for t in tc_issues):
+                keys.append(issue_key("timecode", channel, f"out:{check['file_name']}"))
+                keys.append(issue_key("conflict", channel, f"tc_out:{check['file_name']}"))
+        stage_file = os.path.basename(stage.get("file_path", "")) if stage else ""
+        if stage_file and check.get("file_name") and stage_file != check["file_name"]:
+            if not check.get("manual_rename"):
+                keys.append(issue_key("conflict", channel, f"file:{check['file_name']}"))
+
+    auth_ok, _ = check_authorization(stage) if stage else (False, "")
+    if not auth_ok:
+        keys.append(issue_key("auth", channel, "expired"))
+        keys.append(issue_key("auth", channel, "missing"))
+
+    for check in checks:
+        empty_fields = check_empty_values(stage or {}, check)
+        for f in empty_fields:
+            keys.append(issue_key("empty", channel, f))
+
+    return keys
+
+
+def map_issue_types_to_keys(issue_types, channel, stage_records, check_records):
+    """将问题类型名称映射到具体问题 key"""
+    type_map = {
+        "auth": ["auth:"],
+        "master": ["old_master:"],
+        "timecode": ["timecode:"],
+        "file": ["conflict:.*file:"],
+        "empty": ["empty:"],
+        "conflict": ["conflict:"],
+        "dup": ["duplicate:"],
+    }
+    all_keys = collect_all_issue_keys(channel, stage_records, check_records)
+    matched = []
+    for itype in issue_types:
+        for pattern_prefix in type_map.get(itype.lower(), [f"{itype}:"]):
+            for k in all_keys:
+                if re.match(pattern_prefix.replace(".*", ".*"), k):
+                    matched.append(k)
+    return matched
+
+
+class IssueManager:
+    """统一管理问题的生成、key 分配和状态过滤"""
+
+    def __init__(self, channel, resolved_keys, state_notes):
+        self.channel = channel
+        self.resolved_keys = set(resolved_keys or [])
+        self.state_notes = state_notes or ""
+        self.open_issues = []
+        self.resolved_issues = []
+        self.category_items = defaultdict(list)
+
+    def add(self, category, issue_key, item_data, level, msg):
+        if issue_key in self.resolved_keys:
+            self.resolved_issues.append((level, msg, issue_key))
+        else:
+            self.open_issues.append((level, msg, issue_key))
+            self.category_items[category].append(item_data)
+
+    def add_category_only(self, category, item_data):
+        self.category_items[category].append(item_data)
+
+    def add_issue_only(self, level, msg):
+        self.open_issues.append((level, msg, "_warning_"))
+
+    def get_display_issues(self):
+        return [(l, m) for l, m, _ in self.open_issues]
+
+    def get_resolved_display(self):
+        return [(l, m) for l, m, _ in self.resolved_issues]
+
+    def status_summary(self):
+        actual_total = len(self.open_issues) + len(self.resolved_keys)
+        actual_resolved = len(self.resolved_keys)
+        actual_open = len([k for _, _, k in self.open_issues if not k.startswith("_warning_")])
+        warning_count = len([k for _, _, k in self.open_issues if k.startswith("_warning_")])
+        
+        if actual_open == 0 and warning_count == 0 and actual_resolved == 0:
+            return "✅ 正常", ""
+        if actual_open == 0:
+            return "✅ 已处理", f"（{actual_resolved} 项问题已解决）"
+        if actual_resolved > 0:
+            return "⚠️ 处理中", f"（{actual_resolved}/{actual_total} 已解决）"
+        return "⚠️ 待处理", ""
 
 
 def normalize_row(raw_row, mapping, source_file, source_row_no, target_fields):
@@ -494,14 +693,25 @@ def apply_supplements(stage_records, check_records):
         if channel in check_records:
             for patches in (patches_list if isinstance(patches_list, list) else [patches_list]):
                 for rec in check_records[channel]:
+                    rec_updated = False
                     for internal_field, value in patches.items():
                         if internal_field in rec:
+                            if rec.get(internal_field) == value:
+                                continue
                             rec[internal_field] = value
                             rec["_supplemented"] = True
                             std_name = INTERNAL_TO_CHECK_FIELD.get(internal_field, internal_field)
-                            rec.setdefault("_supplement_log", []).append(
-                                f"{std_name}: → {value}"
-                            )
+                            if "_supplement_log" not in rec:
+                                rec["_supplement_log"] = []
+                            log_entry = f"{std_name}: → {value}"
+                            if log_entry not in rec["_supplement_log"]:
+                                rec["_supplement_log"].append(log_entry)
+                            rec_updated = True
+                    if rec_updated:
+                        if "tc_in" in patches and rec.get("tc_in"):
+                            rec["tc_in_sec"] = parse_timecode(rec["tc_in"])
+                        if "tc_out" in patches and rec.get("tc_out"):
+                            rec["tc_out_sec"] = parse_timecode(rec["tc_out"])
 
     return stage_records, check_records
 
@@ -635,19 +845,22 @@ def find_duplicate_tracks(stage_records, check_records):
 def detect_conflicts(stage_rec, check_rec_list):
     conflicts = []
     for check_rec in check_rec_list:
+        file_name = check_rec.get("file_name", "")
         if stage_rec.get("track_name") and check_rec.get("track_name") and stage_rec["track_name"] != check_rec["track_name"]:
             conflicts.append({
                 "field": "曲目名称",
+                "file_name": file_name,
                 "stage_value": stage_rec["track_name"],
                 "check_value": check_rec["track_name"],
                 "evidence": f"舞台表登记为「{stage_rec['track_name']}」，检查表登记为「{check_rec['track_name']}」",
                 "suggestion": "请核对曲目实际名称，以文件元数据或纸质合同为准",
             })
-        stage_file = os.path.basename(stage_rec["file_path"]) if stage_rec.get("file_path") else ""
+        stage_file = os.path.basename(stage_rec.get("file_path", "")) if stage_rec.get("file_path") else ""
         if stage_file and check_rec.get("file_name") and stage_file != check_rec["file_name"]:
             if not check_rec.get("manual_rename"):
                 conflicts.append({
                     "field": "文件名",
+                    "file_name": file_name,
                     "stage_value": stage_file,
                     "check_value": check_rec["file_name"],
                     "evidence": f"舞台表文件「{stage_file}」，检查表文件「{check_rec['file_name']}」",
@@ -657,6 +870,7 @@ def detect_conflicts(stage_rec, check_rec_list):
         for issue in tc_issues:
             conflicts.append({
                 "field": "时码",
+                "file_name": file_name,
                 "stage_value": f"{stage_rec.get('tc_in', '')} - {stage_rec.get('tc_out', '')}",
                 "check_value": f"{check_rec.get('tc_in', '')} - {check_rec.get('tc_out', '')}",
                 "evidence": issue,
@@ -680,16 +894,7 @@ def analyze_data(stage_path=None, check_path=None):
             "total_channels": len(all_channels),
             "checked_date": TODAY.isoformat(),
         },
-        "issues_by_category": {
-            "expired_auth": [],
-            "timecode_misalignment": [],
-            "duplicate_tracks": [],
-            "old_master": [],
-            "missing_auth": [],
-            "empty_values": [],
-            "manual_rename": [],
-            "conflicts": [],
-        },
+        "issues_by_category": defaultdict(list),
         "channel_details": {},
         "duplicate_tracks": duplicate_tracks,
     }
@@ -697,120 +902,150 @@ def analyze_data(stage_path=None, check_path=None):
     for channel in all_channels:
         stage_rec = stage_records.get(channel, {})
         check_rec_list = check_records.get(channel, [])
-        channel_issues = []
+
+        resolved_keys = state.get("resolved_issues", {}).get(channel, [])
+        state_notes = state.get("notes", {}).get(channel, "")
+        im = IssueManager(channel, resolved_keys, state_notes)
 
         if not stage_rec:
-            channel_issues.append(("警告", f"通道 {channel} 无舞台表记录"))
+            im.add_issue_only("警告", f"通道 {channel} 无舞台表记录")
         if not check_rec_list:
-            channel_issues.append(("警告", f"通道 {channel} 无检查记录"))
+            im.add_issue_only("警告", f"通道 {channel} 无检查记录")
 
         auth_ok, auth_msg = check_authorization(stage_rec) if stage_rec else (False, "无舞台表记录")
         if not auth_ok:
+            auth_item = {
+                "channel": channel,
+                "track": stage_rec.get("track_name", "未知"),
+                "reason": auth_msg,
+                "contract": stage_rec.get("contract_no", ""),
+            }
             if "过期" in auth_msg:
-                results["issues_by_category"]["expired_auth"].append({
-                    "channel": channel,
-                    "track": stage_rec.get("track_name", "未知"),
-                    "reason": auth_msg,
-                    "contract": stage_rec.get("contract_no", ""),
-                })
+                im.add("expired_auth", issue_key("auth", channel, "expired"), auth_item, "授权", auth_msg)
             elif "待确认" in auth_msg or "未找到" in auth_msg:
-                results["issues_by_category"]["missing_auth"].append({
-                    "channel": channel,
-                    "track": stage_rec.get("track_name", "未知"),
-                    "reason": auth_msg,
-                    "contract": stage_rec.get("contract_no", ""),
-                })
-            channel_issues.append(("授权", auth_msg))
+                im.add("missing_auth", issue_key("auth", channel, "missing"), auth_item, "授权", auth_msg)
+            else:
+                im.add("expired_auth", issue_key("auth", channel, "expired"), auth_item, "授权", auth_msg)
 
         for check_rec in check_rec_list:
+            file_name = check_rec.get("file_name", "")
             ver_ok, ver_msg = check_master_version(stage_rec, check_rec) if stage_rec else (False, "无舞台表记录")
             if not ver_ok:
-                results["issues_by_category"]["old_master"].append({
+                master_item = {
                     "channel": channel,
                     "track": check_rec.get("track_name", ""),
-                    "file": check_rec.get("file_name", ""),
+                    "file": file_name,
                     "reason": ver_msg,
                     "annotation": check_rec.get("annotation", ""),
-                })
-                channel_issues.append(("母带", ver_msg))
+                }
+                im.add("old_master", issue_key("old_master", channel, file_name), master_item, "母带", ver_msg)
 
             empty_fields = check_empty_values(stage_rec or {}, check_rec)
             for field in empty_fields:
-                results["issues_by_category"]["empty_values"].append({
+                empty_item = {
                     "channel": channel,
                     "field": field,
                     "track": check_rec.get("track_name", ""),
                     "reason": f"{field} 为空",
-                })
-                channel_issues.append(("空值", f"{field} 为空"))
+                }
+                im.add("empty_values", issue_key("empty", channel, field), empty_item, "空值", f"{field} 为空")
 
             if check_rec.get("manual_rename"):
-                results["issues_by_category"]["manual_rename"].append({
+                rename_item = {
                     "channel": channel,
                     "track": check_rec.get("track_name", ""),
                     "stage_file": os.path.basename(stage_rec.get("file_path", "")) if stage_rec else "",
-                    "check_file": check_rec.get("file_name", ""),
+                    "check_file": file_name,
                     "annotation": check_rec.get("annotation", ""),
-                })
-                channel_issues.append(("改名", f"人工改名: {check_rec.get('file_name', '')}"))
+                }
+                im.add_category_only("manual_rename", rename_item)
+                im.add_issue_only("改名", f"人工改名: {file_name}")
 
         if stage_rec and check_rec_list:
             conflicts = detect_conflicts(stage_rec, check_rec_list)
             for conflict in conflicts:
-                results["issues_by_category"]["conflicts"].append({
+                conflict_field = conflict["field"]
+                file_name = conflict.get("file_name", "")
+                conflict_item = {
                     "channel": channel,
                     "track": stage_rec.get("track_name", "未知"),
                     **conflict,
-                })
-                channel_issues.append(("冲突", conflict["evidence"]))
+                }
+                if conflict_field == "时码":
+                    tc_detail = "tc_in" if "入点" in conflict["evidence"] else "tc_out"
+                    conflict_key = issue_key("conflict", channel, f"{tc_detail}:{file_name}")
+                    im.add("conflicts", conflict_key, conflict_item, "冲突", conflict["evidence"])
+                elif conflict_field == "文件名":
+                    im.add("conflicts", issue_key("conflict", channel, f"file:{file_name}"), conflict_item, "冲突", conflict["evidence"])
+                else:
+                    im.add("conflicts", issue_key("conflict", channel, f"field:{conflict_field}"), conflict_item, "冲突", conflict["evidence"])
 
             for check_rec in check_rec_list:
+                file_name = check_rec.get("file_name", "")
                 tc_issues = check_timecode_alignment(stage_rec, check_rec)
                 for issue in tc_issues:
-                    results["issues_by_category"]["timecode_misalignment"].append({
+                    tc_item = {
                         "channel": channel,
                         "track": stage_rec.get("track_name", "未知"),
-                        "file": check_rec.get("file_name", ""),
+                        "file": file_name,
                         "reason": issue,
                         "stage_tc": f"{stage_rec.get('tc_in', '')} - {stage_rec.get('tc_out', '')}",
                         "check_tc": f"{check_rec.get('tc_in', '')} - {check_rec.get('tc_out', '')}",
-                    })
+                    }
+                    tc_detail = f"in:{file_name}" if "入点" in issue else f"out:{file_name}"
+                    im.add("timecode_misalignment", issue_key("timecode", channel, tc_detail), tc_item, "时码", issue)
 
         for track, channels in duplicate_tracks.items():
             if channel in channels:
                 other_channels = [c for c in channels if c != channel]
-                results["issues_by_category"]["duplicate_tracks"].append({
+                dup_item = {
                     "channel": channel,
                     "track": track,
                     "duplicate_with": ", ".join(other_channels),
                     "reason": f"曲目「{track}」在多个通道出现: {', '.join(channels)}",
-                })
+                }
+                im.add("duplicate_tracks", issue_key("duplicate", channel, track), dup_item, "重复", dup_item["reason"])
 
         source_info = ""
         if stage_rec.get("_source_file"):
             source_info = f" (导入自: {stage_rec['_source_file']} 行{stage_rec.get('_source_row', '?')})"
 
         supplement_log = stage_rec.get("_supplement_log", []) if stage_rec else []
+        check_supplement_logs = []
+        for cr in check_rec_list:
+            check_supplement_logs.extend(cr.get("_supplement_log", []))
+        if check_supplement_logs:
+            supplement_log = supplement_log + check_supplement_logs
+
+        status_label, status_text = im.status_summary()
+
+        for cat, items in im.category_items.items():
+            results["issues_by_category"][cat].extend(items)
 
         results["channel_details"][channel] = {
             "stage": stage_rec,
             "checks": check_rec_list,
-            "issues": channel_issues,
+            "issues": im.get_display_issues(),
+            "resolved_issues": im.get_resolved_display(),
+            "open_count": len(im.open_issues),
+            "resolved_count": len(im.resolved_issues),
+            "status_label": status_label,
+            "status_text": status_text,
             "annotation": " | ".join([c.get("annotation", "") for c in check_rec_list if c.get("annotation")]),
             "processed": channel in state["processed_channels"],
-            "user_notes": state["notes"].get(channel, ""),
+            "user_notes": state.get("notes", {}).get(channel, ""),
             "source_info": source_info,
             "supplement_log": supplement_log,
         }
 
-    results["summary"]["expired_auth_count"] = len(results["issues_by_category"]["expired_auth"])
-    results["summary"]["timecode_misalignment_count"] = len(results["issues_by_category"]["timecode_misalignment"])
-    results["summary"]["duplicate_tracks_count"] = len(set([i["track"] for i in results["issues_by_category"]["duplicate_tracks"]]))
-    results["summary"]["old_master_count"] = len(results["issues_by_category"]["old_master"])
-    results["summary"]["missing_auth_count"] = len(results["issues_by_category"]["missing_auth"])
-    results["summary"]["empty_values_count"] = len(results["issues_by_category"]["empty_values"])
-    results["summary"]["manual_rename_count"] = len(results["issues_by_category"]["manual_rename"])
-    results["summary"]["conflicts_count"] = len(results["issues_by_category"]["conflicts"])
+    results["summary"]["expired_auth_count"] = len(results["issues_by_category"].get("expired_auth", []))
+    results["summary"]["timecode_misalignment_count"] = len(results["issues_by_category"].get("timecode_misalignment", []))
+    results["summary"]["duplicate_tracks_count"] = len(set([i["track"] for i in results["issues_by_category"].get("duplicate_tracks", [])]))
+    results["summary"]["old_master_count"] = len(results["issues_by_category"].get("old_master", []))
+    results["summary"]["missing_auth_count"] = len(results["issues_by_category"].get("missing_auth", []))
+    results["summary"]["empty_values_count"] = len(results["issues_by_category"].get("empty_values", []))
+    results["summary"]["manual_rename_count"] = len(results["issues_by_category"].get("manual_rename", []))
+    results["summary"]["conflicts_count"] = len(results["issues_by_category"].get("conflicts", []))
 
     return results, state
 
@@ -937,9 +1172,9 @@ def generate_report(results, state):
         detail = results["channel_details"][channel]
         stage = detail["stage"]
         checks = detail["checks"]
-        status = "✅ 正常" if not detail["issues"] else "⚠️ 待处理"
-        processed_mark = " (已处理)" if detail["processed"] else ""
-        lines.append(f"### 通道 {channel} - {stage.get('track_name', '未知曲目') if stage else '未知曲目'} {status}{processed_mark}")
+        status_label = detail.get("status_label", "⚠️ 待处理")
+        status_text = detail.get("status_text", "")
+        lines.append(f"### 通道 {channel} - {stage.get('track_name', '未知曲目') if stage else '未知曲目'} {status_label}{status_text}")
         lines.append("")
 
         if detail.get("source_info"):
@@ -972,7 +1207,10 @@ def generate_report(results, state):
                 lines.append(f"  - 文件名：{check.get('file_name', '')}")
                 lines.append(f"  - 曲目：{check.get('track_name', '')}")
                 lines.append(f"  - 版本标记：{check.get('version_tag', '')}")
-                lines.append(f"  - 时码：{check.get('tc_in', '')} - {check.get('tc_out', '')}")
+                if check.get("_supplemented"):
+                    lines.append(f"  - 时码：{check.get('tc_in', '')} - {check.get('tc_out', '')}（已同步）")
+                else:
+                    lines.append(f"  - 时码：{check.get('tc_in', '')} - {check.get('tc_out', '')}")
                 lines.append(f"  - 文件时长：{check.get('duration', '')}")
                 lines.append(f"  - 批注：{check.get('annotation', '') or '(无)'}")
                 lines.append(f"  - 导入来源：{check.get('import_source', '')}")
@@ -983,9 +1221,15 @@ def generate_report(results, state):
             lines.append("")
 
         if detail["issues"]:
-            lines.append("**问题列表：**")
+            lines.append("**待处理问题：**")
             for level, msg in detail["issues"]:
                 lines.append(f"- [{level}] {msg}")
+            lines.append("")
+
+        if detail.get("resolved_issues"):
+            lines.append("**已解决问题：**")
+            for level, msg in detail["resolved_issues"]:
+                lines.append(f"- ~~[{level}] {msg}~~ ✅")
             lines.append("")
 
         if detail["annotation"]:
@@ -1018,16 +1262,62 @@ def generate_report(results, state):
     return report
 
 
-def mark_processed(channel, note=""):
+def mark_processed(channel, note="", resolve_all=False, issues_to_resolve=None):
+    """
+    标记通道为已处理，并根据备注智能应用变更
+    resolve_all=True 时标记所有问题为已解决
+    issues_to_resolve 可以指定具体问题类型列表：["auth", "master", "timecode", "file", "empty"]
+    """
+    stage_records = read_stage_table()
+    check_records = read_check_data()
+    stage_records, check_records = apply_supplements(stage_records, check_records)
+
     state = load_state()
+
     if channel not in state["processed_channels"]:
         state["processed_channels"].append(channel)
+
     if note:
         state["notes"][channel] = note
-    save_state(state)
-    print(f"✅ 通道 {channel} 已标记为已处理")
+
+    all_resolve_keys = []
     if note:
-        print(f"   备注：{note}")
+        supplement_actions, resolve_keys, summary = parse_note_for_actions(
+            note, channel, stage_records, check_records
+        )
+        if supplement_actions:
+            apply_supplement_actions(supplement_actions, channel)
+            print("  自动应用变更:")
+            for s in summary:
+                print(f"    - {s}")
+        all_resolve_keys.extend(resolve_keys)
+
+    if resolve_all:
+        all_issues = collect_all_issue_keys(channel, stage_records, check_records)
+        all_resolve_keys.extend(all_issues)
+        print(f"  标记所有问题为已解决 ({len(all_issues)} 项)")
+
+    if issues_to_resolve:
+        mapped_keys = map_issue_types_to_keys(
+            issues_to_resolve, channel, stage_records, check_records
+        )
+        all_resolve_keys.extend(mapped_keys)
+        print(f"  标记指定问题为已解决: {', '.join(issues_to_resolve)}")
+
+    if channel not in state["resolved_issues"]:
+        state["resolved_issues"][channel] = []
+
+    for k in all_resolve_keys:
+        if k not in state["resolved_issues"][channel]:
+            state["resolved_issues"][channel].append(k)
+
+    save_state(state)
+
+    print(f"\n✅ 通道 {channel} 处理状态已更新")
+    if note:
+        print(f"   处理备注：{note}")
+    if state["resolved_issues"][channel]:
+        print(f"   已解决问题：{len(state['resolved_issues'][channel])} 项")
 
 
 def add_supplement(channel, field, value, data_type="stage"):
@@ -1077,7 +1367,8 @@ def print_console_summary(results):
     print("常用命令:")
     print("  导入台账:   python ear_return_check.py --import data/厂牌运营台账.csv --type stage")
     print("  补录数据:   python ear_return_check.py --supplement CH-007 曲目名称 补录曲目 --type stage")
-    print("  标记已处理: python ear_return_check.py --mark CH-002 --note \"已续签\"")
+    print("  标记已处理: python ear_return_check.py --mark CH-002 --note \"授权已确认，母带为最新版\"")
+    print("  解决指定问题: python ear_return_check.py --mark CH-002 --resolve auth,master --note \"已处理\"")
     print("  重新校验:   python ear_return_check.py")
     print("")
 
@@ -1119,7 +1410,10 @@ def cmd_supplement(args):
 
 
 def cmd_mark(args):
-    mark_processed(args.mark, args.note)
+    resolve_all = getattr(args, "resolve_all", False)
+    resolve = getattr(args, "resolve", None)
+    issues_list = resolve.split(",") if resolve else None
+    mark_processed(args.mark, args.note, resolve_all=resolve_all, issues_to_resolve=issues_list)
 
 
 def cmd_check(args):
@@ -1155,20 +1449,35 @@ def main():
   # 补录缺失字段
   python ear_return_check.py --supplement CH-007 曲目名称 "补录的曲目名" --type stage
 
-  # 标记已处理
-  python ear_return_check.py --mark CH-002 --note "已续签"
+  # 标记已处理（根据备注自动应用变更）
+  python ear_return_check.py --mark CH-002 --note "授权已确认，母带为最新版"
+
+  # 标记已处理并解决指定类型的问题
+  python ear_return_check.py --mark CH-002 --resolve auth,master,timecode --note "问题已解决"
+
+  # 标记已处理并解决所有问题
+  python ear_return_check.py --mark CH-002 --resolve-all --note "全部问题已确认"
 
   # 运行校验并生成报告
   python ear_return_check.py
 
   # 查看已保存的列名映射
   python ear_return_check.py --show-mapping
+
+备注关键词自动处理:
+  - "母带为最新版" / "2025_master" → 自动将旧版母带升级为 2025_master
+  - "时码已对齐" / "时码同步" → 自动同步检查表时码为舞台表时码
+  - "文件已确认" / "文件名一致" → 标记文件名冲突为已解决
+  - "授权已续签" → 自动将授权期限续签到备注中的年份（默认2027）
+  - "授权已确认" → 标记授权状态问题为已解决
 """)
     parser.add_argument("--import", dest="import_file", help="导入 CSV/Excel 文件路径")
     parser.add_argument("--type", dest="type", choices=["stage", "check"], help="数据类型: stage(舞台通道表) 或 check(耳返检查)")
     parser.add_argument("--supplement", nargs=3, metavar=("CHANNEL", "FIELD", "VALUE"), help="补录字段值")
     parser.add_argument("--mark", help="标记通道为已处理")
     parser.add_argument("--note", help="处理备注", default="")
+    parser.add_argument("--resolve-all", action="store_true", help="标记所有问题为已解决")
+    parser.add_argument("--resolve", help="指定解决的问题类型，逗号分隔: auth,master,timecode,file,empty,conflict,dup")
     parser.add_argument("--show-mapping", action="store_true", help="查看已保存的列名映射")
 
     args = parser.parse_args()

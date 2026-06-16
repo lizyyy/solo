@@ -3,9 +3,24 @@
     "CH-002",
     "S-011"
   ],
-  "resolved_issues": [],
+  "resolved_issues": {
+    "CH-002": [
+      "old_master:CH-002:neon_deep_v2.wav",
+      "conflict:CH-002:version:neon_deep_v2.wav",
+      "timecode:CH-002:in:neon_deep_v2.wav",
+      "conflict:CH-002:tc_in:neon_deep_v2.wav",
+      "timecode:CH-002:out:neon_deep_v2.wav",
+      "conflict:CH-002:tc_out:neon_deep_v2.wav",
+      "conflict:CH-002:file:neon_deep_v2.wav",
+      "auth:CH-002:expired",
+      "auth:CH-002:missing"
+    ],
+    "S-011": [
+      "auth:S-011:expired"
+    ]
+  },
   "notes": {
-    "CH-002": "授权已确认，母带为最新版",
+    "CH-002": "授权已确认，母带为最新版，时码已对齐，文件已确认",
     "S-011": "授权已续签到2027"
   },
   "last_updated": "2026-06-08"
