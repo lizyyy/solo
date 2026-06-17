@@ -1,11 +1,12 @@
 ﻿attribution_id,log_id,annotation_id,error_type,result_error_type,confidence,evidence,status,threshold_version,model_version,created_at,reviewed_by,reviewed_at,review_notes,review_action,final_error_type
-20b55562-b16b-42bd-bcbe-6351dc1fd2c9,log_002,ann_001,proper_noun,proper_noun,0.5,"[""正确词 '阿里巴巴' 是专有名词"", '拼写相似度: 0.50']",pending,threshold_v1,whisper_v1,2026-06-08T17:40:21.153313,,,,,
-0efe1a9a-1957-4bab-8978-e80d19d8ad78,log_003,ann_002,homophone,homophone,0.95,['匹配同音词表: 苹果 -> 平果'],auto_attributed,threshold_v1,whisper_v1,2026-06-08T17:40:21.153348,,,,,
-8fd76327-ec0a-4d60-8e6e-96c6505f3c12,log_004,ann_003,unknown,acronym,0.0,"['未匹配到明确错误类型', '置信度 0.00 低于阈值 0.5']",manual_reviewed,threshold_v1,whisper_v1,2026-06-08T17:40:21.153370,小孟,2026-06-08T17:40:34.075280,确认是缩写识别错误，人工修正,revise,acronym
-4f9acdea-980a-4b1a-b237-2a255ca10d96,log_005,ann_004,homophone,homophone,0.95,['匹配同音词表: 北京 -> 背景'],auto_attributed,threshold_v1,whisper_v1,2026-06-08T17:40:21.153388,,,,,
-a44854ca-2dca-4f08-bd60-cdbb56aba548,log_006,ann_005,homophone,homophone,0.95,['匹配同音词表: 会议 -> 回忆'],auto_attributed,threshold_v1,whisper_v1,2026-06-08T17:40:21.153406,,,,,
-b03fe48a-8634-4635-b188-54c56be037bd,log_007,ann_006,proper_noun,proper_noun,0.5,"[""正确词 '腾讯' 是专有名词"", '拼写相似度: 0.50']",pending,threshold_v1,whisper_v1,2026-06-08T17:40:21.153424,,,,,
-eee33a19-4453-47a2-9628-1c52f847e19f,log_008,ann_007,homophone,homophone,0.95,['匹配同音词表: 上海 -> 伤害'],auto_attributed,threshold_v1,whisper_v1,2026-06-08T17:40:21.153438,,,,,
-c57c419a-5ef1-41f5-ba6a-55b8cb9e366f,log_009,ann_008,proper_noun,proper_noun,0.5,"[""正确词 '华为' 是专有名词"", '拼写相似度: 0.50']",pending,threshold_v1,whisper_v1,2026-06-08T17:40:21.153456,,,,,
-7d63bc68-a43c-485e-a301-c4a1049c61cb,log_010,ann_009,homophone,homophone,0.95,['匹配同音词表: 百度 -> 摆渡'],auto_attributed,threshold_v1,whisper_v1,2026-06-08T17:40:21.153470,,,,,
-1f1c961b-fa2e-4685-8a2b-831f2394a88f,log_001,ann_011,homophone,homophone,1.0,['发音相似度: 1.00'],auto_attributed,threshold_v1,whisper_v1,2026-06-08T17:40:21.153490,,,,,
+2fe32975-2bf2-4765-baa5-f060c26e4627,log_002,ann_001,proper_noun,proper_noun,0.5,"[""正确词 '阿里巴巴' 是专有名词"", '拼写相似度: 0.50']",pending,threshold_v1,whisper_v1,2026-06-17T21:16:30.701918,,,,,
+6a6832c8-79bb-48a8-a434-8c283d72c8c8,log_002,ann_012,proper_noun,proper_noun,0.5,"[""正确词 '阿里巴巴' 是专有名词"", '拼写相似度: 0.50']",manual_reviewed,threshold_v1,whisper_v1,2026-06-17T21:16:30.701945,小孟,2026-06-17T21:17:35.629525,ann_012确认是专有名词错误,revise,proper_noun
+557b44b0-c357-49ef-a544-fea099eeb307,log_003,ann_002,homophone,homophone,0.95,['匹配同音词表: 苹果 -> 平果'],auto_attributed,threshold_v1,whisper_v1,2026-06-17T21:16:30.701966,,,,,
+9183deff-34f4-4a2b-ae54-a9f2e5be0e86,log_004,ann_003,unknown,unknown,0.0,"['未匹配到明确错误类型', '置信度 0.00 低于阈值 0.5']",pending,threshold_v1,whisper_v1,2026-06-17T21:16:30.701983,,,,,
+a26c928f-b082-4170-95dd-41092ac77988,log_005,ann_004,homophone,homophone,0.95,['匹配同音词表: 北京 -> 背景'],auto_attributed,threshold_v1,whisper_v1,2026-06-17T21:16:30.701997,,,,,
+02def92f-c788-46f4-ab7b-3dc6eefe8400,log_006,ann_005,homophone,homophone,0.95,['匹配同音词表: 会议 -> 回忆'],auto_attributed,threshold_v1,whisper_v1,2026-06-17T21:16:30.702011,,,,,
+a88fd776-5831-4dd7-817f-11133ae41758,log_007,ann_006,proper_noun,proper_noun,0.5,"[""正确词 '腾讯' 是专有名词"", '拼写相似度: 0.50']",pending,threshold_v1,whisper_v1,2026-06-17T21:16:30.702034,,,,,
+93d2bf90-9c77-4ee5-af4f-3dc324f6afbb,log_008,ann_007,homophone,homophone,0.95,['匹配同音词表: 上海 -> 伤害'],auto_attributed,threshold_v1,whisper_v1,2026-06-17T21:16:30.702048,,,,,
+b14da361-3524-4ff9-8bcb-b2bf17f37781,log_009,ann_008,proper_noun,proper_noun,0.5,"[""正确词 '华为' 是专有名词"", '拼写相似度: 0.50']",pending,threshold_v1,whisper_v1,2026-06-17T21:16:30.702064,,,,,
+34684469-4358-4198-b953-eaba223af3cd,log_010,ann_009,homophone,homophone,0.95,['匹配同音词表: 百度 -> 摆渡'],auto_attributed,threshold_v1,whisper_v1,2026-06-17T21:16:30.702076,,,,,
+a2d77db6-7b13-4593-9c7d-89a4f621f40e,log_001,ann_011,unknown,unknown,0.0,"['空值: 错误词, 正确词为空']",pending,threshold_v1,whisper_v1,2026-06-17T21:16:30.702082,,,,,

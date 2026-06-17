@@ -19,6 +19,7 @@ class ConflictManager:
         self,
         attributions: List[AttributionResult],
         annotations: List[AnnotationRecord],
+        annotation_conflicts: Optional[List[Dict]] = None,
     ) -> List[ConflictRecord]:
         annotation_map = {a.annotation_id: a for a in annotations}
         conflicts = []
@@ -33,6 +34,22 @@ class ConflictManager:
                 conflicts.append(conflict)
                 self.conflicts[conflict.conflict_id] = conflict
 
+        if annotation_conflicts:
+            for ac in annotation_conflicts:
+                conflict = ConflictRecord(
+                    conflict_id=str(uuid.uuid4()),
+                    log_id=ac["triple_key"][0] if ac["triple_key"] else "",
+                    annotation_id=",".join(ac["annotation_ids"]),
+                    attribution_id="",
+                    conflict_type="annotation_conflict",
+                    description=ac["description"],
+                    auto_attribution=",".join(ac["conflict_types"]),
+                    manual_attribution=None,
+                    resolved=False,
+                )
+                conflicts.append(conflict)
+                self.conflicts[conflict.conflict_id] = conflict
+
         return conflicts
 
     def _check_single_conflict(
@@ -41,27 +58,31 @@ class ConflictManager:
         conflict_type = None
         description = ""
 
-        if annotation.error_type and attribution.error_type != annotation.error_type:
+        if not annotation.error_word or not annotation.correct_word:
+            empty_parts = []
+            if not annotation.error_word:
+                empty_parts.append("错误词")
+            if not annotation.correct_word:
+                empty_parts.append("正确词")
+            conflict_type = "missing_data"
+            description = f"标注数据空值: {', '.join(empty_parts)}为空，需要人工确认"
+
+        elif annotation.error_type and attribution.error_type != annotation.error_type:
             conflict_type = "type_mismatch"
             description = (
                 f"自动归因类型 '{attribution.error_type}' 与标注类型 "
                 f"'{annotation.error_type}' 不一致"
             )
 
-        if (
+        elif (
             attribution.confidence < 0.7
             and annotation.confidence > 0.8
         ):
-            if not conflict_type:
-                conflict_type = "confidence_mismatch"
-                description = (
-                    f"自动归因置信度 {attribution.confidence:.2f} 与标注置信度 "
-                    f"{annotation.confidence:.2f} 存在显著差异"
-                )
-
-        if not annotation.error_word or not annotation.correct_word:
-            conflict_type = "missing_data"
-            description = "标注数据存在空值，需要人工确认"
+            conflict_type = "confidence_mismatch"
+            description = (
+                f"自动归因置信度 {attribution.confidence:.2f} 与标注置信度 "
+                f"{annotation.confidence:.2f} 存在显著差异"
+            )
 
         if conflict_type:
             return ConflictRecord(

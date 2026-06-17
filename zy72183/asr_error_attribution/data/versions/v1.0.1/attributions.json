@@ -1,7 +1,7 @@
 {
   "records": [
     {
-      "attribution_id": "2fe32975-2bf2-4765-baa5-f060c26e4627",
+      "attribution_id": "216db174-71be-45cc-bb0a-ef0fa79c12f4",
       "log_id": "log_002",
       "annotation_id": "ann_001",
       "error_type": "proper_noun",
@@ -12,9 +12,9 @@
         "拼写相似度: 0.50"
       ],
       "status": "pending",
-      "threshold_version": "threshold_v1",
-      "model_version": "whisper_v1",
-      "created_at": "2026-06-17T21:16:30.701918",
+      "threshold_version": "default",
+      "model_version": "unknown",
+      "created_at": "2026-06-17T21:17:16.725683",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",
@@ -22,7 +22,7 @@
       "final_error_type": null
     },
     {
-      "attribution_id": "6a6832c8-79bb-48a8-a434-8c283d72c8c8",
+      "attribution_id": "c57c44f4-1dd8-4427-abeb-3ae397492e89",
       "log_id": "log_002",
       "annotation_id": "ann_012",
       "error_type": "proper_noun",
@@ -32,18 +32,18 @@
         "正确词 '阿里巴巴' 是专有名词",
         "拼写相似度: 0.50"
       ],
-      "status": "manual_reviewed",
-      "threshold_version": "threshold_v1",
-      "model_version": "whisper_v1",
-      "created_at": "2026-06-17T21:16:30.701945",
-      "reviewed_by": "小孟",
-      "reviewed_at": "2026-06-17T21:17:35.629525",
-      "review_notes": "ann_012确认是专有名词错误",
-      "review_action": "revise",
-      "final_error_type": "proper_noun"
+      "status": "pending",
+      "threshold_version": "default",
+      "model_version": "unknown",
+      "created_at": "2026-06-17T21:17:16.725711",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "review_notes": "",
+      "review_action": null,
+      "final_error_type": null
     },
     {
-      "attribution_id": "557b44b0-c357-49ef-a544-fea099eeb307",
+      "attribution_id": "14ed4bb5-c1c2-47da-99b3-9427f839e857",
       "log_id": "log_003",
       "annotation_id": "ann_002",
       "error_type": "homophone",
@@ -53,9 +53,9 @@
         "匹配同音词表: 苹果 -> 平果"
       ],
       "status": "auto_attributed",
-      "threshold_version": "threshold_v1",
-      "model_version": "whisper_v1",
-      "created_at": "2026-06-17T21:16:30.701966",
+      "threshold_version": "default",
+      "model_version": "unknown",
+      "created_at": "2026-06-17T21:17:16.725734",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",
@@ -63,7 +63,7 @@
       "final_error_type": null
     },
     {
-      "attribution_id": "9183deff-34f4-4a2b-ae54-a9f2e5be0e86",
+      "attribution_id": "7a42fb3e-206a-4c2f-8ca5-af856c0196fa",
       "log_id": "log_004",
       "annotation_id": "ann_003",
       "error_type": "unknown",
@@ -74,9 +74,9 @@
         "置信度 0.00 低于阈值 0.5"
       ],
       "status": "pending",
-      "threshold_version": "threshold_v1",
-      "model_version": "whisper_v1",
-      "created_at": "2026-06-17T21:16:30.701983",
+      "threshold_version": "default",
+      "model_version": "unknown",
+      "created_at": "2026-06-17T21:17:16.725753",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",
@@ -84,7 +84,7 @@
       "final_error_type": null
     },
     {
-      "attribution_id": "a26c928f-b082-4170-95dd-41092ac77988",
+      "attribution_id": "a4baaa3e-609e-4316-b0dd-9baf4b01b84b",
       "log_id": "log_005",
       "annotation_id": "ann_004",
       "error_type": "homophone",
@@ -94,9 +94,9 @@
         "匹配同音词表: 北京 -> 背景"
       ],
       "status": "auto_attributed",
-      "threshold_version": "threshold_v1",
-      "model_version": "whisper_v1",
-      "created_at": "2026-06-17T21:16:30.701997",
+      "threshold_version": "default",
+      "model_version": "unknown",
+      "created_at": "2026-06-17T21:17:16.725769",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",
@@ -104,7 +104,7 @@
       "final_error_type": null
     },
     {
-      "attribution_id": "02def92f-c788-46f4-ab7b-3dc6eefe8400",
+      "attribution_id": "c181938b-abbf-4d2b-900f-b9b44cf3583e",
       "log_id": "log_006",
       "annotation_id": "ann_005",
       "error_type": "homophone",
@@ -114,9 +114,9 @@
         "匹配同音词表: 会议 -> 回忆"
       ],
       "status": "auto_attributed",
-      "threshold_version": "threshold_v1",
-      "model_version": "whisper_v1",
-      "created_at": "2026-06-17T21:16:30.702011",
+      "threshold_version": "default",
+      "model_version": "unknown",
+      "created_at": "2026-06-17T21:17:16.725783",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",
@@ -124,7 +124,7 @@
       "final_error_type": null
     },
     {
-      "attribution_id": "a88fd776-5831-4dd7-817f-11133ae41758",
+      "attribution_id": "9a6074bc-91a3-4808-bef3-43bb61c802b3",
       "log_id": "log_007",
       "annotation_id": "ann_006",
       "error_type": "proper_noun",
@@ -135,9 +135,9 @@
         "拼写相似度: 0.50"
       ],
       "status": "pending",
-      "threshold_version": "threshold_v1",
-      "model_version": "whisper_v1",
-      "created_at": "2026-06-17T21:16:30.702034",
+      "threshold_version": "default",
+      "model_version": "unknown",
+      "created_at": "2026-06-17T21:17:16.725800",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",
@@ -145,7 +145,7 @@
       "final_error_type": null
     },
     {
-      "attribution_id": "93d2bf90-9c77-4ee5-af4f-3dc324f6afbb",
+      "attribution_id": "aa085c40-207f-489e-8f6e-55b4165795a1",
       "log_id": "log_008",
       "annotation_id": "ann_007",
       "error_type": "homophone",
@@ -155,9 +155,9 @@
         "匹配同音词表: 上海 -> 伤害"
       ],
       "status": "auto_attributed",
-      "threshold_version": "threshold_v1",
-      "model_version": "whisper_v1",
-      "created_at": "2026-06-17T21:16:30.702048",
+      "threshold_version": "default",
+      "model_version": "unknown",
+      "created_at": "2026-06-17T21:17:16.725813",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",
@@ -165,7 +165,7 @@
       "final_error_type": null
     },
     {
-      "attribution_id": "b14da361-3524-4ff9-8bcb-b2bf17f37781",
+      "attribution_id": "b844d0e7-14e2-4388-a7c8-a6d20e7729b2",
       "log_id": "log_009",
       "annotation_id": "ann_008",
       "error_type": "proper_noun",
@@ -176,9 +176,9 @@
         "拼写相似度: 0.50"
       ],
       "status": "pending",
-      "threshold_version": "threshold_v1",
-      "model_version": "whisper_v1",
-      "created_at": "2026-06-17T21:16:30.702064",
+      "threshold_version": "default",
+      "model_version": "unknown",
+      "created_at": "2026-06-17T21:17:16.725828",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",
@@ -186,7 +186,7 @@
       "final_error_type": null
     },
     {
-      "attribution_id": "34684469-4358-4198-b953-eaba223af3cd",
+      "attribution_id": "8182e047-1310-4ca0-adef-56959cab9dbd",
       "log_id": "log_010",
       "annotation_id": "ann_009",
       "error_type": "homophone",
@@ -196,9 +196,9 @@
         "匹配同音词表: 百度 -> 摆渡"
       ],
       "status": "auto_attributed",
-      "threshold_version": "threshold_v1",
-      "model_version": "whisper_v1",
-      "created_at": "2026-06-17T21:16:30.702076",
+      "threshold_version": "default",
+      "model_version": "unknown",
+      "created_at": "2026-06-17T21:17:16.725841",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",
@@ -206,7 +206,7 @@
       "final_error_type": null
     },
     {
-      "attribution_id": "a2d77db6-7b13-4593-9c7d-89a4f621f40e",
+      "attribution_id": "5b4bbc5e-d8a9-40a7-9afc-cb6e124528e8",
       "log_id": "log_001",
       "annotation_id": "ann_011",
       "error_type": "unknown",
@@ -216,9 +216,9 @@
         "空值: 错误词, 正确词为空"
       ],
       "status": "pending",
-      "threshold_version": "threshold_v1",
-      "model_version": "whisper_v1",
-      "created_at": "2026-06-17T21:16:30.702082",
+      "threshold_version": "default",
+      "model_version": "unknown",
+      "created_at": "2026-06-17T21:17:16.725846",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",

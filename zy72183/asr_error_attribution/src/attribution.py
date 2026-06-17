@@ -108,6 +108,12 @@ class ErrorAttributor:
             return confidence >= self.threshold.confidence_low, confidence, evidence
         return False, 0.0, []
 
+    @staticmethod
+    def _is_empty(val: str) -> bool:
+        if not val:
+            return True
+        return val.strip().lower() in ("nan", "none", "null")
+
     def attribute_error(
         self,
         annotation: AnnotationRecord,
@@ -117,14 +123,21 @@ class ErrorAttributor:
         correct_word = annotation.correct_word
         model_version = eval_log.model_version if eval_log else "unknown"
 
-        if not error_word or not correct_word:
+        empty_fields = []
+        if self._is_empty(error_word):
+            empty_fields.append("错误词")
+        if self._is_empty(correct_word):
+            empty_fields.append("正确词")
+
+        if empty_fields:
+            evidence = [f"空值: {', '.join(empty_fields)}为空"]
             return AttributionResult(
                 attribution_id=str(uuid.uuid4()),
                 log_id=annotation.log_id,
                 annotation_id=annotation.annotation_id,
                 error_type=ErrorType.UNKNOWN.value,
                 confidence=0.0,
-                evidence=["空值: 错误词或正确词为空"],
+                evidence=evidence,
                 status=AttributionStatus.PENDING,
                 threshold_version=self.threshold.version,
                 model_version=model_version,
@@ -173,24 +186,42 @@ class ErrorAttributor:
         self,
         annotations: List[AnnotationRecord],
         eval_logs: Optional[Dict[str, EvaluationLog]] = None,
-    ) -> List[AttributionResult]:
+    ) -> Tuple[List[AttributionResult], List[Dict[str, Any]]]:
         results = []
-        seen_keys = set()
+        annotation_conflicts = []
+        seen_exact = set()
+        triple_type_map: Dict[Tuple, List[AnnotationRecord]] = {}
 
         for annotation in annotations:
             key = (annotation.log_id, annotation.error_word, annotation.correct_word)
-            if key in seen_keys:
+            exact_key = (annotation.log_id, annotation.error_word, annotation.correct_word, annotation.error_type)
+            if exact_key in seen_exact:
                 continue
-            seen_keys.add(key)
+            seen_exact.add(exact_key)
 
-            eval_log = None
-            if eval_logs and annotation.log_id in eval_logs:
-                eval_log = eval_logs[annotation.log_id]
+            triple_type_map.setdefault(key, []).append(annotation)
 
-            result = self.attribute_error(annotation, eval_log)
-            results.append(result)
+        for key, group in triple_type_map.items():
+            if len(group) > 1:
+                types_involved = sorted(set(a.error_type for a in group))
+                annotation_conflicts.append({
+                    "triple_key": list(key),
+                    "annotation_ids": [a.annotation_id for a in group],
+                    "conflict_types": types_involved,
+                    "description": (
+                        f"同一错误对({key[1]}→{key[2]})存在不同人工标注类型: "
+                        f"{', '.join(types_involved)}"
+                    ),
+                })
 
-        return results
+            for annotation in group:
+                eval_log = None
+                if eval_logs and annotation.log_id in eval_logs:
+                    eval_log = eval_logs[annotation.log_id]
+                result = self.attribute_error(annotation, eval_log)
+                results.append(result)
+
+        return results, annotation_conflicts
 
 
 class DataProcessor:
@@ -199,6 +230,17 @@ class DataProcessor:
         self.raw_dir = self.project_root / "data" / "raw"
         self.processed_dir = self.project_root / "data" / "processed"
         self.processed_dir.mkdir(parents=True, exist_ok=True)
+
+    @staticmethod
+    def _clean_cell(val) -> str:
+        if val is None:
+            return ""
+        if isinstance(val, float) and (val != val):
+            return ""
+        s = str(val).strip()
+        if s.lower() in ("nan", "none", "null", ""):
+            return ""
+        return s
 
     def load_evaluation_logs(self, filename: str) -> List[EvaluationLog]:
         file_path = self.raw_dir / filename
@@ -218,14 +260,14 @@ class DataProcessor:
         for _, row in df.iterrows():
             log = EvaluationLog.from_dict(
                 {
-                    "log_id": str(row.get("log_id", row.get("id", uuid.uuid4()))),
-                    "audio_id": str(row.get("audio_id", "")),
-                    "reference_text": str(row.get("reference_text", "")),
-                    "asr_output": str(row.get("asr_output", "")),
-                    "model_version": str(row.get("model_version", "")),
-                    "wer": float(row.get("wer", 0.0)),
-                    "cer": float(row.get("cer", 0.0)),
-                    "created_at": row.get("created_at", datetime.now().isoformat()),
+                    "log_id": self._clean_cell(row.get("log_id", row.get("id", uuid.uuid4()))),
+                    "audio_id": self._clean_cell(row.get("audio_id", "")),
+                    "reference_text": self._clean_cell(row.get("reference_text", "")),
+                    "asr_output": self._clean_cell(row.get("asr_output", "")),
+                    "model_version": self._clean_cell(row.get("model_version", "")),
+                    "wer": float(row.get("wer", 0.0)) if pd.notna(row.get("wer")) else 0.0,
+                    "cer": float(row.get("cer", 0.0)) if pd.notna(row.get("cer")) else 0.0,
+                    "created_at": row.get("created_at", datetime.now().isoformat()) if pd.notna(row.get("created_at")) else datetime.now().isoformat(),
                     "source_file": filename,
                     "raw_data": row.to_dict(),
                 }
@@ -252,16 +294,16 @@ class DataProcessor:
         for _, row in df.iterrows():
             annotation = AnnotationRecord.from_dict(
                 {
-                    "annotation_id": str(row.get("annotation_id", row.get("id", uuid.uuid4()))),
-                    "log_id": str(row.get("log_id", "")),
-                    "error_word": str(row.get("error_word", "")),
-                    "correct_word": str(row.get("correct_word", "")),
-                    "error_type": str(row.get("error_type", "unknown")),
-                    "confidence": float(row.get("confidence", 0.0)),
-                    "annotated_by": str(row.get("annotated_by", "system")),
-                    "annotated_at": row.get("annotated_at", datetime.now().isoformat()),
-                    "notes": str(row.get("notes", "")),
-                    "is_valid": bool(row.get("is_valid", True)),
+                    "annotation_id": self._clean_cell(row.get("annotation_id", row.get("id", uuid.uuid4()))),
+                    "log_id": self._clean_cell(row.get("log_id", "")),
+                    "error_word": self._clean_cell(row.get("error_word", "")),
+                    "correct_word": self._clean_cell(row.get("correct_word", "")),
+                    "error_type": self._clean_cell(row.get("error_type", "unknown")) or "unknown",
+                    "confidence": float(row.get("confidence", 0.0)) if pd.notna(row.get("confidence")) else 0.0,
+                    "annotated_by": self._clean_cell(row.get("annotated_by", "system")),
+                    "annotated_at": row.get("annotated_at", datetime.now().isoformat()) if pd.notna(row.get("annotated_at")) else datetime.now().isoformat(),
+                    "notes": self._clean_cell(row.get("notes", "")),
+                    "is_valid": bool(row.get("is_valid", True)) if pd.notna(row.get("is_valid")) else True,
                 }
             )
             annotations.append(annotation)

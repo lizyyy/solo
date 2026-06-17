@@ -1,10 +1,10 @@
 {
   "records": [
     {
-      "conflict_id": "3aa24e1d-ee5a-45a7-9ce8-a37274cb936b",
+      "conflict_id": "95cf8482-6b1d-4399-abf7-b5bec63335cb",
       "log_id": "log_002",
       "annotation_id": "ann_001",
-      "attribution_id": "2fe32975-2bf2-4765-baa5-f060c26e4627",
+      "attribution_id": "216db174-71be-45cc-bb0a-ef0fa79c12f4",
       "conflict_type": "confidence_mismatch",
       "description": "自动归因置信度 0.50 与标注置信度 0.95 存在显著差异",
       "auto_attribution": "proper_noun",
@@ -15,24 +15,24 @@
       "resolution_notes": ""
     },
     {
-      "conflict_id": "95c0a767-47f9-4008-ae9f-f9889f239c51",
+      "conflict_id": "57c7f19e-72fc-4b91-82b2-d99fbc8e7e60",
       "log_id": "log_002",
       "annotation_id": "ann_012",
-      "attribution_id": "6a6832c8-79bb-48a8-a434-8c283d72c8c8",
+      "attribution_id": "c57c44f4-1dd8-4427-abeb-3ae397492e89",
       "conflict_type": "type_mismatch",
       "description": "自动归因类型 'proper_noun' 与标注类型 'unknown' 不一致",
       "auto_attribution": "proper_noun",
-      "manual_attribution": "proper_noun",
-      "resolved": true,
-      "resolved_by": "小孟",
-      "resolved_at": "2026-06-17T21:17:35.629518",
-      "resolution_notes": "ann_012确认是专有名词错误"
+      "manual_attribution": "unknown",
+      "resolved": false,
+      "resolved_by": null,
+      "resolved_at": null,
+      "resolution_notes": ""
     },
     {
-      "conflict_id": "c412fc50-ceca-4928-8598-e39aa357654d",
+      "conflict_id": "bbe195fc-3189-4feb-845e-c0f1a89c0179",
       "log_id": "log_004",
       "annotation_id": "ann_003",
-      "attribution_id": "9183deff-34f4-4a2b-ae54-a9f2e5be0e86",
+      "attribution_id": "7a42fb3e-206a-4c2f-8ca5-af856c0196fa",
       "conflict_type": "type_mismatch",
       "description": "自动归因类型 'unknown' 与标注类型 'acronym' 不一致",
       "auto_attribution": "unknown",
@@ -43,10 +43,10 @@
       "resolution_notes": ""
     },
     {
-      "conflict_id": "43c6736f-529e-4f9c-b149-55e02bc4dcb4",
+      "conflict_id": "ee1b0bb7-0c82-4757-96ab-4611e0a01db7",
       "log_id": "log_007",
       "annotation_id": "ann_006",
-      "attribution_id": "a88fd776-5831-4dd7-817f-11133ae41758",
+      "attribution_id": "9a6074bc-91a3-4808-bef3-43bb61c802b3",
       "conflict_type": "confidence_mismatch",
       "description": "自动归因置信度 0.50 与标注置信度 0.90 存在显著差异",
       "auto_attribution": "proper_noun",
@@ -57,10 +57,10 @@
       "resolution_notes": ""
     },
     {
-      "conflict_id": "a5afa160-26f9-44d8-8f1e-a11b61bd909a",
+      "conflict_id": "ad9a50c6-f21f-4463-a2c4-abd0e4c2614c",
       "log_id": "log_009",
       "annotation_id": "ann_008",
-      "attribution_id": "b14da361-3524-4ff9-8bcb-b2bf17f37781",
+      "attribution_id": "b844d0e7-14e2-4388-a7c8-a6d20e7729b2",
       "conflict_type": "confidence_mismatch",
       "description": "自动归因置信度 0.50 与标注置信度 0.93 存在显著差异",
       "auto_attribution": "proper_noun",
@@ -71,10 +71,10 @@
       "resolution_notes": ""
     },
     {
-      "conflict_id": "a76cdde0-45b0-4a0b-9a5d-05d57acb28b0",
+      "conflict_id": "47f2d414-8003-467c-9252-e6be6e47515a",
       "log_id": "log_001",
       "annotation_id": "ann_011",
-      "attribution_id": "a2d77db6-7b13-4593-9c7d-89a4f621f40e",
+      "attribution_id": "5b4bbc5e-d8a9-40a7-9afc-cb6e124528e8",
       "conflict_type": "missing_data",
       "description": "标注数据空值: 错误词, 正确词为空，需要人工确认",
       "auto_attribution": "unknown",
@@ -85,7 +85,7 @@
       "resolution_notes": ""
     },
     {
-      "conflict_id": "dafab5e1-b5f6-4160-98c3-1dbdb74ed7e1",
+      "conflict_id": "a112d3bf-9f49-4911-b4e4-2ee521143c6d",
       "log_id": "log_002",
       "annotation_id": "ann_001,ann_012",
       "attribution_id": "",

@@ -1,0 +1,12 @@
+﻿attribution_id,log_id,annotation_id,error_type,result_error_type,confidence,evidence,status,threshold_version,model_version,created_at,reviewed_by,reviewed_at,review_notes,review_action,final_error_type
+216db174-71be-45cc-bb0a-ef0fa79c12f4,log_002,ann_001,proper_noun,proper_noun,0.5,"[""正确词 '阿里巴巴' 是专有名词"", '拼写相似度: 0.50']",pending,default,unknown,2026-06-17T21:17:16.725683,,,,,
+c57c44f4-1dd8-4427-abeb-3ae397492e89,log_002,ann_012,proper_noun,proper_noun,0.5,"[""正确词 '阿里巴巴' 是专有名词"", '拼写相似度: 0.50']",pending,default,unknown,2026-06-17T21:17:16.725711,,,,,
+14ed4bb5-c1c2-47da-99b3-9427f839e857,log_003,ann_002,homophone,homophone,0.95,['匹配同音词表: 苹果 -> 平果'],auto_attributed,default,unknown,2026-06-17T21:17:16.725734,,,,,
+7a42fb3e-206a-4c2f-8ca5-af856c0196fa,log_004,ann_003,unknown,unknown,0.0,"['未匹配到明确错误类型', '置信度 0.00 低于阈值 0.5']",pending,default,unknown,2026-06-17T21:17:16.725753,,,,,
+a4baaa3e-609e-4316-b0dd-9baf4b01b84b,log_005,ann_004,homophone,homophone,0.95,['匹配同音词表: 北京 -> 背景'],auto_attributed,default,unknown,2026-06-17T21:17:16.725769,,,,,
+c181938b-abbf-4d2b-900f-b9b44cf3583e,log_006,ann_005,homophone,homophone,0.95,['匹配同音词表: 会议 -> 回忆'],auto_attributed,default,unknown,2026-06-17T21:17:16.725783,,,,,
+9a6074bc-91a3-4808-bef3-43bb61c802b3,log_007,ann_006,proper_noun,proper_noun,0.5,"[""正确词 '腾讯' 是专有名词"", '拼写相似度: 0.50']",pending,default,unknown,2026-06-17T21:17:16.725800,,,,,
+aa085c40-207f-489e-8f6e-55b4165795a1,log_008,ann_007,homophone,homophone,0.95,['匹配同音词表: 上海 -> 伤害'],auto_attributed,default,unknown,2026-06-17T21:17:16.725813,,,,,
+b844d0e7-14e2-4388-a7c8-a6d20e7729b2,log_009,ann_008,proper_noun,proper_noun,0.5,"[""正确词 '华为' 是专有名词"", '拼写相似度: 0.50']",pending,default,unknown,2026-06-17T21:17:16.725828,,,,,
+8182e047-1310-4ca0-adef-56959cab9dbd,log_010,ann_009,homophone,homophone,0.95,['匹配同音词表: 百度 -> 摆渡'],auto_attributed,default,unknown,2026-06-17T21:17:16.725841,,,,,
+5b4bbc5e-d8a9-40a7-9afc-cb6e124528e8,log_001,ann_011,unknown,unknown,0.0,"['空值: 错误词, 正确词为空']",pending,default,unknown,2026-06-17T21:17:16.725846,,,,,
