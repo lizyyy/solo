@@ -57,28 +57,85 @@ class Exporter:
 
     def export_conflicts(self, version_id: str, conflict_type: str = "all") -> str:
         """导出冲突清单"""
+        TYPE_KEY_MAP = {
+            "label": "label_conflicts",
+            "sample_leak": "sample_leaks",
+            "version": "version_conflicts",
+            "empty": "empty_values",
+            "duplicate": "duplicate_records",
+            "boundary": "boundary_cases",
+        }
+
         conflicts = self.conflict_detector.detect_all(version_id)
         if "error" in conflicts:
             raise ValueError(conflicts["error"])
+
+        all_conflicts = conflicts.get("conflicts", {})
+        all_summary = conflicts.get("summary", {})
+
+        if conflict_type == "all":
+            filtered_conflicts = all_conflicts
+            filtered_summary = all_summary
+        else:
+            real_key = TYPE_KEY_MAP.get(conflict_type, conflict_type)
+            matched_items = all_conflicts.get(real_key, [])
+            filtered_conflicts = {real_key: matched_items}
+
+            breakdown = {}
+            severity = {"critical": 0, "high": 0, "medium": 0, "low": 0}
+            decision = 0
+            for item in matched_items:
+                sv = item.get("severity", "medium")
+                if sv in severity:
+                    severity[sv] += 1
+                if item.get("decision_required"):
+                    decision += 1
+            breakdown[real_key] = len(matched_items)
+
+            filtered_summary = {
+                "total_conflicts": len(matched_items),
+                "breakdown": breakdown,
+                "severity_breakdown": severity,
+                "decision_required_count": decision,
+            }
 
         export_data = {
             "export_metadata": {
                 "export_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "export_tool": "大模型提示词版本仓库 v1.0",
                 "version_id": version_id,
-                "conflict_type": conflict_type
+                "conflict_type": conflict_type,
+                "real_conflict_key": "all" if conflict_type == "all" else (TYPE_KEY_MAP.get(conflict_type, conflict_type)),
             },
-            "summary": conflicts.get("summary", {}),
-            "conflicts": {}
+            "summary": filtered_summary,
+            "conflicts": filtered_conflicts,
         }
 
-        if conflict_type == "all":
-            export_data["conflicts"] = conflicts.get("conflicts", {})
-        else:
-            export_data["conflicts"][conflict_type] = conflicts.get("conflicts", {}).get(conflict_type, [])
+        def _filter_decision(all_conflicts_map, ftype, real_map):
+            if ftype == "all":
+                return self._get_decision_required_items({"conflicts": all_conflicts_map})
+            rk = TYPE_KEY_MAP.get(ftype, ftype)
+            items = all_conflicts_map.get(rk, [])
+            result = []
+            for item in items:
+                if item.get("decision_required"):
+                    result.append({
+                        "conflict_type": rk,
+                        "conflict_id": item.get("conflict_id", item.get("case_id")),
+                        "case_id": item.get("case_id"),
+                        "severity": item.get("severity"),
+                        "release_claim": item.get("release_claim"),
+                        "actual_data": item.get("actual_data"),
+                        "evidence_comparison": item.get("evidence_comparison"),
+                        "suggested_actions": item.get("suggested_actions"),
+                        "note": item.get("note"),
+                    })
+            return result
 
-        export_data["decision_required_items"] = self._get_decision_required_items(conflicts)
-        export_data["export_reason"] = self._generate_conflict_export_reason(conflicts, conflict_type)
+        export_data["decision_required_items"] = _filter_decision(all_conflicts, conflict_type, filtered_conflicts)
+        export_data["export_reason"] = self._generate_conflict_export_reason(
+            {"summary": filtered_summary, "conflicts": filtered_conflicts}, conflict_type
+        )
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"conflicts_{version_id}_{conflict_type}_{timestamp}.json"
@@ -193,7 +250,16 @@ class Exporter:
             count = total
             reason = f"导出全部{count}个冲突问题，用于人工审核和决策"
         else:
-            count = len(conflicts.get("conflicts", {}).get(conflict_type, []))
+            TYPE_KEY_MAP = {
+                "label": "label_conflicts",
+                "sample_leak": "sample_leaks",
+                "version": "version_conflicts",
+                "empty": "empty_values",
+                "duplicate": "duplicate_records",
+                "boundary": "boundary_cases",
+            }
+            real_key = TYPE_KEY_MAP.get(conflict_type, conflict_type)
+            count = len(conflicts.get("conflicts", {}).get(real_key, []))
             reason = f"导出{conflict_type}类型的{count}个冲突问题"
 
         decision_required = summary.get("decision_required_count", 0)
