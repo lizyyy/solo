@@ -1,57 +1,55 @@
-# React + TypeScript + Vite
+# 宠物训练课排程对账
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Python FastAPI + SQLite 后端服务。导入、确认、撤回、异常隔离、操作日志和 CSV 明细都写入同一份本地 SQLite 数据，不再依赖浏览器 localStorage。
 
-Currently, two official plugins are available:
+## 快速运行
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt
+uvicorn pet_training_reconcile.api:app --reload
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+初始化演示数据：
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+curl -X POST http://127.0.0.1:8000/seed
+curl http://127.0.0.1:8000/summary
+curl http://127.0.0.1:8000/exports/schedules.csv
 ```
+
+运行验证：
+
+```bash
+pytest -q
+```
+
+## 接班顺序
+
+1. 先 `POST /imports/schedules` 导入 `samples/training_schedules.csv`，训练课 CSV 会进入 `schedules` 表。
+2. 再 `POST /medical-records` 录入病历手写单，系统会按宠物别名和日期尝试接到排程。
+3. 看 `GET /summary`：异常别名不会揉进正常汇总。
+4. 看 `GET /anomalies`：每条异常带来源和影响范围，接手同事能从汇总追到原始记录。
+5. 对正常排程调用 `POST /schedules/{id}/confirm`，确认前后快照写入 `operation_logs`。
+6. 发现误确认时调用 `POST /schedules/{id}/withdraw`，撤回同样留痕。
+7. 公示复盘时看 `GET /logs` 和 `GET /exports/schedules.csv`，能对出处理记录和 CSV 明细。
+
+## 关键接口
+
+| 方法 | 路径 | 作用 |
+| --- | --- | --- |
+| `POST` | `/imports/schedules` | 导入训练课 CSV |
+| `POST` | `/medical-records` | 录入病历手写单 |
+| `GET` | `/summary` | 查看汇总口径 |
+| `GET` | `/schedules` | 查看排程明细 |
+| `POST` | `/schedules/{id}/confirm` | 人工确认排程 |
+| `POST` | `/schedules/{id}/withdraw` | 撤回排程 |
+| `POST` | `/aliases/bind` | 把别名绑定到规范宠物 |
+| `GET` | `/anomalies` | 查看异常来源和影响范围 |
+| `GET` | `/logs` | 查看确认/撤回前后变动 |
+| `GET` | `/exports/schedules.csv` | 导出 CSV 明细 |
+
+## 样例说明
+
+`samples/training_schedules.csv` 包含一条正常记录、一条待确认记录、一条例名可识别记录，以及一条 `黑妞` 未绑定别名。导入后 `黑妞` 会被隔离为异常，不计入正常汇总；调用 `/aliases/bind` 把 `黑妞 -> 阿黑` 后才会回到待确认明细。
