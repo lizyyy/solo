@@ -688,6 +688,7 @@ var G = {
             recordId: existingRecord.id,
             recordClaim: recordImplies,
             importClaim: importImplies,
+            importMaterial: JSON.parse(JSON.stringify(im)),
             suggestion: '学生记录与导入数据对材料描述不一致，请确认以哪个为准',
             resolved: false,
             resolution: null
@@ -740,26 +741,36 @@ var G = {
     conflict.resolved = true;
     conflict.resolution = resolution;
 
-    if (resolution === 'useImport' && this.state.status === 'playing') {
-      try {
-        var importData = JSON.parse(conflict.importClaim);
-        if (importData.category && importData.value) {
-          var newId = 'imp_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
-          this.state.materials.push({
-            id: newId,
-            category: importData.category,
-            value: importData.value,
-            label: importData.label || importData.value,
-            desc: importData.desc || '冲突解决后导入',
-            targetSlot: importData.targetSlot ? importData.targetSlot + '_r' + this.state.round : 'imp_slot_' + Date.now(),
-            matched: false,
-            fromSupplement: true
-          });
-        }
-      } catch(e) {}
+    if (resolution === 'useImport' && this.state.status === 'playing' && conflict.importMaterial) {
+      var im = conflict.importMaterial;
+      var newId = 'imp_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
+      var newSlotId = 'imp_slot_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
+      var slotId = im.targetSlot ? im.targetSlot + '_r' + this.state.round : newSlotId;
+      this.state.materials.push({
+        id: newId,
+        category: im.category,
+        value: im.value,
+        label: im.label || im.value,
+        desc: im.desc || '冲突解决后导入',
+        targetSlot: slotId,
+        matched: false,
+        fromSupplement: true
+      });
+      this.state.slots.push({
+        id: slotId,
+        label: '导入槽: ' + (im.label || im.value),
+        accepts: [im.category],
+        hint: im.desc || '导入: ' + im.category,
+        material: null,
+        correct: null
+      });
+      this.addRecord('⚖ 冲突解决：采用导入材料 ' + im.category + '=' + im.value, 'normal');
+    } else if (resolution === 'useRecord') {
+      this.addRecord('⚖ 冲突解决：保留学生记录说法', 'normal');
+    } else if (resolution === 'manual') {
+      this.addRecord('⚖ 冲突标记为手动处理', 'normal');
     }
 
-    this.addRecord('⚖ 冲突解决: ' + conflictId.substr(0,12) + ' → ' + resolution, 'normal');
     UI.render();
   },
 
@@ -813,10 +824,10 @@ var G = {
     return Math.abs(hash).toString(16).padStart(8, '0');
   },
 
-  _verifyExport: function(exportData, type) {
-    var stateRecords = JSON.stringify(this.state.records);
-    var stateSettlements = JSON.stringify(this.state.settlements);
-    var stateConflicts = JSON.stringify(this.state.conflicts);
+  _verifyExport: function(exportData, snapshot, type) {
+    var snapRecords = JSON.stringify(snapshot.records || []);
+    var snapSettlements = JSON.stringify(snapshot.settlements || []);
+    var snapConflicts = JSON.stringify(snapshot.conflicts || []);
 
     var exportRecords = JSON.stringify(exportData.records || []);
     var exportSettlements = JSON.stringify(exportData.settlements || []);
@@ -824,34 +835,35 @@ var G = {
 
     var issues = [];
     if (type === 'all' || type === 'records') {
-      if (stateRecords !== exportRecords) {
-        issues.push('记录数据与页面状态不一致！');
+      if (snapRecords !== exportRecords) {
+        issues.push('记录数据与导出快照不一致！');
       }
     }
     if (type === 'all' || type === 'settlements') {
-      if (stateSettlements !== exportSettlements) {
-        issues.push('结算数据与页面状态不一致！');
+      if (snapSettlements !== exportSettlements) {
+        issues.push('结算数据与导出快照不一致！');
       }
     }
     if (type === 'all' || type === 'conflicts') {
-      if (stateConflicts !== exportConflicts) {
-        issues.push('冲突数据与页面状态不一致！');
+      if (snapConflicts !== exportConflicts) {
+        issues.push('冲突数据与导出快照不一致！');
       }
     }
     return issues;
   },
 
-  _setExportData: function(data, type) {
+  _setExportData: function(data, type, snapshot) {
     this._currentExport = data;
     this._exportType = type;
+    this._exportSnapshot = snapshot;
     var json = JSON.stringify(data, null, 2);
     document.getElementById('export-output').value = json;
     document.getElementById('export-checksum').textContent = this._hashString(json);
 
-    var issues = this._verifyExport(data, type);
+    var issues = this._verifyExport(data, snapshot, type);
     var statusEl = document.getElementById('export-status');
     if (issues.length === 0) {
-      statusEl.innerHTML = '<span class="ok">✓ 数据一致性验证通过</span>';
+      statusEl.innerHTML = '<span class="ok">✓ 导出数据与快照一致</span>';
     } else {
       statusEl.innerHTML = '<span class="warn">⚠ ' + issues.join('; ') + '</span>';
     }
@@ -863,14 +875,26 @@ var G = {
       settlements: '回合结算',
       conflicts: '冲突记录'
     };
+    var recordCount = data.records ? data.records.length : 0;
+    var currentRecordCount = this.state.records.length;
+    var diffNote = '';
+    if (currentRecordCount > recordCount) {
+      diffNote = ' <span class="warn">（页面多' + (currentRecordCount - recordCount) + '条，为导出操作本身的记录，不含在导出文件中）</span>';
+    }
     infoEl.innerHTML = (typeLabels[type] || type) + ' | ' +
-      '记录: ' + (data.records ? data.records.length : 0) + '条 | ' +
+      '导出记录: ' + recordCount + '条' + diffNote + '<br>' +
       '结算: ' + (data.settlements ? data.settlements.length : 0) + '条 | ' +
       '冲突: ' + (data.conflicts ? data.conflicts.length : 0) + '条 | ' +
       '生成时间: ' + new Date(data.exportedAt).toLocaleString();
   },
 
   exportAll: function() {
+    var snapshot = {
+      records: JSON.parse(JSON.stringify(this.state.records)),
+      settlements: JSON.parse(JSON.stringify(this.state.settlements)),
+      conflicts: JSON.parse(JSON.stringify(this.state.conflicts)),
+      supplementLog: JSON.parse(JSON.stringify(this.state.supplementLog))
+    };
     var exportData = {
       version: '1.0',
       exportedAt: Date.now(),
@@ -883,50 +907,59 @@ var G = {
         risk: this.state.risk,
         status: this.state.status
       },
-      records: JSON.parse(JSON.stringify(this.state.records)),
-      settlements: JSON.parse(JSON.stringify(this.state.settlements)),
-      conflicts: JSON.parse(JSON.stringify(this.state.conflicts)),
-      supplementLog: JSON.parse(JSON.stringify(this.state.supplementLog))
+      records: snapshot.records,
+      settlements: snapshot.settlements,
+      conflicts: snapshot.conflicts,
+      supplementLog: snapshot.supplementLog
     };
-    this._setExportData(exportData, 'all');
-    this.addRecord('📤 导出全部数据（记录' + this.state.records.length + '条，结算' + this.state.settlements.length + '条）', 'normal');
+    this._setExportData(exportData, 'all', snapshot);
+    this.addRecord('📤 导出全部数据（记录' + snapshot.records.length + '条，结算' + snapshot.settlements.length + '条）', 'normal');
     this.showToast('已生成完整导出数据', 'info');
   },
 
   exportRecords: function() {
+    var snapshot = {
+      records: JSON.parse(JSON.stringify(this.state.records))
+    };
     var exportData = {
       version: '1.0',
       exportedAt: Date.now(),
       tool: '声波料理节奏战',
       type: 'records',
-      records: JSON.parse(JSON.stringify(this.state.records))
+      records: snapshot.records
     };
-    this._setExportData(exportData, 'records');
-    this.showToast('已导出 ' + this.state.records.length + ' 条记录', 'info');
+    this._setExportData(exportData, 'records', snapshot);
+    this.showToast('已导出 ' + snapshot.records.length + ' 条记录', 'info');
   },
 
   exportSettlements: function() {
+    var snapshot = {
+      settlements: JSON.parse(JSON.stringify(this.state.settlements))
+    };
     var exportData = {
       version: '1.0',
       exportedAt: Date.now(),
       tool: '声波料理节奏战',
       type: 'settlements',
-      settlements: JSON.parse(JSON.stringify(this.state.settlements))
+      settlements: snapshot.settlements
     };
-    this._setExportData(exportData, 'settlements');
-    this.showToast('已导出 ' + this.state.settlements.length + ' 条结算', 'info');
+    this._setExportData(exportData, 'settlements', snapshot);
+    this.showToast('已导出 ' + snapshot.settlements.length + ' 条结算', 'info');
   },
 
   exportConflicts: function() {
+    var snapshot = {
+      conflicts: JSON.parse(JSON.stringify(this.state.conflicts))
+    };
     var exportData = {
       version: '1.0',
       exportedAt: Date.now(),
       tool: '声波料理节奏战',
       type: 'conflicts',
-      conflicts: JSON.parse(JSON.stringify(this.state.conflicts))
+      conflicts: snapshot.conflicts
     };
-    this._setExportData(exportData, 'conflicts');
-    this.showToast('已导出 ' + this.state.conflicts.length + ' 条冲突', 'info');
+    this._setExportData(exportData, 'conflicts', snapshot);
+    this.showToast('已导出 ' + snapshot.conflicts.length + ' 条冲突', 'info');
   },
 
   copyExportToClipboard: function() {
