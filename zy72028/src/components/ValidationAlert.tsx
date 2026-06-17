@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle, XCircle, Info } from 'lucide-react';
+import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import type { ValidationResult } from '../types';
 
 interface ValidationAlertProps {

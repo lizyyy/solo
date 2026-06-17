@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
-  Trophy, XCircle, Clock, FileText, User, Calendar, 
+  Trophy, XCircle, FileText, Calendar, 
   CheckCircle2, AlertTriangle, ChevronDown, ChevronUp,
   Edit3, Home, RotateCcw
 } from 'lucide-react';
@@ -14,7 +14,7 @@ import type { DecisionRecord } from '../types';
 export function ResultPage() {
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
-  const { currentGame, currentMaterial, loadGame, initMaterials, materials } = useGameStore();
+  const { currentGame, currentMaterial, loadGame, initMaterials } = useGameStore();
   const [expandedDecisions, setExpandedDecisions] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -37,7 +37,6 @@ export function ResultPage() {
 
   const isSuccess = currentGame.status === 'completed';
   const scoreAnalysis = GameEngine.getScoreAnalysis(currentGame);
-  const criticalDecisions = GameEngine.getCriticalDecisions(currentGame);
   const failureDescription = currentGame.failureType 
     ? GameEngine.getFailureDescription(currentGame.failureType)
     : null;

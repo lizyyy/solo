@@ -2,7 +2,6 @@ import type {
   MaterialPackage,
   GameState,
   DecisionRecord,
-  EventOption,
   Resources,
   GameEvent,
   FailureType
@@ -208,10 +207,20 @@ export class GameEngine {
     const pauseDurationMs = nowMs - pausedMs;
     const newStartMs = new Date(gameState.startTime).getTime() + pauseDurationMs;
 
-    const { pausedAt, ...rest } = gameState;
     return {
-      ...rest,
-      startTime: new Date(newStartMs).toISOString()
+      id: gameState.id,
+      materialId: gameState.materialId,
+      materialName: gameState.materialName,
+      startTime: new Date(newStartMs).toISOString(),
+      endTime: gameState.endTime,
+      status: gameState.status,
+      failureType: gameState.failureType,
+      currentEventIndex: gameState.currentEventIndex,
+      resources: gameState.resources,
+      score: gameState.score,
+      decisions: gameState.decisions,
+      totalTimeUsed: gameState.totalTimeUsed,
+      gameDuration: gameState.gameDuration
     };
   }
 

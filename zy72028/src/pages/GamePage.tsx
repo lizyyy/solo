@@ -101,12 +101,6 @@ export function GamePage() {
     };
   }, [isPaused, currentGame?.status, currentGame?.pausedAt]);
 
-  useEffect(() => {
-    if (remainingTime === 0 && currentGame && currentMaterial && currentGame.status === 'playing' && !isPaused) {
-      handleGameEnd('timeout');
-    }
-  }, [remainingTime, currentGame, currentMaterial, isPaused]);
-
   const handleGameEnd = useCallback((failureType?: 'timeout' | 'rule_misunderstanding') => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
@@ -117,6 +111,12 @@ export function GamePage() {
       navigate(`/result/${currentGame?.id}`);
     }, 500);
   }, [endGame, navigate, currentGame?.id]);
+
+  useEffect(() => {
+    if (remainingTime === 0 && currentGame && currentMaterial && currentGame.status === 'playing' && !isPaused) {
+      handleGameEnd('timeout');
+    }
+  }, [remainingTime, currentGame, currentMaterial, isPaused, handleGameEnd]);
 
   const handlePause = () => {
     if (timerRef.current) {
