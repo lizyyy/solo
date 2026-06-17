@@ -2,7 +2,6 @@ import {
   CsvRawRow,
   ColumnMapping,
   ImportFieldKey,
-  ImportFieldDef,
   ImportPreviewItem,
   importFieldDefs,
   ShelterPoint,
@@ -67,10 +66,10 @@ export function autoMapColumns(headers: string[]): ColumnMapping {
     let bestScore = 0;
 
     for (const header of headers) {
-      const h = header.replace(/[\s\-\_（()）]/g, '').toLowerCase();
+      const h = header.replace(/[\s\-_（()）]/g, '').toLowerCase();
 
       for (const hint of field.hints) {
-        const ht = hint.replace(/[\s\-\_（()）]/g, '').toLowerCase();
+        const ht = hint.replace(/[\s\-_（()）]/g, '').toLowerCase();
         if (h === ht) {
           if (1 > bestScore) {
             bestScore = 1;
@@ -135,7 +134,6 @@ export function buildPreviews(
     let duplicateReason = '';
     if (matched) {
       const reporter = mappedValues.reporter || '';
-      const reportTime = mappedValues.reportTime || '';
       const existingFeedbacks = existingShelters.filter(
         s => s.standardName === normalizedName
       );
@@ -246,11 +244,23 @@ export function buildSheltersFromImport(
         if (item.rawName !== normalizedName) allAliases.add(item.rawName);
       }
 
+      const finalConflictType = conflictType !== ConflictType.NONE ? conflictType : existing.conflictType;
+      const hadConflict = existing.conflictType !== ConflictType.NONE;
+      const hasNewOrWorseConflict = !hadConflict && finalConflictType !== ConflictType.NONE;
+
+      let newStatus = existing.status;
+      let statusRemark = '';
+      if (hasNewOrWorseConflict && existing.status === ShelterStatus.PROCESSED) {
+        newStatus = ShelterStatus.PENDING_VERIFY;
+        statusRemark = '，因导入后检测到新冲突，状态重置为待核实';
+      }
+
       const merged = {
         ...existing,
         aliases: Array.from(allAliases),
         reportedCount: Math.max(existing.reportedCount, maxReportedCount),
-        conflictType: conflictType !== ConflictType.NONE ? conflictType : existing.conflictType,
+        conflictType: finalConflictType,
+        status: newStatus,
         capacityByTime: {
           ...existing.capacityByTime,
           ...capacityByTime,
@@ -267,8 +277,8 @@ export function buildSheltersFromImport(
         operator,
         action: 'CSV导入更新',
         oldStatus: existing.status,
-        newStatus: existing.status,
-        remark: `从CSV导入更新点位数据，原始名称包括：${group.map(g => g.rawName).join('、')}，最大反馈人数${maxReportedCount}人`,
+        newStatus,
+        remark: `从CSV导入更新点位数据，原始名称包括：${group.map(g => g.rawName).join('、')}，最大反馈人数${maxReportedCount}人${statusRemark}`,
       });
     } else {
       const allAliases = getAliases(normalizedName);

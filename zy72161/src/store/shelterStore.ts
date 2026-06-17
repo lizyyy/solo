@@ -1,11 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { ShelterPoint, ProcessRecord, ShelterStatus, ConflictType, ConflictItem, ImportPreviewItem, FeedbackSource } from '../types';
+import { ShelterPoint, ProcessRecord, ShelterStatus, ConflictType, ConflictItem, ImportPreviewItem } from '../types';
 import { mockSheltersWithAnalysis } from '../data/shelters';
 import { mockFeedbacks } from '../data/feedbacks';
 import { mockRecords } from '../data/records';
 import { generateCapacityAnalysis, generateConflictSuggestion } from '../utils/nlGenerator';
-import { normalizeLocationName, getAliases } from '../utils/deduplicate';
 import { checkCoordinateOffset } from '../utils/geo';
 import { buildSheltersFromImport } from '../utils/csvImport';
 
@@ -48,18 +47,18 @@ function detectConflicts(shelters: ShelterPoint[]): ConflictItem[] {
   shelters.forEach(shelter => {
     if (shelter.conflictType === ConflictType.NONE) return;
 
-    let leftEvidence = '';
-    let rightEvidence = '';
+    const leftEvidences: string[] = [];
+    const rightEvidences: string[] = [];
     let severity = 1;
 
     if (shelter.conflictType === ConflictType.CAPACITY || shelter.conflictType === ConflictType.MIXED) {
       if (shelter.oldDesignCapacity && shelter.newDesignCapacity) {
-        leftEvidence = `居民反馈表（旧口径）：${shelter.oldCapacityYear}设计容量${shelter.oldDesignCapacity}人，当前反馈${shelter.reportedCount}人，占比${Math.round((shelter.reportedCount / shelter.oldDesignCapacity) * 100)}%，容量充足。`;
-        rightEvidence = `官方导入数据（新口径）：${shelter.newCapacityYear}设计容量${shelter.newDesignCapacity}人，当前反馈${shelter.reportedCount}人，占比${Math.round((shelter.reportedCount / shelter.newDesignCapacity) * 100)}%，已超限${Math.round((shelter.reportedCount / shelter.newDesignCapacity - 1) * 100)}%。`;
+        leftEvidences.push(`【容量标准】居民反馈表（旧口径）：${shelter.oldCapacityYear}设计容量${shelter.oldDesignCapacity}人，当前反馈${shelter.reportedCount}人，占比${Math.round((shelter.reportedCount / shelter.oldDesignCapacity) * 100)}%，容量充足。`);
+        rightEvidences.push(`【容量标准】官方导入数据（新口径）：${shelter.newCapacityYear}设计容量${shelter.newDesignCapacity}人，当前反馈${shelter.reportedCount}人，占比${Math.round((shelter.reportedCount / shelter.newDesignCapacity) * 100)}%，已超限${Math.round((shelter.reportedCount / shelter.newDesignCapacity - 1) * 100)}%。`);
         severity = 3;
       } else {
-        leftEvidence = `居民反馈：${shelter.reportedCount}人`;
-        rightEvidence = `官方容量：${shelter.designCapacity}人，超限${Math.round((shelter.reportedCount / shelter.designCapacity - 1) * 100)}%`;
+        leftEvidences.push(`【容量反馈】居民反馈：${shelter.reportedCount}人`);
+        rightEvidences.push(`【容量标准】官方容量：${shelter.designCapacity}人，超限${Math.round((shelter.reportedCount / shelter.designCapacity - 1) * 100)}%`);
         severity = shelter.reportedCount > shelter.designCapacity * 1.5 ? 4 : 2;
       }
     }
@@ -72,11 +71,14 @@ function detectConflicts(shelters: ShelterPoint[]): ConflictItem[] {
           shelter.reportedLatitude,
           shelter.reportedLongitude
         );
-        leftEvidence = `官方坐标：${shelter.longitude.toFixed(6)}, ${shelter.latitude.toFixed(6)}`;
-        rightEvidence = `居民反馈坐标：${shelter.reportedLongitude.toFixed(6)}, ${shelter.reportedLatitude.toFixed(6)}，偏移约${Math.round(offset.distance)}米`;
+        leftEvidences.push(`【坐标位置】居民反馈坐标：${shelter.reportedLongitude.toFixed(6)}, ${shelter.reportedLatitude.toFixed(6)}`);
+        rightEvidences.push(`【坐标位置】官方坐标：${shelter.longitude.toFixed(6)}, ${shelter.latitude.toFixed(6)}，偏移约${Math.round(offset.distance)}米`);
         severity = Math.max(severity, offset.distance > 100 ? 3 : 2);
       }
     }
+
+    const leftEvidence = leftEvidences.join('\n');
+    const rightEvidence = rightEvidences.join('\n');
 
     conflicts.push({
       id: `conflict-${shelter.id}`,

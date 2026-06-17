@@ -1,5 +1,5 @@
 import { useShelterStore } from '../store/shelterStore';
-import { ShelterStatus, shelterStatusLabels } from '../types';
+import { ShelterStatus } from '../types';
 import { generateReportSummary } from '../utils/nlGenerator';
 import { exportToPDF, exportToExcel, printReport } from '../utils/export';
 

@@ -1,5 +1,5 @@
 import { useShelterStore } from '../store/shelterStore';
-import { ShelterStatus, ImportPreviewItem } from '../types';
+import { ShelterStatus } from '../types';
 
 export function useShelter() {
   const {

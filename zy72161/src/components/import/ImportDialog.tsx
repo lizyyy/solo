@@ -1,11 +1,11 @@
 import React, { useState, useCallback, useRef } from 'react';
 import {
   X, Upload, FileText, ChevronRight, ChevronLeft, CheckCircle2,
-  AlertCircle, AlertTriangle, ArrowRight, RefreshCw, Download
+  AlertTriangle, ArrowRight, Download
 } from 'lucide-react';
 import { useUIStore } from '@/store/uiStore';
 import { useShelter } from '@/hooks/useShelter';
-import { parseCSV, autoMapColumns, buildPreviews, extractMappedValue } from '@/utils/csvImport';
+import { parseCSV, autoMapColumns, buildPreviews } from '@/utils/csvImport';
 import {
   ColumnMapping, CsvRawRow, ImportPreviewItem,
   importFieldDefs, ImportFieldKey
@@ -16,7 +16,7 @@ type Step = 'upload' | 'mapping' | 'preview' | 'result';
 
 export const ImportDialog: React.FC = () => {
   const { showImportDialog, closeImportDialog } = useUIStore();
-  const { importFromCsv, shelters, resetToDefault } = useShelter();
+  const { importFromCsv, shelters } = useShelter();
 
   const [step, setStep] = useState<Step>('upload');
   const [fileName, setFileName] = useState('');

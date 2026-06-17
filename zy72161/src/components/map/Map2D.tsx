@@ -51,7 +51,7 @@ interface Map2DProps {
 }
 
 export const Map2D: React.FC<Map2DProps> = ({ shelters, selectedShelter, onSelectShelter }) => {
-  const mapRef = useRef<any>(null);
+  const mapRef = useRef<L.Map | null>(null);
   const { openDetailPanel } = useUIStore();
 
   const center: [number, number] = selectedShelter

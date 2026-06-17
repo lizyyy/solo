@@ -15,6 +15,12 @@ export const ShelterDetailPanel: React.FC = () => {
   const [showSupplementForm, setShowSupplementForm] = useState(false);
   const [supplementText, setSupplementText] = useState('');
 
+  const tabs: { id: 'overview' | 'evidence' | 'records'; label: string; icon: typeof MapPin }[] = [
+    { id: 'overview', label: '概览', icon: MapPin },
+    { id: 'evidence', label: '来源证据', icon: FileText },
+    { id: 'records', label: '处理记录', icon: Clock }
+  ];
+
   if (!showDetailPanel || !selectedShelter || selectedShelter.id !== detailPanelShelterId) {
     return null;
   }
@@ -81,14 +87,10 @@ export const ShelterDetailPanel: React.FC = () => {
         </div>
 
         <div className="flex border-b border-gray-700">
-          {[
-            { id: 'overview', label: '概览', icon: MapPin },
-            { id: 'evidence', label: '来源证据', icon: FileText },
-            { id: 'records', label: '处理记录', icon: Clock }
-          ].map(tab => (
+          {tabs.map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id)}
               className={cn(
                 'flex flex-1 items-center justify-center gap-2 py-3 text-sm font-medium transition-colors border-b-2',
                 activeTab === tab.id
@@ -291,7 +293,7 @@ export const ShelterDetailPanel: React.FC = () => {
             <div className="space-y-4">
               <h4 className="text-sm font-medium text-gray-200">居民反馈来源（{feedbacks.length}条）</h4>
 
-              {feedbacks.map((feedback, idx) => (
+              {feedbacks.map((feedback) => (
                 <div
                   key={feedback.id}
                   className={cn(

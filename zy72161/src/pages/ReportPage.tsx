@@ -3,7 +3,7 @@ import { FileText, Download, FileSpreadsheet, Printer, TrendingUp, Users, AlertT
 import { useReport } from '@/hooks/useReport';
 import { useShelter } from '@/hooks/useShelter';
 import { StatusBadge } from '@/components/common/StatusBadge';
-import { shelterStatusLabels } from '@/types';
+import { shelterStatusLabels, ShelterStatus } from '@/types';
 
 export const ReportPage: React.FC = () => {
   const { reportData, processed, pending, onsite, handleExportPDF, handleExportExcel, handlePrint } = useReport();
@@ -194,13 +194,14 @@ export const ReportPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-gray-700">
                 {Object.entries(shelterStatusLabels).map(([status, label]) => {
-                  const count = status === 'processed' ? processed.length :
-                                status === 'pending_verify' ? pending.length : onsite.length;
+                  const statusKey = status as ShelterStatus;
+                  const count = statusKey === ShelterStatus.PROCESSED ? processed.length :
+                                statusKey === ShelterStatus.PENDING_VERIFY ? pending.length : onsite.length;
                   const total = shelters.length;
                   return (
                     <tr key={status} className="transition-colors hover:bg-gray-700/30">
                       <td className="px-4 py-3">
-                        <StatusBadge status={status as any} size="sm" />
+                        <StatusBadge status={statusKey} size="sm" />
                         <span className="ml-2 text-gray-300">{label}</span>
                       </td>
                       <td className="px-4 py-3 text-center font-mono text-white">{count}</td>

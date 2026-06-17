@@ -5,12 +5,14 @@ import { useShelter } from '@/hooks/useShelter';
 import { ShelterStatus, shelterStatusLabels } from '@/types';
 import { cn } from '@/lib/utils';
 
+type TabId = 'map' | 'conflicts' | 'report';
+
 export const Header: React.FC = () => {
   const { activeTab, setActiveTab, openReportModal, openImportDialog } = useUIStore();
   const { filterStatus, searchKeyword, setFilterStatus, setSearchKeyword, is3DMode, toggle3DMode, stats, resetToDefault } = useShelter();
   const [showFilters, setShowFilters] = useState(false);
 
-  const navItems = [
+  const navItems: { id: TabId; label: string; icon: typeof Map; badge?: number }[] = [
     { id: 'map', label: '地图总览', icon: Map },
     { id: 'conflicts', label: '冲突处理', icon: AlertTriangle, badge: stats.pending + stats.onsite },
     { id: 'report', label: '报告导出', icon: FileText }
@@ -34,7 +36,7 @@ export const Header: React.FC = () => {
             {navItems.map((item) => (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id as any)}
+                onClick={() => setActiveTab(item.id)}
                 className={cn(
                   'flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200',
                   activeTab === item.id

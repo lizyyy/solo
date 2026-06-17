@@ -11,7 +11,7 @@ export const ReportModal: React.FC = () => {
 
   if (!showReportModal) return null;
 
-  const renderShelterList = (shelters: typeof processed, statusClass: string) => (
+  const renderShelterList = (shelters: typeof processed) => (
     <div className="space-y-3">
       {shelters.map((shelter) => (
         <div key={shelter.id} className="rounded-lg border border-gray-200 bg-white p-4">
@@ -94,7 +94,7 @@ export const ReportModal: React.FC = () => {
                 二、已处理点位（{processed.length}处）
               </h2>
               {processed.length > 0 ? (
-                renderShelterList(processed, 'bg-green-500/10 text-green-700 border-green-200')
+                renderShelterList(processed)
               ) : (
                 <p className="text-sm text-gray-500">暂无已处理点位</p>
               )}
@@ -106,7 +106,7 @@ export const ReportModal: React.FC = () => {
                 三、待核实时点（{pending.length}处）
               </h2>
               {pending.length > 0 ? (
-                renderShelterList(pending, 'bg-orange-500/10 text-orange-700 border-orange-200')
+                renderShelterList(pending)
               ) : (
                 <p className="text-sm text-gray-500">暂无待核实时点</p>
               )}
@@ -118,7 +118,7 @@ export const ReportModal: React.FC = () => {
                 四、需现场复看点位（{onsite.length}处）
               </h2>
               {onsite.length > 0 ? (
-                renderShelterList(onsite, 'bg-red-500/10 text-red-700 border-red-200')
+                renderShelterList(onsite)
               ) : (
                 <p className="text-sm text-gray-500">暂无需现场复看点位</p>
               )}

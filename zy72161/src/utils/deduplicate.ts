@@ -39,9 +39,9 @@ const aliasMap: Record<string, string[]> = {
 };
 
 export function normalizeLocationName(rawName: string): string {
-  let normalized = rawName
+  const normalized = rawName
     .trim()
-    .replace(/[\s\-_，。、；：""''（）()【】\[\]]/g, '')
+    .replace(/[\]\s\-_，。、；：""''（）()【】[]/g, '')
     .replace(/路$|街$|巷$|口$|交叉口$|十字$|红绿灯$/g, '');
 
   for (const [standard, aliases] of Object.entries(aliasMap)) {

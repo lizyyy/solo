@@ -86,7 +86,7 @@ const ShelterMarker: React.FC<ShelterMarkerProps> = ({ shelter, isSelected, onCl
   );
 };
 
-const cn = (...args: any[]) => args.filter(Boolean).join(' ');
+const cn = (...args: (string | false | null | undefined)[]) => args.filter(Boolean).join(' ');
 
 interface GroundProps {
   shelters: ShelterPoint[];
