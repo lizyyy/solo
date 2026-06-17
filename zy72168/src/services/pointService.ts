@@ -1,6 +1,8 @@
 import type { Point } from '@/types';
 import { mockPoints } from '@/mocks/points';
 import { findMergeCandidates, mergePoints as mergePointsUtil } from '@/utils/merge';
+import { feedbackService } from '@/services/feedbackService';
+import { planService } from '@/services/planService';
 
 let pointsData: Point[] = [...mockPoints];
 
@@ -46,6 +48,10 @@ export const pointService = {
     const mergedPoint = mergePointsUtil(pointsToMerge, targetName);
     pointsData = pointsData.filter(p => !pointIds.includes(p.id));
     pointsData.push(mergedPoint);
+    for (const oldId of pointIds) {
+      await feedbackService.reassignPointId(oldId, mergedPoint.id);
+      await planService.reassignPointId(oldId, mergedPoint.id);
+    }
     return mergedPoint;
   },
 

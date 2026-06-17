@@ -134,4 +134,20 @@ export const planService = {
     }
     return trace;
   },
+
+  async reassignPointId(oldPointId: string, newPointId: string): Promise<number> {
+    let count = 0;
+    for (let i = 0; i < plansData.length; i++) {
+      if (plansData[i].pointIds.includes(oldPointId)) {
+        plansData[i] = {
+          ...plansData[i],
+          pointIds: plansData[i].pointIds.map(pid =>
+            pid === oldPointId ? newPointId : pid
+          ),
+        };
+        count++;
+      }
+    }
+    return count;
+  },
 };

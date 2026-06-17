@@ -1,7 +1,7 @@
 import type { Feedback, ConflictDecision, DuplicateGroup } from '@/types';
 import { mockFeedbacks, mockDuplicateGroups } from '@/mocks/feedbacks';
 import { findDuplicateGroups, mergeDuplicateFeedbacks } from '@/utils/duplicate';
-import { resolveConflict, detectEmptyValues, isBoundaryRecord } from '@/utils/conflict';
+import { resolveConflict as resolveConflictUtil, detectEmptyValues, isBoundaryRecord } from '@/utils/conflict';
 
 let feedbacksData: Feedback[] = [...mockFeedbacks];
 
@@ -49,7 +49,20 @@ export const feedbackService = {
     if (index === -1) {
       throw new Error('反馈不存在');
     }
-    feedbacksData[index] = resolveConflict(feedbacksData[index], decision, note);
+    const counterpartId = feedbacksData[index].conflictWith;
+    feedbacksData[index] = resolveConflictUtil(feedbacksData[index], decision, note);
+    if (counterpartId) {
+      const counterpartIndex = feedbacksData.findIndex(f => f.id === counterpartId);
+      if (counterpartIndex !== -1 && feedbacksData[counterpartIndex].hasConflict) {
+        feedbacksData[counterpartIndex] = {
+          ...feedbacksData[counterpartIndex],
+          hasConflict: false,
+          conflictWith: undefined,
+          conflictEvidence: undefined,
+          status: 'resolved',
+        };
+      }
+    }
     return feedbacksData[index];
   },
 
@@ -97,5 +110,16 @@ export const feedbackService = {
     const index = feedbacksData.findIndex(f => f.id === primaryId);
     feedbacksData[index] = merged;
     return merged;
+  },
+
+  async reassignPointId(oldPointId: string, newPointId: string): Promise<number> {
+    let count = 0;
+    for (let i = 0; i < feedbacksData.length; i++) {
+      if (feedbacksData[i].pointId === oldPointId) {
+        feedbacksData[i] = { ...feedbacksData[i], pointId: newPointId };
+        count++;
+      }
+    }
+    return count;
   },
 };

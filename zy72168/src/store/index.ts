@@ -22,6 +22,7 @@ interface AppState {
   fetchPlans: (params?: { pointId?: string }) => Promise<void>;
   generateReport: (timeRange?: { start: string; end: string }) => Promise<void>;
   fetchCrossPeriodData: () => Promise<void>;
+  refreshAllData: () => Promise<void>;
   mergePoints: (pointIds: string[], targetName: string) => Promise<void>;
   resolveConflict: (id: string, decision: ConflictDecision, note: string) => Promise<void>;
   mergeDuplicates: (primaryId: string, duplicateIds: string[]) => Promise<void>;
@@ -102,8 +103,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   fetchCrossPeriodData: async () => {
     set({ loading: true, error: null });
     try {
-      const { points, feedbacks } = get();
-      const data = await reportService.getCrossPeriodStats({ points, feedbacks, plans: get().plans });
+      const { points, feedbacks, plans } = get();
+      const data = await reportService.getCrossPeriodStats({ points, feedbacks, plans });
       set({ crossPeriodData: data });
     } catch {
       set({ error: '获取跨时段统计失败' });
@@ -112,11 +113,27 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
 
+  refreshAllData: async () => {
+    const [points, feedbacks, plans] = await Promise.all([
+      pointService.getPoints(),
+      feedbackService.getFeedbacks(),
+      planService.getPlans(),
+    ]);
+    set({ points, feedbacks, plans });
+    const { plans: latestPlans } = get();
+    const crossPeriodData = await reportService.getCrossPeriodStats({
+      points,
+      feedbacks,
+      plans: latestPlans,
+    });
+    set({ crossPeriodData });
+  },
+
   mergePoints: async (pointIds, targetName) => {
     set({ loading: true, error: null });
     try {
       await pointService.mergePoints(pointIds, targetName);
-      await get().fetchPoints();
+      await get().refreshAllData();
     } catch {
       set({ error: '合并点位失败' });
     } finally {
@@ -128,7 +145,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ loading: true, error: null });
     try {
       await feedbackService.resolveConflict(id, decision, note);
-      await get().fetchFeedbacks();
+      await get().refreshAllData();
     } catch {
       set({ error: '解决冲突失败' });
     } finally {
@@ -140,7 +157,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ loading: true, error: null });
     try {
       await feedbackService.mergeDuplicates(primaryId, duplicateIds);
-      await get().fetchFeedbacks();
+      await get().refreshAllData();
     } catch {
       set({ error: '合并重复项失败' });
     } finally {
@@ -152,7 +169,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ loading: true, error: null });
     try {
       await feedbackService.updateFeedback(id, data);
-      await get().fetchFeedbacks();
+      await get().refreshAllData();
     } catch {
       set({ error: '更新反馈失败' });
     } finally {
