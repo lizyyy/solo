@@ -4,7 +4,7 @@ import { useAppStore } from '../store';
 import { exportToExcel, exportToJSON } from '../utils/importExport';
 
 const Report = () => {
-  const { points, photos, schemes, conflicts, getFilteredPoints, filters } = useAppStore();
+  const { points, photos, schemes, conflicts, getFilteredPoints } = useAppStore();
   const [exportSuccess, setExportSuccess] = useState<string | null>(null);
 
   const filteredPoints = getFilteredPoints();

@@ -1,8 +1,7 @@
 import { useState, useRef } from 'react';
 import { X, Upload, FileSpreadsheet, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { parseExcelFile, type ImportPointData, sourceToLabel, statusToLabel } from '../utils/importExport';
-import type { PointSource, PointStatus } from '../types';
+import { parseExcelFile, type ImportPointData, sourceToLabel } from '../utils/importExport';
 
 interface ImportModalProps {
   isOpen: boolean;
@@ -28,7 +27,7 @@ const ImportModal = ({ isOpen, onClose, onImport }: ImportModalProps) => {
     try {
       const data = await parseExcelFile(selectedFile);
       setPreview(data);
-    } catch (err) {
+    } catch {
       setError('文件解析失败，请检查格式');
       setPreview([]);
     } finally {
