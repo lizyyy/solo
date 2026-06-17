@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import TrailMap from '@/components/TrailMap'
 import Sidebar from '@/components/Sidebar'
 import ConflictBanner from '@/components/ConflictBanner'
@@ -7,6 +8,16 @@ import { Download } from 'lucide-react'
 
 export default function Home() {
   const exportReport = useTrailStore((s) => s.exportReport)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('reset') === '1') {
+      localStorage.removeItem('trail-crowding-monitor')
+      const cleanUrl = window.location.pathname
+      window.history.replaceState({}, document.title, cleanUrl)
+      window.location.reload()
+    }
+  }, [])
 
   const handleExport = () => {
     const report = exportReport()

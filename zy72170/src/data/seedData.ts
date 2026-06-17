@@ -16,7 +16,7 @@ export const seedStatuses: CrowdingStatus[] = [
   { id: 's2', pointId: 'p2', status: 'normal', source: 'GIS导入', recordedAt: '2025-05-01T10:00:00Z' },
   { id: 's3', pointId: 'p3', status: 'crowded', source: '居民反馈', recordedAt: '2025-05-05T15:00:00Z' },
   { id: 's4', pointId: 'p4', status: 'pending_review', source: '巡检录入', recordedAt: '2025-05-08T09:00:00Z' },
-  { id: 's5', pointId: 'p5', status: 'normal', source: 'GIS导入', recordedAt: '2025-05-01T10:00:00Z' },
+  { id: 's5', pointId: 'p5', status: 'crowded', source: 'GIS导入', recordedAt: '2025-05-01T10:00:00Z' },
   { id: 's6', pointId: 'p6', status: 'crowded', source: '居民反馈', recordedAt: '2025-05-10T11:00:00Z' },
   { id: 's7', pointId: 'p7', status: 'normal', source: 'GIS导入', recordedAt: '2025-05-01T10:00:00Z' },
   { id: 's8', pointId: 'p8', status: 'pending_review', source: '巡检录入', recordedAt: '2025-05-12T14:00:00Z' },
