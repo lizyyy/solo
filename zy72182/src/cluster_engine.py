@@ -127,37 +127,129 @@ class ClusterEngine:
             "sample_changes": {
                 "added": [],
                 "removed": [],
-                "unchanged": []
+                "unchanged": [],
+                "matched_by_image_path": []
             },
             "label_changes": {
-                "changed": [],
+                "predicted_changed": [],
+                "human_changed": [],
                 "unchanged": []
             }
         }
         
-        old_ids = set(df_old['sample_id'].values) if 'sample_id' in df_old.columns else set()
-        new_ids = set(df_new['sample_id'].values) if 'sample_id' in df_new.columns else set()
+        has_old_id = 'sample_id' in df_old.columns
+        has_new_id = 'sample_id' in df_new.columns
+        has_old_img = 'image_path' in df_old.columns
+        has_new_img = 'image_path' in df_new.columns
         
-        comparison["sample_changes"]["added"] = list(new_ids - old_ids)
-        comparison["sample_changes"]["removed"] = list(old_ids - new_ids)
-        comparison["sample_changes"]["unchanged"] = list(old_ids & new_ids)
+        old_by_id = {}
+        new_by_id = {}
+        if has_old_id:
+            old_by_id = df_old.set_index('sample_id').to_dict('index')
+        if has_new_id:
+            new_by_id = df_new.set_index('sample_id').to_dict('index')
         
-        common_samples = old_ids & new_ids
-        if common_samples and 'human_label' in df_old.columns and 'predicted_label' in df_new.columns:
-            old_labels = df_old.set_index('sample_id')['human_label'].to_dict()
-            new_labels = df_new.set_index('sample_id')['predicted_label'].to_dict()
+        old_by_img = {}
+        new_by_img = {}
+        if has_old_img:
+            for _, row in df_old.iterrows():
+                ip = row.get('image_path', '')
+                if pd.notna(ip) and ip:
+                    old_by_img[ip] = row.to_dict()
+        if has_new_img:
+            for _, row in df_new.iterrows():
+                ip = row.get('image_path', '')
+                if pd.notna(ip) and ip:
+                    new_by_img[ip] = row.to_dict()
+        
+        old_matched = set()
+        new_matched = set()
+        
+        if has_old_id and has_new_id:
+            common_ids = set(old_by_id.keys()) & set(new_by_id.keys())
+            for sid in common_ids:
+                old_matched.add(('id', sid))
+                new_matched.add(('id', sid))
+                comparison["sample_changes"]["unchanged"].append(sid)
+        
+        if has_old_img and has_new_img:
+            common_imgs = set(old_by_img.keys()) & set(new_by_img.keys())
+            for img in common_imgs:
+                old_row = old_by_img[img]
+                new_row = new_by_img[img]
+                old_sid = old_row.get('sample_id', '')
+                new_sid = new_row.get('sample_id', '')
+                
+                if ('id', old_sid) not in old_matched and ('id', new_sid) not in new_matched:
+                    old_matched.add(('img', img))
+                    new_matched.add(('img', img))
+                    comparison["sample_changes"]["matched_by_image_path"].append({
+                        "image_path": img,
+                        "old_sample_id": old_sid,
+                        "new_sample_id": new_sid
+                    })
+                    comparison["sample_changes"]["unchanged"].append(new_sid)
+        
+        if has_new_id:
+            for sid, row in new_by_id.items():
+                if ('id', sid) not in new_matched:
+                    ip = row.get('image_path', '')
+                    if not (has_new_img and ip and ('img', ip) in new_matched):
+                        comparison["sample_changes"]["added"].append(sid)
+        
+        if has_old_id:
+            for sid, row in old_by_id.items():
+                if ('id', sid) not in old_matched:
+                    ip = row.get('image_path', '')
+                    if not (has_old_img and ip and ('img', ip) in old_matched):
+                        comparison["sample_changes"]["removed"].append(sid)
+        
+        for item in comparison["sample_changes"]["matched_by_image_path"]:
+            img = item["image_path"]
+            old_row = old_by_img.get(img, {})
+            new_row = new_by_img.get(img, {})
             
-            for sid in common_samples:
-                old_lbl = old_labels.get(sid)
-                new_lbl = new_labels.get(sid)
+            old_pred = old_row.get('predicted_label')
+            new_pred = new_row.get('predicted_label')
+            old_human = old_row.get('human_label')
+            new_human = new_row.get('human_label')
+            
+            pred_changed = pd.notna(old_pred) and pd.notna(new_pred) and str(old_pred) != str(new_pred)
+            human_changed = pd.notna(old_human) and pd.notna(new_human) and str(old_human) != str(new_human)
+            
+            if pred_changed:
+                comparison["label_changes"]["predicted_changed"].append({
+                    "sample_id": item["new_sample_id"],
+                    "image_path": img,
+                    "old_label": old_pred,
+                    "new_label": new_pred
+                })
+            elif human_changed:
+                comparison["label_changes"]["human_changed"].append({
+                    "sample_id": item["new_sample_id"],
+                    "image_path": img,
+                    "old_label": old_human,
+                    "new_label": new_human
+                })
+            else:
+                comparison["label_changes"]["unchanged"].append(item["new_sample_id"])
+        
+        common_ids = [sid for sid in comparison["sample_changes"]["unchanged"] 
+                      if not any(m["new_sample_id"] == sid 
+                                for m in comparison["sample_changes"]["matched_by_image_path"])]
+        if common_ids and 'predicted_label' in df_old.columns and 'predicted_label' in df_new.columns:
+            old_pred_labels = df_old.set_index('sample_id')['predicted_label'].to_dict()
+            new_pred_labels = df_new.set_index('sample_id')['predicted_label'].to_dict()
+            
+            for sid in common_ids:
+                old_lbl = old_pred_labels.get(sid)
+                new_lbl = new_pred_labels.get(sid)
                 if pd.notna(old_lbl) and pd.notna(new_lbl) and str(old_lbl) != str(new_lbl):
-                    comparison["label_changes"]["changed"].append({
+                    comparison["label_changes"]["predicted_changed"].append({
                         "sample_id": sid,
                         "old_label": old_lbl,
                         "new_label": new_lbl
                     })
-                else:
-                    comparison["label_changes"]["unchanged"].append(sid)
         
         return comparison
     

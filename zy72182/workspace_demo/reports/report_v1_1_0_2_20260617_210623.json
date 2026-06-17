@@ -1,33 +1,41 @@
 {
-  "report_id": "report_v1_1_0_2_20260608_174236",
-  "generated_at": "2026-06-08T17:42:36.675108",
+  "report_id": "report_v1_1_0_2_20260617_210623",
+  "generated_at": "2026-06-17T21:06:23.257145",
   "version_info": {
     "version_id": "v1_1_0_2",
     "model_version": "1.0.2",
-    "created_at": "2026-06-08T17:42:36.573576",
+    "created_at": "2026-06-17T21:06:23.214531",
     "description": "图像质检缺陷聚类 - 第一版发布",
     "status": "created"
   },
   "data_cleaning": {
     "total_rows": 9,
     "null_rows": 0,
+    "invalid_rows": 1,
     "duplicate_rows": 1,
-    "valid_rows": 8,
+    "valid_rows": 7,
     "removed_samples": [
       {
         "sample_id": "893179f90c31",
-        "_raw_index": 4
+        "_raw_index": 4,
+        "image_path": "images/scratch_001.jpg"
+      }
+    ],
+    "invalid_details": [
+      {
+        "_raw_index": 5,
+        "_reason": "关键字段全空（image_path/predicted_label/defect_type）"
       }
     ]
   },
   "historical_merge": {
-    "total_samples": 8,
+    "total_samples": 7,
     "matched_reviews": 3,
     "conflicting_labels": 1,
     "applied_labels": 2
   },
   "clustering": {
-    "cluster_count": 6,
+    "cluster_count": 5,
     "noise_count": 0,
     "samples_per_cluster": {
       "C0": {
@@ -53,17 +61,12 @@
       },
       "C3": {
         "count": 1,
-        "defect_types": {},
-        "avg_confidence": 0.0
-      },
-      "C4": {
-        "count": 1,
         "defect_types": {
           "边缘缺陷": 1
         },
         "avg_confidence": 0.45
       },
-      "C5": {
+      "C4": {
         "count": 1,
         "defect_types": {
           "污点": 1
@@ -73,9 +76,9 @@
     }
   },
   "metrics": {
-    "total_samples": 8,
+    "total_samples": 7,
     "review_status": {
-      "pending": 5,
+      "pending": 4,
       "confirmed": 3
     },
     "label_distribution": {
@@ -104,8 +107,7 @@
       "C1": 2,
       "C2": 1,
       "C3": 1,
-      "C4": 1,
-      "C5": 1
+      "C4": 1
     },
     "confidence_stats": {
       "mean": 0.75,
@@ -116,9 +118,9 @@
   },
   "version_comparison": {},
   "sample_summary": {
-    "total_samples": 8,
+    "total_samples": 7,
     "by_review_status": {
-      "pending": 5,
+      "pending": 4,
       "confirmed": 3
     },
     "by_defect_type": {
@@ -133,8 +135,7 @@
       "C1": 2,
       "C2": 1,
       "C3": 1,
-      "C4": 1,
-      "C5": 1
+      "C4": 1
     },
     "representative_samples": [
       {
@@ -150,20 +151,14 @@
         "confidence": "0.65"
       },
       {
-        "sample_id": "7287ccdfbbbc",
-        "cluster_id": "C3",
-        "defect_type": NaN,
-        "confidence": NaN
-      },
-      {
         "sample_id": "8fed541a08a0",
-        "cluster_id": "C4",
+        "cluster_id": "C3",
         "defect_type": "边缘缺陷",
         "confidence": "0.45"
       },
       {
         "sample_id": "7da3d420fa0f",
-        "cluster_id": "C5",
+        "cluster_id": "C4",
         "defect_type": "污点",
         "confidence": "0.82"
       },
@@ -203,7 +198,7 @@
           "action": "confirmed",
           "model_label": "划痕",
           "human_label": "划痕",
-          "note": "已确认是划痕缺陷"
+          "note": "已确认是划痕缺陷，模型判断正确"
         }
       ]
     },
@@ -284,32 +279,7 @@
           "action": "confirmed",
           "model_label": "灰尘",
           "human_label": "灰尘",
-          "note": "旧口径：按灰尘处理，无需返工"
-        }
-      ]
-    },
-    {
-      "sample_id": "7287ccdfbbbc",
-      "decisions": [
-        {
-          "step": "data_loading",
-          "action": "loaded",
-          "source": "v1_model_results.csv",
-          "raw_index": 5
-        },
-        {
-          "step": "clustering",
-          "action": "clustered",
-          "cluster_id": "C3",
-          "is_representative": true,
-          "cluster_label": null
-        },
-        {
-          "step": "review",
-          "action": "pending",
-          "model_label": NaN,
-          "human_label": null,
-          "note": null
+          "note": "旧口径：按灰尘处理，无需返工，后续模型升级需复核"
         }
       ]
     },
@@ -325,7 +295,7 @@
         {
           "step": "clustering",
           "action": "clustered",
-          "cluster_id": "C4",
+          "cluster_id": "C3",
           "is_representative": true,
           "cluster_label": "边缘缺陷"
         },
@@ -350,7 +320,7 @@
         {
           "step": "clustering",
           "action": "clustered",
-          "cluster_id": "C5",
+          "cluster_id": "C4",
           "is_representative": true,
           "cluster_label": "污点"
         },
@@ -375,7 +345,7 @@
         {
           "step": "historical_merge",
           "action": "matched_history",
-          "source_version": "v1_0_0",
+          "source_version": "v1_1_0_2",
           "result": "confirmed"
         },
         {
@@ -390,7 +360,7 @@
           "action": "confirmed",
           "model_label": "气泡",
           "human_label": "严重气泡",
-          "note": "此样本模型预测为气泡，人工确认为严重气泡，需关注"
+          "note": "人工确认标签[严重气泡]，模型当前预测[气泡]，以人工为准"
         }
       ]
     }

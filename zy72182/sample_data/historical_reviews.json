@@ -1,29 +1,32 @@
 [
   {
     "sample_id": "893179f90c31",
+    "image_path": "images/scratch_001.jpg",
     "human_label": "划痕",
     "reviewer": "小乔",
     "review_time": "2026-05-15T10:30:00",
-    "note": "已确认是划痕缺陷",
+    "note": "已确认是划痕缺陷，模型判断正确",
     "source_version": "v1_0_1",
     "status": "confirmed"
   },
   {
     "sample_id": "cbeb879cd8f3",
+    "image_path": "images/dust_001.jpg",
     "human_label": "灰尘",
     "reviewer": "小乔",
-    "review_time": "2026-05-15T10:35:00",
-    "note": "旧口径：按灰尘处理，无需返工",
+    "review_time": "2026-05-10T09:15:00",
+    "note": "旧口径：按灰尘处理，无需返工，后续模型升级需复核",
     "source_version": "v0_9_9_legacy",
     "status": "confirmed"
   },
   {
     "sample_id": "dd6914cffcc3",
+    "image_path": "images/bubble_002.jpg",
     "human_label": "严重气泡",
     "reviewer": "小乔",
     "review_time": "2026-05-20T14:20:00",
-    "note": "此样本模型预测为气泡，人工确认为严重气泡，需关注",
+    "note": "上一版标记待复核：模型预测为气泡，人工判断为严重气泡，需最终确认",
     "source_version": "v1_0_0",
-    "status": "confirmed"
+    "status": "need_recheck"
   }
 ]

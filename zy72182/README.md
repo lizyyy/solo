@@ -15,16 +15,82 @@
 
 ## 快速开始
 
+### 环境要求
+
+- Python 3.8+
+- pip
+
 ### 安装依赖
 
 ```bash
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
+
+依赖包：pandas, numpy, scikit-learn, python-dateutil, openpyxl
 
 ### 运行完整演示
 
 ```bash
-python demo_pipeline.py
+python3 demo_pipeline.py
+```
+
+演示包含三个场景：
+1. **V1 版本完整闭环** - 从数据加载 → 清洗 → 历史合并 → 待确认 → 人工确认 → 生成报告
+2. **V2 版本旧口径继承** - 验证人工标签不被新模型盖掉 + 版本对比
+3. **一致性验证** - 清洗统计、报告、Excel 三方对账
+
+### 操作路径：待确认 → 人工确认 → 已确认
+
+```python
+from src import DataManager, ClusterEngine, ReviewManager, ReportGenerator
+
+# 初始化
+dm = DataManager("./workspace")
+ce = ClusterEngine()
+rm = ReviewManager("./workspace/reviews")
+rg = ReportGenerator("./workspace/reports")
+
+# 1. 创建版本 + 加载数据 + 清洗
+version_id = dm.create_version("1.0.0", "版本描述")
+raw_df = dm.load_raw_data("data.csv", version_id)
+clean_df, clean_stats = dm.clean_data(raw_df)
+
+# 2. 合并历史记录（自动找出待确认样本）
+merged_df, merge_stats = dm.merge_with_historical_reviews(clean_df, version_id)
+# merge_stats['conflicting_labels'] → 待确认样本数
+# merge_stats['applied_labels'] → 直接继承confirmed的样本数
+
+# 3. 聚类分析
+clustered_df, _ = ce.cluster_defects(merged_df)
+labeled_df, _ = ce.assign_cluster_labels(clustered_df)
+reviewed_df, _ = rm.apply_reviews_to_dataframe(labeled_df)
+
+# 4. 查看待确认清单
+pending = reviewed_df[reviewed_df['review_status'] == 'need_confirm']
+for _, row in pending.iterrows():
+    print(f"{row['sample_id']}: {row['review_note']}")
+
+# 5. 人工确认（小乔操作）
+for _, row in pending.iterrows():
+    rm.submit_review(
+        sample_id=row['sample_id'],
+        human_label=row['human_label'],  # 或改成新的标签
+        reviewer="小乔",
+        note="人工确认说明",
+        version_id=version_id
+    )
+
+# 6. 重新应用 → 状态更新为confirmed
+final_df, _ = rm.apply_reviews_to_dataframe(reviewed_df)
+
+# 7. 生成报告
+version_info = dm.get_version_info(version_id)
+metrics = ce.calculate_metrics(final_df)
+summary = rm.get_review_summary(final_df)
+
+rg.generate_full_report(final_df, version_info, metrics, ...)
+rg.generate_handoff_report(final_df, version_info, summary)
+rg.export_result_excel(final_df, version_id)
 ```
 
 ## 模块说明

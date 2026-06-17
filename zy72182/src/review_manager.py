@@ -161,27 +161,23 @@ class ReviewManager:
                 historical_label = matched_review['human_label']
                 review_status = matched_review.get('status', '')
                 current_pred = row.get('predicted_label')
+                is_label_match = pd.isna(current_pred) or str(current_pred) == str(historical_label)
+                
+                result_df.at[idx, 'human_label'] = historical_label
+                result_df.at[idx, 'review_source'] = matched_review.get('source_version', 'historical')
                 
                 if review_status == 'confirmed':
-                    result_df.at[idx, 'human_label'] = historical_label
                     result_df.at[idx, 'review_status'] = 'confirmed'
-                    result_df.at[idx, 'review_note'] = matched_review.get('note', '')
-                    result_df.at[idx, 'review_source'] = matched_review.get('source_version', 'historical')
-                    
-                    if pd.notna(current_pred) and str(current_pred) != str(historical_label):
-                        apply_stats["conflicts_found"] += 1
-                    else:
+                    if is_label_match:
+                        result_df.at[idx, 'review_note'] = matched_review.get('note', '')
                         apply_stats["labels_applied"] += 1
-                elif pd.notna(current_pred) and str(current_pred) != str(historical_label):
+                    else:
+                        result_df.at[idx, 'review_note'] = f'人工确认标签[{historical_label}]，模型当前预测[{current_pred}]，以人工为准'
+                        apply_stats["conflicts_found"] += 1
+                else:
                     apply_stats["conflicts_found"] += 1
                     result_df.at[idx, 'review_status'] = 'need_confirm'
-                    result_df.at[idx, 'human_label'] = historical_label
-                    result_df.at[idx, 'review_note'] = f"模型预测[{current_pred}]与人工标签[{historical_label}]不一致"
-                else:
-                    result_df.at[idx, 'human_label'] = historical_label
-                    result_df.at[idx, 'review_status'] = 'confirmed'
-                    result_df.at[idx, 'review_note'] = matched_review.get('note', '')
-                    apply_stats["labels_applied"] += 1
+                    result_df.at[idx, 'review_note'] = matched_review.get('note', f'待确认标签[{historical_label}]，需人工复核')
         
         return result_df, apply_stats
     

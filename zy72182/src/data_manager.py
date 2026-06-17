@@ -87,22 +87,37 @@ class DataManager:
         stats = {
             "total_rows": len(df),
             "null_rows": 0,
+            "invalid_rows": 0,
             "duplicate_rows": 0,
             "valid_rows": 0,
-            "removed_samples": []
+            "removed_samples": [],
+            "invalid_details": []
         }
         
         df = df.replace(r'^\s*$', np.nan, regex=True)
+        df = df.replace('', np.nan)
         df = df.fillna(np.nan)
+        
         null_mask = df.isnull().all(axis=1)
         stats["null_rows"] = int(null_mask.sum())
+        null_indices = df[null_mask].index.tolist()
         df = df[~null_mask].copy()
+        
+        key_fields = ['image_path', 'predicted_label', 'defect_type']
+        available_keys = [f for f in key_fields if f in df.columns]
+        if available_keys:
+            invalid_mask = df[available_keys].isnull().all(axis=1)
+            stats["invalid_rows"] = int(invalid_mask.sum())
+            invalid_samples = df[invalid_mask].copy()
+            invalid_samples['_reason'] = '关键字段全空（' + '/'.join(available_keys) + '）'
+            stats["invalid_details"] = invalid_samples[['_raw_index', '_reason']].to_dict('records') if '_raw_index' in invalid_samples.columns else []
+            df = df[~invalid_mask].copy()
         
         df['sample_id'] = df.apply(self._generate_sample_id, axis=1)
         
         duplicate_mask = df.duplicated(subset=['sample_id'], keep='first')
-        stats["duplicate_rows"] = duplicate_mask.sum()
-        stats["removed_samples"] = df[duplicate_mask][['sample_id', '_raw_index']].to_dict('records')
+        stats["duplicate_rows"] = int(duplicate_mask.sum())
+        stats["removed_samples"] = df[duplicate_mask][['sample_id', '_raw_index', 'image_path']].to_dict('records') if 'image_path' in df.columns else df[duplicate_mask][['sample_id', '_raw_index']].to_dict('records')
         df = df[~duplicate_mask].copy()
         
         stats["valid_rows"] = len(df)
@@ -201,28 +216,22 @@ class DataManager:
                 if pd.notna(matched_review.get('human_label')):
                     current_label = row.get('predicted_label', row.get('model_label'))
                     historical_label = matched_review['human_label']
-                    review_status = matched_review.get('status', '')
-                    is_conflict = pd.notna(current_label) and str(current_label) != str(historical_label)
+                    historical_status = matched_review.get('status', '')
+                    is_label_match = pd.isna(current_label) or str(current_label) == str(historical_label)
                     
-                    if is_conflict:
-                        merge_stats["conflicting_labels"] += 1
-                    
-                    if review_status == 'confirmed':
-                        df.at[idx, 'human_label'] = historical_label
-                        df.at[idx, 'review_status'] = 'confirmed'
-                        df.at[idx, 'review_note'] = matched_review.get('note', '')
-                        if not is_conflict:
-                            merge_stats["applied_labels"] += 1
-                    elif is_conflict:
-                        df.at[idx, 'review_status'] = 'need_confirm'
-                        df.at[idx, 'human_label'] = historical_label
-                        df.at[idx, 'review_note'] = f'历史标签[{historical_label}]与模型预测[{current_label}]不一致'
-                    else:
-                        df.at[idx, 'human_label'] = historical_label
-                        df.at[idx, 'review_status'] = 'confirmed'
-                        df.at[idx, 'review_note'] = matched_review.get('note', '')
-                        merge_stats["applied_labels"] += 1
-                    
+                    df.at[idx, 'human_label'] = historical_label
                     df.at[idx, 'review_source'] = matched_review.get('source_version', 'historical')
+                    
+                    if historical_status == 'confirmed':
+                        df.at[idx, 'review_status'] = 'confirmed'
+                        merge_stats["applied_labels"] += 1
+                        if is_label_match:
+                            df.at[idx, 'review_note'] = matched_review.get('note', '')
+                        else:
+                            df.at[idx, 'review_note'] = f'人工确认标签[{historical_label}]，模型当前预测[{current_label}]，以人工为准'
+                    else:
+                        merge_stats["conflicting_labels"] += 1
+                        df.at[idx, 'review_status'] = 'need_confirm'
+                        df.at[idx, 'review_note'] = matched_review.get('note', f'历史待确认标签[{historical_label}]，需人工复核')
         
         return df, merge_stats
