@@ -1,5 +1,5 @@
 import { X, MapPin, Calendar, User, FileText, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
-import { GarbagePoint, SourceType } from '@/types';
+import { GarbagePoint } from '@/types';
 import { useAppStore } from '@/store';
 import StatusBadge from './StatusBadge';
 import SourceBadge from './SourceBadge';

@@ -159,6 +159,7 @@ export class MergeEngine {
   }
 
   createNewPointFromSource(sourceData: SourceData, operator: string): GarbagePoint {
+    void operator;
     const lat = sourceData.rawData.lat ?? sourceData.rawData.exifLat ?? sourceData.rawData.coordinates?.[1];
     const lng = sourceData.rawData.lng ?? sourceData.rawData.exifLng ?? sourceData.rawData.coordinates?.[0];
     const address = sourceData.rawData.address || sourceData.sourceName;
@@ -185,6 +186,7 @@ export class MergeEngine {
     confidence: number,
     operator: string
   ): GarbagePoint {
+    void operator;
     const existingSource = point.sources.find(s => s.id === sourceData.id);
     let newSources = [...point.sources];
     

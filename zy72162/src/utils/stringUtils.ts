@@ -21,7 +21,7 @@ const SYNONYMS: Record<string, string[]> = {
 export function normalizeName(name: string): string {
   let normalized = name.trim();
   
-  normalized = normalized.replace(/[（）()【】\[\]【】]/g, '');
+  normalized = normalized.replace(/[（）()【】[\]]/g, '');
   normalized = normalized.replace(/\s+/g, '');
   
   for (const suffix of COMMON_SUFFIXES) {

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Search, Filter, User, Calendar, ChevronLeft, ChevronRight, FileText, Clock } from 'lucide-react';
 import { useAppStore } from '@/store';
 import { ActionType, actionTypeLabels } from '@/types';
@@ -34,10 +34,10 @@ export default function LogsPage() {
     return uniqueOperators.sort();
   }, [logs]);
 
-  const getPointName = (pointId: string) => {
+  const getPointName = useCallback((pointId: string) => {
     const point = points.find(p => p.id === pointId);
     return point?.canonicalName || '未知点位';
-  };
+  }, [points]);
 
   const filteredLogs = useMemo(() => {
     return logs.filter(log => {
@@ -56,7 +56,7 @@ export default function LogsPage() {
       }
       return true;
     });
-  }, [logs, actionTypeFilter, operatorFilter, dateFrom, dateTo, searchQuery, points]);
+  }, [logs, actionTypeFilter, operatorFilter, dateFrom, dateTo, searchQuery, getPointName]);
 
   const totalPages = Math.ceil(filteredLogs.length / PAGE_SIZE);
   const paginatedLogs = useMemo(() => {
@@ -175,9 +175,8 @@ export default function LogsPage() {
         <div className="relative pl-8">
           <div className="absolute left-3 top-2 bottom-2 w-0.5 bg-neutral-200" />
 
-          {paginatedLogs.map((log, index) => {
+          {paginatedLogs.map((log) => {
             const colors = actionTypeColors[log.action];
-            const isLast = index === paginatedLogs.length - 1;
             const pointName = getPointName(log.pointId);
 
             return (

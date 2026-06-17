@@ -1,7 +1,5 @@
 import { GarbagePoint, SourceData, OperationLog, PointStatus, SourceType, MergeConfig, DEFAULT_MERGE_CONFIG } from '@/types';
 
-const generateId = () => Math.random().toString(36).substring(2, 11);
-
 const now = new Date();
 const daysAgo = (days: number) => new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 

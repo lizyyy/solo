@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import { Search, Filter, Map, List, Eye, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { Search, Filter, Map, List, Eye } from 'lucide-react';
 import L from 'leaflet';
 import { useAppStore } from '@/store';
 import { PointStatus } from '@/types';

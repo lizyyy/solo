@@ -81,16 +81,39 @@ const systemFields = [
 
 function getFieldAliases(field: string): string[] {
   const aliases: Record<string, string[]> = {
-    name: ['名称', '点位名称', '投放点名称', 'title', '点位', '名字', '地点名称', '投放点'],
-    lat: ['纬度', 'latitude', 'y', 'lat坐标'],
-    lng: ['经度', 'longitude', 'lon', 'x', 'lng坐标'],
-    address: ['地址', '位置', '详细地址', '住址', '地址详情'],
-    street: ['街道', '所属街道', '街道办事处', '片区', '区域'],
+    name: ['名称', '点位名称', '投放点名称', 'title', '点位', '名字', '地点名称', '投放点', '站点名称'],
+    lat: ['纬度', 'latitude', 'y', 'lat坐标', 'Y坐标', 'y坐标', 'Latitude', '纬度坐标'],
+    lng: ['经度', 'longitude', 'lon', 'x', 'lng坐标', 'X坐标', 'x坐标', 'Longitude', '经度坐标'],
+    address: ['地址', '位置', '详细地址', '住址', '地址详情', '位置描述', '详细位置', '坐落位置'],
+    street: ['街道', '所属街道', '街道办事处', '片区', '区域', '所属片区', '所属区域', '管辖街道'],
     description: ['描述', '备注', '说明', '详情', '介绍'],
     contact: ['联系人', '负责人', '经办人', '联络人'],
     phone: ['联系电话', '电话', '手机号', '联系方式', '手机'],
   };
   return aliases[field] || [];
+}
+
+const KEY_FIELD_ALIASES: Record<string, string[]> = {
+  lat: ['纬度', 'latitude', 'y', 'lat坐标', 'Y坐标', 'y坐标', 'Latitude', '纬度坐标'],
+  lng: ['经度', 'longitude', 'lon', 'x', 'lng坐标', 'X坐标', 'x坐标', 'Longitude', '经度坐标'],
+  address: ['地址', '位置', '详细地址', '住址', '地址详情', '位置描述', '详细位置', '坐落位置'],
+  street: ['街道', '所属街道', '街道办事处', '片区', '区域', '所属片区', '所属区域', '管辖街道'],
+};
+
+function getUnmappedKeyFields(headers: string[], mapping: FieldMapping): string[] {
+  const unmapped: string[] = [];
+  const lowerHeaders = headers.map(h => h.toLowerCase());
+
+  for (const [sysField, aliases] of Object.entries(KEY_FIELD_ALIASES)) {
+    const aliasesLower = aliases.map(a => a.toLowerCase());
+    const found = headers.find(h => aliasesLower.includes(h.toLowerCase()));
+    if (found && mapping[found] !== sysField) {
+      unmapped.push(found);
+    }
+    void lowerHeaders;
+  }
+
+  return unmapped;
 }
 
 function autoMapFields(fileFields: string[]): FieldMapping {
@@ -144,13 +167,13 @@ export default function ImportPage() {
     return acceptedFileTypes[selectedSourceType].join(',');
   };
 
-  const validateFileType = (file: File): boolean => {
+  const validateFileType = useCallback((file: File): boolean => {
     if (!selectedSourceType) return false;
     const fileName = file.name.toLowerCase();
     return acceptedFileTypes[selectedSourceType].some((ext) => fileName.endsWith(ext));
-  };
+  }, [selectedSourceType]);
 
-  const extractRawFromFile = async (file: File, sourceType: SourceType): Promise<ParsedFile> => {
+  const extractRawFromFile = useCallback(async (file: File, sourceType: SourceType): Promise<ParsedFile> => {
     const fileName = file.name.toLowerCase();
 
     if (sourceType === SourceType.INSPECTION) {
@@ -170,8 +193,9 @@ export default function ImportPage() {
           importedAt: new Date(),
           confidence: 0.8,
         });
-      } catch (error: any) {
-        result.errors.push(`解析图片失败: ${error.message}`);
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        result.errors.push(`解析图片失败: ${message}`);
         result.success = false;
       }
       return { file, sourceType, rawPreview: null, result, fieldMapping: {}, mappingApplied: true };
@@ -203,8 +227,9 @@ export default function ImportPage() {
           result.errors.push('文件内容为空');
           result.success = false;
         }
-      } catch (error: any) {
-        result.errors.push(`解析TXT文件失败: ${error.message}`);
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        result.errors.push(`解析TXT文件失败: ${message}`);
         result.success = false;
       }
       return { file, sourceType, rawPreview: null, result, fieldMapping: {}, mappingApplied: true };
@@ -224,7 +249,8 @@ export default function ImportPage() {
     }
 
     const fieldMapping = autoMapFields(rawPreview.headers);
-    const mappingApplied = hasNameMapping(fieldMapping);
+    const unmappedKeyFields = getUnmappedKeyFields(rawPreview.headers, fieldMapping);
+    const mappingApplied = hasNameMapping(fieldMapping) && unmappedKeyFields.length === 0;
 
     let result: ImportResult | null = null;
     if (mappingApplied) {
@@ -232,7 +258,7 @@ export default function ImportPage() {
     }
 
     return { file, sourceType, rawPreview, result, fieldMapping, mappingApplied };
-  };
+  }, [savePhoto]);
 
   const handleFiles = useCallback(
     async (files: FileList | File[]) => {
@@ -249,19 +275,20 @@ export default function ImportPage() {
         try {
           const pf = await extractRawFromFile(file, selectedSourceType);
           setParsedFiles((prev) => [...prev, pf]);
-        } catch (error: any) {
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : String(error);
           setParsedFiles((prev) => [
             ...prev,
             {
               file, sourceType: selectedSourceType, rawPreview: null,
-              result: { success: false, data: [], errors: [`文件读取失败: ${error.message}`], warnings: [] },
+              result: { success: false, data: [], errors: [`文件读取失败: ${message}`], warnings: [] },
               fieldMapping: {}, mappingApplied: true,
             },
           ]);
         }
       }
     },
-    [selectedSourceType]
+    [selectedSourceType, validateFileType, extractRawFromFile]
   );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -394,8 +421,9 @@ export default function ImportPage() {
 
       setImportStats({ autoMerged: totalAutoMerged, pendingReview: totalPendingReview, newPoints: totalNewPoints, total: totalProcessed });
       setShowSuccess(true);
-    } catch (error: any) {
-      alert(`导入失败: ${error.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(`导入失败: ${message}`);
     } finally {
       setIsImporting(false);
     }
@@ -561,12 +589,34 @@ export default function ImportPage() {
                         <div className="flex items-center gap-2 mb-3">
                           <Link2 size={16} className="text-warning-500" />
                           <h4 className="text-sm font-semibold text-warning-700">
-                            文件表头无法自动识别，请手动映射字段
+                            {!hasNameMapping(pf.fieldMapping)
+                              ? '文件表头无法自动识别，请手动映射字段'
+                              : '检测到疑似坐标/地址/街道字段未映射，请补全或确认忽略'}
                           </h4>
                         </div>
                         <p className="text-xs text-neutral-500 mb-3">
-                          将左侧文件列名映射到右侧系统字段，其中"点位名称"为必填项。映射完成后点击"确认映射"。
+                          将左侧文件列名映射到右侧系统字段，其中"点位名称"为必填项。坐标、地址、街道虽非必填，但建议补全以提升归并准确率。映射完成后点击"确认映射并预览"。
                         </p>
+
+                        {hasNameMapping(pf.fieldMapping) && (() => {
+                          const unmapped = getUnmappedKeyFields(pf.rawPreview!.headers, pf.fieldMapping);
+                          if (unmapped.length === 0) return null;
+                          return (
+                            <div className="p-3 bg-warning-50 border border-warning-200 rounded-sm mb-3">
+                              <div className="flex items-start gap-2">
+                                <AlertCircle size={16} className="text-warning-500 flex-shrink-0 mt-0.5" />
+                                <div>
+                                  <div className="text-sm font-medium text-warning-700 mb-1">建议补充映射：</div>
+                                  <div className="text-sm text-warning-600">
+                                    {unmapped.join('、')}
+                                    {unmapped.length > 1 ? ' 这些列看起来像' : ' 这列看起来像'}
+                                    {' '}关键字段，如果确实不需要可以选择"不映射"后继续。
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
 
                         <div className="space-y-2 mb-4">
                           {pf.rawPreview.headers.map((header) => (

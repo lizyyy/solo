@@ -1,8 +1,7 @@
 import { create } from 'zustand';
-import { GarbagePoint, SourceData, OperationLog, MergeConfig, PointStatus, SourceType, ActionType, MergeCandidate, DEFAULT_MERGE_CONFIG } from '@/types';
+import { GarbagePoint, SourceData, OperationLog, MergeConfig, PointStatus, MergeCandidate, DEFAULT_MERGE_CONFIG } from '@/types';
 import { db, initDatabase } from '@/db';
 import { generateMockData, mockPhotos } from '@/data/mockData';
-import { mergeEngine } from '@/utils/mergeEngine';
 import { generateShortId } from '@/utils/stringUtils';
 import { mergeEngine as engine } from '@/utils/mergeEngine';
 
@@ -310,7 +309,6 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   importSourceDataBatch: async (sourceDataList) => {
-    const { operator } = get();
     let autoMerged = 0;
     let pendingReview = 0;
     let newPoints = 0;

@@ -2,7 +2,7 @@ import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { SourceData, SourceType, GarbagePoint, PointStatus, ExportConfig, sourceTypeLabels, pointStatusLabels, exportColumnOptions } from '@/types';
+import { SourceData, SourceType, GarbagePoint, ExportConfig, sourceTypeLabels, pointStatusLabels, exportColumnOptions } from '@/types';
 import { generateShortId, formatDateTime } from './stringUtils';
 import { isValidCoordinate } from './geoUtils';
 
@@ -15,17 +15,17 @@ export interface ImportResult {
 
 export interface RawPreview {
   headers: string[];
-  rows: Record<string, any>[];
+  rows: Record<string, unknown>[];
   totalRows: number;
 }
 
 export async function extractRawCSV(file: File): Promise<RawPreview> {
   return new Promise((resolve, reject) => {
-    Papa.parse(file, {
+    Papa.parse<Record<string, unknown>>(file, {
       header: true,
       skipEmptyLines: true,
       complete: (results) => {
-        const rows = results.data as Record<string, any>[];
+        const rows = results.data;
         const headers = rows.length > 0 ? Object.keys(rows[0]) : [];
         resolve({ headers, rows, totalRows: rows.length });
       },
@@ -41,13 +41,13 @@ export async function extractRawExcel(file: File): Promise<RawPreview> {
   const workbook = XLSX.read(buffer);
   const sheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[sheetName];
-  const rows = XLSX.utils.sheet_to_json(worksheet) as Record<string, any>[];
+  const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet);
   const headers = rows.length > 0 ? Object.keys(rows[0]) : [];
   return { headers, rows, totalRows: rows.length };
 }
 
 export function applyMappingAndParse(
-  rawRows: Record<string, any>[],
+  rawRows: Record<string, unknown>[],
   mapping: Record<string, string>,
   sourceType: SourceType
 ): ImportResult {
@@ -55,7 +55,7 @@ export function applyMappingAndParse(
 
   rawRows.forEach((rawRow, index) => {
     try {
-      const remappedRow: Record<string, any> = {};
+      const remappedRow: Record<string, unknown> = {};
       Object.entries(rawRow).forEach(([key, value]) => {
         if (mapping[key]) {
           remappedRow[mapping[key]] = value;
@@ -68,8 +68,9 @@ export function applyMappingAndParse(
       if (sourceData) {
         result.data.push(sourceData);
       }
-    } catch (error: any) {
-      result.errors.push(`第 ${index + 2} 行: ${error.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      result.errors.push(`第 ${index + 2} 行: ${message}`);
     }
   });
 
@@ -91,8 +92,9 @@ export async function parseCSVFile(file: File, sourceType: SourceType, mapping?:
       return applyMappingAndParse(preview.rows, mapping, sourceType);
     }
     return applyMappingAndParse(preview.rows, {}, sourceType);
-  } catch (error: any) {
-    return { success: false, data: [], errors: [`解析错误: ${error.message}`], warnings: [] };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    return { success: false, data: [], errors: [`解析错误: ${message}`], warnings: [] };
   }
 }
 
@@ -103,8 +105,9 @@ export async function parseExcelFile(file: File, sourceType: SourceType, mapping
       return applyMappingAndParse(preview.rows, mapping, sourceType);
     }
     return applyMappingAndParse(preview.rows, {}, sourceType);
-  } catch (error: any) {
-    return { success: false, data: [], errors: [`解析错误: ${error.message}`], warnings: [] };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    return { success: false, data: [], errors: [`解析错误: ${message}`], warnings: [] };
   }
 }
 
@@ -126,14 +129,15 @@ export async function parseGeoJSONFile(file: File, sourceType: SourceType): Prom
       return result;
     }
 
-    geojson.features.forEach((feature: any, index: number) => {
+    geojson.features.forEach((feature: Record<string, unknown>, index: number) => {
       try {
         if (feature.type !== 'Feature' || !feature.geometry) {
           result.warnings.push(`第 ${index + 1} 个要素: 无效的Feature格式，已跳过`);
           return;
         }
 
-        const coordinates = feature.geometry.coordinates;
+        const geom = feature.geometry as Record<string, unknown>;
+        const coordinates = geom.coordinates as number[];
         if (!Array.isArray(coordinates) || coordinates.length < 2) {
           result.warnings.push(`第 ${index + 1} 个要素: 无效的坐标，已跳过`);
           return;
@@ -145,8 +149,12 @@ export async function parseGeoJSONFile(file: File, sourceType: SourceType): Prom
           return;
         }
 
-        const properties = feature.properties || {};
-        const name = properties.name || properties.名称 || properties.title || `点位${index + 1}`;
+        const properties = (feature.properties as Record<string, unknown>) || {};
+        const name =
+          (properties.name as string) ||
+          (properties.名称 as string) ||
+          (properties.title as string) ||
+          `点位${index + 1}`;
 
         const sourceData: SourceData = {
           id: generateShortId(),
@@ -165,12 +173,14 @@ export async function parseGeoJSONFile(file: File, sourceType: SourceType): Prom
         };
 
         result.data.push(sourceData);
-      } catch (error: any) {
-        result.errors.push(`第 ${index + 1} 个要素: ${error.message}`);
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        result.errors.push(`第 ${index + 1} 个要素: ${message}`);
       }
     });
-  } catch (error: any) {
-    result.errors.push(`解析错误: ${error.message}`);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    result.errors.push(`解析错误: ${message}`);
     result.success = false;
   }
 
@@ -189,7 +199,8 @@ export async function parseImageFile(file: File): Promise<{ dataUrl: string; exi
   });
 }
 
-function parseRowToSourceData(row: Record<string, any>, sourceType: SourceType, lineNum: number): SourceData | null {
+function parseRowToSourceData(row: Record<string, unknown>, sourceType: SourceType, lineNum: number): SourceData | null {
+  void lineNum;
   const nameField = findField(row, ['name', '名称', '点位名称', '投放点名称', 'title']);
   const latField = findField(row, ['lat', 'latitude', '纬度', 'y']);
   const lngField = findField(row, ['lng', 'lon', 'longitude', '经度', 'x']);
@@ -215,8 +226,8 @@ function parseRowToSourceData(row: Record<string, any>, sourceType: SourceType, 
   let lng: number | undefined;
 
   if (latField && lngField) {
-    lat = parseFloat(row[latField]);
-    lng = parseFloat(row[lngField]);
+    lat = parseFloat(String(row[latField]));
+    lng = parseFloat(String(row[lngField]));
     
     if (isNaN(lat) || isNaN(lng)) {
       throw new Error('坐标格式无效');
@@ -227,7 +238,7 @@ function parseRowToSourceData(row: Record<string, any>, sourceType: SourceType, 
     }
   }
 
-  const rawData: Record<string, any> = { ...row };
+  const rawData: Record<string, unknown> = { ...row };
   if (lat !== undefined && lng !== undefined) {
     rawData.lat = lat;
     rawData.lng = lng;
@@ -251,7 +262,7 @@ function parseRowToSourceData(row: Record<string, any>, sourceType: SourceType, 
   };
 }
 
-function findField(row: Record<string, any>, candidates: string[]): string | undefined {
+function findField(row: Record<string, unknown>, candidates: string[]): string | undefined {
   const keys = Object.keys(row);
   for (const candidate of candidates) {
     const found = keys.find(k => k.toLowerCase() === candidate.toLowerCase());
@@ -261,8 +272,8 @@ function findField(row: Record<string, any>, candidates: string[]): string | und
 }
 
 export async function exportToExcel(points: GarbagePoint[], config: ExportConfig): Promise<Blob> {
-  const rows = points.map(point => {
-    const row: Record<string, any> = {};
+  const rows: Record<string, unknown>[] = points.map(point => {
+    const row: Record<string, unknown> = {};
     
     config.columns.forEach(col => {
       switch (col) {

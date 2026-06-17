@@ -14,12 +14,33 @@ export enum SourceType {
 
 export type ActionType = 'import' | 'merge' | 'split' | 'confirm' | 'reject' | 'export' | 'update';
 
+export interface SourceRawData {
+  name?: string;
+  lat?: number;
+  lng?: number;
+  exifLat?: number;
+  exifLng?: number;
+  coordinates?: number[];
+  address?: string;
+  street?: string;
+  description?: string;
+  contact?: string;
+  phone?: string;
+  fileName?: string;
+  fileSize?: number;
+  fileType?: string;
+  photoId?: string;
+  content?: string;
+  lineNumber?: number;
+  [key: string]: unknown;
+}
+
 export interface SourceData {
   id: string;
   pointId: string;
   sourceType: SourceType;
   sourceName: string;
-  rawData: Record<string, any>;
+  rawData: SourceRawData;
   photoUrl?: string;
   operator: string;
   importedAt: Date;
@@ -81,7 +102,7 @@ export interface ImportPreview {
   total: number;
   valid: number;
   invalid: number;
-  samples: any[];
+  samples: unknown[];
   fieldMapping: Record<string, string>;
   errors: string[];
 }

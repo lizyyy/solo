@@ -10,7 +10,6 @@ import {
   User
 } from 'lucide-react';
 import { useAppStore } from '@/store';
-import { PointStatus } from '@/types';
 import { cn } from '@/utils/cn';
 
 const navItems = [

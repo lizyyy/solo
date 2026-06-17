@@ -6,14 +6,13 @@ import {
   ArrowRight, 
   MapPin, 
   User,
-  Calendar,
   FileText,
   Lightbulb,
   ChevronRight,
   Info
 } from 'lucide-react';
 import { useAppStore } from '@/store';
-import { SourceData, SourceType } from '@/types';
+import { SourceType } from '@/types';
 import StatusBadge from '@/components/StatusBadge';
 import SourceBadge from '@/components/SourceBadge';
 import { mergeEngine } from '@/utils/mergeEngine';
@@ -30,7 +29,6 @@ export default function ReviewPage() {
     rejectMerge,
     createNewPointFromSource,
     splitSourceFromPoint,
-    confirmPoint,
     operator,
   } = useAppStore();
 
@@ -88,16 +86,6 @@ export default function ReviewPage() {
     }
   };
 
-  const handleConfirmPoint = async () => {
-    if (!currentPoint) return;
-    const reason = reviewReason || '人工审核通过，数据一致';
-    await confirmPoint(currentPoint.id, reason);
-    setShowConfirmModal(null);
-    if (pendingPoints.length > 0 && selectedIndex >= pendingPoints.length) {
-      setSelectedIndex(Math.max(0, pendingPoints.length - 1));
-    }
-  };
-
   const getSuggestedActions = () => {
     if (!currentPoint || !selectedSource) return [];
 
@@ -130,7 +118,6 @@ export default function ReviewPage() {
   if (!currentPoint) return null;
 
   const gisSource = currentPoint.sources.find(s => s.sourceType === SourceType.GIS);
-  const otherSources = currentPoint.sources.filter(s => s.sourceType !== SourceType.GIS);
 
   return (
     <div className="flex flex-col gap-4 h-full">
