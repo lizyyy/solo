@@ -52,7 +52,12 @@ export function createMergedPoint(data: {
 
 export function getMergedPointsByBatch(batchId: string): MergedPoint[] {
   const rows = db.prepare('SELECT * FROM merged_point WHERE batch_id = ? ORDER BY created_at').all(batchId) as any[]
-  return rows.map(rowToMergedPoint)
+  return rows.map(row => {
+    const point = rowToMergedPoint(row)
+    point.sources = getEvidenceByPoint(row.id)
+    point.appendedNotes = getAppendedNotesByPoint(row.id)
+    return point
+  })
 }
 
 export function getMergedPointById(id: string): MergedPoint | undefined {

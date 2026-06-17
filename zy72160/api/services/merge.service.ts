@@ -1,6 +1,6 @@
 import db from '../database.js'
 import { getImportJobsByBatch, getRawRecordsByJob, updateImportJobStatus } from '../repositories/import-job.repo.js'
-import { createMergedPoint, getMergedPointsByBatch, updateMergedPointConflictStatus } from '../repositories/merged-point.repo.js'
+import { createMergedPoint, getMergedPointsByBatch, updateMergedPointConflictStatus, createEvidenceRecord } from '../repositories/merged-point.repo.js'
 import { createConflictItem, countUnresolvedConflicts } from '../repositories/conflict-item.repo.js'
 import { createAnomaly, anomalyExists } from '../repositories/anomaly.repo.js'
 import { createAuditLog } from '../repositories/audit-log.repo.js'
@@ -13,7 +13,7 @@ export function mergeData(batchId: string, actor: string = 'system') {
     throw new Error('No confirmed import jobs to merge')
   }
 
-  const allRecords: { jobId: string; sourceType: string; fileName: string; importTime: string; mappedData: Record<string, unknown> }[] = []
+  const allRecords: { jobId: string; sourceType: string; fileName: string; importTime: string; mappedData: Record<string, unknown>; rawData: Record<string, unknown> }[] = []
   for (const job of jobs) {
     const records = getRawRecordsByJob(job.id)
     for (const r of records) {
@@ -23,6 +23,7 @@ export function mergeData(batchId: string, actor: string = 'system') {
         fileName: job.fileName,
         importTime: job.importTime,
         mappedData: (r.mappedData || r.rawData) as Record<string, unknown>,
+        rawData: r.rawData as Record<string, unknown>,
       })
     }
   }
@@ -38,7 +39,12 @@ export function mergeData(batchId: string, actor: string = 'system') {
     addressMap.set(key, point)
   }
 
-  for (const record of allRecords) {
+  const now = new Date().toISOString()
+
+  const fileRecords = allRecords.filter(r => r.sourceType === 'photo' || r.sourceType === 'approval')
+  const tableRecords = allRecords.filter(r => r.sourceType === 'gis' || r.sourceType === 'street_table')
+
+  for (const record of tableRecords) {
     const mapped = record.mappedData
     const address = String(mapped.address || mapped['地址'] || '').trim()
     if (!address) continue
@@ -46,12 +52,26 @@ export function mergeData(batchId: string, actor: string = 'system') {
     const gisId = String(mapped.gisId || mapped['gis_id'] || mapped['编号'] || '')
     const businessType = String(mapped.businessType || mapped['业态'] || '')
     const area = Number(mapped.area || mapped['面积'] || 0)
+    const notes = String(mapped.notes || mapped['备注'] || mapped['remarks'] || '')
 
     const key = address.toLowerCase().trim()
     const existing = addressMap.get(key)
 
+    const originalValue = `${businessType || '—'} | ${area ? area + '㎡' : '—'}`
+
     if (existing) {
       matchedCount++
+
+      const evidence = createEvidenceRecord({
+        mergedPointId: existing.id,
+        sourceType: record.sourceType,
+        fileName: record.fileName,
+        importTime: record.importTime,
+        processTime: now,
+        originalValue,
+      })
+      existing.sources.push(evidence)
+
       const detectedConflicts = detectConflicts(existing, {
         businessType,
         area,
@@ -59,11 +79,13 @@ export function mergeData(batchId: string, actor: string = 'system') {
           sourceType: existing.sources.length > 0 ? existing.sources[0].sourceType : 'gis',
           fileName: existing.sources.length > 0 ? existing.sources[0].fileName : '',
           importTime: existing.sources.length > 0 ? existing.sources[0].importTime : '',
+          processTime: existing.sources.length > 0 ? existing.sources[0].processTime : '',
         },
         importSource: {
           sourceType: record.sourceType,
           fileName: record.fileName,
           importTime: record.importTime,
+          processTime: now,
         },
       })
 
@@ -84,6 +106,12 @@ export function mergeData(batchId: string, actor: string = 'system') {
         updateMergedPointConflictStatus(existing.id, 'conflict')
       }
 
+      if (notes && !existing.originalNotes) {
+        db.prepare('UPDATE merged_point SET original_notes = ?, updated_at = ? WHERE id = ?')
+          .run(notes, now, existing.id)
+        existing.originalNotes = notes
+      }
+
       existing.sourceCount += 1
     } else {
       const newPoint = createMergedPoint({
@@ -93,10 +121,53 @@ export function mergeData(batchId: string, actor: string = 'system') {
         businessType,
         area,
         sourceCount: 1,
+        originalNotes: notes || undefined,
       })
+
+      const evidence = createEvidenceRecord({
+        mergedPointId: newPoint.id,
+        sourceType: record.sourceType,
+        fileName: record.fileName,
+        importTime: record.importTime,
+        processTime: now,
+        originalValue,
+      })
+      newPoint.sources.push(evidence)
+
       addressMap.set(key, newPoint)
       newCount++
     }
+  }
+
+  for (const record of fileRecords) {
+    const mapped = record.mappedData
+    const address = String(mapped.address || '').trim()
+    if (!address) continue
+
+    const key = address.toLowerCase().trim()
+    const existing = addressMap.get(key)
+    if (!existing) continue
+
+    const originalValue = record.sourceType === 'photo'
+      ? `现场照片：${record.fileName}`
+      : `审批文件：${record.fileName}`
+
+    const evidence = createEvidenceRecord({
+      mergedPointId: existing.id,
+      sourceType: record.sourceType,
+      fileName: record.fileName,
+      importTime: record.importTime,
+      processTime: now,
+      originalValue,
+    })
+    existing.sources.push(evidence)
+
+    existing.sourceCount += 1
+  }
+
+  for (const point of addressMap.values()) {
+    db.prepare('UPDATE merged_point SET source_count = ?, updated_at = ? WHERE id = ?')
+      .run(point.sourceCount, now, point.id)
   }
 
   const mergedPoints = getMergedPointsByBatch(batchId)

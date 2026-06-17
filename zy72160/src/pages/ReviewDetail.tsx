@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Save } from "lucide-react";
 import { useAppStore } from "../store/app.store";
 import { api } from "../utils/api";
-import type { ConflictItem } from "../../shared/types";
+import type { ConflictItem, MergedPoint } from "../../shared/types";
 import StatusBadge from "../components/StatusBadge";
 import EvidenceTag from "../components/EvidenceTag";
 
@@ -22,6 +22,7 @@ export default function ReviewDetail() {
   const addToast = useAppStore((s) => s.addToast);
 
   const [conflict, setConflict] = useState<ConflictItem | null>(null);
+  const [point, setPoint] = useState<MergedPoint | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -30,13 +31,21 @@ export default function ReviewDetail() {
   const [reason, setReason] = useState("");
   const [noteText, setNoteText] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [appendingNote, setAppendingNote] = useState(false);
+
+  const loadPoint = (pointId: string) => {
+    api.merge.getPoint(pointId).then((p) => setPoint(p)).catch(() => {});
+  };
 
   useEffect(() => {
     if (!id) return;
     setLoading(true);
     api.conflicts
       .get(id)
-      .then((c) => setConflict(c))
+      .then((c) => {
+        setConflict(c);
+        loadPoint(c.mergedPointId);
+      })
       .catch(() => setError("加载冲突详情失败"))
       .finally(() => setLoading(false));
   }, [id]);
@@ -56,6 +65,21 @@ export default function ReviewDetail() {
       addToast("error", "提交裁决失败");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleAppendNote = async () => {
+    if (!conflict || !noteText.trim()) return;
+    setAppendingNote(true);
+    try {
+      await api.merge.appendNote(conflict.mergedPointId, noteText.trim());
+      addToast("success", "备注已追加");
+      setNoteText("");
+      loadPoint(conflict.mergedPointId);
+    } catch {
+      addToast("error", "追加备注失败");
+    } finally {
+      setAppendingNote(false);
     }
   };
 
@@ -129,16 +153,16 @@ export default function ReviewDetail() {
         <div className="card-body space-y-3">
           <div className="flex items-center gap-3 text-sm">
             <EvidenceTag sourceType={conflict.gisSource.sourceType} />
-            <span className="text-ink">GIS 来源: {conflict.gisSource.fileName}</span>
+            <span className="text-ink">GIS 来源: {conflict.gisSource.fileName || "未命名"}</span>
             <span className="text-xs text-gray-500 ml-auto">
-              处理时间: {new Date(conflict.gisSource.processTime).toLocaleString("zh-CN")}
+              处理时间: {conflict.gisSource.processTime ? new Date(conflict.gisSource.processTime).toLocaleString("zh-CN") : "—"}
             </span>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <EvidenceTag sourceType={conflict.importSource.sourceType} />
-            <span className="text-ink">导入来源: {conflict.importSource.fileName}</span>
+            <span className="text-ink">导入来源: {conflict.importSource.fileName || "未命名"}</span>
             <span className="text-xs text-gray-500 ml-auto">
-              处理时间: {new Date(conflict.importSource.processTime).toLocaleString("zh-CN")}
+              处理时间: {conflict.importSource.processTime ? new Date(conflict.importSource.processTime).toLocaleString("zh-CN") : "—"}
             </span>
           </div>
         </div>
@@ -150,20 +174,50 @@ export default function ReviewDetail() {
         </div>
         <div className="card-body space-y-3">
           <div className="border border-gray-200 rounded-sm p-3 bg-gray-50 text-sm text-gray-700 min-h-[40px]">
-            {conflict.resolutionReason || "无原始备注"}
+            {point?.originalNotes || "无原始备注"}
           </div>
-          <div className="flex gap-2">
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-header flex items-center justify-between">
+          <h3 className="section-title">追加备注</h3>
+          <span className="text-xs text-gray-500">{point?.appendedNotes.length || 0} 条</span>
+        </div>
+        <div className="card-body space-y-3">
+          {point?.appendedNotes && point.appendedNotes.length > 0 ? (
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {point.appendedNotes.map((note) => (
+                <div key={note.id} className="border border-gray-200 rounded-sm p-3 bg-blue-50/30">
+                  <div className="text-sm text-ink">{note.content}</div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {note.author} · {new Date(note.createdAt).toLocaleString("zh-CN")}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-sm text-gray-400 py-2">暂无追加备注</div>
+          )}
+          <div className="flex gap-2 pt-2">
             <input
               className="input-base flex-1"
-              placeholder="追加备注..."
+              placeholder="输入追加备注..."
               value={noteText}
               onChange={(e) => setNoteText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleAppendNote();
+                }
+              }}
             />
             <button
               className="btn-secondary"
-              onClick={() => { setNoteText(""); addToast("success", "备注已追加"); }}
+              disabled={!noteText.trim() || appendingNote}
+              onClick={handleAppendNote}
             >
-              追加
+              {appendingNote ? "追加中..." : "追加"}
             </button>
           </div>
         </div>

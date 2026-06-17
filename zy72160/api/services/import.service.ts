@@ -5,7 +5,88 @@ import { createImportJob, updateImportJobMapping, updateImportJobStatus, getImpo
 import { createAuditLog } from '../repositories/audit-log.repo.js'
 import type { ImportJob } from '../../shared/types.js'
 
+const TABLE_TYPES = ['gis', 'street_table']
+const FILE_TYPES = ['photo', 'approval']
+
+function fixFileNameEncoding(fileName: string): string {
+  if (/[\u4e00-\u9fa5]/.test(fileName)) {
+    return fileName
+  }
+  try {
+    const reconstructed = Buffer.from(fileName, 'latin1').toString('utf-8')
+    if (/[\u4e00-\u9fa5]/.test(reconstructed)) {
+      return reconstructed
+    }
+  } catch (e) {
+    // ignore
+  }
+  return fileName
+}
+
+function extractAddressFromFileName(fileName: string): string {
+  const baseName = path.basename(fileName, path.extname(fileName))
+  const parts = baseName.split(/[_\s]+/)
+  if (parts.length > 0 && parts[0].trim()) {
+    return parts[0].trim()
+  }
+  return baseName
+}
+
 export function processUploadedFile(filePath: string, originalName: string, sourceType: string, batchId: string): ImportJob {
+  const fixedName = fixFileNameEncoding(originalName)
+  const ext = path.extname(fixedName).toLowerCase()
+
+  if (FILE_TYPES.includes(sourceType)) {
+    return processFileUpload(filePath, fixedName, sourceType, batchId)
+  }
+
+  return processTableUpload(filePath, fixedName, sourceType, batchId)
+}
+
+function processFileUpload(filePath: string, originalName: string, sourceType: string, batchId: string): ImportJob {
+  const ext = path.extname(originalName).toLowerCase()
+  const address = extractAddressFromFileName(originalName)
+
+  const uploadsDir = path.join(path.dirname(filePath), '..')
+  if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true })
+
+  const timestamp = Date.now()
+  const savedName = `${timestamp}_${originalName}`
+  const savedPath = path.join(uploadsDir, savedName)
+  fs.copyFileSync(filePath, savedPath)
+
+  const fileSize = fs.statSync(savedPath).size
+  const preview = [{
+    fileName: originalName,
+    address,
+    fileType: sourceType,
+    fileSize: `${(fileSize / 1024).toFixed(1)} KB`,
+    savedPath,
+  }]
+
+  const fieldMapping: Record<string, string> = {
+    address: 'address',
+    fileName: 'fileName',
+  }
+
+  const job = createImportJob({
+    batchId,
+    sourceType,
+    fileName: originalName,
+    recordCount: 1,
+    fieldMapping,
+    rawPreview: preview,
+  })
+
+  createRawRecords(
+    job.id,
+    preview.map(row => ({ rawData: row }))
+  )
+
+  return job
+}
+
+function processTableUpload(filePath: string, originalName: string, sourceType: string, batchId: string): ImportJob {
   const ext = path.extname(originalName).toLowerCase()
   let data: Record<string, unknown>[] = []
 

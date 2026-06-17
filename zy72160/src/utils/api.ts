@@ -67,6 +67,14 @@ export const api = {
     listPoints: (batchId: string) =>
       request<MergedPoint[]>(`/batches/${batchId}/merged-points`),
     getPoint: (pointId: string) => request<MergedPoint>(`/batches/points/${pointId}`),
+    appendNote: (pointId: string, content: string, author?: string) =>
+      request<{ id: string; mergedPointId: string; content: string; author: string; createdAt: string }>(
+        `/batches/points/${pointId}/notes`,
+        {
+          method: "POST",
+          body: JSON.stringify({ content, author: author || "system" }),
+        }
+      ),
   },
 
   conflicts: {

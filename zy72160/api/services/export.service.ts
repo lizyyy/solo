@@ -11,6 +11,16 @@ import type { MergedPoint, Anomaly } from '../../shared/types.js'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+function sourceTypeLabel(type: string): string {
+  switch (type) {
+    case 'gis': return 'GIS点位'
+    case 'street_table': return '街道表格'
+    case 'photo': return '现场照片'
+    case 'approval': return '审批记录'
+    default: return type
+  }
+}
+
 export function exportToExcel(batchId: string, filters?: { district?: string; businessType?: string; conflictStatus?: string }) {
   let points = getMergedPointsByBatch(batchId)
 
@@ -31,9 +41,11 @@ export function exportToExcel(batchId: string, filters?: { district?: string; bu
 
   const wb = xlsx.utils.book_new()
 
-  const header = ['GIS编号', '地址', '业态', '面积(㎡)', '来源数量', '冲突状态', '备注', '异常描述']
+  const header = ['GIS编号', '地址', '业态', '面积(㎡)', '来源数量', '冲突状态', '原始备注', '证据来源', '追加备注', '异常描述']
   const rows = points.map(p => {
     const pointAnomalies = anomalyMap.get(p.id) || []
+    const sourcesText = p.sources.map(s => `${sourceTypeLabel(s.sourceType)}: ${s.fileName}`).join('\n')
+    const notesText = p.appendedNotes.map(n => `[${n.author}] ${n.content}`).join('\n')
     return [
       p.gisId,
       p.address,
@@ -42,6 +54,8 @@ export function exportToExcel(batchId: string, filters?: { district?: string; bu
       p.sourceCount,
       p.conflictStatus === 'none' ? '无冲突' : p.conflictStatus === 'conflict' ? '有冲突' : '已解决',
       p.originalNotes,
+      sourcesText,
+      notesText,
       pointAnomalies.map(a => a.humanReadable).join('；'),
     ]
   })
@@ -49,7 +63,8 @@ export function exportToExcel(batchId: string, filters?: { district?: string; bu
   const ws = xlsx.utils.aoa_to_sheet([header, ...rows])
   ws['!cols'] = [
     { wch: 15 }, { wch: 30 }, { wch: 15 }, { wch: 10 },
-    { wch: 10 }, { wch: 10 }, { wch: 20 }, { wch: 40 },
+    { wch: 10 }, { wch: 10 }, { wch: 30 }, { wch: 40 },
+    { wch: 40 }, { wch: 40 },
   ]
   xlsx.utils.book_append_sheet(wb, ws, '合并点位数据')
 
@@ -119,7 +134,19 @@ export function exportToPdf(batchId: string, filters?: { district?: string; busi
     doc.text(`  GIS编号：${point.gisId} | 业态：${point.businessType} | 面积：${point.area}㎡`)
     doc.text(`  来源数量：${point.sourceCount} | 冲突状态：${point.conflictStatus}`)
     if (point.originalNotes) {
-      doc.text(`  备注：${point.originalNotes}`)
+      doc.text(`  原始备注：${point.originalNotes}`)
+    }
+    if (point.sources.length > 0) {
+      doc.text(`  证据来源：`)
+      point.sources.forEach((s, i) => {
+        doc.text(`    ${i + 1}. [${sourceTypeLabel(s.sourceType)}] ${s.fileName} (${new Date(s.processTime).toLocaleDateString('zh-CN')})`)
+      })
+    }
+    if (point.appendedNotes.length > 0) {
+      doc.text(`  追加备注：`)
+      point.appendedNotes.forEach((n, i) => {
+        doc.text(`    ${i + 1}. [${n.author}] ${n.content}`)
+      })
     }
     doc.moveDown(0.3)
   }

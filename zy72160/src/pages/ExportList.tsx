@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { FileSpreadsheet, FileText, Filter, RotateCcw, Search } from "lucide-react";
+import { FileSpreadsheet, FileText, Filter, RotateCcw, Search, ChevronDown, ChevronRight } from "lucide-react";
 import { api } from "../utils/api";
 import { useAppStore } from "../store/app.store";
 import StatusBadge from "../components/StatusBadge";
@@ -12,6 +12,7 @@ export default function ExportList() {
   const [anomalies, setAnomalies] = useState<Anomaly[]>([]);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const batchId = currentBatch?.id;
 
@@ -108,6 +109,7 @@ export default function ExportList() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs text-gray-500">
+                  <th className="px-3 py-2.5 font-medium w-8"></th>
                   <th className="px-3 py-2.5 font-medium">编号</th>
                   <th className="px-3 py-2.5 font-medium">地址</th>
                   <th className="px-3 py-2.5 font-medium">业态</th>
@@ -120,16 +122,67 @@ export default function ExportList() {
               <tbody>
                 {filtered.map((p) => {
                   const anomaly = anomalyMap.get(p.id);
+                  const expanded = expandedId === p.id;
                   return (
-                    <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50">
-                      <td className="px-3 py-2.5 font-mono text-xs">{p.gisId}</td>
-                      <td className="px-3 py-2.5">{p.address}</td>
-                      <td className="px-3 py-2.5">{p.businessType}</td>
-                      <td className="px-3 py-2.5">{p.area} ㎡</td>
-                      <td className="px-3 py-2.5"><div className="flex gap-1 flex-wrap">{p.sources.map((s) => <EvidenceTag key={s.id} sourceType={s.sourceType} />)}</div></td>
-                      <td className="px-3 py-2.5"><StatusBadge status={p.conflictStatus} /></td>
-                      <td className="px-3 py-2.5 text-gray-500">{anomaly?.humanReadable || "—"}</td>
-                    </tr>
+                    <>
+                      <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
+                        onClick={() => setExpandedId(expanded ? null : p.id)}>
+                        <td className="px-3 py-2.5 text-gray-400">
+                          {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                        </td>
+                        <td className="px-3 py-2.5 font-mono text-xs">{p.gisId}</td>
+                        <td className="px-3 py-2.5">{p.address}</td>
+                        <td className="px-3 py-2.5">{p.businessType}</td>
+                        <td className="px-3 py-2.5">{p.area} ㎡</td>
+                        <td className="px-3 py-2.5"><div className="flex gap-1 flex-wrap">{p.sources.map((s) => <EvidenceTag key={s.id} sourceType={s.sourceType} />)}</div></td>
+                        <td className="px-3 py-2.5"><StatusBadge status={p.conflictStatus} /></td>
+                        <td className="px-3 py-2.5 text-gray-500">{anomaly?.humanReadable || "—"}</td>
+                      </tr>
+                      {expanded && (
+                        <tr className="bg-gray-50/50">
+                          <td colSpan={8} className="px-6 py-3">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <div className="text-xs font-medium text-gray-600">证据链 ({p.sources.length})</div>
+                                <div className="space-y-1.5">
+                                  {p.sources.map((s) => (
+                                    <div key={s.id} className="flex items-center gap-2 text-xs bg-white border border-gray-200 rounded-sm px-2.5 py-1.5">
+                                      <EvidenceTag sourceType={s.sourceType} />
+                                      <span className="text-ink flex-1 truncate" title={s.fileName}>{s.fileName}</span>
+                                      <span className="text-gray-400 whitespace-nowrap">
+                                        {new Date(s.processTime).toLocaleDateString("zh-CN")}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <div className="text-xs font-medium text-gray-600">
+                                  备注 ({p.appendedNotes.length + (p.originalNotes ? 1 : 0)})
+                                </div>
+                                <div className="space-y-1.5">
+                                  {p.originalNotes && (
+                                    <div className="text-xs bg-amber-50 border border-amber-200 rounded-sm px-2.5 py-1.5">
+                                      <span className="text-amber-700 font-medium">原始备注：</span>
+                                      <span className="text-ink">{p.originalNotes}</span>
+                                    </div>
+                                  )}
+                                  {p.appendedNotes.slice(0, 3).map((n) => (
+                                    <div key={n.id} className="text-xs bg-blue-50 border border-blue-200 rounded-sm px-2.5 py-1.5">
+                                      <span className="text-blue-700 font-medium">{n.author}：</span>
+                                      <span className="text-ink">{n.content}</span>
+                                    </div>
+                                  ))}
+                                  {p.appendedNotes.length === 0 && !p.originalNotes && (
+                                    <div className="text-xs text-gray-400">暂无备注</div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </>
                   );
                 })}
               </tbody>
