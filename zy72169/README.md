@@ -1,57 +1,167 @@
-# React + TypeScript + Vite
+# 社区充电桩布局 · 街道工作管理工具
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+面向街道工作人员（周姐等）的浏览器本地小工具，帮助整理社区充电桩点位、现场会议反馈、审批方案版本，导出可交接的 CSV 报表。
+**纯前端 SPA + 浏览器 IndexedDB 本地存储**——不需要后端，不需要数据库服务器，打开浏览器就能用。
 
-Currently, two official plugins are available:
+## 功能一览
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+| 页面 | 作用 | 入口 |
+| --- | --- | --- |
+| 数据看板 | 总览点位 / 反馈 / 方案 / 异常数据，一键载入样例，时间线追踪操作 | 左侧导航「数据看板」|
+| 点位管理 | 查看、搜索、筛选点位；查看详情、上传/删除照片；处理归并建议 | 左侧导航「点位管理」|
+| 反馈与方案 | 查看反馈记录并处理状态；查看方案版本与版本对比差异 | 左侧导航「反馈与方案」|
+| 导入导出 | 批量导入 CSV/Excel、**点位补录 / 会议反馈录入 / 方案版本录入**、**按筛选条件导出 CSV** | 左侧导航「导入导出」|
 
-## Expanding the ESLint configuration
+## 技术栈
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- React 18 + TypeScript
+- Vite（构建工具）
+- TailwindCSS 3（样式）
+- Zustand 5（状态管理：5 个独立 store，按数据域拆分）
+- IndexedDB（通过 `idb` 封装，浏览器本地持久化）
+- SheetJS / `xlsx`（解析 CSV、Excel 导入文件）
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 安装与启动
+
+```bash
+# 1. 安装依赖
+npm install
+
+# 2. 启动开发服务器（默认 5173，被占用时会自动换端口）
+npm run dev
+
+# 3. 打开浏览器访问 http://localhost:5173
+
+# 4. 构建生产版本（输出到 dist/）
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+> 首次运行时仪表盘是空的，点击右上角**「加载演示数据」**可以立刻看到一个完整样例（包含 12 个点位、6 条反馈、3 个方案版本、1 条归并建议、6 条操作日志、几条脏数据）。
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 数据保存在哪里？
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+所有数据存在**当前浏览器的 IndexedDB**（数据库名：`charging_station_db`）。包括：
+
+- 点位、别名、归并建议
+- 照片（base64 DataURL 形式）
+- 反馈记录、方案版本与点位关联
+- 操作日志（导入 / 补录 / 归并 / 修改 / 导出 都会写入时间线）
+
+**清理数据**：打开浏览器 DevTools → Application → IndexedDB → `charging_station_db` → 删除数据库。刷新后从零开始。
+
+## 操作说明
+
+### 1. 载入样例数据
+
+1. 打开「数据看板」。
+2. 点击右上角**「加载演示数据」**。
+3. 看板会刷新，出现 12 个点位、4 条待处理反馈、方案版本 V3、4 条异常数据、操作时间线。
+
+> 演示数据里故意放了 3 条脏数据：充电桩数量 -1、地址缺失、数量为 0 但状态=暂停。这些会在「例外/异常」卡片和操作时间线中突出显示，不会被静默清洗。
+
+### 2. 批量导入点位（CSV / Excel）
+
+1. 进入「导入导出」→ 顶部切到**「批量导入」**。
+2. 拖拽 CSV 或 Excel（`.xlsx` `.xls`）到虚线框，或点击「选择文件」。
+3. 下方会出现解析预览表：
+   - 行号左边有⚠️图标+红色左边框的是**异常行**，备注列会写明原因（缺名称、数量为负/NaN、状态不合法等）。
+   - 异常行**仍然会导入**，但会被标记为「例外」，exceptionNote 写明问题，保证现场材料不丢。
+4. 点击**「确认导入」**。
+5. 每条新导入的点位会**自动触发归并检查**（`checkMergeSuggestions`），如果和已有点位名字相近会生成归并建议。
+
+**支持的列名**（大小写不敏感，支持中英文常见写法）：
+`点位名称 / 名称 / 原始写法 / originalName`、`标准名称 / canonicalName`、`地址 / address`、`充电桩数量 / 数量 / 枪数 / chargerCount`、`状态 / status`（规划中 / 施工中 / 已启用 / 暂停）、`来源 / source`（表格 / 照片 / 审批记录 / 手动补录）、`备注 / rawNote`。
+
+### 3. 单条补录点位
+
+1. 进入「导入导出」→「补录与导出」→ 子 tab 选**「点位补录」**。
+2. 填字段（只有「点位名称」是必填）。
+3. 点**「提交补录」**。
+4. 下方会出现「变更差异」区，告诉周姐这次补录新增了什么（方便交接时一眼看懂）。
+5. 补录完的点位同样**自动触发归并检查**。
+
+### 4. 录入会议反馈
+
+1. 进入「导入导出」→「补录与导出」→ 子 tab 选**「会议反馈」**。
+2. **关联点位**（下拉选择，会显示标准名称 + 原始写法）、**反馈内容**（多行文本，写会议纪要里的原话）、来源、初始状态。
+3. 点**「录入反馈」**。
+4. 成功后可以在「反馈与方案」页看到这条反馈，也可以在点位详情侧栏的「反馈历史」里看到。
+
+### 5. 创建方案版本
+
+1. 进入「导入导出」→「补录与导出」→ 子 tab 选**「方案版本」**。
+2. 填「版本名称」（例如 `V4 街道审批会讨论版`）和「版本说明」。
+3. 下方可以选**是否关联点位**：点「新增一行」→ 选点位 → 选操作（新增 / 保留 / 移除 / 修改）→ 写备注。
+4. 点**「创建方案版本」**。
+5. 到「反馈与方案」→ 「方案版本」可以看到新增的版本卡片，点击展开查看点位列表；有两个以上版本时可以用下方的**版本对比**看差异。
+
+### 6. 点位归并
+
+系统在导入、补录时**自动跑归并检查**，也可以在点位管理页顶部看到归并建议提示：
+
+1. 点位管理页筛选栏右边如果看到**「N 条归并建议」**的琥珀色按钮，点击。
+2. 弹出面板左右对比两个点位，左边是「保留」、右边是「合并」。
+3. 理由和相似度分数写在顶部（例如「标准名称高度相似，且无方向词冲突 · 相似度 0.92」）。
+4. **「确认归并」**或**「拒绝」**。归并后 B 条的 mergeStatus=已归并，mergedIntoId 指向 A。
+5. 归并判断的两个原则：
+   - **相似度够高才建议**（编辑距离 + 拼音首字母双维度）。
+   - **方向词冲突不合**（东门 vs 西门、南门 vs 北门 等互斥方向词会被强制判为不同地点，即使其它字都一样）。
+
+### 7. 上传现场照片
+
+1. 在「点位管理」点击任意一行 → 右侧弹出详情侧栏。
+2. 滚到**「照片」**区 → 点**「上传照片」**（虚线边框按钮）。
+3. 支持多选、支持常见图片格式。照片以 base64 形式存到 IndexedDB。
+4. 鼠标悬停在缩略图上，右上角出现红色删除按钮；底部是文件名标签。
+
+### 8. 导出 CSV（按筛选条件）
+
+1. 进入「导入导出」→「补录与导出」→ 滚到下方**「导出 CSV」**区。
+2. 先选筛选条件（三者任意组合）：
+   - **关键词**：按标准名称或原始写法模糊匹配。
+   - **归并状态**：全部 / 已归并 / 疑似重复 / 未归并。
+   - **点位状态**：全部 / 规划中 / 施工中 / 已启用 / 暂停。
+3. 中间一行文字会实时提示：`全量共 X 条；按当前筛选条件匹配 Y 条`。
+4. 点**「导出 Y 条 CSV」**。
+5. 文件名规则：`点位导出_YYYY-MM-DD_筛选后Y条.csv`（如果 Y < X 会加 `_筛选后Y条` 后缀，方便和全量区分）。
+6. 导出的 CSV 共 15 列，带 UTF-8 BOM（Excel 打开中文不乱码）：
+   点位 ID、原始写法、标准名称、地址、充电桩数量、状态、归并状态、已归并到 ID、来源、来源详情、是否例外、例外说明、原始备注、创建时间、更新时间。
+
+> 导出操作会写一条操作日志，详情里会带上你选的筛选条件（关键词 / 归并状态 / 点位状态），交接时清楚知道这份 CSV 是怎么筛出来的。
+
+## 脏数据策略（为什么不自动清洗）
+
+街道现场的材料经常：名字写一半、数量填 -1、地址空、状态写成错别字、备注里一大段会议原文。
+
+本工具的策略：**不洗、不扔、标出来**：
+
+| 情况 | 处理 |
+| --- | --- |
+| 缺名称 | 标记「例外」，exceptionNote = 「点位名称为空」，仍然入库 |
+| 数量 NaN / 负数 | 标记「例外」，exceptionNote 写明原因，数量=0 或原值保留 |
+| 状态不合法 | 标记「例外」，状态兜底成「规划中」并在 exceptionNote 写原输入 |
+| 备注一大段原文 | 原样存在 `rawNote`，点位详情侧栏「原始备注」区原样显示，不截断不清洗 |
+
+所有例外在点位列表的「例外」列有⚠️图标 + 悬浮 tooltip；数据看板也会把例外数量单独计数，**不会混在正常数据里消失**。
+
+## 追溯与交接
+
+- 每条点位 / 反馈 / 方案版本都有 `createdAt` + `updatedAt`。
+- 每条点位有 `source`（表格 / 照片 / 审批记录 / 手动补录）和 `sourceDetail`（例如「导入自 6月街道点位表.csv」「手动补录」）。
+- 操作日志时间线（仪表盘底部）记录：**类型 · 操作人 · 时间 · 摘要 · 详情**（包括导入 N 条含多少异常、补录了哪个点位、导出时的筛选条件）。
+
+接手人只要拿到导出的 CSV + 看到仪表盘时间线，就能快速还原周姐当初为什么这么判。
+
+## 常见问题
+
+**Q：数据会丢吗？**
+A：只要不清理浏览器数据、不换浏览器 / 换设备就一直在。换电脑时可以在旧设备先导出 CSV，再在新设备导入——归并检查会自动跑。
+
+**Q：两个点位明明是同一个地点，为什么没提示归并？**
+A：可能方向词冲突（例如「阳光花园东门」vs「阳光花园西门」）。或者相似度低于阈值（默认 0.75）。可以手动在反馈里备注，交接时说明。
+
+**Q：归并建议把不同点位拼在一起了（误合并）？**
+A：点「拒绝」就行；系统不会自动合并，所有归并都需要人工确认。
+
+**Q：CSV 用 Excel 打开中文乱码？**
+A：导出文件带了 UTF-8 BOM，Excel 2016+ 直接双击打开即可。老版本 Excel 可以用「数据 → 从文本/CSV 导入 → 编码选 UTF-8」。

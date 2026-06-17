@@ -6,7 +6,7 @@ interface PlanState {
   planVersions: PlanVersion[]
   planLocations: PlanLocation[]
   loadAll: () => Promise<void>
-  addPlanVersion: (version: Omit<PlanVersion, 'id' | 'createdAt'>) => Promise<void>
+  addPlanVersion: (version: Omit<PlanVersion, 'id' | 'createdAt'>) => Promise<PlanVersion>
   addPlanLocation: (planLocation: Omit<PlanLocation, 'id'>) => Promise<void>
   getLocationsByPlanId: (planId: string) => PlanLocation[]
   getPlansByLocationId: (locationId: string) => PlanVersion[]
@@ -28,6 +28,7 @@ export const usePlanStore = create<PlanState>((set, get) => ({
     const record: PlanVersion = { ...version, id: generateId(), createdAt: nowISO() }
     await db.put('planVersions', record)
     set((state) => ({ planVersions: [...state.planVersions, record] }))
+    return record
   },
 
   addPlanLocation: async (planLocation) => {
