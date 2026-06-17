@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { FileOutput, ChevronDown, ChevronUp, Download } from 'lucide-react'
 import { useProjectStore } from '@/store'
-import { fetchExport, generateExport, downloadCsv } from '@/api'
+import { fetchExport, generateExport, downloadCsv, fetchProjects } from '@/api'
 
 const categoryConfig: Record<string, { label: string; headerCls: string; badgeCls: string }> = {
   processed: {
@@ -22,7 +22,7 @@ const categoryConfig: Record<string, { label: string; headerCls: string; badgeCl
 }
 
 export default function ExportPage() {
-  const { currentProjectId, operator } = useProjectStore()
+  const { currentProjectId, operator, setCurrentProjectId } = useProjectStore()
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
@@ -33,8 +33,23 @@ export default function ExportPage() {
   })
 
   useEffect(() => {
-    if (currentProjectId) loadExport()
+    if (currentProjectId) {
+      loadExport()
+    } else {
+      ensureProject()
+    }
   }, [currentProjectId])
+
+  async function ensureProject() {
+    try {
+      const projects = await fetchProjects()
+      if (projects.length > 0) {
+        setCurrentProjectId(projects[0].id)
+      }
+    } catch {
+      // ignore
+    }
+  }
 
   async function loadExport() {
     try {

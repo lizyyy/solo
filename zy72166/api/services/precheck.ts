@@ -186,9 +186,28 @@ export function runPrecheck(projectId: string): void {
     INSERT INTO review_items (id, project_id, record_id, status, verdict, conflict_ledger_evidence, conflict_import_evidence, conflict_suggestion)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `)
-  const deleteReviewNotes = db.prepare(`DELETE FROM review_notes WHERE review_item_id IN (SELECT id FROM review_items WHERE project_id = ? AND status = 'pending')`)
-  const deleteReviewHistory = db.prepare(`DELETE FROM review_history WHERE review_item_id IN (SELECT id FROM review_items WHERE project_id = ? AND status = 'pending')`)
-  const deleteReviewItems = db.prepare(`DELETE FROM review_items WHERE project_id = ? AND status = 'pending'`)
+  const deleteReviewNotes = db.prepare(`
+    DELETE FROM review_notes WHERE review_item_id IN (
+      SELECT id FROM review_items
+      WHERE project_id = ? AND status IN ('pending', 'conflict')
+      AND id NOT IN (SELECT review_item_id FROM review_notes)
+      AND id NOT IN (SELECT review_item_id FROM review_history)
+    )
+  `)
+  const deleteReviewHistory = db.prepare(`
+    DELETE FROM review_history WHERE review_item_id IN (
+      SELECT id FROM review_items
+      WHERE project_id = ? AND status IN ('pending', 'conflict')
+      AND id NOT IN (SELECT review_item_id FROM review_notes)
+      AND id NOT IN (SELECT review_item_id FROM review_history)
+    )
+  `)
+  const deleteReviewItems = db.prepare(`
+    DELETE FROM review_items
+    WHERE project_id = ? AND status IN ('pending', 'conflict')
+    AND id NOT IN (SELECT review_item_id FROM review_notes)
+    AND id NOT IN (SELECT review_item_id FROM review_history)
+  `)
   const deleteMergeGroups = db.prepare(`DELETE FROM merge_groups WHERE project_id = ?`)
   const insertMergeGroup = db.prepare(`
     INSERT INTO merge_groups (id, project_id, type, record_ids, strategy, note)
