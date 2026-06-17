@@ -223,10 +223,12 @@ class ReportGenerator:
         
         sample_diff = comparison.get("sample_diff", {})
         metric_diff = comparison.get("metric_diff", {})
+        sample_changes = comparison.get("sample_changes", {})
+        score_changes = comparison.get("score_changes", {})
         
         section.append(f"\n对比: {comparison.get('run1_name', '前次')} vs {comparison.get('run2_name', '本次')}")
         
-        section.append("\n📊 样本变化:")
+        section.append("\n📊 A. 样本总量变化:")
         sample_data = [
             ["", comparison.get('run1_name', '前次'), comparison.get('run2_name', '本次'), "变化"],
             ["样本总数", sample_diff.get("run1_count", 0), sample_diff.get("run2_count", 0), 
@@ -236,8 +238,64 @@ class ReportGenerator:
         ]
         section.append(tabulate(sample_data, tablefmt="simple"))
         
+        new_ids = sample_changes.get("new_sample_ids", [])
+        removed_ids = sample_changes.get("removed_sample_ids", [])
+        common_count = sample_changes.get("common_samples_count", 0)
+        
+        if new_ids or removed_ids:
+            section.append("\n📋 B. 样本明细变化:")
+            
+            if new_ids:
+                section.append(f"\n  ✅ 新增样本 ({len(new_ids)} 条):")
+                for sid in new_ids[:20]:
+                    section.append(f"     • {sid}")
+                if len(new_ids) > 20:
+                    section.append(f"     ... 还有 {len(new_ids)-20} 条")
+            
+            if removed_ids:
+                section.append(f"\n  ❌ 移除样本 ({len(removed_ids)} 条):")
+                for sid in removed_ids[:20]:
+                    section.append(f"     • {sid}")
+                if len(removed_ids) > 20:
+                    section.append(f"     ... 还有 {len(removed_ids)-20} 条")
+            
+            if common_count > 0:
+                section.append(f"\n  ➡️  两次共有样本: {common_count} 条")
+        elif common_count > 0:
+            section.append(f"\n📋 B. 样本明细变化: 两次运行样本完全一致 ({common_count} 条)")
+        
+        if score_changes:
+            changed_count = score_changes.get("score_changed_count", 0)
+            changed_ratio = score_changes.get("score_changed_ratio", 0)
+            diff_mean = score_changes.get("score_diff_mean", 0)
+            diff_std = score_changes.get("score_diff_std", 0)
+            
+            section.append(f"\n📋 C. 共有样本分数变化:")
+            section.append(f"  分数有变化的样本: {changed_count} 条 ({changed_ratio:.1%})")
+            section.append(f"  平均分数变化: {diff_mean:+.4f}  (标准差: {diff_std:.4f})")
+            
+            top_increases = score_changes.get("top_increases", {})
+            top_decreases = score_changes.get("top_decreases", {})
+            
+            real_increases = {k: v for k, v in top_increases.items() if v > 1e-6}
+            real_decreases = {k: v for k, v in top_decreases.items() if v < -1e-6}
+            
+            if real_increases:
+                section.append(f"\n  🔺 分数升最多的样本 (最多10条):")
+                inc_data = [["样本ID", "分数变化"]]
+                for sid, delta in real_increases.items():
+                    inc_data.append([sid, f"{delta:+.4f}"])
+                section.append(tabulate(inc_data, tablefmt="simple"))
+            
+            if real_decreases:
+                section.append(f"\n  🔻 分数降最多的样本 (最多10条):")
+                dec_data = [["样本ID", "分数变化"]]
+                for sid, delta in real_decreases.items():
+                    dec_data.append([sid, f"{delta:+.4f}"])
+                section.append(tabulate(dec_data, tablefmt="simple"))
+        
         if metric_diff:
-            section.append("\n📈 指标变化:")
+            section.append("\n�� D. 指标变化:")
             metric_data = [["指标", "前次", "本次", "变化(%)"]]
             for key, value in metric_diff.items():
                 diff_pct = value.get("diff_pct")
@@ -249,20 +307,46 @@ class ReportGenerator:
                     diff_str
                 ])
             section.append(tabulate(metric_data, tablefmt="simple"))
-            
-            section.append("\n💡 解读:")
+        
+        section.append("\n💡 E. 复盘归因:")
+        explanations = []
+        
+        n_new = len(new_ids)
+        n_removed = len(removed_ids)
+        n_score_changed = score_changes.get("score_changed_count", 0) if score_changes else 0
+        
+        if n_new == 0 and n_removed == 0 and n_score_changed == 0:
+            explanations.append("✅ 两次运行样本完全一致，模型分数也没有变化，指标差异不存在")
+        else:
+            if n_new > 0:
+                explanations.append(f"📌 新增了 {n_new} 条样本 — 可能改变了欺诈率分布，影响精确率和召回率的分母")
+            if n_removed > 0:
+                explanations.append(f"📌 移除了 {n_removed} 条样本 — 需要确认是清洗去掉了还是数据源变了")
+            if n_score_changed > 0:
+                explanations.append(f"� 有 {n_score_changed} 条共有样本的模型分数发生了变化 — 这直接导致判定结果翻转，是指标变化的核心原因")
+            if n_new == 0 and n_removed == 0 and n_score_changed > 0:
+                explanations.append("📌 样本数没变但分数变了，说明是模型本身或特征工程有调整，不是数据问题")
+        
+        if metric_diff:
             recall_diff = metric_diff.get("recall", {}).get("diff", 0)
             precision_diff = metric_diff.get("precision", {}).get("diff", 0)
+            f1_diff = metric_diff.get("f1", {}).get("diff", 0)
             
             if recall_diff > 0.02:
-                section.append("  ✅ 召回率提升明显，抓到的欺诈更多了！")
+                explanations.append(f"✅ 召回率上升 {recall_diff:+.2f}，抓到的欺诈更多了")
             elif recall_diff < -0.02:
-                section.append("  ⚠️  召回率下降，需要关注是否漏了更多欺诈")
+                explanations.append(f"⚠️  召回率下降 {recall_diff:+.2f}，可能漏了更多欺诈")
             
             if precision_diff > 0.02:
-                section.append("  ✅ 精确率提升，审核效率更高了！")
+                explanations.append(f"✅ 精确率上升 {precision_diff:+.2f}，审核效率更高")
             elif precision_diff < -0.02:
-                section.append("  ⚠️  精确率下降，可能增加了审核压力")
+                explanations.append(f"⚠️  精确率下降 {precision_diff:+.2f}，审核压力增大")
+            
+            if abs(f1_diff) > 0.02:
+                explanations.append(f"📊 F1变化 {f1_diff:+.2f}，综合表现{'提升' if f1_diff > 0 else '下降'}")
+        
+        for exp in explanations:
+            section.append(f"  {exp}")
         
         return "\n".join(section)
 

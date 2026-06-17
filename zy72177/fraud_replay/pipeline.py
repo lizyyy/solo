@@ -74,6 +74,10 @@ class ReplayPipeline:
         if self.previous_run_df is not None:
             previous_metrics = self.metric_calculator.calculate_metrics(self.previous_run_df, group_name="previous")
             run_comparison = self.metric_calculator.compare_metrics(previous_metrics, metrics)
+            
+            sample_comparison = self.model_processor.compare_runs(self.previous_run_df, processed_df)
+            run_comparison["sample_changes"] = sample_comparison.get("sample_changes", {})
+            run_comparison["score_changes"] = sample_comparison.get("metric_changes", {})
         
         report = self.reporter.generate_report(
             processed_df, sample_summary, model_summary,
