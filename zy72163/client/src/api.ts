@@ -73,18 +73,21 @@ export interface Report {
 export interface DataConflict {
   id: number;
   locationId: number;
-  type: 'location_name' | 'pruning_suggestion' | 'status' | 'other';
-  sourceA: string;
-  sourceB: string;
-  valueA: string;
-  valueB: string;
+  feedbackId?: number;
+  relatedFeedbackId?: number;
+  conflictType: 'location_name' | 'pruning_suggestion' | 'status' | 'content_discrepancy' | 'priority' | 'other';
   description: string;
-  suggestion: string;
-  resolved: boolean;
-  resolvedBy?: string;
+  feedbackValue?: string;
+  existingValue?: string;
+  suggestedAction: string;
   resolvedAt?: string;
+  resolvedBy?: string;
+  resolution?: string;
   createdAt: string;
-  locationName?: string;
+  updatedAt: string;
+  location?: Location;
+  feedback?: ResidentFeedback;
+  relatedFeedback?: ResidentFeedback;
 }
 
 export interface Statistics {
@@ -160,11 +163,11 @@ export const reportsApi = {
 };
 
 export const conflictsApi = {
-  getAll: (includeResolved = false) => 
-    api.get<DataConflict[]>(`/conflicts?includeResolved=${includeResolved}`),
+  getAll: (resolved?: boolean) => 
+    api.get<DataConflict[]>(resolved !== undefined ? `/conflicts?resolved=${resolved}` : '/conflicts'),
   getById: (id: number) => api.get<DataConflict>(`/conflicts/${id}`),
-  resolve: (id: number, resolvedBy: string, resolution?: string) => 
-    api.post<DataConflict>(`/conflicts/${id}/resolve`, { resolvedBy, resolution })
+  resolve: (id: number, resolution: 'use_feedback' | 'use_existing' | 'manual', resolvedBy: string, notes?: string) => 
+    api.post<DataConflict>(`/conflicts/${id}/resolve`, { resolution, resolvedBy, notes })
 };
 
 export const statisticsApi = {

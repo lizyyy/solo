@@ -7,7 +7,8 @@ export default function ConflictsPage() {
   const [includeResolved, setIncludeResolved] = useState(false);
   const [loading, setLoading] = useState(true);
   const [resolvingId, setResolvingId] = useState<number | null>(null);
-  const [resolution, setResolution] = useState('');
+  const [resolutionType, setResolutionType] = useState<'use_feedback' | 'use_existing' | 'manual'>('use_feedback');
+  const [notes, setNotes] = useState('');
 
   useEffect(() => {
     loadData();
@@ -15,7 +16,7 @@ export default function ConflictsPage() {
 
   async function loadData() {
     try {
-      const response = await conflictsApi.getAll(includeResolved);
+      const response = await conflictsApi.getAll(includeResolved ? undefined : false);
       setConflicts(response.data);
     } catch (error) {
       console.error('加载数据失败:', error);
@@ -26,9 +27,10 @@ export default function ConflictsPage() {
 
   async function handleResolve(conflictId: number) {
     try {
-      await conflictsApi.resolve(conflictId, '何工', resolution);
+      await conflictsApi.resolve(conflictId, resolutionType, '何工', notes);
       setResolvingId(null);
-      setResolution('');
+      setNotes('');
+      setResolutionType('use_feedback');
       loadData();
     } catch (error) {
       console.error('解决冲突失败:', error);
@@ -40,15 +42,19 @@ export default function ConflictsPage() {
       case 'pruning_suggestion': return '修剪建议冲突';
       case 'status': return '状态冲突';
       case 'location_name': return '点位名称冲突';
+      case 'content_discrepancy': return '内容描述冲突';
+      case 'priority': return '优先级冲突';
       default: return '其他冲突';
     }
   };
+
+  const isResolved = (c: DataConflict) => !!c.resolvedAt;
 
   if (loading) {
     return <div>加载中...</div>;
   }
 
-  const unresolvedCount = conflicts.filter(c => !c.resolved).length;
+  const unresolvedCount = conflicts.filter(c => !isResolved(c)).length;
 
   return (
     <div>
@@ -63,7 +69,7 @@ export default function ConflictsPage() {
           <div className="stat-label">⚠️ 待处理冲突</div>
         </div>
         <div className="stat-card">
-          <div className="stat-value">{conflicts.filter(c => c.resolved).length}</div>
+          <div className="stat-value">{conflicts.filter(c => isResolved(c)).length}</div>
           <div className="stat-label">✅ 已解决</div>
         </div>
         <div className="stat-card success">
@@ -99,32 +105,34 @@ export default function ConflictsPage() {
             conflicts.map(conflict => (
               <div 
                 key={conflict.id} 
-                className={`conflict-card ${conflict.resolved ? 'resolved' : ''}`}
+                className={`conflict-card ${isResolved(conflict) ? 'resolved' : ''}`}
               >
                 <div className="conflict-header">
                   <div>
                     <span className="conflict-type">
-                      {conflict.locationName && <strong>{conflict.locationName}</strong>}
+                      {conflict.location?.name && <strong>{conflict.location.name}</strong>}
                       {' · '}
-                      {getTypeLabel(conflict.type)}
+                      {getTypeLabel(conflict.conflictType)}
                     </span>
                     <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
                       检测时间: {conflict.createdAt}
                     </div>
                   </div>
                   <div>
-                    {conflict.resolved ? (
+                    {isResolved(conflict) ? (
                       <span className="badge badge-resolved">
                         已解决 · {conflict.resolvedBy}
                       </span>
                     ) : (
                       <button 
                         className="btn btn-sm btn-success"
-                        onClick={() => setResolvingId(
-                          resolvingId === conflict.id ? null : conflict.id
-                        )}
+                        onClick={() => {
+                          setResolvingId(resolvingId === conflict.id ? null : conflict.id);
+                          setNotes('');
+                          setResolutionType('use_feedback');
+                        }}
                       >
-                        {resolvingId === conflict.id ? '取消' : '标记解决'}
+                        {resolvingId === conflict.id ? '取消' : '人工裁决'}
                       </button>
                     )}
                   </div>
@@ -132,12 +140,22 @@ export default function ConflictsPage() {
                 
                 <div className="conflict-sources">
                   <div className="conflict-source">
-                    <div className="conflict-source-label">{conflict.sourceA}</div>
-                    <div>{conflict.valueA}</div>
+                    <div className="conflict-source-label">🆕 新反馈内容</div>
+                    <div>{conflict.feedbackValue || '无'}</div>
+                    {conflict.feedback && (
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                        来源: {conflict.feedback.source} · {conflict.feedback.feedbackDate}
+                      </div>
+                    )}
                   </div>
                   <div className="conflict-source">
-                    <div className="conflict-source-label">{conflict.sourceB}</div>
-                    <div>{conflict.valueB}</div>
+                    <div className="conflict-source-label">📋 已有记录</div>
+                    <div>{conflict.existingValue || '无'}</div>
+                    {conflict.relatedFeedback && (
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                        来源: {conflict.relatedFeedback.source} · {conflict.relatedFeedback.feedbackDate}
+                      </div>
+                    )}
                   </div>
                 </div>
                 
@@ -146,26 +164,78 @@ export default function ConflictsPage() {
                 </div>
                 
                 <div className="conflict-suggestion">
-                  💡 <strong>处理建议：</strong>{conflict.suggestion}
+                  💡 <strong>处理建议：</strong>{conflict.suggestedAction}
                 </div>
 
+                {isResolved(conflict) && conflict.resolution && (
+                  <div style={{ marginTop: '12px', padding: '12px', background: '#f0fdf4', borderRadius: '6px', fontSize: '13px' }}>
+                    <strong>✅ 裁决结果：</strong>{conflict.resolution}
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                      解决时间: {conflict.resolvedAt}
+                    </div>
+                  </div>
+                )}
+
                 {resolvingId === conflict.id && (
-                  <div style={{ marginTop: '12px' }}>
+                  <div style={{ marginTop: '12px', padding: '16px', background: '#f8fafc', borderRadius: '6px' }}>
                     <div className="form-group">
-                      <label className="form-label">处理说明（可选）</label>
+                      <label className="form-label">📌 裁决方式</label>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '8px 12px', background: resolutionType === 'use_feedback' ? '#eff6ff' : 'white', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer' }}>
+                          <input 
+                            type="radio" 
+                            name="resolutionType"
+                            value="use_feedback"
+                            checked={resolutionType === 'use_feedback'}
+                            onChange={(e) => setResolutionType(e.target.value as any)}
+                          />
+                          采用新反馈
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '8px 12px', background: resolutionType === 'use_existing' ? '#eff6ff' : 'white', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer' }}>
+                          <input 
+                            type="radio" 
+                            name="resolutionType"
+                            value="use_existing"
+                            checked={resolutionType === 'use_existing'}
+                            onChange={(e) => setResolutionType(e.target.value as any)}
+                          />
+                          保留原有记录
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '8px 12px', background: resolutionType === 'manual' ? '#eff6ff' : 'white', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer' }}>
+                          <input 
+                            type="radio" 
+                            name="resolutionType"
+                            value="manual"
+                            checked={resolutionType === 'manual'}
+                            onChange={(e) => setResolutionType(e.target.value as any)}
+                          />
+                          手动处理
+                        </label>
+                      </div>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">📝 处理说明（可选）</label>
                       <textarea
                         className="form-textarea"
-                        value={resolution}
-                        onChange={(e) => setResolution(e.target.value)}
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
                         placeholder="请输入处理说明，便于后续追溯..."
                       />
                     </div>
-                    <button 
-                      className="btn btn-primary"
-                      onClick={() => handleResolve(conflict.id)}
-                    >
-                      确认解决
-                    </button>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button 
+                        className="btn btn-primary"
+                        onClick={() => handleResolve(conflict.id)}
+                      >
+                        确认裁决
+                      </button>
+                      <button 
+                        className="btn btn-secondary"
+                        onClick={() => setResolvingId(null)}
+                      >
+                        取消
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -182,7 +252,7 @@ export default function ConflictsPage() {
           <ul style={{ fontSize: '14px', lineHeight: '2', paddingLeft: '20px' }}>
             <li><strong>自动检测</strong>：系统自动检测居民反馈、修剪方案之间的数据冲突</li>
             <li><strong>双向对比</strong>：展示冲突双方的原始数据，便于人工核对</li>
-            <li><strong>不替用户拍板</strong>：系统只提供处理建议，最终决策由人工确认</li>
+            <li><strong>不替用户拍板</strong>：系统只提供处理建议，最终决策由人工裁决</li>
             <li><strong>全程追溯</strong>：所有冲突处理记录都保留，便于后续审计</li>
           </ul>
         </div>
