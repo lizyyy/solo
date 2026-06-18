@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商户退款批次回放</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f7fa; color: #303133; font-size: 14px; }
+    .header { background: linear-gradient(135deg, #409eff 0%, #2b7cd3 100%); color: white; padding: 16px 24px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+    .header h1 { font-size: 20px; font-weight: 600; }
+    .header .sub { font-size: 12px; opacity: .85; margin-top: 4px; }
+    .container { max-width: 1280px; margin: 0 auto; padding: 20px; }
+    .tabs { display: flex; gap: 4px; background: white; border-radius: 8px 8px 0 0; padding: 8px 8px 0; border-bottom: 1px solid #ebeef5; }
+    .tab { padding: 10px 20px; cursor: pointer; border-radius: 6px 6px 0 0; color: #606266; font-weight: 500; transition: all .2s; }
+    .tab:hover { color: #409eff; background: #f0f7ff; }
+    .tab.active { color: #409eff; background: #ecf5ff; border-bottom: 2px solid #409eff; }
+    .panel { display: none; background: white; border-radius: 0 0 8px 8px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    .panel.active { display: block; }
+    .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; transition: all .2s; }
+    .btn-primary { background: #409eff; color: white; }
+    .btn-primary:hover { background: #66b1ff; }
+    .btn-success { background: #67c23a; color: white; }
+    .btn-success:hover { background: #85ce61; }
+    .btn-warning { background: #e6a23c; color: white; }
+    .btn-warning:hover { background: #ebb563; }
+    .btn-danger { background: #f56c6c; color: white; }
+    .btn-danger:hover { background: #f78989; }
+    .btn-default { background: white; color: #606266; border: 1px solid #dcdfe6; }
+    .btn-default:hover { color: #409eff; border-color: #c6e2ff; background: #ecf5ff; }
+    .btn-sm { padding: 4px 10px; font-size: 12px; }
+    .btn-block { width: 100%; padding: 10px; font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #ebeef5; }
+    th { background: #fafafa; color: #606266; font-weight: 600; font-size: 12px; }
+    tr:hover td { background: #f5f7fa; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+    .tag-blue { background: #ecf5ff; color: #409eff; }
+    .tag-green { background: #f0f9eb; color: #67c23a; }
+    .tag-orange { background: #fdf6ec; color: #e6a23c; }
+    .tag-red { background: #fef0f0; color: #f56c6c; }
+    .tag-gray { background: #f4f4f5; color: #909399; }
+    .form-row { margin-bottom: 16px; }
+    .form-row label { display: block; margin-bottom: 6px; color: #606266; font-size: 13px; }
+    .form-row input, .form-row textarea, .form-row select {
+      width: 100%; padding: 8px 12px; border: 1px solid #dcdfe6; border-radius: 4px;
+      font-size: 13px; outline: none; transition: border-color .2s;
+    }
+    .form-row input:focus, .form-row textarea:focus, .form-row select:focus { border-color: #409eff; }
+    .form-row textarea { resize: vertical; min-height: 120px; font-family: monospace; font-size: 12px; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .card { background: #f5f7fa; border-radius: 6px; padding: 16px; margin-bottom: 16px; }
+    .card h3 { font-size: 14px; margin-bottom: 12px; color: #303133; }
+    .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+    .stat-card { background: white; border-radius: 8px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.04); }
+    .stat-card .label { color: #909399; font-size: 12px; margin-bottom: 6px; }
+    .stat-card .value { font-size: 22px; font-weight: 600; color: #303133; }
+    .stat-card .value.warn { color: #e6a23c; }
+    .stat-card .value.danger { color: #f56c6c; }
+    .stat-card .value.success { color: #67c23a; }
+    .split-row { background: #fdf6ec !important; }
+    .split-row .same-group { font-weight: 600; color: #e6a23c; }
+    .evidence-badge { font-size: 11px; color: #909399; }
+    .evidence-badge.done { color: #67c23a; }
+    .manual-badge { font-size: 11px; color: #e6a23c; }
+    .step-indicator { display: flex; justify-content: space-between; margin-bottom: 24px; position: relative; }
+    .step-indicator::before { content: ''; position: absolute; top: 16px; left: 0; right: 0; height: 2px; background: #e4e7ed; z-index: 0; }
+    .step-item { flex: 1; text-align: center; position: relative; z-index: 1; }
+    .step-circle { width: 32px; height: 32px; border-radius: 50%; background: white; border: 2px solid #dcdfe6; color: #909399; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-weight: 600; font-size: 13px; }
+    .step-item.active .step-circle { background: #409eff; border-color: #409eff; color: white; }
+    .step-item.done .step-circle { background: #67c23a; border-color: #67c23a; color: white; }
+    .step-label { font-size: 12px; color: #909399; }
+    .step-item.active .step-label, .step-item.done .step-label { color: #303133; font-weight: 500; }
+    .detail-section { margin-bottom: 20px; }
+    .detail-section h4 { font-size: 13px; color: #606266; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #ebeef5; }
+    .detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .detail-item .k { font-size: 12px; color: #909399; margin-bottom: 2px; }
+    .detail-item .v { font-size: 13px; color: #303133; font-weight: 500; }
+    .modal-mask { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.5); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-mask.show { display: flex; }
+    .modal { background: white; border-radius: 8px; width: 560px; max-height: 80vh; overflow-y: auto; }
+    .modal-header { padding: 16px 20px; border-bottom: 1px solid #ebeef5; font-size: 15px; font-weight: 600; }
+    .modal-body { padding: 20px; }
+    .modal-footer { padding: 12px 20px; border-top: 1px solid #ebeef5; text-align: right; }
+    .modal-footer .btn { margin-left: 8px; }
+    .alert { padding: 10px 14px; border-radius: 4px; margin-bottom: 16px; font-size: 13px; }
+    .alert-warning { background: #fdf6ec; color: #e6a23c; border: 1px solid #faecd8; }
+    .alert-info { background: #ecf5ff; color: #409eff; border: 1px solid #d9ecff; }
+    .alert-success { background: #f0f9eb; color: #67c23a; border: 1px solid #e1f3d8; }
+    .toolbar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .toolbar .spacer { flex: 1; }
+    .empty { text-align: center; padding: 40px; color: #909399; font-size: 13px; }
+    .link-btn { background: none; border: none; color: #409eff; cursor: pointer; font-size: 12px; padding: 0; }
+    .link-btn:hover { text-decoration: underline; }
+    .check-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .check-row input[type=checkbox] { width: auto; }
+    .audited-flag { display: inline-block; background: #fdf6ec; color: #e6a23c; padding: 1px 6px; border-radius: 3px; font-size: 10px; margin-left: 4px; }
+    .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+    .toast { padding: 12px 20px; border-radius: 6px; color: white; font-size: 13px; box-shadow: 0 4px 12px rgba(0,0,0,.15); animation: slideIn .3s ease; }
+    .toast.success { background: #67c23a; }
+    .toast.error { background: #f56c6c; }
+    .toast.info { background: #409eff; }
+    .toast.warning { background: #e6a23c; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>商户退款批次回放</h1>
+    <div class="sub">托管确认页 + 除权日截图双证据整合，结算主管复核，统一结果数据源</div>
+  </div>
+
+  <div class="container">
+    <div class="tabs">
+      <div class="tab active" data-tab="list">批次列表</div>
+      <div class="tab" data-tab="import">新建批次（导入）</div>
+      <div class="tab" data-tab="detail">批次详情</div>
+    </div>
+
+    <!-- 批次列表 -->
+    <div class="panel active" id="panel-list">
+      <div class="toolbar">
+        <span style="color:#909399;font-size:13px;">共 <span id="list-count">0</span> 个批次</span>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" onclick="switchTab('import')">+ 新建批次</button>
+        <button class="btn btn-default" onclick="loadBatchList()">刷新</button>
+      </div>
+      <table id="batch-table">
+        <thead>
+          <tr>
+            <th>批次号</th>
+            <th>批次名称</th>
+            <th>基金</th>
+            <th>托管方</th>
+            <th>笔数</th>
+            <th>总金额</th>
+            <th>状态</th>
+            <th>当前步骤</th>
+            <th>操作人</th>
+            <th>创建时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="batch-tbody">
+        </tbody>
+      </table>
+      <div class="empty" id="list-empty" style="display:none;">暂无批次数据，点击右上角新建</div>
+    </div>
+
+    <!-- 新建批次（导入） -->
+    <div class="panel" id="panel-import">
+      <div class="step-indicator">
+        <div class="step-item active" id="step-1"><div class="step-circle">1</div><div class="step-label">基本信息</div></div>
+        <div class="step-item" id="step-2"><div class="step-circle">2</div><div class="step-label">托管确认页数据</div></div>
+        <div class="step-item" id="step-3"><div class="step-circle">3</div><div class="step-label">预览确认</div></div>
+      </div>
+
+      <div id="import-step1">
+        <div class="card">
+          <h3>批次基本信息</h3>
+          <div class="form-grid">
+            <div class="form-row">
+              <label>批次号 *</label>
+              <input type="text" id="f-batchNo" placeholder="如 RF20260608001" value="RF20260618001">
+            </div>
+            <div class="form-row">
+              <label>批次名称 *</label>
+              <input type="text" id="f-batchName" placeholder="如 2026年6月商户退款第一批" value="2026年6月商户退款第一批">
+            </div>
+            <div class="form-row">
+              <label>批次日期 *</label>
+              <input type="date" id="f-batchDate" value="2026-06-18">
+            </div>
+            <div class="form-row">
+              <label>基金代码</label>
+              <input type="text" id="f-fundCode" value="FUND001">
+            </div>
+            <div class="form-row">
+              <label>基金名称</label>
+              <input type="text" id="f-fundName" value="华夏成长混合">
+            </div>
+            <div class="form-row">
+              <label>托管方</label>
+              <input type="text" id="f-custodian" value="招商证券托管部">
+            </div>
+            <div class="form-row">
+              <label>操作人 *</label>
+              <input type="text" id="f-operator" value="linjie">
+            </div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <button class="btn btn-default" onclick="loadSampleData()">加载示例数据</button>
+          <button class="btn btn-primary" onclick="goImportStep(2)">下一步：填写托管确认数据</button>
+        </div>
+      </div>
+
+      <div id="import-step2" style="display:none;">
+        <div class="alert alert-info">
+          请按行粘贴托管确认页数据，每行一条记录，字段用逗号分隔。格式：行号,业务号,商户号,商户名称,交易日,结算日,金额,本金,手续费,币种,状态,备注,原始内容
+        </div>
+        <div class="form-row">
+          <label>托管确认页原始数据（每行一条，逗号分隔）</label>
+          <textarea id="f-rawData" placeholder="1,BIZ20260601001,M001,京东科技,2026-06-01,2026-06-03,50000,50000,0,CNY,normal,正常退款,京东科技退款50000"></textarea>
+        </div>
+        <div style="text-align:right;">
+          <button class="btn btn-default" onclick="goImportStep(1)">上一步</button>
+          <button class="btn btn-primary" onclick="previewImport()">预览</button>
+        </div>
+      </div>
+
+      <div id="import-step3" style="display:none;">
+        <div class="alert alert-warning" id="import-warn" style="display:none;"></div>
+        <div class="stat-row">
+          <div class="stat-card"><div class="label">总记录数</div><div class="value" id="prev-count">0</div></div>
+          <div class="stat-card"><div class="label">总金额</div><div class="value" id="prev-amount">0</div></div>
+          <div class="stat-card"><div class="label">拆分待复核</div><div class="value warn" id="prev-split">0</div></div>
+          <div class="stat-card"><div class="label">正常记录</div><div class="value success" id="prev-normal">0</div></div>
+        </div>
+        <h4 style="margin-bottom:12px;">预览明细</h4>
+        <table id="preview-table">
+          <thead>
+            <tr>
+              <th>行号</th>
+              <th>业务号</th>
+              <th>商户</th>
+              <th>交易日</th>
+              <th>结算日</th>
+              <th>原始金额</th>
+              <th>本金</th>
+              <th>手续费</th>
+              <th>类型</th>
+              <th>状态预测</th>
+            </tr>
+          </thead>
+          <tbody id="preview-tbody">
+          </tbody>
+        </table>
+        <div style="text-align:right;margin-top:16px;">
+          <button class="btn btn-default" onclick="goImportStep(2)">上一步</button>
+          <button class="btn btn-success" onclick="confirmImport()">确认导入</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 批次详情 -->
+    <div class="panel" id="panel-detail">
+      <div id="detail-empty" class="empty">请从批次列表选择一个批次查看详情</div>
+      <div id="detail-content" style="display:none;">
+        <div class="toolbar">
+          <button class="btn btn-default btn-sm" onclick="switchTab('list')">← 返回列表</button>
+          <span style="font-size:16px;font-weight:600;" id="d-batchNo">—</span>
+          <span class="tag tag-blue" id="d-status">—</span>
+          <span class="tag tag-gray" id="d-step">—</span>
+          <div class="spacer" style="flex:1;"></div>
+          <button class="btn btn-warning" onclick="showEvidenceModal()">补看除权日证据</button>
+          <button class="btn btn-primary" onclick="showDiffModal()">更新差异清单</button>
+          <button class="btn btn-success" onclick="showSupervisorModal()">主管复核</button>
+          <button class="btn btn-default" onclick="exportBatch()">导出 Excel</button>
+          <button class="btn btn-default" onclick="loadDetail()">刷新</button>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-card"><div class="label">总笔数</div><div class="value" id="d-count">0</div></div>
+          <div class="stat-card"><div class="label">总确认金额</div><div class="value" id="d-amount">0</div></div>
+          <div class="stat-card"><div class="label">待主管复核</div><div class="value warn" id="d-pending">0</div></div>
+          <div class="stat-card"><div class="label">证据已补看</div><div class="value success" id="d-evidence">0</div></div>
+        </div>
+
+        <div class="detail-section">
+          <h4>基本信息</h4>
+          <div class="detail-grid">
+            <div class="detail-item"><div class="k">批次名称</div><div class="v" id="d-batchName">—</div></div>
+            <div class="detail-item"><div class="k">基金</div><div class="v" id="d-fund">—</div></div>
+            <div class="detail-item"><div class="k">托管方</div><div class="v" id="d-custodian">—</div></div>
+            <div class="detail-item"><div class="k">操作人</div><div class="v" id="d-operator">—</div></div>
+            <div class="detail-item"><div class="k">主管</div><div class="v" id="d-supervisor">—</div></div>
+            <div class="detail-item"><div class="k">创建时间</div><div class="v" id="d-created">—</div></div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4>自检结果 <button class="link-btn" onclick="runSelfCheck()">重新执行</button></h4>
+          <table id="check-table">
+            <thead>
+              <tr><th>检查项</th><th>结果</th><th>详情</th><th>操作人</th><th>时间</th></tr>
+            </thead>
+            <tbody id="check-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="detail-section">
+          <h4>明细列表（与导出同数据源）</h4>
+          <div class="alert alert-info" style="margin-bottom:12px;">
+            页面明细、接口返回、Excel导出 三方读取同一份 refund_detail 数据，保证一致。
+            <span class="audited-flag">拆分记录标记为橙色</span>
+          </div>
+          <table id="detail-table">
+            <thead>
+              <tr>
+                <th>托管行号</th>
+                <th>业务号</th>
+                <th>同组标识</th>
+                <th>类型</th>
+                <th>商户</th>
+                <th>交易日</th>
+                <th>原始金额</th>
+                <th>确认金额</th>
+                <th>本金</th>
+                <th>手续费</th>
+                <th>处理状态</th>
+                <th>证据状态</th>
+                <th>人工改动</th>
+                <th>差异状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="detail-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="detail-section">
+          <h4>审计日志</h4>
+          <table id="audit-table">
+            <thead>
+              <tr><th>操作</th><th>业务号</th><th>旧值</th><th>新值</th><th>操作人</th><th>时间</th><th>备注</th></tr>
+            </thead>
+            <tbody id="audit-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- 证据补看弹窗 -->
+  <div class="modal-mask" id="evidence-modal">
+    <div class="modal">
+      <div class="modal-header">补看除权日证据</div>
+      <div class="modal-body">
+        <div class="form-row">
+          <label>复核人</label>
+          <input type="text" id="ev-reviewer" value="linjie">
+        </div>
+        <div class="form-row">
+          <label>证据数据（每行一条：业务号,除权日,证据来源,证据内容,截图地址,复核意见）</label>
+          <textarea id="ev-data" style="min-height:180px;"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" onclick="hideModal('evidence-modal')">取消</button>
+        <button class="btn btn-primary" onclick="submitEvidence()">提交</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 差异更新弹窗 -->
+  <div class="modal-mask" id="diff-modal">
+    <div class="modal" style="width:720px;">
+      <div class="modal-header">更新差异清单</div>
+      <div class="modal-body">
+        <div class="form-row">
+          <label>操作人</label>
+          <input type="text" id="diff-operator" value="linjie">
+        </div>
+        <div class="form-row">
+          <label>差异项数据（每行一条：明细ID,业务号,差异状态,差异说明,确认金额,本金,手续费,人工改动）</label>
+          <textarea id="diff-data" style="min-height:240px;font-size:12px;"></textarea>
+        </div>
+        <div class="alert alert-info" style="font-size:12px;">
+          差异状态：normal-正常 resolved-已解决 abnormal-异常
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" onclick="hideModal('diff-modal')">取消</button>
+        <button class="btn btn-primary" onclick="submitDiff()">提交</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 主管复核弹窗 -->
+  <div class="modal-mask" id="supervisor-modal">
+    <div class="modal" style="width:640px;">
+      <div class="modal-header">结算主管复核</div>
+      <div class="modal-body">
+        <div class="form-row">
+          <label>主管姓名</label>
+          <input type="text" id="sv-name" value="zhang_leader">
+        </div>
+        <div id="sv-list"></div>
+        <div class="alert alert-warning" id="sv-empty" style="display:none;">
+          当前没有待复核的拆分记录
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" onclick="hideModal('supervisor-modal')">取消</button>
+        <button class="btn btn-success" onclick="submitSupervisor()">提交复核</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 明细详情弹窗 -->
+  <div class="modal-mask" id="row-modal">
+    <div class="modal" style="width:680px;">
+      <div class="modal-header">明细详情</div>
+      <div class="modal-body" id="row-detail-body"></div>
+      <div class="modal-footer">
+        <button class="btn btn-default" onclick="hideModal('row-modal')">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = '/api/refund-batch-replay';
+    let currentBatchId = null;
+    let currentBatchData = null;
+    let importPreviewData = [];
+
+    function toast(msg, type) {
+      type = type || 'info';
+      const el = document.createElement('div');
+      el.className = 'toast ' + type;
+      el.textContent = msg;
+      document.getElementById('toast-container').appendChild(el);
+      setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(() => el.remove(), 300); }, 3000);
+    }
+
+    function switchTab(name) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelector(`.tab[data-tab="${name}"]`).classList.add('active');
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-' + name).classList.add('active');
+      if (name === 'list') loadBatchList();
+    }
+
+    document.querySelectorAll('.tab').forEach(t => {
+      t.addEventListener('click', () => switchTab(t.dataset.tab));
+    });
+
+    function goImportStep(n) {
+      for (let i = 1; i <= 3; i++) {
+        document.getElementById('import-step' + i).style.display = (i === n) ? 'block' : 'none';
+        document.getElementById('step-' + i).classList.remove('active', 'done');
+      }
+      document.getElementById('step-' + n).classList.add('active');
+      for (let i = 1; i < n; i++) {
+        document.getElementById('step-' + i).classList.add('done');
+      }
+    }
+
+    function loadSampleData() {
+      const sample = `1,BIZ20260601001,M001,京东科技,2026-06-01,2026-06-03,50000.00,50000.00,0,CNY,normal,正常退款,京东科技 BIZ20260601001 退款50000.00
+2,BIZ20260601002,M002,美团支付,2026-06-01,2026-06-03,12000.00,12000.00,0,CNY,normal,本金,美团支付 BIZ20260601002 本金12000.00
+3,BIZ20260601002,M002,美团支付,2026-06-01,2026-06-03,300.00,0,300.00,CNY,normal,手续费,美团支付 BIZ20260601002 手续费300.00
+4,BIZ20260601003,M003,拼多多,2026-06-02,2026-06-04,8500.00,8500.00,0,CNY,正常,正常退款,拼多多 BIZ20260601003 退款8500.00`;
+      document.getElementById('f-rawData').value = sample;
+    }
+
+    function parseRawData(text) {
+      const lines = text.trim().split('\n').filter(l => l.trim());
+      const rows = [];
+      for (const line of lines) {
+        const parts = line.split(',').map(s => s.trim());
+        if (parts.length < 7) continue;
+        rows.push({
+          rowNo: parseInt(parts[0]) || 0,
+          bizNo: parts[1] || '',
+          merchantNo: parts[2] || '',
+          merchantName: parts[3] || '',
+          tradeDate: parts[4] || '',
+          settlementDate: parts[5] || '',
+          amount: parseFloat(parts[6]) || 0,
+          principal: parseFloat(parts[7]) || 0,
+          fee: parseFloat(parts[8]) || 0,
+          currency: parts[9] || 'CNY',
+          status: parts[10] || 'normal',
+          remark: parts[11] || '',
+          rawContent: parts[12] || parts[3] + ' ' + parts[1]
+        });
+      }
+      return rows;
+    }
+
+    function previewImport() {
+      const raw = document.getElementById('f-rawData').value;
+      const rows = parseRawData(raw);
+      importPreviewData = rows;
+
+      const bizGroups = {};
+      for (const r of rows) {
+        if (!bizGroups[r.bizNo]) bizGroups[r.bizNo] = [];
+        bizGroups[r.bizNo].push(r);
+      }
+
+      const tbody = document.getElementById('preview-tbody');
+      tbody.innerHTML = '';
+      let splitCount = 0, normalCount = 0, totalAmount = 0;
+
+      for (const r of rows) {
+        totalAmount += r.amount;
+        const isSplit = bizGroups[r.bizNo].length > 1;
+        const hasPrincipal = bizGroups[r.bizNo].some(x => (x.remark || '').includes('本金') || x.principal > 0);
+        const hasFee = bizGroups[r.bizNo].some(x => (x.remark || '').includes('手续费') || x.fee > 0);
+        const needReview = isSplit && hasPrincipal && hasFee;
+
+        const tr = document.createElement('tr');
+        if (needReview) tr.className = 'split-row';
+
+        let type = '合并';
+        if ((r.remark || '').includes('本金') || (r.principal > 0 && r.fee === 0)) type = '本金';
+        else if ((r.remark || '').includes('手续费') || (r.fee > 0 && r.principal === 0)) type = '手续费';
+
+        let statusTag = '';
+        if (needReview) {
+          statusTag = '<span class="tag tag-orange">待主管复核</span>';
+          if (type === '本金') splitCount += 0.5;
+        } else {
+          statusTag = '<span class="tag tag-green">正常</span>';
+          normalCount++;
+        }
+
+        tr.innerHTML = `
+          <td>${r.rowNo}</td>
+          <td>${r.bizNo}</td>
+          <td>${r.merchantName}</td>
+          <td>${r.tradeDate}</td>
+          <td>${r.settlementDate}</td>
+          <td>${r.amount.toFixed(2)}</td>
+          <td>${r.principal.toFixed(2)}</td>
+          <td>${r.fee.toFixed(2)}</td>
+          <td>${type}</td>
+          <td>${statusTag}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      document.getElementById('prev-count').textContent = rows.length;
+      document.getElementById('prev-amount').textContent = totalAmount.toFixed(2);
+      document.getElementById('prev-split').textContent = Math.round(splitCount);
+      document.getElementById('prev-normal').textContent = normalCount;
+
+      const warnDiv = document.getElementById('import-warn');
+      if (splitCount > 0) {
+        warnDiv.style.display = 'block';
+        warnDiv.textContent = `检测到 ${Math.round(splitCount)} 组同一业务号拆成本金+手续费的记录，导入后将标记为"待主管复核"，需结算主管确认后才能归正常。`;
+      } else {
+        warnDiv.style.display = 'none';
+      }
+
+      goImportStep(3);
+    }
+
+    function confirmImport() {
+      const req = {
+        batchNo: document.getElementById('f-batchNo').value,
+        batchName: document.getElementById('f-batchName').value,
+        batchDate: document.getElementById('f-batchDate').value,
+        fundCode: document.getElementById('f-fundCode').value,
+        fundName: document.getElementById('f-fundName').value,
+        custodian: document.getElementById('f-custodian').value,
+        operator: document.getElementById('f-operator').value,
+        rows: importPreviewData
+      };
+
+      fetch(API + '/step1/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(req)
+      }).then(r => r.json()).then(res => {
+        if (res.code === 200) {
+          toast('导入成功！', 'success');
+          currentBatchId = res.data.id;
+          switchTab('detail');
+          loadDetail();
+        } else {
+          toast('导入失败：' + res.message, 'error');
+        }
+      }).catch(err => toast('请求失败：' + err, 'error'));
+    }
+
+    function loadBatchList() {
+      fetch(API + '/batches').then(r => r.json()).then(res => {
+        const tbody = document.getElementById('batch-tbody');
+        tbody.innerHTML = '';
+        const list = res.data || [];
+        document.getElementById('list-count').textContent = list.length;
+        document.getElementById('list-empty').style.display = list.length ? 'none' : 'block';
+
+        for (const b of list) {
+          const tr = document.createElement('tr');
+          const statusTag = getStatusTag(b.processStatus);
+          const stepName = getStepName(b.currentStep);
+          tr.innerHTML = `
+            <td><strong>${b.batchNo}</strong></td>
+            <td>${b.batchName || '-'}</td>
+            <td>${b.fundName || b.fundCode || '-'}</td>
+            <td>${b.custodian || '-'}</td>
+            <td>${b.totalCount || 0}</td>
+            <td>${b.totalAmount ? b.totalAmount.toFixed(2) : '-'}</td>
+            <td>${statusTag}</td>
+            <td>${stepName}</td>
+            <td>${b.operator || '-'}</td>
+            <td>${formatDate(b.createdAt)}</td>
+            <td><button class="link-btn" onclick="viewDetail(${b.id})">查看</button></td>
+          `;
+          tbody.appendChild(tr);
+        }
+      });
+    }
+
+    function viewDetail(id) {
+      currentBatchId = id;
+      switchTab('detail');
+      loadDetail();
+    }
+
+    function loadDetail() {
+      if (!currentBatchId) return;
+      fetch(API + '/result/' + currentBatchId).then(r => r.json()).then(res => {
+        if (res.code !== 200) {
+          document.getElementById('detail-empty').style.display = 'block';
+          document.getElementById('detail-content').style.display = 'none';
+          return;
+        }
+        const d = res.data;
+        currentBatchData = d;
+
+        document.getElementById('detail-empty').style.display = 'none';
+        document.getElementById('detail-content').style.display = 'block';
+
+        document.getElementById('d-batchNo').textContent = d.batchNo;
+        document.getElementById('d-status').textContent = d.processStatusDesc;
+        document.getElementById('d-step').textContent = getStepName(d.currentStep);
+        document.getElementById('d-batchName').textContent = d.batchName || '-';
+        document.getElementById('d-fund').textContent = (d.fundName || '') + ' ' + (d.fundCode || '');
+        document.getElementById('d-custodian').textContent = d.custodian || '-';
+        document.getElementById('d-operator').textContent = d.operator || '-';
+        document.getElementById('d-supervisor').textContent = d.supervisor || '-';
+        document.getElementById('d-created').textContent = formatDate(d.createdAt);
+
+        const details = d.details || [];
+        let totalAmount = 0, pending = 0, evidenceDone = 0;
+        for (const item of details) {
+          totalAmount += item.confirmedAmount || 0;
+          if (item.processStatus === 'pending_supervisor') pending++;
+          if (item.evidenceStatus === 'reviewed') evidenceDone++;
+        }
+
+        document.getElementById('d-count').textContent = details.length;
+        document.getElementById('d-amount').textContent = totalAmount.toFixed(2);
+        document.getElementById('d-pending').textContent = pending;
+        document.getElementById('d-evidence').textContent = evidenceDone;
+
+        renderDetailTable(details);
+        renderCheckTable(d.selfCheckResults || []);
+        loadAuditLogs();
+      });
+    }
+
+    function renderDetailTable(details) {
+      const tbody = document.getElementById('detail-tbody');
+      tbody.innerHTML = '';
+
+      for (const d of details) {
+        const tr = document.createElement('tr');
+        const isSplit = d.sameBizNoGroup && d.detailType !== 'combined';
+        if (isSplit) tr.className = 'split-row';
+
+        const statusTag = getStatusTag(d.processStatus);
+        const evidenceClass = d.evidenceStatus === 'reviewed' ? 'done' : '';
+        const evidenceText = d.evidenceStatus === 'reviewed' ? '已补看' : '待补看';
+
+        tr.innerHTML = `
+          <td><strong>${d.custodianRowNo || '-'}</strong></td>
+          <td>${d.bizNo}</td>
+          <td class="same-group">${d.sameBizNoGroup || '-'}</td>
+          <td>${d.detailTypeDesc || d.detailType}</td>
+          <td>${d.merchantName || '-'}</td>
+          <td>${d.tradeDate || '-'}</td>
+          <td>${d.originalAmount != null ? d.originalAmount.toFixed(2) : '-'}</td>
+          <td><strong>${d.confirmedAmount != null ? d.confirmedAmount.toFixed(2) : '-'}</strong></td>
+          <td>${d.principal != null ? d.principal.toFixed(2) : '-'}</td>
+          <td>${d.fee != null ? d.fee.toFixed(2) : '-'}</td>
+          <td>${statusTag}</td>
+          <td><span class="evidence-badge ${evidenceClass}">${evidenceText}</span></td>
+          <td>${d.manualChanges ? `<span class="manual-badge">${d.manualChanges.substring(0, 15)}</span>` : '-'}</td>
+          <td>${d.diffStatus || '-'}</td>
+          <td><button class="link-btn" onclick='showRowDetail(${JSON.stringify(d).replace(/'/g, "&apos;")})'>详情</button></td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function showRowDetail(d) {
+      const body = document.getElementById('row-detail-body');
+      body.innerHTML = `
+        <div class="detail-section">
+          <h4>基本信息</h4>
+          <div class="detail-grid">
+            <div class="detail-item"><div class="k">托管确认页行号</div><div class="v">第 ${d.custodianRowNo} 行</div></div>
+            <div class="detail-item"><div class="k">业务号</div><div class="v">${d.bizNo}</div></div>
+            <div class="detail-item"><div class="k">同组标识</div><div class="v">${d.sameBizNoGroup || '-'}</div></div>
+            <div class="detail-item"><div class="k">明细类型</div><div class="v">${d.detailTypeDesc || d.detailType}</div></div>
+            <div class="detail-item"><div class="k">商户</div><div class="v">${d.merchantName || '-'}</div></div>
+            <div class="detail-item"><div class="k">币种</div><div class="v">${d.currency || '-'}</div></div>
+          </div>
+        </div>
+        <div class="detail-section">
+          <h4>金额信息</h4>
+          <div class="detail-grid">
+            <div class="detail-item"><div class="k">原始金额</div><div class="v">${d.originalAmount != null ? d.originalAmount.toFixed(2) : '-'}</div></div>
+            <div class="detail-item"><div class="k">确认金额</div><div class="v"><strong>${d.confirmedAmount != null ? d.confirmedAmount.toFixed(2) : '-'}</strong></div></div>
+            <div class="detail-item"><div class="k">本金</div><div class="v">${d.principal != null ? d.principal.toFixed(2) : '-'}</div></div>
+            <div class="detail-item"><div class="k">手续费</div><div class="v">${d.fee != null ? d.fee.toFixed(2) : '-'}</div></div>
+            <div class="detail-item"><div class="k">交易日</div><div class="v">${d.tradeDate || '-'}</div></div>
+            <div class="detail-item"><div class="k">结算日</div><div class="v">${d.settlementDate || '-'}</div></div>
+          </div>
+        </div>
+        <div class="detail-section">
+          <h4>状态跟踪</h4>
+          <div class="detail-grid">
+            <div class="detail-item"><div class="k">处理状态</div><div class="v">${getStatusTag(d.processStatus)}</div></div>
+            <div class="detail-item"><div class="k">证据状态</div><div class="v">${d.evidenceStatus || '-'}</div></div>
+            <div class="detail-item"><div class="k">差异状态</div><div class="v">${d.diffStatus || '-'}</div></div>
+            <div class="detail-item"><div class="k">差异说明</div><div class="v">${d.diffRemark || '-'}</div></div>
+          </div>
+        </div>
+        <div class="detail-section">
+          <h4>人工改动记录</h4>
+          <div class="detail-grid">
+            <div class="detail-item"><div class="k">改动内容</div><div class="v">${d.manualChanges || '-'}</div></div>
+            <div class="detail-item"><div class="k">改动人</div><div class="v">${d.manualOperator || '-'}</div></div>
+            <div class="detail-item"><div class="k">改动时间</div><div class="v">${formatDate(d.manualOperateAt)}</div></div>
+          </div>
+        </div>
+        <div class="detail-section">
+          <h4>主管复核</h4>
+          <div class="detail-grid">
+            <div class="detail-item"><div class="k">主管</div><div class="v">${d.supervisor || '-'}</div></div>
+            <div class="detail-item"><div class="k">复核意见</div><div class="v">${d.supervisorRemark || '-'}</div></div>
+            <div class="detail-item"><div class="k">复核时间</div><div class="v">${formatDate(d.supervisorReviewedAt)}</div></div>
+          </div>
+        </div>
+        <div class="detail-section">
+          <h4>双证据来源</h4>
+          <div class="detail-grid">
+            <div class="detail-item" style="grid-column: span 3;"><div class="k">托管确认页原始证据</div><div class="v" style="word-break:break-all;">${d.originalEvidenceContent || '-'}</div></div>
+            <div class="detail-item" style="grid-column: span 3;"><div class="k">除权日证据</div><div class="v" style="word-break:break-all;">${d.exDividendEvidenceContent || '-'}</div></div>
+          </div>
+        </div>
+      `;
+      showModal('row-modal');
+    }
+
+    function renderCheckTable(checks) {
+      const tbody = document.getElementById('check-tbody');
+      tbody.innerHTML = '';
+      for (const c of checks) {
+        let resultTag = '';
+        if (c.checkResult === 'passed') resultTag = '<span class="tag tag-green">通过</span>';
+        else if (c.checkResult === 'warning') resultTag = '<span class="tag tag-orange">警告</span>';
+        else resultTag = '<span class="tag tag-red">未通过</span>';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${c.checkTypeDesc || c.checkType}</td>
+          <td>${resultTag}</td>
+          <td style="max-width:400px;">${c.checkDetail || '-'}</td>
+          <td>${c.operator || '-'}</td>
+          <td>${formatDate(c.createdAt)}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function runSelfCheck() {
+      const operator = 'linjie';
+      fetch(API + '/self-check/run/' + currentBatchId + '?operator=' + encodeURIComponent(operator), { method: 'POST' })
+        .then(r => r.json()).then(res => {
+          if (res.code === 200) {
+            loadDetail();
+          } else {
+            toast('自检失败：' + res.message, 'error');
+          }
+        });
+    }
+
+    function loadAuditLogs() {
+      fetch(API + '/audit-logs/' + currentBatchId).then(r => r.json()).then(res => {
+        const tbody = document.getElementById('audit-tbody');
+        tbody.innerHTML = '';
+        const logs = res.data || [];
+        for (const l of logs) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><strong>${l.operation}</strong></td>
+            <td>${l.bizNo || '-'}</td>
+            <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${l.oldValue || ''}">${l.oldValue || '-'}</td>
+            <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${l.newValue || ''}">${l.newValue || '-'}</td>
+            <td>${l.operator || '-'}</td>
+            <td>${formatDate(l.createdAt)}</td>
+            <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${l.remark || ''}">${l.remark || '-'}</td>
+          `;
+          tbody.appendChild(tr);
+        }
+      });
+    }
+
+    function showEvidenceModal() {
+      document.getElementById('ev-reviewer').value = 'linjie';
+      const details = currentBatchData.details || [];
+      let sample = '';
+      const seen = {};
+      for (const d of details) {
+        if (seen[d.bizNo]) continue;
+        seen[d.bizNo] = true;
+        sample += `${d.bizNo},2026-05-28,除权日截图,${d.merchantName}除权日核对一致,/evidence/${d.bizNo}.png,金额一致\n`;
+      }
+      document.getElementById('ev-data').value = sample.trim();
+      showModal('evidence-modal');
+    }
+
+    function submitEvidence() {
+      const reviewer = document.getElementById('ev-reviewer').value;
+      const text = document.getElementById('ev-data').value;
+      const lines = text.trim().split('\n').filter(l => l.trim());
+      const items = [];
+      for (const line of lines) {
+        const p = line.split(',').map(s => s.trim());
+        if (p.length < 2) continue;
+        items.push({
+          bizNo: p[0],
+          exDividendDate: p[1],
+          evidenceSource: p[2] || '除权日截图',
+          evidenceContent: p[3] || '',
+          screenshotUrl: p[4] || '',
+          reviewRemark: p[5] || ''
+        });
+      }
+
+      fetch(API + '/step2/evidence', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ batchId: currentBatchId, reviewer, evidenceItems: items })
+      }).then(r => r.json()).then(res => {
+        if (res.code === 200) {
+          hideModal('evidence-modal');
+          loadDetail();
+        } else {
+          toast('提交失败：' + res.message, 'error');
+        }
+      });
+    }
+
+    function showDiffModal() {
+      document.getElementById('diff-operator').value = 'linjie';
+      const details = currentBatchData.details || [];
+      let sample = '';
+      for (const d of details) {
+        const diffStatus = d.diffStatus === 'normal' ? 'normal' : 'normal';
+        sample += `${d.id},${d.bizNo},${diffStatus},与除权日截图一致,${d.confirmedAmount || 0},${d.principal || 0},${d.fee || 0},补录确认金额\n`;
+      }
+      document.getElementById('diff-data').value = sample.trim();
+      showModal('diff-modal');
+    }
+
+    function submitDiff() {
+      const operator = document.getElementById('diff-operator').value;
+      const text = document.getElementById('diff-data').value;
+      const lines = text.trim().split('\n').filter(l => l.trim());
+      const items = [];
+      for (const line of lines) {
+        const p = line.split(',').map(s => s.trim());
+        if (p.length < 3) continue;
+        items.push({
+          detailId: parseInt(p[0]),
+          bizNo: p[1],
+          diffStatus: p[2],
+          diffRemark: p[3] || '',
+          confirmedAmount: parseFloat(p[4]) || 0,
+          principal: parseFloat(p[5]) || 0,
+          fee: parseFloat(p[6]) || 0,
+          manualChanges: p[7] || ''
+        });
+      }
+
+      fetch(API + '/step3/diff', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ batchId: currentBatchId, operator, diffItems: items })
+      }).then(r => r.json()).then(res => {
+        if (res.code === 200) {
+          hideModal('diff-modal');
+          loadDetail();
+        } else {
+          toast('提交失败：' + res.message, 'error');
+        }
+      });
+    }
+
+    function showSupervisorModal() {
+      if (!currentBatchData) return;
+      const pending = (currentBatchData.pendingSupervisorBizNos || []);
+      const details = currentBatchData.details || [];
+      const listDiv = document.getElementById('sv-list');
+      listDiv.innerHTML = '';
+
+      const groups = {};
+      for (const bizNo of pending) {
+        groups[bizNo] = details.filter(d => d.sameBizNoGroup === bizNo && d.processStatus === 'pending_supervisor');
+      }
+
+      if (pending.length === 0) {
+        document.getElementById('sv-empty').style.display = 'block';
+      } else {
+        document.getElementById('sv-empty').style.display = 'none';
+        for (const bizNo of pending) {
+          const rows = groups[bizNo] || [];
+          const div = document.createElement('div');
+          div.style.cssText = 'background:#fdf6ec;border-radius:6px;padding:12px;margin-bottom:12px;';
+          let html = `<div style="margin-bottom:8px;font-weight:600;color:#e6a23c;">业务号 ${bizNo}（拆分待复核）</div>`;
+          for (const r of rows) {
+            html += `
+              <div class="check-row">
+                <input type="checkbox" id="sv-${r.id}" data-id="${r.id}" data-biz="${bizNo}" data-detail='${JSON.stringify(r)}' checked>
+                <label for="sv-${r.id}">
+                  ${r.detailTypeDesc} - 第${r.custodianRowNo}行 - ${r.confirmedAmount?.toFixed(2) || 0}元
+                  <span style="color:#909399;font-size:12px;margin-left:8px;">${r.merchantName}</span>
+                </label>
+              </div>`;
+          }
+          html += `<div class="form-row" style="margin-top:8px;">
+            <label>复核意见</label>
+            <input type="text" class="sv-remark" data-biz="${bizNo}" placeholder="请输入复核意见" value="拆分记录核对一致，同意通过">
+          </div>`;
+          div.innerHTML = html;
+          listDiv.appendChild(div);
+        }
+      }
+
+      showModal('supervisor-modal');
+    }
+
+    function submitSupervisor() {
+      const supervisor = document.getElementById('sv-name').value;
+      const checkboxes = document.querySelectorAll('#sv-list input[type="checkbox"]:checked');
+      const reviewItems = [];
+
+      const bizRemarks = {};
+      document.querySelectorAll('.sv-remark').forEach(i => {
+        bizRemarks[i.dataset.biz] = i.value;
+      });
+
+      checkboxes.forEach(cb => {
+        const detail = JSON.parse(cb.dataset.detail);
+        reviewItems.push({
+          detailId: detail.id,
+          bizNo: detail.bizNo,
+          sameBizNoGroup: detail.sameBizNoGroup,
+          approved: true,
+          supervisorRemark: bizRemarks[detail.sameBizNoGroup] || ''
+        });
+      });
+
+      if (reviewItems.length === 0) {
+        toast('请选择要复核的记录', 'warning');
+        return;
+      }
+
+      fetch(API + '/supervisor/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ batchId: currentBatchId, supervisor, reviewItems })
+      }).then(r => r.json()).then(res => {
+        if (res.code === 200) {
+          hideModal('supervisor-modal');
+          loadDetail();
+        } else {
+          toast('提交失败：' + res.message, 'error');
+        }
+      });
+    }
+
+    function exportBatch() {
+      window.location.href = API + '/export/' + currentBatchId;
+    }
+
+    function showModal(id) { document.getElementById(id).classList.add('show'); }
+    function hideModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    document.querySelectorAll('.modal-mask').forEach(m => {
+      m.addEventListener('click', e => {
+        if (e.target === m) m.classList.remove('show');
+      });
+    });
+
+    function getStatusTag(status) {
+      const map = {
+        'pending': ['待处理', 'tag-gray'],
+        'imported': ['已导入', 'tag-blue'],
+        'evidence_reviewed': ['证据已补看', 'tag-blue'],
+        'diff_updated': ['差异已更新', 'tag-blue'],
+        'pending_supervisor': ['待主管复核', 'tag-orange'],
+        'supervisor_approved': ['主管已复核', 'tag-green'],
+        'normal': ['正常', 'tag-green'],
+        'abnormal': ['异常', 'tag-red']
+      };
+      const arr = map[status] || [status, 'tag-gray'];
+      return `<span class="tag ${arr[1]}">${arr[0]}</span>`;
+    }
+
+    function getStepName(step) {
+      const map = {
+        'step1_import': 'Step1-托管确认页导入',
+        'step2_evidence': 'Step2-除权日证据补看',
+        'step3_diff': 'Step3-差异清单更新'
+      };
+      return map[step] || step || '-';
+    }
+
+    function formatDate(s) {
+      if (!s) return '-';
+      const d = new Date(s);
+      if (isNaN(d.getTime())) return s;
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const h = String(d.getHours()).padStart(2, '0');
+      const mi = String(d.getMinutes()).padStart(2, '0');
+      return `${y}-${m}-${day} ${h}:${mi}`;
+    }
+
+    loadBatchList();
+  </script>
+</body>
+</html>

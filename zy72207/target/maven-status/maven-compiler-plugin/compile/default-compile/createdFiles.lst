@@ -32,6 +32,7 @@ com/fund/refund/dto/BatchReplayResultVO.class
 com/fund/refund/service/RefundBatchReplayService.class
 com/fund/refund/service/SelfCheckService.class
 com/fund/refund/dto/BatchImportRequest.class
+com/fund/refund/config/WebConfig.class
 com/fund/refund/entity/RefundBatch.class
 com/fund/refund/enums/SelfCheckType.class
 com/fund/refund/controller/RefundBatchReplayController.class
