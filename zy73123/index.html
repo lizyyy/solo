@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>浮标海况空间标注系统</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="app">
+  <header class="top-bar">
+    <h1>浮标海况空间标注</h1>
+    <div class="top-actions">
+      <button id="btnImport" class="btn btn-primary">导入船上记录本</button>
+      <button id="btnExport" class="btn">导出结果</button>
+      <button id="btnHelp" class="btn btn-ghost">接班须知</button>
+    </div>
+  </header>
+
+  <div class="main-layout">
+    <aside class="sidebar">
+      <div class="panel">
+        <h3>统计概览</h3>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-label">总记录</span>
+            <span class="stat-value" id="statTotal">0</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">已复核</span>
+            <span class="stat-value" id="statReviewed">0</span>
+          </div>
+          <div class="stat-card stat-warn">
+            <span class="stat-label">异常</span>
+            <span class="stat-value" id="statAbnormal">0</span>
+          </div>
+          <div class="stat-card stat-cloud">
+            <span class="stat-label">云遮挡</span>
+            <span class="stat-value" id="statCloud">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>海况分布</h3>
+        <canvas id="seaStateChart" height="180"></canvas>
+      </div>
+
+      <div class="panel">
+        <h3>经纬度写法对照</h3>
+        <div class="coord-ref">
+          <div class="coord-item">
+            <span class="coord-label">船上记录</span>
+            <span class="coord-val" id="coordShipExample">30°15'30"N</span>
+          </div>
+          <div class="coord-arrow">↓</div>
+          <div class="coord-item">
+            <span class="coord-label">系统标准</span>
+            <span class="coord-val" id="coordStdExample">30.2583°N</span>
+          </div>
+        </div>
+        <p class="coord-note">支持度分秒、十进制度混合导入，自动统一</p>
+      </div>
+
+      <div class="panel">
+        <h3>云遮挡 / 边界样本</h3>
+        <div id="specialList" class="special-list">
+          <p class="empty-tip">暂无特殊记录</p>
+        </div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="map-container">
+        <div id="map"></div>
+        <div class="map-legend">
+          <span><i class="dot dot-normal"></i>正常</span>
+          <span><i class="dot dot-abnormal"></i>异常</span>
+          <span><i class="dot dot-cloud"></i>云遮挡</span>
+          <span><i class="dot dot-boundary"></i>边界</span>
+          <span><i class="dot dot-reviewed"></i>已复核</span>
+        </div>
+      </div>
+
+      <div class="record-section">
+        <div class="section-header">
+          <h3>船上记录本</h3>
+          <div class="filter-bar">
+            <button class="filter-btn active" data-filter="all">全部</button>
+            <button class="filter-btn" data-filter="abnormal">异常</button>
+            <button class="filter-btn" data-filter="cloud">云遮挡</button>
+            <button class="filter-btn" data-filter="boundary">边界</button>
+            <button class="filter-btn" data-filter="unreviewed">待复核</button>
+          </div>
+        </div>
+        <div id="recordTable" class="record-table">
+          <p class="empty-tip">请导入船上记录本数据</p>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div id="detailModal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modalTitle">记录详情</h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="markReviewed()">标记已复核</button>
+      <button class="btn" onclick="closeModal()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div id="helpModal" class="modal hidden">
+  <div class="modal-content modal-help">
+    <div class="modal-header">
+      <h3>接班须知</h3>
+      <button class="modal-close" onclick="closeHelp()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="help-section">
+        <h4>📁 样例在哪</h4>
+        <p>点右上角「导入船上记录本」，选样例文件：<code>样例_船上记录本.csv</code></p>
+        <p>样例里包含：正常记录、异常记录、云遮挡记录、边界样本各若干</p>
+      </div>
+      <div class="help-section">
+        <h4>⚠️ 异常在哪</h4>
+        <p>1. 左侧「统计概览」点异常数字</p>
+        <p>2. 地图上红点 = 异常，黄点 = 云遮挡，紫点 = 边界</p>
+        <p>3. 下方记录本筛选栏选「异常」</p>
+        <p>点异常记录可回溯：船上原始记录 + 本次计算口径</p>
+      </div>
+      <div class="help-section">
+        <h4>📤 结果怎么导出</h4>
+        <p>点右上角「导出结果」，导出 CSV 包含全部标注和复核状态</p>
+      </div>
+      <div class="help-section">
+        <h4>🔁 重复导入</h4>
+        <p>同一批数据重复导入不会翻倍，人工备注也不会被覆盖</p>
+        <p>判断依据：记录ID + 经纬度 + 观测时间</p>
+      </div>
+      <div class="help-section">
+        <h4>📍 经纬度写法</h4>
+        <p>船上记录本的度分秒（如 30°15'30"N）自动转十进制度</p>
+        <p>对照表在左侧，保留原始写法可追溯</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept=".csv,.txt" style="display:none">
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
