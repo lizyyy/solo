@@ -178,15 +178,13 @@ class ModelOutputProcessor:
             score_diff = common2["model_score"] - common1["model_score"]
             changed_mask = score_diff.abs() > 1e-6
             
-            score_changed = score_diff[changed_mask]
-            
             comparison["metric_changes"] = {
                 "score_changed_count": changed_mask.sum(),
                 "score_changed_ratio": changed_mask.mean(),
                 "score_diff_mean": score_diff.mean(),
                 "score_diff_std": score_diff.std(),
-                "top_increases": score_changed.nlargest(10).to_dict() if len(score_changed) > 0 else {},
-                "top_decreases": score_changed.nsmallest(10).to_dict() if len(score_changed) > 0 else {}
+                "top_increases": score_diff.nlargest(10).to_dict(),
+                "top_decreases": score_diff.nsmallest(10).to_dict()
             }
         
         self._log(f"对比完成: 新增 {len(new_samples)} 条，移除 {len(removed_samples)} 条，共有 {len(common_samples)} 条")
