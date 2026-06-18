@@ -154,11 +154,6 @@ class ConflictDetector:
                         "recall_delta": metrics.get("actual_recall", 0) - metrics.get("claimed_recall", 0)
                     },
                     "release_note_evidence": [line for line in release_notes.split("\n") if "精确率" in line],
-                    "evidence_comparison": {
-                        "版本发布记录宣称": f"精确率{metrics.get('claimed_precision')}, 召回率{metrics.get('claimed_recall')}",
-                        "评测日志实际数据": f"精确率{metrics.get('actual_precision')}, 召回率{metrics.get('actual_recall')}, F1{metrics.get('actual_f1')}",
-                        "差异": f"精确率{metrics.get('actual_precision', 0) - metrics.get('claimed_precision', 0):+.2f}, 召回率{metrics.get('actual_recall', 0) - metrics.get('claimed_recall', 0):+.2f}"
-                    },
                     "suggested_actions": [
                         "核实发布记录中精确率0.92的来源，可能是笔误或计算错误",
                         "以实际评测数据0.87为准，修正发布记录",

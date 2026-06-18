@@ -264,31 +264,15 @@ python3 -m src.cli check v1.2.0 --type boundary   # 边界记录
 # 导出完整冲突清单（带原因）
 python3 -m src.cli export-conflicts v1.2.0
 
-# 导出特定类型冲突（摘要数字、明细数组、证据列表来自同一份检测结果）
+# 导出特定类型冲突
 python3 -m src.cli export-conflicts v1.2.0 --type version
 ```
 
-`--type` 参数值与冲突类型的对应关系：
-
-| `--type` 参数 | JSON 中的真实键名       | 数量示例 (v1.2.0) | 说明 |
-|--------------|------------------------|------------------|------|
-| `label`      | `label_conflicts`      | 4                | 模型预测标签 vs 人工标注标签不一致 |
-| `sample_leak`| `sample_leaks`         | 1                | 训练集/测试集样本重叠（Critical级） |
-| `version`    | `version_conflicts`    | 3                | 发布记录宣称 vs 实际导入数据不一致，全部需人工决策 |
-| `empty`      | `empty_values`         | 1                | 标注表有空字段 |
-| `duplicate`  | `duplicate_records`    | 1                | 同一 case_id 多条标注 |
-| `boundary`   | `boundary_cases`       | 6                | 分数接近阈值、白户等边界样本 |
-| `all`(默认)  | 上述全部 6 个键        | 共 16            | 全量导出 |
-
-> **保证一致性**：按类型导出时，`summary.total_conflicts`、`conflicts[真实键名].length`、
-> `decision_required_items` 的计数三者完全一致，均来自同一次 `detect_all()` 检测结果。
-
 导出的JSON文件包含：
-- `export_reason`（自动生成，包含本次导出的问题数量和类型）
-- `summary`（按本次导出类型过滤后的摘要）
-- `conflicts`（键名使用上表中的真实键名，不是传入的 `--type` 值）
-- `decision_required_items`（仅本次导出类型内需要人工决策的项，每项均含证据对比+建议动作+人工决策说明）
-- `export_metadata.real_conflict_key`（记录真实的冲突键名，方便后续处理）
+- 导出原因（自动生成，说明导出时检测到的问题）
+- 需要人工决策的所有项
+- 每项的两边证据对比
+- 建议动作
 
 ---
 
