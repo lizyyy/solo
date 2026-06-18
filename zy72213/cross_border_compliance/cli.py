@@ -69,7 +69,7 @@ def import_screenshots(source_file, operator, data_file):
 
     db = next(get_db())
     result = import_ex_dividend_screenshots(
-        db, screenshots_data, source_file, operator
+        db, screenshots_data, source_file, operator, data_file
     )
 
     click.echo(f"\n📋 {result['summary']}")

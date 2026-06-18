@@ -532,7 +532,8 @@ class TestAuditAndRerun:
             }
         ]
         result = import_ex_dividend_screenshots(
-            db_session, screenshots_data, "/data/test.png", "assistant_zhou"
+            db_session, screenshots_data, "/data/test.png", "assistant_zhou",
+            data_file="test_data/screenshots_20260603.json"
         )
         spot_check_id = result["spot_check_ids"][0]
 
@@ -553,8 +554,10 @@ class TestAuditAndRerun:
         import_log = next(l for l in audit_logs if l.operation == "import_ex_dividend_screenshots")
         assert "import-screenshots" in import_log.rerun_command
         assert "--source-file" in import_log.rerun_command
-        assert "--data-file" in import_log.rerun_command
+        assert "--data-file 'test_data/screenshots_20260603.json'" in import_log.rerun_command
         assert "--operator" in import_log.rerun_command
+        assert "DATA_FILE" not in import_log.rerun_command
+        assert import_log.parameters["data_file"] == "test_data/screenshots_20260603.json"
 
         remark_log = next(l for l in audit_logs if l.operation == "add_tax_rate_remark")
         assert "add-remark" in remark_log.rerun_command

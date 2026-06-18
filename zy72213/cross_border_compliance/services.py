@@ -45,7 +45,8 @@ def import_ex_dividend_screenshots(
     db: Session,
     screenshots_data: List[Dict[str, Any]],
     source_file: str,
-    imported_by: str = "assistant_zhou"
+    imported_by: str = "assistant_zhou",
+    data_file: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     导入除权日截图（第一步）
@@ -144,18 +145,20 @@ def import_ex_dividend_screenshots(
         f"(去重规则: 源文件+日期+机构名联合去重)"
     )
 
+    data_file_arg = f"--data-file '{data_file}'" if data_file else ""
     rerun_cmd = (
         f"python -m cross_border_compliance.cli import-screenshots "
         f"--source-file '{source_file}' "
-        f"--data-file DATA_FILE.json "
+        f"{data_file_arg} "
         f"--operator {imported_by}"
-    )
+    ).replace("  ", " ")
 
     audit = AuditLog(
         operation="import_ex_dividend_screenshots",
         operator=imported_by,
         parameters={
             "source_file": source_file,
+            "data_file": data_file,
             "batch_id": batch_id,
             "total_count": total
         },
