@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+    background-color: #0A0C0D;
+    color: #E9ECEF;
+  }
+  
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #495057 #212529;
+  }
+  
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  *::-webkit-scrollbar-track {
+    background: #212529;
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    background: #495057;
+    border-radius: 3px;
+  }
+  
+  *::-webkit-scrollbar-thumb:hover {
+    background: #6C757D;
+  }
+}
+
+@layer components {
+  .industrial-card {
+    @apply bg-industrial-800 border border-industrial-700 rounded-lg;
+    background-image: 
+      linear-gradient(90deg, rgba(108, 117, 125, 0.03) 1px, transparent 1px),
+      linear-gradient(rgba(108, 117, 125, 0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
+  .status-dot {
+    @apply w-2 h-2 rounded-full;
+  }
+  
+  .timeline-line {
+    @apply absolute left-3 top-6 bottom-0 w-0.5 bg-industrial-600;
+  }
+  
+  .timeline-node {
+    @apply relative w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 z-10;
+  }
+  
+  .btn-primary {
+    @apply px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md transition-colors duration-200 font-medium text-sm;
+  }
+  
+  .btn-secondary {
+    @apply px-4 py-2 bg-industrial-700 hover:bg-industrial-600 text-industrial-100 rounded-md transition-colors duration-200 font-medium text-sm border border-industrial-600;
+  }
+  
+  .btn-danger {
+    @apply px-4 py-2 bg-danger-600 hover:bg-danger-700 text-white rounded-md transition-colors duration-200 font-medium text-sm;
+  }
+  
+  .input-field {
+    @apply w-full px-3 py-2 bg-industrial-900 border border-industrial-600 rounded-md text-industrial-100 placeholder-industrial-500 focus:outline-none focus:border-primary-400 focus:ring-1 focus:ring-primary-400 transition-colors text-sm;
+  }
+  
+  .label-field {
+    @apply block text-sm font-medium text-industrial-300 mb-1;
+  }
+  
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium;
+  }
+  
+  .chip {
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border;
+  }
+  
+  .withdrawn-record {
+    @apply border-l-4 border-danger-500 bg-danger-900/20;
+  }
+  
+  .exception-pulse {
+    animation: exceptionPulse 2s ease-in-out infinite;
+  }
+}
+
+@keyframes exceptionPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(230, 126, 34, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(230, 126, 34, 0);
+  }
+}
+
+.grid-pattern {
+  background-image: 
+    linear-gradient(90deg, rgba(30, 58, 95, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(30, 58, 95, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.corner-accent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  border-top: 2px solid #1E3A5F;
+  border-left: 2px solid #1E3A5F;
+}
+
+.corner-accent::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  border-bottom: 2px solid #1E3A5F;
+  border-right: 2px solid #1E3A5F;
+}
