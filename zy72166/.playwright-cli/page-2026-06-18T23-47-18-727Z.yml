@@ -1,0 +1,49 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e6]:
+      - img [ref=e7]
+      - heading "口袋公园日照复核" [level=1] [ref=e13]
+    - navigation [ref=e14]:
+      - link "工作台" [ref=e15] [cursor=pointer]:
+        - /url: /
+        - img [ref=e16]
+        - text: 工作台
+      - link "数据导入" [ref=e21] [cursor=pointer]:
+        - /url: /import
+        - img [ref=e22]
+        - text: 数据导入
+      - link "归并去重" [ref=e25] [cursor=pointer]:
+        - /url: /merge
+        - img [ref=e26]
+        - text: 归并去重
+      - link "人工复核" [ref=e30] [cursor=pointer]:
+        - /url: /review
+        - img [ref=e31]
+        - text: 人工复核
+      - link "公示清单" [ref=e35] [cursor=pointer]:
+        - /url: /export
+        - img [ref=e36]
+        - text: 公示清单
+    - generic [ref=e42]:
+      - generic [ref=e43]: 操作人
+      - textbox "请输入姓名" [ref=e44]
+  - main [ref=e45]:
+    - generic [ref=e46]:
+      - heading "数据导入" [level=2] [ref=e47]
+      - combobox [ref=e49]:
+        - option "第三轮复检-CSV台账冲突" [selected]
+        - option "口袋公园日照复核示范项目"
+      - generic [ref=e50]:
+        - button "上传 CSV 文件 支持中英文表头" [ref=e51] [cursor=pointer]:
+          - img [ref=e52]
+          - generic [ref=e55]: 上传 CSV 文件
+          - generic [ref=e56]: 支持中英文表头
+        - button "手动录入 逐条填写数据" [ref=e57] [cursor=pointer]:
+          - img [ref=e58]
+          - generic [ref=e61]: 手动录入
+          - generic [ref=e62]: 逐条填写数据
+        - button "加载示范数据 含同名路口、重复投诉等场景" [ref=e63] [cursor=pointer]:
+          - img [ref=e64]
+          - generic [ref=e69]: 加载示范数据
+          - generic [ref=e70]: 含同名路口、重复投诉等场景
+      - generic [ref=e71]: 暂无预检结果，请先导入数据

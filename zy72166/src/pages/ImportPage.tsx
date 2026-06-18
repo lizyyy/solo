@@ -98,6 +98,7 @@ export default function ImportPage() {
   const [importing, setImporting] = useState(false)
   const [importMsg, setImportMsg] = useState<string | null>(null)
   const [mode, setMode] = useState<'idle' | 'file' | 'manual'>('idle')
+  const [fileSource, setFileSource] = useState<'sunlight' | 'ledger'>('sunlight')
   const [manualRows, setManualRows] = useState<ManualRow[]>([emptyRow()])
   const [manualSource, setManualSource] = useState<'sunlight' | 'ledger'>('sunlight')
   const fileRef = useRef<HTMLInputElement>(null)
@@ -157,8 +158,7 @@ export default function ImportPage() {
         setImportMsg('文件为空或格式不正确，需含表头行和至少一行数据')
         return
       }
-      const source = rows[0]['日照时长'] || rows[0]['投诉情况'] ? 'sunlight' : 'sunlight'
-      await importData(currentProjectId, source, rows)
+      await importData(currentProjectId, fileSource, rows)
       await loadPrecheck()
       setImportMsg(`成功导入 ${rows.length} 条记录`)
       setMode('idle')
@@ -178,13 +178,13 @@ export default function ImportPage() {
     } else {
       setImportMsg('仅支持 CSV 文件')
     }
-  }, [currentProjectId])
+  }, [currentProjectId, fileSource])
 
   const onFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) handleFileImport(file)
     e.target.value = ''
-  }, [currentProjectId])
+  }, [currentProjectId, fileSource])
 
   async function handleManualImport() {
     if (!currentProjectId) return
@@ -288,7 +288,17 @@ export default function ImportPage() {
       {mode === 'file' && (
         <div className="bg-white rounded-lg border border-slate-200 p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-slate-700">上传 CSV 文件</h3>
+            <div className="flex items-center gap-3">
+              <h3 className="text-sm font-semibold text-slate-700">上传 CSV 文件</h3>
+              <select
+                value={fileSource}
+                onChange={(e) => setFileSource(e.target.value as 'sunlight' | 'ledger')}
+                className="px-2 py-1 border border-slate-200 rounded text-xs focus:outline-none focus:ring-2 focus:ring-teal-700/30"
+              >
+                <option value="sunlight">实测数据</option>
+                <option value="ledger">审批台账</option>
+              </select>
+            </div>
             <button onClick={() => setMode('idle')} className="text-xs text-slate-400 hover:text-slate-600 flex items-center gap-1">
               <X className="w-3.5 h-3.5" /> 返回
             </button>

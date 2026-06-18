@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { FileOutput, ChevronDown, ChevronUp, Download } from 'lucide-react'
 import { useProjectStore } from '@/store'
-import { fetchExport, generateExport, downloadCsv, fetchProjects } from '@/api'
+import { fetchExport, fetchProjects, generateExport, downloadCsv } from '@/api'
 
 const categoryConfig: Record<string, { label: string; headerCls: string; badgeCls: string }> = {
   processed: {
@@ -22,7 +22,7 @@ const categoryConfig: Record<string, { label: string; headerCls: string; badgeCl
 }
 
 export default function ExportPage() {
-  const { currentProjectId, operator, setCurrentProjectId } = useProjectStore()
+  const { currentProjectId, setCurrentProjectId, operator } = useProjectStore()
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
@@ -33,27 +33,29 @@ export default function ExportPage() {
   })
 
   useEffect(() => {
-    if (currentProjectId) {
-      loadExport()
-    } else {
-      ensureProject()
-    }
+    ensureProject()
   }, [currentProjectId])
 
   async function ensureProject() {
+    if (currentProjectId) {
+      await loadExport(currentProjectId)
+      return
+    }
     try {
       const projects = await fetchProjects()
       if (projects.length > 0) {
         setCurrentProjectId(projects[0].id)
+      } else {
+        setLoading(false)
       }
     } catch {
-      // ignore
+      setLoading(false)
     }
   }
 
-  async function loadExport() {
+  async function loadExport(projectId = currentProjectId!) {
     try {
-      const result = await fetchExport(currentProjectId!)
+      const result = await fetchExport(projectId)
       setData(result)
     } catch {
       // ignore
@@ -67,7 +69,7 @@ export default function ExportPage() {
     setGenerating(true)
     try {
       await generateExport(currentProjectId, operator)
-      await loadExport()
+      await loadExport(currentProjectId)
     } catch {
       // ignore
     } finally {
