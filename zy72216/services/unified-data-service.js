@@ -65,10 +65,16 @@ function getAllRecordsWithDetails(callback) {
             ReconciliationNote.getNotesByRecordId(record.id, (e, notes) => {
               if (e) rej(e); else res(notes);
             });
+          }),
+          new Promise((res, rej) => {
+            ExRightScreenshot.getScreenshotsByRecordId(record.id, (e, screenshots) => {
+              if (e) rej(e); else res(screenshots);
+            });
           })
-        ]).then(([logs, notes]) => {
+        ]).then(([logs, notes, screenshots]) => {
           record.change_logs = logs.map(enrichChangeLog);
           record.reconciliation_notes = notes;
+          record.ex_right_screenshots = screenshots;
           resolve(record);
         }).catch(reject);
       })
@@ -96,10 +102,16 @@ function getRecordsByBatchWithDetails(batchId, callback) {
             ReconciliationNote.getNotesByRecordId(record.id, (e, notes) => {
               if (e) rej(e); else res(notes);
             });
+          }),
+          new Promise((res, rej) => {
+            ExRightScreenshot.getScreenshotsByRecordId(record.id, (e, screenshots) => {
+              if (e) rej(e); else res(screenshots);
+            });
           })
-        ]).then(([logs, notes]) => {
+        ]).then(([logs, notes, screenshots]) => {
           record.change_logs = logs.map(enrichChangeLog);
           record.reconciliation_notes = notes;
+          record.ex_right_screenshots = screenshots;
           resolve(record);
         }).catch(reject);
       })
@@ -134,6 +146,12 @@ function getExportData(callback) {
       '人工改动记录': record.change_logs.map(l =>
         `${l.operate_time} ${l.operator} ${l.field_label}: ${l.old_value} → ${l.new_value} (${l.change_reason})`
       ).join('; '),
+      '人工改动证据截图': record.change_logs.map(l =>
+        l.evidence_screenshot ? `${l.operate_time} ${l.field_label}: ${l.evidence_screenshot}` : ''
+      ).filter(s => s).join('; '),
+      '除权日截图': record.ex_right_screenshots ? record.ex_right_screenshots.map(s =>
+        `${s.upload_time} ${s.upload_operator}: ${s.screenshot_path}${s.remark ? ' (' + s.remark + ')' : ''}`
+      ).join('; ') : '',
       '对账说明': record.reconciliation_notes ? record.reconciliation_notes.map(n => n.note_content).join('; ') : ''
     }));
 
