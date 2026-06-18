@@ -193,3 +193,43 @@ EXTRA_SAMPLES = [
         "notes": "跨库去重测试：内容与S003相同，ID不同",
     },
 ]
+
+
+EXTRA_SAMPLES2 = [
+    {
+        "id": "S003",
+        "content": "以下哪个选项是正确的？A.地球是平的 B.地球是圆的 C.地球是三角形的",
+        "domain": "常识问答",
+        "reference_result": "B",
+        "model_output": "B",
+        "model_confidence": 0.42,
+        "human_label": None,
+        "source": "常识问答集v2（覆盖更新）",
+        "import_batch": "batch_2026_03",
+        "notes": "同ID覆盖更新：置信度从0.99降到0.42，置信度分层从高置信度变为低置信度",
+    },
+    {
+        "id": "S018",
+        "content": "请将以下英文翻译为中文：The quick brown fox jumps over the lazy dog.",
+        "domain": "翻译",
+        "reference_result": "那只敏捷的棕色狐狸跳过了那只懒狗。",
+        "model_output": "那只敏捷的棕色狐狸跳过懒狗。",
+        "model_confidence": 0.77,
+        "human_label": None,
+        "source": "翻译评测集v3",
+        "import_batch": "batch_2026_03",
+        "notes": "不同ID跨库重复：内容与S001相同，应该被标记为重复并指向S001",
+    },
+    {
+        "id": "S019",
+        "content": "请回答：太阳系最大的行星是哪一颗？",
+        "domain": "常识问答",
+        "reference_result": "木星",
+        "model_output": "土星",
+        "model_confidence": 0.31,
+        "human_label": None,
+        "source": "常识问答集v3",
+        "import_batch": "batch_2026_03",
+        "notes": "纯新增样本：预测错误，低置信度",
+    },
+]

@@ -10,7 +10,7 @@ from app.stratifier import (
     run_stratification, incremental_stratification,
     compare_runs, generate_report,
 )
-from app.demo_data import SAMPLES, EXTRA_SAMPLES
+from app.demo_data import SAMPLES, EXTRA_SAMPLES, EXTRA_SAMPLES2
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -73,6 +73,12 @@ async def load_demo():
 @app.post("/api/load-extra")
 async def load_extra():
     result = incremental_stratification(EXTRA_SAMPLES, operator="补录数据")
+    return result
+
+
+@app.post("/api/load-extra2")
+async def load_extra2():
+    result = incremental_stratification(EXTRA_SAMPLES2, operator="补录数据（第二轮）")
     return result
 
 

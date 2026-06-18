@@ -113,6 +113,7 @@ tr:hover { background: #f7fafc; }
       <div class="actions">
         <button class="btn btn-primary" onclick="loadDemo()">加载演示数据</button>
         <button class="btn" onclick="loadExtra()">补录增量数据</button>
+        <button class="btn" onclick="loadExtra2()">补录第二轮(含覆盖+重复+新增)</button>
         <button class="btn" onclick="doRerun()">重跑分层</button>
       </div>
       <div class="stats-grid" id="overview-stats"></div>
@@ -270,7 +271,13 @@ async function loadDemo() {
 
 async function loadExtra() {
   const res = await api('/api/load-extra', { method: 'POST' });
-  showToast(`增量数据已补录：${res.new_unique} 条新增，${res.new_duplicates} 条重复`);
+  showToast(`增量数据已补录：${res.new_adds} 条新增，${res.db_duplicates||0} 条跨库重复，${res.internal_dups||0} 条内部重复`);
+  loadOverview();
+}
+
+async function loadExtra2() {
+  const res = await api('/api/load-extra2', { method: 'POST' });
+  showToast(`第二轮补录：${res.overwrite_updates||0} 条覆盖更新，${res.new_adds} 条新增，${res.db_duplicates||0} 条跨库重复，${res.internal_dups||0} 条内部重复`);
   loadOverview();
 }
 
