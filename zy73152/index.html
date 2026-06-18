@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>海洋牧场时序回放</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="app-title">🌊 海洋牧场时序回放</h1>
+        <span class="app-subtitle">实验室结果复核 · 过程可追溯</span>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-primary" id="btn-rerun">🔄 补备注重跑</button>
+        <button class="btn btn-secondary" id="btn-sample">🧪 试跑样例</button>
+      </div>
+    </header>
+
+    <div class="quick-nav">
+      <div class="nav-card nav-summary" data-nav="summary">
+        <div class="nav-icon">📋</div>
+        <div class="nav-text">
+          <div class="nav-title">页面摘要</div>
+          <div class="nav-desc">当前跑次速览</div>
+        </div>
+      </div>
+      <div class="nav-card nav-materials" data-nav="materials">
+        <div class="nav-icon">📁</div>
+        <div class="nav-text">
+          <div class="nav-title">材料区</div>
+          <div class="nav-desc">原始数据与附件</div>
+        </div>
+      </div>
+      <div class="nav-card nav-anomaly" data-nav="anomaly">
+        <div class="nav-icon">⚠️</div>
+        <div class="nav-text">
+          <div class="nav-title">异常区</div>
+          <div class="nav-desc">云遮挡记录</div>
+        </div>
+        <span class="nav-badge" id="anomaly-count">3</span>
+      </div>
+      <div class="nav-card nav-export" data-nav="export">
+        <div class="nav-icon">📤</div>
+        <div class="nav-text">
+          <div class="nav-title">导出区</div>
+          <div class="nav-desc">结果报告下载</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <aside class="sidebar">
+        <div class="sidebar-section">
+          <h3 class="sidebar-title">跑次记录</h3>
+          <div class="run-list" id="run-list"></div>
+        </div>
+        <div class="sidebar-section">
+          <h3 class="sidebar-title">复核人指引</h3>
+          <div class="guide-card">
+            <div class="guide-item">
+              <span class="guide-dot">1</span>
+              <span>左侧选跑次，中间看步骤</span>
+            </div>
+            <div class="guide-item">
+              <span class="guide-dot">2</span>
+              <span>步骤有<mark class="mark-diff">差异标记</mark>的是变化点</span>
+            </div>
+            <div class="guide-item">
+              <span class="guide-dot">3</span>
+              <span>右上角<mark class="mark-btn">补备注重跑</mark>可留痕重跑</span>
+            </div>
+            <div class="guide-item">
+              <span class="guide-dot">4</span>
+              <span>异常区单独看云遮挡，不混入正常结果</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="content-area">
+        <div class="run-header" id="run-header"></div>
+
+        <div class="timeline-section" id="timeline-section">
+          <h2 class="section-title">
+            <span>⏱️ 时序回放</span>
+            <span class="section-tip">点击步骤查看详情，橙色标记为相对上一次的变化</span>
+          </h2>
+          <div class="timeline" id="timeline"></div>
+        </div>
+
+        <div class="detail-section" id="step-detail">
+          <div class="detail-placeholder">
+            <div class="placeholder-icon">👆</div>
+            <p>选择左侧步骤查看详细信息</p>
+          </div>
+        </div>
+
+        <div class="panels-row">
+          <div class="panel coord-panel" id="coord-panel">
+            <div class="panel-header">
+              <h3>📍 经纬度标准化对照</h3>
+              <span class="panel-badge">原始写法统一为十进制度</span>
+            </div>
+            <div class="panel-body" id="coord-table"></div>
+          </div>
+
+          <div class="panel late-panel" id="late-panel">
+            <div class="panel-header">
+              <h3>📮 晚到附件处理</h3>
+              <span class="panel-badge late-badge" id="late-badge">无</span>
+            </div>
+            <div class="panel-body" id="late-list"></div>
+          </div>
+        </div>
+
+        <div class="panel cloud-panel" id="cloud-panel">
+          <div class="panel-header">
+            <h3>☁️ 云遮挡记录（已单独拎出）</h3>
+            <span class="panel-badge warn-badge">未计入正常结果</span>
+          </div>
+          <div class="panel-body" id="cloud-table"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="modal" id="rerun-modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🔄 补备注重跑</h3>
+        <button class="modal-close" id="modal-close">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>备注说明</label>
+          <textarea id="rerun-remark" rows="3" placeholder="填写这次重跑的原因，例如：调整云阈值、补充晚到数据..."></textarea>
+        </div>
+        <div class="form-hint">
+          <p>💡 重跑后会：</p>
+          <ul>
+            <li>保留旧记录作为基准版本</li>
+            <li>新记录自动关联上一版</li>
+            <li>每一步参数变化会用橙色标记</li>
+            <li>备注会显示在跑次名称旁</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modal-cancel">取消</button>
+        <button class="btn btn-primary" id="modal-confirm">确认重跑</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="sample-modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🧪 试跑样例</h3>
+        <button class="modal-close" id="sample-close">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="sample-intro">这里有3组预置的跑次样例，展示了不同场景下的回放效果：</p>
+        <div class="sample-list">
+          <div class="sample-item" data-run="run-2026-06-15-v1">
+            <div class="sample-title">第1次跑 · 基准版</div>
+            <div class="sample-desc">初始跑，所有数据齐全，无晚到附件，云阈值20%</div>
+          </div>
+          <div class="sample-item" data-run="run-2026-06-17-v2">
+            <div class="sample-title">第2次跑 · 补晚到附件</div>
+            <div class="sample-desc">收到晚到的实验室样品数据后重跑，可对比新增数据的影响</div>
+          </div>
+          <div class="sample-item" data-run="run-2026-06-18-v3">
+            <div class="sample-title">第3次跑 · 调云阈值+补备注</div>
+            <div class="sample-desc">云阈值从20%调到25%，补全备注字段，展示参数变化追踪</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="sample-cancel">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
