@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>深海采样空间标注</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- 顶部标题栏 -->
+    <header class="topbar">
+      <div class="title">
+        <h1>深海采样空间标注</h1>
+        <span class="subtitle">港口工程水质监测 · 采样瓶异常标注工具</span>
+      </div>
+      <div class="meta">
+        <span class="tag">批次 2026-JUN-15</span>
+        <span class="tag tag-warn">含云遮挡样例</span>
+      </div>
+    </header>
+
+    <!-- 汇总区 -->
+    <section class="summary">
+      <div class="sum-card">
+        <div class="sum-num" id="sumTotal">0</div>
+        <div class="sum-label">采样点总数</div>
+      </div>
+      <div class="sum-card sum-abnormal">
+        <div class="sum-num" id="sumAbnormal">0</div>
+        <div class="sum-label">异常点</div>
+      </div>
+      <div class="sum-card sum-cloud">
+        <div class="sum-num" id="sumCloud">0</div>
+        <div class="sum-label">云遮挡待复核</div>
+      </div>
+      <div class="sum-card sum-ok">
+        <div class="sum-num" id="sumPass">0</div>
+        <div class="sum-label">可直接放行</div>
+      </div>
+    </section>
+
+    <!-- 主体区 -->
+    <div class="main">
+      <!-- 左侧：空间标注图 -->
+      <div class="map-panel">
+        <div class="panel-title">
+          <h2>采样空间分布</h2>
+          <div class="legend">
+            <span class="dot dot-normal"></span>正常
+            <span class="dot dot-abnormal"></span>异常
+            <span class="dot dot-cloud"></span>云遮挡
+          </div>
+        </div>
+        <div class="map-container">
+          <svg id="mapSvg" viewBox="0 0 600 420" xmlns="http://www.w3.org/2000/svg">
+            <!-- 海域背景 -->
+            <defs>
+              <linearGradient id="seaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#cfe8ff" />
+                <stop offset="100%" stop-color="#1e6091" />
+              </linearGradient>
+              <radialGradient id="cloudGrad">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.9)" />
+                <stop offset="100%" stop-color="rgba(255,255,255,0.2)" />
+              </radialGradient>
+            </defs>
+            <!-- 海底地形示意 -->
+            <rect x="0" y="0" width="600" height="420" fill="url(#seaGrad)" />
+            <!-- 海岸线 -->
+            <path d="M0,60 Q100,30 200,70 T400,50 T600,80 L600,0 L0,0 Z" fill="#e8dcc4" />
+            <!-- 等深线 -->
+            <path d="M0,140 Q150,120 300,150 T600,130" stroke="rgba(255,255,255,0.3)" fill="none" />
+            <path d="M0,230 Q150,210 300,240 T600,220" stroke="rgba(255,255,255,0.25)" fill="none" />
+            <path d="M0,320 Q150,300 300,330 T600,310" stroke="rgba(255,255,255,0.2)" fill="none" />
+            <!-- 云遮挡区域 -->
+            <ellipse id="cloudArea" cx="420" cy="190" rx="90" ry="55" fill="url(#cloudGrad)" stroke="#aaa" stroke-dasharray="4 3" />
+            <text x="420" y="195" text-anchor="middle" fill="#555" font-size="12">云遮挡区</text>
+            <!-- 采样点通过 JS 渲染 -->
+            <g id="samplePoints"></g>
+          </svg>
+          <div class="depth-bar">
+            <span>浅海</span>
+            <div class="bar"></div>
+            <span>深海</span>
+          </div>
+        </div>
+        <div class="tip">
+          <strong>提示：</strong>点击采样点查看详情，编号与右侧同步高亮。
+        </div>
+      </div>
+
+      <!-- 右侧：列表 + 详情 -->
+      <div class="right-panel">
+        <!-- 筛选栏 -->
+        <div class="filters">
+          <button class="filter-btn active" data-filter="all">全部</button>
+          <button class="filter-btn" data-filter="abnormal">异常</button>
+          <button class="filter-btn" data-filter="cloud">云遮挡</button>
+          <button class="filter-btn" data-filter="pass">可放行</button>
+        </div>
+
+        <!-- 采样瓶列表 -->
+        <div class="bottle-list" id="bottleList"></div>
+
+        <!-- 详情面板 -->
+        <div class="detail-panel" id="detailPanel">
+          <div class="detail-empty">点击左侧采样点或右侧列表查看详情</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 交接说明区 -->
+    <section class="handover">
+      <div class="handover-title">
+        <h2>老何操作手册（交接说明）</h2>
+        <span class="handover-hint">按样例跑一遍 → 找到接口返回 → 知道哪条补、哪条放</span>
+      </div>
+      <div class="handover-body">
+        <div class="step">
+          <span class="step-num">1</span>
+          <div>
+            <h3>先扫汇总</h3>
+            <p>顶部 4 张卡片：总数、异常、云遮挡、可放行。先看数字有没有大出入。</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div>
+            <h3>再追异常</h3>
+            <p>点"异常"筛选 → 红标采样瓶 → 看"数据来源"和"超标项" → 决定<strong>补材料</strong>还是<strong>放行</strong>。</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div>
+            <h3>云遮挡怎么处理</h3>
+            <p>灰标 = 遥感数据被云挡了，<strong>不能直接放行</strong>，要补现场采样或下次过境再扫。</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">4</span>
+          <div>
+            <h3>编号备注怎么改判断</h3>
+            <p>评审会前临时补一条采样瓶编号备注 → 系统会在"变更记录"里标出哪些判断变了、为什么变。</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">5</span>
+          <div>
+            <h3>接口返回在哪</h3>
+            <p>详情面板底部 → <code>/api/v1/sample/{编号}</code> → 返回原始数据，可溯源。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 示例：补一条备注的演示按钮 -->
+    <div class="demo-bar">
+      <span>评审会前模拟：</span>
+      <button class="demo-btn" id="addRemarkBtn">补一条 S-07 备注（现场复测合格）</button>
+      <button class="demo-btn demo-btn-reset" id="resetBtn">重置</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
