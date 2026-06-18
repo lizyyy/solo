@@ -81,6 +81,7 @@ export interface HistoryVersion {
   version: number;
   action: 'CREATE' | 'UPDATE' | 'DELETE' | 'ROLLBACK';
   changedFields: Record<string, { old: any; new: any }>;
+  fullSnapshot: any;
   operatedBy: string;
   operatedAt: string;
   remark: string;
