@@ -1,0 +1,67 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(46, 196, 182, 0.15), transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, rgba(30, 96, 199, 0.35), transparent 60%),
+    linear-gradient(180deg, #04172e 0%, #050c1a 100%);
+  color: #e7ecf5;
+  font-family: "Inter", ui-sans-serif, system-ui;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  .glass-card {
+    @apply rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-card;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-xs text-ink-100;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-ink-50 transition hover:bg-white/10 hover:shadow-card;
+  }
+  .btn-primary {
+    @apply inline-flex items-center gap-1.5 rounded-xl bg-ocean-600 px-3.5 py-1.5 text-sm font-medium text-white transition hover:bg-ocean-500 hover:shadow-glow;
+  }
+  .tab-btn {
+    @apply relative px-3 py-1.5 text-sm text-ink-200 transition hover:text-white;
+  }
+  .tab-btn.active {
+    @apply text-white;
+  }
+  .tab-btn.active::after {
+    content: "";
+    @apply absolute inset-x-2 -bottom-0.5 h-0.5 rounded-full bg-tide-500;
+  }
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(149, 164, 190, 0.25);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(149, 164, 190, 0.45);
+}
