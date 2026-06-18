@@ -36,7 +36,7 @@
 
     <div class="summary-box">
         <div><strong>模型版本：</strong>v1.0</div>
-        <div><strong>评估时间：</strong>2026-06-08 19:17:05</div>
+        <div><strong>评估时间：</strong>2026-06-18 08:41:08</div>
     </div>
 
     <h2>总体指标</h2>
@@ -77,10 +77,10 @@
     
 
     
-    <h2>未解决冲突 (2)</h2>
+    <h2>未解决冲突 (1)</h2>
     
     <div class="conflict">
-        <strong>[ErrorType.FALSE_POSITIVE]</strong> REC006: 模型将8位数字12345678误识别为手机号，但标注认为不是手机号
+        <strong>[false_positive]</strong> REC006: 模型将8位数字12345678误识别为手机号，但标注认为不是手机号
         <div style="margin-top: 8px;">
             <strong>证据：</strong>
             
@@ -95,28 +95,6 @@
                 <div><strong>annotation</strong>: expected_level = <code>not_masked</code></div>
                 
                 <div class="evidence-source">来源: <a href="samples/annotations/ground_truth.csv#L12" class="link">samples/annotations/ground_truth.csv#L12</a></div>
-                
-            </div>
-            
-        </div>
-    </div>
-    
-    <div class="conflict">
-        <strong>[ErrorType.FALSE_NEGATIVE]</strong> REC009: 座机号010-12345678是否需要脱敏存在争议
-        <div style="margin-top: 8px;">
-            <strong>证据：</strong>
-            
-            <div class="evidence">
-                <div><strong>model_output</strong>: detected_entities = <code>[]</code></div>
-                
-                <div class="evidence-source">来源: <a href="samples/model_logs/v1.0/batch_001.jsonl#L10" class="link">samples/model_logs/v1.0/batch_001.jsonl#L10</a></div>
-                
-            </div>
-            
-            <div class="evidence">
-                <div><strong>annotation</strong>: expected_level = <code>not_masked</code></div>
-                
-                <div class="evidence-source">来源: <a href="samples/annotations/ground_truth.csv#L16" class="link">samples/annotations/ground_truth.csv#L16</a></div>
                 
             </div>
             
@@ -229,7 +207,7 @@
         
         <tr class="error-row">
             <td><strong>false_negative</strong></td>
-            <td class="fail">2</td>
+            <td class="fail">1</td>
             <td>
                 
                 <code>REC004</code>
@@ -264,15 +242,15 @@
     
     
     
-    <h3>false_negative (2条)</h3>
+    <h3>false_negative (1条)</h3>
     
     <div class="error-row" style="padding: 15px; margin: 10px 0; border-radius: 8px;">
         <div><strong>记录ID：</strong><code>REC004</code></div>
-        <div><strong>敏感类型：</strong>SensitiveType.PHONE</div>
+        <div><strong>敏感类型：</strong>phone</div>
         <div><strong>检测值：</strong><code>(空)</code></div>
         <div><strong>期望值：</strong><code>13900139000</code></div>
-        <div><strong>模型级别：</strong>DesensitizationLevel.NOT_MASKED</div>
-        <div><strong>期望级别：</strong>DesensitizationLevel.PARTIAL_MASK</div>
+        <div><strong>模型级别：</strong>not_masked</div>
+        <div><strong>期望级别：</strong>partial_mask</div>
         
         <div class="note"><strong>评估说明：</strong>漏检：13900139000(phone)未被模型检测到
 2026-06-02 临时补录：13900139000是真实手机号，v2.0已修复，v1.0漏检是因为正则少了139号段</div>
@@ -304,11 +282,11 @@
     
     <div class="error-row" style="padding: 15px; margin: 10px 0; border-radius: 8px;">
         <div><strong>记录ID：</strong><code>REC006</code></div>
-        <div><strong>敏感类型：</strong>SensitiveType.PHONE</div>
+        <div><strong>敏感类型：</strong>phone</div>
         <div><strong>检测值：</strong><code>12345678</code></div>
         <div><strong>期望值：</strong><code>12345678</code></div>
-        <div><strong>模型级别：</strong>DesensitizationLevel.FULL_MASK</div>
-        <div><strong>期望级别：</strong>DesensitizationLevel.NOT_MASKED</div>
+        <div><strong>模型级别：</strong>full_mask</div>
+        <div><strong>期望级别：</strong>not_masked</div>
         
         <div class="note"><strong>评估说明：</strong>脱敏级别不匹配：模型输出full_mask，期望not_masked
 2026-06-02 评审确认：12345678不是有效手机号，模型误报，需要优化正则表达式</div>
@@ -335,11 +313,11 @@
     
     <div class="error-row" style="padding: 15px; margin: 10px 0; border-radius: 8px;">
         <div><strong>记录ID：</strong><code>REC008</code></div>
-        <div><strong>敏感类型：</strong>SensitiveType.ID_CARD</div>
+        <div><strong>敏感类型：</strong>id_card</div>
         <div><strong>检测值：</strong><code>110101199003075678</code></div>
         <div><strong>期望值：</strong><code>110101199003075678</code></div>
-        <div><strong>模型级别：</strong>DesensitizationLevel.PARTIAL_MASK</div>
-        <div><strong>期望级别：</strong>DesensitizationLevel.FULL_MASK</div>
+        <div><strong>模型级别：</strong>partial_mask</div>
+        <div><strong>期望级别：</strong>full_mask</div>
         
         <div class="note"><strong>评估说明：</strong>脱敏级别不匹配：模型输出partial_mask，期望full_mask
 2026-06-02 补充说明：身份证号根据最新合规要求必须全脱敏，v1.0模型只做了部分脱敏</div>

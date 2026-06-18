@@ -133,7 +133,7 @@ class ResultReporter:
     <h2>未解决冲突 ({{ conflicts|length }})</h2>
     {% for conflict in conflicts %}
     <div class="conflict">
-        <strong>[{{ conflict.conflict_type }}]</strong> {{ conflict.record_id }}: {{ conflict.description }}
+        <strong>[{{ conflict.conflict_type.value }}]</strong> {{ conflict.record_id }}: {{ conflict.description }}
         <div style="margin-top: 8px;">
             <strong>证据：</strong>
             {% for ev in conflict.evidences %}
@@ -210,11 +210,11 @@ class ResultReporter:
     {% for result in group.records %}
     <div class="error-row" style="padding: 15px; margin: 10px 0; border-radius: 8px;">
         <div><strong>记录ID：</strong><code>{{ result.record_id }}</code></div>
-        <div><strong>敏感类型：</strong>{{ result.sensitive_type }}</div>
+        <div><strong>敏感类型：</strong>{{ result.sensitive_type.value }}</div>
         <div><strong>检测值：</strong><code>{{ result.detected_value or '(空)' }}</code></div>
         <div><strong>期望值：</strong><code>{{ result.expected_value or '(空)' }}</code></div>
-        <div><strong>模型级别：</strong>{{ result.model_level }}</div>
-        <div><strong>期望级别：</strong>{{ result.expected_level }}</div>
+        <div><strong>模型级别：</strong>{{ result.model_level.value if result.model_level else '(空)' }}</div>
+        <div><strong>期望级别：</strong>{{ result.expected_level.value if result.expected_level else '(空)' }}</div>
         {% if result.note %}
         <div class="note"><strong>评估说明：</strong>{{ result.note }}</div>
         {% endif %}
