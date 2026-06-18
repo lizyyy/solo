@@ -1,0 +1,79 @@
+{
+  "dataset": "2024_Q2_Xisha",
+  "source": "Sentinel-2 L2A",
+  "description": "哨兵2号L2A级遥感反射率数据，已标记云遮挡",
+  "scenes": [
+    {
+      "id": "S2A_20240315T030519",
+      "date": "2024-03-15",
+      "station_code": "XS-BJ-07",
+      "cloud_coverage_pct": 12,
+      "bleaching_index": 0.08,
+      "cloud_mask_rows": [145, 146, 147, 178, 179, 210, 211, 212],
+      "affected_pixels_affected": 2847,
+      "total_pixels": 23600,
+      "source_band_lines": ["B2", "B3", "B4", "B8"],
+      "quality_note": "薄云边缘有少量散射，北礁东北角受影响"
+    },
+    {
+      "id": "S2A_20240410T025531",
+      "date": "2024-04-10",
+      "station_code": "XS-BJ-07",
+      "cloud_coverage_pct": 3,
+      "bleaching_index": 0.19,
+      "cloud_mask_rows": [],
+      "affected_pixels_affected": 0,
+      "total_pixels": 23600,
+      "source_band_lines": ["B2", "B3", "B4", "B8"],
+      "quality_note": "晴空，数据质量良好"
+    },
+    {
+      "id": "S2A_20240422T031027",
+      "date": "2024-04-22",
+      "station_code": "XS-BJ-07",
+      "cloud_coverage_pct": 47,
+      "bleaching_index": 0.33,
+      "cloud_mask_rows": [88, 89, 90, 91, 120, 121, 122, 123, 124, 155, 156, 187, 188, 220],
+      "affected_pixels_affected": 11092,
+      "total_pixels": 23600,
+      "source_band_lines": ["B2", "B3", "B4", "B8"],
+      "quality_note": "⚠️ 厚云覆盖约47%，仅南部数据受影响，与船测同日需交叉验证"
+    },
+    {
+      "id": "S2A_20240505T025948",
+      "date": "2024-05-05",
+      "station_code": "XS-BJ-07",
+      "cloud_coverage_pct": 8,
+      "bleaching_index": 0.39,
+      "cloud_mask_rows": [201, 202, 233],
+      "affected_pixels_affected": 1888,
+      "total_pixels": 23600,
+      "source_band_lines": ["B2", "B3", "B4", "B8"],
+      "quality_note": "局部碎云，整体可用"
+    },
+    {
+      "id": "S2A_20240518T030509",
+      "date": "2024-05-18",
+      "station_code": "XS-BJ-07",
+      "cloud_coverage_pct": 68,
+      "bleaching_index": 0.41,
+      "cloud_mask_rows": [45, 46, 77, 78, 79, 80, 110, 111, 112, 140, 141, 142, 143, 144, 173, 174, 175, 206, 207, 238, 239],
+      "affected_pixels_affected": 16048,
+      "total_pixels": 23600,
+      "source_band_lines": ["B2", "B3", "B4", "B8"],
+      "quality_note": "⚠️ 云遮挡严重(68%)，大量像素缺失，白化指数插值补齐"
+    },
+    {
+      "id": "S2A_20240602T030133",
+      "date": "2024-06-02",
+      "station_code": "XS-BJ-07",
+      "cloud_coverage_pct": 5,
+      "bleaching_index": 0.40,
+      "cloud_mask_rows": [166, 167],
+      "affected_pixels_affected": 1180,
+      "total_pixels": 23600,
+      "source_band_lines": ["B2", "B3", "B4", "B8"],
+      "quality_note": "良好"
+    }
+  ]
+}

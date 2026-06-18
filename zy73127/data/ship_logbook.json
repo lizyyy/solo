@@ -1,0 +1,229 @@
+{
+  "dataset": "2024_Q2_Xisha",
+  "station": "永兴岛北礁",
+  "description": "2024年第二季度西沙北礁珊瑚白化监测样本包",
+  "entries": [
+    {
+      "id": "LOG-20240315-001",
+      "date": "2024-03-15",
+      "station_code": "XS-BJ-07",
+      "depth_m": 5,
+      "coral_cover_pct_raw": 62,
+      "bleaching_pct_raw": 8,
+      "water_temp_c_raw": 27.8,
+      "versions": [
+        {
+          "version": 1,
+          "timestamp": "2024-03-15T09:30:00Z",
+          "author": "阿乔",
+          "values": {
+            "coral_cover_pct": 62,
+            "bleaching_pct": 8,
+            "water_temp_c": 27.8
+          },
+          "note": "初始记录，水下拍照编号IMG_20240315_0930.jpg",
+          "screenshot_ref": "img/scanned_logbook_page17.png"
+        },
+        {
+          "version": 2,
+          "timestamp": "2024-03-16T14:20:00Z",
+          "author": "阿乔",
+          "values": {
+            "coral_cover_pct": 62,
+            "bleaching_pct": 12,
+            "water_temp_c": 27.8
+          },
+          "note": "补录：回看照片发现3号样方漏记4株白化鹿角珊瑚，已修正",
+          "screenshot_ref": "img/scanned_logbook_page17_v2_annotation.png"
+        }
+      ],
+      "final_values": {
+        "coral_cover_pct": 62,
+        "bleaching_pct": 12,
+        "water_temp_c": 27.8
+      },
+      "flags": []
+    },
+    {
+      "id": "LOG-20240410-003",
+      "date": "2024-04-10",
+      "station_code": "XS-BJ-07",
+      "depth_m": 5,
+      "coral_cover_pct_raw": 58,
+      "bleaching_pct_raw": 18,
+      "water_temp_c_raw": 29.1,
+      "versions": [
+        {
+          "version": 1,
+          "timestamp": "2024-04-10T10:15:00Z",
+          "author": "阿乔",
+          "values": {
+            "coral_cover_pct": 58,
+            "bleaching_pct": 18,
+            "water_temp_c": 29.1
+          },
+          "note": "现场记录，水温偏高，可见白色絮状物",
+          "screenshot_ref": "img/scanned_logbook_page29.png"
+        }
+      ],
+      "final_values": {
+        "coral_cover_pct": 58,
+        "bleaching_pct": 18,
+        "water_temp_c": 29.1
+      },
+      "flags": []
+    },
+    {
+      "id": "LOG-20240422-007",
+      "date": "2024-04-22",
+      "station_code": "XS-BJ-07",
+      "depth_m": 5,
+      "coral_cover_pct_raw": 55,
+      "bleaching_pct_raw": 45,
+      "water_temp_c_raw": 30.2,
+      "versions": [
+        {
+          "version": 1,
+          "timestamp": "2024-04-22T11:00:00Z",
+          "author": "阿乔",
+          "values": {
+            "coral_cover_pct": 55,
+            "bleaching_pct": 45,
+            "water_temp_c": 30.2
+          },
+          "note": "疑似异常！大量珊瑚大面积白化，目测超40%+",
+          "screenshot_ref": "img/scanned_logbook_page41.png"
+        },
+        {
+          "version": 2,
+          "timestamp": "2024-04-25T09:00:00Z",
+          "author": "李主任",
+          "values": {
+            "coral_cover_pct": 55,
+            "bleaching_pct": 28,
+            "water_temp_c": 30.2
+          },
+          "note": "复核：45%包含死珊瑚（非本次白化），修正为28%",
+          "screenshot_ref": "img/scanned_logbook_page41_v2_review.png"
+        },
+        {
+          "version": 3,
+          "timestamp": "2024-04-28T16:45:00Z",
+          "author": "阿乔",
+          "values": {
+            "coral_cover_pct": 55,
+            "bleaching_pct": 35,
+            "water_temp_c": 30.2
+          },
+          "note": "再复核：照片AI分类器识别白化35%，主任28%偏保守，取中值35%",
+          "screenshot_ref": "img/ai_classify_20240422_report.pdf"
+        }
+      ],
+      "final_values": {
+        "coral_cover_pct": 55,
+        "bleaching_pct": 35,
+        "water_temp_c": 30.2
+      },
+      "flags": ["outlier_suspected", "revised_multiple_times"]
+    },
+    {
+      "id": "LOG-20240505-002",
+      "date": "2024-05-05",
+      "station_code": "XS-BJ-07",
+      "depth_m": 5,
+      "coral_cover_pct_raw": 52,
+      "bleaching_pct_raw": 38,
+      "water_temp_c_raw": 30.5,
+      "versions": [
+        {
+          "version": 1,
+          "timestamp": "2024-05-05T08:45:00Z",
+          "author": "阿乔",
+          "values": {
+            "coral_cover_pct": 52,
+            "bleaching_pct": 38,
+            "water_temp_c": 30.5
+          },
+          "note": "连续高温，白化持续扩散",
+          "screenshot_ref": "img/scanned_logbook_page55.png"
+        }
+      ],
+      "final_values": {
+        "coral_cover_pct": 52,
+        "bleaching_pct": 38,
+        "water_temp_c": 30.5
+      },
+      "flags": []
+    },
+    {
+      "id": "LOG-20240518-005",
+      "date": "2024-05-18",
+      "station_code": "XS-BJ-07",
+      "depth_m": 5,
+      "coral_cover_pct_raw": 50,
+      "bleaching_pct_raw": 99,
+      "water_temp_c_raw": 29.8,
+      "versions": [
+        {
+          "version": 1,
+          "timestamp": "2024-05-18T13:20:00Z",
+          "author": "实习生小王",
+          "values": {
+            "coral_cover_pct": 50,
+            "bleaching_pct": 99,
+            "water_temp_c": 29.8
+          },
+          "note": "实习生代班记录，目测几乎全白",
+          "screenshot_ref": "img/scanned_logbook_page67.png"
+        },
+        {
+          "version": 2,
+          "timestamp": "2024-05-20T10:00:00Z",
+          "author": "阿乔",
+          "values": {
+            "coral_cover_pct": 50,
+            "bleaching_pct": 42,
+            "water_temp_c": 29.8
+          },
+          "note": "⚠️ 严重离群值：实习生99%系误读样方占比与全群占比，修正为42%，原值保留",
+          "screenshot_ref": "img/scanned_logbook_page67_v2_correction.png"
+        }
+      ],
+      "final_values": {
+        "coral_cover_pct": 50,
+        "bleaching_pct": 42,
+        "water_temp_c": 29.8
+      },
+      "flags": ["outlier_corrected", "raw_outlier_kept"]
+    },
+    {
+      "id": "20240602-004",
+      "date": "2024-06-02",
+      "station_code": "XS-BJ-07",
+      "depth_m": 5,
+      "coral_cover_pct_raw": 48,
+      "bleaching_pct_raw": 40,
+      "water_temp_c_raw": 29.5,
+      "versions": [
+        {
+          "version": 1,
+          "timestamp": "2024-06-02T09:10:00Z",
+          "author": "阿乔",
+          "values": {
+            "coral_cover_pct": 48,
+            "bleaching_pct": 40,
+            "water_temp_c": 29.5
+          },
+          "note": "水温略降，白化趋稳",
+          "screenshot_ref": "img/scanned_logbook_page80.png"
+        }
+      ],
+      "final_values": {
+        "coral_cover_pct": 48,
+        "bleaching_pct": 40,
+        "water_temp_c": 29.5
+      },
+      "flags": []
+    }
+  ]
+}

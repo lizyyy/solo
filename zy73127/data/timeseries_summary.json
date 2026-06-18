@@ -1,0 +1,121 @@
+{
+  "dataset": "2024_Q2_Xisha",
+  "station": "永兴岛北礁",
+  "series": [
+    {
+      "date": "2024-03-15",
+      "bleaching_rate": 9.6,
+      "ship_bleaching_pct": 12,
+      "rs_bleaching_index": 8,
+      "water_temp_c": 27.8,
+      "coral_cover_pct": 62,
+      "anomaly": false,
+      "log_id": "LOG-20240315-001",
+      "rs_scene_id": "S2A_20240315T030519",
+      "cloud_coverage_pct": 12,
+      "driver": {
+        "ship_contribution_pct": 60,
+        "rs_contribution_pct": 40,
+        "ship_used_final": true,
+        "rs_used_final": true
+      }
+    },
+    {
+      "date": "2024-04-10",
+      "bleaching_rate": 18.4,
+      "ship_bleaching_pct": 18,
+      "rs_bleaching_index": 19,
+      "water_temp_c": 29.1,
+      "coral_cover_pct": 58,
+      "anomaly": false,
+      "log_id": "LOG-20240410-003",
+      "rs_scene_id": "S2A_20240410T025531",
+      "cloud_coverage_pct": 3,
+      "driver": {
+        "ship_contribution_pct": 60,
+        "rs_contribution_pct": 40,
+        "ship_used_final": true,
+        "rs_used_final": true
+      }
+    },
+    {
+      "date": "2024-04-22",
+      "bleaching_rate": 34.2,
+      "ship_bleaching_pct": 35,
+      "rs_bleaching_index": 33,
+      "water_temp_c": 30.2,
+      "coral_cover_pct": 55,
+      "anomaly": true,
+      "anomaly_reason": "白化率跳升15.8个百分点，超警戒阈值(30%)",
+      "anomaly_flags": ["outlier_suspected", "revised_multiple_times"],
+      "log_id": "LOG-20240422-007",
+      "rs_scene_id": "S2A_20240422T031027",
+      "cloud_coverage_pct": 47,
+      "driver": {
+        "ship_contribution_pct": 61,
+        "rs_contribution_pct": 39,
+        "ship_used_final": true,
+        "rs_used_final": true,
+        "note": "云遮挡47%，遥感贡献略降"
+      }
+    },
+    {
+      "date": "2024-05-05",
+      "bleaching_rate": 38.4,
+      "ship_bleaching_pct": 38,
+      "rs_bleaching_index": 39,
+      "water_temp_c": 30.5,
+      "coral_cover_pct": 52,
+      "anomaly": false,
+      "log_id": "LOG-20240505-002",
+      "rs_scene_id": "S2A_20240505T025948",
+      "cloud_coverage_pct": 8,
+      "driver": {
+        "ship_contribution_pct": 60,
+        "rs_contribution_pct": 40,
+        "ship_used_final": true,
+        "rs_used_final": true
+      }
+    },
+    {
+      "date": "2024-05-18",
+      "bleaching_rate": 41.6,
+      "ship_bleaching_pct_raw": 99,
+      "ship_bleaching_pct": 42,
+      "rs_bleaching_index": 41,
+      "water_temp_c": 29.8,
+      "coral_cover_pct": 50,
+      "anomaly": true,
+      "anomaly_reason": "船测原始值99%被修正为42%，属离群值但保留历史",
+      "anomaly_flags": ["outlier_corrected", "raw_outlier_kept"],
+      "log_id": "LOG-20240518-005",
+      "rs_scene_id": "S2A_20240518T030509",
+      "cloud_coverage_pct": 68,
+      "driver": {
+        "ship_contribution_pct": 62,
+        "rs_contribution_pct": 38,
+        "ship_used_final": true,
+        "rs_used_final": true,
+        "note": "云遮挡68%，船测原始99%修正为42%（实习生误读）"
+      }
+    },
+    {
+      "date": "2024-06-02",
+      "bleaching_rate": 40.0,
+      "ship_bleaching_pct": 40,
+      "rs_bleaching_index": 40,
+      "water_temp_c": 29.5,
+      "coral_cover_pct": 48,
+      "anomaly": false,
+      "log_id": "LOG-20240602-004",
+      "rs_scene_id": "S2A_20240602T030133",
+      "cloud_coverage_pct": 5,
+      "driver": {
+        "ship_contribution_pct": 60,
+        "rs_contribution_pct": 40,
+        "ship_used_final": true,
+        "rs_used_final": true
+      }
+    }
+  ]
+}

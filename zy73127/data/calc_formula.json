@@ -1,0 +1,41 @@
+{
+  "dataset": "2024_Q2_Xisha",
+  "version": "v1.2",
+  "description": "珊瑚白化率计算口径（阿乔团队当前执行版本）",
+  "formula_definition": {
+    "bleaching_rate": {
+      "name": "白化率 = 白化珊瑚覆盖面积 / 活珊瑚总覆盖面积 × 100%",
+      "fields_used": ["bleaching_pct (船测)", "bleaching_index (遥感)"],
+      "weighting": "船测权重 0.6, 遥感权重 0.4",
+      "outlier_detection": "3σ 原则 + 人工复核保留原值",
+      "interpolation_for_cloud": "相邻晴空日线性插值",
+      "history_preservation": "所有历史版本与备注、截图均保存在LOG条目内"
+    },
+    "thresholds": {
+      "normal_max": 15,
+      "warning_min": 15,
+      "warning_max": 30,
+      "alert_min": 30
+    },
+    "change_log": [
+      {
+        "version": "v1.0",
+        "date": "2024-01-10",
+        "author": "阿乔",
+        "note": "初始版本，船测遥感等权"
+      },
+      {
+        "version": "v1.1",
+        "date": "2024-03-01",
+        "author": "阿乔",
+        "note": "调整船测权重提升至0.6，现场数据更可信"
+      },
+      {
+        "version": "v1.2",
+        "date": "2024-04-28",
+        "author": "阿乔",
+        "note": "增加离群值不删除、原始值保留规则"
+      }
+    ]
+  }
+}

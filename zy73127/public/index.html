@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>珊瑚白化时序回放</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="app-header">
+    <h1>珊瑚白化时序回放</h1>
+    <div class="header-meta">
+      <span class="tag">站位：永兴岛北礁 XS-BJ-07</span>
+      <span class="tag">样例包：2024_Q2_Xisha</span>
+      <button id="refreshBtn" class="btn-small">重新加载</button>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <section class="chart-section">
+      <div class="chart-title">
+        <h2>白化率时序</h2>
+        <p class="hint">红色点为异常值，点击查看溯源明细；阈值：预警 ≥30%</p>
+      </div>
+      <div class="chart-wrapper">
+        <canvas id="timeseriesChart"></canvas>
+      </div>
+      <div class="legend-hint">
+        <span><i class="dot dot-normal"></i>正常值</span>
+        <span><i class="dot dot-anomaly"></i>异常值（点击回溯）</span>
+        <span class="threshold-line-demo">—— 警戒阈值 30%</span>
+      </div>
+    </section>
+
+    <aside class="detail-section" id="detailPanel">
+      <div class="detail-empty" id="detailEmpty">
+        <p>← 点击左侧异常红点查看明细</p>
+        <p class="empty-sub">含：船上记录本版本、遥感云遮挡、计算口径、结果拉动来源</p>
+      </div>
+      <div class="detail-body" id="detailBody" hidden></div>
+    </aside>
+  </main>
+
+  <footer class="app-footer">
+    <p>接口说明：<code>/api/timeseries</code> · <code>/api/anomaly/YYYY-MM-DD</code> · <code>/api/log/:id</code> · <code>/api/remote/:scene_id</code> · <code>/api/formula</code> · <code>/api/health</code></p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
