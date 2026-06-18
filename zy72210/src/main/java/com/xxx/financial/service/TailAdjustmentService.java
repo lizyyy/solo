@@ -4,7 +4,6 @@ import com.xxx.financial.enums.ApproverType;
 import com.xxx.financial.enums.ReviewStatus;
 import com.xxx.financial.model.InterestReviewContext;
 import com.xxx.financial.model.TailAdjustment;
-import com.xxx.financial.store.ReviewDataStore;
 import com.xxx.financial.util.PinyinDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,25 +15,22 @@ public class TailAdjustmentService {
 
     private static final Logger logger = LoggerFactory.getLogger(TailAdjustmentService.class);
 
-    private final Set<String> importedAdjustmentNos = new HashSet<>();
-    private ReviewDataStore dataStore;
+    private final Set<String> importedAdjustmentNos;
+    private final Object persistenceDelegate;
 
     public TailAdjustmentService() {
+        this.importedAdjustmentNos = new HashSet<>();
+        this.persistenceDelegate = null;
     }
 
-    public TailAdjustmentService(ReviewDataStore dataStore) {
-        this.dataStore = dataStore;
-        if (dataStore != null) {
-            importedAdjustmentNos.addAll(dataStore.getAllImportedAdjustments());
-        }
+    public TailAdjustmentService(Set<String> externalStore) {
+        this.importedAdjustmentNos = externalStore;
+        this.persistenceDelegate = null;
     }
 
-    public void setDataStore(ReviewDataStore dataStore) {
-        this.dataStore = dataStore;
-        if (dataStore != null) {
-            importedAdjustmentNos.clear();
-            importedAdjustmentNos.addAll(dataStore.getAllImportedAdjustments());
-        }
+    public TailAdjustmentService(com.xxx.financial.repository.ReviewRepository repository) {
+        this.persistenceDelegate = repository;
+        this.importedAdjustmentNos = repository.getAllImportedAdjustments();
     }
 
     public boolean processTailAdjustment(InterestReviewContext context, TailAdjustment adjustment) {
@@ -68,15 +64,15 @@ public class TailAdjustmentService {
 
     public void recordImport(String adjustmentNo) {
         importedAdjustmentNos.add(adjustmentNo);
-        if (dataStore != null) {
-            dataStore.addImportedAdjustment(adjustmentNo);
+        if (persistenceDelegate instanceof com.xxx.financial.repository.ReviewRepository) {
+            ((com.xxx.financial.repository.ReviewRepository) persistenceDelegate).recordAdjustmentImported(adjustmentNo);
         }
     }
 
     public void clearImportRecord(String adjustmentNo) {
         importedAdjustmentNos.remove(adjustmentNo);
-        if (dataStore != null) {
-            dataStore.removeImportedAdjustment(adjustmentNo);
+        if (persistenceDelegate instanceof com.xxx.financial.repository.ReviewRepository) {
+            ((com.xxx.financial.repository.ReviewRepository) persistenceDelegate).clearAdjustmentImported(adjustmentNo);
         }
     }
 }

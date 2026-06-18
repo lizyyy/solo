@@ -1,0 +1,133 @@
+{
+  "reviewNo" : "REV167CA912",
+  "commercialBill" : {
+    "billNo" : "CD20260619A001",
+    "billType" : "银行承兑汇票",
+    "faceAmount" : 1000000.00,
+    "discountRate" : 3.65,
+    "discountDate" : "2026-06-19 07:34:04",
+    "maturityDate" : "2026-09-17 07:34:04",
+    "discountInterest" : 9000.00,
+    "drawer" : "贸易公司",
+    "drawee" : "承兑银行"
+  },
+  "tailAdjustment" : {
+    "adjustmentNo" : "ADJ-20260619-001",
+    "billNo" : "CD20260619A001",
+    "adjustmentAmount" : 12.50,
+    "adjustmentReason" : "四舍五入尾差调整",
+    "approver" : "张明",
+    "approverType" : "FULL_NAME",
+    "importTime" : "2026-06-19 07:34:04",
+    "importBatchNo" : "BATCH-API-001",
+    "remark" : "",
+    "pinyinApproverFlag" : false
+  },
+  "trusteeConfirmation" : {
+    "confirmationNo" : "TC-20260619-001",
+    "billNo" : "CD20260619A001",
+    "confirmedInterest" : 9012.50,
+    "confirmedBalance" : 9012.50,
+    "confirmationDate" : "2026-06-19 07:34:04",
+    "trustee" : "中国工商银行托管部",
+    "confirmationStatus" : "已确认",
+    "remark" : null
+  },
+  "balanceHistory" : [ {
+    "recordNo" : "BALREV167CA912",
+    "billNo" : "CD20260619A001",
+    "previousBalance" : 0,
+    "changeAmount" : 9000.00,
+    "currentBalance" : 9000.00,
+    "changeTime" : "2026-06-19 07:34:04",
+    "changeReason" : "贴现利息入账",
+    "operator" : "operator_anan_01",
+    "relatedBusinessNo" : "INTREV167CA912"
+  }, {
+    "recordNo" : "BAL867DD388",
+    "billNo" : "CD20260619A001",
+    "previousBalance" : 9000.00,
+    "changeAmount" : 12.50,
+    "currentBalance" : 9012.50,
+    "changeTime" : "2026-06-19 07:34:04",
+    "changeReason" : "企业票据贴现利息尾差调整",
+    "operator" : "operator_anan_01",
+    "relatedBusinessNo" : "ADJ-20260619-001"
+  } ],
+  "status" : "REVIEW_PASSED",
+  "selfCheckResults" : [ {
+    "passed" : true,
+    "resolved" : false,
+    "resolutionRemark" : null,
+    "message" : "当前流程已导入，非外部重复(正常)",
+    "detail" : "调整单号ADJ-20260619-001为本流程自身记录",
+    "checkItemDescription" : null,
+    "severityDescription" : null,
+    "checkItemName" : null,
+    "severityName" : null,
+    "blocking" : false
+  }, {
+    "passed" : true,
+    "resolved" : false,
+    "resolutionRemark" : null,
+    "message" : "审批人信息完整",
+    "detail" : null,
+    "checkItemDescription" : null,
+    "severityDescription" : null,
+    "checkItemName" : null,
+    "severityName" : null,
+    "blocking" : false
+  }, {
+    "passed" : true,
+    "resolved" : false,
+    "resolutionRemark" : null,
+    "message" : "补录后重算一致",
+    "detail" : "系统利息(9000.00) + 尾差调整(12.50) = 托管确认利息(9012.50)",
+    "checkItemDescription" : null,
+    "severityDescription" : null,
+    "checkItemName" : null,
+    "severityName" : null,
+    "blocking" : false
+  }, {
+    "passed" : true,
+    "resolved" : false,
+    "resolutionRemark" : null,
+    "message" : "导出数据一致",
+    "detail" : null,
+    "checkItemDescription" : null,
+    "severityDescription" : null,
+    "checkItemName" : null,
+    "severityName" : null,
+    "blocking" : false
+  }, {
+    "passed" : true,
+    "resolved" : false,
+    "resolutionRemark" : null,
+    "message" : "余额变化表与历史记录一致",
+    "detail" : null,
+    "checkItemDescription" : null,
+    "severityDescription" : null,
+    "checkItemName" : null,
+    "severityName" : null,
+    "blocking" : false
+  }, {
+    "passed" : true,
+    "resolved" : false,
+    "resolutionRemark" : null,
+    "message" : "尾差调整与托管确认无冲突",
+    "detail" : null,
+    "checkItemDescription" : null,
+    "severityDescription" : null,
+    "checkItemName" : null,
+    "severityName" : null,
+    "blocking" : false
+  } ],
+  "conflicts" : [ ],
+  "operator" : "operator_anan_01",
+  "managerReviewRemark" : null,
+  "productDecision" : null,
+  "step1ImportCompleted" : true,
+  "step2TrusteeReviewed" : true,
+  "step3BalanceUpdated" : true,
+  "allSelfCheckPassed" : true
+}

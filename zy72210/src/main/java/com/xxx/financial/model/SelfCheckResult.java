@@ -1,5 +1,6 @@
 package com.xxx.financial.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.xxx.financial.enums.CheckSeverity;
 import com.xxx.financial.enums.SelfCheckItem;
@@ -7,43 +8,56 @@ import com.xxx.financial.enums.SelfCheckItem;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SelfCheckResult {
     private SelfCheckItem checkItem;
+    private CheckSeverity severity;
     private boolean passed;
+    private boolean resolved;
+    private String resolutionRemark;
     private String message;
     private String detail;
-    private CheckSeverity severity;
-    private boolean overridden;
-    private String overrideReason;
 
     public SelfCheckResult() {
+        this.resolved = false;
     }
 
-    public SelfCheckResult(SelfCheckItem checkItem, boolean passed, String message) {
+    public SelfCheckResult(SelfCheckItem checkItem, CheckSeverity severity, boolean passed, String message) {
         this.checkItem = checkItem;
+        this.severity = severity;
         this.passed = passed;
         this.message = message;
-        this.severity = checkItem != null ? checkItem.getDefaultSeverity() : CheckSeverity.ERROR;
+        this.resolved = false;
     }
 
-    public SelfCheckResult(SelfCheckItem checkItem, boolean passed, String message, String detail) {
-        this(checkItem, passed, message);
-        this.detail = detail;
-    }
-
-    public SelfCheckResult(SelfCheckItem checkItem, boolean passed, String message, CheckSeverity severity) {
-        this(checkItem, passed, message);
+    public SelfCheckResult(SelfCheckItem checkItem, CheckSeverity severity, boolean passed, String message, String detail) {
+        this.checkItem = checkItem;
         this.severity = severity;
+        this.passed = passed;
+        this.message = message;
+        this.detail = detail;
+        this.resolved = false;
     }
 
-    public void overrideAsPassed(String reason) {
-        this.overridden = true;
-        this.passed = true;
-        this.overrideReason = reason;
+    public String getCheckItemName() {
+        return checkItem != null ? checkItem.name() : null;
     }
 
-    public boolean isBlockingError() {
-        return !passed && !overridden && severity == CheckSeverity.ERROR;
+    public String getCheckItemDescription() {
+        return checkItem != null ? checkItem.getDescription() : null;
     }
 
+    public String getSeverityName() {
+        return severity != null ? severity.name() : null;
+    }
+
+    public String getSeverityDescription() {
+        return severity != null ? severity.getDescription() : null;
+    }
+
+    public void markResolved(String remark) {
+        this.resolved = true;
+        this.resolutionRemark = remark;
+    }
+
+    @JsonIgnore
     public SelfCheckItem getCheckItem() {
         return checkItem;
     }
@@ -52,12 +66,37 @@ public class SelfCheckResult {
         this.checkItem = checkItem;
     }
 
+    @JsonIgnore
+    public CheckSeverity getSeverity() {
+        return severity;
+    }
+
+    public void setSeverity(CheckSeverity severity) {
+        this.severity = severity;
+    }
+
     public boolean isPassed() {
         return passed;
     }
 
     public void setPassed(boolean passed) {
         this.passed = passed;
+    }
+
+    public boolean isResolved() {
+        return resolved;
+    }
+
+    public void setResolved(boolean resolved) {
+        this.resolved = resolved;
+    }
+
+    public String getResolutionRemark() {
+        return resolutionRemark;
+    }
+
+    public void setResolutionRemark(String resolutionRemark) {
+        this.resolutionRemark = resolutionRemark;
     }
 
     public String getMessage() {
@@ -76,27 +115,13 @@ public class SelfCheckResult {
         this.detail = detail;
     }
 
-    public CheckSeverity getSeverity() {
-        return severity;
-    }
-
-    public void setSeverity(CheckSeverity severity) {
-        this.severity = severity;
-    }
-
-    public boolean isOverridden() {
-        return overridden;
-    }
-
-    public void setOverridden(boolean overridden) {
-        this.overridden = overridden;
-    }
-
-    public String getOverrideReason() {
-        return overrideReason;
-    }
-
-    public void setOverrideReason(String overrideReason) {
-        this.overrideReason = overrideReason;
+    public boolean isBlocking() {
+        if (passed) {
+            return false;
+        }
+        if (CheckSeverity.WARN.equals(severity) && resolved) {
+            return false;
+        }
+        return true;
     }
 }

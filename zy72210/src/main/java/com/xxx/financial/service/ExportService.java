@@ -103,40 +103,14 @@ public class ExportService {
             if (!selfCheck.isEmpty()) {
                 writer.write("-- 自检报告 --\n");
                 long passed = selfCheck.stream().filter(SelfCheckResult::isPassed).count();
-                long blockingErrors = selfCheck.stream().filter(SelfCheckResult::isBlockingError).count();
-                long warnings = selfCheck.stream()
-                        .filter(r -> r.getSeverity() == com.xxx.financial.enums.CheckSeverity.WARNING)
-                        .filter(r -> !r.isPassed())
-                        .count();
-                long overridden = selfCheck.stream().filter(SelfCheckResult::isOverridden).count();
-                writer.write(String.format("  总计%d项, 通过%d项, 阻断错误%d项, 预警%d项, 人工覆盖%d项\n",
-                        selfCheck.size(), passed, blockingErrors, warnings, overridden));
-                if (blockingErrors > 0) {
-                    writer.write("  状态说明: 存在未解决的阻断性错误，当前复核状态与自检一致\n");
-                } else if (warnings > 0) {
-                    writer.write("  状态说明: 存在预警项，已通过人工复核，不阻断当前通过状态\n");
-                } else if (overridden > 0) {
-                    writer.write("  状态说明: 存在人工覆盖项，当前通过状态经业务确认有效\n");
-                } else {
-                    writer.write("  状态说明: 所有自检项通过，当前状态与自检一致\n");
-                }
+                writer.write(String.format("  总计%d项, 通过%d项, 未通过%d项\n", selfCheck.size(), passed, selfCheck.size() - passed));
                 for (SelfCheckResult r : selfCheck) {
-                    String status = r.isPassed() ? "PASS" : "FAIL";
-                    String tag = "";
-                    if (r.isOverridden()) {
-                        tag = " [人工通过]";
-                    } else if (!r.isPassed() && r.getSeverity() == com.xxx.financial.enums.CheckSeverity.ERROR) {
-                        tag = " [阻断]";
-                    } else if (!r.isPassed() && r.getSeverity() == com.xxx.financial.enums.CheckSeverity.WARNING) {
-                        tag = " [预警]";
-                    }
-                    writer.write(String.format("  %s%s %s: %s\n",
-                            status, tag, r.getCheckItem().getDescription(), r.getMessage()));
-                    if (r.getDetail() != null && !r.isPassed() && !r.isOverridden()) {
+                    writer.write(String.format("  %s %s: %s\n",
+                            r.isPassed() ? "PASS" : "FAIL",
+                            r.getCheckItem().getDescription(),
+                            r.getMessage()));
+                    if (r.getDetail() != null && !r.isPassed()) {
                         writer.write(String.format("    -> %s\n", r.getDetail()));
-                    }
-                    if (r.getOverrideReason() != null) {
-                        writer.write(String.format("    -> 覆盖理由: %s\n", r.getOverrideReason()));
                     }
                 }
             }

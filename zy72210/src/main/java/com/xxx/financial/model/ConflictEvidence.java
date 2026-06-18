@@ -1,7 +1,9 @@
 package com.xxx.financial.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.math.BigDecimal;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ConflictEvidence {
     private String billNo;
     private String adjustmentNo;

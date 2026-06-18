@@ -1,19 +1,13 @@
 package com.xxx.financial.enums;
 
 public enum CheckSeverity {
-    ERROR("阻断性错误", "必须解决才能继续流程"),
-    WARNING("预警提示", "已通过人工复核后可继续");
+    ERROR("错误-阻断流程，必须修正数据"),
+    WARN("警告-不阻断但需人工处理，处理后可继续");
 
-    private final String label;
     private final String description;
 
-    CheckSeverity(String label, String description) {
-        this.label = label;
+    CheckSeverity(String description) {
         this.description = description;
-    }
-
-    public String getLabel() {
-        return label;
     }
 
     public String getDescription() {

@@ -1,8 +1,10 @@
 package com.xxx.financial.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.math.BigDecimal;
 import java.util.Date;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BalanceChangeRecord {
     private String recordNo;
     private String billNo;

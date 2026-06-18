@@ -2,7 +2,6 @@ package com.xxx.financial.service;
 
 import com.xxx.financial.enums.ReviewStatus;
 import com.xxx.financial.model.*;
-import com.xxx.financial.store.ReviewDataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +17,6 @@ public class InterestReviewService {
     private final TrusteeConfirmationService trusteeConfirmationService;
     private final BalanceVerificationService balanceVerificationService;
     private final SelfCheckService selfCheckService;
-    private ReviewDataStore dataStore;
 
     public InterestReviewService() {
         this.tailAdjustmentService = new TailAdjustmentService();
@@ -27,23 +25,14 @@ public class InterestReviewService {
         this.selfCheckService = new SelfCheckService(tailAdjustmentService, balanceVerificationService, trusteeConfirmationService);
     }
 
-    public InterestReviewService(ReviewDataStore dataStore) {
-        this.dataStore = dataStore;
-        this.tailAdjustmentService = new TailAdjustmentService(dataStore);
-        this.trusteeConfirmationService = new TrusteeConfirmationService();
-        this.balanceVerificationService = new BalanceVerificationService();
-        this.selfCheckService = new SelfCheckService(tailAdjustmentService, balanceVerificationService, trusteeConfirmationService);
-    }
-
-    public void setDataStore(ReviewDataStore dataStore) {
-        this.dataStore = dataStore;
-        this.tailAdjustmentService.setDataStore(dataStore);
-    }
-
-    private void persistContext(InterestReviewContext context) {
-        if (dataStore != null) {
-            dataStore.saveContext(context);
-        }
+    public InterestReviewService(TailAdjustmentService tailAdjustmentService,
+                                 TrusteeConfirmationService trusteeConfirmationService,
+                                 BalanceVerificationService balanceVerificationService,
+                                 SelfCheckService selfCheckService) {
+        this.tailAdjustmentService = tailAdjustmentService;
+        this.trusteeConfirmationService = trusteeConfirmationService;
+        this.balanceVerificationService = balanceVerificationService;
+        this.selfCheckService = selfCheckService;
     }
 
     public InterestReviewContext initReview(CommercialBill bill, String operator) {
@@ -64,6 +53,18 @@ public class InterestReviewService {
         ReviewResult result = new ReviewResult();
         result.setReviewNo(context.getReviewNo());
         List<String> messages = new ArrayList<>();
+
+        if (context.isStep1ImportCompleted()) {
+            result.setSuccess(false);
+            result.setFinalStatus(context.getStatus());
+            messages.add("本复核流程步骤1已完成，不可重复导入尾差调整条");
+            messages.add("如需重新导入，请新建复核流程");
+            result.setMessages(messages);
+            result.setNextAction("请使用新单号新建复核流程");
+            result.setHandler("操作员");
+            logger.warn("步骤1重复提交被拒绝: {}, 调整单号: {}", context.getReviewNo(), adjustment.getAdjustmentNo());
+            return result;
+        }
 
         context.setTailAdjustment(adjustment);
         SelfCheckResult duplicateCheck = selfCheckService.checkDuplicateImport(context);
@@ -113,7 +114,6 @@ public class InterestReviewService {
         }
 
         result.setSelfCheckReport(new ArrayList<>(context.getSelfCheckResults()));
-        persistContext(context);
         return result;
     }
 
@@ -175,7 +175,6 @@ public class InterestReviewService {
         }
 
         result.setSelfCheckReport(new ArrayList<>(context.getSelfCheckResults()));
-        persistContext(context);
         return result;
     }
 
@@ -195,19 +194,28 @@ public class InterestReviewService {
         }
 
         if (!context.hasUnresolvedConflicts()) {
-            context.overrideSelfCheckItem(com.xxx.financial.enums.SelfCheckItem.TAIL_TRUSTEE_CONFLICT,
-                    "产品决策: " + (confirm ? "确认尾差调整" : "驳回以托管为准") + "。备注: " + decisionRemark);
-            selfCheckService.checkSupplementRecalculate(context);
-            selfCheckService.checkExportConsistency(context);
+            selfCheckService.markTailTrusteeConflictResolved(context, context.getProductDecision());
+            SelfCheckResult recalcCheck = selfCheckService.checkSupplementRecalculate(context);
+            context.getSelfCheckResults().removeIf(r ->
+                    r.getCheckItem().equals(com.xxx.financial.enums.SelfCheckItem.SUPPLEMENT_RECALCULATE)
+                            && r != recalcCheck);
+
             result.setSuccess(true);
-            if (context.hasPinyinApprover() && context.getManagerReviewRemark() == null) {
+            if (!recalcCheck.isPassed()) {
+                result.setFinalStatus(ReviewStatus.CALIBER_ERROR);
+                messages.add("数据冲突已解决，但补录后重算仍不匹配，请检查数据");
+                result.setNextAction("请修正尾差或托管数据后重新复核");
+                result.setHandler("操作员");
+            } else if (context.hasPinyinApprover() && context.getManagerReviewRemark() == null) {
                 result.setFinalStatus(ReviewStatus.PENDING_MANAGER_REVIEW);
+                context.setStatus(ReviewStatus.PENDING_MANAGER_REVIEW);
                 messages.add("数据冲突已解决");
                 messages.add("审批人仅为拼音，仍需客户经理复核");
                 result.setNextAction("请客户经理完成审批人复核");
                 result.setHandler("客户经理");
             } else {
                 result.setFinalStatus(ReviewStatus.NORMAL);
+                context.setStatus(ReviewStatus.NORMAL);
                 messages.add("数据冲突已解决");
                 result.setNextAction("请更新余额变化表");
                 result.setHandler("系统/操作员");
@@ -222,7 +230,6 @@ public class InterestReviewService {
 
         result.setMessages(messages);
         result.setConflictReport(new ArrayList<>(context.getConflicts()));
-        persistContext(context);
         return result;
     }
 
@@ -236,10 +243,9 @@ public class InterestReviewService {
         context.setManagerReviewRemark(remark);
 
         if (approved) {
+            selfCheckService.markApproverPinyinResolved(context, remark);
             result.setSuccess(true);
             context.setStatus(ReviewStatus.NORMAL);
-            context.overrideSelfCheckItem(com.xxx.financial.enums.SelfCheckItem.APPROVER_PINYIN,
-                    "客户经理复核通过: " + remark);
             if (context.hasUnresolvedConflicts()) {
                 result.setFinalStatus(ReviewStatus.DATA_CONFLICT);
                 messages.add("客户经理已确认审批人身份");
