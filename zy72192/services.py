@@ -163,8 +163,10 @@ def get_conflicts_list(batch_id: Optional[str] = None) -> List[Dict[str, Any]]:
 
 def detect_conflicts(eval_id: int, sample_id: str, predict_result: int,
                      predict_score: float, evidence: List[Dict],
-                     threshold: float) -> List[Dict[str, Any]]:
-    conn = get_conn()
+                     threshold: float, conn=None) -> List[Dict[str, Any]]:
+    own_conn = conn is None
+    if own_conn:
+        conn = get_conn()
     c = conn.cursor()
     conflicts = []
     now = datetime.now().isoformat()
@@ -198,8 +200,9 @@ def detect_conflicts(eval_id: int, sample_id: str, predict_result: int,
             ))
             conflicts.append({'type': 'model_vs_annotation', 'description': conflict_desc, 'severity': 'medium'})
 
-    conn.commit()
-    conn.close()
+    if own_conn:
+        conn.commit()
+        conn.close()
     return conflicts
 
 
@@ -280,7 +283,8 @@ def add_supplementary_note(sample_id: str, batch_id: str, note_content: str,
     return {'success': True, 'created_at': now, 'diff_description': diff_description}
 
 
-def simulate_model_predict(sample_id: str, model_version_id: int, threshold: float) -> Dict[str, Any]:
+def simulate_model_predict(sample_id: str, model_version_id: int, threshold: float,
+                           sample_tags: str = '') -> Dict[str, Any]:
     random.seed(hash(sample_id + str(model_version_id)) % 2**32)
     base_score = random.uniform(0, 1)
     predict_result = 1 if base_score >= threshold else 0
@@ -288,7 +292,11 @@ def simulate_model_predict(sample_id: str, model_version_id: int, threshold: flo
     evidence = []
     reasons_parts = []
 
-    if base_score > 0.8:
+    if 'TRAINSET_' in sample_id or (sample_tags and 'data_leak' in sample_tags):
+        evidence.append({'type': 'image_similarity', 'top1_match': f'TRAINSET_{sample_id}_ref', 'similarity': 0.98})
+        evidence.append({'type': 'train_set_check', 'in_train': True, 'train_id': f'{sample_id}_ref', 'note': '样本泄漏警告'})
+        reasons_parts.append(f'该样本与训练集TRAINSET_{sample_id}_ref相似度达0.98，疑似训练样本泄漏；此样本评测结果不可信')
+    elif base_score > 0.8:
         evidence.append({'type': 'character_detection', 'detected': 'known_character', 'confidence': 0.95})
         evidence.append({'type': 'image_similarity', 'top1_match': 'copyrighted_work', 'similarity': 0.88})
         reasons_parts.append(f'检测到知名版权角色，与官方素材相似度{base_score:.2f}')
@@ -357,7 +365,7 @@ def run_batch_evaluation(batch_id: str, model_version_id: int, operator: str,
             })
             continue
 
-        pred = simulate_model_predict(sid, model_version_id, threshold)
+        pred = simulate_model_predict(sid, model_version_id, threshold, sample.get('tags', ''))
 
         c.execute('''INSERT INTO evaluation_logs
             (sample_id, model_version_id, batch_id, batch_run_id, predict_score, predict_result,
@@ -370,7 +378,7 @@ def run_batch_evaluation(batch_id: str, model_version_id: int, operator: str,
         eval_id = c.lastrowid
 
         conflicts = detect_conflicts(eval_id, sid, pred['result'], pred['score'],
-                                     pred['evidence'], threshold)
+                                     pred['evidence'], threshold, conn=conn)
         if conflicts:
             conflicts_found.extend([{'sample_id': sid, **cf} for cf in conflicts])
 
@@ -568,7 +576,9 @@ def export_batch_results(batch_id: str, operator: str,
     evals = get_evaluation_list(batch_id)
 
     export_rows = []
+    eval_sample_ids = set()
     for ev in evals:
+        eval_sample_ids.add(ev['sample_id'])
         detail = get_sample_detail(ev['sample_id'])
 
         conflicts_info = []
@@ -608,6 +618,54 @@ def export_batch_results(batch_id: str, operator: str,
             'conflicts_info': '；'.join(conflicts_info),
             'copyright_reasons': ' | '.join(reasons),
             'image_url': ev['image_url']
+        })
+
+    c.execute('SELECT * FROM samples WHERE batch_id = ?', (batch_id,))
+    all_samples = rows_to_dicts(c.fetchall())
+    for sample in all_samples:
+        sid = sample['sample_id']
+        if sid in eval_sample_ids:
+            continue
+        detail = get_sample_detail(sid)
+        if not detail['has_protected_review']:
+            continue
+
+        review = detail['reviews'][0] if detail['reviews'] else None
+        latest_eval = detail['evaluations'][0] if detail['evaluations'] else None
+
+        conflicts_info = []
+        for c_item in detail['conflicts']:
+            status = '已解决' if c_item.get('resolved') == 1 else '待处理'
+            conflicts_info.append(f"[{c_item['conflict_type']}]{status}:{c_item['description'][:50]}")
+
+        reasons = []
+        if review:
+            reasons.append(f"人工判罚（{review['reviewer']}），受保护不可被模型覆盖")
+        if latest_eval and latest_eval.get('reasons'):
+            reasons.append(f"模型原因：{latest_eval['reasons']}")
+        if detail['annotations']:
+            anno = detail['annotations'][0]
+            reasons.append(f"口径{anno.get('caliber_version','')}：{anno.get('note','')}")
+        for note in detail['notes']:
+            reasons.append(f"备注[{note['note_type']}]：{note['note_content']}")
+
+        export_rows.append({
+            'sample_id': sid,
+            'prompt': sample.get('prompt', ''),
+            'tags': sample.get('tags', ''),
+            'source': sample.get('source', ''),
+            'model_version': latest_eval.get('version_name', '') if latest_eval else '',
+            'model_threshold': latest_eval.get('threshold', '') if latest_eval else '',
+            'model_score': latest_eval.get('predict_score', '') if latest_eval else '',
+            'model_result': '侵权' if latest_eval and latest_eval.get('predict_result') == 1 else ('非侵权' if latest_eval else '跳过'),
+            'final_result': '侵权' if review and review['final_result'] == 1 else '非侵权',
+            'result_source': 'manual(受保护跳过)',
+            'reviewer': review['reviewer'] if review else '',
+            'has_protected_review': '是',
+            'has_conflict': '是' if detail['conflicts'] else '否',
+            'conflicts_info': '；'.join(conflicts_info),
+            'copyright_reasons': ' | '.join(reasons),
+            'image_url': sample.get('image_url', '')
         })
 
     now = datetime.now().isoformat()

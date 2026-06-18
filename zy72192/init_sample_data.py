@@ -51,7 +51,7 @@ def seed_data():
          '运营提交-20260601', now.isoformat(), 'BATCH-20260602-001', 'character_infringement'),
         ('SAMPLE-005', 'https://img.example.com/005.png',
          '手绘风格山水画，远山近水，孤舟蓑笠翁，留白意境',
-         '运营提交-20260601', now.isoformat(), 'BATCH-20260602-001', 'art_style'),
+         '运营提交-20260601', now.isoformat(), 'BATCH-20260602-001', 'art_style,data_leak'),
     ]
 
     for s in samples:
