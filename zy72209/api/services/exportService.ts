@@ -5,14 +5,9 @@ import * as XLSX from 'xlsx';
 
 class ExportService {
   verifyConsistency(pageHash: string): boolean {
-    const { records, dataHash } = unifiedResultRepository.getAllRecords();
-    const exportData = this.prepareExportData(records);
-    const exportHash = crypto
-      .createHash('md5')
-      .update(JSON.stringify(exportData))
-      .digest('hex');
-    
-    return pageHash === dataHash && exportHash === dataHash;
+    if (!pageHash) return false;
+    const { dataHash } = unifiedResultRepository.getAllRecords();
+    return pageHash === dataHash;
   }
 
   getExportData(): { records: any[]; dataHash: string } {

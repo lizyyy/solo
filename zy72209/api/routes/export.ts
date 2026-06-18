@@ -37,14 +37,16 @@ router.get('/excel', (req, res) => {
     const { buffer, dataHash } = exportService.generateExcelBuffer();
     
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename=授信额度明细_${new Date().toISOString().split('T')[0]}.xlsx`);
+    const filename = encodeURIComponent(`授信额度明细_${new Date().toISOString().split('T')[0]}.xlsx`);
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${filename}`);
     res.setHeader('X-Data-Hash', dataHash);
     
     res.send(buffer);
-  } catch (error) {
+  } catch (error: any) {
+    console.error('导出Excel失败:', error);
     res.status(500).json({
       success: false,
-      message: '导出失败',
+      message: `导出失败: ${error?.message || String(error)}`,
       timestamp: new Date().toISOString(),
       dataHash: ''
     });

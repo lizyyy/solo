@@ -6,26 +6,24 @@ import { cn } from '@/lib/utils';
 import type { CreditRecord, OperationLog, RemarkItem } from '../../shared/types';
 
 export function RecordDetailDrawer() {
-  const { selectedRecord, setSelectedRecord } = useDashboardStore();
+  const { detailRecord, setDetailRecord, fetchRecords } = useDashboardStore();
   const [logs, setLogs] = useState<OperationLog[]>([]);
   const [remarkContent, setRemarkContent] = useState('');
   const [submittingRemark, setSubmittingRemark] = useState(false);
   const [activeTab, setActiveTab] = useState<'info' | 'remarks' | 'logs'>('info');
   const [currentRecord, setCurrentRecord] = useState<CreditRecord | null>(null);
 
-  const { fetchRecords } = useDashboardStore();
-
   useEffect(() => {
-    if (!selectedRecord) {
+    if (!detailRecord) {
       setCurrentRecord(null);
       return;
     }
-    setCurrentRecord(selectedRecord);
-    fetch(`/api/records/${selectedRecord.id}/logs`)
+    setCurrentRecord(detailRecord);
+    fetch(`/api/records/${detailRecord.id}/logs`)
       .then(r => r.json())
       .then(d => { if (d.success) setLogs(d.data); })
       .catch(() => {});
-  }, [selectedRecord]);
+  }, [detailRecord]);
 
   if (!currentRecord) return null;
 
@@ -54,15 +52,15 @@ export function RecordDetailDrawer() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
-      <div className="absolute inset-0 bg-black/50" onClick={() => setSelectedRecord(null)} />
+    <div className="fixed inset-0 z-40 overflow-hidden">
+      <div className="absolute inset-0 bg-black/30" onClick={() => setDetailRecord(null)} />
       <div className="absolute right-0 top-0 h-full w-full max-w-xl overflow-y-auto bg-white shadow-xl">
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
           <div className="flex items-center gap-3">
             <FileText className="h-5 w-5 text-blue-500" />
             <h2 className="text-lg font-semibold text-gray-900">记录详情</h2>
           </div>
-          <button onClick={() => setSelectedRecord(null)} className="rounded-lg p-2 text-gray-400 hover:bg-gray-100">
+          <button onClick={() => setDetailRecord(null)} className="rounded-lg p-2 text-gray-400 hover:bg-gray-100">
             <X className="h-5 w-5" />
           </button>
         </div>

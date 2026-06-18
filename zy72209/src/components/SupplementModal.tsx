@@ -4,7 +4,7 @@ import { useDashboardStore } from '@/store/dashboardStore';
 import { formatAmount } from '@/utils/format';
 
 export function SupplementModal() {
-  const { selectedRecord, showSupplementModal, setShowSupplementModal, supplementRecord, fetchRecords } = useDashboardStore();
+  const { supplementRecord, setSupplementRecord, supplementRecordAction, fetchRecords } = useDashboardStore();
   const [formData, setFormData] = useState({
     settlementAccount: '',
     settlementBank: '',
@@ -16,14 +16,14 @@ export function SupplementModal() {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  if (!selectedRecord || !showSupplementModal) return null;
+  if (!supplementRecord) return null;
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async () => {
-    if (!selectedRecord) return;
+    if (!supplementRecord) return;
     
     const fields: Record<string, any> = {};
     
@@ -41,10 +41,10 @@ export function SupplementModal() {
     }
     
     setSubmitting(true);
-    const success = await supplementRecord(selectedRecord.id, fields);
+    const success = await supplementRecordAction(supplementRecord.id, fields);
     if (success) {
       await fetchRecords();
-      setShowSupplementModal(false);
+      setSupplementRecord(null);
       setFormData({
         settlementAccount: '',
         settlementBank: '',
@@ -59,11 +59,11 @@ export function SupplementModal() {
   };
 
   const previewRecalc = () => {
-    const shareRatio = formData.shareRatio ? parseFloat(formData.shareRatio) : selectedRecord.custodianData.shareRatio;
-    const totalShares = formData.totalShares ? parseInt(formData.totalShares) : selectedRecord.custodianData.totalShares;
+    const shareRatio = formData.shareRatio ? parseFloat(formData.shareRatio) : supplementRecord.custodianData.shareRatio;
+    const totalShares = formData.totalShares ? parseInt(formData.totalShares) : supplementRecord.custodianData.totalShares;
     
     const occupiedAmount = Math.round(totalShares * shareRatio * 100);
-    const availableAmount = selectedRecord.creditLine - occupiedAmount;
+    const availableAmount = supplementRecord.creditLine - occupiedAmount;
     
     return { occupiedAmount, availableAmount };
   };
@@ -74,7 +74,7 @@ export function SupplementModal() {
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
       <div 
         className="absolute inset-0 bg-black/50"
-        onClick={() => setShowSupplementModal(false)}
+        onClick={() => setSupplementRecord(null)}
       />
       
       <div className="relative z-10 w-full max-w-lg rounded-xl bg-white shadow-xl">
@@ -84,7 +84,7 @@ export function SupplementModal() {
             <h2 className="text-lg font-semibold text-gray-900">补录记录</h2>
           </div>
           <button
-            onClick={() => setShowSupplementModal(false)}
+            onClick={() => setSupplementRecord(null)}
             className="rounded-lg p-2 text-gray-400 hover:bg-gray-100"
           >
             <X className="h-5 w-5" />
@@ -94,9 +94,9 @@ export function SupplementModal() {
         <div className="p-6">
           <div className="mb-4 rounded-lg bg-blue-50 px-4 py-3">
             <p className="text-sm font-medium text-blue-900">
-              {selectedRecord.institutionNameCurrent}
+              {supplementRecord.institutionNameCurrent}
               <span className="ml-2 text-blue-600">
-                {selectedRecord.institutionCode}
+                {supplementRecord.institutionCode}
               </span>
             </p>
           </div>
@@ -166,7 +166,7 @@ export function SupplementModal() {
                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <p className="mt-1 text-xs text-gray-400">
-                当前值: {selectedRecord.custodianData.exDividendDate}
+                当前值: {supplementRecord.custodianData.exDividendDate}
               </p>
             </div>
             
@@ -178,7 +178,7 @@ export function SupplementModal() {
                   step="0.01"
                   value={formData.shareRatio}
                   onChange={(e) => handleChange('shareRatio', e.target.value)}
-                  placeholder={selectedRecord.custodianData.shareRatio.toString()}
+                  placeholder={supplementRecord.custodianData.shareRatio.toString()}
                   className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
@@ -188,7 +188,7 @@ export function SupplementModal() {
                   type="number"
                   value={formData.totalShares}
                   onChange={(e) => handleChange('totalShares', e.target.value)}
-                  placeholder={selectedRecord.custodianData.totalShares.toString()}
+                  placeholder={supplementRecord.custodianData.totalShares.toString()}
                   className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
@@ -217,7 +217,7 @@ export function SupplementModal() {
 
           <div className="flex gap-3">
             <button
-              onClick={() => setShowSupplementModal(false)}
+              onClick={() => setSupplementRecord(null)}
               className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
               取消

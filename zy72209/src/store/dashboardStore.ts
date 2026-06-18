@@ -6,34 +6,34 @@ interface DashboardStore {
   dataHash: string;
   loading: boolean;
   error: string | null;
-  
+
   filters: {
     status: string[];
     hasConflict: boolean | null;
     nameConsistent: boolean | null;
     searchText: string;
   };
-  
+
   selfCheckResults: SelfCheckResult[];
   selfCheckRunning: boolean;
-  
-  selectedRecord: CreditRecord | null;
-  showConflictDrawer: boolean;
-  showSupplementModal: boolean;
+
+  detailRecord: CreditRecord | null;
+  conflictRecord: CreditRecord | null;
+  supplementRecord: CreditRecord | null;
   showImportModal: boolean;
-  
+
   fetchRecords: () => Promise<void>;
   setFilters: (filters: Partial<DashboardStore['filters']>) => void;
-  setSelectedRecord: (record: CreditRecord | null) => void;
-  setShowConflictDrawer: (show: boolean) => void;
-  setShowSupplementModal: (show: boolean) => void;
+  setDetailRecord: (record: CreditRecord | null) => void;
+  setConflictRecord: (record: CreditRecord | null) => void;
+  setSupplementRecord: (record: CreditRecord | null) => void;
   setShowImportModal: (show: boolean) => void;
-  
+
   runSelfCheck: (checks?: string) => Promise<void>;
   importCustodian: (data: any[]) => Promise<ImportResult | null>;
   uploadScreenshot: (id: string, screenshotData: any) => Promise<{ hasConflict: boolean; conflicts: ConflictEvidence[] } | null>;
   resolveConflict: (id: string, resolution: 'confirm_custodian' | 'reject_use_screenshot', remark: string) => Promise<boolean>;
-  supplementRecord: (id: string, fields: Record<string, any>) => Promise<boolean>;
+  supplementRecordAction: (id: string, fields: Record<string, any>) => Promise<boolean>;
   addRemark: (id: string, content: string) => Promise<boolean>;
   exportData: () => Promise<void>;
   verifyExportConsistency: () => Promise<boolean>;
@@ -44,22 +44,22 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
   dataHash: '',
   loading: false,
   error: null,
-  
+
   filters: {
     status: [],
     hasConflict: null,
     nameConsistent: null,
     searchText: ''
   },
-  
+
   selfCheckResults: [],
   selfCheckRunning: false,
-  
-  selectedRecord: null,
-  showConflictDrawer: false,
-  showSupplementModal: false,
+
+  detailRecord: null,
+  conflictRecord: null,
+  supplementRecord: null,
   showImportModal: false,
-  
+
   fetchRecords: async () => {
     set({ loading: true, error: null });
     try {
@@ -74,27 +74,27 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
       set({ error: '获取数据失败', loading: false });
     }
   },
-  
+
   setFilters: (filters) => {
     set(state => ({ filters: { ...state.filters, ...filters } }));
   },
-  
-  setSelectedRecord: (record) => {
-    set({ selectedRecord: record });
+
+  setDetailRecord: (record) => {
+    set({ detailRecord: record });
   },
-  
-  setShowConflictDrawer: (show) => {
-    set({ showConflictDrawer: show });
+
+  setConflictRecord: (record) => {
+    set({ conflictRecord: record });
   },
-  
-  setShowSupplementModal: (show) => {
-    set({ showSupplementModal: show });
+
+  setSupplementRecord: (record) => {
+    set({ supplementRecord: record });
   },
-  
+
   setShowImportModal: (show) => {
     set({ showImportModal: show });
   },
-  
+
   runSelfCheck: async (checks) => {
     set({ selfCheckRunning: true });
     try {
@@ -108,7 +108,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
       set({ selfCheckRunning: false });
     }
   },
-  
+
   importCustodian: async (importData) => {
     try {
       const res = await fetch('/api/records/import', {
@@ -126,7 +126,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
       return null;
     }
   },
-  
+
   uploadScreenshot: async (id, screenshotData) => {
     try {
       const res = await fetch(`/api/records/${id}/screenshot`, {
@@ -144,7 +144,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
       return null;
     }
   },
-  
+
   resolveConflict: async (id, resolution, remark) => {
     try {
       const res = await fetch(`/api/records/${id}/resolve`, {
@@ -162,8 +162,8 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
       return false;
     }
   },
-  
-  supplementRecord: async (id, fields) => {
+
+  supplementRecordAction: async (id, fields) => {
     try {
       const res = await fetch(`/api/records/${id}/supplement`, {
         method: 'POST',
@@ -180,7 +180,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
       return false;
     }
   },
-  
+
   addRemark: async (id, content) => {
     try {
       const res = await fetch(`/api/records/${id}/remark`, {
@@ -198,21 +198,27 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
       return false;
     }
   },
-  
+
   exportData: async () => {
     try {
-      const isConsistent = await get().verifyExportConsistency();
-      if (!isConsistent) {
-        alert('数据不一致，请刷新后再导出');
-        return;
-      }
-      
-      window.open('/api/export/excel', '_blank');
+      const res = await fetch('/api/export/excel');
+      if (!res.ok) throw new Error(`导出请求失败: ${res.status}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const disposition = res.headers.get('Content-Disposition') || '';
+      const match = disposition.match(/filename="?([^";\n]+)"?/);
+      a.download = match ? decodeURIComponent(match[1]) : `授信额度明细_${new Date().toISOString().split('T')[0]}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     } catch (err) {
       console.error('导出失败', err);
     }
   },
-  
+
   verifyExportConsistency: async () => {
     try {
       const { dataHash } = get();

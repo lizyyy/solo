@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { AlertTriangle, FileCheck, RefreshCw, Download, Users, DollarSign, Activity, CheckCircle2, Upload, ImagePlus } from 'lucide-react';
 import { useDashboardStore } from '@/store/dashboardStore';
 import { StatsCard } from '@/components/StatsCard';
@@ -10,7 +10,6 @@ import { SupplementModal } from '@/components/SupplementModal';
 import { ImportModal } from '@/components/ImportModal';
 import { ScreenshotModal } from '@/components/ScreenshotModal';
 import { RecordDetailDrawer } from '@/components/RecordDetailDrawer';
-import { useMemo } from 'react';
 import type { CreditRecord } from '../../shared/types';
 
 export default function Home() {

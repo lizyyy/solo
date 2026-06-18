@@ -10,7 +10,7 @@ interface RecordsTableProps {
 }
 
 export function RecordsTable({ onScreenshot }: RecordsTableProps) {
-  const { records, filters, setSelectedRecord, setShowConflictDrawer, setShowSupplementModal } = useDashboardStore();
+  const { records, filters, setDetailRecord, setConflictRecord, setSupplementRecord } = useDashboardStore();
 
   const filteredRecords = useMemo(() => {
     return records.filter(record => {
@@ -36,13 +36,11 @@ export function RecordsTable({ onScreenshot }: RecordsTableProps) {
   }, [records, filters]);
 
   const handleViewConflict = (record: CreditRecord) => {
-    setSelectedRecord(record);
-    setShowConflictDrawer(true);
+    setConflictRecord(record);
   };
 
   const handleSupplement = (record: CreditRecord) => {
-    setSelectedRecord(record);
-    setShowSupplementModal(true);
+    setSupplementRecord(record);
   };
 
   return (
@@ -190,7 +188,7 @@ export function RecordsTable({ onScreenshot }: RecordsTableProps) {
                       补录
                     </button>
                     <button
-                      onClick={() => setSelectedRecord(record)}
+                      onClick={() => setDetailRecord(record)}
                       className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
                     >
                       <FileText className="h-3.5 w-3.5" />
