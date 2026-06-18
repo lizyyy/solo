@@ -95,13 +95,6 @@
     .check-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
     .check-row input[type=checkbox] { width: auto; }
     .audited-flag { display: inline-block; background: #fdf6ec; color: #e6a23c; padding: 1px 6px; border-radius: 3px; font-size: 10px; margin-left: 4px; }
-    .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
-    .toast { padding: 12px 20px; border-radius: 6px; color: white; font-size: 13px; box-shadow: 0 4px 12px rgba(0,0,0,.15); animation: slideIn .3s ease; }
-    .toast.success { background: #67c23a; }
-    .toast.error { background: #f56c6c; }
-    .toast.info { background: #409eff; }
-    .toast.warning { background: #e6a23c; }
-    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
   </style>
 </head>
 <body>
@@ -332,8 +325,6 @@
     </div>
   </div>
 
-  <div class="toast-container" id="toast-container"></div>
-
   <!-- 证据补看弹窗 -->
   <div class="modal-mask" id="evidence-modal">
     <div class="modal">
@@ -416,15 +407,6 @@
     let currentBatchId = null;
     let currentBatchData = null;
     let importPreviewData = [];
-
-    function toast(msg, type) {
-      type = type || 'info';
-      const el = document.createElement('div');
-      el.className = 'toast ' + type;
-      el.textContent = msg;
-      document.getElementById('toast-container').appendChild(el);
-      setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(() => el.remove(), 300); }, 3000);
-    }
 
     function switchTab(name) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -569,14 +551,14 @@
         body: JSON.stringify(req)
       }).then(r => r.json()).then(res => {
         if (res.code === 200) {
-          toast('导入成功！', 'success');
+          alert('导入成功！');
           currentBatchId = res.data.id;
           switchTab('detail');
           loadDetail();
         } else {
-          toast('导入失败：' + res.message, 'error');
+          alert('导入失败：' + res.message);
         }
-      }).catch(err => toast('请求失败：' + err, 'error'));
+      }).catch(err => alert('请求失败：' + err));
     }
 
     function loadBatchList() {
@@ -775,13 +757,14 @@
     }
 
     function runSelfCheck() {
-      const operator = 'linjie';
+      const operator = prompt('请输入操作人', 'linjie');
+      if (!operator) return;
       fetch(API + '/self-check/run/' + currentBatchId + '?operator=' + encodeURIComponent(operator), { method: 'POST' })
         .then(r => r.json()).then(res => {
           if (res.code === 200) {
             loadDetail();
           } else {
-            toast('自检失败：' + res.message, 'error');
+            alert('自检失败：' + res.message);
           }
         });
     }
@@ -848,7 +831,7 @@
           hideModal('evidence-modal');
           loadDetail();
         } else {
-          toast('提交失败：' + res.message, 'error');
+          alert('提交失败：' + res.message);
         }
       });
     }
@@ -894,7 +877,7 @@
           hideModal('diff-modal');
           loadDetail();
         } else {
-          toast('提交失败：' + res.message, 'error');
+          alert('提交失败：' + res.message);
         }
       });
     }
@@ -964,7 +947,7 @@
       });
 
       if (reviewItems.length === 0) {
-        toast('请选择要复核的记录', 'warning');
+        alert('请选择要复核的记录');
         return;
       }
 
@@ -977,7 +960,7 @@
           hideModal('supervisor-modal');
           loadDetail();
         } else {
-          toast('提交失败：' + res.message, 'error');
+          alert('提交失败：' + res.message);
         }
       });
     }
