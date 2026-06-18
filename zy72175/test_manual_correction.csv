@@ -1,0 +1,5 @@
+sample_id,content,original_intent,source,manual_intent
+UP002,"用户：这个商品可以退货吗？买错颜色了。","退货咨询",manual,退货咨询
+UP003,"用户：请问客服人工服务时间？","客服时间咨询",manual,客服时间咨询
+BADLINE_MISSING_CONTENT
+UP004,"用户：退款什么时候到账？已经3天了。","退款查询",manual,退款查询

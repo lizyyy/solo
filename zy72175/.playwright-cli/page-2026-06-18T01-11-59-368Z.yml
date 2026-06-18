@@ -1,0 +1,175 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e6]:
+        - img [ref=e8]
+        - generic [ref=e10]:
+          - heading "意图漂移监控" [level=1] [ref=e11]
+          - paragraph [ref=e12]: 客服质量监控系统
+      - navigation [ref=e13]:
+        - paragraph [ref=e14]: 导航菜单
+        - generic [ref=e15]:
+          - link "检测仪表盘" [ref=e16] [cursor=pointer]:
+            - /url: "#/"
+            - img [ref=e17]
+            - generic [ref=e20]: 检测仪表盘
+          - link "样本管理" [ref=e21] [cursor=pointer]:
+            - /url: "#/samples"
+            - img [ref=e22]
+            - generic [ref=e26]: 样本管理
+          - link "漂移检测" [ref=e27] [cursor=pointer]:
+            - /url: "#/detection"
+            - img [ref=e28]
+            - generic [ref=e30]: 漂移检测
+          - link "人工改判" [ref=e31] [cursor=pointer]:
+            - /url: "#/review"
+            - img [ref=e32]
+            - generic [ref=e36]: 人工改判
+          - link "报告中心" [ref=e37] [cursor=pointer]:
+            - /url: "#/reports"
+            - img [ref=e38]
+            - generic [ref=e41]: 报告中心
+      - generic [ref=e44]:
+        - generic [ref=e46]: 周
+        - generic [ref=e47]:
+          - paragraph [ref=e48]: 周姐
+          - paragraph [ref=e49]: 标注负责人
+    - main [ref=e50]:
+      - generic [ref=e678]:
+        - generic [ref=e680]:
+          - heading "人工改判" [level=1] [ref=e681]
+          - paragraph [ref=e682]: 对检测结果进行人工复核和改判
+        - generic [ref=e683]:
+          - generic [ref=e685]:
+            - generic [ref=e686]:
+              - heading "待复核样本" [level=2] [ref=e687]
+              - paragraph [ref=e688]: 共 9 条待处理
+            - generic [ref=e689]:
+              - generic [ref=e690] [cursor=pointer]:
+                - generic [ref=e691]:
+                  - generic [ref=e692]: S002
+                  - generic [ref=e693]: 待复核
+                - paragraph [ref=e694]: 用户：这个商品可以退货吗？买错颜色了。
+                - generic [ref=e695]:
+                  - generic [ref=e696]: 换货咨询
+                  - generic [ref=e697]: ≠
+                  - generic [ref=e698]: 退货咨询
+              - generic [ref=e699] [cursor=pointer]:
+                - generic [ref=e700]:
+                  - generic [ref=e701]: S003
+                  - generic [ref=e702]: 已检测
+                - paragraph [ref=e703]: 用户：为什么价格和昨天不一样了？涨价了？
+                - generic [ref=e704]:
+                  - generic [ref=e705]: 价格投诉
+                  - generic [ref=e706]: ≠
+                  - generic [ref=e707]: 价格咨询
+              - generic [ref=e708] [cursor=pointer]:
+                - generic [ref=e709]:
+                  - generic [ref=e710]: S004
+                  - generic [ref=e711]: 已检测
+                - paragraph [ref=e712]: 用户：发票什么时候开？我已经等了一周了。
+                - generic [ref=e713]:
+                  - generic [ref=e714]: 投诉建议
+                  - generic [ref=e715]: ≠
+                  - generic [ref=e716]: 发票问题
+              - generic [ref=e717] [cursor=pointer]:
+                - generic [ref=e718]:
+                  - generic [ref=e719]: S007
+                  - generic [ref=e720]: 待复核
+                - paragraph [ref=e721]: 用户：优惠券怎么用不了？
+                - generic [ref=e722]:
+                  - generic [ref=e723]: 活动咨询
+                  - generic [ref=e724]: ≠
+                  - generic [ref=e725]: 优惠券问题
+              - generic [ref=e726] [cursor=pointer]:
+                - generic [ref=e727]:
+                  - generic [ref=e728]: IM_UP001
+                  - generic [ref=e729]: 已检测
+                - paragraph [ref=e730]: 用户：这个商品可以换货吗？我想换个尺码。
+                - generic [ref=e732]: 换货咨询
+              - generic [ref=e733] [cursor=pointer]:
+                - generic [ref=e734]:
+                  - generic [ref=e735]: IM_UP002
+                  - generic [ref=e736]: 已检测
+                - paragraph [ref=e737]: 用户：这个商品可以退货吗？买错颜色了。
+                - generic [ref=e738]:
+                  - generic [ref=e739]: 换货咨询
+                  - generic [ref=e740]: ≠
+                  - generic [ref=e741]: 退货咨询
+              - generic [ref=e742] [cursor=pointer]:
+                - generic [ref=e743]:
+                  - generic [ref=e744]: IM_UP003
+                  - generic [ref=e745]: 已检测
+                - paragraph [ref=e746]: 用户：请问客服人工服务时间？
+                - generic [ref=e747]:
+                  - generic [ref=e748]: 活动咨询
+                  - generic [ref=e749]: ≠
+                  - generic [ref=e750]: 客服时间咨询
+              - generic [ref=e751] [cursor=pointer]:
+                - generic [ref=e752]:
+                  - generic [ref=e753]: IM_UP004
+                  - generic [ref=e754]: 已检测
+                - paragraph [ref=e755]: 用户：退款什么时候到账？已经3天了。
+                - generic [ref=e756]:
+                  - generic [ref=e757]: 退款查询
+                  - generic [ref=e758]: 退款查询
+              - generic [ref=e759] [cursor=pointer]:
+                - generic [ref=e760]:
+                  - generic [ref=e761]: IM_UP005
+                  - generic [ref=e762]: 已检测
+                - paragraph [ref=e763]: 用户：优惠券怎么用不了？
+                - generic [ref=e765]: 优惠券问题
+          - generic [ref=e766]:
+            - generic [ref=e767]:
+              - generic [ref=e768]:
+                - heading "评审工作台" [level=2] [ref=e772]
+                - generic [ref=e773]: IM_UP002
+              - generic [ref=e774]:
+                - generic [ref=e775]:
+                  - heading "客服对话内容" [level=3] [ref=e776]
+                  - generic [ref=e778]: 用户：这个商品可以退货吗？买错颜色了。
+                - generic [ref=e779]:
+                  - generic [ref=e780]:
+                    - generic [ref=e781]:
+                      - img [ref=e783]
+                      - generic [ref=e785]: 模型输出
+                    - paragraph [ref=e786]: 换货咨询
+                    - paragraph [ref=e787]: "置信度: 78%"
+                  - generic [ref=e788]:
+                    - generic [ref=e789]:
+                      - img [ref=e791]
+                      - generic [ref=e794]: 人工标注
+                    - paragraph [ref=e795]: 退货咨询
+            - generic [ref=e796]:
+              - heading "改判操作" [level=2] [ref=e798]
+              - generic [ref=e799]:
+                - generic [ref=e800]:
+                  - generic [ref=e801]: 最终判定意图
+                  - combobox [ref=e802]:
+                    - option "请选择意图"
+                    - option "物流查询"
+                    - option "退货咨询"
+                    - option "换货咨询" [selected]
+                    - option "价格咨询"
+                    - option "价格投诉"
+                    - option "发票问题"
+                    - option "会员咨询"
+                    - option "退款查询"
+                    - option "优惠券问题"
+                    - option "地址修改"
+                    - option "投诉建议"
+                    - option "活动咨询"
+                - generic [ref=e803]:
+                  - generic [ref=e804]: 改判理由
+                  - textbox "请填写改判理由，便于后续追溯..." [ref=e805]
+                - generic [ref=e806]:
+                  - generic [ref=e808]: 补录备注
+                  - textbox "可临时补充备注说明..." [ref=e809]
+                - generic [ref=e810]:
+                  - button "保存评审结果" [ref=e811] [cursor=pointer]:
+                    - img [ref=e812]
+                    - text: 保存评审结果
+                  - button "补录备注" [disabled] [ref=e816]:
+                    - img [ref=e817]
+                    - text: 补录备注
+  - generic [ref=e198]: "0"

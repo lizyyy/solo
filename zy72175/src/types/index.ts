@@ -5,9 +5,11 @@ export type EvidenceType = 'model_output' | 'manual_label' | 'threshold_config';
 
 export interface Sample {
   id: string;
+  sampleKey?: string;
   content: string;
   originalIntent: string;
   source: SourceType;
+  sources: SourceType[];
   status: SampleStatus;
   createdAt: string;
   updatedAt: string;

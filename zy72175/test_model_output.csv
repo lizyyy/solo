@@ -1,0 +1,4 @@
+sample_id,content,original_intent,source,model_intent,model_confidence,is_drift,drift_score
+UP001,"用户：这个商品可以换货吗？我想换个尺码。","换货咨询",model,换货咨询,0.72,false,0.18
+UP002,"用户：这个商品可以退货吗？买错颜色了。","退货咨询",model,换货咨询,0.78,true,0.55
+UP003,"用户：请问客服人工服务时间？","客服时间咨询",model,活动咨询,0.55,true,0.42
