@@ -406,33 +406,69 @@ setTimeout(() => {
   addTest('页面/API/导出读同一份数据', (done) => {
     unifiedDataService.getFullRecordById(recordId, (err, apiData) => {
       if (err) return done(err);
-      unifiedDataService.getExportData((err, exportData) => {
+      unifiedDataService.getAllRecordsWithDetails((err, listData) => {
         if (err) return done(err);
-        try {
-          const exportRecord = exportData.find(r => r['原始行号'] === 3 && r['基金代码'] === 'PF002');
+        unifiedDataService.getExportData((err, exportData) => {
+          if (err) return done(err);
+          try {
+            const listRecord = listData.find(r => r.id === recordId);
+            const exportRecord = exportData.find(r => r['原始行号'] === 3 && r['基金代码'] === 'PF002');
 
-          assertTrue(!!exportRecord, '导出数据中应包含该记录');
-          assertEqual(exportRecord['原始到账日'], apiData.original_settlement_date, '导出原始到账日应与API一致');
-          assertEqual(exportRecord['当前到账日'], apiData.current_settlement_date, '导出当前到账日应与API一致');
-          assertEqual(exportRecord['是否人工改动'], '是', '导出应显示有人工改动');
-          assertEqual(exportRecord['处理状态'], '正常', '导出状态应为正常');
-          assertTrue(exportRecord['人工改动记录'].includes('T+1'), '导出应包含改动记录');
-          assertTrue(exportRecord['人工改动记录'].includes('阿芬'), '导出应包含操作员');
-          assertTrue(!!exportRecord['对账说明'] && exportRecord['对账说明'].length > 0, '导出对账说明不应为空');
-          assertTrue(exportRecord['对账说明'].includes('托管确认页显示T+1'), '导出对账说明应包含内容');
+            assertTrue(!!listRecord, '列表数据中应包含该记录');
+            assertTrue(!!exportRecord, '导出数据中应包含该记录');
 
-          assertTrue(Array.isArray(apiData.reconciliation_notes), 'API数据应包含reconciliation_notes数组');
-          assertTrue(apiData.reconciliation_notes.length > 0, 'API数据对账说明不应为空');
-          assertEqual(apiData.reconciliation_notes[0].note_content, exportRecord['对账说明'].split('; ')[0], 'API和导出的对账说明应一致');
+            assertEqual(exportRecord['原始到账日'], apiData.original_settlement_date, '导出原始到账日应与API一致');
+            assertEqual(exportRecord['当前到账日'], apiData.current_settlement_date, '导出当前到账日应与API一致');
+            assertEqual(exportRecord['是否人工改动'], '是', '导出应显示有人工改动');
+            assertEqual(exportRecord['处理状态'], '正常', '导出状态应为正常');
+            assertTrue(exportRecord['人工改动记录'].includes('T+1'), '导出应包含改动记录');
+            assertTrue(exportRecord['人工改动记录'].includes('阿芬'), '导出应包含操作员');
 
-          console.log(`   ✅ API数据和导出数据完全一致`);
-          console.log(`      原始到账日: ${exportRecord['原始到账日']}`);
-          console.log(`      当前到账日: ${exportRecord['当前到账日']}`);
-          console.log(`      处理状态: ${exportRecord['处理状态']}`);
-          console.log(`      人工改动记录: ${exportRecord['人工改动记录']}`);
-          console.log(`      对账说明: ${exportRecord['对账说明']}`);
-          done();
-        } catch (e) { done(e); }
+            assertTrue(!!exportRecord['对账说明'] && exportRecord['对账说明'].length > 0, '导出对账说明不应为空');
+            assertTrue(exportRecord['对账说明'].includes('托管确认页显示T+1'), '导出对账说明应包含内容');
+
+            assertTrue(!!exportRecord['除权日截图'] && exportRecord['除权日截图'].url, '导出除权日截图链接不应为空');
+            assertTrue(exportRecord['除权日截图'].url.includes('/uploads/'), '除权日截图链接应包含/uploads路径');
+            assertTrue(exportRecord['除权日截图'].url.startsWith('http'), '除权日截图链接应为完整URL');
+
+            assertTrue(!!exportRecord['人工改动证据截图'] && exportRecord['人工改动证据截图'].url, '导出人工改动证据截图链接不应为空');
+            assertTrue(exportRecord['人工改动证据截图'].url.includes('/uploads/'), '人工改动证据截图链接应包含/uploads路径');
+            assertTrue(exportRecord['人工改动证据截图'].url.startsWith('http'), '人工改动证据截图链接应为完整URL');
+
+            assertTrue(!!exportRecord['状态流转历史'] && exportRecord['状态流转历史'].length > 0, '导出状态流转历史不应为空');
+            assertTrue(exportRecord['状态流转历史'].includes('待基金经理复核'), '状态流转历史应包含待复核');
+            assertTrue(exportRecord['状态流转历史'].includes('基金经理复核通过'), '状态流转历史应包含复核通过');
+
+            assertTrue(Array.isArray(apiData.reconciliation_notes), 'API数据应包含reconciliation_notes数组');
+            assertTrue(apiData.reconciliation_notes.length > 0, 'API数据对账说明不应为空');
+            assertEqual(apiData.reconciliation_notes[0].note_content, exportRecord['对账说明'].split('; ')[0], 'API和导出的对账说明应一致');
+
+            assertTrue(Array.isArray(listRecord.ex_right_screenshots), '列表数据应包含ex_right_screenshots数组');
+            assertTrue(listRecord.ex_right_screenshots.length > 0, '列表数据除权日截图不应为空');
+            assertTrue(!!listRecord.ex_right_screenshots[0].screenshot_url, '列表数据截图应包含完整URL');
+            assertEqual(listRecord.ex_right_screenshots[0].screenshot_url, apiData.ex_right_screenshots[0].screenshot_url, '列表和API的截图URL应一致');
+
+            assertTrue(Array.isArray(listRecord.status_transitions), '列表数据应包含status_transitions数组');
+            assertTrue(listRecord.status_transitions.length >= 5, '列表数据状态流转不应为空');
+            assertEqual(listRecord.status_transitions.length, apiData.status_transitions.length, '列表和API的状态流转条数应一致');
+
+            assertTrue(Array.isArray(listRecord.change_logs), '列表数据应包含change_logs数组');
+            assertTrue(listRecord.change_logs.length > 0, '列表数据人工改动日志不应为空');
+            assertTrue(!!listRecord.change_logs[0].evidence_screenshot_url, '列表数据改动日志应包含证据截图URL');
+            assertEqual(listRecord.change_logs[0].evidence_screenshot_url, apiData.change_logs[0].evidence_screenshot_url, '列表和API的证据截图URL应一致');
+
+            console.log(`   ✅ 三源数据完全一致`);
+            console.log(`      原始到账日: ${exportRecord['原始到账日']}`);
+            console.log(`      当前到账日: ${exportRecord['当前到账日']}`);
+            console.log(`      处理状态: ${exportRecord['处理状态']}`);
+            console.log(`      人工改动记录: ${exportRecord['人工改动记录']}`);
+            console.log(`      对账说明: ${exportRecord['对账说明']}`);
+            console.log(`      除权日截图: ${exportRecord['除权日截图'].url}`);
+            console.log(`      人工改动证据: ${exportRecord['人工改动证据截图'].url}`);
+            console.log(`      状态流转历史: ${exportRecord['状态流转历史'].slice(0, 80)}...`);
+            done();
+          } catch (e) { done(e); }
+        });
       });
     });
   }, true);

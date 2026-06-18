@@ -251,7 +251,7 @@ function renderDetailModal(record) {
             </div>
             <div><span class="detail-value original">${log.old_value}</span> → <span class="detail-value changed">${log.new_value}</span></div>
             <div style="margin-top: 4px; color: #606266;">原因: ${log.change_reason}</div>
-            ${log.evidence_screenshot ? `<div style="margin-top: 4px;">证据: <a href="${log.evidence_screenshot}" target="_blank">查看截图</a></div>` : ''}
+            ${log.evidence_screenshot_url ? `<div style="margin-top: 4px;">证据: <a href="${log.evidence_screenshot_url}" target="_blank">查看截图</a></div>` : ''}
           </div>
         `).join('')}
       </div>
@@ -290,7 +290,7 @@ function renderDetailModal(record) {
               <span><strong>${s.upload_operator}</strong> 上传</span>
               <span>${s.upload_time}</span>
             </div>
-            <div><a href="${s.screenshot_path}" target="_blank">查看截图</a></div>
+            <div><a href="${s.screenshot_url}" target="_blank">查看截图</a></div>
             ${s.remark ? `<div style="margin-top: 4px; color: #606266;">备注: ${s.remark}</div>` : ''}
           </div>
         `).join('')}
