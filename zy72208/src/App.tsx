@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Home } from "./pages/Home.js";
-import { ImportPage } from "./pages/ImportPage.js";
-import { BatchDetailPage } from "./pages/BatchDetailPage.js";
-import { ReplayPage } from "./pages/ReplayPage.js";
+import { Home } from "@/pages/Home";
+import { ImportPage } from "@/pages/ImportPage";
+import { BatchDetailPage } from "@/pages/BatchDetailPage";
+import { ReplayPage } from "@/pages/ReplayPage";
 
 export default function App() {
   return (

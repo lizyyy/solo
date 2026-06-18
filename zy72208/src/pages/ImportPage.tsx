@@ -17,7 +17,7 @@ POL-008	终身寿险F款	1200000	人民币`;
 export const ImportPage: React.FC = () => {
   const navigate = useNavigate();
   const { createBatch, loading } = useSettlementStore();
-  const [batchNo, setBatchNo] = useState(`INS-2025-IMPORT-WALK`);
+  const [batchNo, setBatchNo] = useState(`INS-${new Date().toISOString().slice(0, 10)}`);
   const [sourceFile, setSourceFile] = useState('除权日截图.xlsx');
   const [pastedData, setPastedData] = useState('');
   const [preview, setPreview] = useState<any[]>([]);
@@ -36,7 +36,7 @@ export const ImportPage: React.FC = () => {
       originalLineNo: row.lineNo,
       policyNo: row.policyNo,
       productName: row.productName,
-      commissionAmount: parseFloat(row.commissionAmount) || 0,
+      commissionAmount: parseFloat(row.commissionAmount),
       currencyRaw: row.currency
     }));
 
@@ -187,16 +187,15 @@ export const ImportPage: React.FC = () => {
                       const hasHKD = /HKD|HK\$|港币|港幣|HK/i.test(raw);
                       const hasCNY = /CNY|RMB|¥|￥|人民币|元/i.test(raw);
                       const isMixed = hasHKD && hasCNY;
-                      const amount = parseFloat(row.commissionAmount);
                       return (
                         <tr key={idx} className={isMixed ? 'bg-audit-orange/5' : idx % 2 === 0 ? 'bg-white' : 'bg-navy-50/30'}>
                           <td className="px-4 py-3 font-mono text-sm text-navy-600">#{row.lineNo}</td>
                           <td className="px-4 py-3 font-mono text-sm text-navy-700">{row.policyNo}</td>
                           <td className="px-4 py-3 text-sm text-navy-700">{row.productName}</td>
                           <td className="px-4 py-3 font-mono text-sm text-right text-navy-700">
-                            {isNaN(amount) ? '-' : amount.toLocaleString()}
+                            {parseFloat(row.commissionAmount).toLocaleString()}
                           </td>
-                          <td className="px-4 py-3 font-mono text-sm text-navy-700">{raw}</td>
+                          <td className="px-4 py-3 font-mono text-sm text-navy-700">{row.currency}</td>
                           <td className="px-4 py-3">
                             {isMixed ? (
                               <span className="inline-flex items-center gap-1 px-2 py-1 bg-audit-orange/10 text-audit-orange text-xs font-medium rounded">
