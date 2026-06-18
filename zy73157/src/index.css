@@ -1,89 +1,14 @@
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Courier+Prime:wght@400;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  html,
-  body,
-  #root {
-    height: 100%;
-  }
-  body {
-    @apply bg-deepsea-900 text-deepsea-50 font-display antialiased;
-    background-image:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(48, 86, 138, 0.35), transparent),
-      linear-gradient(180deg, #02060d 0%, #061627 100%);
-    background-attachment: fixed;
-  }
-}
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.5;
+  font-weight: 400;
 
-@layer components {
-  .panel {
-    @apply rounded-xl border border-deepsea-700 bg-deepsea-800/80 backdrop-blur-sm;
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 10px 30px -10px rgba(0, 0, 0, 0.6);
-  }
-  .panel-header {
-    @apply flex items-center justify-between border-b border-deepsea-700 px-4 py-3 text-sm font-medium text-deepsea-100;
-  }
-  .tag {
-    @apply inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium;
-  }
-  .tag-processed {
-    @apply bg-status-processed/15 text-status-processed ring-1 ring-inset ring-status-processed/30;
-  }
-  .tag-pending {
-    @apply bg-status-pending/15 text-status-pending ring-1 ring-inset ring-status-pending/30;
-  }
-  .tag-blocked {
-    @apply bg-status-blocked/15 text-status-blocked ring-1 ring-inset ring-status-blocked/30;
-  }
-  .tag-drift {
-    @apply bg-status-drift/15 text-status-drift ring-1 ring-inset ring-status-drift/30;
-  }
-  .tag-withdrawn {
-    @apply bg-status-withdrawn/15 text-status-withdrawn ring-1 ring-inset ring-status-withdrawn/30;
-  }
-  .btn {
-    @apply inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition;
-  }
-  .btn-primary {
-    @apply bg-status-processed/20 text-status-processed ring-1 ring-inset ring-status-processed/40 hover:bg-status-processed/30;
-  }
-  .btn-ghost {
-    @apply bg-deepsea-700/50 text-deepsea-100 ring-1 ring-inset ring-deepsea-600 hover:bg-deepsea-700;
-  }
-  .btn-danger {
-    @apply bg-status-blocked/15 text-status-blocked ring-1 ring-inset ring-status-blocked/30 hover:bg-status-blocked/25;
-  }
-  .stat-card {
-    @apply relative overflow-hidden rounded-lg border p-3 transition hover:scale-[1.01];
-  }
-  .logbook-line {
-    @apply flex gap-3 border-b border-deepsea-700/60 py-2 px-3 font-typewriter text-[13px] leading-relaxed;
-  }
-  .grid-bg {
-    background-image:
-      linear-gradient(rgba(95, 135, 184, 0.07) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(95, 135, 184, 0.07) 1px, transparent 1px);
-    background-size: 24px 24px;
-  }
-}
-
-@layer utilities {
-  .scroll-thin::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  .scroll-thin::-webkit-scrollbar-thumb {
-    background: rgba(95, 135, 184, 0.35);
-    border-radius: 9999px;
-  }
-  .scroll-thin::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .text-balance {
-    text-wrap: balance;
-  }
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
