@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Roboto Mono', monospace;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+  color: rgba(255, 255, 255, 0.95);
+  background-color: #0A1628;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0A1628 0%, #0D1F35 50%, #0A1628 100%);
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.05em;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(30, 58, 95, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 212, 255, 0.5);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 212, 255, 0.7);
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-track {
+  background: rgba(30, 58, 95, 0.8);
+  height: 6px;
+  border-radius: 3px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #00D4FF;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.7);
+  margin-top: -5px;
+  transition: transform 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.glass-panel {
+  background: rgba(30, 58, 95, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 12px;
+}
+
+.glow-text {
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.7);
+}
+
+.anomaly-pulse {
+  animation: anomalyPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes anomalyPulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 71, 87, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 71, 87, 0.8);
+  }
+}
+
+.boundary-mark {
+  position: relative;
+}
+
+.boundary-mark::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #FFA502;
+  border-radius: 0 2px 2px 0;
+}
+
+.source-row-mark {
+  position: relative;
+}
+
+.source-row-mark::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #2ED573;
+  border-radius: 0 2px 2px 0;
+}
+
+.affected-area-highlight {
+  background: linear-gradient(90deg, 
+    rgba(255, 71, 87, 0.1) 0%, 
+    rgba(255, 71, 87, 0.2) 50%, 
+    rgba(255, 71, 87, 0.1) 100%
+  );
+}
