@@ -532,8 +532,7 @@ class TestAuditAndRerun:
             }
         ]
         result = import_ex_dividend_screenshots(
-            db_session, screenshots_data, "/data/test.png", "assistant_zhou",
-            data_file="test_data/screenshots_20260603.json"
+            db_session, screenshots_data, "/data/test.png", "assistant_zhou"
         )
         spot_check_id = result["spot_check_ids"][0]
 
@@ -554,10 +553,10 @@ class TestAuditAndRerun:
         import_log = next(l for l in audit_logs if l.operation == "import_ex_dividend_screenshots")
         assert "import-screenshots" in import_log.rerun_command
         assert "--source-file" in import_log.rerun_command
-        assert "--data-file 'test_data/screenshots_20260603.json'" in import_log.rerun_command
+        # 测试用例中未传 data_file_path，走 stdin 分支
+        assert "cat <JSON_FILE> |" in import_log.rerun_command
         assert "--operator" in import_log.rerun_command
-        assert "DATA_FILE" not in import_log.rerun_command
-        assert import_log.parameters["data_file"] == "test_data/screenshots_20260603.json"
+        assert "DATA_FILE.json" not in import_log.rerun_command
 
         remark_log = next(l for l in audit_logs if l.operation == "add_tax_rate_remark")
         assert "add-remark" in remark_log.rerun_command
@@ -572,6 +571,44 @@ class TestAuditAndRerun:
         assert "--check-result" in update_log.rerun_command
         assert "--operator" in update_log.rerun_command
         assert "--update-data" not in update_log.rerun_command
+
+    def test_import_rerun_with_real_data_file_path(self, db_session):
+        """测试导入时传真实 data_file_path，rerun 命令使用真实路径而非占位符"""
+        screenshots_data = [
+            {
+                "institution_name": "摩根大通银行",
+                "ex_dividend_date": "2026-06-15",
+                "dividend_amount": "0.25",
+                "currency": "USD"
+            }
+        ]
+        real_path = "/test_data/screenshots_20260603.json"
+        result = import_ex_dividend_screenshots(
+            db_session, screenshots_data,
+            "/data/test.png", "assistant_zhou",
+            data_file_path=real_path
+        )
+        spot_check_id = result["spot_check_ids"][0]
+
+        remark_data = {
+            "institution_name": "摩根大通银行",
+            "remark_content": "跨境汇款税率10%",
+            "tax_rate": "10%"
+        }
+        add_tax_rate_remark(db_session, spot_check_id, remark_data, "assistant_zhou")
+
+        update_data = {"check_result": "合规"}
+        update_spot_check_record(
+            db_session, spot_check_id, update_data, "assistant_zhou"
+        )
+
+        commands = get_rerun_commands(db_session, spot_check_id)
+        import_step = next(
+            c for c in commands if c["operation"] == "import_ex_dividend_screenshots"
+        )
+        assert real_path in import_step["command"]
+        assert "DATA_FILE.json" not in import_step["command"]
+        assert "--data-file" in import_step["command"]
 
 
 class TestSpotCheckDetail:

@@ -46,7 +46,7 @@ def import_ex_dividend_screenshots(
     screenshots_data: List[Dict[str, Any]],
     source_file: str,
     imported_by: str = "assistant_zhou",
-    data_file: Optional[str] = None
+    data_file_path: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     导入除权日截图（第一步）
@@ -56,6 +56,10 @@ def import_ex_dividend_screenshots(
     - 同一来源文件中相同机构+日期的记录只保留一份
     - 重复导入时跳过已存在的记录，不创建新的抽检记录
     - 不把"跨境汇款合规抽检"数量翻倍
+
+    参数：
+    - data_file_path: 包含截图数据的 JSON 文件实际路径（用于重跑命令），
+                     若为 None 则表示数据来自 stdin
 
     返回导入结果统计
     """
@@ -145,20 +149,26 @@ def import_ex_dividend_screenshots(
         f"(去重规则: 源文件+日期+机构名联合去重)"
     )
 
-    data_file_arg = f"--data-file '{data_file}'" if data_file else ""
-    rerun_cmd = (
-        f"python -m cross_border_compliance.cli import-screenshots "
-        f"--source-file '{source_file}' "
-        f"{data_file_arg} "
-        f"--operator {imported_by}"
-    ).replace("  ", " ")
+    if data_file_path:
+        rerun_cmd = (
+            f"python -m cross_border_compliance.cli import-screenshots "
+            f"--source-file '{source_file}' "
+            f"--data-file '{data_file_path}' "
+            f"--operator {imported_by}"
+        )
+    else:
+        rerun_cmd = (
+            f"cat <JSON_FILE> | python -m cross_border_compliance.cli import-screenshots "
+            f"--source-file '{source_file}' "
+            f"--operator {imported_by}"
+        )
 
     audit = AuditLog(
         operation="import_ex_dividend_screenshots",
         operator=imported_by,
         parameters={
             "source_file": source_file,
-            "data_file": data_file,
+            "data_file": data_file_path,
             "batch_id": batch_id,
             "total_count": total
         },
