@@ -1,0 +1,36 @@
+seagrass_warning:
+  version: "1.0.0"
+  input_dir: "data/raw"
+  sample_dir: "data/samples"
+  output_dir: "output"
+  history_dir: "data/history"
+  csv_dir: "output/csv"
+  
+  sensor_params:
+    temperature_threshold: 30.0
+    salinity_threshold_min: 20.0
+    salinity_threshold_max: 40.0
+    turbidity_threshold: 50.0
+    drift_detection_window: 5
+    drift_max_deviation: 2.0
+  
+  data_sources:
+    sensor_data_pattern: "sensor_*.csv"
+    ship_record_pattern: "ship_*.csv"
+    remote_sensing_pattern: "remote_*.png"
+    boundary_sample_pattern: "boundary_*.csv"
+    note_pattern: "notes_*.txt"
+  
+  output_fields:
+    - record_id
+    - timestamp
+    - source_type
+    - data_source
+    - metric_name
+    - metric_value
+    - threshold
+    - is_anomaly
+    - anomaly_type
+    - confidence
+    - affected_conclusion
+    - notes
