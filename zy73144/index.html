@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>海草床调查报告汇总</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-left">
+      <h1>🌊 海草床调查报告汇总</h1>
+      <div class="header-meta">
+        <span class="version-badge">v2.3</span>
+        <span class="update-time">更新于 2026-06-18 14:30</span>
+        <span class="deadline-warning">距封账还有 <strong>12</strong> 天</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="user-info">
+        <span class="user-label">负责人：</span>
+        <span class="user-name">老何（港口工程师）</span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="overview">📊 汇总总览</button>
+    <button class="tab-btn" data-tab="sites">📍 站点明细</button>
+    <button class="tab-btn" data-tab="issues">⚠️ 异常与待办</button>
+    <button class="tab-btn" data-tab="history">📜 版本历史</button>
+    <button class="tab-btn" data-tab="trace">🔍 数据溯源</button>
+  </nav>
+
+  <main class="main-content">
+    <!-- 汇总总览 -->
+    <section id="overview" class="tab-panel active">
+      <div class="stats-grid">
+        <div class="stat-card stat-completed">
+          <div class="stat-icon">✅</div>
+          <div class="stat-content">
+            <div class="stat-value">9<span class="stat-unit">/12</span></div>
+            <div class="stat-label">站点完成</div>
+            <div class="stat-bar"><div class="stat-bar-fill" style="width: 75%"></div></div>
+          </div>
+        </div>
+        <div class="stat-card stat-samples">
+          <div class="stat-icon">🧪</div>
+          <div class="stat-content">
+            <div class="stat-value">72<span class="stat-unit">/86</span></div>
+            <div class="stat-label">样本有数据</div>
+            <div class="stat-bar"><div class="stat-bar-fill" style="width: 83.7%"></div></div>
+          </div>
+        </div>
+        <div class="stat-card stat-problem">
+          <div class="stat-icon">⚠️</div>
+          <div class="stat-content">
+            <div class="stat-value">2</div>
+            <div class="stat-label">问题站点</div>
+            <div class="stat-desc">采样时间异常 + 潮位单位混写</div>
+          </div>
+        </div>
+        <div class="stat-card stat-pending">
+          <div class="stat-icon">📋</div>
+          <div class="stat-content">
+            <div class="stat-value">4</div>
+            <div class="stat-label">待补材料</div>
+            <div class="stat-desc">涉及3个站点</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="overview-grid">
+        <div class="panel chart-panel">
+          <div class="panel-header">
+            <h2>各站点海草密度对比</h2>
+            <span class="panel-hint">点击柱状图可查看站点详情</span>
+          </div>
+          <div class="bar-chart" id="densityChart"></div>
+        </div>
+
+        <div class="panel quick-issues">
+          <div class="panel-header">
+            <h2>🚨 高优先级异常</h2>
+            <span class="panel-badge">2项</span>
+          </div>
+          <div class="issue-list" id="highPriorityIssues"></div>
+        </div>
+      </div>
+
+      <div class="panel progress-panel">
+        <div class="panel-header">
+          <h2>📈 处理进度与缺口</h2>
+        </div>
+        <div class="progress-overview">
+          <div class="progress-section">
+            <h3>站点处理进度</h3>
+            <div class="progress-timeline">
+              <div class="progress-item done">
+                <div class="progress-dot"></div>
+                <div class="progress-label">已完成 9站</div>
+                <div class="progress-detail">S01, S02, S04, S06, S08, S09, S11, S12 + S03(有异常)</div>
+              </div>
+              <div class="progress-line partial"></div>
+              <div class="progress-item problem">
+                <div class="progress-dot"></div>
+                <div class="progress-label">有异常 1站</div>
+                <div class="progress-detail">S05 采样时间对不上，待实验室批次2报告</div>
+              </div>
+              <div class="progress-line partial"></div>
+              <div class="progress-item pending">
+                <div class="progress-dot"></div>
+                <div class="progress-label">待补材料 2站</div>
+                <div class="progress-detail">S07 缺照片/编号记录，S10 材料严重缺失</div>
+              </div>
+            </div>
+          </div>
+          <div class="gap-section">
+            <h3>材料缺口清单</h3>
+            <div class="gap-list" id="gapList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 站点明细 -->
+    <section id="sites" class="tab-panel">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>📍 全部站点</h2>
+          <div class="filter-group">
+            <button class="filter-btn active" data-filter="all">全部</button>
+            <button class="filter-btn" data-filter="completed">已完成</button>
+            <button class="filter-btn" data-filter="problem">有异常</button>
+            <button class="filter-btn" data-filter="pending">待补</button>
+          </div>
+        </div>
+        <div class="site-table">
+          <div class="table-header">
+            <div class="th">站点</div>
+            <div class="th">位置</div>
+            <div class="th">样本数</div>
+            <div class="th">密度(株/m²)</div>
+            <div class="th">生物量(g/m²)</div>
+            <div class="th">平均潮位</div>
+            <div class="th">状态</div>
+            <div class="th">材料</div>
+            <div class="th">操作</div>
+          </div>
+          <div class="table-body" id="siteTableBody"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 异常与待办 -->
+    <section id="issues" class="tab-panel">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>⚠️ 异常与待处理事项</h2>
+          <span class="panel-hint">按优先级排序，高优先处理</span>
+        </div>
+        <div class="action-items" id="actionItems"></div>
+      </div>
+    </section>
+
+    <!-- 版本历史 -->
+    <section id="history" class="tab-panel">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>📜 版本变更历史</h2>
+          <span class="panel-hint">后补材料不覆盖原判断，所有修改可追溯</span>
+        </div>
+        <div class="version-timeline" id="versionTimeline"></div>
+      </div>
+    </section>
+
+    <!-- 数据溯源 -->
+    <section id="trace" class="tab-panel">
+      <div class="trace-layout">
+        <div class="trace-sidebar">
+          <div class="panel">
+            <div class="panel-header">
+              <h2>选择站点</h2>
+            </div>
+            <div class="site-selector" id="siteSelector"></div>
+          </div>
+        </div>
+        <div class="trace-detail">
+          <div class="panel">
+            <div class="panel-header">
+              <h2 id="traceSiteTitle">🔍 数据溯源</h2>
+              <span class="panel-hint">从汇总 → 明细 → 原始材料，层层追溯</span>
+            </div>
+            <div class="trace-content" id="traceContent">
+              <div class="trace-empty">
+                <div class="trace-empty-icon">👈</div>
+                <p>请从左侧选择一个站点查看数据溯源</p>
+                <p class="trace-empty-hint">推荐先看有异常的站点：S03、S05</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 站点详情弹窗 -->
+  <div class="modal" id="siteModal">
+    <div class="modal-overlay" onclick="closeModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">站点详情</h2>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
