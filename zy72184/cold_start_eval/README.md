@@ -146,12 +146,17 @@ python main.py --list-versions
 python main.py --anomalies v1
 ```
 
-### 2. 只看标签冲突
+### 2. 只看重复样本（样本ID重复 + 特征重复）
+```bash
+python main.py --anomalies v1 --type duplicate
+```
+
+### 3. 只看标签冲突
 ```bash
 python main.py --anomalies v1 --type label_conflict
 ```
 
-### 3. 只看样本泄漏（最严重）
+### 4. 只看样本泄漏（最严重）
 ```bash
 python main.py --anomalies v1 --type sample_leakage
 ```
@@ -183,27 +188,27 @@ python main.py --evaluate v1
 ============================================================
 
 📊 评测完成
-  总样本数: 7
+  总样本数: 8
   有效样本数: 5
   异常总数: 9
 
 📈 指标汇总:
-  approval_rate: 0.7143
-  avg_review_round: 1.5714
-  explanation_quality_accuracy: 0.8286
-  feature_relevance_accuracy: 0.8571
-  human_online_consistency: 0.8333
-  label_conflict_rate: 0.4286
-  overall_score: 0.7914
+  approval_rate: 0.7500
+  avg_review_round: 1.2500
+  explanation_quality_accuracy: 0.8750
+  feature_relevance_accuracy: 0.8750
+  human_online_consistency: 1.0000
+  label_conflict_rate: 0.3750
+  overall_score: 0.8638
   pending_rate: 0.0000
-  rejection_rate: 0.1429
+  rejection_rate: 0.2500
   review_rate: 1.0000
-  rework_rate: 0.2857
-  user_understandable_accuracy: 0.9286
+  rework_rate: 0.0000
+  user_understandable_accuracy: 1.0000
 
 ⚠️  异常分类统计:
   boundary: 1 条 (最严重: warning)
-  duplicate: 2 条 (最严重: warning)
+  duplicate: 3 条 (最严重: error)
   label_conflict: 3 条 (最严重: error)
   null_value: 1 条 (最严重: error)
   sample_leakage: 1 条 (最严重: critical)
@@ -213,6 +218,11 @@ python main.py --evaluate v1
   - eval_summary_*.md   (摘要Markdown)
   - anomalies_*.md      (异常清单)
 ```
+
+> **说明**：
+> - `总样本数: 8` — 包含 CS_001 两次导入（1条顺利处理 + 1条看板重导入）
+> - `duplicate: 3 条` — 2条样本ID重复(CS_001×2，error) + 1条特征重复(CS_004，warning)，最严重级别为 **error**
+> - `有效样本数: 5` — 排除了样本泄漏(CS_007)和样本ID重复(CS_001重导入)导致的冗余记录
 
 ### 2. 对比两个版本
 ```bash
@@ -285,6 +295,9 @@ python main.py --evaluate v1 --data-dir /path/to/data --output-dir /path/to/outp
 # 先评测 v1，看空值、重复、边界检测
 python main.py --evaluate v1
 
+# 看两种重复（样本ID重复 + 特征重复）
+python main.py --anomalies v1 --type duplicate
+
 # 看标签冲突清单
 python main.py --anomalies v1 --type label_conflict
 
@@ -314,4 +327,4 @@ python main.py --compare v1 v2
 
 ---
 
-*最后更新：2026-06-02*
+*最后更新：2026-06-17*

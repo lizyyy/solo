@@ -1,0 +1,1066 @@
+{
+  "model_version": "v1",
+  "total_samples": 8,
+  "valid_samples": 5,
+  "metrics_summary": {
+    "explanation_quality_accuracy": 0.875,
+    "feature_relevance_accuracy": 0.875,
+    "user_understandable_accuracy": 1.0,
+    "review_rate": 1.0,
+    "approval_rate": 0.75,
+    "rejection_rate": 0.25,
+    "rework_rate": 0.0,
+    "pending_rate": 0.0,
+    "avg_review_round": 1.25,
+    "human_online_consistency": 1.0,
+    "label_conflict_rate": 0.375,
+    "overall_score": 0.86375
+  },
+  "anomalies": [
+    {
+      "anomaly_type": "duplicate",
+      "sample_id": "CS_001",
+      "description": "样本ID重复出现 2 次，来源: ['kanban_review_20260515', 'kanban_review_20260520_reimport']",
+      "severity": "error",
+      "details": {
+        "duplicate_count": 2,
+        "duplicate_type": "sample_id",
+        "sources": [
+          "kanban_review_20260515",
+          "kanban_review_20260520_reimport"
+        ],
+        "source": "kanban_review_20260515"
+      },
+      "detected_at": "2026-06-18T08:26:53.699137"
+    },
+    {
+      "anomaly_type": "duplicate",
+      "sample_id": "CS_001",
+      "description": "样本ID重复出现 2 次，来源: ['kanban_review_20260515', 'kanban_review_20260520_reimport']",
+      "severity": "error",
+      "details": {
+        "duplicate_count": 2,
+        "duplicate_type": "sample_id",
+        "sources": [
+          "kanban_review_20260515",
+          "kanban_review_20260520_reimport"
+        ],
+        "source": "kanban_review_20260520_reimport"
+      },
+      "detected_at": "2026-06-18T08:26:53.699143"
+    },
+    {
+      "anomaly_type": "duplicate",
+      "sample_id": "CS_004",
+      "description": "样本特征与不同ID样本重复: ['CS_001']",
+      "severity": "warning",
+      "details": {
+        "duplicate_count": 3,
+        "duplicate_type": "features",
+        "duplicate_with": [
+          "CS_001",
+          "CS_004"
+        ],
+        "source": "kanban_review_20260516"
+      },
+      "detected_at": "2026-06-18T08:26:53.699147"
+    },
+    {
+      "anomaly_type": "null_value",
+      "sample_id": "CS_003",
+      "description": "存在 3 个空值字段: ['user_history_count', 'item_popularity', 'explanation_context']",
+      "severity": "error",
+      "details": {
+        "null_fields": [
+          "user_history_count",
+          "item_popularity",
+          "explanation_context"
+        ],
+        "null_ratio": 0.42857142857142855,
+        "total_fields": 7,
+        "source": "kanban_review_20260516"
+      },
+      "detected_at": "2026-06-18T08:26:53.699158"
+    },
+    {
+      "anomaly_type": "boundary",
+      "sample_id": "CS_005",
+      "description": "模型预测分数 0.9700 处于边界区域",
+      "severity": "warning",
+      "details": {
+        "score": 0.97,
+        "threshold": 0.95,
+        "boundary_type": "high",
+        "source": "kanban_review_20260517",
+        "prediction": {
+          "explanation_quality": "excellent",
+          "feature_relevance": "high",
+          "user_understandable": "yes",
+          "explanation_text": "这款智能音箱是最新爆款，支持语音控制，适合您的智能家居需求"
+        }
+      },
+      "detected_at": "2026-06-18T08:26:53.699164"
+    },
+    {
+      "anomaly_type": "label_conflict",
+      "sample_id": "CS_002",
+      "description": "人工复核与模型预测存在 3 处标签冲突",
+      "severity": "error",
+      "details": {
+        "conflicts": [
+          {
+            "field": "explanation_quality",
+            "issue": "value_mismatch",
+            "predicted": "medium",
+            "corrected": "good"
+          },
+          {
+            "field": "feature_relevance",
+            "issue": "value_mismatch",
+            "predicted": "medium",
+            "corrected": "high"
+          },
+          {
+            "field": "explanation_text",
+            "issue": "value_mismatch",
+            "predicted": "为您推荐这本热门小说",
+            "corrected": "为您推荐这本热门悬疑小说，豆瓣评分8.5分，适合喜欢推理题材的读者"
+          }
+        ],
+        "model_prediction": {
+          "explanation_quality": "medium",
+          "feature_relevance": "medium",
+          "user_understandable": "yes",
+          "explanation_text": "为您推荐这本热门小说"
+        },
+        "human_correction": {
+          "explanation_quality": "good",
+          "feature_relevance": "high",
+          "user_understandable": "yes",
+          "explanation_text": "为您推荐这本热门悬疑小说，豆瓣评分8.5分，适合喜欢推理题材的读者"
+        },
+        "reviewer": "xiaomeng",
+        "review_comment": "返工后补充了具体信息，解释质量达标。",
+        "review_round": 2,
+        "source": "kanban_review_20260515"
+      },
+      "detected_at": "2026-06-18T08:26:53.699175"
+    },
+    {
+      "anomaly_type": "label_conflict",
+      "sample_id": "CS_006",
+      "description": "人工复核与模型预测存在 3 处标签冲突",
+      "severity": "error",
+      "details": {
+        "conflicts": [
+          {
+            "field": "explanation_quality",
+            "issue": "value_mismatch",
+            "predicted": "medium",
+            "corrected": "good"
+          },
+          {
+            "field": "feature_relevance",
+            "issue": "value_mismatch",
+            "predicted": "medium",
+            "corrected": "high"
+          },
+          {
+            "field": "explanation_text",
+            "issue": "value_mismatch",
+            "predicted": "这款护肤品温和不刺激，适合敏感肌使用，添加了天然植物精华",
+            "corrected": "这款护肤品专为敏感肌设计，温和不刺激，添加了天然植物精华"
+          }
+        ],
+        "model_prediction": {
+          "explanation_quality": "medium",
+          "feature_relevance": "medium",
+          "user_understandable": "yes",
+          "explanation_text": "这款护肤品温和不刺激，适合敏感肌使用，添加了天然植物精华"
+        },
+        "human_correction": {
+          "explanation_quality": "good",
+          "feature_relevance": "high",
+          "user_understandable": "yes",
+          "explanation_text": "这款护肤品专为敏感肌设计，温和不刺激，添加了天然植物精华"
+        },
+        "reviewer": "xiaomeng",
+        "review_comment": "返工后重点突出了敏感肌需求，通过。",
+        "review_round": 2,
+        "source": "kanban_review_20260517"
+      },
+      "detected_at": "2026-06-18T08:26:53.699183"
+    },
+    {
+      "anomaly_type": "label_conflict",
+      "sample_id": "CS_007",
+      "description": "人工复核与模型预测存在 1 处标签冲突",
+      "severity": "error",
+      "details": {
+        "conflicts": [
+          {
+            "field": "explanation_text",
+            "issue": "value_mismatch",
+            "predicted": "用户历史活跃度0.85分，为您推荐这款0.85分的专业跑步鞋，轻便透气",
+            "corrected": "为您推荐这款专业跑步鞋，轻便透气，适合长距离跑步"
+          }
+        ],
+        "model_prediction": {
+          "explanation_quality": "good",
+          "feature_relevance": "high",
+          "user_understandable": "yes",
+          "explanation_text": "用户历史活跃度0.85分，为您推荐这款0.85分的专业跑步鞋，轻便透气"
+        },
+        "human_correction": {
+          "explanation_quality": "good",
+          "feature_relevance": "high",
+          "user_understandable": "yes",
+          "explanation_text": "为您推荐这款专业跑步鞋，轻便透气，适合长距离跑步"
+        },
+        "reviewer": "xiaomeng",
+        "review_comment": "模型解释泄漏了用户特征（活跃度分数直接暴露），属于严重问题。",
+        "review_round": 1,
+        "source": "kanban_review_20260518"
+      },
+      "detected_at": "2026-06-18T08:26:53.699185"
+    },
+    {
+      "anomaly_type": "sample_leakage",
+      "sample_id": "CS_007",
+      "description": "检测到 2 处潜在样本泄漏",
+      "severity": "critical",
+      "details": {
+        "leakage_fields": [
+          {
+            "feature_field": "user_history_count",
+            "prediction_field": "explanation_text",
+            "feature_value": 0.85,
+            "prediction_value": "0.85",
+            "leakage_type": "text_numeric"
+          },
+          {
+            "feature_field": "item_popularity",
+            "prediction_field": "explanation_text",
+            "feature_value": 0.85,
+            "prediction_value": "0.85",
+            "leakage_type": "text_numeric"
+          }
+        ],
+        "source": "kanban_review_20260518"
+      },
+      "detected_at": "2026-06-18T08:26:53.699263"
+    }
+  ],
+  "evaluations": [
+    {
+      "sample_id": "CS_001",
+      "sample": {
+        "sample_id": "CS_001",
+        "source": "kanban_review_20260515",
+        "features": {
+          "user_id": "U10001",
+          "item_id": "I20001",
+          "item_category": "electronics",
+          "user_history_count": 15,
+          "item_popularity": 0.72,
+          "cold_start_type": "new_item",
+          "explanation_context": "新品耳机推荐"
+        },
+        "created_at": "2026-05-15T10:30:00",
+        "processed_at": "2026-05-15T14:20:00",
+        "raw_data": {
+          "original_query": "推荐一款适合运动的耳机"
+        }
+      },
+      "prediction": {
+        "sample_id": "CS_001",
+        "model_version": "v1",
+        "prediction": {
+          "explanation_quality": "good",
+          "feature_relevance": "high",
+          "user_understandable": "yes",
+          "explanation_text": "根据您浏览过的电子产品，为您推荐这款运动耳机，音质好且防水"
+        },
+        "score": 0.82,
+        "predicted_at": "2026-05-15T12:00:00",
+        "metadata": {
+          "model_type": "cold_start_xgboost_v1",
+          "inference_latency_ms": 45
+        }
+      },
+      "review": {
+        "sample_id": "CS_001",
+        "reviewer": "xiaomeng",
+        "review_status": "approved",
+        "corrected_label": {
+          "explanation_quality": "good",
+          "feature_relevance": "high",
+          "user_understandable": "yes",
+          "explanation_text": "根据您浏览过的电子产品，为您推荐这款运动耳机，音质好且防水"
+        },
+        "review_comment": "解释清晰，特征关联准确，用户容易理解。一次通过。",
+        "reviewed_at": "2026-05-15T15:30:00",
+        "review_round": 1
+      },
+      "feedback": {
+        "sample_id": "CS_001",
+        "feedback_type": "user_click",
+        "feedback_value": "good",
+        "feedback_source": "app_recommend_feed",
+        "collected_at": "2026-05-15T18:30:00",
+        "metadata": {
+          "user_behavior": "clicked_and_stayed_30s"
+        }
+      },
+      "anomalies": [
+        {
+          "anomaly_type": "duplicate",
+          "sample_id": "CS_001",
+          "description": "样本ID重复出现 2 次，来源: ['kanban_review_20260515', 'kanban_review_20260520_reimport']",
+          "severity": "error",
+          "details": {
+            "duplicate_count": 2,
+            "duplicate_type": "sample_id",
+            "sources": [
+              "kanban_review_20260515",
+              "kanban_review_20260520_reimport"
+            ],
+            "source": "kanban_review_20260515"
+          },
+          "detected_at": "2026-06-18T08:26:53.699137"
+        }
+      ],
+      "metrics": {
+        "explanation_quality_accuracy": 1.0,
+        "explanation_quality_weighted": 0.4,
+        "feature_relevance_accuracy": 1.0,
+        "feature_relevance_weighted": 0.3,
+        "user_understandable_accuracy": 1.0,
+        "user_understandable_weighted": 0.3,
+        "overall_score": 1.0,
+        "approved": 1.0
+      }
+    },
+    {
+      "sample_id": "CS_002",
+      "sample": {
+        "sample_id": "CS_002",
+        "source": "kanban_review_20260515",
+        "features": {
+          "user_id": "U10002",
+          "item_id": "I20002",
+          "item_category": "books",
+          "user_history_count": 3,
+          "item_popularity": 0.25,
+          "cold_start_type": "new_user",
+          "explanation_context": "新书推荐给新用户"
+        },
+        "created_at": "2026-05-15T11:45:00",
+        "processed_at": "2026-05-16T09:10:00",
+        "raw_data": {
+          "original_query": "有什么好看的小说"
+        }
+      },
+      "prediction": {
+        "sample_id": "CS_002",
+        "model_version": "v1",
+        "prediction": {
+          "explanation_quality": "medium",
+          "feature_relevance": "medium",
+          "user_understandable": "yes",
+          "explanation_text": "为您推荐这本热门小说"
+        },
+        "score": 0.58,
+        "predicted_at": "2026-05-15T13:30:00",
+        "metadata": {
+          "model_type": "cold_start_xgboost_v1",
+          "inference_latency_ms": 52
+        }
+      },
+      "review": {
+        "sample_id": "CS_002",
+        "reviewer": "xiaomeng",
+        "review_status": "approved",
+        "corrected_label": {
+          "explanation_quality": "good",
+          "feature_relevance": "high",
+          "user_understandable": "yes",
+          "explanation_text": "为您推荐这本热门悬疑小说，豆瓣评分8.5分，适合喜欢推理题材的读者"
+        },
+        "review_comment": "返工后补充了具体信息，解释质量达标。",
+        "reviewed_at": "2026-05-16T14:30:00",
+        "review_round": 2
+      },
+      "feedback": {
+        "sample_id": "CS_002",
+        "feedback_type": "user_click",
+        "feedback_value": "good",
+        "feedback_source": "app_recommend_feed",
+        "collected_at": "2026-05-16T20:15:00",
+        "metadata": {
+          "user_behavior": "clicked_and_added_to_favorites"
+        }
+      },
+      "anomalies": [
+        {
+          "anomaly_type": "label_conflict",
+          "sample_id": "CS_002",
+          "description": "人工复核与模型预测存在 3 处标签冲突",
+          "severity": "error",
+          "details": {
+            "conflicts": [
+              {
+                "field": "explanation_quality",
+                "issue": "value_mismatch",
+                "predicted": "medium",
+                "corrected": "good"
+              },
+              {
+                "field": "feature_relevance",
+                "issue": "value_mismatch",
+                "predicted": "medium",
+                "corrected": "high"
+              },
+              {
+                "field": "explanation_text",
+                "issue": "value_mismatch",
+                "predicted": "为您推荐这本热门小说",
+                "corrected": "为您推荐这本热门悬疑小说，豆瓣评分8.5分，适合喜欢推理题材的读者"
+              }
+            ],
+            "model_prediction": {
+              "explanation_quality": "medium",
+              "feature_relevance": "medium",
+              "user_understandable": "yes",
+              "explanation_text": "为您推荐这本热门小说"
+            },
+            "human_correction": {
+              "explanation_quality": "good",
+              "feature_relevance": "high",
+              "user_understandable": "yes",
+              "explanation_text": "为您推荐这本热门悬疑小说，豆瓣评分8.5分，适合喜欢推理题材的读者"
+            },
+            "reviewer": "xiaomeng",
+            "review_comment": "返工后补充了具体信息，解释质量达标。",
+            "review_round": 2,
+            "source": "kanban_review_20260515"
+          },
+          "detected_at": "2026-06-18T08:26:53.699175"
+        }
+      ],
+      "metrics": {
+        "explanation_quality_accuracy": 0.5,
+        "explanation_quality_weighted": 0.2,
+        "feature_relevance_accuracy": 0.5,
+        "feature_relevance_weighted": 0.15,
+        "user_understandable_accuracy": 1.0,
+        "user_understandable_weighted": 0.3,
+        "overall_score": 0.6499999999999999,
+        "approved": 1.0
+      }
+    },
+    {
+      "sample_id": "CS_003",
+      "sample": {
+        "sample_id": "CS_003",
+        "source": "kanban_review_20260516",
+        "features": {
+          "user_id": "U10003",
+          "item_id": "I20003",
+          "item_category": "fashion",
+          "user_history_count": null,
+          "item_popularity": null,
+          "cold_start_type": "new_item",
+          "explanation_context": ""
+        },
+        "created_at": "2026-05-16T08:20:00",
+        "processed_at": null,
+        "raw_data": null
+      },
+      "prediction": {
+        "sample_id": "CS_003",
+        "model_version": "v1",
+        "prediction": {
+          "explanation_quality": "low",
+          "feature_relevance": "low",
+          "user_understandable": "no",
+          "explanation_text": "为您推荐时尚单品"
+        },
+        "score": 0.35,
+        "predicted_at": "2026-05-16T09:00:00",
+        "metadata": {
+          "model_type": "cold_start_xgboost_v1",
+          "inference_latency_ms": 38
+        }
+      },
+      "review": {
+        "sample_id": "CS_003",
+        "reviewer": "xiaomeng",
+        "review_status": "rejected",
+        "corrected_label": {
+          "explanation_quality": "low",
+          "feature_relevance": "low",
+          "user_understandable": "no",
+          "explanation_text": "为您推荐时尚单品"
+        },
+        "review_comment": "样本特征缺失严重，无法进行有效评测。建议退回数据收集环节。",
+        "reviewed_at": "2026-05-16T11:00:00",
+        "review_round": 1
+      },
+      "feedback": {
+        "sample_id": "CS_003",
+        "feedback_type": "user_skip",
+        "feedback_value": "bad",
+        "feedback_source": "app_recommend_feed",
+        "collected_at": "2026-05-16T12:00:00",
+        "metadata": {
+          "user_behavior": "skipped_immediately"
+        }
+      },
+      "anomalies": [
+        {
+          "anomaly_type": "null_value",
+          "sample_id": "CS_003",
+          "description": "存在 3 个空值字段: ['user_history_count', 'item_popularity', 'explanation_context']",
+          "severity": "error",
+          "details": {
+            "null_fields": [
+              "user_history_count",
+              "item_popularity",
+              "explanation_context"
+            ],
+            "null_ratio": 0.42857142857142855,
+            "total_fields": 7,
+            "source": "kanban_review_20260516"
+          },
+          "detected_at": "2026-06-18T08:26:53.699158"
+        }
+      ],
+      "metrics": {
+        "explanation_quality_accuracy": 1.0,
+        "explanation_quality_weighted": 0.4,
+        "feature_relevance_accuracy": 1.0,
+        "feature_relevance_weighted": 0.3,
+        "user_understandable_accuracy": 1.0,
+        "user_understandable_weighted": 0.3,
+        "overall_score": 1.0,
+        "approved": 0.0
+      }
+    },
+    {
+      "sample_id": "CS_004",
+      "sample": {
+        "sample_id": "CS_004",
+        "source": "kanban_review_20260516",
+        "features": {
+          "user_id": "U10004",
+          "item_id": "I20004",
+          "item_category": "electronics",
+          "user_history_count": 15,
+          "item_popularity": 0.72,
+          "cold_start_type": "new_item",
+          "explanation_context": "新品耳机推荐"
+        },
+        "created_at": "2026-05-16T10:00:00",
+        "processed_at": "2026-05-16T15:30:00",
+        "raw_data": {
+          "original_query": "推荐一款适合运动的耳机"
+        }
+      },
+      "prediction": {
+        "sample_id": "CS_004",
+        "model_version": "v1",
+        "prediction": {
+          "explanation_quality": "good",
+          "feature_relevance": "high",
+          "user_understandable": "yes",
+          "explanation_text": "根据您浏览过的电子产品，为您推荐这款运动耳机，音质好且防水"
+        },
+        "score": 0.82,
+        "predicted_at": "2026-05-16T11:00:00",
+        "metadata": {
+          "model_type": "cold_start_xgboost_v1",
+          "inference_latency_ms": 41
+        }
+      },
+      "review": {
+        "sample_id": "CS_004",
+        "reviewer": "xiaomeng",
+        "review_status": "approved",
+        "corrected_label": {
+          "explanation_quality": "good",
+          "feature_relevance": "high",
+          "user_understandable": "yes",
+          "explanation_text": "根据您浏览过的电子产品，为您推荐这款运动耳机，音质好且防水"
+        },
+        "review_comment": "与CS_001样本重复，注意去重。",
+        "reviewed_at": "2026-05-16T16:00:00",
+        "review_round": 1
+      },
+      "feedback": null,
+      "anomalies": [
+        {
+          "anomaly_type": "duplicate",
+          "sample_id": "CS_004",
+          "description": "样本特征与不同ID样本重复: ['CS_001']",
+          "severity": "warning",
+          "details": {
+            "duplicate_count": 3,
+            "duplicate_type": "features",
+            "duplicate_with": [
+              "CS_001",
+              "CS_004"
+            ],
+            "source": "kanban_review_20260516"
+          },
+          "detected_at": "2026-06-18T08:26:53.699147"
+        }
+      ],
+      "metrics": {
+        "explanation_quality_accuracy": 1.0,
+        "explanation_quality_weighted": 0.4,
+        "feature_relevance_accuracy": 1.0,
+        "feature_relevance_weighted": 0.3,
+        "user_understandable_accuracy": 1.0,
+        "user_understandable_weighted": 0.3,
+        "overall_score": 1.0,
+        "approved": 1.0
+      }
+    },
+    {
+      "sample_id": "CS_005",
+      "sample": {
+        "sample_id": "CS_005",
+        "source": "kanban_review_20260517",
+        "features": {
+          "user_id": "U10005",
+          "item_id": "I20005",
+          "item_category": "home",
+          "user_history_count": 28,
+          "item_popularity": 0.98,
+          "cold_start_type": "new_item",
+          "explanation_context": "智能家居设备推荐"
+        },
+        "created_at": "2026-05-17T09:30:00",
+        "processed_at": "2026-05-17T11:45:00",
+        "raw_data": {
+          "original_query": "想要一个智能音箱"
+        }
+      },
+      "prediction": {
+        "sample_id": "CS_005",
+        "model_version": "v1",
+        "prediction": {
+          "explanation_quality": "excellent",
+          "feature_relevance": "high",
+          "user_understandable": "yes",
+          "explanation_text": "这款智能音箱是最新爆款，支持语音控制，适合您的智能家居需求"
+        },
+        "score": 0.97,
+        "predicted_at": "2026-05-17T10:00:00",
+        "metadata": {
+          "model_type": "cold_start_xgboost_v1",
+          "inference_latency_ms": 55
+        }
+      },
+      "review": {
+        "sample_id": "CS_005",
+        "reviewer": "xiaomeng",
+        "review_status": "approved",
+        "corrected_label": {
+          "explanation_quality": "excellent",
+          "feature_relevance": "high",
+          "user_understandable": "yes",
+          "explanation_text": "这款智能音箱是最新爆款，支持语音控制，适合您的智能家居需求"
+        },
+        "review_comment": "分数接近阈值，但解释质量确实很好，通过。",
+        "reviewed_at": "2026-05-17T13:00:00",
+        "review_round": 1
+      },
+      "feedback": {
+        "sample_id": "CS_005",
+        "feedback_type": "user_purchase",
+        "feedback_value": "good",
+        "feedback_source": "app_recommend_feed",
+        "collected_at": "2026-05-17T16:45:00",
+        "metadata": {
+          "user_behavior": "purchased_after_click"
+        }
+      },
+      "anomalies": [
+        {
+          "anomaly_type": "boundary",
+          "sample_id": "CS_005",
+          "description": "模型预测分数 0.9700 处于边界区域",
+          "severity": "warning",
+          "details": {
+            "score": 0.97,
+            "threshold": 0.95,
+            "boundary_type": "high",
+            "source": "kanban_review_20260517",
+            "prediction": {
+              "explanation_quality": "excellent",
+              "feature_relevance": "high",
+              "user_understandable": "yes",
+              "explanation_text": "这款智能音箱是最新爆款，支持语音控制，适合您的智能家居需求"
+            }
+          },
+          "detected_at": "2026-06-18T08:26:53.699164"
+        }
+      ],
+      "metrics": {
+        "explanation_quality_accuracy": 1.0,
+        "explanation_quality_weighted": 0.4,
+        "feature_relevance_accuracy": 1.0,
+        "feature_relevance_weighted": 0.3,
+        "user_understandable_accuracy": 1.0,
+        "user_understandable_weighted": 0.3,
+        "overall_score": 1.0,
+        "approved": 1.0
+      }
+    },
+    {
+      "sample_id": "CS_006",
+      "sample": {
+        "sample_id": "CS_006",
+        "source": "kanban_review_20260517",
+        "features": {
+          "user_id": "U10006",
+          "item_id": "I20006",
+          "item_category": "beauty",
+          "user_history_count": 42,
+          "item_popularity": 0.55,
+          "cold_start_type": "new_item",
+          "explanation_context": "护肤品推荐"
+        },
+        "created_at": "2026-05-17T14:20:00",
+        "processed_at": "2026-05-18T08:30:00",
+        "raw_data": {
+          "original_query": "敏感肌用什么护肤品"
+        }
+      },
+      "prediction": {
+        "sample_id": "CS_006",
+        "model_version": "v1",
+        "prediction": {
+          "explanation_quality": "medium",
+          "feature_relevance": "medium",
+          "user_understandable": "yes",
+          "explanation_text": "这款护肤品温和不刺激，适合敏感肌使用，添加了天然植物精华"
+        },
+        "score": 0.71,
+        "predicted_at": "2026-05-17T15:00:00",
+        "metadata": {
+          "model_type": "cold_start_xgboost_v1",
+          "inference_latency_ms": 48
+        }
+      },
+      "review": {
+        "sample_id": "CS_006",
+        "reviewer": "xiaomeng",
+        "review_status": "approved",
+        "corrected_label": {
+          "explanation_quality": "good",
+          "feature_relevance": "high",
+          "user_understandable": "yes",
+          "explanation_text": "这款护肤品专为敏感肌设计，温和不刺激，添加了天然植物精华"
+        },
+        "review_comment": "返工后重点突出了敏感肌需求，通过。",
+        "reviewed_at": "2026-05-18T15:00:00",
+        "review_round": 2
+      },
+      "feedback": {
+        "sample_id": "CS_006",
+        "feedback_type": "user_click",
+        "feedback_value": "good",
+        "feedback_source": "app_recommend_feed",
+        "collected_at": "2026-05-18T19:00:00",
+        "metadata": {
+          "user_behavior": "clicked_and_viewed_details"
+        }
+      },
+      "anomalies": [
+        {
+          "anomaly_type": "label_conflict",
+          "sample_id": "CS_006",
+          "description": "人工复核与模型预测存在 3 处标签冲突",
+          "severity": "error",
+          "details": {
+            "conflicts": [
+              {
+                "field": "explanation_quality",
+                "issue": "value_mismatch",
+                "predicted": "medium",
+                "corrected": "good"
+              },
+              {
+                "field": "feature_relevance",
+                "issue": "value_mismatch",
+                "predicted": "medium",
+                "corrected": "high"
+              },
+              {
+                "field": "explanation_text",
+                "issue": "value_mismatch",
+                "predicted": "这款护肤品温和不刺激，适合敏感肌使用，添加了天然植物精华",
+                "corrected": "这款护肤品专为敏感肌设计，温和不刺激，添加了天然植物精华"
+              }
+            ],
+            "model_prediction": {
+              "explanation_quality": "medium",
+              "feature_relevance": "medium",
+              "user_understandable": "yes",
+              "explanation_text": "这款护肤品温和不刺激，适合敏感肌使用，添加了天然植物精华"
+            },
+            "human_correction": {
+              "explanation_quality": "good",
+              "feature_relevance": "high",
+              "user_understandable": "yes",
+              "explanation_text": "这款护肤品专为敏感肌设计，温和不刺激，添加了天然植物精华"
+            },
+            "reviewer": "xiaomeng",
+            "review_comment": "返工后重点突出了敏感肌需求，通过。",
+            "review_round": 2,
+            "source": "kanban_review_20260517"
+          },
+          "detected_at": "2026-06-18T08:26:53.699183"
+        }
+      ],
+      "metrics": {
+        "explanation_quality_accuracy": 0.5,
+        "explanation_quality_weighted": 0.2,
+        "feature_relevance_accuracy": 0.5,
+        "feature_relevance_weighted": 0.15,
+        "user_understandable_accuracy": 1.0,
+        "user_understandable_weighted": 0.3,
+        "overall_score": 0.6499999999999999,
+        "approved": 1.0
+      }
+    },
+    {
+      "sample_id": "CS_007",
+      "sample": {
+        "sample_id": "CS_007",
+        "source": "kanban_review_20260518",
+        "features": {
+          "user_id": "U10007",
+          "item_id": "I20007",
+          "item_category": "sports",
+          "user_history_count": 0.85,
+          "item_popularity": 0.85,
+          "cold_start_type": "new_user",
+          "explanation_context": "运动装备推荐"
+        },
+        "created_at": "2026-05-18T10:00:00",
+        "processed_at": "2026-05-18T16:45:00",
+        "raw_data": {
+          "original_query": "推荐跑步装备"
+        }
+      },
+      "prediction": {
+        "sample_id": "CS_007",
+        "model_version": "v1",
+        "prediction": {
+          "explanation_quality": "good",
+          "feature_relevance": "high",
+          "user_understandable": "yes",
+          "explanation_text": "用户历史活跃度0.85分，为您推荐这款0.85分的专业跑步鞋，轻便透气"
+        },
+        "score": 0.88,
+        "predicted_at": "2026-05-18T11:00:00",
+        "metadata": {
+          "model_type": "cold_start_xgboost_v1",
+          "inference_latency_ms": 43
+        }
+      },
+      "review": {
+        "sample_id": "CS_007",
+        "reviewer": "xiaomeng",
+        "review_status": "rejected",
+        "corrected_label": {
+          "explanation_quality": "good",
+          "feature_relevance": "high",
+          "user_understandable": "yes",
+          "explanation_text": "为您推荐这款专业跑步鞋，轻便透气，适合长距离跑步"
+        },
+        "review_comment": "模型解释泄漏了用户特征（活跃度分数直接暴露），属于严重问题。",
+        "reviewed_at": "2026-05-18T17:00:00",
+        "review_round": 1
+      },
+      "feedback": {
+        "sample_id": "CS_007",
+        "feedback_type": "user_report",
+        "feedback_value": "bad",
+        "feedback_source": "user_support_ticket",
+        "collected_at": "2026-05-18T20:30:00",
+        "metadata": {
+          "user_behavior": "reported_privacy_concern",
+          "ticket_id": "T20260518001"
+        }
+      },
+      "anomalies": [
+        {
+          "anomaly_type": "label_conflict",
+          "sample_id": "CS_007",
+          "description": "人工复核与模型预测存在 1 处标签冲突",
+          "severity": "error",
+          "details": {
+            "conflicts": [
+              {
+                "field": "explanation_text",
+                "issue": "value_mismatch",
+                "predicted": "用户历史活跃度0.85分，为您推荐这款0.85分的专业跑步鞋，轻便透气",
+                "corrected": "为您推荐这款专业跑步鞋，轻便透气，适合长距离跑步"
+              }
+            ],
+            "model_prediction": {
+              "explanation_quality": "good",
+              "feature_relevance": "high",
+              "user_understandable": "yes",
+              "explanation_text": "用户历史活跃度0.85分，为您推荐这款0.85分的专业跑步鞋，轻便透气"
+            },
+            "human_correction": {
+              "explanation_quality": "good",
+              "feature_relevance": "high",
+              "user_understandable": "yes",
+              "explanation_text": "为您推荐这款专业跑步鞋，轻便透气，适合长距离跑步"
+            },
+            "reviewer": "xiaomeng",
+            "review_comment": "模型解释泄漏了用户特征（活跃度分数直接暴露），属于严重问题。",
+            "review_round": 1,
+            "source": "kanban_review_20260518"
+          },
+          "detected_at": "2026-06-18T08:26:53.699185"
+        },
+        {
+          "anomaly_type": "sample_leakage",
+          "sample_id": "CS_007",
+          "description": "检测到 2 处潜在样本泄漏",
+          "severity": "critical",
+          "details": {
+            "leakage_fields": [
+              {
+                "feature_field": "user_history_count",
+                "prediction_field": "explanation_text",
+                "feature_value": 0.85,
+                "prediction_value": "0.85",
+                "leakage_type": "text_numeric"
+              },
+              {
+                "feature_field": "item_popularity",
+                "prediction_field": "explanation_text",
+                "feature_value": 0.85,
+                "prediction_value": "0.85",
+                "leakage_type": "text_numeric"
+              }
+            ],
+            "source": "kanban_review_20260518"
+          },
+          "detected_at": "2026-06-18T08:26:53.699263"
+        }
+      ],
+      "metrics": {
+        "explanation_quality_accuracy": 1.0,
+        "explanation_quality_weighted": 0.4,
+        "feature_relevance_accuracy": 1.0,
+        "feature_relevance_weighted": 0.3,
+        "user_understandable_accuracy": 1.0,
+        "user_understandable_weighted": 0.3,
+        "overall_score": 1.0,
+        "approved": 0.0
+      }
+    },
+    {
+      "sample_id": "CS_001",
+      "sample": {
+        "sample_id": "CS_001",
+        "source": "kanban_review_20260520_reimport",
+        "features": {
+          "user_id": "U10001",
+          "item_id": "I20001",
+          "item_category": "electronics",
+          "user_history_count": 15,
+          "item_popularity": 0.72,
+          "cold_start_type": "new_item",
+          "explanation_context": "新品耳机推荐"
+        },
+        "created_at": "2026-05-20T09:00:00",
+        "processed_at": "2026-05-20T11:30:00",
+        "raw_data": {
+          "original_query": "推荐一款适合运动的耳机",
+          "note": "看板重新导入，与5月15日为同一条样本"
+        }
+      },
+      "prediction": {
+        "sample_id": "CS_001",
+        "model_version": "v1",
+        "prediction": {
+          "explanation_quality": "good",
+          "feature_relevance": "high",
+          "user_understandable": "yes",
+          "explanation_text": "根据您浏览过的电子产品，为您推荐这款运动耳机，音质好且防水"
+        },
+        "score": 0.82,
+        "predicted_at": "2026-05-15T12:00:00",
+        "metadata": {
+          "model_type": "cold_start_xgboost_v1",
+          "inference_latency_ms": 45
+        }
+      },
+      "review": {
+        "sample_id": "CS_001",
+        "reviewer": "xiaomeng",
+        "review_status": "approved",
+        "corrected_label": {
+          "explanation_quality": "good",
+          "feature_relevance": "high",
+          "user_understandable": "yes",
+          "explanation_text": "根据您浏览过的电子产品，为您推荐这款运动耳机，音质好且防水"
+        },
+        "review_comment": "解释清晰，特征关联准确，用户容易理解。一次通过。",
+        "reviewed_at": "2026-05-15T15:30:00",
+        "review_round": 1
+      },
+      "feedback": {
+        "sample_id": "CS_001",
+        "feedback_type": "user_click",
+        "feedback_value": "good",
+        "feedback_source": "app_recommend_feed",
+        "collected_at": "2026-05-15T18:30:00",
+        "metadata": {
+          "user_behavior": "clicked_and_stayed_30s"
+        }
+      },
+      "anomalies": [
+        {
+          "anomaly_type": "duplicate",
+          "sample_id": "CS_001",
+          "description": "样本ID重复出现 2 次，来源: ['kanban_review_20260515', 'kanban_review_20260520_reimport']",
+          "severity": "error",
+          "details": {
+            "duplicate_count": 2,
+            "duplicate_type": "sample_id",
+            "sources": [
+              "kanban_review_20260515",
+              "kanban_review_20260520_reimport"
+            ],
+            "source": "kanban_review_20260520_reimport"
+          },
+          "detected_at": "2026-06-18T08:26:53.699143"
+        }
+      ],
+      "metrics": {
+        "explanation_quality_accuracy": 1.0,
+        "explanation_quality_weighted": 0.4,
+        "feature_relevance_accuracy": 1.0,
+        "feature_relevance_weighted": 0.3,
+        "user_understandable_accuracy": 1.0,
+        "user_understandable_weighted": 0.3,
+        "overall_score": 1.0,
+        "approved": 1.0
+      }
+    }
+  ],
+  "generated_at": "2026-06-18T08:26:53.699326",
+  "source": "cold_start_eval"
+}
