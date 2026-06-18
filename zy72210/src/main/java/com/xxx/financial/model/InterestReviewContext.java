@@ -1,10 +1,13 @@
 package com.xxx.financial.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.xxx.financial.enums.ReviewStatus;
+import com.xxx.financial.enums.SelfCheckItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class InterestReviewContext {
     private String reviewNo;
     private CommercialBill commercialBill;
@@ -144,6 +147,10 @@ public class InterestReviewContext {
         this.selfCheckResults.add(result);
     }
 
+    public void removeSelfCheckItem(SelfCheckItem item) {
+        this.selfCheckResults.removeIf(r -> r.getCheckItem() == item);
+    }
+
     public void addConflict(ConflictEvidence conflict) {
         this.conflicts.add(conflict);
     }
@@ -158,5 +165,33 @@ public class InterestReviewContext {
 
     public boolean isAllSelfCheckPassed() {
         return selfCheckResults.stream().allMatch(SelfCheckResult::isPassed);
+    }
+
+    public boolean hasBlockingErrors() {
+        return selfCheckResults.stream().anyMatch(SelfCheckResult::isBlockingError);
+    }
+
+    public void overrideSelfCheckItem(com.xxx.financial.enums.SelfCheckItem item, String reason) {
+        for (SelfCheckResult result : selfCheckResults) {
+            if (result.getCheckItem() == item) {
+                result.overrideAsPassed(reason);
+                return;
+            }
+        }
+    }
+
+    public long getSelfCheckPassedCount() {
+        return selfCheckResults.stream().filter(SelfCheckResult::isPassed).count();
+    }
+
+    public long getSelfCheckWarningCount() {
+        return selfCheckResults.stream()
+                .filter(r -> r.getSeverity() == com.xxx.financial.enums.CheckSeverity.WARNING)
+                .filter(r -> !r.isPassed())
+                .count();
+    }
+
+    public long getSelfCheckBlockingErrorCount() {
+        return selfCheckResults.stream().filter(SelfCheckResult::isBlockingError).count();
     }
 }

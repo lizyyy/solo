@@ -86,6 +86,8 @@ public class SelfCheckService {
     public SelfCheckResult checkSupplementRecalculate(InterestReviewContext context) {
         SelfCheckResult result;
 
+        context.removeSelfCheckItem(SelfCheckItem.SUPPLEMENT_RECALCULATE);
+
         if (context.getTailAdjustment() == null) {
             result = new SelfCheckResult(SelfCheckItem.SUPPLEMENT_RECALCULATE, false, "尾差调整数据为空");
         } else if (context.getCommercialBill() == null) {
@@ -120,10 +122,13 @@ public class SelfCheckService {
         return result;
     }
 
-    public SelfCheckResult checkExportConsistency(InterestReviewContext context) {
+ public SelfCheckResult checkExportConsistency(InterestReviewContext context) {
         SelfCheckResult result;
 
-        if (context.getTailAdjustment() == null || context.getTrusteeConfirmation() == null) {
+        context.removeSelfCheckItem(SelfCheckItem.EXPORT_CONSISTENCY);
+
+        if (context.getTailAdjustment() == null || context.getTrusteeConfirmation() == null
+                || context.getCommercialBill() == null) {
             result = new SelfCheckResult(SelfCheckItem.EXPORT_CONSISTENCY, false, "导出数据不完整");
         } else {
             boolean adjustmentMatch = context.getTailAdjustment().getBillNo()
@@ -220,18 +225,43 @@ public class SelfCheckService {
         sb.append("----------------------------------------\n");
 
         long passed = results.stream().filter(SelfCheckResult::isPassed).count();
-        long failed = results.size() - passed;
+        long blockingErrors = results.stream().filter(SelfCheckResult::isBlockingError).count();
+        long warnings = results.stream()
+                .filter(r -> r.getSeverity() == com.xxx.financial.enums.CheckSeverity.WARNING)
+                .filter(r -> !r.isPassed())
+                .count();
+        long overridden = results.stream().filter(SelfCheckResult::isOverridden).count();
 
-        sb.append(String.format("总计: %d项, 通过: %d项, 未通过: %d项\n", results.size(), passed, failed));
+        sb.append(String.format("总计: %d项, 通过: %d项, 阻断错误: %d项, 预警: %d项, 人工覆盖: %d项\n",
+                results.size(), passed, blockingErrors, warnings, overridden));
         sb.append("----------------------------------------\n");
 
         for (SelfCheckResult result : results) {
             String status = result.isPassed() ? "✓ 通过" : "✗ 未通过";
-            sb.append(String.format("%s %s: %s\n", status,
+            String severity = "";
+            if (result.getSeverity() == com.xxx.financial.enums.CheckSeverity.ERROR && !result.isPassed() && !result.isOverridden()) {
+                severity = " [阻断]";
+            } else if (result.getSeverity() == com.xxx.financial.enums.CheckSeverity.WARNING && !result.isPassed()) {
+                severity = " [预警]";
+            }
+            if (result.isOverridden()) {
+                severity = " [人工通过]";
+            }
+            sb.append(String.format("%s%s %s: %s\n", status, severity,
                     result.getCheckItem().getDescription(), result.getMessage()));
-            if (result.getDetail() != null && !result.isPassed()) {
+            if (result.getDetail() != null && !result.isPassed() && !result.isOverridden()) {
                 sb.append(String.format("  详情: %s\n", result.getDetail()));
             }
+            if (result.getOverrideReason() != null) {
+                sb.append(String.format("  覆盖理由: %s\n", result.getOverrideReason()));
+            }
+        }
+
+        if (blockingErrors > 0) {
+            sb.append("\n说明: 存在阻断性错误，必须解决后才能继续流程\n");
+        }
+        if (warnings > 0) {
+            sb.append("\n说明: 存在预警项，已通过人工复核后可继续流程\n");
         }
 
         return sb.toString();

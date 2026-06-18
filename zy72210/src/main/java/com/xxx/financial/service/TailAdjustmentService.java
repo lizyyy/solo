@@ -4,6 +4,7 @@ import com.xxx.financial.enums.ApproverType;
 import com.xxx.financial.enums.ReviewStatus;
 import com.xxx.financial.model.InterestReviewContext;
 import com.xxx.financial.model.TailAdjustment;
+import com.xxx.financial.store.ReviewDataStore;
 import com.xxx.financial.util.PinyinDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,25 @@ public class TailAdjustmentService {
     private static final Logger logger = LoggerFactory.getLogger(TailAdjustmentService.class);
 
     private final Set<String> importedAdjustmentNos = new HashSet<>();
+    private ReviewDataStore dataStore;
+
+    public TailAdjustmentService() {
+    }
+
+    public TailAdjustmentService(ReviewDataStore dataStore) {
+        this.dataStore = dataStore;
+        if (dataStore != null) {
+            importedAdjustmentNos.addAll(dataStore.getAllImportedAdjustments());
+        }
+    }
+
+    public void setDataStore(ReviewDataStore dataStore) {
+        this.dataStore = dataStore;
+        if (dataStore != null) {
+            importedAdjustmentNos.clear();
+            importedAdjustmentNos.addAll(dataStore.getAllImportedAdjustments());
+        }
+    }
 
     public boolean processTailAdjustment(InterestReviewContext context, TailAdjustment adjustment) {
         logger.info("开始处理尾差调整条，调整单号: {}, 票据号: {}", adjustment.getAdjustmentNo(), adjustment.getBillNo());
@@ -48,9 +68,15 @@ public class TailAdjustmentService {
 
     public void recordImport(String adjustmentNo) {
         importedAdjustmentNos.add(adjustmentNo);
+        if (dataStore != null) {
+            dataStore.addImportedAdjustment(adjustmentNo);
+        }
     }
 
     public void clearImportRecord(String adjustmentNo) {
         importedAdjustmentNos.remove(adjustmentNo);
+        if (dataStore != null) {
+            dataStore.removeImportedAdjustment(adjustmentNo);
+        }
     }
 }

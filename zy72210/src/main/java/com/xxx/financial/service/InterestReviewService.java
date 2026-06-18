@@ -2,6 +2,7 @@ package com.xxx.financial.service;
 
 import com.xxx.financial.enums.ReviewStatus;
 import com.xxx.financial.model.*;
+import com.xxx.financial.store.ReviewDataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,12 +18,32 @@ public class InterestReviewService {
     private final TrusteeConfirmationService trusteeConfirmationService;
     private final BalanceVerificationService balanceVerificationService;
     private final SelfCheckService selfCheckService;
+    private ReviewDataStore dataStore;
 
     public InterestReviewService() {
         this.tailAdjustmentService = new TailAdjustmentService();
         this.trusteeConfirmationService = new TrusteeConfirmationService();
         this.balanceVerificationService = new BalanceVerificationService();
         this.selfCheckService = new SelfCheckService(tailAdjustmentService, balanceVerificationService, trusteeConfirmationService);
+    }
+
+    public InterestReviewService(ReviewDataStore dataStore) {
+        this.dataStore = dataStore;
+        this.tailAdjustmentService = new TailAdjustmentService(dataStore);
+        this.trusteeConfirmationService = new TrusteeConfirmationService();
+        this.balanceVerificationService = new BalanceVerificationService();
+        this.selfCheckService = new SelfCheckService(tailAdjustmentService, balanceVerificationService, trusteeConfirmationService);
+    }
+
+    public void setDataStore(ReviewDataStore dataStore) {
+        this.dataStore = dataStore;
+        this.tailAdjustmentService.setDataStore(dataStore);
+    }
+
+    private void persistContext(InterestReviewContext context) {
+        if (dataStore != null) {
+            dataStore.saveContext(context);
+        }
     }
 
     public InterestReviewContext initReview(CommercialBill bill, String operator) {
@@ -92,6 +113,7 @@ public class InterestReviewService {
         }
 
         result.setSelfCheckReport(new ArrayList<>(context.getSelfCheckResults()));
+        persistContext(context);
         return result;
     }
 
@@ -153,6 +175,7 @@ public class InterestReviewService {
         }
 
         result.setSelfCheckReport(new ArrayList<>(context.getSelfCheckResults()));
+        persistContext(context);
         return result;
     }
 
@@ -172,6 +195,10 @@ public class InterestReviewService {
         }
 
         if (!context.hasUnresolvedConflicts()) {
+            context.overrideSelfCheckItem(com.xxx.financial.enums.SelfCheckItem.TAIL_TRUSTEE_CONFLICT,
+                    "产品决策: " + (confirm ? "确认尾差调整" : "驳回以托管为准") + "。备注: " + decisionRemark);
+            selfCheckService.checkSupplementRecalculate(context);
+            selfCheckService.checkExportConsistency(context);
             result.setSuccess(true);
             if (context.hasPinyinApprover() && context.getManagerReviewRemark() == null) {
                 result.setFinalStatus(ReviewStatus.PENDING_MANAGER_REVIEW);
@@ -195,6 +222,7 @@ public class InterestReviewService {
 
         result.setMessages(messages);
         result.setConflictReport(new ArrayList<>(context.getConflicts()));
+        persistContext(context);
         return result;
     }
 
@@ -210,6 +238,8 @@ public class InterestReviewService {
         if (approved) {
             result.setSuccess(true);
             context.setStatus(ReviewStatus.NORMAL);
+            context.overrideSelfCheckItem(com.xxx.financial.enums.SelfCheckItem.APPROVER_PINYIN,
+                    "客户经理复核通过: " + remark);
             if (context.hasUnresolvedConflicts()) {
                 result.setFinalStatus(ReviewStatus.DATA_CONFLICT);
                 messages.add("客户经理已确认审批人身份");
