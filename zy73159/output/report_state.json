@@ -1,0 +1,134 @@
+{
+  "version": "1.0",
+  "records": {
+    "ST001": {
+      "notes": "",
+      "screenshot_note": "",
+      "status": "已确认",
+      "source_file": "log_book_01.csv",
+      "source_line": 2
+    },
+    "ST002": {
+      "notes": "",
+      "screenshot_note": "",
+      "status": "已确认",
+      "source_file": "log_book_01.csv",
+      "source_line": 3
+    },
+    "ST003": {
+      "notes": "",
+      "screenshot_note": "",
+      "status": "已确认",
+      "source_file": "log_book_01.csv",
+      "source_line": 4
+    },
+    "ST004": {
+      "notes": "老何复核：经纬度确实写反了，已电话联系船上确认\n[纬度格式无法识别] 第5行: 无法解析纬度: 121.2345°E\n[经度格式无法识别] 第5行: 无法解析经度: 30.1111°N\n[经纬度反写(标识)] 第5行: 纬度字段包含 E/W 标识: 121.2345°E\n[经纬度反写(标识)] 第5行: 经度字段包含 N/S 标识: 30.1111°N",
+      "screenshot_note": "截图1：与船长通话记录截图，确认ST004经纬度反写",
+      "status": "待补件",
+      "source_file": "log_book_01.csv",
+      "source_line": 5
+    },
+    "ST005": {
+      "notes": "",
+      "screenshot_note": "",
+      "status": "已确认",
+      "source_file": "log_book_01.csv",
+      "source_line": 6
+    },
+    "ST006": {
+      "notes": "",
+      "screenshot_note": "",
+      "status": "已确认",
+      "source_file": "log_book_01.csv",
+      "source_line": 7
+    },
+    "ST007": {
+      "notes": "老何：这条纬度是乱写的，退回重填\n[纬度格式无法识别] 第8行: 无法解析纬度: abc",
+      "screenshot_note": "截图2：退回邮件截图",
+      "status": "退回",
+      "source_file": "log_book_01.csv",
+      "source_line": 8
+    },
+    "ST008": {
+      "notes": "",
+      "screenshot_note": "",
+      "status": "已确认",
+      "source_file": "log_book_01.csv",
+      "source_line": 9
+    },
+    "ST009": {
+      "notes": "",
+      "screenshot_note": "",
+      "status": "待补件",
+      "source_file": "log_book_01.csv",
+      "source_line": 10
+    },
+    "ST010": {
+      "notes": "",
+      "screenshot_note": "",
+      "status": "已确认",
+      "source_file": "log_book_01.csv",
+      "source_line": 11
+    },
+    "1": {
+      "notes": "",
+      "screenshot_note": "",
+      "status": "已确认",
+      "source_file": "log_book_02.csv",
+      "source_line": 2
+    },
+    "2": {
+      "notes": "",
+      "screenshot_note": "",
+      "status": "已确认",
+      "source_file": "log_book_02.csv",
+      "source_line": 3
+    },
+    "3": {
+      "notes": "[纬度越界] 第4行: 纬度值 119.7777 超出 -90~90 范围，疑似经纬度反写\n[经纬度反写] 第4行: 纬度值 119.7777 超出正常范围，经度值 23.9999 在纬度范围内，疑似经纬度写反",
+      "screenshot_note": "",
+      "status": "待补件",
+      "source_file": "log_book_02.csv",
+      "source_line": 4
+    },
+    "4": {
+      "notes": "",
+      "screenshot_note": "",
+      "status": "已确认",
+      "source_file": "log_book_02.csv",
+      "source_line": 5
+    },
+    "5": {
+      "notes": "",
+      "screenshot_note": "",
+      "status": "已确认",
+      "source_file": "log_book_02.csv",
+      "source_line": 6
+    },
+    "6": {
+      "notes": "[纬度缺失] 第7行: 纬度字段为空",
+      "screenshot_note": "",
+      "status": "待补件",
+      "source_file": "log_book_02.csv",
+      "source_line": 7
+    },
+    "7": {
+      "notes": "[经度缺失] 第8行: 经度字段为空",
+      "screenshot_note": "",
+      "status": "待补件",
+      "source_file": "log_book_02.csv",
+      "source_line": 8
+    },
+    "8": {
+      "notes": "",
+      "screenshot_note": "",
+      "status": "已确认",
+      "source_file": "log_book_02.csv",
+      "source_line": 9
+    }
+  },
+  "metadata": {
+    "input_dir": "/Users/maca/pro/solo/workspaces/zy73159/sample_input"
+  }
+}
