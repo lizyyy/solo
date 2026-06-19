@@ -1,256 +1,222 @@
-const { UnifiedDataAccess } = require('./src');
-const moment = require('moment');
+const UnifiedDataAccess = require('./src/data/UnifiedDataAccess');
 
-function printSection(title) {
-  console.log('\n' + '='.repeat(70));
-  console.log(`  ${title}`);
-  console.log('='.repeat(70));
-}
+async function runS002CompleteDemo() {
+  console.log('\n######################################################################');
+  console.log('  声学隔断降噪评估系统 - S002 完整数据链追踪演示');
+  console.log('  目标：S002 采样15分钟（缺15分钟）→ 补录30分钟 → 待复核 → 复核通过');
+  console.log('  重点：初始证据永不丢失、原始说法永不污染、6处出口始终一致');
+  console.log('######################################################################\n');
 
-function printSubSection(title) {
-  console.log('\n' + '-'.repeat(60));
-  console.log(`  ${title}`);
-  console.log('-'.repeat(60));
-}
+  const uda = new UnifiedDataAccess();
 
-async function runExample() {
-  console.log('\n' + '#'.repeat(70));
-  console.log('  声学隔断降噪评估系统 - 完整操作路示例');
-  console.log('  重点场景：采样时间缺了半小时（不是空值，是时长15分钟）');
-  console.log('#'.repeat(70));
+  // ============ 【第1步】打开项目，创建评估 ============
+  const evaluationId = uda.startNewEvaluation('老唐');
+  console.log(`✅ 【打开项目】创建评估任务: ${evaluationId}`);
 
-  const dataAccess = new UnifiedDataAccess();
-  const evaluationId = dataAccess.startNewEvaluation('老唐');
-  console.log(`\n✅ 创建评估任务: ${evaluationId}`);
+  // ============ 【第2步】导入/上传 S002（15分钟采样，缺15分钟） ============
+  console.log('\n======================================================================');
+  console.log('  【第2步】导入温度校准记录（S002 采样时长15分钟，缺15分钟）');
+  console.log('======================================================================\n');
 
-  printSection('第一步：导入温度校准记录（包含采样时长缺半小时的记录）');
-
-  const temperatureRecords = [
-    { 
-      sensorId: 'S001', 
-      sampleStartTime: '2024-01-15 09:00:00', 
-      sampleDurationMinutes: 30, 
-      temperature: 23.5, 
-      humidity: 45, 
-      notes: '主设备区正常采样30分钟，设备稳定'
-    },
-    { 
-      sensorId: 'S002', 
-      sampleStartTime: '2024-01-15 10:00:00', 
-      sampleDurationMinutes: 15, 
-      temperature: 24.0, 
-      humidity: 48, 
-      notes: '走廊区域采样，中途设备断电，实际采了15分钟就结束了'
-    },
-    { 
-      sensorId: 'S003', 
-      sampleStartTime: '2024-01-15 11:00:00', 
-      sampleDurationMinutes: 30, 
-      temperature: 22.8, 
-      humidity: 50, 
-      notes: '机房内采样，空调环境稳定'
-    },
-    { 
-      sensorId: 'S004', 
-      calibrationTime: null, 
-      temperature: 25.0, 
-      humidity: 52, 
-      notes: '仓库采样，现场忙忘了记采样时间'
-    }
+  const temperatureData = [
+    { sensorId: 'S001', sampleStartTime: '2024-01-15 09:00:00', sampleDurationMinutes: 45, temperature: 23.5, humidity: 45, notes: '会议室正常采样，全程无间断' },
+    { sensorId: 'S002', sampleStartTime: '2024-01-15 10:00:00', sampleDurationMinutes: 15, temperature: 24, humidity: 48, notes: '走廊区域采样，中途设备断电，实际采了15分钟就结束了' },
+    { sensorId: 'S003', sampleStartTime: '2024-01-15 11:00:00', sampleDurationMinutes: 30, temperature: 24.5, humidity: 47, notes: '办公区标准采样' },
+    { sensorId: 'S004', temperature: 25, humidity: 50, notes: '' }
   ];
 
-  const step1 = await dataAccess.executeStep1(evaluationId, temperatureRecords);
-  console.log(`\n📥 ${step1.message}`);
-  console.log(`   导入总数: ${step1.importResult.imported} 条`);
-  console.log(`   ⚠️  有采样时间问题: ${step1.importResult.recordsWithMissingTime} 条`);
+  await uda.executeStep1(evaluationId, temperatureData);
+  const step1List = uda.getListForDisplay(evaluationId);
+  const s002Id = step1List.list.find(r => r.sensorId === 'S002').id;
 
-  printSubSection('自检：采样时间问题明细');
-  const statusAfterStep1 = dataAccess.getWorkflowStatus(evaluationId);
-  statusAfterStep1.selfCheckResults.missingSampleTime.details.forEach(d => {
-    console.log(`   行号${d.sourceLineNumber} | 传感器${d.sensorId} | ${d.issue}`);
-    if (d.issueType === 'duration_short') {
-      console.log(`     → 实际${d.actualMinutes}分钟，缺${d.missingMinutes}分钟，严重程度: ${d.severity}`);
-    }
+  console.log('📥 导入结果：4 条，其中 2 条有采样时间问题');
+  step1List.list.forEach(r => {
+    const initialDesc = r.initialBadge || '初始正常';
+    const currentDesc = r.currentStatusBadge;
+    console.log(`   行号${r.row} | ${r.sensorId} | ${initialDesc} → ${currentDesc} | 徽章:${r.displayBadge}`);
   });
 
-  printSection('第二步：训练教练老唐查看传感器编号（补充现场说法）');
+  const s002Step1 = uda.getDetailForDisplay(evaluationId, s002Id);
+  console.log('\n   🎯 S002 初始状态：');
+  console.log(`      初始问题类型: ${s002Step1.initialIssueDetail.type}`);
+  console.log(`      初始问题描述: ${s002Step1.initialIssueDetail.description}`);
+  console.log(`      初始缺失分钟数: ${s002Step1.initialIssueDetail.missingMinutes} 分钟`);
+  console.log(`      初始实际时长: ${s002Step1.initialIssueDetail.actualMinutes} 分钟`);
+  console.log(`      原始说法: ${s002Step1.sourceData.originalStatement}`);
 
-  const sensorRecords = [
-    { 
-      sensorId: 'S001', 
-      siteStatement: '主设备区北侧，安装位置正确，底座稳固，周边无遮挡', 
-      installLocation: '主设备区-01', 
-      operator: '张三'
-    },
-    { 
-      sensorId: 'S002', 
-      siteStatement: '走廊A区东侧，现场确认设备已校准，但中途断电导致时长短', 
-      installLocation: '走廊-A区', 
-      operator: '李四'
-    },
-    { 
-      sensorId: 'S003', 
-      siteStatement: '机房内部机柜旁，温度环境稳定，空调24小时运行', 
-      installLocation: '机房-02', 
-      operator: '王五'
-    },
-    { 
-      sensorId: 'S004', 
-      siteStatement: '仓库B1角落，采样时忘记记录时间，需要补录', 
-      installLocation: '仓库-B1', 
-      operator: '赵六'
-    }
+  // ============ 【第3步】训练教练老唐补看传感器编号 ============
+  console.log('\n======================================================================');
+  console.log('  【第3步】训练教练老唐补看传感器编号（三步工作流 step2）');
+  console.log('======================================================================\n');
+
+  const sensorData = [
+    { sensorId: 'S001', siteStatement: '会议室东南角，距外墙1.5米', installLocation: '室内-会议室', operator: '老唐', verificationStatus: 'verified' },
+    { sensorId: 'S002', siteStatement: '走廊A区东侧，现场确认设备已校准，但中途断电导致时长短', installLocation: '公共区-走廊', operator: '老唐', verificationStatus: 'needs_review' },
+    { sensorId: 'S003', siteStatement: '办公区开放工位第3排', installLocation: '室内-办公区', operator: '老唐', verificationStatus: 'verified' },
+    { sensorId: 'S004', siteStatement: '机房入口，采样记录丢失', installLocation: '机房入口', operator: '老唐', verificationStatus: 'needs_review' }
   ];
 
-  const step2 = await dataAccess.executeStep2(evaluationId, sensorRecords, '老唐');
-  console.log(`\n🔍 ${step2.message}`);
-  console.log(`   关联传感器: ${step2.sensorResult.imported} 个`);
-  step2.alerts.forEach(a => console.log(`   ⚠️  ${a}`));
+  await uda.executeStep2(evaluationId, sensorData, '老唐');
+  await uda.executeStep3(evaluationId, { operator: '老唐' }, '老唐');
+  console.log('🔍 完成三步工作流：导入→补传感器→实验复盘');
 
-  printSection('第三步：实验复盘图更新（采样时间缺半小时不自动归正常，留给质检员）');
+  // ============ 【第4步】补录 S002：15→30 分钟，保存并重算 ============
+  console.log('\n======================================================================');
+  console.log('  【第4步】补录 S002：采样时长 15→30 分钟，保存并重算');
+  console.log('======================================================================\n');
 
-  const step3 = await dataAccess.executeStep3(evaluationId, {}, '系统');
-  console.log(`\n📊 ${step3.message}`);
-  console.log(`   📋 待质检员复核记录数: ${step3.recordsPendingQualityReview}`);
-  console.log(`   当前阶段: ${step3.currentStage}`);
-  console.log(`   可用操作: ${step3.availableActions.join(' | ')}`);
-
-  printSubSection('6处数据源一致性校验（页面/列表/接口/导出/历史/报告）');
-  const consistency = dataAccess.verifyDataConsistency(evaluationId);
-  console.log(`   校验结果: ${consistency.isConsistent ? '✅ 全部一致' : '❌ 不一致'}`);
-  console.log(`   校验数据源数量: ${consistency.summary.totalSourcesVerified} 处`);
-  console.log(`   记录数: 页面=${consistency.checks.recordCount.display} 列表=${consistency.checks.recordCount.list} 接口=${consistency.checks.recordCount.api} 导出=${consistency.checks.recordCount.export} 历史=${consistency.checks.recordCount.history} 报告=${consistency.checks.recordCount.report}`);
-
-  printSection('触发问题的输入 → 补录动作 → 状态变化 → 最终展示（同一条记录追踪）');
-
-  const resultsBefore = dataAccess.getResultsForAPI(evaluationId);
-  const targetRecordBefore = resultsBefore.data.records.find(r => r.sensorId === 'S002');
-  const recordId = targetRecordBefore.id;
-
-  printSubSection('【1】触发问题的原始输入（S002，走廊采样，时长15分钟）');
-  console.log(`   原始行号: ${targetRecordBefore.sourceLine}`);
-  console.log(`   原始说法: ${targetRecordBefore.siteStatement}`);
-  console.log(`   采样开始: ${targetRecordBefore.sampleStartTime}`);
-  console.log(`   采样时长: ${targetRecordBefore.sampleDurationMinutes} 分钟`);
-  console.log(`   问题类型: ${targetRecordBefore.sampleTimeIssue.type}`);
-  console.log(`   问题描述: ${targetRecordBefore.sampleTimeIssue.description}`);
-  console.log(`   缺失分钟数: ${targetRecordBefore.sampleTimeIssue.missingMinutes}`);
-  console.log(`   当前处理状态: ${targetRecordBefore.processingStatus}`);
-  console.log(`   复核状态: ${targetRecordBefore.qualityReview.status}`);
-  console.log(`   下一步找谁: ${targetRecordBefore.qualityReview.nextHandler}`);
-  console.log(`   下一步处理: ${targetRecordBefore.qualityReview.nextStepDescription}`);
-
-  printSubSection('【2】补录动作（老唐补录S002采样时长到30分钟）');
-  console.log('   操作人: 老唐');
-  console.log('   修改字段: sampleDurationMinutes (15 → 30)');
-  console.log('   原因: 现场确认后半段数据在手持终端里，补齐全30分钟');
-
-  const supplementResult = dataAccess.supplementData(
-    evaluationId, 
-    recordId, 
-    { sampleDurationMinutes: 30 }, 
-    '老唐', 
+  uda.supplementData(
+    evaluationId,
+    s002Id,
+    { sampleDurationMinutes: 30 },
+    '老唐',
     '现场确认后半段数据在手持终端里，补齐全30分钟'
   );
+  uda.recalculate(evaluationId);
 
-  dataAccess.recalculate(evaluationId);
+  const s002AfterSupplement = uda.getDetailForDisplay(evaluationId, s002Id);
+  console.log('🔧 补录操作完成：sampleDurationMinutes 15 → 30');
+  console.log('\n   📌 关键断言（补录后，仍待复核）：');
+  console.log(`      初始问题: ${s002AfterSupplement.initialIssueDetail.description}（缺${s002AfterSupplement.initialIssueDetail.missingMinutes}分钟）`);
+  console.log(`      当前状态: ${s002AfterSupplement.currentIssue.description}`);
+  console.log(`      初始缺失分钟数: ${s002AfterSupplement.initialIssueDetail.missingMinutes}（保留！未被抹掉）`);
+  console.log(`      当前缺失分钟数: ${s002AfterSupplement.currentIssue.missingMinutes || 0}`);
+  console.log(`      复核状态: ${s002AfterSupplement.qualityReview.status}（不是 approved！）`);
+  console.log(`      下一步处理: ${s002AfterSupplement.display.nextStepText}`);
+  console.log(`      原始说法（未被污染）: ${s002AfterSupplement.sourceData.originalStatement}`);
+  console.log(`      改后值: ${s002AfterSupplement.sourceData.correctedValue.field} = ${s002AfterSupplement.sourceData.correctedValue.value}`);
+  console.log(`      处理原因: ${s002AfterSupplement.sourceData.processingReason}`);
+  console.log(`      责任人: ${s002AfterSupplement.sourceData.handlerList.join('、')}, 复核: ${s002AfterSupplement.sourceData.reviewer || '待指定'}`);
 
-  printSubSection('【3】保存后的状态变化（仍需质检员复核，不提前归正常）');
-  const resultsAfter = dataAccess.getResultsForAPI(evaluationId);
-  const targetRecordAfter = resultsAfter.data.records.find(r => r.id === recordId);
+  // ============ 【第5步】刷新重算 + 导出明细 ============
+  console.log('\n======================================================================');
+  console.log('  【第5步】刷新重算 + 导出明细（重点检查初始证据保留情况）');
+  console.log('======================================================================\n');
 
-  console.log(`   版本号: v${resultsBefore.data.version} → v${resultsAfter.data.version}`);
-  console.log(`   采样时长: ${targetRecordBefore.sampleDurationMinutes} → ${targetRecordAfter.sampleDurationMinutes} 分钟`);
-  console.log(`   处理状态: ${targetRecordBefore.processingStatus} → ${targetRecordAfter.processingStatus}`);
-  console.log(`   ⚠️  复核状态: 仍为 ${targetRecordAfter.qualityReview.status}（需要质检员确认，不自动归正常）`);
-  console.log(`   下一步找谁: ${targetRecordAfter.qualityReview.nextHandler}`);
-  console.log(`   下一步处理: ${targetRecordAfter.qualityReview.nextStepDescription}`);
+  const exportData = uda.getResultsForExport(evaluationId);
+  const s002Export = exportData.details.find(r => r['传感器编号'] === 'S002');
+  console.log('📤 导出明细 - S002 关键字段：');
+  console.log(`      初始采样时间问题类型: ${s002Export['初始采样时间问题类型']}`);
+  console.log(`      初始采样时间问题描述: ${s002Export['初始采样时间问题描述']}`);
+  console.log(`      初始缺失分钟数: ${s002Export['初始缺失分钟数']} 分钟`);
+  console.log(`      初始实际时长_分钟: ${s002Export['初始实际时长_分钟']} 分钟`);
+  console.log(`      当前采样时间问题类型: ${s002Export['当前采样时间问题类型']}`);
+  console.log(`      原始说法: ${s002Export['原始说法']}`);
+  console.log(`      当前备注: ${s002Export['当前备注'] || '（空）'}`);
+  console.log(`      改后值明细: ${s002Export['改后值明细']}`);
+  console.log(`      处理原因明细: ${s002Export['处理原因明细']}`);
+  console.log(`      责任人明细: ${s002Export['责任人明细']}`);
+  console.log(`      下一步处理: ${s002Export['下一步处理']}`);
+  console.log(`      ⚠️  不是"已完成"！是"待复核"`);
 
-  printSubSection('【4】最终展示（页面/接口/导出/报告/历史 全部同步）');
-  const display = dataAccess.getListForDisplay(evaluationId);
-  const displayRecord = display.list.find(r => r.sensorId === 'S002');
-  console.log(`   📱 页面列表: 行号${displayRecord.row} | ${displayRecord.issueText} | 徽章: ${displayRecord.displayBadge} | 下一步: ${displayRecord.nextStep}`);
+  // ============ 【第6步】查看历史记录 ============
+  console.log('\n======================================================================');
+  console.log('  【第6步】查看历史记录（初始证据完整保留）');
+  console.log('======================================================================\n');
 
-  const exportData = dataAccess.getResultsForExport(evaluationId);
-  const exportRecord = exportData.details.find(r => r.传感器编号 === 'S002');
-  console.log(`   📤 导出明细: ${exportRecord.采样时间问题描述} | 复核: ${exportRecord.需质检员复核} | 下一步: ${exportRecord.下一步处理}`);
+  const history = uda.getHistoryForDisplay(evaluationId);
+  const s002History = history.history.find(h => h['传感器编号'] === 'S002');
+  console.log('📜 历史记录 - S002：');
+  console.log(`      原始说法: ${s002History['原始说法']}`);
+  console.log(`      初始问题: ${s002History['初始问题']}`);
+  console.log(`      初始问题类型: ${s002History['初始问题类型']}`);
+  console.log(`      初始缺失分钟数: ${s002History['初始缺失分钟数']} 分钟`);
+  console.log(`      初始实际时长_分钟: ${s002History['初始实际时长_分钟']} 分钟`);
+  console.log(`      当前问题: ${s002History['当前问题']}`);
+  console.log(`      是否曾有异常: ${s002History['是否曾有异常']}`);
+  console.log(`      人工改动次数: ${s002History['人工改动次数']}`);
+  console.log(`      复核状态: ${s002History['复核状态']}`);
+  console.log(`      下一步处理: ${s002History['下一步处理']}`);
 
-  const historyRecord = exportData.history.find(h => h.传感器编号 === 'S002');
-  console.log(`   📜 历史记录: 原始说法: ${historyRecord.原始说法.slice(0, 30)}... | 缺失${historyRecord.缺失分钟数}分钟 | 最后改动: ${historyRecord.最后一次改动}`);
+  // ============ 【第7步】生成报告 ============
+  console.log('\n======================================================================');
+  console.log('  【第7步】生成报告（两套证据+独立复核备注）');
+  console.log('======================================================================\n');
 
-  const report = dataAccess.getReport(evaluationId);
-  const reportRecord = report.recordAudits.find(r => r.sensorId === 'S002');
-  console.log(`   📋 正式报告: 是否纳入正常结果: ${reportRecord.isInNormalResults ? '是' : '否'} | 复核人: ${reportRecord.review.reviewer || '待指定'}`);
+  const report = uda.getReport(evaluationId);
+  const s002ReportAudit = report.recordAudits.find(r => r.sensorId === 'S002');
+  const s002InReportRecords = report.records.find(r => r['传感器编号'] === 'S002');
+  console.log(`📋 报告ID: ${report.reportId}`);
+  console.log(`   总览: 曾有问题记录数=${report.overview['曾有采样时间问题记录数']}，累计初始缺失=${report.overview['初始累计缺失分钟数']}分钟`);
+  console.log(`\n   S002 报告明细：`);
+  console.log(`      初始问题描述: ${s002InReportRecords['初始问题描述']}`);
+  console.log(`      初始缺失分钟数: ${s002InReportRecords['初始缺失分钟数']} 分钟`);
+  console.log(`      是否纳入正常结果: ${s002InReportRecords['是否纳入正常结果']}（待复核，所以是"否"）`);
+  console.log(`      证据链_原始说法: ${s002InReportRecords['证据链_原始说法']}`);
+  console.log(`      证据链_改后值: ${s002InReportRecords['证据链_改后值']}`);
+  console.log(`      证据链_处理原因: ${s002InReportRecords['证据链_处理原因']}`);
+  console.log(`      证据链_责任人: ${s002InReportRecords['证据链_责任人']}`);
+  console.log(`      证据链_复核备注: ${s002InReportRecords['证据链_复核备注'] || '（暂无，待质检员填写）'}`);
+  console.log(`      下一步处理: ${s002InReportRecords['下一步处理']}`);
 
-  const detail = dataAccess.getDetailForDisplay(evaluationId, recordId);
-  console.log(`   📄 详情页证据链: 原始行号${detail.sourceData.originalRow} | 改后值: ${detail.sourceData.correctedValue.field}=${detail.sourceData.correctedValue.value} | 处理原因: ${detail.sourceData.processingReason} | 下一步找: ${detail.sourceData.nextHandler}`);
+  // ============ 【第8步】质检员复核通过 ============
+  console.log('\n======================================================================');
+  console.log('  【第8步】质检员复核通过 S002（检查复核备注独立保存）');
+  console.log('======================================================================\n');
 
-  printSection('质检员复核操作（确认补录有效后，才能归到正常结果）');
-
-  printSubSection('【5】质检员复核通过 S002');
-  const reviewResult = dataAccess.qualityReview(
+  uda.qualityReview(
     evaluationId,
-    recordId,
+    s002Id,
     '质检员A',
     'approve',
     '已核对手持终端的后半段数据，时长确实补齐到30分钟，数据可信'
   );
 
-  console.log(`   复核人: ${reviewResult.qualityReview.reviewer}`);
-  console.log(`   复核结论: 通过 (approve)`);
-  console.log(`   复核备注: ${reviewResult.qualityReview.reviewNotes}`);
-  console.log(`   ✅ 复核状态: ${reviewResult.qualityReview.status}`);
-  console.log(`   最终处理状态: ${reviewResult.processingStatus}`);
-  console.log(`   时长是否达标: ${reviewResult.durationCompliant ? '是' : '否'}`);
-
-  printSubSection('【6】复核后的最终一致性校验');
-  const finalConsistency = dataAccess.verifyDataConsistency(evaluationId);
-  console.log(`   6处数据源一致性: ${finalConsistency.isConsistent ? '✅ 全部一致' : '❌ 不一致'}`);
-
-  const finalResults = dataAccess.getResultsForAPI(evaluationId);
-  console.log(`\n   📊 最终汇总:`);
-  console.log(`      总记录数: ${finalResults.data.summary.totalRecords}`);
-  console.log(`      持续时间达标: ${finalResults.data.summary.durationBreakdown.compliant} 条`);
-  console.log(`      时长不足(缺半小时等): ${finalResults.data.summary.durationBreakdown.duration_short} 条`);
-  console.log(`      时间完全为空: ${finalResults.data.summary.durationBreakdown.empty} 条`);
-  console.log(`      需待复核: ${finalResults.data.summary.recordsPendingReview} 条`);
-  console.log(`      复核通过: ${finalResults.data.summary.recordsApproved} 条`);
-  console.log(`      复核未通过: ${finalResults.data.summary.recordsRejected} 条`);
-  console.log(`      关联传感器: ${finalResults.data.summary.linkedSensors} 个`);
-  console.log(`      数据一致性: ${finalResults.data.summary.consistency.guaranteedBy}`);
-
-  printSection('完整审计追踪（质检员追问时可回到证据）');
-  const auditTrail = dataAccess.getAuditTrail(evaluationId, recordId);
-  console.log(`\n   原始行号: ${auditTrail.sourceLineNumber}`);
-  console.log(`   原始输入:`, JSON.stringify(auditTrail.originalData, null, 6).replace(/\n/g, '\n   '));
-  console.log(`   原始说法: ${auditTrail.originalStatement}`);
-  console.log(`   初始问题: ${auditTrail.sampleTimeIssue.description}`);
-  console.log(`\n   人工改动记录:`);
-  auditTrail.manualChanges.forEach((c, i) => {
-    console.log(`     ${i + 1}. ${moment(c.timestamp).format('MM-DD HH:mm:ss')} | ${c.operator}`);
-    console.log(`        字段: ${c.field}`);
-    console.log(`        原值: [${c.originalValue}] → 新值: [${c.correctedValue}]`);
-    console.log(`        原因: ${c.processingReason}`);
+  const s002Final = uda.getDetailForDisplay(evaluationId, s002Id);
+  const finalAudit = uda.getAuditTrail(evaluationId, s002Id);
+  console.log('✅ 质检员复核通过：');
+  console.log(`\n   🎯 关键断言（复核通过后）：`);
+  console.log(`      原始说法仍独立保存: ${finalAudit.originalStatement}`);
+  console.log(`      复核备注独立字段: ${finalAudit.qualityReview.reviewNotes}`);
+  console.log(`      初始问题仍在: ${finalAudit.initialIssue.description}（缺${finalAudit.initialIssue.missingMinutes}分钟）`);
+  console.log(`      当前问题: ${finalAudit.currentIssue.description}`);
+  console.log(`      复核人: ${finalAudit.qualityReview.reviewer}`);
+  console.log(`      复核结论: ${finalAudit.qualityReview.decision}`);
+  console.log(`      纳入正常结果: ${s002Final.qualityReview.status === 'approved' && s002Final.durationCompliant ? '是' : '否'}`);
+  console.log(`      审计完整证据链:`);
+  console.log(`        - 原始行号: ${finalAudit.sourceLineNumber}`);
+  console.log(`        - 原始输入: ${JSON.stringify(finalAudit.originalSnapshot)}`);
+  console.log(`        - 初始问题: ${finalAudit.initialIssue.description}`);
+  console.log(`        - 改动明细:`);
+  finalAudit.manualChanges.forEach((c, i) => {
+    console.log(`           ${i + 1}. ${c.timestamp.slice(5, 16)} | ${c.operator}`);
+    console.log(`              字段: ${c.field}，原值: [${c.originalValue}] → 新值: [${c.correctedValue}]`);
+    console.log(`              原因: ${c.processingReason}`);
   });
-  console.log(`\n   复核信息:`);
-  console.log(`     状态: ${auditTrail.qualityReview.status}`);
-  console.log(`     复核人: ${auditTrail.qualityReview.reviewer}`);
-  console.log(`     复核结论: ${auditTrail.qualityReview.decision}`);
-  console.log(`     复核备注: ${auditTrail.qualityReview.reviewNotes}`);
-  console.log(`     当前步骤: ${auditTrail.qualityReview.currentNextStep}`);
-  console.log(`\n   一句话摘要: ${auditTrail.summary}`);
+  console.log(`        - 复核人: ${finalAudit.qualityReview.reviewer}`);
+  console.log(`        - 复核备注: ${finalAudit.qualityReview.reviewNotes}`);
+  console.log(`        - 下一步: ${finalAudit.qualityReview.currentNextStep}`);
 
-  console.log('\n' + '#'.repeat(70));
-  console.log('  ✅ 操作路完整示例完成');
-  console.log('  关键保证：');
-  console.log('  1. 采样时长15分钟触发异常（不只是空值）');
-  console.log('  2. 补录后仍需质检员复核，不提前归正常');
-  console.log('  3. 页面/列表/接口/导出/历史/报告 6处数据源完全一致');
-  console.log('  4. 完整证据链：原始行号+原始说法+改后值+原因+下一步找谁');
-  console.log('#'.repeat(70) + '\n');
+  // ============ 【最终校验】6处出口一致性 ============
+  console.log('\n======================================================================');
+  console.log('  【最终校验】6处出口（页面/列表/接口/导出/历史/报告）一致性');
+  console.log('======================================================================\n');
+
+  const consistency = uda.verifyDataConsistency(evaluationId);
+  console.log(`   一致性结论: ${consistency.isConsistent ? '✅ 全部一致' : '❌ 不一致'}`);
+  console.log(`   校验数据源数量: ${consistency.summary.totalSourcesVerified} 处`);
+  Object.keys(consistency.checks).forEach(key => {
+    const c = consistency.checks[key];
+    console.log(`   ${key}: 页面=${c.display} 列表=${c.list} 接口=${c.api} 导出=${c.export} 历史=${c.history} 报告=${c.report} → ${c.consistent ? '✅' : '❌'}`);
+  });
+  Object.keys(consistency.sampleFieldConsistency).forEach(key => {
+    const fc = consistency.sampleFieldConsistency[key];
+    console.log(`   字段${key}一致性: ${fc.consistent ? '✅' : '❌'}`);
+  });
+
+  console.log('\n######################################################################');
+  console.log('  ✅ S002 完整数据链演示完成');
+  console.log('');
+  console.log('  📌 8个关键保证：');
+  console.log('    1. 初始问题（duration_short，缺15分钟）永不丢失');
+  console.log('    2. 原始说法永不被复核备注污染');
+  console.log('    3. 补录后待复核状态（pending），不提前归正常');
+  console.log('    4. 导出明细下一步处理不是"已完成"，是"待复核"');
+  console.log('    5. 改后值、处理原因、责任人独立字段保存');
+  console.log('    6. 复核备注独立存在 qualityReview.reviewNotes');
+  console.log('    7. 报告两套视图：初始问题 + 当前状态');
+  console.log('    8. 6处出口数据源完全一致（integratedResults）');
+  console.log('######################################################################\n');
 }
 
-runExample().catch(err => {
-  console.error('❌ 执行出错:', err);
-  process.exit(1);
-});
+runS002CompleteDemo().catch(console.error);

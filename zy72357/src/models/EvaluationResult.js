@@ -50,6 +50,14 @@ class EvaluationResult {
   _buildIntegratedRecord(tempRecord, sensorRecord) {
     const hasIssue = tempRecord.hasMissingSampleTime();
     const needsReview = tempRecord.needsQualityReview();
+    const nextStepText = tempRecord._getNextStepDescription ? tempRecord._getNextStepDescription() : null;
+
+    const initialIssue = tempRecord.originalSampleTimeIssue || tempRecord.sampleTimeIssue;
+    const currentIssue = tempRecord.sampleTimeIssue;
+    const wasEverIssue = initialIssue && initialIssue.type !== 'none';
+
+    const initialMissingMinutes = initialIssue ? (initialIssue.missingMinutes || 0) : 0;
+    const currentMissingMinutes = currentIssue ? (currentIssue.missingMinutes || 0) : 0;
 
     return {
       recordId: tempRecord.id,
@@ -63,19 +71,23 @@ class EvaluationResult {
       humidity: tempRecord.humidity,
       processingStatus: tempRecord.processingStatus,
 
-      sampleTimeIssue: tempRecord.sampleTimeIssue,
+      initialIssue,
+      currentIssue,
+      wasEverIssue,
+      sampleTimeIssue: currentIssue,
       hasMissingSampleTime: hasIssue,
 
       qualityReview: {
         ...tempRecord.qualityReview,
-        nextStepDescription: tempRecord._getNextStepDescription ? tempRecord._getNextStepDescription() : null
+        nextStepDescription: nextStepText
       },
       needsQualityReview: needsReview,
-      qualityReviewStatus: needsReview 
-        ? (tempRecord.qualityReview.status === 'rejected' ? 'rejected' : 'pending') 
+      qualityReviewStatus: needsReview
+        ? (tempRecord.qualityReview.status === 'rejected' ? 'rejected' : 'pending')
         : 'approved',
 
       originalData: tempRecord.originalData,
+      originalSnapshot: tempRecord.originalSnapshot,
       manualChanges: tempRecord.manualChanges,
 
       siteStatement: sensorRecord ? sensorRecord.siteStatement : null,
@@ -88,37 +100,67 @@ class EvaluationResult {
       durationCompliant: tempRecord._isDurationFixed ? tempRecord._isDurationFixed() : true,
 
       display: {
-        rowHighlight: hasIssue ? 'warning' : 'normal',
-        statusBadge: needsReview 
-          ? (tempRecord.qualityReview.status === 'rejected' ? '复核未通过' : '待复核') 
-          : '正常',
-        nextStepText: tempRecord._getNextStepDescription ? tempRecord._getNextStepDescription() : null
+        rowHighlight: needsReview ? 'warning' : (wasEverIssue ? 'reviewed' : 'normal'),
+        statusBadge: tempRecord.qualityReview.status === 'approved'
+          ? '复核通过'
+          : (tempRecord.qualityReview.status === 'rejected' ? '复核未通过' : '待复核'),
+        initialIssueBadge: wasEverIssue
+          ? `初始：${initialIssue.description}（缺${initialMissingMinutes}分钟）`
+          : '初始正常',
+        currentStatusBadge: currentIssue.type === 'none'
+          ? '当前：采样时间完整'
+          : `当前：${currentIssue.description}`,
+        nextStepText
       },
       export: {
         原始行号: tempRecord.sourceLineNumber,
         传感器编号: tempRecord.sensorId,
-        采样开始时间: tempRecord.sampleStartTime ? tempRecord.sampleStartTime.format() : null,
-        采样结束时间: tempRecord.sampleEndTime ? tempRecord.sampleEndTime.format() : null,
-        采样时长_分钟: tempRecord.sampleDurationMinutes,
+        采样开始时间_当前: tempRecord.sampleStartTime ? tempRecord.sampleStartTime.format() : null,
+        采样结束时间_当前: tempRecord.sampleEndTime ? tempRecord.sampleEndTime.format() : null,
+        采样时长_分钟_当前: tempRecord.sampleDurationMinutes,
+        采样开始时间_初始: tempRecord.originalSnapshot ? tempRecord.originalSnapshot.sampleStartTime : null,
+        采样时长_分钟_初始: tempRecord.originalSnapshot ? tempRecord.originalSnapshot.sampleDurationMinutes : null,
         温度: tempRecord.temperature,
         湿度: tempRecord.humidity,
         现场说法: sensorRecord ? sensorRecord.siteStatement : null,
         安装位置: sensorRecord ? sensorRecord.installLocation : null,
         处理状态: tempRecord.processingStatus,
-        采样时间问题类型: tempRecord.sampleTimeIssue.type,
-        采样时间问题描述: tempRecord.sampleTimeIssue.description,
-        缺失分钟数: tempRecord.sampleTimeIssue.missingMinutes || 0,
+
+        初始采样时间问题类型: initialIssue ? initialIssue.type : '',
+        初始采样时间问题描述: initialIssue ? initialIssue.description : '',
+        初始缺失分钟数: initialMissingMinutes,
+        初始实际时长_分钟: initialIssue && initialIssue.actualMinutes ? initialIssue.actualMinutes : null,
+
+        当前采样时间问题类型: currentIssue.type,
+        当前采样时间问题描述: currentIssue.description,
+        当前缺失分钟数: currentMissingMinutes,
+
+        采样时间问题类型: currentIssue.type,
+        采样时间问题描述: currentIssue.description,
+        缺失分钟数: currentMissingMinutes,
         采样时间缺失: hasIssue ? '是' : '否',
+        采样时间曾有异常: wasEverIssue ? '是' : '否',
         需质检员复核: needsReview ? '是' : '否',
         复核状态: tempRecord.qualityReview.status,
         复核员: tempRecord.qualityReview.reviewer,
-        原始说法: tempRecord.notes || '（无备注）',
-        人工改动记录: tempRecord.manualChanges.length > 0 
-          ? tempRecord.manualChanges.map(c => 
+        复核结论: tempRecord.qualityReview.decision,
+        复核备注: tempRecord.qualityReview.reviewNotes || '',
+
+        原始说法: tempRecord.originalNotes || '（无备注）',
+        当前备注: tempRecord.notes || '',
+
+        人工改动次数: tempRecord.manualChanges.length,
+        改后值明细: tempRecord.manualChanges.length > 0
+          ? tempRecord.manualChanges.map(c =>
               `${c.timestamp}: ${c.operator} 修改 ${c.field} 从 [${c.oldValue}] 到 [${c.newValue}]，原因：${c.reason}`
             ).join('；')
           : '无',
-        下一步处理: tempRecord.qualityReview.nextStepDescription || '已完成'
+        处理原因明细: tempRecord.manualChanges.map(c => `${c.operator}：${c.reason}`).join('；') || '无',
+        责任人明细: tempRecord.manualChanges.length > 0
+          ? Array.from(new Set(tempRecord.manualChanges.map(c => c.operator))).join('、')
+          : '无',
+
+        下一步处理: nextStepText || '待处理'
       }
     };
   }
@@ -127,10 +169,10 @@ class EvaluationResult {
     this.integratedResults = [];
     const sortedRecords = Array.from(this.temperatureRecords.values())
       .sort((a, b) => a.sourceLineNumber - b.sourceLineNumber);
-    
+
     for (const tempRecord of sortedRecords) {
-      const sensorRecord = tempRecord.sensorId 
-        ? this.sensorRecords.get(tempRecord.sensorId) 
+      const sensorRecord = tempRecord.sensorId
+        ? this.sensorRecords.get(tempRecord.sensorId)
         : null;
 
       if (sensorRecord) {
@@ -151,7 +193,7 @@ class EvaluationResult {
     this.checkMissingSampleTime();
     this.checkRecalculationAfterSupplement();
     this.checkExportConsistency();
-    
+
     this.updatedAt = moment().toISOString();
     return this.selfCheckResults;
   }
@@ -161,14 +203,14 @@ class EvaluationResult {
     const duplicates = [];
 
     for (const [recordId, record] of this.temperatureRecords) {
-      const timeKey = record.sampleStartTime 
-        ? record.sampleStartTime.format() 
+      const timeKey = record.sampleStartTime
+        ? record.sampleStartTime.format()
         : 'no-start';
-      const durationKey = record.sampleDurationMinutes !== null 
-        ? `dur_${record.sampleDurationMinutes}` 
+      const durationKey = record.sampleDurationMinutes !== null
+        ? `dur_${record.sampleDurationMinutes}`
         : 'no-dur';
       const key = `${record.sensorId || 'no-sensor'}-${timeKey}-${durationKey}`;
-      
+
       if (seen.has(key)) {
         duplicates.push({
           recordId1: seen.get(key),
@@ -194,17 +236,26 @@ class EvaluationResult {
     const missingTimeRecords = [];
 
     for (const [recordId, record] of this.temperatureRecords) {
-      const issue = record.sampleTimeIssue;
-      if (issue.type !== 'none') {
+      const initialIssue = record.originalSampleTimeIssue || record.sampleTimeIssue;
+      const currentIssue = record.sampleTimeIssue;
+
+      if (currentIssue.type !== 'none') {
         missingTimeRecords.push({
           recordId,
           sourceLineNumber: record.sourceLineNumber,
           sensorId: record.sensorId,
-          issueType: issue.type,
-          issue: issue.description,
-          missingMinutes: issue.missingMinutes || 0,
-          severity: issue.severity,
-          actualMinutes: issue.actualMinutes || null,
+          initialIssueType: initialIssue ? initialIssue.type : '',
+          initialIssue: initialIssue ? initialIssue.description : '',
+          initialMissingMinutes: initialIssue ? (initialIssue.missingMinutes || 0) : 0,
+          initialActualMinutes: initialIssue && initialIssue.actualMinutes ? initialIssue.actualMinutes : null,
+          currentIssueType: currentIssue.type,
+          currentIssue: currentIssue.description,
+          currentMissingMinutes: currentIssue.missingMinutes || 0,
+          missingMinutes: currentIssue.missingMinutes || 0,
+          actualMinutes: currentIssue.actualMinutes || null,
+          issue: currentIssue.description,
+          issueType: currentIssue.type,
+          severity: currentIssue.severity || 'none',
           processingStatus: record.processingStatus,
           qualityReviewStatus: record.qualityReview.status,
           nextHandler: record.qualityReview.nextHandler
@@ -224,35 +275,53 @@ class EvaluationResult {
     let hasRecalculated = false;
 
     for (const [recordId, record] of this.temperatureRecords) {
-      const hadInitialIssue = record.manualChanges.length > 0 && (
-        record.manualChanges[0].field === 'sampleStartTime' ||
-        record.manualChanges[0].field === 'sampleEndTime' ||
-        record.manualChanges[0].field === 'sampleDurationMinutes' ||
-        record.manualChanges[0].field === 'calibrationTime'
+      const initialIssue = record.originalSampleTimeIssue;
+      const hadInitialIssue = initialIssue && initialIssue.type !== 'none';
+      const hasTimeChanges = record.manualChanges.some(c =>
+        c.field === 'sampleStartTime' ||
+        c.field === 'sampleEndTime' ||
+        c.field === 'sampleDurationMinutes' ||
+        c.field === 'calibrationTime'
       );
 
-      const supplemented = record.processingStatus === 'supplemented' || 
-        record.processingStatus === 'recalculated';
-      
-      if (hadInitialIssue || supplemented) {
+      const supplemented = [
+        'supplemented',
+        'recalculated',
+        'quality_approved',
+        'quality_rejected'
+      ].includes(record.processingStatus);
+
+      if (hadInitialIssue || hasTimeChanges || supplemented) {
         hasRecalculated = true;
-        const beforeStatus = hadInitialIssue ? '初始有采样时间问题' : '正常导入';
         recalculationDetails.push({
           recordId,
           sourceLineNumber: record.sourceLineNumber,
           sensorId: record.sensorId,
-          beforeStatus,
+          initialIssueType: initialIssue ? initialIssue.type : '',
+          initialIssueDescription: initialIssue ? initialIssue.description : '初始正常',
+          initialMissingMinutes: initialIssue ? (initialIssue.missingMinutes || 0) : 0,
+          initialActualMinutes: initialIssue && initialIssue.actualMinutes ? initialIssue.actualMinutes : null,
           currentIssueType: record.sampleTimeIssue.type,
           currentIssueFixed: record.sampleTimeIssue.type === 'none',
           currentDurationMinutes: record.sampleDurationMinutes,
           currentCompliant: record._isDurationFixed ? record._isDurationFixed() : true,
           qualityReviewStatus: record.qualityReview.status,
-          changes: record.manualChanges.filter(c => 
-            c.field === 'sampleStartTime' || 
-            c.field === 'sampleEndTime' || 
+          supplemented: supplemented,
+          changes: record.manualChanges.filter(c =>
+            c.field === 'sampleStartTime' ||
+            c.field === 'sampleEndTime' ||
             c.field === 'sampleDurationMinutes' ||
             c.field === 'calibrationTime'
-          )
+          ).map(c => ({
+            field: c.field,
+            from: c.oldValue,
+            to: c.newValue,
+            operator: c.operator,
+            reason: c.reason,
+            timestamp: c.timestamp,
+            beforeIssue: c.beforeIssue,
+            afterIssue: c.afterIssue
+          }))
         });
       }
     }
@@ -267,7 +336,7 @@ class EvaluationResult {
 
   checkExportConsistency() {
     const currentHash = this.calculateSnapshotHash();
-    const isConsistent = !this.exportSnapshot || 
+    const isConsistent = !this.exportSnapshot ||
       this.lastIntegratedHash === currentHash;
 
     this.selfCheckResults.exportConsistency = {
@@ -299,11 +368,14 @@ class EvaluationResult {
       sampleStartTime: r.sampleStartTime,
       sampleEndTime: r.sampleEndTime,
       sampleDurationMinutes: r.sampleDurationMinutes,
+      initialIssueType: r.initialIssue ? r.initialIssue.type : null,
+      initialMissingMinutes: r.initialIssue && r.initialIssue.missingMinutes ? r.initialIssue.missingMinutes : 0,
       temperature: r.temperature,
       processingStatus: r.processingStatus,
       hasMissingSampleTime: r.hasMissingSampleTime,
       needsQualityReview: r.needsQualityReview,
-      qualityReviewStatus: r.qualityReview.status
+      qualityReviewStatus: r.qualityReview.status,
+      wasEverIssue: r.wasEverIssue
     })));
     return Buffer.from(data).toString('base64').slice(0, 32);
   }
@@ -344,6 +416,7 @@ class EvaluationResult {
     const rejected = this.integratedResults.filter(r => r.qualityReview.status === 'rejected');
     const pendingReview = this.integratedResults.filter(r => r.qualityReview.status === 'pending');
     const supplemented = this.integratedResults.filter(r => r.processingStatus === 'supplemented' || r.processingStatus === 'recalculated');
+    const everHadIssue = this.integratedResults.filter(r => r.wasEverIssue);
 
     const durationBreakdown = {
       empty: 0,
@@ -352,30 +425,53 @@ class EvaluationResult {
       duration_short: 0,
       compliant: 0
     };
+    const initialDurationBreakdown = {
+      empty: 0,
+      missing_start: 0,
+      missing_end_or_duration: 0,
+      duration_short: 0,
+      compliant: 0
+    };
+    const totalInitialMissingMinutes = everHadIssue.reduce(
+      (sum, r) => sum + (r.initialIssue && r.initialIssue.missingMinutes ? r.initialIssue.missingMinutes : 0), 0
+    );
+
     this.integratedResults.forEach(r => {
-      const type = r.sampleTimeIssue.type;
+      const type = r.currentIssue ? r.currentIssue.type : 'none';
       if (durationBreakdown.hasOwnProperty(type)) {
         durationBreakdown[type]++;
       } else {
         durationBreakdown.compliant++;
       }
+      const initType = r.initialIssue ? r.initialIssue.type : 'none';
+      if (initialDurationBreakdown.hasOwnProperty(initType)) {
+        initialDurationBreakdown[initType]++;
+      } else {
+        initialDurationBreakdown.compliant++;
+      }
     });
 
     return {
       totalRecords: total,
-      recordsWithMissingTime: withIssue.length,
+      recordsEverHadMissingTime: everHadIssue.length,
+      totalInitialMissingMinutes,
+      recordsWithCurrentMissingTime: withIssue.length,
       recordsNeedingReview: needsReview.length,
       recordsApproved: approved.length,
       recordsRejected: rejected.length,
       recordsPendingReview: pendingReview.length,
       recordsSupplemented: supplemented.length,
       linkedSensors: this.sensorRecords.size,
-      durationBreakdown,
+      currentDurationBreakdown: durationBreakdown,
+      initialDurationBreakdown,
       consistency: {
         displaySource: 'integratedResults（同一份数据）',
+        listSource: 'integratedResults（同一份数据）',
         apiSource: 'integratedResults（同一份数据）',
         exportSource: 'integratedResults（同一份数据）',
-        guaranteedBy: '列表/详情/摘要/导出/报告全部从integratedData()生成，无独立计算'
+        historySource: 'integratedResults（同一份数据）',
+        reportSource: 'integratedResults（同一份数据）',
+        guaranteedBy: '列表/详情/摘要/导出/报告/历史 全部从integrateData()生成，无独立计算'
       }
     };
   }

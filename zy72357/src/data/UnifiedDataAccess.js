@@ -42,11 +42,12 @@ class UnifiedDataAccess {
         showManualChanges: true,
         showQualityReviewStatus: true,
         highlightMissingTime: true,
-        showNextStepHint: true
+        showNextStepHint: true,
+        showInitialVsCurrentDualView: true
       },
       list: this.getListForDisplay(evaluationId).list,
       history: this.getHistoryForDisplay(evaluationId).history,
-      dataSource: 'integratedResults（同一份数据，保证三处一致）'
+      dataSource: 'integratedResults（同一份数据，保证6处一致，初始证据+当前状态分开展示）'
     };
   }
 
@@ -73,7 +74,7 @@ class UnifiedDataAccess {
   getReport(evaluationId) {
     const exportData = this.workflow.engine.getExportDetails(evaluationId);
     const unified = this.workflow.getUnifiedResults(evaluationId);
-    
+
     return {
       reportId: `RPT-${evaluationId.slice(0, 8)}-v${unified.version}`,
       generatedAt: new Date().toISOString(),
@@ -85,29 +86,41 @@ class UnifiedDataAccess {
       },
       overview: exportData.summary,
       selfCheckReport: exportData.selfCheckReport,
-      durationBreakdown: unified.summary.durationBreakdown,
+      initialDurationBreakdown: unified.summary.initialDurationBreakdown,
+      currentDurationBreakdown: unified.summary.currentDurationBreakdown,
       pendingActions: unified.records
         .filter(r => r.needsQualityReview)
         .map(r => ({
           sourceLine: r.sourceLineNumber,
           sensorId: r.sensorId,
-          issue: r.sampleTimeIssue.description,
-          missingMinutes: r.sampleTimeIssue.missingMinutes || 0,
+          initialIssue: r.initialIssue ? r.initialIssue.description : '（初始正常）',
+          initialMissingMinutes: r.initialIssue && r.initialIssue.missingMinutes ? r.initialIssue.missingMinutes : 0,
+          currentIssue: r.currentIssue.description,
+          missingMinutes: r.currentIssue.missingMinutes || 0,
           nextHandler: r.qualityReview.nextHandler,
           nextAction: r.qualityReview.nextStepDescription
         })),
+      records: exportData.report,
       recordAudits: unified.records.map(r => ({
         sourceLine: r.sourceLineNumber,
         sensorId: r.sensorId,
         siteStatement: r.siteStatement,
         originalInput: r.originalData,
-        sampleTimeIssue: r.sampleTimeIssue,
+        originalSnapshot: r.originalSnapshot,
+        originalStatement: r.auditTrail.originalStatement,
+        initialIssue: r.initialIssue,
+        initialMissingMinutes: r.initialIssue && r.initialIssue.missingMinutes ? r.initialIssue.missingMinutes : 0,
+        currentIssue: r.currentIssue,
+        wasEverIssue: r.wasEverIssue,
+        sampleTimeIssue: r.currentIssue,
         corrections: r.manualChanges.map(c => ({
           field: c.field,
           originalValue: c.oldValue,
           correctedValue: c.newValue,
           operator: c.operator,
           reason: c.reason,
+          beforeIssue: c.beforeIssue,
+          afterIssue: c.afterIssue,
           at: c.timestamp
         })),
         review: {
@@ -152,6 +165,10 @@ class UnifiedDataAccess {
           humidity: r.humidity,
           siteStatement: r.siteStatement,
           installLocation: r.installLocation,
+          initialIssue: r.initialIssue,
+          initialMissingMinutes: r.initialIssue && r.initialIssue.missingMinutes ? r.initialIssue.missingMinutes : 0,
+          currentIssue: r.currentIssue,
+          wasEverIssue: r.wasEverIssue,
           sampleTimeIssue: r.sampleTimeIssue,
           hasMissingSampleTime: r.hasMissingSampleTime,
           needsQualityReview: r.needsQualityReview,
@@ -187,16 +204,12 @@ class UnifiedDataAccess {
     const historyCount = exportData.history.length;
     const reportCount = report.recordAudits.length;
 
-    const displayMissingCount = display.records.filter(r => r.hasMissingSampleTime).length;
-    const listMissingCount = list.list.filter(r => r.hasIssue).length;
-    const apiMissingCount = api.data.records.filter(r => r.hasMissingSampleTime).length;
-    const exportMissingCount = exportData.details.filter(r => r.采样时间缺失 === '是').length;
-    const historyMissingCount = exportData.history.filter(
-      h => h.初始问题类型 !== 'none'
-    ).length;
-    const reportMissingCount = report.recordAudits.filter(
-      r => r.sampleTimeIssue.type !== 'none'
-    ).length;
+    const displayEverIssueCount = display.records.filter(r => r.wasEverIssue).length;
+    const listEverIssueCount = list.list.filter(r => r.wasEverIssue).length;
+    const apiEverIssueCount = api.data.records.filter(r => r.wasEverIssue).length;
+    const exportEverIssueCount = exportData.details.filter(r => r.采样时间曾有异常 === '是').length;
+    const historyEverIssueCount = exportData.history.filter(h => h.初始问题类型 !== 'none').length;
+    const reportEverIssueCount = report.recordAudits.filter(r => r.wasEverIssue).length;
 
     const displayReviewCount = display.records.filter(r => r.needsQualityReview).length;
     const listReviewCount = list.list.filter(r => r.needsReview).length;
@@ -207,6 +220,13 @@ class UnifiedDataAccess {
     ).length;
     const reportReviewCount = report.pendingActions.length;
 
+    const displayMissingTimeCount = displayEverIssueCount;
+    const listMissingTimeCount = listEverIssueCount;
+    const apiMissingTimeCount = apiEverIssueCount;
+    const exportMissingTimeCount = exportEverIssueCount;
+    const historyMissingTimeCount = historyEverIssueCount;
+    const reportMissingTimeCount = reportEverIssueCount;
+
     const allCountConsistent = (
       displayCount === listCount &&
       listCount === apiCount &&
@@ -216,11 +236,11 @@ class UnifiedDataAccess {
     );
 
     const allMissingConsistent = (
-      displayMissingCount === listMissingCount &&
-      listMissingCount === apiMissingCount &&
-      apiMissingCount === exportMissingCount &&
-      exportMissingCount === historyMissingCount &&
-      historyMissingCount === reportMissingCount
+      displayMissingTimeCount === listMissingTimeCount &&
+      listMissingTimeCount === apiMissingTimeCount &&
+      apiMissingTimeCount === exportMissingTimeCount &&
+      exportMissingTimeCount === historyMissingTimeCount &&
+      historyMissingTimeCount === reportMissingTimeCount
     );
 
     const allReviewConsistent = (
@@ -235,6 +255,7 @@ class UnifiedDataAccess {
     const sampleListRecord = list.list[0];
     const sampleAPIRecord = api.data.records[0];
     const sampleExportRecord = exportData.details[0];
+    const sampleHistoryRecord = exportData.history[0];
 
     const fieldConsistencyChecks = sampleRecord ? {
       sourceLine: {
@@ -242,10 +263,12 @@ class UnifiedDataAccess {
         list: sampleListRecord.row,
         api: sampleAPIRecord.sourceLine,
         export: sampleExportRecord.原始行号,
+        history: sampleHistoryRecord.原始行号,
         consistent: (
           sampleRecord.sourceLineNumber === sampleListRecord.row &&
           sampleListRecord.row === sampleAPIRecord.sourceLine &&
-          sampleAPIRecord.sourceLine === sampleExportRecord.原始行号
+          sampleAPIRecord.sourceLine === sampleExportRecord.原始行号 &&
+          sampleExportRecord.原始行号 === sampleHistoryRecord.原始行号
         )
       },
       sensorId: {
@@ -253,10 +276,26 @@ class UnifiedDataAccess {
         list: sampleListRecord.sensorId,
         api: sampleAPIRecord.sensorId,
         export: sampleExportRecord.传感器编号,
+        history: sampleHistoryRecord.传感器编号,
         consistent: (
           sampleRecord.sensorId === sampleListRecord.sensorId &&
           sampleListRecord.sensorId === sampleAPIRecord.sensorId &&
-          sampleAPIRecord.sensorId === sampleExportRecord.传感器编号
+          sampleAPIRecord.sensorId === sampleExportRecord.传感器编号 &&
+          sampleExportRecord.传感器编号 === sampleHistoryRecord.传感器编号
+        )
+      },
+      initialMissingMinutes: {
+        display: sampleRecord.initialIssue && sampleRecord.initialIssue.missingMinutes ? sampleRecord.initialIssue.missingMinutes : 0,
+        list: sampleListRecord.initialMissingMinutes,
+        api: sampleAPIRecord.initialMissingMinutes,
+        export: sampleExportRecord.初始缺失分钟数,
+        history: sampleHistoryRecord.初始缺失分钟数,
+        consistent: (
+          (sampleRecord.initialIssue && sampleRecord.initialIssue.missingMinutes ? sampleRecord.initialIssue.missingMinutes : 0)
+          === sampleListRecord.initialMissingMinutes &&
+          sampleListRecord.initialMissingMinutes === sampleAPIRecord.initialMissingMinutes &&
+          sampleAPIRecord.initialMissingMinutes === sampleExportRecord.初始缺失分钟数 &&
+          sampleExportRecord.初始缺失分钟数 === sampleHistoryRecord.初始缺失分钟数
         )
       }
     } : {};
@@ -285,12 +324,21 @@ class UnifiedDataAccess {
           consistent: allCountConsistent
         },
         missingTimeCount: {
-          display: displayMissingCount,
-          list: listMissingCount,
-          api: apiMissingCount,
-          export: exportMissingCount,
-          history: historyMissingCount,
-          report: reportMissingCount,
+          display: displayMissingTimeCount,
+          list: listMissingTimeCount,
+          api: apiMissingTimeCount,
+          export: exportMissingTimeCount,
+          history: historyMissingTimeCount,
+          report: reportMissingTimeCount,
+          consistent: allMissingConsistent
+        },
+        recordsEverHadIssue: {
+          display: displayEverIssueCount,
+          list: listEverIssueCount,
+          api: apiEverIssueCount,
+          export: exportEverIssueCount,
+          history: historyEverIssueCount,
+          report: reportEverIssueCount,
           consistent: allMissingConsistent
         },
         qualityReviewCount: {
@@ -304,7 +352,7 @@ class UnifiedDataAccess {
         }
       },
       sampleFieldConsistency: fieldConsistencyChecks,
-      guarantee: exportData.dataConsistencyNote
+      guarantee: '列表/详情/摘要/导出/报告/历史 全部从 integratedResults（同一份数据）生成，无独立计算'
     };
   }
 }

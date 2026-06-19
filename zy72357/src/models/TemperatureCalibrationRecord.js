@@ -8,20 +8,31 @@ class TemperatureCalibrationRecord {
     this.id = uuidv4();
     this.sourceLineNumber = sourceLineNumber;
     this.originalData = { ...data };
+    this.originalNotes = data.notes || '';
     this.manualChanges = [];
     this.sensorId = data.sensorId || null;
 
-    this.sampleStartTime = data.sampleStartTime 
-      ? moment(data.sampleStartTime) 
+    this.sampleStartTime = data.sampleStartTime
+      ? moment(data.sampleStartTime)
       : (data.calibrationTime ? moment(data.calibrationTime) : null);
 
-    this.sampleEndTime = data.sampleEndTime 
-      ? moment(data.sampleEndTime) 
+    this.sampleEndTime = data.sampleEndTime
+      ? moment(data.sampleEndTime)
       : (data.calibrationEndTime ? moment(data.calibrationEndTime) : null);
 
-    this.sampleDurationMinutes = data.sampleDurationMinutes 
-      ? Number(data.sampleDurationMinutes) 
+    this.sampleDurationMinutes = data.sampleDurationMinutes
+      ? Number(data.sampleDurationMinutes)
       : this._calculateDurationMinutes();
+
+    const originalStartTime = this.sampleStartTime ? this.sampleStartTime.clone() : null;
+    const originalEndTime = this.sampleEndTime ? this.sampleEndTime.clone() : null;
+    const originalDurationMinutes = this.sampleDurationMinutes;
+    this.originalSnapshot = {
+      sampleStartTime: originalStartTime ? originalStartTime.format() : null,
+      sampleEndTime: originalEndTime ? originalEndTime.format() : null,
+      sampleDurationMinutes: originalDurationMinutes,
+      notes: this.originalNotes
+    };
 
     this.calibrationTime = this.sampleStartTime;
     this.temperature = data.temperature || null;
@@ -44,6 +55,7 @@ class TemperatureCalibrationRecord {
     };
 
     this.sampleTimeIssue = this._detectSampleTimeIssue();
+    this.originalSampleTimeIssue = { ...this.sampleTimeIssue };
     if (this.sampleTimeIssue.type !== 'none') {
       this.qualityReview.required = true;
       this.qualityReview.status = 'pending';
@@ -87,8 +99,8 @@ class TemperatureCalibrationRecord {
       };
     }
 
-    const duration = this.sampleDurationMinutes !== null 
-      ? this.sampleDurationMinutes 
+    const duration = this.sampleDurationMinutes !== null
+      ? this.sampleDurationMinutes
       : this._calculateDurationMinutes();
 
     if (duration !== null && duration < MIN_SAMPLE_DURATION_MINUTES) {
@@ -110,7 +122,7 @@ class TemperatureCalibrationRecord {
   updateField(field, value, operator, reason) {
     const oldValue = this[field];
     let processedValue = value;
-    
+
     if ((field === 'sampleStartTime' || field === 'sampleEndTime' || field === 'calibrationTime') && value) {
       processedValue = moment(value);
     }
@@ -121,6 +133,8 @@ class TemperatureCalibrationRecord {
 
     let oldDisplayValue = oldValue ? (oldValue.format ? oldValue.format() : String(oldValue)) : null;
     let newDisplayValue = processedValue ? (processedValue.format ? processedValue.format() : String(processedValue)) : null;
+
+    const issueBeforeChange = { ...this.sampleTimeIssue };
 
     this[field] = processedValue;
 
@@ -148,7 +162,8 @@ class TemperatureCalibrationRecord {
       newValue: newDisplayValue,
       operator,
       reason,
-      beforeIssue: this.manualChanges.length === 0 ? null : undefined,
+      beforeIssue: issueBeforeChange,
+      afterIssue: { ...this.sampleTimeIssue },
       timestamp: moment().toISOString()
     });
     this.updatedAt = moment().toISOString();
@@ -199,7 +214,7 @@ class TemperatureCalibrationRecord {
 
   _isDurationFixed() {
     if (this.sampleTimeIssue.type === 'none') return true;
-    
+
     if (this.sampleDurationMinutes !== null) {
       return this.sampleDurationMinutes >= MIN_SAMPLE_DURATION_MINUTES;
     }
@@ -210,7 +225,7 @@ class TemperatureCalibrationRecord {
   }
 
   hasMissingSampleTime() {
-    return this.sampleTimeIssue.type !== 'none' 
+    return this.sampleTimeIssue.type !== 'none'
       || this.qualityReview.status === 'pending'
       || this.qualityReview.status === 'rejected';
   }
@@ -229,17 +244,21 @@ class TemperatureCalibrationRecord {
         sampleEndTime: this.originalData.sampleEndTime || this.originalData.calibrationEndTime || null,
         sampleDurationMinutes: this.originalData.sampleDurationMinutes || null
       },
-      originalStatement: this.notes || '（原始记录无备注）',
+      originalSnapshot: this.originalSnapshot,
+      originalStatement: this.originalNotes || '（原始记录无备注）',
+      initialIssue: this.originalSampleTimeIssue,
+      currentIssue: this.sampleTimeIssue,
       manualChanges: this.manualChanges.map(c => ({
         field: c.field,
         originalValue: c.oldValue,
         correctedValue: c.newValue,
         operator: c.operator,
         processingReason: c.reason,
+        beforeIssue: c.beforeIssue,
+        afterIssue: c.afterIssue,
         timestamp: c.timestamp
       })),
       processingStatus: this.processingStatus,
-      sampleTimeIssue: this.sampleTimeIssue,
       qualityReview: {
         ...this.qualityReview,
         currentNextStep: this._getNextStepDescription()
@@ -267,9 +286,14 @@ class TemperatureCalibrationRecord {
     const parts = [];
     parts.push(`原始行号：${this.sourceLineNumber}`);
     if (this.sensorId) parts.push(`传感器：${this.sensorId}`);
-    parts.push(`问题：${this.sampleTimeIssue.description}`);
-    if (this.sampleTimeIssue.missingMinutes) {
-      parts.push(`缺${this.sampleTimeIssue.missingMinutes}分钟`);
+    if (this.originalSampleTimeIssue.type !== 'none') {
+      parts.push(`初始问题：${this.originalSampleTimeIssue.description}`);
+      if (this.originalSampleTimeIssue.missingMinutes) {
+        parts.push(`初始缺${this.originalSampleTimeIssue.missingMinutes}分钟`);
+      }
+    }
+    if (this.sampleTimeIssue.type !== this.originalSampleTimeIssue.type) {
+      parts.push(`当前状态：${this.sampleTimeIssue.description}`);
     }
     if (this.manualChanges.length > 0) {
       const lastChange = this.manualChanges[this.manualChanges.length - 1];
@@ -292,7 +316,10 @@ class TemperatureCalibrationRecord {
       processingStatus: this.processingStatus,
       importBatchId: this.importBatchId,
       notes: this.notes,
+      originalNotes: this.originalNotes,
+      originalSnapshot: this.originalSnapshot,
       sampleTimeIssue: this.sampleTimeIssue,
+      originalSampleTimeIssue: this.originalSampleTimeIssue,
       qualityReview: {
         ...this.qualityReview,
         nextStepDescription: this._getNextStepDescription()
@@ -304,10 +331,14 @@ class TemperatureCalibrationRecord {
       originalData: this.originalData,
       summary: this._getSummary(),
       auditTrail: {
-        originalStatement: this.notes || '（原始记录无备注）',
+        originalStatement: this.originalNotes || '（原始记录无备注）',
         correctedValues: this.manualChanges.length > 0 ? this.manualChanges[this.manualChanges.length - 1] : null,
         processingReasons: this.manualChanges.map(c => `${c.operator}: ${c.reason}`),
-        nextHandler: this.qualityReview.nextHandler
+        nextHandler: this.qualityReview.nextHandler,
+        initialIssue: this.originalSampleTimeIssue,
+        initialMissingMinutes: this.originalSampleTimeIssue.missingMinutes || 0,
+        reviewNotes: this.qualityReview.reviewNotes,
+        reviewer: this.qualityReview.reviewer
       },
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
