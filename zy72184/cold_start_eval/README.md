@@ -146,17 +146,12 @@ python main.py --list-versions
 python main.py --anomalies v1
 ```
 
-### 2. 只看重复样本（样本ID重复 + 特征重复）
-```bash
-python main.py --anomalies v1 --type duplicate
-```
-
-### 3. 只看标签冲突
+### 2. 只看标签冲突
 ```bash
 python main.py --anomalies v1 --type label_conflict
 ```
 
-### 4. 只看样本泄漏（最严重）
+### 3. 只看样本泄漏（最严重）
 ```bash
 python main.py --anomalies v1 --type sample_leakage
 ```
@@ -219,11 +214,6 @@ python main.py --evaluate v1
   - anomalies_*.md      (异常清单)
 ```
 
-> **说明**：
-> - `总样本数: 8` — 包含 CS_001 两次导入（1条顺利处理 + 1条看板重导入）
-> - `duplicate: 3 条` — 2条样本ID重复(CS_001×2，error) + 1条特征重复(CS_004，warning)，最严重级别为 **error**
-> - `有效样本数: 5` — 排除了样本泄漏(CS_007)和样本ID重复(CS_001重导入)导致的冗余记录
-
 ### 2. 对比两个版本
 ```bash
 python main.py --compare v1 v2
@@ -276,6 +266,9 @@ python main.py --evaluate v1 --data-dir /path/to/data --output-dir /path/to/outp
 ✅ **边界和空值**：用户提到的空值、重复、边界都有专门检测  
 
 ### 自测用例（已内置在样例数据中）
+> 总计 **8 条样本记录**（7 个唯一样本 + 1 条重导入重复），**9 条异常**。
+> duplicate 共 3 条：2 条样本 ID 重复（🟠 error）+ 1 条特征重复（🟡 warning），最严重级别为 error。
+
 | 样本 | 测试点 | 预期结果 |
 |------|--------|----------|
 | CS_001 | 顺利处理，一次通过 | approved，无异常 |
@@ -294,9 +287,6 @@ python main.py --evaluate v1 --data-dir /path/to/data --output-dir /path/to/outp
 ```bash
 # 先评测 v1，看空值、重复、边界检测
 python main.py --evaluate v1
-
-# 看两种重复（样本ID重复 + 特征重复）
-python main.py --anomalies v1 --type duplicate
 
 # 看标签冲突清单
 python main.py --anomalies v1 --type label_conflict
@@ -327,4 +317,4 @@ python main.py --compare v1 v2
 
 ---
 
-*最后更新：2026-06-17*
+*最后更新：2026-06-19*

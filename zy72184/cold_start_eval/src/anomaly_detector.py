@@ -13,42 +13,18 @@ class AnomalyDetector:
         self.null_threshold = null_threshold
 
     def detect_all(self, records: List[EvaluationRecord]) -> List[AnomalyRecord]:
-        all_anomalies = []
-        dup_anomalies = self.detect_duplicates(records)
-        all_anomalies.extend(dup_anomalies)
-        for anomaly in dup_anomalies:
-            self._attach_anomaly_to_records(anomaly, records)
+        all_anomalies: List[AnomalyRecord] = []
+        all_anomalies.extend(self.detect_duplicates(records))
         for record in records:
-            anomalies = self.detect_single(record)
-            record.anomalies.extend(anomalies)
-            all_anomalies.extend(anomalies)
-        lc_anomalies = self.detect_label_conflicts(records)
-        all_anomalies.extend(lc_anomalies)
-        for anomaly in lc_anomalies:
-            self._attach_anomaly_to_records(anomaly, records)
-        sl_anomalies = self.detect_sample_leakage(records)
-        all_anomalies.extend(sl_anomalies)
-        for anomaly in sl_anomalies:
-            self._attach_anomaly_to_records(anomaly, records)
+            single_anomalies = self.detect_single(record)
+            record.anomalies.extend(single_anomalies)
+            all_anomalies.extend(single_anomalies)
+        all_anomalies.extend(self.detect_label_conflicts(records))
+        all_anomalies.extend(self.detect_sample_leakage(records))
         return all_anomalies
 
-    def _attach_anomaly_to_records(
-        self, anomaly: AnomalyRecord, records: List[EvaluationRecord]
-    ) -> None:
-        anomaly_source = anomaly.details.get("source")
-        matched = False
-        for record in records:
-            if record.sample_id != anomaly.sample_id:
-                continue
-            if anomaly_source and record.sample.source == anomaly_source:
-                record.anomalies.append(anomaly)
-                matched = True
-                break
-        if not matched:
-            for record in records:
-                if record.sample_id == anomaly.sample_id:
-                    record.anomalies.append(anomaly)
-                    break
+    def _attach_anomaly(self, record: EvaluationRecord, anomaly: AnomalyRecord) -> None:
+        record.anomalies.append(anomaly)
 
     def detect_duplicates(self, records: List[EvaluationRecord]) -> List[AnomalyRecord]:
         anomalies = []
@@ -77,6 +53,7 @@ class AnomalyDetector:
                         }
                     )
                     anomalies.append(anomaly)
+                    self._attach_anomaly(record, anomaly)
         for feature_hash, group in feature_hashes.items():
             if len(group) > 1:
                 distinct_ids = list(dict.fromkeys(r.sample_id for r in group))
@@ -99,6 +76,7 @@ class AnomalyDetector:
                         }
                     )
                     anomalies.append(anomaly)
+                    self._attach_anomaly(record, anomaly)
         return anomalies
 
     def detect_null_values(self, record: EvaluationRecord) -> List[AnomalyRecord]:
@@ -176,6 +154,7 @@ class AnomalyDetector:
                     }
                 )
                 anomalies.append(anomaly)
+                self._attach_anomaly(record, anomaly)
         return anomalies
 
     def detect_sample_leakage(self, records: List[EvaluationRecord]) -> List[AnomalyRecord]:
@@ -209,6 +188,7 @@ class AnomalyDetector:
                     }
                 )
                 anomalies.append(anomaly)
+                self._attach_anomaly(record, anomaly)
         return anomalies
 
     def _hash_features(self, features: Dict[str, Any]) -> str:
