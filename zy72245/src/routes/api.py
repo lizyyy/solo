@@ -12,6 +12,7 @@ from src.services.verification import (
     fix_approver,
     confirm_review,
     list_verifications,
+    export_verifications,
 )
 
 bp = Blueprint("api", __name__, url_prefix="/api")
@@ -216,6 +217,14 @@ def api_review_transaction(transaction_id):
         })
     finally:
         conn.close()
+
+
+@bp.route("/verifications/export", methods=["GET"])
+def api_export_verifications():
+    step = request.args.get("step")
+    approver_status = request.args.get("approver_status")
+    data = export_verifications(step=step, approver_status=approver_status)
+    return jsonify(data)
 
 
 @bp.route("/verifications/chart-data", methods=["GET"])

@@ -134,6 +134,7 @@ review_required 清零，方可进入余额更新步骤
 | POST | `/api/verifications/{id}/advance` | 推进核验步骤 |
 | POST | `/api/verifications/{id}/rollback` | 回滚核验步骤 |
 | GET | `/api/verifications/chart-data` | 图表数据（含拼音审批人明细） |
+| GET | `/api/verifications/export` | 导出绿色债券投向占比核验报告（含复核状态、历史记录、阻断原因） |
 
 ## 启动
 

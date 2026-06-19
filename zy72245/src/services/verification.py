@@ -159,11 +159,17 @@ def update_transaction_field(
         )
 
         new_approver_status = row["approver_status"]
+        review_required = row["review_required"] if "review_required" in row.keys() else 0
         if field_name == "approver":
             new_approver_status = classify_approver(new_value)
+            needs_review = (
+                row["approver_status"] == APPROVER_STATUS_PINYIN_ONLY
+                or new_approver_status == APPROVER_STATUS_PINYIN_ONLY
+            )
+            review_required = 1 if needs_review else review_required
             c.execute(
-                "UPDATE counter_transactions SET approver_status = ?, updated_at = ? WHERE id = ?",
-                (new_approver_status, now, transaction_id),
+                "UPDATE counter_transactions SET approver_status = ?, review_required = ?, updated_at = ? WHERE id = ?",
+                (new_approver_status, review_required, now, transaction_id),
             )
 
         conn.commit()
@@ -176,13 +182,11 @@ def update_transaction_field(
             "changed_by": changed_by,
             "changed_at": now,
             "approver_status": new_approver_status,
+            "review_required": bool(review_required) if field_name == "approver" else None,
         }
 
-        if field_name == "approver" and new_approver_status == APPROVER_STATUS_PINYIN_ONLY:
+        if field_name == "approver" and review_required:
             result["warning"] = get_error("APPROVER_FIX_REQUIRES_REVIEW")
-        elif field_name == "approver" and new_approver_status == APPROVER_STATUS_NORMAL:
-            if row["approver_status"] == APPROVER_STATUS_PINYIN_ONLY:
-                result["warning"] = get_error("APPROVER_FIX_REQUIRES_REVIEW")
 
         return result
     finally:
@@ -569,7 +573,7 @@ def list_verifications(
         c = conn.cursor()
 
         query = """
-            SELECT v.*, t.tail_number, t.approver, t.approver_status, t.amount
+            SELECT v.*, t.tail_number, t.approver, t.approver_status, t.review_required, t.amount
             FROM green_bond_verifications v
             JOIN counter_transactions t ON v.transaction_id = t.id
             WHERE 1=1
@@ -597,13 +601,203 @@ def list_verifications(
             seen_txn_steps[key] = True
 
             item = dict(r)
-            if r["approver_status"] == APPROVER_STATUS_PINYIN_ONLY:
+            review_required = r["review_required"] if "review_required" in r.keys() else 0
+            if r["approver_status"] == APPROVER_STATUS_PINYIN_ONLY or review_required:
                 item["trace_links"] = {
                     "transaction_detail": f"/api/transactions/{r['transaction_id']}",
                     "supplementary_emails": f"/api/transactions/{r['transaction_id']}/emails",
+                    "approver_review": f"/api/transactions/{r['transaction_id']}/review",
                 }
             result.append(item)
 
         return result
+    finally:
+        conn.close()
+
+
+def export_verifications(
+    step: Optional[str] = None,
+    approver_status: Optional[str] = None,
+    db_path: Optional[str] = None,
+) -> Dict[str, Any]:
+    conn = get_db(db_path)
+    try:
+        c = conn.cursor()
+
+        query = """
+            SELECT DISTINCT
+                t.id AS transaction_id,
+                t.tail_number,
+                t.amount,
+                t.approver,
+                t.approver_status,
+                t.review_required,
+                t.remark,
+                t.batch_id,
+                t.created_at,
+                t.updated_at
+            FROM counter_transactions t
+            WHERE 1=1
+        """
+        params = []
+        if approver_status:
+            query += " AND t.approver_status = ?"
+            params.append(approver_status)
+
+        query += " ORDER BY t.created_at DESC"
+
+        c.execute(query, params)
+        txn_rows = [dict(r) for r in c.fetchall()]
+
+        txn_ids = [r["transaction_id"] for r in txn_rows]
+        placeholders = ",".join("?" * len(txn_ids)) if txn_ids else "''"
+
+        verif_map = {}
+        if txn_ids:
+            c.execute(
+                f"""
+                SELECT transaction_id, id AS verification_id,
+                       green_ratio, verification_step, status, reviewer,
+                       supplementary_email_id, created_at, updated_at
+                FROM green_bond_verifications
+                WHERE transaction_id IN ({placeholders})
+                ORDER BY created_at DESC
+                """,
+                txn_ids,
+            )
+            for v in c.fetchall():
+                vid = v["transaction_id"]
+                verif_map.setdefault(vid, []).append(dict(v))
+
+        email_map = {}
+        if txn_ids:
+            c.execute(
+                f"""
+                SELECT id, transaction_id, sender, content, created_at
+                FROM supplementary_emails
+                WHERE transaction_id IN ({placeholders})
+                ORDER BY created_at ASC
+                """,
+                txn_ids,
+            )
+            for e in c.fetchall():
+                tid = e["transaction_id"]
+                email_map.setdefault(tid, []).append(dict(e))
+
+        balance_map = {}
+        if txn_ids:
+            c.execute(
+                f"""
+                SELECT id, transaction_id, old_balance, new_balance, changed_at
+                FROM balance_changes
+                WHERE transaction_id IN ({placeholders})
+                ORDER BY changed_at ASC
+                """,
+                txn_ids,
+            )
+            for b in c.fetchall():
+                tid = b["transaction_id"]
+                balance_map.setdefault(tid, []).append(dict(b))
+
+        history_map = {}
+        if txn_ids:
+            c.execute(
+                f"""
+                SELECT id, transaction_id, field_name, old_value, new_value, changed_by, changed_at
+                FROM transaction_history
+                WHERE transaction_id IN ({placeholders})
+                ORDER BY changed_at ASC
+                """,
+                txn_ids,
+            )
+            for h in c.fetchall():
+                tid = h["transaction_id"]
+                history_map.setdefault(tid, []).append({
+                    "field_name": humanize_field(h["field_name"]),
+                    "field_key": h["field_name"],
+                    "old_value": h["old_value"],
+                    "new_value": h["new_value"],
+                    "changed_by": h["changed_by"],
+                    "changed_at": h["changed_at"],
+                })
+
+        rows = []
+        status_display = {
+            APPROVER_STATUS_PINYIN_ONLY: "审批人仅拼音（待复核）",
+            APPROVER_STATUS_NORMAL: "审批人正常",
+        }
+        step_display = {
+            VERIFICATION_STEP_IMPORT: "第1步-柜台流水尾号导入",
+            VERIFICATION_STEP_EMAIL_REVIEW: "第2步-补看客户经理补充邮件",
+            VERIFICATION_STEP_BALANCE_UPDATE: "第3步-余额变化表更新",
+        }
+        review_display = {0: "无需复核", 1: "待复核确认"}
+
+        for txn in txn_rows:
+            tid = txn["transaction_id"]
+            verifs = verif_map.get(tid, [])
+            last_verif = verifs[0] if verifs else {}
+
+            pinyin_only = txn["approver_status"] == APPROVER_STATUS_PINYIN_ONLY
+            review_req = bool(txn.get("review_required", 0))
+
+            block_reason = None
+            if pinyin_only and last_verif.get("verification_step") != VERIFICATION_STEP_IMPORT:
+                block_reason = "拼音审批人未解决"
+            elif review_req and last_verif.get("verification_step") == VERIFICATION_STEP_EMAIL_REVIEW:
+                block_reason = "审批人已修改，尚未复核确认"
+
+            export_row = {
+                "柜台流水尾号": txn["tail_number"],
+                "金额": txn["amount"],
+                "审批人": txn["approver"],
+                "审批人状态": status_display.get(txn["approver_status"], txn["approver_status"]),
+                "复核状态": review_display.get(txn.get("review_required", 0), "未知"),
+                "是否需复核": "是" if (pinyin_only or review_req) else "否",
+                "绿色债券投向占比": last_verif.get("green_ratio", 0),
+                "当前核验步骤": step_display.get(last_verif.get("verification_step", ""),
+                                              last_verif.get("verification_step", "-")),
+                "核验状态": "待处理" if last_verif.get("status") == VERIFICATION_STATUS_PENDING
+                           else "已通过" if last_verif.get("status") == VERIFICATION_STATUS_APPROVED
+                           else last_verif.get("status", "-"),
+                "流程阻断原因": block_reason if block_reason else "无",
+                "备注": txn.get("remark", ""),
+                "客户经理补充邮件数量": len(email_map.get(tid, [])),
+                "余额变更次数": len(balance_map.get(tid, [])),
+                "变更历史条目数": len(history_map.get(tid, [])),
+                "导入时间": txn["created_at"],
+                "最后更新时间": txn["updated_at"],
+                "transaction_id": tid,
+                "_detail": {
+                    "all_verification_steps": verifs,
+                    "supplementary_emails": email_map.get(tid, []),
+                    "balance_changes": balance_map.get(tid, []),
+                    "change_history": history_map.get(tid, []),
+                },
+            }
+            rows.append(export_row)
+
+        pinyin_count = sum(1 for r in rows if r["审批人状态"] == status_display[APPROVER_STATUS_PINYIN_ONLY])
+        review_pending_count = sum(1 for r in rows if r["复核状态"] == "待复核确认")
+        approved_count = sum(1 for r in rows if r["核验状态"] == "已通过")
+        blocked_count = sum(1 for r in rows if r["流程阻断原因"] != "无")
+
+        return {
+            "exported_at": _now(),
+            "summary": {
+                "总记录数": len(rows),
+                "拼音审批人记录数": pinyin_count,
+                "待复核确认记录数": review_pending_count,
+                "已通过核验记录数": approved_count,
+                "流程阻断记录数": blocked_count,
+                "已完成余额更新记录数": len(balance_map),
+            },
+            "rules": {
+                "改为中文名后仍需复核": "是",
+                "所有改审批人的入口都必须复核": "是",
+                "复核通过后方可继续余额更新": "是",
+            },
+            "rows": rows,
+        }
     finally:
         conn.close()

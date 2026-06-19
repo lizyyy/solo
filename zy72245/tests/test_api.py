@@ -332,3 +332,215 @@ class TestEndToEndAPIWorkflow:
         assert txn_data["approver"] == "张三"
         assert txn_data["approver_status"] == "normal"
         assert txn_data["review_required"] == 0
+
+
+class TestGenericUpdateApproverAPI:
+    def test_generic_update_approver_persists_review_required(self, app_client):
+        r = _import_one(app_client, approver="zhangsan")
+        txn_id = r.get_json()["imported"][0]["transaction_id"]
+
+        r_update = app_client.patch(
+            f"/api/transactions/{txn_id}/update",
+            data=json.dumps({"field_name": "approver", "new_value": "张三", "changed_by": "林姐"}),
+            content_type="application/json",
+        )
+        d = r_update.get_json()
+        assert d["review_required"] is True
+        assert d["approver_status"] == "normal"
+        assert "复核" in d["warning"]
+
+        r_txn = app_client.get(f"/api/transactions/{txn_id}")
+        txn_data = r_txn.get_json()
+        assert txn_data["review_required"] == 1
+        assert txn_data["approver_status"] == "normal"
+        assert txn_data["approver"] == "张三"
+
+    def test_generic_update_remark_does_not_affect_review(self, app_client):
+        r = _import_one(app_client, approver="张三", remark="v1")
+        txn_id = r.get_json()["imported"][0]["transaction_id"]
+
+        r_update = app_client.patch(
+            f"/api/transactions/{txn_id}/update",
+            data=json.dumps({"field_name": "remark", "new_value": "v2", "changed_by": "林姐"}),
+            content_type="application/json",
+        )
+        assert "review_required" not in r_update.get_json() or r_update.get_json()["review_required"] is None
+
+    def test_generic_update_then_advance_blocked_then_confirm_then_pass(self, app_client):
+        r = _import_one(app_client, approver="lisi", green_ratio=0.65)
+        txn_id = r.get_json()["imported"][0]["transaction_id"]
+        verif_id = r.get_json()["imported"][0]["verification_id"]
+
+        app_client.post(
+            f"/api/transactions/{txn_id}/emails",
+            data=json.dumps({"sender": "客户经理", "content": "确认"}),
+            content_type="application/json",
+        )
+        app_client.post(
+            f"/api/verifications/{verif_id}/advance",
+            data=json.dumps({"target_step": "基金会计补看客户经理补充邮件"}),
+            content_type="application/json",
+        )
+
+        app_client.patch(
+            f"/api/transactions/{txn_id}/update",
+            data=json.dumps({"field_name": "approver", "new_value": "李四", "changed_by": "林姐"}),
+            content_type="application/json",
+        )
+
+        r_blocked = app_client.post(
+            f"/api/verifications/{verif_id}/advance",
+            data=json.dumps({"target_step": "余额变化表更新", "new_balance": 300000}),
+            content_type="application/json",
+        )
+        assert "error" in r_blocked.get_json()
+        assert "复核确认" in r_blocked.get_json()["error"]
+
+        app_client.post(
+            f"/api/transactions/{txn_id}/confirm-review",
+            data=json.dumps({"reviewer": "客户经理王五"}),
+            content_type="application/json",
+        )
+
+        r_pass = app_client.post(
+            f"/api/verifications/{verif_id}/advance",
+            data=json.dumps({"target_step": "余额变化表更新", "new_balance": 300000, "operator": "林姐"}),
+            content_type="application/json",
+        )
+        d = r_pass.get_json()
+        assert d["current_step"] == "余额变化表更新"
+        assert d["status"] == "approved"
+
+
+class TestExportAPI:
+    def test_export_route_returns_full_report(self, app_client):
+        _import_one(app_client, tail_number="T888", approver="zhangsan", amount=500000, green_ratio=0.7)
+
+        r = app_client.get("/api/verifications/export")
+        data = r.get_json()
+        assert r.status_code == 200
+        assert "exported_at" in data
+        assert "summary" in data
+        assert "rules" in data
+        assert "rows" in data
+        assert data["rules"]["改为中文名后仍需复核"] == "是"
+        assert data["rules"]["所有改审批人的入口都必须复核"] == "是"
+        assert data["rules"]["复核通过后方可继续余额更新"] == "是"
+        assert len(data["rows"]) == 1
+        row = data["rows"][0]
+        assert row["柜台流水尾号"] == "T888"
+        assert row["审批人状态"] == "审批人仅拼音（待复核）"
+        assert row["是否需复核"] == "是"
+
+    def test_export_reflects_state_after_generic_update(self, app_client):
+        r = _import_one(app_client, tail_number="T999", approver="zhangsan", green_ratio=0.7)
+        txn_id = r.get_json()["imported"][0]["transaction_id"]
+        verif_id = r.get_json()["imported"][0]["verification_id"]
+
+        app_client.post(
+            f"/api/transactions/{txn_id}/emails",
+            data=json.dumps({"sender": "客户经理", "content": "确认"}),
+            content_type="application/json",
+        )
+        app_client.post(
+            f"/api/verifications/{verif_id}/advance",
+            data=json.dumps({"target_step": "基金会计补看客户经理补充邮件"}),
+            content_type="application/json",
+        )
+        app_client.patch(
+            f"/api/transactions/{txn_id}/update",
+            data=json.dumps({"field_name": "approver", "new_value": "张三", "changed_by": "林姐"}),
+            content_type="application/json",
+        )
+
+        data = app_client.get("/api/verifications/export").get_json()
+        row = data["rows"][0]
+        assert row["审批人"] == "张三"
+        assert row["复核状态"] == "待复核确认"
+        assert row["流程阻断原因"] == "审批人已修改，尚未复核确认"
+        assert data["summary"]["待复核确认记录数"] == 1
+        assert data["summary"]["流程阻断记录数"] == 1
+
+    def test_export_after_full_workflow_matches_page_state(self, app_client):
+        r = _import_one(app_client, tail_number="T100", approver="zhangsan", remark="初始备注", green_ratio=0.68)
+        txn_id = r.get_json()["imported"][0]["transaction_id"]
+        verif_id = r.get_json()["imported"][0]["verification_id"]
+
+        app_client.patch(
+            f"/api/transactions/{txn_id}/update",
+            data=json.dumps({"field_name": "remark", "new_value": "改了备注", "changed_by": "林姐"}),
+            content_type="application/json",
+        )
+
+        app_client.post(
+            f"/api/transactions/{txn_id}/emails",
+            data=json.dumps({"sender": "客户经理王五", "content": "确认审批人张三"}),
+            content_type="application/json",
+        )
+        app_client.post(
+            f"/api/verifications/{verif_id}/advance",
+            data=json.dumps({"target_step": "基金会计补看客户经理补充邮件", "operator": "林姐"}),
+            content_type="application/json",
+        )
+
+        page_state_1 = app_client.get(f"/api/transactions/{txn_id}/review").get_json()
+        assert page_state_1["transaction"]["approver"] == "zhangsan"
+        assert page_state_1["transaction"]["approver_status"] == "pinyin_only"
+
+        app_client.patch(
+            f"/api/transactions/{txn_id}/update",
+            data=json.dumps({"field_name": "approver", "new_value": "张三", "changed_by": "林姐"}),
+            content_type="application/json",
+        )
+
+        page_state_2 = app_client.get(f"/api/transactions/{txn_id}/review").get_json()
+        assert page_state_2["transaction"]["approver"] == "张三"
+        assert page_state_2["transaction"]["review_required"] == 1
+        assert "confirm_review_hint" in page_state_2["review_actions"]
+
+        history = app_client.get(f"/api/transactions/{txn_id}/history").get_json()["history"]
+        history_fields = [(h["old_value"], h["new_value"], h["field_key"]) for h in history]
+        assert ("初始备注", "改了备注", "remark") in history_fields
+        assert ("zhangsan", "张三", "approver") in history_fields
+
+        app_client.post(
+            f"/api/transactions/{txn_id}/confirm-review",
+            data=json.dumps({"reviewer": "客户经理王五"}),
+            content_type="application/json",
+        )
+
+        app_client.post(
+            f"/api/verifications/{verif_id}/advance",
+            data=json.dumps({"target_step": "余额变化表更新", "operator": "林姐", "new_balance": 650000}),
+            content_type="application/json",
+        )
+
+        export_data = app_client.get("/api/verifications/export").get_json()
+        row = export_data["rows"][0]
+
+        assert row["柜台流水尾号"] == "T100"
+        assert row["审批人"] == "张三"
+        assert row["审批人状态"] == "审批人正常"
+        assert row["复核状态"] == "无需复核"
+        assert row["是否需复核"] == "否"
+        assert row["绿色债券投向占比"] == 0.68
+        assert row["当前核验步骤"] == "第3步-余额变化表更新"
+        assert row["核验状态"] == "已通过"
+        assert row["流程阻断原因"] == "无"
+        assert row["备注"] == "改了备注"
+        assert row["客户经理补充邮件数量"] == 1
+        assert row["余额变更次数"] == 1
+        assert row["变更历史条目数"] == 3
+
+        detail = row["_detail"]
+        assert len(detail["change_history"]) == 3
+        assert detail["change_history"][-1]["field_key"] == "review_required"
+        assert detail["change_history"][-1]["old_value"] == "1"
+        assert detail["change_history"][-1]["new_value"] == "0"
+
+        assert export_data["summary"]["总记录数"] == 1
+        assert export_data["summary"]["拼音审批人记录数"] == 0
+        assert export_data["summary"]["待复核确认记录数"] == 0
+        assert export_data["summary"]["已通过核验记录数"] == 1
+        assert export_data["summary"]["流程阻断记录数"] == 0
+

@@ -14,6 +14,7 @@ from src.services.verification import (
     fix_approver,
     confirm_review,
     list_verifications,
+    export_verifications,
 )
 from src.services.approver_checker import is_pinyin_only, classify_approver
 from src.services.error_messages import get_error, humanize_field
@@ -567,3 +568,238 @@ class TestEndToEndPinyinWorkflow:
         for link in trace["trace_links"].get("supplementary_emails", []):
             assert "/api/emails/" not in link
             assert "/api/transactions/" in link
+
+
+class TestUpdateFieldApproverReviewRequired:
+    def test_generic_update_approver_from_pinyin_sets_review_required_in_db(self, db_path):
+        result = _import_one(db_path, approver="zhangsan")
+        txn_id = result["imported"][0]["transaction_id"]
+
+        r = update_transaction_field(
+            txn_id, "approver", "张三", changed_by="林姐", db_path=db_path
+        )
+        assert r["review_required"] is True
+        assert r["approver_status"] == APPROVER_STATUS_NORMAL
+        assert "复核" in r["warning"]
+
+        conn = get_db(db_path)
+        try:
+            c = conn.cursor()
+            c.execute(
+                "SELECT approver_status, review_required FROM counter_transactions WHERE id = ?",
+                (txn_id,),
+            )
+            row = c.fetchone()
+            assert row["approver_status"] == APPROVER_STATUS_NORMAL
+            assert row["review_required"] == 1
+        finally:
+            conn.close()
+
+    def test_generic_update_pinyin_to_pinyin_still_requires_review(self, db_path):
+        result = _import_one(db_path, approver="zhangsan")
+        txn_id = result["imported"][0]["transaction_id"]
+
+        r = update_transaction_field(
+            txn_id, "approver", "zhang san", changed_by="林姐", db_path=db_path
+        )
+        assert r["review_required"] is True
+        assert r["approver_status"] == APPROVER_STATUS_PINYIN_ONLY
+
+    def test_generic_update_normal_approver_no_review(self, db_path):
+        result = _import_one(db_path, approver="张三")
+        txn_id = result["imported"][0]["transaction_id"]
+
+        r = update_transaction_field(
+            txn_id, "approver", "李四", changed_by="林姐", db_path=db_path
+        )
+        assert r["review_required"] is False
+
+    def test_generic_update_review_required_blocks_balance_update(self, db_path):
+        result = _import_one(db_path, approver="lisi")
+        txn_id = result["imported"][0]["transaction_id"]
+
+        add_supplementary_email(txn_id, "客户经理", "确认", db_path=db_path)
+        advance_verification_step(
+            txn_id, VERIFICATION_STEP_EMAIL_REVIEW, db_path=db_path,
+        )
+
+        update_transaction_field(
+            txn_id, "approver", "李四", changed_by="林姐", db_path=db_path
+        )
+
+        r_blocked = advance_verification_step(
+            txn_id, VERIFICATION_STEP_BALANCE_UPDATE, new_balance=100, db_path=db_path,
+        )
+        assert "error" in r_blocked
+        assert "复核确认" in r_blocked["error"]
+
+        confirm_review(txn_id, reviewer="客户经理王五", db_path=db_path)
+
+        r_pass = advance_verification_step(
+            txn_id, VERIFICATION_STEP_BALANCE_UPDATE, new_balance=100, db_path=db_path,
+        )
+        assert r_pass["current_step"] == VERIFICATION_STEP_BALANCE_UPDATE
+
+    def test_generic_update_remark_unchanged_approver(self, db_path):
+        result = _import_one(db_path, approver="zhangsan", remark="旧备注")
+        txn_id = result["imported"][0]["transaction_id"]
+
+        r = update_transaction_field(
+            txn_id, "remark", "新备注", changed_by="林姐", db_path=db_path
+        )
+        assert r["review_required"] is None
+
+    def test_both_entry_points_require_review_consistent(self, db_path):
+        r1 = _import_one(db_path, tail_number="T001", approver="zhangsan")
+        r2 = _import_one(db_path, tail_number="T002", approver="lisi")
+        tid_generic = r1["imported"][0]["transaction_id"]
+        tid_fix = r2["imported"][0]["transaction_id"]
+
+        update_transaction_field(
+            tid_generic, "approver", "张三", changed_by="林姐", db_path=db_path
+        )
+        fix_approver(tid_fix, "李四", operator="林姐", db_path=db_path)
+
+        conn = get_db(db_path)
+        try:
+            c = conn.cursor()
+            c.execute(
+                "SELECT id, review_required FROM counter_transactions WHERE id IN (?, ?) ORDER BY id",
+                (tid_generic, tid_fix),
+            )
+            rows = c.fetchall()
+            assert rows[0]["review_required"] == 1
+            assert rows[1]["review_required"] == 1
+        finally:
+            conn.close()
+
+
+class TestExportVerifications:
+    def test_export_contains_all_expected_columns(self, db_path):
+        _import_one(db_path, tail_number="T001", approver="zhangsan", amount=500000, green_ratio=0.7)
+
+        data = export_verifications(db_path=db_path)
+        assert "summary" in data
+        assert "rules" in data
+        assert "rows" in data
+        assert len(data["rows"]) == 1
+
+        row = data["rows"][0]
+        expected_cols = [
+            "柜台流水尾号", "金额", "审批人", "审批人状态", "复核状态",
+            "是否需复核", "绿色债券投向占比", "当前核验步骤", "核验状态",
+            "流程阻断原因", "备注", "变更历史条目数", "导入时间",
+        ]
+        for col in expected_cols:
+            assert col in row, f"导出缺少列：{col}"
+
+    def test_export_pinyin_approver_shows_correct_status(self, db_path):
+        _import_one(db_path, tail_number="T001", approver="zhangsan", green_ratio=0.7)
+
+        data = export_verifications(db_path=db_path)
+        row = data["rows"][0]
+        assert row["审批人状态"] == "审批人仅拼音（待复核）"
+        assert row["是否需复核"] == "是"
+        assert data["summary"]["拼音审批人记录数"] == 1
+        assert data["rules"]["改为中文名后仍需复核"] == "是"
+        assert data["rules"]["所有改审批人的入口都必须复核"] == "是"
+
+    def test_export_after_generic_update_shows_review_pending(self, db_path):
+        result = _import_one(db_path, tail_number="T001", approver="zhangsan", green_ratio=0.7)
+        txn_id = result["imported"][0]["transaction_id"]
+
+        add_supplementary_email(txn_id, "客户经理", "确认", db_path=db_path)
+        advance_verification_step(
+            txn_id, VERIFICATION_STEP_EMAIL_REVIEW, db_path=db_path,
+        )
+        update_transaction_field(
+            txn_id, "approver", "张三", changed_by="林姐", db_path=db_path
+        )
+
+        data = export_verifications(db_path=db_path)
+        row = data["rows"][0]
+        assert row["审批人"] == "张三"
+        assert row["审批人状态"] == "审批人正常"
+        assert row["复核状态"] == "待复核确认"
+        assert row["是否需复核"] == "是"
+        assert row["流程阻断原因"] == "审批人已修改，尚未复核确认"
+        assert data["summary"]["待复核确认记录数"] == 1
+        assert data["summary"]["流程阻断记录数"] == 1
+
+    def test_export_after_confirm_review_clears_block(self, db_path):
+        result = _import_one(db_path, tail_number="T001", approver="zhangsan", green_ratio=0.7)
+        txn_id = result["imported"][0]["transaction_id"]
+
+        add_supplementary_email(txn_id, "客户经理", "确认", db_path=db_path)
+        advance_verification_step(
+            txn_id, VERIFICATION_STEP_EMAIL_REVIEW, db_path=db_path,
+        )
+        update_transaction_field(
+            txn_id, "approver", "张三", changed_by="林姐", db_path=db_path
+        )
+        confirm_review(txn_id, reviewer="客户经理王五", db_path=db_path)
+        advance_verification_step(
+            txn_id, VERIFICATION_STEP_BALANCE_UPDATE, new_balance=400000, db_path=db_path,
+        )
+
+        data = export_verifications(db_path=db_path)
+        row = data["rows"][0]
+        assert row["复核状态"] == "无需复核"
+        assert row["是否需复核"] == "否"
+        assert row["流程阻断原因"] == "无"
+        assert row["核验状态"] == "已通过"
+        assert row["当前核验步骤"] == "第3步-余额变化表更新"
+        assert data["summary"]["已通过核验记录数"] == 1
+        assert data["summary"]["流程阻断记录数"] == 0
+
+    def test_export_contains_change_history_detail(self, db_path):
+        result = _import_one(db_path, tail_number="T001", approver="zhangsan", remark="v1")
+        txn_id = result["imported"][0]["transaction_id"]
+
+        update_transaction_field(
+            txn_id, "remark", "v2", changed_by="林姐", db_path=db_path
+        )
+        update_transaction_field(
+            txn_id, "approver", "张三", changed_by="林姐", db_path=db_path
+        )
+
+        data = export_verifications(db_path=db_path)
+        row = data["rows"][0]
+        assert row["变更历史条目数"] == 2
+        detail = row["_detail"]
+        assert len(detail["change_history"]) == 2
+        assert detail["change_history"][0]["field_name"] == "备注"
+        assert detail["change_history"][0]["old_value"] == "v1"
+        assert detail["change_history"][0]["new_value"] == "v2"
+        assert detail["change_history"][1]["field_name"] == "审批人"
+        assert detail["change_history"][1]["old_value"] == "zhangsan"
+        assert detail["change_history"][1]["new_value"] == "张三"
+
+    def test_export_multiple_records_consistent_summary(self, db_path):
+        _import_one(db_path, tail_number="T001", approver="zhangsan", green_ratio=0.7)
+        _import_one(db_path, tail_number="T002", approver="张三", green_ratio=0.6)
+        r3 = _import_one(db_path, tail_number="T003", approver="lisi", green_ratio=0.5)
+        tid3 = r3["imported"][0]["transaction_id"]
+        fix_approver(tid3, "李四", operator="林姐", db_path=db_path)
+
+        data = export_verifications(db_path=db_path)
+        assert data["summary"]["总记录数"] == 3
+        assert data["summary"]["拼音审批人记录数"] == 1
+        assert data["summary"]["待复核确认记录数"] == 1
+        assert data["rules"]["改为中文名后仍需复核"] == "是"
+        assert data["rules"]["复核通过后方可继续余额更新"] == "是"
+
+    def test_list_verifications_includes_review_required_trace_links(self, db_path):
+        result = _import_one(db_path, approver="zhangsan")
+        txn_id = result["imported"][0]["transaction_id"]
+
+        update_transaction_field(
+            txn_id, "approver", "张三", changed_by="林姐", db_path=db_path
+        )
+
+        verifs = list_verifications(db_path=db_path)
+        items = [v for v in verifs if v["transaction_id"] == txn_id]
+        assert len(items) >= 1
+        item = items[0]
+        assert "trace_links" in item
+        assert "approver_review" in item["trace_links"]
