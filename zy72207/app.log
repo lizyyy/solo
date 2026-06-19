@@ -1,0 +1,61 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-06-19T12:00:53.823+08:00  INFO 45462 --- [refund-batch-replay] [           main] c.f.refund.RefundBatchReplayApplication  : Starting RefundBatchReplayApplication v1.0.0 using Java 25.0.3 with PID 45462 (/Users/lzy/pro/solo/workspaces/zy72207/target/refund-batch-replay-1.0.0.jar started by lzy in /Users/lzy/pro/solo/workspaces/zy72207)
+2026-06-19T12:00:53.823+08:00 DEBUG 45462 --- [refund-batch-replay] [           main] c.f.refund.RefundBatchReplayApplication  : Running with Spring Boot v3.2.5, Spring v6.1.6
+2026-06-19T12:00:53.823+08:00  INFO 45462 --- [refund-batch-replay] [           main] c.f.refund.RefundBatchReplayApplication  : No active profile set, falling back to 1 default profile: "default"
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by org.apache.tomcat.jni.Library in an unnamed module (jar:nested:/Users/lzy/pro/solo/workspaces/zy72207/target/refund-batch-replay-1.0.0.jar/!BOOT-INF/lib/tomcat-embed-core-10.1.20.jar!/)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+2026-06-19T12:00:54.486+08:00  INFO 45462 --- [refund-batch-replay] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-06-19T12:00:54.492+08:00  INFO 45462 --- [refund-batch-replay] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-06-19T12:00:54.492+08:00  INFO 45462 --- [refund-batch-replay] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-06-19T12:00:54.508+08:00  INFO 45462 --- [refund-batch-replay] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-06-19T12:00:54.508+08:00  INFO 45462 --- [refund-batch-replay] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 650 ms
+2026-06-19T12:00:54.524+08:00  INFO 45462 --- [refund-batch-replay] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-06-19T12:00:54.619+08:00  INFO 45462 --- [refund-batch-replay] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:refunddb user=SA
+2026-06-19T12:00:54.620+08:00  INFO 45462 --- [refund-batch-replay] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-06-19T12:00:54.624+08:00  INFO 45462 --- [refund-batch-replay] [           main] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:refunddb'
+Logging initialized using 'class org.apache.ibatis.logging.stdout.StdOutImpl' adapter.
+Get /192.168.31.139 network interface 
+Get network interface info: name:en1 (en1)
+Initialization Sequence datacenterId:13 workerId:13
+ _ _   |_  _ _|_. ___ _ |    _ 
+| | |\/|_)(_| | |_\  |_)||_|_\ 
+     /               |         
+                        3.5.7 
+2026-06-19T12:00:54.963+08:00  INFO 45462 --- [refund-batch-replay] [           main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2026-06-19T12:00:55.180+08:00  INFO 45462 --- [refund-batch-replay] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path ''
+2026-06-19T12:00:55.185+08:00  INFO 45462 --- [refund-batch-replay] [           main] c.f.refund.RefundBatchReplayApplication  : Started RefundBatchReplayApplication in 1.575 seconds (process running for 1.822)
+2026-06-19T12:01:08.609+08:00  INFO 45462 --- [refund-batch-replay] [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-06-19T12:01:08.609+08:00  INFO 45462 --- [refund-batch-replay] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-06-19T12:01:08.610+08:00  INFO 45462 --- [refund-batch-replay] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@55ac9d87] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1394260987 wrapping conn0: url=jdbc:h2:mem:refunddb user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,batch_no,batch_name,batch_date,fund_code,fund_name,custodian,total_count,total_amount,process_status,current_step,operator,supervisor,remark,created_at,updated_at,deleted FROM refund_batch WHERE deleted=0 ORDER BY created_at DESC
+==> Parameters: 
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@55ac9d87]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@254bf23] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@210977049 wrapping conn0: url=jdbc:h2:mem:refunddb user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,batch_no,batch_name,batch_date,fund_code,fund_name,custodian,total_count,total_amount,process_status,current_step,operator,supervisor,remark,created_at,updated_at,deleted FROM refund_batch WHERE deleted=0 ORDER BY created_at DESC
+==> Parameters: 
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@254bf23]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a9f722e] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@609786125 wrapping conn0: url=jdbc:h2:mem:refunddb user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,batch_no,batch_name,batch_date,fund_code,fund_name,custodian,total_count,total_amount,process_status,current_step,operator,supervisor,remark,created_at,updated_at,deleted FROM refund_batch WHERE deleted=0 ORDER BY created_at DESC
+==> Parameters: 
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a9f722e]

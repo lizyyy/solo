@@ -28,6 +28,7 @@ com/fund/refund/mapper/AuditLogMapper.class
 com/fund/refund/entity/ExDividendEvidence.class
 com/fund/refund/service/ExportService.class
 com/fund/refund/RefundBatchReplayApplication.class
+com/fund/refund/config/WebMvcConfig.class
 com/fund/refund/dto/BatchReplayResultVO.class
 com/fund/refund/service/RefundBatchReplayService.class
 com/fund/refund/service/SelfCheckService.class

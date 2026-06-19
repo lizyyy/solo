@@ -38,7 +38,11 @@ public class UnifiedResultService {
         Map<String, ExDividendEvidence> evidenceMap = getEvidenceMap(batchId);
 
         return details.stream()
-                .map(d -> convertToVO(d, custodianMap.get(d.getBizNo()), evidenceMap.get(d.getBizNo())))
+                .map(d -> convertToVO(
+                        d,
+                        custodianMap.get(buildCustodianKey(d.getBizNo(), d.getCustodianRowNo())),
+                        evidenceMap.get(d.getBizNo())
+                ))
                 .collect(Collectors.toList());
     }
 
@@ -51,6 +55,7 @@ public class UnifiedResultService {
                 new LambdaQueryWrapper<CustodianConfirmation>()
                         .eq(CustodianConfirmation::getBatchId, detail.getBatchId())
                         .eq(CustodianConfirmation::getBizNo, detail.getBizNo())
+                        .eq(CustodianConfirmation::getOriginalRowNo, detail.getCustodianRowNo())
                         .last("LIMIT 1")
         );
         ExDividendEvidence evidence = exDividendEvidenceMapper.selectOne(
@@ -60,6 +65,10 @@ public class UnifiedResultService {
                         .last("LIMIT 1")
         );
         return convertToVO(detail, custodian, evidence);
+    }
+
+    private String buildCustodianKey(String bizNo, Integer rowNo) {
+        return (bizNo == null ? "" : bizNo) + ":" + (rowNo == null ? "" : rowNo);
     }
 
     private RefundDetailVO convertToVO(RefundDetail detail, CustodianConfirmation custodian, ExDividendEvidence evidence) {
@@ -126,7 +135,11 @@ public class UnifiedResultService {
                         .eq(CustodianConfirmation::getBatchId, batchId)
         );
         return list.stream()
-                .collect(Collectors.toMap(CustodianConfirmation::getBizNo, c -> c, (v1, v2) -> v1));
+                .collect(Collectors.toMap(
+                        c -> buildCustodianKey(c.getBizNo(), c.getOriginalRowNo()),
+                        c -> c,
+                        (v1, v2) -> v1
+                ));
     }
 
     private Map<String, ExDividendEvidence> getEvidenceMap(Long batchId) {
