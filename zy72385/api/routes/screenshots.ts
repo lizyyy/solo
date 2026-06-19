@@ -61,7 +61,7 @@ router.post('/upload', async (req: Request, res: Response) => {
         fileHash: fileHash || `dup-${Date.now()}`,
         fileSize,
         uploader,
-      });
+      }, repeatType);
       
       await recordChange(
         'screenshot',
@@ -73,8 +73,8 @@ router.post('/upload', async (req: Request, res: Response) => {
         uploader,
         []
       );
-      
-      res.json({
+
+      await res.json({
         screenshot: duplicate,
         isDuplicate: true,
         repeatType,

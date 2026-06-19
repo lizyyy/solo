@@ -59,7 +59,8 @@ export async function checkDuplicate(fileHash: string, fileName?: string, curren
 
 export async function handleDuplicateUpload(
   duplicateOf: string,
-  newFile: { fileName: string; fileHash: string; fileSize: number; uploader: string }
+  newFile: { fileName: string; fileHash: string; fileSize: number; uploader: string },
+  repeatType?: 'new' | 'current_batch' | 'historical'
 ): Promise<MaintenanceScreenshot> {
   await db.read();
   
@@ -77,6 +78,7 @@ export async function handleDuplicateUpload(
     uploader: newFile.uploader,
     status: 'duplicate',
     duplicateOf,
+    repeatType: repeatType || 'historical' as const,
     calculationIds: [],
     ocrData: existing.ocrData,
     extractedData: existing.extractedData,

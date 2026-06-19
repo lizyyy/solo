@@ -16,6 +16,8 @@ export interface MaintenanceScreenshot {
   };
   status: 'pending' | 'processing' | 'processed' | 'duplicate' | 'error';
   duplicateOf?: string;
+  repeatType?: 'new' | 'current_batch' | 'historical';
+  remark?: string;
   calculationIds: string[];
 }
 

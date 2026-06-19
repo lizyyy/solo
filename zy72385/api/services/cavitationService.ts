@@ -12,17 +12,29 @@ export function detectMissingIntervals(
 
   const times = sampleTimes.map((t) => new Date(t).getTime()).sort((a, b) => a - b);
   const expectedMs = expectedIntervalMinutes * 60 * 1000;
-  const tolerance = expectedMs * 0.2;
+  const tolerance = expectedMs * 0.5;
+
+  const toLocalISOString = (ts: number) => {
+    const d = new Date(ts);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  };
 
   for (let i = 0; i < times.length - 1; i++) {
     const diff = times[i + 1] - times[i];
-    if (diff > expectedMs + tolerance && diff >= 30 * 60 * 1000) {
-      missing.push({
-        start: new Date(times[i]).toISOString(),
-        end: new Date(times[i + 1]).toISOString(),
-        duration: Math.round(diff / 60000),
-        source: 'screenshot',
-      });
+    if (diff > expectedMs + tolerance) {
+      const gapStart = times[i] + expectedMs;
+      const gapEnd = times[i + 1] - expectedMs;
+      let cursor = gapStart;
+      while (cursor <= gapEnd) {
+        missing.push({
+          start: toLocalISOString(cursor),
+          end: toLocalISOString(cursor + expectedMs),
+          duration: expectedIntervalMinutes,
+          source: 'screenshot',
+        });
+        cursor += expectedMs;
+      }
     }
   }
 
@@ -131,8 +143,15 @@ export async function createCalculation(
     riskLevel: riskResult.riskLevel,
     riskScore: riskResult.riskScore,
     result: riskResult.result,
+    name: data.name,
+    pumpId: data.pumpId,
+    screenshotIds: data.screenshotIds,
+    samplingIntervalIds: data.samplingIntervalIds,
     parameters: paramsWithMissing,
-    ...data,
+    status: data.status || 'draft',
+    remark: data.remark || '',
+    createdBy: data.createdBy || createdBy,
+    updatedBy: data.updatedBy || createdBy,
   };
 
   db.data.calculations.unshift(calculation);
@@ -151,12 +170,17 @@ export async function createCalculation(
     }
   });
 
-  if (missingIntervals.length > 0 && missingIntervals.some((m) => m.duration >= 30)) {
+  if (missingIntervals.length > 0) {
+    const gapDescriptions = missingIntervals.map((m) => {
+      const startStr = new Date(m.start).toLocaleString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+      const endStr = new Date(m.end).toLocaleString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+      return `${startStr}-${endStr}缺${m.duration}分钟`;
+    });
     const reviewTask: ReviewTask = {
       id: `task-${crypto.randomUUID().slice(0, 8)}`,
       calculationId: calculation.id,
       type: 'missing_interval',
-      description: `采样时间缺失${missingIntervals.map((m) => m.duration).join('、')}分钟，请质检员复核`,
+      description: `采样时间缺失：${gapDescriptions.join('、')}，请质检员复核`,
       status: 'pending',
       assignee: 'user-2',
       createdAt: new Date().toISOString(),

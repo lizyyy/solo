@@ -5,7 +5,7 @@
       "fileName": "维修群截图_20240601_1430.png",
       "fileHash": "hash-abc123",
       "fileSize": 1024000,
-      "uploadTime": "2026-06-01T12:08:08.871Z",
+      "uploadTime": "2024-06-01T14:30:00",
       "uploader": "user-1",
       "ocrData": "泵站A-01 压力: 0.32MPa 流量: 120m³/h 采样时间: 2024-06-01 14:30:00 温度: 25℃",
       "imageUrl": "/mock/shot1.svg",
@@ -17,9 +17,9 @@
         "temperature": 25
       },
       "status": "processed",
+      "repeatType": "new",
       "calculationIds": [
-        "calc-1",
-        "calc-56833f75"
+        "calc-437fcd83"
       ]
     },
     {
@@ -27,7 +27,7 @@
       "fileName": "维修群截图_20240601_1500.png",
       "fileHash": "hash-def456",
       "fileSize": 1056000,
-      "uploadTime": "2026-06-01T12:08:08.871Z",
+      "uploadTime": "2024-06-01T15:00:00",
       "uploader": "user-1",
       "ocrData": "泵站A-01 压力: 0.30MPa 流量: 115m³/h 采样时间: 2024-06-01 15:00:00 温度: 26℃",
       "imageUrl": "/mock/shot2.svg",
@@ -39,9 +39,9 @@
         "temperature": 26
       },
       "status": "processed",
+      "repeatType": "new",
       "calculationIds": [
-        "calc-1",
-        "calc-56833f75"
+        "calc-437fcd83"
       ]
     },
     {
@@ -49,7 +49,7 @@
       "fileName": "维修群截图_20240601_1600.png",
       "fileHash": "hash-ghi789",
       "fileSize": 987000,
-      "uploadTime": "2026-06-01T12:08:08.871Z",
+      "uploadTime": "2024-06-01T16:00:00",
       "uploader": "user-1",
       "ocrData": "泵站A-01 压力: 0.28MPa 流量: 110m³/h 采样时间: 2024-06-01 16:00:00 温度: 27℃",
       "imageUrl": "/mock/shot3.svg",
@@ -61,10 +61,9 @@
         "temperature": 27
       },
       "status": "processed",
+      "repeatType": "new",
       "calculationIds": [
-        "calc-1",
-        "calc-2",
-        "calc-56833f75"
+        "calc-437fcd83"
       ]
     },
     {
@@ -72,7 +71,7 @@
       "fileName": "维修群截图_20240602_0900.png",
       "fileHash": "hash-jkl012",
       "fileSize": 1123000,
-      "uploadTime": "2026-06-02T12:08:08.871Z",
+      "uploadTime": "2024-06-02T09:00:00",
       "uploader": "user-1",
       "ocrData": "泵站B-02 压力: 0.45MPa 流量: 180m³/h 采样时间: 2024-06-02 09:00:00 温度: 24℃",
       "imageUrl": "/mock/shot4.svg",
@@ -84,9 +83,29 @@
         "temperature": 24
       },
       "status": "processed",
-      "calculationIds": [
-        "calc-3"
-      ]
+      "repeatType": "new",
+      "calculationIds": []
+    },
+    {
+      "id": "shot-4dc3a330",
+      "fileName": "维修群截图_重复上传.png",
+      "fileHash": "hash-abc123",
+      "fileSize": 1024000,
+      "uploadTime": "2026-06-19T15:32:45.509Z",
+      "uploader": "user-1",
+      "status": "duplicate",
+      "duplicateOf": "shot-1",
+      "repeatType": "historical",
+      "calculationIds": [],
+      "ocrData": "泵站A-01 压力: 0.32MPa 流量: 120m³/h 采样时间: 2024-06-01 14:30:00 温度: 25℃",
+      "extractedData": {
+        "pumpId": "pump-a01",
+        "pressure": 0.32,
+        "flowRate": 120,
+        "sampleTime": "2024-06-01T14:30:00",
+        "temperature": 25
+      },
+      "imageUrl": "/mock/shot1.svg"
     }
   ],
   "samplingIntervals": [
@@ -98,12 +117,11 @@
       "intervalMinutes": 30,
       "description": "6月1日泵站A-01常规采样，每30分钟一次",
       "creator": "user-1",
-      "createTime": "2026-06-01T12:08:08.871Z",
-      "updateTime": "2026-06-01T12:08:08.871Z",
+      "createTime": "2024-06-01T08:00:00",
+      "updateTime": "2024-06-01T08:00:00",
       "version": 1,
       "calculationIds": [
-        "calc-1",
-        "calc-56833f75"
+        "calc-437fcd83"
       ]
     },
     {
@@ -114,19 +132,17 @@
       "intervalMinutes": 15,
       "description": "6月2日泵站B-02加密采样，每15分钟一次",
       "creator": "user-1",
-      "createTime": "2026-06-02T12:08:08.871Z",
-      "updateTime": "2026-06-02T12:08:08.871Z",
+      "createTime": "2024-06-02T08:00:00",
+      "updateTime": "2024-06-02T08:00:00",
       "version": 1,
-      "calculationIds": [
-        "calc-3"
-      ]
+      "calculationIds": []
     }
   ],
   "calculations": [
     {
-      "id": "calc-56833f75",
-      "createdAt": "2026-06-11T17:23:26.756Z",
-      "updatedAt": "2026-06-11T17:38:50.999Z",
+      "id": "calc-437fcd83",
+      "createdAt": "2026-06-19T15:32:45.626Z",
+      "updatedAt": "2026-06-19T15:32:46.247Z",
       "riskLevel": "low",
       "riskScore": 25,
       "result": {
@@ -138,30 +154,7 @@
           "运行状态良好，继续按计划监测"
         ]
       },
-      "parameters": {
-        "pressure": [
-          0.32,
-          0.3,
-          0.28
-        ],
-        "flowRate": [
-          120,
-          115,
-          110
-        ],
-        "temperatures": [
-          25,
-          26,
-          27
-        ],
-        "sampleTimes": [
-          "2024-06-01T14:30:00",
-          "2024-06-01T15:00:00",
-          "2024-06-01T16:00:00"
-        ],
-        "missingIntervals": []
-      },
-      "name": "维修群第一次导入测试计算",
+      "name": "泵站A-01 维修群第一次导入汽蚀风险计算",
       "pumpId": "pump-a01",
       "screenshotIds": [
         "shot-1",
@@ -171,87 +164,6 @@
       "samplingIntervalIds": [
         "interval-1"
       ],
-      "status": "completed",
-      "remark": "林老师补充说明：15:30那段时间设备临时停机检修，有现场巡检记录可查",
-      "createdBy": "user-1",
-      "updatedBy": "user-1",
-      "reviewAssignee": "user-2",
-      "reviewComment": "经核查，15:30设备临时停机检修有巡检记录和审批单，不属于数据异常，不影响汽蚀风险评估结果"
-    },
-    {
-      "id": "calc-03b2d447",
-      "createdAt": "2026-06-11T16:26:02.656Z",
-      "updatedAt": "2026-06-11T16:27:09.966Z",
-      "riskLevel": "low",
-      "riskScore": 25,
-      "result": {
-        "npshAvailable": 3.82,
-        "npshRequired": 1.39,
-        "cavitationProbability": 0,
-        "affectedAreas": [],
-        "recommendations": [
-          "运行状态良好，继续按计划监测"
-        ]
-      },
-      "parameters": {
-        "pressure": [
-          0.35,
-          0.38,
-          0.42,
-          0.39,
-          0.41
-        ],
-        "flowRate": [
-          120,
-          125,
-          130,
-          128,
-          132
-        ],
-        "temperatures": [
-          25,
-          26,
-          27,
-          26,
-          28
-        ],
-        "sampleTimes": [
-          "2026-06-12T08:00:00Z",
-          "2026-06-12T08:30:00Z",
-          "2026-06-12T09:00:00Z",
-          "2026-06-12T10:00:00Z",
-          "2026-06-12T10:30:00Z"
-        ],
-        "missingIntervals": []
-      },
-      "name": "测试汽蚀计算",
-      "pumpId": "PUMP-001",
-      "screenshotIds": [
-        "shot-test-1"
-      ],
-      "samplingIntervalIds": [],
-      "status": "completed",
-      "remark": "林老师修改备注：这是修改后的备注，需要重点关注",
-      "createdBy": "user-1",
-      "updatedBy": "user-1",
-      "reviewAssignee": "user-2",
-      "reviewComment": "经复核，该时间段设备正常停机，不影响汽蚀风险计算结果"
-    },
-    {
-      "id": "calc-1",
-      "pumpId": "pump-a01",
-      "name": "泵站A-01 6月1日汽蚀风险计算",
-      "screenshotIds": [
-        "shot-1",
-        "shot-2",
-        "shot-3"
-      ],
-      "samplingIntervalIds": [
-        "interval-1"
-      ],
-      "status": "completed",
-      "riskLevel": "medium",
-      "riskScore": 62,
       "parameters": {
         "pressure": [
           0.32,
@@ -282,374 +194,113 @@
           }
         ]
       },
-      "result": {
-        "npshAvailable": 2.8,
-        "npshRequired": 2.2,
-        "cavitationProbability": 0.35,
-        "affectedAreas": [
-          "叶轮入口",
-          "吸入室"
-        ],
-        "recommendations": [
-          "建议检查入口过滤器是否堵塞",
-          "考虑增加吸入压力",
-          "下周进行复查检测"
-        ]
-      },
-      "remark": "初始计算，注意15:30缺失数据",
-      "createdAt": "2026-06-02T12:08:08.871Z",
+      "status": "completed",
+      "remark": "林老师补充：15:30设备临时停机检修，有现场巡检记录可查",
       "createdBy": "user-1",
-      "updatedAt": "2026-06-03T12:08:08.871Z",
-      "updatedBy": "user-1"
-    },
-    {
-      "id": "calc-2",
-      "pumpId": "pump-a01",
-      "name": "泵站A-01 补充测试计算",
-      "screenshotIds": [
-        "shot-3"
-      ],
-      "samplingIntervalIds": [],
-      "status": "pending_review",
-      "riskLevel": "high",
-      "riskScore": 78,
-      "parameters": {
-        "pressure": [
-          0.28,
-          0.25,
-          0.22
-        ],
-        "flowRate": [
-          110,
-          105,
-          98
-        ],
-        "temperatures": [
-          27,
-          28,
-          29
-        ],
-        "sampleTimes": [
-          "2024-06-01T16:00:00",
-          "2024-06-01T16:30:00",
-          "2024-06-01T17:00:00"
-        ],
-        "missingIntervals": [
-          {
-            "start": "2024-06-01T17:00:00",
-            "end": "2024-06-01T17:30:00",
-            "duration": 30,
-            "source": "screenshot"
-          }
-        ]
-      },
-      "result": {
-        "npshAvailable": 1.8,
-        "npshRequired": 2.2,
-        "cavitationProbability": 0.72,
-        "affectedAreas": [
-          "叶轮入口",
-          "吸入室",
-          "前盖板"
-        ],
-        "recommendations": [
-          "立即停机检查",
-          "检测入口压力管线",
-          "安排维修人员现场勘查"
-        ]
-      },
-      "remark": "高压测试后补充数据，待质检员复核缺失时间",
-      "createdAt": "2026-06-03T12:08:08.871Z",
-      "createdBy": "user-1",
-      "updatedAt": "2026-06-03T12:08:08.871Z",
       "updatedBy": "user-1",
-      "reviewAssignee": "user-2"
-    },
-    {
-      "id": "calc-3",
-      "pumpId": "pump-b02",
-      "name": "泵站B-02 6月2日汽蚀风险计算",
-      "screenshotIds": [
-        "shot-4"
-      ],
-      "samplingIntervalIds": [
-        "interval-2"
-      ],
-      "status": "draft",
-      "riskLevel": "low",
-      "riskScore": 25,
-      "parameters": {
-        "pressure": [
-          0.45,
-          0.44,
-          0.46
-        ],
-        "flowRate": [
-          180,
-          178,
-          182
-        ],
-        "temperatures": [
-          24,
-          24,
-          25
-        ],
-        "sampleTimes": [
-          "2024-06-02T09:00:00",
-          "2024-06-02T09:15:00",
-          "2024-06-02T09:30:00"
-        ],
-        "missingIntervals": []
-      },
-      "result": {
-        "npshAvailable": 4.5,
-        "npshRequired": 2,
-        "cavitationProbability": 0.08,
-        "affectedAreas": [],
-        "recommendations": [
-          "运行状态良好，继续按计划监测"
-        ]
-      },
-      "remark": "",
-      "createdAt": "2026-06-04T11:08:08.871Z",
-      "createdBy": "user-1",
-      "updatedAt": "2026-06-04T11:08:08.871Z",
-      "updatedBy": "user-1"
+      "reviewAssignee": "user-2",
+      "reviewComment": "经核查，15:30设备临时停机检修有巡检记录和审批单，不属于数据异常，不影响汽蚀风险评估结果"
     }
   ],
   "changeRecords": [
     {
-      "id": "change-a9426ec9",
+      "id": "change-b222d6a2",
       "entityType": "calculation",
-      "entityId": "calc-56833f75",
+      "entityId": "calc-437fcd83",
       "fieldName": "status",
       "oldValue": "pending_review",
       "newValue": "completed",
       "changeReason": "质检员复核通过: 经核查，15:30设备临时停机检修有巡检记录和审批单，不属于数据异常，不影响汽蚀风险评估结果",
       "changedBy": "user-2",
-      "changedAt": "2026-06-11T17:37:57.356Z",
+      "changedAt": "2026-06-19T15:32:46.115Z",
       "affectedResults": [
-        "calc-56833f75"
+        "calc-437fcd83"
       ]
     },
     {
-      "id": "change-5fedb474",
+      "id": "change-1676521f",
       "entityType": "calculation",
-      "entityId": "calc-56833f75",
+      "entityId": "calc-437fcd83",
       "fieldName": "remark",
-      "oldValue": "维修群第一次导入，15:30缺失半小时数据",
-      "newValue": "林老师补充说明：15:30那段时间设备临时停机检修，有现场巡检记录可查",
+      "oldValue": "维修群第一次导入，注意15:30缺失半小时数据",
+      "newValue": "林老师补充：15:30设备临时停机检修，有现场巡检记录可查",
       "changeReason": "补充15:30缺失数据的现场背景说明",
       "changedBy": "user-1",
-      "changedAt": "2026-06-11T17:34:13.421Z",
+      "changedAt": "2026-06-19T15:32:45.905Z",
       "affectedResults": [
-        "calc-56833f75"
+        "calc-437fcd83"
       ]
     },
     {
-      "id": "change-34ae85fc",
-      "entityType": "calculation",
-      "entityId": "calc-03b2d447",
-      "fieldName": "status",
-      "oldValue": "pending_review",
-      "newValue": "completed",
-      "changeReason": "质检员复核通过: 经复核，该时间段设备正常停机，不影响汽蚀风险计算结果",
-      "changedBy": "user-2",
-      "changedAt": "2026-06-11T16:31:31.324Z",
-      "affectedResults": [
-        "calc-03b2d447"
-      ]
-    },
-    {
-      "id": "change-64333196",
-      "entityType": "calculation",
-      "entityId": "calc-03b2d447",
-      "fieldName": "remark",
-      "oldValue": "初始备注",
-      "newValue": "林老师修改备注：这是修改后的备注，需要重点关注",
-      "changeReason": "补充现场实验说明",
-      "changedBy": "user-1",
-      "changedAt": "2026-06-11T16:27:09.967Z",
-      "affectedResults": [
-        "calc-03b2d447"
-      ]
-    },
-    {
-      "id": "change-1",
-      "entityType": "calculation",
-      "entityId": "calc-1",
-      "fieldName": "remark",
-      "oldValue": "初始计算",
-      "newValue": "初始计算，注意15:30缺失数据",
-      "changeReason": "补充说明缺失数据情况，便于后续复核",
-      "changedBy": "user-1",
-      "changedAt": "2026-06-03T00:08:08.871Z",
-      "affectedResults": [
-        "calc-1"
-      ]
-    },
-    {
-      "id": "change-2",
-      "entityType": "calculation",
-      "entityId": "calc-1",
-      "fieldName": "result.recommendations",
-      "oldValue": "[\"建议检查入口过滤器\",\"考虑增加吸入压力\"]",
-      "newValue": "[\"建议检查入口过滤器是否堵塞\",\"考虑增加吸入压力\",\"下周进行复查检测\"]",
-      "changeReason": "根据最新运行数据增加复查建议",
-      "changedBy": "user-1",
-      "changedAt": "2026-06-03T12:08:08.871Z",
-      "affectedResults": [
-        "calc-1"
-      ]
-    },
-    {
-      "id": "change-3",
+      "id": "change-142747d9",
       "entityType": "screenshot",
-      "entityId": "shot-3",
-      "fieldName": "extractedData.pressure",
-      "oldValue": 0.29,
-      "newValue": 0.28,
-      "changeReason": "OCR识别修正，人工核实原始截图",
+      "entityId": "shot-1",
+      "fieldName": "duplicateRecords",
+      "oldValue": null,
+      "newValue": "shot-4dc3a330",
+      "changeReason": "历史重复：与历史上传文件重复",
       "changedBy": "user-1",
-      "changedAt": "2026-06-02T00:08:08.871Z",
-      "affectedResults": [
-        "calc-1",
-        "calc-2"
-      ]
-    },
-    {
-      "id": "change-4",
-      "entityType": "sampling_interval",
-      "entityId": "interval-1",
-      "fieldName": "intervalMinutes",
-      "oldValue": 60,
-      "newValue": 30,
-      "changeReason": "更正采样间隔，原始记录为每30分钟",
-      "changedBy": "user-1",
-      "changedAt": "2026-06-01T16:56:08.871Z",
-      "affectedResults": [
-        "calc-1"
-      ]
-    },
-    {
-      "id": "change-5",
-      "entityType": "calculation",
-      "entityId": "calc-2",
-      "fieldName": "status",
-      "oldValue": "draft",
-      "newValue": "pending_review",
-      "changeReason": "提交质检员复核缺失的半小时数据",
-      "changedBy": "user-1",
-      "changedAt": "2026-06-03T16:56:08.871Z",
-      "affectedResults": [
-        "calc-2"
-      ]
+      "changedAt": "2026-06-19T15:32:45.509Z",
+      "affectedResults": []
     }
   ],
   "reviews": [
     {
-      "id": "review-7539284b",
-      "calculationId": "calc-56833f75",
+      "id": "review-80115c4d",
+      "calculationId": "calc-437fcd83",
       "decisions": [
         {
           "dataPointId": "dp-1",
-          "keepReason": "14:30数据完整，压力流量温度均在正常范围，作为基准值",
+          "keepReason": "14:30数据完整，压力流量温度正常，作为基准值",
           "missingMaterials": [],
           "nextAction": "none"
         },
         {
           "dataPointId": "dp-2",
-          "keepReason": "15:00数据波动正常，压力略有下降符合趋势",
+          "keepReason": "15:00数据正常，压力略有下降符合趋势",
           "missingMaterials": [],
           "nextAction": "none"
         },
         {
           "dataPointId": "dp-3",
-          "keepReason": "16:00数据正常，15:30停机检修有巡检记录已复核通过",
+          "keepReason": "16:00数据正常，15:30停机有巡检记录已复核",
           "missingMaterials": [
             "15:30停机审批单扫描件"
           ],
           "nextAction": "teacher",
           "assignee": "user-1"
-        }
-      ],
-      "reportContent": "## 实验复盘：维修群第一次导入测试计算\n\n### 数据来源与去重处理\n本次计算共使用 **3张** 有效截图\n\n1. ✅ **维修群截图_20240601_1430.png**\n   - 上传人：林老师\n   - 上传时间：2026/6/1 20:08:08\n   - 状态：新记录，已纳入计算\n\n2. ✅ **维修群截图_20240601_1500.png**\n   - 上传人：林老师\n   - 上传时间：2026/6/1 20:08:08\n   - 状态：新记录，已纳入计算\n\n3. ✅ **维修群截图_20240601_1600.png**\n   - 上传人：林老师\n   - 上传时间：2026/6/1 20:08:08\n   - 状态：新记录，已纳入计算\n\n### 备注变更历史\n> 林老师只改了一条备注，历史记录保留原话、修改人和修改原因\n\n1. **修改时间**：2026/6/12 01:34:13\n   - **修改人**：林老师\n   - **修改原因**：补充15:30缺失数据的现场背景说明\n   - **改前**：维修群第一次导入，15:30缺失半小时数据\n   - **改后**：林老师补充说明：15:30那段时间设备临时停机检修，有现场巡检记录可查\n\n### 数据质量评估\n本次计算共**3个**有效数据点。整体数据趋势缓慢下降，压力从0.32MPa缓慢下降至0.28MPa，符合预期运行规律。\n\n### 风险分析\n汽蚀风险等级：**低**（风险评分25分）\n- NPSH可用值：2.91m\n- NPSH必需值：1.37m\n- 汽蚀概率：23%\n\n### 关键决策\n1. **数据点1（14:30）**：保留。14:30数据完整，压力流量温度均在正常范围，作为基准值\n2. **数据点2（15:00）**：保留。15:00数据波动正常，压力略有下降符合趋势\n3. **数据点3（16:00）**：保留。16:00数据正常，15:30停机检修有巡检记录已复核通过 🔴 缺15:30停机审批单扫描件\n\n### 缺失材料\n- 15:30停机审批单扫描件 - 请👨‍🔬 林老师补充\n\n### 下一步行动\n| 责任人 | 任务 | 截止时间 |\n|--------|------|----------|\n| 👨‍🔬 林老师 | 补充缺失数据或说明原因 | 2026-06-14 |\n\n### 建议措施\n1. 运行状态良好，继续按计划监测\n\n### 备注\n林老师补充说明：15:30那段时间设备临时停机检修，有现场巡检记录可查\n",
-      "createdAt": "2026-06-11T17:38:50.999Z",
-      "createdBy": "user-1"
-    },
-    {
-      "id": "review-1",
-      "calculationId": "calc-1",
-      "decisions": [
+        },
         {
-          "dataPointId": "dp-1",
-          "keepReason": "数据趋势稳定，虽缺15:30但前后数据可佐证",
+          "dataPointId": "missing-1",
+          "keepReason": "15:30缺失因设备停机检修，已有巡检记录佐证",
           "missingMaterials": [
-            "15:30原始截图"
+            "停机审批单"
           ],
           "nextAction": "teacher",
           "assignee": "user-1"
-        },
-        {
-          "dataPointId": "dp-2",
-          "keepReason": "压力值在正常波动范围内",
-          "missingMaterials": [],
-          "nextAction": "none"
         }
       ],
-      "reportContent": "## 实验复盘：泵站A-01 6月1日\n\n### 数据质量评估\n本次计算共3个有效数据点，缺失1个采样点（15:30）。整体数据趋势稳定，压力从0.32MPa缓慢下降至0.28MPa，符合预期运行规律。\n\n### 风险分析\n汽蚀风险等级：**中等**（风险评分62分）\n- NPSH可用值：2.8m\n- NPSH必需值：2.2m\n- 汽蚀概率：35%\n\n### 关键决策\n1. **数据点1（14:30）**：保留。数据完整，作为基准值。\n2. **数据点2（15:00）**：保留。与趋势一致。\n3. **数据点3（16:00）**：保留。虽缺15:30但前后逻辑通顺，已标注待补。\n\n### 缺失材料\n- 15:30维修群截图 - 请林老师补充\n\n### 下一步行动\n| 责任人 | 任务 | 截止时间 |\n|--------|------|----------|\n| 👨‍🔬 林老师 | 查找15:30缺失截图或说明原因 | 2024-06-05 |\n| 🔍 王质检员 | 复核本次计算结果 | 2024-06-06 |\n\n### 建议措施\n1. 检查入口过滤器是否堵塞\n2. 考虑优化入口管线设计\n3. 下周进行超声波检测确认汽蚀情况",
-      "createdAt": "2026-06-04T00:08:08.871Z",
+      "reportContent": "## 实验复盘：泵站A-01 维修群第一次导入汽蚀风险计算\n\n### 数据来源与去重处理\n本次计算共涉及 **4张** 截图，其中 **3张** 有效（新记录）、**1张** 重复\n\n1. ✅ **维修群截图_20240601_1430.png**\n   - 上传人：林老师\n   - 上传时间：2024/6/1 14:30:00\n   - 重复类型：新记录\n   - 处理判断：有效数据，纳入计算\n   - 当前状态：已纳入本次计算结果\n   - 最终结论：作为有效采样数据参与汽蚀风险计算\n\n2. ✅ **维修群截图_20240601_1500.png**\n   - 上传人：林老师\n   - 上传时间：2024/6/1 15:00:00\n   - 重复类型：新记录\n   - 处理判断：有效数据，纳入计算\n   - 当前状态：已纳入本次计算结果\n   - 最终结论：作为有效采样数据参与汽蚀风险计算\n\n3. ✅ **维修群截图_20240601_1600.png**\n   - 上传人：林老师\n   - 上传时间：2024/6/1 16:00:00\n   - 重复类型：新记录\n   - 处理判断：有效数据，纳入计算\n   - 当前状态：已纳入本次计算结果\n   - 最终结论：作为有效采样数据参与汽蚀风险计算\n\n#### 重复导入处理记录\n1. ⚠️ **维修群截图_重复上传.png**\n   - 上传人：林老师\n   - 上传时间：2026/6/19 23:32:45\n   - 重复类型：历史重复\n   - 重复来源：与「维修群截图_20240601_1430.png」内容重复（原始上传于 2024/6/1 14:30:00）\n   - 处理判断：内容重复，不新增计算任务\n   - 当前状态：已标记为重复，仅保留上传记录\n   - 最终结论：未纳入本次计算，不影响\"泵站汽蚀风险计算\"数量\n\n### 备注变更历史\n> 修改记录保留原话、修改人和修改原因，不覆盖\n\n1. **修改时间**：2026/6/19 23:32:45\n   - **修改人**：林老师\n   - **修改原因**：补充15:30缺失数据的现场背景说明\n   - **改前**：维修群第一次导入，注意15:30缺失半小时数据\n   - **改后**：林老师补充：15:30设备临时停机检修，有现场巡检记录可查\n\n### 数据质量评估\n本次计算共 **3个** 有效采样时间点，检测到 **1个** 缺失采样点：\n- 缺失采样点1：15:30-16:00（缺30分钟）\n\n> **说明**：采样间隔为30分钟，相邻采样点之间缺少30分钟的数据点（15:30），不是缺失60分钟，而是该30分钟间隔内缺少1个采样记录。\n\n整体数据趋势缓慢下降，压力从0.32MPa缓慢下降至0.28MPa。\n\n### 风险分析\n汽蚀风险等级：**低**（风险评分25分）\n- NPSH可用值：2.91m\n- NPSH必需值：1.37m\n- 汽蚀概率：23%\n\n### 关键决策\n1. **数据点1（14:30）**：保留。14:30数据完整，压力流量温度正常，作为基准值\n2. **数据点2（15:00）**：保留。15:00数据正常，压力略有下降符合趋势\n3. **数据点3（16:00）**：保留。16:00数据正常，15:30停机有巡检记录已复核 🔴 缺15:30停机审批单扫描件\n\n**缺失采样点决策**：\n- 缺失点1（15:30-16:00，30分钟）：15:30缺失因设备停机检修，已有巡检记录佐证。 缺停机审批单。\n\n### 缺失材料\n- 15:30停机审批单扫描件 - 请👨‍🔬 林老师补充\n- 停机审批单 - 请👨‍🔬 林老师补充\n\n### 下一步行动\n| 责任人 | 任务 | 截止时间 |\n|--------|------|----------|\n| 👨‍🔬 林老师 | 补充缺失数据或说明原因 | 2026-06-22 |\n| 👨‍🔬 林老师 | 补充缺失数据或说明原因 | 2026-06-22 |\n\n### 建议措施\n1. 运行状态良好，继续按计划监测\n\n### 备注\n林老师补充：15:30设备临时停机检修，有现场巡检记录可查\n",
+      "createdAt": "2026-06-19T15:32:46.247Z",
       "createdBy": "user-1"
     }
   ],
   "reviewTasks": [
     {
-      "id": "task-1",
-      "calculationId": "calc-2",
+      "id": "task-09a4e82c",
+      "calculationId": "calc-437fcd83",
       "type": "missing_interval",
-      "description": "采样时间缺失半小时（2024-06-01 17:00-17:30），请质检员复核",
-      "status": "pending",
+      "description": "采样时间缺失：15:30-16:00缺30分钟，请质检员复核",
+      "status": "resolved",
       "assignee": "user-2",
-      "createdAt": "2026-06-03T16:56:08.871Z",
+      "createdAt": "2026-06-19T15:32:45.627Z",
       "missingInterval": {
-        "start": "2024-06-01T17:00:00",
-        "end": "2024-06-01T17:30:00",
+        "start": "2024-06-01T15:30:00",
+        "end": "2024-06-01T16:00:00",
         "duration": 30,
         "source": "screenshot"
-      }
-    },
-    {
-      "id": "task-90317be3",
-      "calculationId": "calc-03b2d447",
-      "type": "missing_interval",
-      "description": "采样时间缺失60分钟，请质检员复核",
-      "status": "resolved",
-      "assignee": "user-2",
-      "createdAt": "2026-06-11T16:26:02.656Z",
-      "missingInterval": {
-        "start": "2026-06-12T09:00:00.000Z",
-        "end": "2026-06-12T10:00:00.000Z",
-        "duration": 60,
-        "source": "screenshot"
       },
-      "resolvedAt": "2026-06-11T16:31:31.323Z",
-      "resolution": "经复核，该时间段设备正常停机，不影响汽蚀风险计算结果"
-    },
-    {
-      "id": "task-ee3a8480",
-      "calculationId": "calc-56833f75",
-      "type": "missing_interval",
-      "description": "采样时间缺失60分钟，请质检员复核",
-      "status": "resolved",
-      "assignee": "user-2",
-      "createdAt": "2026-06-11T17:23:26.756Z",
-      "missingInterval": {
-        "start": "2024-06-01T07:00:00.000Z",
-        "end": "2024-06-01T08:00:00.000Z",
-        "duration": 60,
-        "source": "screenshot"
-      },
-      "resolvedAt": "2026-06-11T17:37:57.356Z",
+      "resolvedAt": "2026-06-19T15:32:46.115Z",
       "resolution": "经核查，15:30设备临时停机检修有巡检记录和审批单，不属于数据异常，不影响汽蚀风险评估结果"
     }
   ],

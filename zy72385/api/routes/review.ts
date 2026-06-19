@@ -80,14 +80,18 @@ router.post('/reviews', async (req: Request, res: Response) => {
 
     await db.read();
     
-    const relatedScreenshots = db.data.screenshots.filter(s => calc.screenshotIds.includes(s.id));
+    const directScreenshots = db.data.screenshots.filter(s => calc.screenshotIds.includes(s.id));
+    const duplicateScreenshots = db.data.screenshots.filter(
+      s => s.status === 'duplicate' && directScreenshots.some(ds => ds.id === s.duplicateOf)
+    );
+    const allRelatedScreenshots = [...directScreenshots, ...duplicateScreenshots];
     const changeHistory = await getChangeHistory('calculation', calculationId);
     
     const reportContent = generateHumanizedReport(
       calc,
       decisions,
       db.data.users,
-      relatedScreenshots,
+      allRelatedScreenshots,
       changeHistory
     );
 
@@ -118,14 +122,18 @@ router.get('/reports/:calculationId', async (req: Request, res: Response) => {
 
     const decisions = review?.decisions || [];
     
-    const relatedScreenshots = db.data.screenshots.filter(s => calc.screenshotIds.includes(s.id));
+    const directScreenshots = db.data.screenshots.filter(s => calc.screenshotIds.includes(s.id));
+    const duplicateScreenshots = db.data.screenshots.filter(
+      s => s.status === 'duplicate' && directScreenshots.some(ds => ds.id === s.duplicateOf)
+    );
+    const allRelatedScreenshots = [...directScreenshots, ...duplicateScreenshots];
     const changeHistory = await getChangeHistory('calculation', calculationId);
     
     const reportContent = generateHumanizedReport(
       calc,
       decisions,
       db.data.users,
-      relatedScreenshots,
+      allRelatedScreenshots,
       changeHistory
     );
 
