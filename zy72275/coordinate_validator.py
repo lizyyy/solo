@@ -18,7 +18,8 @@ class CoordinateValidator:
         metric_match = cls.METRIC_PATTERN.search(content)
         
         has_lat_lng_keywords = any(k in content.lower() for k in ['lat', 'lng', '经度', '纬度', '经纬度'])
-        has_metric_keywords = any(k in content.lower() for k in ['x=', 'y=', 'x:', 'y:', '米制', '坐标'])
+        has_metric_keywords = any(k in content.lower() for k in ['x=', 'y=', 'x:', 'y:', '米制'])
+        has_deny_metric = any(k in content for k in ['无坐标', '无定位', '缺坐标'])
         
         lat_lng_values = None
         metric_values = None
@@ -54,9 +55,12 @@ class CoordinateValidator:
         
         explicit_metric_markers = has_metric_keywords or (
             metric_match and 
-            (re.search(r'[XYxy][:=]', content) or '米制' in content or '坐标' in content)
+            (re.search(r'[XYxy][:=]', content) or '米制' in content)
         )
         has_metric = bool((metric_values and explicit_metric_markers) or has_metric_keywords)
+        
+        if has_deny_metric and not lat_lng_values and not metric_values:
+            return CoordinateType.UNKNOWN, None
         
         if has_lat_lng and has_metric:
             return CoordinateType.MIXED, {**(lat_lng_values or {}), **(metric_values or {})}

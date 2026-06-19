@@ -14,13 +14,13 @@
     "remark": null,
     "inspection_photo_id": null,
     "site_instruction": null,
-    "import_batch": "BATCH20260608225651",
+    "import_batch": "BATCH20260619110914",
     "version": 3,
-    "created_at": "2026-06-08T22:56:51.398002",
-    "updated_at": "2026-06-08T22:56:51.399507",
+    "created_at": "2026-06-19T11:09:14.315549",
+    "updated_at": "2026-06-19T11:09:14.316962",
     "change_history": [
       {
-        "timestamp": "2026-06-08T22:56:51.398456",
+        "timestamp": "2026-06-19T11:09:14.316176",
         "operator": "施工管理员",
         "field_name": "site_instruction",
         "old_value": null,
@@ -28,12 +28,12 @@
         "reason": "更新现场施工说明"
       },
       {
-        "timestamp": "2026-06-08T22:56:51.399503",
+        "timestamp": "2026-06-19T11:09:14.316960",
         "operator": "巡检组管理员",
         "field_name": "_rollback",
-        "old_value": "reverted 1 changes",
-        "new_value": "{\"site_instruction\": {\"before_rollback\": \"按坐标定位施工\", \"after_rollback\": null, \"original_change_operator\": \"施工管理员\", \"original_change_time\": \"2026-06-08T22:56:51.398456\"}}",
-        "reason": "回滚 1 步变更"
+        "old_value": "reverted 1 business changes",
+        "new_value": "{\"site_instruction\": {\"before_rollback\": \"按坐标定位施工\", \"after_rollback\": null, \"original_change_operator\": \"施工管理员\", \"original_change_time\": \"2026-06-19T11:09:14.316176\"}}",
+        "reason": "回滚 1 步业务变更"
       }
     ]
   },
@@ -52,13 +52,13 @@
     "remark": null,
     "inspection_photo_id": null,
     "site_instruction": "按坐标定位施工",
-    "import_batch": "BATCH20260608225651",
+    "import_batch": "BATCH20260619110914",
     "version": 2,
-    "created_at": "2026-06-08T22:56:51.398023",
-    "updated_at": "2026-06-08T22:56:51.398635",
+    "created_at": "2026-06-19T11:09:14.315576",
+    "updated_at": "2026-06-19T11:09:14.316300",
     "change_history": [
       {
-        "timestamp": "2026-06-08T22:56:51.398633",
+        "timestamp": "2026-06-19T11:09:14.316298",
         "operator": "施工管理员",
         "field_name": "site_instruction",
         "old_value": null,
@@ -82,13 +82,13 @@
     "remark": null,
     "inspection_photo_id": null,
     "site_instruction": null,
-    "import_batch": "BATCH20260608225651",
+    "import_batch": "BATCH20260619110914",
     "version": 3,
-    "created_at": "2026-06-08T22:56:51.398034",
-    "updated_at": "2026-06-08T22:56:51.399289",
+    "created_at": "2026-06-19T11:09:14.315587",
+    "updated_at": "2026-06-19T11:09:14.316822",
     "change_history": [
       {
-        "timestamp": "2026-06-08T22:56:51.398315",
+        "timestamp": "2026-06-19T11:09:14.316046",
         "operator": "许工",
         "field_name": "inspection_photo_id",
         "old_value": null,
@@ -96,12 +96,12 @@
         "reason": "补录巡检照片编号"
       },
       {
-        "timestamp": "2026-06-08T22:56:51.399284",
+        "timestamp": "2026-06-19T11:09:14.316819",
         "operator": "巡检组管理员",
         "field_name": "_rollback",
-        "old_value": "reverted 1 changes",
-        "new_value": "{\"inspection_photo_id\": {\"before_rollback\": \"PHOTO-2024-001\", \"after_rollback\": null, \"original_change_operator\": \"许工\", \"original_change_time\": \"2026-06-08T22:56:51.398315\"}}",
-        "reason": "回滚 1 步变更"
+        "old_value": "reverted 1 business changes",
+        "new_value": "{\"inspection_photo_id\": {\"before_rollback\": \"PHOTO-2024-001\", \"after_rollback\": null, \"original_change_operator\": \"许工\", \"original_change_time\": \"2026-06-19T11:09:14.316046\"}}",
+        "reason": "回滚 1 步业务变更"
       }
     ]
   },
@@ -120,13 +120,13 @@
     "remark": null,
     "inspection_photo_id": null,
     "site_instruction": "按坐标定位施工",
-    "import_batch": "BATCH20260608225651",
+    "import_batch": "BATCH20260619110914",
     "version": 2,
-    "created_at": "2026-06-08T22:56:51.398043",
-    "updated_at": "2026-06-08T22:56:51.398764",
+    "created_at": "2026-06-19T11:09:14.315595",
+    "updated_at": "2026-06-19T11:09:14.316426",
     "change_history": [
       {
-        "timestamp": "2026-06-08T22:56:51.398762",
+        "timestamp": "2026-06-19T11:09:14.316424",
         "operator": "施工管理员",
         "field_name": "site_instruction",
         "old_value": null,

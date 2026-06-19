@@ -10,14 +10,16 @@
 
 ### 规则1: 坐标类型判断逻辑
 
-**判断标准**（见 [coordinate_validator.py](file:///Users/lzy/pro/solo/workspaces/zy72275/coordinate_validator.py#L15-L57)）：
+**判断标准**（见 [coordinate_validator.py](file:///Users/lzy/pro/solo/workspaces/zy72275/coordinate_validator.py#L15-L72)）：
 
 | 坐标类型 | 判定条件 | 处理状态 |
 |---------|---------|---------|
 | `lat_lng` (经纬度) | 匹配 `纬度, 经度` 格式，数值在有效范围（纬度±90，经度±180）内 | PENDING → NORMAL（需人工确认） |
-| `metric` (米制) | 匹配 `X=数值, Y=数值` 格式 | PENDING → NORMAL（需人工确认） |
+| `metric` (米制) | 匹配 `X=数值, Y=数值` 格式，且有 `X=`/`Y=`/`米制` 明确标记 | PENDING → NORMAL（需人工确认） |
 | `mixed` (混合) | **同时**出现经纬度和米制坐标特征 | **NEEDS_REVIEW（必须巡检组复核）** |
-| `unknown` (未知) | 无法识别任何坐标格式 | ABNORMAL |
+| `unknown` (未知) | 无法识别任何坐标格式 **或** 内容含「无坐标/无定位/缺坐标」且无数值 | **ABNORMAL** |
+
+> **边界规则（CRITICAL）**：内容含「无坐标」「无定位」「缺坐标」字样时，即使出现「坐标」二字，也判为 `unknown` → `ABNORMAL`，不得误判为米制坐标。
 
 ### 规则2: 混合坐标的处理流程（CRITICAL）
 
@@ -71,6 +73,8 @@
 | 回滚记录 | 无细节 | 记录每个字段的回滚前后值和原改动人 |
 
 **关键点**：回滚后 `processing_status` 不是 `'rollbacked'`，而是根据 `coordinate_type` 重新计算的状态，保证与同一份最新坐标类型结果一致。
+
+> **证据链规则（CRITICAL）**：系统追加的 `_rollback` 记录（field_name 以 `_` 开头）在下一次默认全量回滚时会被自动跳过，不会被当成业务字段恢复，避免重复回滚时污染业务数据。重复回滚仅恢复真实业务变更，步数为0表示无剩余业务变更可回滚。
 
 ---
 
@@ -306,9 +310,9 @@ python cli.py update <point_id> site_instruction "现场按坐标定位" --opera
 
 | 规则 | 文件 | 行号 |
 |------|------|------|
-| 坐标类型检测 | [coordinate_validator.py](file:///Users/lzy/pro/solo/workspaces/zy72275/coordinate_validator.py) | L15-L68 |
-| 处理状态判定 | [coordinate_validator.py](file:///Users/lzy/pro/solo/workspaces/zy72275/coordinate_validator.py) | L70-L79 |
-| 边界规则文档 | [coordinate_validator.py](file:///Users/lzy/pro/solo/workspaces/zy72275/coordinate_validator.py) | L81-L99 |
+| 坐标类型检测（含无坐标否定判断） | [coordinate_validator.py](file:///Users/lzy/pro/solo/workspaces/zy72275/coordinate_validator.py) | L15-L72 |
+| 处理状态判定 | [coordinate_validator.py](file:///Users/lzy/pro/solo/workspaces/zy72275/coordinate_validator.py) | L74-L83 |
+| 边界规则文档 | [coordinate_validator.py](file:///Users/lzy/pro/solo/workspaces/zy72275/coordinate_validator.py) | L85-L103 |
 | 重复导入去重 | [archive_manager.py](file:///Users/lzy/pro/solo/workspaces/zy72275/archive_manager.py) | L72-L82 |
 | 变更历史记录 | [archive_manager.py](file:///Users/lzy/pro/solo/workspaces/zy72275/archive_manager.py) | L114-L145 |
-| 回滚字段恢复 | [archive_manager.py](file:///Users/lzy/pro/solo/workspaces/zy72275/archive_manager.py) | L147-L202 |
+| 回滚字段恢复（跳过_rollback系统记录） | [archive_manager.py](file:///Users/lzy/pro/solo/workspaces/zy72275/archive_manager.py) | L147-L220 |

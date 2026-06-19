@@ -152,13 +152,30 @@ class ArchiveManager:
         if not point.change_history:
             return None
         
-        target_steps = steps if steps > 0 else len(point.change_history)
-        target_steps = min(target_steps, len(point.change_history))
+        business_changes = [
+            (idx, ch) for idx, ch in enumerate(point.change_history)
+            if not ch.field_name.startswith('_')
+        ]
+        if not business_changes:
+            return None
+        
+        target_business_steps = steps if steps > 0 else len(business_changes)
+        target_business_steps = min(target_business_steps, len(business_changes))
         
         reverted_fields = {}
-        for i in range(target_steps):
-            change = point.change_history[-(i + 1)]
+        reverted_count = 0
+        
+        for i in range(len(business_changes) - 1, -1, -1):
+            if reverted_count >= target_business_steps:
+                break
+            orig_idx, change = business_changes[i]
+            if change.field_name.startswith('_'):
+                continue
+            
             current_val = getattr(point, change.field_name, None)
+            if current_val == change.old_value:
+                continue
+            
             reverted_fields[change.field_name] = {
                 'before_rollback': current_val,
                 'after_rollback': change.old_value,
@@ -166,6 +183,7 @@ class ArchiveManager:
                 'original_change_time': change.timestamp.isoformat()
             }
             setattr(point, change.field_name, change.old_value)
+            reverted_count += 1
         
         recalculated_status = CoordinateValidator.determine_processing_status(point.coordinate_type)
         if point.processing_status != recalculated_status:
@@ -180,9 +198,9 @@ class ArchiveManager:
         rollback_record = ChangeRecord(
             operator=operator,
             field_name='_rollback',
-            old_value=f'reverted {target_steps} changes',
+            old_value=f'reverted {reverted_count} business changes',
             new_value=json.dumps(reverted_fields, ensure_ascii=False, default=str),
-            reason=f'回滚 {target_steps} 步变更'
+            reason=f'回滚 {reverted_count} 步业务变更'
         )
         point.change_history.append(rollback_record)
         point.manual_modified = any(
@@ -195,7 +213,7 @@ class ArchiveManager:
         self._save_points()
         return {
             'point_id': point_id,
-            'steps_reverted': target_steps,
+            'steps_reverted': reverted_count,
             'reverted_fields': reverted_fields,
             'current_status': point.processing_status,
             'current_coordinate_type': point.coordinate_type
