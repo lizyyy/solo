@@ -441,6 +441,22 @@ class ProcessingEngine:
             )
             return record
 
+        if record.status in [RecordStatus.REJECTED, RecordStatus.CONFIRMED]:
+            decision_label = "驳回" if record.status == RecordStatus.REJECTED else "确认"
+            change_msg = (
+                f"记录经人工决策处理（已{decision_label}），"
+                f"审计明细与历史记录需人工核查确认，状态保留为{record.status.value}"
+            )
+            self._add_audit(
+                record=record,
+                step_name="第三步：审计明细更新",
+                operator="审计系统",
+                before_status=before_status,
+                after_status=record.status,
+                change_content=change_msg
+            )
+            return record
+
         is_aligned = self._verify_audit_history_alignment(record)
         
         if is_aligned:

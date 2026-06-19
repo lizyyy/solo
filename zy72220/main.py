@@ -235,7 +235,9 @@ def print_final_summary(results):
             len(r.audit_details) >= 3 for r in results
         )),
         ("审计与历史记录对齐", all(
-            len(r.audit_details) > 2 and len(r.history_records) > 2 for r in results
+            r.status not in [RecordStatus.REJECTED, RecordStatus.CONFIRMED]
+            and len(r.audit_details) > 2 and len(r.history_records) > 2
+            for r in results
         )),
         ("港币人民币同列不自动处理", results[1].need_custodian_review == True or 
          (results[1].custodian_review_result == True and results[1].custodian_reviewer is not None)),

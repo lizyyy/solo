@@ -251,7 +251,18 @@ class CalcDisplayer:
         
         output.append("\n" + "-" * 80)
         output.append(f"三步流程完整性: {'✓ 完整' if has_full_flow else '✗ 缺失'}")
-        output.append(f"双向核对结果: {'✓ 一致' if len(record.audit_details) > 2 and len(record.history_records) > 2 else '⚠ 需核查'}")
+        if record.status in [RecordStatus.REJECTED, RecordStatus.CONFIRMED]:
+            decision_label = "驳回" if record.status == RecordStatus.REJECTED else "确认"
+            alignment_label = f"⚠ 需人工核查（已{decision_label}记录经人工决策处理，不可自动标记一致通过）"
+        elif len(record.audit_details) > 2 and len(record.history_records) > 2:
+            has_step1 = any("第一步" in a.step_name for a in record.audit_details)
+            has_step2 = any("第二步" in a.step_name for a in record.audit_details)
+            has_email_hist = "email_supplement" in {h.field_name for h in record.history_records}
+            has_settle_hist = "settlement_batch" in {h.field_name for h in record.history_records}
+            alignment_label = "✓ 一致" if (has_step1 and has_step2 and has_email_hist and has_settle_hist) else "⚠ 需核查"
+        else:
+            alignment_label = "⚠ 需核查"
+        output.append(f"双向核对结果: {alignment_label}")
         output.append("=" * 80)
         
         return "\n".join(output)
