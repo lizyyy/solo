@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { Overview } from './pages/Overview';
@@ -5,8 +6,19 @@ import { CoordinateOrigin } from './pages/CoordinateOrigin';
 import { SelfCheck } from './pages/SelfCheck';
 import { WorkflowPage } from './pages/Workflow';
 import { AuditLogPage } from './pages/AuditLogPage';
+import { initDatabase } from './db';
+import { useCanonicalStore } from './store/canonicalStore';
 
 export default function App() {
+  const initWorkflow = useCanonicalStore(s => s.initWorkflow);
+
+  useEffect(() => {
+    (async () => {
+      await initDatabase();
+      await initWorkflow();
+    })();
+  }, [initWorkflow]);
+
   return (
     <Router>
       <Layout>

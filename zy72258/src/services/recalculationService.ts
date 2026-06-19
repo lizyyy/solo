@@ -2,8 +2,6 @@ import { db } from '../db';
 import type {
   CanonicalResult,
   AnnotationRow,
-  CoordinateOriginRow,
-  OcclusionEntry,
   ModificationRecord,
 } from '../types';
 import { calculateChecksum, generateId } from '../utils/checksum';
@@ -69,6 +67,7 @@ export async function generateCanonicalResult(
 
     const { x3d, y3d, z3d } = calculate3DCoordinates(pixelX, pixelY, baseX, baseY, baseZ);
 
+    const existingTrace = existing?.rows.find(r => r.coordinateOriginRowId === row.id);
     const traceInfo = {
       importTime: row.createdAt,
       modificationRecords: row.modificationHistory,
@@ -77,8 +76,8 @@ export async function generateCanonicalResult(
         time: row.reviewedAt,
         comment: '安全员复核确认',
       } : undefined,
-      recalculationVersions: existing
-        ? [...(existing.rows.find(r => r.coordinateOriginRowId === row.id)?.traceInfo.recalculationVersions || []), version]
+      recalculationVersions: existingTrace
+        ? [...existingTrace.traceInfo.recalculationVersions, version]
         : [version],
     };
 
@@ -152,6 +151,75 @@ export async function generateCanonicalResult(
   return { result, isNew };
 }
 
+async function transitionSupplementedToRecalculated(operator: string): Promise<{
+  updatedCount: number;
+  updatedRows: Array<{ originalLineNumber: number; photoPointId: string }>;
+}> {
+  const now = Date.now();
+  const supplementedRows = await db.coordinateOrigin
+    .where('processingStatus')
+    .equals('supplemented')
+    .toArray();
+
+  if (supplementedRows.length === 0) {
+    return { updatedCount: 0, updatedRows: [] };
+  }
+
+  const updated: Array<{ originalLineNumber: number; photoPointId: string }> = [];
+
+  await db.transaction('rw', db.coordinateOrigin, async () => {
+    for (const originRow of supplementedRows) {
+      const record: ModificationRecord = {
+        field: 'processingStatus',
+        oldValue: 'supplemented',
+        newValue: 'recalculated',
+        operator: operator as '许工' | '安全员' | '系统',
+        timestamp: now,
+      };
+      await db.coordinateOrigin.update(originRow.id, {
+        ...originRow,
+        processingStatus: 'recalculated',
+        modificationHistory: [...originRow.modificationHistory, record],
+        updatedAt: now,
+      });
+      updated.push({
+        originalLineNumber: originRow.originalLineNumber,
+        photoPointId: originRow.photoPointId,
+      });
+    }
+  });
+
+  return { updatedCount: updated.length, updatedRows: updated };
+}
+
+async function syncOcclusionForPhotoPointIds(
+  photoPointIds: string[],
+  operator: string
+): Promise<{ added: number; updated: number }> {
+  const now = Date.now();
+  let added = 0;
+  let updated = 0;
+
+  await db.transaction('rw', db.occlusionList, async () => {
+    for (const ppId of photoPointIds) {
+      const existing = await db.occlusionList.where('photoPointId').equals(ppId).first();
+      if (existing) {
+        updated++;
+      } else {
+        await db.occlusionList.add({
+          id: generateId('oc_'),
+          photoPointId: ppId,
+          isOccluded: false,
+          updatedAt: now,
+        });
+        added++;
+      }
+    }
+  });
+
+  return { added, updated };
+}
+
 export async function triggerRecalculation(
   operator: string
 ): Promise<{
@@ -160,64 +228,113 @@ export async function triggerRecalculation(
   result: CanonicalResult;
   recalculationCheck: SelfCheckResult;
 }> {
+  const now = Date.now();
+
+  const beforeSupplementCount = await db.coordinateOrigin
+    .where('processingStatus')
+    .equals('supplemented')
+    .count();
+
+  const beforeMissingCount = await db.coordinateOrigin
+    .where('processingStatus')
+    .equals('missing_row')
+    .count();
+
+  const beforeRecalculatedCount = await db.coordinateOrigin
+    .where('processingStatus')
+    .equals('recalculated')
+    .count();
+
+  const photoPointIdsInOrigin = (await db.coordinateOrigin.toArray()).map(r => r.photoPointId);
+  const occlusionSync = await syncOcclusionForPhotoPointIds(photoPointIdsInOrigin, operator);
+
+  const transitionResult = await transitionSupplementedToRecalculated(operator);
+
   const { result, isNew } = await generateCanonicalResult(operator);
 
-  const beforeRows = await db.coordinateOrigin.where('processingStatus').equals('supplemented').count();
-  const afterRows = result.rows.filter(r => r.status === 'recalculated').length;
-  const passed = beforeRows === 0 || afterRows > 0;
+  const recalculatedInResult = result.rows.filter(r => r.status === 'recalculated').length;
+  const supplementedInResult = result.rows.filter(r => r.status === 'supplemented').length;
+  const missingInResult = result.rows.filter(r => r.status === 'missing_row').length;
 
-  const now = Date.now();
+  const transitionSuccessful = transitionResult.updatedCount === beforeSupplementCount
+    && supplementedInResult === 0;
+
+  const passed = beforeSupplementCount === 0 || transitionSuccessful;
+
+  const details: Record<string, unknown> = {
+    beforeSupplementCount,
+    beforeMissingCount,
+    beforeRecalculatedCount,
+    transitionedCount: transitionResult.updatedCount,
+    transitionedRows: transitionResult.updatedRows,
+    occlusionAdded: occlusionSync.added,
+    occlusionUpdated: occlusionSync.updated,
+    afterRecalculatedCount: recalculatedInResult,
+    afterSupplementCount: supplementedInResult,
+    afterMissingCount: missingInResult,
+    isNewResult: isNew,
+    version: result.version,
+    checksum: result.checksum,
+    rowCount: result.rowCount,
+    missingRowCount: result.missingRowCount,
+  };
+
+  const message = passed
+    ? (beforeSupplementCount > 0
+        ? `重算成功：${transitionResult.updatedCount} 条补录记录已转为已重算，共 ${result.rowCount} 条记录（版本 ${result.version}）`
+        : `重算成功：无待重算补录记录，共 ${result.rowCount} 条记录（版本 ${result.version}）`)
+    : `重算校验失败：${beforeSupplementCount} 条补录记录中仅 ${transitionResult.updatedCount} 条完成状态转换`;
+
   const recalculationCheck: SelfCheckResult = {
     type: 'recalculation',
     passed,
     checkedAt: now,
-    details: {
-      beforeSupplementCount: beforeRows,
-      afterRecalculatedCount: afterRows,
-      isNewResult: isNew,
-      version: result.version,
-      checksum: result.checksum,
-    },
-    message: passed
-      ? `重算成功，共处理 ${result.rowCount} 条记录，其中异常 ${result.missingRowCount} 条`
-      : '重算校验失败：补录记录未正确转换为重算状态',
+    details,
+    message,
   };
 
   await db.selfCheckResults.put(recalculationCheck);
 
-  if (passed) {
-    await db.transaction('rw', db.coordinateOrigin, async () => {
-      for (const row of result.rows) {
-        const originRow = await db.coordinateOrigin.get(row.coordinateOriginRowId);
-        if (originRow && originRow.processingStatus === 'supplemented') {
-          const record: ModificationRecord = {
-            field: 'processingStatus',
-            oldValue: 'supplemented',
-            newValue: 'recalculated',
-            operator: '系统',
-            timestamp: now,
-          };
-          await db.coordinateOrigin.update(row.coordinateOriginRowId, {
-            ...originRow,
-            processingStatus: 'recalculated',
-            modificationHistory: [...originRow.modificationHistory, record],
-            updatedAt: now,
-          });
-        }
-      }
-    });
-
-    const { result: updatedResult } = await generateCanonicalResult(operator);
+  if (!passed) {
     return {
-      success: true,
-      newVersion: updatedResult.version,
-      result: updatedResult,
+      success: false,
+      newVersion: result.version,
+      result,
       recalculationCheck,
     };
   }
 
+  const log: AuditLog = {
+    id: generateId('log_'),
+    timestamp: now,
+    operator,
+    actionType: 'recalculate',
+    action: 'trigger_recalculation',
+    message,
+    rerunnableCommand: generateRecalculateCommand(result.version, operator),
+    payload: { version: result.version, beforeSupplementCount },
+    result: {
+      success: true,
+      transitionedCount: transitionResult.updatedCount,
+      version: result.version,
+      checksum: result.checksum,
+    },
+    success: true,
+    details,
+    rowReference: transitionResult.updatedRows.length > 0
+      ? `原始行号${transitionResult.updatedRows.map(r => r.originalLineNumber).join(', ')}`
+      : undefined,
+    traceInfo: [{
+      action: '触发重算',
+      operator,
+      timestamp: now,
+      details: message,
+    }],
+  };
+  await db.auditLogs.add(log);
+
   return {
-    success: false,
+    success: true,
     newVersion: result.version,
     result,
     recalculationCheck,
