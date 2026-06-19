@@ -115,31 +115,32 @@ def load_demo_data(processor):
     )
     print("  ✓ 老枪乐队 已标记为补录（旧口径）")
     
-    print("\n【第三步】一次重跑（极光乐队）")
+    print("\n【第三步】一次人工修正（极光乐队 - 调音师名补全）")
+    print("    ← 调音师留言没写全名，老周补全，仍留给巡演统筹复核")
+    print("-" * 60)
+    print("\n  老周正在补全极光乐队的调音师信息...")
+    processor.manual_correct(
+        record_ids["record_1"],
+        {
+            "tuner_name": "李明（主调音师）"
+        },
+        operator="老周"
+    )
+    print("  ✓ 极光乐队 已人工修正调音师姓名")
+    print("  ⚠️ 状态仍为待巡演统筹复核")
+    
+    print("\n【第四步】一次重跑（极光乐队）")
     print("    ← 重跑后仍保持待复核状态")
     print("-" * 60)
     print("\n  重跑 极光乐队 记录...")
     processor.rerun_record(record_ids["record_1"])
     print("  ✓ 极光乐队 重跑完成，状态仍为待巡演统筹复核")
     
-    print("\n【第四步】一次人工修正（超音速乐队 - 调音师名补全）")
-    print("    ← 演示修正功能，但不碰待复核的记录")
-    print("-" * 60)
-    print("\n  老周正在修正超音速乐队的信息...")
-    processor.manual_correct(
-        record_ids["record_0"],
-        {
-            "tuner_name": "阿凯（主调音）"
-        },
-        operator="老周"
-    )
-    print("  ✓ 超音速乐队 已人工修正调音师信息")
-    
     print("\n" + "=" * 60)
     print("  演示数据导入完成！")
     print("  三种场景处理结果不同：")
     print("    1. 超音速乐队 - 顺利记录 + 补录群接龙")
-    print("    2. 极光乐队 - 请假被算消耗，待巡演统筹复核 ⚠️")
+    print("    2. 极光乐队 - 请假被算消耗 + 人工修正调音师名 + 待巡演统筹复核 ⚠️")
     print("    3. 老枪乐队 - 补录旧口径")
     print("=" * 60)
     
@@ -156,6 +157,7 @@ def print_demo_summary(processor):
         flag = " ⚠️待复核" if r['needs_review'] else ""
         print(f"\n【{r['band_name']}】{r['date']}")
         print(f"  状态: {r['status_text']}{flag}")
+        print(f"  调音师: {r['tuner_name'] or '未记录'}")
         print(f"  课时: {r['hours']}小时")
         print(f"  是否请假: {'是' if r['is_leave'] else '否'}")
         print(f"  是否消耗: {'是' if r['is_consumed'] else '否'}")

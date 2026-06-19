@@ -51,10 +51,14 @@ class RecordProcessor:
             except:
                 pass
 
-        tuner_match = re.search(r'(调音师|录音师)[:：]\s*(\S+)|(\S+)\s*(调音|录音)', raw_text)
         tuner_name = ""
+        tuner_match = re.search(r'(调音师|录音师)[:：]\s*(\S+)', raw_text)
         if tuner_match:
-            tuner_name = tuner_match.group(2) or tuner_match.group(1) or ""
+            tuner_name = tuner_match.group(2)
+        else:
+            tuner_match2 = re.search(r'(?m)^\s*(\S{2,8})\s*(?:调音师|调音|录音师|录音)\s*$', raw_text)
+            if tuner_match2:
+                tuner_name = tuner_match2.group(1)
 
         notes = ""
         leave_keywords = ["请假", "请假了", "没来", "缺席", "取消", "停一次"]
@@ -283,10 +287,24 @@ class RecordProcessor:
             record.hours = corrections["hours"]
         if "members" in corrections:
             record.members = corrections["members"]
+        if "tuner_name" in corrections:
+            record.tuner_name = corrections["tuner_name"]
 
         record.updated_at = datetime.now()
 
-        self._log(record.id, "人工修正", f"人工修正: {corrections}", operator)
+        change_desc_parts = []
+        for key, value in corrections.items():
+            if key == "tuner_name":
+                change_desc_parts.append(f"调音师姓名 → {value}")
+            elif key == "hours":
+                change_desc_parts.append(f"课时 → {value}小时")
+            elif key == "status":
+                change_desc_parts.append(f"状态 → {value}")
+            elif key == "song_list":
+                change_desc_parts.append(f"曲目 → {len(value)}首")
+            else:
+                change_desc_parts.append(f"{key} → {value}")
+        self._log(record.id, "人工修正", "人工修正: " + "; ".join(change_desc_parts), operator)
         
         return record
 
@@ -340,6 +358,7 @@ class RecordProcessor:
                 "id": r.id,
                 "date": r.date,
                 "band_name": r.band_name,
+                "tuner_name": r.tuner_name,
                 "hours": r.hours,
                 "status": r.status.value,
                 "status_text": self._status_text(r.status),
@@ -347,7 +366,9 @@ class RecordProcessor:
                 "is_leave": r.is_leave,
                 "is_consumed": r.is_consumed,
                 "run_count": r.run_count,
-                "song_count": len(r.song_list)
+                "song_count": len(r.song_list),
+                "correction_count": len(r.corrections),
+                "has_corrections": len(r.corrections) > 0
             })
         return summary
 
@@ -423,6 +444,8 @@ class RecordProcessor:
             "tuner_note": record.tuner_note,
             "group_remark": record.group_remark,
             "corrections": record.corrections,
+            "correction_count": len(record.corrections),
+            "has_corrections": len(record.corrections) > 0,
             "run_count": record.run_count,
             "created_at": record.created_at.isoformat(),
             "updated_at": record.updated_at.isoformat()
@@ -454,7 +477,7 @@ class RecordProcessor:
                 stats["pending_hours"] += r.hours
             if r.status == RecordStatus.SUPPLEMENTED:
                 stats["supplemented"] += 1
-            if r.status == RecordStatus.CORRECTED:
+            if len(r.corrections) > 0:
                 stats["corrected"] += 1
             if r.status == RecordStatus.REVIEW_APPROVED:
                 stats["review_approved"] += 1
@@ -468,13 +491,16 @@ class RecordProcessor:
             record_list.append({
                 "date": r.date,
                 "band_name": r.band_name,
+                "tuner_name": r.tuner_name,
                 "hours": r.hours,
                 "status": self._status_text(r.status),
                 "is_leave": r.is_leave,
                 "is_consumed": r.is_consumed,
                 "needs_review": r.needs_review,
                 "review_note": r.review_note,
-                "songs": r.song_list
+                "songs": r.song_list,
+                "correction_count": len(r.corrections),
+                "has_corrections": len(r.corrections) > 0
             })
 
         return {
@@ -511,8 +537,10 @@ class RecordProcessor:
         lines.append("-" * 60)
         for i, r in enumerate(report["records"], 1):
             flag = " ⚠️待复核" if r["needs_review"] else ""
-            lines.append(f"{i}. {r['band_name']} - {r['date']}")
-            lines.append(f"   状态: {r['status']}{flag}")
+            corr_tag = " 🔧已人工修正" if r["has_corrections"] else ""
+            lines.append(f"{i}. {r['band_name']} - {r['date']}{flag}{corr_tag}")
+            lines.append(f"   状态: {r['status']}")
+            lines.append(f"   调音师: {r['tuner_name'] or '未记录'}")
             lines.append(f"   课时: {r['hours']}小时 | 请假: {'是' if r['is_leave'] else '否'} | 消耗: {'是' if r['is_consumed'] else '否'}")
             if r["review_note"]:
                 lines.append(f"   复核说明: {r['review_note']}")

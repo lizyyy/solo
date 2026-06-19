@@ -113,6 +113,7 @@ body {
 .badge.corrected { background: #d1fae5; color: #065f46; }
 .badge.review-approved { background: #dbeafe; color: #1e40af; }
 .badge.review-rejected { background: #f3f4f6; color: #374151; }
+.badge.corrected-tag { background: #ecfeff; color: #155e75; margin-left: 4px; }
 .record-details {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -460,9 +461,12 @@ async function loadRecords() {
             <div class="record-header">
                 <div>
                     <div class="record-title">${r.band_name}</div>
-                    <div class="record-meta">${r.date} · ${r.hours}小时</div>
+                    <div class="record-meta">${r.date} · ${r.hours}小时 · 调音师: ${r.tuner_name || '未记录'}</div>
                 </div>
-                <span class="badge ${getBadgeClass(r.status)}">${r.status_text}</span>
+                <div>
+                    <span class="badge ${getBadgeClass(r.status)}">${r.status_text}</span>
+                    ${r.has_corrections ? '<span class="badge corrected-tag">🔧 已修正</span>' : ''}
+                </div>
             </div>
             <div class="record-details">
                 <div class="detail-item"><div class="label">请假</div><div class="value">${r.is_leave ? '是' : '否'}</div></div>
@@ -506,6 +510,7 @@ async function selectRecord(id) {
             <div class="detail-row"><span class="label">课时</span><span class="value">${r.hours} 小时</span></div>
             <div class="detail-row"><span class="label">调音师</span><span class="value">${r.tuner_name || '-'}</span></div>
             <div class="detail-row"><span class="label">状态</span><span class="value">${r.status_text}</span></div>
+            ${r.has_corrections ? `<div class="detail-row"><span class="label">修正记录</span><span class="value" style="color:#0891b2;">🔧 ${r.correction_count} 次人工修正</span></div>` : ''}
         </div>
         <div class="detail-section">
             <h4>课时状态</h4>
