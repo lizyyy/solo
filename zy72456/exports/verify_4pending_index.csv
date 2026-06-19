@@ -1,0 +1,3 @@
+﻿complaint_no,community_name,original_line_no,import_batch_id,photo_remark,photo_uploaded_at,record_id,trace_hint
+TS20260601001,阳光花园小区,1,BATCH-20260620-e0657e28,入口右侧3辆违停，已劝离,2026-06-20 07:31:15,1,cli.py rollback-op 1 整体回滚此记录上一次操作
+TS20260601002,阳光花园,2,BATCH-20260620-e0657e28,早高峰潮汐车道需调整，建议7-9点启用,2026-06-20 07:31:15,2,cli.py rollback-op 2 整体回滚此记录上一次操作

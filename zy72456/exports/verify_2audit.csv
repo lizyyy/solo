@@ -1,0 +1,16 @@
+﻿audit_id,changed_at,changed_by,record_id,complaint_no,original_line_no,import_batch_id,field_name,old_value,new_value,change_reason
+1,2026-06-20 07:31:15,traffic_laoma,2,TS20260601002,2,BATCH-20260620-e0657e28,photo_remark,,早高峰潮汐车道需调整，建议7-9点启用,老马补看路口照片
+2,2026-06-20 07:31:15,traffic_laoma,2,TS20260601002,2,BATCH-20260620-e0657e28,status,IMPORTED,PENDING_INSPECTOR,存在小区新旧名冲突，转市政巡检员复核
+3,2026-06-20 07:31:15,muni_inspector,2,TS20260601002,2,BATCH-20260620-e0657e28,community_name,阳光花园,阳光花园小区,巡检员复核小区新旧名冲突，采用新名
+4,2026-06-20 07:31:15,muni_inspector,2,TS20260601002,2,BATCH-20260620-e0657e28,community_name_normalized,阳光花园,阳光花园小区,巡检员复核同步更新标准化名
+5,2026-06-20 07:31:15,muni_inspector,2,TS20260601002,2,BATCH-20260620-e0657e28,has_alias_conflict,1,0,冲突已解决
+6,2026-06-20 07:31:15,muni_inspector,2,TS20260601002,2,BATCH-20260620-e0657e28,status,PENDING_INSPECTOR,PHOTO_REVIEWED,巡检员复核通过
+7,2026-06-20 07:31:15,admin,2,TS20260601002,2,BATCH-20260620-e0657e28,status,PHOTO_REVIEWED,PENDING_INSPECTOR,按操作原子回滚（撤销：巡检员复核通过）
+8,2026-06-20 07:31:15,admin,2,TS20260601002,2,BATCH-20260620-e0657e28,has_alias_conflict,0,1,按操作原子回滚（撤销：冲突已解决）
+9,2026-06-20 07:31:15,admin,2,TS20260601002,2,BATCH-20260620-e0657e28,community_name_normalized,阳光花园小区,阳光花园,按操作原子回滚（撤销：巡检员复核同步更新标准化名）
+10,2026-06-20 07:31:15,admin,2,TS20260601002,2,BATCH-20260620-e0657e28,community_name,阳光花园小区,阳光花园,按操作原子回滚（撤销：巡检员复核小区新旧名冲突，采用新名）
+11,2026-06-20 07:31:15,traffic_laoma,1,TS20260601001,1,BATCH-20260620-e0657e28,photo_remark,,入口右侧3辆违停，已劝离,老马补看路口照片
+12,2026-06-20 07:31:15,traffic_laoma,1,TS20260601001,1,BATCH-20260620-e0657e28,status,IMPORTED,PENDING_INSPECTOR,存在小区新旧名冲突，转市政巡检员复核
+13,2026-06-20 07:31:15,traffic_laoma,5,TS20260601005,5,BATCH-20260620-e0657e28,photo_remark,,救护车通道有社会车辆，已贴单,老马补看路口照片
+14,2026-06-20 07:31:15,traffic_laoma,5,TS20260601005,5,BATCH-20260620-e0657e28,status,IMPORTED,PHOTO_REVIEWED,路口照片审核完成
+15,2026-06-20 07:31:15,traffic_laoma,5,TS20260601005,5,BATCH-20260620-e0657e28,photo_remark,救护车通道有社会车辆，已贴单,补充：下午4点又有2辆违停，已拖移,老马修改照片备注

@@ -28,10 +28,11 @@ ALIAS_RULES = """
 2. 导入时自动匹配 community_aliases 表，命中则标记 has_alias_conflict=1，状态不推进到 PHOTO_REVIEWED
 3. 有冲突的记录，老马补看照片后状态变为 PENDING_INSPECTOR，不归入正常，留待市政巡检员复核
 4. 巡检员确认后可选择：(a)保留旧名→更新 normalized 并解除标记；(b)改用新名→更新 name 并解除标记
-5. 巡检员复核作为一次"操作原子"，同时修改 community_name/has_alias_conflict/status；回滚必须三者一起回
+5. 巡检员复核作为一次"操作原子"，同时修改 community_name/community_name_normalized/has_alias_conflict/status；回滚必须四者一起回
 6. 所有改名、备注、状态变更都记录在 audit_log，可按记录ID或操作原子整体回滚
 7. 导出明细包含：原始导入值 + 最终值 + 历次修改历史 + 审计轨迹 + 冲突分组索引，可从摘要回溯到原始材料
 8. 别名映射表新增/停用都会触发当日摘要标记"受影响记录"
+9. "仅修改照片备注"指已审核记录上的二次备注修改，首次照片审核（IMPORTED→PENDING/REVIEWED）不算
 """
 
 
@@ -75,6 +76,7 @@ def import_complaints(records: List[Dict[str, Any]], operator: str,
         info["seed_aliases_injected"] = seed_default_aliases(operator)
     if batch_id is None:
         batch_id = "BATCH-" + datetime.now().strftime("%Y%m%d") + "-" + str(uuid.uuid4())[:8]
+    now_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     conn = get_conn()
     c = conn.cursor()
     for idx, rec in enumerate(records, start=1):
@@ -86,8 +88,8 @@ def import_complaints(records: List[Dict[str, Any]], operator: str,
             INSERT OR IGNORE INTO complaint_records
             (original_line_no, import_batch_id, complaint_no, community_name,
              community_name_normalized, address, complaint_content,
-             status, has_alias_conflict)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+             import_time, status, has_alias_conflict)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             rec.get("line_no", idx),
             batch_id,
@@ -96,6 +98,7 @@ def import_complaints(records: List[Dict[str, Any]], operator: str,
             normalize_community_name(name),
             rec.get("address", ""),
             rec.get("complaint_content", ""),
+            now_ts,
             "IMPORTED",
             1 if has_conflict else 0
         ))
@@ -134,24 +137,33 @@ def lao_ma_review_photo(complaint_no: str, batch_id: str, photo_remark: str,
     c = conn.cursor()
     old_status = rec["status"]
     old_remark = rec["photo_remark"]
-    if rec["has_alias_conflict"]:
-        new_status = "PENDING_INSPECTOR"
-        reason = "存在小区新旧名冲突，转市政巡检员复核"
+    is_first_review = (old_status == "IMPORTED")
+    now_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    if is_first_review:
+        if rec["has_alias_conflict"]:
+            new_status = "PENDING_INSPECTOR"
+            reason = "存在小区新旧名冲突，转市政巡检员复核"
+        else:
+            new_status = "PHOTO_REVIEWED"
+            reason = "路口照片审核完成"
+        c.execute("""
+            UPDATE complaint_records
+            SET photo_remark = ?, photo_uploaded_by = ?, photo_uploaded_at = ?,
+                status = ?
+            WHERE id = ?
+        """, (photo_remark, operator, now_ts, new_status, rec["id"]))
     else:
-        new_status = "PHOTO_REVIEWED"
-        reason = "路口照片审核完成"
-    c.execute("""
-        UPDATE complaint_records
-        SET photo_remark = ?, photo_uploaded_by = ?, photo_uploaded_at = datetime('now'),
-            status = ?
-        WHERE id = ?
-    """, (photo_remark, operator, new_status, rec["id"]))
+        c.execute("""
+            UPDATE complaint_records
+            SET photo_remark = ?, photo_uploaded_by = ?, photo_uploaded_at = ?
+            WHERE id = ?
+        """, (photo_remark, operator, now_ts, rec["id"]))
     conn.commit()
     conn.close()
-    op_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     log_audit(rec["id"], "photo_remark", old_remark, photo_remark, operator,
-              "老马补看路口照片", op_ts)
-    log_audit(rec["id"], "status", old_status, new_status, operator, reason, op_ts)
+              "老马补看路口照片" if is_first_review else "老马修改照片备注", now_ts)
+    if is_first_review:
+        log_audit(rec["id"], "status", old_status, new_status, operator, reason, now_ts)
     return True
 
 
@@ -163,21 +175,25 @@ def inspector_resolve_alias(complaint_no: str, batch_id: str,
     conn = get_conn()
     c = conn.cursor()
     old_name = rec["community_name"]
+    old_normalized = rec["community_name_normalized"]
     old_conflict = rec["has_alias_conflict"]
     old_status = rec["status"]
     _, new_name = check_alias_conflict(old_name)
     final_name = new_name if use_new_name else old_name
+    final_normalized = normalize_community_name(final_name)
     c.execute("""
         UPDATE complaint_records
         SET community_name = ?, community_name_normalized = ?,
             has_alias_conflict = 0, status = 'PHOTO_REVIEWED'
         WHERE id = ?
-    """, (final_name, normalize_community_name(final_name), rec["id"]))
+    """, (final_name, final_normalized, rec["id"]))
     conn.commit()
     conn.close()
     op_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     log_audit(rec["id"], "community_name", old_name, final_name, operator,
               "巡检员复核小区新旧名冲突，采用{}".format("新名" if use_new_name else "旧名"), op_ts)
+    log_audit(rec["id"], "community_name_normalized", old_normalized, final_normalized, operator,
+              "巡检员复核同步更新标准化名", op_ts)
     log_audit(rec["id"], "has_alias_conflict", str(old_conflict), "0", operator,
               "冲突已解决", op_ts)
     log_audit(rec["id"], "status", old_status, "PHOTO_REVIEWED", operator,
@@ -294,8 +310,12 @@ def generate_daily_summary(operator: str = "summary_bot") -> Dict[str, Any]:
     for r in photo_updated:
         audits = get_audit_log(r["id"])
         today_audits = [a for a in audits if a["changed_at"].startswith(today)]
-        fields = set(a["field_name"] for a in today_audits)
-        if fields == {"photo_remark", "status"} or fields == {"photo_remark"}:
+        has_secondary_remark = any(
+            a["field_name"] == "photo_remark"
+            and a["change_reason"] == "老马修改照片备注"
+            for a in today_audits
+        )
+        if has_secondary_remark:
             only_remark_changed.append(r)
     conflict_groups: Dict[str, List[Dict[str, Any]]] = {}
     for r in records:
@@ -412,6 +432,7 @@ def build_export_package(batch_id: Optional[str] = None) -> Dict[str, Any]:
         audits = get_audit_log(r["id"])
         remark_history = []
         name_history = []
+        normalized_history = []
         status_history = []
         for a in audits:
             item = {
@@ -423,6 +444,8 @@ def build_export_package(batch_id: Optional[str] = None) -> Dict[str, Any]:
                 remark_history.append(item)
             elif a["field_name"] == "community_name":
                 name_history.append(item)
+            elif a["field_name"] == "community_name_normalized":
+                normalized_history.append(item)
             elif a["field_name"] == "status":
                 status_history.append(item)
         _, suggested = check_alias_conflict(r["community_name"])
@@ -433,6 +456,7 @@ def build_export_package(batch_id: Optional[str] = None) -> Dict[str, Any]:
             "complaint_no": r["complaint_no"],
             "community_name_raw_imported": r["community_name"],
             "community_name_final": r["community_name"],
+            "community_name_normalized_final": r["community_name_normalized"] or "",
             "community_name_suggested_pair": suggested or "",
             "address": r["address"],
             "complaint_content": r["complaint_content"],
@@ -443,6 +467,7 @@ def build_export_package(batch_id: Optional[str] = None) -> Dict[str, Any]:
             "photo_uploaded_at": r["photo_uploaded_at"] or "",
             "summary_note": r["summary_note"] or "",
             "community_name_history": json.dumps(name_history, ensure_ascii=False),
+            "normalized_name_history": json.dumps(normalized_history, ensure_ascii=False),
             "photo_remark_history": json.dumps(remark_history, ensure_ascii=False),
             "status_history": json.dumps(status_history, ensure_ascii=False),
             "audit_trail_count": len(audits),

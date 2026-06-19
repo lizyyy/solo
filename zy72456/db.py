@@ -83,21 +83,16 @@ def init_db():
 def log_audit(record_id: int, field_name: str, old_value: Optional[str],
               new_value: Optional[str], changed_by: str, change_reason: str = "",
               changed_at: Optional[str] = None):
+    if changed_at is None:
+        changed_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     conn = get_conn()
     c = conn.cursor()
-    if changed_at:
-        c.execute("""
-        INSERT INTO audit_log
-        (record_id, field_name, old_value, new_value, changed_by, change_reason, changed_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (record_id, field_name, str(old_value) if old_value is not None else None,
-              str(new_value) if new_value is not None else None,
-              changed_by, change_reason, changed_at))
-    else:
-        c.execute("""
-        INSERT INTO audit_log (record_id, field_name, old_value, new_value, changed_by, change_reason)
-        VALUES (?, ?, ?, ?, ?, ?)
-        """, (record_id, field_name, str(old_value) if old_value is not None else None,
-              str(new_value) if new_value is not None else None, changed_by, change_reason))
+    c.execute("""
+    INSERT INTO audit_log
+    (record_id, field_name, old_value, new_value, changed_by, change_reason, changed_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, (record_id, field_name, str(old_value) if old_value is not None else None,
+          str(new_value) if new_value is not None else None,
+          changed_by, change_reason, changed_at))
     conn.commit()
     conn.close()

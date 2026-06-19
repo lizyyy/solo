@@ -66,9 +66,9 @@ python cli.py inspector-review TS20260601002 BATCH-xxxx --use-new-name
 python cli.py inspector-review TS20260601002 BATCH-xxxx --use-old-name
 ```
 
-- 这是一次**「操作原子」**：同时修改 `community_name` + `has_alias_conflict` + `status` 三个字段
-- 三者共享同一个时间戳，被视为同一次操作
-- **回滚必须三者一起回，不能 name 回了 status 没回**
+- 这是一次**「操作原子」**：同时修改 `community_name` + `community_name_normalized` + `has_alias_conflict` + `status` 四个字段
+- 四者共享同一个时间戳，被视为同一次操作
+- **回滚必须四者一起回，不能 name 回了 normalized 和 status 没回**
 
 ### 第四步：生成给街道会看的摘要
 
@@ -100,7 +100,7 @@ python cli.py summary
 
 ### 怎么回滚（关键！）
 
-**不要用单字段回滚！** 巡检员复核改了 3 个字段，必须整体回：
+**不要用单字段回滚！** 巡检员复核改了 4 个字段（含 `community_name_normalized`），必须整体回：
 
 ```bash
 # ✅ 正确：按操作原子整体回滚（推荐）
@@ -134,8 +134,9 @@ python cli.py seed-aliases --force
 ## 日常检查机制
 
 ### 老马只改照片备注的场景
-- 系统自动识别：当日修改字段只有 `photo_remark`（+ 正常流转的 status）
-- 街道摘要里 `remark_only_list` 单独列出，**含原始行号 + 小区名 + 备注原话**
+- **首次照片审核**（IMPORTED → PENDING/REVIEWED）是正常工作流，不算"仅改备注"
+- **二次备注修改**（已审核记录上改 photo_remark，不改状态）才是"仅改备注"，审计原因为"老马修改照片备注"
+- 街道摘要里 `remark_only_list` 单独列出二次备注修改的记录，**含原始行号 + 小区名 + 备注原话**
 - 摘要备注：「仅修改照片备注的有 N 条，已标记请当日复核」
 
 ---
@@ -174,7 +175,7 @@ python cli.py export --batch BATCH-xxxx  # 按批次导出
 
 | # | 文件 | 内容 | 解决什么问题 |
 |---|------|------|-------------|
-| 1 | `*_1detailed.csv` | 每条一行：原始导入值 + 最终值 + **小区名修改历史(JSON)** + **备注修改历史(JSON)** + **状态流转历史(JSON)** | 不把备注覆盖成最终值，历史里留住原话、修改人、原因 |
+| 1 | `*_1detailed.csv` | 每条一行：原始导入值 + 最终值 + **小区名修改历史(JSON)** + **标准化名修改历史(JSON)** + **备注修改历史(JSON)** + **状态流转历史(JSON)** | 不把备注覆盖成最终值，历史里留住原话、修改人、原因；标准化名变更可追踪 |
 | 2 | `*_2audit.csv` | 所有字段每次修改一行：时间/操作人/记录ID/投诉编号/原始行号/字段名/原值/新值/修改原因 | 回滚前后的值、修改人和原因直接从这里查 |
 | 3 | `*_3conflict_index.csv` | 冲突分组索引：`阳光花园↔阳光花园小区` → 每条的投诉号/原始行号/批次/状态 + `trace_hint` | **从阳光花园/阳光花园小区追回原始材料** |
 | 4 | `*_4pending_index.csv` | 待巡检员复核清单：含备注原话、照片上传时间、回滚命令提示 | **从「留给市政巡检员复核」追回触发导出的明细** |
@@ -225,14 +226,11 @@ python cli.py export --batch BATCH-xxxx  # 按批次导出
 python verify.py
 ```
 
-完整核对 7 个断点：
-1. 干净库首次导入 → 自动注入 5 对别名 → 阳光花园/丽景苑 4 条被标记冲突
-2. 老马审核 → 有冲突的 3 条 `PENDING_INSPECTOR`（留给巡检员），幸福里正常 `PHOTO_REVIEWED`
-3. 巡检员复核 → 三字段联动（name/conflict/status）一起改，共享同一时间戳
-4. `rollback-op` 整体回滚 → 三者同步还原，审计日志 3 条回滚痕迹
-5. 导出 4 个文件：detailed 含历史 JSON、audit 含原话、冲突索引、待复核索引
-6. 从 阳光花园↔阳光花园小区、留给巡检员复核，都能追回原始行号 1/2 和备注原话
-7. 老马只改备注 → 街道摘要 `remark_only_list` 单独列出幸福里，方便当日复核
+完整核对 4 大场景 56 个断点：
+1. **场景 A（回滚同步）**：导入 → 老马首次审核 → 巡检员采用新名 → rollback-op → **四字段同步恢复**（展示名+标准化名+冲突标记+状态），不会旧名配新标准名
+2. **场景 B（首次 vs 二次）**：首次照片审核不在 remark_only 清单 → 二次备注修改在 remark_only 清单
+3. **场景 C（导出明细）**：detailed 含展示名+标准化名+冲突标记+状态+历史JSON（含 normalized_name_history）+修改人+原因
+4. **场景 D（互相解释）**：摘要的 pending_trace/conflict_groups/remark_only_list 与导出文件能互相回溯到原始行号
 
 ---
 
@@ -240,11 +238,11 @@ python verify.py
 
 | 功能 | 位置 |
 |------|------|
-| 默认别名 + 边界规则常量 | [core.py DEFAULT_COMMUNITY_ALIASES / ALIAS_RULES](file:///Users/lzy/pro/solo/workspaces/zy72456/core.py#L17-L35) |
-| 导入 + 首次自动注入 | [core.py import_complaints / seed_default_aliases](file:///Users/lzy/pro/solo/workspaces/zy72456/core.py#L56-L106) |
-| 老马审核（冲突→PENDING） | [core.py lao_ma_review_photo](file:///Users/lzy/pro/solo/workspaces/zy72456/core.py#L128-L155) |
-| 巡检员复核（操作原子三字段） | [core.py inspector_resolve_alias](file:///Users/lzy/pro/solo/workspaces/zy72456/core.py#L158-L185) |
-| 操作原子分组 + 整体回滚 | [core.py _group_operations / rollback_last_operation](file:///Users/lzy/pro/solo/workspaces/zy72456/core.py#L188-L264) |
-| 摘要（含 conflict_groups + pending_trace + remark_only） | [core.py generate_daily_summary](file:///Users/lzy/pro/solo/workspaces/zy72456/core.py#L284-L355) |
-| 导出明细四文件打包 | [core.py build_export_package](file:///Users/lzy/pro/solo/workspaces/zy72456/core.py#L405-L515) |
-| log_audit 支持自定义时间戳 | [db.py log_audit](file:///Users/lzy/pro/solo/workspaces/zy72456/db.py#L83-L103) |
+| 默认别名 + 边界规则常量 | [core.py DEFAULT_COMMUNITY_ALIASES / ALIAS_RULES](file:///Users/lzy/pro/solo/workspaces/zy72456/core.py#L17-L36) |
+| 导入 + 首次自动注入 | [core.py import_complaints / seed_default_aliases](file:///Users/lzy/pro/solo/workspaces/zy72456/core.py#L56-L108) |
+| 老马审核（首次审核 vs 二次改备注） | [core.py lao_ma_review_photo](file:///Users/lzy/pro/solo/workspaces/zy72456/core.py#L129-L165) |
+| 巡检员复核（操作原子四字段） | [core.py inspector_resolve_alias](file:///Users/lzy/pro/solo/workspaces/zy72456/core.py#L168-L200) |
+| 操作原子分组 + 整体回滚 | [core.py _group_operations / rollback_last_operation](file:///Users/lzy/pro/solo/workspaces/zy72456/core.py#L203-L278) |
+| 摘要（含 conflict_groups + pending_trace + remark_only） | [core.py generate_daily_summary](file:///Users/lzy/pro/solo/workspaces/zy72456/core.py#L290-L370) |
+| 导出明细四文件打包 | [core.py build_export_package](file:///Users/lzy/pro/solo/workspaces/zy72456/core.py#L410-L530) |
+| log_audit 默认本地时间 | [db.py log_audit](file:///Users/lzy/pro/solo/workspaces/zy72456/db.py#L83-L98) |
