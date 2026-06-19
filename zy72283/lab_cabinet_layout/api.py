@@ -13,7 +13,8 @@ from .origin_manager import set_coordinate_origin, get_origin_info, check_origin
 from .route_calculator import detect_route_issues, recalculate_route_length, update_route_manual_length
 from .workflow import (
     manual_fix_issue, rerun_issue, client_review_issue,
-    escalate_to_client, process_issue_after_origin_check, get_workflow_status
+    escalate_to_client, process_issue_after_origin_check, get_workflow_status,
+    fill_material
 )
 from .visualization import export_layout_screenshot, export_issue_detail_screenshot
 from .service import get_project_serializable, run_standard_three_step_process
@@ -212,6 +213,26 @@ def escalate(project_id, issue_id):
     """升级给展陈客户复核"""
     project = _get_or_create_project(project_id)
     result = escalate_to_client(project, issue_id, Handler.PARK_OPS_XT)
+
+    if not result:
+        return jsonify({"error": "问题不存在"}), 404
+
+    return jsonify(get_project_serializable(project))
+
+
+@app.route('/api/project/<project_id>/issue/<issue_id>/fill-material', methods=['POST'])
+def fill_issue_material(project_id, issue_id):
+    """园区运维小陶补齐材料"""
+    project = _get_or_create_project(project_id)
+    data = request.json or {}
+
+    result = fill_material(
+        project=project,
+        issue_id=issue_id,
+        material_name=data.get('material_name', ''),
+        fill_note=data.get('fill_note', ''),
+        operator=Handler(data.get('operator', '园区运维小陶'))
+    )
 
     if not result:
         return jsonify({"error": "问题不存在"}), 404

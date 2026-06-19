@@ -521,6 +521,47 @@
         </div>
     </div>
 
+    <div id="fillMaterialModal" class="modal">
+        <div class="modal-content">
+            <h3>📦 补齐材料</h3>
+            <input type="hidden" id="fillIssueId">
+            <div class="form-group">
+                <label>材料名称</label>
+                <select id="fillMaterialName">
+                    <option value="坐标原点校准记录">坐标原点校准记录</option>
+                    <option value="坐标原点说明确认">坐标原点说明确认</option>
+                    <option value="重新计算后的路线长度确认凭证">重新计算后的路线长度确认凭证</option>
+                    <option value="路线长度校验记录">路线长度校验记录</option>
+                    <option value="系统重跑计算结果">系统重跑计算结果</option>
+                    <option value="展陈客户复核确认">展陈客户复核确认</option>
+                    <option value="展陈客户对补录差异的复核确认">展陈客户对补录差异的复核确认</option>
+                    <option value="">-- 自定义 --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>或自定义材料名</label>
+                <input type="text" id="fillMaterialCustom" placeholder="自定义材料名（选择了上面则填此处）">
+            </div>
+            <div class="form-group">
+                <label>提交人</label>
+                <select id="fillMaterialOperator">
+                    <option value="园区运维小陶">园区运维小陶</option>
+                    <option value="展陈客户">展陈客户</option>
+                    <option value="系统">系统</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>补齐说明</label>
+                <textarea id="fillMaterialNote" placeholder="请填写补齐说明，例如：2025-06-10全站仪校准，误差0.02米..."></textarea>
+            </div>
+            <div class="form-group" id="fillMaterialPendingList"></div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal('fillMaterialModal')">取消</button>
+                <button class="btn btn-success" onclick="submitFillMaterial()">确认补齐</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast"></div>
 
     <script>
@@ -654,6 +695,9 @@
                                  issue.status === '已重跑' ? 'rerun' : '';
 
                 const actions = [];
+                if (issue.status !== '已解决') {
+                    actions.push(`<button class="btn btn-sm btn-outline-success" onclick="openFillMaterialModal('${issue.issue_id}', ${JSON.stringify(issue.pending_materials||[])})">📦 补齐材料</button>`);
+                }
                 if (issue.status === '已检测' || issue.status === '已人工修正') {
                     actions.push(`<button class="btn btn-sm btn-primary" onclick="openFixModal('${issue.issue_id}')">🔧 人工修正</button>`);
                     actions.push(`<button class="btn btn-sm btn-info" onclick="processAfterOrigin('${issue.issue_id}')">📍 检查原点后处理</button>`);
@@ -669,6 +713,10 @@
                 }
                 actions.push(`<button class="btn btn-sm btn-info" onclick="exportIssueDetail('${issue.issue_id}')">🖼️ 导出详情</button>`);
 
+                const pendingBadge = issue.missing_info && issue.missing_info !== '无'
+                    ? `<span style="background:#fff5f5;color:#d9480f;padding:2px 8px;border-radius:4px;">⚠️ 还缺 ${(issue.pending_materials||[]).length} 项</span>`
+                    : `<span style="background:#d3f9d8;color:#2f9e44;padding:2px 8px;border-radius:4px;">✅ 材料齐全</span>`;
+
                 return `
                     <div class="issue-item ${itemClass}">
                         <div class="issue-header">
@@ -679,7 +727,9 @@
                         <div class="issue-meta">
                             <span><strong>当前处理:</strong> ${issue.current_handler}</span>
                             <span><strong>为什么被留下:</strong> ${issue.why_kept}</span>
+                            <div style="margin-top:6px;margin-bottom:4px;">${pendingBadge}</div>
                             <span><strong>还缺材料:</strong> ${issue.missing_info}</span>
+                            <span style="color:#2f9e44;"><strong>已补齐:</strong> ${issue.filled_info || '无'}</span>
                             <span><strong>下一步:</strong> ${issue.next_step}</span>
                         </div>
                         <div class="issue-actions">${actions.join('')}</div>

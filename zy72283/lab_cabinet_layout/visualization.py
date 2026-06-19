@@ -268,7 +268,7 @@ def _plot_legend_panel(ax, project: LayoutProject):
 
 
 def _plot_issues_panel(ax, project: LayoutProject):
-    """绘制问题详情面板 - 说明为什么被留下、缺什么、下一步找谁"""
+    """绘制问题详情面板 - 说明为什么被留下、缺什么、下一步找谁、已补齐什么"""
     ax.set_facecolor('#fff9db')
 
     if not project.issues:
@@ -284,7 +284,7 @@ def _plot_issues_panel(ax, project: LayoutProject):
     ax.text(0.02, 0.95, title, fontsize=13, fontweight='bold',
             transform=ax.transAxes, color='#343a40')
 
-    all_issues = unresolved + resolved[:1]
+    all_issues = unresolved + resolved
     num_issues = min(len(all_issues), 3)
 
     if num_issues == 0:
@@ -339,6 +339,18 @@ def _plot_issues_panel(ax, project: LayoutProject):
                 transform=ax.transAxes)
         y -= 0.05
         ax.text(x_left, y, f'   {issue.missing_info()}',
+                fontsize=8, color='#495057', transform=ax.transAxes,
+                wrap=True)
+
+        y -= 0.07
+        ax.text(x_left, y, '📦 已补齐:',
+                fontsize=9, fontweight='bold', color='#2f9e44',
+                transform=ax.transAxes)
+        y -= 0.05
+        filled_txt = issue.filled_info()
+        if len(filled_txt) > 50:
+            filled_txt = filled_txt[:48] + '…'
+        ax.text(x_left, y, f'   {filled_txt}',
                 fontsize=8, color='#495057', transform=ax.transAxes,
                 wrap=True)
 
@@ -489,11 +501,21 @@ def _plot_issue_detail(ax, project: LayoutProject, issue: IssueRecord, route: Op
     ax.text(0.08, y_pos, issue.why_kept(), fontsize=9,
             color='#495057', transform=ax.transAxes, wrap=True)
 
-    y_pos -= 0.08
+    y_pos -= 0.05
     ax.text(0.05, y_pos, '📋 还缺什么材料:', fontsize=11,
             fontweight='bold', color='#d9480f', transform=ax.transAxes)
     y_pos -= 0.05
     ax.text(0.08, y_pos, issue.missing_info(), fontsize=9,
+            color='#495057', transform=ax.transAxes, wrap=True)
+
+    y_pos -= 0.08
+    ax.text(0.05, y_pos, '📦 已补齐材料:', fontsize=11,
+            fontweight='bold', color='#2f9e44', transform=ax.transAxes)
+    y_pos -= 0.05
+    filled_display = issue.filled_info()
+    if len(filled_display) > 70:
+        filled_display = filled_display[:68] + '…'
+    ax.text(0.08, y_pos, filled_display, fontsize=9,
             color='#495057', transform=ax.transAxes, wrap=True)
 
     y_pos -= 0.08

@@ -259,11 +259,16 @@ def get_project_serializable(project: LayoutProject) -> Dict[str, Any]:
                 "detected_at": i.detected_at.isoformat() if i.detected_at else None,
                 "current_handler": i.current_handler.value,
                 "missing_materials": i.missing_materials,
+                "filled_materials": i.filled_materials,
+                "material_fill_notes": i.material_fill_notes,
+                "filled_info": i.filled_info(),
+                "pending_materials": i.pending_materials(),
                 "why_kept": i.why_kept(),
                 "missing_info": i.missing_info(),
                 "next_step": i.next_step(),
                 "fix_notes": i.fix_notes,
                 "review_notes": i.review_notes,
+                "resolved_note": i.resolved_note,
                 "resolved_at": i.resolved_at.isoformat() if i.resolved_at else None
             }
             for i in project.issues

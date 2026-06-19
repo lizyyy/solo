@@ -1,6 +1,6 @@
 """数据模型定义"""
 from dataclasses import dataclass, field
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict
 from datetime import datetime
 from enum import Enum
 
@@ -78,13 +78,52 @@ class IssueRecord:
     detected_at: datetime = field(default_factory=datetime.now)
     current_handler: Handler = Handler.PARK_OPS_XT
     missing_materials: List[str] = field(default_factory=list)
+    filled_materials: List[str] = field(default_factory=list)
+    material_fill_notes: Dict[str, str] = field(default_factory=dict)
     fix_notes: str = ""
     review_notes: str = ""
+    resolved_note: str = ""
     resolved_at: Optional[datetime] = None
+
+    def fill_material(self, material_name: str, fill_note: str = "", operator: Handler = Handler.PARK_OPS_XT):
+        """补齐某项材料"""
+        if material_name not in self.filled_materials:
+            self.filled_materials.append(material_name)
+        self.material_fill_notes[material_name] = f"[{operator.value}] {fill_note}"
+
+    def required_materials(self) -> List[str]:
+        """根据当前状态计算应需要的材料清单（基准列表）"""
+        base = []
+        if self.issue_type == IssueType.ROUTE_NOT_RECALCULATED:
+            if self.status == IssueStatus.DETECTED:
+                base = ["坐标原点说明确认", "路线长度校验记录"]
+            elif self.status == IssueStatus.PENDING_REVIEW:
+                base = ["重新计算后的路线长度确认凭证", "坐标原点校准记录"]
+            elif self.status == IssueStatus.MANUAL_FIXED:
+                base = ["系统重跑计算结果", "展陈客户复核确认"]
+            elif self.status == IssueStatus.RERUN:
+                base = ["展陈客户对补录差异的复核确认"]
+            elif self.status == IssueStatus.RESOLVED:
+                base = []
+            else:
+                base = ["重新计算后的路线长度确认凭证", "坐标原点校准记录"]
+        elif self.missing_materials:
+            base = list(self.missing_materials)
+        for m in self.missing_materials:
+            if m not in base:
+                base.append(m)
+        return base
+
+    def pending_materials(self) -> List[str]:
+        """当前还没补齐的材料列表"""
+        required = self.required_materials()
+        return [m for m in required if m not in self.filled_materials]
 
     def why_kept(self) -> str:
         """说明这条为什么被留下——跟当前状态走，不只看 issue_type"""
         if self.status == IssueStatus.RESOLVED:
+            if self.resolved_note:
+                return f"已解决：{self.resolved_note}"
             return "已解决"
         if self.issue_type == IssueType.ROUTE_NOT_RECALCULATED:
             if self.status == IssueStatus.PENDING_REVIEW:
@@ -115,28 +154,26 @@ class IssueRecord:
         return f"由 {Handler.PARK_OPS_XT.value} 检查坐标原点说明并确认处理方式"
 
     def missing_info(self) -> str:
-        """还缺什么材料——跟当前状态走"""
-        base = []
-        if self.issue_type == IssueType.ROUTE_NOT_RECALCULATED:
-            if self.status == IssueStatus.PENDING_REVIEW:
-                base = ["重新计算后的路线长度确认凭证", "坐标原点校准记录"]
-            elif self.status == IssueStatus.MANUAL_FIXED:
-                base = ["系统重跑计算结果", "展陈客户复核确认"]
-            elif self.status == IssueStatus.RERUN:
-                base = ["展陈客户对补录差异的复核确认"]
-            elif self.status == IssueStatus.DETECTED:
-                base = ["坐标原点说明确认", "路线长度校验记录"]
+        """还缺什么材料——只列还没补齐的，已解决直接返回无"""
+        if self.status == IssueStatus.RESOLVED:
+            return "无"
+        pending = self.pending_materials()
+        if not pending:
+            return "无"
+        return "、".join(pending)
+
+    def filled_info(self) -> str:
+        """已补齐的材料及说明"""
+        if not self.filled_materials:
+            return "无"
+        items = []
+        for m in self.filled_materials:
+            note = self.material_fill_notes.get(m, "")
+            if note:
+                items.append(f"{m}（{note}）")
             else:
-                base = ["重新计算后的路线长度确认凭证", "坐标原点校准记录"]
-        elif self.missing_materials:
-            base = list(self.missing_materials)
-        else:
-            return "待确认"
-        if self.missing_materials:
-            for m in self.missing_materials:
-                if m not in base:
-                    base.append(m)
-        return "、".join(base)
+                items.append(m)
+        return "、".join(items)
 
 
 @dataclass
