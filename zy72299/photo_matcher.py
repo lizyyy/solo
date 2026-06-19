@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import List, Dict, Optional, Tuple
-import uuid
 from models import (
     InspectionPhoto,
     ObstacleRecord,
@@ -8,6 +7,7 @@ from models import (
     ObstacleType,
     RecordStatus,
     HistoryEntry,
+    deterministic_id,
 )
 
 
@@ -24,9 +24,18 @@ class PhotoMatcher:
         actor: str = "xiaotao",
     ) -> Dict:
         photos = []
-        for photo_data in photos_data:
+        for idx, photo_data in enumerate(photos_data):
+            pos = photo_data["position"]
             photo = InspectionPhoto(
-                photo_id=f"photo_{uuid.uuid4().hex[:8]}",
+                photo_id=deterministic_id(
+                    "photo",
+                    building_id,
+                    idx,
+                    photo_data["photo_number"],
+                    photo_data["obstacle_name"],
+                    photo_data["type"],
+                    pos.get("x"), pos.get("y"), pos.get("z"),
+                ),
                 photo_number=photo_data["photo_number"],
                 building_id=building_id,
                 obstacle_name=photo_data["obstacle_name"],
@@ -157,7 +166,15 @@ class PhotoMatcher:
         self, photo: InspectionPhoto, building_id: str, actor: str
     ):
         new_record = ObstacleRecord(
-            record_id=f"rec_{uuid.uuid4().hex[:8]}",
+            record_id=deterministic_id(
+                "rec",
+                building_id,
+                "photo_supplement",
+                photo.photo_number,
+                photo.obstacle_name,
+                photo.obstacle_type.value,
+                photo.position.x, photo.position.y, photo.position.z,
+            ),
             building_id=building_id,
             obstacle_name=photo.obstacle_name,
             obstacle_type=photo.obstacle_type,
@@ -197,7 +214,8 @@ class PhotoMatcher:
         record_id: Optional[str] = None,
     ):
         entry = HistoryEntry(
-            entry_id=f"hist_{uuid.uuid4().hex[:8]}",
+            entry_id=deterministic_id("hist", action, actor, record_id,
+                                       str(sorted(details.items())) if details else "", len(self.history)),
             timestamp=datetime.now(),
             action=action,
             actor=actor,

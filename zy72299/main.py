@@ -3,6 +3,7 @@ import json
 import uuid
 import sys
 import os
+import glob
 from datetime import datetime
 from typing import List, Dict, Optional
 
@@ -23,6 +24,36 @@ from history_manager import HistoryManager, ResultFormatter
 def load_json_file(filepath: str) -> Dict:
     with open(filepath, "r", encoding="utf-8") as f:
         return json.load(f)
+
+
+def expand_photo_files(paths: List[str]) -> List[str]:
+    """展开glob并转绝对路径，去重，返回真实可读的照片文件列表"""
+    resolved = []
+    seen = set()
+    for p in paths or []:
+        if any(ch in p for ch in '*?['):
+            matched = sorted(glob.glob(p))
+            for m in matched:
+                abs_m = os.path.abspath(m)
+                if abs_m not in seen and os.path.isfile(abs_m):
+                    resolved.append(abs_m)
+                    seen.add(abs_m)
+        else:
+            abs_p = os.path.abspath(p)
+            if abs_p not in seen and os.path.isfile(abs_p):
+                resolved.append(abs_p)
+                seen.add(abs_p)
+    return resolved
+
+
+def load_photos_from_files(paths: List[str]) -> List[Dict]:
+    """从多个照片JSON文件合并读取photos数组"""
+    all_photos = []
+    for fp in expand_photo_files(paths):
+        data = load_json_file(fp)
+        if isinstance(data, dict) and "photos" in data:
+            all_photos.extend(data["photos"])
+    return all_photos
 
 
 def build_origin_data_map(origin_spec: Dict, records: List[ObstacleRecord]) -> Dict[str, Dict]:
@@ -66,6 +97,7 @@ def process_building(
     duplicate_resolutions: Optional[List[Dict]] = None,
     origin_file: Optional[str] = None,
     photo_file: Optional[str] = None,
+    photo_files: Optional[List[str]] = None,
     include_view: bool = True,
 ) -> ProcessingResult:
     history_manager = HistoryManager()
@@ -111,6 +143,9 @@ def process_building(
 
     if duplicate_resolutions:
         print(f"  → 正在处理 {len(duplicate_resolutions)} 个重复名称决议")
+        # 关键：修改前先拍 before 快照，保证视图版本 before/after 有真实差异
+        view_updater.records = all_records
+        before_dup_snapshot = view_updater.take_snapshot()
         for res in duplicate_resolutions:
             resolved = dup_detector.resolve_duplicate(
                 record_id=res["record_id"],
@@ -127,6 +162,7 @@ def process_building(
         view_updater.bump_version(
             trigger_reason="apply_duplicate_resolutions",
             actor=duplicate_resolutions[0].get("actor", "xiaotao"),
+            external_before_snapshot=before_dup_snapshot,
         )
 
     for record in all_records:
@@ -154,6 +190,9 @@ def process_building(
 
     if conflict_resolutions:
         print(f"  → 正在处理 {len(conflict_resolutions)} 个冲突决议")
+        # 关键：修改前先拍 before 快照
+        view_updater.records = all_records
+        before_conflict_snapshot = view_updater.take_snapshot()
         for res in conflict_resolutions:
             resolved = conflict_resolver.resolve_conflict(
                 conflict_id=res["conflict_id"],
@@ -169,6 +208,7 @@ def process_building(
         view_updater.bump_version(
             trigger_reason="apply_conflict_resolutions",
             actor=conflict_resolutions[0].get("actor", "xiaotao"),
+            external_before_snapshot=before_conflict_snapshot,
         )
 
     conflict_count = len([r for r in all_records if r.status == RecordStatus.CONFLICT])
@@ -223,6 +263,7 @@ def process_building(
         scenario_type=scenario_type,
         origin_file=origin_file,
         photo_file=photo_file,
+        photo_files=photo_files,
         conflict_resolutions=conflict_resolutions,
         duplicate_resolutions=duplicate_resolutions,
         include_view=include_view,
@@ -256,37 +297,35 @@ def run_scenario(scenario_name: str, building_id: str = "BUILDING_A", include_vi
     origin_file = os.path.join(sample_dir, "origin_spec_building_a.json")
     origin_spec = load_json_file(origin_file)
 
+    photo_file_list = []
     if scenario_name == "normal":
-        photo_file = os.path.join(sample_dir, "inspection_photos_building_a_normal.json")
-        photos_data = load_json_file(photo_file)["photos"]
+        pf = os.path.join(sample_dir, "inspection_photos_building_a_normal.json")
+        photo_file_list = [pf]
+        photos_data = load_photos_from_files(photo_file_list)
         scenario_type = "正常场景-顺利记录"
     elif scenario_name == "duplicate":
-        photo_file = os.path.join(sample_dir, "inspection_photos_building_a_duplicate.json")
-        photos_data = load_json_file(photo_file)["photos"]
+        pf = os.path.join(sample_dir, "inspection_photos_building_a_duplicate.json")
+        photo_file_list = [pf]
+        photos_data = load_photos_from_files(photo_file_list)
         scenario_type = "重复名称场景-同一障碍物多名称"
     elif scenario_name == "supplement":
-        photo_file = os.path.join(sample_dir, "inspection_photos_building_a_supplement.json")
-        photos_data = load_json_file(photo_file)["photos"]
+        pf = os.path.join(sample_dir, "inspection_photos_building_a_supplement.json")
+        photo_file_list = [pf]
+        photos_data = load_photos_from_files(photo_file_list)
         scenario_type = "补录场景-旧口径补录"
     elif scenario_name == "conflict":
-        photo_file = os.path.join(sample_dir, "inspection_photos_building_a_conflict.json")
-        photos_data = load_json_file(photo_file)["photos"]
+        pf = os.path.join(sample_dir, "inspection_photos_building_a_conflict.json")
+        photo_file_list = [pf]
+        photos_data = load_photos_from_files(photo_file_list)
         scenario_type = "冲突场景-坐标与照片矛盾"
     elif scenario_name == "all":
-        normal_photos = load_json_file(
-            os.path.join(sample_dir, "inspection_photos_building_a_normal.json")
-        )["photos"]
-        dup_photos = load_json_file(
-            os.path.join(sample_dir, "inspection_photos_building_a_duplicate.json")
-        )["photos"]
-        supp_photos = load_json_file(
-            os.path.join(sample_dir, "inspection_photos_building_a_supplement.json")
-        )["photos"]
-        conflict_photos = load_json_file(
-            os.path.join(sample_dir, "inspection_photos_building_a_conflict.json")
-        )["photos"]
-        photos_data = normal_photos + dup_photos + supp_photos + conflict_photos
-        photo_file = "sample_data/*_building_a_*.json"
+        photo_file_list = [
+            os.path.join(sample_dir, "inspection_photos_building_a_normal.json"),
+            os.path.join(sample_dir, "inspection_photos_building_a_duplicate.json"),
+            os.path.join(sample_dir, "inspection_photos_building_a_supplement.json"),
+            os.path.join(sample_dir, "inspection_photos_building_a_conflict.json"),
+        ]
+        photos_data = load_photos_from_files(photo_file_list)
         scenario_type = "完整场景-三种情况全包含"
     else:
         raise ValueError(f"未知场景: {scenario_name}")
@@ -301,7 +340,8 @@ def run_scenario(scenario_name: str, building_id: str = "BUILDING_A", include_vi
         inspection_photos=photos_data,
         scenario_type=scenario_type,
         origin_file=origin_file,
-        photo_file=photo_file,
+        photo_file=photo_file_list[0] if len(photo_file_list) == 1 else None,
+        photo_files=photo_file_list,
         include_view=include_view,
     )
 
@@ -358,8 +398,9 @@ def main():
     )
     parser.add_argument(
         "--inspection-photos",
-        type=str,
-        help="巡检照片JSON文件路径",
+        action="append",
+        default=[],
+        help="巡检照片JSON文件路径 (可多次传参，也支持glob模式如 'sample_data/*_building_a_*.json')",
     )
     parser.add_argument(
         "--conflict-resolutions",
@@ -407,7 +448,8 @@ def main():
 
     if args.origin_spec and args.inspection_photos:
         origin_spec = load_json_file(args.origin_spec)
-        photos_data = load_json_file(args.inspection_photos)["photos"]
+        resolved_photo_files = expand_photo_files(args.inspection_photos)
+        photos_data = load_photos_from_files(args.inspection_photos)
 
         result = process_building(
             building_id=args.building_id,
@@ -416,8 +458,8 @@ def main():
             scenario_type="custom",
             conflict_resolutions=conflict_resolutions,
             duplicate_resolutions=duplicate_resolutions,
-            origin_file=args.origin_spec,
-            photo_file=args.inspection_photos,
+            origin_file=os.path.abspath(args.origin_spec),
+            photo_files=resolved_photo_files,
             include_view=args.include_view,
         )
     else:

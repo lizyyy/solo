@@ -72,11 +72,15 @@ class HistoryManager:
         scenario_type: str,
         origin_file: Optional[str] = None,
         photo_file: Optional[str] = None,
+        photo_files: Optional[List[str]] = None,
         conflict_resolutions: Optional[List[Dict]] = None,
         duplicate_resolutions: Optional[List[Dict]] = None,
         include_view: bool = True,
         view_version: Optional[int] = None,
     ) -> str:
+        import glob as _glob
+        import os as _os
+
         cmd_parts = [
             "python3 main.py",
             f"--building-id {building_id}",
@@ -99,9 +103,31 @@ class HistoryManager:
             cmd_parts.append(f"--scenario all")
 
         if origin_file:
-            cmd_parts.append(f"--origin-spec '{origin_file}'")
-        if photo_file:
-            cmd_parts.append(f"--inspection-photos '{photo_file}'")
+            abs_origin = _os.path.abspath(origin_file)
+            cmd_parts.append(f"--origin-spec '{abs_origin}'")
+
+        # 处理照片文件：优先用 photo_files 列表，否则解析 photo_file（含glob）
+        resolved_photos: List[str] = []
+        if photo_files:
+            for pf in photo_files:
+                if any(ch in pf for ch in '*?['):
+                    resolved_photos.extend(sorted(_glob.glob(pf)))
+                elif _os.path.exists(pf):
+                    resolved_photos.append(pf)
+        elif photo_file:
+            if any(ch in photo_file for ch in '*?['):
+                resolved_photos = sorted(_glob.glob(photo_file))
+            elif _os.path.exists(photo_file):
+                resolved_photos = [photo_file]
+
+        # 去重并转绝对路径
+        seen = set()
+        for pf in resolved_photos:
+            abs_pf = _os.path.abspath(pf)
+            if abs_pf not in seen and _os.path.exists(abs_pf):
+                cmd_parts.append(f"--inspection-photos '{abs_pf}'")
+                seen.add(abs_pf)
+
         if conflict_resolutions:
             resolutions_json = json.dumps(conflict_resolutions, ensure_ascii=False)
             cmd_parts.append(f'--conflict-resolutions \'{resolutions_json}\'')

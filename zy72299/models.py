@@ -1,7 +1,15 @@
 from datetime import datetime
 from enum import Enum
 from typing import List, Optional, Dict, Any
+import hashlib
 from pydantic import BaseModel, Field
+
+
+def deterministic_id(prefix: str, *parts: Any) -> str:
+    """基于关键字段生成确定性ID：同一输入→同一ID，保证复跑时编号对应"""
+    raw = "|".join(str(p) for p in parts if p is not None)
+    digest = hashlib.sha256(raw.encode("utf-8")).hexdigest()[:10]
+    return f"{prefix}_{digest[:8]}"
 
 
 class ObstacleType(str, Enum):

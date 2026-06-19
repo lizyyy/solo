@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import List, Dict, Optional
-import uuid
 from models import (
     CoordinateOrigin,
     Coordinate3D,
@@ -8,6 +7,7 @@ from models import (
     ObstacleType,
     RecordStatus,
     HistoryEntry,
+    deterministic_id,
 )
 
 
@@ -24,7 +24,8 @@ class CoordinateOriginImporter:
         actor: str = "system",
     ) -> Dict:
         origin = CoordinateOrigin(
-            origin_id=f"origin_{uuid.uuid4().hex[:8]}",
+            origin_id=deterministic_id("origin", building_id, description,
+                                       origin_point.get("x"), origin_point.get("y"), origin_point.get("z")),
             building_id=building_id,
             origin_point=Coordinate3D(**origin_point),
             description=description,
@@ -44,9 +45,18 @@ class CoordinateOriginImporter:
         )
 
         records = []
-        for obs_data in obstacles_data:
+        for idx, obs_data in enumerate(obstacles_data):
+            pos = obs_data["position"]
             record = ObstacleRecord(
-                record_id=f"rec_{uuid.uuid4().hex[:8]}",
+                record_id=deterministic_id(
+                    "rec",
+                    building_id,
+                    "origin_spec",
+                    idx,
+                    obs_data["name"],
+                    obs_data["type"],
+                    pos.get("x"), pos.get("y"), pos.get("z"),
+                ),
                 building_id=building_id,
                 obstacle_name=obs_data["name"],
                 obstacle_type=ObstacleType(obs_data["type"]),
@@ -85,7 +95,8 @@ class CoordinateOriginImporter:
         record_id: Optional[str] = None,
     ):
         entry = HistoryEntry(
-            entry_id=f"hist_{uuid.uuid4().hex[:8]}",
+            entry_id=deterministic_id("hist", action, actor, record_id,
+                                       str(sorted(details.items())) if details else "", len(self.history)),
             timestamp=datetime.now(),
             action=action,
             actor=actor,

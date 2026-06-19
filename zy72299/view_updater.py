@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import List, Dict, Optional, Tuple
-import uuid
 import copy
 from models import (
     ObstacleRecord,
@@ -9,6 +8,7 @@ from models import (
     Coordinate3D,
     RecordStatus,
     HistoryEntry,
+    deterministic_id,
 )
 
 
@@ -77,8 +77,21 @@ class View3DUpdater:
 
         return changed, changes_count
 
-    def bump_version(self, trigger_reason: str, actor: str = "system") -> int:
-        old_snap = {k: copy.deepcopy(v) for k, v in self._snapshot_records().items()}
+    def take_snapshot(self) -> Dict[str, Dict]:
+        """公开方法：在修改前拍摄记录快照，保证before/after有真实差异"""
+        return {k: copy.deepcopy(v) for k, v in self._snapshot_records().items()}
+
+    def bump_version(
+        self,
+        trigger_reason: str,
+        actor: str = "system",
+        external_before_snapshot: Optional[Dict[str, Dict]] = None,
+    ) -> int:
+        """版本递增。external_before_snapshot: 修改前就拍好的快照（若不传则用当前值）"""
+        if external_before_snapshot is not None:
+            old_snap = {k: copy.deepcopy(v) for k, v in external_before_snapshot.items()}
+        else:
+            old_snap = {k: copy.deepcopy(v) for k, v in self._snapshot_records().items()}
         self.version += 1
         changed_records, total_changes = self._detect_record_changes(old_snap)
 
@@ -407,7 +420,10 @@ class View3DUpdater:
         points = []
         for idx, record in enumerate(valid_records):
             point = CleaningPathPoint(
-                point_id=f"point_{idx}_{record.record_id}",
+                point_id=deterministic_id(
+                    "point", building_id, path_name, idx,
+                    record.record_id, record.position.x, record.position.y, record.position.z,
+                ),
                 position=record.position,
                 obstacle_id=record.record_id,
                 cleaning_action=self._get_cleaning_action(record.obstacle_type),
@@ -423,7 +439,7 @@ class View3DUpdater:
         ]
 
         path = CleaningPath(
-            path_id=f"path_{uuid.uuid4().hex[:8]}",
+            path_id=deterministic_id("path", building_id, path_name, len(points), self.version),
             building_id=building_id,
             path_name=path_name,
             points=points,
@@ -511,7 +527,8 @@ class View3DUpdater:
         record_id: Optional[str] = None,
     ):
         entry = HistoryEntry(
-            entry_id=f"hist_{uuid.uuid4().hex[:8]}",
+            entry_id=deterministic_id("hist", "view_updater", action, actor, record_id,
+                                       str(sorted(details.items())) if details else "", len(self.history)),
             timestamp=datetime.now(),
             action=action,
             actor=actor,

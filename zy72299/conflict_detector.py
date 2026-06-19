@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import List, Dict, Optional, Tuple
-import uuid
 import copy
 from models import (
     ObstacleRecord,
@@ -9,6 +8,7 @@ from models import (
     HistoryEntry,
     Coordinate3D,
     ReviewTrail,
+    deterministic_id,
 )
 
 
@@ -74,7 +74,14 @@ class DuplicateNameDetector:
         handled_by: str,
     ) -> ReviewTrail:
         trail = ReviewTrail(
-            trail_id=f"trail_{uuid.uuid4().hex[:8]}",
+            trail_id=deterministic_id(
+                "trail",
+                record.record_id,
+                "dup",
+                "|".join(sorted(changed_fields)),
+                next_handler,
+                reason[:50] if reason else "",
+            ),
             record_id=record.record_id,
             original_value=copy.deepcopy(original),
             modified_value=copy.deepcopy(modified),
@@ -246,7 +253,8 @@ class DuplicateNameDetector:
         record_id: Optional[str] = None,
     ):
         entry = HistoryEntry(
-            entry_id=f"hist_{uuid.uuid4().hex[:8]}",
+            entry_id=deterministic_id("hist", "dup_detector", action, actor, record_id,
+                                       str(sorted(details.items())) if details else "", len(self.history)),
             timestamp=datetime.now(),
             action=action,
             actor=actor,
@@ -289,7 +297,14 @@ class ConflictResolver:
         handled_by: str,
     ) -> ReviewTrail:
         trail = ReviewTrail(
-            trail_id=f"trail_{uuid.uuid4().hex[:8]}",
+            trail_id=deterministic_id(
+                "trail",
+                record.record_id,
+                "conf",
+                "|".join(sorted(changed_fields)),
+                next_handler,
+                reason[:50] if reason else "",
+            ),
             record_id=record.record_id,
             original_value=copy.deepcopy(original),
             modified_value=copy.deepcopy(modified),
@@ -320,7 +335,11 @@ class ConflictResolver:
 
                     if conflicting_fields:
                         conflict = ConflictEvidence(
-                            conflict_id=f"conflict_{uuid.uuid4().hex[:8]}",
+                            conflict_id=deterministic_id(
+                                "conflict",
+                                record.record_id,
+                                "|".join(sorted(conflicting_fields)),
+                            ),
                             record_id=record.record_id,
                             origin_data=origin_data,
                             photo_data=photo_data,
@@ -599,7 +618,8 @@ class ConflictResolver:
         record_id: Optional[str] = None,
     ):
         entry = HistoryEntry(
-            entry_id=f"hist_{uuid.uuid4().hex[:8]}",
+            entry_id=deterministic_id("hist", "conflict_resolver", action, actor, record_id,
+                                       str(sorted(details.items())) if details else "", len(self.history)),
             timestamp=datetime.now(),
             action=action,
             actor=actor,
