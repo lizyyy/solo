@@ -158,15 +158,16 @@ function seedData(db: Database.Database): void {
 
   insertQr.run('qr-001', 'batch-001', '客户满意度', 0.3, 85.0, 100.0, '客户满意度,0.3,85.0,100.0', 'normal', 'questionnaire', 'confirmed', null, null, now)
   insertQr.run('qr-002', 'batch-001', '响应时效', 0.25, 0, 0, '响应时效,0.25,,', 'zero_denominator_empty', 'questionnaire', 'review', null, null, now)
-  insertQr.run('qr-003', 'batch-001', '合规达标率', 0.2, 92.0, 100.0, '合规达标率,0.2,92.0,100.0', 'supplemented', 'boundary_note', 'pending', 'bn-001', '2024年Q1之前合规达标率计算口径：分母为实际检查项数，非全部应检项数。补录时需按旧口径折算。', now)
+  insertQr.run('qr-003', 'batch-001', '合规达标率', 0.2, 92.0, 100.0, '合规达标率,0.2,92.0,100.0', 'normal', 'questionnaire', 'confirmed', null, null, now)
 
   const insertBn = db.prepare(`
     INSERT INTO boundary_notes (id, title, content, related_fields, methodology, effective_date, created_at, updated_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `)
 
-  insertBn.run('bn-001', '合规达标率旧口径说明', '2024年Q1之前合规达标率计算口径：分母为实际检查项数，非全部应检项数。补录时需按旧口径折算。', '["合规达标率"]', '旧口径：实际检查项数作分母', '2024-03-31', now, now)
+  insertBn.run('bn-001', '客户满意度旧口径说明', '2024年Q1之前客户满意度按服务人次折算，原问卷值偏低。按旧口径补录为88分。', '["客户满意度"]', '旧口径：按服务人次折算', '2024-03-31', now, now)
   insertBn.run('bn-002', '响应时效异常处理说明', '当响应时效分母为0时（无工单），原始行可能填为空字符串，不可自动归零或归正常，需提交复核人员判断。', '["响应时效"]', '分母为0时保留空值，标记待复核', '2024-06-01', now, now)
+  insertBn.run('bn-003', '合规达标率旧口径说明', '2024年Q1之前合规达标率计算口径：分母为实际检查项数，非全部应检项数。补录时需按旧口径折算。', '["合规达标率"]', '旧口径：实际检查项数作分母', '2024-03-31', now, now)
 
   const insertSr = db.prepare(`
     INSERT INTO scoring_results (id, target_name, weight, score, weighted_score, source, version, updated_at)
@@ -175,7 +176,7 @@ function seedData(db: Database.Database): void {
 
   insertSr.run('sr-001', '客户满意度', 0.3, 85.0, 25.5, 'questionnaire', 1, now)
   insertSr.run('sr-002', '响应时效', 0.25, 0, 0, 'questionnaire', 1, now)
-  insertSr.run('sr-003', '合规达标率', 0.2, 92.0, 18.4, 'boundary_note', 1, now)
+  insertSr.run('sr-003', '合规达标率', 0.2, 92.0, 18.4, 'questionnaire', 1, now)
 
   const insertRt = db.prepare(`
     INSERT INTO review_tasks (id, record_id, reviewer, status, created_at)
@@ -183,4 +184,13 @@ function seedData(db: Database.Database): void {
   `)
 
   insertRt.run('rt-001', 'qr-002', '复核员A', 'pending', now)
+
+  const insertAudit = db.prepare(`
+    INSERT INTO audit_logs (id, operator, action, target_type, target_id, before_value, after_value, reason, affected_results, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `)
+
+  insertAudit.run('al-001', 'system', 'import', 'questionnaire', 'qr-001', null, JSON.stringify({ target_name: '客户满意度', weight: 0.3, score: 85.0, denominator: 100.0 }), '导入问卷数据：客户满意度', JSON.stringify(['qr-001']), now)
+  insertAudit.run('al-002', 'system', 'import', 'questionnaire', 'qr-002', null, JSON.stringify({ target_name: '响应时效', weight: 0.25, score: 0, denominator: 0, record_type: 'zero_denominator_empty' }), '导入问卷数据：响应时效（分母为0空串，需复核）', JSON.stringify(['qr-002', 'rt-001']), now)
+  insertAudit.run('al-003', 'system', 'import', 'questionnaire', 'qr-003', null, JSON.stringify({ target_name: '合规达标率', weight: 0.2, score: 92.0, denominator: 100.0 }), '导入问卷数据：合规达标率', JSON.stringify(['qr-003']), now)
 }

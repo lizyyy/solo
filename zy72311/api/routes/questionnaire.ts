@@ -24,7 +24,6 @@ router.post('/import', (req: Request, res: Response): void => {
 
   let normalCount = 0
   let zeroDenominatorCount = 0
-  let supplementedCount = 0
 
   const insertQr = db.prepare(`
     INSERT INTO questionnaire_raw (id, batch_id, target_name, weight, score, denominator, raw_value, record_type, source, status, created_at)
@@ -39,6 +38,11 @@ router.post('/import', (req: Request, res: Response): void => {
   const insertAudit = db.prepare(`
     INSERT INTO audit_logs (id, operator, action, target_type, target_id, before_value, after_value, reason, affected_results, created_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `)
+
+  const insertSr = db.prepare(`
+    INSERT INTO scoring_results (id, target_name, weight, score, weighted_score, source, version, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `)
 
   const transaction = db.transaction(() => {
@@ -73,10 +77,21 @@ router.post('/import', (req: Request, res: Response): void => {
         insertReview.run(reviewId, id, '复核员', 'pending', now)
       }
 
+      if (status === 'confirmed') {
+        const existingSr = db.prepare("SELECT * FROM scoring_results WHERE target_name = ?").get(row.target_name) as any
+        if (existingSr) {
+          db.prepare(`
+            UPDATE scoring_results SET score = ?, weighted_score = ?, weight = ?, source = 'questionnaire', version = version + 1, updated_at = ? WHERE id = ?
+          `).run(score, score * weight, weight, now, existingSr.id)
+        } else {
+          insertSr.run(uuidv4(), row.target_name, weight, score, score * weight, 'questionnaire', 1, now)
+        }
+      }
+
       insertAudit.run(
         uuidv4(), 'system', 'import', 'questionnaire', id,
-        null, JSON.stringify({ target_name: row.target_name, weight, score, denominator }),
-        `导入问卷数据：${row.target_name}`,
+        null, JSON.stringify({ target_name: row.target_name, weight, score, denominator, record_type: recordType, status, batch_id: batchId }),
+        `导入问卷数据：${row.target_name}${recordType === 'zero_denominator_empty' ? '（分母为0空串，需复核）' : ''}`,
         JSON.stringify([id]),
         now
       )
@@ -92,7 +107,6 @@ router.post('/import', (req: Request, res: Response): void => {
       totalRecords: data.length,
       normalCount,
       zeroDenominatorCount,
-      supplementedCount,
     },
   })
 })

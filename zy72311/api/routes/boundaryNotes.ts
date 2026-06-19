@@ -65,7 +65,7 @@ router.post('/supplement', (req: Request, res: Response): void => {
   `)
 
   const updateQr = db.prepare(`
-    UPDATE questionnaire_raw SET score = ?, source = ?, status = ?, boundary_note_id = ?, original_statement = ?, created_at = ? WHERE id = ?
+    UPDATE questionnaire_raw SET score = ?, source = ?, status = ?, record_type = ?, boundary_note_id = ?, original_statement = ?, created_at = ? WHERE id = ?
   `)
 
   const insertConflict = db.prepare(`
@@ -105,9 +105,10 @@ router.post('/supplement', (req: Request, res: Response): void => {
       const oldScore = existingRecord.score
       const oldSource = existingRecord.source
       const oldStatus = existingRecord.status
+      const oldRecordType = existingRecord.record_type
 
       updateQr.run(
-        parsedValue, 'boundary_note', 'pending',
+        parsedValue, 'boundary_note', 'pending', 'supplemented',
         noteId, originalStatement, now,
         existingRecord.id
       )
@@ -115,11 +116,13 @@ router.post('/supplement', (req: Request, res: Response): void => {
       beforeValue = JSON.stringify({
         score: oldScore,
         source: oldSource,
-        status: oldStatus
+        status: oldStatus,
+        recordType: oldRecordType
       })
       afterValue = JSON.stringify({
         score: parsedValue,
         source: 'boundary_note',
+        recordType: 'supplemented',
         boundaryNoteId: noteId,
         originalStatement
       })

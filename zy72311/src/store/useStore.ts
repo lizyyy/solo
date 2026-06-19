@@ -363,16 +363,10 @@ export const useStore = create<StoreState>((set, get) => ({
   updateResults: async () => {
     set({ loading: true, error: null })
     try {
-      const { batchId } = get()
-      const body: any = {}
-      if (batchId) {
-        body.batchId = batchId
-      }
-
       const res = await fetch(`${API_BASE}/scoring/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify({}),
       })
 
       if (!res.ok) throw new Error('更新评分结果失败')
@@ -393,9 +387,8 @@ export const useStore = create<StoreState>((set, get) => ({
 
       set((state) => ({
         scoringData: state.scoringData
-          ? { ...state.scoringData, results: resultsWithComparison, stepStatus: 'updated' }
+          ? { ...state.scoringData, results: resultsWithComparison }
           : null,
-        currentStep: 'updated',
         loading: false,
       }))
 
