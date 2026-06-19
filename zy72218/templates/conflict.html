@@ -33,23 +33,97 @@
 
     <p><strong>差异金额：</strong>{{ "%.2f"|format(decision.difference) }} 元</p>
 
+    <h2>请填写决策原因</h2>
+    <div style="margin: 12px 0;">
+        <textarea id="reason-input" rows="3" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;" placeholder="请输入决策原因（将记入审计日志）"></textarea>
+    </div>
+
     <h2>请手动选择</h2>
     <div class="actions">
-        <form method="POST" action="/api/resolve-conflict" style="display:inline;">
-            <input type="hidden" name="business_no" value="{{ decision.business_no }}">
-            <input type="hidden" name="action" value="confirm_holiday">
-            <button type="submit" class="btn btn-primary">确认采用节假日顺延说明结论</button>
-        </form>
-        <form method="POST" action="/api/resolve-conflict" style="display:inline;">
-            <input type="hidden" name="business_no" value="{{ decision.business_no }}">
-            <input type="hidden" name="action" value="confirm_tail">
-            <button type="submit" class="btn btn-success">确认采用尾差调整条结论</button>
-        </form>
-        <form method="POST" action="/api/resolve-conflict" style="display:inline;">
-            <input type="hidden" name="business_no" value="{{ decision.business_no }}">
-            <input type="hidden" name="action" value="reject_both">
-            <button type="submit" class="btn btn-danger">驳回两者，要求业务重新提供</button>
-        </form>
+        <button type="button" class="btn btn-primary" onclick="submitDecision('confirm_holiday')">
+            确认采用节假日顺延说明结论
+        </button>
+        <button type="button" class="btn btn-success" onclick="submitDecision('confirm_tail')">
+            确认采用尾差调整条结论
+        </button>
+        <button type="button" class="btn btn-danger" onclick="submitDecision('reject_both')">
+            驳回两者，要求业务重新提供
+        </button>
     </div>
 </div>
+
+<div id="result-message" style="display:none;margin-top:16px;"></div>
+
+<script>
+function submitDecision(action) {
+    const reason = document.getElementById('reason-input').value.trim();
+    if (!reason) {
+        alert('请填写决策原因');
+        document.getElementById('reason-input').focus();
+        return;
+    }
+
+    const businessNo = "{{ decision.business_no }}";
+    const btn = event.target;
+    btn.disabled = true;
+    btn.innerHTML = '提交中...';
+
+    fetch('/api/resolve-conflict', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            business_no: businessNo,
+            action: action,
+            reason: reason,
+            operator: '投研助理小周'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const resultDiv = document.getElementById('result-message');
+        resultDiv.style.display = 'block';
+
+        if (data.resolution) {
+            let chosenRule = data.resolution.chosen_rule === 'holiday_extension' ? '节假日顺延说明' :
+                            data.resolution.chosen_rule === 'tail_adjustment' ? '尾差调整条' : '无';
+            let statusClass = data.resolution.status === '已驳回' ? 'error' : 'success';
+            resultDiv.className = statusClass;
+
+            if (data.resolution.status === '已驳回') {
+                resultDiv.innerHTML = '<strong>✗ 已驳回</strong><br>该记录需要业务重新提供数据。即将跳转...';
+            } else {
+                resultDiv.innerHTML = `
+                    <strong>✓ 决策已保存</strong><br>
+                    已选择：${chosenRule}<br>
+                    最终金额：${data.resolution.final_amount?.toFixed(2)} 元<br>
+                    状态：${data.resolution.status}<br>
+                    正在跳转...
+                `;
+            }
+            setTimeout(() => {
+                window.location.href = '/records';
+            }, 2000);
+        } else if (data.error) {
+            resultDiv.className = 'error';
+            resultDiv.innerHTML = `<strong>✗ 提交失败</strong><br>${data.error}`;
+            btn.disabled = false;
+            btn.innerHTML = btn.innerHTML.replace('提交中...', '');
+        } else {
+            window.location.href = '/records';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        const resultDiv = document.getElementById('result-message');
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'error';
+        resultDiv.innerHTML = '<strong>✗ 提交失败</strong><br>请检查网络连接后重试。';
+        btn.disabled = false;
+        btn.innerHTML = btn.innerHTML.replace('提交中...', '');
+    });
+}
+</script>
 {% endblock %}

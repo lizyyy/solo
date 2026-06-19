@@ -149,6 +149,26 @@ class MatchRepository:
                     record_dict["counterpart_type"] = related.record_type.value
                     record_dict["counterpart_amount"] = related.expected_amount
                     record_dict["combined_amount"] = record.expected_amount + related.expected_amount
+
+            resolution = self._conflict_resolutions.get(record.business_no)
+            if resolution:
+                rule_map = {
+                    "holiday_extension": "节假日顺延说明",
+                    "tail_adjustment": "尾差调整条",
+                    None: "未选择（已驳回）",
+                }
+                record_dict["conflict_resolution_rule"] = rule_map.get(resolution.chosen_rule, "未知")
+                record_dict["conflict_resolution_status"] = resolution.resolution.value
+                record_dict["conflict_resolution_reason"] = resolution.reason
+                record_dict["conflict_resolved_by"] = resolution.operator
+                if resolution.final_amount is not None:
+                    record_dict["conflict_final_amount"] = resolution.final_amount
+            else:
+                evidence = self._conflict_evidences.get(record.business_no)
+                if evidence:
+                    record_dict["conflict_pending"] = True
+                    record_dict["conflict_pending_description"] = "存在未解决的规则冲突"
+
             result.append(record_dict)
         return result
 

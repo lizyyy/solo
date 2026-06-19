@@ -122,6 +122,13 @@ class ExportService:
             "counterpart_amount": "对应行金额",
             "combined_amount": "合并金额",
             "invoice_ids": "关联发票",
+            "conflict_pending": "是否有未解决冲突",
+            "conflict_pending_description": "冲突状态说明",
+            "conflict_resolution_rule": "冲突选择规则",
+            "conflict_resolution_status": "冲突解决状态",
+            "conflict_resolution_reason": "冲突解决原因",
+            "conflict_resolved_by": "冲突决策人",
+            "conflict_final_amount": "冲突最终金额",
         }
         result = []
         for record in records:

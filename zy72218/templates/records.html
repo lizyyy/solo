@@ -6,7 +6,6 @@
     <table>
         <thead>
             <tr>
-                <th>记录ID</th>
                 <th>业务号</th>
                 <th>记录类型</th>
                 <th>预期金额</th>
@@ -16,22 +15,22 @@
                 <th>拆分行</th>
                 <th>节假日顺延</th>
                 <th>尾差调整</th>
-                <th>对应行类型</th>
-                <th>合并金额</th>
+                <th>冲突选择规则</th>
+                <th>冲突状态</th>
                 <th>操作</th>
             </tr>
         </thead>
         <tbody>
             {% for r in records %}
-            <tr class="{% if r.is_split_record %}split-row{% elif '冲突' in r.status %}conflict-row{% endif %}">
-                <td>{{ r.record_id[:8] }}...</td>
+            <tr class="{% if r.is_split_record %}split-row{% elif '冲突' in r.status or r.conflict_pending %}conflict-row{% endif %}">
                 <td>{{ r.business_no }}</td>
                 <td>{{ r.record_type }}</td>
                 <td>{{ "%.2f"|format(r.expected_amount) }}</td>
                 <td>{{ "%.2f"|format(r.matched_amount) }}</td>
                 <td>{{ r.match_date or '-' }}</td>
                 <td>
-                    {% if '冲突' in r.status %}<span class="badge badge-conflict">{{ r.status }}</span>
+                    {% if r.conflict_pending %}<span class="badge badge-conflict">规则冲突待处理</span>
+                    {% elif '冲突' in r.status %}<span class="badge badge-conflict">{{ r.status }}</span>
                     {% elif '差异' in r.status %}<span class="badge badge-discrepancy">{{ r.status }}</span>
                     {% elif '复核' in r.status %}<span class="badge badge-review">{{ r.status }}</span>
                     {% elif '已匹配' in r.status %}<span class="badge badge-matched">{{ r.status }}</span>
@@ -39,14 +38,41 @@
                     {% endif %}
                 </td>
                 <td>{{ '是' if r.is_split_record else '否' }}</td>
-                <td>{{ '是' if r.holiday_extension_applied else '否' }}</td>
-                <td>{{ '是' if r.tail_adjustment_applied else '否' }}</td>
-                <td>{{ r.counterpart_type or '-' }}</td>
-                <td>{{ "%.2f"|format(r.combined_amount) if r.combined_amount else '-' }}</td>
+                <td>
+                    {% if r.holiday_extension_applied %}<span class="badge badge-primary" style="background:#4472C4;color:white;">是</span>
+                    {% else %}<span style="color:#999;">否</span>{% endif %}
+                </td>
+                <td>
+                    {% if r.tail_adjustment_applied %}<span class="badge badge-success" style="background:#2e7d32;color:white;">是</span>
+                    {% else %}<span style="color:#999;">否</span>{% endif %}
+                </td>
+                <td>
+                    {% if r.conflict_resolution_rule %}
+                        <strong>{{ r.conflict_resolution_rule }}</strong>
+                        {% if r.conflict_resolved_by %}<br><small>by {{ r.conflict_resolved_by }}</small>{% endif %}
+                    {% elif r.conflict_pending %}
+                        <span class="badge badge-conflict">待处理</span>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if r.conflict_resolution_status %}
+                        {% if '驳回' in r.conflict_resolution_status %}
+                            <span class="badge badge-discrepancy">{{ r.conflict_resolution_status }}</span>
+                        {% else %}
+                            <span class="badge badge-confirmed">{{ r.conflict_resolution_status }}</span>
+                        {% endif %}
+                    {% elif r.conflict_pending %}
+                        <span class="badge badge-conflict">待决策</span>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
                 <td>
                     <a href="/audit/{{ r.business_no }}" class="btn btn-warning" style="font-size:12px;padding:4px 8px;">审计</a>
-                    {% if '冲突' in r.status %}
-                    <a href="/conflict/{{ r.business_no }}" class="btn btn-danger" style="font-size:12px;padding:4px 8px;">冲突</a>
+                    {% if '冲突' in r.status or r.conflict_pending %}
+                    <a href="/conflict/{{ r.business_no }}" class="btn btn-danger" style="font-size:12px;padding:4px 8px;">处理冲突</a>
                     {% endif %}
                 </td>
             </tr>

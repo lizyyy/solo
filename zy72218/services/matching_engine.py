@@ -162,6 +162,8 @@ class MatchingEngine:
 
         if resolution and resolution.final_amount is not None:
             calculated_amount = resolution.final_amount
+        elif resolution and resolution.resolution == DiscrepancyStatus.REJECTED:
+            calculated_amount = base_amount
 
         changes_list = []
         for record in records:
@@ -183,8 +185,21 @@ class MatchingEngine:
             record.holiday_extension_applied = holiday is not None
             record.tail_adjustment_applied = tail_adj is not None
 
+            if resolution:
+                if resolution.chosen_rule == "holiday_extension":
+                    record.holiday_extension_applied = True
+                    record.tail_adjustment_applied = False
+                elif resolution.chosen_rule == "tail_adjustment":
+                    record.tail_adjustment_applied = True
+                    record.holiday_extension_applied = False
+                elif resolution.resolution == DiscrepancyStatus.REJECTED:
+                    record.holiday_extension_applied = False
+                    record.tail_adjustment_applied = False
+
             if record.status == MatchStatus.PENDING_REVIEW:
                 pass
+            elif resolution and resolution.resolution == DiscrepancyStatus.REJECTED:
+                record.status = MatchStatus.DISCREPANCY
             elif abs(record.expected_amount - record.matched_amount) > 0.001:
                 record.status = MatchStatus.DISCREPANCY
             else:

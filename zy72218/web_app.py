@@ -159,14 +159,24 @@ def create_app(data_dir: str = None):
 
     @app.route("/api/resolve-conflict", methods=["POST"])
     def api_resolve_conflict():
-        data = request.get_json()
+        data = request.get_json(silent=True)
+        if data is None:
+            data = request.form.to_dict()
+
+        if not data or "business_no" not in data or "action" not in data:
+            return jsonify({"error": "缺少必要参数: business_no, action"}), 400
+
         result = workflow_engine.resolve_conflict(
             business_no=data["business_no"],
             action=data["action"],
             operator=data.get("operator", "投研助理小周"),
-            reason=data.get("reason", ""),
+            reason=data.get("reason", "页面人工决策"),
         )
-        return jsonify(result)
+
+        if request.is_json or request.headers.get("Accept") == "application/json":
+            return jsonify(result)
+
+        return redirect(url_for("records_page"))
 
     @app.route("/api/update-discrepancies", methods=["POST"])
     def api_update_discrepancies():
