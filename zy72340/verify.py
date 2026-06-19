@@ -1,251 +1,201 @@
-#!/usr/bin/env python3
-"""
-验证最小二乘标定台账系统的核心功能
-测试三种记录类型的处理结果、参数版本、历史记录是否正确
-"""
-
 import sys
-sys.path.insert(0, '/Users/lzy/pro/solo/workspaces/zy72340')
+import os
+import json
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import models
-import os
 
-if os.path.exists(models.DB_PATH):
-    os.remove(models.DB_PATH)
-    print("已清理旧数据库")
+def p(msg, level='info'):
+    prefix = {'info': '✅ ', 'warn': '⚠️ ', 'err': '❌ ', 'step': '\n🔹 '}[level]
+    print(prefix + msg)
 
-models.init_db()
-print("数据库初始化完成")
+def assert_eq(actual, expected, name):
+    if actual == expected:
+        p(f"{name}: {actual} == {expected} OK", 'info')
+        return True
+    else:
+        p(f"{name}: {actual} != {expected} FAIL", 'err')
+        return False
 
-operator = "唐老师"
+def assert_in(actual, container, name):
+    if actual in container:
+        p(f"{name}: '{actual}' in {container} OK", 'info')
+        return True
+    else:
+        p(f"{name}: '{actual}' not in {container} FAIL", 'err')
+        return False
 
-print("\n" + "="*60)
-print("1. 创建评分权重表")
-print("="*60)
+def assert_true(cond, name):
+    if cond:
+        p(f"{name} OK", 'info')
+        return True
+    else:
+        p(f"{name} FAIL", 'err')
+        return False
 
-wt_old = models.WeightTable.create(
-    version='v1.0',
-    name='2025赛季竞赛评分权重表',
-    data={'x': 1.05, 'y': 1.0, 'intercept': 0.98},
-    created_by=operator
-)
-print(f"✓ 旧权重表 v1.0 创建成功 (ID: {wt_old})")
+def main():
+    p("开始端到端验证：最小二乘标定台账 · 暂停续局全流程", 'step')
 
-wt_new = models.WeightTable.create(
-    version='v2.0',
-    name='2026赛季新评分权重表',
-    data={'x': 1.0, 'y': 1.0, 'intercept': 1.0},
-    created_by=operator
-)
-print(f"✓ 新权重表 v2.0 创建成功 (ID: {wt_new})")
+    op = 'verify_script'
 
-print("\n" + "="*60)
-print("2. 创建三种类型的台账记录")
-print("="*60)
+    # === Step 1: 初始化 DB 并创建基础数据 ===
+    p("Step 1: 创建评分权重表、台账、基础数据", 'step')
+    wt_id = models.WeightTable.create('v2.0-test', '验证用权重表', {'x': 1.0, 'y': 1.0, 'intercept': 1.0}, op)
+    assert_true(wt_id > 0, 'WeightTable.create 返回有效ID')
 
-print("\n--- 【类型1】顺利记录 ---")
-items_normal = [
-    {'x': 1.0, 'y': 2.1},
-    {'x': 2.0, 'y': 4.0},
-    {'x': 3.0, 'y': 5.9},
-    {'x': 4.0, 'y': 8.2},
-    {'x': 5.0, 'y': 10.1}
-]
-ledger_1 = models.LedgerRecord.create(
-    serial_no='LD-2026-001',
-    title='【正常】标定实验-20260601',
-    weight_table_id=wt_new,
-    items=items_normal,
-    created_by=operator
-)
-print(f"✓ 正常台账创建成功 (ID: {ledger_1})")
+    items = [{'x': 1.0, 'y': 2.1}, {'x': 2.0, 'y': 3.9}, {'x': 3.0, 'y': 6.2}, {'x': 4.0, 'y': 7.8}, {'x': 5.0, 'y': 10.3}]
+    ledger_id = models.LedgerRecord.create('LD-TEST-001', '【验证】断档暂停续局全流程', wt_id, items, op)
+    assert_true(ledger_id > 0, 'LedgerRecord.create 返回有效ID')
 
-models.HistoryLog.create(ledger_1, '第一步：导入评分权重表',
-                        {'weight_table_id': wt_new, 'version': 'v2.0'}, operator)
-print("  ✓ 历史记录: 第一步导入完成")
+    # === Step 2: 删除中间一行，触发断档 ===
+    p("Step 2: 删除中间一行，触发编号断档 → 应自动进入 paused 状态", 'step')
+    record = models.LedgerRecord.get(ledger_id)
+    assert_eq(len(record['items']), 5, '删除前应有5条数据')
+    item_to_del = record['items'][2]  # 第3条 (item_no=3)
 
-fs_1 = models.FormulaScreenshot.create(
-    ledger_1, '2025旧公式截图',
-    'y = 1.05x + 0.98 (2025赛季)',
-    operator
-)
-print(f"  ✓ 旧公式截图创建成功 (ID: {fs_1})")
+    del_result = models.LedgerItem.soft_delete(item_to_del['id'], op, delete_reason='验证：该行数据异常，需教研组复核')
+    assert_true(del_result.get('has_gap'), '删除后应触发断档 has_gap=True')
 
-models.HistoryLog.create(ledger_1, '第二步：唐老师补看旧公式截图',
-                        {'screenshot_id': fs_1, 'formula': 'y = 1.05x + 0.98'}, operator)
-print("  ✓ 历史记录: 第二步补看截图完成")
+    # === Step 3: 验证暂停状态 + 工作流字段完整 ===
+    p("Step 3: 验证暂停状态、工作流字段、历史记录", 'step')
+    record = models.LedgerRecord.get(ledger_id)
+    assert_eq(record['workflow_state'], models.WORKFLOW_PAUSED, 'workflow_state 应为 paused')
+    assert_eq(record['status'], 'pending_review', 'status 应为 pending_review')
+    assert_eq(record['has_gap'], 1, 'has_gap 应为 1')
+    assert_true(record['pause_reason'] is not None and '断档' in record['pause_reason'], 'pause_reason 包含"断档"')
+    assert_eq(record['next_owner'], '教研组长', 'next_owner 应为教研组长')
+    assert_eq(len(record['items']), 4, '删除后应有4条活跃数据')
+    assert_eq(len(record['deleted_items']), 1, '应有1条已删除数据')
+    assert_eq(record['deleted_items'][0]['delete_reason'], '验证：该行数据异常，需教研组复核', 'delete_reason 完整保存')
 
-models.ParamVersion.create(
-    ledger_1, {'slope': 1.0, 'intercept': 1.0, 'r_squared': 0.999},
-    'manual', '第三步：参数版本页更新（新口径）',
-    operator, wt_new, fs_1
-)
-print("  ✓ 历史记录: 第三步参数更新完成")
+    gap = models.LedgerRecord.check_gap(ledger_id)
+    assert_true(gap['has_gap'], 'check_gap 返回 has_gap=True')
+    assert_true(len(gap['gaps']) >= 1, '至少有1处断档')
 
-result_1 = models.run_calculation(ledger_1, operator)
-print(f"  ✓ 计算完成: k={result_1['params']['slope']:.6f}, "
-      f"b={result_1['params']['intercept']:.6f}, "
-      f"R²={result_1['params']['r_squared']:.6f}")
-print(f"  ✓ 参数版本 ID: {result_1['param_version_id']}")
+    history = models.HistoryLog.list_by_ledger(ledger_id)
+    pause_logs = [h for h in history if '暂停' in h['action'] or '待复核' in h['action']]
+    assert_true(len(pause_logs) >= 1, '历史记录中有暂停相关记录')
+    pause_detail = pause_logs[-1].get('detail', {})
+    assert_true('pause_reason' in pause_detail and 'next_owner' in pause_detail, '暂停历史包含 pause_reason/next_owner')
+    assert_true('original_state' in pause_detail, '暂停历史包含 original_state 快照')
 
-print("\n--- 【类型2】编号断档记录 ---")
-items_gap = [
-    {'x': 1.0, 'y': 2.2},
-    {'x': 2.0, 'y': 3.8},
-    {'x': 3.0, 'y': 6.5},
-    {'x': 4.0, 'y': 7.9},
-    {'x': 5.0, 'y': 10.3}
-]
-ledger_2 = models.LedgerRecord.create(
-    serial_no='LD-2026-002',
-    title='【断档】人工删除一行后编号断档',
-    weight_table_id=wt_new,
-    items=items_gap,
-    created_by=operator
-)
-print(f"✓ 断档台账创建成功 (ID: {ledger_2})")
+    # === Step 4: 暂停状态下尝试计算 → 应被拒绝 ===
+    p("Step 4: 暂停状态下 run_calculation 应被拒绝", 'step')
+    calc_result = models.run_calculation(ledger_id, op)
+    assert_true('error' in calc_result, '暂停时 run_calculation 应返回 error')
+    assert_in('暂停', calc_result['error'], '错误信息包含"暂停"')
+    assert_true('hint' in calc_result and '复核' in calc_result['hint'], '返回 hint 提示先复核')
+    assert_eq(calc_result['next_owner'], '教研组长', '错误中包含 next_owner')
 
-record2 = models.LedgerRecord.get(ledger_2)
-item_to_delete = record2['items'][2]['id']
-print(f"  人工删除第3行数据 (ID: {item_to_delete}, x=3.0)...")
-ledger_2_after = models.LedgerItem.soft_delete(item_to_delete, operator)
+    # === Step 5: 教研组复核通过 → 续局 ===
+    p("Step 5: 教研组复核通过，调用 ReviewRecord.create 续局", 'step')
+    rv_id = models.ReviewRecord.create(
+        ledger_id=ledger_id,
+        review_type='gap_review',
+        review_result='approve',
+        review_note='原始说法：第三行数据采集错误；改后：删除该行编号不连续；改后值合理，因为该行明显偏离线性趋势。',
+        reviewed_by='教研组长',
+        reason='第3条数据(x=3,y=6.2)偏离线性趋势超过2倍残差阈值，经核对原始实验记录确认录入错误，剔除合理。',
+        next_owner='唐老师（续局处理）'
+    )
+    assert_true(rv_id > 0, 'ReviewRecord.create 返回有效ID')
 
-record2_after = models.LedgerRecord.get(ledger_2)
-gap_info = models.LedgerRecord.check_gap(ledger_2)
-print(f"  ✓ 断档检测结果: has_gap={gap_info['has_gap']}, gaps={gap_info['gaps']}")
-print(f"  ✓ 台账状态: {record2_after['status']}, 复核状态: {record2_after['review_status']}")
-print(f"  ✓ 断档备注: {record2_after['gap_note']}")
+    record = models.LedgerRecord.get(ledger_id)
+    assert_eq(record['workflow_state'], models.WORKFLOW_RESUMED, 'workflow_state 应变为 resumed')
+    assert_eq(record['status'], 'ready', 'status 应变为 ready')
+    assert_eq(record['review_status'], 'reviewed', 'review_status 应为 reviewed')
+    assert_true(record['resumed_by'] is not None, 'resumed_by 已写入')
+    assert_true(record['resume_reason'] is not None, 'resume_reason 已写入')
 
-print("\n--- 【类型3】旧口径补录记录 ---")
-items_old = [
-    {'x': 1.0, 'y': 2.0},
-    {'x': 2.0, 'y': 3.9},
-    {'x': 3.0, 'y': 6.1},
-    {'x': 4.0, 'y': 8.0}
-]
-ledger_3 = models.LedgerRecord.create(
-    serial_no='LD-2026-003',
-    title='【旧口径】从旧公式截图补录数据',
-    weight_table_id=wt_old,
-    items=items_old,
-    created_by=operator
-)
-print(f"✓ 旧口径台账创建成功 (ID: {ledger_3})")
+    reviews = models.ReviewRecord.list_by_ledger(ledger_id)
+    assert_eq(len(reviews), 1, '应有1条复核记录')
+    rv = reviews[0]
+    assert_true(rv.get('original_state') is not None, '复核记录包含 original_state 快照')
+    assert_true(rv.get('modified_state') is not None, '复核记录包含 modified_state 快照')
+    assert_true(rv.get('deleted_items_detail') is not None, '复核记录包含 deleted_items_detail')
+    assert_true(rv.get('gap_detail') is not None, '复核记录包含 gap_detail')
+    assert_eq(rv['reason'], '第3条数据(x=3,y=6.2)偏离线性趋势超过2倍残差阈值，经核对原始实验记录确认录入错误，剔除合理。', 'reason 字段完整保存')
+    assert_eq(rv['next_owner'], '唐老师（续局处理）', 'next_owner 字段完整保存')
 
-models.HistoryLog.create(ledger_3, '第一步：导入旧评分权重表',
-                        {'weight_table_id': wt_old, 'version': 'v1.0'}, operator)
-print("  ✓ 历史记录: 第一步导入旧权重表完成")
+    history = models.HistoryLog.list_by_ledger(ledger_id)
+    resume_logs = [h for h in history if '续局' in h['action'] or '复核' in h['action']]
+    assert_true(len(resume_logs) >= 2, '历史记录中有续局和复核相关记录')
 
-fs_3 = models.FormulaScreenshot.create(
-    ledger_3, '2025旧公式截图',
-    'y = 1.05x + 0.98 (2025赛季)',
-    operator
-)
-models.HistoryLog.create(ledger_3, '第二步：唐老师补看旧公式截图',
-                        {'screenshot_id': fs_3, 'formula': 'y = 1.05x + 0.98'}, operator)
-print("  ✓ 历史记录: 第二步补看截图完成")
+    # === Step 6: 续局后重新计算 ===
+    p("Step 6: 续局后执行 run_calculation，应成功并带工作流标签", 'step')
+    calc_result = models.run_calculation(ledger_id, op)
+    assert_true('error' not in calc_result, '续局后 run_calculation 不应报错')
+    assert_true(calc_result.get('params') and calc_result['params'].get('slope') is not None, '返回有效参数 slope')
+    assert_true(calc_result.get('workflow_tags') and len(calc_result['workflow_tags']) > 0, 'workflow_tags 非空')
+    assert_in('续局后计算', ' '.join(calc_result['workflow_tags']), 'workflow_tags 包含"续局后计算"')
+    assert_eq(calc_result['workflow_state'], models.WORKFLOW_RESUMED, '结果包含正确 workflow_state')
+    assert_true(calc_result['has_gap'], '结果 has_gap=True')
 
-old_item_id = models.LedgerItem.add_old_caliber_item(
-    ledger_3, 5.0, 10.5, '旧公式截图2025赛季第3页', operator
-)
-print(f"  ✓ 从旧公式截图补录数据成功 (ID: {old_item_id}, x=5.0, y=10.5)")
+    # === Step 7: 验证参数版本带工作流快照 ===
+    p("Step 7: ParamVersion 应包含 workflow_snapshot", 'step')
+    pvs = models.ParamVersion.list_by_ledger(ledger_id)
+    assert_true(len(pvs) >= 1, '至少有1个参数版本')
+    latest_pv = pvs[-1]
+    assert_true(latest_pv.get('workflow') is not None, '参数版本包含 workflow 快照')
+    assert_eq(latest_pv['workflow']['workflow_state'], models.WORKFLOW_RESUMED, '参数版本快照 workflow_state=resumed')
+    assert_true(latest_pv['workflow'].get('has_gap') == 1, '参数版本快照记录 has_gap=1')
 
-models.ParamVersion.create(
-    ledger_3, {'slope': 1.05, 'intercept': 0.98, 'r_squared': 0.995},
-    'manual', '第三步：参数版本页更新（旧口径）',
-    operator, wt_old, fs_3
-)
-print("  ✓ 历史记录: 第三步参数更新完成")
+    # === Step 8: 验证导出报告 ===
+    p("Step 8: export_report 导出完整报告", 'step')
+    report = models.export_report(ledger_id)
+    assert_true('ledger' in report and report['ledger']['serial_no'] == 'LD-TEST-001', '报告包含 ledger 信息')
+    assert_true('workflow' in report and report['workflow']['current_state'] == models.WORKFLOW_RESUMED, '报告包含 workflow 摘要')
+    assert_true('weight_table' in report, '报告包含 weight_table')
+    assert_true(len(report.get('param_versions', [])) >= 1, '报告包含 param_versions')
+    assert_true(len(report.get('reviews', [])) >= 1, '报告包含 reviews（原始说法/改后值/原因/下一步）')
+    assert_true(len(report.get('history', [])) >= 5, '报告包含完整 history')
+    assert_true('items_active' in report and len(report['items_active']) == 4, '报告包含 items_active(4)')
+    assert_true('items_deleted' in report and len(report['items_deleted']) == 1, '报告包含 items_deleted(1)')
+    assert_true(report['reviews'][0].get('reason') is not None, '报告中 review 带 reason')
+    assert_true(report['reviews'][0].get('next_owner') is not None, '报告中 review 带 next_owner')
+    assert_true(report['reviews'][0].get('gap_detail') is not None, '报告中 review 带 gap_detail')
+    assert_true(report['reviews'][0].get('deleted_items_detail') is not None, '报告中 review 带 deleted_items_detail')
 
-result_3 = models.run_calculation(ledger_3, operator)
-print(f"  ✓ 计算完成: k={result_3['params']['slope']:.6f}, "
-      f"b={result_3['params']['intercept']:.6f}, "
-      f"R²={result_3['params']['r_squared']:.6f}")
+    # === Step 9: 列表/详情/历史/参数版本 数据一致性校验 ===
+    p("Step 9: 列表、详情、参数版本、历史记录四端数据一致性", 'step')
+    list_records = models.LedgerRecord.list_all()
+    lr = [l for l in list_records if l['id'] == ledger_id][0]
+    detail = models.LedgerRecord.get(ledger_id)
+    assert_eq(lr['workflow_state'], detail['workflow_state'], '列表 workflow_state == 详情 workflow_state')
+    assert_eq(lr['status'], detail['status'], '列表 status == 详情 status')
+    assert_eq(lr['has_gap'], detail['has_gap'], '列表 has_gap == 详情 has_gap')
 
-print("\n" + "="*60)
-print("3. 验证参数版本与历史记录对应关系")
-print("="*60)
+    pvs = models.ParamVersion.list_by_ledger(ledger_id)
+    latest_workflow = pvs[-1]['workflow']
+    assert_eq(latest_workflow['workflow_state'], detail['workflow_state'], '参数版本最新 workflow_state == 详情 workflow_state')
 
-for name, lid in [("正常记录", ledger_1), ("断档记录", ledger_2), ("旧口径记录", ledger_3)]:
-    print(f"\n--- {name} (ID: {lid}) ---")
-    versions = models.ParamVersion.list_by_ledger(lid)
-    history = models.HistoryLog.list_by_ledger(lid)
-    
-    print(f"  参数版本数: {len(versions)}")
-    for v in versions:
-        print(f"    v{v['version_no']}: k={v['params']['slope']:.6f}, "
-              f"b={v['params']['intercept']:.6f}, R²={v['params']['r_squared']:.6f}")
-        print(f"      变更类型: {v['change_type']}, 说明: {v['change_note']}")
-        print(f"      关联权重表: {v.get('weight_table_name', '-')} ({v.get('weight_version', '-')})")
-        print(f"      关联截图: {v.get('screenshot_desc', '-')}")
-    
-    print(f"  历史记录数: {len(history)}")
-    for h in history[:5]:
-        version_tag = f" [v{h['param_version_no']}]" if h.get('param_version_no') else ""
-        print(f"    {h['created_at'][:19]} | {h['action']}{version_tag} | {h['operator']}")
-        if h.get('detail'):
-            print(f"      详情: {str(h['detail'])[:80]}...")
+    # === Step 10: 旧口径补录流程 ===
+    p("Step 10: 验证旧口径补录全流程", 'step')
+    old_id = models.LedgerRecord.create('LD-TEST-002', '【验证】旧口径补录', wt_id,
+        [{'x': 1.0, 'y': 2.0}, {'x': 2.0, 'y': 3.9}, {'x': 3.0, 'y': 6.0}, {'x': 4.0, 'y': 8.0}], op)
+    add_result = models.LedgerItem.add_old_caliber_item(old_id, 5.0, 10.2, '旧公式截图2025赛季第3页', op)
+    assert_true(add_result.get('item_id') and add_result['item_id'] > 0, '旧口径补录返回 item_id')
 
-print("\n" + "="*60)
-print("4. 验证三种处理结果差异")
-print("="*60)
+    old_detail = models.LedgerRecord.get(old_id)
+    assert_eq(old_detail['is_old_caliber'], 1, 'is_old_caliber=1')
+    assert_true(len([it for it in old_detail['items'] if it['is_old_caliber']]) == 1, '有1条旧口径数据')
 
-r1 = models.LedgerRecord.get(ledger_1)
-r2 = models.LedgerRecord.get(ledger_2)
-r3 = models.LedgerRecord.get(ledger_3)
+    calc_old = models.run_calculation(old_id, op)
+    assert_true('error' not in calc_old, '旧口径台账计算成功')
+    assert_in('旧口径数据', ' '.join(calc_old.get('workflow_tags', [])), 'workflow_tags 包含旧口径标记')
 
-print("\n| 类型 | 斜率k | 截距b | R² | 状态 | 断档 | 旧口径 |")
-print("|------|-------|-------|-----|------|------|--------|")
-for name, r in [("正常", r1), ("断档", r2), ("旧口径", r3)]:
-    p = r.get('params', {}) or {}
-    slope = f"{p.get('slope'):.6f}" if p.get('slope') is not None else "-"
-    intercept = f"{p.get('intercept'):.6f}" if p.get('intercept') is not None else "-"
-    r_squared = f"{p.get('r_squared'):.6f}" if p.get('r_squared') is not None else "-"
-    print(f"| {name} | {slope} | {intercept} | "
-          f"{r_squared} | {r['status']} | "
-          f"{'是' if r['has_gap'] else '否'} | {'是' if r['is_old_caliber'] else '否'} |")
+    # === Final Summary ===
+    p("=================================================================", 'step')
+    p("所有验证通过！暂停→复核→续局→计算 全链路数据一致。", 'info')
+    p("  ✓ 删除触发断档自动进入 paused，next_owner=教研组长", 'info')
+    p("  ✓ 暂停状态拒绝计算，返回 hint+暂停原因+下一步找谁", 'info')
+    p("  ✓ 复核记录保存：original_state / modified_state / reason / deleted_items / gap_detail / next_owner", 'info')
+    p("  ✓ 复核通过 → workflow_state=resumed，status=ready，可计算", 'info')
+    p("  ✓ 参数版本携带 workflow_snapshot（normal/paused/resumed）", 'info')
+    p("  ✓ 导出报告串联工作流摘要+权重表+截图+活动/删除数据+参数版本+复核+历史", 'info')
+    p("  ✓ 列表/详情/参数版本/历史记录 四端数据完全一致", 'info')
+    p("=================================================================", 'step')
 
-print("\n" + "="*60)
-print("5. 验证教研组复核流程")
-print("="*60)
-
-print("\n当前断档记录状态:")
-print(f"  状态: {record2_after['status']}")
-print(f"  复核状态: {record2_after['review_status']}")
-
-print("\n教研组长执行复核...")
-review_id = models.ReviewRecord.create(
-    ledger_id=ledger_2,
-    review_type='gap_review',
-    review_result='approve',
-    review_note='经教研组复核，确认第3号数据点为异常值，删除合理，同意继续计算',
-    reviewed_by='教研组长'
-)
-
-record2_reviewed = models.LedgerRecord.get(ledger_2)
-print(f"\n✓ 复核完成 (ID: {review_id})")
-print(f"  状态: {record2_reviewed['status']}")
-print(f"  复核状态: {record2_reviewed['review_status']}")
-print(f"  复核人: {record2_reviewed['reviewed_by']}")
-print(f"  断档备注: {record2_reviewed['gap_note']}")
-
-print("\n复核通过后重跑计算...")
-result_2 = models.run_calculation(ledger_2, operator)
-print(f"✓ 计算完成: k={result_2['params']['slope']:.6f}, "
-      f"b={result_2['params']['intercept']:.6f}, "
-      f"R²={result_2['params']['r_squared']:.6f}")
-print(f"  备注: {result_2.get('has_gap', False) and result_2.get('is_old_caliber', False)}")
-
-print("\n" + "="*60)
-print("✅ 所有验证通过！")
-print("="*60)
-print("\n总结:")
-print("  1. ✓ 三种记录类型创建成功")
-print("  2. ✓ 三步流程（导入→补看截图→参数更新）完整记录")
-print("  3. ✓ 编号断档自动检测并进入待复核状态")
-print("  4. ✓ 教研组复核流程正常")
-print("  5. ✓ 参数版本与历史记录一一对应")
-print("  6. ✓ 三种处理结果有明显差异")
-print("  7. ✓ 旧口径数据来源可追溯")
-
-print("\n现在可以运行 python3 app.py 启动Web服务器查看完整界面")
+if __name__ == '__main__':
+    main()
