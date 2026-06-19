@@ -235,11 +235,20 @@ class SettlementEngine:
             return TicketType.PAID
         return TicketType.UNKNOWN
 
-    def _build_batches(self, run: SettlementRun):
+    def _build_batches(self, run: SettlementRun, preserve_existing: bool = True):
+        old_batches = run.batches if preserve_existing else {}
         batches: Dict[str, BatchSummary] = {}
         for ticket in run.tickets:
             if ticket.batch_no not in batches:
-                batches[ticket.batch_no] = BatchSummary(batch_no=ticket.batch_no)
+                if ticket.batch_no in old_batches:
+                    batches[ticket.batch_no] = copy.copy(old_batches[ticket.batch_no])
+                    batches[ticket.batch_no].total_tickets = 0
+                    batches[ticket.batch_no].total_amount = 0.0
+                    batches[ticket.batch_no].free_count = 0
+                    batches[ticket.batch_no].paid_count = 0
+                    batches[ticket.batch_no].unknown_count = 0
+                else:
+                    batches[ticket.batch_no] = BatchSummary(batch_no=ticket.batch_no)
             batch = batches[ticket.batch_no]
             batch.total_tickets += 1
             batch.total_amount += ticket.amount
@@ -258,6 +267,9 @@ class SettlementEngine:
     def _classify_batch(self, batch: BatchSummary):
         has_free = batch.free_count > 0
         has_paid = batch.paid_count > 0
+        if batch.reviewer is not None and batch.status == BatchStatus.REVIEWED:
+            batch.needs_review = False
+            return
         if has_free and has_paid:
             batch.status = BatchStatus.MIXED
             batch.needs_review = True
@@ -266,34 +278,56 @@ class SettlementEngine:
             batch.needs_review = False
 
     def _generate_alerts(self, run: SettlementRun):
+        old_alerts_by_key: Dict[str, AuthAlert] = {}
+        for a in run.alerts:
+            key = a.batch_no + "|" + a.title.replace(" - 已复核", "").replace(" - 已补齐", "")
+            old_alerts_by_key[key] = a
+
         alerts: List[AuthAlert] = []
         for batch_no, batch in run.batches.items():
             tickets_in_batch = [t for t in run.tickets if t.batch_no == batch_no]
-            if batch.status == BatchStatus.MIXED:
-                free_tickets = [t for t in tickets_in_batch if t.ticket_type == TicketType.FREE]
-                paid_tickets = [t for t in tickets_in_batch if t.ticket_type == TicketType.PAID]
-                alert = AuthAlert(
-                    batch_no=batch_no,
-                    level=AlertLevel.BLOCKER,
-                    title=f"批次 {batch_no} 存在赠票售票混批",
-                    reason=f"该批次共 {batch.total_tickets} 张票，其中赠票 {batch.free_count} 张、售票 {batch.paid_count} 张，两类票混在同一批次结算，可能影响餐补计算口径。",
-                    missing_materials=[
-                        "录音师对该批次票种划分的确认说明",
-                        "赠票对应的艺人授权期限页"
-                    ],
-                    next_step="请先转录音师复核确认票种归属，待确认后再由版权运营小鹿补充授权期限页。",
-                    assignee="录音师",
-                    trigger_ticket_nos=[t.ticket_no for t in tickets_in_batch],
-                    trigger_remarks=[f"{t.ticket_no}: {t.audio_remark}" for t in tickets_in_batch]
-                )
-                alerts.append(alert)
-
             missing_auth = [t for t in tickets_in_batch if not t.auth_period]
-            if missing_auth and batch.status != BatchStatus.MIXED:
+
+            if batch.status == BatchStatus.MIXED and batch.reviewer is None:
+                base_title = f"批次 {batch_no} 存在赠票售票混批"
+                key = batch_no + "|" + base_title
+                if key in old_alerts_by_key and old_alerts_by_key[key].resolved:
+                    existing = old_alerts_by_key[key]
+                    alerts.append(existing)
+                else:
+                    alert = AuthAlert(
+                        batch_no=batch_no,
+                        level=AlertLevel.BLOCKER,
+                        title=base_title,
+                        reason=f"该批次共 {batch.total_tickets} 张票，其中赠票 {batch.free_count} 张、售票 {batch.paid_count} 张，两类票混在同一批次结算，可能影响餐补计算口径。",
+                        missing_materials=[
+                            "录音师对该批次票种划分的确认说明",
+                            "赠票对应的艺人授权期限页"
+                        ],
+                        next_step="请先转录音师复核确认票种归属，待确认后再由版权运营小鹿补充授权期限页。",
+                        assignee="录音师",
+                        trigger_ticket_nos=[t.ticket_no for t in tickets_in_batch],
+                        trigger_remarks=[f"{t.ticket_no}: {t.audio_remark}" for t in tickets_in_batch]
+                    )
+                    alerts.append(alert)
+                if missing_auth:
+                    last_alert = alerts[-1]
+                    last_alert.missing_materials.append(f"售票部分的授权期限页（缺 {len(missing_auth)} 条）")
+                    for t in missing_auth:
+                        last_alert.trigger_remarks.append(f"{t.ticket_no}: 授权期限未补")
+                continue
+
+            if missing_auth:
+                base_title = f"批次 {batch_no} 缺 {len(missing_auth)} 条授权期限"
+                key = batch_no + "|" + base_title
+                if key in old_alerts_by_key and old_alerts_by_key[key].resolved:
+                    existing = old_alerts_by_key[key]
+                    alerts.append(existing)
+                    continue
                 alert = AuthAlert(
                     batch_no=batch_no,
                     level=AlertLevel.WARNING,
-                    title=f"批次 {batch_no} 缺 {len(missing_auth)} 条授权期限",
+                    title=base_title,
                     reason=f"该批次有 {len(missing_auth)} 张票尚未补录授权期限页信息。",
                     missing_materials=["对应艺人的授权期限页扫描件/照片"],
                     next_step="请版权运营小鹿补充授权期限后重跑。",
@@ -302,13 +336,6 @@ class SettlementEngine:
                     trigger_remarks=[f"{t.ticket_no}: {t.audio_remark} (授权期限={t.auth_period})" for t in missing_auth]
                 )
                 alerts.append(alert)
-
-            if missing_auth and batch.status == BatchStatus.MIXED:
-                auth_alert = next((a for a in alerts if a.batch_no == batch_no), None)
-                if auth_alert:
-                    auth_alert.missing_materials.append(f"售票部分的授权期限页（缺 {len(missing_auth)} 条）")
-                    for t in missing_auth:
-                        auth_alert.trigger_remarks.append(f"{t.ticket_no}: 授权期限未补")
 
         run.alerts = alerts
 
@@ -413,12 +440,12 @@ class SettlementEngine:
         if field == "audio_remark":
             after_parts.append(f"  改后备注: {new_display}")
 
-        self._build_batches(run)
+        self._build_batches(run, preserve_existing=True)
         self._generate_alerts(run)
 
         affected = [f"票号 {ticket_no} 的 {field} 变更: {old_display} → {new_display}"]
         batch = run.batches.get(ticket.batch_no)
-        if batch and batch.status == BatchStatus.MIXED:
+        if batch and batch.status == BatchStatus.MIXED and batch.reviewer is None:
             affected.append(f"批次 {ticket.batch_no} 状态变为混批，需复核")
 
         self._log_action(
@@ -447,11 +474,13 @@ class SettlementEngine:
             source_files=list(parent_run.source_files),
             is_rerun=True,
             parent_run_id=parent_run.run_id,
-            tickets=copy.deepcopy(parent_run.tickets)
+            tickets=copy.deepcopy(parent_run.tickets),
+            batches=copy.deepcopy(parent_run.batches),
+            alerts=copy.deepcopy(parent_run.alerts)
         )
 
         self._current_run = new_run
-        self._build_batches(new_run)
+        self._build_batches(new_run, preserve_existing=True)
         self._generate_alerts(new_run)
 
         diffs = self._compare_runs(parent_run, new_run)
