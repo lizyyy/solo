@@ -169,13 +169,13 @@ class StationFlowProcessor:
             PathPoint(**point) for point in path_points
         ]
 
-        self._replay.record_path(
-            self._current_result.path_history,
-            self._current_result.result_id,
-            self._current_result.version
-        )
+        consistency_check = self._replay.check_history_consistency(self._current_result)
+
+        if not consistency_check.get("can_continue"):
+            raise ValueError(f"路径回放更新失败：{consistency_check.get('message', '未知错误')}")
 
         self._current_result.current_step = WorkflowStep.COMPLETED
+        self._current_result._last_replay_check = consistency_check
 
         if self._store:
             self._store.save_result(self._current_result)

@@ -1,0 +1,126 @@
+{
+  "result_id": "3eec5b76-ec4a-4e14-8302-2303b2a67002",
+  "station_name": "未命名站厅",
+  "hall_name": "站厅A-1号出入口（Z轴写反）",
+  "calculate_time": "2026-06-19T11:30:34.777937",
+  "bottleneck_location": "1号出入口通道",
+  "bottleneck_flow": 1980,
+  "capacity": 3300,
+  "utilization_rate": 0.6,
+  "cad_layer": {
+    "layer_id": "9f625e51-eb2b-478e-91f9-25b59221ccf5",
+    "layer_name": "站厅A-1号出入口（Z轴写反）",
+    "import_time": "2026-06-19T11:26:29.415220",
+    "z_direction": 1.0,
+    "points": [
+      {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      {
+        "x": 5.25,
+        "y": 0.0,
+        "z": 0.0
+      },
+      {
+        "x": 10.5,
+        "y": 0.0,
+        "z": 0.0
+      }
+    ],
+    "is_duplicate": false,
+    "source_file": "station_A_2025.dwg",
+    "import_batch": "batch_20260619"
+  },
+  "rangefinder_records": [
+    {
+      "record_id": "21c289cc-8941-4574-bb98-1daddfe46e71",
+      "measure_time": "2026-06-19T11:28:12.296854",
+      "z_direction": -1.0,
+      "distance": 15.0,
+      "measure_point": "1号出入口通道",
+      "operator": "小陶",
+      "is_supplement": false,
+      "notes": "与CAD标注距离差异较大，待核对"
+    },
+    {
+      "record_id": "be51d33f-ced4-4c60-a66d-17e661cd782d",
+      "measure_time": "2026-06-19T11:29:40.296964",
+      "z_direction": 1.0,
+      "distance": 18.0,
+      "measure_point": "1号出入口拐角处",
+      "operator": "小陶",
+      "is_supplement": true,
+      "notes": "补录：昨天漏测了拐角区域，现场重新测量"
+    }
+  ],
+  "conflicts": [],
+  "self_check_results": [
+    {
+      "check_name": "Z轴方向检查",
+      "passed": false,
+      "message": "Z轴方向可能写反了！CAD显示向下，按现场常规应该是向上。请留给现场班组复核。",
+      "details": {
+        "cad_z_value": -1.0,
+        "expected_direction": "向上",
+        "status": "pending_review"
+      }
+    },
+    {
+      "check_name": "重复导入检查",
+      "passed": true,
+      "message": "没有发现重复导入，没问题。",
+      "details": null
+    },
+    {
+      "check_name": "补录重算检查",
+      "passed": true,
+      "message": "补录数据已纳入计算。",
+      "details": null
+    },
+    {
+      "check_name": "补录重算检查",
+      "passed": false,
+      "message": "检测到1条补录数据，请重新计算客流瓶颈。",
+      "details": {
+        "supplement_count": 1
+      }
+    }
+  ],
+  "current_step": "completed",
+  "z_direction_status": "pending_review",
+  "path_history": [
+    {
+      "x": 0.0,
+      "y": 0.0,
+      "z": -1.0,
+      "timestamp": "2025-01-01T18:00:00",
+      "passenger_count": 85
+    },
+    {
+      "x": 3.5,
+      "y": 0.0,
+      "z": -1.0,
+      "timestamp": "2025-01-01T18:01:00",
+      "passenger_count": 112
+    },
+    {
+      "x": 7.0,
+      "y": 0.0,
+      "z": -1.0,
+      "timestamp": "2025-01-01T18:02:00",
+      "passenger_count": 98
+    },
+    {
+      "x": 10.5,
+      "y": 0.0,
+      "z": -1.0,
+      "timestamp": "2025-01-01T18:03:00",
+      "passenger_count": 76
+    }
+  ],
+  "is_supplemented": true,
+  "version": 2,
+  "operator": "小陶"
+}

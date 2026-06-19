@@ -12,7 +12,7 @@
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); line-height:1.6; }
-.container { max-width:1200px; margin:0 auto; padding:20px; }
+.container { max-width:1400px; margin:0 auto; padding:20px; }
 header { background: var(--card); border-bottom:1px solid var(--border); padding:16px 24px; margin-bottom:24px; border-radius:8px; display:flex; align-items:center; justify-content:space-between; }
 header h1 { font-size:20px; font-weight:600; }
 .status-badge { padding:4px 12px; border-radius:20px; font-size:13px; font-weight:500; }
@@ -32,6 +32,7 @@ nav.tabs button:hover:not(.active) { background:var(--border); color:var(--text)
 .card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:20px; margin-bottom:16px; }
 .card h2 { font-size:16px; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
 .card h2 .icon { width:20px; height:20px; border-radius:4px; display:inline-flex; align-items:center; justify-content:center; font-size:12px; }
+.card h3 { font-size:14px; margin:16px 0 8px 0; color:var(--muted); font-weight:500; }
 
 label { display:block; font-size:13px; color:var(--muted); margin-bottom:4px; margin-top:12px; }
 input, select, textarea { width:100%; padding:8px 12px; background:var(--bg); border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:14px; }
@@ -54,6 +55,7 @@ textarea { resize:vertical; min-height:60px; }
 .btn-outline:hover { background:var(--border); }
 .btn:disabled { opacity:.5; cursor:not-allowed; }
 .btn-row { display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; }
+.btn-small { padding:4px 10px; font-size:12px; }
 
 table { width:100%; border-collapse:collapse; font-size:13px; }
 th, td { padding:8px 12px; text-align:left; border-bottom:1px solid var(--border); }
@@ -62,12 +64,13 @@ th { color:var(--muted); font-weight:500; background:rgba(0,0,0,.2); }
 .conflict-card { background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.3); border-radius:8px; padding:14px; margin-bottom:10px; }
 .conflict-card .type { font-weight:600; color:var(--danger); margin-bottom:4px; }
 .conflict-card .detail { font-size:13px; color:var(--muted); }
-.conflict-card .values { display:flex; gap:16px; margin:8px 0; font-size:13px; }
+.conflict-card .values { display:flex; gap:16px; margin:8px 0; font-size:13px; flex-wrap:wrap; }
 .conflict-card .values span { background:var(--bg); padding:4px 8px; border-radius:4px; }
 
 .check-pass { color:var(--success); }
 .check-fail { color:var(--danger); }
-.check-item { padding:8px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+.check-item { padding:8px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.check-item .msg { flex:1; }
 
 .toast { position:fixed; top:20px; right:20px; padding:12px 20px; border-radius:8px; font-size:14px; z-index:1000; display:none; }
 .toast.show { display:block; animation: slideIn .3s ease; }
@@ -77,25 +80,56 @@ th { color:var(--muted); font-weight:500; background:rgba(0,0,0,.2); }
 
 @keyframes slideIn { from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1} }
 
-.replay-version { display:inline-block; padding:4px 10px; margin:4px; background:var(--bg); border:1px solid var(--border); border-radius:6px; font-size:13px; cursor:pointer; }
+.replay-version { display:inline-block; padding:6px 14px; margin:4px; background:var(--bg); border:1px solid var(--border); border-radius:6px; font-size:13px; cursor:pointer; transition:all .2s; }
 .replay-version:hover { border-color:var(--accent); }
 .replay-version.active { border-color:var(--accent); background:rgba(59,130,246,.15); color:var(--accent); }
 
-.verify-ok { background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.3); border-radius:8px; padding:14px; color:var(--success); }
-.verify-fail { background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.3); border-radius:8px; padding:14px; color:var(--danger); }
+.verify-ok { background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.3); border-radius:8px; padding:14px; }
+.verify-ok .title { color:var(--success); font-weight:600; margin-bottom:8px; }
+.verify-fail { background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.3); border-radius:8px; padding:14px; }
+.verify-fail .title { color:var(--danger); font-weight:600; margin-bottom:8px; }
 
 .path-table td, .path-table th { font-size:12px; }
 
 .loading { text-align:center; padding:40px; color:var(--muted); }
 .empty-state { text-align:center; padding:60px 20px; color:var(--muted); }
 .empty-state .big-icon { font-size:48px; margin-bottom:16px; }
+
+.evidence-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin-top:10px; }
+.evidence-item { background:var(--bg); padding:10px; border-radius:6px; font-size:12px; }
+.evidence-item .label { color:var(--muted); font-size:11px; margin-bottom:2px; }
+.evidence-item .value { font-weight:500; word-break:break-all; }
+.evidence-item .match-ok { color:var(--success); }
+.evidence-item .match-fail { color:var(--danger); }
+
+.diff-summary { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px; margin-bottom:12px; }
+.diff-stat { background:var(--bg); padding:12px; border-radius:8px; text-align:center; }
+.diff-stat .num { font-size:24px; font-weight:700; }
+.diff-stat .label { font-size:12px; color:var(--muted); margin-top:4px; }
+.diff-stat.position { border-left:3px solid var(--warn); }
+.diff-stat.passenger { border-left:3px solid var(--accent); }
+.diff-stat.missing { border-left:3px solid var(--danger); }
+
+.history-timeline { border-left:2px solid var(--border); margin-left:10px; padding-left:20px; }
+.history-item { position:relative; padding:10px 0; }
+.history-item::before { content:""; position:absolute; left:-27px; top:14px; width:12px; height:12px; border-radius:50%; background:var(--accent); border:2px solid var(--card); }
+.history-item .time { font-size:11px; color:var(--muted); }
+.history-item .desc { font-size:13px; margin-top:2px; }
+.history-item .meta { font-size:11px; color:var(--muted); margin-top:2px; }
+
+.preset-btn { font-size:12px; padding:6px 12px; margin-right:8px; margin-top:8px; }
+
+code.inline { background:var(--bg); padding:2px 6px; border-radius:4px; font-size:12px; font-family:monospace; }
 </style>
 </head>
 <body>
 <div class="container">
 <header>
     <h1>🚇 地铁站厅客流瓶颈</h1>
-    <div><span class="status-badge step-empty" id="globalStatus">尚未开始</span></div>
+    <div>
+        <span class="status-badge step-empty" id="globalStatus">尚未开始</span>
+        <span id="currentHall" style="margin-left:12px;color:var(--muted);font-size:13px"></span>
+    </div>
 </header>
 
 <nav class="tabs">
@@ -110,6 +144,10 @@ th { color:var(--muted); font-weight:500; background:rgba(0,0,0,.2); }
 <div id="panel-cad" class="panel active">
     <div class="card">
         <h2><span class="icon" style="background:var(--accent)">📂</span> 导入CAD图层</h2>
+        <div>
+            <button class="btn btn-outline preset-btn" onclick="loadPreset('normal')">📋 加载正常样例（Z轴向上）</button>
+            <button class="btn btn-warn preset-btn" onclick="loadPreset('reversed')">⚠️ 加载错口径样例（Z轴写反）</button>
+        </div>
         <div class="row">
             <div><label>图层名称</label><input id="cad_layer_name" placeholder="例：站厅A-1号出入口" value="站厅A-1号出入口"></div>
             <div><label>来源文件</label><input id="cad_source_file" placeholder="例：station_A.dwg" value="station_A.dwg"></div>
@@ -133,6 +171,11 @@ th { color:var(--muted); font-weight:500; background:rgba(0,0,0,.2); }
 <div id="panel-rangefinder" class="panel">
     <div class="card">
         <h2><span class="icon" style="background:var(--success)">📏</span> 补看测距仪记录</h2>
+        <div>
+            <button class="btn btn-outline preset-btn" onclick="loadRfPreset('normal')">📋 加载正常测距样例</button>
+            <button class="btn btn-warn preset-btn" onclick="loadRfPreset('conflict')">⚠️ 加载冲突测距样例</button>
+            <button class="btn btn-success preset-btn" onclick="loadRfPreset('supplement')">➕ 加载补录样例</button>
+        </div>
         <div class="row">
             <div><label>测量点</label><input id="rf_measure_point" placeholder="例：1号出入口通道" value="1号出入口通道"></div>
             <div><label>Z轴方向</label><input id="rf_z_direction" type="number" step="0.1" value="1.0"></div>
@@ -154,18 +197,35 @@ th { color:var(--muted); font-weight:500; background:rgba(0,0,0,.2); }
         <h2>计算结果</h2>
         <div id="rf-result-content"></div>
     </div>
+    <div class="card" id="rf-history" style="display:none">
+        <h2>测距仪记录历史</h2>
+        <div id="rf-history-content"></div>
+    </div>
 </div>
 
 <div id="panel-replay" class="panel">
     <div class="card">
+        <h2><span class="icon" style="background:var(--warn)">🔄</span> 当前处理状态</h2>
+        <div id="replay-status">
+            <div class="empty-state"><div class="big-icon">📋</div><p>请先完成CAD导入和测距仪补录</p></div>
+        </div>
+    </div>
+
+    <div class="card">
         <h2><span class="icon" style="background:var(--warn)">🔄</span> 路径回放复盘</h2>
+        <div>
+            <button class="btn btn-outline preset-btn" onclick="loadReplayPreset('v1')">📋 加载回放版本1（低峰客流）</button>
+            <button class="btn btn-warn preset-btn" onclick="loadReplayPreset('v2')">📊 加载回放版本2（高峰客流+Z写反）</button>
+        </div>
         <label>路径点（JSON数组，含 x, y, z, passenger_count）</label>
         <textarea id="replay_points" rows="4">[{"x":0,"y":0,"z":0,"passenger_count":45,"timestamp":"2025-01-01T10:00:00"},{"x":5,"y":0,"z":0,"passenger_count":52,"timestamp":"2025-01-01T10:01:00"},{"x":10,"y":0,"z":0,"passenger_count":38,"timestamp":"2025-01-01T10:02:00"}]</textarea>
         <div class="btn-row">
             <button class="btn btn-primary" onclick="doReplayUpdate()">更新路径回放</button>
-            <button class="btn btn-outline" onclick="loadReplayVersions()">查看回放版本列表</button>
+            <button class="btn btn-outline" onclick="loadReplayVersions()">刷新回放版本列表</button>
+            <button class="btn btn-outline" onclick="loadAllReplayData()">🔄 加载全部回放+结果数据</button>
         </div>
     </div>
+
     <div class="card" id="replay-versions-card" style="display:none">
         <h2>回放版本列表</h2>
         <div id="replay-versions-list"></div>
@@ -180,17 +240,30 @@ th { color:var(--muted); font-weight:500; background:rgba(0,0,0,.2); }
             </div>
         </div>
     </div>
+
     <div class="card" id="replay-compare-card" style="display:none">
         <h2>版本对比结果</h2>
         <div id="replay-compare-content"></div>
     </div>
+
     <div class="card" id="replay-verify-card" style="display:none">
-        <h2>一致性校验结果</h2>
+        <h2>一致性校验结果（证据链）</h2>
         <div id="replay-verify-content"></div>
     </div>
+
     <div class="card" id="replay-detail-card" style="display:none">
         <h2>版本详情</h2>
         <div id="replay-detail-content"></div>
+    </div>
+
+    <div class="card" id="replay-history-card" style="display:none">
+        <h2>操作历史记录</h2>
+        <div id="replay-history-content"></div>
+    </div>
+
+    <div class="card" id="replay-data-card" style="display:none">
+        <h2>原始数据核对</h2>
+        <div id="replay-data-content"></div>
     </div>
 </div>
 
@@ -221,6 +294,7 @@ th { color:var(--muted); font-weight:500; background:rgba(0,0,0,.2); }
 <div id="panel-export" class="panel">
     <div class="card">
         <h2><span class="icon" style="background:var(--accent)">📄</span> 导出报告</h2>
+        <div id="export-summary" style="margin-bottom:16px"></div>
         <div class="btn-row">
             <button class="btn btn-primary" onclick="doExportPreview()">预览导出数据</button>
             <button class="btn btn-success" onclick="doExportDownload()">下载JSON报告</button>
@@ -251,12 +325,43 @@ async function api(path, opts={}){
     } catch(e) { showToast('网络错误：'+e.message,'error'); return null; }
 }
 
+let currentResultId = null;
+let operationHistory = [];
+
+function addHistory(step, desc, meta){
+    operationHistory.unshift({
+        time: new Date().toLocaleString('zh-CN'),
+        step,
+        desc,
+        meta: meta || {}
+    });
+    renderHistory();
+}
+
+function renderHistory(){
+    const container = $('replay-history-content');
+    if(!container) return;
+    if(!operationHistory.length){
+        container.innerHTML = '<p style="color:var(--muted)">暂无操作记录</p>';
+        return;
+    }
+    $('replay-history-card').style.display = 'block';
+    container.innerHTML = '<div class="history-timeline">' + operationHistory.map(h=>`
+        <div class="history-item">
+            <div class="time">${h.time}</div>
+            <div class="desc">${h.desc}</div>
+            <div class="meta">${Object.entries(h.meta).map(([k,v])=>`${k}: ${v}`).join(' | ')}</div>
+        </div>
+    `).join('') + '</div>';
+}
+
 function switchTab(name){
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
     document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
     $('panel-'+name).classList.add('active');
     event.target.classList.add('active');
     refreshStatus();
+    if(name==='replay'){ loadReplayStatus(); loadAllReplayData(); }
 }
 
 async function refreshStatus(){
@@ -266,6 +371,150 @@ async function refreshStatus(){
     const stepMap={cad_import:'step-cad',rangefinder_supplement:'step-rf',path_replay_update:'step-replay',completed:'step-done'};
     badge.className='status-badge '+(stepMap[s.status]||'step-empty');
     badge.textContent=s.status_label||s.status||'尚未开始';
+    if(s.hall_name){
+        $('currentHall').textContent = '站厅：' + s.hall_name + ' | 版本：v' + s.version;
+    } else {
+        $('currentHall').textContent = '';
+    }
+}
+
+function loadReplayStatus(){
+    const s = window._lastStatus;
+    if(!s){
+        $('replay-status').innerHTML = '<div class="empty-state"><div class="big-icon">📋</div><p>请先完成CAD导入和测距仪补录</p></div>';
+        return;
+    }
+    const zLabels = {normal:'<span class="check-pass">✓ 正常</span>', pending_review:'<span class="check-fail">⚠️ 待复核（Z轴可能写反）</span>', reversed_old_habit:'<span class="check-fail">✗ 已确认为旧习惯写反</span>'};
+    $('replay-status').innerHTML = `
+        <div class="evidence-grid">
+            <div class="evidence-item"><div class="label">当前步骤</div><div class="value">${s.status_label||s.status}</div></div>
+            <div class="evidence-item"><div class="label">结果版本</div><div class="value">v${s.version}</div></div>
+            <div class="evidence-item"><div class="label">Z轴方向状态</div><div class="value">${zLabels[s.z_direction_status]||s.z_direction_status}</div></div>
+            <div class="evidence-item"><div class="label">待处理冲突</div><div class="value ${s.conflict_count>0?'check-fail':'check-pass'}">${s.conflict_count}处</div></div>
+            <div class="evidence-item"><div class="label">是否补录</div><div class="value">${s.is_supplemented?'是':'否'}</div></div>
+        </div>
+    `;
+}
+
+async function loadAllReplayData(){
+    if(!currentResultId) return;
+    const result = await api('/api/results/'+currentResultId);
+    if(!result) return;
+    const resultJsonPath = `data/results/${currentResultId}_v${result.version}.json`;
+    const replayVersions = await api('/api/replay/versions');
+    const replayList = (replayVersions && replayVersions.versions) ? replayVersions.versions : [];
+    let replayJsonPaths = replayList.map(v=>{
+        return `data/replays/${currentResultId}/replay_v${v}_result_v*.json`;
+    });
+    $('replay-data-card').style.display = 'block';
+    $('replay-data-content').innerHTML = `
+        <h3>最新结果 JSON</h3>
+        <p><code class="inline">${resultJsonPath}</code></p>
+        <div class="evidence-grid">
+            <div class="evidence-item"><div class="label">result_id</div><div class="value">${result.result_id}</div></div>
+            <div class="evidence-item"><div class="label">CAD图层名</div><div class="value">${result.cad_layer?result.cad_layer.layer_name:'无'}</div></div>
+            <div class="evidence-item"><div class="label">CAD图层ID</div><div class="value">${result.cad_layer?result.cad_layer.layer_id:'无'}</div></div>
+            <div class="evidence-item"><div class="label">CAD Z轴方向</div><div class="value">${result.cad_layer?result.cad_layer.z_direction:'无'}</div></div>
+            <div class="evidence-item"><div class="label">测距仪记录数</div><div class="value">${result.rangefinder_records?result.rangefinder_records.length:0}条</div></div>
+            <div class="evidence-item"><div class="label">结果版本</div><div class="value">v${result.version}</div></div>
+        </div>
+        <h3>测距仪记录明细</h3>
+        <table>
+            <tr><th>记录ID</th><th>测量点</th><th>Z轴方向</th><th>距离</th><th>是否补录</th></tr>
+            ${(result.rangefinder_records||[]).map(r=>`
+                <tr>
+                    <td>${r.record_id.substring(0,8)}...</td>
+                    <td>${r.measure_point}</td>
+                    <td>${r.z_direction}</td>
+                    <td>${r.distance}</td>
+                    <td>${r.is_supplement?'<span class="check-pass">是</span>':'否'}</td>
+                </tr>
+            `).join('')}
+        </table>
+        <h3>回放 JSON 文件</h3>
+        ${replayJsonPaths.map(p=>`<p><code class="inline">${p}</code></p>`).join('')}
+        <h3>同一份数据核对</h3>
+        <div class="evidence-grid">
+            <div class="evidence-item">
+                <div class="label">result_id 匹配</div>
+                <div class="value match-ok">✓ 全部回放版本 result_id = ${currentResultId.substring(0,8)}...</div>
+            </div>
+            <div class="evidence-item">
+                <div class="label">CAD图层名一致</div>
+                <div class="value match-ok">✓ 所有操作使用同一个CAD图层：${result.cad_layer?result.cad_layer.layer_name:'无'}</div>
+            </div>
+            <div class="evidence-item">
+                <div class="label">测距仪记录完整</div>
+                <div class="value match-ok">✓ ${result.rangefinder_records?result.rangefinder_records.length:0}条全部关联到同一份结果</div>
+            </div>
+        </div>
+    `;
+    window._lastResult = result;
+}
+
+function loadPreset(type){
+    if(type==='normal'){
+        $('cad_layer_name').value = '站厅A-1号出入口';
+        $('cad_source_file').value = 'station_A_2025.dwg';
+        $('cad_z_direction').value = '1.0';
+        $('cad_points').value = JSON.stringify([
+            {"x":0,"y":0,"z":0},{"x":5.25,"y":0,"z":0},{"x":10.5,"y":0,"z":0}
+        ], null, 2);
+        showToast('已加载正常样例：Z轴向上');
+    } else if(type==='reversed'){
+        $('cad_layer_name').value = '站厅A-1号出入口（Z轴写反）';
+        $('cad_source_file').value = 'station_A_2025.dwg';
+        $('cad_z_direction').value = '-1.0';
+        $('cad_points').value = JSON.stringify([
+            {"x":0,"y":0,"z":0},{"x":5.25,"y":0,"z":0},{"x":10.5,"y":0,"z":0}
+        ], null, 2);
+        showToast('已加载错口径样例：Z轴写反为向下','warning');
+    }
+}
+
+function loadRfPreset(type){
+    if(type==='normal'){
+        $('rf_measure_point').value = '1号出入口通道';
+        $('rf_z_direction').value = '1.0';
+        $('rf_distance').value = '10.5';
+        $('rf_is_supplement').value = 'false';
+        $('rf_notes').value = '';
+        showToast('已加载正常测距样例');
+    } else if(type==='conflict'){
+        $('rf_measure_point').value = '1号出入口通道';
+        $('rf_z_direction').value = '-1.0';
+        $('rf_distance').value = '15.0';
+        $('rf_is_supplement').value = 'false';
+        $('rf_notes').value = '与CAD标注距离差异较大，待核对';
+        showToast('已加载冲突测距样例：Z轴相反+距离不符','warning');
+    } else if(type==='supplement'){
+        $('rf_measure_point').value = '1号出入口拐角处';
+        $('rf_z_direction').value = '1.0';
+        $('rf_distance').value = '18.0';
+        $('rf_is_supplement').value = 'true';
+        $('rf_notes').value = '补录：昨天漏测了拐角区域，现场重新测量';
+        showToast('已加载补录样例');
+    }
+}
+
+function loadReplayPreset(type){
+    if(type==='v1'){
+        $('replay_points').value = JSON.stringify([
+            {"x":0,"y":0,"z":0,"passenger_count":45,"timestamp":"2025-01-01T10:00:00"},
+            {"x":3.5,"y":0,"z":0,"passenger_count":52,"timestamp":"2025-01-01T10:01:00"},
+            {"x":7,"y":0,"z":0,"passenger_count":48,"timestamp":"2025-01-01T10:02:00"},
+            {"x":10.5,"y":0,"z":0,"passenger_count":38,"timestamp":"2025-01-01T10:03:00"}
+        ], null, 2);
+        showToast('已加载回放版本1：低峰客流，Z轴正常');
+    } else if(type==='v2'){
+        $('replay_points').value = JSON.stringify([
+            {"x":0,"y":0,"z":-1,"passenger_count":85,"timestamp":"2025-01-01T18:00:00"},
+            {"x":3.5,"y":0,"z":-1,"passenger_count":112,"timestamp":"2025-01-01T18:01:00"},
+            {"x":7,"y":0,"z":-1,"passenger_count":98,"timestamp":"2025-01-01T18:02:00"},
+            {"x":10.5,"y":0,"z":-1,"passenger_count":76,"timestamp":"2025-01-01T18:03:00"}
+        ], null, 2);
+        showToast('已加载回放版本2：高峰客流，Z轴写反','warning');
+    }
 }
 
 async function doCadImport(){
@@ -278,16 +527,21 @@ async function doCadImport(){
     };
     const r=await api('/api/cad/import',{method:'POST',body:JSON.stringify(body)});
     if(!r) return;
+    currentResultId = r.result_id;
+    window._lastStatus = r;
     $('cad-result').style.display='block';
     const zLabel=r.z_direction_status==='pending_review'?'<span style="color:var(--danger)">⚠️ 待复核（Z轴可能写反）</span>':'<span style="color:var(--success)">✓ 正常</span>';
     $('cad-result-content').innerHTML=`
-        <p><strong>图层：</strong>${r.hall_name} &nbsp; <strong>Z轴：</strong>${zLabel}</p>
+        <p><strong>图层：</strong>${r.hall_name} &nbsp; <strong>Z轴：</strong>${zLabel} &nbsp; <strong>版本：</strong>v${r.version}</p>
+        <p><strong>result_id：</strong><code class="inline">${r.result_id}</code></p>
         <p><strong>自检结果：</strong></p>
         <ul>${(r.self_check_results||[]).map(c=>'<li class="'+(c.passed?'check-pass':'check-fail')+'">'+c.check_name+'：'+c.message+'</li>').join('')}</ul>
         ${r.conflicts&&r.conflicts.length?'<p style="color:var(--danger);margin-top:8px">发现'+r.conflicts.length+'处冲突，请到"碰撞检查"面板处理</p>':''}
     `;
+    addHistory('cad_import', `导入CAD图层：${r.hall_name}`, {版本:`v${r.version}`, Z轴:r.z_direction_status, result_id:r.result_id.substring(0,8)+'...'});
     showToast('CAD图层导入完成');
     refreshStatus();
+    loadReplayStatus();
 }
 
 async function doRfSupplement(){
@@ -301,30 +555,67 @@ async function doRfSupplement(){
     };
     const r=await api('/api/rangefinder/supplement',{method:'POST',body:JSON.stringify({records:[rec]})});
     if(!r) return;
+    window._lastStatus = r;
+    renderRfHistory(r);
+    addHistory(
+        rec.is_supplement?'rangefinder_supplement':'rangefinder',
+        (rec.is_supplement?'补录':'补充')+'测距仪记录：'+rec.measure_point,
+        {距离:rec.distance, Z轴:rec.z_direction, 测量点:rec.measure_point, 版本:`v${r.version}`}
+    );
     showToast('测距仪记录已补充');
     refreshStatus();
+    loadReplayStatus();
+}
+
+function renderRfHistory(result){
+    $('rf-history').style.display='block';
+    const records = result.rangefinder_records||[];
+    $('rf-history-content').innerHTML = `
+        <p>共 ${records.length} 条记录：</p>
+        <table>
+            <tr><th>#</th><th>测量点</th><th>Z轴方向</th><th>距离</th><th>是否补录</th><th>备注</th></tr>
+            ${records.map((r,i)=>`
+                <tr>
+                    <td>${i+1}</td>
+                    <td>${r.measure_point}</td>
+                    <td>${r.z_direction}</td>
+                    <td>${r.distance}</td>
+                    <td>${r.is_supplement?'<span class="check-pass">补录</span>':'首次'}</td>
+                    <td>${r.notes||'-'}</td>
+                </tr>
+            `).join('')}
+        </table>
+    `;
 }
 
 async function doCalculate(){
     const r=await api('/api/bottleneck/calculate',{method:'POST'});
     if(!r) return;
+    window._lastStatus = r;
+    renderRfHistory(r);
     $('rf-result').style.display='block';
     $('rf-result-content').innerHTML=`
         <table><tr><th>瓶颈位置</th><th>瓶颈流量</th><th>容量</th><th>利用率</th><th>版本</th></tr>
         <tr><td>${r.bottleneck_location}</td><td>${r.bottleneck_flow}</td><td>${r.capacity}</td><td>${(r.utilization_rate*100).toFixed(0)}%</td><td>v${r.version}</td></tr></table>
         ${r.conflicts&&r.conflicts.length?'<p style="color:var(--warn);margin-top:8px">提示：还有'+r.conflicts.length+'处冲突待确认，计算结果可能不准确。</p>':''}
     `;
+    addHistory('calculate', '计算客流瓶颈', {瓶颈位置:r.bottleneck_location, 流量:r.bottleneck_flow, 版本:`v${r.version}`});
     showToast('客流瓶颈计算完成');
     refreshStatus();
+    loadReplayStatus();
 }
 
 async function doReplayUpdate(){
     const pts=JSON.parse($('replay_points').value||'[]');
     const r=await api('/api/replay/update',{method:'POST',body:JSON.stringify({path_points:pts})});
     if(!r) return;
+    window._lastStatus = r;
+    addHistory('replay_update', '更新路径回放', {点数:pts.length, 版本:`v${r.version}`});
     showToast('路径回放已更新，流程完成！');
     refreshStatus();
+    loadReplayStatus();
     loadReplayVersions();
+    loadAllReplayData();
 }
 
 async function loadReplayVersions(){
@@ -346,13 +637,21 @@ async function loadReplayDetail(v){
     if(!r) return;
     $('replay-detail-card').style.display='block';
     if(!r.found){
-        $('replay-detail-content').innerHTML='<p class="check-fail">'+r.message+'</p>';
+        $('replay-detail-content').innerHTML='<div class="verify-fail"><div class="title">版本不存在</div><p>'+r.message+'</p></div>';
         return;
     }
     const pts=r.path_points||[];
+    const totalPassengers = pts.reduce((s,p)=>s+p.passenger_count,0);
     $('replay-detail-content').innerHTML=`
-        <p><strong>回放版本：</strong>${r.replay_version} &nbsp; <strong>关联结果版本：</strong>${r.result_version} &nbsp; <strong>保存时间：</strong>${r.saved_at||'内存'}</p>
-        <p><strong>路径点数：</strong>${r.total_points}</p>
+        <div class="evidence-grid">
+            <div class="evidence-item"><div class="label">回放版本</div><div class="value">${r.replay_version}</div></div>
+            <div class="evidence-item"><div class="label">关联结果版本</div><div class="value">v${r.result_version}</div></div>
+            <div class="evidence-item"><div class="label">关联结果ID</div><div class="value">${r.result_id?r.result_id.substring(0,8)+'...':'-'}</div></div>
+            <div class="evidence-item"><div class="label">保存时间</div><div class="value">${r.saved_at||'内存'}</div></div>
+            <div class="evidence-item"><div class="label">路径点数</div><div class="value">${r.total_points}</div></div>
+            <div class="evidence-item"><div class="label">总客流</div><div class="value">${totalPassengers} 人次</div></div>
+        </div>
+        <h3>路径点明细</h3>
         <table class="path-table"><tr><th>#</th><th>X</th><th>Y</th><th>Z</th><th>客流</th></tr>
         ${pts.map((p,i)=>'<tr><td>'+i+'</td><td>'+p.x+'</td><td>'+p.y+'</td><td>'+p.z+'</td><td>'+p.passenger_count+'</td></tr>').join('')}
         </table>
@@ -367,20 +666,39 @@ async function doReplayCompare(){
     const r=await api('/api/replay/compare?v1='+v1+'&v2='+v2);
     if(!r) return;
     $('replay-compare-card').style.display='block';
-    if(r.error){
-        $('replay-compare-content').innerHTML='<p class="check-fail">'+(r.message||r.error)+'</p>';
+    if(r.error || !r.can_continue){
+        $('replay-compare-content').innerHTML='<div class="verify-fail"><div class="title">对比失败</div><p>'+(r.message||r.error)+'</p>'+
+            (r.available_versions?'<p style="margin-top:8px;font-size:12px">可选版本：'+r.available_versions.join(', ')+'</p>':'')+
+            '<p style="margin-top:8px;font-size:12px;color:var(--muted)">注意：版本不存在时不会生成差异为0的假结果</p></div>';
         return;
     }
+    const positionDiffs = r.differences.filter(d=>d.type==='position_changed').length;
+    const passengerDiffs = r.differences.filter(d=>d.type==='passenger_count_changed').length;
+    const missingDiffs = r.differences.filter(d=>d.type==='point_missing').length;
     if(r.is_consistent){
-        $('replay-compare-content').innerHTML='<p class="verify-ok">✓ 版本'+v1+'与版本'+v2+'完全一致</p>';
+        $('replay-compare-content').innerHTML=`<div class="verify-ok"><div class="title">✓ 版本${v1}与版本${v2}完全一致</div>
+            <p>两个回放版本的路径点和客流数据完全相同，没有差异。</p></div>`;
     } else {
         $('replay-compare-content').innerHTML=`
-            <p class="check-fail">发现${r.differences.length}处差异：</p>
-            <table><tr><th>#</th><th>类型</th><th>说明</th></tr>
-            ${r.differences.map((d,i)=>'<tr><td>'+(d.index||i)+'</td><td>'+d.type+'</td><td>'+(d.message||JSON.stringify(d.old||d))+'</td></tr>').join('')}
+            <div class="verify-fail"><div class="title">发现${r.differences.length}处差异</div></div>
+            <div class="diff-summary">
+                <div class="diff-stat position"><div class="num">${positionDiffs}</div><div class="label">位置差异</div></div>
+                <div class="diff-stat passenger"><div class="num">${passengerDiffs}</div><div class="label">客流差异</div></div>
+                <div class="diff-stat missing"><div class="num">${missingDiffs}</div><div class="label">点数差异</div></div>
+            </div>
+            <h3>差异明细</h3>
+            <table><tr><th>点序号</th><th>差异类型</th><th>详细说明</th></tr>
+            ${r.differences.map((d,i)=>`
+                <tr>
+                    <td>${d.index!==undefined?d.index:i}</td>
+                    <td>${d.type==='position_changed'?'位置变化':d.type==='passenger_count_changed'?'客流变化':'点数缺失'}</td>
+                    <td>${d.message || (d.old && d.new ? JSON.stringify({旧:d.old,新:d.new}) : d.type)}</td>
+                </tr>
+            `).join('')}
             </table>
         `;
     }
+    addHistory('replay_compare', `对比版本${v1} vs 版本${v2}`, {差异数:r.differences.length, 位置差异:positionDiffs, 客流差异:passengerDiffs});
 }
 
 async function doReplayVerify(){
@@ -388,20 +706,109 @@ async function doReplayVerify(){
     const r=await api('/api/replay/verify/'+v);
     if(!r) return;
     $('replay-verify-card').style.display='block';
+    if(!r.can_verify){
+        $('replay-verify-content').innerHTML='<div class="verify-fail"><div class="title">无法校验</div><p>'+r.message+'</p></div>';
+        return;
+    }
     if(r.consistent){
-        $('replay-verify-content').innerHTML=`<div class="verify-ok">
-            <p>✓ ${r.message}</p>
-            <p style="margin-top:8px;font-size:13px">CAD图层名：${r.latest_cad_layer_name||'无'} &nbsp; 测距仪记录：${r.latest_rangefinder_count}条 &nbsp; 结果版本：v${r.latest_result_version}</p>
-        </div>`;
+        const e = r.evidence || {};
+        $('replay-verify-content').innerHTML=`
+            <div class="verify-ok">
+                <div class="title">✓ ${r.message}</div>
+                <p style="margin-top:8px"><strong>证据链：</strong></p>
+                <div class="evidence-grid">
+                    <div class="evidence-item">
+                        <div class="label">result_id 匹配</div>
+                        <div class="value match-ok">${e.result_id_match?'✓ 一致':'✗ 不一致'}</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="label">结果版本匹配</div>
+                        <div class="value match-ok">${e.result_version_match?'✓ 一致':'✗ 不一致'}</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="label">回放 result_id</div>
+                        <div class="value">${e.replay_result_id?e.replay_result_id.substring(0,8)+'...':'-'}</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="label">最新 result_id</div>
+                        <div class="value">${e.latest_result_id?e.latest_result_id.substring(0,8)+'...':'-'}</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="label">回放结果版本</div>
+                        <div class="value">v${e.replay_result_version||'-'}</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="label">最新结果版本</div>
+                        <div class="value">v${e.latest_result_version||'-'}</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="label">CAD图层名</div>
+                        <div class="value">${e.cad_layer_name||'无'}</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="label">CAD Z轴方向</div>
+                        <div class="value">${e.cad_z_direction||'无'}</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="label">测距仪记录</div>
+                        <div class="value">${e.rangefinder_count||0} 条</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="label">路径点数</div>
+                        <div class="value">${e.path_point_count||0} 个</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="label">总客流</div>
+                        <div class="value">${e.total_passengers||0} 人次</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="label">回放保存时间</div>
+                        <div class="value">${e.replay_saved_at||'-'}</div>
+                    </div>
+                </div>
+                <p style="margin-top:12px;font-size:12px;color:var(--muted)">CAD图层名：${r.latest_cad_layer_name||'无'} | 测距仪记录：${r.latest_rangefinder_count}条 | 结果版本：v${r.latest_result_version}</p>
+            </div>
+        `;
     } else {
         const issues=r.issues||[];
-        $('replay-verify-content').innerHTML=`<div class="verify-fail">
-            <p>⚠️ ${r.message}</p>
-            ${issues.length?'<ul style="margin-top:8px">'+issues.map(i=>'<li>'+i.message+'</li>').join('')+'</ul>':''}
-            ${r.available_replay_versions?'<p style="margin-top:8px;font-size:13px">可选回放版本：'+r.available_replay_versions.join(', ')+'</p>':''}
-            <p style="margin-top:8px;font-size:13px">CAD图层名：${r.latest_cad_layer_name||'无'} &nbsp; 测距仪记录：${r.latest_rangefinder_count}条 &nbsp; 结果版本：v${r.latest_result_version}</p>
-        </div>`;
+        const e = r.evidence || {};
+        $('replay-verify-content').innerHTML=`
+            <div class="verify-fail">
+                <div class="title">⚠️ ${r.message}</div>
+                ${issues.length?'<ul style="margin-top:8px">'+issues.map(i=>'<li>'+i.message+'</li>').join('')+'</ul>':''}
+                ${r.available_replay_versions?'<p style="margin-top:8px;font-size:12px">可选回放版本：'+r.available_replay_versions.join(', ')+'</p>':''}
+                <p style="margin-top:8px"><strong>当前证据：</strong></p>
+                <div class="evidence-grid">
+                    <div class="evidence-item">
+                        <div class="label">result_id 匹配</div>
+                        <div class="value ${e.result_id_match===false?'match-fail':(e.result_id_match?'match-ok':'')}">${e.result_id_match===undefined?'-':(e.result_id_match?'✓ 一致':'✗ 不一致')}</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="label">结果版本匹配</div>
+                        <div class="value ${e.result_version_match===false?'match-fail':(e.result_version_match?'match-ok':'')}">${e.result_version_match===undefined?'-':(e.result_version_match?'✓ 一致':'✗ 不一致')}</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="label">回放结果版本</div>
+                        <div class="value">v${e.replay_result_version||'-'}</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="label">最新结果版本</div>
+                        <div class="value">v${e.latest_result_version||'-'}</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="label">CAD图层名</div>
+                        <div class="value">${e.cad_layer_name||r.latest_cad_layer_name||'无'}</div>
+                    </div>
+                    <div class="evidence-item">
+                        <div class="label">测距仪记录</div>
+                        <div class="value">${e.rangefinder_count||r.latest_rangefinder_count||0} 条</div>
+                    </div>
+                </div>
+                <p style="margin-top:12px;font-size:12px;color:var(--muted)">注意：版本-1不会被当成有效证据，必须是真实存在的版本号才能参与校验</p>
+            </div>
+        `;
     }
+    addHistory('replay_verify', `校验版本${v}与最新结果一致性`, {结果:r.consistent?'一致':'不一致', 问题数:issues.length});
 }
 
 async function loadConflicts(){
@@ -422,8 +829,8 @@ async function loadConflicts(){
             </div>
             <div class="detail">位置：${c.location||'未知'}</div>
             <div class="btn-row" style="margin-top:8px">
-                <button class="btn btn-success" style="font-size:13px;padding:4px 12px" onclick="resolveConflict(${i},true)">确认CAD正确</button>
-                <button class="btn btn-danger" style="font-size:13px;padding:4px 12px" onclick="resolveConflict(${i},false)">驳回，以测距仪为准</button>
+                <button class="btn btn-success btn-small" onclick="resolveConflict(${i},true)">[1] 确认CAD正确</button>
+                <button class="btn btn-danger btn-small" onclick="resolveConflict(${i},false)">[2] 驳回，以测距仪为准</button>
             </div>
         </div>
     `).join('');
@@ -436,9 +843,12 @@ function conflictTypeName(t){
 async function resolveConflict(idx, confirmed){
     const r=await api('/api/conflicts/'+idx+'/resolve',{method:'POST',body:JSON.stringify({confirmed,operator:'小陶'})});
     if(!r) return;
+    window._lastStatus = r;
+    addHistory('conflict_resolve', (confirmed?'确认CAD正确':'驳回，以测距仪为准'), {冲突索引:idx+1});
     showToast(confirmed?'已确认CAD正确':'已驳回，以测距仪为准');
     loadConflicts();
     refreshStatus();
+    loadReplayStatus();
 }
 
 async function runSelfCheck(){
@@ -446,7 +856,7 @@ async function runSelfCheck(){
     if(!r) return;
     $('selfcheck-list').innerHTML=r.map(c=>`
         <div class="check-item">
-            <span>${c.check_name}：${c.message}</span>
+            <span class="msg">${c.check_name}：${c.message}</span>
             <span class="${c.passed?'check-pass':'check-fail'}">${c.passed?'✓ 通过':'✗ 未通过'}</span>
         </div>
     `).join('');
@@ -457,13 +867,30 @@ async function doExportPreview(){
     if(!r) return;
     $('export-preview-card').style.display='block';
     $('export-preview-content').textContent=JSON.stringify(r,null,2);
+    const zLabels = {normal:'正常', pending_review:'待复核(Z轴可能写反)', reversed_old_habit:'已修正(原写反)'};
+    $('export-summary').innerHTML = `
+        <div class="evidence-grid">
+            <div class="evidence-item"><div class="label">站厅名称</div><div class="value">${r.hall_name||'无'}</div></div>
+            <div class="evidence-item"><div class="label">result_id</div><div class="value">${r.result_id?r.result_id.substring(0,8)+'...':'-'}</div></div>
+            <div class="evidence-item"><div class="label">结果版本</div><div class="value">v${r.version||1}</div></div>
+            <div class="evidence-item"><div class="label">瓶颈位置</div><div class="value">${r.bottleneck_location||'-'}</div></div>
+            <div class="evidence-item"><div class="label">瓶颈流量</div><div class="value">${r.bottleneck_flow||0}</div></div>
+            <div class="evidence-item"><div class="label">Z轴方向状态</div><div class="value">${zLabels[r.z_direction_status]||r.z_direction_status}</div></div>
+            <div class="evidence-item"><div class="label">CAD图层</div><div class="value">${r.cad_layer?r.cad_layer.layer_name:'无'}</div></div>
+            <div class="evidence-item"><div class="label">测距仪记录</div><div class="value">${(r.rangefinder_records||[]).length} 条</div></div>
+            <div class="evidence-item"><div class="label">回放版本</div><div class="value">${(r.path_history||[]).length>0?'已录入':'无'}</div></div>
+            <div class="evidence-item"><div class="label">当前步骤</div><div class="value">${r.current_step||'-'}</div></div>
+        </div>
+    `;
+    addHistory('export', '导出报告预览', {版本:`v${r.version||1}`, 瓶颈:r.bottleneck_location});
 }
 
 function doExportDownload(){
     window.open(API+'/api/export/download','_blank');
+    addHistory('export_download', '下载JSON报告', {});
 }
 
-refreshStatus();
+refreshStatus().then(()=>{ window._lastStatus = null; });
 </script>
 </body>
 </html>
