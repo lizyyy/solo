@@ -32,6 +32,37 @@ class RecordProcessor:
         )
         self.logs.append(log)
 
+    @staticmethod
+    def _get_current_next_handler(record: PredictionRecord) -> str:
+        if record.state_history:
+            for sc in reversed(record.state_history):
+                if sc.next_handler:
+                    return sc.next_handler
+        if record.review_info and record.review_info.next_handler:
+            return record.review_info.next_handler
+        return ""
+
+    def _append_flow_milestone(self, record: PredictionRecord, operator: str,
+                               reason: str, next_handler: str,
+                               original_value: float = None,
+                               new_value: float = None):
+        change = StatusChange(
+            from_status=record.status.value,
+            to_status=record.status.value,
+            operator=operator,
+            reason=reason,
+            original_value=original_value,
+            new_value=new_value,
+            next_handler=next_handler
+        )
+        record.record_status_change(change)
+        self._log_action(
+            record.record_id,
+            "FLOW_MILESTONE",
+            operator,
+            {"reason": reason, "next_handler": next_handler}
+        )
+
     def _change_status(self, record: PredictionRecord, to_status: RecordStatus,
                        operator: str, reason: str,
                        original_value: float = None, new_value: float = None,
@@ -313,7 +344,8 @@ class RecordProcessor:
                         new_value=conflict.parameter_value,
                         next_handler="数据组更新参数版本页"
                     )
-                    record.notes = (f"运营规划{operator}确认：采用参数值{conflict.parameter_value}，"
+                    old_note = (record.notes + " | ") if record.notes else ""
+                    record.notes = (f"{old_note}运营规划{operator}确认：采用参数值{conflict.parameter_value}，"
                                     f"驳回手算反例{conflict.hand_calc_id}的{conflict.hand_calc_value}。"
                                     f"理由：{resolve_reason or '参数值更符合最新泊松模型校准结果'}")
                 elif resolution == "reject":
@@ -330,7 +362,8 @@ class RecordProcessor:
                         next_handler="数据组更新参数版本页"
                     )
                     record.predicted_foot_traffic = conflict.hand_calc_value
-                    record.notes = (f"运营规划{operator}驳回：采用手算反例值{conflict.hand_calc_value}，"
+                    old_note = (record.notes + " | ") if record.notes else ""
+                    record.notes = (f"{old_note}运营规划{operator}驳回：采用手算反例值{conflict.hand_calc_value}，"
                                     f"替换原参数值{conflict.parameter_value}。"
                                     f"理由：{resolve_reason or '手算反例更贴合门店实际情况'}")
                 else:
@@ -341,6 +374,26 @@ class RecordProcessor:
                     operator,
                     {"conflict_id": conflict_id, "reason": resolve_reason}
                 )
+                if record.gap_info is not None:
+                    record.gap_pending_review = True
+                    gap_next = ("教研组张老师（本月底教研组例会再议：是否对编号"
+                                f"{record.record_id}所在的断档补号，"
+                                f"前一编号{record.gap_info['gap_start']}，"
+                                f"当前编号{record.gap_info['gap_end']}）")
+                    self._append_flow_milestone(
+                        record,
+                        "system",
+                        (f"冲突{conflict_id}已由运营规划{operator}处理完成，"
+                         "编号断档尚未闭环，流转至后续教研组复核补号"),
+                        gap_next,
+                        original_value=record.original_predicted,
+                        new_value=record.predicted_foot_traffic
+                    )
+                    record.notes = ((record.notes + " | ") if record.notes else "") + (
+                        "【后续事项】本月底教研组例会再议："
+                        f"编号断档（{record.gap_info['gap_start']}→{record.gap_info['gap_end']}）"
+                        "是否补号。当前预测值保留，待教研组合议后决定是否调整"
+                    )
                 return True
         return False
 
@@ -397,7 +450,8 @@ class RecordProcessor:
                 old_ver = record.version
                 record.previous_version = old_ver
                 record.version = version.version
-                if record.poisson_lambda and abs(record.poisson_lambda) > 1e-9:
+                old_lambda = record.poisson_lambda
+                if old_lambda and abs(old_lambda) > 1e-9:
                     record.poisson_lambda = lambda_value
                 self._log_action(
                     rid,
@@ -405,6 +459,23 @@ class RecordProcessor:
                     created_by,
                     {"new_version": version.version, "old_version": old_ver,
                      "new_lambda": lambda_value, "reason": reason}
+                )
+                if record.gap_pending_review or record.gap_info:
+                    gap_next = ("教研组张老师（本月底教研组例会再议：是否对编号"
+                                f"{record.record_id}所在的断档补号，"
+                                f"前一编号{record.gap_info['gap_start'] if record.gap_info else '?'}, "
+                                f"当前编号{record.gap_info['gap_end'] if record.gap_info else '?'})")
+                else:
+                    gap_next = None
+                self._append_flow_milestone(
+                    record,
+                    created_by,
+                    (f"参数版本页更新：从{old_ver}升级到{version.version}，"
+                     f"lambda从{old_lambda}调整为{lambda_value}。"
+                     f"专业判断取舍理由：{tradeoff_note or reason}"),
+                    gap_next or record.review_info.next_handler or "流程闭环",
+                    original_value=old_lambda,
+                    new_value=lambda_value
                 )
         self._log_action(
             0,
@@ -463,6 +534,7 @@ class RecordProcessor:
         return history
 
     def _record_to_list_row(self, record: PredictionRecord) -> Dict:
+        current_next = self._get_current_next_handler(record)
         return {
             "record_id": record.record_id,
             "date": record.date,
@@ -477,8 +549,16 @@ class RecordProcessor:
             "version": record.version,
             "notes": record.notes,
             "has_gap": record.gap_info is not None,
+            "gap_pending_review": record.gap_pending_review,
             "has_conflict": len(record.conflict_ids) > 0,
+            "conflict_resolved": all(
+                (c.resolution is not None) for c in self.conflicts if c.record_id == record.record_id
+            ),
             "review_next_handler": record.review_info.next_handler,
+            "current_next_handler": current_next,
+            "next_handler_source": ("state_history[-1]" if (record.state_history and
+                                     record.state_history[-1].next_handler) else
+                                    "review_info" if record.review_info.next_handler else ""),
             "state_count": len(record.state_history)
         }
 
@@ -548,10 +628,21 @@ class RecordProcessor:
             key = r.status.value
             by_status[key] = by_status.get(key, 0) + 1
         gap_count = sum(1 for r in self.records if r.gap_info)
+        gap_pending_count = sum(1 for r in self.records if r.gap_pending_review)
+        gap_closed_count = gap_count - gap_pending_count
         conflict_count = sum(1 for r in self.records if r.conflict_ids)
+        conflict_unresolved_count = sum(
+            1 for r in self.records
+            if r.conflict_ids and any(c.resolution is None
+                                      for c in self.conflicts if c.record_id == r.record_id)
+        )
         paused_count = sum(1 for r in self.records if r.status == RecordStatus.PAUSED)
-        need_teaching = sum(1 for r in self.records if r.status in (
-            RecordStatus.GAP_DETECTED, RecordStatus.TEACHING_REVIEW))
+        need_teaching = sum(1 for r in self.records
+                            if r.status in (RecordStatus.GAP_DETECTED, RecordStatus.TEACHING_REVIEW)
+                            or r.gap_pending_review)
+        need_teaching_ids = sorted([r.record_id for r in self.records
+                                    if r.status in (RecordStatus.GAP_DETECTED, RecordStatus.TEACHING_REVIEW)
+                                    or r.gap_pending_review])
         need_operation = sum(1 for r in self.records if r.status == RecordStatus.PENDING_REVIEW)
         active_pv = None
         for pv in self.parameter_versions:
@@ -562,9 +653,15 @@ class RecordProcessor:
             "total_records": total,
             "by_status": {k: {"count": v, "label": STATUS_LABEL_CN.get(k, k)} for k, v in by_status.items()},
             "gap_count": gap_count,
+            "gap_pending_count": gap_pending_count,
+            "gap_pending_record_ids": need_teaching_ids,
+            "gap_closed_count": gap_closed_count,
             "conflict_count": conflict_count,
+            "conflict_unresolved_count": conflict_unresolved_count,
             "paused_count": paused_count,
             "need_teaching_review": need_teaching,
+            "need_teaching_reason": (f"包含status∈{{gap_detected,teaching_review}} "
+                                     f"或 gap_pending_review=True 的记录 {need_teaching_ids}"),
             "need_operation_review": need_operation,
             "active_parameter_version": active_pv.version if active_pv else "v1.0(未创建)",
             "active_lambda": active_pv.lambda_value if active_pv else None,
@@ -574,6 +671,7 @@ class RecordProcessor:
     def get_export_records(self) -> List[ExportRecord]:
         exports = []
         for record in sorted(self.records, key=lambda x: x.record_id):
+            current_next = self._get_current_next_handler(record)
             exports.append(ExportRecord(
                 record_id=record.record_id,
                 date=record.date,
@@ -591,9 +689,11 @@ class RecordProcessor:
                 review_corrected_value=record.review_info.corrected_value,
                 review_processing_reason=record.review_info.processing_reason,
                 review_next_handler=record.review_info.next_handler,
+                current_next_handler=current_next,
                 state_count=len(record.state_history),
                 has_gap=record.gap_info is not None,
-                has_conflict=len(record.conflict_ids) > 0
+                has_conflict=len(record.conflict_ids) > 0,
+                gap_pending_review=record.gap_pending_review
             ))
         return exports
 
@@ -619,14 +719,31 @@ class RecordProcessor:
         history = self.get_processing_history()
         pending_items = []
         for r in sorted(self.records, key=lambda x: x.record_id):
-            if r.status in (RecordStatus.GAP_DETECTED, RecordStatus.PENDING_REVIEW,
-                            RecordStatus.PAUSED, RecordStatus.TEACHING_REVIEW):
+            should_pend = (
+                r.status in (RecordStatus.GAP_DETECTED, RecordStatus.PENDING_REVIEW,
+                             RecordStatus.PAUSED, RecordStatus.TEACHING_REVIEW)
+                or r.gap_pending_review
+            )
+            if should_pend:
+                current_next = self._get_current_next_handler(r)
+                pending_type = []
+                if r.gap_info:
+                    pending_type.append("断档待复核")
+                if r.gap_pending_review:
+                    pending_type.append("断档待补号")
+                if any(c.resolution is None for c in self.conflicts if c.record_id == r.record_id):
+                    pending_type.append("冲突待确认")
+                if r.status == RecordStatus.PAUSED:
+                    pending_type.append("处理暂停")
                 pending_items.append({
                     "record_id": r.record_id,
                     "status": r.status.value,
                     "status_label": STATUS_LABEL_CN.get(r.status.value, r.status.value),
-                    "next_handler": (r.review_info.next_handler or
-                                     (r.state_history[-1].next_handler if r.state_history else "待分配")),
+                    "next_handler": current_next,
+                    "next_handler_source": ("state_history[-1]" if (r.state_history and
+                                            r.state_history[-1].next_handler) else
+                                           "review_info" if r.review_info.next_handler else ""),
+                    "pending_type": pending_type,
                     "issue": r.notes or "待处理"
                 })
         return {

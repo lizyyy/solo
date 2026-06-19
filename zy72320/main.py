@@ -86,6 +86,11 @@ def cmd_interactive(args):
     return 0
 
 
+def cmd_e2e_test(args):
+    from test_record3_pipeline import run_record3_e2e
+    return run_record3_e2e()
+
+
 def build_parser():
     parser = argparse.ArgumentParser(
         prog="poisson_prediction",
@@ -98,6 +103,9 @@ def build_parser():
 
     p_smoke = sub.add_parser("smoke", help="冒烟测试（验证系统各模块可用）")
     p_smoke.set_defaults(func=cmd_smoke_test)
+
+    p_e2e = sub.add_parser("e2e", help="E2E测试（编号3断档+冲突全链路，7项断言）")
+    p_e2e.set_defaults(func=cmd_e2e_test)
 
     p_inter = sub.add_parser("run", help="交互运行模式")
     p_inter.set_defaults(func=cmd_interactive)

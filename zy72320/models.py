@@ -76,6 +76,7 @@ class PredictionRecord:
     review_info: ReviewInfo = field(default_factory=ReviewInfo)
     conflict_ids: List[str] = field(default_factory=list)
     gap_info: Optional[Dict[str, Any]] = None
+    gap_pending_review: bool = False
 
     def record_status_change(self, change: StatusChange):
         self.state_history.append(change)
@@ -149,6 +150,8 @@ class ExportRecord:
     review_corrected_value: Optional[float]
     review_processing_reason: str
     review_next_handler: str
+    current_next_handler: str
     state_count: int
     has_gap: bool
     has_conflict: bool
+    gap_pending_review: bool
