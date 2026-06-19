@@ -1,0 +1,50 @@
+{
+  "history_id": "HIST_c0d879cf",
+  "record_id": "REC_5c1d5220",
+  "operator": "王老师",
+  "operation": "回滚至 HIST_6abcfc40 之前",
+  "changes": [
+    {
+      "field_name": "discrepancy_note",
+      "old_value": "现场名「小星星」与版权名「小星星变奏曲」不一致，需音乐老师复核\n[2026-06-20 00:57 老周] 家长确认孩子平时叫小星星（原因: 补充家长反馈）",
+      "new_value": "现场名「小星星」与版权名「小星星变奏曲」不一致，需音乐老师复核"
+    },
+    {
+      "field_name": "discrepancy_note",
+      "old_value": "现场名「小星星」与版权名「小星星变奏曲」不一致，需音乐老师复核",
+      "new_value": null
+    },
+    {
+      "field_name": "discrepancy_type",
+      "old_value": "name_mismatch",
+      "new_value": null
+    },
+    {
+      "field_name": "review_status",
+      "old_value": "needs_review",
+      "new_value": "pending"
+    },
+    {
+      "field_name": "workflow_stage",
+      "old_value": "contract_supplemented",
+      "new_value": "imported"
+    },
+    {
+      "field_name": "screenshot_path",
+      "old_value": "screenshots/ct_2024_001.png",
+      "new_value": null
+    },
+    {
+      "field_name": "song_copyright_name",
+      "old_value": "小星星变奏曲",
+      "new_value": null
+    },
+    {
+      "field_name": "contract_id",
+      "old_value": "CT-2024-001",
+      "new_value": null
+    }
+  ],
+  "timestamp": "2026-06-20T00:57:15.159043",
+  "note": "回滚操作，共撤销 2 条历史记录"
+}

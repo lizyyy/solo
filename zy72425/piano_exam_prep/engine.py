@@ -19,15 +19,15 @@ class PrepEngine:
 
     def import_signups(self, batch_id: str, lines: List[str], operator: str) -> List[ImportResultItem]:
         """
-        导入排练群接龙
-        返回: 每条接龙的明细结果（不靠总数糊过去）
-        边界规则：
-        - 重复导入同一批接龙不会使数量翻倍（按 source_hash 去重）
-        - 原始行号完整保留
-        - 每条标注: NEW(新记录) / HISTORY_DUPLICATE(历史重复) / BATCH_DUPLICATE(本次批次内重复)
+        导入排练群接龙 - 返回每条明细结果
+        边界规则（按真实报名对象判断，不包含行号）：
+        - NEW: 历史未出现过该（学生+歌曲），新增记录
+        - HISTORY_DUPLICATE: 历史批次已存在（学生+歌曲相同），不新增
+        - BATCH_DUPLICATE: 同一批接龙里（学生+歌曲）重复出现多行，不新增
+        每行原始接龙证据（含原始行号）都会独立保存，便于追溯
         """
         results: List[ImportResultItem] = []
-        seen_in_batch = set()
+        batch_seen_keys = set()
 
         for idx, line in enumerate(lines, start=1):
             line = line.strip()
@@ -45,23 +45,37 @@ class PrepEngine:
                 import_note=f"由 {operator} 批量导入",
             )
 
+            dk = signup.dedupe_key()
             source_hash = signup.source_hash()
 
-            if source_hash in seen_in_batch:
+            if dk in batch_seen_keys:
+                self.storage.save_signup(signup)
+                record = self._find_record_by_signup(student_name, song_name)
+                if record and source_hash not in record.source_signup_hashes:
+                    record.source_signup_hashes.append(source_hash)
+                    record.updated_at = datetime.now()
+                    self.storage.save_record(record)
                 results.append(ImportResultItem(
                     original_line_number=idx,
                     student_name=student_name,
                     song_name_raw=song_name,
                     result_type=ImportResultType.BATCH_DUPLICATE,
+                    record_id=record.record_id if record else None,
                     source_hash=source_hash,
-                    note="同一批接龙内重复，跳过",
+                    note=f"本批次内重复，关联到已有记录",
                 ))
                 continue
 
-            seen_in_batch.add(source_hash)
+            batch_seen_keys.add(dk)
 
-            if self.storage.signup_exists(source_hash):
+            existing_saved = self.storage.dedupe_key_exists(dk)
+            if existing_saved is not None:
+                self.storage.save_signup(signup)
                 record = self._find_record_by_signup(student_name, song_name)
+                if record and source_hash not in record.source_signup_hashes:
+                    record.source_signup_hashes.append(source_hash)
+                    record.updated_at = datetime.now()
+                    self.storage.save_record(record)
                 results.append(ImportResultItem(
                     original_line_number=idx,
                     student_name=student_name,
@@ -69,12 +83,11 @@ class PrepEngine:
                     result_type=ImportResultType.HISTORY_DUPLICATE,
                     record_id=record.record_id if record else None,
                     source_hash=source_hash,
-                    note="历史批次已导入，跳过",
+                    note=f"历史批次重复，首次见于批次 {existing_saved.get('batch_id')} 第{existing_saved.get('original_line_number')}行",
                 ))
                 continue
 
             self.storage.save_signup(signup)
-
             record = self._find_or_create_record(student_name, song_name, operator)
             if source_hash not in record.source_signup_hashes:
                 record.source_signup_hashes.append(source_hash)
@@ -88,7 +101,7 @@ class PrepEngine:
                 result_type=ImportResultType.NEW,
                 record_id=record.record_id,
                 source_hash=source_hash,
-                note="新增记录",
+                note="新增报名记录",
             ))
 
         return results
@@ -319,7 +332,7 @@ class PrepEngine:
                 song_display_name=record.song_display_name,
                 review_status=record.review_status,
                 discrepancy_note=record.discrepancy_note,
-                has_contract=record.contract_info is not None,
+                has_contract=(record.contract_info is not None and record.contract_info.is_valid()),
             ))
 
         return entries
@@ -488,6 +501,9 @@ class PrepEngine:
             else:
                 setattr(record.contract_info, field_name, value if value else "")
 
+            if record.contract_info and not record.contract_info.is_valid():
+                record.contract_info = None
+
     # ==================== 三段追溯查询 ====================
 
     def trace_record(self, record_id: str) -> dict:
@@ -513,7 +529,7 @@ class PrepEngine:
                 })
 
         contract = None
-        if record.contract_info:
+        if record.contract_info and record.contract_info.is_valid():
             contract = {
                 "contract_id": record.contract_info.contract_id,
                 "song_copyright_name": record.contract_info.song_copyright_name,

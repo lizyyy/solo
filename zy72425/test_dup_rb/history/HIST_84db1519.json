@@ -1,0 +1,25 @@
+{
+  "history_id": "HIST_84db1519",
+  "record_id": "REC_76f070e0",
+  "operator": "老周",
+  "operation": "创建记录",
+  "changes": [
+    {
+      "field_name": "student_name",
+      "old_value": null,
+      "new_value": "小张"
+    },
+    {
+      "field_name": "song_display_name",
+      "old_value": null,
+      "new_value": "童年的回忆"
+    },
+    {
+      "field_name": "workflow_stage",
+      "old_value": null,
+      "new_value": "imported"
+    }
+  ],
+  "timestamp": "2026-06-20T00:57:15.153934",
+  "note": "从排练群接龙导入创建"
+}

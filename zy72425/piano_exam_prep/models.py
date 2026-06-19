@@ -39,8 +39,18 @@ class RehearsalSignUp:
     imported_at: datetime = field(default_factory=datetime.now)
     import_note: Optional[str] = None
 
+    def dedupe_key(self) -> str:
+        """按真实报名对象去重的 key（批次+学生+歌名），不包含原始行号
+        同一批接龙里"小明 - 小星星"出现在多行，dedupe_key 相同，判定为本次重复
+        """
+        content = f"{self.batch_id}:{self.student_name}:{self.song_name_raw}"
+        return hashlib.sha256(content.encode("utf-8")).hexdigest()[:16]
+
     def source_hash(self) -> str:
-        """原始记录哈希 - 用于去重"""
+        """原始记录哈希 - 用于证据行的独立存储
+        包含原始行号，保证接龙里每一行都有独立的证据文件
+        注意：不用于去重判定，去重用 dedupe_key
+        """
         content = f"{self.batch_id}:{self.original_line_number}:{self.student_name}:{self.song_name_raw}"
         return hashlib.sha256(content.encode("utf-8")).hexdigest()[:16]
 
@@ -54,6 +64,16 @@ class ContractInfo:
     supplemented_by: str
     supplemented_at: datetime = field(default_factory=datetime.now)
     note: Optional[str] = None
+
+    def is_valid(self) -> bool:
+        """合同信息是否有效（至少有合同号或版权名或截图路径任一非空）
+        用于判断是否该把整个 contract_info 清空，避免回滚后残留空壳
+        """
+        return any([
+            self.contract_id and self.contract_id.strip(),
+            self.song_copyright_name and self.song_copyright_name.strip(),
+            self.screenshot_path and self.screenshot_path.strip(),
+        ])
 
 
 @dataclass

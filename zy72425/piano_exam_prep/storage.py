@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 import uuid
+import hashlib
 
 from .models import (
     RehearsalSignUp, RepertoireRecord, ChangeHistory, ChangeEntry,
@@ -41,6 +42,25 @@ class Storage:
     def signup_exists(self, source_hash: str) -> bool:
         return os.path.exists(os.path.join(self.signups_dir, f"{source_hash}.json"))
 
+    def dedupe_key_exists(self, dedupe_key: str) -> Optional[str]:
+        """检查 dedupe_key 是否已存在（历史重复判断）
+        返回找到的 source_hash，没找到返回 None
+        """
+        for fname in os.listdir(self.signups_dir):
+            if not fname.endswith(".json"):
+                continue
+            path = os.path.join(self.signups_dir, fname)
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                content = f"{data['batch_id']}:{data['student_name']}:{data['song_name_raw']}"
+                h = hashlib.sha256(content.encode("utf-8")).hexdigest()[:16]
+                if h == dedupe_key:
+                    return data
+            except (KeyError, json.JSONDecodeError):
+                continue
+        return None
+
     def load_signup(self, source_hash: str) -> Optional[RehearsalSignUp]:
         path = os.path.join(self.signups_dir, f"{source_hash}.json")
         if not os.path.exists(path):
@@ -76,7 +96,7 @@ class Storage:
             data["updated_at"] = record.updated_at.isoformat()
             if record.confirmed_at:
                 data["confirmed_at"] = record.confirmed_at.isoformat()
-            if record.contract_info:
+            if record.contract_info and record.contract_info.is_valid():
                 data["contract_info"] = {
                     "contract_id": record.contract_info.contract_id,
                     "song_copyright_name": record.contract_info.song_copyright_name,
@@ -85,6 +105,8 @@ class Storage:
                     "supplemented_at": record.contract_info.supplemented_at.isoformat(),
                     "note": record.contract_info.note,
                 }
+            else:
+                data["contract_info"] = None
             json.dump(data, f, ensure_ascii=False, indent=2)
 
     def load_record(self, record_id: str) -> Optional[RepertoireRecord]:
@@ -97,13 +119,15 @@ class Storage:
         if data.get("contract_info"):
             ci = data["contract_info"]
             contract = ContractInfo(
-                contract_id=ci["contract_id"],
-                song_copyright_name=ci["song_copyright_name"],
-                screenshot_path=ci["screenshot_path"],
-                supplemented_by=ci["supplemented_by"],
-                supplemented_at=datetime.fromisoformat(ci["supplemented_at"]),
+                contract_id=ci.get("contract_id", "") or "",
+                song_copyright_name=ci.get("song_copyright_name", "") or "",
+                screenshot_path=ci.get("screenshot_path", "") or "",
+                supplemented_by=ci.get("supplemented_by", "") or "",
+                supplemented_at=datetime.fromisoformat(ci["supplemented_at"]) if ci.get("supplemented_at") else datetime.now(),
                 note=ci.get("note"),
             )
+            if not contract.is_valid():
+                contract = None
         return RepertoireRecord(
             record_id=data["record_id"],
             student_name=data["student_name"],

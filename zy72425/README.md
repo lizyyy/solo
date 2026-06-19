@@ -8,7 +8,9 @@
 |------|---------|
 | 同一首歌有现场名和版权名，音乐老师追问前后不一致 | 自动标记「需复核」，留给老师判定，不自动归一 |
 | 老周手工解释，没有证据 | 完整保留原始行号、变更历史、操作人 |
-| 重复导入导致数量翻倍 | 按 source_hash 去重，同一批接龙导入 N 次也只算一次 |
+| 重复导入导致数量翻倍 | 按真实报名对象（学生+歌名）去重，原始行号保留但不参与判定 |
+| 同一批接龙里"小明-小星星"重复出现在多行，被误判成多条 | 按 dedupe_key（批次+学生+歌名）判定，与行号无关 |
+| 回滚后追溯仍显示"合同补录"，像还有效 | 回滚时空壳 contract_info 整体清空，追溯/周报不再误判 |
 | 只改了一条备注，看不出差别 | 每条变更都有改前/改后记录，操作人、时间戳齐全 |
 | 复查时要重新翻聊天记录 | 三段追溯：接龙来源 → 合同补录 → 人工确认，一站式查看 |
 
@@ -36,27 +38,36 @@ python prep.py rollback --record-id REC_xxx --history-id HIST_xxx --operator 王
 
 ### 规则 2: 重复导入怎么判？
 
-**判定逻辑**（见 [engine.py](file:///Users/lzy/pro/solo/workspaces/zy72425/piano_exam_prep/engine.py#L20-L94)）：
-- 每条接龙记录计算 `source_hash = sha256(batch_id:line_number:student:song)`
+**判定逻辑**（见 [engine.py](file:///Users/lzy/pro/solo/workspaces/zy72425/piano_exam_prep/engine.py#L20-L99)）：
+- 每条接龙有两个哈希：
+  - `dedupe_key` = `sha256(batch_id:student:song)` — **用于去重判断，不包含行号**
+  - `source_hash` = `sha256(batch_id:line_number:student:song)` — 用于证据行独立存储
+- **同一批接龙里"小明-小星星"出现在第1行、第3行、第6行，行号不同但 dedupe_key 相同 → 判为本次重复**
 - 三种结果，每条都标注清楚，不靠总数糊过去：
-  - ✅ **新记录 (NEW)** — 历史上没出现过，新增
-  - ⚠️  **历史重复 (HISTORY_DUPLICATE)** — 之前批次导入过，跳过，不翻倍
-  - 🔁 **本次重复 (BATCH_DUPLICATE)** — 同一批接龙里就重复了，跳过
-- 所以同一批接龙重复导入，数量不会翻倍
+  - ✅ **新记录 (NEW)** — 历史上没出现过该（批次+学生+歌曲）
+  - ⚠️  **历史重复 (HISTORY_DUPLICATE)** — 之前其他批次已存在该学生+歌曲
+  - 🔁 **本次重复 (BATCH_DUPLICATE)** — 同一批接龙里该学生+歌曲重复出现多行
+- 每行原始证据（含行号）都会独立保存，关联到同一条 record，追溯时能看到所有原始行
 
-**导入输出示例：**
+**导入输出示例（同批小明重复 3 行）：**
 ```
 行号   学生    曲目       类型         记录ID        备注
 ------------------------------------------------------------------
-1     小明    小星星    ✅ 新记录     REC_xxx      新增记录
-2     小红    致爱丽丝   ⚠️  历史重复   REC_yyy      历史批次已导入，跳过
-3     小华    月光奏鸣曲  🔁 本次重复   (无)         同一批接龙内重复，跳过
+1     小明    小星星    ✅ 新记录     REC_xxx      新增报名记录
+2     小红    致爱丽丝   ✅ 新记录     REC_yyy      新增报名记录
+3     小明    小星星    🔁 本次重复   REC_xxx      本批次内重复，关联到已有记录
+4     小华    月光奏鸣曲 ✅ 新记录     REC_zzz      新增报名记录
+6     小明    小星星    🔁 本次重复   REC_xxx      本批次内重复，关联到已有记录
 ------------------------------------------------------------------
-总计 3 条 | 新记录 1 | 历史重复 1 | 本次重复 1
+总计 5 条 | 新记录 3 | 历史重复 0 | 本次重复 2
 ```
 
 **验证命令：**
 ```bash
+# 运行完整的 36 点验证脚本（真实样例：同批小明重复+补录合同+回滚）
+python3 test_duplicate_rollback.py
+
+# 或用 reimport-test 简单验证
 python prep.py reimport-test --batch-id BATCH_001 --input-file examples/signup_batch_001.txt --operator 测试
 ```
 
@@ -109,6 +120,13 @@ python prep.py rollback \
   --history-id HIST_xxx \
   --operator 王老师
 ```
+
+**回滚清理（写死在代码里，避免残留误导）**（见 [storage.py](file:///Users/lzy/pro/solo/workspaces/zy72425/piano_exam_prep/storage.py#L91-L145) + [engine.py](file:///Users/lzy/pro/solo/workspaces/zy72425/piano_exam_prep/engine.py#L462-L497)）：
+- `ContractInfo.is_valid()` 判断合同信息是否有效：合同号/版权名/截图路径任一非空才算有效
+- 回滚把合同关键字段都清空后，**`contract_info` 整体被设为 `None`**，不留下空壳
+- 存盘时无效合同不写入；读盘时空壳自动还原为 `None`
+- **trace 追溯**、**list 明细**、**weekly-report 周报**、**导出 JSON** 都用 `is_valid()` 判断
+- 音乐老师看到 `trace` 第二段显示 `(未补录)` 就可以确认：合同补录已彻底回滚，不是仍有效
 
 ---
 
