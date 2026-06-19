@@ -1,4 +1,4 @@
-import type { TensionRecord, ProcessingStatus } from "../types.js";
+import type { TensionRecord, ProcessingStatus, BeltThreshold } from "../types.js";
 
 export interface ThresholdConfig {
   upperLimit: number;
@@ -13,14 +13,35 @@ export function checkThreshold(
   return value > config.upperLimit || value < config.lowerLimit;
 }
 
+export function getThresholdForRecord(
+  record: TensionRecord,
+  beltThresholds: BeltThreshold[],
+  fallback: ThresholdConfig
+): ThresholdConfig {
+  const found = beltThresholds.find(
+    (t) => t.beltId === record.beltId && t.unit === record.unit
+  );
+  if (found) {
+    return {
+      upperLimit: found.upperLimit,
+      lowerLimit: found.lowerLimit,
+      unit: found.unit,
+    };
+  }
+  return fallback;
+}
+
 export function processRecords(
   rawRecords: TensionRecord[],
-  config: ThresholdConfig
+  config: ThresholdConfig,
+  beltThresholds?: BeltThreshold[]
 ): TensionRecord[] {
   const avg = computeAverage(rawRecords);
+  const thresholds = beltThresholds ?? [];
 
   return rawRecords.map((record) => {
-    const isOver = checkThreshold(record.tensionValue, config);
+    const recConfig = getThresholdForRecord(record, thresholds, config);
+    const isOver = checkThreshold(record.tensionValue, recConfig);
     const nearAvg = Math.abs(record.tensionValue - avg) < avg * 0.05;
     const avgMasked = isOver && nearAvg;
 
@@ -32,7 +53,8 @@ export function processRecords(
     return {
       ...record,
       isOverThreshold: isOver,
-      thresholdValue: config.upperLimit,
+      thresholdValue: recConfig.upperLimit,
+      thresholdUnit: recConfig.unit,
       avgMasked,
       processingStatus: status,
     };
@@ -48,13 +70,16 @@ function computeAverage(records: TensionRecord[]): number {
 export function recalculateAfterSupplement(
   existingRecords: TensionRecord[],
   supplementRecords: TensionRecord[],
-  config: ThresholdConfig
+  config: ThresholdConfig,
+  beltThresholds?: BeltThreshold[]
 ): TensionRecord[] {
   const merged = [...existingRecords, ...supplementRecords];
   const avg = computeAverage(merged);
+  const thresholds = beltThresholds ?? [];
 
   return merged.map((record) => {
-    const isOver = checkThreshold(record.tensionValue, config);
+    const recConfig = getThresholdForRecord(record, thresholds, config);
+    const isOver = checkThreshold(record.tensionValue, recConfig);
     const nearAvg = Math.abs(record.tensionValue - avg) < avg * 0.05;
     const avgMasked = isOver && nearAvg;
 
@@ -71,6 +96,8 @@ export function recalculateAfterSupplement(
     return {
       ...record,
       isOverThreshold: isOver,
+      thresholdValue: recConfig.upperLimit,
+      thresholdUnit: recConfig.unit,
       avgMasked,
       processingStatus: status,
     };

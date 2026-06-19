@@ -303,6 +303,49 @@ function advanceToStep(n) {
   goToStep(n);
 }
 
+async function syncAdvanceStep() {
+  const res = await api('/api/advance-step', { method: 'POST' });
+  const backendStep = res.step;
+  const stepMap: Record<string, number> = {
+    first_import: 1,
+    temperature_calibration_review: 2,
+    unit_conversion_update: 3,
+  };
+  let targetIdx = stepMap[backendStep];
+  if (targetIdx === undefined) {
+    targetIdx = 5;
+  } else {
+    targetIdx = targetIdx + 1;
+  }
+  for (let i = 1; i < targetIdx; i++) {
+    completedSteps.add(i);
+  }
+  goToStep(targetIdx);
+}
+
+async function initStepFromBackend() {
+  try {
+    const res = await api('/api/step');
+    const backendStep = res.step;
+    const stepMap: Record<string, number> = {
+      first_import: 1,
+      temperature_calibration_review: 2,
+      unit_conversion_update: 3,
+    };
+    const backendIdx = stepMap[backendStep] ?? 0;
+    currentStep = backendIdx + 1;
+    for (let i = 1; i <= backendIdx; i++) {
+      completedSteps.add(i);
+    }
+    for (let i = 1; i <= 5; i++) {
+      document.getElementById('step' + i).classList.toggle('active', i === currentStep);
+    }
+    renderStepNav();
+  } catch (e) {
+    console.warn('Failed to sync step from backend:', e);
+  }
+}
+
 async function saveConfig() {
   const upperLimit = parseFloat(document.getElementById('cfgUpper').value);
   const lowerLimit = parseFloat(document.getElementById('cfgLower').value);
@@ -379,6 +422,7 @@ async function doFirstImport() {
     lastImportResult = result;
     toast(`导入成功！新记录 ${result.newRecordIds.length} 条，本次重复 ${result.currentBatchDuplicateKeys.length} 条，历史重复 ${result.historyDuplicateKeys.length} 条`, 'success');
     await refreshStep2FromApi();
+    await syncAdvanceStep();
   } catch (e) { toast(e.message, 'error'); }
 }
 
@@ -493,6 +537,7 @@ async function doCalibrationImport() {
     await api('/api/import/calibration', { method: 'POST', body: { supplements } });
     toast('校准补录完成', 'success');
     await renderStep3();
+    await syncAdvanceStep();
   } catch (e) { toast(e.message, 'error'); }
 }
 
@@ -560,6 +605,7 @@ async function doUnitImport() {
     await api('/api/import/unit', { method: 'POST', body: { conversionMap } });
     toast('单位换算完成', 'success');
     await renderStep4();
+    await syncAdvanceStep();
   } catch (e) { toast(e.message, 'error'); }
 }
 
@@ -792,6 +838,7 @@ async function compareSources() {
 }
 
 renderStepNav();
+initStepFromBackend();
 </script>
 </body>
 </html>

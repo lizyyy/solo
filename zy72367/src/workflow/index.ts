@@ -1,4 +1,4 @@
-import type { TensionRecord, ImportStep } from "../types.js";
+import type { TensionRecord, ImportStep, BeltThreshold } from "../types.js";
 import type { ThresholdConfig } from "../core/processor.js";
 import {
   firstImport,
@@ -36,24 +36,26 @@ export function advanceStep(): ImportStep | null {
 
 export function runFirstImport(
   rawData: Parameters<typeof firstImport>[0],
-  config: ThresholdConfig
+  config: ThresholdConfig,
+  beltThresholds?: BeltThreshold[]
 ) {
   if (currentStepIndex !== 0) {
     throw new Error(`Current step is ${VALID_STEPS[currentStepIndex]}, cannot re-run first import`);
   }
-  const result = firstImport(rawData, config);
+  const result = firstImport(rawData, config, beltThresholds);
   setRecords(result.records);
   return result;
 }
 
 export function runTemperatureCalibrationReview(
   supplements: Parameters<typeof supplementTemperatureCalibration>[0],
-  config: ThresholdConfig
+  config: ThresholdConfig,
+  beltThresholds?: BeltThreshold[]
 ) {
   if (currentStepIndex !== 1) {
     throw new Error(`Current step is ${VALID_STEPS[currentStepIndex]}, please complete previous step first`);
   }
-  const result = supplementTemperatureCalibration(supplements, config);
+  const result = supplementTemperatureCalibration(supplements, config, beltThresholds);
   setRecords(result.records);
 
   const records = getRecords();
@@ -74,12 +76,13 @@ export function runTemperatureCalibrationReview(
 
 export function runUnitConversionUpdate(
   conversionMap: Parameters<typeof updateUnitConversion>[0],
-  config: ThresholdConfig
+  config: ThresholdConfig,
+  beltThresholds?: BeltThreshold[]
 ) {
   if (currentStepIndex !== 2) {
     throw new Error(`Current step is ${VALID_STEPS[currentStepIndex]}, please complete previous step first`);
   }
-  const result = updateUnitConversion(conversionMap, config);
+  const result = updateUnitConversion(conversionMap, config, beltThresholds);
   setRecords(result.records);
 
   const records = getRecords();

@@ -5,6 +5,7 @@ import type {
   DedupCategory,
   CurrentBatchDuplicateKey,
   HistoryDuplicateKey,
+  BeltThreshold,
 } from "../types.js";
 import {
   processRecords,
@@ -29,7 +30,8 @@ export function firstImport(
     unit: string;
     temperature: number | null;
   }>,
-  config: ThresholdConfig
+  config: ThresholdConfig,
+  beltThresholds?: BeltThreshold[]
 ): ImportResult {
   const batchId = `batch_${++batchCounter}`;
 
@@ -81,6 +83,7 @@ export function firstImport(
         samplingIntervalNote: null,
         isOverThreshold: false,
         thresholdValue: config.upperLimit,
+        thresholdUnit: config.unit,
         processingStatus: "pending_review",
         avgMasked: false,
         manualOverrides: [],
@@ -93,7 +96,7 @@ export function firstImport(
     }
   }
 
-  const processed = processRecords(records, config);
+  const processed = processRecords(records, config, beltThresholds);
   existingRecords = processed;
 
   return {
@@ -117,7 +120,8 @@ export function supplementTemperatureCalibration(
     calibrationNote: string;
     temperature: number;
   }>,
-  config: ThresholdConfig
+  config: ThresholdConfig,
+  beltThresholds?: BeltThreshold[]
 ): ImportResult {
   const batchId = `batch_${++batchCounter}`;
   let matched = 0;
@@ -133,7 +137,7 @@ export function supplementTemperatureCalibration(
     }
   }
 
-  const recalculated = recalculateAfterSupplement(existingRecords, [], config);
+  const recalculated = recalculateAfterSupplement(existingRecords, [], config, beltThresholds);
   existingRecords = recalculated;
 
   return {
@@ -157,7 +161,8 @@ export function updateUnitConversion(
     toUnit: string;
     factor: number;
   }>,
-  config: ThresholdConfig
+  config: ThresholdConfig,
+  beltThresholds?: BeltThreshold[]
 ): ImportResult {
   const batchId = `batch_${++batchCounter}`;
 
@@ -184,7 +189,7 @@ export function updateUnitConversion(
     };
   });
 
-  const recalculated = processRecords(updated, config);
+  const recalculated = processRecords(updated, config, beltThresholds);
   existingRecords = recalculated;
 
   return {

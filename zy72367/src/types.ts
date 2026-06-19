@@ -26,12 +26,20 @@ export interface TensionRecord {
   samplingIntervalNote: SamplingIntervalNote | null;
   isOverThreshold: boolean;
   thresholdValue: number;
+  thresholdUnit: string;
   processingStatus: ProcessingStatus;
   avgMasked: boolean;
   manualOverrides: ManualOverrideEntry[];
   importBatchId: string;
   importStep: ImportStep;
   dedupCategory: DedupCategory;
+}
+
+export interface BeltThreshold {
+  beltId: string;
+  unit: string;
+  upperLimit: number;
+  lowerLimit: number;
 }
 
 export interface ManualOverrideEntry {

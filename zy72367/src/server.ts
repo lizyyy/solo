@@ -1,7 +1,7 @@
 import http, { type IncomingMessage, type ServerResponse } from "http";
 import fs from "fs";
 import path from "path";
-import type { ProcessingStatus, TensionRecord } from "./types.js";
+import type { ProcessingStatus, TensionRecord, BeltThreshold } from "./types.js";
 import type { ThresholdConfig } from "./core/processor.js";
 import {
   resetWorkflow,
@@ -24,13 +24,15 @@ import {
 
 const __dirname = path.resolve();
 const PUBLIC_DIR = path.join(__dirname, "public");
-const PORT = 3876;
+const PORT = Number(process.env.PORT) || 3876;
 
 let currentConfig: ThresholdConfig = {
   upperLimit: 100,
   lowerLimit: 20,
   unit: "N",
 };
+
+let beltThresholds: BeltThreshold[] = [];
 
 type ParsedBody = Record<string, unknown>;
 
@@ -153,6 +155,7 @@ async function route(req: IncomingMessage, res: ServerResponse): Promise<void> {
   if (pathname === "/api/reset" && method === "GET") {
     resetWorkflow();
     resetStore();
+    beltThresholds = [];
     sendJson(res, 200, { ok: true });
     return;
   }
@@ -170,7 +173,10 @@ async function route(req: IncomingMessage, res: ServerResponse): Promise<void> {
           lowerLimit: body.lowerLimit,
           unit: body.unit,
         };
-        sendJson(res, 200, { ok: true, config: currentConfig });
+        if (Array.isArray(body.beltThresholds)) {
+          beltThresholds = body.beltThresholds as BeltThreshold[];
+        }
+        sendJson(res, 200, { ok: true, config: currentConfig, beltThresholds });
       } else {
         sendError(res, 400, "Invalid config body. Need upperLimit(number), lowerLimit(number), unit(string)");
       }
@@ -181,7 +187,7 @@ async function route(req: IncomingMessage, res: ServerResponse): Promise<void> {
   }
 
   if (pathname === "/api/config" && method === "GET") {
-    sendJson(res, 200, currentConfig);
+    sendJson(res, 200, { ...currentConfig, beltThresholds });
     return;
   }
 
@@ -204,7 +210,7 @@ async function route(req: IncomingMessage, res: ServerResponse): Promise<void> {
         sendError(res, 400, "Missing records array in body");
         return;
       }
-      const result = runFirstImport(records as any, currentConfig);
+      const result = runFirstImport(records as any, currentConfig, beltThresholds);
       sendJson(res, 200, result);
     } catch (e) {
       sendError(res, 400, (e as Error).message);
@@ -220,7 +226,7 @@ async function route(req: IncomingMessage, res: ServerResponse): Promise<void> {
         sendError(res, 400, "Missing supplements array in body");
         return;
       }
-      const result = runTemperatureCalibrationReview(supplements as any, currentConfig);
+      const result = runTemperatureCalibrationReview(supplements as any, currentConfig, beltThresholds);
       sendJson(res, 200, result);
     } catch (e) {
       sendError(res, 400, (e as Error).message);
@@ -245,9 +251,25 @@ async function route(req: IncomingMessage, res: ServerResponse): Promise<void> {
               unit: entry.toUnit,
             };
           }
+          const existingBeltThresholds = beltThresholds.filter(
+            (t) => t.beltId === entry.beltId && t.unit === entry.fromUnit
+          );
+          for (const old of existingBeltThresholds) {
+            const alreadyExists = beltThresholds.some(
+              (t) => t.beltId === entry.beltId && t.unit === entry.toUnit
+            );
+            if (!alreadyExists) {
+              beltThresholds.push({
+                beltId: entry.beltId,
+                unit: entry.toUnit,
+                upperLimit: old.upperLimit * entry.factor,
+                lowerLimit: old.lowerLimit * entry.factor,
+              });
+            }
+          }
         }
       }
-      const result = runUnitConversionUpdate(conversionMap as any, currentConfig);
+      const result = runUnitConversionUpdate(conversionMap as any, currentConfig, beltThresholds);
       sendJson(res, 200, result);
     } catch (e) {
       sendError(res, 400, (e as Error).message);
