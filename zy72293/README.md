@@ -8,69 +8,93 @@
 
 ## 快速开始
 
-### 1. 安装依赖
+### 零门槛上手（Web 看板）
+
+无需记忆任何命令，浏览器即可完成全部操作。
+
+**Step 1** -- 安装依赖：
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. 创建项目并导入障碍物备注（第一步）
+**Step 2** -- 启动 API 服务：
 
 ```bash
-python -m sewage_inspection.cli create --name "A2O池体巡检" --plant "城东污水处理厂" --by 老梁
+python3 -m sewage_inspection.api
+```
+
+**Step 3** -- 浏览器打开 `http://127.0.0.1:8000`。
+
+**Step 4** -- 点击"一键加载完整样例"按钮，系统自动创建项目并导入全部样例数据。
+
+**Step 5** -- 在遮挡点清单中找到 SKETCH_A2O_1F.jpg（"照片有点位但坐标表缺一行"记录），点击"补录坐标"，填写坐标后点击"保存并重算"。
+
+**Step 6** -- 切换到"图表展示"或"3D展示"标签页，点击红色圆点查看详情弹窗，包含审计轨迹、原始值和跳转按钮。
+
+### CLI 操作
+
+#### 1. 安装依赖
+
+```bash
+pip install -r requirements.txt
+```
+
+#### 2. 创建项目并导入障碍物备注（第一步）
+
+```bash
+python3 -m sewage_inspection.cli create --name "A2O池体巡检" --plant "城东污水处理厂" --by 老梁
 ```
 
 记下输出的项目 ID，例如 `abc123def456`。
 
 ```bash
-python -m sewage_inspection.cli import-obstacles --project <项目ID> --file sample_data/obstacles.json
+python3 -m sewage_inspection.cli import-obstacles --project <项目ID> --file sample_data/obstacles.json
 ```
 
 此时系统会检测：照片有点位但坐标表缺行 → 生成遮挡点，**不急着归正常，留给安全员复核**。
 
-### 3. 培训教官老梁补看楼层剖面草图（第二步）
+#### 3. 培训教官老梁补看楼层剖面草图（第二步）
 
 ```bash
-python -m sewage_inspection.cli import-floor-profiles --project <项目ID> --file sample_data/floor_profiles.json
+python3 -m sewage_inspection.cli import-floor-profiles --project <项目ID> --file sample_data/floor_profiles.json
 ```
 
 补录后，遮挡点清单自动更新。
 
-### 4. 补录坐标表（解决遮挡点）
+#### 4. 补录坐标表（解决遮挡点）
 
 ```bash
-python -m sewage_inspection.cli import-coordinates --project <项目ID> --file sample_data/coordinates.json
+python3 -m sewage_inspection.cli import-coordinates --project <项目ID> --file sample_data/coordinates.json
 ```
 
 坐标表补录后，匹配上的遮挡点自动标记为已解决；仍然缺行的留给安全员复核。
 
-### 5. 推进工作流并生成报告
+#### 5. 推进工作流并生成报告
 
 ```bash
-python -m sewage_inspection.cli step --project <项目ID>
-python -m sewage_inspection.cli report --project <项目ID>
+python3 -m sewage_inspection.cli step --project <项目ID>
+python3 -m sewage_inspection.cli report --project <项目ID>
 ```
 
 报告里每条遮挡点都写明了：为什么被留下、还缺什么材料、下一步找谁。
 
-### 6. 查看项目详情
+#### 6. 查看项目详情
 
 ```bash
-python -m sewage_inspection.cli show --project <项目ID>
-python -m sewage_inspection.cli list
+python3 -m sewage_inspection.cli show --project <项目ID>
+python3 -m sewage_inspection.cli list
 ```
 
-## 使用 API / Web 看板
+## API 接口
 
 启动服务：
 
 ```bash
-python -m sewage_inspection.api
+python3 -m sewage_inspection.api
 ```
 
-浏览器打开 `http://127.0.0.0:8000` 即可使用 Web 看板。
-
-### API 接口
+浏览器打开 `http://127.0.0.1:8000` 即可使用 Web 看板。
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
@@ -83,6 +107,7 @@ python -m sewage_inspection.api
 | POST | `/api/projects/{id}/step` | 推进工作流 |
 | GET | `/api/projects/{id}/report` | 生成遮挡点清单报告 |
 | POST | `/api/projects/{id}/occlusion/{oid}/escalate` | 升级遮挡点到安全员 |
+| POST | `/api/projects/{id}/occlusion/{oid}/resolve` | 补录坐标并解决遮挡点 |
 | GET | `/api/projects/{id}/chart-data` | 获取3D/图表数据 |
 
 ### Web 看板功能

@@ -100,6 +100,7 @@ def detect_inconsistencies(project: InspectionProject) -> list[OcclusionPoint]:
 
 def resolve_occlusion_points(
     project: InspectionProject,
+    resolved_by: str = "system_auto",
 ) -> list[OcclusionPoint]:
     resolved: list[OcclusionPoint] = []
     now = datetime.now().isoformat()
@@ -130,13 +131,13 @@ def resolve_occlusion_points(
                 to_missing_material=new_missing,
                 from_next_action=old_next,
                 to_next_action=new_next,
-                changed_by="system_auto",
+                changed_by=resolved_by,
                 change_cause=f"坐标表补录了匹配行 {match.point_label} ({match.x:.2f}, {match.y:.2f}, {match.z:.2f})",
                 note="原始说法已保留，改后值和原因已记录",
             )
 
             op.status = OcclusionStatus.RESOLVED
-            op.resolved_by = "system_auto"
+            op.resolved_by = resolved_by
             op.resolved_at = now
             op.updated_at = now
             op.missing_material = new_missing

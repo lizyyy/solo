@@ -1,13 +1,13 @@
 {
-  "id": "107c1f75463a",
-  "name": "污水厂池体检修-2025-06",
+  "id": "5ccf4a36996a",
+  "name": "污水厂池体检修-样例演示",
   "plant_name": "第一污水厂",
-  "created_by": "cli-新人",
-  "created_at": "2026-06-08T23:59:57.808523",
+  "created_by": "web-新人",
+  "created_at": "2026-06-19T14:01:33.303482",
   "current_phase": "obstacle_import",
   "obstacle_remarks": [
     {
-      "id": "b393feab2a87",
+      "id": "faa3e76c4c03",
       "location": "A2O池-厌氧段东侧走廊",
       "description": "走道护栏锈蚀松动，靠近曝气管道处有油污堆积",
       "severity": "high",
@@ -16,12 +16,12 @@
         "IMG_002.jpg"
       ],
       "created_by": "培训教官老梁",
-      "created_at": "2026-06-09T00:00:02.355174",
+      "created_at": "2026-06-19T14:01:33.304253",
       "status": "active",
       "notes": "巡检必经之路，栏杆松动有坠落风险"
     },
     {
-      "id": "f0da95681bd4",
+      "id": "59102cd2d0b1",
       "location": "二沉池-出水堰北侧",
       "description": "出水堰标高指示牌被污泥遮挡，看不清刻度",
       "severity": "medium",
@@ -29,12 +29,12 @@
         "IMG_003.jpg"
       ],
       "created_by": "培训教官老梁",
-      "created_at": "2026-06-09T00:00:02.355321",
+      "created_at": "2026-06-19T14:01:33.304291",
       "status": "active",
       "notes": "日常巡检需要读取堰上水头"
     },
     {
-      "id": "383631ac5c4f",
+      "id": "a8a4c17381b2",
       "location": "污泥回流泵房-地下二层",
       "description": "楼梯转角处有临时堆放的管道支架，挡住一半通道",
       "severity": "critical",
@@ -43,157 +43,167 @@
         "IMG_005.jpg"
       ],
       "created_by": "培训教官老梁",
-      "created_at": "2026-06-09T00:00:02.355346",
+      "created_at": "2026-06-19T14:01:33.304305",
       "status": "active",
       "notes": "紧急情况撤离通道受阻，必须尽快清理"
     }
   ],
   "floor_profiles": [
     {
-      "id": "826f8b41cfad",
+      "id": "cdf35c74b0b5",
       "floor_name": "A2O池体-地上一层",
       "sketch_data": null,
       "photo_refs": [
         "SKETCH_A2O_1F.jpg"
       ],
       "created_by": "培训教官老梁",
-      "created_at": "2026-06-09T00:00:09.675093",
+      "created_at": "2026-06-19T14:01:33.305269",
       "notes": "老梁补看：曝气廊道与回流廊道交叉处有新增管道，照片可见点位但坐标表缺行"
     },
     {
-      "id": "46295df73d4a",
+      "id": "19a6071c9054",
       "floor_name": "污泥回流泵房-地下二层剖面",
       "sketch_data": null,
       "photo_refs": [
         "SKETCH_PUMP_B2.jpg"
       ],
       "created_by": "培训教官老梁",
-      "created_at": "2026-06-09T00:00:09.675119",
+      "created_at": "2026-06-19T14:01:33.305287",
       "notes": "老梁补看：地下二层楼梯转角照片标注了临时堆放物位置，坐标表尚未补录"
     }
   ],
   "photo_locations": [
     {
-      "id": "024ded9fa272",
+      "id": "0a858072e4b8",
       "photo_ref": "IMG_001.jpg",
       "x": 5.0,
       "y": 3.0,
       "z": 0.0,
       "floor_profile_id": null,
-      "obstacle_remark_id": "b393feab2a87",
+      "obstacle_remark_id": "faa3e76c4c03",
       "source": "obstacle_import",
       "label": "障碍物:A2O池-厌氧段东侧走廊",
-      "created_at": "2026-06-09T00:00:02.355282"
+      "created_at": "2026-06-19T14:01:33.304272"
     },
     {
-      "id": "338e0e6d2820",
+      "id": "7c14a4490f1d",
       "photo_ref": "IMG_002.jpg",
       "x": 5.0,
       "y": 3.0,
       "z": 0.0,
       "floor_profile_id": null,
-      "obstacle_remark_id": "b393feab2a87",
+      "obstacle_remark_id": "faa3e76c4c03",
       "source": "obstacle_import",
       "label": "障碍物:A2O池-厌氧段东侧走廊",
-      "created_at": "2026-06-09T00:00:02.355305"
+      "created_at": "2026-06-19T14:01:33.304283"
     },
     {
-      "id": "e53c3fbdc165",
+      "id": "9e7990e46e43",
       "photo_ref": "IMG_003.jpg",
       "x": 12.0,
       "y": 8.0,
       "z": 1.5,
       "floor_profile_id": null,
-      "obstacle_remark_id": "f0da95681bd4",
+      "obstacle_remark_id": "59102cd2d0b1",
       "source": "obstacle_import",
       "label": "障碍物:二沉池-出水堰北侧",
-      "created_at": "2026-06-09T00:00:02.355334"
+      "created_at": "2026-06-19T14:01:33.304298"
     },
     {
-      "id": "9776104dbdae",
+      "id": "9d02ea9e0f41",
       "photo_ref": "IMG_004.jpg",
       "x": 3.0,
       "y": 15.0,
       "z": -2.0,
       "floor_profile_id": null,
-      "obstacle_remark_id": "383631ac5c4f",
+      "obstacle_remark_id": "a8a4c17381b2",
       "source": "obstacle_import",
       "label": "障碍物:污泥回流泵房-地下二层",
-      "created_at": "2026-06-09T00:00:02.355358"
+      "created_at": "2026-06-19T14:01:33.304311"
     },
     {
-      "id": "22e338d6dd90",
+      "id": "ea70d95b53c4",
       "photo_ref": "IMG_005.jpg",
       "x": 3.0,
       "y": 15.0,
       "z": -2.0,
       "floor_profile_id": null,
-      "obstacle_remark_id": "383631ac5c4f",
+      "obstacle_remark_id": "a8a4c17381b2",
       "source": "obstacle_import",
       "label": "障碍物:污泥回流泵房-地下二层",
-      "created_at": "2026-06-09T00:00:02.355369"
+      "created_at": "2026-06-19T14:01:33.304417"
     },
     {
-      "id": "9824adc18a37",
+      "id": "e6f2739dc0e2",
       "photo_ref": "SKETCH_A2O_1F.jpg",
       "x": 6.0,
       "y": 4.0,
       "z": 0.0,
-      "floor_profile_id": "826f8b41cfad",
+      "floor_profile_id": "cdf35c74b0b5",
       "obstacle_remark_id": null,
       "source": "floor_profile_supplement",
       "label": "楼层:A2O池体-地上一层",
-      "created_at": "2026-06-09T00:00:09.675112"
+      "created_at": "2026-06-19T14:01:33.305279"
     },
     {
-      "id": "27c71906628f",
+      "id": "4c904265bba3",
       "photo_ref": "SKETCH_PUMP_B2.jpg",
       "x": 3.5,
       "y": 15.5,
       "z": -2.0,
-      "floor_profile_id": "46295df73d4a",
+      "floor_profile_id": "19a6071c9054",
       "obstacle_remark_id": null,
       "source": "floor_profile_supplement",
       "label": "楼层:污泥回流泵房-地下二层剖面",
-      "created_at": "2026-06-09T00:00:09.675125"
+      "created_at": "2026-06-19T14:01:33.305294"
     }
   ],
   "coordinate_rows": [
     {
-      "id": "e5fd0364267e",
+      "id": "745722466a53",
       "point_label": "P-A2O-01",
       "x": 5.0,
       "y": 3.0,
       "z": 0.0,
       "floor_profile_id": null,
       "verified": true,
-      "created_at": "2026-06-09T00:00:16.049349"
+      "created_at": "2026-06-19T14:01:33.306114"
     },
     {
-      "id": "360e04fda9ef",
+      "id": "54f619b003c0",
       "point_label": "P-A2O-02",
       "x": 5.2,
       "y": 3.1,
       "z": 0.0,
       "floor_profile_id": null,
       "verified": true,
-      "created_at": "2026-06-09T00:00:16.049366"
+      "created_at": "2026-06-19T14:01:33.306122"
     },
     {
-      "id": "5983da97908c",
+      "id": "b0249bcff315",
       "point_label": "P-SC-01",
       "x": 12.0,
       "y": 8.0,
       "z": 1.5,
       "floor_profile_id": null,
       "verified": true,
-      "created_at": "2026-06-09T00:00:16.049372"
+      "created_at": "2026-06-19T14:01:33.306128"
+    },
+    {
+      "id": "478c6ea1742c",
+      "point_label": "P-A2O-1F-01",
+      "x": 6.0,
+      "y": 4.0,
+      "z": 0.0,
+      "floor_profile_id": "cdf35c74b0b5",
+      "verified": false,
+      "created_at": "2026-06-19T14:04:02.501957"
     }
   ],
   "occlusion_points": [
     {
-      "id": "95d84c903fee",
-      "photo_location_id": "024ded9fa272",
+      "id": "33595554b8e2",
+      "photo_location_id": "0a858072e4b8",
       "photo_ref": "IMG_001.jpg",
       "point_x": 5.0,
       "point_y": 3.0,
@@ -202,18 +212,18 @@
       "reason": "照片 IMG_001.jpg 标注了点位 (5.00, 3.00, 0.00)，但坐标表中无对应行（容差 ±0.5）",
       "missing_material": "已通过补录坐标表解决（匹配坐标行: P-A2O-01）",
       "next_action": "safety_officer",
-      "obstacle_remark_id": "b393feab2a87",
+      "obstacle_remark_id": "faa3e76c4c03",
       "floor_profile_id": null,
       "resolved_by": "system_auto",
-      "resolved_at": "2026-06-09T00:00:16.049374",
-      "created_at": "2026-06-09T00:00:02.355465",
-      "updated_at": "2026-06-09T00:00:16.049374",
+      "resolved_at": "2026-06-19T14:01:33.306131",
+      "created_at": "2026-06-19T14:01:33.304456",
+      "updated_at": "2026-06-19T14:01:33.306131",
       "original_reason": "照片 IMG_001.jpg 标注了点位 (5.00, 3.00, 0.00)，但坐标表中无对应行（容差 ±0.5）",
       "original_missing_material": "坐标表缺少该点位行；关联障碍物备注已确认，但坐标未补录",
       "original_next_action": "instructor_liang",
       "audit_trail": [
         {
-          "timestamp": "2026-06-09T00:00:02.355399",
+          "timestamp": "2026-06-19T14:01:33.304436",
           "action": "created",
           "from_status": "",
           "to_status": "pending_review",
@@ -228,7 +238,7 @@
           "note": "原始检测：不要急着归正常，留给安全员复核"
         },
         {
-          "timestamp": "2026-06-09T00:00:16.049374",
+          "timestamp": "2026-06-19T14:01:33.306131",
           "action": "resolved_by_coordinate",
           "from_status": "pending_review",
           "to_status": "resolved",
@@ -245,8 +255,8 @@
       ]
     },
     {
-      "id": "6b75d158d919",
-      "photo_location_id": "338e0e6d2820",
+      "id": "3e79026a259c",
+      "photo_location_id": "7c14a4490f1d",
       "photo_ref": "IMG_002.jpg",
       "point_x": 5.0,
       "point_y": 3.0,
@@ -255,18 +265,18 @@
       "reason": "照片 IMG_002.jpg 标注了点位 (5.00, 3.00, 0.00)，但坐标表中无对应行（容差 ±0.5）",
       "missing_material": "已通过补录坐标表解决（匹配坐标行: P-A2O-01）",
       "next_action": "safety_officer",
-      "obstacle_remark_id": "b393feab2a87",
+      "obstacle_remark_id": "faa3e76c4c03",
       "floor_profile_id": null,
       "resolved_by": "system_auto",
-      "resolved_at": "2026-06-09T00:00:16.049374",
-      "created_at": "2026-06-09T00:00:02.355504",
-      "updated_at": "2026-06-09T00:00:16.049374",
+      "resolved_at": "2026-06-19T14:01:33.306131",
+      "created_at": "2026-06-19T14:01:33.304473",
+      "updated_at": "2026-06-19T14:01:33.306131",
       "original_reason": "照片 IMG_002.jpg 标注了点位 (5.00, 3.00, 0.00)，但坐标表中无对应行（容差 ±0.5）",
       "original_missing_material": "坐标表缺少该点位行；关联障碍物备注已确认，但坐标未补录",
       "original_next_action": "instructor_liang",
       "audit_trail": [
         {
-          "timestamp": "2026-06-09T00:00:02.355483",
+          "timestamp": "2026-06-19T14:01:33.304463",
           "action": "created",
           "from_status": "",
           "to_status": "pending_review",
@@ -281,7 +291,7 @@
           "note": "原始检测：不要急着归正常，留给安全员复核"
         },
         {
-          "timestamp": "2026-06-09T00:00:16.049374",
+          "timestamp": "2026-06-19T14:01:33.306131",
           "action": "resolved_by_coordinate",
           "from_status": "pending_review",
           "to_status": "resolved",
@@ -298,8 +308,8 @@
       ]
     },
     {
-      "id": "392e683575ee",
-      "photo_location_id": "e53c3fbdc165",
+      "id": "5d72cfdaa368",
+      "photo_location_id": "9e7990e46e43",
       "photo_ref": "IMG_003.jpg",
       "point_x": 12.0,
       "point_y": 8.0,
@@ -308,18 +318,18 @@
       "reason": "照片 IMG_003.jpg 标注了点位 (12.00, 8.00, 1.50)，但坐标表中无对应行（容差 ±0.5）",
       "missing_material": "已通过补录坐标表解决（匹配坐标行: P-SC-01）",
       "next_action": "safety_officer",
-      "obstacle_remark_id": "f0da95681bd4",
+      "obstacle_remark_id": "59102cd2d0b1",
       "floor_profile_id": null,
       "resolved_by": "system_auto",
-      "resolved_at": "2026-06-09T00:00:16.049374",
-      "created_at": "2026-06-09T00:00:02.355542",
-      "updated_at": "2026-06-09T00:00:16.049374",
+      "resolved_at": "2026-06-19T14:01:33.306131",
+      "created_at": "2026-06-19T14:01:33.304490",
+      "updated_at": "2026-06-19T14:01:33.306131",
       "original_reason": "照片 IMG_003.jpg 标注了点位 (12.00, 8.00, 1.50)，但坐标表中无对应行（容差 ±0.5）",
       "original_missing_material": "坐标表缺少该点位行；关联障碍物备注已确认，但坐标未补录",
       "original_next_action": "safety_officer",
       "audit_trail": [
         {
-          "timestamp": "2026-06-09T00:00:02.355515",
+          "timestamp": "2026-06-19T14:01:33.304480",
           "action": "created",
           "from_status": "",
           "to_status": "pending_review",
@@ -334,7 +344,7 @@
           "note": "原始检测：不要急着归正常，留给安全员复核"
         },
         {
-          "timestamp": "2026-06-09T00:00:16.049374",
+          "timestamp": "2026-06-19T14:01:33.306131",
           "action": "resolved_by_coordinate",
           "from_status": "pending_review",
           "to_status": "resolved",
@@ -351,8 +361,8 @@
       ]
     },
     {
-      "id": "337482a9f59a",
-      "photo_location_id": "9776104dbdae",
+      "id": "cd292d83fcf7",
+      "photo_location_id": "9d02ea9e0f41",
       "photo_ref": "IMG_004.jpg",
       "point_x": 3.0,
       "point_y": 15.0,
@@ -361,18 +371,18 @@
       "reason": "照片 IMG_004.jpg 标注了点位 (3.00, 15.00, -2.00)，但坐标表中无对应行（容差 ±0.5）",
       "missing_material": "坐标表缺少该点位行；关联障碍物备注已确认，但坐标未补录",
       "next_action": "instructor_liang",
-      "obstacle_remark_id": "383631ac5c4f",
+      "obstacle_remark_id": "a8a4c17381b2",
       "floor_profile_id": null,
       "resolved_by": "",
       "resolved_at": null,
-      "created_at": "2026-06-09T00:00:02.355568",
-      "updated_at": "2026-06-09T00:00:02.355570",
+      "created_at": "2026-06-19T14:01:33.304511",
+      "updated_at": "2026-06-19T14:01:33.304512",
       "original_reason": "照片 IMG_004.jpg 标注了点位 (3.00, 15.00, -2.00)，但坐标表中无对应行（容差 ±0.5）",
       "original_missing_material": "坐标表缺少该点位行；关联障碍物备注已确认，但坐标未补录",
       "original_next_action": "instructor_liang",
       "audit_trail": [
         {
-          "timestamp": "2026-06-09T00:00:02.355551",
+          "timestamp": "2026-06-19T14:01:33.304496",
           "action": "created",
           "from_status": "",
           "to_status": "pending_review",
@@ -389,8 +399,8 @@
       ]
     },
     {
-      "id": "ff2bd26f1f93",
-      "photo_location_id": "22e338d6dd90",
+      "id": "24c6b45e7900",
+      "photo_location_id": "ea70d95b53c4",
       "photo_ref": "IMG_005.jpg",
       "point_x": 3.0,
       "point_y": 15.0,
@@ -399,18 +409,18 @@
       "reason": "照片 IMG_005.jpg 标注了点位 (3.00, 15.00, -2.00)，但坐标表中无对应行（容差 ±0.5）",
       "missing_material": "坐标表缺少该点位行；关联障碍物备注已确认，但坐标未补录",
       "next_action": "instructor_liang",
-      "obstacle_remark_id": "383631ac5c4f",
+      "obstacle_remark_id": "a8a4c17381b2",
       "floor_profile_id": null,
       "resolved_by": "",
       "resolved_at": null,
-      "created_at": "2026-06-09T00:00:02.355624",
-      "updated_at": "2026-06-09T00:00:02.355627",
+      "created_at": "2026-06-19T14:01:33.304525",
+      "updated_at": "2026-06-19T14:01:33.304526",
       "original_reason": "照片 IMG_005.jpg 标注了点位 (3.00, 15.00, -2.00)，但坐标表中无对应行（容差 ±0.5）",
       "original_missing_material": "坐标表缺少该点位行；关联障碍物备注已确认，但坐标未补录",
       "original_next_action": "instructor_liang",
       "audit_trail": [
         {
-          "timestamp": "2026-06-09T00:00:02.355578",
+          "timestamp": "2026-06-19T14:01:33.304516",
           "action": "created",
           "from_status": "",
           "to_status": "pending_review",
@@ -427,28 +437,28 @@
       ]
     },
     {
-      "id": "bede264f24c4",
-      "photo_location_id": "9824adc18a37",
+      "id": "5c692672a768",
+      "photo_location_id": "e6f2739dc0e2",
       "photo_ref": "SKETCH_A2O_1F.jpg",
       "point_x": 6.0,
       "point_y": 4.0,
       "point_z": 0.0,
-      "status": "escalated_safety",
+      "status": "resolved",
       "reason": "照片 SKETCH_A2O_1F.jpg 标注了点位 (6.00, 4.00, 0.00)，但坐标表中无对应行（容差 ±0.5）",
-      "missing_material": "坐标表缺少该点位行；未关联障碍物备注，需确认是否遗漏；已升级安全员复核",
+      "missing_material": "已通过补录坐标表解决（匹配坐标行: P-A2O-1F-01）",
       "next_action": "safety_officer",
       "obstacle_remark_id": null,
-      "floor_profile_id": "826f8b41cfad",
-      "resolved_by": "",
-      "resolved_at": null,
-      "created_at": "2026-06-09T00:00:09.675153",
-      "updated_at": "2026-06-09T00:09:29.012746",
+      "floor_profile_id": "cdf35c74b0b5",
+      "resolved_by": "web-user",
+      "resolved_at": "2026-06-19T14:04:02.501966",
+      "created_at": "2026-06-19T14:01:33.305312",
+      "updated_at": "2026-06-19T14:04:02.501966",
       "original_reason": "照片 SKETCH_A2O_1F.jpg 标注了点位 (6.00, 4.00, 0.00)，但坐标表中无对应行（容差 ±0.5）",
       "original_missing_material": "坐标表缺少该点位行；未关联障碍物备注，需确认是否遗漏",
       "original_next_action": "safety_officer",
       "audit_trail": [
         {
-          "timestamp": "2026-06-09T00:00:09.675138",
+          "timestamp": "2026-06-19T14:01:33.305300",
           "action": "created",
           "from_status": "",
           "to_status": "pending_review",
@@ -463,55 +473,25 @@
           "note": "原始检测：不要急着归正常，留给安全员复核"
         },
         {
-          "timestamp": "2026-06-09T00:00:30.698949",
-          "action": "escalated_to_safety",
+          "timestamp": "2026-06-19T14:04:02.501966",
+          "action": "resolved_by_coordinate",
           "from_status": "pending_review",
-          "to_status": "escalated_safety",
+          "to_status": "resolved",
           "from_reason": "照片 SKETCH_A2O_1F.jpg 标注了点位 (6.00, 4.00, 0.00)，但坐标表中无对应行（容差 ±0.5）",
           "to_reason": "照片 SKETCH_A2O_1F.jpg 标注了点位 (6.00, 4.00, 0.00)，但坐标表中无对应行（容差 ±0.5）",
           "from_missing_material": "坐标表缺少该点位行；未关联障碍物备注，需确认是否遗漏",
-          "to_missing_material": "坐标表缺少该点位行；未关联障碍物备注，需确认是否遗漏；已升级安全员复核",
+          "to_missing_material": "已通过补录坐标表解决（匹配坐标行: P-A2O-1F-01）",
           "from_next_action": "safety_officer",
           "to_next_action": "safety_officer",
-          "changed_by": "instructor_liang",
-          "change_cause": "培训教官老梁确认需安全员现场复核",
-          "note": "不提前归正常，保留原始说法和改后值，等安全员到场确认"
-        },
-        {
-          "timestamp": "2026-06-09T00:00:36.767722",
-          "action": "review_comment",
-          "from_status": "escalated_safety",
-          "to_status": "escalated_safety",
-          "from_reason": "照片 SKETCH_A2O_1F.jpg 标注了点位 (6.00, 4.00, 0.00)，但坐标表中无对应行（容差 ±0.5）",
-          "to_reason": "照片 SKETCH_A2O_1F.jpg 标注了点位 (6.00, 4.00, 0.00)，但坐标表中无对应行（容差 ±0.5）",
-          "from_missing_material": "坐标表缺少该点位行；未关联障碍物备注，需确认是否遗漏；已升级安全员复核",
-          "to_missing_material": "坐标表缺少该点位行；未关联障碍物备注，需确认是否遗漏；已升级安全员复核",
-          "from_next_action": "safety_officer",
-          "to_next_action": "safety_officer",
-          "changed_by": "安全员张师傅",
-          "change_cause": "人工复核批注",
-          "note": "现场复核：该点位是A2O池1楼临时检修口，已在坐标表补录前升级复核，建议下次巡检时补拍并录入坐标"
-        },
-        {
-          "timestamp": "2026-06-09T00:09:29.012746",
-          "action": "review_comment",
-          "from_status": "escalated_safety",
-          "to_status": "escalated_safety",
-          "from_reason": "照片 SKETCH_A2O_1F.jpg 标注了点位 (6.00, 4.00, 0.00)，但坐标表中无对应行（容差 ±0.5）",
-          "to_reason": "照片 SKETCH_A2O_1F.jpg 标注了点位 (6.00, 4.00, 0.00)，但坐标表中无对应行（容差 ±0.5）",
-          "from_missing_material": "坐标表缺少该点位行；未关联障碍物备注，需确认是否遗漏；已升级安全员复核",
-          "to_missing_material": "坐标表缺少该点位行；未关联障碍物备注，需确认是否遗漏；已升级安全员复核",
-          "from_next_action": "safety_officer",
-          "to_next_action": "safety_officer",
-          "changed_by": "安全元老梁",
-          "change_cause": "人工复核批注",
-          "note": "Web看板端复核批注：经现场核实，此处为1楼临时检修通道，属于巡检必到点，下次巡检时需补录坐标行并签字确认。"
+          "changed_by": "web-user",
+          "change_cause": "坐标表补录了匹配行 P-A2O-1F-01 (6.00, 4.00, 0.00)",
+          "note": "原始说法已保留，改后值和原因已记录"
         }
       ]
     },
     {
-      "id": "70523e2c5031",
-      "photo_location_id": "27c71906628f",
+      "id": "12f1fa913d2a",
+      "photo_location_id": "4c904265bba3",
       "photo_ref": "SKETCH_PUMP_B2.jpg",
       "point_x": 3.5,
       "point_y": 15.5,
@@ -521,17 +501,17 @@
       "missing_material": "坐标表缺少该点位行；未关联障碍物备注，需确认是否遗漏",
       "next_action": "safety_officer",
       "obstacle_remark_id": null,
-      "floor_profile_id": "46295df73d4a",
+      "floor_profile_id": "19a6071c9054",
       "resolved_by": "",
       "resolved_at": null,
-      "created_at": "2026-06-09T00:00:09.675166",
-      "updated_at": "2026-06-09T00:00:09.675167",
+      "created_at": "2026-06-19T14:01:33.305326",
+      "updated_at": "2026-06-19T14:01:33.305327",
       "original_reason": "照片 SKETCH_PUMP_B2.jpg 标注了点位 (3.50, 15.50, -2.00)，但坐标表中无对应行（容差 ±0.5）",
       "original_missing_material": "坐标表缺少该点位行；未关联障碍物备注，需确认是否遗漏",
       "original_next_action": "safety_officer",
       "audit_trail": [
         {
-          "timestamp": "2026-06-09T00:00:09.675158",
+          "timestamp": "2026-06-19T14:01:33.305317",
           "action": "created",
           "from_status": "",
           "to_status": "pending_review",

@@ -7,6 +7,21 @@ let threeHitTargets = [];
 
 const API = "/api";
 
+function showStatusMsg(msg, isError) {
+  var bar = document.getElementById("status-bar");
+  if (!bar) {
+    bar = document.createElement("div");
+    bar.id = "status-bar";
+    bar.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:9999;padding:10px 20px;text-align:center;font-size:15px;transition:opacity 0.5s;";
+    document.body.appendChild(bar);
+  }
+  bar.textContent = msg;
+  bar.style.background = isError ? "#e74c3c" : "#27ae60";
+  bar.style.color = "#fff";
+  bar.style.opacity = "1";
+  setTimeout(function() { bar.style.opacity = "0"; }, 3000);
+}
+
 async function api(method, path, body) {
   const opts = { method, headers: { "Content-Type": "application/json" } };
   if (body) opts.body = JSON.stringify(body);
@@ -51,12 +66,28 @@ function hideCreateProject() {
 async function createProject() {
   const name = el("cp-name").value.trim();
   const plant = el("cp-plant").value.trim();
-  if (!name) return alert("请输入项目名称");
+  if (!name) return showStatusMsg("请输入项目名称", true);
   const result = await api("POST", "/projects", { name, plant_name: plant });
   currentProjectId = result.id;
   await refreshProjectList();
   hideCreateProject();
   await loadProject(currentProjectId);
+}
+
+async function loadSampleProject() {
+  try {
+    const result = await api("POST", "/load-sample", {
+      name: "污水厂池体检修-样例演示",
+      plant_name: "第一污水厂",
+      by: "web-新人",
+    });
+    currentProjectId = result.id || result.project_id;
+    await refreshProjectList();
+    await loadProject(currentProjectId);
+    showStatusMsg("样例项目已加载成功！");
+  } catch (e) {
+    showStatusMsg("加载样例失败: " + e.message, true);
+  }
 }
 
 async function loadProject(id) {
@@ -172,6 +203,7 @@ function renderOcclusionList(data) {
         <div class="occlusion-actions">
           ${op.status === "pending_review" ? `<button class="escalate" onclick="escalateOcclusion('${op.id}')">升级到安全员</button>` : ""}
           <button onclick="showOcclusionDetail('${op.id}')">查看详情 + 审计轨迹</button>
+          ${op.status !== "resolved" ? `<button onclick="showOcclusionDetail('${op.id}')" style="background:#52c41a;color:#fff;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:12px;">补录坐标</button>` : ""}
           ${op.obstacle_remark_id ? `<span class="back-link" onclick="goToObstacle('${op.obstacle_remark_id}')">→ 查看关联障碍物备注</span>` : ""}
           ${op.floor_profile_id ? `<span class="back-link" onclick="goToProfile('${op.floor_profile_id}')">→ 查看关联楼层剖面草图</span>` : ""}
         </div>
@@ -290,12 +322,12 @@ function hideImportPanel() {
 
 async function doImport() {
   const raw = el("import-json").value.trim();
-  if (!raw) return alert("请粘贴JSON数据");
+  if (!raw) return showStatusMsg("请粘贴JSON数据", true);
   let data;
   try {
     data = JSON.parse(raw);
   } catch (e) {
-    return alert("JSON解析失败: " + e.message);
+    return showStatusMsg("JSON解析失败: " + e.message, true);
   }
   if (!Array.isArray(data)) data = [data];
 
@@ -310,7 +342,7 @@ async function doImport() {
     renderProject(result);
     hideImportPanel();
   } catch (e) {
-    alert("导入失败: " + e.message);
+    showStatusMsg("导入失败: " + e.message, true);
   }
 }
 
@@ -320,7 +352,7 @@ async function runStep() {
     currentProjectData = result;
     renderProject(result);
   } catch (e) {
-    alert("推进失败: " + e.message);
+    showStatusMsg("推进失败: " + e.message, true);
   }
 }
 
@@ -330,7 +362,37 @@ async function escalateOcclusion(occlusionId) {
     currentProjectData = result;
     renderProject(result);
   } catch (e) {
-    alert("升级失败: " + e.message);
+    showStatusMsg("升级失败: " + e.message, true);
+  }
+}
+
+async function escalateAndShowDetail(occlusionId) {
+  try {
+    const result = await api("POST", `/projects/${currentProjectId}/occlusion/${occlusionId}/escalate`, { target: "safety_officer" });
+    currentProjectData = result;
+    renderProject(result);
+    showOcclusionDetail(occlusionId);
+  } catch (e) {
+    showStatusMsg("升级失败: " + e.message, true);
+  }
+}
+
+async function resolveWithCoords(occlusionId) {
+  const pointLabel = document.getElementById(`resolve-point_label-${occlusionId}`).value.trim();
+  const x = parseFloat(document.getElementById(`resolve-x-${occlusionId}`).value);
+  const y = parseFloat(document.getElementById(`resolve-y-${occlusionId}`).value);
+  const z = parseFloat(document.getElementById(`resolve-z-${occlusionId}`).value);
+  if (!pointLabel) return showStatusMsg("请输入点位标签", true);
+  if (isNaN(x) || isNaN(y) || isNaN(z)) return showStatusMsg("请输入有效的坐标值", true);
+  try {
+    const result = await api("POST", `/projects/${currentProjectId}/occlusion/${occlusionId}/resolve`, {
+      point_label: pointLabel, x, y, z,
+    });
+    currentProjectData = result;
+    renderProject(result);
+    showOcclusionDetail(occlusionId);
+  } catch (e) {
+    showStatusMsg("补录坐标失败: " + e.message, true);
   }
 }
 
@@ -339,7 +401,7 @@ async function submitReviewComment(occlusionId) {
   const reviewer = document.getElementById(`reviewer-${occlusionId}`);
   const comment = (textarea?.value || "").trim();
   const who = (reviewer?.value || "safety_officer");
-  if (!comment) return alert("请填写复核批注内容");
+  if (!comment) return showStatusMsg("请填写复核批注内容", true);
   try {
     const result = await api("POST", `/projects/${currentProjectId}/occlusion/${occlusionId}/review-comment`, {
       comment,
@@ -349,7 +411,7 @@ async function submitReviewComment(occlusionId) {
     renderProject(result);
     showOcclusionDetail(occlusionId);
   } catch (e) {
-    alert("提交失败: " + e.message);
+    showStatusMsg("提交失败: " + e.message, true);
   }
 }
 
@@ -701,13 +763,24 @@ function showOcclusionDetail(occlusionId) {
     </div>
 
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
-      ${op.status === "pending_review" ? `<button class="escalate" style="background:#f5222d;color:white;border:none;border-radius:4px;padding:8px 16px;cursor:pointer;" onclick="escalateOcclusion('${op.id}');showOcclusionDetail('${op.id}');">升级到安全员</button>` : ""}
+      ${op.status === "pending_review" ? `<button class="escalate" style="background:#f5222d;color:white;border:none;border-radius:4px;padding:8px 16px;cursor:pointer;" onclick="escalateAndShowDetail('${op.id}')">升级安全员</button>` : ""}
       ${op.obstacle_remark_id ? `<button style="border:1px solid #1890ff;background:white;color:#1890ff;border-radius:4px;padding:8px 16px;cursor:pointer;" onclick="goToObstacle('${op.obstacle_remark_id}')">→ 回到障碍物备注</button>` : ""}
       ${op.floor_profile_id ? `<button style="border:1px solid #1890ff;background:white;color:#1890ff;border-radius:4px;padding:8px 16px;cursor:pointer;" onclick="goToProfile('${op.floor_profile_id}')">→ 回到楼层剖面草图</button>` : ""}
       <button style="border:1px solid #d9d9d9;background:white;color:#666;border-radius:4px;padding:8px 16px;cursor:pointer;" onclick="switchTab('occlusion');hideDetailModal();">在遮挡点清单中查看</button>
     </div>
 
     ${auditHtml}
+
+    <div style="margin-top:16px;padding:14px;background:#f6ffed;border:1px solid #b7eb8f;border-radius:6px;">
+      <h5 style="margin:0 0 10px 0;color:#389e0d;">📍 补录坐标行</h5>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <label style="font-size:13px;">点位标签 <input id="resolve-point_label-${op.id}" type="text" value="P-NEW-XX" style="padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;width:120px;"></label>
+        <label style="font-size:13px;">X <input id="resolve-x-${op.id}" type="number" step="0.01" value="${(op.x ?? 0).toFixed(2)}" style="padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;width:90px;"></label>
+        <label style="font-size:13px;">Y <input id="resolve-y-${op.id}" type="number" step="0.01" value="${(op.y ?? 0).toFixed(2)}" style="padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;width:90px;"></label>
+        <label style="font-size:13px;">Z <input id="resolve-z-${op.id}" type="number" step="0.01" value="${(op.z ?? 0).toFixed(2)}" style="padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;width:90px;"></label>
+        <button onclick="resolveWithCoords('${op.id}')" style="background:#52c41a;color:white;border:none;border-radius:4px;padding:6px 16px;cursor:pointer;font-weight:bold;">保存并重算</button>
+      </div>
+    </div>
 
     <div class="review-form">
       <h5>📝 人工复核批注（留痕：原始说法 + 改后值 + 原因 + 下一步找谁）</h5>
