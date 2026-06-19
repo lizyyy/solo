@@ -190,13 +190,37 @@ examples/
 pip install -r requirements.txt
 ```
 
-### 运行示例
+### 一键运行主演示
+
+按以下任意一种方式启动，都能直接走通完整链路：
 
 ```bash
-python examples/demo.py
+# 方式一：项目根目录直接运行（推荐）
+cd /Users/lzy/pro/solo/workspaces/zy72396
+PYTHONPATH=. python3 examples/demo.py
+
+# 方式二：使用便捷脚本
+./run_demo.sh
 ```
 
-### 基本使用
+运行后会依次输出 9 步：
+1. 工况照片第一次导入（五类重复分类明细）
+2. 再导入同一文件触发历史重复
+3. 同批次 reimport，林老师只改一条备注
+4. 摄氏度/开尔文混用 → 不急着归正常
+5. 教练修正混用
+6. 林老师补备注（改前/改后/原因三元组）
+7. 教练更新交接报告
+8. 回滚（字段级证据恢复 + 闭环验证）
+9. 生成批次报告 / 单张证据报告（追溯触发重复导入的原始材料）
+
+### 端到端自动验证（打标 PASS / FAIL）
+
+```bash
+PYTHONPATH=. python3 examples/e2e_verification.py
+```
+
+### 基本使用（真实 API）
 
 ```python
 from src.app import BalanceWheelErrorApp
@@ -204,29 +228,59 @@ from src.models.enums import TemperatureUnit
 
 app = BalanceWheelErrorApp()
 
-# 第一步：导入照片
+# ===== 第 1 步：导入照片（返回真实分类，不是跳过数） =====
 rows = [
     {"file_name": "IMG_001.jpg", "original_row": 1, "temperature": "25°C", "balance_wheel_error": 0.5},
     {"file_name": "IMG_002.jpg", "original_row": 2, "temperature": "25°C / 298.15K", "balance_wheel_error": 0.3},
+    {"file_name": "IMG_001.jpg", "original_row": 1, "temperature": "25°C", "balance_wheel_error": 0.5},  # 本批重复
 ]
 result = app.import_photos(rows, "工况表.xlsx")
 batch_id = result["batch_id"]
 
-# 查看待教练复核的混用照片
+# 读取五类真实分类
+print("新记录:",          result["classification"]["new_count"])
+print("本次导入内重复:",  result["classification"]["batch_duplicate_count"])
+print("历史重复:",        result["classification"]["history_duplicate_count"])
+print("有更新:",          result["classification"]["updated_count"])
+print("无变化:",          result["classification"]["unchanged_count"])
+
+# ===== 查看待教练复核的混用照片（返回完整证据报告） =====
 pending = app.get_pending_coach_review()
+photo_id = pending[0]["photo_evidence"]["photo_id"]
 
-# 教练修正混用
-photo_id = pending[0]["photo_id"]
-app.coach_fix_mixed_units(photo_id, TemperatureUnit.CELSIUS, "经核对以摄氏度为准")
+# ===== 教练修正混用 =====
+ok, msg, ev = app.coach_fix_mixed_units(photo_id, TemperatureUnit.CELSIUS, "经核对以摄氏度为准")
 
-# 第二步：林老师补备注
-app.lin_teacher_add_remark(photo_id, "巡检正常，磨损轻微")
+# ===== 第 2 步：林老师补备注（含修改原因三元组） =====
+ok, msg, ev = app.lin_teacher_add_remark(
+    photo_id,
+    "巡检正常，磨损轻微",
+    change_reason="对照 2024-01-15 手写巡检本第 7 页补录",
+)
 
-# 第三步：教练更新报告
-app.coach_update_report(photo_id, "交接报告：误差在允许范围内")
+# ===== 第 3 步：教练更新交接报告 =====
+ok, msg, ev = app.coach_update_report(photo_id, "交接报告：误差在允许范围内")
 
-# 追溯变更历史
-ok, msg, trail = app.get_photo_audit_trail(photo_id)
+# ===== 回滚（字段级快照恢复，不是只改状态） =====
+ok, msg, ev = app.coach_rollback(photo_id, 1, "修正依据有误，回滚到导入后状态重新判定")
+
+# ===== 验证回滚闭环 =====
+ok, msg, loop = app.verify_rollback_closed_loop(photo_id)
+print("闭环通过:", loop["closed_loop_verified"])
+print("字段检查:", loop["field_checks"])  # 每个字段的 true/false
+
+# ===== 追溯：批次报告（可追回触发重复导入的原始材料） =====
+ok, msg, batch = app.get_batch_summary(batch_id)
+print("导入审计日志:", batch["import_audit_log"])     # 每次导入/重导都有记录
+print("追溯线索:", [p["traceback_hint"] for p in batch["photos"]])
+print("操作指引:", batch["traceback_instructions"])
+
+# ===== 追溯：单张照片完整证据链 =====
+ok, msg, photo = app.get_photo_evidence(photo_id)
+print("原始行号:", photo["photo_evidence"]["original_row"])
+print("原始温度文本（永不修改）:", photo["photo_evidence"]["temperature_raw"])
+print("追溯路径:", photo["traceback_path"])
+print("重要变更:", photo["notable_changes"])  # 每条带 version / type / operator / reason
 ```
 
 ---
