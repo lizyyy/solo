@@ -2,7 +2,6 @@ import type { BillItem, ConflictEvidence, HistoryRecord, ImportBatch } from '@/t
 
 let _id = 0
 const nid = () => `B${String(++_id).padStart(4, '0')}`
-const batchId = () => `IMP-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
 
 const TAX_REMARKS = ['6%', '9%', '13%', '3%', '0%', '免税', '6%已冲正', '9%已冲正']
 const TAIL_NOS = ['8842', '3317', '0056', '7721', '5593', '6688', '1144', '2299']

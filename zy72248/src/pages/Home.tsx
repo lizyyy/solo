@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 import { useBillStore } from '@/store/billStore'
 import { cn } from '@/lib/utils'
-import type { BillItem, BillStatus, MaterialType, RiskReviewStatus, SelfCheckType, SelfCheckResult } from '@/types'
+import type { BillItem, BillStatus, MaterialType, RiskReviewStatus, SelfCheckType, SelfCheckResult, LastExportSnapshot } from '@/types'
 import { STATUS_LABELS, MATERIAL_TYPE_LABELS, SELF_CHECK_LABELS } from '@/types'
 
 const PAGE_SIZE = 10
@@ -29,8 +29,10 @@ export default function Home() {
   const selfCheckResults = useBillStore((s) => s.selfCheckResults)
   const selfCheckDrawerOpen = useBillStore((s) => s.selfCheckDrawerOpen)
   const importModalOpen = useBillStore((s) => s.importModalOpen)
+  const history = useBillStore((s) => s.history)
   const setSelfCheckDrawerOpen = useBillStore((s) => s.setSelfCheckDrawerOpen)
   const setImportModalOpen = useBillStore((s) => s.setImportModalOpen)
+  const setLastExportSnapshot = useBillStore((s) => s.setLastExportSnapshot)
   const importItems = useBillStore((s) => s.importItems)
   const runSelfCheck = useBillStore((s) => s.runSelfCheck)
   const addHistoryRecord = useBillStore((s) => s.addHistoryRecord)
@@ -53,18 +55,54 @@ export default function Home() {
       票据号: it.billNo, 金额: it.amount, 税费率备注: it.taxRateRemark,
       柜台流水尾号: it.counterTxnTailNo, 备注: it.remark, 状态: STATUS_LABELS[it.status],
     }))
+
+    const statusDistribution: Record<string, number> = {}
+    for (const it of filtered) {
+      const label = STATUS_LABELS[it.status]
+      statusDistribution[label] = (statusDistribution[label] || 0) + 1
+    }
+
+    const itemsState = filtered.map((it) => ({
+      id: it.id,
+      billNo: it.billNo,
+      status: it.status,
+      taxRateRemark: it.taxRateRemark,
+      remark: it.remark,
+      summaryUpdated: it.summaryUpdated,
+      conflictResolution: it.conflictResolution,
+      riskReviewStatus: it.riskReviewStatus,
+    }))
+
+    const ts = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14)
+    const fileName = `票据影像补录清单_${ts}.xlsx`
+    const exportTime = new Date().toISOString().replace('T', ' ').slice(0, 19)
+
+    const snapshot: LastExportSnapshot = {
+      exportTime,
+      fileName,
+      recordCount: filtered.length,
+      fields: ['票据号', '金额', '税费率备注', '柜台流水尾号', '备注', '状态'],
+      rows,
+      statusDistribution,
+      itemsState,
+      historyCount: history.length,
+      lastHistoryIds: history.slice(0, 5).map((h) => h.id),
+    }
+
+    setLastExportSnapshot(snapshot)
+
     const ws = XLSX.utils.json_to_sheet(rows)
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, '票据清单')
-    const ts = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14)
-    XLSX.writeFile(wb, `票据影像补录清单_${ts}.xlsx`)
+    XLSX.writeFile(wb, fileName)
+
     addHistoryRecord({
       billItemId: '', action: 'export', operator: '阿芬',
-      timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19),
-      beforeSnapshot: '{}', afterSnapshot: JSON.stringify({ count: filtered.length }),
-      detail: `导出 ${filtered.length} 条记录`,
+      timestamp: exportTime,
+      beforeSnapshot: '{}', afterSnapshot: JSON.stringify({ count: filtered.length, fileName }),
+      detail: `导出 ${filtered.length} 条记录，文件名：${fileName}`,
     })
-  }, [filtered, addHistoryRecord])
+  }, [filtered, history, setLastExportSnapshot, addHistoryRecord])
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const handleFile = useCallback((file: File) => {

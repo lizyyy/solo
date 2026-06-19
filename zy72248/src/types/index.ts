@@ -67,6 +67,34 @@ export interface ImportBatch {
   count: number
 }
 
+export interface LastExportSnapshot {
+  exportTime: string
+  fileName: string
+  recordCount: number
+  fields: string[]
+  rows: Array<{
+    票据号: string
+    金额: number
+    税费率备注: string
+    柜台流水尾号: string
+    备注: string
+    状态: string
+  }>
+  statusDistribution: Record<string, number>
+  itemsState: Array<{
+    id: string
+    billNo: string
+    status: BillStatus
+    taxRateRemark: string
+    remark: string
+    summaryUpdated: boolean
+    conflictResolution?: ConflictResolution
+    riskReviewStatus?: RiskReviewStatus
+  }>
+  historyCount: number
+  lastHistoryIds: string[]
+}
+
 export const STATUS_LABELS: Record<BillStatus, string> = {
   normal: '正常',
   wrong_caliber: '错口径',
