@@ -77,3 +77,14 @@ def make_webcalc_screenshot_b_mixed() -> ChatScreenshot:
         efficiency=0.90,
         captured_at=datetime(2026, 6, 2, 14, 30, 0),
     )
+
+
+def make_old_caliber_screenshot() -> ChatScreenshot:
+    return ChatScreenshot(
+        id="ss-old-caliber-005",
+        equipment_id="PULLEY-A01",
+        temperature_value=26.5,
+        temperature_unit=TempUnit.CELSIUS,
+        efficiency=0.87,
+        captured_at=datetime(2026, 5, 20, 9, 0, 0),
+    )

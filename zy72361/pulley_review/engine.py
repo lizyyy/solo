@@ -93,6 +93,57 @@ def import_chat_screenshot(
     return record, audit_entries
 
 
+def create_supplemented_record(
+    note: SamplingIntervalNote,
+    operator: str = "老岑",
+    related_record: Optional[ReviewRecord] = None,
+) -> tuple[ReviewRecord, list[AuditEntry]]:
+    audit_entries: list[AuditEntry] = []
+
+    record = ReviewRecord(
+        id="rec-suppl-{}".format(note.id),
+        equipment_id=note.equipment_id,
+        temperature_value=note.temperature_value,
+        temperature_unit=note.temperature_unit,
+        efficiency=note.efficiency,
+        source=RecordSource.SAMPLING_INTERVAL_NOTE,
+        status=ReviewStatus.SUPPLEMENTED,
+        supplemental_source=RecordSource.SAMPLING_INTERVAL_NOTE,
+        original_unit=note.temperature_unit,
+        related_screenshot_id=related_record.id if related_record else None,
+        note="旧口径补录记录，来源：采样间隔说明({})；原始说法（来自采样说明）：{}{}/eff={}；处理原因：从采样间隔说明补录旧口径数据；后续动作：归档交接报告".format(
+            note.id, note.temperature_value, note.temperature_unit.value, note.efficiency
+        ),
+    )
+
+    audit_entries.append(
+        AuditEntry(
+            id="aud-{}-suppl-new".format(record.id),
+            record_id=record.id,
+            changed_by=operator,
+            change_type="supplement_new_record",
+            old_value="",
+            new_value="{}{}/eff={}".format(note.temperature_value, note.temperature_unit.value, note.efficiency),
+            reason="创建旧口径补录记录，来源：采样间隔说明({})".format(note.id),
+            affected_results=["效率值", "温度值", "交接报告", "列表展示", "详情页", "历史记录"],
+        )
+    )
+    audit_entries.append(
+        AuditEntry(
+            id="aud-{}-status".format(record.id),
+            record_id=record.id,
+            changed_by=operator,
+            change_type="status_set",
+            old_value="",
+            new_value=ReviewStatus.SUPPLEMENTED.value,
+            reason="补录记录初始状态设为 supplemented",
+            affected_results=["复核状态", "摘要统计"],
+        )
+    )
+
+    return record, audit_entries
+
+
 def supplement_from_sampling_note(
     note: SamplingIntervalNote,
     target_record: ReviewRecord,
@@ -100,66 +151,20 @@ def supplement_from_sampling_note(
 ) -> tuple[ReviewRecord, list[AuditEntry]]:
     audit_entries: list[AuditEntry] = []
 
-    old_status = target_record.status
-    old_unit = target_record.temperature_unit
-    old_value = target_record.temperature_value
-    old_eff = target_record.efficiency
-
-    if target_record.original_value_before_supplement is None:
-        target_record.original_value_before_supplement = old_value
-    if target_record.original_efficiency_before_supplement is None:
-        target_record.original_efficiency_before_supplement = old_eff
-
-    if note.is_old_caliber:
-        target_record.status = ReviewStatus.SUPPLEMENTED
+    if not note.is_old_caliber:
         target_record.supplemental_source = RecordSource.SAMPLING_INTERVAL_NOTE
-        target_record.original_unit = old_unit
-        target_record.temperature_unit = note.temperature_unit
-        target_record.temperature_value = note.temperature_value
-        target_record.efficiency = note.efficiency
-        target_record.note = (
-            "旧口径补录，来源：采样间隔说明({})；".format(note.id)
-            + "原始说法：{}{}/eff={} → ".format(old_value, old_unit.value, old_eff)
-            + "补录后：{}{}/eff={}".format(note.temperature_value, note.temperature_unit.value, note.efficiency)
-        )
 
-        audit_entries.append(
-            AuditEntry(
-                id="aud-{}-supplement".format(target_record.id),
-                record_id=target_record.id,
-                changed_by=operator,
-                change_type="supplement_old_caliber",
-                old_value="{}{}/eff={}".format(old_value, old_unit.value, old_eff),
-                new_value="{}{}/eff={}".format(note.temperature_value, note.temperature_unit.value, note.efficiency),
-                reason="从采样间隔说明({})补录旧口径数据；下一步：归档交接报告".format(note.id),
-                affected_results=["效率值", "温度值", "交接报告", "列表展示", "详情页", "历史记录"],
-            )
+    audit_entries.append(
+        AuditEntry(
+            id="aud-{}-ref".format(target_record.id),
+            record_id=target_record.id,
+            changed_by=operator,
+            change_type="reference_added",
+            old_value="",
+            new_value="sampling_interval_note:{}".format(note.id),
+            reason="补充采样间隔说明({})作为参考".format(note.id),
+            affected_results=["参考资料", "详情页"],
         )
-        audit_entries.append(
-            AuditEntry(
-                id="aud-{}-status".format(target_record.id),
-                record_id=target_record.id,
-                changed_by=operator,
-                change_type="status_change",
-                old_value=old_status.value,
-                new_value=ReviewStatus.SUPPLEMENTED.value,
-                reason="旧口径数据补录",
-                affected_results=["复核状态", "摘要统计"],
-            )
-        )
-    else:
-        target_record.supplemental_source = RecordSource.SAMPLING_INTERVAL_NOTE
-        audit_entries.append(
-            AuditEntry(
-                id="aud-{}-ref".format(target_record.id),
-                record_id=target_record.id,
-                changed_by=operator,
-                change_type="reference_added",
-                old_value="",
-                new_value="sampling_interval_note:{}".format(note.id),
-                reason="补充采样间隔说明({})作为参考".format(note.id),
-                affected_results=["参考资料", "详情页"],
-            )
-        )
+    )
 
     return target_record, audit_entries

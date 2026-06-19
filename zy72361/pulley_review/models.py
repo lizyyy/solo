@@ -54,6 +54,7 @@ class ReviewRecord:
     pending_review: Optional[PendingReviewInfo] = None
     original_value_before_supplement: Optional[float] = None
     original_efficiency_before_supplement: Optional[float] = None
+    related_screenshot_id: Optional[str] = None
 
 
 @dataclass

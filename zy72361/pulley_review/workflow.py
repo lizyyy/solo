@@ -4,7 +4,7 @@ import json
 
 from .audit import AuditLog
 from .conflict import detect_conflicts, resolve_conflict
-from .engine import import_chat_screenshot, supplement_from_sampling_note
+from .engine import create_supplemented_record, import_chat_screenshot, supplement_from_sampling_note
 from .models import (
     AuditEntry,
     ChatScreenshot,
@@ -54,11 +54,12 @@ class PulleyReviewWorkflow:
         return record
 
     def step2_review_sampling_note(
-        self, note: SamplingIntervalNote, target_record_id: str, operator: str = "老岑"
+        self, note: SamplingIntervalNote, target_record_id: str | None = None, operator: str = "老岑"
     ) -> ReviewRecord | None:
-        target = next((r for r in self.records if r.id == target_record_id), None)
-        if target is None:
-            return None
+        target = None
+        if target_record_id:
+            target = next((r for r in self.records if r.id == target_record_id), None)
+
         self.notes.append(note)
         new_conflicts = detect_conflicts(
             [s for s in self.screenshots if s.equipment_id == note.equipment_id],
@@ -66,10 +67,45 @@ class PulleyReviewWorkflow:
         )
         for c in new_conflicts:
             self.conflicts.append(c)
-        record, entries = supplement_from_sampling_note(note, target, operator)
-        for entry in entries:
+
+        if note.is_old_caliber:
+            if target:
+                record_ref, entries_ref = supplement_from_sampling_note(note, target, operator)
+                for entry in entries_ref:
+                    self.audit_log.add(entry)
+            new_record, entries_new = create_supplemented_record(note, operator, related_record=target)
+            self.records.append(new_record)
+            for entry in entries_new:
+                self.audit_log.add(entry)
+            return new_record
+        else:
+            if target is None:
+                return None
+            record, entries = supplement_from_sampling_note(note, target, operator)
+            for entry in entries:
+                self.audit_log.add(entry)
+            return record
+
+    def step2_create_supplemented(
+        self, note: SamplingIntervalNote, operator: str = "老岑", related_record_id: str | None = None
+    ) -> ReviewRecord:
+        related_record = None
+        if related_record_id:
+            related_record = next((r for r in self.records if r.id == related_record_id), None)
+
+        self.notes.append(note)
+        new_conflicts = detect_conflicts(
+            [s for s in self.screenshots if s.equipment_id == note.equipment_id],
+            [note],
+        )
+        for c in new_conflicts:
+            self.conflicts.append(c)
+
+        new_record, entries_new = create_supplemented_record(note, operator, related_record=related_record)
+        self.records.append(new_record)
+        for entry in entries_new:
             self.audit_log.add(entry)
-        return record
+        return new_record
 
     def step3_update_handover_report(self) -> HandoverReport:
         c = self._counts()
@@ -124,6 +160,7 @@ class PulleyReviewWorkflow:
                 "supplemental_source": r.supplemental_source.value if r.supplemental_source else None,
                 "original_value_before_supplement": r.original_value_before_supplement,
                 "original_efficiency_before_supplement": r.original_efficiency_before_supplement,
+                "related_screenshot_id": r.related_screenshot_id,
                 "has_pending": r.pending_review is not None,
                 "report_summary": summary,
                 "recorded_at": r.recorded_at.isoformat(),
@@ -168,8 +205,14 @@ class PulleyReviewWorkflow:
                 "original_value_before_supplement": r.original_value_before_supplement,
                 "original_efficiency_before_supplement": r.original_efficiency_before_supplement,
                 "supplemental_source": r.supplemental_source.value if r.supplemental_source else None,
+                "related_screenshot_id": r.related_screenshot_id,
             },
             "pending_review": pending,
+            "related_supplemented_records": [
+                {"id": s.id, "status": s.status.value}
+                for s in self.records
+                if s.related_screenshot_id == r.id and s.status == ReviewStatus.SUPPLEMENTED
+            ],
             "history": [
                 {
                     "id": h.id,

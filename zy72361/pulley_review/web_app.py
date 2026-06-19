@@ -224,7 +224,7 @@ def _render_home(sv: dict, records: list[dict]) -> str:
         <button type="submit" class="btn-secondary">📥 导入样例B(开尔文→混用)</button>
       </form>
       <form method="POST" action="/supplement-old">
-        <button type="submit" class="btn-secondary">📝 补录旧口径采样说明</button>
+        <button type="submit" class="btn-secondary">📝 导入旧口径补录（独立补录记录，来自采样间隔说明）</button>
       </form>
       <form method="POST" action="/export-text">
         <button type="submit" class="btn-success">📄 导出文本报告</button>
@@ -368,7 +368,15 @@ def _render_record_detail(detail: dict | None, record_id: str) -> str:
     {f'<div class="field-row"><span class="field-label">补录前温度</span><span class="field-value">{rec["original_value_before_supplement"]}</span></div>' if rec["original_value_before_supplement"] is not None else ''}
     {f'<div class="field-row"><span class="field-label">补录前效率</span><span class="field-value">{rec["original_efficiency_before_supplement"]}</span></div>' if rec["original_efficiency_before_supplement"] is not None else ''}
     {f'<div class="field-row"><span class="field-label">补录来源</span><span class="field-value">{_escape(rec["supplemental_source"])}</span></div>' if rec["supplemental_source"] else ''}
+    {f'<div class="field-row"><span class="field-label">关联原始记录</span><span class="field-value"><a href="/record/{_escape(rec["related_screenshot_id"])}">{_escape(rec["related_screenshot_id"])}</a></span></div>' if rec["related_screenshot_id"] else ''}
   </div>
+
+  {f'''
+  <div class="card" style="background: #e3f2fd; border: 1px solid #2196f3;">
+    <h3 style="color: #1565c0; margin-bottom: 8px;">🔗 关联的旧口径补录记录</h3>
+    {"".join([f'<div><a href="/record/{_escape(s["id"])}">{_escape(s["id"])}</a></div>' for s in detail["related_supplemented_records"]])}
+  </div>
+  ''' if detail["related_supplemented_records"] else ''}
 
   {pending_html}
   {history_html}
@@ -478,10 +486,11 @@ class PulleyReviewWebServer(http.server.BaseHTTPRequestHandler):
             return
 
         if path == "/supplement-old":
+            old_note = make_old_caliber_note()
+            related_record_id = None
             if _workflow.records:
-                first_record_id = _workflow.records[0].id
-                old_note = make_old_caliber_note()
-                _workflow.step2_review_sampling_note(old_note, first_record_id, "老岑")
+                related_record_id = _workflow.records[0].id
+            _workflow.step2_create_supplemented(old_note, "老岑", related_record_id)
             self._send_redirect("/")
             return
 
