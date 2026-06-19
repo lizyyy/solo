@@ -205,6 +205,60 @@ def _next_owner_after(row: ScoringWeightRow) -> Optional[str]:
     return None
 
 
+def _check_phase_allowed(
+    db: Session,
+    import_batch_id: str,
+    target_phase: ImportPhase,
+    operation_type: str = "advance",
+) -> None:
+    """
+    阶段校验：禁止跳步。
+    operation_type:
+      - "advance": 阶段推进操作（review_old_formula, update_counterexample）
+                   必须按顺序：target_idx == current_idx + 1 或 target_idx == current_idx
+      - "modify":  修改操作（manual_override, quick_fix, rollback, boundary_review）
+                   要求当前阶段 >= 目标阶段（必须先完成前置步骤才能修改）
+    """
+    workflow = db.query(WorkflowState).filter(WorkflowState.import_batch_id == import_batch_id).first()
+    if not workflow:
+        raise ValueError(f"import_batch_id={import_batch_id} 不存在")
+
+    current = workflow.current_phase
+    phase_order = [
+        ImportPhase.WEIGHT_TABLE_IMPORTED,
+        ImportPhase.OLD_FORMULA_REVIEWED,
+        ImportPhase.COUNTEREXAMPLE_UPDATED,
+    ]
+    try:
+        current_idx = phase_order.index(current)
+        target_idx = phase_order.index(target_phase)
+    except ValueError:
+        raise ValueError(f"无效的阶段: current={current}, target={target_phase}")
+
+    phase_map = {
+        ImportPhase.WEIGHT_TABLE_IMPORTED: "第一步：评分权重表导入",
+        ImportPhase.OLD_FORMULA_REVIEWED: "第二步：补看旧公式截图",
+        ImportPhase.COUNTEREXAMPLE_UPDATED: "第三步：反例列表更新",
+    }
+
+    if operation_type == "advance":
+        if target_idx != current_idx + 1 and target_idx != current_idx:
+            raise ValueError(
+                f"禁止跳步！当前批次阶段为「{phase_map[current]}」，"
+                f"不能直接执行「{phase_map[target_phase]}」。"
+                f"请先完成「{phase_map[phase_order[current_idx]]}」"
+            )
+    elif operation_type == "modify":
+        if current_idx < target_idx:
+            raise ValueError(
+                f"禁止跳步修改！当前批次阶段为「{phase_map[current]}」，"
+                f"必须先完成「{phase_map[target_phase]}」才能执行此修改操作。"
+                f"请按顺序完成「{phase_map[phase_order[current_idx]]}」→「{phase_map[target_phase]}」"
+            )
+    else:
+        raise ValueError(f"无效的 operation_type: {operation_type}")
+
+
 def import_weight_table(db: Session, rows: List[WeightRowImportItem]) -> WorkflowStateResponse:
     batch_id = str(uuid.uuid4())[:8]
     boundary_count = 0
@@ -283,6 +337,7 @@ def review_old_formula(
     note: Optional[str] = None,
     changed_by: str = "analyst_qi",
 ) -> RepairRecordResponse:
+    _check_phase_allowed(db, import_batch_id, ImportPhase.OLD_FORMULA_REVIEWED, operation_type="advance")
     row = db.query(ScoringWeightRow).filter(ScoringWeightRow.id == row_id).first()
     if not row:
         raise ValueError(f"row_id={row_id} 不存在")
@@ -330,6 +385,7 @@ def update_counterexample(
     counterexample_note: str,
     changed_by: str = "analyst_qi",
 ) -> RepairRecordResponse:
+    _check_phase_allowed(db, import_batch_id, ImportPhase.COUNTEREXAMPLE_UPDATED, operation_type="advance")
     row = db.query(ScoringWeightRow).filter(ScoringWeightRow.id == row_id).first()
     if not row:
         raise ValueError(f"row_id={row_id} 不存在")
@@ -386,6 +442,7 @@ def manual_override(
     row = db.query(ScoringWeightRow).filter(ScoringWeightRow.id == row_id).first()
     if not row:
         raise ValueError(f"row_id={row_id} 不存在")
+    _check_phase_allowed(db, row.import_batch_id, ImportPhase.OLD_FORMULA_REVIEWED, operation_type="modify")
 
     old_val_raw = getattr(row, field_name, None)
     old_val = str(old_val_raw) if old_val_raw is not None else None
@@ -404,13 +461,17 @@ def manual_override(
     else:
         setattr(row, field_name, new_value)
 
-    if row.boundary_judgment == BoundaryJudgment.EQUAL_THRESHOLD and \
-       row.processing_status != ProcessingStatus.ROLLED_BACK:
-        row.processing_status = ProcessingStatus.BOUNDARY_PENDING_REVIEW
-    elif field_name in ("original_value", "threshold") and \
-         row.boundary_judgment != BoundaryJudgment.EQUAL_THRESHOLD and \
-         row.processing_status == ProcessingStatus.BOUNDARY_PENDING_REVIEW:
-        row.processing_status = ProcessingStatus.REVIEWING
+    if field_name in ("original_value", "threshold") and row.boundary_judgment is not None:
+        if row.boundary_judgment == BoundaryJudgment.EQUAL_THRESHOLD and \
+           row.processing_status != ProcessingStatus.ROLLED_BACK:
+            row.processing_status = ProcessingStatus.BOUNDARY_PENDING_REVIEW
+        elif row.boundary_judgment != BoundaryJudgment.EQUAL_THRESHOLD and \
+             row.processing_status in (
+                 ProcessingStatus.BOUNDARY_PENDING_REVIEW,
+                 ProcessingStatus.REVIEWING,
+                 ProcessingStatus.PENDING,
+             ):
+            row.processing_status = ProcessingStatus.CONFIRMED
 
     row.updated_at = datetime.utcnow()
     db.flush()
@@ -457,6 +518,7 @@ def review_boundary(
         raise ValueError(f"row_id={row_id} 不存在")
     if row.boundary_judgment != BoundaryJudgment.EQUAL_THRESHOLD:
         raise ValueError(f"row_id={row_id} 非边界等于阈值，无需复核")
+    _check_phase_allowed(db, row.import_batch_id, ImportPhase.COUNTEREXAMPLE_UPDATED, operation_type="modify")
 
     old_status = row.processing_status
     reason_text = f"任课老师复核：{'确认正常' if confirmed_normal else '继续审核'}{f'，理由：{reason}' if reason else ''}"
@@ -508,6 +570,7 @@ def rollback_row(
     row = db.query(ScoringWeightRow).filter(ScoringWeightRow.id == row_id).first()
     if not row:
         raise ValueError(f"row_id={row_id} 不存在")
+    _check_phase_allowed(db, row.import_batch_id, ImportPhase.OLD_FORMULA_REVIEWED, operation_type="modify")
 
     old_status = row.processing_status
     row.processing_status = ProcessingStatus.ROLLED_BACK
@@ -555,6 +618,7 @@ def _quick_fix_impl(
     row = db.query(ScoringWeightRow).filter(ScoringWeightRow.id == row_id).first()
     if not row:
         raise ValueError(f"row_id={row_id} 不存在")
+    _check_phase_allowed(db, row.import_batch_id, ImportPhase.OLD_FORMULA_REVIEWED, operation_type="modify")
 
     snap = _recompute_value_and_status(row, new_original_value=fix_value)
 
@@ -673,3 +737,92 @@ def get_batch_summary(db: Session, import_batch_id: str) -> BatchSummaryResponse
         created_at=workflow.created_at,
         updated_at=workflow.updated_at,
     )
+
+
+def export_batch_json(db: Session, import_batch_id: str) -> dict:
+    """
+    导出批次全部明细为 JSON（读取同一份最新数据）。
+    """
+    _check_phase_allowed(db, import_batch_id, ImportPhase.COUNTEREXAMPLE_UPDATED, operation_type="modify")
+    details = get_batch_export_details(db, import_batch_id)
+    summary = get_batch_summary(db, import_batch_id)
+    workflow = get_workflow_state(db, import_batch_id)
+    return {
+        "export_metadata": {
+            "export_at": datetime.utcnow().isoformat() + "Z",
+            "import_batch_id": import_batch_id,
+            "export_source": "single_source_of_truth (ScoringWeightRow + AuditTrail + RepairRecord)",
+        },
+        "summary": summary.model_dump(),
+        "workflow": workflow.model_dump() if workflow else None,
+        "details": [d.model_dump() for d in details],
+    }
+
+
+def export_batch_csv(db: Session, import_batch_id: str) -> str:
+    """
+    导出批次全部明细为 CSV（读取同一份最新数据）。
+    包含：行数据 + 最新修补记录摘要 + 处理状态 + 下一步找谁。
+    """
+    _check_phase_allowed(db, import_batch_id, ImportPhase.COUNTEREXAMPLE_UPDATED, operation_type="modify")
+    details = get_batch_export_details(db, import_batch_id)
+    summary = get_batch_summary(db, import_batch_id)
+
+    headers = [
+        "batch_id", "original_row_number", "indicator_name", "threshold", "weight",
+        "original_value", "interpolated_value", "boundary_judgment", "processing_status",
+        "error_type", "next_action_owner", "instructor_reviewed",
+        "latest_repair_action", "latest_change_reason", "latest_repair_at",
+        "original_value_before", "original_value_after", "interpolated_value_before", "interpolated_value_after",
+        "old_formula_screenshot_ref", "counterexample_note", "rollback_reason",
+        "row_created_at", "row_updated_at",
+    ]
+
+    lines = [",".join(headers)]
+    for d in details:
+        row = d.row
+        latest_rr = d.repair_records[-1] if d.repair_records else None
+        fields = [
+            import_batch_id,
+            str(row.original_row_number),
+            row.indicator_name,
+            f"{row.threshold}",
+            f"{row.weight}",
+            f"{row.original_value}" if row.original_value is not None else "",
+            f"{row.interpolated_value}" if row.interpolated_value is not None else "",
+            row.boundary_judgment.value if row.boundary_judgment else "",
+            row.processing_status.value,
+            row.error_type.value if row.error_type else "",
+            latest_rr.next_action_owner if latest_rr and latest_rr.next_action_owner else "",
+            "1" if latest_rr and latest_rr.instructor_reviewed else "0",
+            latest_rr.action_type if latest_rr and latest_rr.action_type else "",
+            (latest_rr.change_reason if latest_rr and latest_rr.change_reason else "").replace(",", "，").replace("\n", " "),
+            latest_rr.created_at.isoformat() if latest_rr else "",
+            f"{latest_rr.original_value_before}" if latest_rr and latest_rr.original_value_before is not None else "",
+            f"{latest_rr.original_value_after}" if latest_rr and latest_rr.original_value_after is not None else "",
+            f"{latest_rr.interpolated_value_before}" if latest_rr and latest_rr.interpolated_value_before is not None else "",
+            f"{latest_rr.interpolated_value_after}" if latest_rr and latest_rr.interpolated_value_after is not None else "",
+            latest_rr.old_formula_screenshot_ref if latest_rr and latest_rr.old_formula_screenshot_ref else "",
+            (latest_rr.counterexample_note if latest_rr and latest_rr.counterexample_note else "").replace(",", "，").replace("\n", " "),
+            (latest_rr.rollback_reason if latest_rr and latest_rr.rollback_reason else "").replace(",", "，").replace("\n", " "),
+            row.created_at.isoformat(),
+            row.updated_at.isoformat(),
+        ]
+        lines.append(",".join(fields))
+
+    # 末尾追加摘要信息
+    lines.append("")
+    lines.append("=== BATCH SUMMARY (同一份数据源生成) ===")
+    lines.append(f"current_phase,{summary.current_phase.value}")
+    lines.append(f"total_rows,{summary.total_rows}")
+    lines.append(f"boundary_equal_threshold_count,{summary.boundary_equal_threshold_count}")
+    lines.append(f"wrong_caliber_count,{summary.wrong_caliber_count}")
+    lines.append(f"supplementary_rework_count,{summary.supplementary_rework_count}")
+    lines.append(f"pending_count,{summary.pending_count}")
+    lines.append(f"reviewing_count,{summary.reviewing_count}")
+    lines.append(f"boundary_pending_review_count,{summary.boundary_pending_review_count}")
+    lines.append(f"confirmed_count,{summary.confirmed_count}")
+    lines.append(f"rolled_back_count,{summary.rolled_back_count}")
+    lines.append(f"export_at,{datetime.utcnow().isoformat()}Z")
+
+    return "\n".join(lines)

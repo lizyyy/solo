@@ -1,5 +1,5 @@
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 from interpolation_gauge.database import get_db
 from interpolation_gauge.models.payloads import (
@@ -27,7 +27,7 @@ def review_old_formula(request: OldFormulaReviewRequest, db: Session = Depends(g
             request.screenshot_ref, request.note,
         )
     except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.post("/update-counterexample", response_model=RepairRecordResponse, summary="第三步：反例列表更新")
@@ -37,7 +37,7 @@ def update_counterexample(request: CounterexampleUpdateRequest, db: Session = De
             db, request.import_batch_id, request.row_id, request.counterexample_note,
         )
     except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("/workflow/{import_batch_id}", response_model=Optional[WorkflowStateResponse], summary="查询流程状态")
@@ -82,7 +82,7 @@ def manual_override(request: ManualOverrideRequest, db: Session = Depends(get_db
             request.new_value, request.change_reason, request.changed_by,
         )
     except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.post("/boundary-review", response_model=WeightRowResponse, summary="任课老师复核边界值")
@@ -101,7 +101,7 @@ def rollback_row(request: RollbackRequest, db: Session = Depends(get_db)):
     try:
         return repair_service.rollback_row(db, request.row_id, request.rollback_reason)
     except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.post("/quick-fix", response_model=WeightRowResponse, summary="快捷修补（错口径/补录返工）")
@@ -118,4 +118,27 @@ def quick_fix(request: QuickFixRequest, db: Session = Depends(get_db)):
         else:
             raise HTTPException(status_code=400, detail=f"不支持的快捷修补类型: {request.error_type}")
     except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/export/{import_batch_id}/json", summary="导出批次明细（JSON 格式），与详情/列表同数据源")
+def export_json(import_batch_id: str, db: Session = Depends(get_db)):
+    try:
+        return repair_service.export_batch_json(db, import_batch_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/export/{import_batch_id}/csv", summary="导出批次明细（CSV 格式），与详情/列表同数据源")
+def export_csv(import_batch_id: str, db: Session = Depends(get_db)):
+    try:
+        csv_content = repair_service.export_batch_csv(db, import_batch_id)
+        return Response(
+            content=csv_content,
+            media_type="text/csv; charset=utf-8",
+            headers={
+                "Content-Disposition": f"attachment; filename=interpolation_gauge_{import_batch_id}.csv"
+            }
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

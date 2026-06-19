@@ -21,11 +21,22 @@ python3 -m uvicorn interpolation_gauge.main:app --reload --port 8000
 
 ### 阶段推进规则（链路稳定关键）
 
-- **只按 1→2→3 顺序推进，不可跳步**。
+- **只按 1→2→3 顺序推进，不可跳步**。所有接口都有阶段校验。
+- **阶段推进操作**（`review-old-formula`、`update-counterexample`）：必须按顺序，`target_idx == current_idx + 1` 或 `target_idx == current_idx`（允许重复执行同一阶段）。
+- **修改操作**（`manual-override`、`quick-fix`、`rollback`、`boundary-review`、`export`）：要求当前批次阶段 >= 目标依赖阶段。
+- **跳步拦截**：导入后直接调用 `update-counterexample` 或 `manual-override` 会返回 HTTP 400，错误信息包含明确提示。
 - **只有批次内所有行都完成当前阶段，整个批次阶段才推进**（任意一行没做完都不推进）。
 - 第 1 步执行完批次进入 `weight_table_imported`；所有行都做完第 2 步 → 进入 `old_formula_reviewed`；所有行都做完第 3 步 → 进入 `counterexample_updated`。
 - 流程状态通过 `GET /api/interpolation-gauge/workflow/{batch_id}` 查询。
+- 阶段校验逻辑见 `interpolation_gauge/services/repair_service.py` 中的 `_check_phase_allowed()`。
 - 步骤推进逻辑见 `interpolation_gauge/services/repair_service.py` 中的 `_determine_phase_after_action()`。
+
+### 跳步拦截错误码
+
+| 错误场景 | HTTP 状态码 | 错误提示示例 |
+|----------|------------|--------------|
+| 导入后直接调 `update-counterexample` | 400 | 禁止跳步！当前批次阶段为「第一步：评分权重表导入」，不能直接执行「第三步：反例列表更新」。请先完成「第一步：评分权重表导入」 |
+| 导入后直接调 `manual-override` | 400 | 禁止跳步修改！当前批次阶段为「第一步：评分权重表导入」，必须先完成「第二步：补看旧公式截图」才能执行此修改操作。 |
 
 ---
 
@@ -145,6 +156,78 @@ python3 -m uvicorn interpolation_gauge.main:app --reload --port 8000
 5. 刷新批次计数
 
 ---
+
+## 导出接口（同一份数据源）
+
+导出接口与列表、详情、摘要读取同一份最新数据，必须先完成第三步（反例列表更新）才能导出。
+
+| 导出格式 | 接口 | 说明 |
+|---------|------|------|
+| JSON | `GET /api/interpolation-gauge/export/{batch_id}/json` | 完整结构：元数据 + 摘要 + 工作流 + 所有行明细（含历史轨迹） |
+| CSV | `GET /api/interpolation-gauge/export/{batch_id}/csv` | 表格格式：当前行状态 + 最新修补快照 + 末尾追加批次摘要 |
+
+### CSV 导出字段
+
+| 字段 | 说明 |
+|------|------|
+| `batch_id` | 批次ID |
+| `original_row_number` | 评分权重表原始行号 |
+| `indicator_name` | 指标名称 |
+| `threshold` | 阈值 |
+| `weight` | 权重 |
+| `original_value` | 当前原始值 |
+| `interpolated_value` | 当前插值结果 |
+| `boundary_judgment` | 边界判定结果 |
+| `processing_status` | 当前处理状态 |
+| `error_type` | 错误类型 |
+| `next_action_owner` | 下一步找谁（analyst_qi / instructor） |
+| `instructor_reviewed` | 任课老师是否已复核（1=是/0=否） |
+| `latest_repair_action` | 最新修补动作类型 |
+| `latest_change_reason` | 最新处理原因 |
+| `latest_repair_at` | 最新修补时间 |
+| `original_value_before / after` | 最新修补前后原始值 |
+| `interpolated_value_before / after` | 最新修补前后插值结果 |
+| `old_formula_screenshot_ref` | 旧公式截图引用 |
+| `counterexample_note` | 反例备注 |
+| `rollback_reason` | 回滚原因 |
+| `row_created_at / updated_at` | 行创建/更新时间 |
+
+### 导出前置条件
+
+- 批次必须已完成第三步（反例列表更新），否则返回 400 错误
+- 导出时自动做阶段校验，防止未完成流程就导出报告
+
+---
+
+## 可复现验证脚本
+
+项目提供 `reproduce_issue.py` 可一键复现完整流程，覆盖以下场景：
+
+```bash
+# 清理并重启服务
+lsof -t -i :8000 | xargs kill 2>/dev/null
+rm -f interpolation_gauge.db
+nohup python3 -m uvicorn interpolation_gauge.main:app --host 0.0.0.0 --port 8000 > /tmp/gauge_server.log 2>&1 & disown
+sleep 3
+
+# 运行完整复现脚本
+python3 reproduce_issue.py
+```
+
+脚本覆盖的 10 个场景：
+1. **跳步拦截测试**：导入后直接调用反例更新 → HTTP 400 拦截
+2. **跳步改值拦截**：导入后直接调用 manual_override → HTTP 400 拦截
+3. **按顺序推进**：导入 → 补看截图 → 更新反例，阶段正确推进
+4. **边界值等于阈值详情**：导入时识别，标记 `boundary_pending_review`，留待任课老师
+5. **改值重算**：80.0 → 79.5，插值+边界判定+状态同步更新
+6. **临时补材料场景**：79.5 → 80.0，再次触发边界待复核
+7. **多视图一致性**：列表/详情/摘要/待复核/导出五处一致
+8. **任课老师复核**：边界值确认正常，状态流转为 confirmed
+9. **导出 JSON**：解析验证，与实时接口一致
+10. **导出 CSV**：解析验证 24 个字段 + 末尾摘要
+11. **持久化数据验证**：直接读取 SQLite 三张表核对
+
+脚本运行完成后，所有输出保存在 `reproduction_output/` 目录。
 
 ## 处理状态流转
 

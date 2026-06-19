@@ -1,0 +1,304 @@
+======================================================================
+插值曲线仪表修补 - 完整复现脚本
+======================================================================
+
+======================================================================
+环境检查
+======================================================================
+  [✓] 服务运行状态: HTTP 200, {'service': '插值曲线仪表修补系统', 'version': '1.0.0'}
+  [✓] 数据库路径: /Users/lzy/pro/solo/workspaces/zy72316/interpolation_gauge.db  存在: True
+
+======================================================================
+场景 1：跳步拦截测试（导入后直接调用反例更新，应该失败）
+======================================================================
+  [✓] 导入成功 batch_id=faf088d2, 当前阶段=weight_table_imported
+     boundary_equal_threshold_count=1
+  row IDs: row1=1, row2(边界)=2, row3=3
+
+  [测试] 导入后直接调用 update-counterexample（跳步到第3步）...
+  [✓] 跳步拦截成功: HTTP 400
+     错误信息: 禁止跳步！当前批次阶段为「第一步：评分权重表导入」，不能直接执行「第三步：反例列表更新」。请先完成「第一步：评分权重表导入」
+
+  [测试] 导入后直接调用 manual-override（应被拦截，需要先完成第2步）...
+  [✓] 跳步改值拦截成功: HTTP 400
+     错误信息: 禁止跳步修改！当前批次阶段为「第一步：评分权重表导入」，必须先完成「第二步：补看旧公式截图」才能执行此修改操作。请按顺序完成「第一步：评分权重表导入」→「第二步：补看旧公式截图」
+
+======================================================================
+场景 2：按顺序推进（导入 → 补看截图 → 更新反例）
+======================================================================
+
+  [第二步] 补看旧公式截图（逐行处理）...
+    row_id=1: phase=old_formula_reviewed, next_owner=analyst_qi
+    row_id=2: phase=old_formula_reviewed, next_owner=instructor
+    row_id=3: phase=old_formula_reviewed, next_owner=analyst_qi
+  [✓] 第二步完成后阶段: old_formula_reviewed
+
+  [第三步] 反例列表更新（逐行处理）...
+    row_id=1: phase=counterexample_updated, next_owner=None, instructor_reviewed=True
+    row_id=2: phase=counterexample_updated, next_owner=instructor, instructor_reviewed=False
+    row_id=3: phase=counterexample_updated, next_owner=None, instructor_reviewed=True
+  [✓] 第三步完成后阶段: counterexample_updated
+
+======================================================================
+场景 3：边界值等于阈值的 row2 详情核对
+======================================================================
+  row2 状态: status=boundary_pending_review, boundary=equal_threshold
+  原始值=80.0, 阈值=80.0, 插值=1.0
+  error_type=None, updated_at=2026-06-19T08:20:52.748820
+
+  修补记录（共3条，按时间升序）:
+    [0] phase=weight_table_imported, action=import
+        value: None → 80.0
+        interp: None → 1.0
+        change_reason: 评分权重表首次导入
+        changed_by=system, next_owner=instructor, instructor_reviewed=False
+    [1] phase=old_formula_reviewed, action=old_formula_review
+        value: 80.0 → 80.0
+        interp: 1.0 → 1.0
+        change_reason: 补看旧公式截图，备注：旧公式截图中阈值=80，原始值=80，边界值等于阈值，未见特殊处理说明，需任课老师明确
+        changed_by=analyst_qi, next_owner=instructor, instructor_reviewed=False
+    [2] phase=counterexample_updated, action=counterexample_update
+        value: 80.0 → 80.0
+        interp: 1.0 → 1.0
+        change_reason: 反例列表更新，边界值等于阈值，留待任课老师复核：期末笔试80.0=80.0，边界值等于阈值，插值结果1.0，需任课老师复核后再确认
+        changed_by=analyst_qi, next_owner=instructor, instructor_reviewed=False
+
+  审计轨迹（共3条）:
+    [0] 2026-06-19T08:20:52.712327: system 改 import: None → row=2, indicator=期末笔试, val=80.0, th=80.0
+        原因: 评分权重表首次导入
+    [1] 2026-06-19T08:20:52.734925: analyst_qi 改 old_formula_screenshot_ref: None → old_formula_期末笔试_v20260619.png
+        原因: 补看旧公式截图，备注：旧公式截图中阈值=80，原始值=80，边界值等于阈值，未见特殊处理说明，需任课老师明确
+    [2] 2026-06-19T08:20:52.749331: analyst_qi 改 counterexample_note: None → 期末笔试80.0=80.0，边界值等于阈值，插值结果1.0，需任课老师复核后再确认
+        原因: 反例列表更新，边界值等于阈值，留待任课老师复核：期末笔试80.0=80.0，边界值等于阈值，插值结果1.0，需任课老师复核后再确认
+
+======================================================================
+场景 4：改值重算（触发插值和边界判定重算）
+======================================================================
+
+  [改值] 补录返工：row2 original_value 80.0 → 79.5...
+  [✓] 改值成功: field=original_value, 80.0 → 79.5
+
+  改值后 row2:
+    original_value=79.5, boundary=below_threshold
+    interpolated_value=0.99375, status=confirmed
+    error_type=None
+  最新修补记录快照:
+    value: 80.0 → 79.5
+    interp: 1.0 → 0.99375
+    threshold: 80.0 → 80.0
+    action=manual_override:original_value, next_owner=None
+
+======================================================================
+场景 5：再改回 80.0，再次触发边界待复核（最怕临时补材料）
+======================================================================
+
+  [改值] 再次复核底册，发现79.5是错的，原始值确为80.0，改回...
+  [✓] 快捷修补成功: status=boundary_pending_review, boundary=equal_threshold
+     interpolated=1.0, error_type=supplementary_rework
+
+  改回后:
+    original_value=80.0, boundary=equal_threshold
+    interpolated=1.0, status=boundary_pending_review
+    error_type=supplementary_rework
+  最新修补: value 79.5→80.0
+           interp 0.99375→1.0
+           next_owner=instructor, instructor_reviewed=False
+
+======================================================================
+场景 6：多视图一致性核对（改值后同一份最新结果）
+======================================================================
+  batch-summary:
+    boundary_equal_threshold_count=1
+    boundary_pending_review_count=1
+    supplementary_rework_count=1
+    confirmed_count=2, total=3
+
+  workflow: boundary_equal_threshold_count=1
+  batch 接口中边界行数量: 1
+  boundary-pending 列表长度: 1
+  detail 接口中 row2 boundary: equal_threshold
+  detail 接口中 row2 status: boundary_pending_review
+  [✓] 五处视图数据完全一致 ✓
+
+======================================================================
+场景 7：任课老师复核边界值等于阈值
+======================================================================
+
+  [复核] 任课老师确认 row2 原始值80.0=阈值80.0 按正常计入...
+  [✓] 复核完成: status=confirmed
+  最新修补: action=boundary_instructor_review
+           changed_by=teacher_zhang
+           change_reason=任课老师复核：确认正常，理由：评分细则第3.2条明示：等于阈值按下一档上限计入，确认正常
+           instructor_reviewed=True
+           next_action_owner=None
+
+  复核后 batch_summary: boundary_pending=0, confirmed=3
+
+======================================================================
+场景 8：导出 JSON 并解析验证
+======================================================================
+  [✓] JSON 导出已保存: /Users/lzy/pro/solo/workspaces/zy72316/reproduction_output/12_export.json
+  export_metadata: {'export_at': '2026-06-19T08:20:52.804347Z', 'import_batch_id': 'faf088d2', 'export_source': 'single_source_of_truth (ScoringWeightRow + AuditTrail + RepairRecord)'}
+  summary in export: boundary=1, pending=0
+  [✓] JSON 导出数据与实时接口完全一致 ✓
+
+======================================================================
+场景 9：导出 CSV 并解析验证
+======================================================================
+  [✓] CSV 导出已保存: /Users/lzy/pro/solo/workspaces/zy72316/reproduction_output/13_export.csv
+  CSV 总行数（含表头）: 17
+  数据行数: 13
+  表头字段（共24个）:
+    [0] batch_id
+    [1] original_row_number
+    [2] indicator_name
+    [3] threshold
+    [4] weight
+    [5] original_value
+    [6] interpolated_value
+    [7] boundary_judgment
+    [8] processing_status
+    [9] error_type
+    [10] next_action_owner
+    [11] instructor_reviewed
+    [12] latest_repair_action
+    [13] latest_change_reason
+    [14] latest_repair_at
+    [15] original_value_before
+    [16] original_value_after
+    [17] interpolated_value_before
+    [18] interpolated_value_after
+    [19] old_formula_screenshot_ref
+    [20] counterexample_note
+    [21] rollback_reason
+    [22] row_created_at
+    [23] row_updated_at
+
+  row2 在 CSV 中的核心字段:
+    original_value=80.0
+    interpolated_value=1.0
+    boundary_judgment=equal_threshold
+    processing_status=confirmed
+    next_action_owner=
+    instructor_reviewed=1
+    original_value_before=80.0
+    original_value_after=80.0
+    latest_repair_action=boundary_instructor_review
+    latest_change_reason=任课老师复核：确认正常，理由：评分细则第3.2条明示：等于阈值按下一档上限计入，确认正常
+
+  CSV 末尾摘要:
+    current_phase,counterexample_updated
+    boundary_equal_threshold_count,1
+    export_at,2026-06-19T08:20:52.817212Z
+
+======================================================================
+场景 10：持久化数据（SQLite 直接查询）
+======================================================================
+  scoring_weight_rows 表 row2:
+    id = 2
+    import_batch_id = faf088d2
+    original_row_number = 2
+    indicator_name = 期末笔试
+    threshold = 80.0
+    weight = 0.4
+    original_value = 80.0
+    interpolated_value = 1.0
+    boundary_judgment = EQUAL_THRESHOLD
+    processing_status = CONFIRMED
+    error_type = SUPPLEMENTARY_REWORK
+    created_at = 2026-06-19 08:20:52.712265
+    updated_at = 2026-06-19 08:20:52.790690
+
+  audit_trails 表 row2 共 6 条:
+    [2] 2026-06-19 08:20:52.712327: import None → row=2, indicator=期末笔试, val=80.0, th=80.0 by system
+        reason: 评分权重表首次导入
+    [5] 2026-06-19 08:20:52.734925: old_formula_screenshot_ref None → old_formula_期末笔试_v20260619.png by analyst_qi
+        reason: 补看旧公式截图，备注：旧公式截图中阈值=80，原始值=80，边界值等于阈值，未见特殊处理说明，需任课老师明确
+    [8] 2026-06-19 08:20:52.749331: counterexample_note None → 期末笔试80.0=80.0，边界值等于阈值，插值结果1.0，需任课老师复核后再确认 by analyst_qi
+        reason: 反例列表更新，边界值等于阈值，留待任课老师复核：期末笔试80.0=80.0，边界值等于阈值，插值结果1.0，需任课老师复核后再确认
+    [10] 2026-06-19 08:20:52.762969: original_value 80.0 → 79.5 by analyst_qi
+        reason: 对照评分表底册复查，期末笔试原始值确为79.5，原录入误写为80.0
+    [11] 2026-06-19 08:20:52.771614: original_value 79.5 → 80.0 by analyst_qi
+        reason: quick_fix_supplementary_rework: 二次核对原始评分表，期末笔试确为80.0分，之前79.5是相邻行串位了
+    [12] 2026-06-19 08:20:52.791255: processing_status boundary_pending_review → confirmed by teacher_zhang
+        reason: 任课老师复核：确认正常，理由：评分细则第3.2条明示：等于阈值按下一档上限计入，确认正常
+
+  repair_records 表 row2 共 6 条:
+    [2] phase=WEIGHT_TABLE_IMPORTED, action=import
+        value None → 80.0
+        interp None → 1.0
+        is_boundary=True, instructor_reviewed=False
+        changed_by=system, next_owner=instructor
+    [5] phase=OLD_FORMULA_REVIEWED, action=old_formula_review
+        value 80.0 → 80.0
+        interp 1.0 → 1.0
+        is_boundary=True, instructor_reviewed=False
+        changed_by=analyst_qi, next_owner=instructor
+    [8] phase=COUNTEREXAMPLE_UPDATED, action=counterexample_update
+        value 80.0 → 80.0
+        interp 1.0 → 1.0
+        is_boundary=True, instructor_reviewed=False
+        changed_by=analyst_qi, next_owner=instructor
+    [10] phase=COUNTEREXAMPLE_UPDATED, action=manual_override:original_value
+        value 80.0 → 79.5
+        interp 1.0 → 0.99375
+        is_boundary=False, instructor_reviewed=True
+        changed_by=analyst_qi, next_owner=None
+    [11] phase=COUNTEREXAMPLE_UPDATED, action=quick_fix_supplementary_rework
+        value 79.5 → 80.0
+        interp 0.99375 → 1.0
+        is_boundary=True, instructor_reviewed=False
+        changed_by=analyst_qi, next_owner=instructor
+    [12] phase=COUNTEREXAMPLE_UPDATED, action=boundary_instructor_review
+        value 80.0 → 80.0
+        interp 1.0 → 1.0
+        is_boundary=True, instructor_reviewed=True
+        changed_by=teacher_zhang, next_owner=None
+
+======================================================================
+最终验证：最新处理结果可被继续使用
+======================================================================
+  批次最终状态: phase=counterexample_updated
+  total=3, confirmed=3
+  boundary_pending=0
+  wrong_caliber=0, supplementary=1
+
+  row2 完整证据链（可用于后续审计/报告）:
+  [0] 2026-06-19T08:20:52: import
+       None→80.0 | None→1.0
+       by=system | next=instructor | instructor_reviewed=False
+       reason: 评分权重表首次导入
+  [1] 2026-06-19T08:20:52: old_formula_review
+       80.0→80.0 | 1.0→1.0
+       by=analyst_qi | next=instructor | instructor_reviewed=False
+       reason: 补看旧公式截图，备注：旧公式截图中阈值=80，原始值=80，边界值等于阈值，未见特殊处理说明，需任课老师明确
+  [2] 2026-06-19T08:20:52: counterexample_update
+       80.0→80.0 | 1.0→1.0
+       by=analyst_qi | next=instructor | instructor_reviewed=False
+       reason: 反例列表更新，边界值等于阈值，留待任课老师复核：期末笔试80.0=80.0，边界值等于阈值，插值结果1.0，需任课老师复核后再确认
+  [3] 2026-06-19T08:20:52: manual_override:original_value
+       80.0→79.5 | 1.0→0.99375
+       by=analyst_qi | next=None | instructor_reviewed=True
+       reason: 对照评分表底册复查，期末笔试原始值确为79.5，原录入误写为80.0
+  [4] 2026-06-19T08:20:52: quick_fix_supplementary_rework
+       79.5→80.0 | 0.99375→1.0
+       by=analyst_qi | next=instructor | instructor_reviewed=False
+       reason: quick_fix_supplementary_rework: 二次核对原始评分表，期末笔试确为80.0分，之前79.5是相邻行串位了
+  [5] 2026-06-19T08:20:52: boundary_instructor_review
+       80.0→80.0 | 1.0→1.0
+       by=teacher_zhang | next=None | instructor_reviewed=True
+       reason: 任课老师复核：确认正常，理由：评分细则第3.2条明示：等于阈值按下一档上限计入，确认正常
+
+======================================================================
+[✓] 全部场景验证通过！
+[✓] 跳步拦截功能正常：导入后直接调用第3步被拦截
+[✓] 三步流程按顺序推进：导入→补看截图→更新反例
+[✓] 边界值等于阈值：不急着归正常，标记待复核
+[✓] 改值重算：插值+边界判定+状态同步更新
+[✓] 多视图一致性：列表/详情/摘要/待复核/导出五处一致
+[✓] 导出文件：JSON+CSV 均为同一份最新数据
+[✓] 持久化数据：SQLite 三张表完整保留证据链
+[✓] 最新结果可被继续使用：包含完整历史/处理原因/下一步找谁
+======================================================================
+
+所有输出文件保存在: /Users/lzy/pro/solo/workspaces/zy72316/reproduction_output

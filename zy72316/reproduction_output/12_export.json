@@ -1,0 +1,618 @@
+{
+  "export_metadata": {
+    "export_at": "2026-06-19T08:20:52.804347Z",
+    "import_batch_id": "faf088d2",
+    "export_source": "single_source_of_truth (ScoringWeightRow + AuditTrail + RepairRecord)"
+  },
+  "summary": {
+    "import_batch_id": "faf088d2",
+    "current_phase": "counterexample_updated",
+    "total_rows": 3,
+    "boundary_equal_threshold_count": 1,
+    "wrong_caliber_count": 0,
+    "supplementary_rework_count": 1,
+    "pending_count": 0,
+    "reviewing_count": 0,
+    "boundary_pending_review_count": 0,
+    "confirmed_count": 3,
+    "rolled_back_count": 0,
+    "created_at": "2026-06-19T08:20:52.713276",
+    "updated_at": "2026-06-19T08:20:52.801838"
+  },
+  "workflow": {
+    "id": 1,
+    "import_batch_id": "faf088d2",
+    "current_phase": "counterexample_updated",
+    "total_rows": 3,
+    "boundary_equal_threshold_count": 1,
+    "wrong_caliber_count": 0,
+    "supplementary_rework_count": 1,
+    "created_at": "2026-06-19T08:20:52.713276",
+    "updated_at": "2026-06-19T08:20:52.803623"
+  },
+  "details": [
+    {
+      "row": {
+        "id": 1,
+        "import_batch_id": "faf088d2",
+        "original_row_number": 1,
+        "indicator_name": "课堂参与度",
+        "threshold": 80.0,
+        "weight": 0.3,
+        "original_value": 60.0,
+        "interpolated_value": 0.75,
+        "boundary_judgment": "below_threshold",
+        "processing_status": "confirmed",
+        "error_type": null,
+        "created_at": "2026-06-19T08:20:52.710522",
+        "updated_at": "2026-06-19T08:20:52.744051"
+      },
+      "audit_trails": [
+        {
+          "id": 1,
+          "row_id": 1,
+          "original_row_number": 1,
+          "field_name": "import",
+          "old_value": null,
+          "new_value": "row=1, indicator=课堂参与度, val=60.0, th=80.0",
+          "change_reason": "评分权重表首次导入",
+          "changed_by": "system",
+          "changed_at": "2026-06-19T08:20:52.710973"
+        },
+        {
+          "id": 4,
+          "row_id": 1,
+          "original_row_number": 1,
+          "field_name": "old_formula_screenshot_ref",
+          "old_value": null,
+          "new_value": "old_formula_课堂参与度_v20260619.png",
+          "change_reason": "补看旧公式截图，备注：阈值80.0确认无误，原始值60.0<80，正常",
+          "changed_by": "analyst_qi",
+          "changed_at": "2026-06-19T08:20:52.729181"
+        },
+        {
+          "id": 7,
+          "row_id": 1,
+          "original_row_number": 1,
+          "field_name": "counterexample_note",
+          "old_value": null,
+          "new_value": "课堂参与度60.0<80.0，插值结果0.75，无异常",
+          "change_reason": "反例列表更新，无边界问题：课堂参与度60.0<80.0，插值结果0.75，无异常",
+          "changed_by": "analyst_qi",
+          "changed_at": "2026-06-19T08:20:52.744515"
+        }
+      ],
+      "repair_records": [
+        {
+          "id": 1,
+          "row_id": 1,
+          "import_batch_id": "faf088d2",
+          "phase": "weight_table_imported",
+          "boundary_judgment": "below_threshold",
+          "interpolated_curve_data": {
+            "breakpoints_used": "default",
+            "breakpoints": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                40.0,
+                0.5
+              ],
+              [
+                80.0,
+                1.0
+              ],
+              [
+                120.0,
+                1.5
+              ]
+            ]
+          },
+          "old_formula_screenshot_ref": null,
+          "counterexample_note": null,
+          "is_boundary_equal_threshold": false,
+          "instructor_reviewed": true,
+          "rollback_reason": null,
+          "original_value_before": null,
+          "original_value_after": 60.0,
+          "interpolated_value_before": null,
+          "interpolated_value_after": 0.75,
+          "threshold_before": null,
+          "threshold_after": 80.0,
+          "action_type": "import",
+          "change_reason": "评分权重表首次导入",
+          "changed_by": "system",
+          "next_action_owner": "analyst_qi",
+          "created_at": "2026-06-19T08:20:52.711470"
+        },
+        {
+          "id": 4,
+          "row_id": 1,
+          "import_batch_id": "faf088d2",
+          "phase": "old_formula_reviewed",
+          "boundary_judgment": "below_threshold",
+          "interpolated_curve_data": null,
+          "old_formula_screenshot_ref": "old_formula_课堂参与度_v20260619.png",
+          "counterexample_note": "阈值80.0确认无误，原始值60.0<80，正常",
+          "is_boundary_equal_threshold": false,
+          "instructor_reviewed": true,
+          "rollback_reason": null,
+          "original_value_before": 60.0,
+          "original_value_after": 60.0,
+          "interpolated_value_before": 0.75,
+          "interpolated_value_after": 0.75,
+          "threshold_before": 80.0,
+          "threshold_after": 80.0,
+          "action_type": "old_formula_review",
+          "change_reason": "补看旧公式截图，备注：阈值80.0确认无误，原始值60.0<80，正常",
+          "changed_by": "analyst_qi",
+          "next_action_owner": "analyst_qi",
+          "created_at": "2026-06-19T08:20:52.728951"
+        },
+        {
+          "id": 7,
+          "row_id": 1,
+          "import_batch_id": "faf088d2",
+          "phase": "counterexample_updated",
+          "boundary_judgment": "below_threshold",
+          "interpolated_curve_data": null,
+          "old_formula_screenshot_ref": null,
+          "counterexample_note": "课堂参与度60.0<80.0，插值结果0.75，无异常",
+          "is_boundary_equal_threshold": false,
+          "instructor_reviewed": true,
+          "rollback_reason": null,
+          "original_value_before": 60.0,
+          "original_value_after": 60.0,
+          "interpolated_value_before": 0.75,
+          "interpolated_value_after": 0.75,
+          "threshold_before": 80.0,
+          "threshold_after": 80.0,
+          "action_type": "counterexample_update",
+          "change_reason": "反例列表更新，无边界问题：课堂参与度60.0<80.0，插值结果0.75，无异常",
+          "changed_by": "analyst_qi",
+          "next_action_owner": null,
+          "created_at": "2026-06-19T08:20:52.744296"
+        }
+      ]
+    },
+    {
+      "row": {
+        "id": 2,
+        "import_batch_id": "faf088d2",
+        "original_row_number": 2,
+        "indicator_name": "期末笔试",
+        "threshold": 80.0,
+        "weight": 0.4,
+        "original_value": 80.0,
+        "interpolated_value": 1.0,
+        "boundary_judgment": "equal_threshold",
+        "processing_status": "confirmed",
+        "error_type": "supplementary_rework",
+        "created_at": "2026-06-19T08:20:52.712265",
+        "updated_at": "2026-06-19T08:20:52.790690"
+      },
+      "audit_trails": [
+        {
+          "id": 2,
+          "row_id": 2,
+          "original_row_number": 2,
+          "field_name": "import",
+          "old_value": null,
+          "new_value": "row=2, indicator=期末笔试, val=80.0, th=80.0",
+          "change_reason": "评分权重表首次导入",
+          "changed_by": "system",
+          "changed_at": "2026-06-19T08:20:52.712327"
+        },
+        {
+          "id": 5,
+          "row_id": 2,
+          "original_row_number": 2,
+          "field_name": "old_formula_screenshot_ref",
+          "old_value": null,
+          "new_value": "old_formula_期末笔试_v20260619.png",
+          "change_reason": "补看旧公式截图，备注：旧公式截图中阈值=80，原始值=80，边界值等于阈值，未见特殊处理说明，需任课老师明确",
+          "changed_by": "analyst_qi",
+          "changed_at": "2026-06-19T08:20:52.734925"
+        },
+        {
+          "id": 8,
+          "row_id": 2,
+          "original_row_number": 2,
+          "field_name": "counterexample_note",
+          "old_value": null,
+          "new_value": "期末笔试80.0=80.0，边界值等于阈值，插值结果1.0，需任课老师复核后再确认",
+          "change_reason": "反例列表更新，边界值等于阈值，留待任课老师复核：期末笔试80.0=80.0，边界值等于阈值，插值结果1.0，需任课老师复核后再确认",
+          "changed_by": "analyst_qi",
+          "changed_at": "2026-06-19T08:20:52.749331"
+        },
+        {
+          "id": 10,
+          "row_id": 2,
+          "original_row_number": 2,
+          "field_name": "original_value",
+          "old_value": "80.0",
+          "new_value": "79.5",
+          "change_reason": "对照评分表底册复查，期末笔试原始值确为79.5，原录入误写为80.0",
+          "changed_by": "analyst_qi",
+          "changed_at": "2026-06-19T08:20:52.762969"
+        },
+        {
+          "id": 11,
+          "row_id": 2,
+          "original_row_number": 2,
+          "field_name": "original_value",
+          "old_value": "79.5",
+          "new_value": "80.0",
+          "change_reason": "quick_fix_supplementary_rework: 二次核对原始评分表，期末笔试确为80.0分，之前79.5是相邻行串位了",
+          "changed_by": "analyst_qi",
+          "changed_at": "2026-06-19T08:20:52.771614"
+        },
+        {
+          "id": 12,
+          "row_id": 2,
+          "original_row_number": 2,
+          "field_name": "processing_status",
+          "old_value": "boundary_pending_review",
+          "new_value": "confirmed",
+          "change_reason": "任课老师复核：确认正常，理由：评分细则第3.2条明示：等于阈值按下一档上限计入，确认正常",
+          "changed_by": "teacher_zhang",
+          "changed_at": "2026-06-19T08:20:52.791255"
+        }
+      ],
+      "repair_records": [
+        {
+          "id": 2,
+          "row_id": 2,
+          "import_batch_id": "faf088d2",
+          "phase": "weight_table_imported",
+          "boundary_judgment": "equal_threshold",
+          "interpolated_curve_data": {
+            "breakpoints_used": "default",
+            "breakpoints": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                40.0,
+                0.5
+              ],
+              [
+                80.0,
+                1.0
+              ],
+              [
+                120.0,
+                1.5
+              ]
+            ]
+          },
+          "old_formula_screenshot_ref": null,
+          "counterexample_note": null,
+          "is_boundary_equal_threshold": true,
+          "instructor_reviewed": false,
+          "rollback_reason": null,
+          "original_value_before": null,
+          "original_value_after": 80.0,
+          "interpolated_value_before": null,
+          "interpolated_value_after": 1.0,
+          "threshold_before": null,
+          "threshold_after": 80.0,
+          "action_type": "import",
+          "change_reason": "评分权重表首次导入",
+          "changed_by": "system",
+          "next_action_owner": "instructor",
+          "created_at": "2026-06-19T08:20:52.712456"
+        },
+        {
+          "id": 5,
+          "row_id": 2,
+          "import_batch_id": "faf088d2",
+          "phase": "old_formula_reviewed",
+          "boundary_judgment": "equal_threshold",
+          "interpolated_curve_data": null,
+          "old_formula_screenshot_ref": "old_formula_期末笔试_v20260619.png",
+          "counterexample_note": "旧公式截图中阈值=80，原始值=80，边界值等于阈值，未见特殊处理说明，需任课老师明确",
+          "is_boundary_equal_threshold": true,
+          "instructor_reviewed": false,
+          "rollback_reason": null,
+          "original_value_before": 80.0,
+          "original_value_after": 80.0,
+          "interpolated_value_before": 1.0,
+          "interpolated_value_after": 1.0,
+          "threshold_before": 80.0,
+          "threshold_after": 80.0,
+          "action_type": "old_formula_review",
+          "change_reason": "补看旧公式截图，备注：旧公式截图中阈值=80，原始值=80，边界值等于阈值，未见特殊处理说明，需任课老师明确",
+          "changed_by": "analyst_qi",
+          "next_action_owner": "instructor",
+          "created_at": "2026-06-19T08:20:52.734712"
+        },
+        {
+          "id": 8,
+          "row_id": 2,
+          "import_batch_id": "faf088d2",
+          "phase": "counterexample_updated",
+          "boundary_judgment": "equal_threshold",
+          "interpolated_curve_data": null,
+          "old_formula_screenshot_ref": null,
+          "counterexample_note": "期末笔试80.0=80.0，边界值等于阈值，插值结果1.0，需任课老师复核后再确认",
+          "is_boundary_equal_threshold": true,
+          "instructor_reviewed": false,
+          "rollback_reason": null,
+          "original_value_before": 80.0,
+          "original_value_after": 80.0,
+          "interpolated_value_before": 1.0,
+          "interpolated_value_after": 1.0,
+          "threshold_before": 80.0,
+          "threshold_after": 80.0,
+          "action_type": "counterexample_update",
+          "change_reason": "反例列表更新，边界值等于阈值，留待任课老师复核：期末笔试80.0=80.0，边界值等于阈值，插值结果1.0，需任课老师复核后再确认",
+          "changed_by": "analyst_qi",
+          "next_action_owner": "instructor",
+          "created_at": "2026-06-19T08:20:52.749128"
+        },
+        {
+          "id": 10,
+          "row_id": 2,
+          "import_batch_id": "faf088d2",
+          "phase": "counterexample_updated",
+          "boundary_judgment": "below_threshold",
+          "interpolated_curve_data": {
+            "breakpoints_used": "default",
+            "breakpoints": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                40.0,
+                0.5
+              ],
+              [
+                80.0,
+                1.0
+              ],
+              [
+                120.0,
+                1.5
+              ]
+            ]
+          },
+          "old_formula_screenshot_ref": null,
+          "counterexample_note": null,
+          "is_boundary_equal_threshold": false,
+          "instructor_reviewed": true,
+          "rollback_reason": null,
+          "original_value_before": 80.0,
+          "original_value_after": 79.5,
+          "interpolated_value_before": 1.0,
+          "interpolated_value_after": 0.99375,
+          "threshold_before": 80.0,
+          "threshold_after": 80.0,
+          "action_type": "manual_override:original_value",
+          "change_reason": "对照评分表底册复查，期末笔试原始值确为79.5，原录入误写为80.0",
+          "changed_by": "analyst_qi",
+          "next_action_owner": null,
+          "created_at": "2026-06-19T08:20:52.762759"
+        },
+        {
+          "id": 11,
+          "row_id": 2,
+          "import_batch_id": "faf088d2",
+          "phase": "counterexample_updated",
+          "boundary_judgment": "equal_threshold",
+          "interpolated_curve_data": {
+            "breakpoints_used": "default",
+            "breakpoints": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                40.0,
+                0.5
+              ],
+              [
+                80.0,
+                1.0
+              ],
+              [
+                120.0,
+                1.5
+              ]
+            ]
+          },
+          "old_formula_screenshot_ref": null,
+          "counterexample_note": null,
+          "is_boundary_equal_threshold": true,
+          "instructor_reviewed": false,
+          "rollback_reason": null,
+          "original_value_before": 79.5,
+          "original_value_after": 80.0,
+          "interpolated_value_before": 0.99375,
+          "interpolated_value_after": 1.0,
+          "threshold_before": 80.0,
+          "threshold_after": 80.0,
+          "action_type": "quick_fix_supplementary_rework",
+          "change_reason": "quick_fix_supplementary_rework: 二次核对原始评分表，期末笔试确为80.0分，之前79.5是相邻行串位了",
+          "changed_by": "analyst_qi",
+          "next_action_owner": "instructor",
+          "created_at": "2026-06-19T08:20:52.771297"
+        },
+        {
+          "id": 12,
+          "row_id": 2,
+          "import_batch_id": "faf088d2",
+          "phase": "counterexample_updated",
+          "boundary_judgment": "equal_threshold",
+          "interpolated_curve_data": null,
+          "old_formula_screenshot_ref": null,
+          "counterexample_note": null,
+          "is_boundary_equal_threshold": true,
+          "instructor_reviewed": true,
+          "rollback_reason": null,
+          "original_value_before": 80.0,
+          "original_value_after": 80.0,
+          "interpolated_value_before": 1.0,
+          "interpolated_value_after": 1.0,
+          "threshold_before": 80.0,
+          "threshold_after": 80.0,
+          "action_type": "boundary_instructor_review",
+          "change_reason": "任课老师复核：确认正常，理由：评分细则第3.2条明示：等于阈值按下一档上限计入，确认正常",
+          "changed_by": "teacher_zhang",
+          "next_action_owner": null,
+          "created_at": "2026-06-19T08:20:52.791045"
+        }
+      ]
+    },
+    {
+      "row": {
+        "id": 3,
+        "import_batch_id": "faf088d2",
+        "original_row_number": 3,
+        "indicator_name": "实践报告",
+        "threshold": 80.0,
+        "weight": 0.3,
+        "original_value": 95.0,
+        "interpolated_value": 1.1875,
+        "boundary_judgment": "above_threshold",
+        "processing_status": "confirmed",
+        "error_type": null,
+        "created_at": "2026-06-19T08:20:52.712695",
+        "updated_at": "2026-06-19T08:20:52.752889"
+      },
+      "audit_trails": [
+        {
+          "id": 3,
+          "row_id": 3,
+          "original_row_number": 3,
+          "field_name": "import",
+          "old_value": null,
+          "new_value": "row=3, indicator=实践报告, val=95.0, th=80.0",
+          "change_reason": "评分权重表首次导入",
+          "changed_by": "system",
+          "changed_at": "2026-06-19T08:20:52.712746"
+        },
+        {
+          "id": 6,
+          "row_id": 3,
+          "original_row_number": 3,
+          "field_name": "old_formula_screenshot_ref",
+          "old_value": null,
+          "new_value": "old_formula_实践报告_v20260619.png",
+          "change_reason": "补看旧公式截图，备注：阈值80.0确认无误，原始值95.0>80，正常",
+          "changed_by": "analyst_qi",
+          "changed_at": "2026-06-19T08:20:52.738229"
+        },
+        {
+          "id": 9,
+          "row_id": 3,
+          "original_row_number": 3,
+          "field_name": "counterexample_note",
+          "old_value": null,
+          "new_value": "实践报告95.0>80.0，插值结果1.1875，无异常",
+          "change_reason": "反例列表更新，无边界问题：实践报告95.0>80.0，插值结果1.1875，无异常",
+          "changed_by": "analyst_qi",
+          "changed_at": "2026-06-19T08:20:52.753460"
+        }
+      ],
+      "repair_records": [
+        {
+          "id": 3,
+          "row_id": 3,
+          "import_batch_id": "faf088d2",
+          "phase": "weight_table_imported",
+          "boundary_judgment": "above_threshold",
+          "interpolated_curve_data": {
+            "breakpoints_used": "default",
+            "breakpoints": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                40.0,
+                0.5
+              ],
+              [
+                80.0,
+                1.0
+              ],
+              [
+                120.0,
+                1.5
+              ]
+            ]
+          },
+          "old_formula_screenshot_ref": null,
+          "counterexample_note": null,
+          "is_boundary_equal_threshold": false,
+          "instructor_reviewed": true,
+          "rollback_reason": null,
+          "original_value_before": null,
+          "original_value_after": 95.0,
+          "interpolated_value_before": null,
+          "interpolated_value_after": 1.1875,
+          "threshold_before": null,
+          "threshold_after": 80.0,
+          "action_type": "import",
+          "change_reason": "评分权重表首次导入",
+          "changed_by": "system",
+          "next_action_owner": "analyst_qi",
+          "created_at": "2026-06-19T08:20:52.712863"
+        },
+        {
+          "id": 6,
+          "row_id": 3,
+          "import_batch_id": "faf088d2",
+          "phase": "old_formula_reviewed",
+          "boundary_judgment": "above_threshold",
+          "interpolated_curve_data": null,
+          "old_formula_screenshot_ref": "old_formula_实践报告_v20260619.png",
+          "counterexample_note": "阈值80.0确认无误，原始值95.0>80，正常",
+          "is_boundary_equal_threshold": false,
+          "instructor_reviewed": true,
+          "rollback_reason": null,
+          "original_value_before": 95.0,
+          "original_value_after": 95.0,
+          "interpolated_value_before": 1.1875,
+          "interpolated_value_after": 1.1875,
+          "threshold_before": 80.0,
+          "threshold_after": 80.0,
+          "action_type": "old_formula_review",
+          "change_reason": "补看旧公式截图，备注：阈值80.0确认无误，原始值95.0>80，正常",
+          "changed_by": "analyst_qi",
+          "next_action_owner": "analyst_qi",
+          "created_at": "2026-06-19T08:20:52.738058"
+        },
+        {
+          "id": 9,
+          "row_id": 3,
+          "import_batch_id": "faf088d2",
+          "phase": "counterexample_updated",
+          "boundary_judgment": "above_threshold",
+          "interpolated_curve_data": null,
+          "old_formula_screenshot_ref": null,
+          "counterexample_note": "实践报告95.0>80.0，插值结果1.1875，无异常",
+          "is_boundary_equal_threshold": false,
+          "instructor_reviewed": true,
+          "rollback_reason": null,
+          "original_value_before": 95.0,
+          "original_value_after": 95.0,
+          "interpolated_value_before": 1.1875,
+          "interpolated_value_after": 1.1875,
+          "threshold_before": 80.0,
+          "threshold_after": 80.0,
+          "action_type": "counterexample_update",
+          "change_reason": "反例列表更新，无边界问题：实践报告95.0>80.0，插值结果1.1875，无异常",
+          "changed_by": "analyst_qi",
+          "next_action_owner": null,
+          "created_at": "2026-06-19T08:20:52.753224"
+        }
+      ]
+    }
+  ]
+}

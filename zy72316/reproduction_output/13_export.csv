@@ -1,0 +1,17 @@
+batch_id,original_row_number,indicator_name,threshold,weight,original_value,interpolated_value,boundary_judgment,processing_status,error_type,next_action_owner,instructor_reviewed,latest_repair_action,latest_change_reason,latest_repair_at,original_value_before,original_value_after,interpolated_value_before,interpolated_value_after,old_formula_screenshot_ref,counterexample_note,rollback_reason,row_created_at,row_updated_at
+faf088d2,1,课堂参与度,80.0,0.3,60.0,0.75,below_threshold,confirmed,,,1,counterexample_update,反例列表更新，无边界问题：课堂参与度60.0<80.0，插值结果0.75，无异常,2026-06-19T08:20:52.744296,60.0,60.0,0.75,0.75,,课堂参与度60.0<80.0，插值结果0.75，无异常,,2026-06-19T08:20:52.710522,2026-06-19T08:20:52.744051
+faf088d2,2,期末笔试,80.0,0.4,80.0,1.0,equal_threshold,confirmed,supplementary_rework,,1,boundary_instructor_review,任课老师复核：确认正常，理由：评分细则第3.2条明示：等于阈值按下一档上限计入，确认正常,2026-06-19T08:20:52.791045,80.0,80.0,1.0,1.0,,,,2026-06-19T08:20:52.712265,2026-06-19T08:20:52.790690
+faf088d2,3,实践报告,80.0,0.3,95.0,1.1875,above_threshold,confirmed,,,1,counterexample_update,反例列表更新，无边界问题：实践报告95.0>80.0，插值结果1.1875，无异常,2026-06-19T08:20:52.753224,95.0,95.0,1.1875,1.1875,,实践报告95.0>80.0，插值结果1.1875，无异常,,2026-06-19T08:20:52.712695,2026-06-19T08:20:52.752889
+
+=== BATCH SUMMARY (同一份数据源生成) ===
+current_phase,counterexample_updated
+total_rows,3
+boundary_equal_threshold_count,1
+wrong_caliber_count,0
+supplementary_rework_count,1
+pending_count,0
+reviewing_count,0
+boundary_pending_review_count,0
+confirmed_count,3
+rolled_back_count,0
+export_at,2026-06-19T08:20:52.817212Z
