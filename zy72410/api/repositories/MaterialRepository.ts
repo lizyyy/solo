@@ -58,6 +58,16 @@ export class MaterialRepository {
     return row ? this.mapMaterial(row) : null;
   }
 
+  findByIsrcAndDate(material_name: string, isrc_code: string, license_start_date: string): Material | null {
+    const stmt = this.db.prepare(`
+      SELECT * FROM material 
+      WHERE material_name = ? AND isrc_code = ? AND license_start_date = ?
+      LIMIT 1
+    `);
+    const row = stmt.get(material_name, isrc_code, license_start_date) as any;
+    return row ? this.mapMaterial(row) : null;
+  }
+
   findAll(status?: MaterialStatus): Material[] {
     let sql = 'SELECT * FROM material';
     const params: string[] = [];

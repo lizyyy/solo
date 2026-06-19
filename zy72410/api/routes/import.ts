@@ -49,8 +49,12 @@ router.post('/confirm', async (req: Request, res: Response) => {
 
     res.json({
       success: true,
-      data: result,
-      message: `成功导入${result.materials.length}条素材，${result.tracks.length}条轨道`
+      data: {
+        materials: result.materials,
+        tracks: result.tracks,
+        stats: result.stats
+      },
+      message: `成功导入${result.stats.new_count}条新素材，复用${result.stats.reused_count}条已有素材，共创建${result.tracks.length}条轨道`
     } as ApiResponse<any>);
   } catch (e: any) {
     res.status(500).json({

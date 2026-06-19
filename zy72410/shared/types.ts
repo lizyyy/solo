@@ -107,14 +107,19 @@ export interface ImportPreviewItem {
   temp_id: string;
   material_name: string;
   isrc_code: string;
+  composer: string;
+  project_name: string;
   license_start_date: string;
   license_end_date: string;
   episode_count: number;
   license_fee: number;
   revenue_ratio: string;
+  error_tolerance: string;
   match_status: 'new' | 'reused' | 'duplicate';
   match_dimensions?: string[];
   existing_id?: string;
+  track_name: string;
+  track_number: number;
 }
 
 export interface ImportPreviewResult {

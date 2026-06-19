@@ -41,7 +41,7 @@ export class ImportService {
   }
 
   previewImport(
-    materials: Array<Omit<Material, 'id' | 'status' | 'batch_id' | 'created_at' | 'updated_at'>>,
+    materials: Array<Omit<Material, 'id' | 'status' | 'batch_id' | 'created_at' | 'updated_at'> & { track_name?: string; track_number?: number }>,
     file_name: string,
     imported_by: string
   ): ImportPreviewResult {
@@ -64,14 +64,19 @@ export class ImportService {
         temp_id,
         material_name: mat.material_name,
         isrc_code: mat.isrc_code,
+        composer: mat.composer,
+        project_name: mat.project_name,
         license_start_date: mat.license_start_date,
         license_end_date: mat.license_end_date,
         episode_count: mat.episode_count,
         license_fee: mat.license_fee,
         revenue_ratio: mat.revenue_ratio,
+        error_tolerance: mat.error_tolerance,
         match_status: match.is_duplicate ? 'reused' : (match.match_score >= 2 ? 'duplicate' : 'new'),
         match_dimensions: match.matched_fields,
-        existing_id: match.existing_material_id
+        existing_id: match.existing_material_id,
+        track_name: (mat as any).track_name || '',
+        track_number: (mat as any).track_number || 1
       };
 
       if (match.is_duplicate && match.existing_material_id) {
@@ -102,13 +107,53 @@ export class ImportService {
     };
   }
 
-  confirmImport(request: ImportConfirmRequest, operator: string): { materials: Material[]; tracks: any[] } {
+  confirmImport(request: ImportConfirmRequest, operator: string): { materials: Material[]; tracks: any[]; stats: { new_count: number; reused_count: number; reused_material_ids: string[] } {
     const createdMaterials: Material[] = [];
     const createdTracks: any[] = [];
+    let new_count = 0;
+    let reused_count = 0;
+    const reused_material_ids: string[] = [];
 
     for (const item of request.items) {
-      const hasReworkInTracks = item.tracks.some(t => detectReworkReason(t.remarks || ''));
-      const status: MaterialStatus = hasReworkInTracks ? 'rework_pending' : 'normal';
+      const hasTrackRework = item.tracks.some(t => detectReworkReason(t.remarks || ''));
+      const hasMaterialRework = detectReworkReason(item.material.error_tolerance || '');
+      const hasRework = hasTrackRework || hasMaterialRework;
+      const status: MaterialStatus = hasRework ? 'rework_pending' : 'normal';
+
+      const existingMatch = this.materialRepo.findByIsrcAndDate(
+        item.material.material_name,
+        item.material.isrc_code,
+        item.material.license_start_date
+      );
+      if (existingMatch) {
+        reused_count++;
+        reused_material_ids.push(existingMatch.id);
+
+        const reuseChange = this.changeRepo.create({
+          material_id: existingMatch.id,
+          track_id: '',
+          field_name: 'import_reuse',
+          old_value: 'existing',
+          new_value: 'reused',
+          operator,
+          change_reason: '授权期限页重复导入，复用已存在素材，不重复创建',
+          affected_items: [existingMatch.id]
+        });
+
+        this.changeRepo.createHistoryRecord({
+          material_id: existingMatch.id,
+          track_id: '',
+          field_name: 'import_reuse',
+          old_value: 'existing',
+          new_value: 'reused',
+          operator,
+          change_reason: '授权期限页重复导入，复用已存在素材，不重复创建',
+          record_snapshot: existingMatch as unknown as Record<string, unknown>,
+          change_id: reuseChange.id
+        });
+
+        continue;
+      }
 
       const material = this.materialRepo.create({
         ...item.material,
@@ -116,6 +161,7 @@ export class ImportService {
         batch_id: request.batch_id
       });
       createdMaterials.push(material);
+      new_count++;
 
       const initialChange = this.changeRepo.create({
         material_id: material.id,
@@ -140,39 +186,42 @@ export class ImportService {
         change_id: initialChange.id
       });
 
-      for (const trackData of item.tracks) {
-        const track = this.trackRepo.create({
-          ...trackData,
-          material_id: material.id,
-          need_recheck: detectReworkReason(trackData.remarks || ''),
-          rework_confirmed: false,
-          rework_confirmed_by: '',
-          rework_confirmed_at: ''
-        });
-        createdTracks.push(track);
+      if (item.tracks && item.tracks.length > 0) {
+        for (const trackData of item.tracks) {
+          if (!trackData.track_name && !trackData.track_number) continue;
+          const track = this.trackRepo.create({
+            ...trackData,
+            material_id: material.id,
+            need_recheck: detectReworkReason(trackData.remarks || ''),
+            rework_confirmed: false,
+            rework_confirmed_by: '',
+            rework_confirmed_at: ''
+          });
+          createdTracks.push(track);
 
-        const trackChange = this.changeRepo.create({
-          material_id: material.id,
-          track_id: track.id,
-          field_name: 'track_import',
-          old_value: 'none',
-          new_value: track.track_name,
-          operator,
-          change_reason: '导入时创建轨道记录',
-          affected_items: [material.id, track.id]
-        });
+          const trackChange = this.changeRepo.create({
+            material_id: material.id,
+            track_id: track.id,
+            field_name: 'track_import',
+            old_value: 'none',
+            new_value: track.track_name,
+            operator,
+            change_reason: '导入时创建轨道记录',
+            affected_items: [material.id, track.id]
+          });
 
-        this.changeRepo.createHistoryRecord({
-          material_id: material.id,
-          track_id: track.id,
-          field_name: 'track_import',
-          old_value: 'none',
-          new_value: track.track_name,
-          operator,
-          change_reason: '导入时创建轨道记录',
-          record_snapshot: track as unknown as Record<string, unknown>,
-          change_id: trackChange.id
-        });
+          this.changeRepo.createHistoryRecord({
+            material_id: material.id,
+            track_id: track.id,
+            field_name: 'track_import',
+            old_value: 'none',
+            new_value: track.track_name,
+            operator,
+            change_reason: '导入时创建轨道记录',
+            record_snapshot: track as unknown as Record<string, unknown>,
+            change_id: trackChange.id
+          });
+        }
       }
 
       const tracks = this.trackRepo.findByMaterialId(material.id);
@@ -182,10 +231,14 @@ export class ImportService {
       }
     }
 
-    return { materials: createdMaterials, tracks: createdTracks };
+    return {
+      materials: createdMaterials,
+      tracks: createdTracks,
+      stats: { new_count, reused_count, reused_material_ids }
+    };
   }
 
-  private mapRowToMaterial(row: any): Omit<Material, 'id' | 'status' | 'batch_id' | 'created_at' | 'updated_at'> {
+  private mapRowToMaterial(row: any): Omit<Material, 'id' | 'status' | 'batch_id' | 'created_at' | 'updated_at'> & { track_name?: string; track_number?: number } {
     const getValue = (keys: string[]): string => {
       for (const key of keys) {
         if (row[key] !== undefined && row[key] !== null) {
@@ -210,23 +263,25 @@ export class ImportService {
     };
 
     const royaltyRate = (() => {
-      const val = getValue(['分成比例', '分成', 'royaltyRate']);
+      const val = getValue(['分成比例', '分成', 'royaltyRate', 'revenue_ratio']);
       if (!val) return '0';
       const num = parseFloat(val.replace(/%/g, ''));
       return String(num > 1 ? num / 100 : num);
     })();
 
     return {
-      material_name: getValue(['素材名称', '名称', 'name', 'materialName']),
-      isrc_code: getValue(['ISRC', 'isrc', '编码', 'ISRC编码']),
+      material_name: getValue(['素材名称', '名称', 'name', 'materialName', 'material_name']),
+      isrc_code: getValue(['ISRC', 'isrc', '编码', 'ISRC编码', 'isrc_code']),
       composer: getValue(['作曲', '作曲家', 'composer']),
-      project_name: getValue(['影视剧名称', '剧目', '作品名称', 'dramaName', 'projectName']),
-      license_start_date: parseDate(getValue(['授权起始', '开始日期', '起始日期', 'authorizationStart', 'licenseStartDate'])),
-      license_end_date: parseDate(getValue(['授权结束', '结束日期', '截止日期', 'authorizationEnd', 'licenseEndDate'])),
-      episode_count: getNumberValue(['集数', 'episodes', 'episodeCount'], 0),
-      license_fee: getNumberValue(['保底费用', '保底', '金额', 'baseFee', 'licenseFee'], 0),
+      project_name: getValue(['项目名称', '影视剧名称', '剧目', '作品名称', 'dramaName', 'projectName', 'project_name']),
+      license_start_date: parseDate(getValue(['授权起始', '授权起始日期', '开始日期', '起始日期', 'authorizationStart', 'licenseStartDate', 'license_start_date'])),
+      license_end_date: parseDate(getValue(['授权结束', '授权截止日期', '结束日期', '截止日期', 'authorizationEnd', 'licenseEndDate', 'license_end_date'])),
+      episode_count: getNumberValue(['集数', 'episodes', 'episodeCount', 'episode_count'], 0),
+      license_fee: getNumberValue(['授权费用(万元)', '保底费用', '保底', '金额', 'baseFee', 'licenseFee', 'license_fee'], 0),
       revenue_ratio: royaltyRate,
-      error_tolerance: getValue(['误差容限', '容差', 'errorTolerance'])
+      error_tolerance: getValue(['误差说明', '误差容限', '容差', 'errorTolerance', 'error_tolerance']),
+      track_name: getValue(['轨道名称', 'trackName', 'track_name']),
+      track_number: getNumberValue(['轨道编号', 'trackNumber', 'track_number'], 1)
     };
   }
 }

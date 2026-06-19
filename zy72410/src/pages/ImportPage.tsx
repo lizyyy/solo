@@ -134,28 +134,34 @@ export default function ImportPage() {
     if (!importPreview) return;
     setLoading('import-confirm', true);
     try {
-      const selectedIds = [
-        ...importPreview.new_items.map(i => i.temp_id),
-        ...importPreview.reused_items.map(i => i.temp_id),
-      ];
-      const items = [
+      const allPreviewItems = [
         ...importPreview.new_items,
         ...importPreview.reused_items,
-      ].map(item => ({
+      ];
+      const selectedIds = allPreviewItems.map(i => i.temp_id);
+
+      const items = allPreviewItems.map(item => ({
         material: {
           material_name: item.material_name,
           isrc_code: item.isrc_code,
-          composer: '',
-          project_name: '',
+          composer: item.composer || '',
+          project_name: item.project_name || '',
           license_start_date: item.license_start_date,
           license_end_date: item.license_end_date,
-          episode_count: item.episode_count,
-          license_fee: item.license_fee,
-          revenue_ratio: item.revenue_ratio,
-          error_tolerance: '',
+          episode_count: item.episode_count || 0,
+          license_fee: item.license_fee || 0,
+          revenue_ratio: item.revenue_ratio || '0',
+          error_tolerance: item.error_tolerance || '',
         },
-        tracks: [],
+        tracks: item.track_name ? [{
+          track_name: item.track_name,
+          track_number: item.track_number || 1,
+          track_type: '音乐轨',
+          isrc_code: item.isrc_code,
+          remarks: '',
+        }] : [],
       }));
+
       const result = await importApi.confirm({
         batch_id: importPreview.batch_id,
         selected_ids: selectedIds,
@@ -163,7 +169,7 @@ export default function ImportPage() {
         items,
       }, '版权运营');
       
-      showNotification('success', `导入成功: 新增 ${result.stats?.new_count || 0} 条，复用 ${result.stats?.reused_count || 0} 条`);
+      showNotification('success', `导入成功: 新增 ${result.stats?.new_count || 0} 条，复用 ${result.stats?.reused_count || 0} 条，轨道 ${result.tracks?.length || 0} 条`);
       
       const allMaterials = await materialApi.getAll();
       setMaterials(allMaterials);
