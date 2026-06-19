@@ -21,7 +21,7 @@
 
     <div v-if="viewMode === 'chart'" class="space-y-6">
       <div>
-        <h4 class="text-sm font-medium text-gray-700 mb-3">拥堵等级分布</h4>
+        <h4 class="text-sm font-medium text-gray-700 mb-3">拥堵等级分布（点击柱子跳转到对应记录）</h4>
         <div class="flex items-end gap-4 h-48">
           <div
             v-for="item in levelDistribution"
@@ -29,10 +29,21 @@
             class="flex-1 flex flex-col items-center"
           >
             <div
-              :class="['w-full rounded-t transition-all cursor-pointer hover:opacity-80', item.bgClass]"
+              :class="[
+                'w-full rounded-t transition-all cursor-pointer hover:opacity-80 relative group',
+                item.bgClass,
+                selectedLevel === item.level ? 'ring-2 ring-offset-2 ring-blue-500' : ''
+              ]"
               :style="{ height: `${item.height}%` }"
-              @click="filterByLevel(item.level)"
-            ></div>
+              @click="handleLevelClick(item.level)"
+            >
+              <div
+                v-if="item.count > 0 && selectedLevel === item.level"
+                class="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap"
+              >
+                共 {{ item.count }} 条 · 已定位第1条
+              </div>
+            </div>
             <div class="mt-2 text-sm font-medium text-gray-800">{{ item.count }}</div>
             <div class="text-xs text-gray-500">{{ item.label }}</div>
           </div>
@@ -40,12 +51,13 @@
       </div>
 
       <div>
-        <h4 class="text-sm font-medium text-gray-700 mb-3">流程进度分布</h4>
+        <h4 class="text-sm font-medium text-gray-700 mb-3">流程进度分布（点击进度条跳转到对应记录）</h4>
         <div class="space-y-3">
           <div
             v-for="step in flowDistribution"
             :key="step.step"
-            class="flex items-center gap-3"
+            class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded-md p-1 -ml-1 transition-colors"
+            @click="handleFlowStepClick(step.step)"
           >
             <span class="text-sm text-gray-600 w-24">{{ step.label }}</span>
             <div class="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
@@ -62,8 +74,12 @@
       </div>
 
       <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
-        <p class="text-sm text-blue-700">
-          💡 点击图表中的数据点，可以快速筛选并跳转到对应的原始记录详情
+        <p class="text-sm text-blue-700 mb-1">
+          💡 点击图表中的数据点，可直接跳转到对应原始记录的红线图备注详情
+        </p>
+        <p v-if="selectedRecord" class="text-xs text-blue-600 mt-1">
+          📌 当前定位：<span class="font-medium">{{ selectedRecord.redLineNote.communityName }}</span>
+          <span class="text-blue-500 ml-2">(ID: {{ selectedRecord.id }})</span>
         </p>
       </div>
     </div>
@@ -130,13 +146,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useStore } from '../store'
+import { computed, ref } from 'vue'
+import { useStore, type DetailTab } from '../store'
 
-const { state, setViewMode, setSelectedRecord, setActiveTab } = useStore()
+const {
+  state,
+  setViewMode,
+  selectRecordAndJump,
+  findFirstRecordByLevel,
+  findFirstRecordByFlowStep,
+  selectedRecord
+} = useStore()
 
 const viewMode = computed(() => state.viewMode)
 const records = computed(() => state.records)
+
+const selectedLevel = ref<string | null>(null)
 
 const viewModes = [
   { value: 'chart' as const, label: '📊 图表' },
@@ -170,9 +195,23 @@ const flowDistribution = computed(() => {
   ]
 })
 
-function filterByLevel(_level: string) {
-  setActiveTab('all')
-  setSelectedRecord(null)
+function handleLevelClick(level: string) {
+  selectedLevel.value = level
+  const record = findFirstRecordByLevel(level)
+  if (record) {
+    selectRecordAndJump(record.id, 'redline')
+  }
+}
+
+function handleFlowStepClick(step: string) {
+  const record = findFirstRecordByFlowStep(step)
+  if (!record) return
+  const tabMap: Record<string, DetailTab> = {
+    import: 'redline',
+    inspector_review: 'inspector',
+    summary_update: 'summary'
+  }
+  selectRecordAndJump(record.id, tabMap[step] || 'redline')
 }
 
 function getX(index: number) {
@@ -209,6 +248,7 @@ function getSeverityScore(record: typeof records.value[0]) {
 }
 
 function handle3DClick(record: typeof records.value[0]) {
-  setSelectedRecord(record.id)
+  const targetTab: DetailTab = record.gridInspector ? 'inspector' : 'redline'
+  selectRecordAndJump(record.id, targetTab)
 }
 </script>

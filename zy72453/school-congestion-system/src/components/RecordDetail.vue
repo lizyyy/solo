@@ -53,7 +53,7 @@
           <button
             v-for="tab in detailTabs"
             :key="tab.value"
-            @click="activeDetailTab = tab.value"
+            @click="setActiveDetailTab(tab.value)"
             :class="[
               'flex-1 px-4 py-3 text-sm font-medium transition-colors',
               activeDetailTab === tab.value
@@ -99,7 +99,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useStore } from '../store'
 import RedLineNoteEditor from './RedLineNoteEditor.vue'
 import GridInspectorView from './GridInspectorView.vue'
@@ -107,19 +107,19 @@ import StreetSummaryView from './StreetSummaryView.vue'
 import HistoryVersionView from './HistoryVersionView.vue'
 import CalculationView from './CalculationView.vue'
 
-const { selectedRecord, setSelectedRecord, inspectorReview, state } = useStore()
+const { selectedRecord, setSelectedRecord, inspectorReview, state, setActiveDetailTab } = useStore()
 
 const record = selectedRecord
 const currentUser = computed(() => state.currentUser)
 
-const activeDetailTab = ref('redline')
+const activeDetailTab = computed(() => state.activeDetailTab)
 
 const detailTabs = [
-  { value: 'redline', label: '红线图备注' },
-  { value: 'inspector', label: '网格员巡查表' },
-  { value: 'summary', label: '街道会看摘要' },
-  { value: 'history', label: '历史版本' },
-  { value: 'calculation', label: '模型计算' }
+  { value: 'redline' as const, label: '红线图备注' },
+  { value: 'inspector' as const, label: '网格员巡查表' },
+  { value: 'summary' as const, label: '街道会看摘要' },
+  { value: 'history' as const, label: '历史版本' },
+  { value: 'calculation' as const, label: '模型计算' }
 ]
 
 function getLevelClass(level: string) {

@@ -93,6 +93,20 @@ const mockRedLineNotes: RedLineNote[] = [
     importTime: '2024-10-15 09:30:00',
     importedBy: '城更项目经理-阿宁',
     isDuplicate: false
+  },
+  {
+    id: 'note-003',
+    importBatchId: 'batch-001',
+    communityId: 'comm-001',
+    communityName: '阳光花园',
+    schoolName: '第一实验小学',
+    distanceToSchool: 320,
+    noteContent: '学校门口接送车辆较多，早高峰尤为明显',
+    congestionLevel: 'medium',
+    importTime: '2024-10-15 09:30:00',
+    importedBy: '城更项目经理-阿宁',
+    isDuplicate: true,
+    duplicateOfId: 'note-001'
   }
 ]
 
@@ -157,6 +171,31 @@ const mockHistory: HistoryVersion[] = [
   }
 ]
 
+const mockHistory003: HistoryVersion[] = [
+  {
+    id: 'hist-003',
+    recordId: 'note-003',
+    recordType: 'redLineNote',
+    fieldName: 'noteContent',
+    oldValue: '接送车辆较多',
+    newValue: '学校门口接送车辆较多，早高峰尤为明显',
+    changedBy: '城更项目经理-阿宁',
+    changedAt: '2024-10-15 10:15:00',
+    changeReason: '补充高峰时段特征'
+  },
+  {
+    id: 'hist-004',
+    recordId: 'note-003',
+    recordType: 'redLineNote',
+    fieldName: 'congestionLevel',
+    oldValue: 'low',
+    newValue: 'medium',
+    changedBy: '城更项目经理-阿宁',
+    changedAt: '2024-10-15 10:20:00',
+    changeReason: '根据现场观察调整拥堵等级'
+  }
+]
+
 const mockRecords: CongestionRecord[] = [
   {
     id: 'record-001',
@@ -181,8 +220,20 @@ const mockRecords: CongestionRecord[] = [
     createdAt: '2024-10-15 09:30:00',
     updatedAt: '2024-10-15 09:30:00',
     historyVersions: []
+  },
+  {
+    id: 'record-003',
+    redLineNote: mockRedLineNotes[2],
+    flowStep: 'inspector_review',
+    needsReview: false,
+    reviewedByInspector: false,
+    createdAt: '2024-10-15 09:30:00',
+    updatedAt: '2024-10-15 10:20:00',
+    historyVersions: mockHistory003
   }
 ]
+
+export type DetailTab = 'redline' | 'inspector' | 'summary' | 'history' | 'calculation'
 
 interface State {
   records: CongestionRecord[]
@@ -192,6 +243,7 @@ interface State {
   selectedRecordId: string | null
   viewMode: 'list' | 'chart' | '3d'
   activeTab: 'all' | 'pending' | 'needsReview'
+  activeDetailTab: DetailTab
   lastImportResult: ImportResult | null
 }
 
@@ -203,6 +255,7 @@ const state = reactive<State>({
   selectedRecordId: null,
   viewMode: 'list',
   activeTab: 'all',
+  activeDetailTab: 'redline',
   lastImportResult: null
 })
 
@@ -527,6 +580,23 @@ export function useStore() {
     state.activeTab = tab
   }
 
+  function setActiveDetailTab(tab: DetailTab) {
+    state.activeDetailTab = tab
+  }
+
+  function selectRecordAndJump(recordId: string, tab: DetailTab = 'redline') {
+    state.selectedRecordId = recordId
+    state.activeDetailTab = tab
+  }
+
+  function findFirstRecordByLevel(level: string): CongestionRecord | undefined {
+    return state.records.find(r => r.redLineNote.congestionLevel === level)
+  }
+
+  function findFirstRecordByFlowStep(step: string): CongestionRecord | undefined {
+    return state.records.find(r => r.flowStep === step)
+  }
+
   function setCurrentUser(user: 'inspector' | 'manager') {
     state.currentUser = user
   }
@@ -569,6 +639,10 @@ export function useStore() {
     setSelectedRecord,
     setViewMode,
     setActiveTab,
+    setActiveDetailTab,
+    selectRecordAndJump,
+    findFirstRecordByLevel,
+    findFirstRecordByFlowStep,
     setCurrentUser,
     addHistoryVersion,
     exportRecordsToCSV
