@@ -135,11 +135,7 @@ public class UnifiedResultService {
                         .eq(CustodianConfirmation::getBatchId, batchId)
         );
         return list.stream()
-                .collect(Collectors.toMap(
-                        c -> buildCustodianKey(c.getBizNo(), c.getOriginalRowNo()),
-                        c -> c,
-                        (v1, v2) -> v1
-                ));
+                .collect(Collectors.toMap(CustodianConfirmation::getBizNo, c -> c, (v1, v2) -> v1));
     }
 
     private Map<String, ExDividendEvidence> getEvidenceMap(Long batchId) {
