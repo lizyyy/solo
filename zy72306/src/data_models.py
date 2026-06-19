@@ -196,7 +196,8 @@ class UnifiedDataExporter:
 
     def export_to_csv(self, filepath: str, flat: bool = False) -> None:
         df = self._flat_dataframe if flat else self._dataframe
-        df.to_csv(filepath, index=False, encoding='utf-8-sig')
+        # na_rep='' 防止空字符串（如 raw_denominator）被转成 NaN
+        df.to_csv(filepath, index=False, encoding='utf-8-sig', na_rep='')
 
     def export_to_excel(self, filepath: str) -> None:
         with pd.ExcelWriter(filepath, engine='openpyxl') as writer:

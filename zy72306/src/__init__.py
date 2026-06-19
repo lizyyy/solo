@@ -14,6 +14,7 @@ from .data_models import (
     SummaryStats,
     FIELD_ALIASES,
     AuditRecord,
+    ManualModification,
 )
 from .state_store import StateStore, StateSnapshot, StateMetadata
 from .pipeline import DecompositionPipeline
@@ -36,6 +37,7 @@ __all__ = [
     "ReviewRecord",
     "SummaryStats",
     "FIELD_ALIASES",
+    "ManualModification",
     "StateStore",
     "StateSnapshot",
     "StateMetadata",

@@ -77,6 +77,11 @@ class StateStore:
         with open(self.state_file, "w", encoding="utf-8") as f:
             json.dump(self._state, f, ensure_ascii=False, indent=2)
 
+    def exists(self) -> bool:
+        """是否已有导入的数据（用于 API 判断是否 404）"""
+        results = self._state.get(self.RESULTS_KEY, {})
+        return len(results) > 0
+
     def _invalidate_results(self) -> None:
         """触发快照和备份"""
         pass
@@ -108,11 +113,18 @@ class StateStore:
         for new_r in results:
             if new_r.row_number in result_map:
                 old = result_map[new_r.row_number]
-                # 保留已经积累的人工修改/复核记录
-                new_r.manual_modifications = (
-                    list(old.manual_modifications) + list(new_r.manual_modifications)
-                )
-                new_r.review_records = list(old.review_records) + list(new_r.review_records)
+                # 去重合并人工修改（用 modified_at 做唯一键，防止指数级重复累积）
+                seen_mods = {}
+                for m in list(old.manual_modifications) + list(new_r.manual_modifications):
+                    key = m.modified_at.isoformat() if hasattr(m, 'modified_at') else f"{m.field_name}_{m.old_value}_{m.new_value}"
+                    seen_mods[key] = m
+                new_r.manual_modifications = list(seen_mods.values())
+                # 去重合并复核记录（用 reviewed_at 做唯一键）
+                seen_reviews = {}
+                for r in list(old.review_records) + list(new_r.review_records):
+                    key = r.reviewed_at.isoformat() if hasattr(r, 'reviewed_at') else f"{r.reviewed_by}_{r.original_statement}"
+                    seen_reviews[key] = r
+                new_r.review_records = list(seen_reviews.values())
                 new_r.snapshot_version = old.snapshot_version + 1
             else:
                 new_r.snapshot_version = 1

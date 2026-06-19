@@ -5,7 +5,7 @@
     "old_status": null,
     "new_status": "imported",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:11:20.520993",
+    "timestamp": "2026-06-19T14:59:53.565801",
     "details": {
       "screenshot_ref": "screenshot_001",
       "source": "sample_input.csv"
@@ -18,7 +18,7 @@
     "old_status": null,
     "new_status": "imported",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:11:20.527426",
+    "timestamp": "2026-06-19T14:59:53.565979",
     "details": {
       "screenshot_ref": "screenshot_002",
       "source": "sample_input.csv"
@@ -31,7 +31,7 @@
     "old_status": null,
     "new_status": "imported",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:11:20.528514",
+    "timestamp": "2026-06-19T14:59:53.566143",
     "details": {
       "screenshot_ref": "screenshot_003",
       "source": "sample_input.csv"
@@ -44,7 +44,7 @@
     "old_status": null,
     "new_status": "imported",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:11:20.528857",
+    "timestamp": "2026-06-19T14:59:53.566343",
     "details": {
       "screenshot_ref": "screenshot_004",
       "source": "sample_input.csv"
@@ -57,7 +57,7 @@
     "old_status": null,
     "new_status": "imported",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:11:20.529185",
+    "timestamp": "2026-06-19T14:59:53.566516",
     "details": {
       "screenshot_ref": "screenshot_005",
       "source": "sample_input.csv"
@@ -70,7 +70,7 @@
     "old_status": null,
     "new_status": "imported",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:11:20.531544",
+    "timestamp": "2026-06-19T14:59:53.566730",
     "details": {
       "screenshot_ref": "screenshot_006",
       "source": "sample_input.csv"
@@ -83,7 +83,7 @@
     "old_status": null,
     "new_status": "imported",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:11:20.533962",
+    "timestamp": "2026-06-19T14:59:53.566955",
     "details": {
       "screenshot_ref": "screenshot_007",
       "source": "sample_input.csv"
@@ -96,7 +96,7 @@
     "old_status": null,
     "new_status": "imported",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:11:20.535322",
+    "timestamp": "2026-06-19T14:59:53.567166",
     "details": {
       "screenshot_ref": "screenshot_008",
       "source": "sample_input.csv"
@@ -109,156 +109,11 @@
     "old_status": "manual_updated",
     "new_status": "manual_updated",
     "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:11:21.764944",
+    "timestamp": "2026-06-19T14:59:54.146678",
     "details": {
       "field": "denominator",
-      "reason": "根据旧公式截图 screenshot_002 老师批注漏填了100补录"
+      "reason": "测试API同步"
     },
-    "comment": "根据旧公式截图 screenshot_002 老师批注漏填了100补录"
-  },
-  {
-    "row_number": 2,
-    "action": "add_teacher_comment",
-    "old_status": "imported",
-    "new_status": "pending_review",
-    "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:12:01.808871",
-    "details": {
-      "comment": "分母为空需复核，可能是数据录入错误，见旧公式截图 screenshot_002"
-    },
-    "comment": "数据分析师小祁补充老师批注，进入待复核状态"
-  },
-  {
-    "row_number": 3,
-    "action": "add_teacher_comment",
-    "old_status": "imported",
-    "new_status": "pending_review",
-    "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:12:01.814642",
-    "details": {
-      "comment": "分母为0但原始公式截图显示为空字符串，和老师批注冲突，留待复核人"
-    },
-    "comment": "数据分析师小祁补充老师批注，进入待复核状态"
-  },
-  {
-    "row_number": 6,
-    "action": "add_teacher_comment",
-    "old_status": "imported",
-    "new_status": "pending_review",
-    "actor": "数据分析师小祁",
-    "timestamp": "2026-06-09T01:12:01.815591",
-    "details": {
-      "comment": "空值记录，待与数据源方确认是否该补为100"
-    },
-    "comment": "数据分析师小祁补充老师批注，进入待复核状态"
-  },
-  {
-    "row_number": 2,
-    "action": "review_complete",
-    "old_status": "reviewed",
-    "new_status": "reviewed",
-    "actor": "数据复核人-张",
-    "timestamp": "2026-06-09T01:12:02.900916",
-    "details": {
-      "original_statement": "公式截图中分母格为空，老师批注说'漏填了100'",
-      "next_owner": "数据分析师小祁确认改后数"
-    },
-    "comment": "对比旧公式截图和老师批注，以老师批注为准，分母漏填"
-  },
-  {
-    "row_number": 3,
-    "action": "review_complete",
-    "old_status": "reviewed",
-    "new_status": "reviewed",
-    "actor": "数据复核人-张",
-    "timestamp": "2026-06-09T01:12:02.901720",
-    "details": {
-      "original_statement": "分母原始显示为空字符串，数值是0",
-      "next_owner": "课堂演示环节重点说明"
-    },
-    "comment": "空字符串就是0，按0处理，不提前归normal，按异常记"
-  },
-  {
-    "row_number": 6,
-    "action": "review_complete",
-    "old_status": "reviewed",
-    "new_status": "reviewed",
-    "actor": "数据复核人-张",
-    "timestamp": "2026-06-09T01:12:02.902531",
-    "details": {
-      "original_statement": "旧截图中该行为空，老师批注'数据源方确认'",
-      "next_owner": "下周找数据源方追数"
-    },
-    "comment": "数据源方还没回复，继续挂待验证，不提前归normal"
-  },
-  {
-    "row_number": 1,
-    "action": "finalize",
-    "old_status": "reviewed",
-    "new_status": "finalized",
-    "actor": "课堂演示",
-    "timestamp": "2026-06-09T01:12:03.766742",
-    "details": {},
-    "comment": "课堂演示结果更新，最终确认"
-  },
-  {
-    "row_number": 2,
-    "action": "finalize",
-    "old_status": "reviewed",
-    "new_status": "finalized",
-    "actor": "课堂演示",
-    "timestamp": "2026-06-09T01:12:03.768015",
-    "details": {},
-    "comment": "课堂演示结果更新，最终确认"
-  },
-  {
-    "row_number": 3,
-    "action": "finalize",
-    "old_status": "reviewed",
-    "new_status": "finalized",
-    "actor": "课堂演示",
-    "timestamp": "2026-06-09T01:12:03.768948",
-    "details": {},
-    "comment": "课堂演示结果更新，最终确认"
-  },
-  {
-    "row_number": 4,
-    "action": "finalize",
-    "old_status": "reviewed",
-    "new_status": "finalized",
-    "actor": "课堂演示",
-    "timestamp": "2026-06-09T01:12:03.769894",
-    "details": {},
-    "comment": "课堂演示结果更新，最终确认"
-  },
-  {
-    "row_number": 5,
-    "action": "finalize",
-    "old_status": "reviewed",
-    "new_status": "finalized",
-    "actor": "课堂演示",
-    "timestamp": "2026-06-09T01:12:03.771207",
-    "details": {},
-    "comment": "课堂演示结果更新，最终确认"
-  },
-  {
-    "row_number": 7,
-    "action": "finalize",
-    "old_status": "reviewed",
-    "new_status": "finalized",
-    "actor": "课堂演示",
-    "timestamp": "2026-06-09T01:12:03.772865",
-    "details": {},
-    "comment": "课堂演示结果更新，最终确认"
-  },
-  {
-    "row_number": 8,
-    "action": "finalize",
-    "old_status": "reviewed",
-    "new_status": "finalized",
-    "actor": "课堂演示",
-    "timestamp": "2026-06-09T01:12:03.773886",
-    "details": {},
-    "comment": "课堂演示结果更新，最终确认"
+    "comment": "测试API同步"
   }
 ]
