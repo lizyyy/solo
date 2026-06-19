@@ -274,6 +274,8 @@ interface VarStore {
 
   releaseCalculation: (calcId: string, operator: string) => void
 
+  confirmReview: (rowId: string, operator: string, reason: string) => void
+
   setCalculations: (calcs: CalculationDetail[]) => void
   addAudit: (entry: Omit<AuditEntry, 'id'>) => void
   runSelfCheck: () => SelfCheckResult
@@ -463,7 +465,7 @@ export const useVarStore = create<VarStore>((set, get) => ({
             operator: decidedBy,
             timestamp: Date.now(),
             nextOwner:
-              fmt === 'mixed' ? '活动负责人' : target.formatType !== fmt ? '活动负责人' : undefined,
+              fmt === 'mixed' ? '活动负责人' : undefined,
           }
           updatedRows = updatedRows.map((r) =>
             r.id === conflict.rowId
@@ -476,7 +478,7 @@ export const useVarStore = create<VarStore>((set, get) => ({
                   recalcRequired: true,
                   lastRecalcAt: undefined,
                   reviewOwner: change.nextOwner || r.reviewOwner,
-                  reviewStatus: change.nextOwner ? 'pending' : r.reviewStatus,
+                  reviewStatus: change.nextOwner ? 'pending' : fmt === 'mixed' ? 'pending' : r.reviewStatus,
                   needsReview: fmt === 'mixed' ? true : r.needsReview,
                 }
               : r
@@ -527,7 +529,7 @@ export const useVarStore = create<VarStore>((set, get) => ({
               updatedBy: decidedBy,
               recalcVersion: nextVersion,
               recalcSource: `冲突裁决#${id}`,
-              released: row.formatType !== 'mixed' ? c.released : false,
+              released: row.reviewStatus === 'released' ? true : (row.formatType !== 'mixed' && !row.needsReview ? c.released : false),
               versionHistory: [
                 ...c.versionHistory,
                 {
@@ -633,7 +635,7 @@ export const useVarStore = create<VarStore>((set, get) => ({
           updatedBy: operator,
           recalcVersion: nextVersion,
           recalcSource: source,
-          released: row.formatType !== 'mixed' && !row.needsReview ? c.released : false,
+          released: row.reviewStatus === 'released' ? true : (row.formatType !== 'mixed' && !row.needsReview ? c.released : false),
           versionHistory: [
             ...c.versionHistory,
             {
@@ -673,7 +675,7 @@ export const useVarStore = create<VarStore>((set, get) => ({
       const calc = state.calculations.find((c) => c.id === calcId)
       if (!calc) return state
       const row = state.rows.find((r) => r.id === calc.rowId)
-      if (row && (row.formatType === 'mixed' || row.needsReview)) {
+      if (row && row.reviewStatus !== 'released' && (row.formatType === 'mixed' || row.needsReview)) {
         return state
       }
 
@@ -699,10 +701,65 @@ export const useVarStore = create<VarStore>((set, get) => ({
         action: '释放发布',
         operator,
         timestamp: Date.now(),
-        reason: `计算明细通过复核，正式发布`,
+        reason: `计算明细通过复核，正式发布。行格式：${row?.formatType || 'unknown'}，人工复核状态：${row?.reviewStatus || 'unknown'}`,
         affectedResults: [calcId],
-        extra: { rowId: calc.rowId },
+        extra: { rowId: calc.rowId, formatType: row?.formatType, reviewStatus: row?.reviewStatus },
       }
+      return {
+        rows: updatedRows,
+        calculations: updatedCalcs,
+        audits: [...state.audits, audit],
+      }
+    }),
+
+  confirmReview: (rowId, operator, reason) =>
+    set((state) => {
+      const row = state.rows.find((r) => r.id === rowId)
+      if (!row) return state
+
+      const updatedRows = state.rows.map((r) =>
+        r.id === rowId
+          ? {
+              ...r,
+              reviewStatus: 'released' as const,
+              needsReview: false,
+              reviewedBy: operator,
+              reviewedAt: Date.now(),
+              reviewReason: reason,
+              reviewOwner: undefined,
+              recalcRequired: false,
+            }
+          : r
+      )
+
+      const updatedCalcs = state.calculations.map((c) =>
+        c.rowId === rowId
+          ? {
+              ...c,
+              released: true,
+              releasedBy: operator,
+              releasedAt: Date.now(),
+            }
+          : c
+      )
+
+      const audit: AuditEntry = {
+        id: uid(),
+        entityType: 'row',
+        entityId: rowId,
+        action: '人工复核确认',
+        operator,
+        timestamp: Date.now(),
+        reason: `活动负责人复核通过：${reason}。原始说法保留于 originalFields，改后值已确认，发布状态已同步。`,
+        affectedResults: updatedCalcs.filter((c) => c.rowId === rowId).map((c) => c.id),
+        extra: {
+          originalFields: row.originalFields,
+          currentFields: row.fields,
+          valueChanges: row.valueChanges,
+          formatType: row.formatType,
+        },
+      }
+
       return {
         rows: updatedRows,
         calculations: updatedCalcs,
@@ -730,8 +787,10 @@ export const useVarStore = create<VarStore>((set, get) => ({
     const dups = Array.from(duplicateKeys.entries()).filter(([, ids]) => ids.length > 1)
     const duplicateImport: CheckStatus = dups.length > 0 ? 'warning' : 'pass'
 
-    const mixedRows = rows.filter((r) => r.formatType === 'mixed')
-    const formatConsistency: CheckStatus = mixedRows.length > 0 ? 'fail' : 'pass'
+    const mixedRowsPending = rows.filter((r) => r.formatType === 'mixed' && r.reviewStatus !== 'released')
+    const mixedRowsReviewed = rows.filter((r) => r.formatType === 'mixed' && r.reviewStatus === 'released')
+    const formatConsistency: CheckStatus =
+      mixedRowsPending.length > 0 ? 'fail' : mixedRowsReviewed.length > 0 ? 'warning' : 'pass'
 
     const pendingConflicts = conflicts.filter((c) => c.status === 'pending')
     const recalcUnfinished = conflicts.filter(
@@ -747,12 +806,20 @@ export const useVarStore = create<VarStore>((set, get) => ({
 
     const rowIds = new Set(rows.map((r) => r.id))
     const calcRowIds = new Set(calculations.map((c) => c.rowId))
-    const noCalc = rows.filter((r) => !calcRowIds.has(r.id))
+    const noCalc = rows.filter((r) => !calcRowIds.has(r.id) && r.reviewStatus !== 'released')
     const orphanCalc = calculations.filter((c) => !rowIds.has(c.rowId))
-    const noRelease = calculations.filter((c) => !c.released).length
-    const bnNotApplied = boundaryNotes.filter(
-      (n) => n.relatedRowIds.length > 0 && n.appliedRowIds.length < n.relatedRowIds.length
-    )
+    const noRelease = calculations.filter((c) => {
+      const row = rows.find((r) => r.id === c.rowId)
+      return !c.released && (!row || row.reviewStatus !== 'released')
+    }).length
+    const bnNotApplied = boundaryNotes.filter((n) => {
+      if (n.relatedRowIds.length === 0) return false
+      const pendingRelated = n.relatedRowIds.filter((rid) => {
+        const r = rows.find((row) => row.id === rid)
+        return r && r.reviewStatus !== 'released'
+      })
+      return pendingRelated.length > n.appliedRowIds.length
+    })
     const exportConsistency: CheckStatus =
       noCalc.length > 0 || orphanCalc.length > 0
         ? 'fail'
@@ -774,10 +841,15 @@ export const useVarStore = create<VarStore>((set, get) => ({
               )
             : ['未检测到重复导入'],
         formatConsistency:
-          mixedRows.length > 0
-            ? mixedRows.map(
+          mixedRowsPending.length > 0
+            ? mixedRowsPending.map(
                 (r) =>
                   `行${r.rowIndex}(${r.fields.portfolio})格式混搭,负责人=${r.reviewOwner || '未指派'},状态=${r.reviewStatus}`
+              )
+            : mixedRowsReviewed.length > 0
+            ? mixedRowsReviewed.map(
+                (r) =>
+                  `行${r.rowIndex}(${r.fields.portfolio})格式混搭但已人工复核通过,复核人=${r.reviewedBy || '未知'},保留原始说法备查`
               )
             : ['所有行格式一致'],
         recalcAfterSupplement:
@@ -793,10 +865,10 @@ export const useVarStore = create<VarStore>((set, get) => ({
             ? [
                 ...noCalc.map((r) => `行${r.rowIndex}(${r.fields.portfolio})无计算明细`),
                 ...orphanCalc.map((c) => `明细${c.id}关联的行${c.rowId}不存在`),
-                ...(noRelease > 0 ? [`${noRelease}条计算明细未发布`] : []),
+                ...(noRelease > 0 ? [`${noRelease}条计算明细未发布且未人工复核`] : []),
                 ...bnNotApplied.map(
                   (n) =>
-                    `边界值说明#${n.id}(${n.fieldName})有${n.relatedRowIds.length - n.appliedRowIds.length}行未生效`
+                    `边界值说明#${n.id}(${n.fieldName})有${n.relatedRowIds.length - n.appliedRowIds.length}行未生效且待复核`
                 ),
               ]
             : ['导出明细/页面/接口均来自同一份store,完全一致'],

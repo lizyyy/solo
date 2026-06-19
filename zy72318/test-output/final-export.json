@@ -1,0 +1,730 @@
+{
+  "exportTime": "2026-06-19T08:52:14.506Z",
+  "exportedBy": "唐老师",
+  "rows": [
+    {
+      "id": "ryi1027",
+      "rowIndex": 1,
+      "fields": {
+        "portfolio": "沪深300ETF",
+        "confidence": "95%",
+        "holdingPeriod": "1天",
+        "varAmount": "2.35%"
+      },
+      "originalFields": {
+        "portfolio": "沪深300ETF",
+        "confidence": "95%",
+        "holdingPeriod": "1天",
+        "varAmount": "2.35%"
+      },
+      "remark": "该组合波动率近期放大，注意尾部风险",
+      "importBatch": "batch-001",
+      "importTime": 1781772734503,
+      "formatType": "percent",
+      "needsReview": false,
+      "reviewStatus": "released",
+      "valueChanges": [],
+      "recalcRequired": false,
+      "lastRecalcAt": 1781859134506
+    },
+    {
+      "id": "rktvu3h",
+      "rowIndex": 2,
+      "fields": {
+        "portfolio": "中证500期货",
+        "confidence": "0.95",
+        "holdingPeriod": "1天",
+        "varAmount": "0.0312"
+      },
+      "originalFields": {
+        "portfolio": "中证500期货",
+        "confidence": "0.95",
+        "holdingPeriod": "1天",
+        "varAmount": "0.0312"
+      },
+      "remark": "期货保证金占用需额外考虑",
+      "importBatch": "batch-001",
+      "importTime": 1781772734503,
+      "formatType": "decimal",
+      "needsReview": false,
+      "reviewStatus": "released",
+      "valueChanges": [],
+      "recalcRequired": false,
+      "lastRecalcAt": 1781859134506
+    },
+    {
+      "id": "rbgnwn2",
+      "rowIndex": 3,
+      "fields": {
+        "portfolio": "国债10Y",
+        "confidence": "99%",
+        "holdingPeriod": "10天",
+        "varAmount": "1.7%"
+      },
+      "originalFields": {
+        "portfolio": "国债10Y",
+        "confidence": "99%",
+        "holdingPeriod": "10天",
+        "varAmount": "1.7"
+      },
+      "remark": "久期偏长，利率敏感度高。边界值：纯小数=绝对金额(百万元)。需确认1.7是1.7%还是170万元",
+      "importBatch": "batch-001",
+      "importTime": 1781772734503,
+      "formatType": "percent",
+      "needsReview": false,
+      "reviewStatus": "released",
+      "valueChanges": [
+        {
+          "field": "varAmount",
+          "before": "1.7",
+          "after": "1.7%",
+          "reason": "根据边界值说明#bn2，原VaR填写的1.7缺少百分号，实际应该是1.7%。原始说法：1.7（小数无单位），改后值：1.7%。下一步由活动负责人复核。",
+          "operator": "唐老师",
+          "timestamp": 1781859134505
+        }
+      ],
+      "recalcRequired": false,
+      "lastRecalcAt": 1781859134506,
+      "reviewedBy": "活动负责人",
+      "reviewedAt": 1781859134506,
+      "reviewReason": "行3（国债10Y）已完成人工复核：原始说法 1.7（百万元）经与唐老师沟通，实际应为 1.7%（占组合净值比例）。改后值 1.7% 已核实。处理原因：填写人遗漏百分号。下一步：已完成，可发布。边界值说明 bn2 已应用。"
+    },
+    {
+      "id": "rnrdxtu",
+      "rowIndex": 4,
+      "fields": {
+        "portfolio": "黄金T+D",
+        "confidence": "99%",
+        "holdingPeriod": "1天",
+        "varAmount": "4.8%"
+      },
+      "originalFields": {
+        "portfolio": "黄金T+D",
+        "confidence": "0.99",
+        "holdingPeriod": "1天",
+        "varAmount": "4.8%"
+      },
+      "remark": "置信度小数填写，按边界值说明需转换为百分数表达",
+      "importBatch": "batch-001",
+      "importTime": 1781772734503,
+      "formatType": "percent",
+      "needsReview": false,
+      "reviewStatus": "released",
+      "valueChanges": [
+        {
+          "field": "confidence",
+          "before": "0.99",
+          "after": "99%",
+          "reason": "根据边界值说明#bn1，置信度应为百分数表达，0.99需转换为99%。原始说法：0.99（小数），改后值：99%。",
+          "operator": "唐老师",
+          "timestamp": 1781859134506
+        }
+      ],
+      "recalcRequired": false,
+      "lastRecalcAt": 1781859134506,
+      "reviewedBy": "活动负责人",
+      "reviewedAt": 1781859134506,
+      "reviewReason": "行4(黄金T+D)已完成人工复核。原始数据、边界值说明、计算明细均已核对无误。格式一致或已人工确认，可发布。"
+    },
+    {
+      "id": "r5l945g",
+      "rowIndex": 5,
+      "fields": {
+        "portfolio": "沪深300ETF",
+        "confidence": "95%",
+        "holdingPeriod": "1天",
+        "varAmount": "2.35%"
+      },
+      "originalFields": {
+        "portfolio": "沪深300ETF",
+        "confidence": "95%",
+        "holdingPeriod": "1天",
+        "varAmount": "2.35%"
+      },
+      "remark": "重复导入，请确认是否为更新数据。若为新版本，请备注版本号后覆盖旧记录",
+      "importBatch": "batch-002",
+      "importTime": 1781855534503,
+      "formatType": "percent",
+      "needsReview": false,
+      "reviewStatus": "released",
+      "valueChanges": [],
+      "recalcRequired": false,
+      "lastRecalcAt": 1781859134506,
+      "reviewedBy": "活动负责人",
+      "reviewedAt": 1781859134506,
+      "reviewReason": "行5(沪深300ETF)已完成人工复核。原始数据、边界值说明、计算明细均已核对无误。格式一致或已人工确认，可发布。"
+    }
+  ],
+  "boundaryNotes": [
+    {
+      "id": "bn1",
+      "fieldName": "confidence",
+      "originalText": "置信度应为百分数表达，如95%、99%。部分问卷行以0.95小数填写，需统一为百分数后方可入表，但不得删除原始小数记录。转换示例：0.95→95%，0.99→99%。转换前必须先确认原填写人意图，确认值后保留原始说法备查。",
+      "relatedRowIds": [
+        "rktvu3h",
+        "rbgnwn2"
+      ],
+      "appliedRowIds": [
+        "rnrdxtu"
+      ]
+    },
+    {
+      "id": "bn2",
+      "fieldName": "varAmount",
+      "originalText": "VaR金额若带%号，表示占组合净值比例；若为纯小数，表示绝对损失金额（单位：百万元）。二者不可混同计算，务必逐条核实。临界值：值<1的纯小数极可能是遗漏了%号，需回查原始问卷或咨询填写人。原始说法（原值、原格式）任何时候不得被系统静默清洗。",
+      "relatedRowIds": [
+        "rbgnwn2",
+        "rnrdxtu"
+      ],
+      "appliedRowIds": [
+        "rbgnwn2"
+      ]
+    },
+    {
+      "id": "bn3",
+      "fieldName": "holdingPeriod",
+      "originalText": "持有期统一为天数，最小1天。若出现\"1周\"等表述需折算为5天，但原始表述须保留在备注中。若出现小数天数（如0.5天）需回查填写人。",
+      "relatedRowIds": [],
+      "appliedRowIds": []
+    }
+  ],
+  "conflicts": [
+    {
+      "id": "c1",
+      "rowId": "rbgnwn2",
+      "boundaryNoteId": "bn2",
+      "field": "varAmount",
+      "originalValue": "1.7",
+      "boundaryValue": "带%号=占比；纯小数=绝对金额（百万元）。值<1的纯小数需回查是否漏%",
+      "status": "confirmed",
+      "decidedBy": "唐老师",
+      "decidedAt": 1781859134505,
+      "reason": "根据边界值说明#bn2，原VaR填写的1.7缺少百分号，实际应该是1.7%。原始说法：1.7（小数无单位），改后值：1.7%。下一步由活动负责人复核。",
+      "resolvedValue": "1.7%",
+      "recalcTriggered": true,
+      "recalcFinished": true
+    },
+    {
+      "id": "c2",
+      "rowId": "rnrdxtu",
+      "boundaryNoteId": "bn1",
+      "field": "confidence",
+      "originalValue": "0.99",
+      "boundaryValue": "置信度应为百分数表达，0.99需转换为99%，但原值不得删除",
+      "suggestedValue": "99%",
+      "status": "confirmed",
+      "decidedBy": "唐老师",
+      "decidedAt": 1781859134506,
+      "reason": "根据边界值说明#bn1，置信度应为百分数表达，0.99需转换为99%。原始说法：0.99（小数），改后值：99%。",
+      "resolvedValue": "99%",
+      "recalcTriggered": true,
+      "recalcFinished": true
+    }
+  ],
+  "calculations": [
+    {
+      "id": "cd1",
+      "rowId": "ryi1027",
+      "varValue": 0.0235,
+      "originalVarValue": 0.0235,
+      "displayFormat": "percent",
+      "displayValue": "2.35%",
+      "originalDisplayValue": "2.35%",
+      "lastUpdated": 1781859134506,
+      "updatedBy": "唐老师",
+      "recalcVersion": 3,
+      "recalcSource": "发布后验证重算不打回",
+      "released": true,
+      "versionHistory": [
+        {
+          "version": 1,
+          "varValue": 0.0235,
+          "displayValue": "2.35%",
+          "updatedAt": 1781772734503,
+          "updatedBy": "system",
+          "source": "首次导入"
+        },
+        {
+          "version": 2,
+          "varValue": 0.0235,
+          "displayValue": "2.35%",
+          "updatedAt": 1781859134506,
+          "updatedBy": "唐老师",
+          "source": "裁决后手动触发全量重算"
+        },
+        {
+          "version": 3,
+          "varValue": 0.0235,
+          "displayValue": "2.35%",
+          "updatedAt": 1781859134506,
+          "updatedBy": "唐老师",
+          "source": "发布后验证重算不打回"
+        }
+      ]
+    },
+    {
+      "id": "cd2",
+      "rowId": "rktvu3h",
+      "varValue": 0.0312,
+      "originalVarValue": 0.0312,
+      "displayFormat": "decimal",
+      "displayValue": "0.0312",
+      "originalDisplayValue": "0.0312",
+      "lastUpdated": 1781859134506,
+      "updatedBy": "唐老师",
+      "recalcVersion": 3,
+      "recalcSource": "发布后验证重算不打回",
+      "released": true,
+      "versionHistory": [
+        {
+          "version": 1,
+          "varValue": 0.0312,
+          "displayValue": "0.0312",
+          "updatedAt": 1781772734503,
+          "updatedBy": "system",
+          "source": "首次导入"
+        },
+        {
+          "version": 2,
+          "varValue": 0.0312,
+          "displayValue": "0.0312",
+          "updatedAt": 1781859134506,
+          "updatedBy": "唐老师",
+          "source": "裁决后手动触发全量重算"
+        },
+        {
+          "version": 3,
+          "varValue": 0.0312,
+          "displayValue": "0.0312",
+          "updatedAt": 1781859134506,
+          "updatedBy": "唐老师",
+          "source": "发布后验证重算不打回"
+        }
+      ]
+    },
+    {
+      "id": "cd3",
+      "rowId": "rbgnwn2",
+      "varValue": 0.017,
+      "originalVarValue": 1.7,
+      "displayFormat": "percent",
+      "displayValue": "1.7%",
+      "originalDisplayValue": "1.7",
+      "lastUpdated": 1781859134506,
+      "updatedBy": "唐老师",
+      "recalcVersion": 4,
+      "recalcSource": "发布后验证重算不打回",
+      "released": true,
+      "versionHistory": [
+        {
+          "version": 1,
+          "varValue": 1.7,
+          "displayValue": "1.7",
+          "updatedAt": 1781772734503,
+          "updatedBy": "system",
+          "source": "首次导入"
+        },
+        {
+          "version": 2,
+          "varValue": 0.017,
+          "displayValue": "1.7%",
+          "updatedAt": 1781859134505,
+          "updatedBy": "唐老师",
+          "source": "冲突裁决#c1"
+        },
+        {
+          "version": 3,
+          "varValue": 0.017,
+          "displayValue": "1.7%",
+          "updatedAt": 1781859134506,
+          "updatedBy": "唐老师",
+          "source": "裁决后手动触发全量重算"
+        },
+        {
+          "version": 4,
+          "varValue": 0.017,
+          "displayValue": "1.7%",
+          "updatedAt": 1781859134506,
+          "updatedBy": "唐老师",
+          "source": "发布后验证重算不打回"
+        }
+      ],
+      "releasedBy": "活动负责人",
+      "releasedAt": 1781859134506
+    },
+    {
+      "id": "cd4",
+      "rowId": "rnrdxtu",
+      "varValue": 0.048,
+      "originalVarValue": 0.048,
+      "displayFormat": "percent",
+      "displayValue": "4.8%",
+      "originalDisplayValue": "4.8%",
+      "lastUpdated": 1781859134506,
+      "updatedBy": "唐老师",
+      "recalcVersion": 4,
+      "recalcSource": "发布后验证重算不打回",
+      "released": true,
+      "versionHistory": [
+        {
+          "version": 1,
+          "varValue": 0.048,
+          "displayValue": "4.8%",
+          "updatedAt": 1781772734503,
+          "updatedBy": "system",
+          "source": "首次导入"
+        },
+        {
+          "version": 2,
+          "varValue": 0.048,
+          "displayValue": "4.8%",
+          "updatedAt": 1781859134506,
+          "updatedBy": "唐老师",
+          "source": "冲突裁决#c2"
+        },
+        {
+          "version": 3,
+          "varValue": 0.048,
+          "displayValue": "4.8%",
+          "updatedAt": 1781859134506,
+          "updatedBy": "唐老师",
+          "source": "裁决后手动触发全量重算"
+        },
+        {
+          "version": 4,
+          "varValue": 0.048,
+          "displayValue": "4.8%",
+          "updatedAt": 1781859134506,
+          "updatedBy": "唐老师",
+          "source": "发布后验证重算不打回"
+        }
+      ],
+      "releasedBy": "活动负责人",
+      "releasedAt": 1781859134506
+    }
+  ],
+  "audits": [
+    {
+      "id": "a1",
+      "entityType": "row",
+      "entityId": "ryi1027",
+      "action": "导入",
+      "operator": "唐老师",
+      "timestamp": 1781772734503,
+      "reason": "该组合波动率近期放大，注意尾部风险...",
+      "affectedResults": [
+        "cd1"
+      ]
+    },
+    {
+      "id": "a2",
+      "entityType": "row",
+      "entityId": "rktvu3h",
+      "action": "导入",
+      "operator": "唐老师",
+      "timestamp": 1781772734503,
+      "reason": "期货保证金占用需额外考虑...",
+      "affectedResults": [
+        "cd2"
+      ]
+    },
+    {
+      "id": "a3",
+      "entityType": "row",
+      "entityId": "rbgnwn2",
+      "action": "导入",
+      "operator": "唐老师",
+      "timestamp": 1781772734503,
+      "reason": "久期偏长，利率敏感度高。边界值：纯小数=...",
+      "affectedResults": [
+        "cd3"
+      ]
+    },
+    {
+      "id": "a4",
+      "entityType": "row",
+      "entityId": "rnrdxtu",
+      "action": "导入",
+      "operator": "唐老师",
+      "timestamp": 1781772734503,
+      "reason": "置信度小数填写，按边界值说明需转换为百分...",
+      "affectedResults": [
+        "cd4"
+      ]
+    },
+    {
+      "id": "a5",
+      "entityType": "row",
+      "entityId": "r5l945g",
+      "action": "导入",
+      "operator": "唐老师",
+      "timestamp": 1781855534503,
+      "reason": "重复导入，请确认是否为更新数据。若为新版...",
+      "affectedResults": []
+    },
+    {
+      "id": "14f1a6ddmqkox7hm",
+      "entityType": "conflict",
+      "entityId": "c1",
+      "action": "确认冲突",
+      "operator": "唐老师",
+      "timestamp": 1781859134506,
+      "reason": "根据边界值说明#bn2，原VaR填写的1.7缺少百分号，实际应该是1.7%。原始说法：1.7（小数无单位），改后值：1.7%。下一步由活动负责人复核。",
+      "affectedResults": [
+        "cd3"
+      ],
+      "extra": {
+        "decision": "confirmed",
+        "resolvedValue": "1.7%",
+        "field": "varAmount",
+        "rowId": "rbgnwn2"
+      }
+    },
+    {
+      "id": "cyuwduwjmqkox7hl",
+      "entityType": "row",
+      "entityId": "rbgnwn2",
+      "action": "冲突裁决-修正varAmount",
+      "operator": "唐老师",
+      "timestamp": 1781859134505,
+      "reason": "根据边界值说明#bn2，原VaR填写的1.7缺少百分号，实际应该是1.7%。原始说法：1.7（小数无单位），改后值：1.7%。下一步由活动负责人复核。",
+      "affectedResults": [
+        "cd3"
+      ],
+      "extra": {
+        "conflictId": "c1",
+        "before": "1.7",
+        "after": "1.7%",
+        "decision": "confirmed"
+      }
+    },
+    {
+      "id": "cebqmvn4mqkox7hm",
+      "entityType": "recalc",
+      "entityId": "rbgnwn2",
+      "action": "冲突裁决后自动重算",
+      "operator": "唐老师",
+      "timestamp": 1781859134506,
+      "reason": "冲突#c1裁决为确认，已按边界值说明自动重算。原值(1.7)仍保存在originalFields。",
+      "affectedResults": [
+        "cd3"
+      ],
+      "extra": {
+        "conflictId": "c1",
+        "field": "varAmount",
+        "rowId": "rbgnwn2",
+        "decision": "confirmed"
+      }
+    },
+    {
+      "id": "78l46nwimqkox7hm",
+      "entityType": "conflict",
+      "entityId": "c2",
+      "action": "确认冲突",
+      "operator": "唐老师",
+      "timestamp": 1781859134506,
+      "reason": "根据边界值说明#bn1，置信度应为百分数表达，0.99需转换为99%。原始说法：0.99（小数），改后值：99%。",
+      "affectedResults": [
+        "cd4"
+      ],
+      "extra": {
+        "decision": "confirmed",
+        "resolvedValue": "99%",
+        "field": "confidence",
+        "rowId": "rnrdxtu"
+      }
+    },
+    {
+      "id": "vawe4enumqkox7hm",
+      "entityType": "row",
+      "entityId": "rnrdxtu",
+      "action": "冲突裁决-修正confidence",
+      "operator": "唐老师",
+      "timestamp": 1781859134506,
+      "reason": "根据边界值说明#bn1，置信度应为百分数表达，0.99需转换为99%。原始说法：0.99（小数），改后值：99%。",
+      "affectedResults": [
+        "cd4"
+      ],
+      "extra": {
+        "conflictId": "c2",
+        "before": "0.99",
+        "after": "99%",
+        "decision": "confirmed"
+      }
+    },
+    {
+      "id": "jcrur94emqkox7hm",
+      "entityType": "recalc",
+      "entityId": "rnrdxtu",
+      "action": "冲突裁决后自动重算",
+      "operator": "唐老师",
+      "timestamp": 1781859134506,
+      "reason": "冲突#c2裁决为确认，已按边界值说明自动重算。原值(0.99)仍保存在originalFields。",
+      "affectedResults": [
+        "cd4"
+      ],
+      "extra": {
+        "conflictId": "c2",
+        "field": "confidence",
+        "rowId": "rnrdxtu",
+        "decision": "confirmed"
+      }
+    },
+    {
+      "id": "romcor19mqkox7hm",
+      "entityType": "recalc",
+      "entityId": "all",
+      "action": "全量重算",
+      "operator": "唐老师",
+      "timestamp": 1781859134506,
+      "reason": "裁决后手动触发全量重算",
+      "affectedResults": [
+        "cd1",
+        "cd2",
+        "cd3",
+        "cd4"
+      ],
+      "extra": {
+        "recalcCount": 4
+      }
+    },
+    {
+      "id": "361f9qw5mqkox7hm",
+      "entityType": "row",
+      "entityId": "rbgnwn2",
+      "action": "人工复核确认",
+      "operator": "活动负责人",
+      "timestamp": 1781859134506,
+      "reason": "活动负责人复核通过：行3（国债10Y）已完成人工复核：原始说法 1.7（百万元）经与唐老师沟通，实际应为 1.7%（占组合净值比例）。改后值 1.7% 已核实。处理原因：填写人遗漏百分号。下一步：已完成，可发布。边界值说明 bn2 已应用。。原始说法保留于 originalFields，改后值已确认，发布状态已同步。",
+      "affectedResults": [
+        "cd3"
+      ],
+      "extra": {
+        "originalFields": {
+          "portfolio": "国债10Y",
+          "confidence": "99%",
+          "holdingPeriod": "10天",
+          "varAmount": "1.7"
+        },
+        "currentFields": {
+          "portfolio": "国债10Y",
+          "confidence": "99%",
+          "holdingPeriod": "10天",
+          "varAmount": "1.7%"
+        },
+        "valueChanges": [
+          {
+            "field": "varAmount",
+            "before": "1.7",
+            "after": "1.7%",
+            "reason": "根据边界值说明#bn2，原VaR填写的1.7缺少百分号，实际应该是1.7%。原始说法：1.7（小数无单位），改后值：1.7%。下一步由活动负责人复核。",
+            "operator": "唐老师",
+            "timestamp": 1781859134505
+          }
+        ],
+        "formatType": "percent"
+      }
+    },
+    {
+      "id": "7j7j0jmvmqkox7hm",
+      "entityType": "row",
+      "entityId": "rnrdxtu",
+      "action": "人工复核确认",
+      "operator": "活动负责人",
+      "timestamp": 1781859134506,
+      "reason": "活动负责人复核通过：行4(黄金T+D)已完成人工复核。原始数据、边界值说明、计算明细均已核对无误。格式一致或已人工确认，可发布。。原始说法保留于 originalFields，改后值已确认，发布状态已同步。",
+      "affectedResults": [
+        "cd4"
+      ],
+      "extra": {
+        "originalFields": {
+          "portfolio": "黄金T+D",
+          "confidence": "0.99",
+          "holdingPeriod": "1天",
+          "varAmount": "4.8%"
+        },
+        "currentFields": {
+          "portfolio": "黄金T+D",
+          "confidence": "99%",
+          "holdingPeriod": "1天",
+          "varAmount": "4.8%"
+        },
+        "valueChanges": [
+          {
+            "field": "confidence",
+            "before": "0.99",
+            "after": "99%",
+            "reason": "根据边界值说明#bn1，置信度应为百分数表达，0.99需转换为99%。原始说法：0.99（小数），改后值：99%。",
+            "operator": "唐老师",
+            "timestamp": 1781859134506
+          }
+        ],
+        "formatType": "percent"
+      }
+    },
+    {
+      "id": "s34j64g7mqkox7hm",
+      "entityType": "row",
+      "entityId": "r5l945g",
+      "action": "人工复核确认",
+      "operator": "活动负责人",
+      "timestamp": 1781859134506,
+      "reason": "活动负责人复核通过：行5(沪深300ETF)已完成人工复核。原始数据、边界值说明、计算明细均已核对无误。格式一致或已人工确认，可发布。。原始说法保留于 originalFields，改后值已确认，发布状态已同步。",
+      "affectedResults": [],
+      "extra": {
+        "originalFields": {
+          "portfolio": "沪深300ETF",
+          "confidence": "95%",
+          "holdingPeriod": "1天",
+          "varAmount": "2.35%"
+        },
+        "currentFields": {
+          "portfolio": "沪深300ETF",
+          "confidence": "95%",
+          "holdingPeriod": "1天",
+          "varAmount": "2.35%"
+        },
+        "valueChanges": [],
+        "formatType": "percent"
+      }
+    },
+    {
+      "id": "zqhob5okmqkox7hm",
+      "entityType": "recalc",
+      "entityId": "all",
+      "action": "全量重算",
+      "operator": "唐老师",
+      "timestamp": 1781859134506,
+      "reason": "发布后验证重算不打回",
+      "affectedResults": [
+        "cd1",
+        "cd2",
+        "cd3",
+        "cd4"
+      ],
+      "extra": {
+        "recalcCount": 4
+      }
+    }
+  ],
+  "selfCheck": {
+    "duplicateImport": "warning",
+    "formatConsistency": "pass",
+    "recalcAfterSupplement": "pass",
+    "exportConsistency": "pass",
+    "details": {
+      "duplicateImport": [
+        "组合(沪深300ETF,2.35%) 出现 2 次: ryi1027,r5l945g"
+      ],
+      "formatConsistency": [
+        "所有行格式一致"
+      ],
+      "recalcAfterSupplement": [
+        "所有补录/裁决后均已重算"
+      ],
+      "exportConsistency": [
+        "导出明细/页面/接口均来自同一份store,完全一致"
+      ]
+    }
+  }
+}

@@ -24,7 +24,10 @@ export interface QuestionnaireRow {
   formatType: FormatType
   needsReview: boolean
   reviewOwner?: string
-  reviewStatus?: 'pending' | 'reviewing' | 'released'
+  reviewStatus: 'pending' | 'reviewing' | 'released'
+  reviewedBy?: string
+  reviewedAt?: number
+  reviewReason?: string
   valueChanges: ValueChange[]
   recalcRequired: boolean
   lastRecalcAt?: number

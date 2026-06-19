@@ -72,7 +72,7 @@ export default function CalculationTable() {
                 const hasConflict = conflicts.some(
                   (c) => c.rowId === calc.rowId && c.status === 'pending'
                 )
-                const isReview = row?.needsReview
+                const isReview = row?.needsReview && row?.reviewStatus !== 'released'
                 const changed = calc.versionHistory.length > 1
                 return (
                   <tr
@@ -126,6 +126,8 @@ export default function CalculationTable() {
                     <td>
                       {hasConflict ? (
                         <span className="badge-red">冲突待决</span>
+                      ) : row?.reviewStatus === 'released' ? (
+                        <span className="badge-green">已发布</span>
                       ) : isReview ? (
                         <span className="badge-gold">
                           待复核 → {row?.reviewOwner || '负责人'}
@@ -152,7 +154,7 @@ export default function CalculationTable() {
                         >
                           <RefreshCw size={14} />
                         </button>
-                        {!calc.released && !isReview && row?.formatType !== 'mixed' && (
+                        {!calc.released && (row?.reviewStatus === 'released' || (!isReview && row?.formatType !== 'mixed')) && (
                           <button
                             onClick={() => releaseCalculation(calc.id, '活动负责人')}
                             className="p-1.5 rounded hover:bg-accent-green/10 text-text-muted hover:text-text-green transition-colors"

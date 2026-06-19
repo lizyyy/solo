@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Upload, AlertCircle, FileUp, Eye, RefreshCcw } from 'lucide-react'
+import { AlertCircle, FileUp, Eye, RefreshCcw } from 'lucide-react'
 import { useVarStore } from '@/store'
 import type { QuestionnaireRow, FormatType } from '@/types'
 

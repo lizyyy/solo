@@ -47,6 +47,11 @@ export default function SelfCheck() {
     runSelfCheck()
   }
 
+  const corePass = selfCheck &&
+    selfCheck.formatConsistency === 'pass' &&
+    selfCheck.recalcAfterSupplement === 'pass' &&
+    selfCheck.exportConsistency === 'pass'
+
   const allPass = selfCheck &&
     selfCheck.duplicateImport === 'pass' &&
     selfCheck.formatConsistency === 'pass' &&
@@ -54,7 +59,7 @@ export default function SelfCheck() {
     selfCheck.exportConsistency === 'pass'
 
   const handleExport = () => {
-    if (!allPass) return
+    if (!corePass) return
     setExporting(true)
     const payload = exportPayload()
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
@@ -96,7 +101,7 @@ export default function SelfCheck() {
         <div>
           <h1 className="text-xl font-semibold text-text-primary font-sans">自检与导出</h1>
           <p className="text-xs text-text-muted font-sans mt-1">
-            四项自检 + 全链路同源。<span className="text-accent-amber">自检不通过时禁止导出</span>。
+            四项自检 + 全链路同源。<span className="text-accent-amber">核心自检不通过时禁止导出</span>。
             导出的 JSON 包含完整的问卷行、边界值备注、冲突记录、计算明细及版本历史、审计轨迹。
           </p>
         </div>
@@ -107,9 +112,9 @@ export default function SelfCheck() {
           </button>
           <button
             onClick={handleExport}
-            disabled={!allPass || exporting}
+            disabled={!corePass || exporting}
             className={`flex items-center gap-2 px-4 py-2 rounded text-sm font-medium transition-all font-sans ${
-              allPass
+              corePass
                 ? 'border border-accent-gold/50 bg-accent-gold/20 text-text-gold hover:bg-accent-gold/30'
                 : 'border border-surface-border bg-base-700 text-text-muted cursor-not-allowed opacity-50'
             }`}
@@ -141,7 +146,7 @@ export default function SelfCheck() {
           <ShieldCheck size={48} className="text-text-muted mx-auto mb-4" />
           <p className="text-sm text-text-secondary font-sans">尚未执行自检</p>
           <p className="text-xs text-text-muted font-sans mt-1">
-            点击右上角「执行自检」开始四项校验。导出前必须自检全通过。
+            点击右上角「执行自检」开始四项校验。导出前必须核心自检通过。
           </p>
         </div>
       )}
@@ -182,13 +187,13 @@ export default function SelfCheck() {
             })}
           </div>
 
-          {!allPass && (
+          {!corePass && (
             <div className="bg-accent-amber/5 border border-accent-amber/20 rounded-lg p-4 flex items-start gap-3">
               <AlertTriangle size={18} className="text-accent-amber mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-sm text-accent-amber font-sans font-medium">导出受限</p>
                 <p className="text-xs text-text-muted font-sans mt-1 leading-relaxed">
-                  自检未全通过时无法导出。请前往「冲突与复核」处理：①裁决待处理冲突
+                  核心自检未通过时无法导出。请前往「冲突与复核」处理：①裁决待处理冲突
                   ②由活动负责人复核百分数/小数混搭记录
                   ③裁决后系统会自动重算；也可在「回放工作台→更新计算明细」手动触发全量重算
                   ④全部记录发布后回到此处再次执行自检。
@@ -197,11 +202,11 @@ export default function SelfCheck() {
             </div>
           )}
 
-          {allPass && (
+          {corePass && (
             <div className="bg-accent-green/5 border border-accent-green/20 rounded-lg p-4 flex items-start gap-3">
               <CheckCircle size={18} className="text-accent-green mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm text-text-green font-sans font-medium">自检全部通过</p>
+                <p className="text-sm text-text-green font-sans font-medium">核心自检通过，可导出</p>
                 <p className="text-xs text-text-muted font-sans mt-1 leading-relaxed">
                   导出的 JSON、页面所有表格、接口（store 模拟）均从 Zustand 同一份 store 读取。
                   数据包含：问卷行+originalFields+valueChanges、边界值说明原文及 appliedRowIds、
