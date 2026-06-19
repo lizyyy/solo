@@ -1,5 +1,5 @@
 import { getProcessNodesStore } from '../memoryStore.js';
-import type { ProcessNode, ProcessStep, UserRole } from '../../../shared/types.js';
+import type { ProcessNode } from '../../../shared/types.js';
 
 export const ProcessRepo = {
   findAll(): ProcessNode[] {

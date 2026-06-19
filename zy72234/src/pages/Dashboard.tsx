@@ -14,7 +14,6 @@ import {
 import { useClearingStore } from '@/store/useClearingStore';
 import StatusBadge from '@/components/common/StatusBadge';
 import AmountDisplay from '@/components/common/AmountDisplay';
-import { isZeroReversed } from '@shared/types';
 
 export default function Dashboard() {
   const navigate = useNavigate();

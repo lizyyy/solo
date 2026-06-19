@@ -3,7 +3,6 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recha
 import type { PieChartData } from '@shared/types';
 import { useNavigate } from 'react-router-dom';
 import { useClearingStore } from '@/store/useClearingStore';
-import { STATUS_LABELS } from '@shared/types';
 
 interface StatusPieChartProps {
   data: PieChartData[];
@@ -22,7 +21,7 @@ interface CustomLabelProps {
   percent: number;
 }
 
-const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, name, value, percent }: CustomLabelProps) => {
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, percent }: Omit<CustomLabelProps, 'name'>) => {
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
@@ -100,13 +99,17 @@ export default function StatusPieChart({ data }: StatusPieChartProps) {
             }}
           />
           <Legend
-            formatter={(value, entry: any) => (
-              <span className="text-sm text-carbon-600 cursor-pointer hover:text-carbon-800">
-                {entry.payload.name} ({entry.payload.value})
-              </span>
-            )}
-            onClick={(entry: any) => {
-              const index = data.findIndex((d) => d.name === entry.payload.name);
+            formatter={(value, entry) => {
+              const entryData = entry as { payload?: { name?: string; value?: number } };
+              return (
+                <span className="text-sm text-carbon-600 cursor-pointer hover:text-carbon-800">
+                  {entryData?.payload?.name || value} ({entryData?.payload?.value || 0})
+                </span>
+              );
+            }}
+            onClick={(entry) => {
+              const entryData = entry as { payload?: { name?: string; value?: number } };
+              const index = data.findIndex((d) => d.name === entryData?.payload?.name);
               if (index >= 0) {
                 handleClick(data[index], index);
               }

@@ -9,7 +9,6 @@ import type {
   ReviewRequest,
   ExecutiveSummaryItem,
   CustodyCreateResult,
-  CustodyDiffSnapshot,
 } from '@shared/types';
 import {
   mockAdjustments,
@@ -34,7 +33,7 @@ export const api = {
         const result = await res.json();
         return result.data || result;
       }
-    } catch (e) {
+    } catch {
       console.log('使用mock数据: adjustments');
     }
     return delay(mockAdjustments);
@@ -47,7 +46,7 @@ export const api = {
         const result = await res.json();
         return result.data || result;
       }
-    } catch (e) {
+    } catch {
       console.log('使用mock数据: adjustment by id');
     }
     return delay(mockAdjustments.find((a) => a.id === id));
@@ -60,7 +59,7 @@ export const api = {
         const result = await res.json();
         return result.data || result;
       }
-    } catch (e) {
+    } catch {
       console.log('使用mock数据: custody confirmations');
     }
     return delay(mockCustodyConfirmations);
@@ -73,7 +72,7 @@ export const api = {
         const result = await res.json();
         return result.data || result;
       }
-    } catch (e) {
+    } catch {
       console.log('使用mock数据: custody by id');
     }
     return delay(mockCustodyConfirmations.find((c) => c.id === id));
@@ -89,7 +88,7 @@ export const api = {
         const result = await res.json();
         return result.data || result;
       }
-    } catch (e) {
+    } catch {
       console.log('使用mock数据: process nodes');
     }
     let nodes = mockProcessNodes;
@@ -106,7 +105,7 @@ export const api = {
         const result = await res.json();
         return result.data || result;
       }
-    } catch (e) {
+    } catch {
       console.log('使用mock数据: overview stats');
     }
     return delay({
@@ -125,7 +124,7 @@ export const api = {
         const result = await res.json();
         return result.data || result;
       }
-    } catch (e) {
+    } catch {
       console.log('使用mock数据: 3d chart data');
     }
     return delay(mock3DChartData);
@@ -138,7 +137,7 @@ export const api = {
         const result = await res.json();
         return result.data || result;
       }
-    } catch (e) {
+    } catch {
       console.log('使用mock数据: pie chart data');
     }
     return delay(mockPieChartData);
@@ -151,7 +150,7 @@ export const api = {
         const result = await res.json();
         return result.data || result;
       }
-    } catch (e) {
+    } catch {
       console.log('使用mock数据: executive summary');
     }
     const summary = mockAdjustments
@@ -184,7 +183,7 @@ export const api = {
         body: formData,
       });
       if (res.ok) return res.json();
-    } catch (e) {
+    } catch {
       console.log('使用mock数据: import file');
     }
 
@@ -222,7 +221,7 @@ export const api = {
         body: JSON.stringify(request),
       });
       if (res.ok) return;
-    } catch (e) {
+    } catch {
       console.log('使用mock数据: submit review');
     }
     return delay(undefined);
@@ -239,7 +238,7 @@ export const api = {
         const result = await res.json();
         return result.data || result;
       }
-    } catch (e) {
+    } catch {
       console.log('使用mock数据: update custody');
     }
     return delay({ ...custody, updateTime: new Date().toISOString().replace('T', ' ').slice(0, 19) });
@@ -256,7 +255,7 @@ export const api = {
         const result = await res.json();
         return result.data || result;
       }
-    } catch (e) {
+    } catch {
       console.log('使用mock数据: create custody');
     }
     const now = new Date().toISOString().replace('T', ' ').slice(0, 19);

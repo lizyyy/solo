@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { ChevronRight, User, ChevronDown } from 'lucide-react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 import { useClearingStore } from '@/store/useClearingStore';
 import type { UserRole } from '@shared/types';
 
@@ -22,7 +22,7 @@ const breadcrumbLabels: Record<string, string> = {
 
 export default function Header() {
   const location = useLocation();
-  const { currentUser, currentRole, setCurrentUser } = useClearingStore();
+  const { currentUser, setCurrentUser } = useClearingStore();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const getBreadcrumbs = () => {

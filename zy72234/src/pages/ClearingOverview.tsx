@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TrendingUp, AlertTriangle, FileCheck, ShieldCheck, BarChart3 } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { useClearingStore } from '@/store/useClearingStore';
 import Clearing3DChart from '@/components/charts/Clearing3DChart';
 import StatusPieChart from '@/components/charts/StatusPieChart';

@@ -4,7 +4,7 @@ import { Search, Filter, ArrowRight, FileCheck, AlertTriangle, SlidersHorizontal
 import { useClearingStore } from '@/store/useClearingStore';
 import StatusBadge from '@/components/common/StatusBadge';
 import AmountDisplay from '@/components/common/AmountDisplay';
-import { isZeroReversed, STATUS_LABELS } from '@shared/types';
+import { isZeroReversed } from '@shared/types';
 import type { AdjustmentStatus } from '@shared/types';
 
 const filterOptions: { value: AdjustmentStatus | 'all' | 'flagged'; label: string }[] = [

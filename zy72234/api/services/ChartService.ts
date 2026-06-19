@@ -43,7 +43,6 @@ export const ChartService = {
   },
 
   getPieChartData(): PieChartData[] {
-    const stats = AdjustmentRepo.getStats();
     const adjustments = AdjustmentRepo.findAll();
 
     const statusCounts = new Map<AdjustmentStatus, number>();

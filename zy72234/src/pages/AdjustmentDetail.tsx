@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, FileCheck, ShieldCheck, Clock, User, FileText, AlertTriangle, GitCompare } from 'lucide-react';
+import { ArrowLeft, FileCheck, ShieldCheck, Clock, FileText, AlertTriangle, GitCompare } from 'lucide-react';
 import { useClearingStore } from '@/store/useClearingStore';
 import StatusBadge from '@/components/common/StatusBadge';
 import AmountDisplay from '@/components/common/AmountDisplay';

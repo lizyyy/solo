@@ -2,6 +2,7 @@ import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { z } from 'zod';
 import { AdjustmentRepo } from '../db/repositories/AdjustmentRepo.js';
+import { ProcessRepo } from '../db/repositories/ProcessRepo.js';
 import { isZeroReversed } from '../../shared/types.js';
 import type { TailAdjustment, ImportResult, AdjustmentStatus } from '../../shared/types.js';
 
@@ -81,6 +82,15 @@ export const ImportService = {
         status,
         importTime: now,
         importOperator: operator,
+      });
+
+      ProcessRepo.create({
+        adjustmentId: adjustment.id,
+        step: 'import',
+        operator,
+        operatorRole: 'assistant',
+        action,
+        timestamp: now,
       });
 
       importedItems.push(adjustment);

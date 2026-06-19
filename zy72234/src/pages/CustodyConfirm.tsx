@@ -29,7 +29,6 @@ export default function CustodyConfirm() {
     applyCustodyCreateResult,
     updateCustody,
     currentUser,
-    currentRole,
   } = useClearingStore();
 
   const existingCustody = id ? getCustodyById(id) : undefined;
@@ -65,7 +64,6 @@ export default function CustodyConfirm() {
         extraFieldValue: '',
       });
     } else if (adjustment) {
-      const date = new Date();
       const voucherNo = `CUST-${adjustment.tradeDate.replace(/-/g, '')}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
       setFormData((prev) => ({
         ...prev,
@@ -133,7 +131,7 @@ export default function CustodyConfirm() {
       
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    } catch (e) {
+    } catch {
       alert('保存失败，请重试');
     } finally {
       setSaving(false);

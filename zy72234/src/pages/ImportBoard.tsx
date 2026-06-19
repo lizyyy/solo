@@ -9,7 +9,7 @@ import type { TailAdjustment, ImportResult } from '@shared/types';
 import { sampleCsvData } from '@shared/mockData';
 
 export default function ImportBoard() {
-  const { addAdjustments, currentUser } = useClearingStore();
+  const { addAdjustments } = useClearingStore();
   const [isDragging, setIsDragging] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
@@ -26,7 +26,7 @@ export default function ImportBoard() {
       const result = await api.importFile(file);
       setImportResult(result);
       setPreviewData(result.items);
-    } catch (e) {
+    } catch {
       setError('文件解析失败，请检查文件格式是否正确');
     } finally {
       setImporting(false);

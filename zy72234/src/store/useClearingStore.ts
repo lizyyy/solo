@@ -79,7 +79,7 @@ export const useClearingStore = create<ClearingState>((set, get) => ({
         pieChartData,
         loading: false,
       });
-    } catch (err) {
+    } catch {
       set({ error: '数据加载失败，请刷新页面重试', loading: false });
     }
   },

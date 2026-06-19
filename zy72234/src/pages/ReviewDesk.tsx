@@ -106,7 +106,7 @@ export default function ReviewDesk() {
       } else {
         setCurrentIndex(currentIndex + 1);
       }
-    } catch (e) {
+    } catch {
       alert('提交失败，请重试');
     } finally {
       setSubmitting(false);
