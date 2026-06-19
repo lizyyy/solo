@@ -469,9 +469,18 @@ export const useStore = create<AppState>((set, get) => ({
       if (!contract) return false;
 
       const fieldKey = historyItem.fieldName as keyof ContractScreenshot;
+      let typedOldValue: any = historyItem.oldValue;
+
+      if (fieldKey === 'importCount' || fieldKey === 'fileSize') {
+        typedOldValue = Number(historyItem.oldValue) || 0;
+      }
+      if (fieldKey === 'lastImportTime' || fieldKey === 'uploadTime') {
+        typedOldValue = new Date(historyItem.oldValue);
+      }
+
       const rolledBackContract = {
         ...contract,
-        [fieldKey]: historyItem.oldValue,
+        [fieldKey]: typedOldValue,
       };
 
       set({
