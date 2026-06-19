@@ -202,22 +202,34 @@ def cmd_teacher_approve(args):
     engine = CopyrightCheckEngine(args.data)
     operator = args.operator or "音乐老师"
 
+    note = args.note
+    if not note:
+        note = input("审批备注（必填）: ").strip()
+
     print(f"=== 音乐老师复核通过 ===")
     print(f"操作人: {operator}")
     print(f"记录ID: {args.record_id}")
     print()
 
-    success = engine.teacher_approve(args.record_id, operator, args.note)
+    success, blockers = engine.teacher_approve(args.record_id, operator, note)
 
     if not success:
+        print(f"\033[91m✗ 审批被阻止，以下条件未满足:\033[0m")
+        for b in blockers:
+            print(f"  - {b}")
+        print()
         record = engine.get_record(args.record_id)
         if record:
-            print(f"错误: 当前状态 {record.status.value} 不允许审批，或缺少合同证据", file=sys.stderr)
+            print(f"当前状态: {record.status.value}")
+            print(f"接龙证据: {sum(1 for e in record.evidences if e.evidence_type.value == 'group_chat')} 份")
+            print(f"合同证据: {sum(1 for e in record.evidences if e.evidence_type.value == 'contract_screenshot')} 份")
+            print()
+            print("请补齐证据或备注后重新审批")
         else:
             print(f"错误: 未找到记录 {args.record_id}", file=sys.stderr)
         sys.exit(1)
 
-    print("审批通过")
+    print("\033[92m✓ 审批通过\033[0m")
     details = engine.get_record_details(args.record_id)
     pretty_print_record(details, show_details=True)
 
@@ -343,8 +355,11 @@ def cmd_workflow(args):
 
     for i, record in enumerate(need_review):
         if i < len(need_review) - 1:
-            engine.teacher_approve(record.record_id, "音乐老师", "版权名正确，现场名是演出时的别称")
-            print(f"✓ 审批通过: '{record.get_display_name()}' (现场名 '{record.live_name}' 实为版权名 '{record.copyright_name}' 的现场版)")
+            success, blockers = engine.teacher_approve(record.record_id, "音乐老师", "版权名正确，现场名是演出时的别称")
+            if success:
+                print(f"✓ 审批通过: '{record.get_display_name()}' (现场名 '{record.live_name}' 实为版权名 '{record.copyright_name}' 的现场版)")
+            else:
+                print(f"✗ 审批被阻止: '{record.get_display_name()}' - {'; '.join(blockers)}")
         else:
             engine.teacher_reject(record.record_id, "音乐老师", "版权名有误，需重新核对合同")
             print(f"✗ 驳回: '{record.get_display_name()}' - 版权名与合同不符")
@@ -403,6 +418,16 @@ def cmd_rules(args):
     print("4. MIN_EVIDENCE_FOR_APPROVAL = 2")
     print("   审批通过至少需要 2 份证据（接龙+合同各至少一份）")
     print()
+    print("5. APPROVAL_REQUIRES_GROUP_CHAT = True")
+    print("   审批通过必须有排练群接龙证据，缺接龙证据不允许通过")
+    print()
+    print("6. APPROVAL_REQUIRES_CONTRACT = True")
+    print("   审批通过必须有合同页截图证据，缺合同证据不允许通过")
+    print()
+    print("7. APPROVAL_REQUIRES_NOTE = True")
+    print("   审批通过必须填写非空备注，空备注不允许通过")
+    print("   老师追问时需要看到审批理由，而非一个空白的通过标记")
+    print()
     print("\033[1m状态流转图:\033[0m")
     print()
     print("  imported ──> name_conflict ──> teacher_review ──> approved")
@@ -410,7 +435,10 @@ def cmd_rules(args):
     print("     │              │                  └──> rejected   │")
     print("     │              │                                  │")
     print("     └──> awaiting_contract ──> contract_verified ─────┘")
-    print("                                                            ")
+    print("                                   ↑                   ")
+    print("          审批被阻止（缺证据/缺备注）──┘                   ")
+    print()
+    print("  审批门控: 接龙证据 ≥ 1 + 合同证据 ≥ 1 + 备注非空 → 才允许通过")
     print("  任何状态都可回滚(rolled_back)，所有历史保留")
 
 

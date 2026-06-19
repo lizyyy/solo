@@ -15,6 +15,9 @@ class BoundaryRules:
     CONTRACT_EVIDENCE_OUTWEIGHS_GROUP_CHAT = True
     ROLLBACK_PRESERVES_HISTORY = True
     MIN_EVIDENCE_FOR_APPROVAL = 2
+    APPROVAL_REQUIRES_GROUP_CHAT = True
+    APPROVAL_REQUIRES_CONTRACT = True
+    APPROVAL_REQUIRES_NOTE = True
 
     @classmethod
     def to_dict(cls) -> Dict[str, any]:
@@ -22,7 +25,10 @@ class BoundaryRules:
             "NAME_CONFLICT_REQUIRES_TEACHER_REVIEW": cls.NAME_CONFLICT_REQUIRES_TEACHER_REVIEW,
             "CONTRACT_EVIDENCE_OUTWEIGHS_GROUP_CHAT": cls.CONTRACT_EVIDENCE_OUTWEIGHS_GROUP_CHAT,
             "ROLLBACK_PRESERVES_HISTORY": cls.ROLLBACK_PRESERVES_HISTORY,
-            "MIN_EVIDENCE_FOR_APPROVAL": cls.MIN_EVIDENCE_FOR_APPROVAL
+            "MIN_EVIDENCE_FOR_APPROVAL": cls.MIN_EVIDENCE_FOR_APPROVAL,
+            "APPROVAL_REQUIRES_GROUP_CHAT": cls.APPROVAL_REQUIRES_GROUP_CHAT,
+            "APPROVAL_REQUIRES_CONTRACT": cls.APPROVAL_REQUIRES_CONTRACT,
+            "APPROVAL_REQUIRES_NOTE": cls.APPROVAL_REQUIRES_NOTE
         }
 
 
@@ -219,39 +225,66 @@ class CopyrightCheckEngine:
         self._save()
         return change
 
-    def teacher_approve(self, record_id: str, operator: str, note: str = "") -> bool:
+    def teacher_approve(self, record_id: str, operator: str, note: str = "") -> Tuple[bool, List[str]]:
         record = self.records.get(record_id)
         if not record:
-            return False
+            return False, ["记录不存在"]
 
         if record.status not in [SongStatus.TEACHER_REVIEW, SongStatus.CONTRACT_VERIFIED]:
-            return False
+            return False, [f"当前状态 {record.status.value} 不允许审批，需为 teacher_review 或 contract_verified"]
 
+        blockers: List[str] = []
+
+        group_chat_count = sum(1 for e in record.evidences if e.evidence_type == EvidenceType.GROUP_CHAT)
         contract_count = sum(1 for e in record.evidences if e.evidence_type == EvidenceType.CONTRACT_SCREENSHOT)
-        if contract_count == 0 and BoundaryRules.MIN_EVIDENCE_FOR_APPROVAL > 0:
-            record.update_status(SongStatus.AWAITING_CONTRACT, operator)
-            self._log_audit("teacher_approve_failed", record_id, operator, {
-                "reason": "缺少合同页截图证据",
-                "note": note
+        total_evidence = group_chat_count + contract_count
+
+        if BoundaryRules.APPROVAL_REQUIRES_GROUP_CHAT and group_chat_count == 0:
+            blockers.append("缺少排练群接龙证据")
+
+        if BoundaryRules.APPROVAL_REQUIRES_CONTRACT and contract_count == 0:
+            blockers.append("缺少合同页截图证据")
+
+        if total_evidence < BoundaryRules.MIN_EVIDENCE_FOR_APPROVAL:
+            blockers.append(f"证据总数不足（当前 {total_evidence}，需要 {BoundaryRules.MIN_EVIDENCE_FOR_APPROVAL}）")
+
+        if BoundaryRules.APPROVAL_REQUIRES_NOTE and (not note or not note.strip()):
+            blockers.append("审批备注不能为空")
+
+        if blockers:
+            if contract_count == 0:
+                record.update_status(SongStatus.AWAITING_CONTRACT, operator)
+            record.add_evidence(
+                evidence_type=EvidenceType.MANUAL_NOTE,
+                source="teacher_review_blocked",
+                content=f"审批被阻止: {'; '.join(blockers)}",
+                operator=operator
+            )
+            self._log_audit("teacher_approve_blocked", record_id, operator, {
+                "blockers": blockers,
+                "note": note,
+                "group_chat_count": group_chat_count,
+                "contract_count": contract_count
             })
             self._save()
-            return False
+            return False, blockers
 
         record.update_status(SongStatus.APPROVED, operator)
 
-        if note:
-            record.add_evidence(
-                evidence_type=EvidenceType.MANUAL_NOTE,
-                source="teacher_review",
-                content=note,
-                operator=operator
-            )
+        record.add_evidence(
+            evidence_type=EvidenceType.MANUAL_NOTE,
+            source="teacher_review",
+            content=note,
+            operator=operator
+        )
 
         self._log_audit("teacher_approve", record_id, operator, {
-            "note": note
+            "note": note,
+            "group_chat_count": group_chat_count,
+            "contract_count": contract_count
         })
         self._save()
-        return True
+        return True, []
 
     def teacher_reject(self, record_id: str, operator: str, reason: str) -> bool:
         record = self.records.get(record_id)
