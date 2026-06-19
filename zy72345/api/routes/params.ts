@@ -2,11 +2,20 @@ import { Router, type Request, type Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import db from '../db.js'
 
+interface ParamEntryRow {
+  id: string
+  key: string
+  value: number
+  description: string
+  updated_at: string
+  updated_by: string
+}
+
 const router = Router()
 
 router.get('/', (req: Request, res: Response): void => {
   try {
-    const params = db.prepare('SELECT * FROM param_entries ORDER BY id').all()
+    const params = db.prepare('SELECT * FROM param_entries ORDER BY id').all() as ParamEntryRow[]
     res.json({ success: true, data: params })
   } catch (error) {
     console.error('查询参数失败:', error)
@@ -19,7 +28,7 @@ router.put('/:id', (req: Request, res: Response): void => {
     const { id } = req.params
     const { value, description, changedBy, operatorRole } = req.body
 
-    const param = db.prepare('SELECT * FROM param_entries WHERE id = ?').get(id) as Record<string, any> | undefined
+    const param = db.prepare('SELECT * FROM param_entries WHERE id = ?').get(id) as ParamEntryRow | undefined
     if (!param) {
       res.status(404).json({ success: false, error: '参数不存在' })
       return
@@ -37,7 +46,7 @@ router.put('/:id', (req: Request, res: Response): void => {
     const operator = changedBy || 'system'
     const role = operatorRole || 'system'
 
-    const transaction = db.transaction(() => {
+    const transaction = db.transaction((): void => {
       db.prepare("UPDATE param_entries SET value = ?, description = ?, updated_at = datetime('now'), updated_by = ? WHERE id = ?").run(newValue, newDescription, operator, id)
 
       if (newValue !== oldValue) {
@@ -56,8 +65,8 @@ router.put('/:id', (req: Request, res: Response): void => {
 
     transaction()
 
-    const updatedParam = db.prepare('SELECT * FROM param_entries WHERE id = ?').get(id)
-    const latestChange = db.prepare('SELECT * FROM param_change_records WHERE param_id = ? ORDER BY changed_at DESC LIMIT 1').get(id)
+    const updatedParam = db.prepare('SELECT * FROM param_entries WHERE id = ?').get(id) as ParamEntryRow
+    const latestChange = db.prepare('SELECT * FROM param_change_records WHERE param_id = ? ORDER BY changed_at DESC LIMIT 1').get(id) as Record<string, unknown> | undefined
 
     res.json({ success: true, data: { param: updatedParam, changeRecord: latestChange } })
   } catch (error) {
@@ -73,7 +82,7 @@ router.get('/history', (req: Request, res: Response): void => {
     const offset = (page - 1) * pageSize
 
     const total = db.prepare('SELECT COUNT(*) as count FROM param_change_records').get() as { count: number }
-    const history = db.prepare('SELECT * FROM param_change_records ORDER BY changed_at DESC LIMIT ? OFFSET ?').all(pageSize, offset)
+    const history = db.prepare('SELECT * FROM param_change_records ORDER BY changed_at DESC LIMIT ? OFFSET ?').all(pageSize, offset) as Record<string, unknown>[]
 
     res.json({
       success: true,

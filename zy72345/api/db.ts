@@ -165,6 +165,9 @@ try {
 try {
   db.exec('ALTER TABLE cost_allocation_results ADD COLUMN traceable_id TEXT')
 } catch (e) {}
+try {
+  db.exec("ALTER TABLE cost_allocation_results ADD COLUMN boundary_status TEXT NOT NULL DEFAULT 'pending'")
+} catch (e) {}
 
 db.exec(`
   INSERT OR IGNORE INTO param_entries (id, key, value, description, updated_by) VALUES

@@ -4,6 +4,28 @@ import crypto from 'crypto'
 import { v4 as uuidv4 } from 'uuid'
 import db from '../db.js'
 
+interface SamplingListRow {
+  id: string
+  name: string
+  fingerprint: string
+  record_count: number
+  import_time: string
+  status: string
+}
+
+interface BatchImportRow {
+  id: string
+  import_time: string
+  operator: string
+  is_duplicate: number
+  name: string
+}
+
+interface SamplingRecordRow {
+  id: string
+  remark: string
+}
+
 const router = Router()
 const upload = multer({ storage: multer.memoryStorage() })
 
@@ -35,7 +57,7 @@ router.post('/import', upload.single('file'), (req: Request, res: Response): voi
 
     const existingBatches = db.prepare(
       'SELECT id, import_time, operator, name FROM batch_imports WHERE fingerprint = ? ORDER BY import_time DESC LIMIT 3'
-    ).all(fingerprint) as any[]
+    ).all(fingerprint) as Array<{ id: string; import_time: string; operator: string; name: string }>
 
     const duplicateCount = existingBatches.length + 1
 
@@ -53,7 +75,7 @@ router.post('/import', upload.single('file'), (req: Request, res: Response): voi
           batchId,
           originalListId: existing.id,
           duplicateImportCount: duplicateCount,
-          historyBatches: existingBatches.map((b: any) => ({
+          historyBatches: existingBatches.map((b) => ({
             batchId: b.id,
             importTime: b.import_time,
             operator: b.operator,
@@ -66,7 +88,7 @@ router.post('/import', upload.single('file'), (req: Request, res: Response): voi
 
     const listId = uuidv4()
 
-    const records: { value: number; oldTableStatus: string; remark: string }[] = []
+    const records: Array<{ value: number; oldTableStatus: string; remark: string }> = []
     for (const line of dataLines) {
       const parts = line.split(',').map(p => p.trim())
       const value = parseFloat(parts[0])
@@ -86,13 +108,13 @@ router.post('/import', upload.single('file'), (req: Request, res: Response): voi
     const insertRecord = db.prepare('INSERT INTO sampling_records (id, list_id, original_value, is_negative, old_table_status, is_boundary, boundary_status, remark, batch_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
     const insertBoundary = db.prepare('INSERT INTO boundary_samples (id, record_id, type, status, description, original_value) VALUES (?, ?, ?, ?, ?, ?)')
     const insertChangeLog = db.prepare('INSERT INTO change_log (id, entity_type, entity_id, action, field, old_value, new_value, operator, operator_role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
-    const insertResult = db.prepare('INSERT INTO cost_allocation_results (id, record_id, allocated_cost, is_boundary, boundary_type, source_list_id, source_param_id, batch_id, traceable_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+    const insertResult = db.prepare('INSERT INTO cost_allocation_results (id, record_id, allocated_cost, is_boundary, boundary_type, source_list_id, source_param_id, batch_id, traceable_id, boundary_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
     const insertBatch = db.prepare('INSERT INTO batch_imports (id, fingerprint, list_id, name, is_duplicate, operator, operator_role) VALUES (?, ?, ?, ?, ?, ?, ?)')
 
     const totalRecordsRow = db.prepare("SELECT COALESCE(SUM(record_count), 0) as total FROM sampling_lists WHERE status = 'active'").get() as { total: number }
     const totalRecords = totalRecordsRow.total + recordCount
 
-    const params = db.prepare('SELECT id, key, value FROM param_entries').all() as { id: string; key: string; value: number }[]
+    const params = db.prepare('SELECT id, key, value FROM param_entries').all() as Array<{ id: string; key: string; value: number }>
     const paramMap: Record<string, { id: string; value: number }> = {}
     for (const p of params) {
       paramMap[p.key] = { id: p.id, value: p.value }
@@ -103,7 +125,7 @@ router.post('/import', upload.single('file'), (req: Request, res: Response): voi
     const sourceParamId = paramMap['unit_cost']?.id ?? null
     const allocatedCostPerRecord = unitCost * allocationRatio / totalRecords
 
-    const transaction = db.transaction(() => {
+    const transaction = db.transaction((): { boundaryCount: number } => {
       insertBatch.run(batchId, fingerprint, listId, listName, 0, operator, operatorRole)
       insertList.run(listId, listName, fingerprint, recordCount)
 
@@ -127,11 +149,11 @@ router.post('/import', upload.single('file'), (req: Request, res: Response): voi
 
         if (isBoundary) {
           const boundaryId = uuidv4()
-          insertBoundary.run(boundaryId, recordId, boundaryType!, 'pending', '发现负数样本被旧表标记为缺失', record.value)
+          insertBoundary.run(boundaryId, recordId, boundaryType, 'pending', '发现负数样本被旧表标记为缺失', record.value)
           insertChangeLog.run(uuidv4(), 'sampling_record', recordId, 'boundary_detected', 'is_boundary', '0', '1', operator, operatorRole)
         }
 
-        insertResult.run(uuidv4(), recordId, allocatedCostPerRecord, isBoundary, boundaryType, listId, sourceParamId, batchId, recordId)
+        insertResult.run(uuidv4(), recordId, allocatedCostPerRecord, isBoundary, boundaryType, listId, sourceParamId, batchId, recordId, boundaryStatus)
       }
 
       insertChangeLog.run(uuidv4(), 'sampling_list', listId, 'import', 'record_count', '0', String(recordCount), operator, operatorRole)
@@ -183,7 +205,7 @@ router.put('/records/:recordId/remark', (req: Request, res: Response): void => {
     const changeBy = operator || 'system'
     const changeRole = operatorRole || 'system'
 
-    const transaction = db.transaction(() => {
+    const transaction = db.transaction((): void => {
       db.prepare('UPDATE sampling_records SET remark = ? WHERE id = ?').run(newRemark, recordId)
 
       db.prepare(
@@ -197,7 +219,7 @@ router.put('/records/:recordId/remark', (req: Request, res: Response): void => {
 
     transaction()
 
-    const updated = db.prepare('SELECT * FROM sampling_records WHERE id = ?').get(recordId)
+    const updated = db.prepare('SELECT * FROM sampling_records WHERE id = ?').get(recordId) as SamplingRecordRow
     res.json({ success: true, data: updated })
   } catch (error) {
     console.error('修改备注失败:', error)
@@ -227,7 +249,7 @@ router.get('/export/csv', (req: Request, res: Response): void => {
       JOIN sampling_lists sl ON sr.list_id = sl.id
       LEFT JOIN batch_imports bi ON sr.batch_id = bi.id
       WHERE sr.list_id = ?
-    `).all(listId as string) as any[]
+    `).all(listId as string) as Record<string, unknown>[]
 
     const headers = ['traceable_id', 'original_value', 'is_negative', 'old_table_status', 'is_boundary', 'boundary_status', 'remark', 'batch_id', 'import_time', 'list_name']
 
@@ -264,14 +286,14 @@ router.get('/', (req: Request, res: Response): void => {
     const offset = (page - 1) * pageSize
 
     const total = db.prepare('SELECT COUNT(*) as count FROM sampling_lists').get() as { count: number }
-    const rawLists = db.prepare('SELECT * FROM sampling_lists ORDER BY import_time DESC LIMIT ? OFFSET ?').all(pageSize, offset) as any[]
+    const rawLists = db.prepare('SELECT * FROM sampling_lists ORDER BY import_time DESC LIMIT ? OFFSET ?').all(pageSize, offset) as SamplingListRow[]
 
-    const lists = rawLists.map((list: any) => {
+    const lists = rawLists.map((list) => {
       const batches = db.prepare(
         'SELECT id, import_time, operator, is_duplicate FROM batch_imports WHERE fingerprint = ? ORDER BY import_time DESC'
-      ).all(list.fingerprint) as any[]
+      ).all(list.fingerprint) as BatchImportRow[]
       const lastBatch = batches[0]
-      const hasDuplicate = batches.some((b: any) => b.is_duplicate === 1)
+      const hasDuplicate = batches.some((b) => b.is_duplicate === 1)
       return {
         ...list,
         lastBatchId: lastBatch?.id,
@@ -300,7 +322,7 @@ router.get('/:id', (req: Request, res: Response): void => {
   try {
     const { id } = req.params
 
-    const list = db.prepare('SELECT * FROM sampling_lists WHERE id = ?').get(id)
+    const list = db.prepare('SELECT * FROM sampling_lists WHERE id = ?').get(id) as SamplingListRow | undefined
     if (!list) {
       res.status(404).json({ success: false, error: '抽样名单不存在' })
       return
@@ -311,7 +333,7 @@ router.get('/:id', (req: Request, res: Response): void => {
 
     const batches = db.prepare(
       'SELECT id, import_time, operator, is_duplicate, name FROM batch_imports WHERE fingerprint = ? ORDER BY import_time DESC'
-    ).all((list as any).fingerprint)
+    ).all(list.fingerprint) as BatchImportRow[]
 
     res.json({
       success: true,

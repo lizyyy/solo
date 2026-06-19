@@ -2,9 +2,68 @@ import { Router, type Request, type Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import db from '../db.js'
 
+interface ChangeLogEntry {
+  id: string
+  entity_type: string
+  entity_id: string
+  action: string
+  field: string | null
+  old_value: string | null
+  new_value: string | null
+  operator: string
+  operator_role: string
+  timestamp: string
+  can_rollback: number
+}
+
+interface BoundarySampleFull {
+  id: string
+  record_id: string
+  type: string
+  status: string
+  description: string
+  detected_at: string
+  confirmed_by: string | null
+  confirmed_at: string | null
+  original_value: number | null
+  corrected_value: number | null
+  process_reason: string
+  decision_detail: string
+}
+
+interface SamplingRecordFull {
+  id: string
+  original_value: number
+  is_negative: number
+  boundary_status: string
+}
+
+interface AffectedEntity {
+  table: string
+  id: string
+}
+
+interface RollbackField {
+  field: string
+  willBecome: string | null
+  currentValue: string | null
+}
+
+interface RollbackDetailField {
+  table: string
+  field: string
+  from: string
+  to: string
+}
+
+interface RollbackDetails {
+  tables: string[]
+  fields: RollbackDetailField[]
+}
+
 const router = Router()
 
-function generateHumanReadable(entry: any): string {
+function generateHumanReadable(entry: ChangeLogEntry): string {
   const et = entry.entity_type
   const act = entry.action
   const f = entry.field
@@ -17,8 +76,19 @@ function generateHumanReadable(entry: any): string {
     return `参数变更`
   }
   if (et === 'boundary_sample') {
-    if (act === 'update_status') return `将边界样本状态从 ${ov} 回滚到 ${nv}`
+    if (act === 'update_status') return `将边界样本状态从 ${ov} 修改为 ${nv}`
     if (act === 'add_review') return `添加复核意见：${nv}`
+    if (act === 'update_field') {
+      const fieldNames: Record<string, string> = {
+        confirmed_by: '确认人',
+        confirmed_at: '确认时间',
+        process_reason: '处理原因',
+        decision_detail: '决策详情',
+        corrected_value: '修正值'
+      }
+      const fname = fieldNames[f || ''] || f || '字段'
+      return `将边界样本${fname}从 "${ov}" 修改为 "${nv}"`
+    }
     return `边界样本操作`
   }
   if (et === 'sampling_record') {
@@ -34,8 +104,8 @@ function generateHumanReadable(entry: any): string {
   return `${et}: ${act}`
 }
 
-function generateAffectedEntities(entry: any): any[] {
-  const result: any[] = []
+function generateAffectedEntities(entry: ChangeLogEntry): AffectedEntity[] {
+  const result: AffectedEntity[] = []
   const et = entry.entity_type
   const eid = entry.entity_id
 
@@ -43,7 +113,7 @@ function generateAffectedEntities(entry: any): any[] {
     result.push({ table: 'param_entries', id: eid })
   } else if (et === 'boundary_sample') {
     result.push({ table: 'boundary_samples', id: eid })
-    const sample = db.prepare('SELECT record_id FROM boundary_samples WHERE id = ?').get(eid) as any
+    const sample = db.prepare('SELECT record_id FROM boundary_samples WHERE id = ?').get(eid) as { record_id: string } | undefined
     if (sample?.record_id) {
       result.push({ table: 'sampling_records', id: sample.record_id })
     }
@@ -58,8 +128,8 @@ function generateAffectedEntities(entry: any): any[] {
   return result
 }
 
-function generateRollbackPreview(entry: any): any[] {
-  const result: any[] = []
+function generateRollbackPreview(entry: ChangeLogEntry): RollbackField[] {
+  const result: RollbackField[] = []
   result.push({
     field: entry.field || entry.action,
     willBecome: entry.old_value,
@@ -115,7 +185,7 @@ router.get('/:id', (req: Request, res: Response): void => {
   try {
     const { id } = req.params
 
-    const entry = db.prepare('SELECT * FROM change_log WHERE id = ?').get(id) as any
+    const entry = db.prepare('SELECT * FROM change_log WHERE id = ?').get(id) as ChangeLogEntry | undefined
     if (!entry) {
       res.status(404).json({ success: false, error: '变更记录不存在' })
       return
@@ -145,7 +215,7 @@ router.post('/:id/rollback', (req: Request, res: Response): void => {
     const { id } = req.params
     const { operator, operatorRole } = req.body
 
-    const entry = db.prepare('SELECT * FROM change_log WHERE id = ?').get(id) as Record<string, any> | undefined
+    const entry = db.prepare('SELECT * FROM change_log WHERE id = ?').get(id) as ChangeLogEntry | undefined
     if (!entry) {
       res.status(404).json({ success: false, error: '变更记录不存在' })
       return
@@ -158,74 +228,194 @@ router.post('/:id/rollback', (req: Request, res: Response): void => {
 
     const rollbackOperator = operator || 'system'
     const rollbackRole = operatorRole || 'system'
-    const rollbackDetails: any = { tables: [], fields: [] }
+    const rollbackDetails: RollbackDetails = { tables: [], fields: [] }
 
-    const transaction = db.transaction(() => {
+    const addTable = (table: string): void => {
+      if (!rollbackDetails.tables.includes(table)) {
+        rollbackDetails.tables.push(table)
+      }
+    }
+
+    const addField = (table: string, field: string, from: string, to: string): void => {
+      rollbackDetails.fields.push({ table, field, from, to })
+    }
+
+    const insertRollbackLog = (entityType: string, entityId: string, field: string, oldVal: string, newVal: string): void => {
+      db.prepare(
+        'INSERT INTO change_log (id, entity_type, entity_id, action, field, old_value, new_value, operator, operator_role, can_rollback) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)'
+      ).run(uuidv4(), entityType, entityId, 'rollback', field, oldVal, newVal, rollbackOperator, rollbackRole)
+    }
+
+    const transaction = db.transaction((): void => {
       if (entry.entity_type === 'param' && entry.field === 'value') {
-        const realOld = db.prepare('SELECT value FROM param_entries WHERE id = ?').get(entry.entity_id) as any
+        const realOld = db.prepare('SELECT value FROM param_entries WHERE id = ?').get(entry.entity_id) as { value: number } | undefined
         const realOldVal = realOld ? String(realOld.value) : entry.new_value
-        db.prepare('UPDATE param_entries SET value = ? WHERE id = ?').run(parseFloat(entry.old_value), entry.entity_id)
-        rollbackDetails.tables.push('param_entries')
-        rollbackDetails.fields.push({ table: 'param_entries', field: 'value', from: realOldVal, to: entry.old_value })
-        db.prepare('INSERT INTO change_log (id, entity_type, entity_id, action, field, old_value, new_value, operator, operator_role, can_rollback) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)').run(
-          uuidv4(), entry.entity_type, entry.entity_id, 'rollback', entry.field, realOldVal, entry.old_value, rollbackOperator, rollbackRole
-        )
+        db.prepare('UPDATE param_entries SET value = ? WHERE id = ?').run(parseFloat(entry.old_value as string), entry.entity_id)
+        addTable('param_entries')
+        addField('param_entries', 'value', realOldVal as string, entry.old_value as string)
+        insertRollbackLog(entry.entity_type, entry.entity_id, entry.field as string, realOldVal as string, entry.old_value as string)
       } else if (entry.entity_type === 'param' && entry.field === 'description') {
-        const realOld = db.prepare('SELECT description FROM param_entries WHERE id = ?').get(entry.entity_id) as any
+        const realOld = db.prepare('SELECT description FROM param_entries WHERE id = ?').get(entry.entity_id) as { description: string } | undefined
         const realOldVal = realOld ? realOld.description : entry.new_value
         db.prepare('UPDATE param_entries SET description = ? WHERE id = ?').run(entry.old_value, entry.entity_id)
-        rollbackDetails.tables.push('param_entries')
-        rollbackDetails.fields.push({ table: 'param_entries', field: 'description', from: realOldVal, to: entry.old_value })
-        db.prepare('INSERT INTO change_log (id, entity_type, entity_id, action, field, old_value, new_value, operator, operator_role, can_rollback) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)').run(
-          uuidv4(), entry.entity_type, entry.entity_id, 'rollback', entry.field, realOldVal, entry.old_value, rollbackOperator, rollbackRole
-        )
+        addTable('param_entries')
+        addField('param_entries', 'description', realOldVal as string, entry.old_value as string)
+        insertRollbackLog(entry.entity_type, entry.entity_id, entry.field as string, realOldVal as string, entry.old_value as string)
       } else if (entry.entity_type === 'boundary_sample' && entry.field === 'status') {
-        const realOldSample = db.prepare('SELECT status, record_id FROM boundary_samples WHERE id = ?').get(entry.entity_id) as any
-        const realOldVal = realOldSample ? realOldSample.status : entry.new_value
-        db.prepare('UPDATE boundary_samples SET status = ? WHERE id = ?').run(entry.old_value, entry.entity_id)
-        rollbackDetails.tables.push('boundary_samples')
-        rollbackDetails.fields.push({ table: 'boundary_samples', field: 'status', from: realOldVal, to: entry.old_value })
-        const sample = db.prepare('SELECT * FROM boundary_samples WHERE id = ?').get(entry.entity_id) as Record<string, any> | undefined
-        if (sample) {
-          const realOldRec = db.prepare('SELECT boundary_status FROM sampling_records WHERE id = ?').get(sample.record_id) as any
-          const realOldRecVal = realOldRec ? realOldRec.boundary_status : entry.new_value
-          db.prepare('UPDATE sampling_records SET boundary_status = ? WHERE id = ?').run(entry.old_value, sample.record_id)
-          rollbackDetails.tables.push('sampling_records')
-          rollbackDetails.fields.push({ table: 'sampling_records', field: 'boundary_status', from: realOldRecVal, to: entry.old_value })
+        const curBs = db.prepare('SELECT * FROM boundary_samples WHERE id = ?').get(entry.entity_id) as BoundarySampleFull | undefined
+        if (!curBs) {
+          throw new Error('边界样本不存在')
         }
-        db.prepare('INSERT INTO change_log (id, entity_type, entity_id, action, field, old_value, new_value, operator, operator_role, can_rollback) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)').run(
-          uuidv4(), entry.entity_type, entry.entity_id, 'rollback', entry.field, realOldVal, entry.old_value, rollbackOperator, rollbackRole
-        )
+
+        const realOldStatus = curBs.status
+        db.prepare('UPDATE boundary_samples SET status = ? WHERE id = ?').run(entry.old_value, entry.entity_id)
+        addTable('boundary_samples')
+        addField('boundary_samples', 'status', realOldStatus, entry.old_value as string)
+        insertRollbackLog('boundary_sample', entry.entity_id, 'status', realOldStatus, entry.old_value as string)
+
+        const oldProcessReason = curBs.process_reason
+        db.prepare("UPDATE boundary_samples SET process_reason = '' WHERE id = ?").run(entry.entity_id)
+        addField('boundary_samples', 'process_reason', oldProcessReason, '')
+        insertRollbackLog('boundary_sample', entry.entity_id, 'process_reason', oldProcessReason, '')
+
+        const oldDecisionDetail = curBs.decision_detail
+        db.prepare("UPDATE boundary_samples SET decision_detail = '' WHERE id = ?").run(entry.entity_id)
+        addField('boundary_samples', 'decision_detail', oldDecisionDetail, '')
+        insertRollbackLog('boundary_sample', entry.entity_id, 'decision_detail', oldDecisionDetail, '')
+
+        const oldConfirmedBy = curBs.confirmed_by
+        db.prepare('UPDATE boundary_samples SET confirmed_by = NULL WHERE id = ?').run(entry.entity_id)
+        addField('boundary_samples', 'confirmed_by', oldConfirmedBy ?? 'NULL', 'NULL')
+        insertRollbackLog('boundary_sample', entry.entity_id, 'confirmed_by', oldConfirmedBy ?? 'NULL', 'NULL')
+
+        const oldConfirmedAt = curBs.confirmed_at
+        db.prepare('UPDATE boundary_samples SET confirmed_at = NULL WHERE id = ?').run(entry.entity_id)
+        addField('boundary_samples', 'confirmed_at', oldConfirmedAt ?? 'NULL', 'NULL')
+        insertRollbackLog('boundary_sample', entry.entity_id, 'confirmed_at', oldConfirmedAt ?? 'NULL', 'NULL')
+
+        const oldCorrectedValue = curBs.corrected_value
+        db.prepare('UPDATE boundary_samples SET corrected_value = NULL WHERE id = ?').run(entry.entity_id)
+        addField('boundary_samples', 'corrected_value', oldCorrectedValue !== null ? String(oldCorrectedValue) : 'NULL', 'NULL')
+        insertRollbackLog('boundary_sample', entry.entity_id, 'corrected_value', oldCorrectedValue !== null ? String(oldCorrectedValue) : 'NULL', 'NULL')
+
+        if (curBs.original_value !== null && curBs.original_value !== undefined) {
+          const curSr = db.prepare('SELECT original_value, is_negative, boundary_status FROM sampling_records WHERE id = ?').get(curBs.record_id) as SamplingRecordFull | undefined
+          if (curSr) {
+            const realCurrentVal = String(curSr.original_value)
+            const realCurrentIsNegative = String(curSr.is_negative)
+            const restoredIsNegative = curBs.original_value < 0 ? 1 : 0
+
+            db.prepare(
+              'UPDATE sampling_records SET original_value = ?, is_negative = ?, boundary_status = ? WHERE id = ?'
+            ).run(curBs.original_value, restoredIsNegative, entry.old_value, curBs.record_id)
+
+            addTable('sampling_records')
+            addField('sampling_records', 'original_value', realCurrentVal, String(curBs.original_value))
+            addField('sampling_records', 'is_negative', realCurrentIsNegative, String(restoredIsNegative))
+            addField('sampling_records', 'boundary_status', curSr.boundary_status, entry.old_value as string)
+
+            insertRollbackLog('sampling_record', curBs.record_id, 'original_value', realCurrentVal, String(curBs.original_value))
+            insertRollbackLog('sampling_record', curBs.record_id, 'is_negative', realCurrentIsNegative, String(restoredIsNegative))
+            insertRollbackLog('sampling_record', curBs.record_id, 'boundary_status', curSr.boundary_status, entry.old_value as string)
+          }
+        } else {
+          const curSr = db.prepare('SELECT boundary_status FROM sampling_records WHERE id = ?').get(curBs.record_id) as { boundary_status: string } | undefined
+          if (curSr) {
+            db.prepare('UPDATE sampling_records SET boundary_status = ? WHERE id = ?').run(entry.old_value, curBs.record_id)
+            addTable('sampling_records')
+            addField('sampling_records', 'boundary_status', curSr.boundary_status, entry.old_value as string)
+            insertRollbackLog('sampling_record', curBs.record_id, 'boundary_status', curSr.boundary_status, entry.old_value as string)
+          }
+        }
+
+        const carResults = db.prepare('SELECT * FROM cost_allocation_results WHERE record_id = ?').all(curBs.record_id) as Record<string, unknown>[]
+        if (carResults.length > 0) {
+          addTable('cost_allocation_results')
+          for (const car of carResults) {
+            const carId = car.id as string
+            const oldCarBoundaryStatus = (car.boundary_status as string) ?? ''
+            db.prepare(
+              'UPDATE cost_allocation_results SET is_boundary = 1, boundary_status = ? WHERE id = ?'
+            ).run(entry.old_value, carId)
+            addField('cost_allocation_results', 'boundary_status', oldCarBoundaryStatus || 'NULL', entry.old_value as string)
+          }
+        }
+      } else if (entry.entity_type === 'boundary_sample' && entry.action === 'update_field') {
+        const curBs = db.prepare('SELECT * FROM boundary_samples WHERE id = ?').get(entry.entity_id) as BoundarySampleFull | undefined
+        if (!curBs) {
+          throw new Error('边界样本不存在')
+        }
+        const field = entry.field || ''
+        const oldVal = entry.old_value || ''
+        const newVal = entry.new_value || ''
+
+        addTable('boundary_samples')
+
+        if (field === 'confirmed_by') {
+          const realOld = curBs.confirmed_by ?? ''
+          const target = oldVal === '' ? null : oldVal
+          db.prepare('UPDATE boundary_samples SET confirmed_by = ? WHERE id = ?').run(target, entry.entity_id)
+          addField('boundary_samples', 'confirmed_by', realOld || 'NULL', oldVal || 'NULL')
+          insertRollbackLog('boundary_sample', entry.entity_id, 'confirmed_by', realOld || 'NULL', oldVal || 'NULL')
+        } else if (field === 'confirmed_at') {
+          const realOld = curBs.confirmed_at ?? ''
+          const target = oldVal === '' ? null : oldVal
+          db.prepare('UPDATE boundary_samples SET confirmed_at = ? WHERE id = ?').run(target, entry.entity_id)
+          addField('boundary_samples', 'confirmed_at', realOld || 'NULL', oldVal || 'NULL')
+          insertRollbackLog('boundary_sample', entry.entity_id, 'confirmed_at', realOld || 'NULL', oldVal || 'NULL')
+        } else if (field === 'process_reason') {
+          const realOld = curBs.process_reason
+          db.prepare('UPDATE boundary_samples SET process_reason = ? WHERE id = ?').run(oldVal, entry.entity_id)
+          addField('boundary_samples', 'process_reason', realOld, oldVal)
+          insertRollbackLog('boundary_sample', entry.entity_id, 'process_reason', realOld, oldVal)
+        } else if (field === 'decision_detail') {
+          const realOld = curBs.decision_detail
+          db.prepare('UPDATE boundary_samples SET decision_detail = ? WHERE id = ?').run(oldVal, entry.entity_id)
+          addField('boundary_samples', 'decision_detail', realOld, oldVal)
+          insertRollbackLog('boundary_sample', entry.entity_id, 'decision_detail', realOld, oldVal)
+        } else if (field === 'corrected_value') {
+          const realOld = curBs.corrected_value !== null && curBs.corrected_value !== undefined ? String(curBs.corrected_value) : 'NULL'
+          const target = oldVal === '' || oldVal === 'NULL' ? null : parseFloat(oldVal)
+          db.prepare('UPDATE boundary_samples SET corrected_value = ? WHERE id = ?').run(target, entry.entity_id)
+          addField('boundary_samples', 'corrected_value', realOld, oldVal || 'NULL')
+          insertRollbackLog('boundary_sample', entry.entity_id, 'corrected_value', realOld, oldVal || 'NULL')
+        } else {
+          throw new Error(`不支持回滚的字段: ${field}`)
+        }
       } else if (entry.entity_type === 'sampling_record' && entry.action === 'update_remark') {
         const history = db.prepare(
           'SELECT old_remark FROM record_remark_history WHERE record_id = ? ORDER BY changed_at DESC LIMIT 1'
-        ).get(entry.entity_id) as any
+        ).get(entry.entity_id) as { old_remark: string } | undefined
         const targetRemark = history?.old_remark ?? entry.old_value
-        const realOld = db.prepare('SELECT remark FROM sampling_records WHERE id = ?').get(entry.entity_id) as any
+        const realOld = db.prepare('SELECT remark FROM sampling_records WHERE id = ?').get(entry.entity_id) as { remark: string } | undefined
         const realOldVal = realOld ? realOld.remark : entry.new_value
         db.prepare('UPDATE sampling_records SET remark = ? WHERE id = ?').run(targetRemark, entry.entity_id)
-        rollbackDetails.tables.push('sampling_records')
-        rollbackDetails.fields.push({ table: 'sampling_records', field: 'remark', from: realOldVal, to: targetRemark })
-        db.prepare('INSERT INTO change_log (id, entity_type, entity_id, action, field, old_value, new_value, operator, operator_role, can_rollback) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)').run(
-          uuidv4(), entry.entity_type, entry.entity_id, 'rollback', 'remark', realOldVal, targetRemark, rollbackOperator, rollbackRole
-        )
+        addTable('sampling_records')
+        addField('sampling_records', 'remark', realOldVal as string, targetRemark as string)
+        insertRollbackLog('sampling_record', entry.entity_id, 'remark', realOldVal as string, targetRemark as string)
       } else if (entry.entity_type === 'sampling_record' && entry.action === 'correct_value') {
-        const realOld = db.prepare('SELECT original_value FROM sampling_records WHERE id = ?').get(entry.entity_id) as any
+        const realOld = db.prepare('SELECT original_value, is_negative FROM sampling_records WHERE id = ?').get(entry.entity_id) as { original_value: number; is_negative: number } | undefined
         const realOldVal = realOld ? String(realOld.original_value) : entry.new_value
-        db.prepare('UPDATE sampling_records SET original_value = ? WHERE id = ?').run(parseFloat(entry.old_value), entry.entity_id)
-        rollbackDetails.tables.push('sampling_records')
-        rollbackDetails.fields.push({ table: 'sampling_records', field: 'original_value', from: realOldVal, to: entry.old_value })
-        const boundary = db.prepare('SELECT id FROM boundary_samples WHERE record_id = ?').get(entry.entity_id) as any
+        const realOldIsNegative = realOld ? String(realOld.is_negative) : '0'
+        const parsedOldValue = parseFloat(entry.old_value as string)
+        const restoredIsNegative = parsedOldValue < 0 ? 1 : 0
+
+        db.prepare('UPDATE sampling_records SET original_value = ?, is_negative = ? WHERE id = ?').run(parsedOldValue, restoredIsNegative, entry.entity_id)
+        addTable('sampling_records')
+        addField('sampling_records', 'original_value', realOldVal as string, entry.old_value as string)
+        addField('sampling_records', 'is_negative', realOldIsNegative, String(restoredIsNegative))
+        insertRollbackLog('sampling_record', entry.entity_id, 'original_value', realOldVal as string, entry.old_value as string)
+        insertRollbackLog('sampling_record', entry.entity_id, 'is_negative', realOldIsNegative, String(restoredIsNegative))
+
+        const boundary = db.prepare('SELECT id FROM boundary_samples WHERE record_id = ?').get(entry.entity_id) as { id: string } | undefined
         if (boundary) {
-          const realOldBs = db.prepare('SELECT corrected_value FROM boundary_samples WHERE id = ?').get(boundary.id) as any
+          const realOldBs = db.prepare('SELECT corrected_value FROM boundary_samples WHERE id = ?').get(boundary.id) as { corrected_value: number | null } | undefined
           const realOldBsVal = realOldBs ? (realOldBs.corrected_value !== null ? String(realOldBs.corrected_value) : 'NULL') : entry.new_value
           db.prepare('UPDATE boundary_samples SET corrected_value = NULL WHERE id = ?').run(boundary.id)
-          rollbackDetails.tables.push('boundary_samples')
-          rollbackDetails.fields.push({ table: 'boundary_samples', field: 'corrected_value', from: realOldBsVal, to: 'NULL' })
+          addTable('boundary_samples')
+          addField('boundary_samples', 'corrected_value', realOldBsVal as string, 'NULL')
+          insertRollbackLog('boundary_sample', boundary.id, 'corrected_value', realOldBsVal as string, 'NULL')
         }
-        db.prepare('INSERT INTO change_log (id, entity_type, entity_id, action, field, old_value, new_value, operator, operator_role, can_rollback) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)').run(
-          uuidv4(), entry.entity_type, entry.entity_id, 'rollback', 'original_value', realOldVal, entry.old_value, rollbackOperator, rollbackRole
-        )
       } else {
         throw new Error('该变更类型暂不支持回滚')
       }
@@ -236,9 +426,10 @@ router.post('/:id/rollback', (req: Request, res: Response): void => {
     transaction()
 
     res.json({ success: true, message: '回滚成功', rollbackDetails })
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { message?: string }
     console.error('回滚失败:', error)
-    res.status(500).json({ success: false, error: error.message || '回滚操作失败' })
+    res.status(500).json({ success: false, error: err.message || '回滚操作失败' })
   }
 })
 
