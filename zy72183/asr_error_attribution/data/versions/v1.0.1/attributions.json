@@ -1,7 +1,7 @@
 {
   "records": [
     {
-      "attribution_id": "216db174-71be-45cc-bb0a-ef0fa79c12f4",
+      "attribution_id": "36aea836-0bce-42ea-86cf-d0d8e542b987",
       "log_id": "log_002",
       "annotation_id": "ann_001",
       "error_type": "proper_noun",
@@ -9,12 +9,13 @@
       "confidence": 0.5,
       "evidence": [
         "正确词 '阿里巴巴' 是专有名词",
-        "拼写相似度: 0.50"
+        "拼写相似度: 0.50",
+        "重复三元组可复核: 同 log_id+错词+正确词 的其他标注 ann_012 (本记录: ann_001)"
       ],
       "status": "pending",
       "threshold_version": "default",
       "model_version": "unknown",
-      "created_at": "2026-06-17T21:17:16.725683",
+      "created_at": "2026-06-19T07:19:57.338282",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",
@@ -22,40 +23,20 @@
       "final_error_type": null
     },
     {
-      "attribution_id": "c57c44f4-1dd8-4427-abeb-3ae397492e89",
-      "log_id": "log_002",
-      "annotation_id": "ann_012",
-      "error_type": "proper_noun",
-      "result_error_type": "proper_noun",
-      "confidence": 0.5,
-      "evidence": [
-        "正确词 '阿里巴巴' 是专有名词",
-        "拼写相似度: 0.50"
-      ],
-      "status": "pending",
-      "threshold_version": "default",
-      "model_version": "unknown",
-      "created_at": "2026-06-17T21:17:16.725711",
-      "reviewed_by": null,
-      "reviewed_at": null,
-      "review_notes": "",
-      "review_action": null,
-      "final_error_type": null
-    },
-    {
-      "attribution_id": "14ed4bb5-c1c2-47da-99b3-9427f839e857",
+      "attribution_id": "7ab138f7-16c3-445f-bbc4-25d0d1d75547",
       "log_id": "log_003",
       "annotation_id": "ann_002",
       "error_type": "homophone",
       "result_error_type": "homophone",
       "confidence": 0.95,
       "evidence": [
-        "匹配同音词表: 苹果 -> 平果"
+        "匹配同音词表: 苹果 -> 平果",
+        "重复三元组可复核: 同 log_id+错词+正确词 的其他标注 ann_010 (本记录: ann_002)"
       ],
       "status": "auto_attributed",
       "threshold_version": "default",
       "model_version": "unknown",
-      "created_at": "2026-06-17T21:17:16.725734",
+      "created_at": "2026-06-19T07:19:57.338312",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",
@@ -63,7 +44,7 @@
       "final_error_type": null
     },
     {
-      "attribution_id": "7a42fb3e-206a-4c2f-8ca5-af856c0196fa",
+      "attribution_id": "d60891b0-0b24-4037-8fd8-209cbef6778c",
       "log_id": "log_004",
       "annotation_id": "ann_003",
       "error_type": "unknown",
@@ -76,7 +57,7 @@
       "status": "pending",
       "threshold_version": "default",
       "model_version": "unknown",
-      "created_at": "2026-06-17T21:17:16.725753",
+      "created_at": "2026-06-19T07:19:57.338335",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",
@@ -84,7 +65,7 @@
       "final_error_type": null
     },
     {
-      "attribution_id": "a4baaa3e-609e-4316-b0dd-9baf4b01b84b",
+      "attribution_id": "8bd1d457-9061-4ddb-85db-9b881e31cc53",
       "log_id": "log_005",
       "annotation_id": "ann_004",
       "error_type": "homophone",
@@ -96,7 +77,7 @@
       "status": "auto_attributed",
       "threshold_version": "default",
       "model_version": "unknown",
-      "created_at": "2026-06-17T21:17:16.725769",
+      "created_at": "2026-06-19T07:19:57.338352",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",
@@ -104,7 +85,7 @@
       "final_error_type": null
     },
     {
-      "attribution_id": "c181938b-abbf-4d2b-900f-b9b44cf3583e",
+      "attribution_id": "76adf542-1b0f-4cf5-a1a6-8003d4a1c4d7",
       "log_id": "log_006",
       "annotation_id": "ann_005",
       "error_type": "homophone",
@@ -116,7 +97,7 @@
       "status": "auto_attributed",
       "threshold_version": "default",
       "model_version": "unknown",
-      "created_at": "2026-06-17T21:17:16.725783",
+      "created_at": "2026-06-19T07:19:57.338368",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",
@@ -124,7 +105,7 @@
       "final_error_type": null
     },
     {
-      "attribution_id": "9a6074bc-91a3-4808-bef3-43bb61c802b3",
+      "attribution_id": "dcbd4b46-d394-415b-bf20-27b96647c71c",
       "log_id": "log_007",
       "annotation_id": "ann_006",
       "error_type": "proper_noun",
@@ -137,7 +118,7 @@
       "status": "pending",
       "threshold_version": "default",
       "model_version": "unknown",
-      "created_at": "2026-06-17T21:17:16.725800",
+      "created_at": "2026-06-19T07:19:57.338388",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",
@@ -145,7 +126,7 @@
       "final_error_type": null
     },
     {
-      "attribution_id": "aa085c40-207f-489e-8f6e-55b4165795a1",
+      "attribution_id": "09cc6cc8-0eaf-416b-ad68-548fa9b77d27",
       "log_id": "log_008",
       "annotation_id": "ann_007",
       "error_type": "homophone",
@@ -157,7 +138,7 @@
       "status": "auto_attributed",
       "threshold_version": "default",
       "model_version": "unknown",
-      "created_at": "2026-06-17T21:17:16.725813",
+      "created_at": "2026-06-19T07:19:57.338404",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",
@@ -165,7 +146,7 @@
       "final_error_type": null
     },
     {
-      "attribution_id": "b844d0e7-14e2-4388-a7c8-a6d20e7729b2",
+      "attribution_id": "d8f4af9a-4809-419d-a421-015462849cd4",
       "log_id": "log_009",
       "annotation_id": "ann_008",
       "error_type": "proper_noun",
@@ -178,7 +159,7 @@
       "status": "pending",
       "threshold_version": "default",
       "model_version": "unknown",
-      "created_at": "2026-06-17T21:17:16.725828",
+      "created_at": "2026-06-19T07:19:57.338423",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",
@@ -186,7 +167,7 @@
       "final_error_type": null
     },
     {
-      "attribution_id": "8182e047-1310-4ca0-adef-56959cab9dbd",
+      "attribution_id": "488f229d-d4c0-495c-944b-531898c3b384",
       "log_id": "log_010",
       "annotation_id": "ann_009",
       "error_type": "homophone",
@@ -198,7 +179,7 @@
       "status": "auto_attributed",
       "threshold_version": "default",
       "model_version": "unknown",
-      "created_at": "2026-06-17T21:17:16.725841",
+      "created_at": "2026-06-19T07:19:57.338439",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",
@@ -206,19 +187,62 @@
       "final_error_type": null
     },
     {
-      "attribution_id": "5b4bbc5e-d8a9-40a7-9afc-cb6e124528e8",
+      "attribution_id": "74cfb3c3-9277-4424-8d47-57eff834996a",
+      "log_id": "log_003",
+      "annotation_id": "ann_010",
+      "error_type": "homophone",
+      "result_error_type": "homophone",
+      "confidence": 0.95,
+      "evidence": [
+        "匹配同音词表: 苹果 -> 平果",
+        "重复三元组可复核: 同 log_id+错词+正确词 的其他标注 ann_002 (本记录: ann_010)"
+      ],
+      "status": "auto_attributed",
+      "threshold_version": "default",
+      "model_version": "unknown",
+      "created_at": "2026-06-19T07:19:57.338493",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "review_notes": "",
+      "review_action": null,
+      "final_error_type": null
+    },
+    {
+      "attribution_id": "f0376e45-134b-4e9f-af08-438e711f9654",
       "log_id": "log_001",
       "annotation_id": "ann_011",
       "error_type": "unknown",
       "result_error_type": "unknown",
       "confidence": 0.0,
       "evidence": [
-        "空值: 错误词, 正确词为空"
+        "空值: 缺失字段 error_word, correct_word (标注来源: ann_011)"
       ],
       "status": "pending",
       "threshold_version": "default",
       "model_version": "unknown",
-      "created_at": "2026-06-17T21:17:16.725846",
+      "created_at": "2026-06-19T07:19:57.338506",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "review_notes": "",
+      "review_action": null,
+      "final_error_type": null
+    },
+    {
+      "attribution_id": "dea55448-195d-41f4-be94-ffca7856c021",
+      "log_id": "log_002",
+      "annotation_id": "ann_012",
+      "error_type": "proper_noun",
+      "result_error_type": "proper_noun",
+      "confidence": 0.5,
+      "evidence": [
+        "正确词 '阿里巴巴' 是专有名词",
+        "拼写相似度: 0.50",
+        "重复三元组可复核: 同 log_id+错词+正确词 的其他标注 ann_001 (本记录: ann_012)"
+      ],
+      "status": "pending",
+      "threshold_version": "default",
+      "model_version": "unknown",
+      "created_at": "2026-06-19T07:19:57.338535",
       "reviewed_by": null,
       "reviewed_at": null,
       "review_notes": "",
@@ -226,5 +250,5 @@
       "final_error_type": null
     }
   ],
-  "count": 11
+  "count": 12
 }

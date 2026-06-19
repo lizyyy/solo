@@ -64,14 +64,12 @@ def process(
 
     click.echo(f"\n执行归因分析 (阈值版本: {threshold_version})...")
     attributor = ErrorAttributor(threshold_config)
-    attributions, annotation_conflicts = attributor.batch_attribute(annotations, eval_log_map)
+    attributions = attributor.batch_attribute(annotations, eval_log_map)
     click.echo(f"  生成归因结果: {len(attributions)} 条")
-    if annotation_conflicts:
-        click.echo(f"  标注间类型冲突: {len(annotation_conflicts)} 条")
 
     click.echo("\n检测冲突...")
     conflict_manager = ConflictManager()
-    conflicts = conflict_manager.detect_conflicts(attributions, annotations, annotation_conflicts)
+    conflicts = conflict_manager.detect_conflicts(attributions, annotations)
     click.echo(f"  发现冲突: {len(conflicts)} 条")
 
     click.echo("\n创建版本...")

@@ -1,10 +1,10 @@
 {
   "records": [
     {
-      "conflict_id": "95cf8482-6b1d-4399-abf7-b5bec63335cb",
+      "conflict_id": "894726a4-2215-4dc6-b422-7038e96fecb8",
       "log_id": "log_002",
       "annotation_id": "ann_001",
-      "attribution_id": "216db174-71be-45cc-bb0a-ef0fa79c12f4",
+      "attribution_id": "36aea836-0bce-42ea-86cf-d0d8e542b987",
       "conflict_type": "confidence_mismatch",
       "description": "自动归因置信度 0.50 与标注置信度 0.95 存在显著差异",
       "auto_attribution": "proper_noun",
@@ -15,24 +15,10 @@
       "resolution_notes": ""
     },
     {
-      "conflict_id": "57c7f19e-72fc-4b91-82b2-d99fbc8e7e60",
-      "log_id": "log_002",
-      "annotation_id": "ann_012",
-      "attribution_id": "c57c44f4-1dd8-4427-abeb-3ae397492e89",
-      "conflict_type": "type_mismatch",
-      "description": "自动归因类型 'proper_noun' 与标注类型 'unknown' 不一致",
-      "auto_attribution": "proper_noun",
-      "manual_attribution": "unknown",
-      "resolved": false,
-      "resolved_by": null,
-      "resolved_at": null,
-      "resolution_notes": ""
-    },
-    {
-      "conflict_id": "bbe195fc-3189-4feb-845e-c0f1a89c0179",
+      "conflict_id": "1744f8bb-04aa-43ac-9c43-1cce8b8d883e",
       "log_id": "log_004",
       "annotation_id": "ann_003",
-      "attribution_id": "7a42fb3e-206a-4c2f-8ca5-af856c0196fa",
+      "attribution_id": "d60891b0-0b24-4037-8fd8-209cbef6778c",
       "conflict_type": "type_mismatch",
       "description": "自动归因类型 'unknown' 与标注类型 'acronym' 不一致",
       "auto_attribution": "unknown",
@@ -43,10 +29,10 @@
       "resolution_notes": ""
     },
     {
-      "conflict_id": "ee1b0bb7-0c82-4757-96ab-4611e0a01db7",
+      "conflict_id": "39b5d4da-cdef-48f1-920f-982e8742135b",
       "log_id": "log_007",
       "annotation_id": "ann_006",
-      "attribution_id": "9a6074bc-91a3-4808-bef3-43bb61c802b3",
+      "attribution_id": "dcbd4b46-d394-415b-bf20-27b96647c71c",
       "conflict_type": "confidence_mismatch",
       "description": "自动归因置信度 0.50 与标注置信度 0.90 存在显著差异",
       "auto_attribution": "proper_noun",
@@ -57,10 +43,10 @@
       "resolution_notes": ""
     },
     {
-      "conflict_id": "ad9a50c6-f21f-4463-a2c4-abd0e4c2614c",
+      "conflict_id": "4ce363f5-d0d3-492a-ac31-c07fabe403b1",
       "log_id": "log_009",
       "annotation_id": "ann_008",
-      "attribution_id": "b844d0e7-14e2-4388-a7c8-a6d20e7729b2",
+      "attribution_id": "d8f4af9a-4809-419d-a421-015462849cd4",
       "conflict_type": "confidence_mismatch",
       "description": "自动归因置信度 0.50 与标注置信度 0.93 存在显著差异",
       "auto_attribution": "proper_noun",
@@ -71,12 +57,12 @@
       "resolution_notes": ""
     },
     {
-      "conflict_id": "47f2d414-8003-467c-9252-e6be6e47515a",
+      "conflict_id": "ab1de97c-8bd5-4af8-8a01-c59065974f97",
       "log_id": "log_001",
       "annotation_id": "ann_011",
-      "attribution_id": "5b4bbc5e-d8a9-40a7-9afc-cb6e124528e8",
+      "attribution_id": "f0376e45-134b-4e9f-af08-438e711f9654",
       "conflict_type": "missing_data",
-      "description": "标注数据空值: 错误词, 正确词为空，需要人工确认",
+      "description": "标注数据存在空值，需要人工确认 (缺失: error_word, correct_word)",
       "auto_attribution": "unknown",
       "manual_attribution": "unknown",
       "resolved": false,
@@ -85,19 +71,19 @@
       "resolution_notes": ""
     },
     {
-      "conflict_id": "a112d3bf-9f49-4911-b4e4-2ee521143c6d",
+      "conflict_id": "b1c581fc-e972-4651-9bf1-9cb4d2cee81a",
       "log_id": "log_002",
-      "annotation_id": "ann_001,ann_012",
-      "attribution_id": "",
-      "conflict_type": "annotation_conflict",
-      "description": "同一错误对(阿里吧吧→阿里巴巴)存在不同人工标注类型: proper_noun, unknown",
-      "auto_attribution": "proper_noun,unknown",
-      "manual_attribution": null,
+      "annotation_id": "ann_012",
+      "attribution_id": "dea55448-195d-41f4-be94-ffca7856c021",
+      "conflict_type": "type_mismatch",
+      "description": "自动归因类型 'proper_noun' 与标注类型 'unknown' 不一致",
+      "auto_attribution": "proper_noun",
+      "manual_attribution": "unknown",
       "resolved": false,
       "resolved_by": null,
       "resolved_at": null,
       "resolution_notes": ""
     }
   ],
-  "count": 7
+  "count": 6
 }

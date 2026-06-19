@@ -1,10 +1,10 @@
 {
   "records": [
     {
-      "conflict_id": "3aa24e1d-ee5a-45a7-9ce8-a37274cb936b",
+      "conflict_id": "db3fafa7-b502-4fd1-a39a-870bcb4921fd",
       "log_id": "log_002",
       "annotation_id": "ann_001",
-      "attribution_id": "2fe32975-2bf2-4765-baa5-f060c26e4627",
+      "attribution_id": "2446bea4-8eb5-49a5-bfc6-b7658f00675d",
       "conflict_type": "confidence_mismatch",
       "description": "自动归因置信度 0.50 与标注置信度 0.95 存在显著差异",
       "auto_attribution": "proper_noun",
@@ -15,38 +15,24 @@
       "resolution_notes": ""
     },
     {
-      "conflict_id": "95c0a767-47f9-4008-ae9f-f9889f239c51",
-      "log_id": "log_002",
-      "annotation_id": "ann_012",
-      "attribution_id": "6a6832c8-79bb-48a8-a434-8c283d72c8c8",
-      "conflict_type": "type_mismatch",
-      "description": "自动归因类型 'proper_noun' 与标注类型 'unknown' 不一致",
-      "auto_attribution": "proper_noun",
-      "manual_attribution": "proper_noun",
-      "resolved": true,
-      "resolved_by": "小孟",
-      "resolved_at": "2026-06-17T21:17:35.629518",
-      "resolution_notes": "ann_012确认是专有名词错误"
-    },
-    {
-      "conflict_id": "c412fc50-ceca-4928-8598-e39aa357654d",
+      "conflict_id": "246a49cc-882c-42f1-8cdf-3be96214d951",
       "log_id": "log_004",
       "annotation_id": "ann_003",
-      "attribution_id": "9183deff-34f4-4a2b-ae54-a9f2e5be0e86",
+      "attribution_id": "c7980118-ecae-4bd0-9afc-a3c43f1d0eac",
       "conflict_type": "type_mismatch",
       "description": "自动归因类型 'unknown' 与标注类型 'acronym' 不一致",
       "auto_attribution": "unknown",
       "manual_attribution": "acronym",
-      "resolved": false,
-      "resolved_by": null,
-      "resolved_at": null,
-      "resolution_notes": ""
+      "resolved": true,
+      "resolved_by": "小孟",
+      "resolved_at": "2026-06-19T07:18:46.138938",
+      "resolution_notes": "确认是缩写识别错误，人工修正"
     },
     {
-      "conflict_id": "43c6736f-529e-4f9c-b149-55e02bc4dcb4",
+      "conflict_id": "56227f95-46d3-41c6-9743-de79b8284b8c",
       "log_id": "log_007",
       "annotation_id": "ann_006",
-      "attribution_id": "a88fd776-5831-4dd7-817f-11133ae41758",
+      "attribution_id": "93692ca8-fd95-4133-99ea-85982493b1a0",
       "conflict_type": "confidence_mismatch",
       "description": "自动归因置信度 0.50 与标注置信度 0.90 存在显著差异",
       "auto_attribution": "proper_noun",
@@ -57,10 +43,10 @@
       "resolution_notes": ""
     },
     {
-      "conflict_id": "a5afa160-26f9-44d8-8f1e-a11b61bd909a",
+      "conflict_id": "a4f23063-0a80-43ca-b8c3-5794687d18c8",
       "log_id": "log_009",
       "annotation_id": "ann_008",
-      "attribution_id": "b14da361-3524-4ff9-8bcb-b2bf17f37781",
+      "attribution_id": "fb221246-8fbf-4e53-b12d-90a0b576e38c",
       "conflict_type": "confidence_mismatch",
       "description": "自动归因置信度 0.50 与标注置信度 0.93 存在显著差异",
       "auto_attribution": "proper_noun",
@@ -71,12 +57,12 @@
       "resolution_notes": ""
     },
     {
-      "conflict_id": "a76cdde0-45b0-4a0b-9a5d-05d57acb28b0",
+      "conflict_id": "7c1f03be-d632-4fb1-8cf0-bf56c2f33662",
       "log_id": "log_001",
       "annotation_id": "ann_011",
-      "attribution_id": "a2d77db6-7b13-4593-9c7d-89a4f621f40e",
+      "attribution_id": "5d939d3c-800a-422d-b5ce-80c250343dd9",
       "conflict_type": "missing_data",
-      "description": "标注数据空值: 错误词, 正确词为空，需要人工确认",
+      "description": "标注数据存在空值，需要人工确认 (缺失: error_word, correct_word)",
       "auto_attribution": "unknown",
       "manual_attribution": "unknown",
       "resolved": false,
@@ -85,19 +71,19 @@
       "resolution_notes": ""
     },
     {
-      "conflict_id": "dafab5e1-b5f6-4160-98c3-1dbdb74ed7e1",
+      "conflict_id": "6365938b-eb27-45d9-8245-9dc2039cf58c",
       "log_id": "log_002",
-      "annotation_id": "ann_001,ann_012",
-      "attribution_id": "",
-      "conflict_type": "annotation_conflict",
-      "description": "同一错误对(阿里吧吧→阿里巴巴)存在不同人工标注类型: proper_noun, unknown",
-      "auto_attribution": "proper_noun,unknown",
-      "manual_attribution": null,
+      "annotation_id": "ann_012",
+      "attribution_id": "df5a63b6-623c-434a-92c6-9b8f04226acb",
+      "conflict_type": "type_mismatch",
+      "description": "自动归因类型 'proper_noun' 与标注类型 'unknown' 不一致",
+      "auto_attribution": "proper_noun",
+      "manual_attribution": "unknown",
       "resolved": false,
       "resolved_by": null,
       "resolved_at": null,
       "resolution_notes": ""
     }
   ],
-  "count": 7
+  "count": 6
 }
