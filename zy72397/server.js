@@ -13,6 +13,18 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// 启动时从持久化文件加载数据（所有命令/Web共用同一份证据链）
+const runtimeLoadResult = dataStore.load();
+if (runtimeLoadResult.loaded) {
+  dataStore.enableAutoSave(true);
+  console.log(`📂 已从持久化文件加载数据: ${runtimeLoadResult.path}`);
+  console.log(`   记录: ${runtimeLoadResult.records} 条 | 审计日志: ${runtimeLoadResult.audit_logs} 条`);
+} else {
+  console.log(`ℹ️  持久化文件不存在或加载失败 (${runtimeLoadResult.reason})，从空开始`);
+  console.log(`   运行 'npm run prepare-demo' 可构建完整演示场景`);
+}
+console.log('');
+
 app.get('/api/records', (req, res) => {
   const { status, turbineId, needsQcReview, hasBoundaryIssues, recordId } = req.query;
   const filters = {};

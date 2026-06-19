@@ -1,81 +1,53 @@
-const dataStore = require('../src/store/data-store');
+const { cliBootstrap } = require('../src/cli-bootstrap');
 const workflowEngine = require('../src/engine/workflow-engine');
-const demoData = [
-  {
-    sensor_id: 'SEN-2024-001',
-    sensor_name: '1号水轮机进口压力传感器',
-    turbine_id: 'TURBINE-A-01',
-    sampling_time: '2024-06-15T08:00:00.000Z',
-    sampling_start_time: '2024-06-15T08:00:00.000Z',
-    sampling_end_time: '2024-06-15T09:00:00.000Z',
-    efficiency: 92.5,
-    flow_rate: 45.2,
-    head: 38.6,
-    power: 15800
-  },
-  {
-    sensor_id: 'SEN-2024-002',
-    sensor_name: '1号水轮机出口压力传感器',
-    turbine_id: 'TURBINE-A-01',
-    sampling_time: '2024-06-15T10:35:00.000Z',
-    sampling_start_time: '2024-06-15T10:35:00.000Z',
-    sampling_end_time: '2024-06-15T10:55:00.000Z',
-    efficiency: 91.8,
-    flow_rate: 44.8,
-    head: 38.2,
-    power: 15600
-  },
-  {
-    sensor_id: 'SEN-2024-003',
-    sensor_name: '2号水轮机进口压力传感器',
-    turbine_id: 'TURBINE-A-02',
-    sampling_time: '2024-06-15T11:00:00.000Z',
-    sampling_start_time: '2024-06-15T11:00:00.000Z',
-    sampling_end_time: '2024-06-15T12:00:00.000Z',
-    efficiency: 93.1,
-    flow_rate: 46.5,
-    head: 39.1,
-    power: 16200
-  }
-];
 
-workflowEngine.importSensorData(demoData, 'demo-loader');
+const { dataFile, loadResult, getArg, dataStore } = cliBootstrap();
 
-const args = process.argv.slice(2);
-let recordId = 'REC-002';
+const recordId = getArg('record-id') || getArg('id') || 'REC-002';
 
-args.forEach((arg, i) => {
-  if (arg === '--record-id' && args[i + 1]) {
-    recordId = args[i + 1];
-  }
-});
+const S = '='.repeat(72);
+const D = '-'.repeat(72);
 
-console.log('='.repeat(60));
-console.log(`⏱️  审计日志重放 - 记录 ${recordId}`);
-console.log('='.repeat(60));
+console.log(S);
+console.log('⏱️  审计日志重放');
+console.log(S);
+console.log(`数据文件: ${dataFile}`);
+if (loadResult && loadResult.loaded) {
+  console.log(`已加载: ${loadResult.records} 条记录，${loadResult.audit_logs} 条审计日志`);
+} else {
+  console.log(`加载状态: ${loadResult ? loadResult.reason : '未知'}（从空开始）`);
+}
+console.log('');
+console.log(`目标记录: ${recordId}`);
 console.log('');
 
 try {
   const audit = workflowEngine.replayAuditLog(recordId);
-  
+
   console.log('📋 状态流转历史:');
-  console.log('-'.repeat(60));
+  console.log(D);
   audit.status_history.forEach((s, i) => {
-    console.log(`[${String(i).padStart(2, '0')}] ${s.timestamp}`);
+    const snap = s.state_snapshot || {};
+    console.log(`[${String(i).padStart(2, '0')}] ${s.timestamp ? s.timestamp.slice(0, 19) : ''}`);
     console.log(`      状态: ${s.status}`);
-    console.log(`      操作人: ${s.operator}`);
+    console.log(`      操作人: ${s.operator || '-'}`);
     console.log(`      备注: ${s.remark || '-'}`);
-    if (s.rejectReason) console.log(`      驳回原因: ${s.rejectReason}`);
-    if (s.boundary_issues) console.log(`      触发边界问题: ${s.boundary_issues.length}项`);
+    console.log(`      快照: qc_review_required=${typeof snap.qc_review_required === 'boolean' ? snap.qc_review_required : '?'}  boundary_issues=${(snap.boundary_issues || []).length}项`);
+    if (s.rollback_from) console.log(`      回滚来源: ${s.rollback_from} (索引 ${s.rollback_index})`);
+    if (s.boundary_issues && Array.isArray(s.boundary_issues) && s.boundary_issues.length > 0) {
+      console.log(`      触发边界问题:`);
+      s.boundary_issues.forEach(bi => console.log(`        - [${bi.issueType}] ${bi.message}`));
+    }
     console.log('');
   });
-  
+
   const record = dataStore.getRecordById(recordId);
-  if (record && record.manual_changes.length > 0) {
+
+  if (record && record.manual_changes && record.manual_changes.length > 0) {
     console.log('✏️  人工改动记录:');
-    console.log('-'.repeat(60));
+    console.log(D);
     record.manual_changes.forEach((c, i) => {
-      console.log(`[${String(i).padStart(2, '0')}] ${c.timestamp}`);
+      console.log(`[${String(i).padStart(2, '0')}] ${c.timestamp ? c.timestamp.slice(0, 19) : ''}`);
       console.log(`      字段: ${c.field}`);
       console.log(`      旧值: ${c.old_value || '(空)'}`);
       console.log(`      新值: ${c.new_value}`);
@@ -84,28 +56,59 @@ try {
       console.log('');
     });
   }
-  
-  if (record && record.previous_versions.length > 0) {
-    console.log('📜 历史结论版本:');
-    console.log('-'.repeat(60));
+
+  if (record && record.previous_versions && record.previous_versions.length > 0) {
+    console.log('📜 历史结论版本（返工证据链）:');
+    console.log(D);
     record.previous_versions.forEach((v, i) => {
-      console.log(`版本 ${v.conclusion_version}:`);
-      console.log(`      结论: ${v.conclusion}`);
-      console.log(`      时间: ${v.timestamp}`);
+      console.log(`版本 V${v.conclusion_version || (i + 1)}:`);
+      console.log(`      来源: ${v.superseded_from || v.from_record_id || '（来自旧版本）'}`);
+      console.log(`      结论: ${v.conclusion || '(空)'}`);
+      console.log(`      时间: ${v.timestamp || '-'}`);
       console.log('');
     });
   }
-  
-  console.log('='.repeat(60));
-  console.log('💡 可执行回滚命令:');
-  console.log(`   node scripts/rollback.js --record-id=${recordId} --version=0`);
+
+  console.log(S);
+  console.log('🎯 回滚入口（实际可用，不是演示脚本）:');
   console.log('');
-  
+  console.log(`   列出 ${recordId} 的所有可回滚版本:`);
+  console.log(`     npm run rollback -- --record-id=${recordId} --version=-1`);
+  console.log('');
+  console.log(`   回滚到指定版本 (将 <idx> 替换为上面的索引数字):`);
+  console.log(`     npm run rollback -- --record-id=${recordId} --version=<idx> --operator=<你的名字>`);
+  console.log('');
+  console.log('   例如 —— 回滚到 NEED_QC_REVIEW 状态（假设索引为 1）:');
+  console.log(`     npm run rollback -- --record-id=${recordId} --version=1 --operator=质检员-撤销`);
+  console.log('');
+  console.log('📤 导出明细（与回滚后状态保持一致）:');
+  console.log(`     npm run export -- --record-id=${recordId} --format=json`);
+  console.log(`     npm run export -- --format=csv --needs-qc-review=true`);
+  console.log('');
+  console.log('🔧 重建样例（如果数据丢了/想重来）:');
+  console.log('     npm run prepare-demo     ← 构建完整返工场景（推荐）');
+  console.log('     npm run import           ← 只导入传感器数据，从头走流程');
+  console.log('');
+
 } catch (e) {
   console.log(`❌ 错误: ${e.message}`);
   console.log('');
-  console.log('可用记录ID:');
-  dataStore.getUnifiedView().forEach(r => {
-    console.log(`   ${r.id} - ${r.sensor_id} - ${r.current_status}`);
-  });
+
+  const all = dataStore.getUnifiedView();
+  if (all.length > 0) {
+    console.log('当前数据文件中存在的记录:');
+    all.forEach(r => {
+      const issues = (r.boundary_issues || []).map(i => i.issueType).join('+') || '—';
+      console.log(`   ${r.id.padEnd(14)} ${r.sensor_id.padEnd(20)} status=${r.current_status.padEnd(20)} qc=${String(r.qc_review_required).padEnd(5)} boundary=[${issues}]`);
+    });
+  } else {
+    console.log('当前数据文件为空。');
+  }
+
+  console.log('');
+  console.log('💡 请先运行以下命令之一来构建数据:');
+  console.log('   npm run prepare-demo       ← 一次性构建完整返工场景（推荐，含 REC-002 采样缺半小时 + 返工）');
+  console.log('   npm run import             ← 只导入传感器数据，后续自己走流程');
+  console.log('');
+  process.exit(1);
 }

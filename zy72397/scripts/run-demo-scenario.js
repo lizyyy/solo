@@ -1,8 +1,8 @@
-const dataStore = require('../src/store/data-store');
+const { cliBootstrap } = require('../src/cli-bootstrap');
 const workflowEngine = require('../src/engine/workflow-engine');
 const { STATUS, BOUNDARY_RULES } = require('../src/models/boundary-rules');
 
-dataStore.clear();
+const { dataFile, autoSave, dataStore } = cliBootstrap({ forceReset: true });
 
 const S = '='.repeat(72);
 const D = '-'.repeat(72);

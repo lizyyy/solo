@@ -6,12 +6,13 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "demo": "node scripts/run-demo-scenario.js",
+    "demo": "node scripts/run-demo-scenario.js --no-save --reset",
+    "prepare-demo": "node scripts/prepare-demo.js --reset",
     "replay": "node scripts/replay-audit-log.js",
     "rollback": "node scripts/rollback-record.js",
     "import": "node scripts/import-sensor-data.js",
     "export": "node scripts/export-data.js",
-    "verify": "node scripts/verify-end-to-end.js",
+    "verify": "node scripts/verify-end-to-end.js --no-save --reset",
     "test:boundary": "node scripts/test-boundary-rules.js"
   },
   "dependencies": {

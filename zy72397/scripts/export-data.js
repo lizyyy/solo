@@ -1,16 +1,9 @@
 const fs = require('fs');
 const path = require('path');
+const { cliBootstrap } = require('../src/cli-bootstrap');
 const dataStore = require('../src/store/data-store');
-const workflowEngine = require('../src/engine/workflow-engine');
 
-const args = process.argv.slice(2);
-function getArg(name, def) {
-  const longIdx = args.findIndex(a => a.startsWith('--' + name + '='));
-  if (longIdx >= 0) return args[longIdx].split('=')[1];
-  const idx = args.findIndex(a => a === '--' + name);
-  if (idx >= 0 && idx + 1 < args.length) return args[idx + 1];
-  return def;
-}
+const { dataFile, loadResult, getArg } = cliBootstrap();
 
 let format = (getArg('format') || 'json').toLowerCase();
 let outputPath = getArg('output');
@@ -18,8 +11,6 @@ let needsQcReview = getArg('needs-qc-review');
 let hasBoundaryIssues = getArg('has-boundary-issues');
 let recordId = getArg('record-id');
 let status = getArg('status');
-let demoScenario = getArg('scenario') !== 'false' && !getArg('setup'); // --scenario=false 或 --setup 都不跑完整demo
-let preloadTestdata = getArg('setup') === '1' || getArg('setup') === 'true' || getArg('setup') === 'demo';
 
 const filters = {};
 if (needsQcReview === 'true' || needsQcReview === '1' || needsQcReview === 'yes') filters.needsQcReview = true;
@@ -35,6 +26,12 @@ const D = '-'.repeat(72);
 console.log(S);
 console.log(`📤 导出明细 (格式: ${format.toUpperCase()})`);
 console.log(S);
+console.log(`数据文件: ${dataFile}`);
+if (loadResult && loadResult.loaded) {
+  console.log(`已加载: ${loadResult.records} 条记录，${loadResult.audit_logs} 条审计日志`);
+} else {
+  console.log(`加载状态: ${loadResult ? loadResult.reason : '未知'}（从空开始）`);
+}
 console.log('');
 console.log('💡 核心保证: 导出与页面展示/API返回走同一份数据源 getUnifiedView()');
 console.log('   尤其是采样缺半小时等边界问题记录，在三方都可追溯');
@@ -42,27 +39,6 @@ console.log('');
 if (Object.keys(filters).length > 0) {
   console.log('🔍 应用过滤器:');
   Object.keys(filters).forEach(k => console.log(`   --${k} = ${filters[k]}`));
-  console.log('');
-}
-
-if (preloadTestdata) {
-  console.log('▶ 先预载入测试数据（不含回滚），再导出...');
-  console.log('');
-  require('./_testdata.js');
-  console.log('');
-  console.log(D);
-  console.log('📤 开始从预载数据中导出...');
-  console.log(D);
-  console.log('');
-} else if (demoScenario) {
-  console.log('▶ 先跑一遍完整 demo 场景（含返工+回滚），再导出...');
-  console.log('  （若要导出 Web 服务中跑出来的数据，传 --scenario=false；若只预载测试数据不传 --setup）');
-  console.log('');
-  require('./run-demo-scenario.js');
-  console.log('');
-  console.log(D);
-  console.log('📤 开始从跑完的 demo 数据中导出...');
-  console.log(D);
   console.log('');
 }
 
@@ -108,16 +84,14 @@ try {
     console.log('');
     // 每条去未过滤的完整视图里核对是否一致（因为过滤只是导出筛选，不代表数据丢失）
     if (format === 'json') {
-      const fullViewNoFilter = dataStore.getUnifiedView();
       const fullExpNoFilter = JSON.parse(dataStore.getExportData('json'));
       boundaryRecsAll.forEach(r => {
-        const inView = fullViewNoFilter.find(x => x.id === r.id);
         const inExp = fullExpNoFilter.find(x => x.id === r.id);
         const statusOk = inExp && inExp.current_status === r.current_status;
         const qcOk = inExp && JSON.stringify(inExp.qc_review_required) === JSON.stringify(r.qc_review_required);
         const issuesOk = inExp && (inExp.boundary_issues ? inExp.boundary_issues.length : 0)
           === (r.boundary_issues ? r.boundary_issues.length : 0);
-        console.log(`   未过滤视图核对 ${r.id}: presentView=${!!inView?'✅':'❌'}  presentExport=${!!inExp?'✅':'❌'}  status${statusOk?'✅':'❌'}  qc${qcOk?'✅':'❌'}  boundary${issuesOk?'✅':'❌'}`);
+        console.log(`   未过滤导出核对 ${r.id}: status${statusOk?'✅':'❌'}  qc_review${qcOk?'✅':'❌'}  boundary${issuesOk?'✅':'❌'}`);
       });
       console.log('');
     } else {
@@ -147,8 +121,8 @@ try {
       });
     } else {
       const lines = data.split('\n');
-      console.log('📋 数据预览 (表头 + 前 3 条):');
-      lines.slice(0, 4).forEach(line => console.log('   ' + line));
+      console.log('📋 数据预览 (表头 + 前 2 条):');
+      lines.slice(0, 3).forEach(line => console.log('   ' + line));
     }
     console.log('');
     console.log('使用 --output=<路径> 保存到文件');
@@ -161,7 +135,6 @@ try {
   console.log('   npm run export -- --format=json --has-boundary-issues=true         ← 只导含边界问题的');
   console.log('   npm run export -- --format=csv --record-id=REC-002 --output=out/REC-002.csv  ← 追一条记录');
   console.log('   npm run export -- --format=csv --status=SUPERSEDED                 ← 查被返工替代的旧结论');
-  console.log('   npm run export -- --scenario=false --output=out/server-data.json   ← 导出 Web 服务中现有数据（不先跑demo）');
   console.log('');
 
 } catch (e) {

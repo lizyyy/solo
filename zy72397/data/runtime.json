@@ -1,0 +1,608 @@
+{
+  "schema_version": "v1.0",
+  "saved_at": "2026-06-19T16:42:04.933Z",
+  "records": [
+    {
+      "id": "REC-001",
+      "original_line_no": 1,
+      "import_batch_id": "BATCH-001",
+      "created_at": "2026-06-19T16:42:04.932Z",
+      "updated_at": "2026-06-19T16:42:04.932Z",
+      "sensor_id": "SEN-2024-001",
+      "sensor_name": "1号水轮机进口压力传感器",
+      "turbine_id": "TURBINE-A-01",
+      "sampling_time": "2024-06-15T08:00:00.000Z",
+      "sampling_start_time": "2024-06-15T08:00:00.000Z",
+      "sampling_end_time": "2024-06-15T09:00:00.000Z",
+      "efficiency": 92.5,
+      "flow_rate": 45.2,
+      "head": 38.6,
+      "power": 15800,
+      "current_status": "IMPORTED",
+      "status_history": [
+        {
+          "status": "IMPORTED",
+          "timestamp": "2026-06-19T16:42:04.932Z",
+          "operator": "system",
+          "remark": "传感器数据导入",
+          "state_snapshot": {
+            "qc_review_required": false,
+            "boundary_issues": [],
+            "conclusion": null,
+            "superseded_by": null,
+            "previous_versions_count": 0
+          }
+        }
+      ],
+      "manual_changes": [],
+      "boundary_issues": [],
+      "qc_review_required": false,
+      "engineer_notes": null,
+      "work_condition_photos": [],
+      "conclusion": null,
+      "conclusion_version": 1,
+      "previous_versions": [],
+      "superseded_by": null
+    },
+    {
+      "id": "REC-002",
+      "original_line_no": 2,
+      "import_batch_id": "BATCH-001",
+      "created_at": "2026-06-19T16:42:04.932Z",
+      "updated_at": "2026-06-19T16:42:04.932Z",
+      "sensor_id": "SEN-2024-002",
+      "sensor_name": "1号水轮机出口压力传感器",
+      "turbine_id": "TURBINE-A-01",
+      "sampling_time": "2024-06-15T10:35:00.000Z",
+      "sampling_start_time": "2024-06-15T10:35:00.000Z",
+      "sampling_end_time": "2024-06-15T10:55:00.000Z",
+      "efficiency": 91.8,
+      "flow_rate": 44.8,
+      "head": 38.2,
+      "power": 15600,
+      "current_status": "NEED_QC_REVIEW",
+      "status_history": [
+        {
+          "status": "IMPORTED",
+          "timestamp": "2026-06-19T16:42:04.932Z",
+          "operator": "system",
+          "remark": "传感器数据导入",
+          "state_snapshot": {
+            "qc_review_required": false,
+            "boundary_issues": [],
+            "conclusion": null,
+            "superseded_by": null,
+            "previous_versions_count": 0
+          }
+        },
+        {
+          "status": "NEED_QC_REVIEW",
+          "timestamp": "2026-06-19T16:42:04.932Z",
+          "operator": "system",
+          "remark": "边界规则检查发现问题，需质检员复核",
+          "boundary_issues": [
+            {
+              "hasIssue": true,
+              "issueType": "SAMPLING_GAP_EXCEEDED",
+              "gapMinutes": "95.0",
+              "threshold": 30,
+              "message": "采样间隔 95.0 分钟，超过阈值 30 分钟"
+            },
+            {
+              "hasIssue": true,
+              "issueType": "SAMPLING_DURATION_TOO_SHORT",
+              "actualDuration": "20.0",
+              "minRequired": "30.0",
+              "message": "采样时长 20.0 分钟，不足理论值的 50%（需要 30.0 分钟）"
+            }
+          ],
+          "state_snapshot": {
+            "qc_review_required": true,
+            "boundary_issues": [
+              {
+                "hasIssue": true,
+                "issueType": "SAMPLING_GAP_EXCEEDED",
+                "gapMinutes": "95.0",
+                "threshold": 30,
+                "message": "采样间隔 95.0 分钟，超过阈值 30 分钟"
+              },
+              {
+                "hasIssue": true,
+                "issueType": "SAMPLING_DURATION_TOO_SHORT",
+                "actualDuration": "20.0",
+                "minRequired": "30.0",
+                "message": "采样时长 20.0 分钟，不足理论值的 50%（需要 30.0 分钟）"
+              }
+            ],
+            "conclusion": null,
+            "superseded_by": null,
+            "previous_versions_count": 0
+          }
+        }
+      ],
+      "manual_changes": [],
+      "boundary_issues": [
+        {
+          "hasIssue": true,
+          "issueType": "SAMPLING_GAP_EXCEEDED",
+          "gapMinutes": "95.0",
+          "threshold": 30,
+          "message": "采样间隔 95.0 分钟，超过阈值 30 分钟"
+        },
+        {
+          "hasIssue": true,
+          "issueType": "SAMPLING_DURATION_TOO_SHORT",
+          "actualDuration": "20.0",
+          "minRequired": "30.0",
+          "message": "采样时长 20.0 分钟，不足理论值的 50%（需要 30.0 分钟）"
+        }
+      ],
+      "qc_review_required": true,
+      "engineer_notes": null,
+      "work_condition_photos": [],
+      "conclusion": null,
+      "conclusion_version": 1,
+      "previous_versions": [],
+      "superseded_by": null
+    },
+    {
+      "id": "REC-003",
+      "original_line_no": 3,
+      "import_batch_id": "BATCH-001",
+      "created_at": "2026-06-19T16:42:04.932Z",
+      "updated_at": "2026-06-19T16:42:04.932Z",
+      "sensor_id": "SEN-2024-003",
+      "sensor_name": "2号水轮机进口压力传感器",
+      "turbine_id": "TURBINE-A-02",
+      "sampling_time": "2024-06-15T11:00:00.000Z",
+      "sampling_start_time": "2024-06-15T11:00:00.000Z",
+      "sampling_end_time": "2024-06-15T12:00:00.000Z",
+      "efficiency": 93.1,
+      "flow_rate": 46.5,
+      "head": 39.1,
+      "power": 16200,
+      "current_status": "IMPORTED",
+      "status_history": [
+        {
+          "status": "IMPORTED",
+          "timestamp": "2026-06-19T16:42:04.932Z",
+          "operator": "system",
+          "remark": "传感器数据导入",
+          "state_snapshot": {
+            "qc_review_required": false,
+            "boundary_issues": [],
+            "conclusion": null,
+            "superseded_by": null,
+            "previous_versions_count": 0
+          }
+        }
+      ],
+      "manual_changes": [],
+      "boundary_issues": [],
+      "qc_review_required": false,
+      "engineer_notes": null,
+      "work_condition_photos": [],
+      "conclusion": null,
+      "conclusion_version": 1,
+      "previous_versions": [],
+      "superseded_by": null
+    },
+    {
+      "id": "REC-004",
+      "original_line_no": 4,
+      "import_batch_id": "BATCH-001",
+      "created_at": "2026-06-19T16:42:04.932Z",
+      "updated_at": "2026-06-19T16:42:04.932Z",
+      "sensor_id": "SEN-2024-004",
+      "sensor_name": "2号水轮机出口压力传感器",
+      "turbine_id": "TURBINE-A-02",
+      "sampling_time": "2024-06-15T13:00:00.000Z",
+      "sampling_start_time": "2024-06-15T13:00:00.000Z",
+      "sampling_end_time": "2024-06-15T14:00:00.000Z",
+      "efficiency": 92.7,
+      "flow_rate": 46.1,
+      "head": 38.9,
+      "power": 16000,
+      "current_status": "NEED_QC_REVIEW",
+      "status_history": [
+        {
+          "status": "IMPORTED",
+          "timestamp": "2026-06-19T16:42:04.932Z",
+          "operator": "system",
+          "remark": "传感器数据导入",
+          "state_snapshot": {
+            "qc_review_required": false,
+            "boundary_issues": [],
+            "conclusion": null,
+            "superseded_by": null,
+            "previous_versions_count": 0
+          }
+        },
+        {
+          "status": "NEED_QC_REVIEW",
+          "timestamp": "2026-06-19T16:42:04.932Z",
+          "operator": "system",
+          "remark": "边界规则检查发现问题，需质检员复核",
+          "boundary_issues": [
+            {
+              "hasIssue": true,
+              "issueType": "SAMPLING_GAP_EXCEEDED",
+              "gapMinutes": "60.0",
+              "threshold": 30,
+              "message": "采样间隔 60.0 分钟，超过阈值 30 分钟"
+            }
+          ],
+          "state_snapshot": {
+            "qc_review_required": true,
+            "boundary_issues": [
+              {
+                "hasIssue": true,
+                "issueType": "SAMPLING_GAP_EXCEEDED",
+                "gapMinutes": "60.0",
+                "threshold": 30,
+                "message": "采样间隔 60.0 分钟，超过阈值 30 分钟"
+              }
+            ],
+            "conclusion": null,
+            "superseded_by": null,
+            "previous_versions_count": 0
+          }
+        }
+      ],
+      "manual_changes": [],
+      "boundary_issues": [
+        {
+          "hasIssue": true,
+          "issueType": "SAMPLING_GAP_EXCEEDED",
+          "gapMinutes": "60.0",
+          "threshold": 30,
+          "message": "采样间隔 60.0 分钟，超过阈值 30 分钟"
+        }
+      ],
+      "qc_review_required": true,
+      "engineer_notes": null,
+      "work_condition_photos": [],
+      "conclusion": null,
+      "conclusion_version": 1,
+      "previous_versions": [],
+      "superseded_by": null
+    }
+  ],
+  "audit_log": [
+    {
+      "id": "AUD-00001",
+      "action": "RECORD_UPDATED",
+      "data": {
+        "recordId": "REC-001",
+        "status": "IMPORTED",
+        "qc_review_required": false,
+        "boundary_issue_count": 0,
+        "superseded_by": null
+      },
+      "timestamp": "2026-06-19T16:42:04.933Z",
+      "_unified_view_snapshot": {
+        "id": "REC-001",
+        "original_line_no": 1,
+        "import_batch_id": "BATCH-001",
+        "sensor_id": "SEN-2024-001",
+        "sensor_name": "1号水轮机进口压力传感器",
+        "turbine_id": "TURBINE-A-01",
+        "sampling_time": "2024-06-15T08:00:00.000Z",
+        "sampling_start_time": "2024-06-15T08:00:00.000Z",
+        "sampling_end_time": "2024-06-15T09:00:00.000Z",
+        "efficiency": 92.5,
+        "flow_rate": 45.2,
+        "head": 38.6,
+        "power": 15800,
+        "current_status": "IMPORTED",
+        "qc_review_required": false,
+        "boundary_issues": [],
+        "conclusion": null,
+        "conclusion_version": 1,
+        "superseded_by": null,
+        "previous_versions": [],
+        "work_condition_photos_count": 0,
+        "manual_changes_count": 0,
+        "status_history_count": 1,
+        "status_history": [
+          {
+            "status": "IMPORTED",
+            "timestamp": "2026-06-19T16:42:04.932Z",
+            "operator": "system",
+            "remark": "传感器数据导入",
+            "state_snapshot": {
+              "qc_review_required": false,
+              "boundary_issues": [],
+              "conclusion": null,
+              "superseded_by": null,
+              "previous_versions_count": 0
+            }
+          }
+        ],
+        "manual_changes": [],
+        "previous_versions_detail": "",
+        "created_at": "2026-06-19T16:42:04.932Z",
+        "updated_at": "2026-06-19T16:42:04.932Z",
+        "work_condition_photos": [],
+        "_source_record_id": "REC-001",
+        "_unified_fields_version": "v1.0"
+      }
+    },
+    {
+      "id": "AUD-00002",
+      "action": "RECORD_UPDATED",
+      "data": {
+        "recordId": "REC-002",
+        "status": "NEED_QC_REVIEW",
+        "qc_review_required": true,
+        "boundary_issue_count": 2,
+        "superseded_by": null
+      },
+      "timestamp": "2026-06-19T16:42:04.933Z",
+      "_unified_view_snapshot": {
+        "id": "REC-002",
+        "original_line_no": 2,
+        "import_batch_id": "BATCH-001",
+        "sensor_id": "SEN-2024-002",
+        "sensor_name": "1号水轮机出口压力传感器",
+        "turbine_id": "TURBINE-A-01",
+        "sampling_time": "2024-06-15T10:35:00.000Z",
+        "sampling_start_time": "2024-06-15T10:35:00.000Z",
+        "sampling_end_time": "2024-06-15T10:55:00.000Z",
+        "efficiency": 91.8,
+        "flow_rate": 44.8,
+        "head": 38.2,
+        "power": 15600,
+        "current_status": "NEED_QC_REVIEW",
+        "qc_review_required": true,
+        "boundary_issues": [
+          {
+            "hasIssue": true,
+            "issueType": "SAMPLING_GAP_EXCEEDED",
+            "gapMinutes": "95.0",
+            "threshold": 30,
+            "message": "采样间隔 95.0 分钟，超过阈值 30 分钟"
+          },
+          {
+            "hasIssue": true,
+            "issueType": "SAMPLING_DURATION_TOO_SHORT",
+            "actualDuration": "20.0",
+            "minRequired": "30.0",
+            "message": "采样时长 20.0 分钟，不足理论值的 50%（需要 30.0 分钟）"
+          }
+        ],
+        "conclusion": null,
+        "conclusion_version": 1,
+        "superseded_by": null,
+        "previous_versions": [],
+        "work_condition_photos_count": 0,
+        "manual_changes_count": 0,
+        "status_history_count": 2,
+        "status_history": [
+          {
+            "status": "IMPORTED",
+            "timestamp": "2026-06-19T16:42:04.932Z",
+            "operator": "system",
+            "remark": "传感器数据导入",
+            "state_snapshot": {
+              "qc_review_required": false,
+              "boundary_issues": [],
+              "conclusion": null,
+              "superseded_by": null,
+              "previous_versions_count": 0
+            }
+          },
+          {
+            "status": "NEED_QC_REVIEW",
+            "timestamp": "2026-06-19T16:42:04.932Z",
+            "operator": "system",
+            "remark": "边界规则检查发现问题，需质检员复核",
+            "boundary_issues": [
+              {
+                "hasIssue": true,
+                "issueType": "SAMPLING_GAP_EXCEEDED",
+                "gapMinutes": "95.0",
+                "threshold": 30,
+                "message": "采样间隔 95.0 分钟，超过阈值 30 分钟"
+              },
+              {
+                "hasIssue": true,
+                "issueType": "SAMPLING_DURATION_TOO_SHORT",
+                "actualDuration": "20.0",
+                "minRequired": "30.0",
+                "message": "采样时长 20.0 分钟，不足理论值的 50%（需要 30.0 分钟）"
+              }
+            ],
+            "state_snapshot": {
+              "qc_review_required": true,
+              "boundary_issues": [
+                {
+                  "hasIssue": true,
+                  "issueType": "SAMPLING_GAP_EXCEEDED",
+                  "gapMinutes": "95.0",
+                  "threshold": 30,
+                  "message": "采样间隔 95.0 分钟，超过阈值 30 分钟"
+                },
+                {
+                  "hasIssue": true,
+                  "issueType": "SAMPLING_DURATION_TOO_SHORT",
+                  "actualDuration": "20.0",
+                  "minRequired": "30.0",
+                  "message": "采样时长 20.0 分钟，不足理论值的 50%（需要 30.0 分钟）"
+                }
+              ],
+              "conclusion": null,
+              "superseded_by": null,
+              "previous_versions_count": 0
+            }
+          }
+        ],
+        "manual_changes": [],
+        "previous_versions_detail": "",
+        "created_at": "2026-06-19T16:42:04.932Z",
+        "updated_at": "2026-06-19T16:42:04.932Z",
+        "work_condition_photos": [],
+        "_source_record_id": "REC-002",
+        "_unified_fields_version": "v1.0"
+      }
+    },
+    {
+      "id": "AUD-00003",
+      "action": "RECORD_UPDATED",
+      "data": {
+        "recordId": "REC-003",
+        "status": "IMPORTED",
+        "qc_review_required": false,
+        "boundary_issue_count": 0,
+        "superseded_by": null
+      },
+      "timestamp": "2026-06-19T16:42:04.933Z",
+      "_unified_view_snapshot": {
+        "id": "REC-003",
+        "original_line_no": 3,
+        "import_batch_id": "BATCH-001",
+        "sensor_id": "SEN-2024-003",
+        "sensor_name": "2号水轮机进口压力传感器",
+        "turbine_id": "TURBINE-A-02",
+        "sampling_time": "2024-06-15T11:00:00.000Z",
+        "sampling_start_time": "2024-06-15T11:00:00.000Z",
+        "sampling_end_time": "2024-06-15T12:00:00.000Z",
+        "efficiency": 93.1,
+        "flow_rate": 46.5,
+        "head": 39.1,
+        "power": 16200,
+        "current_status": "IMPORTED",
+        "qc_review_required": false,
+        "boundary_issues": [],
+        "conclusion": null,
+        "conclusion_version": 1,
+        "superseded_by": null,
+        "previous_versions": [],
+        "work_condition_photos_count": 0,
+        "manual_changes_count": 0,
+        "status_history_count": 1,
+        "status_history": [
+          {
+            "status": "IMPORTED",
+            "timestamp": "2026-06-19T16:42:04.932Z",
+            "operator": "system",
+            "remark": "传感器数据导入",
+            "state_snapshot": {
+              "qc_review_required": false,
+              "boundary_issues": [],
+              "conclusion": null,
+              "superseded_by": null,
+              "previous_versions_count": 0
+            }
+          }
+        ],
+        "manual_changes": [],
+        "previous_versions_detail": "",
+        "created_at": "2026-06-19T16:42:04.932Z",
+        "updated_at": "2026-06-19T16:42:04.932Z",
+        "work_condition_photos": [],
+        "_source_record_id": "REC-003",
+        "_unified_fields_version": "v1.0"
+      }
+    },
+    {
+      "id": "AUD-00004",
+      "action": "RECORD_UPDATED",
+      "data": {
+        "recordId": "REC-004",
+        "status": "NEED_QC_REVIEW",
+        "qc_review_required": true,
+        "boundary_issue_count": 1,
+        "superseded_by": null
+      },
+      "timestamp": "2026-06-19T16:42:04.933Z",
+      "_unified_view_snapshot": {
+        "id": "REC-004",
+        "original_line_no": 4,
+        "import_batch_id": "BATCH-001",
+        "sensor_id": "SEN-2024-004",
+        "sensor_name": "2号水轮机出口压力传感器",
+        "turbine_id": "TURBINE-A-02",
+        "sampling_time": "2024-06-15T13:00:00.000Z",
+        "sampling_start_time": "2024-06-15T13:00:00.000Z",
+        "sampling_end_time": "2024-06-15T14:00:00.000Z",
+        "efficiency": 92.7,
+        "flow_rate": 46.1,
+        "head": 38.9,
+        "power": 16000,
+        "current_status": "NEED_QC_REVIEW",
+        "qc_review_required": true,
+        "boundary_issues": [
+          {
+            "hasIssue": true,
+            "issueType": "SAMPLING_GAP_EXCEEDED",
+            "gapMinutes": "60.0",
+            "threshold": 30,
+            "message": "采样间隔 60.0 分钟，超过阈值 30 分钟"
+          }
+        ],
+        "conclusion": null,
+        "conclusion_version": 1,
+        "superseded_by": null,
+        "previous_versions": [],
+        "work_condition_photos_count": 0,
+        "manual_changes_count": 0,
+        "status_history_count": 2,
+        "status_history": [
+          {
+            "status": "IMPORTED",
+            "timestamp": "2026-06-19T16:42:04.932Z",
+            "operator": "system",
+            "remark": "传感器数据导入",
+            "state_snapshot": {
+              "qc_review_required": false,
+              "boundary_issues": [],
+              "conclusion": null,
+              "superseded_by": null,
+              "previous_versions_count": 0
+            }
+          },
+          {
+            "status": "NEED_QC_REVIEW",
+            "timestamp": "2026-06-19T16:42:04.932Z",
+            "operator": "system",
+            "remark": "边界规则检查发现问题，需质检员复核",
+            "boundary_issues": [
+              {
+                "hasIssue": true,
+                "issueType": "SAMPLING_GAP_EXCEEDED",
+                "gapMinutes": "60.0",
+                "threshold": 30,
+                "message": "采样间隔 60.0 分钟，超过阈值 30 分钟"
+              }
+            ],
+            "state_snapshot": {
+              "qc_review_required": true,
+              "boundary_issues": [
+                {
+                  "hasIssue": true,
+                  "issueType": "SAMPLING_GAP_EXCEEDED",
+                  "gapMinutes": "60.0",
+                  "threshold": 30,
+                  "message": "采样间隔 60.0 分钟，超过阈值 30 分钟"
+                }
+              ],
+              "conclusion": null,
+              "superseded_by": null,
+              "previous_versions_count": 0
+            }
+          }
+        ],
+        "manual_changes": [],
+        "previous_versions_detail": "",
+        "created_at": "2026-06-19T16:42:04.932Z",
+        "updated_at": "2026-06-19T16:42:04.932Z",
+        "work_condition_photos": [],
+        "_source_record_id": "REC-004",
+        "_unified_fields_version": "v1.0"
+      }
+    }
+  ],
+  "import_batches": [],
+  "_note": "此文件是水轮机效率回放的运行时数据，所有命令/Web服务都可读取同一份证据链"
+}

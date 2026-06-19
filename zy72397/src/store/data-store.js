@@ -5,12 +5,78 @@ const {
   getCsvRow,
   formatViewRecord
 } = require('../models/unified-fields');
+const fs = require('fs');
+const path = require('path');
+
+const DEFAULT_DATA_FILE = path.resolve(__dirname, '../../data/runtime.json');
 
 class DataStore {
   constructor() {
     this.records = [];
     this.auditLog = [];
     this.importBatches = [];
+    this._dataFile = DEFAULT_DATA_FILE;
+    this._autoSave = false;
+  }
+
+  setDataFile(filePath) {
+    this._dataFile = path.resolve(filePath);
+    return this;
+  }
+
+  getDataFile() {
+    return this._dataFile;
+  }
+
+  enableAutoSave(enabled = true) {
+    this._autoSave = enabled;
+    return this;
+  }
+
+  _maybeSave() {
+    if (this._autoSave) {
+      try { this.save(); } catch (e) { /* 不阻塞主流程 */ }
+    }
+  }
+
+  save(filePath = null) {
+    const target = filePath ? path.resolve(filePath) : this._dataFile;
+    const dir = path.dirname(target);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    const payload = {
+      schema_version: 'v1.0',
+      saved_at: new Date().toISOString(),
+      records: this.records,
+      audit_log: this.auditLog,
+      import_batches: this.importBatches,
+      _note: '此文件是水轮机效率回放的运行时数据，所有命令/Web服务都可读取同一份证据链'
+    };
+    fs.writeFileSync(target, JSON.stringify(payload, null, 2));
+    return target;
+  }
+
+  load(filePath = null) {
+    const target = filePath ? path.resolve(filePath) : this._dataFile;
+    if (!fs.existsSync(target)) {
+      return { loaded: false, reason: '文件不存在', path: target };
+    }
+    try {
+      const raw = fs.readFileSync(target, 'utf-8');
+      const payload = JSON.parse(raw);
+      if (Array.isArray(payload.records)) this.records = payload.records;
+      if (Array.isArray(payload.audit_log)) this.auditLog = payload.audit_log;
+      if (Array.isArray(payload.import_batches)) this.importBatches = payload.import_batches;
+      this._dataFile = target;
+      return {
+        loaded: true,
+        path: target,
+        records: this.records.length,
+        audit_logs: this.auditLog.length,
+        schema_version: payload.schema_version || 'unknown'
+      };
+    } catch (e) {
+      return { loaded: false, reason: e.message, path: target };
+    }
   }
 
   addRecord(record) {
@@ -27,6 +93,7 @@ class DataStore {
       boundary_issue_count: record.boundary_issues ? record.boundary_issues.length : 0,
       superseded_by: record.superseded_by || null
     });
+    this._maybeSave();
     return record;
   }
 
@@ -34,6 +101,7 @@ class DataStore {
     records.forEach((record) => {
       this.addRecord(record);
     });
+    this._maybeSave();
     return records;
   }
 
