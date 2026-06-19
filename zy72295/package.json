@@ -4,15 +4,24 @@
   "description": "冷链库温区三维分层管理系统",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "node src/index.js",
+    "start": "node src/server.js",
+    "server": "node src/server.js",
+    "dev": "node src/server.js",
+    "demo": "node scripts/full-demo.js",
     "test": "node tests/run-tests.js",
     "lint": "echo 'Linting...'"
   },
   "dependencies": {
+    "express": "^5.2.1",
+    "jimp": "^0.22.12",
     "uuid": "^9.0.0"
   },
-  "keywords": ["cold-chain", "temperature-zone", "3d", "cad"],
+  "keywords": [
+    "cold-chain",
+    "temperature-zone",
+    "3d",
+    "cad"
+  ],
   "author": "园区运维团队",
   "license": "MIT"
 }

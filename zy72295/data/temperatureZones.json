@@ -1,0 +1,27 @@
+[
+  {
+    "id": "11deb6fc-23a7-44f4-ad21-7a933b3f8976",
+    "name": "冷冻A区-三维",
+    "layerId": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+    "routeId": "5628cb35-c95e-49ef-bee7-c247e6778539",
+    "createdAt": "2026-06-19T06:48:58.526Z",
+    "createdBy": "小陶",
+    "bounds": {
+      "minX": 10,
+      "maxX": 40,
+      "minY": 10,
+      "maxY": 35,
+      "minZ": 0,
+      "maxZ": 8
+    },
+    "temperatureRange": {
+      "min": -20,
+      "max": -15
+    },
+    "color": "#3498db",
+    "sensors": [],
+    "remark": "小陶备注：冷冻区温度偏低，需重点关注",
+    "status": "draft",
+    "validationErrors": []
+  }
+]

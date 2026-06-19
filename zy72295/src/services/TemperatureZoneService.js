@@ -1,11 +1,27 @@
 const { TemperatureZone3D, BOUNDARY_RULES } = require('../models/TemperatureZone3D');
-const { HistoryManager } = require('../utils/history');
+const { historyManager } = require('../utils/history');
 const { getUserFriendlyError } = require('../utils/errors');
+const { store } = require('../store/FileStore');
 
 class TemperatureZoneService {
   constructor() {
-    this.zones = [];
-    this.historyManager = new HistoryManager();
+    this.historyManager = historyManager;
+  }
+
+  _toZone(plain) {
+    if (!plain) return null;
+    const zone = new TemperatureZone3D({});
+    Object.assign(zone, plain);
+    return zone;
+  }
+
+  _saveZone(zone) {
+    const existing = store.getById('temperatureZones', zone.id);
+    if (existing) {
+      return store.update('temperatureZones', zone.id, JSON.parse(JSON.stringify(zone)));
+    } else {
+      return store.add('temperatureZones', JSON.parse(JSON.stringify(zone)));
+    }
   }
 
   createZone(data, operator) {
@@ -32,7 +48,7 @@ class TemperatureZoneService {
       };
     }
 
-    this.zones.push(zone);
+    this._saveZone(zone);
     this.historyManager.createSnapshot(zone, 'create', operator, null, {
       reason: '初次创建温区',
       nextStep: '导入测距仪记录后补录路线',
@@ -42,7 +58,7 @@ class TemperatureZoneService {
   }
 
   updateZone(id, updates, operator, explicitReason = null) {
-    const zone = this.zones.find(z => z.id === id);
+    const zone = this.getZoneById(id);
     if (!zone) return null;
 
     const before = JSON.parse(JSON.stringify(zone));
@@ -53,7 +69,6 @@ class TemperatureZoneService {
     if (!isRemarkOnly) {
       const isValid = zone.validateBounds();
       if (!isValid) {
-        Object.assign(zone, before);
         return {
           success: false,
           message: getUserFriendlyError('TEMPERATURE_ZONE_INVALID'),
@@ -63,7 +78,6 @@ class TemperatureZoneService {
 
       const overlapCheck = this._checkAllOverlaps(zone, id);
       if (overlapCheck.hasOverlap) {
-        Object.assign(zone, before);
         return {
           success: false,
           message: getUserFriendlyError('BOUNDARY_RULE_VIOLATION'),
@@ -71,6 +85,8 @@ class TemperatureZoneService {
         };
       }
     }
+
+    this._saveZone(zone);
 
     const diff = this.historyManager._calculateDiff(before, zone);
     const changedFields = Object.keys(diff);
@@ -105,15 +121,16 @@ class TemperatureZoneService {
   }
 
   getZoneById(id) {
-    return this.zones.find(z => z.id === id);
+    const plain = store.getById('temperatureZones', id);
+    return this._toZone(plain);
   }
 
   getAllZones() {
-    return [...this.zones];
+    return store.getAll('temperatureZones').map(p => this._toZone(p));
   }
 
   getZonesByLayer(layerId) {
-    return this.zones.filter(z => z.layerId === layerId);
+    return store.findMany('temperatureZones', z => z.layerId === layerId).map(p => this._toZone(p));
   }
 
   getZoneSummary(zoneId) {
@@ -132,6 +149,7 @@ class TemperatureZoneService {
       remark: zone.remark,
       layerId: zone.layerId,
       routeId: zone.routeId,
+      color: zone.color,
       latestOperation: latestSnapshot ? {
         operation: latestSnapshot.operation,
         operator: latestSnapshot.operator,
@@ -180,6 +198,7 @@ class TemperatureZoneService {
 
     const before = JSON.parse(JSON.stringify(zone));
     Object.assign(zone, rollbackData);
+    this._saveZone(zone);
 
     this.historyManager.createSnapshot(zone, 'rollback', operator, { before, after: JSON.parse(JSON.stringify(zone)) }, {
       reason: `回滚到快照 ${snapshotId}`,
@@ -208,7 +227,8 @@ class TemperatureZoneService {
 
   _checkAllOverlaps(newZone, excludeId = null) {
     const overlappingZones = [];
-    for (const zone of this.zones) {
+    const allZones = this.getAllZones();
+    for (const zone of allZones) {
       if (excludeId && zone.id === excludeId) continue;
       if (newZone.checkOverlap(zone)) {
         overlappingZones.push({ id: zone.id, name: zone.name });
@@ -221,4 +241,6 @@ class TemperatureZoneService {
   }
 }
 
-module.exports = { TemperatureZoneService };
+const temperatureZoneService = new TemperatureZoneService();
+
+module.exports = { TemperatureZoneService, temperatureZoneService };

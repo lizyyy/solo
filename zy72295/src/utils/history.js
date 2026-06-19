@@ -1,21 +1,34 @@
 const { v4: uuidv4 } = require('uuid');
+const { store } = require('../store/FileStore');
 
 class HistoryManager {
   constructor() {
-    this.history = [];
-    this._seq = 0;
+    this._loadFromStore();
+  }
+
+  _loadFromStore() {
+    this.history = store.getAll('history');
+    this._seq = store.getGlobalSeq();
+  }
+
+  _persist() {
+    store.clear('history');
+    for (const snap of this.history) {
+      store.add('history', snap);
+    }
   }
 
   createSnapshot(entity, operation, operator, changes = null, context = null) {
     const beforeData = changes ? this._deepClone(changes.before) : this._deepClone(entity);
     const afterData = changes ? this._deepClone(changes.after) : this._deepClone(entity);
-    const seq = ++this._seq;
+    const seq = store.incrementGlobalSeq();
+    this._seq = seq;
 
     const snapshot = {
       id: uuidv4(),
       seq,
       entityId: entity.id,
-      entityType: entity.constructor.name,
+      entityType: entity.constructor?.name || entity.entityType || 'Unknown',
       operation,
       operator,
       timestamp: new Date().toISOString(),
@@ -32,6 +45,7 @@ class HistoryManager {
     };
 
     this.history.push(snapshot);
+    store.add('history', snapshot);
     return snapshot;
   }
 
@@ -69,6 +83,10 @@ class HistoryManager {
     return this.history.find(h => h.id === snapshotId) || null;
   }
 
+  reloadFromStore() {
+    this._loadFromStore();
+  }
+
   _calculateDiff(obj1, obj2, prefix = '') {
     const diff = {};
     const allKeys = new Set([...Object.keys(obj1 || {}), ...Object.keys(obj2 || {})]);
@@ -93,4 +111,6 @@ class HistoryManager {
   }
 }
 
-module.exports = { HistoryManager };
+const historyManager = new HistoryManager();
+
+module.exports = { HistoryManager, historyManager };

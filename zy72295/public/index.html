@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>冷链库温区三维分层系统</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>❄️ 冷链库温区三维分层系统</h1>
+    <nav class="app-nav">
+      <a href="#/zones" data-route="zones">温区列表</a>
+      <a href="#/layers" data-route="layers">CAD图层</a>
+      <a href="#/routes" data-route="routes">补录路线</a>
+      <a href="#/3d" data-route="3d">3D视图</a>
+      <a href="#/chart" data-route="chart">温度图表</a>
+      <a href="#/exports" data-route="exports">导出记录</a>
+    </nav>
+    <div class="header-stats" id="headerStats"></div>
+  </header>
+
+  <main class="app-main" id="appMain">
+    <div class="loading">加载中...</div>
+  </main>
+
+  <div class="modal-mask" id="modalMask" style="display:none;">
+    <div class="modal" id="modalContent">
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,679 @@
+[
+  {
+    "id": "877be2ee-149c-4ae4-9f8e-9183cfd3c31d",
+    "seq": 1,
+    "entityId": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+    "entityType": "CADLayer",
+    "operation": "import",
+    "operator": "小陶",
+    "timestamp": "2026-06-19T06:48:58.526Z",
+    "before": {
+      "id": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+      "name": "冷链库-一层-冷冻区",
+      "importedAt": "2026-06-19T06:48:58.525Z",
+      "importedBy": "小陶",
+      "zones": [
+        {
+          "name": "冷冻A区-三维",
+          "color": "#3498db"
+        }
+      ],
+      "isDuplicate": false,
+      "sourceFile": "cold_storage_f1.dwg",
+      "version": 1
+    },
+    "after": {
+      "id": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+      "name": "冷链库-一层-冷冻区",
+      "importedAt": "2026-06-19T06:48:58.525Z",
+      "importedBy": "小陶",
+      "zones": [
+        {
+          "name": "冷冻A区-三维",
+          "color": "#3498db"
+        }
+      ],
+      "isDuplicate": false,
+      "sourceFile": "cold_storage_f1.dwg",
+      "version": 1
+    },
+    "diff": {},
+    "context": {
+      "originalValue": null,
+      "changedValue": null,
+      "reason": "首次导入CAD图层",
+      "nextStep": "关联测距仪记录和补录路线",
+      "reviewRequired": false
+    }
+  },
+  {
+    "id": "143b6c5b-c0c4-410a-80c6-571b2563eba7",
+    "seq": 2,
+    "entityId": "11deb6fc-23a7-44f4-ad21-7a933b3f8976",
+    "entityType": "TemperatureZone3D",
+    "operation": "create",
+    "operator": "小陶",
+    "timestamp": "2026-06-19T06:48:58.526Z",
+    "before": {
+      "id": "11deb6fc-23a7-44f4-ad21-7a933b3f8976",
+      "name": "冷冻A区-三维",
+      "layerId": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+      "routeId": null,
+      "createdAt": "2026-06-19T06:48:58.526Z",
+      "createdBy": "小陶",
+      "bounds": {
+        "minX": 10,
+        "maxX": 40,
+        "minY": 10,
+        "maxY": 35,
+        "minZ": 0,
+        "maxZ": 8
+      },
+      "temperatureRange": {
+        "min": -20,
+        "max": -15
+      },
+      "color": "#3498db",
+      "sensors": [],
+      "remark": "",
+      "status": "draft",
+      "validationErrors": []
+    },
+    "after": {
+      "id": "11deb6fc-23a7-44f4-ad21-7a933b3f8976",
+      "name": "冷冻A区-三维",
+      "layerId": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+      "routeId": null,
+      "createdAt": "2026-06-19T06:48:58.526Z",
+      "createdBy": "小陶",
+      "bounds": {
+        "minX": 10,
+        "maxX": 40,
+        "minY": 10,
+        "maxY": 35,
+        "minZ": 0,
+        "maxZ": 8
+      },
+      "temperatureRange": {
+        "min": -20,
+        "max": -15
+      },
+      "color": "#3498db",
+      "sensors": [],
+      "remark": "",
+      "status": "draft",
+      "validationErrors": []
+    },
+    "diff": {},
+    "context": {
+      "originalValue": null,
+      "changedValue": null,
+      "reason": "初次创建温区",
+      "nextStep": "导入测距仪记录后补录路线",
+      "reviewRequired": false
+    }
+  },
+  {
+    "id": "0e1e7a2b-3ccf-4a43-b7f5-70bc89f04797",
+    "seq": 3,
+    "entityId": "5628cb35-c95e-49ef-bee7-c247e6778539",
+    "entityType": "SupplementaryRoute",
+    "operation": "create",
+    "operator": "小陶",
+    "timestamp": "2026-06-19T06:48:58.526Z",
+    "before": {
+      "id": "5628cb35-c95e-49ef-bee7-c247e6778539",
+      "name": "补录路线-冷冻A区外围",
+      "createdAt": "2026-06-19T06:48:58.526Z",
+      "createdBy": "小陶",
+      "points": [
+        {
+          "x": 10,
+          "y": 10,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 10,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 35,
+          "z": 0
+        },
+        {
+          "x": 10,
+          "y": 35,
+          "z": 0
+        }
+      ],
+      "length": 0,
+      "linkedMeasurementId": null,
+      "linkedCADLayerId": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+      "lengthRecalculated": false,
+      "needsCustomerReview": false,
+      "customerReviewStatus": "pending",
+      "remark": "",
+      "status": "draft"
+    },
+    "after": {
+      "id": "5628cb35-c95e-49ef-bee7-c247e6778539",
+      "name": "补录路线-冷冻A区外围",
+      "createdAt": "2026-06-19T06:48:58.526Z",
+      "createdBy": "小陶",
+      "points": [
+        {
+          "x": 10,
+          "y": 10,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 10,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 35,
+          "z": 0
+        },
+        {
+          "x": 10,
+          "y": 35,
+          "z": 0
+        }
+      ],
+      "length": 0,
+      "linkedMeasurementId": null,
+      "linkedCADLayerId": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+      "lengthRecalculated": false,
+      "needsCustomerReview": false,
+      "customerReviewStatus": "pending",
+      "remark": "",
+      "status": "draft"
+    },
+    "diff": {},
+    "context": {
+      "originalValue": {
+        "lengthRecalculated": false
+      },
+      "changedValue": null,
+      "reason": "创建补录路线",
+      "nextStep": "需要重新计算长度后再复核",
+      "reviewRequired": true
+    }
+  },
+  {
+    "id": "707d92c2-c2d4-4dfc-87bd-2915da9765e2",
+    "seq": 4,
+    "entityId": "11deb6fc-23a7-44f4-ad21-7a933b3f8976",
+    "entityType": "TemperatureZone3D",
+    "operation": "update",
+    "operator": "小陶",
+    "timestamp": "2026-06-19T06:48:58.526Z",
+    "before": {
+      "id": "11deb6fc-23a7-44f4-ad21-7a933b3f8976",
+      "name": "冷冻A区-三维",
+      "layerId": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+      "routeId": null,
+      "createdAt": "2026-06-19T06:48:58.526Z",
+      "createdBy": "小陶",
+      "bounds": {
+        "minX": 10,
+        "maxX": 40,
+        "minY": 10,
+        "maxY": 35,
+        "minZ": 0,
+        "maxZ": 8
+      },
+      "temperatureRange": {
+        "min": -20,
+        "max": -15
+      },
+      "color": "#3498db",
+      "sensors": [],
+      "remark": "",
+      "status": "draft",
+      "validationErrors": []
+    },
+    "after": {
+      "id": "11deb6fc-23a7-44f4-ad21-7a933b3f8976",
+      "name": "冷冻A区-三维",
+      "layerId": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+      "routeId": "5628cb35-c95e-49ef-bee7-c247e6778539",
+      "createdAt": "2026-06-19T06:48:58.526Z",
+      "createdBy": "小陶",
+      "bounds": {
+        "minX": 10,
+        "maxX": 40,
+        "minY": 10,
+        "maxY": 35,
+        "minZ": 0,
+        "maxZ": 8
+      },
+      "temperatureRange": {
+        "min": -20,
+        "max": -15
+      },
+      "color": "#3498db",
+      "sensors": [],
+      "remark": "",
+      "status": "draft",
+      "validationErrors": []
+    },
+    "diff": {
+      "routeId": {
+        "before": null,
+        "after": "5628cb35-c95e-49ef-bee7-c247e6778539"
+      }
+    },
+    "context": {
+      "originalValue": {
+        "routeId": null
+      },
+      "changedValue": {
+        "routeId": "5628cb35-c95e-49ef-bee7-c247e6778539"
+      },
+      "reason": "更新温区属性",
+      "nextStep": "请确认更新后的温区数据是否需要复核",
+      "reviewRequired": true
+    }
+  },
+  {
+    "id": "d713a07b-0c6a-4da7-b267-cefd67fd3b4b",
+    "seq": 5,
+    "entityId": "5628cb35-c95e-49ef-bee7-c247e6778539",
+    "entityType": "SupplementaryRoute",
+    "operation": "mark_for_review",
+    "operator": "小陶",
+    "timestamp": "2026-06-19T06:48:58.527Z",
+    "before": {
+      "id": "5628cb35-c95e-49ef-bee7-c247e6778539",
+      "name": "补录路线-冷冻A区外围",
+      "createdAt": "2026-06-19T06:48:58.526Z",
+      "createdBy": "小陶",
+      "points": [
+        {
+          "x": 10,
+          "y": 10,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 10,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 35,
+          "z": 0
+        },
+        {
+          "x": 10,
+          "y": 35,
+          "z": 0
+        }
+      ],
+      "length": 0,
+      "linkedMeasurementId": null,
+      "linkedCADLayerId": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+      "lengthRecalculated": false,
+      "needsCustomerReview": false,
+      "customerReviewStatus": "pending",
+      "remark": "",
+      "status": "draft"
+    },
+    "after": {
+      "id": "5628cb35-c95e-49ef-bee7-c247e6778539",
+      "name": "补录路线-冷冻A区外围",
+      "createdAt": "2026-06-19T06:48:58.526Z",
+      "createdBy": "小陶",
+      "points": [
+        {
+          "x": 10,
+          "y": 10,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 10,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 35,
+          "z": 0
+        },
+        {
+          "x": 10,
+          "y": 35,
+          "z": 0
+        }
+      ],
+      "length": 0,
+      "linkedMeasurementId": null,
+      "linkedCADLayerId": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+      "lengthRecalculated": false,
+      "needsCustomerReview": true,
+      "customerReviewStatus": "pending",
+      "remark": "",
+      "status": "reviewing"
+    },
+    "diff": {
+      "needsCustomerReview": {
+        "before": false,
+        "after": true
+      },
+      "status": {
+        "before": "draft",
+        "after": "reviewing"
+      }
+    },
+    "context": {
+      "originalValue": {
+        "customerReviewStatus": "pending",
+        "status": "draft"
+      },
+      "changedValue": {
+        "customerReviewStatus": "pending",
+        "status": "reviewing"
+      },
+      "reason": "补录路线待确认",
+      "nextStep": "等待展陈客户复核，请勿提前归为正常",
+      "reviewRequired": true
+    }
+  },
+  {
+    "id": "35dbdf37-2548-4714-bd89-603bf45f7f29",
+    "seq": 6,
+    "entityId": "11deb6fc-23a7-44f4-ad21-7a933b3f8976",
+    "entityType": "TemperatureZone3D",
+    "operation": "update_remark",
+    "operator": "小陶",
+    "timestamp": "2026-06-19T06:48:58.527Z",
+    "before": {
+      "id": "11deb6fc-23a7-44f4-ad21-7a933b3f8976",
+      "name": "冷冻A区-三维",
+      "layerId": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+      "routeId": "5628cb35-c95e-49ef-bee7-c247e6778539",
+      "createdAt": "2026-06-19T06:48:58.526Z",
+      "createdBy": "小陶",
+      "bounds": {
+        "minX": 10,
+        "maxX": 40,
+        "minY": 10,
+        "maxY": 35,
+        "minZ": 0,
+        "maxZ": 8
+      },
+      "temperatureRange": {
+        "min": -20,
+        "max": -15
+      },
+      "color": "#3498db",
+      "sensors": [],
+      "remark": "",
+      "status": "draft",
+      "validationErrors": []
+    },
+    "after": {
+      "id": "11deb6fc-23a7-44f4-ad21-7a933b3f8976",
+      "name": "冷冻A区-三维",
+      "layerId": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+      "routeId": "5628cb35-c95e-49ef-bee7-c247e6778539",
+      "createdAt": "2026-06-19T06:48:58.526Z",
+      "createdBy": "小陶",
+      "bounds": {
+        "minX": 10,
+        "maxX": 40,
+        "minY": 10,
+        "maxY": 35,
+        "minZ": 0,
+        "maxZ": 8
+      },
+      "temperatureRange": {
+        "min": -20,
+        "max": -15
+      },
+      "color": "#3498db",
+      "sensors": [],
+      "remark": "小陶备注：冷冻区温度偏低，需重点关注",
+      "status": "draft",
+      "validationErrors": []
+    },
+    "diff": {
+      "remark": {
+        "before": "",
+        "after": "小陶备注：冷冻区温度偏低，需重点关注"
+      }
+    },
+    "context": {
+      "originalValue": {
+        "remark": ""
+      },
+      "changedValue": {
+        "remark": "小陶备注：冷冻区温度偏低，需重点关注"
+      },
+      "reason": "运维人员修改备注",
+      "nextStep": "备注已更新，温区三维分层数据未变更",
+      "reviewRequired": false
+    }
+  },
+  {
+    "id": "f5e6e006-ad5c-43da-801f-946921b4989c",
+    "seq": 7,
+    "entityId": "5628cb35-c95e-49ef-bee7-c247e6778539",
+    "entityType": "SupplementaryRoute",
+    "operation": "recalculate_length",
+    "operator": "小陶",
+    "timestamp": "2026-06-19T06:48:58.528Z",
+    "before": {
+      "id": "5628cb35-c95e-49ef-bee7-c247e6778539",
+      "name": "补录路线-冷冻A区外围",
+      "createdAt": "2026-06-19T06:48:58.526Z",
+      "createdBy": "小陶",
+      "points": [
+        {
+          "x": 10,
+          "y": 10,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 10,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 35,
+          "z": 0
+        },
+        {
+          "x": 10,
+          "y": 35,
+          "z": 0
+        }
+      ],
+      "length": 0,
+      "linkedMeasurementId": null,
+      "linkedCADLayerId": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+      "lengthRecalculated": false,
+      "needsCustomerReview": true,
+      "customerReviewStatus": "pending",
+      "remark": "",
+      "status": "reviewing"
+    },
+    "after": {
+      "id": "5628cb35-c95e-49ef-bee7-c247e6778539",
+      "name": "补录路线-冷冻A区外围",
+      "createdAt": "2026-06-19T06:48:58.526Z",
+      "createdBy": "小陶",
+      "points": [
+        {
+          "x": 10,
+          "y": 10,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 10,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 35,
+          "z": 0
+        },
+        {
+          "x": 10,
+          "y": 35,
+          "z": 0
+        }
+      ],
+      "length": 85,
+      "linkedMeasurementId": null,
+      "linkedCADLayerId": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+      "lengthRecalculated": true,
+      "needsCustomerReview": true,
+      "customerReviewStatus": "pending",
+      "remark": "",
+      "status": "reviewing"
+    },
+    "diff": {
+      "length": {
+        "before": 0,
+        "after": 85
+      },
+      "lengthRecalculated": {
+        "before": false,
+        "after": true
+      }
+    },
+    "context": {
+      "originalValue": {
+        "length": 0,
+        "lengthRecalculated": false
+      },
+      "changedValue": {
+        "length": 85,
+        "lengthRecalculated": true
+      },
+      "reason": "重新计算补录路线长度",
+      "nextStep": "计算完成，请复核确认",
+      "reviewRequired": true
+    }
+  },
+  {
+    "id": "f6a8fa74-8da3-4fa8-8ced-1f841f15d41c",
+    "seq": 8,
+    "entityId": "5628cb35-c95e-49ef-bee7-c247e6778539",
+    "entityType": "SupplementaryRoute",
+    "operation": "customer_review",
+    "operator": "展陈客户",
+    "timestamp": "2026-06-19T06:48:58.528Z",
+    "before": {
+      "id": "5628cb35-c95e-49ef-bee7-c247e6778539",
+      "name": "补录路线-冷冻A区外围",
+      "createdAt": "2026-06-19T06:48:58.526Z",
+      "createdBy": "小陶",
+      "points": [
+        {
+          "x": 10,
+          "y": 10,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 10,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 35,
+          "z": 0
+        },
+        {
+          "x": 10,
+          "y": 35,
+          "z": 0
+        }
+      ],
+      "length": 85,
+      "linkedMeasurementId": null,
+      "linkedCADLayerId": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+      "lengthRecalculated": true,
+      "needsCustomerReview": true,
+      "customerReviewStatus": "pending",
+      "remark": "",
+      "status": "reviewing"
+    },
+    "after": {
+      "id": "5628cb35-c95e-49ef-bee7-c247e6778539",
+      "name": "补录路线-冷冻A区外围",
+      "createdAt": "2026-06-19T06:48:58.526Z",
+      "createdBy": "小陶",
+      "points": [
+        {
+          "x": 10,
+          "y": 10,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 10,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 35,
+          "z": 0
+        },
+        {
+          "x": 10,
+          "y": 35,
+          "z": 0
+        }
+      ],
+      "length": 85,
+      "linkedMeasurementId": null,
+      "linkedCADLayerId": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+      "lengthRecalculated": true,
+      "needsCustomerReview": false,
+      "customerReviewStatus": "approved",
+      "remark": "",
+      "status": "normal",
+      "reviewerRemark": "确认通过"
+    },
+    "diff": {
+      "needsCustomerReview": {
+        "before": true,
+        "after": false
+      },
+      "customerReviewStatus": {
+        "before": "pending",
+        "after": "approved"
+      },
+      "status": {
+        "before": "reviewing",
+        "after": "normal"
+      },
+      "reviewerRemark": {
+        "after": "确认通过"
+      }
+    },
+    "context": {
+      "originalValue": {
+        "customerReviewStatus": "pending",
+        "status": "reviewing"
+      },
+      "changedValue": {
+        "customerReviewStatus": "approved",
+        "status": "normal"
+      },
+      "reason": "客户复核通过",
+      "nextStep": "可继续导出流程",
+      "reviewRequired": false
+    }
+  }
+]

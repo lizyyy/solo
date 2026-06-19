@@ -1,13 +1,44 @@
 const { MeasurementRecord } = require('../models/MeasurementRecord');
 const { SupplementaryRoute } = require('../models/SupplementaryRoute');
-const { HistoryManager } = require('../utils/history');
+const { historyManager } = require('../utils/history');
 const { getUserFriendlyError } = require('../utils/errors');
+const { store } = require('../store/FileStore');
 
 class MeasurementService {
   constructor() {
-    this.records = [];
-    this.routes = [];
-    this.historyManager = new HistoryManager();
+    this.historyManager = historyManager;
+  }
+
+  _toRecord(plain) {
+    if (!plain) return null;
+    const rec = new MeasurementRecord({});
+    Object.assign(rec, plain);
+    return rec;
+  }
+
+  _toRoute(plain) {
+    if (!plain) return null;
+    const route = new SupplementaryRoute({});
+    Object.assign(route, plain);
+    return route;
+  }
+
+  _saveRecord(record) {
+    const existing = store.getById('measurementRecords', record.id);
+    if (existing) {
+      return store.update('measurementRecords', record.id, JSON.parse(JSON.stringify(record)));
+    } else {
+      return store.add('measurementRecords', JSON.parse(JSON.stringify(record)));
+    }
+  }
+
+  _saveRoute(route) {
+    const existing = store.getById('supplementaryRoutes', route.id);
+    if (existing) {
+      return store.update('supplementaryRoutes', route.id, JSON.parse(JSON.stringify(route)));
+    } else {
+      return store.add('supplementaryRoutes', JSON.parse(JSON.stringify(route)));
+    }
   }
 
   addMeasurementRecord(data, operator) {
@@ -15,7 +46,7 @@ class MeasurementService {
       ...data,
       recordedBy: operator
     });
-    this.records.push(record);
+    this._saveRecord(record);
     this.historyManager.createSnapshot(record, 'create', operator, null, {
       reason: '录入测距仪记录',
       nextStep: '关联到补录路线',
@@ -29,7 +60,7 @@ class MeasurementService {
       ...data,
       createdBy: operator
     });
-    this.routes.push(route);
+    this._saveRoute(route);
     this.historyManager.createSnapshot(route, 'create', operator, null, {
       reason: '创建补录路线',
       nextStep: '需要重新计算长度后再复核',
@@ -41,12 +72,13 @@ class MeasurementService {
   }
 
   recalculateRouteLength(routeId, operator) {
-    const route = this.routes.find(r => r.id === routeId);
+    const route = this.getRouteById(routeId);
     if (!route) return null;
 
     const before = JSON.parse(JSON.stringify(route));
     const oldLength = route.length;
     const newLength = route.recalculateLength();
+    this._saveRoute(route);
 
     this.historyManager.createSnapshot(route, 'recalculate_length', operator, { before, after: JSON.parse(JSON.stringify(route)) }, {
       reason: '重新计算补录路线长度',
@@ -59,7 +91,7 @@ class MeasurementService {
   }
 
   checkRouteForReview(routeId) {
-    const route = this.routes.find(r => r.id === routeId);
+    const route = this.getRouteById(routeId);
     if (!route) return { valid: false, message: '路线不存在' };
 
     if (route.needsLengthRecalculation()) {
@@ -75,11 +107,12 @@ class MeasurementService {
   }
 
   markRouteForCustomerReview(routeId, operator, reason = null) {
-    const route = this.routes.find(r => r.id === routeId);
+    const route = this.getRouteById(routeId);
     if (!route) return null;
 
     const before = JSON.parse(JSON.stringify(route));
     route.markForCustomerReview();
+    this._saveRoute(route);
 
     this.historyManager.createSnapshot(route, 'mark_for_review', operator, { before, after: JSON.parse(JSON.stringify(route)) }, {
       reason: reason || '补录路线需要客户复核',
@@ -92,11 +125,12 @@ class MeasurementService {
   }
 
   completeCustomerReview(routeId, operator, approved, remark = '') {
-    const route = this.routes.find(r => r.id === routeId);
+    const route = this.getRouteById(routeId);
     if (!route) return null;
 
     const before = JSON.parse(JSON.stringify(route));
     route.completeCustomerReview(approved, remark);
+    this._saveRoute(route);
 
     this.historyManager.createSnapshot(route, 'customer_review', operator, { before, after: JSON.parse(JSON.stringify(route)) }, {
       reason: approved ? '客户复核通过' : '客户复核未通过',
@@ -109,15 +143,25 @@ class MeasurementService {
   }
 
   getRouteById(routeId) {
-    return this.routes.find(r => r.id === routeId);
+    const plain = store.getById('supplementaryRoutes', routeId);
+    return this._toRoute(plain);
   }
 
   getRecordById(recordId) {
-    return this.records.find(r => r.id === recordId);
+    const plain = store.getById('measurementRecords', recordId);
+    return this._toRecord(plain);
   }
 
   getRoutesPendingReview() {
-    return this.routes.filter(r => r.needsCustomerReview);
+    return store.findMany('supplementaryRoutes', r => r.needsCustomerReview).map(p => this._toRoute(p));
+  }
+
+  getAllRoutes() {
+    return store.getAll('supplementaryRoutes').map(p => this._toRoute(p));
+  }
+
+  getAllRecords() {
+    return store.getAll('measurementRecords').map(p => this._toRecord(p));
   }
 
   getRouteHistory(routeId) {
@@ -184,6 +228,9 @@ class MeasurementService {
     const beforeMeasurement = JSON.parse(JSON.stringify(measurement));
     measurement.linkedRouteId = routeId;
 
+    this._saveRoute(route);
+    this._saveRecord(measurement);
+
     this.historyManager.createSnapshot(route, 'link_measurement', operator, { before: beforeRoute, after: JSON.parse(JSON.stringify(route)) }, {
       reason: '关联测距仪记录到补录路线',
       originalValue: { linkedMeasurementId: null },
@@ -202,4 +249,6 @@ class MeasurementService {
   }
 }
 
-module.exports = { MeasurementService };
+const measurementService = new MeasurementService();
+
+module.exports = { MeasurementService, measurementService };

@@ -1,0 +1,102 @@
+[
+  {
+    "id": "5f978b46-0320-4eb4-9aa7-0f9030a94123",
+    "viewId": "demo-view",
+    "exportedBy": "小陶",
+    "exportedAt": "2026-06-19T06:48:58.622Z",
+    "status": "completed",
+    "format": "png",
+    "fileName": "export_1781851738528.png",
+    "filePath": "/Users/lzy/pro/solo/workspaces/zy72295/public/exports/export_1781851738528.png",
+    "relativePath": "/exports/export_1781851738528.png",
+    "fileSize": 35533,
+    "zoneIds": [
+      "11deb6fc-23a7-44f4-ad21-7a933b3f8976"
+    ],
+    "zoneCount": 1,
+    "routeCount": 1,
+    "snapshot": {
+      "zones": [
+        {
+          "id": "11deb6fc-23a7-44f4-ad21-7a933b3f8976",
+          "name": "冷冻A区-三维",
+          "status": "draft",
+          "bounds": {
+            "minX": 10,
+            "maxX": 40,
+            "minY": 10,
+            "maxY": 35,
+            "minZ": 0,
+            "maxZ": 8
+          },
+          "temperatureRange": {
+            "min": -20,
+            "max": -15
+          },
+          "remark": "小陶备注：冷冻区温度偏低，需重点关注",
+          "layerId": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+          "routeId": "5628cb35-c95e-49ef-bee7-c247e6778539",
+          "color": "#3498db",
+          "latestOperation": {
+            "operation": "update_remark",
+            "operator": "小陶",
+            "timestamp": "2026-06-19T06:48:58.527Z",
+            "diff": {
+              "remark": {
+                "before": "",
+                "after": "小陶备注：冷冻区温度偏低，需重点关注"
+              }
+            },
+            "context": {
+              "originalValue": {
+                "remark": ""
+              },
+              "changedValue": {
+                "remark": "小陶备注：冷冻区温度偏低，需重点关注"
+              },
+              "reason": "运维人员修改备注",
+              "nextStep": "备注已更新，温区三维分层数据未变更",
+              "reviewRequired": false
+            }
+          },
+          "totalHistoryCount": 3,
+          "hasPendingReview": true
+        }
+      ],
+      "routes": [
+        {
+          "id": "5628cb35-c95e-49ef-bee7-c247e6778539",
+          "name": "补录路线-冷冻A区外围",
+          "length": 85,
+          "lengthRecalculated": true,
+          "needsCustomerReview": false,
+          "customerReviewStatus": "approved",
+          "status": "normal",
+          "linkedMeasurementId": null,
+          "linkedCADLayerId": "a5d59200-fe4c-4b75-ab94-3d00b15fae40",
+          "remark": "",
+          "latestOperation": {
+            "operation": "customer_review",
+            "operator": "展陈客户",
+            "timestamp": "2026-06-19T06:48:58.528Z",
+            "context": {
+              "originalValue": {
+                "customerReviewStatus": "pending",
+                "status": "reviewing"
+              },
+              "changedValue": {
+                "customerReviewStatus": "approved",
+                "status": "normal"
+              },
+              "reason": "客户复核通过",
+              "nextStep": "可继续导出流程",
+              "reviewRequired": false
+            }
+          },
+          "totalHistoryCount": 4
+        }
+      ],
+      "exportedAt": "2026-06-19T06:48:58.622Z"
+    }
+  }
+]

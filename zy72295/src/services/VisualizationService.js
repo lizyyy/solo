@@ -43,11 +43,6 @@ class VisualizationService {
   }
 
   clickZoneInView(viewId, zoneId) {
-    const view = this.activeViews.get(viewId);
-    if (!view) {
-      return { success: false, message: '视图不存在' };
-    }
-
     const zone = this.temperatureZoneService.getZoneById(zoneId);
     if (!zone) {
       return { success: false, message: getUserFriendlyError('THREE_D_LINK_BROKEN') };
@@ -56,12 +51,16 @@ class VisualizationService {
     const sourceData = this._getSourceData(zone);
     const zoneSummary = this.temperatureZoneService.getZoneSummary(zoneId);
 
+    const view = this.activeViews.get(viewId);
+    const viewInfo = view ? { viewId: view.id, viewType: view.type } : null;
+
     if (sourceData.route && sourceData.route.needsLengthRecalculation()) {
       return {
         success: true,
         zone,
         zoneSummary,
         sourceData,
+        viewInfo,
         needsReview: true,
         reviewContext: {
           issue: getUserFriendlyError('ROUTE_LENGTH_NOT_RECALCULATED'),
@@ -79,6 +78,7 @@ class VisualizationService {
         zone,
         zoneSummary,
         sourceData,
+        viewInfo,
         needsReview: true,
         reviewContext: {
           issue: '该路线正处于客户复核中，请勿提前归为正常',
@@ -95,6 +95,7 @@ class VisualizationService {
       zone,
       zoneSummary,
       sourceData,
+      viewInfo,
       needsReview: false
     };
   }
