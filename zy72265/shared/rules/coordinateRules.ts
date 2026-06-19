@@ -12,6 +12,10 @@ const METRIC_PATTERNS = [
   /y\s*[=:]\s*[-+]?\d+\.?\d*/i,
 ];
 
+const LAT_LNG_UNIT_MARKERS = /[°"'NESW]/i;
+const METRIC_UNIT_MARKERS = /[m米]/i;
+const TRAILING_ZERO_PATTERN = /\.\d*0{2,}$/;
+
 const LNG_RANGE = { min: -180, max: 180 };
 const LAT_RANGE = { min: -90, max: 90 };
 
@@ -54,6 +58,25 @@ function looksStronglyLikeLatLng(x: number, y: number): boolean {
   return Math.abs(x) > STRONGLY_LIKE_LNG_THRESHOLD;
 }
 
+function splitCoordPair(rawValue: string): [string, string] {
+  const parts = rawValue.split(/[,]/).map(p => p.trim());
+  return [parts[0] || '', parts[1] || ''];
+}
+
+function hasTrailingEngineeringZeros(value: string): boolean {
+  return TRAILING_ZERO_PATTERN.test(value.trim());
+}
+
+function hasAsymmetricUnitMarker(
+  rawValue: string,
+  markerRegex: RegExp
+): boolean {
+  const [left, right] = splitCoordPair(rawValue);
+  const leftHas = markerRegex.test(left);
+  const rightHas = markerRegex.test(right);
+  return leftHas !== rightHas;
+}
+
 export function detectCoordinateType(rawValue: string): DetectionResult {
   const { x, y } = parseNumbers(rawValue);
   
@@ -66,10 +89,17 @@ export function detectCoordinateType(rawValue: string): DetectionResult {
   const stronglyLatLng = looksStronglyLikeLatLng(x, y);
   
   const anyOutsideLatLngRange = !xInLngRange || !yInLatRange;
-  
+
+  const asymmetricMetricMarker = hasAsymmetricUnitMarker(rawValue, METRIC_UNIT_MARKERS);
+  const asymmetricLatLngMarker = hasAsymmetricUnitMarker(rawValue, LAT_LNG_UNIT_MARKERS);
+  const [leftPart, rightPart] = splitCoordPair(rawValue);
+  const hasEngineeringPrecision = hasTrailingEngineeringZeros(leftPart) || hasTrailingEngineeringZeros(rightPart);
+
   const isMixed = (hasLatLngMark && hasMetricMark)
     || (stronglyLatLng && hasMetricMark)
-    || (hasLatLngMark && anyOutsideLatLngRange);
+    || (hasLatLngMark && anyOutsideLatLngRange)
+    || asymmetricMetricMarker
+    || (asymmetricLatLngMarker && hasEngineeringPrecision);
   
   const isMetric = !isMixed && ((hasMetricMark || anyOutsideLatLngRange) && !hasLatLngMark);
   
@@ -151,9 +181,9 @@ export const COORDINATE_RULES = [
     id: 'rule_003',
     ruleType: 'DETECTION' as const,
     ruleName: '坐标混合检测',
-    condition: '同一条记录中同时检测到经纬度格式和米制格式',
+    condition: '①同时有经纬度和米制标记；②经度>50且有米制标记；③有经纬度标记但数值超范围；④m/米单位不对称（一个有一个没有）；⑤°符号不对称且数值含工程精度尾随零（如x.xx00）',
     action: '标记 is_mixed=1，status=INSPECTION_REVIEW',
-    codeReference: 'shared/rules/coordinateRules.ts:50-72',
+    codeReference: 'shared/rules/coordinateRules.ts:80-118',
     description: '检测坐标混合情况，留待巡检组复核',
   },
   {

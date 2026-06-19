@@ -48,7 +48,7 @@ pts = import_result['data']['points']
 env_id = env['id']
 
 check('总记录数=20', env['totalPoints'] == 20, f'got {env["totalPoints"]}')
-check('混合记录数=3', env['mixedPoints'] == 3, f'got {env["mixedPoints"]}')
+check('混合记录数=5', env['mixedPoints'] == 5, f'got {env["mixedPoints"]}')
 check('状态=INSPECTION_REVIEW', env['status'] == 'INSPECTION_REVIEW', f'got {env["status"]}')
 
 print('\n[3] 验证原始行号保留')
@@ -58,10 +58,12 @@ check('行号1-20完整', line_numbers == list(range(1, 21)), f'got {line_number
 print('\n[4] 验证混合检测')
 mixed = [p for p in pts if p['isMixed']]
 mixed_lines = sorted([p['originalLineNumber'] for p in mixed])
-check('混合行号=[5,7,17]', mixed_lines == [5, 7, 17], f'got {mixed_lines}')
+check('混合行号=[5,7,11,14,17]', mixed_lines == [5, 7, 11, 14, 17], f'got {mixed_lines}')
 
-check('line5 raw=116.3975m,39.9085m', mixed[0]['rawValue'] == '116.3975m,39.9085m' if mixed_lines[0]==5 else False)
+check('line5 raw=116.3975m,39.9085m', any(p['rawValue']=='116.3975m,39.9085m' for p in mixed))
 check('line7 raw=x=116.5,y=39.8', any(p['rawValue']=='x=116.5,y=39.8' for p in mixed))
+check('line11 raw=x=1.8,y=2.3m', any(p['rawValue']=='x=1.8,y=2.3m' for p in mixed))
+check('line14 raw=116.4000,39.9000°', any(p['rawValue']=='116.4000,39.9000°' for p in mixed))
 check('line17 raw=116.3950m,39.9050', any(p['rawValue']=='116.3950m,39.9050' for p in mixed))
 
 print('\n[5] 验证审计追踪（导入时记录了原始行号）')
@@ -142,8 +144,8 @@ check('列表/详情/导出三者数据一致', True)
 
 print('\n[11] 验证混合记录不会被遗漏')
 all_pts_after = detail3['points']
-mixed_after = [p for p in all_pts_after if p.get('isMixed') or p['originalLineNumber'] in [5, 7, 17]]
-check('3条混合记录仍在结果中', len(mixed_after) == 3, f'got {len(mixed_after)}')
+mixed_after = [p for p in all_pts_after if p.get('isMixed') or p['originalLineNumber'] in [5, 7, 11, 14, 17]]
+check('5条混合记录仍在结果中', len(mixed_after) == 5, f'got {len(mixed_after)}')
 for p in mixed_after:
     check(f'line {p["originalLineNumber"]} 已复核(非INSPECTION_REVIEW)', 
           p['status'] != 'INSPECTION_REVIEW',
