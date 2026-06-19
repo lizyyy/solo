@@ -1,12 +1,12 @@
 {
   "step": "step3_summary",
-  "generated_by": "汇总员小李",
-  "timestamp": "2026-06-08T20:03:20.233927",
+  "generated_by": "汇总员小李_回滚后",
+  "timestamp": "2026-06-19T08:36:12.588879",
   "total_records": 4,
-  "normal_count": 1,
+  "normal_count": 0,
   "boundary_count": 0,
   "risk_review_required_count": 1,
-  "pending_count": 2,
+  "pending_count": 3,
   "boundary_rules": [
     {
       "name": "zero_amount_with_reversal_note",
@@ -18,7 +18,7 @@
       "name": "negative_amount",
       "type": "negative_amount",
       "description": "金额为负数时，标记为需风控复核",
-      "has_rollback": false
+      "has_rollback": true
     }
   ],
   "records_summary": [
@@ -35,10 +35,10 @@
       "boundary_note": null,
       "original_row_number": 2,
       "source_file": "sample_ex_dividend.xlsx",
-      "import_timestamp": "2026-06-08T20:02:47.247016",
+      "import_timestamp": "2026-06-19T08:36:08.671044",
       "change_count": 1,
       "last_editor": "操作员小张",
-      "updated_at": "2026-06-08T20:02:47.247582"
+      "updated_at": "2026-06-19T08:36:08.671173"
     },
     {
       "record_id": "f608676be31d9b1b",
@@ -48,15 +48,15 @@
       "remark": "已冲正以前质押",
       "tax_rate": null,
       "tax_amount": null,
-      "status": "normal",
-      "boundary_type": "zero_amount_with_reversal_note",
-      "boundary_note": "已复核通过: 确认已冲正，真实业务无误",
+      "status": "pending",
+      "boundary_type": null,
+      "boundary_note": null,
       "original_row_number": 3,
       "source_file": "sample_ex_dividend.xlsx",
-      "import_timestamp": "2026-06-08T20:02:47.247016",
-      "change_count": 3,
+      "import_timestamp": "2026-06-19T08:36:08.671044",
+      "change_count": 4,
       "last_editor": "风控老秦",
-      "updated_at": "2026-06-08T20:03:15.547832"
+      "updated_at": "2026-06-19T08:36:11.121072"
     },
     {
       "record_id": "d0ba9b36e7b79df1",
@@ -71,10 +71,10 @@
       "boundary_note": null,
       "original_row_number": 4,
       "source_file": "sample_ex_dividend.xlsx",
-      "import_timestamp": "2026-06-08T20:02:47.247016",
+      "import_timestamp": "2026-06-19T08:36:08.671044",
       "change_count": 3,
       "last_editor": "风控值班老秦",
-      "updated_at": "2026-06-08T20:03:07.178026"
+      "updated_at": "2026-06-19T08:36:09.702626"
     },
     {
       "record_id": "dc02c37762d933bb",
@@ -89,10 +89,10 @@
       "boundary_note": "金额为负数，需风控复核",
       "original_row_number": 5,
       "source_file": "sample_ex_dividend.xlsx",
-      "import_timestamp": "2026-06-08T20:02:47.247016",
+      "import_timestamp": "2026-06-19T08:36:08.671044",
       "change_count": 2,
       "last_editor": "system",
-      "updated_at": "2026-06-08T20:02:47.248138"
+      "updated_at": "2026-06-19T08:36:08.671543"
     }
   ]
 }

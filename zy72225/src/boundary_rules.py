@@ -101,6 +101,26 @@ def _action_negative_amount(record: ReleaseRecord, operator: str) -> None:
     record.add_change_log(change_log)
 
 
+def _rollback_negative_amount(record: ReleaseRecord, operator: str) -> None:
+    old_status = record.status
+    old_boundary = record.boundary_type
+    old_note = record.boundary_note
+
+    record.status = ProcessStatus.PENDING
+    record.boundary_type = None
+    record.boundary_note = None
+
+    change_log = ChangeLog(
+        change_type=ChangeType.ROLLBACK,
+        operator=operator,
+        field_name="status_and_boundary",
+        old_value={"status": old_status.value, "boundary_type": old_boundary.value if old_boundary else None, "note": old_note},
+        new_value={"status": record.status.value, "boundary_type": None, "note": None},
+        reason="回滚边界规则：金额为负数",
+    )
+    record.add_change_log(change_log)
+
+
 class BoundaryRuleEngine:
     def __init__(self):
         self.rules: List[BoundaryRule] = []
@@ -122,6 +142,7 @@ class BoundaryRuleEngine:
             check_func=_check_negative_amount,
             action_func=_action_negative_amount,
             description="金额为负数时，标记为需风控复核",
+            rollback_func=_rollback_negative_amount,
         ))
 
     def add_rule(self, rule: BoundaryRule) -> None:

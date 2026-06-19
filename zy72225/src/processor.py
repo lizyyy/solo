@@ -269,6 +269,77 @@ class ReleaseScheduleProcessor:
             "timestamp": datetime.now().isoformat(),
         }
 
+    def rollback_boundary_case(
+        self,
+        record_id: str,
+        operator: str,
+        rollback_reason: str,
+    ) -> Dict[str, Any]:
+        if record_id not in self.records:
+            raise ValueError(f"记录不存在: {record_id}")
+
+        record = self.records[record_id]
+        if record.boundary_type is None:
+            raise ValueError(
+                f"记录 {record_id} 当前未标记任何边界规则，无法回滚。"
+                f"当前 status={record.status.value}, boundary_type=None"
+            )
+
+        rule = self.rule_engine.get_rule_by_type(record.boundary_type)
+        if rule is None or rule.rollback_func is None:
+            raise ValueError(
+                f"边界规则 {record.boundary_type.value} 暂不支持回滚，"
+                f"请联系开发人员补全 rollback_func"
+            )
+
+        old_status = record.status
+        old_boundary_type = record.boundary_type
+        old_boundary_note = record.boundary_note
+
+        rollback_success = self.rule_engine.rollback_rule(
+            record, record.boundary_type, operator
+        )
+        if not rollback_success:
+            raise RuntimeError(f"回滚失败: record_id={record_id}, rule_type={record.boundary_type.value}")
+
+        additional_note_log = ChangeLog(
+            change_type=ChangeType.MANUAL_EDIT,
+            operator=operator,
+            field_name="rollback_reason",
+            old_value=None,
+            new_value=rollback_reason,
+            reason=f"边界规则回滚补充说明: {rollback_reason}",
+        )
+        record.add_change_log(additional_note_log)
+
+        self._save_records()
+
+        self._add_audit_log("rollback_boundary_case", operator, {
+            "record_id": record_id,
+            "rollback_from": {
+                "status": old_status.value,
+                "boundary_type": old_boundary_type.value if old_boundary_type else None,
+                "boundary_note": old_boundary_note,
+            },
+            "rollback_to": {
+                "status": record.status.value,
+                "boundary_type": record.boundary_type.value if record.boundary_type else None,
+                "boundary_note": record.boundary_note,
+            },
+            "rollback_reason": rollback_reason,
+        })
+
+        return {
+            "action": "rollback_boundary_case",
+            "record_id": record_id,
+            "rolled_back_by": operator,
+            "rolled_back_rule": old_boundary_type.value if old_boundary_type else None,
+            "rollback_reason": rollback_reason,
+            "status_before": old_status.value,
+            "status_after": record.status.value,
+            "timestamp": datetime.now().isoformat(),
+        }
+
     def get_record_history(self, record_id: str) -> Dict[str, Any]:
         if record_id not in self.records:
             raise ValueError(f"记录不存在: {record_id}")

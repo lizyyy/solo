@@ -62,6 +62,16 @@ def cmd_reject(args):
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
+def cmd_rollback(args):
+    processor = ReleaseScheduleProcessor(data_dir=args.data_dir)
+    result = processor.rollback_boundary_case(
+        record_id=args.record_id,
+        operator=args.operator,
+        rollback_reason=args.reason,
+    )
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+
+
 def cmd_history(args):
     processor = ReleaseScheduleProcessor(data_dir=args.data_dir)
     history = processor.get_record_history(record_id=args.record_id)
@@ -104,6 +114,9 @@ def main():
 
   # 复核通过边界案例
   python -m src.cli approve -r <record_id> -o 老秦 --note "确认已冲正"
+
+  # 回滚误触发的边界规则（如误判的"金额为0且备注已冲正"）
+  python -m src.cli rollback -r <record_id> -o 老秦 --reason "备注为'已冲正'是正常业务，需撤销边界标记"
 
   # 查看单条记录完整历史
   python -m src.cli history -r <record_id>
@@ -150,6 +163,22 @@ def main():
     reject_parser.add_argument("-o", "--operator", required=True, help="操作人")
     reject_parser.add_argument("--reason", required=True, help="驳回原因")
     reject_parser.set_defaults(func=cmd_reject)
+
+    rollback_parser = subparsers.add_parser(
+        "rollback",
+        help="回滚误触发的边界规则（如误判的'金额为0且备注已冲正'）",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description="""回滚边界规则触发结果：
+  - 回滚对象: record_id 对应记录当前的 boundary_type
+  - 回滚前状态: RISK_REVIEW_REQUIRED (或其他规则设置的状态)
+  - 回滚后状态: PENDING（待处理，边界标记清除）
+  - 历史中会留下 change_type=ROLLBACK 的日志和补充的回滚原因说明
+""",
+    )
+    rollback_parser.add_argument("-r", "--record-id", required=True, help="要回滚的记录ID")
+    rollback_parser.add_argument("-o", "--operator", required=True, help="执行回滚的操作人")
+    rollback_parser.add_argument("--reason", required=True, help="回滚原因（将写入历史，用于向负责人解释）")
+    rollback_parser.set_defaults(func=cmd_rollback)
 
     history_parser = subparsers.add_parser("history", help="查看记录完整历史")
     history_parser.add_argument("-r", "--record-id", required=True, help="记录ID")

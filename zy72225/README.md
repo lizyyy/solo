@@ -51,7 +51,7 @@
 - **触发条件**: `金额 < 0`
 - **处理结果**: 标记为 `RISK_REVIEW_REQUIRED`（需风控复核）
 - **代码位置**: [boundary_rules.py](file:///Users/lzy/pro/solo/workspaces/zy72225/src/boundary_rules.py#L81-L101)
-- **支持回滚**: 否
+- **支持回滚**: 是
 
 ---
 
@@ -116,6 +116,75 @@ python -m src.cli approve -r <记录ID> -o 老秦 --note "确认已冲正，真�
 ```bash
 python -m src.cli reject -r <记录ID> -o 老秦 --reason "冲正凭证不符，退回重查"
 ```
+
+---
+
+## 边界规则回滚（判错或误触发时使用）
+
+> 适用场景：规则误触发（如金额为 0 但备注里的"已冲正"其实是正常业务）、或风控复核时需要把记录**退回待处理状态**而不是 approve / reject。
+
+### 命令格式
+```bash
+python -m src.cli rollback -r <记录ID> -o <操作人> --reason <回滚原因>
+```
+
+| 参数 | 必填 | 说明 |
+|------|------|------|
+| `-r / --record-id` | ✅ | 要回滚的记录 ID（从 `list-risk-review` 或 `history` 中获取） |
+| `-o / --operator` | ✅ | 执行回滚的操作人，记入审计日志 |
+| `--reason` | ✅ | 回滚原因，将写入历史记录，用于向负责人解释"为什么回滚" |
+
+### 回滚对象
+对 record_id 对应记录**当前挂着的** `boundary_type` 执行回滚（根据该字段自动匹配对应的规则，无需手工指定规则名）。
+
+### 回滚前后状态对比
+
+| 字段 | 回滚前 | 回滚后 |
+|------|--------|--------|
+| `status` | `risk_review_required` | `pending`（重新回到待处理） |
+| `boundary_type` | `zero_amount_with_reversal_note` / `negative_amount` | `null`（清除边界标记） |
+| `boundary_note` | 规则自动写入的提示 | `null`（清除提示） |
+| `change_history` | 追加 1 条 `change_type=ROLLBACK` 日志 + 1 条 `rollback_reason` 补充说明 | 不变 |
+
+### 历史记录里会留下什么
+`python -m src.cli history -r <记录ID>` 能看到：
+
+1. **ROLLBACK 日志**：
+   - `old_value.status = "risk_review_required"`
+   - `new_value.status = "pending"`
+   - `operator = 执行回滚的操作人`
+   - `reason = "回滚边界规则：金额为0但备注写着已冲正"`（或对应的规则名）
+
+2. **rollback_reason 补充说明**：
+   - `field_name = "rollback_reason"`
+   - `new_value = --reason 参数传入的解释文字`（向负责人解释时直接引用）
+
+### 示例：回滚误触发的"金额为0且备注已冲正"
+```bash
+# 1) 查看待复核列表，找到被误标记的记录
+python3 -m src.cli list-risk-review
+
+# 2) 执行回滚
+python3 -m src.cli rollback \
+  -r f608676be31d9b1b \
+  -o 风控老秦 \
+  --reason "备注中'已冲正'是正常业务备注，并非异常，需撤销边界标记"
+
+# 3) 回滚后待复核列表中这条记录应该消失
+python3 -m src.cli list-risk-review
+
+# 4) 查看历史确认回滚轨迹
+python3 -m src.cli history -r f608676be31d9b1b
+
+# 5) 重新生成负责人摘要，摘要计数会跟着回滚变化
+python3 -m src.cli summary -o 汇总人
+```
+
+### 负责人摘要如何随回滚变化
+- `risk_review_required_count`：回滚 1 条后 **-1**
+- `pending_count`：回滚 1 条后 **+1**
+- 每条 `records_summary` 中：`status`、`boundary_type`、`boundary_note` 都更新为回滚后的值
+- `boundary_rules[].has_rollback` 中注明该规则是否支持回滚
 
 ---
 

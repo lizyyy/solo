@@ -14,7 +14,7 @@
       "original_snapshot": {
         "row_number": 2,
         "source_file": "sample_ex_dividend.xlsx",
-        "import_timestamp": "2026-06-08T20:02:47.247016",
+        "import_timestamp": "2026-06-19T08:36:08.671044",
         "raw_data": {
           "ex_dividend_date": "2024-06-15",
           "bill_number": "PJ202406001",
@@ -26,18 +26,18 @@
       },
       "change_history": [
         {
-          "timestamp": "2026-06-08T20:02:47.247570",
+          "timestamp": "2026-06-19T08:36:08.671169",
           "change_type": "import",
           "operator": "操作员小张",
           "field_name": null,
           "old_value": null,
           "new_value": "record_created",
           "reason": "首次导入除权日截图",
-          "batch_id": "batch_20260608_200247"
+          "batch_id": "batch_20260619_083608"
         }
       ],
-      "created_at": "2026-06-08T20:02:47.247561",
-      "updated_at": "2026-06-08T20:02:47.247582",
+      "created_at": "2026-06-19T08:36:08.671165",
+      "updated_at": "2026-06-19T08:36:08.671173",
       "last_editor": "操作员小张"
     },
     {
@@ -48,13 +48,13 @@
       "remark": "已冲正以前质押",
       "tax_rate": null,
       "tax_amount": null,
-      "status": "normal",
-      "boundary_type": "zero_amount_with_reversal_note",
-      "boundary_note": "已复核通过: 确认已冲正，真实业务无误",
+      "status": "pending",
+      "boundary_type": null,
+      "boundary_note": null,
       "original_snapshot": {
         "row_number": 3,
         "source_file": "sample_ex_dividend.xlsx",
-        "import_timestamp": "2026-06-08T20:02:47.247016",
+        "import_timestamp": "2026-06-19T08:36:08.671044",
         "raw_data": {
           "ex_dividend_date": "2024-06-15",
           "bill_number": "PJ202406002",
@@ -66,17 +66,17 @@
       },
       "change_history": [
         {
-          "timestamp": "2026-06-08T20:02:47.247685",
+          "timestamp": "2026-06-19T08:36:08.671229",
           "change_type": "import",
           "operator": "操作员小张",
           "field_name": null,
           "old_value": null,
           "new_value": "record_created",
           "reason": "首次导入除权日截图",
-          "batch_id": "batch_20260608_200247"
+          "batch_id": "batch_20260619_083608"
         },
         {
-          "timestamp": "2026-06-08T20:02:47.248119",
+          "timestamp": "2026-06-19T08:36:08.671533",
           "change_type": "boundary_rule_applied",
           "operator": "system",
           "field_name": "status_and_boundary",
@@ -92,18 +92,36 @@
           "batch_id": null
         },
         {
-          "timestamp": "2026-06-08T20:03:15.547758",
-          "change_type": "status_change",
+          "timestamp": "2026-06-19T08:36:11.121059",
+          "change_type": "rollback",
           "operator": "风控老秦",
-          "field_name": "status",
-          "old_value": "risk_review_required",
-          "new_value": "normal",
-          "reason": "风控复核通过: 确认已冲正，真实业务无误",
+          "field_name": "status_and_boundary",
+          "old_value": {
+            "status": "risk_review_required",
+            "boundary_type": "zero_amount_with_reversal_note",
+            "note": "金额为0但备注含'冲正'字样，需风控复核确认，不得自动归为正常"
+          },
+          "new_value": {
+            "status": "pending",
+            "boundary_type": null,
+            "note": null
+          },
+          "reason": "回滚边界规则：金额为0但备注写着已冲正",
+          "batch_id": null
+        },
+        {
+          "timestamp": "2026-06-19T08:36:11.121071",
+          "change_type": "manual_edit",
+          "operator": "风控老秦",
+          "field_name": "rollback_reason",
+          "old_value": null,
+          "new_value": "人工核实：备注'已冲正以前质押'是正常业务备注，规则误触发",
+          "reason": "边界规则回滚补充说明: 人工核实：备注'已冲正以前质押'是正常业务备注，规则误触发",
           "batch_id": null
         }
       ],
-      "created_at": "2026-06-08T20:02:47.247681",
-      "updated_at": "2026-06-08T20:03:15.547832",
+      "created_at": "2026-06-19T08:36:08.671227",
+      "updated_at": "2026-06-19T08:36:11.121072",
       "last_editor": "风控老秦"
     },
     {
@@ -120,7 +138,7 @@
       "original_snapshot": {
         "row_number": 4,
         "source_file": "sample_ex_dividend.xlsx",
-        "import_timestamp": "2026-06-08T20:02:47.247016",
+        "import_timestamp": "2026-06-19T08:36:08.671044",
         "raw_data": {
           "ex_dividend_date": "2024-06-16",
           "bill_number": "PJ202406003",
@@ -132,38 +150,38 @@
       },
       "change_history": [
         {
-          "timestamp": "2026-06-08T20:02:47.247760",
+          "timestamp": "2026-06-19T08:36:08.671271",
           "change_type": "import",
           "operator": "操作员小张",
           "field_name": null,
           "old_value": null,
           "new_value": "record_created",
           "reason": "首次导入除权日截图",
-          "batch_id": "batch_20260608_200247"
+          "batch_id": "batch_20260619_083608"
         },
         {
-          "timestamp": "2026-06-08T20:03:07.178008",
+          "timestamp": "2026-06-19T08:36:09.702612",
           "change_type": "manual_edit",
           "operator": "风控值班老秦",
           "field_name": "tax_rate",
           "old_value": null,
           "new_value": 0.06,
-          "reason": "核对完税凭证后补录",
+          "reason": "核对完税凭证后补录税费率",
           "batch_id": null
         },
         {
-          "timestamp": "2026-06-08T20:03:07.178023",
+          "timestamp": "2026-06-19T08:36:09.702625",
           "change_type": "manual_edit",
           "operator": "风控值班老秦",
           "field_name": "remark",
           "old_value": "待补税费率",
           "new_value": "已补税费率6%，核对完税凭证",
-          "reason": "核对完税凭证后补录",
+          "reason": "核对完税凭证后补录税费率",
           "batch_id": null
         }
       ],
-      "created_at": "2026-06-08T20:02:47.247758",
-      "updated_at": "2026-06-08T20:03:07.178026",
+      "created_at": "2026-06-19T08:36:08.671269",
+      "updated_at": "2026-06-19T08:36:09.702626",
       "last_editor": "风控值班老秦"
     },
     {
@@ -180,7 +198,7 @@
       "original_snapshot": {
         "row_number": 5,
         "source_file": "sample_ex_dividend.xlsx",
-        "import_timestamp": "2026-06-08T20:02:47.247016",
+        "import_timestamp": "2026-06-19T08:36:08.671044",
         "raw_data": {
           "ex_dividend_date": "2024-06-16",
           "bill_number": "PJ202406004",
@@ -192,17 +210,17 @@
       },
       "change_history": [
         {
-          "timestamp": "2026-06-08T20:02:47.247820",
+          "timestamp": "2026-06-19T08:36:08.671313",
           "change_type": "import",
           "operator": "操作员小张",
           "field_name": null,
           "old_value": null,
           "new_value": "record_created",
           "reason": "首次导入除权日截图",
-          "batch_id": "batch_20260608_200247"
+          "batch_id": "batch_20260619_083608"
         },
         {
-          "timestamp": "2026-06-08T20:02:47.248136",
+          "timestamp": "2026-06-19T08:36:08.671541",
           "change_type": "boundary_rule_applied",
           "operator": "system",
           "field_name": "status_and_boundary",
@@ -218,8 +236,8 @@
           "batch_id": null
         }
       ],
-      "created_at": "2026-06-08T20:02:47.247817",
-      "updated_at": "2026-06-08T20:02:47.248138",
+      "created_at": "2026-06-19T08:36:08.671312",
+      "updated_at": "2026-06-19T08:36:08.671543",
       "last_editor": "system"
     }
   ]
