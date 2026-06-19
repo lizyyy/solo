@@ -14,23 +14,22 @@ export function getById(id: string) {
   return db.prepare('SELECT * FROM ledger_records WHERE id = ?').get(id)
 }
 
-export function importRecords(records: any[], operator = 'system') {
+export function importRecords(records: any[], filename = 'unknown.json', operator = 'system') {
   const db = getDb()
   const now = new Date().toISOString()
   const insertRecord = db.prepare(`
     INSERT INTO ledger_records (id, trade_no, institution_name_source1, institution_name_source2, institution_name_consistent, ex_rights_date, extension_date, tax_rate, tax_rate_remark, tax_rate_source, status, created_at, updated_at)
     VALUES (@id, @trade_no, @institution_name_source1, @institution_name_source2, @institution_name_consistent, @ex_rights_date, @extension_date, @tax_rate, @tax_rate_remark, @tax_rate_source, @status, @created_at, @updated_at)
   `)
-  const insertLog = db.prepare(`
-    INSERT INTO operation_logs (id, record_id, action, detail, cli_command, operator, timestamp)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `)
 
   const transaction = db.transaction(() => {
+    const recordIds: string[] = []
+    const details: string[] = []
     for (const r of records) {
       const consistent = r.institution_name_source1 === r.institution_name_source2 ? 1 : 0
       const status = consistent ? 'normal' : 'inconsistent'
       const id = uuidv4()
+      recordIds.push(id)
 
       insertRecord.run({
         id,
@@ -48,12 +47,20 @@ export function importRecords(records: any[], operator = 'system') {
         updated_at: now,
       })
 
-      const cliCommand = `npm run cli -- import --file ${r.trade_no}`
-      const detail = consistent
-        ? `导入记录 ${r.trade_no}，机构简称一致`
-        : `导入记录 ${r.trade_no}，机构简称不一致：${r.institution_name_source1} vs ${r.institution_name_source2}`
-      insertLog.run(uuidv4(), id, 'import', detail, cliCommand, operator, now)
+      if (consistent) {
+        details.push(`${r.trade_no} 一致`)
+      } else {
+        details.push(`${r.trade_no} 不一致：${r.institution_name_source1} vs ${r.institution_name_source2}`)
+      }
     }
+
+    const cliCommand = `npm run cli -- import --file ${filename}`
+    const detail = `导入${records.length}条展期记录（${details.join('；')}）`
+    const insertLog = db.prepare(`
+      INSERT INTO operation_logs (id, record_id, action, detail, cli_command, operator, timestamp)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `)
+    insertLog.run(uuidv4(), null, 'import', detail, cliCommand, operator, now)
   })
 
   transaction()

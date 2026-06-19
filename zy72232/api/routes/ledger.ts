@@ -51,8 +51,8 @@ router.get('/screenshot-by-record/:recordId', (req: Request, res: Response): voi
 
 router.post('/import', (req: Request, res: Response): void => {
   try {
-    const { records, operator } = req.body
-    ledger.importRecords(records, operator)
+    const { records, operator, filename } = req.body
+    ledger.importRecords(records, filename || 'unknown.json', operator)
     res.json({ success: true, data: null })
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message })

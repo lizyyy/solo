@@ -44,7 +44,7 @@ export function seedDemoData(): void {
     `)
 
     const t1 = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
-    insertLog.run(uuidv4(), null, 'import', '导入3条展期记录', 'npm run cli -- import --file batch-2024.xlsx', 'system', t1)
+    insertLog.run(uuidv4(), null, 'import', '导入3条展期记录（TX-2024-001 一致；TX-2024-002 不一致：中信建投证券 vs 中信建投；TX-2024-003 一致）', 'npm run cli -- import --file data/demo-import.json', 'system', t1)
 
     const t2 = new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString()
     insertLog.run(uuidv4(), r2, 'detect', '检测到 TX-2024-002 机构简称不一致：中信建投证券 vs 中信建投', 'npm run cli -- detect --record TX-2024-002', 'system', t2)

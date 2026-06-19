@@ -63,7 +63,7 @@ switch (command) {
       console.error('JSON 文件内容必须为数组')
       process.exit(1)
     }
-    ledger.importRecords(records, operator)
+    ledger.importRecords(records, filePath, operator)
     console.log(`成功导入 ${records.length} 条记录`)
     break
   }

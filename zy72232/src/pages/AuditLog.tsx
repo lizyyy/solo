@@ -14,7 +14,7 @@ const ACTION_CONFIG: Record<OperationLog['action'], { label: string; color: stri
 }
 
 const CLI_TEMPLATES = [
-  'npm run cli -- import --file <filename>',
+  'npm run cli -- import --file data/demo-import.json',
   'npm run cli -- detect --all',
   'npm run cli -- detect --record <trade_no>',
   'npm run cli -- supplement --record <trade_no> --rate <rate> --remark "<remark>"',
