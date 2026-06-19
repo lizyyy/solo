@@ -1,11 +1,11 @@
 [
   {
-    "record_id": "408568bf5844fe8b",
-    "photo_id": "67e377c05dc89714",
+    "record_id": "dce89dab0e437355",
+    "photo_id": "9ce2f952bac22ae1",
     "change_type": "导入（新增）",
     "old_snapshot": {},
     "new_snapshot": {
-      "photo_id": "67e377c05dc89714",
+      "photo_id": "9ce2f952bac22ae1",
       "intersection_name": "中山路与人民路交叉口",
       "import_type": "新增",
       "current_status": "已导入",
@@ -14,19 +14,19 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-20T07:26:45.263309"
+      "updated_at": "2026-06-20T07:26:21.144085"
     },
     "operator": "市政巡检员-小付",
-    "change_timestamp": "2026-06-20T07:26:45.263317",
-    "description": "首次导入（新增）: 中山路与人民路交叉口，源=demo_batch_1.csv 第 1 行"
+    "change_timestamp": "2026-06-20T07:26:21.144097",
+    "description": "首次导入（新增）: 中山路与人民路交叉口，源=batch_2024.csv 第 1 行"
   },
   {
-    "record_id": "b55d58c5d6d129f2",
-    "photo_id": "be1b02acc82b5082",
+    "record_id": "0717999b3c19aa4b",
+    "photo_id": "6b6da8289ce49cbd",
     "change_type": "导入（新增）",
     "old_snapshot": {},
     "new_snapshot": {
-      "photo_id": "be1b02acc82b5082",
+      "photo_id": "6b6da8289ce49cbd",
       "intersection_name": "历史街区南口",
       "import_type": "新增",
       "current_status": "已导入",
@@ -35,18 +35,18 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-20T07:26:45.263327"
+      "updated_at": "2026-06-20T07:26:21.144107"
     },
     "operator": "市政巡检员-小付",
-    "change_timestamp": "2026-06-20T07:26:45.263331",
-    "description": "首次导入（新增）: 历史街区南口，源=demo_batch_1.csv 第 2 行"
+    "change_timestamp": "2026-06-20T07:26:21.144111",
+    "description": "首次导入（新增）: 历史街区南口，源=batch_2024.csv 第 2 行"
   },
   {
-    "record_id": "8721d12ed95a0c9d",
-    "photo_id": "67e377c05dc89714",
+    "record_id": "1268a6feb2b6c0a5",
+    "photo_id": "9ce2f952bac22ae1",
     "change_type": "复用确认",
     "old_snapshot": {
-      "photo_id": "67e377c05dc89714",
+      "photo_id": "9ce2f952bac22ae1",
       "intersection_name": "中山路与人民路交叉口",
       "import_type": "新增",
       "current_status": "已导入",
@@ -55,10 +55,10 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-20T07:26:45.263309"
+      "updated_at": "2026-06-20T07:26:21.144085"
     },
     "new_snapshot": {
-      "photo_id": "67e377c05dc89714",
+      "photo_id": "9ce2f952bac22ae1",
       "intersection_name": "中山路与人民路交叉口",
       "import_type": "新增",
       "current_status": "已导入",
@@ -67,18 +67,18 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-20T07:26:45.263309"
+      "updated_at": "2026-06-20T07:26:21.144085"
     },
     "operator": "市政巡检员-小付",
-    "change_timestamp": "2026-06-20T07:26:45.263578",
+    "change_timestamp": "2026-06-20T07:26:21.144638",
     "description": "重复导入确认（复用）: 中山路与人民路交叉口，当前状态=已导入，热力图问题=无异常，复核意见=无，备注=无，负责人最近修改=无"
   },
   {
-    "record_id": "2be05cfe76584138",
-    "photo_id": "be1b02acc82b5082",
+    "record_id": "e819281fb83151e5",
+    "photo_id": "6b6da8289ce49cbd",
     "change_type": "复用确认",
     "old_snapshot": {
-      "photo_id": "be1b02acc82b5082",
+      "photo_id": "6b6da8289ce49cbd",
       "intersection_name": "历史街区南口",
       "import_type": "新增",
       "current_status": "已导入",
@@ -87,10 +87,10 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-20T07:26:45.263327"
+      "updated_at": "2026-06-20T07:26:21.144107"
     },
     "new_snapshot": {
-      "photo_id": "be1b02acc82b5082",
+      "photo_id": "6b6da8289ce49cbd",
       "intersection_name": "历史街区南口",
       "import_type": "新增",
       "current_status": "已导入",
@@ -99,18 +99,18 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-20T07:26:45.263327"
+      "updated_at": "2026-06-20T07:26:21.144107"
     },
     "operator": "市政巡检员-小付",
-    "change_timestamp": "2026-06-20T07:26:45.263588",
+    "change_timestamp": "2026-06-20T07:26:21.144651",
     "description": "重复导入确认（复用）: 历史街区南口，当前状态=已导入，热力图问题=无异常，复核意见=无，备注=无，负责人最近修改=无"
   },
   {
-    "record_id": "0c0e40b1ad845d4f",
-    "photo_id": "be1b02acc82b5082",
+    "record_id": "f8c9740bd04546af",
+    "photo_id": "6b6da8289ce49cbd",
     "change_type": "公交刷卡时段补录",
     "old_snapshot": {
-      "photo_id": "be1b02acc82b5082",
+      "photo_id": "6b6da8289ce49cbd",
       "intersection_name": "历史街区南口",
       "import_type": "新增",
       "current_status": "已导入",
@@ -119,10 +119,10 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-20T07:26:45.263327"
+      "updated_at": "2026-06-20T07:26:21.144107"
     },
     "new_snapshot": {
-      "photo_id": "be1b02acc82b5082",
+      "photo_id": "6b6da8289ce49cbd",
       "intersection_name": "历史街区南口",
       "import_type": "新增",
       "current_status": "公交刷卡时段已补录",
@@ -134,18 +134,18 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-20T07:26:45.263813"
+      "updated_at": "2026-06-20T07:26:21.144997"
     },
     "operator": "市政巡检员-小付",
-    "change_timestamp": "2026-06-20T07:26:45.263818",
+    "change_timestamp": "2026-06-20T07:26:21.145004",
     "description": "补录公交刷卡时段: ['07:30-09:30', '16:30-18:30']"
   },
   {
-    "record_id": "147fd4959cdee303",
-    "photo_id": "be1b02acc82b5082",
+    "record_id": "a47339ea4f0e9f03",
+    "photo_id": "6b6da8289ce49cbd",
     "change_type": "热力图生成",
     "old_snapshot": {
-      "photo_id": "be1b02acc82b5082",
+      "photo_id": "6b6da8289ce49cbd",
       "intersection_name": "历史街区南口",
       "import_type": "新增",
       "current_status": "公交刷卡时段已补录",
@@ -157,10 +157,10 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-20T07:26:45.263813"
+      "updated_at": "2026-06-20T07:26:21.144997"
     },
     "new_snapshot": {
-      "photo_id": "be1b02acc82b5082",
+      "photo_id": "6b6da8289ce49cbd",
       "intersection_name": "历史街区南口",
       "import_type": "新增",
       "current_status": "待复核",
@@ -199,18 +199,18 @@
       "heatmap_issue": "夜间缺采样导致热力图偏低",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-20T07:26:45.264062"
+      "updated_at": "2026-06-20T07:26:21.145368"
     },
-    "operator": "系统自动生成",
-    "change_timestamp": "2026-06-20T07:26:45.264066",
+    "operator": "系统",
+    "change_timestamp": "2026-06-20T07:26:21.145373",
     "description": "生成热力图，检测结果: 夜间缺采样导致热力图偏低，原因: 夜间平均采样 0.4，日间平均 67.3，比值 0.66% 低于 阈值 30% → 进入待复核状态（RULE_005）"
   },
   {
-    "record_id": "170ded76417eaaf7",
-    "photo_id": "be1b02acc82b5082",
+    "record_id": "f3e6f7df9876d619",
+    "photo_id": "6b6da8289ce49cbd",
     "change_type": "字段修改",
     "old_snapshot": {
-      "photo_id": "be1b02acc82b5082",
+      "photo_id": "6b6da8289ce49cbd",
       "intersection_name": "历史街区南口",
       "import_type": "新增",
       "current_status": "待复核",
@@ -249,10 +249,10 @@
       "heatmap_issue": "夜间缺采样导致热力图偏低",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-20T07:26:45.264062"
+      "updated_at": "2026-06-20T07:26:21.145368"
     },
     "new_snapshot": {
-      "photo_id": "be1b02acc82b5082",
+      "photo_id": "6b6da8289ce49cbd",
       "intersection_name": "历史街区南口",
       "import_type": "新增",
       "current_status": "待复核",
@@ -290,19 +290,143 @@
       },
       "heatmap_issue": "夜间缺采样导致热力图偏低",
       "review_note": null,
-      "remark": "街口招牌有松动，需要重点关注",
-      "updated_at": "2026-06-20T07:26:45.264342"
+      "remark": "南口招牌有松动，需重点关注",
+      "updated_at": "2026-06-20T07:26:21.146161"
     },
     "operator": "市政巡检员-小付",
-    "change_timestamp": "2026-06-20T07:26:45.264345",
-    "description": "修改 remark: None → 街口招牌有松动，需要重点关注"
+    "change_timestamp": "2026-06-20T07:26:21.146231",
+    "description": "修改 remark: None → 南口招牌有松动，需重点关注"
   },
   {
-    "record_id": "bc78430caaf3f994",
-    "photo_id": "be1b02acc82b5082",
+    "record_id": "f32bdc9162ebbe74",
+    "photo_id": "9ce2f952bac22ae1",
+    "change_type": "复用确认",
+    "old_snapshot": {
+      "photo_id": "9ce2f952bac22ae1",
+      "intersection_name": "中山路与人民路交叉口",
+      "import_type": "新增",
+      "current_status": "已导入",
+      "bus_card_hours": null,
+      "heatmap_data": null,
+      "heatmap_issue": "无异常",
+      "review_note": null,
+      "remark": null,
+      "updated_at": "2026-06-20T07:26:21.144085"
+    },
+    "new_snapshot": {
+      "photo_id": "9ce2f952bac22ae1",
+      "intersection_name": "中山路与人民路交叉口",
+      "import_type": "新增",
+      "current_status": "已导入",
+      "bus_card_hours": null,
+      "heatmap_data": null,
+      "heatmap_issue": "无异常",
+      "review_note": null,
+      "remark": null,
+      "updated_at": "2026-06-20T07:26:21.144085"
+    },
+    "operator": "市政巡检员-小付",
+    "change_timestamp": "2026-06-20T07:26:21.147556",
+    "description": "重复导入确认（复用）: 中山路与人民路交叉口，当前状态=已导入，热力图问题=无异常，复核意见=无，备注=无，负责人最近修改=无"
+  },
+  {
+    "record_id": "2189e78f0ccacd8f",
+    "photo_id": "6b6da8289ce49cbd",
+    "change_type": "复用确认",
+    "old_snapshot": {
+      "photo_id": "6b6da8289ce49cbd",
+      "intersection_name": "历史街区南口",
+      "import_type": "新增",
+      "current_status": "待复核",
+      "bus_card_hours": [
+        "07:30-09:30",
+        "16:30-18:30"
+      ],
+      "heatmap_data": {
+        "hourly_samples": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 1,
+          "6": 3,
+          "7": 90,
+          "8": 110,
+          "9": 85,
+          "10": 75,
+          "11": 70,
+          "12": 72,
+          "13": 68,
+          "14": 70,
+          "15": 72,
+          "16": 80,
+          "17": 95,
+          "18": 90,
+          "19": 30,
+          "20": 2,
+          "21": 1,
+          "22": 0,
+          "23": 0
+        }
+      },
+      "heatmap_issue": "夜间缺采样导致热力图偏低",
+      "review_note": null,
+      "remark": "南口招牌有松动，需重点关注",
+      "updated_at": "2026-06-20T07:26:21.146161"
+    },
+    "new_snapshot": {
+      "photo_id": "6b6da8289ce49cbd",
+      "intersection_name": "历史街区南口",
+      "import_type": "新增",
+      "current_status": "待复核",
+      "bus_card_hours": [
+        "07:30-09:30",
+        "16:30-18:30"
+      ],
+      "heatmap_data": {
+        "hourly_samples": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 1,
+          "6": 3,
+          "7": 90,
+          "8": 110,
+          "9": 85,
+          "10": 75,
+          "11": 70,
+          "12": 72,
+          "13": 68,
+          "14": 70,
+          "15": 72,
+          "16": 80,
+          "17": 95,
+          "18": 90,
+          "19": 30,
+          "20": 2,
+          "21": 1,
+          "22": 0,
+          "23": 0
+        }
+      },
+      "heatmap_issue": "夜间缺采样导致热力图偏低",
+      "review_note": null,
+      "remark": "南口招牌有松动，需重点关注",
+      "updated_at": "2026-06-20T07:26:21.146161"
+    },
+    "operator": "市政巡检员-小付",
+    "change_timestamp": "2026-06-20T07:26:21.147581",
+    "description": "重复导入确认（复用）: 历史街区南口，当前状态=待复核，热力图问题=夜间缺采样导致热力图偏低，复核意见=无，备注=南口招牌有松动，需重点关注，负责人最近修改=现场复查后补充备注"
+  },
+  {
+    "record_id": "8c9f1a1ba72978d7",
+    "photo_id": "6b6da8289ce49cbd",
     "change_type": "复核完成",
     "old_snapshot": {
-      "photo_id": "be1b02acc82b5082",
+      "photo_id": "6b6da8289ce49cbd",
       "intersection_name": "历史街区南口",
       "import_type": "新增",
       "current_status": "待复核",
@@ -340,11 +464,11 @@
       },
       "heatmap_issue": "夜间缺采样导致热力图偏低",
       "review_note": null,
-      "remark": "街口招牌有松动，需要重点关注",
-      "updated_at": "2026-06-20T07:26:45.264342"
+      "remark": "南口招牌有松动，需重点关注",
+      "updated_at": "2026-06-20T07:26:21.146161"
     },
     "new_snapshot": {
-      "photo_id": "be1b02acc82b5082",
+      "photo_id": "6b6da8289ce49cbd",
       "intersection_name": "历史街区南口",
       "import_type": "新增",
       "current_status": "复核通过-夜间缺采样",
@@ -381,20 +505,20 @@
         }
       },
       "heatmap_issue": "夜间缺采样导致热力图偏低",
-      "review_note": "确认夜间采样设备故障，导致热力图偏低，非实际人流情况",
-      "remark": "街口招牌有松动，需要重点关注",
-      "updated_at": "2026-06-20T07:26:45.264712"
+      "review_note": "确认夜间采样设备故障，热力图偏低非实际人流",
+      "remark": "南口招牌有松动，需重点关注",
+      "updated_at": "2026-06-20T07:26:21.150902"
     },
     "operator": "街道规划员-张工",
-    "change_timestamp": "2026-06-20T07:26:45.264716",
-    "description": "街道规划员复核确认，标记为夜间缺采样，复核意见: 确认夜间采样设备故障，导致热力图偏低，非实际人流情况"
+    "change_timestamp": "2026-06-20T07:26:21.150925",
+    "description": "街道规划员复核确认，标记为夜间缺采样，复核意见: 确认夜间采样设备故障，热力图偏低非实际人流"
   },
   {
-    "record_id": "36e205559bb2ce8f",
-    "photo_id": "be1b02acc82b5082",
-    "change_type": "回滚",
+    "record_id": "664adb6b7418073d",
+    "photo_id": "6b6da8289ce49cbd",
+    "change_type": "字段修改",
     "old_snapshot": {
-      "photo_id": "be1b02acc82b5082",
+      "photo_id": "6b6da8289ce49cbd",
       "intersection_name": "历史街区南口",
       "import_type": "新增",
       "current_status": "复核通过-夜间缺采样",
@@ -431,12 +555,104 @@
         }
       },
       "heatmap_issue": "夜间缺采样导致热力图偏低",
-      "review_note": "确认夜间采样设备故障，导致热力图偏低，非实际人流情况",
-      "remark": "街口招牌有松动，需要重点关注",
-      "updated_at": "2026-06-20T07:26:45.264712"
+      "review_note": "确认夜间采样设备故障，热力图偏低非实际人流",
+      "remark": "南口招牌有松动，需重点关注",
+      "updated_at": "2026-06-20T07:26:21.150902"
     },
     "new_snapshot": {
-      "photo_id": "be1b02acc82b5082",
+      "photo_id": "6b6da8289ce49cbd",
+      "intersection_name": "历史街区南口",
+      "import_type": "新增",
+      "current_status": "复核通过-夜间缺采样",
+      "bus_card_hours": [
+        "07:30-09:30",
+        "16:30-18:30"
+      ],
+      "heatmap_data": {
+        "hourly_samples": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 1,
+          "6": 3,
+          "7": 90,
+          "8": 110,
+          "9": 85,
+          "10": 75,
+          "11": 70,
+          "12": 72,
+          "13": 68,
+          "14": 70,
+          "15": 72,
+          "16": 80,
+          "17": 95,
+          "18": 90,
+          "19": 30,
+          "20": 2,
+          "21": 1,
+          "22": 0,
+          "23": 0
+        }
+      },
+      "heatmap_issue": "夜间缺采样导致热力图偏低",
+      "review_note": "确认夜间采样设备故障，热力图偏低非实际人流",
+      "remark": "南口招牌已通知施工队下周维修，夜间缺采样待补数据",
+      "updated_at": "2026-06-20T07:26:21.153470"
+    },
+    "operator": "市政巡检员-小付",
+    "change_timestamp": "2026-06-20T07:26:21.153499",
+    "description": "修改 remark: 南口招牌有松动，需重点关注 → 南口招牌已通知施工队下周维修，夜间缺采样待补数据"
+  },
+  {
+    "record_id": "1107cc3780c88081",
+    "photo_id": "6b6da8289ce49cbd",
+    "change_type": "回滚",
+    "old_snapshot": {
+      "photo_id": "6b6da8289ce49cbd",
+      "intersection_name": "历史街区南口",
+      "import_type": "新增",
+      "current_status": "复核通过-夜间缺采样",
+      "bus_card_hours": [
+        "07:30-09:30",
+        "16:30-18:30"
+      ],
+      "heatmap_data": {
+        "hourly_samples": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 1,
+          "6": 3,
+          "7": 90,
+          "8": 110,
+          "9": 85,
+          "10": 75,
+          "11": 70,
+          "12": 72,
+          "13": 68,
+          "14": 70,
+          "15": 72,
+          "16": 80,
+          "17": 95,
+          "18": 90,
+          "19": 30,
+          "20": 2,
+          "21": 1,
+          "22": 0,
+          "23": 0
+        }
+      },
+      "heatmap_issue": "夜间缺采样导致热力图偏低",
+      "review_note": "确认夜间采样设备故障，热力图偏低非实际人流",
+      "remark": "南口招牌已通知施工队下周维修，夜间缺采样待补数据",
+      "updated_at": "2026-06-20T07:26:21.153470"
+    },
+    "new_snapshot": {
+      "photo_id": "6b6da8289ce49cbd",
       "intersection_name": "历史街区南口",
       "import_type": "新增",
       "current_status": "待复核",
@@ -474,19 +690,19 @@
       },
       "heatmap_issue": "夜间缺采样导致热力图偏低",
       "review_note": null,
-      "remark": "街口招牌有松动，需要重点关注",
-      "updated_at": "2026-06-20T07:26:45.265096"
+      "remark": "南口招牌已通知施工队下周维修，夜间缺采样待补数据",
+      "updated_at": "2026-06-20T07:26:21.155522"
     },
     "operator": "管理员",
-    "change_timestamp": "2026-06-20T07:26:45.265101",
-    "description": "从 复核通过-夜间缺采样 回滚至 待复核，原因: 复核意见需要调整，回滚后重新复核，复核意见已清除"
+    "change_timestamp": "2026-06-20T07:26:21.155556",
+    "description": "从 复核通过-夜间缺采样 回滚至 待复核，原因: 需要补充夜间采样数据后重新复核，复核意见已清除"
   },
   {
-    "record_id": "ef5a48e9d9681bd9",
-    "photo_id": "be1b02acc82b5082",
-    "change_type": "回滚",
+    "record_id": "64038db370270bc6",
+    "photo_id": "6b6da8289ce49cbd",
+    "change_type": "复核完成",
     "old_snapshot": {
-      "photo_id": "be1b02acc82b5082",
+      "photo_id": "6b6da8289ce49cbd",
       "intersection_name": "历史街区南口",
       "import_type": "新增",
       "current_status": "待复核",
@@ -524,14 +740,14 @@
       },
       "heatmap_issue": "夜间缺采样导致热力图偏低",
       "review_note": null,
-      "remark": "街口招牌有松动，需要重点关注",
-      "updated_at": "2026-06-20T07:26:45.265096"
+      "remark": "南口招牌已通知施工队下周维修，夜间缺采样待补数据",
+      "updated_at": "2026-06-20T07:26:21.155522"
     },
     "new_snapshot": {
-      "photo_id": "be1b02acc82b5082",
+      "photo_id": "6b6da8289ce49cbd",
       "intersection_name": "历史街区南口",
       "import_type": "新增",
-      "current_status": "热力图已生成",
+      "current_status": "复核通过-正常",
       "bus_card_hours": [
         "07:30-09:30",
         "16:30-18:30"
@@ -564,24 +780,24 @@
           "23": 0
         }
       },
-      "heatmap_issue": "夜间缺采样导致热力图偏低",
-      "review_note": null,
-      "remark": "街口招牌有松动，需要重点关注",
-      "updated_at": "2026-06-20T07:26:45.265881"
+      "heatmap_issue": "无异常",
+      "review_note": "经补充数据验证，人流情况正常",
+      "remark": "南口招牌已通知施工队下周维修，夜间缺采样待补数据",
+      "updated_at": "2026-06-20T07:26:21.156555"
     },
-    "operator": "管理员",
-    "change_timestamp": "2026-06-20T07:26:45.265885",
-    "description": "从 待复核 回滚至 热力图已生成，原因: 继续回滚验证链路"
+    "operator": "街道规划员-张工",
+    "change_timestamp": "2026-06-20T07:26:21.156570",
+    "description": "街道规划员复核通过，标记为正常，复核意见: 经补充数据验证，人流情况正常"
   },
   {
-    "record_id": "16bc17fd7e631a77",
-    "photo_id": "be1b02acc82b5082",
+    "record_id": "29baba98e2514ceb",
+    "photo_id": "6b6da8289ce49cbd",
     "change_type": "回滚",
     "old_snapshot": {
-      "photo_id": "be1b02acc82b5082",
+      "photo_id": "6b6da8289ce49cbd",
       "intersection_name": "历史街区南口",
       "import_type": "新增",
-      "current_status": "热力图已生成",
+      "current_status": "复核通过-正常",
       "bus_card_hours": [
         "07:30-09:30",
         "16:30-18:30"
@@ -614,71 +830,75 @@
           "23": 0
         }
       },
-      "heatmap_issue": "夜间缺采样导致热力图偏低",
-      "review_note": null,
-      "remark": "街口招牌有松动，需要重点关注",
-      "updated_at": "2026-06-20T07:26:45.265881"
+      "heatmap_issue": "无异常",
+      "review_note": "经补充数据验证，人流情况正常",
+      "remark": "南口招牌已通知施工队下周维修，夜间缺采样待补数据",
+      "updated_at": "2026-06-20T07:26:21.156555"
     },
     "new_snapshot": {
-      "photo_id": "be1b02acc82b5082",
+      "photo_id": "6b6da8289ce49cbd",
       "intersection_name": "历史街区南口",
       "import_type": "新增",
-      "current_status": "公交刷卡时段已补录",
+      "current_status": "待复核",
       "bus_card_hours": [
         "07:30-09:30",
         "16:30-18:30"
       ],
-      "heatmap_data": null,
+      "heatmap_data": {
+        "hourly_samples": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 1,
+          "6": 3,
+          "7": 90,
+          "8": 110,
+          "9": 85,
+          "10": 75,
+          "11": 70,
+          "12": 72,
+          "13": 68,
+          "14": 70,
+          "15": 72,
+          "16": 80,
+          "17": 95,
+          "18": 90,
+          "19": 30,
+          "20": 2,
+          "21": 1,
+          "22": 0,
+          "23": 0
+        }
+      },
       "heatmap_issue": "无异常",
       "review_note": null,
-      "remark": "街口招牌有松动，需要重点关注",
-      "updated_at": "2026-06-20T07:26:45.266356"
+      "remark": "南口招牌已通知施工队下周维修，夜间缺采样待补数据",
+      "updated_at": "2026-06-20T07:26:21.158254"
     },
     "operator": "管理员",
-    "change_timestamp": "2026-06-20T07:26:45.266361",
-    "description": "从 热力图已生成 回滚至 公交刷卡时段已补录，原因: 继续回滚验证链路"
+    "change_timestamp": "2026-06-20T07:26:21.158266",
+    "description": "从 复核通过-正常 回滚至 待复核，原因: 重新检查热力图计算逻辑，复核意见已清除"
   },
   {
-    "record_id": "2442ecb4ecde746d",
-    "photo_id": "be1b02acc82b5082",
-    "change_type": "回滚",
+    "record_id": "19b1f8c62754a84e",
+    "photo_id": "9ce2f952bac22ae1",
+    "change_type": "复用确认",
     "old_snapshot": {
-      "photo_id": "be1b02acc82b5082",
-      "intersection_name": "历史街区南口",
-      "import_type": "新增",
-      "current_status": "公交刷卡时段已补录",
-      "bus_card_hours": [
-        "07:30-09:30",
-        "16:30-18:30"
-      ],
-      "heatmap_data": null,
-      "heatmap_issue": "无异常",
-      "review_note": null,
-      "remark": "街口招牌有松动，需要重点关注",
-      "updated_at": "2026-06-20T07:26:45.266356"
-    },
-    "new_snapshot": {
-      "photo_id": "be1b02acc82b5082",
-      "intersection_name": "历史街区南口",
+      "photo_id": "9ce2f952bac22ae1",
+      "intersection_name": "中山路与人民路交叉口",
       "import_type": "新增",
       "current_status": "已导入",
       "bus_card_hours": null,
       "heatmap_data": null,
       "heatmap_issue": "无异常",
       "review_note": null,
-      "remark": "街口招牌有松动，需要重点关注",
-      "updated_at": "2026-06-20T07:26:45.267533"
+      "remark": null,
+      "updated_at": "2026-06-20T07:26:21.144085"
     },
-    "operator": "管理员",
-    "change_timestamp": "2026-06-20T07:26:45.267544",
-    "description": "从 公交刷卡时段已补录 回滚至 已导入，原因: 继续回滚验证链路"
-  },
-  {
-    "record_id": "2c255493f639a420",
-    "photo_id": "67e377c05dc89714",
-    "change_type": "公交刷卡时段补录",
-    "old_snapshot": {
-      "photo_id": "67e377c05dc89714",
+    "new_snapshot": {
+      "photo_id": "9ce2f952bac22ae1",
       "intersection_name": "中山路与人民路交叉口",
       "import_type": "新增",
       "current_status": "已导入",
@@ -687,49 +907,19 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-20T07:26:45.263309"
+      "updated_at": "2026-06-20T07:26:21.144085"
     },
-    "new_snapshot": {
-      "photo_id": "67e377c05dc89714",
-      "intersection_name": "中山路与人民路交叉口",
-      "import_type": "新增",
-      "current_status": "公交刷卡时段已补录",
-      "bus_card_hours": [
-        "07:30-09:30",
-        "16:30-18:30"
-      ],
-      "heatmap_data": null,
-      "heatmap_issue": "无异常",
-      "review_note": null,
-      "remark": null,
-      "updated_at": "2026-06-20T07:26:45.268270"
-    },
-    "operator": "市政巡检员-新同事",
-    "change_timestamp": "2026-06-20T07:26:45.268281",
-    "description": "补录公交刷卡时段: ['07:30-09:30', '16:30-18:30']"
+    "operator": "市政巡检员-小付",
+    "change_timestamp": "2026-06-20T07:26:21.159745",
+    "description": "重复导入确认（复用）: 中山路与人民路交叉口，当前状态=已导入，热力图问题=无异常，复核意见=无，备注=无，负责人最近修改=无"
   },
   {
-    "record_id": "1a7ad30a7400e4ea",
-    "photo_id": "67e377c05dc89714",
-    "change_type": "热力图生成",
+    "record_id": "861845bd87243c93",
+    "photo_id": "6b6da8289ce49cbd",
+    "change_type": "复用确认",
     "old_snapshot": {
-      "photo_id": "67e377c05dc89714",
-      "intersection_name": "中山路与人民路交叉口",
-      "import_type": "新增",
-      "current_status": "公交刷卡时段已补录",
-      "bus_card_hours": [
-        "07:30-09:30",
-        "16:30-18:30"
-      ],
-      "heatmap_data": null,
-      "heatmap_issue": "无异常",
-      "review_note": null,
-      "remark": null,
-      "updated_at": "2026-06-20T07:26:45.268270"
-    },
-    "new_snapshot": {
-      "photo_id": "67e377c05dc89714",
-      "intersection_name": "中山路与人民路交叉口",
+      "photo_id": "6b6da8289ce49cbd",
+      "intersection_name": "历史街区南口",
       "import_type": "新增",
       "current_status": "待复核",
       "bus_card_hours": [
@@ -764,13 +954,55 @@
           "23": 0
         }
       },
-      "heatmap_issue": "夜间缺采样导致热力图偏低",
+      "heatmap_issue": "无异常",
       "review_note": null,
-      "remark": null,
-      "updated_at": "2026-06-20T07:26:45.269033"
+      "remark": "南口招牌已通知施工队下周维修，夜间缺采样待补数据",
+      "updated_at": "2026-06-20T07:26:21.158254"
     },
-    "operator": "系统自动生成",
-    "change_timestamp": "2026-06-20T07:26:45.269042",
-    "description": "生成热力图，检测结果: 夜间缺采样导致热力图偏低，原因: 夜间平均采样 0.4，日间平均 67.3，比值 0.66% 低于 阈值 30% → 进入待复核状态（RULE_005）"
+    "new_snapshot": {
+      "photo_id": "6b6da8289ce49cbd",
+      "intersection_name": "历史街区南口",
+      "import_type": "新增",
+      "current_status": "待复核",
+      "bus_card_hours": [
+        "07:30-09:30",
+        "16:30-18:30"
+      ],
+      "heatmap_data": {
+        "hourly_samples": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 1,
+          "6": 3,
+          "7": 90,
+          "8": 110,
+          "9": 85,
+          "10": 75,
+          "11": 70,
+          "12": 72,
+          "13": 68,
+          "14": 70,
+          "15": 72,
+          "16": 80,
+          "17": 95,
+          "18": 90,
+          "19": 30,
+          "20": 2,
+          "21": 1,
+          "22": 0,
+          "23": 0
+        }
+      },
+      "heatmap_issue": "无异常",
+      "review_note": null,
+      "remark": "南口招牌已通知施工队下周维修，夜间缺采样待补数据",
+      "updated_at": "2026-06-20T07:26:21.158254"
+    },
+    "operator": "市政巡检员-小付",
+    "change_timestamp": "2026-06-20T07:26:21.159757",
+    "description": "重复导入确认（复用）: 历史街区南口，当前状态=待复核，热力图问题=无异常，复核意见=无，备注=南口招牌已通知施工队下周维修，夜间缺采样待补数据，负责人最近修改=更新维修进度和缺采样状态"
   }
 ]

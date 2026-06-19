@@ -7,6 +7,14 @@
     <h2>{{ photo.intersection_name }}</h2>
     <div style="display: flex; gap: 20px; margin-bottom: 15px;">
         <div>
+            <div class="muted">导入类型</div>
+            {% if photo.import_type.value == '新增' %}
+            <span style="color: #2e7d32; font-weight: 500;">新增</span>
+            {% else %}
+            <span style="color: #f57c00; font-weight: 500;">复用</span>
+            {% endif %}
+        </div>
+        <div>
             <div class="muted">当前状态</div>
             <span class="status status-{{ photo.current_status.value }}">{{ photo.current_status.value }}</span>
         </div>

@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, Response
+import json as json_module
 import sys
 from pathlib import Path
 
@@ -146,6 +147,23 @@ def rules():
 def all_history():
     history = dm.get_all_history()
     return render_template("history.html", history=history)
+
+
+@app.route("/report")
+def report():
+    report_data = workflow.export_report()
+    return render_template("report.html", report=report_data)
+
+
+@app.route("/report/export_json")
+def export_json():
+    report_data = workflow.export_report()
+    json_str = json_module.dumps(report_data, ensure_ascii=False, indent=2)
+    return Response(
+        json_str,
+        mimetype="application/json",
+        headers={"Content-Disposition": "attachment; filename=history_district_report.json"},
+    )
 
 
 @app.route("/demo")

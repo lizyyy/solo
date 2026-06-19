@@ -3,7 +3,7 @@ from datetime import datetime
 
 from .data_manager import DataManager
 from .boundary_rules import BoundaryRuleEngine
-from .models import ProcessingStatus, HeatmapIssue
+from .models import ProcessingStatus, HeatmapIssue, ImportType
 
 
 class WorkflowEngine:
@@ -222,12 +222,17 @@ class WorkflowEngine:
         elif target_status == ProcessingStatus.PENDING_REVIEW:
             photo.review_note = None
 
+        rollback_desc = f"从 {old_status.value} 回滚至 {target_status.value}，原因: {reason}"
+        
+        if old_status in [ProcessingStatus.REVIEWED_NORMAL, ProcessingStatus.REVIEWED_LOW_SAMPLING]:
+            rollback_desc += "，复核意见已清除"
+        
         self.dm._add_history_record(
             photo,
             change_type="回滚",
             old_snapshot=old_snapshot,
             operator=operator,
-            description=f"从 {old_status.value} 回滚至 {target_status.value}，原因: {reason}",
+            description=rollback_desc,
         )
 
         self.dm._save_data()
@@ -282,3 +287,81 @@ class WorkflowEngine:
             else:
                 hourly[str(h)] = 10
         return {"hourly_samples": hourly, "total_samples": sum(hourly.values())}
+
+    def export_report(self) -> Dict[str, Any]:
+        photos = self.dm.get_all_photos()
+        all_history = self.dm.get_all_history()
+        
+        photo_reports = []
+        for photo in photos:
+            history = self.dm.get_photo_history(photo.photo_id)
+            
+            remark_changes = [
+                mc for mc in photo.manual_changes
+                if mc.field_name == "remark"
+            ]
+            
+            reuse_events = [
+                h for h in history
+                if h.change_type == "复用确认"
+            ]
+            
+            rollback_events = [
+                h for h in history
+                if h.change_type == "回滚"
+            ]
+            
+            photo_reports.append({
+                "photo_id": photo.photo_id,
+                "intersection_name": photo.intersection_name,
+                "import_type": photo.import_type.value,
+                "original_row_number": photo.original_row.row_number,
+                "source_file": photo.original_row.source_file,
+                "import_time": photo.original_row.import_timestamp.isoformat(),
+                "current_status": photo.current_status.value,
+                "heatmap_issue": photo.heatmap_issue.value,
+                "review_note": photo.review_note,
+                "remark": photo.remark,
+                "bus_card_hours": photo.bus_card_hours,
+                "remark_change_count": len(remark_changes),
+                "remark_changes": [
+                    {
+                        "old_value": mc.old_value,
+                        "new_value": mc.new_value,
+                        "operator": mc.operator,
+                        "reason": mc.reason,
+                        "time": mc.change_timestamp.isoformat(),
+                    }
+                    for mc in remark_changes
+                ],
+                "reuse_event_count": len(reuse_events),
+                "reuse_events": [
+                    {
+                        "time": h.change_timestamp.isoformat(),
+                        "description": h.description,
+                        "snapshot_at_reuse": h.new_snapshot,
+                    }
+                    for h in reuse_events
+                ],
+                "rollback_event_count": len(rollback_events),
+                "rollback_events": [
+                    {
+                        "time": h.change_timestamp.isoformat(),
+                        "description": h.description,
+                        "old_status": h.old_snapshot.get("current_status", ""),
+                        "new_status": h.new_snapshot.get("current_status", ""),
+                        "review_note_cleared": h.old_snapshot.get("review_note") is not None and h.new_snapshot.get("review_note") is None,
+                    }
+                    for h in rollback_events
+                ],
+                "history_count": len(history),
+            })
+        
+        stats = self.dm.get_statistics()
+        
+        return {
+            "report_title": "历史街区招牌整治 - 路口照片管理报告",
+            "generated_at": datetime.now().isoformat(),
+            "summary": stats,
+            "photos": photo_reports,
+        }

@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}导出报告 - 历史街区招牌整治{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>历史街区招牌整治 - 管理报告</h2>
+    <p class="muted">生成时间: {{ report.generated_at }}</p>
+    <div style="margin: 15px 0;">
+        <a href="{{ url_for('export_json') }}" class="btn btn-primary">下载 JSON 报告</a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>汇总统计</h2>
+    <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+        <div>
+            <div style="font-size: 24px; font-weight: bold;">{{ report.summary.total_photos }}</div>
+            <div class="muted">路口照片总数</div>
+        </div>
+        <div>
+            <div style="font-size: 24px; font-weight: bold; color: #2e7d32;">
+                {{ report.summary.status_distribution.get('新增', 0) if report.summary.status_distribution.get is defined else '' }}
+                {% set new_count = report.photos | selectattr('import_type', 'equalto', '新增') | list | length %}
+                {{ new_count }}
+            </div>
+            <div class="muted">新增记录</div>
+        </div>
+        <div>
+            <div style="font-size: 24px; font-weight: bold; color: #f57c00;">
+                {% set reused_count = report.photos | selectattr('import_type', 'equalto', '复用') | list | length %}
+                {{ reused_count }}
+            </div>
+            <div class="muted">复用记录</div>
+        </div>
+        <div>
+            <div style="font-size: 24px; font-weight: bold; color: #ff9800;">
+                {{ report.summary.issue_distribution.get('夜间缺采样导致热力图偏低', 0) }}
+            </div>
+            <div class="muted">夜间缺采样</div>
+        </div>
+    </div>
+</div>
+
+{% for photo in report.photos %}
+<div class="card">
+    <h2>{{ photo.intersection_name }}</h2>
+    <table>
+        <tr>
+            <th style="width: 140px;">导入类型</th>
+            <td>
+                {% if photo.import_type == '新增' %}
+                <span style="color: #2e7d32; font-weight: 500;">新增</span>
+                {% else %}
+                <span style="color: #f57c00; font-weight: 500;">复用</span>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th>原始行号</th>
+            <td>第 {{ photo.original_row_number }} 行（源: {{ photo.source_file }}）</td>
+        </tr>
+        <tr>
+            <th>当前状态</th>
+            <td><span class="status status-{{ photo.current_status }}">{{ photo.current_status }}</span></td>
+        </tr>
+        <tr>
+            <th>热力图问题</th>
+            <td>
+                {% if photo.heatmap_issue != '无异常' %}
+                <span style="color: #e65100;">{{ photo.heatmap_issue }}</span>
+                {% else %}
+                <span class="muted">{{ photo.heatmap_issue }}</span>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th>复核意见</th>
+            <td>{{ photo.review_note or '无' }}</td>
+        </tr>
+        <tr>
+            <th>当前备注</th>
+            <td>{{ photo.remark or '无' }}</td>
+        </tr>
+        <tr>
+            <th>公交刷卡时段</th>
+            <td>{{ photo.bus_card_hours | join(', ') if photo.bus_card_hours else '未补录' }}</td>
+        </tr>
+        <tr>
+            <th>变更历史总数</th>
+            <td>{{ photo.history_count }} 条</td>
+        </tr>
+    </table>
+
+    {% if photo.reuse_events %}
+    <h3 style="font-size: 14px; margin: 15px 0 10px; color: #f57c00;">复用确认记录（{{ photo.reuse_event_count }} 次）</h3>
+    <table>
+        <thead>
+            <tr><th>时间</th><th>描述</th></tr>
+        </thead>
+        <tbody>
+            {% for event in photo.reuse_events %}
+            <tr>
+                <td class="muted" style="font-size: 12px;">{{ event.time[:19] }}</td>
+                <td style="font-size: 13px;">{{ event.description }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {% if photo.remark_changes %}
+    <h3 style="font-size: 14px; margin: 15px 0 10px; color: #1565c0;">备注变更历史（{{ photo.remark_change_count }} 次）</h3>
+    <table>
+        <thead>
+            <tr><th>时间</th><th>改前</th><th>改后</th><th>操作人</th><th>原因</th></tr>
+        </thead>
+        <tbody>
+            {% for change in photo.remark_changes %}
+            <tr>
+                <td class="muted" style="font-size: 12px;">{{ change.time[:19] }}</td>
+                <td style="color: #c62828; font-size: 12px;">{{ change.old_value or '(空)' }}</td>
+                <td style="color: #2e7d32; font-size: 12px;">{{ change.new_value or '(空)' }}</td>
+                <td>{{ change.operator }}</td>
+                <td class="muted" style="font-size: 12px;">{{ change.reason }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {% if photo.rollback_events %}
+    <h3 style="font-size: 14px; margin: 15px 0 10px; color: #c62828;">回滚记录（{{ photo.rollback_event_count }} 次）</h3>
+    <table>
+        <thead>
+            <tr><th>时间</th><th>状态变迁</th><th>复核意见清除</th><th>描述</th></tr>
+        </thead>
+        <tbody>
+            {% for event in photo.rollback_events %}
+            <tr>
+                <td class="muted" style="font-size: 12px;">{{ event.time[:19] }}</td>
+                <td>{{ event.old_status }} → {{ event.new_status }}</td>
+                <td>
+                    {% if event.review_note_cleared %}
+                    <span style="color: #c62828; font-weight: 500;">是（已清除）</span>
+                    {% else %}
+                    <span class="muted">否</span>
+                    {% endif %}
+                </td>
+                <td style="font-size: 12px;">{{ event.description }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+{% endfor %}
+{% endblock %}

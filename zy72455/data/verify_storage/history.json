@@ -1,42 +1,45 @@
 [
   {
-    "record_id": "3f42fb3451f48e0a",
+    "record_id": "d36199402a8e8a89",
     "photo_id": "a8e369b4948332ff",
-    "change_type": "导入",
+    "change_type": "导入（新增）",
     "old_snapshot": {},
     "new_snapshot": {
       "photo_id": "a8e369b4948332ff",
       "intersection_name": "测试路口A",
+      "import_type": "新增",
       "current_status": "已导入",
       "bus_card_hours": null,
       "heatmap_data": null,
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.961551"
+      "updated_at": "2026-06-20T07:26:29.829678"
     },
     "operator": "测试员",
-    "change_timestamp": "2026-06-12T19:58:15.961558",
-    "description": "从 test_rollback.csv 第 1 行导入路口照片数据"
+    "change_timestamp": "2026-06-20T07:26:29.829690",
+    "description": "首次导入（新增）: 测试路口A，源=test_rollback.csv 第 1 行"
   },
   {
-    "record_id": "bca19df2f2d258b8",
+    "record_id": "9b81613e5a50cf57",
     "photo_id": "a8e369b4948332ff",
     "change_type": "公交刷卡时段补录",
     "old_snapshot": {
       "photo_id": "a8e369b4948332ff",
       "intersection_name": "测试路口A",
+      "import_type": "新增",
       "current_status": "已导入",
       "bus_card_hours": null,
       "heatmap_data": null,
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.961551"
+      "updated_at": "2026-06-20T07:26:29.829678"
     },
     "new_snapshot": {
       "photo_id": "a8e369b4948332ff",
       "intersection_name": "测试路口A",
+      "import_type": "新增",
       "current_status": "公交刷卡时段已补录",
       "bus_card_hours": [
         "07:00-09:00",
@@ -46,19 +49,20 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.961782"
+      "updated_at": "2026-06-20T07:26:29.830158"
     },
     "operator": "市政巡检员-小付",
-    "change_timestamp": "2026-06-12T19:58:15.961788",
+    "change_timestamp": "2026-06-20T07:26:29.830165",
     "description": "补录公交刷卡时段: ['07:00-09:00', '17:00-19:00']"
   },
   {
-    "record_id": "f2913c3c03af2162",
+    "record_id": "a4004673967e3fc7",
     "photo_id": "a8e369b4948332ff",
     "change_type": "热力图生成",
     "old_snapshot": {
       "photo_id": "a8e369b4948332ff",
       "intersection_name": "测试路口A",
+      "import_type": "新增",
       "current_status": "公交刷卡时段已补录",
       "bus_card_hours": [
         "07:00-09:00",
@@ -68,11 +72,12 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.961782"
+      "updated_at": "2026-06-20T07:26:29.830158"
     },
     "new_snapshot": {
       "photo_id": "a8e369b4948332ff",
       "intersection_name": "测试路口A",
+      "import_type": "新增",
       "current_status": "待复核",
       "bus_card_hours": [
         "07:00-09:00",
@@ -109,19 +114,20 @@
       "heatmap_issue": "夜间缺采样导致热力图偏低",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.961965"
+      "updated_at": "2026-06-20T07:26:29.830385"
     },
     "operator": "系统",
-    "change_timestamp": "2026-06-12T19:58:15.961970",
+    "change_timestamp": "2026-06-20T07:26:29.830391",
     "description": "生成热力图，检测结果: 夜间缺采样导致热力图偏低，原因: 夜间平均采样 0.2，日间平均 76.0，比值 0.29% 低于 阈值 30% → 进入待复核状态（RULE_005）"
   },
   {
-    "record_id": "ca8bb4637da4714c",
+    "record_id": "64fa69bb789c2782",
     "photo_id": "a8e369b4948332ff",
     "change_type": "复核完成",
     "old_snapshot": {
       "photo_id": "a8e369b4948332ff",
       "intersection_name": "测试路口A",
+      "import_type": "新增",
       "current_status": "待复核",
       "bus_card_hours": [
         "07:00-09:00",
@@ -158,11 +164,12 @@
       "heatmap_issue": "夜间缺采样导致热力图偏低",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.961965"
+      "updated_at": "2026-06-20T07:26:29.830385"
     },
     "new_snapshot": {
       "photo_id": "a8e369b4948332ff",
       "intersection_name": "测试路口A",
+      "import_type": "新增",
       "current_status": "复核通过-夜间缺采样",
       "bus_card_hours": [
         "07:00-09:00",
@@ -199,19 +206,20 @@
       "heatmap_issue": "夜间缺采样导致热力图偏低",
       "review_note": "确认夜间采样设备故障，热力图偏低",
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.962171"
+      "updated_at": "2026-06-20T07:26:29.831396"
     },
     "operator": "街道规划员-张工",
-    "change_timestamp": "2026-06-12T19:58:15.962175",
+    "change_timestamp": "2026-06-20T07:26:29.831404",
     "description": "街道规划员复核确认，标记为夜间缺采样，复核意见: 确认夜间采样设备故障，热力图偏低"
   },
   {
-    "record_id": "2172486194c8de72",
+    "record_id": "86cbbedfc9a8f35b",
     "photo_id": "a8e369b4948332ff",
     "change_type": "回滚",
     "old_snapshot": {
       "photo_id": "a8e369b4948332ff",
       "intersection_name": "测试路口A",
+      "import_type": "新增",
       "current_status": "复核通过-夜间缺采样",
       "bus_card_hours": [
         "07:00-09:00",
@@ -248,11 +256,12 @@
       "heatmap_issue": "夜间缺采样导致热力图偏低",
       "review_note": "确认夜间采样设备故障，热力图偏低",
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.962171"
+      "updated_at": "2026-06-20T07:26:29.831396"
     },
     "new_snapshot": {
       "photo_id": "a8e369b4948332ff",
       "intersection_name": "测试路口A",
+      "import_type": "新增",
       "current_status": "待复核",
       "bus_card_hours": [
         "07:00-09:00",
@@ -289,19 +298,20 @@
       "heatmap_issue": "夜间缺采样导致热力图偏低",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.962505"
+      "updated_at": "2026-06-20T07:26:29.832098"
     },
     "operator": "管理员",
-    "change_timestamp": "2026-06-12T19:58:15.962509",
-    "description": "从 复核通过-夜间缺采样 回滚至 待复核，原因: 测试回滚链路"
+    "change_timestamp": "2026-06-20T07:26:29.832106",
+    "description": "从 复核通过-夜间缺采样 回滚至 待复核，原因: 测试回滚链路，复核意见已清除"
   },
   {
-    "record_id": "9393b3818481f72c",
+    "record_id": "f84cf9fe5202e56b",
     "photo_id": "a8e369b4948332ff",
     "change_type": "复核完成",
     "old_snapshot": {
       "photo_id": "a8e369b4948332ff",
       "intersection_name": "测试路口A",
+      "import_type": "新增",
       "current_status": "待复核",
       "bus_card_hours": [
         "07:00-09:00",
@@ -338,11 +348,12 @@
       "heatmap_issue": "夜间缺采样导致热力图偏低",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.962505"
+      "updated_at": "2026-06-20T07:26:29.832098"
     },
     "new_snapshot": {
       "photo_id": "a8e369b4948332ff",
       "intersection_name": "测试路口A",
+      "import_type": "新增",
       "current_status": "复核通过-正常",
       "bus_card_hours": [
         "07:00-09:00",
@@ -379,19 +390,20 @@
       "heatmap_issue": "无异常",
       "review_note": "经补充数据验证，实际人流正常",
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.962826"
+      "updated_at": "2026-06-20T07:26:29.833609"
     },
     "operator": "街道规划员-张工",
-    "change_timestamp": "2026-06-12T19:58:15.962829",
+    "change_timestamp": "2026-06-20T07:26:29.833637",
     "description": "街道规划员复核通过，标记为正常，复核意见: 经补充数据验证，实际人流正常"
   },
   {
-    "record_id": "2c44530d1f82e228",
+    "record_id": "05cfbd211c77dd1c",
     "photo_id": "a8e369b4948332ff",
     "change_type": "回滚",
     "old_snapshot": {
       "photo_id": "a8e369b4948332ff",
       "intersection_name": "测试路口A",
+      "import_type": "新增",
       "current_status": "复核通过-正常",
       "bus_card_hours": [
         "07:00-09:00",
@@ -428,11 +440,12 @@
       "heatmap_issue": "无异常",
       "review_note": "经补充数据验证，实际人流正常",
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.962826"
+      "updated_at": "2026-06-20T07:26:29.833609"
     },
     "new_snapshot": {
       "photo_id": "a8e369b4948332ff",
       "intersection_name": "测试路口A",
+      "import_type": "新增",
       "current_status": "待复核",
       "bus_card_hours": [
         "07:00-09:00",
@@ -469,19 +482,20 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.963199"
+      "updated_at": "2026-06-20T07:26:29.834595"
     },
     "operator": "管理员",
-    "change_timestamp": "2026-06-12T19:58:15.963203",
-    "description": "从 复核通过-正常 回滚至 待复核，原因: 测试回滚到待复核"
+    "change_timestamp": "2026-06-20T07:26:29.834622",
+    "description": "从 复核通过-正常 回滚至 待复核，原因: 测试回滚到待复核，复核意见已清除"
   },
   {
-    "record_id": "39913f4b574635ea",
+    "record_id": "7cb538d0ee25bb02",
     "photo_id": "a8e369b4948332ff",
     "change_type": "回滚",
     "old_snapshot": {
       "photo_id": "a8e369b4948332ff",
       "intersection_name": "测试路口A",
+      "import_type": "新增",
       "current_status": "待复核",
       "bus_card_hours": [
         "07:00-09:00",
@@ -518,11 +532,12 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.963199"
+      "updated_at": "2026-06-20T07:26:29.834595"
     },
     "new_snapshot": {
       "photo_id": "a8e369b4948332ff",
       "intersection_name": "测试路口A",
+      "import_type": "新增",
       "current_status": "热力图已生成",
       "bus_card_hours": [
         "07:00-09:00",
@@ -559,19 +574,20 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.963618"
+      "updated_at": "2026-06-20T07:26:29.836457"
     },
     "operator": "管理员",
-    "change_timestamp": "2026-06-12T19:58:15.963622",
+    "change_timestamp": "2026-06-20T07:26:29.836479",
     "description": "从 待复核 回滚至 热力图已生成，原因: 继续回滚测试"
   },
   {
-    "record_id": "b37713bae3510a16",
+    "record_id": "89b62862aff34e9c",
     "photo_id": "a8e369b4948332ff",
     "change_type": "回滚",
     "old_snapshot": {
       "photo_id": "a8e369b4948332ff",
       "intersection_name": "测试路口A",
+      "import_type": "新增",
       "current_status": "热力图已生成",
       "bus_card_hours": [
         "07:00-09:00",
@@ -608,11 +624,12 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.963618"
+      "updated_at": "2026-06-20T07:26:29.836457"
     },
     "new_snapshot": {
       "photo_id": "a8e369b4948332ff",
       "intersection_name": "测试路口A",
+      "import_type": "新增",
       "current_status": "公交刷卡时段已补录",
       "bus_card_hours": [
         "07:00-09:00",
@@ -622,19 +639,20 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.964077"
+      "updated_at": "2026-06-20T07:26:29.838481"
     },
     "operator": "管理员",
-    "change_timestamp": "2026-06-12T19:58:15.964081",
+    "change_timestamp": "2026-06-20T07:26:29.838494",
     "description": "从 热力图已生成 回滚至 公交刷卡时段已补录，原因: 继续回滚测试"
   },
   {
-    "record_id": "c733eca02535d3c6",
+    "record_id": "f32427dca9e49ad8",
     "photo_id": "a8e369b4948332ff",
     "change_type": "回滚",
     "old_snapshot": {
       "photo_id": "a8e369b4948332ff",
       "intersection_name": "测试路口A",
+      "import_type": "新增",
       "current_status": "公交刷卡时段已补录",
       "bus_card_hours": [
         "07:00-09:00",
@@ -644,121 +662,256 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.964077"
+      "updated_at": "2026-06-20T07:26:29.838481"
     },
     "new_snapshot": {
       "photo_id": "a8e369b4948332ff",
       "intersection_name": "测试路口A",
+      "import_type": "新增",
       "current_status": "已导入",
       "bus_card_hours": null,
       "heatmap_data": null,
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.964543"
+      "updated_at": "2026-06-20T07:26:29.839043"
     },
     "operator": "管理员",
-    "change_timestamp": "2026-06-12T19:58:15.964547",
+    "change_timestamp": "2026-06-20T07:26:29.839049",
     "description": "从 公交刷卡时段已补录 回滚至 已导入，原因: 继续回滚测试"
   },
   {
-    "record_id": "c4d1230f90cf9625",
+    "record_id": "c6412af11c1b3d60",
     "photo_id": "a43e4ddd699ca782",
-    "change_type": "导入",
+    "change_type": "导入（新增）",
     "old_snapshot": {},
     "new_snapshot": {
       "photo_id": "a43e4ddd699ca782",
       "intersection_name": "重复测试路口1",
+      "import_type": "新增",
       "current_status": "已导入",
       "bus_card_hours": null,
       "heatmap_data": null,
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.965037"
+      "updated_at": "2026-06-20T07:26:29.839780"
     },
     "operator": "测试员",
-    "change_timestamp": "2026-06-12T19:58:15.965041",
-    "description": "从 dedup_test.csv 第 1 行导入路口照片数据"
+    "change_timestamp": "2026-06-20T07:26:29.839784",
+    "description": "首次导入（新增）: 重复测试路口1，源=dedup_test.csv 第 1 行"
   },
   {
-    "record_id": "66e8848b464c9c35",
+    "record_id": "21ecaa875983f666",
     "photo_id": "97cb8e83e5a04ba4",
-    "change_type": "导入",
+    "change_type": "导入（新增）",
     "old_snapshot": {},
     "new_snapshot": {
       "photo_id": "97cb8e83e5a04ba4",
       "intersection_name": "重复测试路口2",
+      "import_type": "新增",
       "current_status": "已导入",
       "bus_card_hours": null,
       "heatmap_data": null,
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.965047"
+      "updated_at": "2026-06-20T07:26:29.839791"
     },
     "operator": "测试员",
-    "change_timestamp": "2026-06-12T19:58:15.965053",
-    "description": "从 dedup_test.csv 第 2 行导入路口照片数据"
+    "change_timestamp": "2026-06-20T07:26:29.839794",
+    "description": "首次导入（新增）: 重复测试路口2，源=dedup_test.csv 第 2 行"
   },
   {
-    "record_id": "6197304f7e46059e",
+    "record_id": "2a05c3d13c82e400",
+    "photo_id": "a43e4ddd699ca782",
+    "change_type": "复用确认",
+    "old_snapshot": {
+      "photo_id": "a43e4ddd699ca782",
+      "intersection_name": "重复测试路口1",
+      "import_type": "新增",
+      "current_status": "已导入",
+      "bus_card_hours": null,
+      "heatmap_data": null,
+      "heatmap_issue": "无异常",
+      "review_note": null,
+      "remark": null,
+      "updated_at": "2026-06-20T07:26:29.839780"
+    },
+    "new_snapshot": {
+      "photo_id": "a43e4ddd699ca782",
+      "intersection_name": "重复测试路口1",
+      "import_type": "新增",
+      "current_status": "已导入",
+      "bus_card_hours": null,
+      "heatmap_data": null,
+      "heatmap_issue": "无异常",
+      "review_note": null,
+      "remark": null,
+      "updated_at": "2026-06-20T07:26:29.839780"
+    },
+    "operator": "测试员",
+    "change_timestamp": "2026-06-20T07:26:29.840715",
+    "description": "重复导入确认（复用）: 重复测试路口1，当前状态=已导入，热力图问题=无异常，复核意见=无，备注=无，负责人最近修改=无"
+  },
+  {
+    "record_id": "c1adfb1fac87e61f",
+    "photo_id": "97cb8e83e5a04ba4",
+    "change_type": "复用确认",
+    "old_snapshot": {
+      "photo_id": "97cb8e83e5a04ba4",
+      "intersection_name": "重复测试路口2",
+      "import_type": "新增",
+      "current_status": "已导入",
+      "bus_card_hours": null,
+      "heatmap_data": null,
+      "heatmap_issue": "无异常",
+      "review_note": null,
+      "remark": null,
+      "updated_at": "2026-06-20T07:26:29.839791"
+    },
+    "new_snapshot": {
+      "photo_id": "97cb8e83e5a04ba4",
+      "intersection_name": "重复测试路口2",
+      "import_type": "新增",
+      "current_status": "已导入",
+      "bus_card_hours": null,
+      "heatmap_data": null,
+      "heatmap_issue": "无异常",
+      "review_note": null,
+      "remark": null,
+      "updated_at": "2026-06-20T07:26:29.839791"
+    },
+    "operator": "测试员",
+    "change_timestamp": "2026-06-20T07:26:29.840727",
+    "description": "重复导入确认（复用）: 重复测试路口2，当前状态=已导入，热力图问题=无异常，复核意见=无，备注=无，负责人最近修改=无"
+  },
+  {
+    "record_id": "8cb1602a21c9e897",
+    "photo_id": "a43e4ddd699ca782",
+    "change_type": "复用确认",
+    "old_snapshot": {
+      "photo_id": "a43e4ddd699ca782",
+      "intersection_name": "重复测试路口1",
+      "import_type": "新增",
+      "current_status": "已导入",
+      "bus_card_hours": null,
+      "heatmap_data": null,
+      "heatmap_issue": "无异常",
+      "review_note": null,
+      "remark": null,
+      "updated_at": "2026-06-20T07:26:29.839780"
+    },
+    "new_snapshot": {
+      "photo_id": "a43e4ddd699ca782",
+      "intersection_name": "重复测试路口1",
+      "import_type": "新增",
+      "current_status": "已导入",
+      "bus_card_hours": null,
+      "heatmap_data": null,
+      "heatmap_issue": "无异常",
+      "review_note": null,
+      "remark": null,
+      "updated_at": "2026-06-20T07:26:29.839780"
+    },
+    "operator": "测试员",
+    "change_timestamp": "2026-06-20T07:26:29.841509",
+    "description": "重复导入确认（复用）: 重复测试路口1，当前状态=已导入，热力图问题=无异常，复核意见=无，备注=无，负责人最近修改=无"
+  },
+  {
+    "record_id": "d332fcf777ed308c",
+    "photo_id": "97cb8e83e5a04ba4",
+    "change_type": "复用确认",
+    "old_snapshot": {
+      "photo_id": "97cb8e83e5a04ba4",
+      "intersection_name": "重复测试路口2",
+      "import_type": "新增",
+      "current_status": "已导入",
+      "bus_card_hours": null,
+      "heatmap_data": null,
+      "heatmap_issue": "无异常",
+      "review_note": null,
+      "remark": null,
+      "updated_at": "2026-06-20T07:26:29.839791"
+    },
+    "new_snapshot": {
+      "photo_id": "97cb8e83e5a04ba4",
+      "intersection_name": "重复测试路口2",
+      "import_type": "新增",
+      "current_status": "已导入",
+      "bus_card_hours": null,
+      "heatmap_data": null,
+      "heatmap_issue": "无异常",
+      "review_note": null,
+      "remark": null,
+      "updated_at": "2026-06-20T07:26:29.839791"
+    },
+    "operator": "测试员",
+    "change_timestamp": "2026-06-20T07:26:29.841519",
+    "description": "重复导入确认（复用）: 重复测试路口2，当前状态=已导入，热力图问题=无异常，复核意见=无，备注=无，负责人最近修改=无"
+  },
+  {
+    "record_id": "07a73a940f33dcda",
     "photo_id": "9a9bc33667ad04ed",
-    "change_type": "导入",
+    "change_type": "导入（新增）",
     "old_snapshot": {},
     "new_snapshot": {
       "photo_id": "9a9bc33667ad04ed",
       "intersection_name": "重复测试路口3",
+      "import_type": "新增",
       "current_status": "已导入",
       "bus_card_hours": null,
       "heatmap_data": null,
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.966117"
+      "updated_at": "2026-06-20T07:26:29.841527"
     },
     "operator": "测试员",
-    "change_timestamp": "2026-06-12T19:58:15.966120",
-    "description": "从 dedup_test.csv 第 3 行导入路口照片数据"
+    "change_timestamp": "2026-06-20T07:26:29.841530",
+    "description": "首次导入（新增）: 重复测试路口3，源=dedup_test.csv 第 3 行"
   },
   {
-    "record_id": "e708bd02eb84767c",
+    "record_id": "65f44163118a5788",
     "photo_id": "6f4e92e6438c5dde",
-    "change_type": "导入",
+    "change_type": "导入（新增）",
     "old_snapshot": {},
     "new_snapshot": {
       "photo_id": "6f4e92e6438c5dde",
       "intersection_name": "备注测试路口",
+      "import_type": "新增",
       "current_status": "已导入",
       "bus_card_hours": null,
       "heatmap_data": null,
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.967194"
+      "updated_at": "2026-06-20T07:26:29.842532"
     },
     "operator": "测试员",
-    "change_timestamp": "2026-06-12T19:58:15.967205",
-    "description": "从 remark_test.csv 第 1 行导入路口照片数据"
+    "change_timestamp": "2026-06-20T07:26:29.842536",
+    "description": "首次导入（新增）: 备注测试路口，源=remark_test.csv 第 1 行"
   },
   {
-    "record_id": "98530cfc1bf5e522",
+    "record_id": "2f7e1d51ab4923a9",
     "photo_id": "6f4e92e6438c5dde",
     "change_type": "公交刷卡时段补录",
     "old_snapshot": {
       "photo_id": "6f4e92e6438c5dde",
       "intersection_name": "备注测试路口",
+      "import_type": "新增",
       "current_status": "已导入",
       "bus_card_hours": null,
       "heatmap_data": null,
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.967194"
+      "updated_at": "2026-06-20T07:26:29.842532"
     },
     "new_snapshot": {
       "photo_id": "6f4e92e6438c5dde",
       "intersection_name": "备注测试路口",
+      "import_type": "新增",
       "current_status": "公交刷卡时段已补录",
       "bus_card_hours": [
         "08:00-10:00"
@@ -767,19 +920,20 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.967872"
+      "updated_at": "2026-06-20T07:26:29.843300"
     },
     "operator": "市政巡检员-小付",
-    "change_timestamp": "2026-06-12T19:58:15.967879",
+    "change_timestamp": "2026-06-20T07:26:29.843308",
     "description": "补录公交刷卡时段: ['08:00-10:00']"
   },
   {
-    "record_id": "247faa9ac5a615e3",
+    "record_id": "72b29ceba0a5c2af",
     "photo_id": "6f4e92e6438c5dde",
     "change_type": "热力图生成",
     "old_snapshot": {
       "photo_id": "6f4e92e6438c5dde",
       "intersection_name": "备注测试路口",
+      "import_type": "新增",
       "current_status": "公交刷卡时段已补录",
       "bus_card_hours": [
         "08:00-10:00"
@@ -788,11 +942,12 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.967872"
+      "updated_at": "2026-06-20T07:26:29.843300"
     },
     "new_snapshot": {
       "photo_id": "6f4e92e6438c5dde",
       "intersection_name": "备注测试路口",
+      "import_type": "新增",
       "current_status": "待复核",
       "bus_card_hours": [
         "08:00-10:00"
@@ -828,19 +983,20 @@
       "heatmap_issue": "夜间缺采样导致热力图偏低",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.968500"
+      "updated_at": "2026-06-20T07:26:29.844249"
     },
     "operator": "系统",
-    "change_timestamp": "2026-06-12T19:58:15.968505",
+    "change_timestamp": "2026-06-20T07:26:29.844258",
     "description": "生成热力图，检测结果: 夜间缺采样导致热力图偏低，原因: 夜间平均采样 0.0，日间平均 100.0，比值 0.00% 低于 阈值 30% → 进入待复核状态（RULE_005）"
   },
   {
-    "record_id": "4188d6436df6bcdf",
+    "record_id": "07f4e5587869dd07",
     "photo_id": "6f4e92e6438c5dde",
     "change_type": "复核完成",
     "old_snapshot": {
       "photo_id": "6f4e92e6438c5dde",
       "intersection_name": "备注测试路口",
+      "import_type": "新增",
       "current_status": "待复核",
       "bus_card_hours": [
         "08:00-10:00"
@@ -876,11 +1032,12 @@
       "heatmap_issue": "夜间缺采样导致热力图偏低",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.968500"
+      "updated_at": "2026-06-20T07:26:29.844249"
     },
     "new_snapshot": {
       "photo_id": "6f4e92e6438c5dde",
       "intersection_name": "备注测试路口",
+      "import_type": "新增",
       "current_status": "复核通过-夜间缺采样",
       "bus_card_hours": [
         "08:00-10:00"
@@ -916,19 +1073,20 @@
       "heatmap_issue": "夜间缺采样导致热力图偏低",
       "review_note": "确认夜间缺采样",
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.969150"
+      "updated_at": "2026-06-20T07:26:29.845535"
     },
     "operator": "街道规划员",
-    "change_timestamp": "2026-06-12T19:58:15.969154",
+    "change_timestamp": "2026-06-20T07:26:29.845541",
     "description": "街道规划员复核确认，标记为夜间缺采样，复核意见: 确认夜间缺采样"
   },
   {
-    "record_id": "953b3679b9cc0e35",
+    "record_id": "2d369c082b3ed863",
     "photo_id": "6f4e92e6438c5dde",
     "change_type": "字段修改",
     "old_snapshot": {
       "photo_id": "6f4e92e6438c5dde",
       "intersection_name": "备注测试路口",
+      "import_type": "新增",
       "current_status": "复核通过-夜间缺采样",
       "bus_card_hours": [
         "08:00-10:00"
@@ -964,11 +1122,12 @@
       "heatmap_issue": "夜间缺采样导致热力图偏低",
       "review_note": "确认夜间缺采样",
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.969150"
+      "updated_at": "2026-06-20T07:26:29.845535"
     },
     "new_snapshot": {
       "photo_id": "6f4e92e6438c5dde",
       "intersection_name": "备注测试路口",
+      "import_type": "新增",
       "current_status": "复核通过-夜间缺采样",
       "bus_card_hours": [
         "08:00-10:00"
@@ -1004,19 +1163,20 @@
       "heatmap_issue": "夜间缺采样导致热力图偏低",
       "review_note": "确认夜间缺采样",
       "remark": "街口招牌有松动，需要重点关注，建议下周复查",
-      "updated_at": "2026-06-12T19:58:15.969825"
+      "updated_at": "2026-06-20T07:26:29.846544"
     },
     "operator": "市政巡检员-小付",
-    "change_timestamp": "2026-06-12T19:58:15.969828",
+    "change_timestamp": "2026-06-20T07:26:29.846548",
     "description": "修改 remark: None → 街口招牌有松动，需要重点关注，建议下周复查"
   },
   {
-    "record_id": "9be834c0cf05e442",
+    "record_id": "4086c9129be273ff",
     "photo_id": "6f4e92e6438c5dde",
     "change_type": "字段修改",
     "old_snapshot": {
       "photo_id": "6f4e92e6438c5dde",
       "intersection_name": "备注测试路口",
+      "import_type": "新增",
       "current_status": "复核通过-夜间缺采样",
       "bus_card_hours": [
         "08:00-10:00"
@@ -1052,11 +1212,12 @@
       "heatmap_issue": "夜间缺采样导致热力图偏低",
       "review_note": "确认夜间缺采样",
       "remark": "街口招牌有松动，需要重点关注，建议下周复查",
-      "updated_at": "2026-06-12T19:58:15.969825"
+      "updated_at": "2026-06-20T07:26:29.846544"
     },
     "new_snapshot": {
       "photo_id": "6f4e92e6438c5dde",
       "intersection_name": "备注测试路口",
+      "import_type": "新增",
       "current_status": "复核通过-夜间缺采样",
       "bus_card_hours": [
         "08:00-10:00"
@@ -1092,50 +1253,53 @@
       "heatmap_issue": "夜间缺采样导致热力图偏低",
       "review_note": "确认夜间缺采样",
       "remark": "已通知施工队下周一进场维修招牌",
-      "updated_at": "2026-06-12T19:58:15.970629"
+      "updated_at": "2026-06-20T07:26:29.847387"
     },
     "operator": "市政巡检员-小付",
-    "change_timestamp": "2026-06-12T19:58:15.970632",
+    "change_timestamp": "2026-06-20T07:26:29.847391",
     "description": "修改 remark: 街口招牌有松动，需要重点关注，建议下周复查 → 已通知施工队下周一进场维修招牌"
   },
   {
-    "record_id": "987d4fb6c2ea1230",
+    "record_id": "ea868de0162db19d",
     "photo_id": "bee7347e7d82dcf2",
-    "change_type": "导入",
+    "change_type": "导入（新增）",
     "old_snapshot": {},
     "new_snapshot": {
       "photo_id": "bee7347e7d82dcf2",
       "intersection_name": "历史追溯测试路口",
+      "import_type": "新增",
       "current_status": "已导入",
       "bus_card_hours": null,
       "heatmap_data": null,
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.971461"
+      "updated_at": "2026-06-20T07:26:29.848420"
     },
     "operator": "测试员",
-    "change_timestamp": "2026-06-12T19:58:15.971465",
-    "description": "从 history_test.csv 第 1 行导入路口照片数据"
+    "change_timestamp": "2026-06-20T07:26:29.848426",
+    "description": "首次导入（新增）: 历史追溯测试路口，源=history_test.csv 第 1 行"
   },
   {
-    "record_id": "e662c8c2ec53439e",
+    "record_id": "38c083f3263ebf5e",
     "photo_id": "bee7347e7d82dcf2",
     "change_type": "公交刷卡时段补录",
     "old_snapshot": {
       "photo_id": "bee7347e7d82dcf2",
       "intersection_name": "历史追溯测试路口",
+      "import_type": "新增",
       "current_status": "已导入",
       "bus_card_hours": null,
       "heatmap_data": null,
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.971461"
+      "updated_at": "2026-06-20T07:26:29.848420"
     },
     "new_snapshot": {
       "photo_id": "bee7347e7d82dcf2",
       "intersection_name": "历史追溯测试路口",
+      "import_type": "新增",
       "current_status": "公交刷卡时段已补录",
       "bus_card_hours": [
         "09:00-11:00"
@@ -1144,19 +1308,20 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.973228"
+      "updated_at": "2026-06-20T07:26:29.850731"
     },
     "operator": "小付",
-    "change_timestamp": "2026-06-12T19:58:15.973250",
+    "change_timestamp": "2026-06-20T07:26:29.850758",
     "description": "补录公交刷卡时段: ['09:00-11:00']"
   },
   {
-    "record_id": "1d687da77d18bde2",
+    "record_id": "7b7a7bac8b93d7b7",
     "photo_id": "bee7347e7d82dcf2",
     "change_type": "热力图生成",
     "old_snapshot": {
       "photo_id": "bee7347e7d82dcf2",
       "intersection_name": "历史追溯测试路口",
+      "import_type": "新增",
       "current_status": "公交刷卡时段已补录",
       "bus_card_hours": [
         "09:00-11:00"
@@ -1165,11 +1330,12 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.973228"
+      "updated_at": "2026-06-20T07:26:29.850731"
     },
     "new_snapshot": {
       "photo_id": "bee7347e7d82dcf2",
       "intersection_name": "历史追溯测试路口",
+      "import_type": "新增",
       "current_status": "热力图已生成",
       "bus_card_hours": [
         "09:00-11:00"
@@ -1205,19 +1371,20 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.974815"
+      "updated_at": "2026-06-20T07:26:29.853433"
     },
     "operator": "系统",
-    "change_timestamp": "2026-06-12T19:58:15.974846",
+    "change_timestamp": "2026-06-20T07:26:29.853458",
     "description": "生成热力图，检测结果: 无异常，原因: 正常"
   },
   {
-    "record_id": "efdc598f5f87bcfe",
+    "record_id": "37682ef240d5518e",
     "photo_id": "bee7347e7d82dcf2",
     "change_type": "回滚",
     "old_snapshot": {
       "photo_id": "bee7347e7d82dcf2",
       "intersection_name": "历史追溯测试路口",
+      "import_type": "新增",
       "current_status": "热力图已生成",
       "bus_card_hours": [
         "09:00-11:00"
@@ -1253,11 +1420,12 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.974815"
+      "updated_at": "2026-06-20T07:26:29.853433"
     },
     "new_snapshot": {
       "photo_id": "bee7347e7d82dcf2",
       "intersection_name": "历史追溯测试路口",
+      "import_type": "新增",
       "current_status": "公交刷卡时段已补录",
       "bus_card_hours": [
         "09:00-11:00"
@@ -1266,10 +1434,10 @@
       "heatmap_issue": "无异常",
       "review_note": null,
       "remark": null,
-      "updated_at": "2026-06-12T19:58:15.976471"
+      "updated_at": "2026-06-20T07:26:29.856109"
     },
     "operator": "管理员",
-    "change_timestamp": "2026-06-12T19:58:15.976482",
+    "change_timestamp": "2026-06-20T07:26:29.856124",
     "description": "从 热力图已生成 回滚至 公交刷卡时段已补录，原因: 测试历史追溯"
   }
 ]

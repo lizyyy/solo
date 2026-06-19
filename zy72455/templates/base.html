@@ -59,6 +59,7 @@
                 <a href="{{ url_for('import_photos') }}" {% if request.endpoint == 'import_photos' %}class="active"{% endif %}>导入数据</a>
                 <a href="{{ url_for('all_history') }}" {% if request.endpoint == 'all_history' %}class="active"{% endif %}>变更历史</a>
                 <a href="{{ url_for('rules') }}" {% if request.endpoint == 'rules' %}class="active"{% endif %}>边界规则</a>
+                <a href="{{ url_for('report') }}" {% if request.endpoint == 'report' %}class="active"{% endif %}>导出报告</a>
                 <a href="{{ url_for('run_demo') }}">一键演示</a>
             </nav>
         </div>

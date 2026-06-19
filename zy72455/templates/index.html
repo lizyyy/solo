@@ -28,6 +28,7 @@
         <thead>
             <tr>
                 <th>路口名称</th>
+                <th>导入类型</th>
                 <th>原始行号</th>
                 <th>源文件</th>
                 <th>当前状态</th>
@@ -40,6 +41,13 @@
             {% for photo in photos %}
             <tr>
                 <td>{{ photo.intersection_name }}</td>
+                <td>
+                    {% if photo.import_type.value == '新增' %}
+                    <span style="color: #2e7d32; font-weight: 500;">新增</span>
+                    {% else %}
+                    <span style="color: #f57c00; font-weight: 500;">复用</span>
+                    {% endif %}
+                </td>
                 <td>第 {{ photo.original_row.row_number }} 行</td>
                 <td class="muted">{{ photo.original_row.source_file }}</td>
                 <td><span class="status status-{{ photo.current_status.value }}">{{ photo.current_status.value }}</span></td>

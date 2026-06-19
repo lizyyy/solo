@@ -20,6 +20,11 @@ class HeatmapIssue(str, Enum):
     OTHER = "其他异常"
 
 
+class ImportType(str, Enum):
+    NEW = "新增"
+    REUSED = "复用"
+
+
 @dataclass
 class OriginalRow:
     row_number: int
@@ -44,6 +49,7 @@ class IntersectionPhoto:
     intersection_name: str
     original_row: OriginalRow
     current_status: ProcessingStatus
+    import_type: ImportType = ImportType.NEW
     manual_changes: List[ManualChange] = field(default_factory=list)
     bus_card_hours: Optional[List[str]] = None
     heatmap_data: Optional[Dict[str, Any]] = None

@@ -11,6 +11,7 @@ from .models import (
     ProcessingStatus,
     HistoryRecord,
     HeatmapIssue,
+    ImportType,
 )
 
 
@@ -56,6 +57,7 @@ class DataManager:
                         intersection_name=pdata["intersection_name"],
                         original_row=original_row,
                         current_status=ProcessingStatus(pdata["current_status"]),
+                        import_type=ImportType(pdata.get("import_type", ImportType.NEW)),
                         manual_changes=manual_changes,
                         bus_card_hours=pdata.get("bus_card_hours"),
                         heatmap_data=pdata.get("heatmap_data"),
@@ -99,6 +101,7 @@ class DataManager:
                     "import_timestamp": photo.original_row.import_timestamp.isoformat(),
                 },
                 "current_status": photo.current_status.value,
+                "import_type": photo.import_type.value,
                 "manual_changes": [
                     {
                         "field_name": mc.field_name,
@@ -143,6 +146,7 @@ class DataManager:
         return {
             "photo_id": photo.photo_id,
             "intersection_name": photo.intersection_name,
+            "import_type": photo.import_type.value,
             "current_status": photo.current_status.value,
             "bus_card_hours": photo.bus_card_hours,
             "heatmap_data": photo.heatmap_data,
@@ -179,7 +183,7 @@ class DataManager:
         operator: str,
     ) -> Tuple[List[IntersectionPhoto], List[Dict[str, Any]]]:
         imported = []
-        skipped = []
+        reused = []
         
         for idx, row_data in enumerate(rows, start=1):
             photo_id = self._generate_photo_id(row_data, source_file)
@@ -187,12 +191,36 @@ class DataManager:
             
             if photo_id in self.photos:
                 existing = self.photos[photo_id]
-                skipped.append({
+                
+                old_snapshot = self._photo_to_snapshot(existing)
+                
+                reuse_desc = (
+                    f"重复导入确认（复用）: {intersection_name}，"
+                    f"当前状态={existing.current_status.value}，"
+                    f"热力图问题={existing.heatmap_issue.value}，"
+                    f"复核意见={existing.review_note or '无'}，"
+                    f"备注={existing.remark or '无'}，"
+                    f"负责人最近修改={existing.manual_changes[-1].reason if existing.manual_changes else '无'}"
+                )
+                
+                self._add_history_record(
+                    existing,
+                    change_type="复用确认",
+                    old_snapshot=old_snapshot,
+                    operator=operator,
+                    description=reuse_desc,
+                )
+                
+                reused.append({
                     "photo_id": photo_id,
                     "intersection_name": intersection_name,
                     "row_number": idx,
                     "original_import_time": existing.created_at.isoformat(),
                     "current_status": existing.current_status.value,
+                    "heatmap_issue": existing.heatmap_issue.value,
+                    "review_note": existing.review_note,
+                    "remark": existing.remark,
+                    "manual_change_count": len(existing.manual_changes),
                 })
                 continue
             
@@ -208,20 +236,21 @@ class DataManager:
                 intersection_name=intersection_name,
                 original_row=original_row,
                 current_status=ProcessingStatus.IMPORTED,
+                import_type=ImportType.NEW,
             )
             
             self.photos[photo_id] = photo
             self._add_history_record(
                 photo,
-                change_type="导入",
+                change_type="导入（新增）",
                 old_snapshot={},
                 operator=operator,
-                description=f"从 {source_file} 第 {idx} 行导入路口照片数据",
+                description=f"首次导入（新增）: {intersection_name}，源={source_file} 第 {idx} 行",
             )
             imported.append(photo)
         
         self._save_data()
-        return imported, skipped
+        return imported, reused
 
     def update_field(
         self,
