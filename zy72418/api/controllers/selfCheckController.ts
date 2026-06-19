@@ -31,6 +31,20 @@ router.get("/", (req: Request, res: Response) => {
   }
 });
 
+router.post("/run", (req: Request, res: Response) => {
+  try {
+    const report = selfCheckService.runSelfCheck();
+
+    res.json({
+      success: true,
+      data: report,
+    });
+  } catch (error) {
+    console.error("Self check error:", error);
+    res.status(500).json({ error: "自检失败", details: (error as Error).message });
+  }
+});
+
 router.get("/run", (req: Request, res: Response) => {
   try {
     const report = selfCheckService.runSelfCheck();

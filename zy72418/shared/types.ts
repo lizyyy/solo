@@ -94,6 +94,7 @@ export interface ImportPreviewResult {
   temporarySubstituteCount: number;
   potentialConflicts: number;
   importBatchId: string;
+  fileName: string;
 }
 
 export interface ImportBatch {

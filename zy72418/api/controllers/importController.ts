@@ -4,6 +4,7 @@ import { RecordRepository } from "../repositories/RecordRepository";
 import { AuditRepository } from "../repositories/AuditRepository";
 import { ConflictRepository } from "../repositories/ConflictRepository";
 import { AuthorizationRepository } from "../repositories/AuthorizationRepository";
+import { ImportBatchRepository } from "../repositories/ImportBatchRepository";
 import { DuplicateService } from "../services/DuplicateService";
 import { ConflictService } from "../services/ConflictService";
 import { ImportService } from "../services/ImportService";
@@ -14,10 +15,11 @@ const recordRepo = new RecordRepository(db);
 const auditRepo = new AuditRepository(db);
 const conflictRepo = new ConflictRepository(db);
 const authRepo = new AuthorizationRepository(db);
+const batchRepo = new ImportBatchRepository(db);
 
 const duplicateService = new DuplicateService(recordRepo);
 const conflictService = new ConflictService(conflictRepo, authRepo, recordRepo, auditRepo);
-const importService = new ImportService(recordRepo, auditRepo, duplicateService, conflictService);
+const importService = new ImportService(db, recordRepo, auditRepo, batchRepo, duplicateService, conflictService);
 
 router.post("/preview", (req: Request, res: Response) => {
   try {
@@ -28,7 +30,7 @@ router.post("/preview", (req: Request, res: Response) => {
     }
 
     const records = importService.parseCSV(csvContent);
-    const preview = importService.previewImport(records);
+    const preview = importService.previewImport(records, fileName || "import.csv");
 
     res.json({
       success: true,
@@ -48,13 +50,14 @@ router.post("/confirm", (req: Request, res: Response) => {
       return res.status(400).json({ error: "预览数据不能为空" });
     }
 
-    const records = importService.confirmImport(preview, importedBy || "阿梅");
+    const result = importService.confirmImport(preview, importedBy || "阿梅");
 
     res.json({
       success: true,
       data: {
-        records,
-        count: records.length,
+        batch: result.batch,
+        records: result.records,
+        count: result.records.length,
       },
     });
   } catch (error) {

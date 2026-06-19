@@ -1,14 +1,18 @@
 import Papa from "papaparse";
-import type { AudioRecord, ImportPreviewResult, SubstituteSource } from "@shared/types";
+import type { Database } from "better-sqlite3";
+import type { AudioRecord, ImportPreviewResult, SubstituteSource, ImportBatch } from "@shared/types";
 import { RecordRepository } from "../repositories/RecordRepository";
 import { AuditRepository } from "../repositories/AuditRepository";
+import { ImportBatchRepository } from "../repositories/ImportBatchRepository";
 import { DuplicateService } from "./DuplicateService";
 import { ConflictService } from "./ConflictService";
 
 export class ImportService {
   constructor(
+    private db: Database,
     private recordRepo: RecordRepository,
     private auditRepo: AuditRepository,
+    private batchRepo: ImportBatchRepository,
     private duplicateService: DuplicateService,
     private conflictService: ConflictService
   ) {}
@@ -52,7 +56,10 @@ export class ImportService {
     });
   }
 
-  previewImport(records: Omit<AudioRecord, "id" | "createdAt" | "updatedAt" | "importBatchId">[]): ImportPreviewResult {
+  previewImport(
+    records: Omit<AudioRecord, "id" | "createdAt" | "updatedAt" | "importBatchId">[],
+    fileName: string = "import.csv"
+  ): ImportPreviewResult {
     const { newRecords, duplicateCurrent, duplicateHistory } = this.duplicateService.identifyDuplicates(records);
 
     const temporarySubstituteCount = [
@@ -80,10 +87,14 @@ export class ImportService {
       temporarySubstituteCount,
       potentialConflicts,
       importBatchId,
+      fileName,
     };
   }
 
-  confirmImport(preview: ImportPreviewResult, importedBy: string = "阿梅"): AudioRecord[] {
+  confirmImport(preview: ImportPreviewResult, importedBy: string = "阿梅"): {
+    batch: ImportBatch;
+    records: AudioRecord[];
+  } {
     const allRecords = [
       ...preview.newRecords,
       ...preview.duplicateCurrent,
@@ -91,34 +102,49 @@ export class ImportService {
     ];
 
     const createdRecords: AudioRecord[] = [];
+    let createdBatch: ImportBatch | null = null;
 
-    for (const record of allRecords) {
-      const created = this.recordRepo.create({
-        ...record,
-        importBatchId: preview.importBatchId,
+    const transaction = this.db.transaction(() => {
+      createdBatch = this.batchRepo.create({
+        id: preview.importBatchId,
+        fileName: preview.fileName,
+        totalCount: allRecords.length,
+        newCount: preview.newRecords.length,
+        duplicateCurrentCount: preview.duplicateCurrent.length,
+        duplicateHistoryCount: preview.duplicateHistory.length,
+        importedBy,
       });
-      createdRecords.push(created);
 
-      this.auditRepo.create({
-        recordId: created.id,
-        operator: importedBy,
-        operatorRole: "coordinator",
-        action: "导入",
-        fieldName: null,
-        oldValue: null,
-        newValue: JSON.stringify(record),
-        reason: `导入批次 ${preview.importBatchId}`,
-        affectedResultIds: [`result_${created.id}`],
-      });
-    }
+      for (const record of allRecords) {
+        const created = this.recordRepo.create({
+          ...record,
+          importBatchId: preview.importBatchId,
+        });
+        createdRecords.push(created);
 
-    for (const record of createdRecords) {
-      if (record.status === "normal" || record.status === "new") {
-        this.conflictService.detectConflicts(record.id);
+        this.auditRepo.create({
+          recordId: created.id,
+          operator: importedBy,
+          operatorRole: "coordinator",
+          action: "导入",
+          fieldName: null,
+          oldValue: null,
+          newValue: JSON.stringify(record),
+          reason: `导入批次 ${preview.importBatchId} (${preview.fileName})`,
+          affectedResultIds: [`result_${created.id}`],
+        });
       }
-    }
 
-    return createdRecords;
+      for (const record of createdRecords) {
+        if (record.status === "normal" || record.status === "new") {
+          this.conflictService.detectConflicts(record.id);
+        }
+      }
+    });
+
+    transaction();
+
+    return { batch: createdBatch!, records: createdRecords };
   }
 
   generateSampleCSV(): string {

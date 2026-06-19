@@ -49,7 +49,9 @@ export class SelfCheckService {
     let passed = true;
     for (const [fileId, recordIds] of fileIdMap) {
       if (recordIds.length > 1) {
-        const dupeRecords = allRecords.filter((r) => r.audioFileId === fileId);
+        const dupeRecords = allRecords
+          .filter((r) => r.audioFileId === fileId)
+          .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
         const extraDupes = dupeRecords.slice(1);
         const hasProperStatus = extraDupes.every(
           (r) => r.status === "duplicate_current" || r.status === "duplicate_history"
