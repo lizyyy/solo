@@ -468,12 +468,12 @@ export default function AnomaliesPage() {
               <Clock className="w-6 h-6 text-yellow-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">待处理</p>
+              <p className="text-sm text-gray-500">待复核（向左/右等口语化）</p>
               <p className="text-2xl font-bold text-yellow-600">
                 {summaryLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin inline text-yellow-400" />
                 ) : (
-                  summary?.pending ?? 0
+                  (summary?.pendingReview ?? summary?.pending ?? 0)
                 )}
               </p>
             </div>
@@ -519,7 +519,7 @@ export default function AnomaliesPage() {
               <XCircle className="w-6 h-6 text-red-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">无效数</p>
+              <p className="text-sm text-gray-500">无效数（乱码/空值）</p>
               <p className="text-2xl font-bold text-red-600">
                 {summaryLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin inline text-red-400" />

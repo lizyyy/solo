@@ -37,10 +37,12 @@ export interface ImportResult {
 }
 
 export interface AnomalySummary {
-  pending: number
+  pendingReview: number
+  invalid: number
   confirmed: number
   rolledBack: number
-  invalid: number
+  total: number
+  pending?: number
 }
 
 export interface ApiError {

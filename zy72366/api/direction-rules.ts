@@ -1,7 +1,7 @@
 type DirectionRule = {
   pattern: RegExp
   normalizedValue: string | null
-  action: "auto_fix" | "mark_invalid"
+  action: "auto_fix" | "mark_invalid" | "pending_review"
   description: string
 }
 
@@ -10,19 +10,19 @@ const DIRECTION_RULES: DirectionRule[] = [
     pattern: /^(正方向|正向|正|positive|\+)$/i,
     normalizedValue: "positive",
     action: "auto_fix",
-    description: "正方向标准值",
+    description: "正方向标准值，自动标准化",
   },
   {
     pattern: /^(负方向|负向|负|negative|-)$/i,
     normalizedValue: "negative",
     action: "auto_fix",
-    description: "负方向标准值",
+    description: "负方向标准值，自动标准化",
   },
   {
     pattern: /^(向左|左|left|向右|右|right|反方向|反向|反转|reverse|backward)$/i,
     normalizedValue: null,
-    action: "mark_invalid",
-    description: "口语化方向表达，判定为无效(abnormal)，无法进入复核链路",
+    action: "pending_review",
+    description: "口语化方向表达，进入实验老师待复核链路，不可直接判无效",
   },
 ]
 
@@ -35,7 +35,7 @@ export function evaluateDirection(direction: string): {
   reason: string
 } {
   if (!direction || typeof direction !== "string") {
-    return { normalizedValue: null, status: "abnormal", reason: "方向字段为空" }
+    return { normalizedValue: null, status: "abnormal", reason: "无效：方向字段为空" }
   }
 
   const trimmed = direction.trim()
@@ -53,7 +53,14 @@ export function evaluateDirection(direction: string): {
         return {
           normalizedValue: null,
           status: "abnormal",
-          reason: rule.description,
+          reason: "无效：" + rule.description,
+        }
+      }
+      if (rule.action === "pending_review") {
+        return {
+          normalizedValue: null,
+          status: "pending_review",
+          reason: "待复核：" + rule.description,
         }
       }
     }
@@ -62,6 +69,6 @@ export function evaluateDirection(direction: string): {
   return {
     normalizedValue: null,
     status: "abnormal",
-    reason: `未识别的方向值: ${trimmed}`,
+    reason: `无效：未识别的方向值 "${trimmed}"，不在标准值/待复核列表中`,
   }
 }
