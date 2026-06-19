@@ -56,6 +56,31 @@ def _generate_text_report(case: DispatchCase) -> str:
                 lines.append(f"     ❌ 还缺材料：{', '.join(suggestion.missing_materials)}")
             if hasattr(suggestion, "provided_materials") and suggestion.provided_materials and not ramp.provided_materials:
                 lines.append(f"     ✅ 已提供材料（对账）：{', '.join(suggestion.provided_materials)}")
+        
+        # 处理历史（从网格员→交通协管→社区书记，整条链路可追回）
+        history = getattr(ramp, "status_history", [])
+        if history:
+            lines.append(f"     🕓 处理历史（共 {len(history)} 步）：")
+            for step_i, rec in enumerate(history, 1):
+                ts = rec.get("timestamp", "")
+                action = rec.get("action", "")
+                actor = rec.get("actor", "")
+                status = rec.get("review_status", "")
+                role = rec.get("responsible_role", "")
+                note = rec.get("note", "")
+                meta_parts = []
+                if role:
+                    meta_parts.append(f"责任人→{role}")
+                if rec.get("score_changed") is True:
+                    meta_parts.append("评分有变化")
+                elif rec.get("score_changed") is False:
+                    meta_parts.append("评分无变化（触发复核）")
+                if rec.get("reviewed_by_secretary"):
+                    meta_parts.append("书记已审阅")
+                meta = f"（{'，'.join(meta_parts)}）" if meta_parts else ""
+                lines.append(f"       {step_i}. [{ts}] {actor} 执行【{action}】，状态：{status}{meta}")
+                if note:
+                    lines.append(f"          说明：{note[:80]}")
         lines.append("")
     
     lines.append("三、整改建议（含材料对账 + 原始证据追溯）")
@@ -181,9 +206,39 @@ def _generate_html_report(case: DispatchCase) -> str:
         .suggestion-content {{ color: #555; line-height: 1.6; }}
         .missing-list {{ margin: 0; padding-left: 20px; }}
         .missing-list li {{ margin-bottom: 4px; }}
+        .provided-list {{ margin: 0; padding-left: 20px; }}
+        .provided-list li {{ margin-bottom: 4px; color: #27ae60; }}
+        .evidence-list {{ margin: 0; padding-left: 20px; }}
+        .evidence-list li {{ margin-bottom: 4px; font-family: monospace; font-size: 12px; background: #fff; padding: 4px 8px; border-radius: 4px; }}
         .role-tag {{ display: inline-block; background: #667eea; color: white; padding: 4px 12px; border-radius: 12px; font-size: 13px; margin-top: 8px; }}
         .footer {{ text-align: center; padding: 20px; color: #888; font-size: 14px; line-height: 1.8; }}
         .footer .emoji {{ font-size: 20px; }}
+        .evidence-id {{ background: #667eea; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-right: 8px; }}
+        .materials-section {{ margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ddd; }}
+        .materials-row {{ display: flex; gap: 8px; margin-bottom: 8px; align-items: flex-start; }}
+        .materials-label {{ font-weight: 600; font-size: 13px; min-width: 70px; flex-shrink: 0; }}
+        .materials-tags {{ display: flex; flex-wrap: wrap; gap: 4px; flex: 1; }}
+        .material-tag {{ padding: 2px 8px; border-radius: 10px; font-size: 11px; }}
+        .material-tag.provided {{ background: #d4edda; color: #155724; }}
+        .material-tag.missing {{ background: #f8d7da; color: #721c24; }}
+        .materials-balance {{ display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px; }}
+        .materials-col {{ background: white; padding: 12px; border-radius: 8px; }}
+        .stats-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 16px; }}
+        .stat-card {{ background: #f8f9fa; padding: 16px; border-radius: 8px; text-align: center; }}
+        .stat-card.stat-escalated {{ background: #ffe0e0; }}
+        .stat-card.stat-pending {{ background: #fff3cd; }}
+        .stat-card.stat-confirmed {{ background: #e0f5e0; }}
+        .stat-value {{ font-size: 28px; font-weight: 700; color: #667eea; margin-bottom: 4px; }}
+        .stat-label {{ font-size: 12px; color: #666; }}
+        .stat-escalated .stat-value {{ color: #c0392b; }}
+        .stat-pending .stat-value {{ color: #856404; }}
+        .stat-confirmed .stat-value {{ color: #27ae60; }}
+        .history-section {{ margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ddd; }}
+        .history-title {{ font-weight: 600; font-size: 13px; color: #667eea; margin-bottom: 8px; }}
+        .history-item {{ background: white; padding: 8px 10px; border-radius: 6px; margin-bottom: 6px; border-left: 3px solid #667eea; }}
+        .history-step {{ display: inline-block; background: #667eea; color: white; padding: 1px 6px; border-radius: 8px; font-size: 10px; font-weight: 600; margin-right: 6px; }}
+        .history-meta {{ font-size: 12px; color: #555; }}
+        .history-note {{ font-size: 11px; color: #888; margin-top: 4px; padding-left: 30px; }}
     </style>
 </head>
 <body>
@@ -200,11 +255,14 @@ def _generate_html_report(case: DispatchCase) -> str:
         <p style="color: #666; margin-top: 0;">整合网格员巡查表与施工告示的现场说法，让每一条证据都有迹可循</p>
 """
     
-    for evidence in case.evidences:
+    for idx, evidence in enumerate(case.evidences, 1):
         html += f"""
         <div class="evidence-card">
             <div class="evidence-source">{evidence.source.value}</div>
-            <div class="evidence-meta">记录人：{evidence.recorded_by} | 时间：{evidence.recorded_at.strftime('%Y-%m-%d %H:%M')}</div>
+            <div class="evidence-meta">
+                <span class="evidence-id">证据#{idx}</span>
+                记录人：{evidence.recorded_by} | 时间：{evidence.recorded_at.strftime('%Y-%m-%d %H:%M')}
+            </div>
             <div>{evidence.description}</div>
         </div>
 """
@@ -214,16 +272,30 @@ def _generate_html_report(case: DispatchCase) -> str:
 
     <div class="section">
         <h2>🛤️ 坡道情况一览</h2>
-        <p style="color: #666; margin-top: 0;">点击坡道可返回巡查表或施工告示查看原始证据，不只是漂亮画面</p>
+        <p style="color: #666; margin-top: 0;">先服务复核优先展示 · 点击可追溯原始证据</p>
 """
     
-    for ramp in case.ramps:
+    # 先服务复核排序：ESCALATED 排最前
+    sorted_ramps = sorted(case.ramps, key=lambda r: {
+        ReviewStatus.ESCALATED: 0,
+        ReviewStatus.PENDING: 1,
+        ReviewStatus.NEEDS_SUPPLEMENT: 2,
+        ReviewStatus.CONFIRMED: 3
+    }.get(r.review_status, 99))
+    
+    for ramp in sorted_ramps:
         status_class = {
             ReviewStatus.ESCALATED: "status-escalated",
             ReviewStatus.CONFIRMED: "status-confirmed",
             ReviewStatus.PENDING: "status-pending",
             ReviewStatus.NEEDS_SUPPLEMENT: "status-pending"
         }.get(ramp.review_status, "status-pending")
+        
+        status_label = {
+            ReviewStatus.ESCALATED: "【先服务复核→交通协管优先】",
+            ReviewStatus.PENDING: "【先服务复核→网格员补证】",
+            ReviewStatus.NEEDS_SUPPLEMENT: "【先服务复核→需补充】",
+        }.get(ramp.review_status, "")
         
         score_html = f"<span class='score-no-change'>{ramp.score_before:.1f} → {ramp.score_after:.1f} 无变化 ⚠️</span>" if not ramp.score_changed else f"{ramp.score_before:.1f} → {ramp.score_after:.1f} ✓"
         
@@ -236,15 +308,64 @@ def _generate_html_report(case: DispatchCase) -> str:
         
         supplement_html = f'<div style="margin-top: 8px; color: #666; font-style: italic;">补录备注：{ramp.supplementary_note}</div>' if ramp.supplementary_note else ""
         
+        # 材料对账
+        suggestion = next((s for s in case.suggestions if s.ramp_id == ramp.id), None)
+        materials_html = ""
+        if suggestion:
+            provided_html = "".join([f'<span class="material-tag provided">{mat}</span>' for mat in suggestion.provided_materials])
+            missing_html = "".join([f'<span class="material-tag missing">{mat}</span>' for mat in suggestion.missing_materials])
+            materials_html = f"""
+            <div class="materials-section">
+                <div class="materials-row">
+                    <span class="materials-label">✅ 已提供：</span>
+                    <div class="materials-tags">{provided_html}</div>
+                </div>
+                <div class="materials-row">
+                    <span class="materials-label">❌ 还缺：</span>
+                    <div class="materials-tags">{missing_html}</div>
+                </div>
+            </div>
+            """
+        
+        # 处理历史
+        history_html = ""
+        history = getattr(ramp, "status_history", [])
+        if history:
+            history_items = ""
+            for step_i, rec in enumerate(history, 1):
+                ts = rec.get("timestamp", "")
+                action = rec.get("action", "")
+                actor = rec.get("actor", "")
+                status = rec.get("review_status", "")
+                role = rec.get("responsible_role", "")
+                note = rec.get("note", "")[:60]
+                meta = f"（责任人→{role}）" if role else ""
+                note_html = f'<div class="history-note">{note}</div>' if note else ""
+                history_items += f"""
+                <div class="history-item">
+                    <span class="history-step">#{step_i}</span>
+                    <span class="history-meta">[{ts}] {actor} 执行【{action}】，状态：{status}{meta}</span>
+                    {note_html}
+                </div>
+                """
+            history_html = f"""
+            <div class="history-section">
+                <div class="history-title">🕓 处理历史（共 {len(history)} 步）</div>
+                {history_items}
+            </div>
+            """
+        
         html += f"""
         <div class="ramp-card">
             <div class="ramp-header">
                 <span class="ramp-location">📍 {ramp.location}</span>
-                <span class="status-badge {status_class}">{ramp.review_status.value}</span>
+                <span class="status-badge {status_class}">{ramp.review_status.value} {status_label}</span>
             </div>
             <div class="score-change">评分变化：{score_html}</div>
             {issues_html}
             {supplement_html}
+            {materials_html}
+            {history_html}
         </div>
 """
     
@@ -264,6 +385,18 @@ def _generate_html_report(case: DispatchCase) -> str:
         }.get(suggestion.responsible_role, "📋")
         
         missing_items = "".join([f"<li>{mat}</li>" for mat in suggestion.missing_materials])
+        provided_items = "".join([f"<li>{mat}</li>" for mat in suggestion.provided_materials])
+        
+        # 证据追溯
+        evidence_html = ""
+        if suggestion.evidence_trace:
+            evidence_items = "".join([f"<li>{e}</li>" for e in suggestion.evidence_trace])
+            evidence_html = f"""
+            <div class="suggestion-section">
+                <div class="suggestion-label">🔗 原始证据追溯</div>
+                <ul class="evidence-list">{evidence_items}</ul>
+            </div>
+            """
         
         html += f"""
         <div class="suggestion-card">
@@ -274,10 +407,18 @@ def _generate_html_report(case: DispatchCase) -> str:
                 <div class="suggestion-content">{suggestion.why_kept}</div>
             </div>
             
-            <div class="suggestion-section">
-                <div class="suggestion-label">📦 还缺什么材料</div>
-                <ul class="missing-list">{missing_items}</ul>
+            <div class="materials-balance">
+                <div class="materials-col">
+                    <div class="suggestion-label">✅ 已提供材料（{len(suggestion.provided_materials)}项）</div>
+                    <ul class="provided-list">{provided_items}</ul>
+                </div>
+                <div class="materials-col">
+                    <div class="suggestion-label">📦 还缺什么材料（{len(suggestion.missing_materials)}项）</div>
+                    <ul class="missing-list">{missing_items}</ul>
+                </div>
             </div>
+            
+            {evidence_html}
             
             <div class="suggestion-section">
                 <div class="suggestion-label">{role_emoji} 下一步该找谁</div>
@@ -289,14 +430,67 @@ def _generate_html_report(case: DispatchCase) -> str:
 """
     
     escalated_count = len([r for r in case.ramps if r.review_status == ReviewStatus.ESCALATED])
+    pending_count = len([r for r in case.ramps if r.review_status == ReviewStatus.PENDING or r.review_status == ReviewStatus.NEEDS_SUPPLEMENT])
+    confirmed_count = len([r for r in case.ramps if r.review_status == ReviewStatus.CONFIRMED])
+    
+    # 责任人统计
+    traffic_count = len([s for s in case.suggestions if s.responsible_role == ResponsibleRole.TRAFFIC_ASSISTANT])
+    secretary_count = len([s for s in case.suggestions if s.responsible_role == ResponsibleRole.COMMUNITY_SECRETARY])
+    inspector_count = len([s for s in case.suggestions if s.responsible_role == ResponsibleRole.GRID_INSPECTOR])
+    
+    total_provided = sum(len(s.provided_materials) for s in case.suggestions)
+    total_missing = sum(len(s.missing_materials) for s in case.suggestions)
     
     html += f"""
     </div>
 
+    <div class="section">
+        <h2>📊 统计与对账小结（不只报总数）</h2>
+        <p style="color: #666; margin-top: 0;">每一次整改都是为了更安全、更便利的社区环境</p>
+        
+        <div class="stats-grid">
+            <div class="stat-card stat-escalated">
+                <div class="stat-value">{escalated_count}</div>
+                <div class="stat-label">⚠️ 需交通协管紧急复核</div>
+            </div>
+            <div class="stat-card stat-pending">
+                <div class="stat-value">{pending_count}</div>
+                <div class="stat-label">🔍 待网格员/社区书记跟进</div>
+            </div>
+            <div class="stat-card stat-confirmed">
+                <div class="stat-value">{confirmed_count}</div>
+                <div class="stat-label">✓ 已确认正常</div>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{total_provided}</div>
+                <div class="stat-label">✅ 累计已提供材料</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{total_missing}</div>
+                <div class="stat-label">❌ 累计还缺材料</div>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{traffic_count}</div>
+                <div class="stat-label">� 交通协管负责</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{secretary_count}</div>
+                <div class="stat-label">👩‍💼 社区书记周姐负责</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{inspector_count}</div>
+                <div class="stat-label">🧑‍🔧 网格员负责</div>
+            </div>
+        </div>
+    </div>
+
     <div class="footer">
-        <p class="emoji">💪</p>
-        <p>这份报告不是冷冰冰的系统日志</p>
-        <p>每一条记录背后都是街坊邻居的日常出行</p>
         <p>每一次整改都是为了更安全、更便利的社区环境</p>
         <p style="margin-top: 16px;">
             本报告共涉及 <strong>{len(case.ramps)}</strong> 处坡道，

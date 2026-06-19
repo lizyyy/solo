@@ -46,6 +46,7 @@ class Ramp:
     supplementary_note: str = ""
     provided_materials: List[str] = field(default_factory=list)
     review_status: ReviewStatus = ReviewStatus.PENDING
+    status_history: List[Dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass

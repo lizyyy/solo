@@ -92,6 +92,21 @@ def _build_evidence_trace(case: DispatchCase, ramp: Ramp) -> List[str]:
     return trace
 
 
+def _append_history(ramp: Ramp, action: str, actor: str, note: str = "", **extra):
+    """追加状态/材料/责任人变化历史，便于报告追溯整条链路"""
+    from datetime import datetime
+    record = {
+        "timestamp": datetime.now().isoformat(timespec="minutes"),
+        "action": action,
+        "actor": actor,
+        "review_status": ramp.review_status.value,
+        "provided_materials": list(ramp.provided_materials),
+        "note": note,
+    }
+    record.update(extra)
+    ramp.status_history.append(record)
+
+
 def calculate_inspection_score(inspection: GridInspection) -> float:
     score = 100.0
     if inspection.bike_overflow:
@@ -151,6 +166,11 @@ def _update_ramps_from_inspection(case: DispatchCase, inspection: GridInspection
     ramp.provided_materials = _merge_inspection_provided(case, ramp)
     ramp.score_after = _recalculate_ramp_score(ramp)
     
+    _append_history(ramp, "初次巡查建档", inspection.inspector_name or "网格员",
+                   f"导入巡查表，初始评分 {ramp.score_after:.1f}",
+                   score_before=ramp.score_before, score_after=ramp.score_after,
+                   responsible_role=ResponsibleRole.GRID_INSPECTOR.value)
+    
     case.ramps.append(ramp)
 
 
@@ -194,6 +214,16 @@ def supplement_ramp(case: DispatchCase, ramp_id: str, note: str, is_accessible: 
     
     _update_suggestions(case)
     
+    # 从最新建议里拿到当前责任人
+    current_suggestion = next((s for s in case.suggestions if s.ramp_id == ramp.id), None)
+    current_role = current_suggestion.responsible_role.value if current_suggestion else ResponsibleRole.TRAFFIC_ASSISTANT.value
+    
+    _append_history(ramp, "坡道补录", ResponsibleRole.COMMUNITY_SECRETARY.value,
+                   note,
+                   score_before=ramp.score_before, score_after=ramp.score_after,
+                   score_changed=ramp.score_changed,
+                   responsible_role=current_role)
+    
     return ramp
 
 
@@ -226,11 +256,23 @@ def import_construction_notice(case: DispatchCase, notice: ConstructionNotice, r
     
     _merge_construction_impact(case, notice)
     for ramp in case.ramps:
-        notice_provided = _merge_notice_provided(case, ramp)
-        for m in notice_provided:
-            if m not in ramp.provided_materials:
-                ramp.provided_materials.append(m)
+        if notice.location in ramp.location or ramp.location in notice.location:
+            notice_provided = _merge_notice_provided(case, ramp)
+            for m in notice_provided:
+                if m not in ramp.provided_materials:
+                    ramp.provided_materials.append(m)
     _update_suggestions(case)
+    
+    # 给匹配的坡道追加历史记录（施工告示导入）
+    for ramp in case.ramps:
+        if notice.location in ramp.location or ramp.location in notice.location:
+            current_suggestion = next((s for s in case.suggestions if s.ramp_id == ramp.id), None)
+            current_role = current_suggestion.responsible_role.value if current_suggestion else ResponsibleRole.COMMUNITY_SECRETARY.value
+            _append_history(ramp, "导入施工告示",
+                           "社区书记周姐" if reviewed_by_secretary else "系统",
+                           f"导入【{notice.title}】，现场说法：{notice.site_statement}",
+                           reviewed_by_secretary=reviewed_by_secretary,
+                           responsible_role=current_role)
     
     return case
 
@@ -271,6 +313,14 @@ def review_ramp(case: DispatchCase, ramp_id: str, status: ReviewStatus, note: st
     
     _update_suggestions(case)
     
+    current_suggestion = next((s for s in case.suggestions if s.ramp_id == ramp.id), None)
+    current_role = current_suggestion.responsible_role.value if current_suggestion else status.value
+    
+    _append_history(ramp, "复核状态更新", ResponsibleRole.TRAFFIC_ASSISTANT.value,
+                   note,
+                   new_status=status.value,
+                   responsible_role=current_role)
+    
     return ramp
 
 
@@ -304,19 +354,32 @@ def _update_suggestions(case: DispatchCase):
             None
         )
         
-        if ramp.review_status == ReviewStatus.ESCALATED:
+        if construction_notice and construction_notice.reviewed_by_secretary:
+            if ramp.review_status == ReviewStatus.ESCALATED:
+                base_missing = [
+                    "施工结束后的清理计划", "临时停放点设置方案",
+                    "与施工方协调记录", "与共享单车运营方沟通记录"
+                ]
+                why_kept = (f"坡道补录后评分无变化，已转交通协管；同时结合施工告示【{construction_notice.title}】的现场说法（"
+                           f"{construction_notice.site_statement}），"
+                           "施工期间共享单车临时堆放是客观因素，不能只让交通协管查现场。"
+                           "先服务复核：社区书记已审阅施工告示，先协调施工清理或临时停放方案，再看是否需交通协管进一步复核。")
+                next_step = "请社区书记周姐协调施工方和共享单车运营方，设置临时停放区域并出具书面方案，同步记录与双方的沟通情况。"
+                role = ResponsibleRole.COMMUNITY_SECRETARY
+                prio = 1
+            else:
+                base_missing = [
+                    "施工结束后的清理计划", "临时停放点设置方案", "无障碍坡道检测报告"
+                ]
+                why_kept = (f"结合施工告示【{construction_notice.title}】的现场说法（"
+                           f"{construction_notice.site_statement}），"
+                           "施工期间共享单车临时堆放是客观因素，但需防止长期占道。"
+                           "先服务复核：社区书记已审阅，下一步重点落实施工结束后的清场和临时停放。")
+                next_step = "请社区书记周姐协调施工方和共享单车运营方，设置临时停放区域并出具书面方案。"
+                role = ResponsibleRole.COMMUNITY_SECRETARY
+                prio = 2
+        elif ramp.review_status == ReviewStatus.ESCALATED:
             base_missing, why_kept, next_step, role, prio = _default_missing_for_status(ramp)
-        elif construction_notice and construction_notice.reviewed_by_secretary:
-            base_missing = [
-                "施工结束后的清理计划", "临时停放点设置方案", "无障碍坡道检测报告"
-            ]
-            why_kept = (f"结合施工告示【{construction_notice.title}】的现场说法（"
-                       f"{construction_notice.site_statement}），"
-                       "施工期间共享单车临时堆放是客观因素，但需防止长期占道。"
-                       "先服务复核：社区书记已审阅，下一步重点落实施工结束后的清场和临时停放。")
-            next_step = "请社区书记周姐协调施工方和共享单车运营方，设置临时停放区域并出具书面方案。"
-            role = ResponsibleRole.COMMUNITY_SECRETARY
-            prio = 2
         else:
             base_missing, why_kept, next_step, role, prio = _default_missing_for_status(ramp)
             if construction_notice and not construction_notice.reviewed_by_secretary:

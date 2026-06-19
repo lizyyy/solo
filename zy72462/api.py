@@ -6,7 +6,7 @@ from bike_dispatch import (
     create_case, import_grid_inspection, supplement_ramp,
     import_construction_notice, review_ramp, generate_report,
     get_ramp_by_id, set_display_mode,
-    GridInspection, ConstructionNotice, ReviewStatus,
+    GridInspection, ConstructionNotice, ReviewStatus, Ramp,
     RectificationSuggestion, Evidence, EvidenceSource, ResponsibleRole, DispatchCase
 )
 import os
@@ -66,7 +66,8 @@ def _save_case(case: DispatchCase):
                 "score_changed": r.score_changed,
                 "supplementary_note": r.supplementary_note,
                 "provided_materials": getattr(r, "provided_materials", []),
-                "review_status": r.review_status.value
+                "review_status": r.review_status.value,
+                "status_history": getattr(r, "status_history", [])
             } for r in case.ramps
         ],
         "suggestions": [
@@ -149,7 +150,8 @@ def _load_case(case_id: str) -> DispatchCase:
             score_changed=r["score_changed"],
             supplementary_note=r.get("supplementary_note", ""),
             provided_materials=r.get("provided_materials", []),
-            review_status=ReviewStatus(r.get("review_status", "待复核"))
+            review_status=ReviewStatus(r.get("review_status", "待复核")),
+            status_history=r.get("status_history", [])
         ))
     
     for s in data.get("suggestions", []):
