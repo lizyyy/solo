@@ -330,8 +330,6 @@ class HistoryManager:
             stu = v.data_snapshot.get("student_id")
             if stu:
                 unique_students_in_history.add(str(stu))
-            if "review_id" in v.data_snapshot:
-                counts["review_approve"] += 1
             if v.is_rollback:
                 counts["rollback"] += 1
         return {

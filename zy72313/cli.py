@@ -141,11 +141,17 @@ def check_answers(ctx, student_id):
 @cli.command()
 @click.argument('review_id')
 @click.argument('action', type=click.Choice(['approve', 'reject', 'info']))
-@click.option('--approver', 'author', required=True, help='操作人')
-@click.option('--comment', default='', help='评论')
+@click.option('--author', required=True, help='操作人，如 唐老师 / 业务运营')
+@click.option('--comment', default='', help='评论/原因/需要的信息')
 @click.pass_context
 def review(ctx, review_id, action, author, comment):
-    """处理复核任务（approve/reject/info）"""
+    """处理复核任务（approve/reject/info）
+    
+    示例:
+      python cli.py review <review_id> approve --author 唐老师 --comment "确认使用v2"
+      python cli.py review <review_id> reject --author 业务运营 --comment "数据有误"
+      python cli.py review <review_id> info --author 唐老师 --comment "请补充误差说明"
+    """
     config = ctx.obj['config']
     history_mgr = HistoryManager(config['system']['history_dir'])
     review_sys = ReviewSystem(
@@ -467,17 +473,19 @@ def report_summary(ctx):
             student_status[sid]["reviews"] += 1
             student_status[sid][r.status] = student_status[sid].get(r.status, 0) + 1
 
+    approved_count = sum(1 for r in all_reviews if r.status == "approved")
+    unapproved_count = sum(1 for r in all_reviews if r.status != "approved")
+    history_approved = history_mgr.summary_report()["operation_counts"].get("review_approve", 0)
+
     report = {
         "generated_at": datetime.now().isoformat(),
         "review_summary": review_summary,
         "student_review_status": student_status,
         "history_summary": history_mgr.summary_report(),
         "consistency_check": {
-            "review_count_match": (
-                len(all_reviews)
-                == history_mgr.summary_report()["operation_counts"].get("review_approve", 0)
-                + sum(1 for r in all_reviews if r.status != "approved")
-            ),
+            "review_count_match": len(all_reviews) == approved_count + unapproved_count,
+            "approval_count_match": approved_count == history_approved,
+            "unique_approved_review_ids_match": len({r.review_id for r in all_reviews if r.status == "approved"}) == approved_count,
             "pending_multiple_answers_count": len(review_sys.get_pending_reviews("multiple_answers"))
         }
     }
@@ -509,6 +517,96 @@ def run_workflow(ctx):
     click.echo(f"  python cli.py import-data {import_file}")
     click.echo("  python cli.py check-answers")
     click.echo("  python cli.py review <review_id> approve --author 唐老师")
+
+
+@cli.command()
+@click.option('--prefix', default='markov_churn_', help='导出文件前缀')
+@click.option('--export-dir', default=None, help='导出目录，默认使用配置的export_dir')
+@click.pass_context
+def export(ctx, prefix, export_dir):
+    """导出完整分析结果：客户状态(CSV) + 转移矩阵(CSV) + 复核报告(JSON) + 版本历史(JSON)
+    
+    读取同一份最新保存后的 model 快照，确保与 report-summary、lookup 等命令数据一致。
+    """
+    config = ctx.obj['config']
+    model = load_or_init_model(config)
+    history_mgr = HistoryManager(config['system']['history_dir'])
+    review_sys = ReviewSystem(
+        Path(config['system']['data_dir']) / "reviews.json",
+        history_mgr
+    )
+
+    export_path = Path(export_dir) if export_dir else Path(config['system']['export_dir'])
+    export_path.mkdir(parents=True, exist_ok=True)
+
+    model.estimate_transition_matrix()
+
+    states_file = export_path / f"{prefix}customer_states.csv"
+    matrix_file = export_path / f"{prefix}transition_matrix.csv"
+    reviews_file = export_path / f"{prefix}review_report.json"
+    history_file = export_path / f"{prefix}version_history.json"
+
+    states = []
+    for cid, state_list in model.customers.items():
+        for s in state_list:
+            states.append({
+                "customer_id": s.customer_id,
+                "student_id": s.student_id,
+                "answer_version": s.answer_version,
+                "timestamp": s.timestamp.isoformat(),
+                "state": s.state,
+                "error_notes": s.error_notes,
+                "annotations": json.dumps(s.annotations, ensure_ascii=False) if s.annotations else "",
+                "source_file": s.source_file
+            })
+    pd.DataFrame(states).to_csv(states_file, index=False, encoding='utf-8-sig')
+
+    tm_df = pd.DataFrame(
+        model.transition_matrix,
+        index=model.states,
+        columns=model.states
+    )
+    tm_df.to_csv(matrix_file, encoding='utf-8-sig')
+
+    all_reviews = review_sys.list_reviews()
+    review_data = []
+    for r in all_reviews:
+        review_data.append({
+            "review_id": r.review_id,
+            "type": r.review_type,
+            "status": r.status,
+            "student_id": r.data.get("student_id"),
+            "answer_version": r.data.get("answer_version"),
+            "description": r.description,
+            "assigned_to": r.assigned_to,
+            "created_at": r.created_at,
+            "resolved_by": r.resolved_by,
+            "resolution": r.resolution,
+            "resolved_at": r.resolved_at,
+            "data": r.data
+        })
+    with open(reviews_file, 'w', encoding='utf-8') as f:
+        json.dump(review_data, f, ensure_ascii=False, indent=2)
+
+    versions = []
+    for v in history_mgr.list_versions():
+        versions.append({
+            "version_id": v.version_id,
+            "author": v.author,
+            "description": v.description,
+            "created_at": v.timestamp,
+            "is_rollback": v.is_rollback,
+            "data_snapshot": v.data_snapshot
+        })
+    with open(history_file, 'w', encoding='utf-8') as f:
+        json.dump(versions, f, ensure_ascii=False, indent=2)
+
+    click.echo("导出完成，文件清单:")
+    click.echo(f"  客户状态: {states_file}")
+    click.echo(f"  转移矩阵: {matrix_file}")
+    click.echo(f"  复核报告: {reviews_file}")
+    click.echo(f"  版本历史: {history_file}")
+    click.echo(f"\n数据来源: 读取最新 model 快照（共 {len(states)} 条客户状态，{len(model.customers)} 个唯一客户）")
 
 
 @cli.command()
