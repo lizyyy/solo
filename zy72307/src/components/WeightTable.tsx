@@ -8,10 +8,11 @@ interface WeightTableProps {
 }
 
 const warningLabels: Record<WarningType, string> = {
-  percent_decimal_mixed: '百分数小数混合',
-  duplicate_row: '重复行',
+  percent_decimal_mixed: '百分数小数混合(不归正常)',
+  duplicate_row: '重复行(同指标)',
+  duplicate_import: '重复导入(文件指纹匹配)',
   invalid_value: '无效值',
-  high_condition_number: '高条件数'
+  high_condition_number: '高条件数预警'
 };
 
 const statusLabels: Record<string, { label: string; color: string }> = {
@@ -28,7 +29,7 @@ export const WeightTable: React.FC<WeightTableProps> = ({ rows, onRowUpdate, onN
 
   const handleEdit = (row: WeightRow) => {
     setEditingId(row.id);
-    setEditValue(row.originalValue);
+    setEditValue(row.modifiedValue || row.originalImportValue);
   };
 
   const handleSave = (id: string) => {
@@ -45,13 +46,16 @@ export const WeightTable: React.FC<WeightTableProps> = ({ rows, onRowUpdate, onN
       <table className="weight-table">
         <thead>
           <tr>
+            <th>批次</th>
             <th>原始行号</th>
             <th>指标名称</th>
-            <th>原始值</th>
+            <th>原始说法(永不覆盖)</th>
+            <th>改后值(补录)</th>
             <th>计算值</th>
             <th>格式</th>
             <th>状态</th>
             <th>警告</th>
+            <th>重复导入</th>
             <th>人工修改</th>
             <th>备注</th>
             <th>操作</th>
@@ -59,10 +63,20 @@ export const WeightTable: React.FC<WeightTableProps> = ({ rows, onRowUpdate, onN
         </thead>
         <tbody>
           {rows.map(row => (
-            <tr key={row.id} className={row.isManualModified ? 'modified' : ''}>
+            <tr key={row.id} className={`
+              ${row.isManualModified ? 'modified' : ''}
+              ${row.isDuplicateImport ? 'duplicate-import' : ''}
+              ${row.warnings.includes('percent_decimal_mixed') ? 'needs-review-row' : ''}
+            `}>
+              <td className="batch-id" title={row.importBatchId}>
+                {row.importBatchId.slice(-8)}
+              </td>
               <td className="row-number">{row.originalRowNumber}</td>
               <td className="criterion-name">{row.criterionName}</td>
-              <td className="original-value">
+              <td className="original-import-value">
+                <strong>{row.originalImportValue}</strong>
+              </td>
+              <td className="modified-value">
                 {editingId === row.id ? (
                   <input
                     type="text"
@@ -70,11 +84,13 @@ export const WeightTable: React.FC<WeightTableProps> = ({ rows, onRowUpdate, onN
                     onChange={(e) => setEditValue(e.target.value)}
                     className="edit-input"
                   />
+                ) : row.modifiedValue ? (
+                  <span className="modified-badge-inline">{row.modifiedValue}</span>
                 ) : (
-                  <span>{row.originalValue}</span>
+                  <span className="no-modified">-</span>
                 )}
               </td>
-              <td className="current-value">{row.currentValue.toFixed(4)}</td>
+              <td className="current-value">{row.currentValue.toFixed(6)}</td>
               <td className="format-type">
                 {row.isPercent ? (
                   <span className="badge percent">百分比</span>
@@ -94,13 +110,22 @@ export const WeightTable: React.FC<WeightTableProps> = ({ rows, onRowUpdate, onN
                 {row.warnings.length > 0 ? (
                   <div className="warning-list">
                     {row.warnings.map((w, i) => (
-                      <span key={i} className="warning-tag">
+                      <span key={i} className={`warning-tag ${w}`}>
                         {warningLabels[w]}
                       </span>
                     ))}
                   </div>
                 ) : (
                   <span className="no-warning">-</span>
+                )}
+              </td>
+              <td className="duplicate-import">
+                {row.isDuplicateImport ? (
+                  <span className="dup-badge" title={`匹配历史记录: ${row.matchedRowId}`}>
+                    🔁 是
+                  </span>
+                ) : (
+                  <span className="no-dup">否</span>
                 )}
               </td>
               <td className="modified">
@@ -126,7 +151,7 @@ export const WeightTable: React.FC<WeightTableProps> = ({ rows, onRowUpdate, onN
                     <button className="btn-cancel" onClick={handleCancel}>取消</button>
                   </>
                 ) : (
-                  <button className="btn-edit" onClick={() => handleEdit(row)}>编辑</button>
+                  <button className="btn-edit" onClick={() => handleEdit(row)}>补录</button>
                 )}
               </td>
             </tr>

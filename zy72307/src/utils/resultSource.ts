@@ -1,5 +1,11 @@
 import { WeightTableData, UnifiedResult, WeightRow, ChangeHistoryEntry } from '../types';
 
+let globalDataVersion = 1;
+
+export function setGlobalDataVersion(version: number): void {
+  globalDataVersion = version;
+}
+
 export function buildUnifiedResult(
   tableData: WeightTableData
 ): UnifiedResult {
@@ -10,6 +16,7 @@ export function buildUnifiedResult(
   const needsReviewCount = rows.filter(r => r.status === 'needs_review').length;
   const normalCount = rows.filter(r => r.status === 'normal').length;
   const modifiedCount = rows.filter(r => r.isManualModified).length;
+  const duplicateImportCount = rows.filter(r => r.isDuplicateImport).length;
 
   return {
     rows: rows.map(r => ({ ...r })),
@@ -20,13 +27,16 @@ export function buildUnifiedResult(
       errorCount,
       needsReviewCount,
       normalCount,
-      modifiedCount
+      modifiedCount,
+      duplicateImportCount
     },
     processStep: tableData.processStep,
     importTime: tableData.importTime,
     importedBy: tableData.importedBy,
     history: [...tableData.history],
     dataVersion: tableData.dataVersion,
+    importBatches: [...tableData.importBatches],
+    currentBatchId: tableData.currentBatchId,
     exportTime: new Date()
   };
 }
@@ -60,6 +70,7 @@ export function createHistoryEntry(params: {
     newValue: params.newValue,
     changedBy: params.changedBy,
     changedAt: new Date(),
-    reason: params.reason
+    reason: params.reason,
+    dataVersion: globalDataVersion
   };
 }

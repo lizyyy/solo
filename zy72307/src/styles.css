@@ -1272,3 +1272,165 @@ body {
   line-height: 1.6;
   color: #276749;
 }
+
+.sample-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.sample-hint {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #718096;
+  text-align: center;
+}
+
+.batch-list {
+  margin-top: 12px;
+  padding: 12px;
+  background: #f7fafc;
+  border-radius: 6px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.batch-list h5 {
+  font-size: 12px;
+  color: #4a5568;
+  margin-bottom: 8px;
+}
+
+.batch-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  background: white;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.batch-item.duplicate {
+  background: #fffaf0;
+  border-left: 3px solid #ed8936;
+}
+
+.batch-name {
+  color: #2d3748;
+  font-weight: 500;
+}
+
+.batch-status {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.batch-status.new {
+  background: #c6f6d5;
+  color: #22543d;
+}
+
+.batch-status.dup {
+  background: #fed7aa;
+  color: #9c4221;
+}
+
+.batch-id {
+  font-family: monospace;
+  font-size: 11px;
+  color: #a0aec0;
+}
+
+.header-version .batch-id {
+  text-align: right;
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+}
+
+.original-import-value {
+  font-family: monospace;
+  color: #2b6cb0;
+  background: #ebf8ff;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.modified-badge-inline {
+  font-family: monospace;
+  color: #276749;
+  background: #c6f6d5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.dup-badge {
+  background: #ed8936;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.no-dup {
+  color: #a0aec0;
+  font-size: 12px;
+}
+
+.duplicate-import {
+  background: #fffaf0 !important;
+}
+
+.needs-review-row {
+  background: #ebf8ff !important;
+}
+
+.warning-tag.duplicate_import {
+  background: #fed7aa;
+  color: #9c4221;
+}
+
+.warning-tag.percent_decimal_mixed {
+  background: #bee3f8;
+  color: #2a4365;
+}
+
+.review-original {
+  font-family: monospace;
+  background: #ebf8ff;
+  color: #2b6cb0;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.review-modified {
+  font-family: monospace;
+  background: #c6f6d5;
+  color: #276749;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.review-wtag.duplicate_import {
+  background: #fed7aa;
+  color: #9c4221;
+}
+
+.batch-id-col {
+  font-family: monospace;
+  font-size: 11px;
+  color: #718096;
+}
+
+.modified-value .edit-input {
+  width: 100px;
+}

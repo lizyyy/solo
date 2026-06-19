@@ -1,8 +1,14 @@
 import React, { useRef, useState } from 'react';
 import { parseExcelFile } from '../utils/excelHandler';
 
+export interface FileLoadResult {
+  rows: Array<{ criterion: string; weight: string }>;
+  fileName: string;
+  fileSize: number;
+}
+
 interface FileUploadProps {
-  onFileLoaded: (data: Array<{ criterion: string; weight: string }>) => void;
+  onFileLoaded: (data: FileLoadResult) => void;
 }
 
 export const FileUpload: React.FC<FileUploadProps> = ({ onFileLoaded }) => {
@@ -39,7 +45,25 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileLoaded }) => {
       { criterion: '教学方法', weight: '0.20' },
       { criterion: '教学效果', weight: '25%' }
     ];
-    onFileLoaded(sampleData);
+    onFileLoaded({
+      rows: sampleData,
+      fileName: '评分权重表示例(含混合).xlsx',
+      fileSize: 12345
+    });
+  };
+
+  const loadSampleDataV2 = () => {
+    const sampleData = [
+      { criterion: '教学态度', weight: '0.25' },
+      { criterion: '教学内容', weight: '30%' },
+      { criterion: '教学方法', weight: '0.20' },
+      { criterion: '教学效果', weight: '25%' }
+    ];
+    onFileLoaded({
+      rows: sampleData,
+      fileName: '评分权重表示例(含混合) - 副本.xlsx',
+      fileSize: 12345
+    });
   };
 
   return (
@@ -59,9 +83,17 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileLoaded }) => {
         {error && <div className="error-message">{error}</div>}
       </div>
       <div className="sample-data">
-        <button className="btn-sample" onClick={loadSampleData}>
-          加载示例数据（包含百分数小数混合）
-        </button>
+        <div className="sample-buttons">
+          <button className="btn-sample" onClick={loadSampleData}>
+            📊 测试1：首次导入（含百分数小数混合）
+          </button>
+          <button className="btn-sample" onClick={loadSampleDataV2}>
+            🔁 测试2：再次上传同一份表（触发重复导入检测）
+          </button>
+        </div>
+        <p className="sample-hint">
+          提示：测试用例 → 先点测试1导入数据，然后点测试2触发重复导入检测（内容相同会被识别）
+        </p>
       </div>
     </div>
   );

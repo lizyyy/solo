@@ -14,7 +14,8 @@ interface ReviewDetailPanelProps {
 
 const warningLabels: Record<WarningType, string> = {
   percent_decimal_mixed: '百分数小数混合(不归正常)',
-  duplicate_row: '重复导入的行',
+  duplicate_row: '重复行(同指标名称)',
+  duplicate_import: '重复导入(文件指纹匹配历史批次)',
   invalid_value: '无效值',
   high_condition_number: '高条件数预警'
 };
@@ -38,8 +39,11 @@ export const ReviewDetailPanel: React.FC<ReviewDetailPanelProps> = ({ rows, onSu
     } else {
       setExpandedRowId(id);
       const row = rows.find(r => r.id === id);
-      if (row && row.warnings.includes('percent_decimal_mixed')) {
-        setReviewReason('检测到百分数和小数混着出现，提交活动负责人复核确认口径');
+      if (row && (row.warnings.includes('percent_decimal_mixed') || row.warnings.includes('duplicate_import'))) {
+        const reason = row.warnings.includes('percent_decimal_mixed') 
+          ? '检测到百分数和小数混着出现，提交活动负责人复核确认口径'
+          : '检测到重复导入，与历史批次数据一致，需活动负责人确认是否沿用历史处理结果';
+        setReviewReason(reason);
         setFinalize(false);
       } else {
         setReviewReason('');
@@ -83,7 +87,10 @@ export const ReviewDetailPanel: React.FC<ReviewDetailPanelProps> = ({ rows, onSu
               <div className="review-main">
                 <span className="review-row-num">[行{row.originalRowNumber}]</span>
                 <span className="review-criterion">{row.criterionName}</span>
-                <span className="review-original">{row.originalValue}</span>
+                <span className="review-original">原始：{row.originalImportValue}</span>
+                {row.modifiedValue && (
+                  <span className="review-modified">改后：{row.modifiedValue}</span>
+                )}
                 <span className={`review-badge status-${row.status}`}>
                   {row.status === 'needs_review' ? '待复核' :
                    row.status === 'warning' ? '警告' : row.reviewInfo ? '已复核' : row.status}
@@ -152,11 +159,11 @@ export const ReviewDetailPanel: React.FC<ReviewDetailPanelProps> = ({ rows, onSu
                       type="checkbox"
                       checked={finalize}
                       onChange={(e) => setFinalize(e.target.checked)}
-                      disabled={row.warnings.includes('percent_decimal_mixed')}
+                      disabled={row.warnings.includes('percent_decimal_mixed') || row.warnings.includes('duplicate_import')}
                     />
                     最终确认后归为正常
-                    {row.warnings.includes('percent_decimal_mixed') && (
-                      <span className="disabled-hint">(百分数混合需保留待复核，不归正常)</span>
+                    {(row.warnings.includes('percent_decimal_mixed') || row.warnings.includes('duplicate_import')) && (
+                      <span className="disabled-hint">(百分数混合/重复导入需保留待复核，不归正常)</span>
                     )}
                   </label>
                 </div>

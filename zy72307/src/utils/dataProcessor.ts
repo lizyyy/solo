@@ -1,7 +1,8 @@
-import { WeightRow, WeightTableData, WeightRowStatus, ChangeHistoryEntry, ReviewInfo } from '../types';
+import { WeightRow, WeightTableData, WeightRowStatus, ChangeHistoryEntry, ReviewInfo, ImportBatch } from '../types';
 import { parseWeightValue, validateWeightTable, isValidNumber } from './validation';
 import { analyzeMatrixCondition } from './matrix';
 import { createHistoryEntry } from './resultSource';
+import { generateFingerprint, findMatchedBatchId, generateBatchId, FileFingerprint } from './fingerprint';
 
 function generateId(): string {
   return Math.random().toString(36).substring(2, 15);
@@ -10,7 +11,8 @@ function generateId(): string {
 export function createWeightRow(
   criterionName: string,
   originalValue: string,
-  originalRowNumber: number
+  originalRowNumber: number,
+  importBatchId: string
 ): WeightRow {
   const validation = isValidNumber(originalValue);
   const { number: currentValue, isPercent } = parseWeightValue(originalValue);
@@ -26,28 +28,84 @@ export function createWeightRow(
     id: generateId(),
     originalRowNumber,
     criterionName,
+    originalImportValue: originalValue,
     originalValue,
     currentValue,
     isPercent,
     status,
     warnings: [],
-    isManualModified: false
+    isManualModified: false,
+    importBatchId,
+    isDuplicateImport: false
   };
 }
 
+export interface ImportContext {
+  rawData: Array<{ criterion: string; weight: string }>;
+  importedBy?: string;
+  fileName?: string;
+  fileSize?: number;
+  existingBatches?: ImportBatch[];
+  existingRows?: WeightRow[];
+}
+
 export function processImportedData(
-  rawData: Array<{ criterion: string; weight: string }>,
-  importedBy: string = '吴老师'
+  context: ImportContext
 ): WeightTableData {
-  const rows = rawData.map((item, index) => 
-    createWeightRow(item.criterion, item.weight, index + 2)
-  );
+  const {
+    rawData,
+    importedBy = '吴老师',
+    fileName = '评分权重表.xlsx',
+    fileSize = 0,
+    existingBatches = [],
+    existingRows = []
+  } = context;
+
+  const fingerprint = generateFingerprint(rawData, fileSize, fileName);
+  const matchedBatchId = findMatchedBatchId(fingerprint, existingBatches);
+  const isDuplicate = !!matchedBatchId;
+  const batchId = isDuplicate && matchedBatchId ? matchedBatchId : generateBatchId();
+
+  const rows = rawData.map((item, index) => {
+    const row = createWeightRow(item.criterion, item.weight, index + 2, batchId);
+    
+    if (isDuplicate) {
+      row.isDuplicateImport = true;
+      row.warnings.push('duplicate_import');
+      
+      const matchedRow = existingRows.find(
+        r => r.criterionName.toLowerCase() === item.criterion.toLowerCase() && 
+             r.originalImportValue === item.weight
+      );
+      if (matchedRow) {
+        row.matchedRowId = matchedRow.id;
+        row.status = matchedRow.status;
+        row.warnings.push(...matchedRow.warnings.filter(w => w !== 'duplicate_import'));
+        row.isManualModified = matchedRow.isManualModified;
+        row.modifiedBy = matchedRow.modifiedBy;
+        row.modifiedAt = matchedRow.modifiedAt;
+        row.notes = matchedRow.notes;
+        row.reviewInfo = matchedRow.reviewInfo;
+        if (matchedRow.modifiedValue) {
+          row.modifiedValue = matchedRow.modifiedValue;
+          const { number } = parseWeightValue(matchedRow.modifiedValue);
+          row.currentValue = number;
+        }
+      }
+      
+      if (row.status === 'normal') {
+        row.status = 'warning';
+      }
+    }
+    
+    return row;
+  });
 
   const validatedRows = validateWeightTable(rows);
   const matrixResult = analyzeMatrixCondition(validatedRows);
 
   const finalRows = validatedRows.map(row => {
-    if (matrixResult.isWarning) {
+    if (matrixResult.isWarning && !row.warnings.includes('high_condition_number')) {
       row.warnings.push('high_condition_number');
       if (row.status === 'normal') {
         row.status = 'warning';
@@ -57,14 +115,28 @@ export function processImportedData(
   });
 
   const importTime = new Date();
+  const newBatch: ImportBatch = {
+    id: batchId,
+    fingerprint: fingerprint.combined,
+    fileName,
+    fileSize,
+    rowCount: rawData.length,
+    importTime,
+    importedBy,
+    isDuplicate,
+    matchedBatchId
+  };
+
   const initialHistory: ChangeHistoryEntry[] = finalRows.map(row => 
     createHistoryEntry({
       row,
       field: 'originalValue',
       oldValue: '(导入)',
-      newValue: row.originalValue,
+      newValue: row.originalImportValue,
       changedBy: importedBy,
-      reason: `导入数据，原始行号 ${row.originalRowNumber}`
+      reason: isDuplicate 
+        ? `重复导入检测：文件指纹[${fingerprint.contentHash}]匹配已有批次` 
+        : `导入数据，原始行号 ${row.originalRowNumber}，批次 ${batchId}`
     })
   );
 
@@ -76,7 +148,9 @@ export function processImportedData(
     processStep: 'step1_imported',
     hasReviewStatus: 'not_viewed',
     history: initialHistory,
-    dataVersion: 1
+    dataVersion: 1,
+    importBatches: isDuplicate ? existingBatches : [...existingBatches, newBatch],
+    currentBatchId: batchId
   };
 }
 
@@ -86,7 +160,7 @@ export function updateWeightRow(
   modifiedBy: string = '吴老师',
   reason: string = '补录修正'
 ): { row: WeightRow; historyEntry: ChangeHistoryEntry } {
-  const oldValue = row.originalValue;
+  const oldDisplayValue = row.originalValue;
   const validation = isValidNumber(newValue);
   const { number: currentValue, isPercent } = parseWeightValue(newValue);
 
@@ -97,6 +171,8 @@ export function updateWeightRow(
 
   const updatedRow: WeightRow = {
     ...row,
+    originalImportValue: row.originalImportValue,
+    modifiedValue: newValue,
     originalValue: newValue,
     currentValue,
     isPercent,
@@ -108,11 +184,11 @@ export function updateWeightRow(
 
   const historyEntry = createHistoryEntry({
     row: updatedRow,
-    field: 'originalValue',
-    oldValue,
-    newValue,
+    field: 'modifiedValue',
+    oldValue: `${oldDisplayValue} (原始说法: ${row.originalImportValue})`,
+    newValue: `${newValue} (原始说法保留: ${row.originalImportValue})`,
     changedBy: modifiedBy,
-    reason
+    reason: `${reason}。原始说法 ${row.originalImportValue} 保留不覆盖，改后值 ${newValue}`
   });
 
   return { row: updatedRow, historyEntry };
@@ -130,17 +206,26 @@ export function markRowReviewed(
   const historyEntries: ChangeHistoryEntry[] = [];
   const oldStatus = row.status;
   const newStatus = params.finalizeStatus || (
-    row.warnings.length === 0 ? 'normal' : 'needs_review'
+    row.warnings.some(w => w === 'percent_decimal_mixed' || w === 'duplicate_import')
+      ? 'needs_review'
+      : row.warnings.length === 0 ? 'normal' : 'needs_review'
   );
 
+  const displayPrevious = row.originalImportValue;
+  const displayNew = row.modifiedValue || row.originalImportValue;
+
   const reviewInfo: ReviewInfo = {
-    previousValue: row.originalValue,
-    newValue: row.originalValue,
+    previousValue: displayPrevious,
+    previousRawValue: displayPrevious,
+    newValue: displayNew,
+    newRawValue: displayNew,
     reason: params.reason,
     nextHandler: params.nextHandler,
     reviewedAt: new Date(),
     reviewedBy: params.reviewedBy,
-    finalized: row.warnings.length === 0 && !params.finalizeStatus ? false : true
+    finalized: !row.warnings.includes('percent_decimal_mixed') && 
+               !row.warnings.includes('duplicate_import') &&
+               !!params.finalizeStatus
   };
 
   const updatedRow: WeightRow = {
@@ -155,7 +240,7 @@ export function markRowReviewed(
     oldValue: oldStatus,
     newValue: newStatus,
     changedBy: params.reviewedBy,
-    reason: `复核：${params.reason} → 下一步：${params.nextHandler}`
+    reason: `复核：原始说法=${displayPrevious}, 改后值=${displayNew}, 原因=${params.reason} → 下一步找${params.nextHandler}`
   }));
 
   return { row: updatedRow, historyEntries };
@@ -177,7 +262,7 @@ export function updateRowNote(
     oldValue: oldNote,
     newValue: note || '(空)',
     changedBy,
-    reason: '更新备注'
+    reason: `更新备注。原始说法=${row.originalImportValue}`
   });
   return { row: updatedRow, historyEntry };
 }
@@ -200,23 +285,26 @@ export function recalculateAfterEdit(
       row.warnings.splice(highConditionWarning, 1);
     }
     
-    if (matrixResult.isWarning) {
+    if (matrixResult.isWarning && !row.warnings.includes('high_condition_number')) {
       row.warnings.push('high_condition_number');
     }
 
     let newStatus = row.status;
 
     const hasPercentMixed = row.warnings.includes('percent_decimal_mixed');
-    const hasDuplicate = row.warnings.includes('duplicate_row');
+    const hasDuplicateImport = row.warnings.includes('duplicate_import');
+    const hasDuplicateRow = row.warnings.includes('duplicate_row');
     const hasInvalid = row.warnings.includes('invalid_value');
     const hasHighCondition = row.warnings.includes('high_condition_number');
 
     if (hasInvalid) {
       newStatus = 'error';
-    } else if (hasPercentMixed) {
+    } else if (hasPercentMixed || hasDuplicateImport) {
       newStatus = 'needs_review';
-    } else if (hasDuplicate || hasHighCondition) {
+    } else if (hasDuplicateRow || hasHighCondition) {
       newStatus = 'warning';
+    } else if (row.reviewInfo && !row.reviewInfo.finalized) {
+      newStatus = 'needs_review';
     } else if (!row.isManualModified && oldStatus === 'normal') {
       newStatus = 'normal';
     } else if (row.warnings.length === 0) {
@@ -232,8 +320,8 @@ export function recalculateAfterEdit(
         newValue: newStatus,
         changedBy: '系统',
         reason: warningsChanged 
-          ? `校验重算：警告=[${row.warnings.join(',')}]` 
-          : `校验重算更新状态`
+          ? `校验重算：原始说法=${row.originalImportValue}, 警告=[${row.warnings.join(',')}]` 
+          : `校验重算更新状态，原始说法=${row.originalImportValue}`
       }));
       row.status = newStatus;
     }
@@ -268,3 +356,13 @@ export function advanceProcessStep(data: WeightTableData): WeightTableData {
   }
   return data;
 }
+
+export function getOriginalDisplayValue(row: WeightRow): string {
+  return row.originalImportValue;
+}
+
+export function getCurrentDisplayValue(row: WeightRow): string {
+  return row.modifiedValue || row.originalImportValue;
+}
+
+export type { FileFingerprint };

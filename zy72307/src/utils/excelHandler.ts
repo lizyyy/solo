@@ -1,12 +1,12 @@
 import * as XLSX from 'xlsx';
-import { WeightRow, UnifiedResult, ChangeHistoryEntry } from '../types';
+import { WeightRow, UnifiedResult, ChangeHistoryEntry, ImportBatch } from '../types';
 
 export interface ImportedRow {
   criterion: string;
   weight: string;
 }
 
-export function parseExcelFile(file: File): Promise<ImportedRow[]> {
+export function parseExcelFile(file: File): Promise<{ rows: ImportedRow[]; fileName: string; fileSize: number }> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     
@@ -26,7 +26,7 @@ export function parseExcelFile(file: File): Promise<ImportedRow[]> {
           };
         }).filter(r => r.criterion && r.weight);
         
-        resolve(rows);
+        resolve({ rows, fileName: file.name, fileSize: file.size });
       } catch (error) {
         reject(error);
       }
@@ -40,9 +40,14 @@ export function parseExcelFile(file: File): Promise<ImportedRow[]> {
 export function exportToExcel(unifiedResult: UnifiedResult): void {
   const exportData = unifiedResult.rows.map((row: WeightRow) => ({
     '数据版本': unifiedResult.dataVersion,
+    '导入批次ID': row.importBatchId,
+    '是否重复导入': row.isDuplicateImport ? '是' : '否',
+    '匹配历史行ID': row.matchedRowId || '',
     '原始行号': row.originalRowNumber,
     '指标名称': row.criterionName,
-    '原始值(保留原格式)': row.originalValue,
+    '原始说法(永不覆盖)': row.originalImportValue,
+    '改后值(补录)': row.modifiedValue || '(未修改)',
+    '当前显示值': row.originalValue,
     '计算值(小数)': row.currentValue.toFixed(6),
     '格式类型': row.isPercent ? '百分比' : '小数',
     '当前状态': getStatusText(row.status),
@@ -50,13 +55,14 @@ export function exportToExcel(unifiedResult: UnifiedResult): void {
     '是否人工修改': row.isManualModified ? '是' : '否',
     '修改人': row.modifiedBy || '',
     '修改时间': row.modifiedAt ? new Date(row.modifiedAt).toLocaleString() : '',
-    '原始说法(复核)': row.reviewInfo?.previousValue || row.originalValue,
-    '改后值(复核)': row.reviewInfo?.newValue || '',
+    '■复核信息■': '',
+    '原始说法(复核)': row.reviewInfo?.previousValue || row.originalImportValue,
+    '改后值(复核)': row.reviewInfo?.newValue || row.modifiedValue || row.originalImportValue,
     '处理原因(复核)': row.reviewInfo?.reason || '',
     '下一步找谁(复核)': row.reviewInfo?.nextHandler || '',
     '复核时间': row.reviewInfo ? new Date(row.reviewInfo.reviewedAt).toLocaleString() : '',
     '复核人': row.reviewInfo?.reviewedBy || '',
-    '是否已最终确认': row.reviewInfo?.finalized ? '是' : (row.reviewInfo ? '待确认' : '未发起复核'),
+    '是否已最终确认': row.reviewInfo?.finalized ? '是' : (row.reviewInfo ? '否(不归入正常)' : '未发起复核'),
     '备注': row.notes || ''
   }));
 
@@ -67,6 +73,7 @@ export function exportToExcel(unifiedResult: UnifiedResult): void {
     { '统计项': '错误数', '数值': unifiedResult.summary.errorCount },
     { '统计项': '待复核数', '数值': unifiedResult.summary.needsReviewCount },
     { '统计项': '人工修改数', '数值': unifiedResult.summary.modifiedCount },
+    { '统计项': '重复导入数', '数值': unifiedResult.summary.duplicateImportCount },
     { '统计项': '', '数值': '' },
     { '统计项': '矩阵条件数', '数值': unifiedResult.matrixResult?.conditionNumber.toFixed(4) || '' },
     { '统计项': '条件数阈值', '数值': unifiedResult.matrixResult?.threshold || '' },
@@ -77,11 +84,13 @@ export function exportToExcel(unifiedResult: UnifiedResult): void {
     { '统计项': '当前步骤', '数值': getStepText(unifiedResult.processStep) },
     { '统计项': '导入人', '数值': unifiedResult.importedBy },
     { '统计项': '导入时间', '数值': new Date(unifiedResult.importTime).toLocaleString() },
+    { '统计项': '当前批次ID', '数值': unifiedResult.currentBatchId },
     { '统计项': '数据版本', '数值': unifiedResult.dataVersion },
     { '统计项': '导出时间', '数值': new Date().toLocaleString() }
   ];
 
   const historyData = unifiedResult.history.map((h: ChangeHistoryEntry) => ({
+    '数据版本': h.dataVersion,
     '变更ID': h.id,
     '指标行ID': h.rowId,
     '指标名称': h.criterionName,
@@ -93,16 +102,30 @@ export function exportToExcel(unifiedResult: UnifiedResult): void {
     '变更原因': h.reason || ''
   }));
 
+  const batchData = unifiedResult.importBatches.map((b: ImportBatch) => ({
+    '批次ID': b.id,
+    '文件指纹': b.fingerprint,
+    '文件名': b.fileName,
+    '文件大小(字节)': b.fileSize,
+    '数据行数': b.rowCount,
+    '导入时间': new Date(b.importTime).toLocaleString(),
+    '导入人': b.importedBy,
+    '是否重复导入': b.isDuplicate ? '是' : '否',
+    '匹配已有批次ID': b.matchedBatchId || ''
+  }));
+
   const wb = XLSX.utils.book_new();
   const ws1 = XLSX.utils.json_to_sheet(exportData);
   const ws2 = XLSX.utils.json_to_sheet(summaryData);
   const ws3 = XLSX.utils.json_to_sheet(historyData);
+  const ws4 = XLSX.utils.json_to_sheet(batchData);
   
   XLSX.utils.book_append_sheet(wb, ws1, '明细数据(与页面/接口一致)');
   XLSX.utils.book_append_sheet(wb, ws2, '汇总信息');
   XLSX.utils.book_append_sheet(wb, ws3, '变更历史');
+  XLSX.utils.book_append_sheet(wb, ws4, '导入批次');
   
-  XLSX.writeFile(wb, `矩阵条件数预警_版本${unifiedResult.dataVersion}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  XLSX.writeFile(wb, `矩阵条件数预警_版本${unifiedResult.dataVersion}_${unifiedResult.currentBatchId}_${new Date().toISOString().slice(0, 10)}.xlsx`);
 }
 
 function getStatusText(status: string): string {
@@ -111,7 +134,7 @@ function getStatusText(status: string): string {
     normal: '正常',
     warning: '警告',
     error: '错误',
-    needs_review: '待复核(百分数混合/未确认)'
+    needs_review: '待复核(百分数混合/重复导入/未确认)'
   };
   return statusMap[status] || status;
 }
@@ -119,7 +142,8 @@ function getStatusText(status: string): string {
 function getWarningText(warning: string): string {
   const warningMap: Record<string, string> = {
     percent_decimal_mixed: '百分数和小数混着出现(需负责人复核,不归正常)',
-    duplicate_row: '重复导入的行',
+    duplicate_row: '重复导入的行(同指标名称)',
+    duplicate_import: '重复导入的文件(指纹匹配历史批次)',
     invalid_value: '无效值',
     high_condition_number: '矩阵条件数过高'
   };
@@ -137,7 +161,8 @@ function getStepText(step: string): string {
 
 function getFieldText(field: string): string {
   const fieldMap: Record<string, string> = {
-    originalValue: '原始值',
+    originalValue: '原始导入值(只读)',
+    modifiedValue: '补录改后值',
     status: '状态',
     notes: '备注'
   };
@@ -149,6 +174,7 @@ export function exportForAPI(unifiedResult: UnifiedResult): UnifiedResult {
     ...unifiedResult,
     rows: unifiedResult.rows.map(r => ({ ...r })),
     history: unifiedResult.history.map(h => ({ ...h })),
+    importBatches: unifiedResult.importBatches.map(b => ({ ...b })),
     exportTime: new Date()
   };
 }
