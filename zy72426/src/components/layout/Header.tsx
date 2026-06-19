@@ -1,8 +1,8 @@
 import { useEmotionLabelStore } from '@/store/useEmotionLabelStore';
-import { Database, RefreshCw, AlertCircle, CheckCircle, Layers, Link2, Link2Off, Hash } from 'lucide-react';
+import { Database, RefreshCw, AlertCircle, CheckCircle, Layers, Link2, Link2Off, Hash, Trash2, History } from 'lucide-react';
 
 export const Header = () => {
-  const { records, selfCheckResults, runSelfCheck, loadSampleData, consistencyCheckResult, getUnifiedView, runConsistencyCheck } =
+  const { records, selfCheckResults, runSelfCheck, loadSampleData, clearAllData, consistencyCheckResult, getUnifiedView, runConsistencyCheck, changeLog } =
     useEmotionLabelStore();
 
   const totalIssues = selfCheckResults.reduce((sum, r) => sum + r.issues.filter((i) => !i.resolved).length, 0);
@@ -12,6 +12,12 @@ export const Header = () => {
 
   const view = getUnifiedView('page');
   const dataHash = view.dataHash.slice(0, 8);
+
+  const handleClearData = () => {
+    if (confirm('确定要清空所有数据吗？此操作不可恢复。')) {
+      clearAllData();
+    }
+  };
 
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4">
@@ -28,6 +34,10 @@ export const Header = () => {
             <span className="inline-flex items-center gap-1 text-xs font-mono text-gray-400">
               <Hash className="w-3 h-3" />
               数据哈希: {dataHash}...
+            </span>
+            <span className="inline-flex items-center gap-1 text-xs text-gray-400">
+              <History className="w-3 h-3" />
+              改动日志: {changeLog.length} 条
             </span>
           </div>
         </div>
@@ -81,6 +91,15 @@ export const Header = () => {
           >
             <Database className="w-4 h-4" />
             加载样例
+          </button>
+
+          <button
+            onClick={handleClearData}
+            className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors"
+            title="清空所有数据，验证真实导入链路"
+          >
+            <Trash2 className="w-4 h-4" />
+            清空数据
           </button>
         </div>
       </div>

@@ -8,6 +8,8 @@ import type {
   RecordStatus,
   ManualChange,
   ImportPreviewRow,
+  ChangeLogEntry,
+  ExportSnapshot,
 } from '@/types';
 import { sampleRecords, sampleGroups, sampleImportHistory, sampleLastImportInfo } from '@/data/sampleData';
 import { parseCSVFile, generatePreview, convertToRecords, ParsedCSVRow } from '@/utils/csvParser';
@@ -28,6 +30,8 @@ interface EmotionLabelState {
   groups: SongGroup[];
   selfCheckResults: SelfCheckResult[];
   importHistory: ImportLog[];
+  changeLog: ChangeLogEntry[];
+  exportHistory: ExportSnapshot[];
   previewRows: ImportPreviewRow[];
   isLoading: boolean;
   lastSelfCheckAt: number | null;
@@ -57,6 +61,7 @@ interface EmotionLabelState {
 
   getUnifiedView: (source?: DataSource) => UnifiedDataView;
   runConsistencyCheck: () => void;
+  recordExport: (exportType: 'csv' | 'excel' | 'weekly_report', operator: string) => void;
 }
 
 const generateId = () => `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -74,6 +79,30 @@ const buildAndVerify = (records: SongRecord[], groups: SongGroup[]) => {
   };
 };
 
+const getDataHash = (records: SongRecord[]): string => {
+  const dataStr = JSON.stringify(
+    records.map((r) => ({
+      id: r.id,
+      liveName: r.liveName,
+      copyrightName: r.copyrightName,
+      emotionTag: r.emotionTag,
+      status: r.status,
+      audioNote: r.audioNote,
+      originalRowNumber: r.originalRowNumber,
+      importVersion: r.importVersion,
+      emotionConfidence: r.emotionConfidence,
+      groupId: r.groupId,
+    }))
+  );
+  let hash = 0;
+  for (let i = 0; i < dataStr.length; i++) {
+    const char = dataStr.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash).toString(16);
+};
+
 export const useEmotionLabelStore = create<EmotionLabelState>()(
   persist(
     (set, get) => ({
@@ -81,6 +110,8 @@ export const useEmotionLabelStore = create<EmotionLabelState>()(
       groups: [],
       selfCheckResults: [],
       importHistory: [],
+      changeLog: [],
+      exportHistory: [],
       previewRows: [],
       isLoading: false,
       lastSelfCheckAt: null,
@@ -94,6 +125,38 @@ export const useEmotionLabelStore = create<EmotionLabelState>()(
       runConsistencyCheck: () => {
         const result = buildAndVerify(get().records, get().groups);
         set({ consistencyCheckResult: result });
+      },
+
+      recordExport: (exportType: 'csv' | 'excel' | 'weekly_report', operator: string) => {
+        const { records } = get();
+        const dataHash = getDataHash(records);
+        const snapshot: ExportSnapshot = {
+          id: `exp_${generateId()}`,
+          timestamp: Date.now(),
+          exportType,
+          operator,
+          dataHash,
+          recordCount: records.length,
+          fileName: `音频样本情绪标签_${new Date().toISOString().slice(0, 10)}.${exportType === 'csv' ? 'csv' : 'xlsx'}`,
+          previewRows: records.slice(0, 5).map((r) => `#${r.originalRowNumber} ${r.liveName} / ${r.copyrightName} → ${r.emotionTag}`),
+        };
+        set((state) => ({
+          exportHistory: [snapshot, ...state.exportHistory].slice(0, 50),
+        }));
+
+        const changeLog: ChangeLogEntry = {
+          id: `log_${generateId()}`,
+          timestamp: Date.now(),
+          operator,
+          action: 'export',
+          description: `导出${exportType === 'csv' ? 'CSV' : exportType === 'excel' ? 'Excel' : '周报'}文件`,
+          affectedRecordIds: records.map((r) => r.id),
+          dataHashAfter: dataHash,
+          details: { exportType, fileName: snapshot.fileName, recordCount: records.length },
+        };
+        set((state) => ({
+          changeLog: [changeLog, ...state.changeLog].slice(0, 200),
+        }));
       },
 
       previewCSV: async (file: File) => {
@@ -299,10 +362,31 @@ export const useEmotionLabelStore = create<EmotionLabelState>()(
             duplicateOfOriginalRow: p.existingRecord.originalRowNumber,
           }));
 
+          const dataHash = getDataHash(finalRecords);
+          const changeLog: ChangeLogEntry = {
+            id: `log_${generateId()}`,
+            timestamp: Date.now(),
+            operator,
+            action: 'import',
+            description: `导入文件「${file.name}」：${reusedPairs.length} 行复用，${newRecords.length} 行真新增，${duplicatePairs.length} 条重复跳过`,
+            affectedRecordIds: finalRecords.map((r) => r.id),
+            dataHashAfter: dataHash,
+            details: {
+              fileName: file.name,
+              importVersion,
+              rawRows: parsedRows.length,
+              reusedRows: reusedPairs.length,
+              newRows: newRecords.length,
+              rejectedDuplicates: rejectedDuplicates.length,
+              resultingReviewCount,
+            },
+          };
+
           set((state) => ({
             records: finalRecords,
             groups: finalGroups,
             importHistory: [...state.importHistory, importLog],
+            changeLog: [changeLog, ...state.changeLog].slice(0, 200),
             previewRows: [],
             isLoading: false,
             lastImportInfo: {
@@ -326,6 +410,7 @@ export const useEmotionLabelStore = create<EmotionLabelState>()(
           }));
 
           get().runSelfCheck();
+          get().runConsistencyCheck();
         } catch (error) {
           console.error('Import CSV error:', error);
           set({ isLoading: false });
@@ -335,6 +420,9 @@ export const useEmotionLabelStore = create<EmotionLabelState>()(
 
       updateRecord: (id: string, updates: Partial<SongRecord>, operator: string, reason?: string) => {
         let affectedGroup: string[] = [id];
+        let fieldChanged = '';
+        let oldVal = '';
+        let newVal = '';
 
         set((state) => {
           const record = state.records.find((r) => r.id === id);
@@ -351,6 +439,9 @@ export const useEmotionLabelStore = create<EmotionLabelState>()(
           Object.entries(updates).forEach(([field, newValue]) => {
             const oldValue = (record as unknown as Record<string, unknown>)[field];
             if (oldValue !== newValue && field !== 'updatedAt' && field !== 'manualChanges') {
+              fieldChanged = field;
+              oldVal = String(oldValue);
+              newVal = String(newValue);
               manualChanges.push({
                 id: `chg_${generateId()}`,
                 field,
@@ -381,6 +472,22 @@ export const useEmotionLabelStore = create<EmotionLabelState>()(
             consistencyCheckResult: consistency,
           };
         });
+
+        const recordName = get().records.find((r) => r.id === id)?.liveName || '未知记录';
+        const dataHash = getDataHash(get().records);
+        const changeLog: ChangeLogEntry = {
+          id: `log_${generateId()}`,
+          timestamp: Date.now(),
+          operator,
+          action: 'update_record',
+          description: `在「${recordName}」修改${fieldChanged}：${oldVal || '(空)'} → ${newVal || '(空)'}${reason ? `（${reason}）` : ''}`,
+          affectedRecordIds: [...affectedGroup],
+          dataHashAfter: dataHash,
+          details: { field: fieldChanged, oldValue: oldVal, newValue: newVal, reason, affectedCount: affectedGroup.length },
+        };
+        set((state) => ({
+          changeLog: [changeLog, ...state.changeLog].slice(0, 200),
+        }));
 
         if (updates.audioNote !== undefined) {
           affectedGroup.forEach((rid) => get().recalculateEmotion(rid));
@@ -430,9 +537,15 @@ export const useEmotionLabelStore = create<EmotionLabelState>()(
       },
 
       confirmGroup: (groupId: string, reviewer: string) => {
+        let memberIds: string[] = [];
+        let groupName = '';
+
         set((state) => {
           const group = state.groups.find((g) => g.id === groupId);
           if (!group) return state;
+
+          memberIds = group.memberIds;
+          groupName = group.canonicalName;
 
           const members = group.memberIds
             .map((id) => state.records.find((r) => r.id === id))
@@ -464,14 +577,36 @@ export const useEmotionLabelStore = create<EmotionLabelState>()(
 
           return { records: updatedRecords, groups: updatedGroups, consistencyCheckResult: consistency };
         });
+
+        const dataHash = getDataHash(get().records);
+        const changeLog: ChangeLogEntry = {
+          id: `log_${generateId()}`,
+          timestamp: Date.now(),
+          operator: reviewer,
+          action: 'confirm_group',
+          description: `确认分组「${groupName}」：${memberIds.length} 条记录关联为同一首歌`,
+          affectedRecordIds: memberIds,
+          dataHashAfter: dataHash,
+          details: { groupId, groupName, memberCount: memberIds.length },
+        };
+        set((state) => ({
+          changeLog: [changeLog, ...state.changeLog].slice(0, 200),
+        }));
+
         get().runSelfCheck();
         get().runConsistencyCheck();
       },
 
       rejectGroup: (groupId: string) => {
+        let memberIds: string[] = [];
+        let groupName = '';
+
         set((state) => {
           const group = state.groups.find((g) => g.id === groupId);
           if (!group) return state;
+
+          memberIds = group.memberIds;
+          groupName = group.canonicalName;
 
           const updatedRecords = state.records.map((r) =>
             group.memberIds.includes(r.id)
@@ -489,6 +624,22 @@ export const useEmotionLabelStore = create<EmotionLabelState>()(
 
           return { records: updatedRecords, groups: updatedGroups, consistencyCheckResult: consistency };
         });
+
+        const dataHash = getDataHash(get().records);
+        const changeLog: ChangeLogEntry = {
+          id: `log_${generateId()}`,
+          timestamp: Date.now(),
+          operator: '系统',
+          action: 'reject_group',
+          description: `拒绝分组「${groupName}」：标记为独立歌曲`,
+          affectedRecordIds: memberIds,
+          dataHashAfter: dataHash,
+          details: { groupId, groupName, memberCount: memberIds.length },
+        };
+        set((state) => ({
+          changeLog: [changeLog, ...state.changeLog].slice(0, 200),
+        }));
+
         get().runSelfCheck();
         get().runConsistencyCheck();
       },
@@ -577,11 +728,24 @@ export const useEmotionLabelStore = create<EmotionLabelState>()(
 
       loadSampleData: () => {
         const consistency = buildAndVerify(sampleRecords, sampleGroups);
+        const dataHash = getDataHash(sampleRecords);
+        const changeLog: ChangeLogEntry = {
+          id: `log_${generateId()}`,
+          timestamp: Date.now(),
+          operator: '系统',
+          action: 'import',
+          description: '加载样例数据：11条记录，3个同名分组，覆盖所有典型场景',
+          affectedRecordIds: sampleRecords.map((r) => r.id),
+          dataHashAfter: dataHash,
+          details: { source: 'sample_data', recordCount: sampleRecords.length, groupCount: sampleGroups.length },
+        };
         set({
           records: sampleRecords,
           groups: sampleGroups,
           importHistory: sampleImportHistory,
           lastImportInfo: sampleLastImportInfo,
+          changeLog: [changeLog],
+          exportHistory: [],
           consistencyCheckResult: consistency,
         });
         get().runSelfCheck();
@@ -589,11 +753,23 @@ export const useEmotionLabelStore = create<EmotionLabelState>()(
       },
 
       clearAllData: () => {
+        const changeLog: ChangeLogEntry = {
+          id: `log_${generateId()}`,
+          timestamp: Date.now(),
+          operator: '系统',
+          action: 'clear_data',
+          description: '清空所有数据：记录、分组、导入历史、自检结果全部清除',
+          affectedRecordIds: [],
+          dataHashAfter: '0',
+          details: { cleared: true },
+        };
         set({
           records: [],
           groups: [],
           selfCheckResults: [],
           importHistory: [],
+          changeLog: [changeLog],
+          exportHistory: [],
           previewRows: [],
           lastSelfCheckAt: null,
           lastImportInfo: null,

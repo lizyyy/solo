@@ -9,7 +9,7 @@ import { exportCSV, exportExcel } from '@/utils/exporter';
 import type { RecordStatus } from '@/types';
 
 export const LabelsPage = () => {
-  const { runSelfCheck, batchUpdateStatus, recalculateAllEmotions, getUnifiedView, runConsistencyCheck, consistencyCheckResult } = useEmotionLabelStore();
+  const { runSelfCheck, batchUpdateStatus, recalculateAllEmotions, getUnifiedView, runConsistencyCheck, consistencyCheckResult, recordExport } = useEmotionLabelStore();
   const view = getUnifiedView('page');
   const records = view.records;
   const groups = view.groups;
@@ -91,11 +91,13 @@ export const LabelsPage = () => {
 
   const handleExportCSV = () => {
     runConsistencyCheck();
+    recordExport('csv', '许老师');
     exportCSV(view.records, view.groups);
   };
 
   const handleExportExcel = () => {
     runConsistencyCheck();
+    recordExport('excel', '许老师');
     exportExcel(view.records, view.groups);
   };
 

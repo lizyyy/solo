@@ -5,11 +5,11 @@ import { useEmotionLabelStore } from '@/store/useEmotionLabelStore';
 import { exportWeeklyReport } from '@/utils/exporter';
 import {
   FileBarChart, Download, Users, Music, CheckCircle, AlertTriangle, Clock, TrendingUp,
-  Link2, Link2Off, Info,
+  Link2, Link2Off, Info, RefreshCw, FilePlus, FileCheck, FileX,
 } from 'lucide-react';
 
 export const WeeklyReportPage = () => {
-  const { getUnifiedView, runSelfCheck, runConsistencyCheck, consistencyCheckResult } = useEmotionLabelStore();
+  const { getUnifiedView, runSelfCheck, runConsistencyCheck, consistencyCheckResult, lastImportInfo, recordExport } = useEmotionLabelStore();
 
   const view = useMemo(() => getUnifiedView('report'), [getUnifiedView]);
   const records = view.records;
@@ -45,6 +45,7 @@ export const WeeklyReportPage = () => {
   const handleExport = () => {
     runSelfCheck();
     runConsistencyCheck();
+    recordExport('weekly_report', '店长');
     setTimeout(() => {
       exportWeeklyReport(view.records, view.groups);
     }, 300);
@@ -157,6 +158,105 @@ export const WeeklyReportPage = () => {
 
       <div className="grid grid-cols-3 gap-6">
         <div className="col-span-2 space-y-6">
+          {lastImportInfo && (
+            <Card
+              title={
+                <span className="flex items-center gap-2">
+                  <FileBarChart className="w-5 h-5 text-[#dd6b20]" />
+                  本期导入分析
+                </span>
+              }
+              subtitle={`批次 ${lastImportInfo.importVersion} · 操作人：${lastImportInfo.operator} · ${new Date(lastImportInfo.importedAt).toLocaleString('zh-CN')}`}
+            >
+              <div className="grid grid-cols-4 gap-4 mb-4">
+                <div className="p-3 bg-gray-50 rounded-lg text-center">
+                  <p className="text-2xl font-bold text-gray-800">{lastImportInfo.rawRows}</p>
+                  <p className="text-xs text-gray-500">原始行数</p>
+                </div>
+                <div className="p-3 bg-green-50 rounded-lg text-center">
+                  <p className="text-2xl font-bold text-green-600">{lastImportInfo.reusedRows}</p>
+                  <p className="text-xs text-gray-500">复用记录</p>
+                </div>
+                <div className="p-3 bg-blue-50 rounded-lg text-center">
+                  <p className="text-2xl font-bold text-blue-600">{lastImportInfo.newRows}</p>
+                  <p className="text-xs text-gray-500">真新增</p>
+                </div>
+                <div className="p-3 bg-amber-50 rounded-lg text-center">
+                  <p className="text-2xl font-bold text-amber-600">{lastImportInfo.resultingReviewCount}</p>
+                  <p className="text-xs text-gray-500">待复核</p>
+                </div>
+              </div>
+
+              {lastImportInfo.reusedPairs.length > 0 && (
+                <div className="mb-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FileCheck className="w-4 h-4 text-green-600" />
+                    <p className="text-sm font-medium text-gray-700">复用记录明细（{lastImportInfo.reusedPairs.length} 条）</p>
+                  </div>
+                  <div className="max-h-36 overflow-y-auto space-y-1 bg-gray-50 p-2 rounded text-xs">
+                    {lastImportInfo.reusedPairs.map((pair) => (
+                      <div key={pair.newKey} className="flex items-center justify-between py-1 px-2 hover:bg-white rounded">
+                        <span className="text-gray-700">
+                          <span className="text-gray-400">#{pair.existingOriginalRow}</span> {pair.liveName}
+                          {pair.liveName !== pair.copyrightName && ` → ${pair.copyrightName}`}
+                        </span>
+                        <span className="text-green-600 font-medium">
+                          {pair.existingGroupCount > 1 ? `${pair.existingGroupCount} 条一组` : '独立'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {lastImportInfo.newRecords && lastImportInfo.newRecords.length > 0 && (
+                <div className="mb-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FilePlus className="w-4 h-4 text-blue-600" />
+                    <p className="text-sm font-medium text-gray-700">真新增记录明细（{lastImportInfo.newRecords.length} 条）</p>
+                  </div>
+                  <div className="max-h-36 overflow-y-auto space-y-1 bg-blue-50 p-2 rounded text-xs">
+                    {lastImportInfo.newRecords.map((rec) => (
+                      <div key={rec.id} className="flex items-center justify-between py-1 px-2 hover:bg-white rounded">
+                        <span className="text-gray-700">
+                          <span className="text-blue-400">#{rec.originalRowNumber}</span> {rec.liveName}
+                          {rec.liveName !== rec.copyrightName && ` → ${rec.copyrightName}`}
+                        </span>
+                        <span className="text-blue-600 font-medium">{rec.emotionTag}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {lastImportInfo.rejectedDuplicates.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <FileX className="w-4 h-4 text-red-500" />
+                    <p className="text-sm font-medium text-gray-700">跳过重复项（{lastImportInfo.rejectedDuplicates.length} 条）</p>
+                  </div>
+                  <div className="max-h-28 overflow-y-auto space-y-1 bg-red-50 p-2 rounded text-xs">
+                    {lastImportInfo.rejectedDuplicates.map((dup, idx) => (
+                      <div key={idx} className="flex items-center justify-between py-1 px-2 hover:bg-white rounded">
+                        <span className="text-gray-700">
+                          第 {dup.row} 行：{dup.liveName} / {dup.copyrightName}
+                        </span>
+                        <span className="text-red-500 font-medium">与第 {dup.duplicateOfOriginalRow} 行重复</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <p className="text-xs text-gray-500">
+                  <span className="font-medium text-gray-600">复用判断逻辑：</span>
+                  基于「现场名 + 版权名」组合唯一键匹配。同一首歌导入过第二次时，之前的人工复核结果（情绪标签、误差说明、备注）会直接沿用，无需重复操作。
+                </p>
+              </div>
+            </Card>
+          )}
+
           <Card
             title={
               <span className="flex items-center gap-2">
@@ -262,6 +362,46 @@ export const WeeklyReportPage = () => {
                 </p>
               )}
             </div>
+          </Card>
+
+          <Card
+            title={
+              <span className="flex items-center gap-2">
+                <FileBarChart className="w-5 h-5 text-[#1e3a5f]" />
+                导出历史记录
+              </span>
+            }
+            subtitle="每次导出留痕，可追溯哪份导出包含哪些数据"
+          >
+            {(() => {
+              const { exportHistory } = useEmotionLabelStore.getState();
+              if (exportHistory.length === 0) {
+                return (
+                  <div className="py-6 text-center text-gray-400 text-sm">
+                    暂无导出记录
+                  </div>
+                );
+              }
+              return (
+                <div className="space-y-2 max-h-56 overflow-y-auto">
+                  {exportHistory.slice(0, 10).map((exp) => (
+                    <div key={exp.id} className="p-2 bg-gray-50 rounded text-xs">
+                      <div className="flex justify-between items-start">
+                        <span className="font-medium text-gray-700">{exp.fileName}</span>
+                        <span className="text-[10px] font-mono text-gray-400">
+                          #{exp.dataHash.slice(0, 6)}
+                        </span>
+                      </div>
+                      <div className="flex gap-3 mt-1 text-gray-500">
+                        <span>{exp.exportType.toUpperCase()}</span>
+                        <span>{exp.recordCount} 条</span>
+                        <span>{new Date(exp.timestamp).toLocaleTimeString('zh-CN')}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </Card>
 
           <Card

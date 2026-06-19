@@ -79,3 +79,25 @@ export const EMOTION_TAGS = [
 ] as const;
 
 export type EmotionTag = typeof EMOTION_TAGS[number];
+
+export interface ChangeLogEntry {
+  id: string;
+  timestamp: number;
+  operator: string;
+  action: 'import' | 'update_record' | 'confirm_group' | 'reject_group' | 'recalculate' | 'clear_data' | 'export';
+  description: string;
+  affectedRecordIds: string[];
+  dataHashAfter: string;
+  details?: Record<string, unknown>;
+}
+
+export interface ExportSnapshot {
+  id: string;
+  timestamp: number;
+  exportType: 'csv' | 'excel' | 'weekly_report';
+  operator: string;
+  dataHash: string;
+  recordCount: number;
+  fileName: string;
+  previewRows: string[];
+}
