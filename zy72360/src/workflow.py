@@ -261,18 +261,61 @@ class QualityWorkflow:
         self.session_name = data.get("session_name", "")
         if data.get("created_time"):
             self.created_time = datetime.fromisoformat(data["created_time"])
-        for rid in self.self_checker.imported_record_ids:
-            pass
+        self.self_checker.imported_record_ids = set()
         for r in self.sampling_records:
             self.self_checker.imported_record_ids.add(r.record_id)
+        if data.get("self_check_results"):
+            for key in self.self_checker.check_results:
+                self.self_checker.check_results[key] = data["self_check_results"].get(key, [])
         self._rebuild_all_links()
         self._log_action("恢复会话", None, {"filepath": filepath, "session_name": self.session_name})
         return {"success": True, "filepath": filepath, "records_count": len(self.sampling_records)}
 
     def step1_import_sampling_record(self, record_data: dict) -> dict:
+        record_id = record_data["record_id"]
+        is_supplementary = record_data.get("is_supplementary", False)
+        original_record_id = record_data.get("original_record_id")
+
+        existing = self._get_record(record_id)
+        if existing is not None and not is_supplementary:
+            dup_result = {
+                "record_id": record_id,
+                "check_time": datetime.now().isoformat(),
+                "issue": "重复导入",
+                "details": f"记录ID [{record_id}] 已存在于系统中，已拦截"
+            }
+            self.self_checker.check_results["duplicate_import"].append(dup_result)
+            self._log_action("拦截重复导入", record_id, {
+                "attempted_data": record_data,
+                "existing_status": existing.status.value,
+                "existing_version": existing.version
+            })
+            return {
+                "step": 1,
+                "action": "重复导入已拦截",
+                "success": False,
+                "record_id": record_id,
+                "status": existing.status.value,
+                "check_issues": [
+                    f"记录ID [{record_id}] 已存在，拒绝重复导入。当前状态：{existing.status.value}，版本：v{existing.version}",
+                    dup_result["details"]
+                ],
+                "conflict_found": False,
+                "needs_attention": True,
+                "version": existing.version,
+                "is_duplicate": True,
+                "existing_record_link": record_id,
+                "links": {
+                    "conflicts": existing.related_conflict_ids,
+                    "calibrations": existing.related_calibration_ids,
+                    "reminders": existing.related_reminder_ids,
+                    "supplementary": existing.supplementary_ids
+                }
+            }
+
         original_interval = record_data.get("sampling_interval")
         record = SamplingRecord(
-            record_id=record_data["record_id"],
+            record_id=record_id,
             ship_id=record_data["ship_id"],
             sensor_id=record_data["sensor_id"],
             sampling_interval=original_interval,
@@ -281,40 +324,58 @@ class QualityWorkflow:
             roll_periods=record_data["roll_periods"],
             import_time=datetime.now(),
             import_user=record_data.get("import_user", "system"),
-            is_supplementary=record_data.get("is_supplementary", False),
-            original_record_id=record_data.get("original_record_id"),
+            is_supplementary=is_supplementary,
+            original_record_id=original_record_id,
             original_sampling_interval=original_interval
         )
-        
+
         check_issues = self.self_checker.run_all_checks(record)
-        
+
         conflict = self.conflict_detector.check_sampling_interval_conflict(
             record, self.calibration_records
         )
-        
+
         self.sampling_records.append(record)
         self._sync_record_links(record)
-        
-        if record.is_supplementary and record.original_record_id:
-            orig = self._get_record(record.original_record_id)
+
+        est_before = None
+        est_after = None
+        if is_supplementary and original_record_id:
+            orig = self._get_record(original_record_id)
             if orig:
+                est_before = self._get_latest_estimate(orig.ship_id)
                 if record.record_id not in orig.supplementary_ids:
                     orig.supplementary_ids.append(record.record_id)
                 orig.status = RecordStatus.SUPPLEMENTED
                 orig.last_modified_time = datetime.now()
                 orig.version += 1
-        
+                est_after_result = self.calculate_roll_period_estimate(orig.ship_id, "系统-补录自动重算")
+                est_after = est_after_result["average_period"]
+                if est_before is not None:
+                    self.self_checker.check_supplementary_recalc(
+                        record, orig, est_before, est_after
+                    )
+                    self._log_action("补录自动重算", original_record_id, {
+                        "supplementary_id": record_id,
+                        "estimate_before": est_before,
+                        "estimate_after": est_after,
+                        "difference": abs(est_after - est_before)
+                    })
+
         self._log_action("导入采样记录", record.record_id, {
             "check_issues": check_issues,
             "has_conflict": conflict is not None,
             "initial_status": record.status.value,
-            "is_supplementary": record.is_supplementary,
-            "original_record_id": record.original_record_id
+            "is_supplementary": is_supplementary,
+            "original_record_id": original_record_id,
+            "estimate_before": est_before,
+            "estimate_after": est_after
         })
-        
-        return {
+
+        result = {
             "step": 1,
             "action": "采样记录导入完成",
+            "success": True,
             "record_id": record.record_id,
             "status": record.status.value,
             "check_issues": check_issues,
@@ -322,6 +383,8 @@ class QualityWorkflow:
             "conflict_details": conflict.description if conflict else None,
             "needs_attention": record.status in [RecordStatus.CONFLICT, RecordStatus.PENDING_REVIEW],
             "version": record.version,
+            "is_supplementary": is_supplementary,
+            "original_record_id": original_record_id,
             "links": {
                 "conflicts": record.related_conflict_ids,
                 "calibrations": record.related_calibration_ids,
@@ -329,6 +392,20 @@ class QualityWorkflow:
                 "supplementary": record.supplementary_ids
             }
         }
+        if est_before is not None and est_after is not None:
+            result["supplementary_recalc"] = {
+                "estimate_before": est_before,
+                "estimate_after": est_after,
+                "difference": abs(est_after - est_before)
+            }
+        return result
+
+    def _get_latest_estimate(self, ship_id: str) -> Optional[float]:
+        ship_estimates = [e for e in self.estimates if e.ship_id == ship_id]
+        if not ship_estimates:
+            return None
+        latest = max(ship_estimates, key=lambda e: e.calculated_time or datetime.min)
+        return latest.average_period
 
     def step2_import_calibration_and_check(self, calibration_data: dict) -> dict:
         calibration = TemperatureCalibration(
@@ -697,11 +774,19 @@ class QualityWorkflow:
         }
 
     def calculate_roll_period_estimate(self, ship_id: str, calculated_by: str) -> dict:
-        ship_records = [
-            r for r in self.sampling_records
-            if r.ship_id == ship_id and r.status in [RecordStatus.NORMAL, RecordStatus.CONFIRMED, RecordStatus.CORRECTED, RecordStatus.SUPPLEMENTED]
-        ]
+        all_ship_records = [r for r in self.sampling_records if r.ship_id == ship_id]
+        valid_statuses = [RecordStatus.NORMAL, RecordStatus.CONFIRMED, RecordStatus.CORRECTED, RecordStatus.SUPPLEMENTED]
+        ship_records = [r for r in all_ship_records if r.status in valid_statuses]
         
+        excluded_by_status = [
+            {
+                "record_id": r.record_id,
+                "status": r.status.value,
+                "reason": f"状态为{r.status.value}，未纳入计算（需先处理冲突/复核）"
+            }
+            for r in all_ship_records if r.status not in valid_statuses
+        ]
+
         estimate = RollPeriodEstimate(
             estimate_id=str(uuid.uuid4()),
             ship_id=ship_id,
@@ -709,12 +794,16 @@ class QualityWorkflow:
         )
         estimate.calculate(ship_records)
         estimate.calculated_by = calculated_by
-        
+
+        for exc in excluded_by_status:
+            if not any(e.get("record_id") == exc["record_id"] for e in estimate.excluded_records):
+                estimate.excluded_records.append(exc)
+
         self.estimates.append(estimate)
-        
+
         for r in ship_records:
             r.last_modified_time = datetime.now()
-        
+
         self._log_action("计算横摇周期", None, {
             "ship_id": ship_id,
             "records_used": len(ship_records),
@@ -722,7 +811,7 @@ class QualityWorkflow:
             "excluded_records": estimate.excluded_records,
             "average_period": round(estimate.average_period, 4)
         })
-        
+
         return {
             "estimate_id": estimate.estimate_id,
             "ship_id": ship_id,
@@ -834,7 +923,21 @@ class QualityWorkflow:
         related_calibrations = [c.to_dict() for c in self.calibration_records if record_id in c.related_sampling_record_ids]
         supplementary_records = [r.to_dict() for r in self.sampling_records if r.original_record_id == record_id]
         original_record = self._get_record(record.original_record_id).to_dict() if record.original_record_id else None
-        
+
+        latest_est = self._get_latest_estimate(record.ship_id)
+        supp_recalc_history = []
+        for sr in self.self_checker.check_results["supplementary_recalc"]:
+            if sr.get("original_id") == record_id:
+                supp_recalc_history.append({
+                    "supplementary_id": sr["record_id"],
+                    "check_time": sr["check_time"],
+                    "estimate_before": sr["estimate_before"],
+                    "estimate_after": sr["estimate_after"],
+                    "difference": sr["difference"],
+                    "has_significant_change": sr["has_significant_change"],
+                    "details": sr["details"]
+                })
+
         return {
             "success": True,
             "record_id": record_id,
@@ -845,7 +948,10 @@ class QualityWorkflow:
                 "is_supplementary": record.is_supplementary,
                 "has_conflicts": len(related_conflicts) > 0,
                 "pending_reminders": sum(1 for r in related_reminders if not r["reviewed"]),
-                "supplementaries_count": len(supplementary_records)
+                "supplementaries_count": len(supplementary_records),
+                "supplementary_recalc_count": len(supp_recalc_history),
+                "current_roll_period_estimate": latest_est,
+                "supplementary_recalc_has_issues": any(s["has_significant_change"] for s in supp_recalc_history)
             },
             "basic_info": {
                 "record_id": record.record_id,
@@ -889,6 +995,7 @@ class QualityWorkflow:
             "related_reminders": related_reminders,
             "original_record": original_record,
             "supplementary_records": supplementary_records,
+            "supplementary_recalc_history": supp_recalc_history,
             "links": {
                 "conflict_ids": record.related_conflict_ids,
                 "calibration_ids": record.related_calibration_ids,
@@ -942,7 +1049,10 @@ class QualityWorkflow:
                 "resolved": sum(1 for c in self.conflict_detector.conflicts if c.resolved),
                 "unresolved": sum(1 for c in self.conflict_detector.conflicts if not c.resolved)
             },
-            "self_check": self.self_checker.get_check_summary(),
+            "self_check": {
+                "summary": self.self_checker.get_check_summary(),
+                "detailed_results": self.self_checker.get_all_results()
+            },
             "record_list_snippet": [
                 {
                     "record_id": r.record_id,

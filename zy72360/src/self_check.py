@@ -140,9 +140,15 @@ class SelfChecker:
     def get_check_summary(self) -> dict:
         summary = {}
         for check_type, results in self.check_results.items():
+            if check_type == "export_consistency":
+                has_issues = any(r.get("is_consistent", True) is False for r in results)
+            elif check_type == "supplementary_recalc":
+                has_issues = any(r.get("has_significant_change", False) for r in results)
+            else:
+                has_issues = len(results) > 0
             summary[check_type] = {
                 "count": len(results),
-                "has_issues": any(r.get("is_consistent", True) is False or "有显著变化" in r.get("details", "") or r.get("issue") in ["重复导入", "传感器编号变更"] for r in results)
+                "has_issues": has_issues
             }
         return summary
 

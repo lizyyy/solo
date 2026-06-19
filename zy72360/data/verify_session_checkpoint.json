@@ -1,0 +1,442 @@
+{
+  "session_name": "验证数据流-暂停点",
+  "saved_time": "2026-06-19T20:29:36.876966",
+  "created_time": "2026-06-19T20:29:36.876626",
+  "sampling_records": [
+    {
+      "record_id": "DUP-1",
+      "ship_id": "SHIP-DUP",
+      "sensor_id": "SENSOR-DUP",
+      "sampling_interval": 0.05,
+      "sampling_start_time": "2026-06-10T08:00:00",
+      "sampling_end_time": "2026-06-10T10:00:00",
+      "roll_periods": [
+        12.5,
+        12.6,
+        12.7
+      ],
+      "import_time": "2026-06-19T20:29:36.876642",
+      "import_user": "操作员张三",
+      "status": "正常",
+      "sensor_status": "原始编号",
+      "previous_sensor_id": null,
+      "is_supplementary": false,
+      "original_record_id": null,
+      "remarks": "",
+      "original_sampling_interval": 0.05,
+      "correction_reason": "",
+      "next_handler": "",
+      "version": 1,
+      "last_modified_time": "2026-06-19T20:29:36.876752",
+      "last_modified_by": "",
+      "supplementary_ids": [],
+      "related_calibration_ids": [],
+      "related_reminder_ids": [],
+      "related_conflict_ids": [],
+      "review_infos": []
+    },
+    {
+      "record_id": "SAMPLE-001",
+      "ship_id": "SHIP-A",
+      "sensor_id": "SENSOR-A01",
+      "sampling_interval": 0.045,
+      "sampling_start_time": "2026-06-08T20:00:00",
+      "sampling_end_time": "2026-06-08T22:00:00",
+      "roll_periods": [
+        12.5,
+        12.3,
+        12.6
+      ],
+      "import_time": "2026-06-19T20:29:36.876755",
+      "import_user": "操作员张三",
+      "status": "已补录",
+      "sensor_status": "原始编号",
+      "previous_sensor_id": null,
+      "is_supplementary": false,
+      "original_record_id": null,
+      "remarks": "发现与校准记录[CAL-A001]冲突；",
+      "original_sampling_interval": 0.05,
+      "correction_reason": "",
+      "next_handler": "安全员王五复核后归档",
+      "version": 5,
+      "last_modified_time": "2026-06-19T20:29:36.876920",
+      "last_modified_by": "",
+      "supplementary_ids": [
+        "SAMPLE-001-SUPP"
+      ],
+      "related_calibration_ids": [
+        "CAL-A001"
+      ],
+      "related_reminder_ids": [
+        "cb81fcfd-d6d0-4100-b884-ca2c7dcc4009"
+      ],
+      "related_conflict_ids": [
+        "8b4ce7c0-ff33-453e-9a44-fc494d5dabd9"
+      ],
+      "review_infos": [
+        {
+          "field_name": "sampling_interval",
+          "original_value": 0.05,
+          "corrected_value": 0.045,
+          "reason": "冲突处理：确认冲突存在，采用折中0.045s",
+          "next_handler": "安全员王五复核后归档",
+          "handled_by": "质检员小白",
+          "handled_time": "2026-06-19T20:29:36.876842",
+          "result": "确认冲突存在，采用折中0.045s"
+        }
+      ]
+    },
+    {
+      "record_id": "SAMPLE-001-SUPP",
+      "ship_id": "SHIP-A",
+      "sensor_id": "SENSOR-A01",
+      "sampling_interval": 0.045,
+      "sampling_start_time": "2026-06-08T22:30:00",
+      "sampling_end_time": "2026-06-09T00:30:00",
+      "roll_periods": [
+        13.0,
+        13.2,
+        12.9
+      ],
+      "import_time": "2026-06-19T20:29:36.876880",
+      "import_user": "操作员张三",
+      "status": "冲突待确认",
+      "sensor_status": "原始编号",
+      "previous_sensor_id": null,
+      "is_supplementary": true,
+      "original_record_id": "SAMPLE-001",
+      "remarks": "发现与校准记录[CAL-A001]冲突；",
+      "original_sampling_interval": 0.045,
+      "correction_reason": "",
+      "next_handler": "",
+      "version": 1,
+      "last_modified_time": "2026-06-19T20:29:36.876922",
+      "last_modified_by": "",
+      "supplementary_ids": [],
+      "related_calibration_ids": [],
+      "related_reminder_ids": [],
+      "related_conflict_ids": [
+        "dba8c99a-4461-48d3-97af-50f57d116c22"
+      ],
+      "review_infos": []
+    }
+  ],
+  "calibration_records": [
+    {
+      "calibration_id": "CAL-A001",
+      "ship_id": "SHIP-A",
+      "sensor_id": "SENSOR-A01",
+      "calibration_time": "2026-06-08T18:00:00",
+      "effective_sampling_interval": 0.04,
+      "calibration_temperature": 32.5,
+      "operator": "校准员李四",
+      "remarks": "夜航高温导致采样频率偏移",
+      "related_sampling_record_ids": [
+        "SAMPLE-001"
+      ],
+      "affected_conflict_ids": [
+        "8b4ce7c0-ff33-453e-9a44-fc494d5dabd9"
+      ]
+    }
+  ],
+  "estimates": [
+    {
+      "estimate_id": "07517ecf-0c9f-4186-af69-0567186b51f8",
+      "ship_id": "SHIP-A",
+      "sampling_records": [
+        "SAMPLE-001"
+      ],
+      "average_period": 12.466666666666667,
+      "period_variance": 0.015555555555555448,
+      "calculated_time": "2026-06-19T20:29:36.876870",
+      "calculated_by": "系统-补录前",
+      "status": "已计算",
+      "excluded_records": []
+    },
+    {
+      "estimate_id": "c84a1c52-ed44-4cdd-88ed-82f779e22370",
+      "ship_id": "SHIP-A",
+      "sampling_records": [
+        "SAMPLE-001"
+      ],
+      "average_period": 12.466666666666667,
+      "period_variance": 0.015555555555555448,
+      "calculated_time": "2026-06-19T20:29:36.876911",
+      "calculated_by": "系统-补录自动重算",
+      "status": "已计算",
+      "excluded_records": [
+        {
+          "record_id": "SAMPLE-001-SUPP",
+          "status": "冲突待确认",
+          "reason": "状态为冲突待确认，未纳入计算（需先处理冲突/复核）"
+        }
+      ]
+    }
+  ],
+  "safety_reminders": [
+    {
+      "reminder_id": "cb81fcfd-d6d0-4100-b884-ca2c7dcc4009",
+      "related_record_id": "SAMPLE-001",
+      "level": "中",
+      "title": "采样间隔冲突待确认",
+      "content": "采样记录声明的间隔(0.05s)与温度校准后的有效间隔(0.04s)不一致",
+      "created_time": "2026-06-19T20:29:36.876827",
+      "reviewed": false,
+      "reviewed_by": null,
+      "reviewed_time": null,
+      "related_conflict_id": "8b4ce7c0-ff33-453e-9a44-fc494d5dabd9",
+      "reminder_type": "interval_conflict",
+      "next_step": "联系质检员小白确认采用哪个间隔值",
+      "original_value": 0.05,
+      "current_value": 0.04
+    }
+  ],
+  "conflicts": [
+    {
+      "conflict_id": "8b4ce7c0-ff33-453e-9a44-fc494d5dabd9",
+      "sampling_record_id": "SAMPLE-001",
+      "calibration_id": "CAL-A001",
+      "conflict_type": "采样间隔与温度校准冲突",
+      "description": "采样记录声明的间隔(0.05s)与温度校准后的有效间隔(0.04s)不一致",
+      "sampling_value": 0.05,
+      "calibration_value": 0.04,
+      "discovered_time": "2026-06-19T20:29:36.876811",
+      "resolved": true,
+      "resolution": "确认冲突存在，采用折中0.045s",
+      "resolved_by": "质检员小白",
+      "resolved_time": "2026-06-19T20:29:36.876841",
+      "original_status": "冲突待确认",
+      "corrected_status": "已修正",
+      "handler_after_resolve": "安全员王五复核后归档",
+      "result_summary": "采样间隔已从0.05s修正为0.045s",
+      "reminder_id": "cb81fcfd-d6d0-4100-b884-ca2c7dcc4009"
+    },
+    {
+      "conflict_id": "dba8c99a-4461-48d3-97af-50f57d116c22",
+      "sampling_record_id": "SAMPLE-001-SUPP",
+      "calibration_id": "CAL-A001",
+      "conflict_type": "采样间隔与温度校准冲突",
+      "description": "采样记录声明的间隔(0.045s)与温度校准后的有效间隔(0.04s)不一致",
+      "sampling_value": 0.045,
+      "calibration_value": 0.04,
+      "discovered_time": "2026-06-19T20:29:36.876894",
+      "resolved": false,
+      "resolution": null,
+      "resolved_by": null,
+      "resolved_time": null,
+      "original_status": null,
+      "corrected_status": null,
+      "handler_after_resolve": "",
+      "result_summary": "",
+      "reminder_id": null
+    }
+  ],
+  "self_check_results": {
+    "duplicate_import": [
+      {
+        "record_id": "DUP-1",
+        "check_time": "2026-06-19T20:29:36.876661",
+        "issue": "重复导入",
+        "details": "记录ID [DUP-1] 已存在于系统中，已拦截"
+      }
+    ],
+    "sensor_id_change": [],
+    "supplementary_recalc": [
+      {
+        "record_id": "SAMPLE-001-SUPP",
+        "original_id": "SAMPLE-001",
+        "check_time": "2026-06-19T20:29:36.876916",
+        "issue": "补录重算验证",
+        "estimate_before": 12.466666666666667,
+        "estimate_after": 12.4667,
+        "difference": 3.333333333266353e-05,
+        "has_significant_change": false,
+        "details": "补录后估算值从 12.4667 变为 12.4667"
+      }
+    ],
+    "export_consistency": [
+      {
+        "record_id": "DUP-1",
+        "export_id": "export_DUP-1_20260619202936",
+        "check_time": "2026-06-19T20:29:36.876741",
+        "issue": "导出一致性",
+        "record_signature": "d5e2f283fc26d84b437f67e4064491e3",
+        "export_signature": "d5e2f283fc26d84b437f67e4064491e3",
+        "is_consistent": true,
+        "details": "导出数据与原始记录一致"
+      }
+    ]
+  },
+  "history_log": [
+    {
+      "timestamp": "2026-06-19T20:29:36.876652",
+      "action": "导入采样记录",
+      "record_id": "DUP-1",
+      "details": {
+        "check_issues": [],
+        "has_conflict": false,
+        "initial_status": "正常",
+        "is_supplementary": false,
+        "original_record_id": null,
+        "estimate_before": null,
+        "estimate_after": null
+      }
+    },
+    {
+      "timestamp": "2026-06-19T20:29:36.876662",
+      "action": "拦截重复导入",
+      "record_id": "DUP-1",
+      "details": {
+        "attempted_data": {
+          "record_id": "DUP-1",
+          "ship_id": "SHIP-DUP",
+          "sensor_id": "SENSOR-DUP",
+          "sampling_interval": 0.05,
+          "sampling_start_time": "2026-06-10T08:00:00",
+          "sampling_end_time": "2026-06-10T10:00:00",
+          "roll_periods": [
+            12.5,
+            12.6,
+            12.7
+          ],
+          "import_user": "操作员张三"
+        },
+        "existing_status": "正常",
+        "existing_version": 1
+      }
+    },
+    {
+      "timestamp": "2026-06-19T20:29:36.876746",
+      "action": "导出记录",
+      "record_id": "DUP-1",
+      "details": {
+        "export_id": "export_DUP-1_20260619202936",
+        "consistent": true,
+        "include_history": true
+      }
+    },
+    {
+      "timestamp": "2026-06-19T20:29:36.876760",
+      "action": "导入采样记录",
+      "record_id": "SAMPLE-001",
+      "details": {
+        "check_issues": [],
+        "has_conflict": false,
+        "initial_status": "正常",
+        "is_supplementary": false,
+        "original_record_id": null,
+        "estimate_before": null,
+        "estimate_after": null
+      }
+    },
+    {
+      "timestamp": "2026-06-19T20:29:36.876816",
+      "action": "校准触发冲突",
+      "record_id": "SAMPLE-001",
+      "details": {
+        "conflict_id": "8b4ce7c0-ff33-453e-9a44-fc494d5dabd9",
+        "calibration_id": "CAL-A001",
+        "old_status": "冲突待确认",
+        "new_status": "冲突待确认",
+        "sampling_value": 0.05,
+        "calibration_value": 0.04
+      }
+    },
+    {
+      "timestamp": "2026-06-19T20:29:36.876819",
+      "action": "导入温度校准记录",
+      "record_id": null,
+      "details": {
+        "calibration_id": "CAL-A001",
+        "new_conflicts_count": 1,
+        "affected_records": [
+          "SAMPLE-001"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-06-19T20:29:36.876831",
+      "action": "更新安全提醒",
+      "record_id": null,
+      "details": {
+        "operator": "质检员小白",
+        "new_reminders": 1,
+        "total_pending": 1
+      }
+    },
+    {
+      "timestamp": "2026-06-19T20:29:36.876846",
+      "action": "冲突处理",
+      "record_id": "SAMPLE-001",
+      "details": {
+        "conflict_id": "8b4ce7c0-ff33-453e-9a44-fc494d5dabd9",
+        "resolution": "确认冲突存在，采用折中0.045s",
+        "resolved_by": "质检员小白",
+        "old_status": "冲突待确认",
+        "new_status": "已修正",
+        "correct_value": 0.045,
+        "handler_after": "安全员王五复核后归档",
+        "result_summary": "采样间隔已从0.05s修正为0.045s"
+      }
+    },
+    {
+      "timestamp": "2026-06-19T20:29:36.876873",
+      "action": "计算横摇周期",
+      "record_id": null,
+      "details": {
+        "ship_id": "SHIP-A",
+        "records_used": 1,
+        "used_record_ids": [
+          "SAMPLE-001"
+        ],
+        "excluded_records": [],
+        "average_period": 12.4667
+      }
+    },
+    {
+      "timestamp": "2026-06-19T20:29:36.876913",
+      "action": "计算横摇周期",
+      "record_id": null,
+      "details": {
+        "ship_id": "SHIP-A",
+        "records_used": 1,
+        "used_record_ids": [
+          "SAMPLE-001"
+        ],
+        "excluded_records": [
+          {
+            "record_id": "SAMPLE-001-SUPP",
+            "status": "冲突待确认",
+            "reason": "状态为冲突待确认，未纳入计算（需先处理冲突/复核）"
+          }
+        ],
+        "average_period": 12.4667
+      }
+    },
+    {
+      "timestamp": "2026-06-19T20:29:36.876918",
+      "action": "补录自动重算",
+      "record_id": "SAMPLE-001",
+      "details": {
+        "supplementary_id": "SAMPLE-001-SUPP",
+        "estimate_before": 12.466666666666667,
+        "estimate_after": 12.4667,
+        "difference": 3.333333333266353e-05
+      }
+    },
+    {
+      "timestamp": "2026-06-19T20:29:36.876921",
+      "action": "导入采样记录",
+      "record_id": "SAMPLE-001-SUPP",
+      "details": {
+        "check_issues": [],
+        "has_conflict": true,
+        "initial_status": "冲突待确认",
+        "is_supplementary": true,
+        "original_record_id": "SAMPLE-001",
+        "estimate_before": 12.466666666666667,
+        "estimate_after": 12.4667
+      }
+    }
+  ]
+}

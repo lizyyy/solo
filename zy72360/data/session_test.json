@@ -1,7 +1,7 @@
 {
   "session_name": "无人船横摇周期-夜间批次",
-  "saved_time": "2026-06-09T09:19:50.127779",
-  "created_time": "2026-06-09T09:19:50.127094",
+  "saved_time": "2026-06-19T20:29:50.836328",
+  "created_time": "2026-06-19T20:29:50.836114",
   "sampling_records": [
     {
       "record_id": "SAMPLE-001",
@@ -17,7 +17,7 @@
         12.4,
         12.5
       ],
-      "import_time": "2026-06-09T09:19:50.127111",
+      "import_time": "2026-06-19T20:29:50.836123",
       "import_user": "操作员张三",
       "status": "已修正",
       "sensor_status": "原始编号",
@@ -29,18 +29,18 @@
       "correction_reason": "",
       "next_handler": "安全员王五复核后归档",
       "version": 4,
-      "last_modified_time": "2026-06-09T09:19:50.127527",
+      "last_modified_time": "2026-06-19T20:29:50.836274",
       "last_modified_by": "",
       "supplementary_ids": [],
       "related_calibration_ids": [
         "CAL-A001"
       ],
       "related_reminder_ids": [
-        "221b97e1-1c05-4346-bf59-b2ef7d37fc33",
-        "660f6681-bd59-4a65-91ed-529fcb2627f2"
+        "d50eceda-fe12-4cc8-af07-1c7cc2fc707d",
+        "60dfaaec-a764-45e6-a096-81d4ca620b81"
       ],
       "related_conflict_ids": [
-        "d123751a-14e5-402e-95da-37333859f9cf"
+        "9ffc81ff-5912-48b6-95fa-e1060ad3aa5a"
       ],
       "review_infos": [
         {
@@ -50,7 +50,7 @@
           "reason": "冲突处理：确认冲突存在，采用折中0.045s",
           "next_handler": "安全员王五复核后归档",
           "handled_by": "质检员小白",
-          "handled_time": "2026-06-09T09:19:50.127516",
+          "handled_time": "2026-06-19T20:29:50.836268",
           "result": "确认冲突存在，采用折中0.045s"
         }
       ]
@@ -70,35 +70,35 @@
         "SAMPLE-001"
       ],
       "affected_conflict_ids": [
-        "d123751a-14e5-402e-95da-37333859f9cf"
+        "9ffc81ff-5912-48b6-95fa-e1060ad3aa5a"
       ]
     }
   ],
   "estimates": [],
   "safety_reminders": [
     {
-      "reminder_id": "221b97e1-1c05-4346-bf59-b2ef7d37fc33",
+      "reminder_id": "d50eceda-fe12-4cc8-af07-1c7cc2fc707d",
       "related_record_id": "SAMPLE-001",
       "level": "中",
       "title": "采样间隔冲突待确认",
       "content": "采样记录声明的间隔(0.05s)与温度校准后的有效间隔(0.04s)不一致",
-      "created_time": "2026-06-09T09:19:50.127424",
+      "created_time": "2026-06-19T20:29:50.836244",
       "reviewed": false,
       "reviewed_by": null,
       "reviewed_time": null,
-      "related_conflict_id": "d123751a-14e5-402e-95da-37333859f9cf",
+      "related_conflict_id": "9ffc81ff-5912-48b6-95fa-e1060ad3aa5a",
       "reminder_type": "interval_conflict",
       "next_step": "联系质检员小白确认采用哪个间隔值",
       "original_value": 0.05,
       "current_value": 0.04
     },
     {
-      "reminder_id": "660f6681-bd59-4a65-91ed-529fcb2627f2",
+      "reminder_id": "60dfaaec-a764-45e6-a096-81d4ca620b81",
       "related_record_id": "SAMPLE-001",
       "level": "中",
       "title": "记录已修正待后续处理",
       "content": "采样间隔已从0.05修正为0.045s，原因：，下一步处理：安全员王五复核后归档",
-      "created_time": "2026-06-09T09:19:50.127657",
+      "created_time": "2026-06-19T20:29:50.836286",
       "reviewed": false,
       "reviewed_by": null,
       "reviewed_time": null,
@@ -111,23 +111,23 @@
   ],
   "conflicts": [
     {
-      "conflict_id": "d123751a-14e5-402e-95da-37333859f9cf",
+      "conflict_id": "9ffc81ff-5912-48b6-95fa-e1060ad3aa5a",
       "sampling_record_id": "SAMPLE-001",
       "calibration_id": "CAL-A001",
       "conflict_type": "采样间隔与温度校准冲突",
       "description": "采样记录声明的间隔(0.05s)与温度校准后的有效间隔(0.04s)不一致",
       "sampling_value": 0.05,
       "calibration_value": 0.04,
-      "discovered_time": "2026-06-09T09:19:50.127262",
+      "discovered_time": "2026-06-19T20:29:50.836212",
       "resolved": true,
       "resolution": "确认冲突存在，采用折中0.045s",
       "resolved_by": "质检员小白",
-      "resolved_time": "2026-06-09T09:19:50.127515",
+      "resolved_time": "2026-06-19T20:29:50.836267",
       "original_status": "冲突待确认",
       "corrected_status": "已修正",
       "handler_after_resolve": "安全员王五复核后归档",
       "result_summary": "采样间隔已从0.05s修正为0.045s",
-      "reminder_id": "221b97e1-1c05-4346-bf59-b2ef7d37fc33"
+      "reminder_id": "d50eceda-fe12-4cc8-af07-1c7cc2fc707d"
     }
   ],
   "self_check_results": {
@@ -138,7 +138,7 @@
   },
   "history_log": [
     {
-      "timestamp": "2026-06-09T09:19:50.127136",
+      "timestamp": "2026-06-19T20:29:50.836135",
       "action": "导入采样记录",
       "record_id": "SAMPLE-001",
       "details": {
@@ -146,15 +146,17 @@
         "has_conflict": false,
         "initial_status": "正常",
         "is_supplementary": false,
-        "original_record_id": null
+        "original_record_id": null,
+        "estimate_before": null,
+        "estimate_after": null
       }
     },
     {
-      "timestamp": "2026-06-09T09:19:50.127269",
+      "timestamp": "2026-06-19T20:29:50.836219",
       "action": "校准触发冲突",
       "record_id": "SAMPLE-001",
       "details": {
-        "conflict_id": "d123751a-14e5-402e-95da-37333859f9cf",
+        "conflict_id": "9ffc81ff-5912-48b6-95fa-e1060ad3aa5a",
         "calibration_id": "CAL-A001",
         "old_status": "冲突待确认",
         "new_status": "冲突待确认",
@@ -163,7 +165,7 @@
       }
     },
     {
-      "timestamp": "2026-06-09T09:19:50.127273",
+      "timestamp": "2026-06-19T20:29:50.836222",
       "action": "导入温度校准记录",
       "record_id": null,
       "details": {
@@ -175,7 +177,7 @@
       }
     },
     {
-      "timestamp": "2026-06-09T09:19:50.127437",
+      "timestamp": "2026-06-19T20:29:50.836250",
       "action": "更新安全提醒",
       "record_id": null,
       "details": {
@@ -185,11 +187,11 @@
       }
     },
     {
-      "timestamp": "2026-06-09T09:19:50.127525",
+      "timestamp": "2026-06-19T20:29:50.836272",
       "action": "冲突处理",
       "record_id": "SAMPLE-001",
       "details": {
-        "conflict_id": "d123751a-14e5-402e-95da-37333859f9cf",
+        "conflict_id": "9ffc81ff-5912-48b6-95fa-e1060ad3aa5a",
         "resolution": "确认冲突存在，采用折中0.045s",
         "resolved_by": "质检员小白",
         "old_status": "冲突待确认",
@@ -200,7 +202,7 @@
       }
     },
     {
-      "timestamp": "2026-06-09T09:19:50.127661",
+      "timestamp": "2026-06-19T20:29:50.836288",
       "action": "更新安全提醒",
       "record_id": null,
       "details": {
