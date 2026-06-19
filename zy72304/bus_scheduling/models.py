@@ -180,6 +180,9 @@ class SchedulingResult:
     total_cost: float
     calculation_details: List[CalculationDetail] = field(default_factory=list)
     issues_found: List[MixedNumberIssue] = field(default_factory=list)
+    rejected_records: List[Dict[str, Any]] = field(default_factory=list)
+    duplicate_records: List[Dict[str, Any]] = field(default_factory=list)
+    excluded_summary: Dict[str, Any] = field(default_factory=dict)
     workflow_step: WorkflowStep = WorkflowStep.STEP1_IMPORT
     created_at: datetime = field(default_factory=datetime.now)
 
@@ -192,6 +195,9 @@ class SchedulingResult:
             "total_cost": self.total_cost,
             "calculation_details": [d.to_dict() for d in self.calculation_details],
             "issues_found": [i.to_dict() for i in self.issues_found],
+            "rejected_records": self.rejected_records,
+            "duplicate_records": self.duplicate_records,
+            "excluded_summary": self.excluded_summary,
             "workflow_step": self.workflow_step.value,
             "created_at": self.created_at.isoformat(),
         }

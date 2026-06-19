@@ -9,6 +9,9 @@
 中间碰到百分数和小数混合时，别急着归正常，留给活动负责人复核。
 """
 
+import csv
+import io
+import json
 import uuid
 from datetime import datetime
 from typing import List, Dict, Any, Optional, Tuple
@@ -530,6 +533,9 @@ class SchedulingWorkflow:
             "calculation_details_count": len(result.calculation_details),
             "drilldown_available": drilldown_summary,
             "issues_count": len(result.issues_found),
+            "excluded_summary": result.excluded_summary,
+            "rejected_records": result.rejected_records,
+            "duplicate_records": result.duplicate_records,
         }
 
     def drilldown_detail(self, detail_id: str) -> Dict[str, Any]:
@@ -668,3 +674,185 @@ class SchedulingWorkflow:
     def get_boundary_rules(self) -> Dict[str, Any]:
         """获取所有边界规则"""
         return self.validator.get_boundary_rules()
+
+    def recalculate(self, operator: str = "实验助理小穆") -> Dict[str, Any]:
+        """
+        刷新、重算排班
+
+        场景：活动负责人修改了某条记录的复核状态（如拒绝、通过、修改值）后，
+        重新执行排班计算。被拒绝的记录不会再进入排班。
+
+        Returns:
+            同 step3_calculate 的结构
+        """
+        if self._result is None:
+            raise ValidationError(
+                format_error("calculation_failed"),
+                {"reason": "尚未执行首次计算，无法重算。请先执行第三步。"},
+            )
+
+        self._current_step = WorkflowStep.STEP3_CALC_UPDATE
+        return self.step3_calculate(operator=operator)
+
+    def generate_report(self) -> Dict[str, Any]:
+        """
+        生成排班报告
+
+        报告包含：
+        1. 排班总览（总车辆、总成本）
+        2. 参与排班的线路明细（含原始客流、有效客流、车辆、成本、理由）
+        3. 被排除记录（拒绝的+重复的），含拒绝原因、负责人、时间
+        4. 变更历史摘要
+
+        被拒绝的记录只出现在「排除清单」，绝不出现在「排班明细」。
+        """
+        if self._result is None:
+            raise ValidationError(
+                format_error("calculation_failed"),
+                {"reason": "尚未完成计算，无法生成报告。"},
+            )
+        result = self._result
+
+        # 参与排班的线路明细
+        route_details = []
+        for detail in result.calculation_details:
+            record = self._find_record(detail.record_id)
+            route_details.append({
+                "detail_id": detail.detail_id,
+                "record_id": detail.record_id,
+                "route_code": detail.route_code,
+                "route_name": record.route_name if record else "",
+                "original_passenger_count": detail.input_params.get(
+                    "original_passenger_count", ""
+                ),
+                "effective_passenger_count": detail.input_params.get(
+                    "effective_passenger_count", 0
+                ),
+                "bus_count": detail.result_value,
+                "bus_cost": detail.result_value * self.scheduler.config.cost_per_bus,
+                "retain_reason": detail.retain_reason,
+                "calculation_steps": [
+                    s.get("description", "") for s in detail.calculation_steps
+                ],
+            })
+
+        # 变更历史摘要
+        history_summary = {}
+        for h in self._change_history:
+            history_summary.setdefault(h.record_id, []).append({
+                "field": h.field_name,
+                "old": h.old_value,
+                "new": h.new_value,
+                "operator": h.operator,
+                "reason": h.change_reason,
+                "time": h.change_time.isoformat() if h.change_time else "",
+            })
+
+        return {
+            "report_id": f"rpt_{uuid.uuid4().hex[:8]}",
+            "generated_at": datetime.now().isoformat(),
+            "overview": {
+                "result_id": result.result_id,
+                "batch_id": result.batch_id,
+                "total_buses": result.bus_count,
+                "total_cost": result.total_cost,
+                "valid_route_count": len(route_details),
+            },
+            "excluded_summary": result.excluded_summary,
+            "rejected_records": result.rejected_records,
+            "duplicate_records": result.duplicate_records,
+            "route_details": route_details,
+            "history_summary": history_summary,
+        }
+
+    def export_result(self, fmt: str = "csv") -> Tuple[str, bytes]:
+        """
+        导出排班结果
+
+        支持 CSV / JSON 两种格式。
+        被拒绝、重复的记录只出现在「排除清单」sheet/节点，不出现在排班明细里。
+
+        Args:
+            fmt: "csv" 或 "json"
+
+        Returns:
+            (文件名, 文件内容bytes)
+        """
+        if self._result is None:
+            raise ValidationError(
+                format_error("calculation_failed"),
+                {"reason": "尚未完成计算，无法导出。"},
+            )
+        report = self.generate_report()
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        if fmt.lower() == "json":
+            filename = f"scheduling_report_{ts}.json"
+            content = json.dumps(report, ensure_ascii=False, indent=2).encode("utf-8")
+            return filename, content
+
+        # 默认 CSV：两个 sheet 的 CSV，用分隔行拼接
+        filename = f"scheduling_report_{ts}.csv"
+        buffer = io.StringIO()
+        writer = csv.writer(buffer)
+
+        # Sheet1: 排班明细
+        writer.writerow(["=== 排班明细（参与计算） ==="])
+        writer.writerow([
+            "线路编号", "线路名称", "原始客流量", "有效客流量",
+            "车辆数", "单车成本", "线路成本", "保留/通过理由",
+        ])
+        for d in report["route_details"]:
+            writer.writerow([
+                d["route_code"],
+                d["route_name"],
+                d["original_passenger_count"],
+                d["effective_passenger_count"],
+                d["bus_count"],
+                self.scheduler.config.cost_per_bus,
+                d["bus_cost"],
+                d["retain_reason"] or "",
+            ])
+        writer.writerow([])
+
+        # Sheet2: 排除清单（拒绝的）
+        writer.writerow(["=== 排除清单：负责人拒绝（不参与计算） ==="])
+        writer.writerow([
+            "线路编号", "线路名称", "原始客流量", "拒绝原因",
+            "复核人", "复核时间", "记录ID", "问题ID",
+        ])
+        for r in report["rejected_records"]:
+            writer.writerow([
+                r["route_code"],
+                r["route_name"],
+                r["original_passenger_count"],
+                r["reject_reason"] or "",
+                r["reviewer"] or "",
+                r["review_time"] or "",
+                r["record_id"],
+                r["issue_id"] or "",
+            ])
+        writer.writerow([])
+
+        # Sheet3: 排除清单（重复的）
+        writer.writerow(["=== 排除清单：重复导入（不参与计算） ==="])
+        writer.writerow(["线路编号", "线路名称", "原始客流量", "状态"])
+        for r in report["duplicate_records"]:
+            writer.writerow([
+                r["route_code"],
+                r["route_name"],
+                r["original_passenger_count"],
+                r["status"],
+            ])
+        writer.writerow([])
+
+        # 总览
+        writer.writerow(["=== 总览 ==="])
+        writer.writerow(["总车辆数", report["overview"]["total_buses"]])
+        writer.writerow(["总成本", report["overview"]["total_cost"]])
+        writer.writerow(["参与线路数", report["overview"]["valid_route_count"]])
+        writer.writerow(["拒绝记录数", report["excluded_summary"]["rejected_count"]])
+        writer.writerow(["重复记录数", report["excluded_summary"]["duplicate_count"]])
+
+        content = buffer.getvalue().encode("utf-8-sig")
+        return filename, content

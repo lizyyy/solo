@@ -57,27 +57,45 @@ class BusScheduler:
         self.config.updated_at = datetime.now()
         return self.config
 
-    def _get_effective_value(self, record: SamplingRecord) -> float:
+    @staticmethod
+    def is_record_rejected(record: SamplingRecord) -> bool:
         """
-        获取记录的有效值
+        判断一条抽样记录是否被活动负责人拒绝（不参与排班）
 
-        规则：
-        1. 如果有待复核的混合问题，使用原始值并标记
-        2. 如果有已批准的问题，使用建议值
-        3. 否则使用记录值
+        边界规则：只要有任一条关联问题状态为 REJECTED，整条记录不参与计算
 
         Args:
             record: 抽样记录
 
         Returns:
-            有效值
+            True 表示该记录被拒绝，不参与排班计算
         """
+        return any(issue.status == IssueStatus.REJECTED for issue in record.issues)
+
+    def _get_effective_value(self, record: SamplingRecord) -> Optional[float]:
+        """
+        获取记录的有效值
+
+        规则：
+        1. 如果记录包含 REJECTED 问题，返回 None（应在 calculate 阶段已被过滤）
+        2. 如果有已批准/已修改的问题，使用其 suggested_value
+        3. 如果有待复核的混合问题，使用 suggested_value 但记录问题
+        4. 否则使用记录值
+
+        Args:
+            record: 抽样记录
+
+        Returns:
+            有效值；记录被拒绝时返回 None
+        """
+        if self.is_record_rejected(record):
+            return None
+
         for issue in record.issues:
-            if issue.status == IssueStatus.PENDING_REVIEW:
-                # 有待复核的问题，使用suggested_value但记录问题
+            if issue.status in (IssueStatus.APPROVED, IssueStatus.MODIFIED):
                 if issue.suggested_value is not None:
                     return issue.suggested_value
-            elif issue.status in (IssueStatus.APPROVED, IssueStatus.MODIFIED):
+            if issue.status == IssueStatus.PENDING_REVIEW:
                 if issue.suggested_value is not None:
                     return issue.suggested_value
 
@@ -284,10 +302,13 @@ class BusScheduler:
 
         对应第三步：计算明细更新
 
-        边界规则：
-        1. 检查是否有待复核的混合问题
+        边界规则（全部硬编码，不靠口头约定）：
+        1. 检查是否有待复核(PENDING_REVIEW)的混合问题
         2. 如有，除非显式指定skip_review_check，否则抛出错误提示活动负责人复核
         3. 不自动将混合问题归为正常
+        4. 重复记录(is_duplicate=True) → 不参与计算
+        5. 负责人拒绝的记录(含REJECTED issue) → 不参与计算，不进入班次/成本/明细
+        6. 被排除的记录必须体现在结果统计中，闭环可见
 
         Args:
             records: 抽样记录列表
@@ -297,36 +318,102 @@ class BusScheduler:
         Returns:
             排班结果
         """
-        # 过滤掉重复记录
-        valid_records = [r for r in records if not r.is_duplicate]
+        total_input_records = len(records)
+
+        # 1. 分离：重复记录
+        duplicate_records = [r for r in records if r.is_duplicate]
+
+        # 2. 分离：负责人拒绝的记录（含任一条 REJECTED 问题）
+        rejected_records_raw = [
+            r for r in records
+            if not r.is_duplicate and self.is_record_rejected(r)
+        ]
+
+        # 3. 真正参与排班的记录（非重复 + 非拒绝 + 非待复核问题已全部复核）
+        valid_records = [
+            r for r in records
+            if not r.is_duplicate and not self.is_record_rejected(r)
+        ]
+
+        # 格式化被排除记录供结果展示（保留原始值、拒绝原因、操作人、可回滚）
+        rejected_records_formatted = []
+        for r in rejected_records_raw:
+            rejected_issue = next(
+                (i for i in r.issues if i.status == IssueStatus.REJECTED),
+                None,
+            )
+            rejected_records_formatted.append({
+                "record_id": r.record_id,
+                "route_code": r.route_code,
+                "route_name": r.route_name,
+                "original_passenger_count": r.original_data.get(
+                    "passenger_count_original", str(r.passenger_count)
+                ),
+                "passenger_count": r.passenger_count,
+                "reject_reason": (
+                    rejected_issue.retain_reason if rejected_issue else None
+                ),
+                "reviewer": rejected_issue.reviewer if rejected_issue else None,
+                "review_time": (
+                    rejected_issue.review_time.isoformat()
+                    if rejected_issue and rejected_issue.review_time
+                    else None
+                ),
+                "issue_id": rejected_issue.issue_id if rejected_issue else None,
+                "status": "已拒绝，不参与计算",
+                "can_rollback": True,
+            })
+
+        duplicate_records_formatted = [
+            {
+                "record_id": r.record_id,
+                "route_code": r.route_code,
+                "route_name": r.route_name,
+                "original_passenger_count": r.original_data.get(
+                    "passenger_count_original", str(r.passenger_count)
+                ),
+                "status": "重复导入，已跳过",
+            }
+            for r in duplicate_records
+        ]
 
         if not valid_records:
             raise SchedulingError(
                 format_error("calculation_failed"),
-                {"reason": "没有有效的记录可用于计算"},
+                {
+                    "reason": "没有有效的记录可用于计算",
+                    "total_input": total_input_records,
+                    "rejected_count": len(rejected_records_raw),
+                    "duplicate_count": len(duplicate_records),
+                    "rejected_records": rejected_records_formatted,
+                    "duplicate_records": duplicate_records_formatted,
+                },
             )
 
-        # 检查待复核问题
+        # 检查待复核问题（只在有效记录里检查）
         pending_issues = self._check_pending_issues(valid_records)
 
         if pending_issues and not skip_review_check:
             raise ValidationError(
-                format_error("review_required") + f"，共发现{pending_issues.__len__()}条待复核记录",
+                format_error("review_required") + f"，共发现{len(pending_issues)}条待复核记录。"
+                f"请先由活动负责人复核后再计算。",
                 {
                     "pending_issues": [i.to_dict() for i in pending_issues],
-                    "note": "请先由活动负责人复核这些百分数和小数混合的记录",
                 },
             )
 
-        # 准备整数规划数据
+        # 准备整数规划数据 —— 只处理 valid_records
         route_codes = []
         passenger_counts = []
         route_buses = {}
         calculation_details = []
-        all_issues = []
+        effective_issues = []
 
         for record in valid_records:
             effective_value = self._get_effective_value(record)
+            if effective_value is None:
+                continue  # 防御性：已被拒绝的不应出现在这里
+
             buses_needed, steps, detail = self._calculate_route_buses(
                 record, effective_value
             )
@@ -335,7 +422,7 @@ class BusScheduler:
             passenger_counts.append(effective_value)
             route_buses[record.route_code] = buses_needed
             calculation_details.append(detail)
-            all_issues.extend(record.issues)
+            effective_issues.extend(record.issues)
 
         # 使用整数规划优化
         total_buses, optimized_allocations, total_cost = self._integer_programming_optimize(
@@ -344,6 +431,16 @@ class BusScheduler:
             route_buses,
         )
 
+        excluded_summary = {
+            "total_input_records": total_input_records,
+            "valid_calculation_count": len(valid_records),
+            "rejected_count": len(rejected_records_raw),
+            "duplicate_count": len(duplicate_records),
+            "participated_routes": route_codes,
+            "rejected_routes": [r["route_code"] for r in rejected_records_formatted],
+            "duplicate_routes": [r["route_code"] for r in duplicate_records_formatted],
+        }
+
         result = SchedulingResult(
             result_id=f"res_{uuid.uuid4().hex[:8]}",
             batch_id=batch_id,
@@ -351,7 +448,10 @@ class BusScheduler:
             route_allocations=optimized_allocations,
             total_cost=total_cost,
             calculation_details=calculation_details,
-            issues_found=all_issues,
+            issues_found=effective_issues,
+            rejected_records=rejected_records_formatted,
+            duplicate_records=duplicate_records_formatted,
+            excluded_summary=excluded_summary,
         )
 
         return result

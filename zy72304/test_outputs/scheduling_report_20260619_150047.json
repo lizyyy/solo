@@ -1,0 +1,582 @@
+{
+  "report_id": "rpt_10940194",
+  "generated_at": "2026-06-19T15:00:47.614384",
+  "overview": {
+    "result_id": "res_6c16da88",
+    "batch_id": "batch_5b926f66",
+    "total_buses": 7,
+    "total_cost": 3500.0,
+    "valid_route_count": 5
+  },
+  "excluded_summary": {
+    "total_input_records": 8,
+    "valid_calculation_count": 5,
+    "rejected_count": 3,
+    "duplicate_count": 0,
+    "participated_routes": [
+      "R001",
+      "R003",
+      "R005",
+      "R007",
+      "R008"
+    ],
+    "rejected_routes": [
+      "R002",
+      "R004",
+      "R006"
+    ],
+    "duplicate_routes": []
+  },
+  "rejected_records": [
+    {
+      "record_id": "rec_f3a94a86",
+      "route_code": "R002",
+      "route_name": "国贸专线",
+      "original_passenger_count": "120",
+      "passenger_count": 120.0,
+      "reject_reason": "R002：客流量异常，负责人决定不参与本轮排班",
+      "reviewer": "活动负责人",
+      "review_time": "2026-06-19T15:00:47.571353",
+      "issue_id": "issue_7a46d6a1",
+      "status": "已拒绝，不参与计算",
+      "can_rollback": true
+    },
+    {
+      "record_id": "rec_99b7e525",
+      "route_code": "R004",
+      "route_name": "亦庄专线",
+      "original_passenger_count": "95",
+      "passenger_count": 95.0,
+      "reject_reason": "R004：客流量异常，负责人决定不参与本轮排班",
+      "reviewer": "活动负责人",
+      "review_time": "2026-06-19T15:00:47.571371",
+      "issue_id": "issue_2d07bb8e",
+      "status": "已拒绝，不参与计算",
+      "can_rollback": true
+    },
+    {
+      "record_id": "rec_b2f5f07f",
+      "route_code": "R006",
+      "route_name": "回龙观专线",
+      "original_passenger_count": "150",
+      "passenger_count": 150.0,
+      "reject_reason": "R006：刷新后重新审议决定排除",
+      "reviewer": "活动负责人",
+      "review_time": "2026-06-19T15:00:47.593553",
+      "issue_id": "issue_51eff41b",
+      "status": "已拒绝，不参与计算",
+      "can_rollback": true
+    }
+  ],
+  "duplicate_records": [],
+  "route_details": [
+    {
+      "detail_id": "det_9d5cbbab",
+      "record_id": "rec_8ac59192",
+      "route_code": "R001",
+      "route_name": "中关村专线",
+      "original_passenger_count": "85%",
+      "effective_passenger_count": 0.85,
+      "bus_count": 1,
+      "bus_cost": 500.0,
+      "retain_reason": "R001：数据正常，保留原值",
+      "calculation_steps": [
+        "获取有效客流量",
+        "高峰时段判断",
+        "调整客流量",
+        "计算班车数量",
+        "应用边界限制"
+      ]
+    },
+    {
+      "detail_id": "det_1279894e",
+      "record_id": "rec_0494be48",
+      "route_code": "R003",
+      "route_name": "望京专线",
+      "original_passenger_count": "75%",
+      "effective_passenger_count": 0.75,
+      "bus_count": 1,
+      "bus_cost": 500.0,
+      "retain_reason": "R003：数据正常，保留原值",
+      "calculation_steps": [
+        "获取有效客流量",
+        "高峰时段判断",
+        "调整客流量",
+        "计算班车数量",
+        "应用边界限制"
+      ]
+    },
+    {
+      "detail_id": "det_1b44339f",
+      "record_id": "rec_c3d32b03",
+      "route_code": "R005",
+      "route_name": "上地专线",
+      "original_passenger_count": "60%",
+      "effective_passenger_count": 0.6,
+      "bus_count": 1,
+      "bus_cost": 500.0,
+      "retain_reason": "R005：数据正常，保留原值",
+      "calculation_steps": [
+        "获取有效客流量",
+        "高峰时段判断",
+        "调整客流量",
+        "计算班车数量",
+        "应用边界限制"
+      ]
+    },
+    {
+      "detail_id": "det_919f92c7",
+      "record_id": "rec_70daced1",
+      "route_code": "R007",
+      "route_name": "天通苑专线",
+      "original_passenger_count": "90%",
+      "effective_passenger_count": 0.9,
+      "bus_count": 1,
+      "bus_cost": 500.0,
+      "retain_reason": "R007：数据正常，保留原值",
+      "calculation_steps": [
+        "获取有效客流量",
+        "高峰时段判断",
+        "调整客流量",
+        "计算班车数量",
+        "应用边界限制"
+      ]
+    },
+    {
+      "detail_id": "det_04dbe3ae",
+      "record_id": "rec_b1fc949c",
+      "route_code": "R008",
+      "route_name": "通州专线",
+      "original_passenger_count": "110",
+      "effective_passenger_count": 110.0,
+      "bus_count": 4,
+      "bus_cost": 2000.0,
+      "retain_reason": "R008：数据正常，保留原值",
+      "calculation_steps": [
+        "获取有效客流量",
+        "高峰时段判断",
+        "调整客流量",
+        "计算班车数量",
+        "应用边界限制"
+      ]
+    }
+  ],
+  "history_summary": {
+    "rec_8ac59192": [
+      {
+        "field": "__import__",
+        "old": null,
+        "new": "导入成功",
+        "operator": "实验助理小穆",
+        "reason": "从文件 sampling_list_mixed.csv 导入",
+        "time": "2026-06-19T15:00:47.571226"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:47.571264"
+      },
+      {
+        "field": "issue:客流量",
+        "old": "pending_review:0.85",
+        "new": "approved:0.85",
+        "operator": "活动负责人",
+        "reason": "R001：数据正常，保留原值",
+        "time": "2026-06-19T15:00:47.571348"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:47.571415"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:47.593272"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:47.614117"
+      }
+    ],
+    "rec_f3a94a86": [
+      {
+        "field": "__import__",
+        "old": null,
+        "new": "导入成功",
+        "operator": "实验助理小穆",
+        "reason": "从文件 sampling_list_mixed.csv 导入",
+        "time": "2026-06-19T15:00:47.571230"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:47.571268"
+      },
+      {
+        "field": "issue:客流量",
+        "old": "pending_review:120.0",
+        "new": "rejected:120.0",
+        "operator": "活动负责人",
+        "reason": "R002：客流量异常，负责人决定不参与本轮排班",
+        "time": "2026-06-19T15:00:47.571358"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:47.571418"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:47.593291"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:47.614124"
+      }
+    ],
+    "rec_0494be48": [
+      {
+        "field": "__import__",
+        "old": null,
+        "new": "导入成功",
+        "operator": "实验助理小穆",
+        "reason": "从文件 sampling_list_mixed.csv 导入",
+        "time": "2026-06-19T15:00:47.571234"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:47.571271"
+      },
+      {
+        "field": "issue:客流量",
+        "old": "pending_review:0.75",
+        "new": "approved:0.75",
+        "operator": "活动负责人",
+        "reason": "R003：数据正常，保留原值",
+        "time": "2026-06-19T15:00:47.571367"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:47.571422"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:47.593300"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:47.614128"
+      }
+    ],
+    "rec_99b7e525": [
+      {
+        "field": "__import__",
+        "old": null,
+        "new": "导入成功",
+        "operator": "实验助理小穆",
+        "reason": "从文件 sampling_list_mixed.csv 导入",
+        "time": "2026-06-19T15:00:47.571237"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:47.571275"
+      },
+      {
+        "field": "issue:客流量",
+        "old": "pending_review:95.0",
+        "new": "rejected:95.0",
+        "operator": "活动负责人",
+        "reason": "R004：客流量异常，负责人决定不参与本轮排班",
+        "time": "2026-06-19T15:00:47.571375"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:47.571425"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:47.593308"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:47.614132"
+      }
+    ],
+    "rec_c3d32b03": [
+      {
+        "field": "__import__",
+        "old": null,
+        "new": "导入成功",
+        "operator": "实验助理小穆",
+        "reason": "从文件 sampling_list_mixed.csv 导入",
+        "time": "2026-06-19T15:00:47.571241"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:47.571278"
+      },
+      {
+        "field": "issue:客流量",
+        "old": "pending_review:0.6",
+        "new": "approved:0.6",
+        "operator": "活动负责人",
+        "reason": "R005：数据正常，保留原值",
+        "time": "2026-06-19T15:00:47.571383"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:47.571428"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:47.593315"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:47.614135"
+      }
+    ],
+    "rec_b2f5f07f": [
+      {
+        "field": "__import__",
+        "old": null,
+        "new": "导入成功",
+        "operator": "实验助理小穆",
+        "reason": "从文件 sampling_list_mixed.csv 导入",
+        "time": "2026-06-19T15:00:47.571244"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:47.571281"
+      },
+      {
+        "field": "issue:客流量",
+        "old": "pending_review:150.0",
+        "new": "approved:150.0",
+        "operator": "活动负责人",
+        "reason": "R006：数据正常，保留原值",
+        "time": "2026-06-19T15:00:47.571391"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:47.571432"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:47.593322"
+      },
+      {
+        "field": "issue_status:issue_51eff41b",
+        "old": "approved",
+        "new": "pending_review",
+        "operator": "活动负责人",
+        "reason": "R006需要重新审议",
+        "time": "2026-06-19T15:00:47.593514"
+      },
+      {
+        "field": "issue:客流量",
+        "old": "pending_review:150.0",
+        "new": "rejected:150.0",
+        "operator": "活动负责人",
+        "reason": "R006：刷新后重新审议决定排除",
+        "time": "2026-06-19T15:00:47.593635"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:47.614139"
+      }
+    ],
+    "rec_70daced1": [
+      {
+        "field": "__import__",
+        "old": null,
+        "new": "导入成功",
+        "operator": "实验助理小穆",
+        "reason": "从文件 sampling_list_mixed.csv 导入",
+        "time": "2026-06-19T15:00:47.571248"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:47.571285"
+      },
+      {
+        "field": "issue:客流量",
+        "old": "pending_review:0.9",
+        "new": "approved:0.9",
+        "operator": "活动负责人",
+        "reason": "R007：数据正常，保留原值",
+        "time": "2026-06-19T15:00:47.571399"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:47.571435"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:47.593330"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:47.614142"
+      }
+    ],
+    "rec_b1fc949c": [
+      {
+        "field": "__import__",
+        "old": null,
+        "new": "导入成功",
+        "operator": "实验助理小穆",
+        "reason": "从文件 sampling_list_mixed.csv 导入",
+        "time": "2026-06-19T15:00:47.571251"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:47.571288"
+      },
+      {
+        "field": "issue:客流量",
+        "old": "pending_review:110.0",
+        "new": "approved:110.0",
+        "operator": "活动负责人",
+        "reason": "R008：数据正常，保留原值",
+        "time": "2026-06-19T15:00:47.571407"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:47.571438"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:47.593356"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:47.614145"
+      }
+    ]
+  }
+}

@@ -1,0 +1,207 @@
+{
+  "report_id": "rpt_26d4cd18",
+  "generated_at": "2026-06-19T15:00:16.998955",
+  "overview": {
+    "result_id": "res_c9d17ea5",
+    "batch_id": "batch_da8bdff9",
+    "total_buses": 4,
+    "total_cost": 2000.0,
+    "valid_route_count": 4
+  },
+  "excluded_summary": {
+    "total_input_records": 4,
+    "valid_calculation_count": 4,
+    "rejected_count": 0,
+    "duplicate_count": 0,
+    "participated_routes": [
+      "R201",
+      "R202",
+      "R203",
+      "R204"
+    ],
+    "rejected_routes": [],
+    "duplicate_routes": []
+  },
+  "rejected_records": [],
+  "duplicate_records": [],
+  "route_details": [
+    {
+      "detail_id": "det_b4412928",
+      "record_id": "rec_f2b4fd12",
+      "route_code": "R201",
+      "route_name": "五道口专线",
+      "original_passenger_count": "85%",
+      "effective_passenger_count": 0.85,
+      "bus_count": 1,
+      "bus_cost": 500.0,
+      "retain_reason": "纯百分数格式，批次未检测到混用，自动通过",
+      "calculation_steps": [
+        "获取有效客流量",
+        "高峰时段判断",
+        "调整客流量",
+        "计算班车数量",
+        "应用边界限制"
+      ]
+    },
+    {
+      "detail_id": "det_6a9e749f",
+      "record_id": "rec_f96604b0",
+      "route_code": "R202",
+      "route_name": "三元桥专线",
+      "original_passenger_count": "70%",
+      "effective_passenger_count": 0.7,
+      "bus_count": 1,
+      "bus_cost": 500.0,
+      "retain_reason": "纯百分数格式，批次未检测到混用，自动通过",
+      "calculation_steps": [
+        "获取有效客流量",
+        "高峰时段判断",
+        "调整客流量",
+        "计算班车数量",
+        "应用边界限制"
+      ]
+    },
+    {
+      "detail_id": "det_272dab28",
+      "record_id": "rec_64f612c0",
+      "route_code": "R203",
+      "route_name": "东直门专线",
+      "original_passenger_count": "75%",
+      "effective_passenger_count": 0.75,
+      "bus_count": 1,
+      "bus_cost": 500.0,
+      "retain_reason": "纯百分数格式，批次未检测到混用，自动通过",
+      "calculation_steps": [
+        "获取有效客流量",
+        "高峰时段判断",
+        "调整客流量",
+        "计算班车数量",
+        "应用边界限制"
+      ]
+    },
+    {
+      "detail_id": "det_62f22ebb",
+      "record_id": "rec_5a6828af",
+      "route_code": "R204",
+      "route_name": "西直门专线",
+      "original_passenger_count": "90%",
+      "effective_passenger_count": 0.9,
+      "bus_count": 1,
+      "bus_cost": 500.0,
+      "retain_reason": "纯百分数格式，批次未检测到混用，自动通过",
+      "calculation_steps": [
+        "获取有效客流量",
+        "高峰时段判断",
+        "调整客流量",
+        "计算班车数量",
+        "应用边界限制"
+      ]
+    }
+  ],
+  "history_summary": {
+    "rec_f2b4fd12": [
+      {
+        "field": "__import__",
+        "old": null,
+        "new": "导入成功",
+        "operator": "实验助理小穆",
+        "reason": "从文件 sampling_list_percentage_only.csv 导入",
+        "time": "2026-06-19T15:00:16.982551"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:16.982571"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:16.998800"
+      }
+    ],
+    "rec_f96604b0": [
+      {
+        "field": "__import__",
+        "old": null,
+        "new": "导入成功",
+        "operator": "实验助理小穆",
+        "reason": "从文件 sampling_list_percentage_only.csv 导入",
+        "time": "2026-06-19T15:00:16.982555"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:16.982574"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:16.998806"
+      }
+    ],
+    "rec_64f612c0": [
+      {
+        "field": "__import__",
+        "old": null,
+        "new": "导入成功",
+        "operator": "实验助理小穆",
+        "reason": "从文件 sampling_list_percentage_only.csv 导入",
+        "time": "2026-06-19T15:00:16.982558"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:16.982578"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:16.998810"
+      }
+    ],
+    "rec_5a6828af": [
+      {
+        "field": "__import__",
+        "old": null,
+        "new": "导入成功",
+        "operator": "实验助理小穆",
+        "reason": "从文件 sampling_list_percentage_only.csv 导入",
+        "time": "2026-06-19T15:00:16.982562"
+      },
+      {
+        "field": "__review__",
+        "old": null,
+        "new": "已查看",
+        "operator": "活动负责人",
+        "reason": "实验助理小穆补看参数调试表",
+        "time": "2026-06-19T15:00:16.982581"
+      },
+      {
+        "field": "__calculate__",
+        "old": null,
+        "new": "计算完成",
+        "operator": "实验助理小穆",
+        "reason": "执行排班计算",
+        "time": "2026-06-19T15:00:16.998813"
+      }
+    ]
+  }
+}
