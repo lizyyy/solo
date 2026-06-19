@@ -25,7 +25,18 @@ import { detectGaps, findConflicts } from '../utils/recordMatcher'
 import { createNewVersion } from './versionService'
 import type { BillRecord, TeacherNote } from '../../../shared/types'
 
-function importTeacherNotes(fileData: any[], operator: string): { batchId: string; count: number; records: TeacherNote[] } {
+function importTeacherNotes(
+  fileData: any[],
+  operator: string,
+  fileName?: string
+): {
+  batchId: string;
+  count: number;
+  importedCount: number;
+  records: TeacherNote[];
+  importType: 'teacher_note';
+  fileName?: string;
+} {
   const batchId = generateBatchId()
 
   const importTransaction = db.transaction(() => {
@@ -66,6 +77,8 @@ function importTeacherNotes(fileData: any[], operator: string): { batchId: strin
       description: `导入老师批注数据 ${records.length} 条`,
       operator,
       operatorRole: 'admin',
+      beforeState: { importType: 'teacher_note', count: 0, fileName: fileName || '' },
+      afterState: { importType: 'teacher_note', count: records.length, fileName: fileName || '', batchId },
     })
 
     return records
@@ -78,11 +91,25 @@ function importTeacherNotes(fileData: any[], operator: string): { batchId: strin
   return {
     batchId,
     count: records.length,
+    importedCount: records.length,
     records,
+    importType: 'teacher_note',
+    fileName,
   }
 }
 
-function importSamplingList(fileData: any[], operator: string): { batchId: string; count: number; records: BillRecord[] } {
+function importSamplingList(
+  fileData: any[],
+  operator: string,
+  fileName?: string
+): {
+  batchId: string;
+  count: number;
+  importedCount: number;
+  records: BillRecord[];
+  importType: 'sampling_list';
+  fileName?: string;
+} {
   const batchId = generateBatchId()
   const createdRecords: BillRecord[] = []
 
@@ -260,6 +287,8 @@ function importSamplingList(fileData: any[], operator: string): { batchId: strin
       description: `导入抽样名单数据 ${samplingRecords.length} 条`,
       operator,
       operatorRole: 'admin',
+      beforeState: { importType: 'sampling_list', count: 0, fileName: fileName || '' },
+      afterState: { importType: 'sampling_list', count: samplingRecords.length, fileName: fileName || '', batchId },
     })
 
     return createdRecords
@@ -272,7 +301,10 @@ function importSamplingList(fileData: any[], operator: string): { batchId: strin
   return {
     batchId,
     count: records.length,
+    importedCount: records.length,
     records,
+    importType: 'sampling_list',
+    fileName,
   }
 }
 

@@ -4,7 +4,7 @@ import * as teacherNoteRepo from '../repositories/teacherNoteRepository'
 import * as samplingListRepo from '../repositories/samplingListRepository'
 import { create as createOperationHistory } from '../repositories/operationHistoryRepository'
 import { generateNextVersion } from '../utils/versionGenerator'
-import type { ParamVersion } from '../../../shared/types'
+import type { ParamVersion, RecordStatus } from '../../../shared/types'
 
 function getVersions(): ParamVersion[] {
   return paramVersionRepo.findAll()
@@ -18,43 +18,146 @@ function getVersion(id: string): ParamVersion {
   return version
 }
 
-function compareVersions(fromId: string, toId: string): { diffs: any[] } {
-  const fromVersion = getVersion(fromId)
-  const toVersion = getVersion(toId)
+const FIELD_LABELS: Record<string, string> = {
+  recordNo: '记录编号',
+  date: '日期',
+  teacherName: '老师姓名',
+  amount: '金额',
+  itemType: '项目类型',
+  status: '状态',
+  annotation: '批注内容',
+  sceneDescription: '场景描述',
+  rawTeacherNote: '老师批注原文',
+  rawSampling: '抽样场景原文',
+  missingRecordNo: '缺失编号',
+  previousNo: '上一编号',
+  nextNo: '下一编号',
+  nextHandler: '下一步处理人',
+  reason: '处理原因',
+  reviewStatus: '复核状态',
+  reviewNote: '复核意见',
+  resolution: '冲突处理方案',
+  resolutionNote: '处理说明',
+}
+
+const STATUS_LABELS: Record<string, string> = {
+  smooth: '顺利',
+  gap: '断档',
+  supplement: '补录',
+  conflict: '冲突',
+  pending: '待处理',
+  reviewed_normal: '复核正常',
+  reviewed_abnormal: '复核异常',
+  approved: '已通过',
+  rejected: '已驳回',
+}
+
+interface RecordChange {
+  recordNo: string;
+  changeType: 'added' | 'removed' | 'modified';
+  beforeStatus?: string;
+  afterStatus?: string;
+  beforeStatusLabel?: string;
+  afterStatusLabel?: string;
+  fieldChanges: Array<{
+    field: string;
+    fieldLabel: string;
+    before: string | number;
+    after: string | number;
+  }>;
+}
+
+interface CountChangeItem {
+  before: number;
+  after: number;
+  diff: number;
+}
+
+interface VersionComparisonResult {
+  fromVersion: string;
+  toVersion: string;
+  fromVersionId: string;
+  toVersionId: string;
+  fromCreatedAt: string;
+  toCreatedAt: string;
+  fromOperator: string;
+  toOperator: string;
+  fromChangeSummary: string;
+  toChangeSummary: string;
+  summary: {
+    added: number;
+    removed: number;
+    modified: number;
+    unchanged: number;
+    totalBefore: number;
+    totalAfter: number;
+  };
+  countChanges: Record<RecordStatus | string, CountChangeItem>;
+  recordChanges: RecordChange[];
+}
+
+function compareVersions(fromVersionStr: string, toVersionStr: string): VersionComparisonResult {
+  const fromVersion = paramVersionRepo.findByVersion(fromVersionStr)
+  const toVersion = paramVersionRepo.findByVersion(toVersionStr)
+
+  if (!fromVersion) {
+    throw new Error(`版本 ${fromVersionStr} 不存在`)
+  }
+  if (!toVersion) {
+    throw new Error(`版本 ${toVersionStr} 不存在`)
+  }
 
   const fromData = JSON.parse(fromVersion.snapshot)
   const toData = JSON.parse(toVersion.snapshot)
 
-  const diffs: any[] = []
-
   const fromRecords = new Map(fromData.billRecords?.map((r: any) => [r.recordNo, r]) || [])
   const toRecords = new Map(toData.billRecords?.map((r: any) => [r.recordNo, r]) || [])
+
+  const recordChanges: RecordChange[] = []
+  let addedCount = 0
+  let removedCount = 0
+  let modifiedCount = 0
 
   for (const [recordNo, toRecord] of toRecords) {
     const fromRecord = fromRecords.get(recordNo)
     if (!fromRecord) {
-      diffs.push({
-        type: 'added',
+      addedCount++
+      recordChanges.push({
         recordNo,
-        from: null,
-        to: toRecord,
+        changeType: 'added',
+        afterStatus: toRecord.status,
+        afterStatusLabel: STATUS_LABELS[toRecord.status] || toRecord.status,
+        fieldChanges: Object.keys(toRecord).map((key) => ({
+          field: key,
+          fieldLabel: FIELD_LABELS[key] || key,
+          before: '-',
+          after: toRecord[key] ?? '-',
+        })),
       })
-    } else if (JSON.stringify(fromRecord) !== JSON.stringify(toRecord)) {
-      const fieldDiffs: any[] = []
+    } else {
+      const fieldChanges: RecordChange['fieldChanges'] = []
       for (const key of Object.keys(toRecord)) {
-        if (fromRecord[key] !== toRecord[key]) {
-          fieldDiffs.push({
+        const fromVal = fromRecord[key]
+        const toVal = toRecord[key]
+        if (JSON.stringify(fromVal) !== JSON.stringify(toVal)) {
+          fieldChanges.push({
             field: key,
-            from: fromRecord[key],
-            to: toRecord[key],
+            fieldLabel: FIELD_LABELS[key] || key,
+            before: fromVal ?? '-',
+            after: toVal ?? '-',
           })
         }
       }
-      if (fieldDiffs.length > 0) {
-        diffs.push({
-          type: 'modified',
+      if (fieldChanges.length > 0) {
+        modifiedCount++
+        recordChanges.push({
           recordNo,
-          fields: fieldDiffs,
+          changeType: 'modified',
+          beforeStatus: fromRecord.status,
+          beforeStatusLabel: STATUS_LABELS[fromRecord.status] || fromRecord.status,
+          afterStatus: toRecord.status,
+          afterStatusLabel: STATUS_LABELS[toRecord.status] || toRecord.status,
+          fieldChanges,
         })
       }
     }
@@ -62,24 +165,60 @@ function compareVersions(fromId: string, toId: string): { diffs: any[] } {
 
   for (const [recordNo, fromRecord] of fromRecords) {
     if (!toRecords.has(recordNo)) {
-      diffs.push({
-        type: 'removed',
+      removedCount++
+      recordChanges.push({
         recordNo,
-        from: fromRecord,
-        to: null,
+        changeType: 'removed',
+        beforeStatus: fromRecord.status,
+        beforeStatusLabel: STATUS_LABELS[fromRecord.status] || fromRecord.status,
+        fieldChanges: Object.keys(fromRecord).map((key) => ({
+          field: key,
+          fieldLabel: FIELD_LABELS[key] || key,
+          before: fromRecord[key] ?? '-',
+          after: '-',
+        })),
       })
     }
   }
 
-  if (JSON.stringify(fromVersion.recordCount) !== JSON.stringify(toVersion.recordCount)) {
-    diffs.push({
-      type: 'count_change',
-      from: fromVersion.recordCount,
-      to: toVersion.recordCount,
-    })
+  const countChanges: Record<string, CountChangeItem> = {}
+  const statusKeys: RecordStatus[] = ['smooth', 'gap', 'supplement', 'conflict', 'pending', 'reviewed_normal', 'reviewed_abnormal']
+  for (const key of statusKeys) {
+    const before = fromVersion.recordCount[key as keyof typeof fromVersion.recordCount] || 0
+    const after = toVersion.recordCount[key as keyof typeof toVersion.recordCount] || 0
+    countChanges[key] = {
+      before,
+      after,
+      diff: after - before,
+    }
   }
 
-  return { diffs }
+  const totalBefore = fromRecords.size
+  const totalAfter = toRecords.size
+  const unchanged = totalBefore - removedCount - modifiedCount
+
+  return {
+    fromVersion: fromVersion.version,
+    toVersion: toVersion.version,
+    fromVersionId: fromVersion.id,
+    toVersionId: toVersion.id,
+    fromCreatedAt: fromVersion.createdAt,
+    toCreatedAt: toVersion.createdAt,
+    fromOperator: fromVersion.operator,
+    toOperator: toVersion.operator,
+    fromChangeSummary: fromVersion.changeSummary,
+    toChangeSummary: toVersion.changeSummary,
+    summary: {
+      added: addedCount,
+      removed: removedCount,
+      modified: modifiedCount,
+      unchanged,
+      totalBefore,
+      totalAfter,
+    },
+    countChanges,
+    recordChanges,
+  }
 }
 
 function createNewVersion(operator: string, operatorRole: string, changeSummary: string): ParamVersion {

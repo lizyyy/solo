@@ -26,9 +26,23 @@ interface LoginResponse {
 }
 
 interface ImportResponse {
-  success: boolean;
+  batchId: string;
+  count: number;
   importedCount: number;
-  message: string;
+  importType: 'teacher_note' | 'sampling_list';
+  fileName?: string;
+  message?: string;
+}
+
+interface ImportHistoryItem {
+  id: string;
+  type: 'teacher_note' | 'sampling_list' | 'unknown';
+  fileName: string;
+  importedAt: string;
+  importedBy: string;
+  count: number;
+  status: 'success';
+  batchId: string;
 }
 
 interface GetRecordsParams {
@@ -55,10 +69,40 @@ interface GetHistoryFilters {
 interface VersionComparison {
   fromVersion: string;
   toVersion: string;
-  changes: Array<{
-    field: string;
-    from: string | number;
-    to: string | number;
+  fromVersionId: string;
+  toVersionId: string;
+  fromCreatedAt: string;
+  toCreatedAt: string;
+  fromOperator: string;
+  toOperator: string;
+  fromChangeSummary: string;
+  toChangeSummary: string;
+  summary: {
+    added: number;
+    removed: number;
+    modified: number;
+    unchanged: number;
+    totalBefore: number;
+    totalAfter: number;
+  };
+  countChanges: Record<string, {
+    before: number;
+    after: number;
+    diff: number;
+  }>;
+  recordChanges: Array<{
+    recordNo: string;
+    changeType: 'added' | 'removed' | 'modified';
+    beforeStatus?: string;
+    afterStatus?: string;
+    beforeStatusLabel?: string;
+    afterStatusLabel?: string;
+    fieldChanges: Array<{
+      field: string;
+      fieldLabel: string;
+      before: string | number;
+      after: string | number;
+    }>;
   }>;
 }
 
@@ -180,6 +224,16 @@ export const api = {
 
     if (!response.success || !response.data) {
       throw new Error(response.message || '导入失败');
+    }
+
+    return response.data;
+  },
+
+  async getImportHistory(): Promise<ImportHistoryItem[]> {
+    const response = await request<ApiResponse<ImportHistoryItem[]>>('/import/history');
+
+    if (!response.success || !response.data) {
+      throw new Error(response.message || '获取导入历史失败');
     }
 
     return response.data;
@@ -327,5 +381,69 @@ export const api = {
     }
 
     return response.data;
+  },
+
+  async exportExcel(): Promise<void> {
+    const token = getToken();
+    const response = await fetch(`${BASE_URL}/export/excel`, {
+      method: 'GET',
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : '',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('导出失败');
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const disposition = response.headers.get('Content-Disposition');
+    let fileName = '对账报告.xlsx';
+    if (disposition) {
+      const match = disposition.match(/filename="?([^"]+)"?/);
+      if (match) {
+        fileName = decodeURIComponent(match[1]);
+      }
+    }
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  },
+
+  async exportCSV(): Promise<void> {
+    const token = getToken();
+    const response = await fetch(`${BASE_URL}/export/csv`, {
+      method: 'GET',
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : '',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('导出失败');
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const disposition = response.headers.get('Content-Disposition');
+    let fileName = '对账报告.csv';
+    if (disposition) {
+      const match = disposition.match(/filename="?([^"]+)"?/);
+      if (match) {
+        fileName = decodeURIComponent(match[1]);
+      }
+    }
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
   },
 };

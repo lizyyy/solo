@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle, AlertTriangle, PlusCircle, TrendingUp, XCircle } from 'lucide-react';
+import { CheckCircle, AlertTriangle, PlusCircle, TrendingUp, XCircle, Download, FileSpreadsheet, FileText, RefreshCw } from 'lucide-react';
 import { useDataStore } from '../store/dataStore';
 import { useAppStore } from '../store';
 import { BillRecord, RecordStatus } from '../../shared/types';
 import { DataTable, Column } from '../components/DataTable';
 import EvidenceDrawer from '../components/EvidenceDrawer';
+import { api } from '../lib/api';
 import { cn } from '../lib/utils';
 
 type TabType = 'smooth' | 'gap' | 'supplement' | 'conflict' | 'reviewed';
@@ -21,10 +22,33 @@ export default function ResultPage() {
   const [activeTab, setActiveTab] = useState<TabType>('smooth');
   const { records, loading, refreshAll } = useDataStore();
   const { selectedRecord, setSelectedRecord, isDrawerOpen, setDrawerOpen } = useAppStore();
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     refreshAll();
   }, [refreshAll]);
+
+  const handleExportExcel = async () => {
+    try {
+      setExporting(true);
+      await api.exportExcel();
+    } catch (error) {
+      alert('导出失败：' + (error instanceof Error ? error.message : '未知错误'));
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleExportCSV = async () => {
+    try {
+      setExporting(true);
+      await api.exportCSV();
+    } catch (error) {
+      alert('导出失败：' + (error instanceof Error ? error.message : '未知错误'));
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const stats = {
     smooth: records.filter((r) => r.status === 'smooth').length,
@@ -121,10 +145,37 @@ export default function ResultPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">整合结果</h1>
           <p className="text-sm text-gray-500 mt-1">查看和管理所有对账记录</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => refreshAll()}
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            刷新
+          </button>
+          <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+            <button
+              onClick={handleExportExcel}
+              disabled={exporting}
+              className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 border-r border-gray-200 transition-colors disabled:opacity-50"
+            >
+              <FileSpreadsheet className="w-4 h-4" />
+              导出 Excel
+            </button>
+            <button
+              onClick={handleExportCSV}
+              disabled={exporting}
+              className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors disabled:opacity-50"
+            >
+              <FileText className="w-4 h-4" />
+              导出 CSV
+            </button>
+          </div>
         </div>
       </div>
 

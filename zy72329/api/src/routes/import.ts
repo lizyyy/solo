@@ -4,6 +4,7 @@ import papaparse from 'papaparse'
 import xlsx from 'xlsx'
 import { authMiddleware, requireRole } from '../middleware/auth'
 import { importTeacherNotes, importSamplingList } from '../services/importService'
+import { findAll as findAllHistory } from '../repositories/operationHistoryRepository'
 import type { UserRole } from '../../../shared/types'
 
 const router = Router()
@@ -61,12 +62,20 @@ router.post(
 
       const fileData = parseFile(req.file.buffer, req.file.originalname)
       const operator = req.user!.username
+      const fileName = req.file.originalname
 
-      const result = importTeacherNotes(fileData, operator)
+      const result = importTeacherNotes(fileData, operator, fileName)
 
       res.json({
         success: true,
-        data: result,
+        data: {
+          batchId: result.batchId,
+          count: result.count,
+          importedCount: result.importedCount,
+          importType: result.importType,
+          fileName: result.fileName,
+          records: result.records,
+        },
         message: `成功导入 ${result.count} 条老师批注数据`
       })
     } catch (error) {
@@ -95,18 +104,61 @@ router.post(
 
       const fileData = parseFile(req.file.buffer, req.file.originalname)
       const operator = req.user!.username
+      const fileName = req.file.originalname
 
-      const result = importSamplingList(fileData, operator)
+      const result = importSamplingList(fileData, operator, fileName)
 
       res.json({
         success: true,
-        data: result,
+        data: {
+          batchId: result.batchId,
+          count: result.count,
+          importedCount: result.importedCount,
+          importType: result.importType,
+          fileName: result.fileName,
+          records: result.records,
+        },
         message: `成功导入 ${result.count} 条抽样名单数据`
       })
     } catch (error) {
       res.status(500).json({
         success: false,
         message: error instanceof Error ? error.message : '导入失败'
+      })
+    }
+  }
+)
+
+router.get(
+  '/history',
+  authMiddleware,
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const allHistory = findAllHistory()
+      const importHistory = allHistory
+        .filter((h) => h.operationType === 'import')
+        .map((h) => {
+          const after = h.afterState || {}
+          return {
+            id: h.id,
+            type: after.importType || 'unknown',
+            fileName: after.fileName || '未知文件',
+            importedAt: h.createdAt,
+            importedBy: h.operator,
+            count: after.count || 0,
+            status: 'success' as const,
+            batchId: after.batchId || '',
+          }
+        })
+
+      res.json({
+        success: true,
+        data: importHistory,
+      })
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error instanceof Error ? error.message : '获取导入历史失败'
       })
     }
   }

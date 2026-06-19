@@ -7,13 +7,13 @@ import { cn } from '../lib/utils';
 
 interface ImportHistoryItem {
   id: string;
-  type: 'teacher_note' | 'sampling_list';
+  type: 'teacher_note' | 'sampling_list' | 'unknown';
   fileName: string;
   importedAt: string;
   importedBy: string;
   count: number;
-  status: 'success' | 'error' | 'processing';
-  message?: string;
+  status: 'success';
+  batchId: string;
 }
 
 interface ImportStats {
@@ -44,13 +44,14 @@ export default function ImportPage() {
     loadImportHistory();
   }, []);
 
-  const loadImportHistory = () => {
-    const mockHistory: ImportHistoryItem[] = [
-      { id: '1', type: 'teacher_note', fileName: 'teacher_notes_2024_01.csv', importedAt: '2024-01-15 10:30:00', importedBy: '系统管理员', count: 156, status: 'success' },
-      { id: '2', type: 'sampling_list', fileName: 'sampling_list_2024_01.xlsx', importedAt: '2024-01-15 10:25:00', importedBy: '系统管理员', count: 148, status: 'success' },
-      { id: '3', type: 'teacher_note', fileName: 'teacher_notes_2024_02.csv', importedAt: '2024-01-14 15:20:00', importedBy: '系统管理员', count: 0, status: 'error', message: '文件格式错误' },
-    ];
-    setImportHistory(mockHistory);
+  const loadImportHistory = async () => {
+    try {
+      const history = await api.getImportHistory();
+      setImportHistory(history);
+    } catch (error) {
+      console.error('加载导入历史失败:', error);
+      setImportHistory([]);
+    }
   };
 
   const calculateImportStats = (): ImportStats => {
@@ -121,7 +122,7 @@ export default function ImportPage() {
     setTeacherResult(null);
     try {
       const result = await api.importTeacherNotes(teacherFile);
-      setTeacherResult({ success: result.success, count: result.importedCount, message: result.message });
+      setTeacherResult({ success: true, count: result.importedCount, message: `成功导入 ${result.importedCount} 条老师批注数据` });
       setTeacherFile(null);
       await refreshAll();
       setImportStats(calculateImportStats());
@@ -141,7 +142,7 @@ export default function ImportPage() {
     setSamplingResult(null);
     try {
       const result = await api.importSamplingList(samplingFile);
-      setSamplingResult({ success: result.success, count: result.importedCount, message: result.message });
+      setSamplingResult({ success: true, count: result.importedCount, message: `成功导入 ${result.importedCount} 条抽样名单数据` });
       setSamplingFile(null);
       await refreshAll();
       setImportStats(calculateImportStats());
