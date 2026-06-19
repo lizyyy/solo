@@ -259,6 +259,7 @@ export class ReverberationService {
     }))
     
     const newMissingRecords = []
+    const processedMissingIds = new Set()
     
     const sortedRecords = [...this.records]
       .filter(r => r.sampleTime)
@@ -278,6 +279,7 @@ export class ReverberationService {
         )
         
         if (existing) {
+          processedMissingIds.add(existing.id)
           newMissingRecords.push(existing)
         } else {
           const missingRecord = {
@@ -285,14 +287,21 @@ export class ReverberationService {
             type: 'time_gap',
             previousRecord: sortedRecords[i - 1],
             nextRecord: sortedRecords[i],
+            previousRecordId: sortedRecords[i - 1].id,
+            nextRecordId: sortedRecords[i].id,
             gapDuration: diffMinutes,
             expectedTime: new Date(prevTime.getTime() + 30 * 60 * 1000).toISOString(),
             status: 'pending_review',
             keepReason: '',
             reviewedBy: '',
             reviewedAt: null,
+            resolvedWith: null,
+            resolvedAt: null,
+            resolvedBy: null,
+            supplementRecordId: null,
             detectedAt: new Date().toISOString()
           }
+          processedMissingIds.add(missingRecord.id)
           newMissingRecords.push(missingRecord)
           
           this.addChangeLog(
@@ -309,6 +318,12 @@ export class ReverberationService {
           )
         }
       }
+    }
+
+    for (const oldMissing of this.missingTimeRecords) {
+      if (processedMissingIds.has(oldMissing.id)) continue
+      if (oldMissing.status === 'pending_review') continue
+      newMissingRecords.push(oldMissing)
     }
 
     this.missingTimeRecords = newMissingRecords
@@ -368,19 +383,25 @@ export class ReverberationService {
     return { success: true, record: missing }
   }
 
-  addSupplementRecord(originalRecordId, newData, reason, supplementedBy) {
+  addSupplementRecord(originalRecordId, newData, reason, supplementedBy, relatedMissingId = null) {
     const originalRecord = this.records.find(r => r.id === originalRecordId)
     
     if (!originalRecord) {
       return { success: false, error: '未找到原始记录' }
     }
 
+    const relatedMissing = relatedMissingId 
+      ? this.missingTimeRecords.find(m => m.id === relatedMissingId)
+      : null
+
     const supplementRecord = new ReverberationRecord({
       ...newData,
       isSupplement: true,
       supplementReason: reason,
       supplementedBy: supplementedBy,
-      originalRecordId: originalRecordId
+      originalRecordId: originalRecordId,
+      relatedMissingId: relatedMissingId,
+      supplementTime: new Date().toISOString()
     })
 
     const batch = this.getCurrentBatch()
@@ -396,33 +417,93 @@ export class ReverberationService {
       importTime: supplementRecord.importTime,
       action: 'supplement',
       originalRecordId: originalRecordId,
+      relatedMissingId: relatedMissingId,
       batchId: supplementRecord.batchId
     })
 
     this.addChangeLog(
-      'create',
+      'supplement',
       'record',
       supplementRecord.id,
-      `添加补录记录：${supplementRecord.location} ${supplementRecord.frequency}Hz`,
+      `${supplementedBy} 添加补录记录，关联原始记录：${originalRecord.location} ${originalRecord.frequency}Hz`,
       supplementedBy,
       {
         originalRecordId: originalRecordId,
+        originalSampleTime: originalRecord.sampleTime,
         reason: reason,
+        relatedMissingId: relatedMissingId,
+        relatedMissingGap: relatedMissing ? Math.round(relatedMissing.gapDuration) + '分钟' : null,
         sampleTime: supplementRecord.sampleTime,
         reverberationTime: supplementRecord.reverberationTime
       }
     )
 
-    const recalcResults = this.recalculateRelatedRecords(originalRecordId)
+    originalRecord.supplementedCount = (originalRecord.supplementedCount || 0) + 1
+    originalRecord.lastSupplementedAt = supplementRecord.supplementTime
+    originalRecord.supplementStatus = 'supplemented'
+
+    this.addChangeLog(
+      'update',
+      'record',
+      originalRecordId,
+      `原始记录关联了新的补录，补录状态：已补录`,
+      supplementedBy,
+      {
+        supplementRecordId: supplementRecord.id,
+        supplementedCount: originalRecord.supplementedCount,
+        relatedMissingId: relatedMissingId
+      }
+    )
+
+    let missingResolution = null
+    if (relatedMissing && relatedMissing.status === 'pending_review') {
+      relatedMissing.status = 'resolved'
+      relatedMissing.resolvedWith = 'supplement'
+      relatedMissing.resolvedAt = supplementRecord.supplementTime
+      relatedMissing.resolvedBy = supplementedBy
+      relatedMissing.supplementRecordId = supplementRecord.id
+      relatedMissing.supplementReason = reason
+
+      this.addChangeLog(
+        'review',
+        'missing_time',
+        relatedMissingId,
+        `${supplementedBy} 通过补录解决了 ${Math.round(relatedMissing.gapDuration)} 分钟缺失间隔`,
+        supplementedBy,
+        {
+          decision: 'supplement',
+          gapDuration: Math.round(relatedMissing.gapDuration),
+          supplementRecordId: supplementRecord.id,
+          expectedTime: relatedMissing.expectedTime,
+          actualSampleTime: supplementRecord.sampleTime,
+          reason: reason
+        }
+      )
+
+      missingResolution = {
+        missingId: relatedMissingId,
+        gapDuration: relatedMissing.gapDuration,
+        beforeStatus: 'pending_review',
+        afterStatus: 'resolved'
+      }
+    }
+
+    const recalcResults = this.recalculateRelatedRecords(originalRecordId, supplementRecord.id, supplementedBy)
 
     return { 
       success: true, 
       record: supplementRecord,
+      originalRecordUpdate: {
+        id: originalRecordId,
+        supplementStatus: originalRecord.supplementStatus,
+        supplementedCount: originalRecord.supplementedCount
+      },
+      missingResolution: missingResolution,
       recalcResults: recalcResults
     }
   }
 
-  recalculateRelatedRecords(originalRecordId) {
+  recalculateRelatedRecords(originalRecordId, supplementRecordId = null, operator = 'system') {
     const beforeMissingCount = this.missingTimeRecords.length
     const beforeMissingIds = new Set(this.missingTimeRecords.map(m => m.id))
     
@@ -432,12 +513,64 @@ export class ReverberationService {
     
     const resolved = [...beforeMissingIds].filter(id => !afterMissingIds.has(id))
     const added = [...afterMissingIds].filter(id => !beforeMissingIds.has(id))
+
+    for (const resolvedId of resolved) {
+      this.addChangeLog(
+        'update',
+        'missing_time',
+        resolvedId,
+        `补录后重算：缺失间隔被消除`,
+        operator,
+        {
+          cause: 'supplement_recalculation',
+          supplementRecordId: supplementRecordId,
+          originalRecordId: originalRecordId
+        }
+      )
+    }
+
+    for (const addedId of added) {
+      const addedMissing = this.missingTimeRecords.find(m => m.id === addedId)
+      this.addChangeLog(
+        'detect',
+        'missing_time',
+        addedId,
+        `补录后重算：检测到新的 ${addedMissing ? Math.round(addedMissing.gapDuration) : 0} 分钟缺失间隔`,
+        operator,
+        {
+          cause: 'supplement_recalculation',
+          supplementRecordId: supplementRecordId,
+          originalRecordId: originalRecordId,
+          gapDuration: addedMissing ? Math.round(addedMissing.gapDuration) : 0
+        }
+      )
+    }
+
+    if (supplementRecordId) {
+      this.addChangeLog(
+        'update',
+        'record',
+        supplementRecordId,
+        `补录后重算完成：消除 ${resolved.length} 个旧缺失，新增 ${added.length} 个缺失`,
+        operator,
+        {
+          cause: 'supplement_recalculation',
+          resolvedMissingCount: resolved.length,
+          addedMissingCount: added.length,
+          resolvedMissingIds: resolved,
+          addedMissingIds: added,
+          originalRecordId: originalRecordId
+        }
+      )
+    }
     
     return {
       beforeCount: beforeMissingCount,
       afterCount: this.missingTimeRecords.length,
       resolvedMissingIds: resolved,
-      addedMissingIds: added
+      addedMissingIds: added,
+      supplementRecordId: supplementRecordId,
+      originalRecordId: originalRecordId
     }
   }
 
@@ -662,14 +795,90 @@ export class ReverberationService {
   checkSupplementRecalculation() {
     const supplements = this.records.filter(r => r.isSupplement)
     const issues = []
+    const warnings = []
+
+    const pendingMissing = this.missingTimeRecords.filter(m => m.status === 'pending_review')
+    const keptMissing = this.missingTimeRecords.filter(m => m.status === 'kept')
+    const resolvedMissing = this.missingTimeRecords.filter(m => m.status === 'resolved')
+
+    if (supplements.length === 0) {
+      if (pendingMissing.length > 0) {
+        warnings.push({
+          type: 'no_supplement_with_pending',
+          message: `存在 ${pendingMissing.length} 个待处理缺失，尚未产生任何补录记录`
+        })
+      }
+    }
 
     for (const supplement of supplements) {
       const original = this.records.find(r => r.id === supplement.originalRecordId)
       if (!original) {
         issues.push({
           supplementId: supplement.id,
-          issue: '补录记录找不到对应的原始记录'
+          sampleTime: supplement.sampleTime,
+          issue: '补录记录找不到对应的原始记录',
+          severity: 'error'
         })
+        continue
+      }
+
+      if (!supplement.supplementedBy) {
+        issues.push({
+          supplementId: supplement.id,
+          sampleTime: supplement.sampleTime,
+          issue: '补录记录缺少补录人信息',
+          severity: 'error'
+        })
+      }
+
+      if (!supplement.supplementReason) {
+        warnings.push({
+          supplementId: supplement.id,
+          sampleTime: supplement.sampleTime,
+          issue: '补录记录未填写补录原因',
+          severity: 'warning'
+        })
+      }
+
+      if (supplement.relatedMissingId) {
+        const relatedMissing = this.missingTimeRecords.find(m => m.id === supplement.relatedMissingId)
+        if (!relatedMissing) {
+          warnings.push({
+            supplementId: supplement.id,
+            sampleTime: supplement.sampleTime,
+            issue: '补录记录关联的缺失间隔已不存在（可能被重算消除）',
+            severity: 'warning'
+          })
+        } else if (relatedMissing.supplementRecordId !== supplement.id) {
+          issues.push({
+            supplementId: supplement.id,
+            sampleTime: supplement.sampleTime,
+            issue: '补录关联的缺失间隔没有反向绑定补录记录，关联链断裂',
+            severity: 'error'
+          })
+        }
+      }
+
+      if (original.supplementStatus !== 'supplemented') {
+        warnings.push({
+          supplementId: supplement.id,
+          sampleTime: supplement.sampleTime,
+          issue: '原始记录补录状态未同步更新',
+          severity: 'warning'
+        })
+      }
+    }
+
+    for (const resolved of resolvedMissing) {
+      if (resolved.resolvedWith === 'supplement') {
+        const relatedSupplement = supplements.find(s => s.id === resolved.supplementRecordId)
+        if (!relatedSupplement) {
+          issues.push({
+            missingId: resolved.id,
+            issue: `缺失间隔标注为补录解决，但找不到对应补录记录（${resolved.supplementRecordId || '无ID'}）`,
+            severity: 'error'
+          })
+        }
       }
     }
 
@@ -677,7 +886,15 @@ export class ReverberationService {
       hasIssues: issues.length > 0,
       count: issues.length,
       issues: issues,
-      supplementCount: supplements.length
+      warnings: warnings,
+      warningCount: warnings.length,
+      supplementCount: supplements.length,
+      pendingMissingCount: pendingMissing.length,
+      keptMissingCount: keptMissing.length,
+      resolvedMissingCount: resolvedMissing.length,
+      status: supplements.length === 0 
+        ? (pendingMissing.length > 0 ? 'pending_missing' : 'no_data')
+        : (issues.length > 0 ? 'has_issues' : (warnings.length > 0 ? 'has_warnings' : 'normal'))
     }
   }
 
@@ -917,18 +1134,59 @@ export class ReverberationService {
     
     let supplements = []
     let originalRecord = null
+    let resolvedMissingForSupplement = null
     
     if (record.isSupplement) {
       originalRecord = this.getRecordById(record.originalRecordId)
+      if (record.relatedMissingId) {
+        resolvedMissingForSupplement = this.getMissingTimeRecordById(record.relatedMissingId)
+      }
     } else {
       supplements = this.records.filter(r => r.originalRecordId === recordId)
     }
     
     const relatedMissing = this.missingTimeRecords.filter(m => 
-      m.previousRecord?.id === recordId || m.nextRecord?.id === recordId
+      m.previousRecord?.id === recordId || 
+      m.nextRecord?.id === recordId ||
+      m.previousRecordId === recordId ||
+      m.nextRecordId === recordId ||
+      m.supplementRecordId === recordId
     )
     
     const relatedConflicts = this.conflicts.filter(c => c.recordId === recordId)
+    
+    const supplementSummary = {
+      isSupplement: !!record.isSupplement,
+      supplementReason: record.supplementReason || null,
+      supplementedBy: record.supplementedBy || null,
+      supplementTime: record.supplementTime || null,
+      relatedMissingId: record.relatedMissingId || null,
+      relatedMissingGap: resolvedMissingForSupplement ? Math.round(resolvedMissingForSupplement.gapDuration) + '分钟' : null,
+      expectedTime: resolvedMissingForSupplement ? resolvedMissingForSupplement.expectedTime : null,
+      originalRecord: originalRecord ? {
+        id: originalRecord.id,
+        sampleTime: originalRecord.sampleTime,
+        location: originalRecord.location,
+        frequency: originalRecord.frequency,
+        reverberationTime: originalRecord.reverberationTime
+      } : null
+    }
+
+    const originalRecordSummary = !record.isSupplement ? {
+      supplementStatus: record.supplementStatus || 'not_supplemented',
+      supplementedCount: record.supplementedCount || 0,
+      lastSupplementedAt: record.lastSupplementedAt || null,
+      supplements: supplements.map(s => ({
+        id: s.id,
+        sampleTime: s.sampleTime,
+        reverberationTime: s.reverberationTime,
+        isSupplement: true,
+        supplementReason: s.supplementReason,
+        supplementedBy: s.supplementedBy,
+        supplementTime: s.supplementTime,
+        relatedMissingId: s.relatedMissingId
+      }))
+    } : null
     
     return {
       record,
@@ -937,7 +1195,10 @@ export class ReverberationService {
       supplements,
       originalRecord,
       relatedMissing,
-      relatedConflicts
+      relatedConflicts,
+      supplementSummary,
+      originalRecordSummary,
+      resolvedMissingForSupplement
     }
   }
 }

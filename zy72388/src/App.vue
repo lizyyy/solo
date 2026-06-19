@@ -345,12 +345,44 @@
 
             <div class="card" style="margin: 0;">
               <h4>🔄 补录重算检查</h4>
-              <div :class="['message', selfCheckResults.supplementRecalcCheck.hasIssues ? 'message-error' : 'message-success']">
+              <div :class="[
+                'message', 
+                selfCheckResults.supplementRecalcCheck.hasIssues ? 'message-error' : 
+                (selfCheckResults.supplementRecalcCheck.status === 'pending_missing' ? 'message-warning' :
+                (selfCheckResults.supplementRecalcCheck.status === 'no_data' ? 'message-info' :
+                (selfCheckResults.supplementRecalcCheck.status === 'has_warnings' ? 'message-warning' : 'message-success')))
+              ]">
                 <div class="message-title">
-                  {{ selfCheckResults.supplementRecalcCheck.hasIssues ? '❌ 补录有问题' : '✅ 补录正常' }}
+                  <span v-if="selfCheckResults.supplementRecalcCheck.hasIssues">❌ 补录有关联断裂</span>
+                  <span v-else-if="selfCheckResults.supplementRecalcCheck.status === 'pending_missing'">⏳ 待补录（有待处理缺失，暂无补录记录）</span>
+                  <span v-else-if="selfCheckResults.supplementRecalcCheck.status === 'no_data'">ℹ️ 暂无补录数据</span>
+                  <span v-else-if="selfCheckResults.supplementRecalcCheck.status === 'has_warnings'">⚠️ 补录基本正常，有 {{ selfCheckResults.supplementRecalcCheck.warningCount }} 项提醒</span>
+                  <span v-else>✅ 补录链路正常</span>
                 </div>
                 <div class="message-content">
-                  问题数量：{{ selfCheckResults.supplementRecalcCheck.count }}
+                  补录记录数：{{ selfCheckResults.supplementRecalcCheck.supplementCount || 0 }}；
+                  待复核缺失：{{ selfCheckResults.supplementRecalcCheck.pendingMissingCount || 0 }}；
+                  已补录解决：{{ selfCheckResults.supplementRecalcCheck.resolvedMissingCount || 0 }}；
+                  已保留：{{ selfCheckResults.supplementRecalcCheck.keptMissingCount || 0 }}；
+                  严重问题：{{ selfCheckResults.supplementRecalcCheck.count || 0 }}
+                </div>
+                <div v-if="selfCheckResults.supplementRecalcCheck.issues && selfCheckResults.supplementRecalcCheck.issues.length > 0" 
+                     class="message-content" style="margin-top: 8px;">
+                  <div style="font-weight: bold; color: #c62828;">严重问题：</div>
+                  <ul style="margin: 4px 0 0 20px;">
+                    <li v-for="(issue, idx) in selfCheckResults.supplementRecalcCheck.issues" :key="idx">
+                      {{ issue.issue }}（{{ issue.supplementId || issue.missingId }}）
+                    </li>
+                  </ul>
+                </div>
+                <div v-if="selfCheckResults.supplementRecalcCheck.warnings && selfCheckResults.supplementRecalcCheck.warnings.length > 0" 
+                     class="message-content" style="margin-top: 8px;">
+                  <div style="font-weight: bold; color: #e65100;">提醒事项：</div>
+                  <ul style="margin: 4px 0 0 20px;">
+                    <li v-for="(warn, idx) in selfCheckResults.supplementRecalcCheck.warnings" :key="idx">
+                      {{ warn.message || warn.issue }}
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -556,18 +588,69 @@
                   <span class="badge badge-info">{{ getBatchName(recordDetail.record.batchId) }}</span>
                 </span>
               </div>
+              <div v-if="recordDetail.record.isSupplement" class="detail-item">
+                <span class="detail-label">补录原因：</span>
+                <span class="detail-value">{{ recordDetail.record.supplementReason || '-' }}</span>
+              </div>
+              <div v-if="recordDetail.record.isSupplement" class="detail-item">
+                <span class="detail-label">补录人：</span>
+                <span class="detail-value">{{ recordDetail.record.supplementedBy || '-' }}</span>
+              </div>
+              <div v-if="recordDetail.record.isSupplement && recordDetail.record.relatedMissingId" class="detail-item">
+                <span class="detail-label">关联缺失ID：</span>
+                <span class="detail-value">{{ recordDetail.record.relatedMissingId }}</span>
+              </div>
+              <div v-if="!recordDetail.record.isSupplement && recordDetail.originalRecordSummary" class="detail-item">
+                <span class="detail-label">补录状态：</span>
+                <span class="detail-value">
+                  <span class="badge" :class="recordDetail.originalRecordSummary.supplementStatus === 'supplemented' ? 'badge-warning' : 'badge-secondary'">
+                    {{ recordDetail.originalRecordSummary.supplementStatus === 'supplemented' ? '已补录' : '未补录' }}
+                  </span>
+                  <span style="margin-left: 8px;">共 {{ recordDetail.originalRecordSummary.supplementedCount }} 次补录</span>
+                </span>
+              </div>
             </div>
           </div>
 
-          <div v-if="recordDetail.supplements.length > 0" class="detail-section">
-            <h4>📝 补录记录</h4>
-            <div v-for="sup in recordDetail.supplements" :key="sup.id" class="supplement-item">
+          <div v-if="recordDetail.record.isSupplement && recordDetail.supplementSummary" class="detail-section">
+            <h4>🔗 补录上下文关联</h4>
+            <div class="detail-grid">
+              <div v-if="recordDetail.supplementSummary.originalRecord" class="detail-item">
+                <span class="detail-label">原始记录：</span>
+                <span class="detail-value">
+                  {{ recordDetail.supplementSummary.originalRecord.location }} · 
+                  {{ recordDetail.supplementSummary.originalRecord.frequency }}Hz · 
+                  {{ formatTime(recordDetail.supplementSummary.originalRecord.sampleTime) }}
+                </span>
+              </div>
+              <div v-if="recordDetail.supplementSummary.relatedMissingGap" class="detail-item">
+                <span class="detail-label">解决的缺失间隔：</span>
+                <span class="detail-value">
+                  <span class="badge badge-success">{{ recordDetail.supplementSummary.relatedMissingGap }}</span>
+                </span>
+              </div>
+              <div v-if="recordDetail.supplementSummary.expectedTime" class="detail-item">
+                <span class="detail-label">当时期望采样时间：</span>
+                <span class="detail-value">{{ formatTime(recordDetail.supplementSummary.expectedTime) }}</span>
+              </div>
+              <div v-if="recordDetail.supplementSummary.supplementTime" class="detail-item">
+                <span class="detail-label">补录操作时间：</span>
+                <span class="detail-value">{{ formatTime(recordDetail.supplementSummary.supplementTime) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="!recordDetail.record.isSupplement && recordDetail.originalRecordSummary && recordDetail.originalRecordSummary.supplements && recordDetail.originalRecordSummary.supplements.length > 0" class="detail-section">
+            <h4>📝 补录记录（{{ recordDetail.originalRecordSummary.supplements.length }} 次）</h4>
+            <div v-for="sup in recordDetail.originalRecordSummary.supplements" :key="sup.id" class="supplement-item">
               <div class="supplement-header">
                 <span class="badge badge-warning">补录</span>
                 <span>{{ formatTime(sup.sampleTime) }} - {{ sup.reverberationTime }} 秒</span>
+                <span v-if="sup.relatedMissingId" class="badge badge-success">解决了缺失</span>
               </div>
               <div class="supplement-reason">补录原因：{{ sup.supplementReason }}</div>
-              <div class="supplement-operator">补录人：{{ sup.supplementedBy }}</div>
+              <div class="supplement-operator">补录人：{{ sup.supplementedBy }} · 操作时间：{{ formatTime(sup.supplementTime) }}</div>
+              <div v-if="sup.relatedMissingId" class="supplement-operator">关联缺失ID：{{ sup.relatedMissingId }}</div>
             </div>
           </div>
 
@@ -591,7 +674,9 @@
               <span class="badge" :class="m.status === 'kept' ? 'badge-info' : m.status === 'resolved' ? 'badge-success' : 'badge-warning'">
                 {{ formatMissingStatus(m.status) }}
               </span>
-              <span>间隔 {{ Math.round(m.gapDuration) }} 分钟</span>
+              <span>间隔 {{ Math.round(m.gapDuration) }} 分钟，期望：{{ formatTime(m.expectedTime) }}</span>
+              <span v-if="m.resolvedWith" style="margin-left: 8px;">（{{ m.resolvedWith === 'supplement' ? '补录解决' : '保留' }}）</span>
+              <span v-if="m.keepReason" style="margin-left: 8px;">理由：{{ m.keepReason }}</span>
             </div>
           </div>
 
@@ -631,6 +716,109 @@
         </div>
       </div>
     </div>
+
+    <div v-if="showSupplementModal" class="modal-overlay" @click.self="showSupplementModal = false">
+      <div class="modal modal-large">
+        <div class="modal-header">
+          <h3>📝 补录缺失采样数据</h3>
+        </div>
+        <div class="modal-body">
+          <div v-if="supplementContext" class="supplement-context-box">
+            <div class="context-title">🔗 补录上下文（从采样时间缺失处理进入）</div>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="detail-label">缺失间隔：</span>
+                <span class="detail-value">
+                  <span class="badge badge-warning">{{ Math.round(supplementContext.gapDuration) }} 分钟</span>
+                </span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">前一条采样：</span>
+                <span class="detail-value">{{ formatTime(supplementContext.previousRecord?.sampleTime) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">后一条采样：</span>
+                <span class="detail-value">{{ formatTime(supplementContext.nextRecord?.sampleTime) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">期望采样时间：</span>
+                <span class="detail-value">
+                  <span class="badge badge-info">{{ formatTime(supplementContext.expectedTime) }}</span>
+                </span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">原始记录（被关联）：</span>
+                <span class="detail-value">
+                  {{ supplementContext.originalRecord?.location }} · {{ supplementContext.originalRecord?.frequency }}Hz · {{ formatTime(supplementContext.originalRecord?.sampleTime) }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="supplementContext?.relatedMissingId" class="supplement-context-box" style="margin-top: 12px;">
+            <div class="context-title" style="color: #E65100;">⚠️ 补录保存后，以下操作将自动进行</div>
+            <ul style="margin: 8px 0 0 20px; color: #555; line-height: 1.8;">
+              <li>该采样时间缺失从「待复核」变为「已解决（补录）」</li>
+              <li>原始记录标记「已补录」状态</li>
+              <li>系统自动重算所有采样时间间隔</li>
+              <li>明细、历史、导出数据即时同步</li>
+              <li>变更日志记录补录人、补录原因、重算影响</li>
+            </ul>
+          </div>
+
+          <h4 style="margin: 20px 0 12px;">补录数据填写</h4>
+          <div class="detail-grid">
+            <div class="form-group">
+              <label>采样时间 <span class="required">*</span></label>
+              <input 
+                type="datetime-local" 
+                v-model="supplementForm.sampleTime" 
+                class="form-control"
+                :placeholder="supplementContext ? '建议填：' + formatTime(supplementContext.expectedTime) : '选择采样时间'"
+              />
+              <div v-if="supplementContext" class="form-hint">建议接近期望时间：{{ formatTime(supplementContext.expectedTime) }}</div>
+            </div>
+            <div class="form-group">
+              <label>地点 <span class="required">*</span></label>
+              <input type="text" v-model="supplementForm.location" class="form-control" placeholder="如：会议室A区" />
+            </div>
+            <div class="form-group">
+              <label>频率 (Hz) <span class="required">*</span></label>
+              <input type="number" v-model="supplementForm.frequency" class="form-control" step="100" min="63" max="8000" />
+            </div>
+            <div class="form-group">
+              <label>混响时间 (秒) <span class="required">*</span></label>
+              <input type="number" v-model="supplementForm.reverberationTime" class="form-control" step="0.01" min="0.1" />
+            </div>
+          </div>
+
+          <div class="detail-grid" style="margin-top: 16px;">
+            <div class="form-group">
+              <label>补录原因 <span class="required">*</span></label>
+              <textarea 
+                v-model="supplementForm.reason" 
+                class="form-control" 
+                rows="3" 
+                placeholder="如：仪器校准后重新测量 / 当时漏测 / 数据异常重测"
+              ></textarea>
+            </div>
+            <div class="form-group">
+              <label>补录人 <span class="required">*</span></label>
+              <input 
+                type="text" 
+                v-model="supplementForm.supplementedBy" 
+                class="form-control" 
+                placeholder="如：质检员老李 / 维修师傅老岑"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showSupplementModal = false">取消</button>
+          <button class="btn btn-warning" @click="submitSupplement">保存补录并重算</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -664,6 +852,17 @@ export default {
     const showMissingDetailModal = ref(null)
     const showRecordDetailModal = ref(false)
     const recordDetail = ref(null)
+    const showSupplementModal = ref(false)
+    const supplementContext = ref(null)
+
+    const supplementForm = ref({
+      sampleTime: '',
+      location: '',
+      frequency: 500,
+      reverberationTime: 1.0,
+      reason: '',
+      supplementedBy: ''
+    })
 
     const importForm = ref({
       sampleTime: '',
@@ -875,13 +1074,32 @@ export default {
     }
 
     function resolveWithSupplement(missing) {
-      messageService.addCustomMessage({
-        title: '请补录缺失数据',
-        message: `请在 ${formatTime(missing.expectedTime)} 附近补录采样数据`,
-        severity: 'info',
-        suggestion: '使用记录管理中的"补录"功能添加数据'
-      })
-      activeTab.value = 'records'
+      const originalRecord = missing.previousRecord
+      const expectedTimeISO = missing.expectedTime
+      const expectedLocal = new Date(expectedTimeISO)
+      const year = expectedLocal.getFullYear()
+      const month = String(expectedLocal.getMonth() + 1).padStart(2, '0')
+      const day = String(expectedLocal.getDate()).padStart(2, '0')
+      const hour = String(expectedLocal.getHours()).padStart(2, '0')
+      const minute = String(expectedLocal.getMinutes()).padStart(2, '0')
+      
+      supplementContext.value = {
+        relatedMissingId: missing.id,
+        gapDuration: missing.gapDuration,
+        expectedTime: missing.expectedTime,
+        previousRecord: missing.previousRecord,
+        nextRecord: missing.nextRecord,
+        originalRecord: originalRecord
+      }
+      supplementForm.value = {
+        sampleTime: `${year}-${month}-${day}T${hour}:${minute}`,
+        location: originalRecord?.location || '',
+        frequency: originalRecord?.frequency || 500,
+        reverberationTime: originalRecord?.reverberationTime || 1.0,
+        reason: `补录 ${Math.round(missing.gapDuration)} 分钟缺失间隔：${formatTime(missing.expectedTime)} 附近漏测`,
+        supplementedBy: '老岑'
+      }
+      showSupplementModal.value = true
     }
 
     function addNoteToRecord(record) {
@@ -912,13 +1130,106 @@ export default {
     }
 
     function addSupplementToRecord(record) {
+      supplementContext.value = {
+        relatedMissingId: null,
+        gapDuration: null,
+        expectedTime: null,
+        previousRecord: null,
+        nextRecord: null,
+        originalRecord: record
+      }
+      supplementForm.value = {
+        sampleTime: '',
+        location: record?.location || '',
+        frequency: record?.frequency || 500,
+        reverberationTime: record?.reverberationTime || 1.0,
+        reason: '',
+        supplementedBy: '老岑'
+      }
+      showSupplementModal.value = true
+    }
+
+    function submitSupplement() {
+      if (!supplementForm.value.sampleTime || !supplementForm.value.location || !supplementForm.value.reason || !supplementForm.value.supplementedBy) {
+        messageService.addCustomMessage({
+          title: '补录失败',
+          message: '请填写采样时间、地点、补录原因、补录人',
+          severity: 'error',
+          suggestion: '标有 * 的字段为必填项'
+        })
+        return
+      }
+
+      const originalRecordId = supplementContext.value?.originalRecord?.id
+      if (!originalRecordId) {
+        messageService.addCustomMessage({
+          title: '补录失败',
+          message: '未找到要关联的原始记录',
+          severity: 'error'
+        })
+        return
+      }
+
+      const sampleDate = new Date(supplementForm.value.sampleTime)
+      if (isNaN(sampleDate.getTime())) {
+        messageService.addCustomMessage({
+          title: '补录失败',
+          message: '采样时间格式不正确',
+          severity: 'error'
+        })
+        return
+      }
+
+      const result = service.addSupplementRecord(
+        originalRecordId,
+        {
+          sampleTime: sampleDate.toISOString(),
+          location: supplementForm.value.location,
+          frequency: Number(supplementForm.value.frequency),
+          reverberationTime: Number(supplementForm.value.reverberationTime)
+        },
+        supplementForm.value.reason,
+        supplementForm.value.supplementedBy,
+        supplementContext.value?.relatedMissingId
+      )
+
+      if (!result.success) {
+        messageService.addCustomMessage({
+          title: '补录失败',
+          message: result.error || '未知错误',
+          severity: 'error'
+        })
+        return
+      }
+
+      const parts = []
+      parts.push(`补录成功：${supplementForm.value.location} ${supplementForm.value.frequency}Hz`)
+      
+      if (result.missingResolution) {
+        parts.push(`关联缺失 ${Math.round(result.missingResolution.gapDuration)} 分钟，已从「待复核」变为「已解决」`)
+      }
+      if (result.originalRecordUpdate) {
+        parts.push(`原始记录补录数：${result.originalRecordUpdate.supplementedCount} 次，状态：${result.originalRecordUpdate.supplementStatus === 'supplemented' ? '已补录' : '待重算'}`)
+      }
+      if (result.recalcResults) {
+        const diff = result.recalcResults.beforeCount - result.recalcResults.afterCount
+        if (diff > 0) {
+          parts.push(`重算后消除了 ${diff} 个时间缺失，新增 ${result.recalcResults.addedMissingIds.length} 个`)
+        } else if (diff < 0) {
+          parts.push(`重算后新增了 ${Math.abs(diff)} 个时间缺失`)
+        }
+      }
+
       messageService.addCustomMessage({
-        title: '补录功能',
-        message: '请在导入时选择"补录材料"类型，系统会自动关联原始记录。',
-        severity: 'info'
+        title: '补录并重算完成',
+        message: parts.join('；'),
+        severity: 'success'
       })
-      showImportModal.value = true
-      importForm.value.materialType = 'supplement'
+
+      showSupplementModal.value = false
+      supplementContext.value = null
+      refreshData()
+      workflowStep.value = 3
     }
 
     function resolveConflict(conflictId, decision) {
@@ -1002,6 +1313,9 @@ export default {
       showMissingDetailModal,
       showRecordDetailModal,
       recordDetail,
+      showSupplementModal,
+      supplementContext,
+      supplementForm,
       importForm,
       keepReasonForm,
       noteForm,
@@ -1020,6 +1334,7 @@ export default {
       addNoteToRecord,
       saveNote,
       addSupplementToRecord,
+      submitSupplement,
       resolveConflict,
       runSelfCheck,
       exportData,

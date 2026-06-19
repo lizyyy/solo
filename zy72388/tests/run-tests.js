@@ -583,6 +583,326 @@ test('按普通使用者路线完整复现', () => {
   assert(batches.length >= 2, '至少有两个批次')
 })
 
+console.log('\n🔗 真实补录链路测试')
+console.log('─'.repeat(50))
+
+test('自检在无补录记录时不显示「补录正常」', () => {
+  const service = new ReverberationService()
+  service.importRecords([
+    { sampleTime: '2026-06-04T09:00:00', location: '会议室A', frequency: 500, reverberationTime: 1.2 },
+    { sampleTime: '2026-06-04T10:05:00', location: '会议室A', frequency: 500, reverberationTime: 1.1 }
+  ], '质检员小王', '有缺失批次')
+  assert(service.getMissingTimeRecords().length === 1, '应该产生 1 个缺失')
+  
+  const check = service.checkSupplementRecalculation()
+  assert(check.supplementCount === 0, '补录记录数应该为 0')
+  assert(check.status === 'pending_missing', `状态应该是 pending_missing，实际是 ${check.status}`)
+  assert(check.warnings.length >= 1, '应该有提醒（有待处理缺失但无补录）')
+})
+
+test('补录记录必须带补录身份字段，不是普通导入伪装', () => {
+  const service = new ReverberationService()
+  const imp = service.importRecords([
+    { sampleTime: '2026-06-04T09:00:00', location: '会议室A', frequency: 500, reverberationTime: 1.2 },
+    { sampleTime: '2026-06-04T10:05:00', location: '会议室A', frequency: 500, reverberationTime: 1.1 }
+  ], '质检员小王', '有缺失批次')
+  const originalRecord = imp.success[0]
+  const missing = service.getMissingTimeRecords()[0]
+
+  const result = service.addSupplementRecord(
+    originalRecord.id,
+    { sampleTime: '2026-06-04T09:30:00', location: '会议室A', frequency: 500, reverberationTime: 1.15 },
+    '当时设备校准延误，重新补测',
+    '维修师傅老岑',
+    missing.id
+  )
+  assert(result.success === true, '补录应该成功')
+
+  const sup = result.record
+  assert(sup.isSupplement === true, '补录记录必须标记 isSupplement=true')
+  assert(sup.originalRecordId === originalRecord.id, '补录记录必须绑定 originalRecordId')
+  assert(sup.relatedMissingId === missing.id, '补录记录必须绑定 relatedMissingId')
+  assert(sup.supplementReason === '当时设备校准延误，重新补测', '补录记录必须带补录原因')
+  assert(sup.supplementedBy === '维修师傅老岑', '补录记录必须带补录人')
+  assert(typeof sup.supplementTime === 'string' && sup.supplementTime.length > 0, '补录记录必须带 supplementTime')
+})
+
+test('补录保存后原始记录进入已补录状态', () => {
+  const service = new ReverberationService()
+  const imp = service.importRecords([
+    { sampleTime: '2026-06-04T09:00:00', location: '会议室A', frequency: 500, reverberationTime: 1.2 },
+    { sampleTime: '2026-06-04T10:05:00', location: '会议室A', frequency: 500, reverberationTime: 1.1 }
+  ], '质检员小王', '有缺失批次')
+  const originalRecord = imp.success[0]
+  const missing = service.getMissingTimeRecords()[0]
+
+  service.addSupplementRecord(
+    originalRecord.id,
+    { sampleTime: '2026-06-04T09:30:00', location: '会议室A', frequency: 500, reverberationTime: 1.15 },
+    '当时设备校准延误',
+    '老岑',
+    missing.id
+  )
+
+  const originalAfter = service.getRecordById(originalRecord.id)
+  assert(originalAfter.supplementStatus === 'supplemented', `原记录状态应为 supplemented，实际是 ${originalAfter.supplementStatus}`)
+  assert(originalAfter.supplementedCount === 1, `原记录补录计数应为 1，实际是 ${originalAfter.supplementedCount}`)
+  assert(typeof originalAfter.lastSupplementedAt === 'string' && originalAfter.lastSupplementedAt.length > 0, '原记录必须有 lastSupplementedAt')
+})
+
+test('补录保存后缺失间隔变为已解决，双向绑定不丢失', () => {
+  const service = new ReverberationService()
+  const imp = service.importRecords([
+    { sampleTime: '2026-06-04T09:00:00', location: '会议室A', frequency: 500, reverberationTime: 1.2 },
+    { sampleTime: '2026-06-04T10:05:00', location: '会议室A', frequency: 500, reverberationTime: 1.1 }
+  ], '质检员小王', '有缺失批次')
+  const missingId = service.getMissingTimeRecords()[0].id
+  const originalRecord = imp.success[0]
+
+  const result = service.addSupplementRecord(
+    originalRecord.id,
+    { sampleTime: '2026-06-04T09:30:00', location: '会议室A', frequency: 500, reverberationTime: 1.15 },
+    '当时设备校准延误',
+    '老岑',
+    missingId
+  )
+
+  const missingAfter = service.getMissingTimeRecordById(missingId)
+  assert(missingAfter.status === 'resolved', `缺失状态应为 resolved，实际是 ${missingAfter.status}`)
+  assert(missingAfter.resolvedWith === 'supplement', `缺失解决方式应为 supplement，实际是 ${missingAfter.resolvedWith}`)
+  assert(missingAfter.resolvedBy === '老岑', `缺失解决人应为老岑，实际是 ${missingAfter.resolvedBy}`)
+  assert(missingAfter.supplementRecordId === result.record.id, `缺失必须反向绑定补录记录ID，关联链不能断`)
+  assert(missingAfter.supplementReason === '当时设备校准延误', '缺失必须带补录原因副本')
+  assert(typeof missingAfter.resolvedAt === 'string' && missingAfter.resolvedAt.length > 0, '缺失必须带 resolvedAt')
+})
+
+test('补录、重算的变更日志记录：谁改了什么、影响了哪条', () => {
+  const service = new ReverberationService()
+  const imp = service.importRecords([
+    { sampleTime: '2026-06-04T09:00:00', location: '会议室A', frequency: 500, reverberationTime: 1.2 },
+    { sampleTime: '2026-06-04T10:05:00', location: '会议室A', frequency: 500, reverberationTime: 1.1 }
+  ], '质检员小王', '有缺失批次')
+  const missingId = service.getMissingTimeRecords()[0].id
+  const originalRecord = imp.success[0]
+
+  const beforeLogCount = service.getChangeLogs().length
+  service.addSupplementRecord(
+    originalRecord.id,
+    { sampleTime: '2026-06-04T09:30:00', location: '会议室A', frequency: 500, reverberationTime: 1.15 },
+    '当时设备校准延误',
+    '维修师傅老岑',
+    missingId
+  )
+  const afterLogCount = service.getChangeLogs().length
+  assert(afterLogCount - beforeLogCount >= 4, `至少产生 4 条变更日志（补录创建+原记录更新+缺失review+重算），实际新增 ${afterLogCount - beforeLogCount} 条`)
+
+  const supplementCreateLogs = service.getChangeLogs({ entityType: 'record', entityId: service.getRecords().find(r => r.isSupplement).id })
+  assert(supplementCreateLogs.length >= 1, '补录记录自身应该有创建日志')
+  assert(supplementCreateLogs.some(l => l.type === 'supplement'), '应该包含 type=supplement 的变更日志')
+  const supLog = supplementCreateLogs.find(l => l.type === 'supplement')
+  assert(supLog.operator === '维修师傅老岑', '变更日志必须记录补录人')
+  assert(supLog.details.relatedMissingId === missingId, '变更日志必须记录关联缺失ID')
+  assert(supLog.details.reason === '当时设备校准延误', '变更日志必须记录补录原因')
+
+  const missingLogs = service.getChangeLogs({ entityType: 'missing_time', entityId: missingId })
+  assert(missingLogs.some(l => l.type === 'review'), '缺失应该有 review 类型日志')
+  const reviewLog = missingLogs.find(l => l.type === 'review')
+  assert(reviewLog.details.decision === 'supplement', 'review 日志决策应为 supplement')
+  assert(reviewLog.details.supplementRecordId, 'review 日志必须指向补录记录')
+})
+
+test('明细、历史、导出读到同一条补录更新', () => {
+  const service = new ReverberationService()
+  const imp = service.importRecords([
+    { sampleTime: '2026-06-04T09:00:00', location: '会议室A', frequency: 500, reverberationTime: 1.2 },
+    { sampleTime: '2026-06-04T10:05:00', location: '会议室A', frequency: 500, reverberationTime: 1.1 }
+  ], '质检员小王', '有缺失批次')
+  const missingId = service.getMissingTimeRecords()[0].id
+  const originalRecord = imp.success[0]
+
+  const supplementResult = service.addSupplementRecord(
+    originalRecord.id,
+    { sampleTime: '2026-06-04T09:30:00', location: '会议室A', frequency: 500, reverberationTime: 1.15 },
+    '当时设备校准延误',
+    '老岑',
+    missingId
+  )
+  const supplementId = supplementResult.record.id
+
+  const detail = service.getRecordDetail(supplementId)
+  assert(detail.record.isSupplement === true, '【明细】补录身份一致')
+  assert(detail.record.relatedMissingId === missingId, '【明细】关联缺失ID一致')
+  assert(detail.supplementSummary.supplementedBy === '老岑', '【明细】补录人一致')
+  assert(detail.supplementSummary.originalRecord.id === originalRecord.id, '【明细】原始记录关联一致')
+
+  const history = service.getImportHistory()
+  const historyItem = history.find(h => h.recordId === supplementId)
+  assert(historyItem, '【导入历史】补录记录存在')
+  assert(historyItem.action === 'supplement', '【导入历史】action 是 supplement 不是普通 import')
+  assert(historyItem.relatedMissingId === missingId, '【导入历史】关联缺失ID一致')
+  assert(historyItem.originalRecordId === originalRecord.id, '【导入历史】原始记录关联一致')
+
+  const exportData = service.exportData()
+  const supInExport = exportData.records.find(r => r.id === supplementId)
+  assert(supInExport, '【导出】补录记录存在')
+  assert(supInExport.isSupplement === true, '【导出】补录身份一致')
+  assert(supInExport.originalRecordId === originalRecord.id, '【导出】原始记录关联一致')
+  assert(supInExport.relatedMissingId === missingId, '【导出】关联缺失ID一致')
+  assert(supInExport.supplementedBy === '老岑', '【导出】补录人一致')
+  assert(supInExport.supplementReason === '当时设备校准延误', '【导出】补录原因一致')
+})
+
+test('自检补录检查：补录前后状态真实变化，不是固定通过', () => {
+  const service = new ReverberationService()
+  const imp = service.importRecords([
+    { sampleTime: '2026-06-04T09:00:00', location: '会议室A', frequency: 500, reverberationTime: 1.2 },
+    { sampleTime: '2026-06-04T10:05:00', location: '会议室A', frequency: 500, reverberationTime: 1.1 }
+  ], '质检员小王', '有缺失批次')
+  const missingId = service.getMissingTimeRecords()[0].id
+
+  const beforeSelfCheck = service.runSelfCheck()
+  assert(beforeSelfCheck.supplementRecalcCheck.status === 'pending_missing', `补录前状态是 pending_missing，实际是 ${beforeSelfCheck.supplementRecalcCheck.status}`)
+  assert(beforeSelfCheck.supplementRecalcCheck.supplementCount === 0, '补录前补录记录数应为 0')
+  assert(beforeSelfCheck.supplementRecalcCheck.pendingMissingCount === 1, '补录前待复核缺失数应为 1')
+
+  service.addSupplementRecord(
+    imp.success[0].id,
+    { sampleTime: '2026-06-04T09:30:00', location: '会议室A', frequency: 500, reverberationTime: 1.15 },
+    '设备校准后重测',
+    '老岑',
+    missingId
+  )
+
+  const afterSelfCheck = service.runSelfCheck()
+  assert(afterSelfCheck.supplementRecalcCheck.supplementCount === 1, '补录后补录记录数应为 1')
+  assert(afterSelfCheck.supplementRecalcCheck.resolvedMissingCount === 1, '补录后已补录解决缺失数应为 1')
+  assert(afterSelfCheck.supplementRecalcCheck.status === 'normal' || afterSelfCheck.supplementRecalcCheck.status === 'has_warnings', `补录后状态应正常，实际是 ${afterSelfCheck.supplementRecalcCheck.status}`)
+  assert(afterSelfCheck.supplementRecalcCheck.hasIssues === false, '补录后不应有严重关联断裂问题')
+})
+
+test('导出字段与明细一致，且两次导出一致（包含补录字段）', () => {
+  const service = new ReverberationService()
+  const imp = service.importRecords([
+    { sampleTime: '2026-06-04T09:00:00', location: '会议室A', frequency: 500, reverberationTime: 1.2 },
+    { sampleTime: '2026-06-04T10:05:00', location: '会议室A', frequency: 500, reverberationTime: 1.1 }
+  ], '质检员小王', '有缺失批次')
+  const missingId = service.getMissingTimeRecords()[0].id
+
+  service.addSupplementRecord(
+    imp.success[0].id,
+    { sampleTime: '2026-06-04T09:30:00', location: '会议室A', frequency: 500, reverberationTime: 1.15 },
+    '设备校准后重测',
+    '老岑',
+    missingId
+  )
+
+  const snapshot1 = JSON.stringify(service.getDataSnapshot())
+  const snapshot2 = JSON.stringify(service.getDataSnapshot())
+  assert(snapshot1 === snapshot2, '两次数据快照内容完全一致')
+
+  const snapshot = service.getDataSnapshot()
+  const supplementInSnapshot = snapshot.records.find(r => r.isSupplement)
+  assert(supplementInSnapshot.originalRecordId, '数据快照补录记录含 originalRecordId')
+  assert(supplementInSnapshot.relatedMissingId, '数据快照补录记录含 relatedMissingId')
+  assert(supplementInSnapshot.supplementedBy, '数据快照补录记录含 supplementedBy')
+  assert(supplementInSnapshot.supplementReason, '数据快照补录记录含 supplementReason')
+
+  const selfCheck = service.checkExportConsistency()
+  assert(selfCheck.consistent === true, '导出一致性自检通过')
+})
+
+test('按普通使用者路线：真实补录缺半小时采样时间全链路复现', () => {
+  const service = new ReverberationService()
+
+  service.addSafetyThreshold({
+    frequency: 500,
+    minReverberationTime: 0.5,
+    maxReverberationTime: 1.5,
+    location: '会议室A'
+  })
+
+  const step1 = service.importRecords([
+    { sampleTime: '2026-06-04T09:00:00', location: '会议室A', frequency: 500, reverberationTime: 1.2 },
+    { sampleTime: '2026-06-04T09:30:00', location: '会议室A', frequency: 500, reverberationTime: 1.15 },
+    { sampleTime: '2026-06-04T10:35:00', location: '会议室A', frequency: 500, reverberationTime: 1.3 },
+    { sampleTime: '2026-06-04T11:05:00', location: '会议室A', frequency: 500, reverberationTime: 1.1 }
+  ], '质检员小王', '手写巡检备注第一次导入')
+  assert(step1.success.length === 4, '第一步：导入 4 条手写巡检记录成功')
+
+  const missingsBefore = service.getMissingTimeRecords()
+  assert(missingsBefore.length === 1, '第一步：检测到 1 个缺半小时采样时间')
+  assert(missingsBefore[0].status === 'pending_review', '第一步：缺失处于待复核状态')
+  assert(Math.abs(missingsBefore[0].gapDuration - 65) < 1, `第一步：缺失间隔约 65 分钟（实际 ${missingsBefore[0].gapDuration.toFixed(1)}）`)
+
+  service.addInspectionNote({
+    recordId: step1.success[2].id,
+    noteContent: '现场检查门窗关好，吸声材料完好',
+    author: '老岑',
+    isHandwritten: true
+  })
+
+  const originalRecord = missingsBefore[0].previousRecord
+  const expectedTime = missingsBefore[0].expectedTime
+  const missingId = missingsBefore[0].id
+  const supplementData = {
+    sampleTime: expectedTime,
+    location: originalRecord.location,
+    frequency: originalRecord.frequency,
+    reverberationTime: 1.18
+  }
+
+  const step3 = service.addSupplementRecord(
+    originalRecord.id,
+    supplementData,
+    '10点左右仪器临时校准，完成后立即补测此点',
+    '维修师傅老岑',
+    missingId
+  )
+  assert(step3.success === true, '第三步（补录解决）：补录保存成功')
+  assert(step3.missingResolution.beforeStatus === 'pending_review', '第三步：缺失状态变化前 pending_review')
+  assert(step3.missingResolution.afterStatus === 'resolved', '第三步：缺失状态变化后 resolved')
+  assert(step3.originalRecordUpdate.supplementStatus === 'supplemented', '第三步：原记录进入已补录状态')
+  assert(step3.recalcResults, '第三步：补录后自动重算')
+
+  const detailSupplement = service.getRecordDetail(step3.record.id)
+  assert(detailSupplement.record.isSupplement === true, '【核对-补录身份】是补录记录')
+  assert(detailSupplement.supplementSummary.originalRecord.id === originalRecord.id, '【核对-原始记录关联】绑定正确')
+  assert(detailSupplement.record.relatedMissingId === missingId, '【核对-缺失间隔】关联正确')
+  assert(detailSupplement.supplementSummary.expectedTime === expectedTime, '【核对-期望采样时间】一致')
+  assert(detailSupplement.record.supplementReason === '10点左右仪器临时校准，完成后立即补测此点', '【核对-补录原因】一致')
+  assert(detailSupplement.record.supplementedBy === '维修师傅老岑', '【核对-补录人】一致')
+
+  const detailOriginal = service.getRecordDetail(originalRecord.id)
+  assert(detailOriginal.originalRecordSummary.supplementStatus === 'supplemented', '【核对-原记录当前状态】已补录')
+  assert(detailOriginal.originalRecordSummary.supplementedCount === 1, '【核对-原记录补录次数】1 次')
+  assert(detailOriginal.originalRecordSummary.supplements[0].id === step3.record.id, '【核对-原记录反向看到补录】ID 一致')
+
+  const missingAfter = service.getMissingTimeRecordById(missingId)
+  assert(missingAfter.status === 'resolved', '【核对-缺失间隔当前状态】已解决')
+  assert(missingAfter.resolvedWith === 'supplement', '【核对-解决方式】补录解决')
+  assert(missingAfter.resolvedBy === '维修师傅老岑', '【核对-解决人】正确')
+  assert(missingAfter.supplementRecordId === step3.record.id, '【核对-缺失反向绑定补录】ID 一致')
+
+  const allLogs = service.getChangeLogs()
+  assert(allLogs.some(l => l.type === 'supplement' && l.operator === '维修师傅老岑'), '【核对-历史】有补录创建日志')
+  assert(allLogs.some(l => l.type === 'review' && l.entityId === missingId && l.details.decision === 'supplement'), '【核对-历史】有缺失补录解决日志')
+  assert(allLogs.some(l => l.details && l.details.cause === 'supplement_recalculation'), '【核对-历史】有补录后重算日志')
+
+  const selfCheckFinal = service.runSelfCheck()
+  assert(selfCheckFinal.exportConsistencyCheck.consistent === true, '【核对-报告和导出】导出一致通过')
+  assert(selfCheckFinal.supplementRecalcCheck.supplementCount === 1, '【核对-报告和导出】补录记录数 1')
+  assert(selfCheckFinal.supplementRecalcCheck.resolvedMissingCount === 1, '【核对-报告和导出】补录解决缺失数 1')
+  assert(selfCheckFinal.supplementRecalcCheck.status === 'normal' || selfCheckFinal.supplementRecalcCheck.status === 'has_warnings', `【核对-报告和导出】补录链路正常，状态：${selfCheckFinal.supplementRecalcCheck.status}`)
+
+  const exportSnapshot = service.getDataSnapshot()
+  const supInExport = exportSnapshot.records.find(r => r.id === step3.record.id)
+  assert(supInExport.isSupplement === true, '【核对-导出字段】补录身份 isSupplement')
+  assert(supInExport.originalRecordId === originalRecord.id, '【核对-导出字段】原始记录关联 originalRecordId')
+  assert(supInExport.relatedMissingId === missingId, '【核对-导出字段】缺失间隔关联 relatedMissingId')
+  assert(supInExport.supplementReason === '10点左右仪器临时校准，完成后立即补测此点', '【核对-导出字段】补录原因')
+  assert(supInExport.supplementedBy === '维修师傅老岑', '【核对-导出字段】补录人')
+})
+
 console.log('\n' + '═'.repeat(50))
 console.log(`测试完成: ${passed} 通过, ${failed} 失败`)
 
