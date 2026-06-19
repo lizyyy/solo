@@ -83,7 +83,10 @@ export default function ReviewPage() {
   }
 
   const handleReview = async (id: string, status: 'confirmed' | 'rejected') => {
-    await reviewCalculation(id, status, currentOperator)
+    const reason = status === 'confirmed'
+      ? '唐老师确认混合格式可用，以小数为准'
+      : '唐老师退回，格式需重新确认'
+    await reviewCalculation(id, status, currentOperator, reason)
   }
 
   const mixedFormatCalculations = useMemo(

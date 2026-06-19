@@ -69,12 +69,13 @@ router.post('/', (req: Request, res: Response): void => {
         db.prepare('UPDATE raw_rows SET boundary_id = ?, updated_at = datetime(\'now\') WHERE id = ?').run(id, rawRowId)
       }
 
+      const reason = req.body.reason || '补录边界值说明'
       const affected = findAffectedResults('boundary', id)
       if (affected.length > 0) {
         db.prepare(`
           INSERT INTO change_records (id, entity_type, entity_id, field_name, old_value, new_value, reason, changed_by, affected_results)
-          VALUES (?, 'raw_row', ?, '边界值说明', '（无）', '已补录', '唐老师补录边界值', ?, ?)
-        `).run(uuidv4(), rawRowId, operator || 'system', JSON.stringify(affected))
+          VALUES (?, 'raw_row', ?, '边界值说明', '（无）', '已补录', ?, ?, ?)
+        `).run(uuidv4(), rawRowId, reason, operator || 'system', JSON.stringify(affected))
       }
     })
 

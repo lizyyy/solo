@@ -120,9 +120,10 @@ router.post('/import', (req: Request, res: Response): void => {
           continue
         }
 
+        const rowId = uuidv4()
         const hasMixed = (row.percentageValue && row.decimalValue) ? 1 : 0
         insertRow.run(
-          uuidv4(),
+          rowId,
           row.uniqueKey,
           row.content,
           row.percentageValue ?? null,
@@ -131,6 +132,19 @@ router.post('/import', (req: Request, res: Response): void => {
           batchId
         )
         newRows++
+
+        const fields = [
+          { name: '内容', value: row.content || '' },
+          { name: '百分数', value: row.percentageValue || '（无）' },
+          { name: '小数', value: row.decimalValue || '（无）' },
+          { name: '混合格式标记', value: hasMixed ? '是' : '否' },
+        ]
+        for (const f of fields) {
+          db.prepare(`
+            INSERT INTO change_records (id, entity_type, entity_id, field_name, old_value, new_value, reason, changed_by, affected_results)
+            VALUES (?, 'raw_row', ?, ?, '（无）', ?, '问卷原始行导入', ?, '[]')
+          `).run(uuidv4(), rowId, f.name, String(f.value), operator)
+        }
       }
 
       db.prepare(`

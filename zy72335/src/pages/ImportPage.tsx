@@ -124,6 +124,7 @@ KEY005,参赛队伍 自动化E队,95%,0.95`
           description: boundaryForm.description,
         },
         '唐老师更新边界值说明',
+        currentOperator,
       )
     } else {
       await createBoundarySpec({
@@ -134,6 +135,7 @@ KEY005,参赛队伍 自动化E队,95%,0.95`
         unit: boundaryForm.unit,
         description: boundaryForm.description,
         operator: currentOperator,
+        reason: '唐老师补录边界值说明',
       })
     }
     setBoundaryModalOpen(false)

@@ -4,7 +4,7 @@ import { useAppStore, type Report } from '@/store'
 import StatusBadge from '@/components/StatusBadge'
 
 export default function ReportPage() {
-  const { reports, fetchReports, generateReport, getReport } = useAppStore()
+  const { reports, fetchReports, generateReport, getReport, currentOperator } = useAppStore()
   const [isGenerating, setIsGenerating] = useState(false)
   const [selectedReport, setSelectedReport] = useState<Report | null>(null)
   const [isLoadingReport, setIsLoadingReport] = useState(false)
@@ -17,7 +17,7 @@ export default function ReportPage() {
   const handleGenerateReport = async () => {
     setIsGenerating(true)
     try {
-      const report = await generateReport()
+      const report = await generateReport(currentOperator)
       setSelectedReport(report)
     } finally {
       setIsGenerating(false)
@@ -35,6 +35,9 @@ export default function ReportPage() {
   }
 
   const handleDownload = () => {
+    if (!selectedReport) return
+    const url = `/api/reports/${selectedReport.id}/download`
+    window.open(url, '_blank')
     setShowToast(true)
     setTimeout(() => setShowToast(false), 3000)
   }
@@ -199,6 +202,9 @@ export default function ReportPage() {
                   </h1>
                   <p className="mt-2 text-sm text-slate-500">
                     生成时间：{formatDate(selectedReport.generatedAt || selectedReport.createdAt)}
+                  </p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    生成人：{selectedReport.generatedBy}
                   </p>
                   <div className="mt-4 flex justify-center">
                     <StatusBadge variant="success">

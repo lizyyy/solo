@@ -101,6 +101,7 @@ CREATE TABLE IF NOT EXISTS reports (
     id TEXT PRIMARY KEY,
     title TEXT NOT NULL,
     content TEXT NOT NULL,
+    generated_by TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -113,5 +114,18 @@ CREATE INDEX IF NOT EXISTS idx_calculation_details_flagged ON calculation_detail
 `)
 
 db.exec(`INSERT OR IGNORE INTO workflow_status (id) VALUES ('1')`)
+
+function columnExists(table: string, column: string): boolean {
+  try {
+    const row = db.prepare(`PRAGMA table_info(${table})`).all() as any[]
+    return row.some(c => c.name === column)
+  } catch {
+    return false
+  }
+}
+
+if (!columnExists('reports', 'generated_by')) {
+  db.exec('ALTER TABLE reports ADD COLUMN generated_by TEXT')
+}
 
 export default db

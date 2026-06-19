@@ -46,7 +46,7 @@ router.get('/', (req: Request, res: Response): void => {
 
 router.put('/:id/review', (req: Request, res: Response): void => {
   try {
-    const { reviewStatus, reviewedBy } = req.body
+    const { reviewStatus, reviewedBy, reason } = req.body
     if (!reviewStatus || !reviewedBy) {
       res.status(400).json({ success: false, error: 'Missing reviewStatus or reviewedBy' })
       return
@@ -63,11 +63,34 @@ router.put('/:id/review', (req: Request, res: Response): void => {
       return
     }
 
-    db.prepare(`
-      UPDATE calculation_details
-      SET review_status = ?, reviewed_by = ?, reviewed_at = datetime('now'), updated_at = datetime('now')
-      WHERE id = ?
-    `).run(reviewStatus, reviewedBy, req.params.id)
+    const oldStatus = existing.review_status || 'pending'
+    const statusChanged = oldStatus !== reviewStatus
+
+    const transaction = db.transaction(() => {
+      db.prepare(`
+        UPDATE calculation_details
+        SET review_status = ?, reviewed_by = ?, reviewed_at = datetime('now'), updated_at = datetime('now')
+        WHERE id = ?
+      `).run(reviewStatus, reviewedBy, req.params.id)
+
+      if (statusChanged) {
+        const affected: string[] = [`raw_row:${existing.raw_row_id}`]
+        db.prepare(`
+          INSERT INTO change_records (id, entity_type, entity_id, field_name, old_value, new_value, reason, changed_by, affected_results)
+          VALUES (?, 'calculation', ?, '复核状态', ?, ?, ?, ?, ?)
+        `).run(
+          uuidv4(),
+          req.params.id,
+          oldStatus,
+          reviewStatus,
+          reason || '复核状态变更',
+          reviewedBy,
+          JSON.stringify(affected)
+        )
+      }
+    })
+
+    transaction()
 
     const updated = db.prepare('SELECT * FROM calculation_details WHERE id = ?').get(req.params.id) as any
     res.json({ success: true, data: toCamelCase(updated) })

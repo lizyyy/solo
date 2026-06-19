@@ -112,6 +112,7 @@ export interface Report {
   title: string
   createdAt: string
   generatedAt: string
+  generatedBy: string
   summary: {
     totalRows: number
     keptCount: number
@@ -151,17 +152,17 @@ interface AppState {
   fetchRawRows: (filters?: { mixedFormat?: boolean; hasBoundary?: boolean }) => Promise<void>
   getRawRow: (id: string) => Promise<RawRow>
   importRawRows: (rows: Array<{ uniqueKey: string; content: string; percentageValue?: string; decimalValue?: string }>, operator: string) => Promise<ImportResult>
-  updateRawRow: (id: string, updates: Partial<{ content: string; percentageValue: string; decimalValue: string; reason: string }>) => Promise<void>
+  updateRawRow: (id: string, updates: Partial<{ content: string; percentageValue: string; decimalValue: string; reason: string; operator: string }>) => Promise<void>
   deleteRawRow: (id: string) => Promise<void>
 
   boundarySpecs: BoundarySpec[]
   fetchBoundarySpecs: (filters?: { rawRowId?: string }) => Promise<void>
-  createBoundarySpec: (spec: Omit<BoundarySpec, 'id' | 'createdAt' | 'updatedAt'>) => Promise<BoundarySpec>
-  updateBoundarySpec: (id: string, updates: Partial<BoundarySpec>, reason?: string) => Promise<void>
+  createBoundarySpec: (spec: Omit<BoundarySpec, 'id' | 'createdAt' | 'updatedAt'> & { operator?: string; reason?: string }) => Promise<BoundarySpec>
+  updateBoundarySpec: (id: string, updates: Partial<BoundarySpec>, reason?: string, operator?: string) => Promise<void>
 
   calculationDetails: CalculationDetail[]
   fetchCalculations: (filters?: { reviewStatus?: string; mixedFormatFlagged?: boolean }) => Promise<void>
-  reviewCalculation: (id: string, reviewStatus: 'confirmed' | 'rejected', reviewedBy: string) => Promise<void>
+  reviewCalculation: (id: string, reviewStatus: 'confirmed' | 'rejected', reviewedBy: string, reason?: string) => Promise<void>
   refreshCalculations: () => Promise<void>
 
   changeRecords: ChangeRecord[]
@@ -172,7 +173,7 @@ interface AppState {
 
   reports: Report[]
   fetchReports: () => Promise<void>
-  generateReport: () => Promise<Report>
+  generateReport: (operator?: string) => Promise<Report>
   getReport: (id: string) => Promise<Report>
 }
 
@@ -261,10 +262,10 @@ export const useAppStore = create<AppState>((set, get) => ({
     await get().fetchRawRows()
     return result
   },
-  updateBoundarySpec: async (id, updates, reason) => {
+  updateBoundarySpec: async (id, updates, reason, operator) => {
     await apiFetch(`/api/boundaries/${id}`, {
       method: 'PUT',
-      body: JSON.stringify({ ...updates, reason }),
+      body: JSON.stringify({ ...updates, reason, operator }),
     })
     await get().fetchBoundarySpecs()
     await get().fetchRawRows()
@@ -290,10 +291,10 @@ export const useAppStore = create<AppState>((set, get) => ({
       set({ calculationDetails: [] })
     }
   },
-  reviewCalculation: async (id, reviewStatus, reviewedBy) => {
+  reviewCalculation: async (id, reviewStatus, reviewedBy, reason) => {
     await apiFetch(`/api/calculations/${id}/review`, {
       method: 'PUT',
-      body: JSON.stringify({ reviewStatus, reviewedBy }),
+      body: JSON.stringify({ reviewStatus, reviewedBy, reason }),
     })
     await get().fetchCalculations()
   },
@@ -339,9 +340,10 @@ export const useAppStore = create<AppState>((set, get) => ({
       set({ reports: [] })
     }
   },
-  generateReport: async () => {
+  generateReport: async (operator) => {
     const result = await apiFetch<Report>('/api/reports/generate', {
       method: 'POST',
+      body: JSON.stringify({ operator }),
     })
     await get().fetchReports()
     return result
