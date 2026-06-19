@@ -1,0 +1,255 @@
+{
+  "runAt": "2026-06-19T11:33:40.438Z",
+  "summary": "7/7 passed",
+  "tests": [
+    {
+      "name": "Test 1",
+      "pass": true,
+      "actual": {
+        "success_count": 1,
+        "new_threshold_status": "needs_manual",
+        "hasUnitMix": true,
+        "review_generated": true,
+        "review_type": "unit_mix",
+        "review_decision": "pending"
+      },
+      "expected": {
+        "success": 1,
+        "status": "needs_manual",
+        "hasUnitMix": true,
+        "review_generated": true,
+        "review_type": "unit_mix",
+        "decision": "pending"
+      }
+    },
+    {
+      "name": "Test 2",
+      "pass": true,
+      "actual": {
+        "history_count": 1,
+        "field_name": "remark",
+        "oldValue": "测试导入 dev-002 Celsius 新记录",
+        "newValue": "何工补看了 B-002 铭牌后修正：确认需转教练复核℃/K 混用问题",
+        "changeReason": "只改了一条备注：补充 B-02 铭牌观察",
+        "hasSnapshot": true
+      },
+      "expected": {
+        "history_count": 1,
+        "field_name": "remark",
+        "oldValue": "测试导入 dev-002 Celsius 新记录",
+        "changeReason_contains": "只改了一条备注",
+        "hasSnapshot": true
+      }
+    },
+    {
+      "name": "Test 3",
+      "pass": true,
+      "actual": {
+        "decision": "confirmed",
+        "reason": "核查 B-002 铭牌序列号 SN20240115002 确认使用开尔文，将新记录调整为 268K",
+        "reviewedBy": "训练教练",
+        "modifiedValue": "268",
+        "modifiedUnit": "Kelvin",
+        "threshold_status": "approved",
+        "threshold_value": 268,
+        "threshold_unit": "Kelvin",
+        "hasUnitMix": false
+      },
+      "expected": {
+        "decision": "confirmed",
+        "reason_contains": "核查 B-002",
+        "reviewedBy": "训练教练",
+        "modifiedValue": "268",
+        "modifiedUnit": "Kelvin",
+        "status": "approved",
+        "value": 268,
+        "unit": "Kelvin",
+        "hasUnitMix": false
+      }
+    },
+    {
+      "name": "Test 4",
+      "pass": true,
+      "actual": {
+        "ok": true,
+        "issues": []
+      },
+      "expected": {
+        "ok": true,
+        "issues": 0
+      }
+    },
+    {
+      "name": "Test 5",
+      "pass": true,
+      "actual": {
+        "reportId": "report-mqkuot7a-jfk4d",
+        "snapshot_value": 268,
+        "snapshot_unit": "Kelvin",
+        "snapshot_status": "approved",
+        "exportTraceId_match": true
+      },
+      "expected": {
+        "snapshot_value": 268,
+        "snapshot_unit": "Kelvin",
+        "snapshot_status": "approved",
+        "exportTraceId_match": true
+      }
+    },
+    {
+      "name": "Test 6",
+      "pass": true,
+      "actual": {
+        "trace_found": true,
+        "trace_type": "threshold",
+        "threshold_id_match": true,
+        "has_batch": true,
+        "has_manualReview": true,
+        "history_count": 5,
+        "workflow_count": 1
+      },
+      "expected": {
+        "trace_found": true,
+        "type": "threshold",
+        "threshold_id_match": true,
+        "has_batch": true,
+        "has_manualReview": true,
+        "history_count": ">0",
+        "workflow_count": ">0"
+      }
+    },
+    {
+      "name": "Test 7",
+      "pass": true,
+      "actual": {
+        "trace_found": true,
+        "type": "threshold"
+      },
+      "expected": {
+        "trace_found": true,
+        "type": "threshold"
+      }
+    }
+  ],
+  "chain": {
+    "batchId": "batch-mqkuot79-lalmk",
+    "thresholdId": "th-mqkuot79-44ukh",
+    "reviewId": "review-mqkuot79-s4d0j",
+    "reportId": "report-mqkuot7a-jfk4d",
+    "exportId": "exp-mqkuot7a-19s98",
+    "reportExportId": "exp-mqkuot7a-hod9e"
+  },
+  "finalState": {
+    "thresholds": [
+      {
+        "id": "th-004",
+        "name": "冷凝管结霜阈值",
+        "value": 268,
+        "unit": "Kelvin",
+        "status": "approved",
+        "hasUnitMix": false,
+        "remark": "复核通过，确认使用开尔文单位",
+        "manualReviewId": "review-002",
+        "importBatchId": "batch-002"
+      },
+      {
+        "id": "th-mqkuot79-44ukh",
+        "name": "冷凝管结霜阈值",
+        "value": 268,
+        "unit": "Kelvin",
+        "status": "approved",
+        "hasUnitMix": false,
+        "remark": "何工补看了 B-002 铭牌后修正：确认需转教练复核℃/K 混用问题",
+        "manualReviewId": "review-mqkuot79-s4d0j",
+        "importBatchId": "batch-mqkuot79-lalmk",
+        "exportTraceId": "exp-mqkuot7a-hod9e"
+      }
+    ],
+    "manualReviews": [
+      {
+        "id": "review-mqkuot79-s4d0j",
+        "thresholdId": "th-mqkuot79-44ukh",
+        "reviewType": "unit_mix",
+        "originalValue": "-5",
+        "originalUnit": "Celsius",
+        "modifiedValue": "268",
+        "modifiedUnit": "Kelvin",
+        "decision": "confirmed",
+        "reason": "核查 B-002 铭牌序列号 SN20240115002 确认使用开尔文，将新记录调整为 268K",
+        "reviewedBy": "训练教练"
+      }
+    ],
+    "history": [
+      {
+        "id": "h-mqkuot79-3von4",
+        "thresholdId": "th-mqkuot79-44ukh",
+        "fieldName": "remark",
+        "oldValue": "测试导入 dev-002 Celsius 新记录",
+        "newValue": "何工补看了 B-002 铭牌后修正：确认需转教练复核℃/K 混用问题",
+        "changeReason": "只改了一条备注：补充 B-02 铭牌观察",
+        "modifiedBy": "何工",
+        "consistencySnapshot": {
+          "thresholdStatus": "needs_manual",
+          "workflowStep": "engineer_review",
+          "batchId": "batch-mqkuot79-lalmk"
+        }
+      },
+      {
+        "id": "h-mqkuot79-2nw48",
+        "thresholdId": "th-mqkuot79-44ukh",
+        "fieldName": "hasUnitMix",
+        "oldValue": "true",
+        "newValue": "false",
+        "changeReason": "人工复核通过：核查 B-002 铭牌序列号 SN20240115002 确认使用开尔文，将新记录调整为 268K",
+        "modifiedBy": "训练教练",
+        "consistencySnapshot": {
+          "thresholdStatus": "approved",
+          "workflowStep": "engineer_review",
+          "batchId": "batch-mqkuot79-lalmk"
+        }
+      },
+      {
+        "id": "h-mqkuot79-jn4fq",
+        "thresholdId": "th-mqkuot79-44ukh",
+        "fieldName": "status",
+        "oldValue": "needs_manual",
+        "newValue": "approved",
+        "changeReason": "人工复核通过：核查 B-002 铭牌序列号 SN20240115002 确认使用开尔文，将新记录调整为 268K",
+        "modifiedBy": "训练教练",
+        "consistencySnapshot": {
+          "thresholdStatus": "approved",
+          "workflowStep": "engineer_review",
+          "batchId": "batch-mqkuot79-lalmk"
+        }
+      },
+      {
+        "id": "h-mqkuot79-3mn5v",
+        "thresholdId": "th-mqkuot79-44ukh",
+        "fieldName": "value",
+        "oldValue": "-5",
+        "newValue": "268",
+        "changeReason": "人工复核通过：核查 B-002 铭牌序列号 SN20240115002 确认使用开尔文，将新记录调整为 268K",
+        "modifiedBy": "训练教练",
+        "consistencySnapshot": {
+          "thresholdStatus": "approved",
+          "workflowStep": "engineer_review",
+          "batchId": "batch-mqkuot79-lalmk"
+        }
+      },
+      {
+        "id": "h-mqkuot79-kgqbw",
+        "thresholdId": "th-mqkuot79-44ukh",
+        "fieldName": "unit",
+        "oldValue": "Celsius",
+        "newValue": "Kelvin",
+        "changeReason": "人工复核通过：核查 B-002 铭牌序列号 SN20240115002 确认使用开尔文，将新记录调整为 268K",
+        "modifiedBy": "训练教练",
+        "consistencySnapshot": {
+          "thresholdStatus": "approved",
+          "workflowStep": "engineer_review",
+          "batchId": "batch-mqkuot79-lalmk"
+        }
+      }
+    ]
+  }
+}

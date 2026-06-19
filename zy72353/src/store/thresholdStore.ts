@@ -53,7 +53,7 @@ interface ThresholdState {
     reviewOpts?: { createManualReview?: boolean; reviewType?: ManualReviewRecord['reviewType'] }
   ) => ManualReviewRecord | null;
 
-  checkUnitMix: (deviceId: string, excludeId?: string) => boolean;
+  checkUnitMix: (deviceId: string, excludeId?: string, newUnit?: TemperatureUnit) => boolean;
 
   getThresholdHistory: (thresholdId: string) => HistoryRecord[];
   getDeviceById: (deviceId: string) => Device | undefined;
@@ -183,7 +183,11 @@ export const useThresholdStore = create<ThresholdState>((set, get) => ({
         return;
       }
 
-      const hasUnitMix = get().checkUnitMix(item.deviceId!);
+      const hasUnitMix = get().checkUnitMix(
+        item.deviceId!,
+        undefined,
+        (item.unit as TemperatureUnit) || 'Celsius'
+      );
 
       const thId = generateId('th');
       const newThreshold: ThresholdData = {
@@ -338,14 +342,17 @@ export const useThresholdStore = create<ThresholdState>((set, get) => ({
     return reviewRecord;
   },
 
-  checkUnitMix: (deviceId, excludeId) => {
+  checkUnitMix: (deviceId, excludeId, newUnit?: TemperatureUnit) => {
     const { thresholds } = get();
     const deviceThresholds = thresholds.filter(
       (t) => t.deviceId === deviceId && t.id !== excludeId
     );
     if (deviceThresholds.length === 0) return false;
-    const units = new Set(deviceThresholds.map((t) => t.unit));
-    return units.size > 1;
+    const existingUnits = new Set(deviceThresholds.map((t) => t.unit));
+    if (newUnit) {
+      return !existingUnits.has(newUnit) || existingUnits.size > 1;
+    }
+    return existingUnits.size > 1;
   },
 
   getThresholdHistory: (thresholdId) => get().history.filter((h) => h.thresholdId === thresholdId),
@@ -404,30 +411,70 @@ export const useThresholdStore = create<ThresholdState>((set, get) => ({
   },
 
   processManualReview: (reviewId, decision, opts) => {
-    const { manualReviews, currentRole } = get();
-    const review = manualReviews.find((r) => r.id === reviewId);
-    if (!review) return;
+    const { manualReviews, currentRole, thresholds } = get();
+    let review = manualReviews.find((r) => r.id === reviewId);
     const now = getCurrentTime();
     const reviewer = currentRole === 'engineer' ? '何工' : '训练教练';
 
-    const updates: Partial<ManualReviewRecord> = {
-      decision,
-      reviewedBy: reviewer,
-      reviewedAt: now,
-    };
-    if (opts?.modifiedValue) updates.modifiedValue = opts.modifiedValue;
-    if (opts?.modifiedUnit) updates.modifiedUnit = opts.modifiedUnit;
-    if (opts?.reason) updates.reason = opts.reason;
+    if (!review) {
+      const isTemp = reviewId.startsWith('temp-review-');
+      if (isTemp) {
+        const tempThId = reviewId.replace('temp-review-', '');
+        const threshold = thresholds.find((t) => t.id === tempThId);
+        if (!threshold) return;
 
-    set((state) => ({
-      manualReviews: state.manualReviews.map((r) =>
-        r.id === reviewId ? { ...r, ...updates } : r
-      ),
-    }));
+        const newReview: ManualReviewRecord = {
+          id: generateId('review'),
+          thresholdId: tempThId,
+          reviewType: threshold.hasUnitMix ? 'unit_mix' : 'remark_change',
+          originalValue: String(threshold.originalImportedValue ?? threshold.value),
+          originalUnit: threshold.originalImportedUnit ?? threshold.unit,
+          modifiedValue: opts?.modifiedValue,
+          modifiedUnit: opts?.modifiedUnit,
+          decision,
+          reason: opts?.reason || '',
+          reviewedBy: reviewer,
+          reviewedAt: now,
+          createdAt: now,
+        };
 
-    if (decision === 'confirmed') {
-      const thresholdUpdates: Partial<ThresholdData> = { hasUnitMix: false };
-      if (opts?.modifiedValue !== undefined && opts.modifiedValue !== null) {
+        set((state) => ({
+          manualReviews: [...state.manualReviews, newReview],
+        }));
+
+        review = newReview;
+
+        set((state) => ({
+          thresholds: state.thresholds.map((t) =>
+            t.id === tempThId ? { ...t, manualReviewId: newReview.id, updatedAt: now } : t
+          ),
+        }));
+      } else {
+        return;
+      }
+    } else {
+      const updates: Partial<ManualReviewRecord> = {
+        decision,
+        reviewedBy: reviewer,
+        reviewedAt: now,
+      };
+      if (opts?.modifiedValue !== undefined) updates.modifiedValue = opts.modifiedValue;
+      if (opts?.modifiedUnit) updates.modifiedUnit = opts.modifiedUnit;
+      if (opts?.reason) updates.reason = opts.reason;
+
+      set((state) => ({
+        manualReviews: state.manualReviews.map((r) =>
+          r.id === reviewId ? { ...r, ...updates } : r
+        ),
+      }));
+    }
+
+    if (decision === 'confirmed' && review) {
+      const thresholdUpdates: Partial<ThresholdData> = {
+        hasUnitMix: false,
+        status: 'approved',
+      };
+      if (opts?.modifiedValue !== undefined && opts?.modifiedValue !== null && opts?.modifiedValue !== '') {
         thresholdUpdates.value = Number(opts.modifiedValue);
       }
       if (opts?.modifiedUnit) {
@@ -436,7 +483,40 @@ export const useThresholdStore = create<ThresholdState>((set, get) => ({
       get().updateThreshold(
         review.thresholdId,
         thresholdUpdates,
-        `人工复核确认：${opts?.reason || '教练确认'}`
+        `人工复核${decision === 'confirmed' ? '通过' : '驳回'}：${opts?.reason || '教练确认'}`
+      );
+
+      const { workflowTasks } = get();
+      const task = workflowTasks.find((t) => t.thresholdId === review.thresholdId);
+      if (task) {
+        const stepOrder: WorkflowStep[] = ['import', 'engineer_review', 'coach_review', 'report'];
+        const currentIndex = stepOrder.indexOf(task.step);
+        if (currentIndex < stepOrder.length - 1) {
+          const nextStep = stepOrder[currentIndex + 1];
+          const finalStep = nextStep === 'coach_review' ? 'report' : nextStep;
+          set((state) => ({
+            workflowTasks: state.workflowTasks.map((t) =>
+              t.id === task.id
+                ? {
+                    ...t,
+                    step: finalStep,
+                    status: 'pending' as const,
+                    assignee: 'coach',
+                    previousStep: task.step,
+                    nextStep: undefined,
+                    completedAt: now,
+                    consistencyCheckedAt: now,
+                  }
+                : t
+            ),
+          }));
+        }
+      }
+    } else if (decision === 'rejected' && review) {
+      get().updateThreshold(
+        review.thresholdId,
+        { status: 'rejected' },
+        `人工复核驳回：${opts?.reason || '教练驳回'}`
       );
     }
   },
@@ -483,7 +563,7 @@ export const useThresholdStore = create<ThresholdState>((set, get) => ({
     const th = thresholds.find((t) => t.id === thresholdId);
     if (!th) throw new Error('Threshold not found');
     const now = getCurrentTime();
-    const exportId = th.exportTraceId || generateId('exp');
+    const exportId = generateId('exp');
 
     const pkg: ExportPackage = {
       exportId,
@@ -629,10 +709,47 @@ export const useThresholdStore = create<ThresholdState>((set, get) => ({
         exportedBy: byRep.createdBy,
         type: 'report' as const,
         referenceIds: [byRep.id, byRep.thresholdId],
-        data: { report: byRep, snapshot: byRep.snapshot },
+        data: { report: byRep, snapshot: byRep.snapshot, threshold: byTh },
         hash: hashData({ report: byRep }),
       };
     }
+
+    if (byTh) {
+      const history = get().history.filter((h) => h.thresholdId === byTh.id);
+      const workflow = get().workflowTasks.filter((t) => t.thresholdId === byTh.id);
+      const manualReview = byTh.manualReviewId
+        ? get().manualReviews.find((r) => r.id === byTh.manualReviewId)
+        : undefined;
+      const batch = byTh.importBatchId
+        ? get().batches.find((b) => b.id === byTh.importBatchId)
+        : undefined;
+      const report = byRep || get().reports.find((r) => r.thresholdId === byTh.id);
+
+      return {
+        exportId,
+        exportedAt: byTh.updatedAt,
+        exportedBy: byTh.createdBy,
+        type: 'threshold' as const,
+        referenceIds: [
+          byTh.id,
+          byTh.importBatchId,
+          byTh.manualReviewId,
+          ...history.map((h) => h.id),
+          ...workflow.map((t) => t.id),
+          report?.id,
+        ].filter(Boolean) as string[],
+        data: {
+          threshold: byTh,
+          batch,
+          manualReview,
+          history,
+          workflow,
+          report,
+        },
+        hash: hashData({ threshold: byTh, history, batch }),
+      };
+    }
+
     return null;
   },
 

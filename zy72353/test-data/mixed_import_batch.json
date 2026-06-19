@@ -1,0 +1,42 @@
+[
+  {
+    "name": "冷凝管结霜阈值",
+    "value": 268,
+    "unit": "Kelvin",
+    "deviceId": "dev-002",
+    "remark": "初始基准数据：dev-002 开尔文 268K",
+    "calculationModel": "FrostPointPrediction",
+    "modelVersion": "v2.1.0",
+    "tradeOffReason": "设备铭牌规定使用开尔文，与国际标准一致"
+  },
+  {
+    "name": "冷凝管结霜阈值",
+    "value": -5,
+    "unit": "Celsius",
+    "deviceId": "dev-002",
+    "remark": "测试触发℃/K混用：同一设备不同单位",
+    "calculationModel": "FrostPointPrediction",
+    "modelVersion": "v2.1.0",
+    "tradeOffReason": "验证单位混用检测逻辑"
+  },
+  {
+    "name": "冷凝管结霜阈值",
+    "value": 268,
+    "unit": "Kelvin",
+    "deviceId": "dev-002",
+    "remark": "测试重复导入：与第一条完全相同",
+    "calculationModel": "FrostPointPrediction",
+    "modelVersion": "v2.1.0",
+    "tradeOffReason": "验证去重逻辑"
+  },
+  {
+    "name": "冷凝管结霜阈值",
+    "value": -5,
+    "unit": "Celsius",
+    "deviceId": "dev-001",
+    "remark": "正常导入：dev-001 摄氏度 -5℃",
+    "calculationModel": "FrostPointPrediction",
+    "modelVersion": "v2.1.0",
+    "tradeOffReason": "dev-001 铭牌统一使用摄氏度"
+  }
+]
