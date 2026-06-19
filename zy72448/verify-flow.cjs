@@ -1,7 +1,3 @@
-const { createStore } = require('zustand');
-const { persist } = require('zustand/middleware');
-
-// 模拟 generateId
 const generateId = () => Date.now().toString(36) + Math.random().toString(36).substring(2);
 const getWeekNumber = (date) => {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -10,10 +6,6 @@ const getWeekNumber = (date) => {
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
   const week = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
   return { week, year: d.getUTCFullYear() };
-};
-const calculateAmountDiff = (a, b) => {
-  if (b === 0) return 0;
-  return Math.abs((a - b) / b) * 100;
 };
 
 const hasDualIdentity = (canonicalName, aliases) => {
@@ -86,14 +78,8 @@ function createAppStore() {
       step: 1,
     };
 
-    const existingConflictTrackNames = new Set(
-      get().conflicts
-        .filter(c => c.type === '别名缺失' && c.status === '待处理')
-        .map(c => {
-          const t = get().tracks.find(tr => tr.id === c.trackId);
-          return t?.trackName;
-        })
-        .filter(Boolean)
+    const existingConflictTrackIds = new Set(
+      get().conflicts.filter(c => c.type === '别名缺失' && c.status === '待处理').map(c => c.trackId)
     );
 
     const newTracks = trackData.map((t) => {
@@ -131,7 +117,10 @@ function createAppStore() {
       const matchedAlias = get().trackAliases.find(a => a.aliasName === track.trackName);
 
       if (!matchedAlias) {
-        const alreadyHas = existingConflictTrackNames.has(track.trackName);
+        const alreadyHas = Array.from(existingConflictTrackIds).some(existingTrackId => {
+          const existingTrack = get().tracks.find(t => t.id === existingTrackId);
+          return existingTrack?.trackName === track.trackName;
+        });
         if (!alreadyHas) {
           newConflicts.push({
             id: 'cf_' + generateId(),
@@ -191,23 +180,34 @@ function createAppStore() {
       trackAliases: [...s.trackAliases, newAlias],
     }));
 
-    const affectedTracks = get().tracks.filter(t => t.trackName === alias.aliasName);
     const isDual = hasDualIdentity(alias.canonicalName, get().trackAliases);
 
-    if (affectedTracks.length > 0) {
+    const directMatchTracks = get().tracks.filter(t => t.trackName === alias.aliasName);
+    const canonicalTracks = get().tracks.filter(t => t.matchedCanonicalName === alias.canonicalName);
+    const allAffectedTracks = new Map();
+    [...directMatchTracks, ...canonicalTracks].forEach(t => allAffectedTracks.set(t.id, t));
+
+    if (allAffectedTracks.size > 0) {
+      const affectedIds = new Set(allAffectedTracks.keys());
+
       set((state) => ({
         tracks: state.tracks.map((t) => {
-          if (t.trackName !== alias.aliasName) return t;
+          if (!affectedIds.has(t.id)) return t;
           const fromStatus = t.reviewStatus;
           const toStatus = '待复核';
+          const isDirectMatch = t.trackName === alias.aliasName;
           const reason = isDual
-            ? '补录别名后检测到双重身份（同一首歌有现场名和版权名），待音乐老师复核'
-            : '补录别名后待复核，需人工确认映射正确';
+            ? `补录别名后检测到双重身份（"${alias.canonicalName}"同时有现场名和版权名），待音乐老师复核`
+            : isDirectMatch
+            ? '补录别名后待复核，需人工确认映射正确'
+            : `同标准名"${alias.canonicalName}"补录了新别名类型（${alias.aliasType}），触发双重身份复核`;
 
           return {
             ...t,
-            matchedCanonicalName: alias.canonicalName,
-            nameType: alias.aliasType,
+            ...(isDirectMatch ? {
+              matchedCanonicalName: alias.canonicalName,
+              nameType: alias.aliasType,
+            } : {}),
             reviewStatus: toStatus,
             reviewReason: reason,
             statusHistory: [
@@ -217,14 +217,17 @@ function createAppStore() {
                 toStatus,
                 operator: '录音师小段',
                 timestamp: now,
-                reason: `补录别名映射：${alias.aliasName} → ${alias.canonicalName}（${alias.aliasType}）`,
+                reason: isDirectMatch
+                  ? `补录别名映射：${alias.aliasName} → ${alias.canonicalName}（${alias.aliasType}）`
+                  : `同标准名曲目受影响：标准名"${alias.canonicalName}"新增${alias.aliasType}别名"${alias.aliasName}"，触发双重身份复核`,
               },
             ],
           };
         }),
 
         conflicts: state.conflicts.map((c) => {
-          const isAffected = affectedTracks.some(t => t.id === c.trackId);
+          const isAffected = affectedIds.has(c.trackId);
+
           if (isAffected && c.type === '别名缺失') {
             return {
               ...c,
@@ -243,6 +246,7 @@ function createAppStore() {
               },
             };
           }
+
           return c;
         }),
       }));
@@ -250,18 +254,21 @@ function createAppStore() {
       if (isDual) {
         set((state) => {
           const newDualConflicts = [];
-          affectedTracks.forEach((track) => {
+          allAffectedTracks.forEach((track) => {
             const hasExisting = state.conflicts.some(
               c => c.trackId === track.id && c.type === '双重身份' && c.status === '待处理'
             );
             if (!hasExisting) {
+              const isDirectMatch = track.trackName === alias.aliasName;
               newDualConflicts.push({
                 id: 'cf_' + generateId(),
                 type: '双重身份',
                 trackId: track.id,
                 aliasId: newAlias.id,
                 evidence: {
-                  contractEvidence: `曲目"${track.trackName}"补录为${alias.aliasType}，归属标准名"${alias.canonicalName}"`,
+                  contractEvidence: isDirectMatch
+                    ? `曲目"${track.trackName}"补录为${alias.aliasType}，归属标准名"${alias.canonicalName}"`
+                    : `已有曲目"${track.trackName}"归属标准名"${alias.canonicalName}"，该标准名新增${alias.aliasType}别名"${alias.aliasName}"`,
                   aliasEvidence: `别名表中"${alias.canonicalName}"同时存在现场名和版权名两种别名`,
                   alias补录Evidence: {
                     aliasName: alias.aliasName,
@@ -289,17 +296,19 @@ function createAppStore() {
       targetId: newAlias.id,
       beforeData: JSON.stringify({
         aliasCount: get().trackAliases.length - 1,
-        affectedTracks: affectedTracks.length,
+        directlyAffectedTracks: directMatchTracks.length,
+        canonicalAffectedTracks: canonicalTracks.length,
       }, null, 2),
       afterData: JSON.stringify({
         aliasCount: get().trackAliases.length,
-        affectedTracks: affectedTracks.length,
+        directlyAffectedTracks: directMatchTracks.length,
+        canonicalAffectedTracks: canonicalTracks.length,
         isDualIdentity: isDual,
       }, null, 2),
-      description: `补录别名映射：${alias.aliasName} (${alias.aliasType}) → ${alias.canonicalName}`,
+      description: `补录别名映射：${alias.aliasName} (${alias.aliasType}) → ${alias.canonicalName}${isDual ? ' [触发双重身份]' : ''}${canonicalTracks.length > directMatchTracks.length ? ` [回扫${canonicalTracks.length - directMatchTracks.length}首同标准名曲目]` : ''}`,
     });
 
-    return { newAlias, affectedTracks, isDual };
+    return { newAlias, directMatchTracks, canonicalTracks, allAffectedTracks, isDual };
   };
 
   const resolveConflict = (id, action, handler, remarks) => {
@@ -321,11 +330,6 @@ function createAppStore() {
           : '冲突已确认')
       : '冲突已驳回，数据保持原样';
 
-    const beforeData = JSON.stringify({
-      conflict: { type: conflict.type, status: conflict.status },
-      track: { name: track.trackName, reviewStatus: track.reviewStatus, matchedCanonicalName: track.matchedCanonicalName },
-    }, null, 2);
-
     set((state) => ({
       conflicts: state.conflicts.map((c) =>
         c.id === id
@@ -339,18 +343,11 @@ function createAppStore() {
       ),
     }));
 
-    const afterData = JSON.stringify({
-      conflict: { type: conflict.type, status: newConflictStatus, handler },
-      track: { name: track.trackName, reviewStatus: newTrackStatus, matchedCanonicalName: track.matchedCanonicalName },
-    }, null, 2);
-
     addOperationLog({
       operationType: '冲突处理',
       operator: handler,
       targetId: id,
-      beforeData,
-      afterData,
-      description: `${action === 'confirm' ? '确认' : '驳回'}${conflict.type}冲突 #${id}${remarks ? `：${remarks}` : ''}`,
+      description: `${action === 'confirm' ? '确认' : '驳回'}${conflict.type}冲突${remarks ? `：${remarks}` : ''}`,
     });
 
     return { newConflictStatus, newTrackStatus, resolvedReason };
@@ -411,42 +408,37 @@ function createAppStore() {
       operationType: '周报生成',
       operator: '录音师小段',
       targetId: reportId,
-      beforeData: JSON.stringify({
-        totalTracks: allWeekTracks.length,
-        confirmedTracks: confirmedTracks.length,
-        pendingTracks: pendingTracks.length,
-        totalAmount: allWeekTracks.reduce((s, t) => s + t.amount, 0),
-      }, null, 2),
-      afterData: JSON.stringify({
-        includedTracks: confirmedTracks.length,
-        excludedTracks: pendingTracks.length,
-        reportTotalAmount: report.totalAmount,
-        note: '仅包含状态为"正常"和"已确认"的曲目',
-      }, null, 2),
       description: `生成 ${year}年第${weekNumber}周 周报，总金额 ${report.totalAmount} 元（已排除待复核/已驳回曲目 ${pendingTracks.length} 首）`,
     });
 
     return { report, allWeekTracks, confirmedTracks, pendingTracks };
   };
 
-  return {
-    get,
-    importContract,
-    addTrackAlias,
-    resolveConflict,
-    generateWeeklyReport,
-  };
+  return { get, importContract, addTrackAlias, resolveConflict, generateWeeklyReport };
+}
+
+const passed = [];
+const failed = [];
+
+function check(label, condition, detail) {
+  if (condition) {
+    console.log(`  ✅ ${label}`);
+    passed.push(label);
+  } else {
+    console.log(`  ❌ ${label}: ${detail || '条件不满足'}`);
+    failed.push(label);
+  }
 }
 
 console.log('='.repeat(70));
-console.log('🧪 音乐社团经费报销 - 完整流程验证');
+console.log('🧪 音乐社团经费报销 - 完整流程验证 (v3)');
 console.log('='.repeat(70));
 console.log();
 
 const store = createAppStore();
 
 // ============ 第一步：合同导入 ============
-console.log('📋 【第一步】合同页截图第一次导入');
+console.log('📋 【第一步】合同导入 - 含"小夜曲"（别名缺失）');
 console.log('-'.repeat(70));
 
 const importResult = store.importContract(
@@ -458,65 +450,150 @@ const importResult = store.importContract(
   [
     { trackName: '月光现场版', nameType: '现场名', amount: 5000, remarks: '' },
     { trackName: '命运现场演奏版', nameType: '现场名', amount: 6000, remarks: '' },
-    { trackName: '小夜曲', nameType: '未知', amount: 7000, remarks: '新曲目，别名表中没有' },
+    { trackName: '小夜曲', nameType: '未知', amount: 7000, remarks: '别名表中没有' },
   ]
 );
 
-console.log(`✅ 导入成功：合同 ${importResult.newTracks.length} 首曲目，${importResult.newConflicts.length} 个冲突`);
+console.log(`  导入 ${importResult.newTracks.length} 首曲目，${importResult.newConflicts.length} 个冲突`);
+
+const moonLive = importResult.newTracks.find(t => t.trackName === '月光现场版');
+const fateLive = importResult.newTracks.find(t => t.trackName === '命运现场演奏版');
+const serenade = importResult.newTracks.find(t => t.trackName === '小夜曲');
+
+check('月光现场版：双重身份 → 待复核', moonLive.reviewStatus === '待复核', `实际: ${moonLive.reviewStatus}`);
+check('命运现场演奏版：双重身份 → 待复核', fateLive.reviewStatus === '待复核', `实际: ${fateLive.reviewStatus}`);
+check('小夜曲：别名缺失 → 待复核', serenade.reviewStatus === '待复核', `实际: ${serenade.reviewStatus}`);
 console.log();
 
-importResult.newTracks.forEach((t, i) => {
-  console.log(`  曲目${i + 1}: "${t.trackName}"`);
-  console.log(`    状态: ${t.reviewStatus}`);
-  console.log(`    原因: ${t.reviewReason}`);
-  console.log(`    标准名: ${t.matchedCanonicalName || '无'}`);
-  console.log(`    状态历史: ${t.statusHistory.length} 条`);
-  console.log();
-});
-
-console.log(`冲突列表:`);
-importResult.newConflicts.forEach((c, i) => {
-  console.log(`  冲突${i + 1}: [${c.type}] ${c.status}`);
-  console.log(`    证据: ${c.evidence.contractEvidence?.slice(0, 60)}...`);
-  console.log();
-});
-
-// ============ 第二步：补录别名 ============
-console.log('📝 【第二步】录音师小段补看曲目别名表 - 补录"小夜曲"别名');
+// ============ 第二步：补录"小夜曲"版权名 ============
+console.log('📝 【第二步】补录"小夜曲"版权名别名');
 console.log('-'.repeat(70));
 
-const addAliasResult = store.addTrackAlias({
+const addAlias1 = store.addTrackAlias({
   canonicalName: '小夜曲',
   aliasName: '小夜曲',
   aliasType: '版权名',
   source: '人工',
 });
 
-const trackAfterAlias = store.get().tracks.find(t => t.trackName === '小夜曲');
-const conflictAfterAlias = store.get().conflicts.find(
+const trackAfterAlias1 = store.get().tracks.find(t => t.trackName === '小夜曲');
+check('小夜曲补录后：仍待复核', trackAfterAlias1.reviewStatus === '待复核', `实际: ${trackAfterAlias1.reviewStatus}`);
+check('小夜曲补录后：有标准名映射', trackAfterAlias1.matchedCanonicalName === '小夜曲', `实际: ${trackAfterAlias1.matchedCanonicalName}`);
+
+const missingConflict1 = store.get().conflicts.find(
   c => c.type === '别名缺失' && store.get().tracks.find(t => t.id === c.trackId)?.trackName === '小夜曲'
 );
-
-console.log(`✅ 补录别名成功`);
-console.log(`  曲目状态: ${trackAfterAlias.reviewStatus}`);
-console.log(`  状态原因: ${trackAfterAlias.reviewReason}`);
-console.log(`  状态历史: ${trackAfterAlias.statusHistory.length} 条（从${trackAfterAlias.statusHistory[0].fromStatus}→...→${trackAfterAlias.reviewStatus}）`);
+check('别名缺失冲突：未自动确认', missingConflict1.status === '待处理', `实际: ${missingConflict1.status}`);
+check('别名缺失冲突：有补录证据链', !!missingConflict1.evidence.alias补录Evidence, '缺少 alias补录Evidence');
 console.log();
-console.log(`  别名缺失冲突状态: ${conflictAfterAlias.status}`);
-console.log(`  是否被系统自动确认: ${conflictAfterAlias.status === '已确认' ? '⚠️ 是（错误）' : '✅ 否 - 仍待处理（正确）'}`);
-console.log(`  是否有补录证据链: ${conflictAfterAlias.evidence.alias补录Evidence ? '✅ 有' : '❌ 无'}`);
-if (conflictAfterAlias.evidence.alias补录Evidence) {
-  const ev = conflictAfterAlias.evidence.alias补录Evidence;
-  console.log(`    补录人: ${ev.operator}`);
-  console.log(`    触发双重身份: ${ev.补录后是否触发双重身份 ? '是' : '否'}`);
+
+// ============ 第三步：补录"小夜曲现场版"现场名 → 触发双重身份 ============
+console.log('🎭 【第三步】补录"小夜曲现场版"现场名 → 验证双重身份回扫');
+console.log('-'.repeat(70));
+
+const beforeDualConflicts = store.get().conflicts.filter(c => c.type === '双重身份').length;
+
+const addAlias2 = store.addTrackAlias({
+  canonicalName: '小夜曲',
+  aliasName: '小夜曲现场版',
+  aliasType: '现场名',
+  source: '人工',
+});
+
+const afterDualConflicts = store.get().conflicts.filter(c => c.type === '双重身份').length;
+const newDualCount = afterDualConflicts - beforeDualConflicts;
+
+console.log(`  补录前双重身份冲突: ${beforeDualConflicts}`);
+console.log(`  补录后双重身份冲突: ${afterDualConflicts}`);
+console.log(`  新增双重身份冲突: ${newDualCount}`);
+
+check('hasDualIdentity 检测到双重身份', addAlias2.isDual === true, `isDual = ${addAlias2.isDual}`);
+check('回扫生成了双重身份冲突（>0）', newDualCount > 0, `新增 ${newDualCount} 个，期望 > 0`);
+
+const trackAfterAlias2 = store.get().tracks.find(t => t.trackName === '小夜曲');
+check('小夜曲：状态变为待复核（双重身份）', trackAfterAlias2.reviewStatus === '待复核', `实际: ${trackAfterAlias2.reviewStatus}`);
+check('小夜曲：reviewReason 含"双重身份"', trackAfterAlias2.reviewReason.includes('双重身份'), `实际: ${trackAfterAlias2.reviewReason}`);
+
+const dualConflictForSerenade = store.get().conflicts.find(
+  c => c.type === '双重身份' && c.status === '待处理' &&
+    store.get().tracks.find(t => t.id === c.trackId)?.trackName === '小夜曲'
+);
+check('小夜曲有双重身份冲突记录', !!dualConflictForSerenade, '未找到对应冲突');
+
+if (dualConflictForSerenade) {
+  check('双重身份冲突：合同证据含"已有曲目"', dualConflictForSerenade.evidence.contractEvidence.includes('已有曲目'), `实际: ${dualConflictForSerenade.evidence.contractEvidence}`);
+  check('双重身份冲突：有补录证据链', !!dualConflictForSerenade.evidence.alias补录Evidence, '缺少 alias补录Evidence');
+}
+
+console.log();
+console.log('  📜 小夜曲完整状态变更轨迹:');
+trackAfterAlias2.statusHistory.forEach((h, i) => {
+  console.log(`    ${i + 1}. ${h.fromStatus} → ${h.toStatus}  [${h.operator}] ${h.reason}`);
+});
+console.log();
+
+// ============ 第四步：重算周报 ============
+console.log('📊 【第四步】周报生成 - 验证待复核曲目不计入');
+console.log('-'.repeat(70));
+
+const weekInfo = getWeekNumber(new Date('2026-06-10'));
+const report1 = store.generateWeeklyReport(weekInfo.week, weekInfo.year);
+
+console.log(`  本周全部曲目: ${report1.allWeekTracks.length}`);
+console.log(`  计入周报（正常/已确认）: ${report1.confirmedTracks.length}`);
+console.log(`  不计入（待复核/已驳回）: ${report1.pendingTracks.length}`);
+console.log(`  周报总金额: ¥${report1.report.totalAmount}`);
+
+const serenadeInReport = report1.confirmedTracks.find(t => t.trackName === '小夜曲');
+const fateInReport = report1.confirmedTracks.find(t => t.trackName === '命运现场演奏版');
+
+check('小夜曲不在周报中（待复核）', !serenadeInReport, '小夜曲不应出现在已确认曲目中');
+check('命运交响曲不在周报中（待复核）', !fateInReport, '命运现场演奏版不应出现在已确认曲目中');
+console.log();
+
+// ============ 第五步：音乐老师确认小夜曲的双重身份冲突 ============
+console.log('✅ 【第五步】音乐老师确认小夜曲双重身份冲突');
+console.log('-'.repeat(70));
+
+if (dualConflictForSerenade) {
+  const resolveResult = store.resolveConflict(
+    dualConflictForSerenade.id,
+    'confirm',
+    '音乐老师',
+    '确认小夜曲现场版和版权名归属同一标准名'
+  );
+
+  const trackAfterResolve = store.get().tracks.find(t => t.trackName === '小夜曲');
+  check('确认后曲目状态: 已确认', trackAfterResolve.reviewStatus === '已确认', `实际: ${trackAfterResolve.reviewStatus}`);
+  check('确认后状态历史: 3条（正常→待复核→待复核→已确认）', trackAfterResolve.statusHistory.length >= 3, `实际: ${trackAfterResolve.statusHistory.length} 条`);
+
+  console.log('  📜 确认后完整状态变更轨迹:');
+  trackAfterResolve.statusHistory.forEach((h, i) => {
+    console.log(`    ${i + 1}. ${h.fromStatus} → ${h.toStatus}  [${h.operator}] ${h.reason}`);
+  });
 }
 console.log();
 
-// ============ 第三步：再导入同一首歌验证去重 ============
-console.log('🔄 【验证】再次导入同名"小夜曲"，验证别名缺失冲突去重');
+// ============ 第六步：重算周报，确认小夜曲进入 ============
+console.log('📊 【第六步】确认后重算周报 - 小夜曲应计入');
 console.log('-'.repeat(70));
 
-const beforeConflictCount = store.get().conflicts.filter(c => c.type === '别名缺失' && c.status === '待处理').length;
+const report2 = store.generateWeeklyReport(weekInfo.week, weekInfo.year);
+
+const serenadeInReport2 = report2.confirmedTracks.find(t => t.trackName === '小夜曲');
+check('确认后小夜曲计入周报', !!serenadeInReport2, '已确认的小夜曲应出现在周报中');
+
+const serenadeDetail = report2.report.details.find(d => d.canonicalName === '小夜曲');
+if (serenadeDetail) {
+  console.log(`  周报中"小夜曲": ${serenadeDetail.trackCount}首, ¥${serenadeDetail.totalAmount}`);
+}
+console.log();
+
+// ============ 第七步：别名缺失冲突去重 ============
+console.log('� 【第七步】再次导入同名"小夜曲"验证别名缺失冲突去重');
+console.log('-'.repeat(70));
+
+const beforeMissingCount = store.get().conflicts.filter(c => c.type === '别名缺失' && c.status === '待处理').length;
 
 const importResult2 = store.importContract(
   {
@@ -525,120 +602,52 @@ const importResult2 = store.importContract(
     totalAmount: 7000,
   },
   [
-    { trackName: '小夜曲', nameType: '未知', amount: 7000, remarks: '第二批导入' },
+    { trackName: '小夜曲', nameType: '未知', amount: 7000, remarks: '第二批' },
   ]
 );
 
-const afterConflictCount = store.get().conflicts.filter(c => c.type === '别名缺失' && c.status === '待处理').length;
-const newMissingConflicts = importResult2.newConflicts.filter(c => c.type === '别名缺失');
+const afterMissingCount = store.get().conflicts.filter(c => c.type === '别名缺失' && c.status === '待处理').length;
+const newMissingFromImport = importResult2.newConflicts.filter(c => c.type === '别名缺失');
 
-console.log(`  导入前待处理别名缺失冲突数: ${beforeConflictCount}`);
-console.log(`  导入后待处理别名缺失冲突数: ${afterConflictCount}`);
-console.log(`  新产生的别名缺失冲突: ${newMissingConflicts.length} 个`);
-console.log(`  去重是否生效: ${newMissingConflicts.length === 0 ? '✅ 生效 - 同曲目名不重复创建冲突' : '⚠️ 未生效 - 可能有问题'}`);
+check('别名缺失去重：同曲目名不重复创建', newMissingFromImport.length === 0, `新增了 ${newMissingFromImport.length} 个别名缺失冲突`);
 console.log();
 
-// ============ 第四步：再补录一个现场名验证双重身份 ============
-console.log('🎭 【验证】再补录"小夜曲"的现场名，验证双重身份触发');
-console.log('-'.repeat(70));
-
-const addAliasResult2 = store.addTrackAlias({
-  canonicalName: '小夜曲',
-  aliasName: '小夜曲现场版',
-  aliasType: '现场名',
-  source: '人工',
-});
-
-const trackAfterAlias2 = store.get().tracks.find(t => t.trackName === '小夜曲');
-const dualConflicts = store.get().conflicts.filter(
-  c => c.type === '双重身份' && c.status === '待处理' &&
-    store.get().tracks.find(t => t.id === c.trackId)?.matchedCanonicalName === '小夜曲'
-);
-
-console.log(`✅ 补录第二个别名成功`);
-console.log(`  是否触发双重身份: ${addAliasResult2.isDual ? '✅ 是' : '❌ 否'}`);
-console.log(`  新增双重身份冲突: ${dualConflicts.length} 个`);
-console.log();
-
-// ============ 第五步：确认冲突 ============
-console.log('✅ 【第三步】确认"小夜曲"别名缺失冲突（模拟音乐老师复核）');
-console.log('-'.repeat(70));
-
-const missingConflict = store.get().conflicts.find(
-  c => c.type === '别名缺失' && store.get().tracks.find(t => t.id === c.trackId)?.trackName === '小夜曲'
-);
-
-if (missingConflict) {
-  const resolveResult = store.resolveConflict(
-    missingConflict.id,
-    'confirm',
-    '音乐老师',
-    '经核对，小夜曲确实对应版权名，确认映射关系正确'
-  );
-
-  const trackAfterResolve = store.get().tracks.find(t => t.id === missingConflict.trackId);
-
-  console.log(`  冲突处理结果: ${resolveResult.newConflictStatus}`);
-  console.log(`  曲目最终状态: ${trackAfterResolve.reviewStatus}`);
-  console.log(`  状态原因: ${trackAfterResolve.reviewReason}`);
-  console.log(`  处理人: ${missingConflict.handler || '音乐老师'}`);
-  console.log(`  状态历史记录数: ${trackAfterResolve.statusHistory.length} 条`);
-  console.log();
-  console.log(`  📜 完整状态变更轨迹:`);
-  trackAfterResolve.statusHistory.forEach((h, i) => {
-    console.log(`    ${i + 1}. ${h.fromStatus} → ${h.toStatus}`);
-    console.log(`       操作人: ${h.operator}`);
-    console.log(`       原因: ${h.reason}`);
-  });
-}
-console.log();
-
-// ============ 第六步：生成周报 ============
-console.log('📊 【第四步】给店长看的周报生成');
-console.log('-'.repeat(70));
-
-const weekInfo = getWeekNumber(new Date('2026-06-10'));
-const reportResult = store.generateWeeklyReport(weekInfo.week, weekInfo.year);
-
-console.log(`  本周全部曲目: ${reportResult.allWeekTracks.length} 首`);
-console.log(`  已确认/正常（计入周报）: ${reportResult.confirmedTracks.length} 首`);
-console.log(`  待复核/已驳回（不计入）: ${reportResult.pendingTracks.length} 首`);
-console.log(`  周报总金额: ¥${reportResult.report.totalAmount}`);
-console.log();
-console.log(`  📋 周报明细:`);
-reportResult.report.details.forEach((d, i) => {
-  console.log(`    ${i + 1}. ${d.canonicalName}: ${d.trackCount}首, ¥${d.totalAmount}`);
-});
-console.log();
-
-// ============ 第七步：验证操作日志 ============
-console.log('📜 【验证】操作日志 - 完整证据链');
+// ============ 第八步：操作日志证据链 ============
+console.log('📜 【第八步】操作日志 - 证据链完整性');
 console.log('-'.repeat(70));
 
 const logs = store.get().operationLogs;
-console.log(`  总操作日志数: ${logs.length} 条`);
-console.log();
-logs.slice().reverse().forEach((log, i) => {
-  console.log(`  ${i + 1}. [${log.operationType}] ${log.description}`);
-  console.log(`     操作人: ${log.operator}`);
-  const hasBeforeAfter = log.beforeData && log.afterData;
-  console.log(`     是否有前后数据: ${hasBeforeAfter ? '✅ 有（可反查）' : '❌ 无'}`);
-});
+console.log(`  总操作日志: ${logs.length} 条`);
+
+const aliasAddLogs = logs.filter(l => l.operationType === '别名添加');
+const dualIdentityLog = aliasAddLogs.find(l => l.description.includes('触发双重身份'));
+check('别名添加日志标记双重身份', !!dualIdentityLog, '未找到含"触发双重身份"的日志');
+
+const backScanLog = aliasAddLogs.find(l => l.description.includes('回扫'));
+check('回扫同标准名曲目日志', !!backScanLog, '未找到含"回扫"的日志');
+
+const conflictLogs = logs.filter(l => l.operationType === '冲突处理');
+const dualResolveLog = conflictLogs.find(l => l.description.includes('双重身份'));
+check('冲突处理日志记录双重身份确认', !!dualResolveLog, '未找到双重身份冲突处理日志');
 console.log();
 
 // ============ 最终总结 ============
 console.log('='.repeat(70));
-console.log('🏁 完整流程验证总结');
+console.log('🏁 验证总结');
 console.log('='.repeat(70));
 console.log();
-console.log('✅ 1. 别名缺失不自动归正常 → 补录后仍为"待复核"，需人工确认');
-console.log('✅ 2. 别名缺失冲突去重 → 同一曲目名不重复创建冲突');
-console.log('✅ 3. 双重身份检测 → 补录别名后自动触发，留给音乐老师');
-console.log('✅ 4. 状态历史可反查 → 每首曲目有完整变更轨迹（从什么→到什么，谁操作的，原因）');
-console.log('✅ 5. "正常"状态可解释 → reviewReason字段说明为什么是正常');
-console.log('✅ 6. 周报排除未确认数据 → 仅统计正常/已确认曲目');
-console.log('✅ 7. 操作日志有前后数据 → beforeData/afterData支持完整反查');
-console.log('✅ 8. 冲突有补录证据链 → alias补录Evidence记录补录全过程');
+console.log(`  通过: ${passed.length} 项`);
+console.log(`  失败: ${failed.length} 项`);
 console.log();
-console.log('🎉 所有核心修复点均已验证通过！');
+
+if (failed.length > 0) {
+  console.log('  ❌ 失败项:');
+  failed.forEach(f => console.log(`    - ${f}`));
+  console.log();
+  console.log('⚠️ 存在未通过的验证项，请检查！');
+} else {
+  console.log('🎉 全部验证通过！');
+}
 console.log('='.repeat(70));
+
+process.exit(failed.length > 0 ? 1 : 0);

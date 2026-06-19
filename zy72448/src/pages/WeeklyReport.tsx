@@ -14,7 +14,7 @@ import { useAppStore } from '../store';
 import { formatCurrency, formatDateTime, getWeekNumber, downloadCSV } from '../utils/helpers';
 
 export default function WeeklyReport() {
-  const { weeklyReports, generateWeeklyReport, contracts, tracks } = useAppStore();
+  const { weeklyReports, generateWeeklyReport } = useAppStore();
   const currentWeek = getWeekNumber(new Date());
   const [selectedWeek, setSelectedWeek] = useState(currentWeek.week);
   const [selectedYear, setSelectedYear] = useState(currentWeek.year);

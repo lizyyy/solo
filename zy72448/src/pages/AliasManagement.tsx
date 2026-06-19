@@ -3,7 +3,6 @@ import {
   Plus,
   Tags,
   Search,
-  Trash2,
   Filter,
   BookOpen,
 } from 'lucide-react';

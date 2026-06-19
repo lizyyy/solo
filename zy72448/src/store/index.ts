@@ -58,10 +58,12 @@ const initialMockData = () => {
       trackName: '命运现场演奏版',
       nameType: '现场名',
       amount: 5000,
-      reviewStatus: '正常',
+      reviewStatus: '待复核',
       matchedCanonicalName: '命运交响曲',
-      reviewReason: '合同导入时匹配别名表，仅单一类型映射，自动归正常',
-      statusHistory: makeInitialStatus('合同导入时匹配别名表，仅单一类型映射'),
+      reviewReason: '同一标准名同时存在现场名和版权名，待音乐老师复核',
+      statusHistory: [
+        { fromStatus: '正常', toStatus: '待复核', operator: '系统', timestamp: now, reason: '检测到双重身份（同一首歌有现场名和版权名）' },
+      ],
     },
     {
       id: generateId(),
@@ -93,10 +95,12 @@ const initialMockData = () => {
       trackName: 'Symphony No.5',
       nameType: '版权名',
       amount: 8000,
-      reviewStatus: '正常',
+      reviewStatus: '待复核',
       matchedCanonicalName: '命运交响曲',
-      reviewReason: '合同导入时匹配别名表，仅单一类型映射，自动归正常',
-      statusHistory: makeInitialStatus('合同导入时匹配别名表，仅单一类型映射'),
+      reviewReason: '同一标准名同时存在现场名和版权名，待音乐老师复核',
+      statusHistory: [
+        { fromStatus: '正常', toStatus: '待复核', operator: '系统', timestamp: now, reason: '检测到双重身份（同一首歌有现场名和版权名）' },
+      ],
     },
     {
       id: generateId(),
@@ -121,6 +125,42 @@ const initialMockData = () => {
       evidence: {
         contractEvidence: '合同 HT-2026-001 中曲目"月光现场版"为现场名',
         aliasEvidence: '别名表中"月光奏鸣曲"同时存在现场名和版权名两种别名',
+      },
+      status: '待处理',
+      createdAt: now,
+    },
+    {
+      id: generateId(),
+      type: '双重身份',
+      trackId: tracks[1].id,
+      aliasId: trackAliases[2].id,
+      evidence: {
+        contractEvidence: '合同 HT-2026-001 中曲目"命运现场演奏版"为现场名',
+        aliasEvidence: '别名表中"命运交响曲"同时存在现场名和版权名两种别名',
+      },
+      status: '待处理',
+      createdAt: now,
+    },
+    {
+      id: generateId(),
+      type: '双重身份',
+      trackId: tracks[3].id,
+      aliasId: trackAliases[1].id,
+      evidence: {
+        contractEvidence: '合同 HT-2026-002 中曲目"Moonlight Sonata"为版权名',
+        aliasEvidence: '别名表中"月光奏鸣曲"同时存在现场名和版权名两种别名',
+      },
+      status: '待处理',
+      createdAt: now,
+    },
+    {
+      id: generateId(),
+      type: '双重身份',
+      trackId: tracks[4].id,
+      aliasId: trackAliases[3].id,
+      evidence: {
+        contractEvidence: '合同 HT-2026-002 中曲目"Symphony No.5"为版权名',
+        aliasEvidence: '别名表中"命运交响曲"同时存在现场名和版权名两种别名',
       },
       status: '待处理',
       createdAt: now,
@@ -184,10 +224,6 @@ export const useAppStore = create<AppState>()(
           status: 'imported',
           step: 1,
         };
-
-        const existingTrackNames = new Set(
-          get().tracks.map(t => t.trackName)
-        );
 
         const existingConflictTrackIds = new Set(
           get().conflicts.filter(c => c.type === '别名缺失' && c.status === '待处理').map(c => c.trackId)
@@ -314,24 +350,34 @@ export const useAppStore = create<AppState>()(
           trackAliases: [...state.trackAliases, newAlias],
         }));
 
-        const affectedTracks = get().tracks.filter(t => t.trackName === alias.aliasName);
         const isDualIdentity = hasDualIdentity(alias.canonicalName, get().trackAliases);
 
-        if (affectedTracks.length > 0) {
+        const directMatchTracks = get().tracks.filter(t => t.trackName === alias.aliasName);
+        const canonicalTracks = get().tracks.filter(t => t.matchedCanonicalName === alias.canonicalName);
+        const allAffectedTracks = new Map<string, Track>();
+        [...directMatchTracks, ...canonicalTracks].forEach(t => allAffectedTracks.set(t.id, t));
+
+        if (allAffectedTracks.size > 0) {
+          const affectedIds = new Set(allAffectedTracks.keys());
 
           set((state) => ({
             tracks: state.tracks.map((t) => {
-              if (t.trackName !== alias.aliasName) return t;
+              if (!affectedIds.has(t.id)) return t;
               const fromStatus = t.reviewStatus;
-              const toStatus: Track['reviewStatus'] = isDualIdentity ? '待复核' : '待复核';
+              const toStatus: Track['reviewStatus'] = '待复核';
+              const isDirectMatch = t.trackName === alias.aliasName;
               const reason = isDualIdentity
-                ? '补录别名后检测到双重身份（同一首歌有现场名和版权名），待音乐老师复核'
-                : '补录别名后待复核，需人工确认映射正确';
+                ? `补录别名后检测到双重身份（"${alias.canonicalName}"同时有现场名和版权名），待音乐老师复核`
+                : isDirectMatch
+                ? '补录别名后待复核，需人工确认映射正确'
+                : `同标准名"${alias.canonicalName}"补录了新别名类型（${alias.aliasType}），触发双重身份复核`;
 
               return {
                 ...t,
-                matchedCanonicalName: alias.canonicalName,
-                nameType: alias.aliasType,
+                ...(isDirectMatch ? {
+                  matchedCanonicalName: alias.canonicalName,
+                  nameType: alias.aliasType,
+                } : {}),
                 reviewStatus: toStatus,
                 reviewReason: reason,
                 statusHistory: [
@@ -341,14 +387,16 @@ export const useAppStore = create<AppState>()(
                     toStatus,
                     operator: '录音师小段',
                     timestamp: now,
-                    reason: `补录别名映射：${alias.aliasName} → ${alias.canonicalName}（${alias.aliasType}）`,
+                    reason: isDirectMatch
+                      ? `补录别名映射：${alias.aliasName} → ${alias.canonicalName}（${alias.aliasType}）`
+                      : `同标准名曲目受影响：标准名"${alias.canonicalName}"新增${alias.aliasType}别名"${alias.aliasName}"，触发双重身份复核`,
                   },
                 ],
               };
             }),
 
             conflicts: state.conflicts.map((c) => {
-              const isAffected = affectedTracks.some(t => t.id === c.trackId);
+              const isAffected = affectedIds.has(c.trackId);
 
               if (isAffected && c.type === '别名缺失') {
                 return {
@@ -380,18 +428,21 @@ export const useAppStore = create<AppState>()(
           if (isDualIdentity) {
             set((state) => {
               const newDualConflicts: Conflict[] = [];
-              affectedTracks.forEach((track) => {
+              allAffectedTracks.forEach((track) => {
                 const hasExistingDual = state.conflicts.some(
                   c => c.trackId === track.id && c.type === '双重身份' && c.status === '待处理'
                 );
                 if (!hasExistingDual) {
+                  const isDirectMatch = track.trackName === alias.aliasName;
                   newDualConflicts.push({
                     id: generateId(),
                     type: '双重身份',
                     trackId: track.id,
                     aliasId: newAlias.id,
                     evidence: {
-                      contractEvidence: `曲目"${track.trackName}"补录为${alias.aliasType}，归属标准名"${alias.canonicalName}"`,
+                      contractEvidence: isDirectMatch
+                        ? `曲目"${track.trackName}"补录为${alias.aliasType}，归属标准名"${alias.canonicalName}"`
+                        : `已有曲目"${track.trackName}"归属标准名"${alias.canonicalName}"，该标准名新增${alias.aliasType}别名"${alias.aliasName}"`,
                       aliasEvidence: `别名表中"${alias.canonicalName}"同时存在现场名和版权名两种别名`,
                       alias补录Evidence: {
                         aliasName: alias.aliasName,
@@ -415,16 +466,20 @@ export const useAppStore = create<AppState>()(
           }
         }
 
+        const affectedTrackNames = Array.from(allAffectedTracks.values()).map(t => t.trackName);
         const beforeData = JSON.stringify({
           aliasCount: get().trackAliases.length - 1,
-          affectedTracks: affectedTracks.length,
-          affectedTrackNames: affectedTracks.map(t => t.trackName),
+          directlyAffectedTracks: directMatchTracks.length,
+          canonicalAffectedTracks: canonicalTracks.length,
+          totalAffectedTracks: allAffectedTracks.size,
         }, null, 2);
 
         const afterData = JSON.stringify({
           aliasCount: get().trackAliases.length,
-          affectedTracks: affectedTracks.length,
-          affectedTrackNames: affectedTracks.map(t => t.trackName),
+          directlyAffectedTracks: directMatchTracks.length,
+          canonicalAffectedTracks: canonicalTracks.length,
+          totalAffectedTracks: allAffectedTracks.size,
+          affectedTrackNames,
           isDualIdentity,
         }, null, 2);
 
@@ -434,7 +489,7 @@ export const useAppStore = create<AppState>()(
           targetId: newAlias.id,
           beforeData,
           afterData,
-          description: `补录别名映射：${alias.aliasName} (${alias.aliasType}) → ${alias.canonicalName}`,
+          description: `补录别名映射：${alias.aliasName} (${alias.aliasType}) → ${alias.canonicalName}${isDualIdentity ? ' [触发双重身份]' : ''}${canonicalTracks.length > directMatchTracks.length ? ` [回扫${canonicalTracks.length - directMatchTracks.length}首同标准名曲目]` : ''}`,
         });
       },
 
@@ -822,7 +877,7 @@ export const useAppStore = create<AppState>()(
       },
     }),
     {
-      name: 'music-club-reimbursement-v2',
+      name: 'music-club-reimbursement-v3',
     }
   )
 );

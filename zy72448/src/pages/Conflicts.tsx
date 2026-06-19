@@ -8,7 +8,6 @@ import {
   Music,
   User,
   Clock,
-  MessageSquare,
   Filter,
   Tags,
   History,
