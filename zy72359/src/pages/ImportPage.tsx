@@ -201,6 +201,16 @@ function RecordsTable({ records, audits, activeBatchId }: {
                 {isOpen && (
                   <tr key={`${r.id}-audit`} className="bg-steel-50/40 border-t border-steel-100">
                     <td colSpan={11} className="px-6 py-3">
+                      <div className="mb-3 grid grid-cols-2 gap-3">
+                        <div className="rounded-md border border-steel-200 bg-white px-3 py-2">
+                          <div className="text-[11px] font-sans font-medium text-steel-500 mb-0.5">改系数原因</div>
+                          <div className="font-mono text-xs text-steel-800">{r.coefficientChangeReason ?? '—'}</div>
+                        </div>
+                        <div className="rounded-md border border-steel-200 bg-white px-3 py-2">
+                          <div className="text-[11px] font-sans font-medium text-steel-500 mb-0.5">工程师意见</div>
+                          <div className="font-mono text-xs text-steel-800">{r.engineerComment ?? '—'}</div>
+                        </div>
+                      </div>
                       <div className="mb-2 text-[11px] font-sans font-medium text-steel-500">审计时间线（共 {rowAudits.length} 条）</div>
                       <div className="space-y-2">
                         {rowAudits.map((a) => (

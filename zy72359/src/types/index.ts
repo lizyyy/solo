@@ -8,7 +8,7 @@ export interface AuditEntry {
   oldValue: string | number | null
   newValue: string | number | null
   reason: string | null
-  action: 'import' | 'update' | 'confirm' | 'reject' | 'review_approve' | 'review_reject'
+  action: 'import' | 'update' | 'confirm' | 'reject' | 'review_approve' | 'review_reject' | 'sensor_note_patch'
 }
 
 export interface CalibrationRecord {
@@ -23,6 +23,7 @@ export interface CalibrationRecord {
   coefficient: number
   originalCoefficient: number | null
   coefficientChangeReason: string | null
+  engineerComment: string | null
   status: 'normal' | 'conflict' | 'pending_review' | 'reviewed'
   nextHandler: 'inspector' | 'engineer' | null
   nextHandlerNote: string | null
@@ -105,6 +106,7 @@ export const ACTION_LABELS: Record<AuditEntry['action'], string> = {
   reject: '驳回冲突',
   review_approve: '复核通过',
   review_reject: '复核驳回',
+  sensor_note_patch: '补录传感器备注',
 }
 
 export const ACTION_COLORS: Record<AuditEntry['action'], string> = {
@@ -114,6 +116,7 @@ export const ACTION_COLORS: Record<AuditEntry['action'], string> = {
   reject: 'bg-red-50 text-red-700 border-red-200',
   review_approve: 'bg-blue-50 text-blue-700 border-blue-200',
   review_reject: 'bg-amber-50 text-amber-700 border-amber-200',
+  sensor_note_patch: 'bg-cyan-50 text-cyan-700 border-cyan-200',
 }
 
 export const ROLE_LABELS: Record<UserRole, string> = {

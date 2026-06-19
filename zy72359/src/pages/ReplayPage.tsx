@@ -80,6 +80,18 @@ function CurveSection({ selectedId, setSelectedId }: Props) {
               <div className="flex-1 rounded-md border border-steel-100 bg-steel-50/60 p-3"><p className="mb-1 text-xs font-medium text-steel-500">版本号</p><p className="font-mono text-xl font-bold text-steel-900">v{curve.version}</p></div>
               <span className={`rounded-md border px-2 py-1 text-xs font-medium ${STATUS_COLORS[record.status]}`}>{STATUS_LABELS[record.status]}</span>
             </div>
+            <div className="rounded-md border border-steel-100 bg-steel-50/60 p-3">
+              <p className="mb-1 text-xs font-medium text-steel-500">改系数原因</p>
+              <p className={`font-mono text-sm ${record.coefficientChangeReason ? 'text-steel-800' : 'text-amber-600'}`}>
+                {record.coefficientChangeReason ?? '未填写'}
+              </p>
+            </div>
+            <div className="rounded-md border border-steel-100 bg-steel-50/60 p-3">
+              <p className="mb-1 text-xs font-medium text-steel-500">工程师意见</p>
+              <p className={`font-mono text-sm ${record.engineerComment ? 'text-steel-800' : 'text-steel-400'}`}>
+                {record.engineerComment ?? '—'}
+              </p>
+            </div>
             {record.nextHandler && (
               <div className="rounded-md border border-amber-100 bg-amber-50/50 p-3">
                 <div className="flex items-center gap-1.5"><User className="h-3.5 w-3.5 text-amber-700" /><span className="text-xs font-medium text-amber-800">下一步处理人：{NEXT_HANDLER_LABELS[record.nextHandler]}</span></div>
@@ -140,6 +152,11 @@ function CoefficientMarkSection() {
                       {a.reason && <><span className="text-steel-300">·</span><span className="text-steel-500">{a.reason}</span></>}
                     </div>
                   ))}
+                </div>
+              )}
+              {r.engineerComment && (
+                <div className="mb-2.5 rounded-md border border-blue-200 bg-blue-50 px-3 py-2">
+                  <p className="text-xs font-medium text-blue-700">工程师意见：{r.engineerComment}</p>
                 </div>
               )}
               <div className="flex gap-2">

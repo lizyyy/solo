@@ -90,8 +90,8 @@ function ExportSection() {
       const url = URL.createObjectURL(blob); const a = document.createElement('a')
       a.href = url; a.download = `校准明细-${Date.now()}.json`; a.click(); URL.revokeObjectURL(url)
     } else {
-      const hs = ['traceId','importBatchId','batchNo','sensorNo','temperatureCalibration','sensorNote','mainMaterial','coefficient','originalCoefficient','coefficientChangeReason','status','nextHandler','auditCount']
-      const rs = data.map((r) => [r.traceId,r.importBatchId,r.batchNo,r.sensorNo,r.temperatureCalibration,`"${r.sensorNote.replace(/"/g,'""')}"`,r.mainMaterial,String(r.coefficient),r.originalCoefficient??'',r.coefficientChangeReason??'',STATUS_LABELS[r.status],r.nextHandler?NEXT_HANDLER_LABELS[r.nextHandler]:'',String(r.audits.length)].join(','))
+      const hs = ['traceId','importBatchId','batchNo','sensorNo','temperatureCalibration','sensorNote','mainMaterial','coefficient','originalCoefficient','coefficientChangeReason','engineerComment','status','nextHandler','auditCount']
+      const rs = data.map((r) => [r.traceId,r.importBatchId,r.batchNo,r.sensorNo,r.temperatureCalibration,`"${r.sensorNote.replace(/"/g,'""')}"`,r.mainMaterial,String(r.coefficient),r.originalCoefficient??'',r.coefficientChangeReason??'',r.engineerComment??'',STATUS_LABELS[r.status],r.nextHandler?NEXT_HANDLER_LABELS[r.nextHandler]:'',String(r.audits.length)].join(','))
       const csv = [hs.join(','), ...rs].join('\n')
       const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' })
       const url = URL.createObjectURL(blob); const a = document.createElement('a')
@@ -119,7 +119,7 @@ function ExportSection() {
       <div className="overflow-x-auto rounded-md border border-steel-200">
         <table className="w-full text-left">
           <thead><tr className="bg-steel-100/80">
-            {['反查主键','批次号','传感器号','主材料','温度校准','系数','原始系数','改系数原因','状态','下一步处理人','审计历史','三端一致性'].map((h) => <th key={h} className="px-3 py-2 text-xs font-semibold text-steel-600">{h}</th>)}
+            {['反查主键','批次号','传感器号','主材料','温度校准','系数','原始系数','改系数原因','工程师意见','状态','下一步处理人','审计历史','三端一致性'].map((h) => <th key={h} className="px-3 py-2 text-xs font-semibold text-steel-600">{h}</th>)}
           </tr></thead>
           <tbody>
             {data.map((r) => (
@@ -138,13 +138,14 @@ function ExportSection() {
                   <td className={`px-3 py-2 ${M} text-steel-800`}>{r.coefficient}</td>
                   <td className={`px-3 py-2 ${M} text-steel-800`}>{r.originalCoefficient ?? '-'}</td>
                   <td className={`px-3 py-2 ${M} text-steel-800 max-w-[120px] truncate`}>{r.coefficientChangeReason ?? '-'}</td>
+                  <td className={`px-3 py-2 ${M} text-steel-800 max-w-[120px] truncate`}>{r.engineerComment ?? '-'}</td>
                   <td className="px-3 py-2"><span className={`inline-block rounded border px-1.5 py-0.5 text-[10px] font-medium ${STATUS_COLORS[r.status]}`}>{STATUS_LABELS[r.status]}</span></td>
                   <td className="px-3 py-2">{r.nextHandler ? <span className="inline-flex items-center gap-0.5 rounded border border-steel-200 bg-steel-50 px-1.5 py-0.5 text-[10px] font-medium text-steel-700"><User className="h-2.5 w-2.5" />{NEXT_HANDLER_LABELS[r.nextHandler]}</span> : <span className="text-[10px] text-steel-400">-</span>}</td>
                   <td className="px-3 py-2"><button onClick={() => toggle(r.id)} className={`${B}`}><History className="h-2.5 w-2.5" />{r.audits.length} 次{ea.has(r.id) ? <ChevronUp className="h-2.5 w-2.5" /> : <ChevronDown className="h-2.5 w-2.5" />}</button></td>
                   <td className="px-3 py-2">{badge(r)}</td>
                 </tr>
                 {ea.has(r.id) && (
-                  <tr className="bg-steel-50/80"><td colSpan={12} className="px-3 py-2"><div className="space-y-1 pl-8">
+                  <tr className="bg-steel-50/80"><td colSpan={13} className="px-3 py-2"><div className="space-y-1 pl-8">
                     {r.audits.map((a) => (
                       <div key={a.id} className="flex items-start gap-2 rounded bg-white px-2 py-1.5 border border-steel-100">
                         <span className={`rounded px-1 py-0.5 text-[9px] font-medium border ${ACTION_COLORS[a.action]}`}>{ACTION_LABELS[a.action]}</span>
@@ -169,8 +170,8 @@ function ConsistencySection() {
   const getApiReturnData = useStore((s) => s.getApiReturnData)
   const ed = useMemo(() => getExportData(), [getExportData])
   const ad = useMemo(() => getApiReturnData(), [getApiReturnData])
-  const kf = ['status', 'coefficient', 'nextHandler', 'coefficientChangeReason'] as const
-  const fl: Record<string, string> = { status: '状态', coefficient: '系数', nextHandler: '下一步处理人', coefficientChangeReason: '改系数原因' }
+  const kf = ['status', 'coefficient', 'nextHandler', 'coefficientChangeReason', 'engineerComment'] as const
+  const fl: Record<string, string> = { status: '状态', coefficient: '系数', nextHandler: '下一步处理人', coefficientChangeReason: '改系数原因', engineerComment: '工程师意见' }
   const cmp = useMemo(() => records.map((p) => {
     const e = ed.find((r) => r.id === p.id); const a = ad.find((r) => r.id === p.id)
     const diffs: string[] = []
@@ -264,7 +265,13 @@ function ReportSection() {
                   <span className="mx-1 text-steel-400">↔</span><span className="text-steel-600">{r.sensorNote.slice(0, 40)}...</span>
                 </p>
                 <p className="text-xs text-steel-700"><span className="font-semibold text-steel-900">系数变更：</span>
-                  {r.originalCoefficient !== null ? (<><span className={`${M} text-red-600 line-through ml-1`}>{r.originalCoefficient}</span><ArrowRight className="mx-1 inline h-2.5 w-2.5 text-steel-400" /><span className={`${M} text-emerald-700`}>{r.coefficient}</span><span className="ml-1 text-steel-500">原因：{r.coefficientChangeReason || <span className="text-amber">未填写</span>}</span></>) : <span className={`ml-1 ${M} text-steel-600`}>{r.coefficient}（未修改）</span>}
+                  {r.originalCoefficient !== null ? (<><span className={`${M} text-red-600 line-through ml-1`}>{r.originalCoefficient}</span><ArrowRight className="mx-1 inline h-2.5 w-2.5 text-steel-400" /><span className={`${M} text-emerald-700`}>{r.coefficient}</span></>) : <span className={`ml-1 ${M} text-steel-600`}>{r.coefficient}（未修改）</span>}
+                </p>
+                <p className="text-xs text-steel-700"><span className="font-semibold text-steel-900">改系数原因：</span>
+                  <span className={`ml-1 ${M} ${r.coefficientChangeReason ? 'text-steel-700' : 'text-amber-600'}`}>{r.coefficientChangeReason || '未填写'}</span>
+                </p>
+                <p className="text-xs text-steel-700"><span className="font-semibold text-steel-900">工程师意见：</span>
+                  <span className={`ml-1 ${M} ${r.engineerComment ? 'text-blue-700' : 'text-steel-400'}`}>{r.engineerComment || '—'}</span>
                 </p>
                 {r.curve?.calculationDetail && <p className="text-xs text-steel-600"><span className="font-semibold text-steel-900">计算明细：</span><span className={`ml-1 ${M} text-[10px] text-steel-500`}>{r.curve.calculationDetail}</span></p>}
               </div>

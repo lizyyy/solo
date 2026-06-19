@@ -32,6 +32,7 @@ const INITIAL_RECORDS: CalibrationRecord[] = [
     coefficient: 1.0,
     originalCoefficient: null,
     coefficientChangeReason: null,
+    engineerComment: null,
     status: 'normal',
     nextHandler: null,
     nextHandlerNote: null,
@@ -52,6 +53,7 @@ const INITIAL_RECORDS: CalibrationRecord[] = [
     coefficient: 1.12,
     originalCoefficient: null,
     coefficientChangeReason: null,
+    engineerComment: null,
     status: 'conflict',
     nextHandler: 'inspector',
     nextHandlerNote: '温度校准值 22.5°C 与传感器备注 28.0°C 矛盾，请质检员确认',
@@ -72,6 +74,7 @@ const INITIAL_RECORDS: CalibrationRecord[] = [
     coefficient: 0.95,
     originalCoefficient: 1.0,
     coefficientChangeReason: null,
+    engineerComment: null,
     status: 'pending_review',
     nextHandler: 'engineer',
     nextHandlerNote: '系数从 1.0 修改为 0.95 但未填写原因，请设备工程师复核',
@@ -92,6 +95,7 @@ const INITIAL_RECORDS: CalibrationRecord[] = [
     coefficient: 1.0,
     originalCoefficient: null,
     coefficientChangeReason: null,
+    engineerComment: null,
     status: 'normal',
     nextHandler: null,
     nextHandlerNote: null,
@@ -112,6 +116,7 @@ const INITIAL_RECORDS: CalibrationRecord[] = [
     coefficient: 0.88,
     originalCoefficient: null,
     coefficientChangeReason: null,
+    engineerComment: null,
     status: 'normal',
     nextHandler: null,
     nextHandlerNote: null,
@@ -214,6 +219,7 @@ function runSelfCheck(
   records: CalibrationRecord[],
   conflicts: ConflictEvidence[],
   audits: AuditEntry[],
+  curves: PumpSpeedCurve[],
 ): SelfCheckResult[] {
   const now = NOW()
   const affected: Record<string, string[]> = {}
@@ -235,10 +241,10 @@ function runSelfCheck(
 
   const patched = records.filter((r) => r.originalCoefficient !== null)
   const recalcFailed = patched.filter((r) => {
-    const baseSpeed = BASE_SPEED_MAP[r.id]
-    if (!baseSpeed) return false
-    const expected = applyCoefficient(baseSpeed, r.coefficient)
-    return !r.coefficientChangeReason && Math.abs(r.coefficient - r.originalCoefficient!) > 0.0001
+    const curve = curves.find((c) => c.recordId === r.id)
+    if (!curve) return false
+    const expected = applyCoefficient(curve.baseSpeed, r.coefficient)
+    return curve.speed.some((v, i) => Math.abs(v - expected[i]) > 0.01)
   })
   const recalcPassed = recalcFailed.length === 0
   affected.recalc_after_patch = recalcFailed.map((r) => r.id)
@@ -399,7 +405,7 @@ export const useStore = create<StoreState>((set, get) => ({
   curves: INITIAL_CURVES,
   audits: INITIAL_AUDIT,
   batches: INITIAL_BATCHES,
-  selfCheckResults: runSelfCheck(INITIAL_RECORDS, INITIAL_CONFLICTS, INITIAL_AUDIT),
+  selfCheckResults: runSelfCheck(INITIAL_RECORDS, INITIAL_CONFLICTS, INITIAL_AUDIT, INITIAL_CURVES),
   currentRole: 'inspector',
   activeImportBatchId: null,
 
@@ -460,6 +466,7 @@ export const useStore = create<StoreState>((set, get) => ({
       coefficient: draft.coefficient,
       originalCoefficient: draft.originalCoefficient,
       coefficientChangeReason: null,
+      engineerComment: null,
       status: finalStatus,
       nextHandler: determineNextHandler({ ...{ id: '' }, status: finalStatus } as CalibrationRecord),
       nextHandlerNote: null,
@@ -550,7 +557,7 @@ export const useStore = create<StoreState>((set, get) => ({
       audits: newAudits,
       batches: newBatches,
       activeImportBatchId: currentBatchId,
-      selfCheckResults: runSelfCheck(newRecords, newConflicts, newAudits),
+      selfCheckResults: runSelfCheck(newRecords, newConflicts, newAudits, newCurves),
     })
 
     return { duplicate, id, isNewBatch }
@@ -599,20 +606,23 @@ export const useStore = create<StoreState>((set, get) => ({
         reason: reason || `确认冲突：以校准值 ${conflict.calibrationValue} 为准`,
         action: 'confirm',
       })
-      newRecords.forEach((r) => {
-        if (r.id === conflict.recordId) {
-          state.curves.forEach((c) => {
-            if (c.recordId === r.id) {
-              get().recalcCurvesForRecord(r.id)
-            }
-          })
+      const newCurves = state.curves.map((c) => {
+        if (c.recordId !== conflict.recordId) return c
+        const r = newRecords.find((x) => x.id === conflict.recordId)!
+        return {
+          ...c,
+          coefficient: r.coefficient,
+          speed: applyCoefficient(c.baseSpeed, r.coefficient),
+          version: c.version + 1,
+          calculationDetail: `冲突确认后重算：抽速 = 基准抽速 × 系数 ${r.coefficient}（原冲突字段：${conflict.field}，已确认以校准值为准；版本 v${c.version + 1}）`,
         }
       })
       return {
         records: newRecords,
         conflicts: newConflicts,
+        curves: newCurves,
         audits: newAudits,
-        selfCheckResults: runSelfCheck(newRecords, newConflicts, newAudits),
+        selfCheckResults: runSelfCheck(newRecords, newConflicts, newAudits, newCurves),
       }
     })
   },
@@ -646,7 +656,7 @@ export const useStore = create<StoreState>((set, get) => ({
       return {
         conflicts: newConflicts,
         audits: newAudits,
-        selfCheckResults: runSelfCheck(state.records, newConflicts, newAudits),
+        selfCheckResults: runSelfCheck(state.records, newConflicts, newAudits, state.curves),
       }
     })
   },
@@ -665,6 +675,7 @@ export const useStore = create<StoreState>((set, get) => ({
           : r,
       )
       let newConflicts = state.conflicts
+      let statusChanged = false
       const existingTempConflict = state.conflicts.find(
         (c) => c.recordId === recordId && c.field === '温度' && c.resolution === 'pending',
       )
@@ -690,6 +701,7 @@ export const useStore = create<StoreState>((set, get) => ({
             r.nextHandler = (r.originalCoefficient !== null && !r.coefficientChangeReason)
               ? 'engineer'
               : null
+            statusChanged = true
           }
         })
       }
@@ -701,13 +713,27 @@ export const useStore = create<StoreState>((set, get) => ({
         oldValue: target.sensorNote,
         newValue: note,
         reason: reason || '补录传感器编号备注（包含关键备注说明）',
-        action: 'update',
+        action: 'sensor_note_patch',
+      })
+      const hasCurve = state.curves.some((c) => c.recordId === recordId)
+      const newCurves = !hasCurve ? state.curves : state.curves.map((c) => {
+        if (c.recordId !== recordId) return c
+        const r = newRecords.find((x) => x.id === recordId)!
+        const trigger = statusChanged ? '状态变更' : '备注补录'
+        return {
+          ...c,
+          coefficient: r.coefficient,
+          speed: applyCoefficient(c.baseSpeed, r.coefficient),
+          version: c.version + 1,
+          calculationDetail: `传感器${trigger}触发重算：抽速 = 基准抽速 × 系数 ${r.coefficient}（备注已更新：${note.substring(0, 40)}…；版本 v${c.version + 1}）`,
+        }
       })
       return {
         records: newRecords,
         conflicts: newConflicts,
+        curves: newCurves,
         audits: newAudits,
-        selfCheckResults: runSelfCheck(newRecords, newConflicts, newAudits),
+        selfCheckResults: runSelfCheck(newRecords, newConflicts, newAudits, newCurves),
       }
     })
   },
@@ -755,7 +781,7 @@ export const useStore = create<StoreState>((set, get) => ({
         records: newRecords,
         curves: newCurves,
         audits: newAudits,
-        selfCheckResults: runSelfCheck(newRecords, state.conflicts, newAudits),
+        selfCheckResults: runSelfCheck(newRecords, state.conflicts, newAudits, newCurves),
       }
     })
   },
@@ -786,7 +812,7 @@ export const useStore = create<StoreState>((set, get) => ({
       return {
         records: newRecords,
         audits: newAudits,
-        selfCheckResults: runSelfCheck(newRecords, state.conflicts, newAudits),
+        selfCheckResults: runSelfCheck(newRecords, state.conflicts, newAudits, state.curves),
       }
     })
   },
@@ -804,7 +830,7 @@ export const useStore = create<StoreState>((set, get) => ({
             status: 'reviewed' as const,
             reviewedBy: ROLE_NAME(reviewer),
             reviewedAt: NOW(),
-            coefficientChangeReason: comment || r.coefficientChangeReason,
+            engineerComment: comment || null,
             nextHandler: null,
             nextHandlerNote: null,
             updatedAt: NOW(),
@@ -813,7 +839,7 @@ export const useStore = create<StoreState>((set, get) => ({
         return {
           ...r,
           status: 'pending_review' as const,
-          coefficientChangeReason: comment || r.coefficientChangeReason,
+          engineerComment: comment || null,
           nextHandler: 'inspector' as const,
           nextHandlerNote: `设备工程师驳回：${comment || '补充更详细的修改原因'}`,
           updatedAt: NOW(),
@@ -829,21 +855,27 @@ export const useStore = create<StoreState>((set, get) => ({
         reason: comment || (approved ? '复核通过' : '复核驳回，退回补原因'),
         action: approved ? 'review_approve' : 'review_reject',
       })
-      const newCurves = approved
-        ? state.curves.map((c) => {
-            if (c.recordId !== recordId) return c
-            const r = newRecords.find((x) => x.id === recordId)!
-            return {
-              ...c,
-              calculationDetail: `已复核：抽速 = 基准抽速 × 系数 ${r.coefficient}（复核人：${ROLE_NAME(reviewer)}，复核意见：${comment || '通过'}; 版本 v${c.version}）`,
-            }
-          })
-        : state.curves
+      const newCurves = state.curves.map((c) => {
+        if (c.recordId !== recordId) return c
+        const r = newRecords.find((x) => x.id === recordId)!
+        const newVersion = c.version + 1
+        const reasonSummary = r.coefficientChangeReason || '未填写（补录后补充）'
+        const commentSummary = comment ? `，工程师意见：${comment}` : ''
+        return {
+          ...c,
+          speed: applyCoefficient(c.baseSpeed, r.coefficient),
+          version: newVersion,
+          status: r.status,
+          calculationDetail: approved
+            ? `已复核：抽速 = 基准抽速 × 系数 ${r.coefficient}（修改原因：${reasonSummary}${commentSummary}；复核人：${ROLE_NAME(reviewer)}；版本 v${newVersion}）`
+            : `复核驳回：抽速 = 基准抽速 × 系数 ${r.coefficient}（驳回意见：${comment || '需补充原因'}；版本 v${newVersion}）`,
+        }
+      })
       return {
         records: newRecords,
         curves: newCurves,
         audits: newAudits,
-        selfCheckResults: runSelfCheck(newRecords, state.conflicts, newAudits),
+        selfCheckResults: runSelfCheck(newRecords, state.conflicts, newAudits, newCurves),
       }
     })
   },
@@ -868,7 +900,7 @@ export const useStore = create<StoreState>((set, get) => ({
 
   runSelfCheckNow: () => {
     set((state) => ({
-      selfCheckResults: runSelfCheck(state.records, state.conflicts, state.audits),
+      selfCheckResults: runSelfCheck(state.records, state.conflicts, state.audits, state.curves),
     }))
   },
 
@@ -903,3 +935,14 @@ export const useStore = create<StoreState>((set, get) => ({
     }))
   },
 }))
+
+export {
+  INITIAL_RECORDS,
+  INITIAL_CURVES,
+  INITIAL_AUDIT,
+  INITIAL_BATCHES,
+  INITIAL_CONFLICTS,
+  runSelfCheck,
+  addAudit,
+  applyCoefficient,
+}
