@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* 暖纸墨底（浅色） */
+    --bg: #f4f1e8;
+    --bg-grain: #efeadd;
+    --surface: #fbf9f3;
+    --surface-2: #f2eee2;
+    --ink: #1b1916;
+    --ink-soft: #4a463e;
+    --ink-mute: #8a8478;
+    --line: #ddd6c4;
+    --line-strong: #c9c1ab;
+
+    /* 语义色 */
+    --anomaly: #ea580c;
+    --anomaly-soft: #fdebd9;
+    --unit-missing: #dc2626;
+    --unit-missing-soft: #fbe0dd;
+    --old-version: #7c3aed;
+    --old-version-soft: #ece5fb;
+    --normal: #0d9488;
+    --normal-soft: #d6f0ec;
+    --verbal: #b45309;
+    --verbal-soft: #f4e6cd;
+    --accent: #1b1916;
+  }
+
+  .dark {
+    /* 深墨底（深色） */
+    --bg: #13110d;
+    --bg-grain: #18150f;
+    --surface: #1c1914;
+    --surface-2: #23201a;
+    --ink: #f1ece0;
+    --ink-soft: #c5beaf;
+    --ink-mute: #8a8275;
+    --line: #322e25;
+    --line-strong: #423c30;
+
+    --anomaly: #fb923c;
+    --anomaly-soft: #3a2417;
+    --unit-missing: #f87171;
+    --unit-missing-soft: #3a1f1d;
+    --old-version: #a78bfa;
+    --old-version-soft: #26203a;
+    --normal: #2dd4bf;
+    --normal-soft: #15302d;
+    --verbal: #d4a373;
+    --verbal-soft: #2f2618;
+    --accent: #f1ece0;
+  }
+
+  html {
+    font-family: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.55;
+    font-weight: 400;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--bg);
+    color: var(--ink);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.022) 1px, transparent 0);
+    background-size: 22px 22px;
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.028) 1px, transparent 0);
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: "Fraunces", Georgia, serif;
+    font-optical-sizing: auto;
+  }
+  .font-mono-data {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-feature-settings: "tnum" 1, "zero" 1;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* 纸张噪点纹理 */
+  .paper-grain {
+    position: relative;
+  }
+  .paper-grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    opacity: 0.035;
+    mix-blend-mode: multiply;
+  }
+  .dark .paper-grain::after {
+    opacity: 0.05;
+    mix-blend-mode: screen;
+  }
+
+  /* 异常格脉冲 */
+  @keyframes anomaly-pulse {
+    0%, 100% { stroke-opacity: 0.85; }
+    50% { stroke-opacity: 0.35; }
+  }
+  .anomaly-pulse {
+    animation: anomaly-pulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes rise-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .rise-in {
+    animation: rise-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  /* 自定义滚动条 */
+  .scroll-atlas::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scroll-atlas::-webkit-scrollbar-track { background: transparent; }
+  .scroll-atlas::-webkit-scrollbar-thumb {
+    background: var(--line-strong);
+    border-radius: 4px;
+  }
+  .scroll-atlas::-webkit-scrollbar-thumb:hover { background: var(--ink-mute); }
+}
