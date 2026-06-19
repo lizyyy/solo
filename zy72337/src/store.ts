@@ -124,7 +124,7 @@ interface AppStore {
   fetchParamItems: (versionId?: string) => Promise<void>
   importParams: (items: Record<string, unknown>[]) => Promise<{ duplicateCount: number; importedCount: number; duplicates: Record<string, unknown>[]; versionId: string; version: number }>
   fetchCounterexamples: () => Promise<void>
-  createCounterexample: (data: { name: string; note: string; expectedValue: string; actualValue: string; sourceParamId: string }) => Promise<void>
+  createCounterexample: (data: { name: string; note?: string; noteRaw?: string; expectedValue: string; actualValue: string; sourceParamId?: string; nextAction?: string; actor?: string; reason?: string }) => Promise<void>
   fetchConflicts: (status?: string) => Promise<void>
   adjudicateConflict: (id: string, decision: 'confirmed' | 'rejected', reason: string, adjudicator: string) => Promise<void>
   fetchDemoResults: () => Promise<void>
@@ -312,7 +312,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
     }
   },
 
-  createCounterexample: async (data: { name: string; note: string; expectedValue: string; actualValue: string; sourceParamId: string }) => {
+  createCounterexample: async (data: { name: string; note?: string; noteRaw?: string; expectedValue: string; actualValue: string; sourceParamId?: string; nextAction?: string; actor?: string; reason?: string }) => {
     set({ loading: true, error: null })
     try {
       await apiFetch('/api/counterexamples', {
@@ -323,10 +323,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
       await get().fetchConflicts()
       await get().fetchWorkflow()
       await get().fetchParamItems()
+      await get().fetchDemoResults()
+      await get().fetchSelfChecks()
       await get().fetchAuditLogs()
       set({ loading: false })
     } catch (e: unknown) {
       set({ error: e instanceof Error ? e.message : String(e), loading: false })
+      throw e
     }
   },
 
@@ -447,7 +450,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
     try {
       await apiFetch('/api/workflow/review-denominator-zero', {
         method: 'POST',
-        body: JSON.stringify({ itemId, decision, reviewer, reason }),
+        body: JSON.stringify({ paramItemId: itemId, decision, reviewer, reason }),
       })
       await get().fetchParamItems()
       await get().fetchDemoResults()

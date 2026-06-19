@@ -168,6 +168,12 @@ addColumnIfNotExists('demo_results', 'next_action', "TEXT NOT NULL DEFAULT ''")
 addColumnIfNotExists('demo_results', 'last_actor', "TEXT NOT NULL DEFAULT ''")
 addColumnIfNotExists('demo_results', 'counterexample_note_raw', "TEXT NOT NULL DEFAULT ''")
 
+addColumnIfNotExists('counterexamples', 'previous_value', "TEXT NOT NULL DEFAULT ''")
+addColumnIfNotExists('counterexamples', 'adjudication_note', "TEXT NOT NULL DEFAULT ''")
+addColumnIfNotExists('counterexamples', 'review_note', "TEXT NOT NULL DEFAULT ''")
+addColumnIfNotExists('counterexamples', 'next_action', "TEXT NOT NULL DEFAULT ''")
+addColumnIfNotExists('counterexamples', 'last_actor', "TEXT NOT NULL DEFAULT ''")
+
 db.exec(`
 INSERT OR IGNORE INTO workflow_state (id, current_step, import_completed, counterexample_review_completed, demo_update_completed) VALUES ('singleton', 'import', 0, 0, 0);
 `)
@@ -182,7 +188,7 @@ if (existingVersions.cnt === 0) {
     INSERT INTO param_items (id, version_id, name, value, rationale, is_denominator_zero, raw_denominator_value, review_status, previous_value, adjudication_note, review_note, next_action, last_actor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `)
   const insertCounterexample = db.prepare(`
-    INSERT INTO counterexamples (id, name, note, note_raw, expected_value, actual_value, source_param_id, has_conflict) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO counterexamples (id, name, note, note_raw, expected_value, actual_value, source_param_id, has_conflict, previous_value, adjudication_note, review_note, next_action, last_actor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `)
   const insertConflict = db.prepare(`
     INSERT INTO conflicts (id, param_item_id, counterexample_id, param_value, counterexample_value, counterexample_note, status) VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -201,7 +207,7 @@ if (existingVersions.cnt === 0) {
   insertItem.run(conflictItemId, versionId, 'substitution_cost', '2', '替换操作代价', 0, '', 'normal', '2', '', '', '', '')
 
   const ceId = 'ce-sample-001'
-  insertCounterexample.run(ceId, 'substitution_cost', '替换代价应为1而非2，基于序列ACGT→ACGA的观察', '替换代价应为1而非2，基于序列ACGT→ACGA的观察', '1', '2', conflictItemId, 1)
+  insertCounterexample.run(ceId, 'substitution_cost', '替换代价应为1而非2，基于序列ACGT→ACGA的观察', '替换代价应为1而非2，基于序列ACGT→ACGA的观察', '1', '2', conflictItemId, 1, '', '', '', '', 'system')
 
   insertConflict.run('cf-sample-001', conflictItemId, ceId, '2', '1', '替换代价应为1而非2，基于序列ACGT→ACGA的观察', 'pending')
 }
