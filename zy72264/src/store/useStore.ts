@@ -206,7 +206,6 @@ export const useStore = create<StoreState & StoreActions>()(
       },
 
       switchUser: (role) => {
-        const state = get();
         const userMap = {
           engineer: { id: 'xg001', name: '许工', role: 'engineer' as const },
           client: { id: 'zz002', name: '张展陈', role: 'client' as const },

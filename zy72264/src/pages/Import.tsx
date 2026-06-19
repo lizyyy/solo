@@ -1,11 +1,23 @@
 import { useState, useRef } from 'react';
 import Papa from 'papaparse';
-import { Upload, FileSpreadsheet, AlertTriangle, CheckCircle2, XCircle, Info } from 'lucide-react';
+import {
+  Upload, FileSpreadsheet, AlertTriangle, CheckCircle2, XCircle, Info,
+  FileDown, Zap,
+} from 'lucide-react';
 import { useStore } from '@/store/useStore';
-import { generateRowKey, detectLengthMismatch, validateRowData } from '@/utils/boundaryRules';
-import { BOUNDARY_RULES_DOC } from '@/utils/boundaryRules';
+import {
+  generateRowKey, detectLengthMismatch, validateRowData, BOUNDARY_RULES_DOC,
+} from '@/utils/boundaryRules';
 import type { SafetyRadiusRow } from '@/types';
-import StatusBadge from '@/components/StatusBadge';
+import { StatusBadge } from '@/components/StatusBadge';
+
+const SAMPLE_ROWS: Omit<SafetyRadiusRow, 'id' | 'status' | 'importedBatchId' | 'createdAt' | 'updatedAt'>[] = [
+  { originalRowNumber: 1, tunnelName: 'A3隧道', coordinateOrigin: 'K0+000', radius: 12.5, length: 120, calculatedLength: 120, remark: '正常入口段' },
+  { originalRowNumber: 2, tunnelName: 'A3隧道', coordinateOrigin: 'K0+120', radius: 15.0, length: 85.5, calculatedLength: 85.5, remark: '标准弯道段' },
+  { originalRowNumber: 3, tunnelName: 'A3隧道', coordinateOrigin: 'K0+205', radius: 10.0, length: 50.0, calculatedLength: 48.0, remark: '补录路线未重新计算长度' },
+  { originalRowNumber: 4, tunnelName: 'B7隧道', coordinateOrigin: 'K0+000', radius: 18.0, length: 200, calculatedLength: 200, remark: '主线入口段' },
+  { originalRowNumber: 5, tunnelName: 'B7隧道', coordinateOrigin: 'K0+200', radius: 14.0, length: 95, calculatedLength: 92.3, remark: '补录匝道未重算长度' },
+];
 
 interface ParsedRow {
   data: Omit<SafetyRadiusRow, 'id' | 'status' | 'importedBatchId' | 'createdAt' | 'updatedAt'>;
@@ -71,6 +83,32 @@ export default function Import() {
     setImportResult(result);
   };
 
+  const loadSampleData = () => {
+    const mapped: ParsedRow[] = SAMPLE_ROWS.map((data) => {
+      const { valid, errors } = validateRowData(data);
+      const tempRow = { ...data, id: '', status: 'pending' as const, importedBatchId: '', createdAt: '', updatedAt: '' };
+      const isDuplicate = rows.some((r) => generateRowKey(r) === generateRowKey(tempRow));
+      const { isAbnormal } = detectLengthMismatch(tempRow);
+      return { data, valid, errors, isDuplicate, hasLengthMismatch: isAbnormal };
+    });
+    setParsedRows(mapped);
+    setFileName('样例数据-安全半径表.csv');
+    setImportResult(null);
+  };
+
+  const downloadTemplate = () => {
+    const headers = '原始行号,隧道名称,坐标原点,安全半径,长度,计算长度,备注';
+    const csvRows = SAMPLE_ROWS.map((r) =>
+      [r.originalRowNumber, r.tunnelName, r.coordinateOrigin, r.radius, r.length, r.calculatedLength, r.remark].join(',')
+    );
+    const csv = [headers, ...csvRows].join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.download = '安全半径表模板.csv';
+    link.href = URL.createObjectURL(blob);
+    link.click();
+  };
+
   return (
     <div className="min-h-screen bg-tunnel-bg p-6 space-y-6">
       <div className="flex items-center gap-3">
@@ -93,6 +131,23 @@ export default function Import() {
         <Upload className="w-12 h-12 text-tunnel-muted" />
         <span className="text-tunnel-muted">拖拽 CSV 文件到此处，或点击选择文件</span>
         <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleFileChange} />
+      </div>
+
+      <div className="flex items-center gap-3">
+        <button
+          onClick={loadSampleData}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-tunnel-card border border-tunnel-border text-tunnel-fg text-sm hover:bg-tunnel-surface transition-colors"
+        >
+          <Zap className="w-4 h-4 text-tunnel-accent" />
+          载入样例数据
+        </button>
+        <button
+          onClick={downloadTemplate}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-tunnel-card border border-tunnel-border text-tunnel-muted text-sm hover:text-tunnel-fg hover:bg-tunnel-surface transition-colors"
+        >
+          <FileDown className="w-4 h-4" />
+          下载 CSV 模板
+        </button>
       </div>
 
       {parsedRows.length > 0 && (

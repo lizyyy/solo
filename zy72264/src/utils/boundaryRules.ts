@@ -1,4 +1,4 @@
-import type { SafetyRadiusRow, ChangeRecord, RowStatus } from '../types';
+import type { SafetyRadiusRow, RowStatus } from '../types';
 
 export function generateRowKey(row: {
   originalRowNumber: number;
@@ -50,7 +50,7 @@ export function canUnarchive(userRole: 'engineer' | 'client'): boolean {
   return userRole === 'client';
 }
 
-export function canRollback(_changeRecord: ChangeRecord): boolean {
+export function canRollback(): boolean {
   return true;
 }
 

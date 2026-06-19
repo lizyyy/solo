@@ -1,33 +1,24 @@
 import { useState } from 'react';
 import { useStore } from '@/store/useStore';
-import type { RowStatus } from '@/types';
 import { canArchive, canUnarchive } from '@/utils/boundaryRules';
 import { StatusBadge } from '@/components/StatusBadge';
 import {
-  Download,
-  Lock,
-  Unlock,
-  Camera,
-  FileText,
-  CheckCircle2,
-  AlertTriangle,
-  Eye,
-  ShieldAlert,
+  Download, Lock, Unlock, Camera, FileText, CheckCircle2,
+  AlertTriangle, ShieldAlert, XCircle, Eye,
 } from 'lucide-react';
 import html2canvas from 'html2canvas';
-
-const statusLabels: Record<RowStatus, string> = {
-  pending: '待处理',
-  modified: '已修改',
-  review: '待复核',
-  archived: '已归档',
-};
 
 export default function Export() {
   const { rows, archiveRow, unarchiveRow, currentUser } = useStore();
   const [showArchivedOnly, setShowArchivedOnly] = useState(false);
   const [archiveConfirmId, setArchiveConfirmId] = useState<string | null>(null);
   const [showArchivedSection, setShowArchivedSection] = useState(false);
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
+
+  const showToast = (type: 'success' | 'error', msg: string) => {
+    setToast({ type, msg });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const filteredRows = showArchivedOnly
     ? rows.filter((r) => r.status !== 'archived')
@@ -86,10 +77,24 @@ export default function Export() {
 
   const handleArchive = (id: string) => {
     if (archiveConfirmId === id) {
-      archiveRow(id);
+      const ok = archiveRow(id);
+      if (ok) {
+        showToast('success', '归档成功');
+      } else {
+        showToast('error', '权限不足：待复核记录仅展陈客户可归档');
+      }
       setArchiveConfirmId(null);
     } else {
       setArchiveConfirmId(id);
+    }
+  };
+
+  const handleUnarchive = (id: string) => {
+    const ok = unarchiveRow(id);
+    if (ok) {
+      showToast('success', '已解锁归档记录');
+    } else {
+      showToast('error', '权限不足：仅展陈客户可解锁归档');
     }
   };
 
@@ -266,7 +271,7 @@ export default function Export() {
                       )
                     ) : canUnarchive(currentUser.role) ? (
                       <button
-                        onClick={() => unarchiveRow(row.id)}
+                        onClick={() => handleUnarchive(row.id)}
                         className="flex items-center gap-1 px-2 py-1 bg-tunnel-success/20 text-tunnel-success rounded text-xs hover:bg-tunnel-success/30 transition-colors"
                       >
                         <Unlock className="w-3 h-3" />
@@ -312,7 +317,7 @@ export default function Export() {
                 </div>
                 {canUnarchive(currentUser.role) && (
                   <button
-                    onClick={() => unarchiveRow(row.id)}
+                    onClick={() => handleUnarchive(row.id)}
                     className="flex items-center gap-1 px-2 py-1 bg-tunnel-success/20 text-tunnel-success rounded text-xs hover:bg-tunnel-success/30 transition-colors"
                   >
                     <Unlock className="w-3 h-3" />
@@ -324,6 +329,22 @@ export default function Export() {
           </div>
         )}
       </div>
+      {toast && (
+        <div
+          className={`fixed top-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-lg shadow-xl border ${
+            toast.type === 'success'
+              ? 'bg-tunnel-success/20 border-tunnel-success text-tunnel-success'
+              : 'bg-tunnel-danger/20 border-tunnel-danger text-tunnel-danger'
+          }`}
+        >
+          {toast.type === 'success' ? (
+            <CheckCircle2 className="w-4 h-4" />
+          ) : (
+            <XCircle className="w-4 h-4" />
+          )}
+          <span className="text-sm font-medium">{toast.msg}</span>
+        </div>
+      )}
     </div>
   );
 }
