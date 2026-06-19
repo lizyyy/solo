@@ -284,11 +284,14 @@ export function approveRecord(recordId, approver, reason) {
 
   const snapshotBefore = { ...record.snapshot() };
   const geo = record.geometryAnalysis;
+  const hasGeoConcerns = geo && geo.issues && geo.issues.some(i =>
+    i.type === 'concave' || i.type === 'winding' || i.type === 'duplicate'
+  );
   const hasPendingConcerns =
     record.hasMultipleVersions ||
     !record.manualExample ||
     !record.questionnaire ||
-    (geo && geo.issues && geo.issues.some(i => i.type === 'concave'));
+    hasGeoConcerns;
 
   const oldStatus = record.status;
   record.status = 'approved';
@@ -416,11 +419,16 @@ export function generateHumanReadableReport(record) {
   record.reviewHistory.forEach((h, i) => {
     lines.push(`${i + 1}. [${h.timestamp ? h.timestamp.substring(0, 19) : '?'}] ${h.action} - ${h.message}`);
     if (h.processReason) lines.push(`　　处理原因：${h.processReason}`);
+    if (h.approvedWithConcerns === true) {
+      lines.push(`　　⚠️ 批准时仍有未清事项：保留全部原始痕迹，不提前归正常`);
+    }
     if (h.snapshotBefore) {
       const sb = h.snapshotBefore;
       const sa = h.snapshotAfter;
       if (sb.status !== (sa && sa.status)) lines.push(`　　状态变化：${sb.status} → ${sa && sa.status}`);
       if (sb.nextStep !== (sa && sa.nextStep)) lines.push(`　　下一步变化：${sb.nextStep} → ${sa && sa.nextStep}`);
+      if (sb.manualExample !== (sa && sa.manualExample)) lines.push(`　　手算反例：${sb.manualExample} → ${sa && sa.manualExample}`);
+      if (sb.questionnaire !== (sa && sa.questionnaire)) lines.push(`　　问卷原始行：${sb.questionnaire} → ${sa && sa.questionnaire}`);
     }
   });
   lines.push('');

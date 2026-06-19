@@ -1,0 +1,229 @@
+{
+  "record": {
+    "id": "review-S004-A001-1781855742219",
+    "studentId": "S004",
+    "answerId": "A001",
+    "status": "approved",
+    "geometryAnalysis": {
+      "rawPoints": [
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 10,
+          "y": 10
+        },
+        {
+          "x": 10,
+          "y": 0
+        },
+        {
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "convexHull": [
+        {
+          "x": 0,
+          "y": 10,
+          "originalIndex": 0
+        },
+        {
+          "x": 10,
+          "y": 10,
+          "originalIndex": 1
+        },
+        {
+          "x": 10,
+          "y": 0,
+          "originalIndex": 2
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "originalIndex": 3
+        }
+      ],
+      "rawArea": 100,
+      "convexArea": 100,
+      "areaDiff": 0,
+      "areaDiffRatio": 0,
+      "issues": [
+        {
+          "type": "winding",
+          "message": "坐标顺序为顺时针，标准应为逆时针",
+          "expected": "counter-clockwise",
+          "actual": "clockwise"
+        }
+      ],
+      "problemEdges": [],
+      "isConvex": true,
+      "windingOrder": "clockwise"
+    },
+    "manualExample": {
+      "id": "M-TEST-S004",
+      "studentId": "S004",
+      "answerId": "A001",
+      "issues": [
+        "顺逆时针问题"
+      ],
+      "expectedArea": 100,
+      "actualArea": 100,
+      "reviewer": "吴老师",
+      "reviewedAt": "2026-06-19T07:55:42.220Z",
+      "notes": "学生按顺时针顺序输入坐标，鞋带公式取绝对值后面积正确，但顺序不符合标准。主流程计算正确。",
+      "sourceType": "manual"
+    },
+    "questionnaire": {
+      "id": "Q-TEST-S004",
+      "studentId": "S004",
+      "answerId": "A001",
+      "siteStatement": "赵六当时从东南角开始按顺时针走的，所以坐标顺序反了，实际围栏就是正方形10×10，面积没问题。",
+      "sitePhotos": [],
+      "measurementData": {},
+      "interviewer": "吴老师",
+      "interviewedAt": "2026-06-19T07:55:42.220Z",
+      "additionalNotes": "已核实，顺时针输入属操作顺序问题，不影响面积计算。",
+      "sourceType": "questionnaire"
+    },
+    "errorAnalysis": "【几何问题（分开提示）】\n• [顺逆时针] 坐标顺序为顺时针，标准应为逆时针",
+    "nextStep": "教研负责人吴老师",
+    "nextStepDetail": "【下一步：教研负责人吴老师人工复核】\n• 事由：材料齐全，但仍存在几何问题，需结合两边证据判断\n• 顺逆时针：参考问卷原始行查看测量起点/方向；若面积正确可批注通过\n• 完成后：吴老师批注理由后点击批准，保留痕迹",
+    "assignedTo": "教研负责人吴老师",
+    "hasMultipleVersions": false,
+    "versions": [
+      {
+        "version": 1,
+        "submittedAt": "2024-01-15T13:00:00.000Z",
+        "source": "系统录入"
+      }
+    ],
+    "createdAt": "2026-06-19T07:55:42.219Z",
+    "updatedAt": "2026-06-19T07:55:42.222Z",
+    "reviewHistory": [
+      {
+        "timestamp": "2026-06-19T07:55:42.219Z",
+        "snapshotBefore": null,
+        "action": "created",
+        "message": "复核记录已创建",
+        "createReason": "几何问题1项；缺手算反例；缺问卷原始行",
+        "snapshotAfter": {
+          "status": "pending",
+          "errorAnalysis": "【几何问题（分开提示）】\n• [顺逆时针] 坐标顺序为顺时针，标准应为逆时针\n【还缺什么材料】\n• 缺少：手算反例（主流程）\n• 缺少：问卷原始行（现场说法）",
+          "nextStep": "找教研负责人吴老师",
+          "nextStepDetail": "【下一步：找教研负责人吴老师】\n• 事由：缺少手算反例，无法核对学生主流程计算\n• 动作：吴老师查阅学生纸质/电子稿，录入计算步骤、期望面积、标注问题\n• 完成后：误差说明中的\"缺少材料\"将自动移除\n• 事由：缺少问卷原始行，无法对照现场说法判断合理性\n• 动作：吴老师或调查员补录现场说法、测量工具、照片、访谈记录\n• 完成后：系统自动重新评估几何问题是否为现场合理情况",
+          "assignedTo": "找教研负责人吴老师",
+          "manualExample": "缺失",
+          "questionnaire": "缺失"
+        }
+      },
+      {
+        "timestamp": "2026-06-19T07:55:42.220Z",
+        "snapshotBefore": {
+          "status": "pending",
+          "errorAnalysis": "【几何问题（分开提示）】\n• [顺逆时针] 坐标顺序为顺时针，标准应为逆时针\n【还缺什么材料】\n• 缺少：手算反例（主流程）\n• 缺少：问卷原始行（现场说法）",
+          "nextStep": "找教研负责人吴老师",
+          "nextStepDetail": "【下一步：找教研负责人吴老师】\n• 事由：缺少手算反例，无法核对学生主流程计算\n• 动作：吴老师查阅学生纸质/电子稿，录入计算步骤、期望面积、标注问题\n• 完成后：误差说明中的\"缺少材料\"将自动移除\n• 事由：缺少问卷原始行，无法对照现场说法判断合理性\n• 动作：吴老师或调查员补录现场说法、测量工具、照片、访谈记录\n• 完成后：系统自动重新评估几何问题是否为现场合理情况",
+          "assignedTo": "找教研负责人吴老师",
+          "manualExample": "缺失",
+          "questionnaire": "缺失"
+        },
+        "action": "questionnaire-added",
+        "message": "已补录问卷原始行（来源：吴老师）；现场说法摘要：\"赵六当时从东南角开始按顺时针走的，所以坐标顺序反了，实际围栏就是正方形10×10，面积没问题。\"；不再缺少：问卷原始行；误差说明与下一步行动已随最新数据重新计算",
+        "changedBy": "吴老师",
+        "originalStatement": {
+          "status": "pending",
+          "errorAnalysis": "【几何问题（分开提示）】\n• [顺逆时针] 坐标顺序为顺时针，标准应为逆时针\n【还缺什么材料】\n• 缺少：手算反例（主流程）\n• 缺少：问卷原始行（现场说法）",
+          "nextStep": "找教研负责人吴老师",
+          "nextStepDetail": "【下一步：找教研负责人吴老师】\n• 事由：缺少手算反例，无法核对学生主流程计算\n• 动作：吴老师查阅学生纸质/电子稿，录入计算步骤、期望面积、标注问题\n• 完成后：误差说明中的\"缺少材料\"将自动移除\n• 事由：缺少问卷原始行，无法对照现场说法判断合理性\n• 动作：吴老师或调查员补录现场说法、测量工具、照片、访谈记录\n• 完成后：系统自动重新评估几何问题是否为现场合理情况",
+          "assignedTo": "找教研负责人吴老师",
+          "manualExample": "缺失",
+          "questionnaire": "缺失"
+        },
+        "snapshotAfter": {
+          "status": "updated",
+          "errorAnalysis": "【几何问题（分开提示）】\n• [顺逆时针] 坐标顺序为顺时针，标准应为逆时针\n【还缺什么材料】\n• 缺少：手算反例（主流程）",
+          "nextStep": "找教研负责人吴老师",
+          "nextStepDetail": "【下一步：找教研负责人吴老师】\n• 事由：缺少手算反例，无法核对学生主流程计算\n• 动作：吴老师查阅学生纸质/电子稿，录入计算步骤、期望面积、标注问题\n• 完成后：误差说明中的\"缺少材料\"将自动移除",
+          "assignedTo": "找教研负责人吴老师",
+          "manualExample": "缺失",
+          "questionnaire": "存在"
+        },
+        "processReason": "补齐缺失材料后重新评估几何问题合理性"
+      },
+      {
+        "timestamp": "2026-06-19T07:55:42.220Z",
+        "snapshotBefore": {
+          "status": "updated",
+          "errorAnalysis": "【几何问题（分开提示）】\n• [顺逆时针] 坐标顺序为顺时针，标准应为逆时针\n【还缺什么材料】\n• 缺少：手算反例（主流程）",
+          "nextStep": "找教研负责人吴老师",
+          "nextStepDetail": "【下一步：找教研负责人吴老师】\n• 事由：缺少手算反例，无法核对学生主流程计算\n• 动作：吴老师查阅学生纸质/电子稿，录入计算步骤、期望面积、标注问题\n• 完成后：误差说明中的\"缺少材料\"将自动移除",
+          "assignedTo": "找教研负责人吴老师",
+          "manualExample": "缺失",
+          "questionnaire": "存在"
+        },
+        "action": "manual-added",
+        "message": "已补录手算反例（审核人：吴老师）；主流程备注：\"学生按顺时针顺序输入坐标，鞋带公式取绝对值后面积正确，但顺序不符合标准。主流程计算正确。\"；误差说明与下一步行动已重新计算",
+        "changedBy": "吴老师",
+        "snapshotAfter": {
+          "status": "updated",
+          "errorAnalysis": "【几何问题（分开提示）】\n• [顺逆时针] 坐标顺序为顺时针，标准应为逆时针",
+          "nextStep": "教研负责人吴老师",
+          "nextStepDetail": "【下一步：教研负责人吴老师人工复核】\n• 事由：材料齐全，但仍存在几何问题，需结合两边证据判断\n• 顺逆时针：参考问卷原始行查看测量起点/方向；若面积正确可批注通过\n• 完成后：吴老师批注理由后点击批准，保留痕迹",
+          "assignedTo": "教研负责人吴老师",
+          "manualExample": "存在",
+          "questionnaire": "存在"
+        },
+        "processReason": "补录手算反例（主流程）后，与问卷原始行两边证据合并判断"
+      },
+      {
+        "timestamp": "2026-06-19T07:55:42.222Z",
+        "snapshotBefore": {
+          "status": "updated",
+          "errorAnalysis": "【几何问题（分开提示）】\n• [顺逆时针] 坐标顺序为顺时针，标准应为逆时针",
+          "nextStep": "教研负责人吴老师",
+          "nextStepDetail": "【下一步：教研负责人吴老师人工复核】\n• 事由：材料齐全，但仍存在几何问题，需结合两边证据判断\n• 顺逆时针：参考问卷原始行查看测量起点/方向；若面积正确可批注通过\n• 完成后：吴老师批注理由后点击批准，保留痕迹",
+          "assignedTo": "教研负责人吴老师",
+          "manualExample": "存在",
+          "questionnaire": "存在"
+        },
+        "action": "approved",
+        "message": "已由 吴老师 批准；批注：顺逆时针问题属操作顺序问题，现场说法与手算反例两边证据均支持面积正确，批注通过。；注意：存在未清事项但人工批准，详情见下方；不提前归正常，保留全部原始痕迹",
+        "approver": "吴老师",
+        "reason": "顺逆时针问题属操作顺序问题，现场说法与手算反例两边证据均支持面积正确，批注通过。",
+        "approvedWithConcerns": true,
+        "statusChange": "updated → approved",
+        "snapshotAfter": {
+          "status": "approved",
+          "errorAnalysis": "【几何问题（分开提示）】\n• [顺逆时针] 坐标顺序为顺时针，标准应为逆时针",
+          "nextStep": "教研负责人吴老师",
+          "nextStepDetail": "【下一步：教研负责人吴老师人工复核】\n• 事由：材料齐全，但仍存在几何问题，需结合两边证据判断\n• 顺逆时针：参考问卷原始行查看测量起点/方向；若面积正确可批注通过\n• 完成后：吴老师批注理由后点击批准，保留痕迹",
+          "assignedTo": "教研负责人吴老师",
+          "manualExample": "存在",
+          "questionnaire": "存在"
+        },
+        "processReason": "人工判断：结合手算反例与问卷原始行，虽仍有几何/材料提示但业务上可通过"
+      }
+    ]
+  },
+  "summary": {
+    "status": "approved",
+    "hasMultipleVersions": false,
+    "versionCount": 1,
+    "hasManual": true,
+    "hasQuestionnaire": true,
+    "issuesByType": {
+      "concave": 0,
+      "duplicate": 0,
+      "winding": 1,
+      "total": 1
+    },
+    "areaDiff": 0,
+    "areaDiffRatio": 0,
+    "nextStep": "教研负责人吴老师",
+    "nextStepDetail": "【下一步：教研负责人吴老师人工复核】\n• 事由：材料齐全，但仍存在几何问题，需结合两边证据判断\n• 顺逆时针：参考问卷原始行查看测量起点/方向；若面积正确可批注通过\n• 完成后：吴老师批注理由后点击批准，保留痕迹",
+    "assignedTo": "教研负责人吴老师",
+    "problemEdgeCount": 0
+  }
+}

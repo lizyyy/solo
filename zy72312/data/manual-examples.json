@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": "M-TEST-S004",
+    "studentId": "S004",
+    "answerId": "A001",
+    "issues": [
+      "顺逆时针问题"
+    ],
+    "expectedArea": 100,
+    "actualArea": 100,
+    "reviewer": "吴老师",
+    "reviewedAt": "2026-06-19T07:55:42.220Z",
+    "notes": "学生按顺时针顺序输入坐标，鞋带公式取绝对值后面积正确，但顺序不符合标准。主流程计算正确。",
+    "sourceType": "manual"
+  }
+]

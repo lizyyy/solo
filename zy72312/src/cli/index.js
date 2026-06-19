@@ -344,6 +344,97 @@ program
   });
 
 program
+  .command('report [recordId]')
+  .description('生成正式复核报告（不传ID则生成全部）')
+  .option('-o, --output <file>', '导出到文件（.txt 或 .md）')
+  .option('-s, --student <studentId>', '按学生ID筛选')
+  .action(async (recordId, options) => {
+    try {
+      dataStore.loadFromFiles();
+      const allRecords = dataStore.getAllReviewRecords();
+
+      let targetRecords = [];
+      if (recordId) {
+        const fullRecord = allRecords.find(r => r.id.startsWith(recordId) || r.id === recordId);
+        if (!fullRecord) {
+          console.log(chalk.yellow('未找到该记录'));
+          return;
+        }
+        targetRecords = [fullRecord];
+      } else if (options.student) {
+        targetRecords = allRecords.filter(r => r.studentId === options.student);
+        if (targetRecords.length === 0) {
+          console.log(chalk.yellow(`未找到学生 ${options.student} 的记录`));
+          return;
+        }
+      } else {
+        targetRecords = allRecords;
+      }
+
+      let fullOutput = '';
+      targetRecords.forEach((rec, i) => {
+        const rpt = generateReport(rec.id);
+        if (rpt) {
+          fullOutput += rpt.humanReport;
+          if (i < targetRecords.length - 1) fullOutput += '\n\n\n';
+        }
+      });
+
+      if (options.output) {
+        const outPath = path.resolve(options.output);
+        fs.writeFileSync(outPath, fullOutput, 'utf-8');
+        console.log(chalk.green(`✓ 已导出 ${targetRecords.length} 份报告到 ${outPath}`));
+        console.log(chalk.gray(`  文件大小: ${Buffer.byteLength(fullOutput, 'utf-8')} 字节`));
+      } else {
+        console.log(fullOutput);
+      }
+    } catch (error) {
+      console.error(chalk.red(`✗ 生成报告失败: ${error.message}`));
+      console.error(error.stack);
+    }
+  });
+
+program
+  .command('export <recordId> [outputFile]')
+  .description('导出单条复核记录的完整报告（含JSON和文本）')
+  .option('--json', '仅导出JSON格式')
+  .option('--text', '仅导出文本格式')
+  .action(async (recordId, outputFile, options) => {
+    try {
+      dataStore.loadFromFiles();
+      const fullRecord = dataStore.reviewRecords.find(r => r.id.startsWith(recordId) || r.id === recordId);
+      if (!fullRecord) {
+        console.log(chalk.yellow('未找到该记录'));
+        return;
+      }
+
+      const rpt = generateReport(fullRecord.id);
+      const outFile = outputFile || `report-${fullRecord.studentId}-${fullRecord.answerId}`;
+
+      if (options.json) {
+        const json = JSON.stringify({ record: rpt.record, summary: rpt.summary }, null, 2);
+        const p = outFile.endsWith('.json') ? outFile : outFile + '.json';
+        fs.writeFileSync(path.resolve(p), json, 'utf-8');
+        console.log(chalk.green(`✓ JSON报告已导出到 ${p}`));
+      } else if (options.text) {
+        const p = outFile.endsWith('.txt') ? outFile : outFile + '.txt';
+        fs.writeFileSync(path.resolve(p), rpt.humanReport, 'utf-8');
+        console.log(chalk.green(`✓ 文本报告已导出到 ${p}`));
+      } else {
+        const base = outFile.replace(/\.(txt|json|md)$/, '');
+        fs.writeFileSync(path.resolve(base + '.txt'), rpt.humanReport, 'utf-8');
+        fs.writeFileSync(path.resolve(base + '.json'), JSON.stringify({ record: rpt.record, summary: rpt.summary }, null, 2), 'utf-8');
+        console.log(chalk.green(`✓ 已导出双格式报告：`));
+        console.log(chalk.gray(`  ${base}.txt`));
+        console.log(chalk.gray(`  ${base}.json`));
+      }
+    } catch (error) {
+      console.error(chalk.red(`✗ 导出失败: ${error.message}`));
+      console.error(error.stack);
+    }
+  });
+
+program
   .command('demo')
   .description('运行完整演示流程')
   .action(async () => {

@@ -10,7 +10,11 @@
     "test": "node tests/end-to-end.test.js",
     "demo": "node src/cli/index.js demo",
     "review": "node src/cli/index.js review",
-    "report": "node src/cli/index.js report"
+    "report": "node src/scripts/generate-report.js",
+    "report:all": "node src/scripts/generate-report.js --all",
+    "report:export": "node src/scripts/generate-report.js --all --output reports/all-reports.txt",
+    "report:cli": "node src/cli/index.js report",
+    "export": "node src/cli/index.js export"
   },
   "keywords": ["convex-hull", "geometry", "review", "education"],
   "author": "",
