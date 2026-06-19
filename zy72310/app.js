@@ -1012,33 +1012,130 @@ function checkExportConsistency() {
         <div class="check-result-item error">
             <h4>📤 导出一致性检查 - 未完成</h4>
             <ul>
-                <li>数据不完整，请先完成全部三步流程</li>
+                <li>数据不完整，请先完成全部三步流程（导入边界值 → 补看权重表 → 生成报告）</li>
             </ul>
         </div>`;
     }
-    
-    const normalConsistent = AppState.compareResults.normal?.every(r => r.missing === 0) ?? false;
-    const supplementMissing = AppState.compareResults.supplement?.reduce((acc,r) => acc + r.missing, 0) ?? 0;
-    const pendingCount = AppState.compareResults.supplement?.reduce((acc,r) => acc + (r.pending || 0), 0) ?? 0;
-    
-    const historyCoverage = AppState.history.filter(h => 
-        h.action.includes('冲突处理') || h.action.includes('生效边界值')
-    ).length;
-    
-    const auditHasReason = AppState.conflictAuditTrail.every(a => a.reason && a.nextStep);
-    
+
+    if (!AppState.reportData) {
+        return `
+        <div class="check-result-item warning">
+            <h4>📤 导出一致性检查 - 未完成</h4>
+            <ul>
+                <li>尚未生成边界样本报告，无法验证样本级最终判定是否写入导出文件</li>
+                <li>请先在第三步点「更新边界样本报告」后再运行本检查</li>
+            </ul>
+            <p class="text-muted mt-2">交接提示：本检查会真实调用 buildExportData() + validateExportData() 对每个待复核样本做字段级断言，不是只展示页面文案。</p>
+        </div>`;
+    }
+
+    const { exportData, pendingSamples } = buildExportData();
+    const validation = validateExportData(exportData);
+
+    const sampleIds = ['SA002', 'SA003', 'SA006', 'SA015'];
+    const criticalAssertions = sampleIds.map(sid => {
+        const s = exportData.sampleData.find(x => x.sampleId === sid);
+        if (!s) return { id: sid, exists: false };
+
+        const isPending = s.finalJudgement === 'pending';
+        const hasPendingReason = !!s.pendingReason;
+        const hasPendingType = !!s.pendingType;
+        const hasReviewHandler = !!s.reviewHandler;
+        const hasOperationLog = !!s.operationLog;
+        const hasFinalJudgement = 'final' in (s.judgements || {}) && !!s.finalJudgement;
+        const hasConflictAuditOrNegativeReason = (
+            s.pendingType === 'negative_value' ||
+            (s.pendingType === 'boundary_range' && s.hasConflictAudit && s.conflictAudit && s.conflictAudit.reason)
+        );
+
+        const pass = isPending && hasPendingReason && hasPendingType && hasReviewHandler && hasOperationLog && hasFinalJudgement && hasConflictAuditOrNegativeReason;
+
+        return {
+            id: sid,
+            exists: true,
+            finalJudgement: s.finalJudgement,
+            pendingType: s.pendingType,
+            pendingReason: s.pendingReason,
+            reviewHandler: s.reviewHandler,
+            operationLogPresent: !!s.operationLog,
+            judgementsFinal: s.judgements?.final,
+            reportIncluded: s.reportIncluded,
+            pass
+        };
+    });
+
+    const criticalAllPass = criticalAssertions.every(a => a.exists && a.pass);
+    const s001Effective = exportData.effectiveBoundaries.find(b => b.boundaryId === 'S001');
+    const s001Audit = exportData.conflictAuditTrail.find(a => a.id === 'S001');
+    const s001Sync = s001Effective && s001Audit && s001Effective.currentBoundary === s001Audit.finalBoundary;
+
+    const s003Effective = exportData.effectiveBoundaries.find(b => b.boundaryId === 'S003');
+    const s003Audit = exportData.conflictAuditTrail.find(a => a.id === 'S003');
+    const s003Sync = s003Effective && s003Audit && s003Effective.currentBoundary === s003Audit.finalBoundary;
+
+    const s005Effective = exportData.effectiveBoundaries.find(b => b.boundaryId === 'S005');
+    const s005Audit = exportData.conflictAuditTrail.find(a => a.id === 'S005');
+    const s005Sync = s005Effective && s005Audit && s005Effective.currentBoundary === s005Audit.finalBoundary;
+
+    const finalCountsOk =
+        exportData.summary.finalCounts.pending === pendingSamples.length &&
+        exportData.summary.finalCounts.normal === exportData.sampleData.filter(s => s.finalJudgement === 'normal').length;
+
+    const pendingNegativeInSummary = exportData.summary.pendingBreakdown.negative_value === criticalAssertions.filter(a => a.pendingType === 'negative_value').length;
+    const pendingBoundaryInSummary = exportData.summary.pendingBreakdown.boundary_range === criticalAssertions.filter(a => a.pendingType === 'boundary_range').length;
+
+    const overallPass =
+        validation.pass &&
+        criticalAllPass &&
+        s001Sync && s003Sync && s005Sync &&
+        finalCountsOk &&
+        pendingNegativeInSummary && pendingBoundaryInSummary;
+
+    const criticalItemsHtml = criticalAssertions.map(a => {
+        if (!a.exists) return `<li><b>${a.id}</b>：❌ 在导出 sampleData 中找不到</li>`;
+        const tag = a.pass ? '✓' : '✗';
+        return `<li><b>${a.id}</b>：${tag} finalJudgement=<code>${a.finalJudgement}</code>，pendingType=<code>${a.pendingType}</code>，reviewHandler=<code>${a.reviewHandler}</code>，operationLog=${a.operationLogPresent ? '存在' : '缺失'}，reportIncluded=<code>${a.reportIncluded}</code>${a.pass ? '' : ` — 失败原因：pendingReason=${a.pendingReason ? '存在' : '缺失'}，judgements.final=${a.judgementsFinal}`}</li>`;
+    }).join('');
+
+    const syncHtml = [
+        { name: 'S001（沿用边界值说明）', eff: s001Effective, audit: s001Audit, ok: s001Sync },
+        { name: 'S003（按权重表修正 70→72）', eff: s003Effective, audit: s003Audit, ok: s003Sync },
+        { name: 'S005（按权重表修正 65→68）', eff: s005Effective, audit: s005Audit, ok: s005Sync }
+    ].map(s => {
+        if (!s.eff || !s.audit) return `<li>${s.name}：❌ 未找到完整记录</li>`;
+        return `<li>${s.name}：${s.ok ? '✓' : '✗'} effectiveBoundary.currentBoundary=<code>${s.eff.currentBoundary}</code> vs conflictAuditTrail.finalBoundary=<code>${s.audit.finalBoundary}</code></li>`;
+    }).join('');
+
     return `
-    <div class="check-result-item ${normalConsistent && auditHasReason ? 'success' : 'warning'}">
-        <h4>📤 导出一致性检查 - 完成</h4>
+    <div class="check-result-item ${overallPass ? 'success' : 'error'}">
+        <h4>📤 导出一致性检查 - ${overallPass ? '通过' : '失败'}</h4>
+        <p class="text-muted mb-1">本次检查真实调用 buildExportData() 构建与真实导出文件完全一致的数据结构，再用 validateExportData() + 关键字段断言校验。校验对象：exportData（与点击「导出报告」按钮生成的文件字节一致）。</p>
+        
+        <h5 class="mt-3 mb-1">① 基础校验（validateExportData）</h5>
         <ul>
-            <li>正常材料导出（缺失标记）：${normalConsistent ? '✓ 无异常缺失' : '⚠ 存在缺失标记'}</li>
-            <li>错口径材料（旧表缺失标记）：${AppState.compareResults.wrong?.reduce((a,r)=>a+r.missing,0)} 处负数被标为缺失（预期）</li>
-            <li>补录材料中缺失标记：${supplementMissing} 处，待复核样本：${pendingCount} 个（留交助教）</li>
-            <li>操作历史中含冲突处理记录：${historyCoverage} 条</li>
-            <li>所有冲突审计项均含「处理说明 + 下一步找谁」：${auditHasReason ? '✓ 完整' : '✗ 有遗漏'}</li>
-            <li>导出 JSON 将携带：summary + effectiveBoundaries + conflictAuditTrail + 标记好的样本数据</li>
+            <li>通用字段校验：${validation.pass ? '✓ 通过' : '✗ 失败'}（错误 ${validation.errors.length} 项）</li>
+            ${validation.errors.length > 0 ? validation.errors.map(e => `<li class="pl-4">· ${e}</li>`).join('') : ''}
+            <li>schemaVersion：<code>${exportData.schemaVersion}</code></li>
+            <li>summary.finalCounts 与 sampleData 实际计数是否一致：${finalCountsOk ? '✓' : '✗'}（pending=${exportData.summary.finalCounts.pending}，normal=${exportData.summary.finalCounts.normal}）</li>
+            <li>summary.pendingBreakdown 与实际 pendingType 计数：negative_value=${pendingNegativeInSummary ? '✓' : '✗'}，boundary_range=${pendingBoundaryInSummary ? '✓' : '✗'}</li>
         </ul>
-        <p class="text-muted mt-2">交接提示：导出文件含 conflictAuditTrail，每个冲突项都保留了原始说法、改后值、处理原因、下一步找谁，不会提前归为正常。</p>
+        
+        <h5 class="mt-3 mb-1">② 4 个关键待复核样本字段级断言（SA002/SA003/SA006/SA015）</h5>
+        <ul>${criticalItemsHtml}</ul>
+        
+        <h5 class="mt-3 mb-1">③ 3 个冲突项 × 两份数据一致性（effectiveBoundary ↔ conflictAuditTrail）</h5>
+        <ul>${syncHtml}</ul>
+        
+        <h5 class="mt-3 mb-1">④ 导出文件顶级结构</h5>
+        <ul>
+            <li>sampleData 样本数：<code>${exportData.sampleData.length}</code></li>
+            <li>pendingSamples 清单：<code>${exportData.pendingSamples.length}</code> 条（待复核样本单独拉出，便于学生助教直接查）</li>
+            <li>negativeSamples 已富集最终判定：<code>${exportData.negativeSamples.length}</code> 条</li>
+            <li>conflictAuditTrail：<code>${exportData.conflictAuditTrail.length}</code> 条</li>
+            <li>effectiveBoundaries：<code>${exportData.effectiveBoundaries.length}</code> 条</li>
+        </ul>
+        
+        <p class="text-muted mt-3">交接提示：关键待复核样本在导出文件中同时存在三份：<code>sampleData[i]</code>（全量样本）、<code>pendingSamples</code>（助教查收用）、<code>negativeSamples</code>（负数专卷）。每份都携带 pendingReason、reviewHandler、operationLog，不会因为换入口查找而丢失处理结论。</p>
     </div>`;
 }
 
@@ -1082,9 +1179,9 @@ function resetStep(step) {
     }
 }
 
-function exportReport() {
+function buildExportData() {
     const exportTime = new Date().toLocaleString('zh-CN');
-    
+
     const effectiveBoundaryList = Object.values(AppState.effectiveBoundary).map(e => ({
         boundaryId: e.boundaryId,
         name: e.name,
@@ -1096,51 +1193,227 @@ function exportReport() {
         modified: e.modified,
         auditTrail: e.auditLog
     }));
-    
-    const sampleExport = AppState.sampleData?.map(s => {
+
+    const processedSamples = (AppState.reportData || AppState.sampleData || []);
+
+    const sampleExport = processedSamples.map(s => {
         const eff = AppState.effectiveBoundary[s.boundaryId];
         const audit = AppState.conflictAuditTrail.find(a => a.id === s.boundaryId);
+
+        let pendingReason = null;
+        let pendingType = null;
+        let reviewHandler = null;
+
+        if (s.finalJudgement === 'pending') {
+            if (s.value < 0) {
+                pendingType = 'negative_value';
+                pendingReason = `原始值(${s.value})为负数，被旧版判定表标记为"缺失"。按审计规则不急于归为正常/异常，留交学生助教复核。`;
+                reviewHandler = '学生助教（负数样本复核组）';
+            } else if (audit && audit.needReview) {
+                const boundaryMin = eff.currentBoundary - 2;
+                const boundaryMax = eff.currentBoundary + 2;
+                pendingType = 'boundary_range';
+                pendingReason = `沿用边界值说明(阈值=${eff.currentBoundary})，原始值(${s.value})落在边界±2复核范围[${boundaryMin}, ${boundaryMax}]内，按处理说明(${audit.reason})需留交学生助教复核后才能最终判定。`;
+                reviewHandler = audit.nextStep && audit.nextStep.includes('学生助教') ? '学生助教（边界样本复核）' : (audit.nextStep || '学生助教');
+            } else {
+                pendingType = 'other';
+                pendingReason = '待人工复核';
+                reviewHandler = '实验助理小穆';
+            }
+        }
+
         return {
             sampleId: s.id,
             boundaryId: s.boundaryId,
             name: s.name,
             originalValue: s.value,
-            originalBoundary: eff?.originalBoundary ?? s.boundary,
-            weightBoundary: eff?.modified ? AppState.weightData?.find(w=>w.id===s.boundaryId)?.threshold : eff?.originalBoundary,
-            effectiveBoundary: eff?.currentBoundary ?? s.newBoundary,
-            boundarySource: eff?.sourceLabel ?? '首次导入',
+            originalBoundary: eff ? eff.originalBoundary : (s.originalBoundary ?? s.boundary),
+            weightBoundary: eff && eff.modified
+                ? (AppState.weightData?.find(w => w.id === s.boundaryId)?.threshold ?? (s.weightBoundary ?? s.newBoundary))
+                : (eff ? eff.originalBoundary : (s.weightBoundary ?? s.boundary)),
+            effectiveBoundary: eff ? eff.currentBoundary : (s.effectiveBoundary ?? s.newBoundary),
+            boundarySource: eff ? eff.sourceLabel : '首次导入',
             hasConflictAudit: !!audit,
             conflictAudit: audit ? {
                 choice: audit.choiceLabel,
+                originalBoundary: audit.originalBoundary,
+                weightBoundary: audit.weightBoundary,
+                finalBoundary: audit.finalBoundary,
                 reason: audit.reason,
                 nextStep: audit.nextStep,
                 operator: audit.operator,
-                timestamp: audit.timestamp
-            } : null
+                timestamp: audit.timestamp,
+                needReview: !!audit.needReview
+            } : null,
+            judgements: {
+                byOriginalBoundary: s.oldJudgement ?? null,
+                byWeightTable: s.weightJudgement ?? null,
+                byEffectiveBoundary: s.effectiveJudgement ?? null,
+                final: s.finalJudgement ?? null
+            },
+            finalJudgement: s.finalJudgement ?? null,
+            finalJudgementLabel: {
+                normal: '正常',
+                borderline: '边界值',
+                abnormal: '异常',
+                missing: '缺失',
+                pending: '待复核'
+            }[s.finalJudgement] ?? s.finalJudgement,
+            isPending: s.finalJudgement === 'pending',
+            pendingType,
+            pendingReason,
+            reviewHandler,
+            operationLog: s.operationLog ?? null,
+            reportIncluded: !!AppState.reportData
         };
-    }) || [];
-    
+    });
+
+    const pendingSamples = sampleExport.filter(s => s.isPending);
+    const normalFinalSamples = sampleExport.filter(s => s.finalJudgement === 'normal');
+    const borderlineSamples = sampleExport.filter(s => s.finalJudgement === 'borderline');
+
     const exportData = {
         exportTime,
+        schemaVersion: '2.0',
+        generatedFromWorkflowStep: AppState.currentStep,
         summary: {
-            totalSamples: AppState.sampleData?.length || 0,
+            totalSamples: sampleExport.length,
             totalBoundaries: Object.keys(AppState.effectiveBoundary).length,
             conflictCount: AppState.conflicts.length,
             resolvedCount: Object.keys(AppState.resolvedConflicts).length,
             negativeSampleCount: AppState.negativeSamples.length,
+            finalCounts: {
+                normal: normalFinalSamples.length,
+                borderline: borderlineSamples.length,
+                pending: pendingSamples.length,
+                abnormal: sampleExport.filter(s => s.finalJudgement === 'abnormal').length,
+                missing: sampleExport.filter(s => s.finalJudgement === 'missing').length
+            },
+            pendingBreakdown: {
+                negative_value: pendingSamples.filter(s => s.pendingType === 'negative_value').length,
+                boundary_range: pendingSamples.filter(s => s.pendingType === 'boundary_range').length,
+                other: pendingSamples.filter(s => s.pendingType === 'other').length
+            },
             operator: '实验助理小穆'
         },
         effectiveBoundaries: effectiveBoundaryList,
-        conflictAuditTrail: AppState.conflictAuditTrail,
+        conflictAuditTrail: AppState.conflictAuditTrail.map(a => ({
+            ...a,
+            reviewHandler: a.needReview ? '学生助教' : null
+        })),
         boundaryData: AppState.boundaryData,
         weightData: AppState.weightData,
         sampleData: sampleExport,
         resolvedConflicts: AppState.resolvedConflicts,
-        negativeSamples: AppState.negativeSamples,
+        negativeSamples: AppState.negativeSamples.map(ns => {
+            const enriched = sampleExport.find(s => s.sampleId === ns.id);
+            return {
+                sampleId: ns.id,
+                boundaryId: ns.boundaryId,
+                name: ns.name,
+                originalValue: ns.value,
+                effectiveBoundary: enriched?.effectiveBoundary ?? null,
+                finalJudgement: enriched?.finalJudgement ?? 'pending',
+                pendingReason: enriched?.pendingReason ?? '负数样本，留交学生助教复核',
+                reviewHandler: enriched?.reviewHandler ?? '学生助教',
+                operationLog: enriched?.operationLog ?? null
+            };
+        }),
+        pendingSamples: pendingSamples.map(s => ({
+            sampleId: s.sampleId,
+            name: s.name,
+            originalValue: s.originalValue,
+            effectiveBoundary: s.effectiveBoundary,
+            pendingType: s.pendingType,
+            pendingReason: s.pendingReason,
+            reviewHandler: s.reviewHandler,
+            conflictChoice: s.conflictAudit?.choice ?? null
+        })),
         compareResults: AppState.compareResults,
         operationHistory: AppState.history
     };
-    
+
+    return { exportTime, exportData, sampleExport, pendingSamples };
+}
+
+function validateExportData(exportData) {
+    const errors = [];
+    const warnings = [];
+
+    if (!exportData || !exportData.sampleData || !Array.isArray(exportData.sampleData)) {
+        errors.push('sampleData 不存在或不是数组');
+        return { errors, warnings, pass: false };
+    }
+
+    if (!exportData.summary || !exportData.summary.finalCounts) {
+        errors.push('summary.finalCounts 缺失');
+    }
+
+    if (!exportData.conflictAuditTrail || !Array.isArray(exportData.conflictAuditTrail)) {
+        errors.push('conflictAuditTrail 缺失');
+    }
+
+    const requiredFields = [
+        'sampleId', 'finalJudgement', 'isPending',
+        'judgements', 'effectiveBoundary', 'operationLog'
+    ];
+
+    exportData.sampleData.forEach((s, idx) => {
+        requiredFields.forEach(f => {
+            if (!(f in s)) errors.push(`样本[${idx}][${s.sampleId}] 缺少字段 ${f}`);
+        });
+
+        if (s.isPending) {
+            if (!s.pendingType) errors.push(`待复核样本 ${s.sampleId} 缺少 pendingType`);
+            if (!s.pendingReason) errors.push(`待复核样本 ${s.sampleId} 缺少 pendingReason`);
+            if (!s.reviewHandler) errors.push(`待复核样本 ${s.sampleId} 缺少 reviewHandler`);
+        }
+
+        if (s.hasConflictAudit) {
+            if (!s.conflictAudit) errors.push(`样本 ${s.sampleId} hasConflictAudit=true 但 conflictAudit 为空`);
+            else if (!s.conflictAudit.reason) errors.push(`样本 ${s.sampleId} conflictAudit 缺少 reason`);
+            else if (!s.conflictAudit.nextStep) errors.push(`样本 ${s.sampleId} conflictAudit 缺少 nextStep`);
+        }
+
+        if (!s.judgements || !('final' in s.judgements)) {
+            errors.push(`样本 ${s.sampleId} judgements.final 缺失`);
+        }
+
+        if (s.finalJudgement !== s.judgements?.final) {
+            errors.push(`样本 ${s.sampleId} finalJudgement 与 judgements.final 不一致`);
+        }
+    });
+
+    exportData.pendingSamples.forEach(ps => {
+        const sample = exportData.sampleData.find(s => s.sampleId === ps.sampleId);
+        if (!sample) errors.push(`pendingSamples 中的 ${ps.sampleId} 在 sampleData 中找不到`);
+        else if (!sample.isPending) errors.push(`${ps.sampleId} 在 pendingSamples 中但 sampleData.isPending=false`);
+    });
+
+    Object.keys(AppState.resolvedConflicts).forEach(bid => {
+        const audit = exportData.conflictAuditTrail.find(a => a.id === bid);
+        if (!audit) warnings.push(`冲突项 ${bid} 在 conflictAuditTrail 中找不到完整记录`);
+    });
+
+    return { errors, warnings, pass: errors.length === 0 };
+}
+
+function exportReport() {
+    const { exportTime, exportData } = buildExportData();
+    const validation = validateExportData(exportData);
+
+    if (!validation.pass) {
+        showModal('导出数据校验失败', `
+            <div class="check-result-item error">
+                <h4>❌ 导出前校验不通过</h4>
+                <ul>${validation.errors.map(e => `<li>${e}</li>`).join('')}</ul>
+                <p class="text-muted mt-2">请检查是否已完成"生成报告"步骤，或联系开发。</p>
+            </div>
+        `, [{ text: '关闭', class: 'btn-outline', action: closeModal }]);
+        addHistory(`导出被拦截：校验发现 ${validation.errors.length} 项错误`);
+        return;
+    }
+
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -1148,9 +1421,13 @@ function exportReport() {
     a.download = `概率抽样审计报告_${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    
-    addHistory(`导出审计报告（${exportTime}，含冲突审计轨迹和生效边界值清单）`);
-    showToast('报告已导出，含完整冲突审计记录');
+
+    const pendingMsg = exportData.summary?.pendingBreakdown
+        ? ` 待复核样本：负数值(${exportData.summary.pendingBreakdown.negative_value}) + 边界范围(${exportData.summary.pendingBreakdown.boundary_range})`
+        : '';
+
+    addHistory(`导出审计报告（${exportTime}），共 ${exportData.sampleData.length} 样本，${exportData.conflictAuditTrail.length} 条冲突审计。${pendingMsg}。导出前校验已通过。`);
+    showToast(`报告已导出（${exportData.sampleData.length} 样本，校验通过）`);
 }
 
 function completeWorkflow() {

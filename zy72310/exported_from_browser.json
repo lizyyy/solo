@@ -1,0 +1,1213 @@
+{
+  "exportTime": "2026/6/19 15:25:07",
+  "schemaVersion": "2.0",
+  "generatedFromWorkflowStep": 3,
+  "summary": {
+    "totalSamples": 18,
+    "totalBoundaries": 6,
+    "conflictCount": 3,
+    "resolvedCount": 3,
+    "negativeSampleCount": 2,
+    "finalCounts": {
+      "normal": 9,
+      "borderline": 3,
+      "pending": 4,
+      "abnormal": 2,
+      "missing": 0
+    },
+    "pendingBreakdown": {
+      "negative_value": 2,
+      "boundary_range": 2,
+      "other": 0
+    },
+    "operator": "实验助理小穆"
+  },
+  "effectiveBoundaries": [
+    {
+      "boundaryId": "S001",
+      "name": "语文阅读理解得分",
+      "originalBoundary": 60,
+      "originalRule": "≥60为合格",
+      "currentBoundary": 60,
+      "currentRule": "≥60为合格",
+      "sourceLabel": "沿用边界值说明（经人工确认）",
+      "modified": true,
+      "auditTrail": [
+        {
+          "action": "首次导入",
+          "value": 60,
+          "rule": "≥60为合格",
+          "operator": "系统导入",
+          "timestamp": "2026/6/19 15:23:54"
+        },
+        {
+          "action": "冲突处理：沿用边界值",
+          "value": 60,
+          "rule": "≥60为合格",
+          "operator": "实验助理小穆",
+          "reason": "与业务组确认语文保持原始阈值",
+          "nextStep": "转交学生助教复核边界±2范围的样本",
+          "timestamp": "2026/6/19 15:23:54"
+        }
+      ]
+    },
+    {
+      "boundaryId": "S002",
+      "name": "数学计算题正确率",
+      "originalBoundary": 75,
+      "originalRule": "≥75为合格",
+      "currentBoundary": 75,
+      "currentRule": "≥75为合格",
+      "sourceLabel": "边界值说明（首次导入）",
+      "modified": false,
+      "auditTrail": [
+        {
+          "action": "首次导入",
+          "value": 75,
+          "rule": "≥75为合格",
+          "operator": "系统导入",
+          "timestamp": "2026/6/19 15:23:54"
+        }
+      ]
+    },
+    {
+      "boundaryId": "S003",
+      "name": "英语听力得分率",
+      "originalBoundary": 70,
+      "originalRule": "≥70为合格",
+      "currentBoundary": 72,
+      "currentRule": "≥72为合格，边界值±3需复核",
+      "sourceLabel": "按评分权重表修正（经人工确认）",
+      "modified": true,
+      "auditTrail": [
+        {
+          "action": "首次导入",
+          "value": 70,
+          "rule": "≥70为合格",
+          "operator": "系统导入",
+          "timestamp": "2026/6/19 15:23:54"
+        },
+        {
+          "action": "冲突处理：按评分权重表修正",
+          "value": 72,
+          "rule": "≥72为合格，边界值±3需复核",
+          "operator": "实验助理小穆",
+          "reason": "英语听力按群内补发评分权重表修正",
+          "nextStep": "自动按新阈值重算",
+          "timestamp": "2026/6/19 15:23:54"
+        }
+      ]
+    },
+    {
+      "boundaryId": "S004",
+      "name": "物理实验操作分",
+      "originalBoundary": 80,
+      "originalRule": "≥80为合格",
+      "currentBoundary": 80,
+      "currentRule": "≥80为合格",
+      "sourceLabel": "边界值说明（首次导入）",
+      "modified": false,
+      "auditTrail": [
+        {
+          "action": "首次导入",
+          "value": 80,
+          "rule": "≥80为合格",
+          "operator": "系统导入",
+          "timestamp": "2026/6/19 15:23:54"
+        }
+      ]
+    },
+    {
+      "boundaryId": "S005",
+      "name": "化学方程式书写",
+      "originalBoundary": 65,
+      "originalRule": "≥65为合格",
+      "currentBoundary": 68,
+      "currentRule": "≥68为合格，边界值±2需复核",
+      "sourceLabel": "按评分权重表修正（经人工确认）",
+      "modified": true,
+      "auditTrail": [
+        {
+          "action": "首次导入",
+          "value": 65,
+          "rule": "≥65为合格",
+          "operator": "系统导入",
+          "timestamp": "2026/6/19 15:23:54"
+        },
+        {
+          "action": "冲突处理：按评分权重表修正",
+          "value": 68,
+          "rule": "≥68为合格，边界值±2需复核",
+          "operator": "实验助理小穆",
+          "reason": "化学方程式按最新补录材料修正",
+          "nextStep": "样本已按新阈值重算",
+          "timestamp": "2026/6/19 15:23:54"
+        }
+      ]
+    },
+    {
+      "boundaryId": "S006",
+      "name": "生物标本识别率",
+      "originalBoundary": 55,
+      "originalRule": "≥55为合格",
+      "currentBoundary": 55,
+      "currentRule": "≥55为合格",
+      "sourceLabel": "边界值说明（首次导入）",
+      "modified": false,
+      "auditTrail": [
+        {
+          "action": "首次导入",
+          "value": 55,
+          "rule": "≥55为合格",
+          "operator": "系统导入",
+          "timestamp": "2026/6/19 15:23:54"
+        }
+      ]
+    }
+  ],
+  "conflictAuditTrail": [
+    {
+      "id": "S001",
+      "name": "语文阅读理解得分",
+      "source": "boundary",
+      "choiceLabel": "沿用边界值说明（60 → 保持60）",
+      "originalBoundary": 60,
+      "originalRule": "≥60为合格",
+      "weightBoundary": 65,
+      "weightRule": "≥65为合格，边界值±2需复核",
+      "finalBoundary": 60,
+      "finalRule": "≥60为合格",
+      "reason": "与业务组确认语文保持原始阈值",
+      "nextStep": "转交学生助教复核边界±2范围的样本",
+      "needReview": true,
+      "operator": "实验助理小穆",
+      "timestamp": "2026/6/19 15:23:54",
+      "reviewHandler": "学生助教"
+    },
+    {
+      "id": "S003",
+      "name": "英语听力得分率",
+      "source": "weight",
+      "choiceLabel": "按评分权重表修正（70 → 72）",
+      "originalBoundary": 70,
+      "originalRule": "≥70为合格",
+      "weightBoundary": 72,
+      "weightRule": "≥72为合格，边界值±3需复核",
+      "finalBoundary": 72,
+      "finalRule": "≥72为合格，边界值±3需复核",
+      "reason": "英语听力按群内补发评分权重表修正",
+      "nextStep": "自动按新阈值重算",
+      "needReview": false,
+      "operator": "实验助理小穆",
+      "timestamp": "2026/6/19 15:23:54",
+      "reviewHandler": null
+    },
+    {
+      "id": "S005",
+      "name": "化学方程式书写",
+      "source": "weight",
+      "choiceLabel": "按评分权重表修正（65 → 68）",
+      "originalBoundary": 65,
+      "originalRule": "≥65为合格",
+      "weightBoundary": 68,
+      "weightRule": "≥68为合格，边界值±2需复核",
+      "finalBoundary": 68,
+      "finalRule": "≥68为合格，边界值±2需复核",
+      "reason": "化学方程式按最新补录材料修正",
+      "nextStep": "样本已按新阈值重算",
+      "needReview": false,
+      "operator": "实验助理小穆",
+      "timestamp": "2026/6/19 15:23:54",
+      "reviewHandler": null
+    }
+  ],
+  "boundaryData": [
+    {
+      "id": "S001",
+      "name": "语文阅读理解得分",
+      "boundary": 60,
+      "rule": "≥60为合格",
+      "status": "pending"
+    },
+    {
+      "id": "S002",
+      "name": "数学计算题正确率",
+      "boundary": 75,
+      "rule": "≥75为合格",
+      "status": "pending"
+    },
+    {
+      "id": "S003",
+      "name": "英语听力得分率",
+      "boundary": 70,
+      "rule": "≥70为合格",
+      "status": "pending"
+    },
+    {
+      "id": "S004",
+      "name": "物理实验操作分",
+      "boundary": 80,
+      "rule": "≥80为合格",
+      "status": "pending"
+    },
+    {
+      "id": "S005",
+      "name": "化学方程式书写",
+      "boundary": 65,
+      "rule": "≥65为合格",
+      "status": "pending"
+    },
+    {
+      "id": "S006",
+      "name": "生物标本识别率",
+      "boundary": 55,
+      "rule": "≥55为合格",
+      "status": "pending"
+    }
+  ],
+  "weightData": [
+    {
+      "id": "S001",
+      "name": "语文阅读理解得分",
+      "weight": "20%",
+      "threshold": 65,
+      "rule": "≥65为合格，边界值±2需复核"
+    },
+    {
+      "id": "S002",
+      "name": "数学计算题正确率",
+      "weight": "25%",
+      "threshold": 75,
+      "rule": "≥75为合格，边界值±1需复核"
+    },
+    {
+      "id": "S003",
+      "name": "英语听力得分率",
+      "weight": "15%",
+      "threshold": 72,
+      "rule": "≥72为合格，边界值±3需复核"
+    },
+    {
+      "id": "S004",
+      "name": "物理实验操作分",
+      "weight": "20%",
+      "threshold": 80,
+      "rule": "≥80为合格，边界值±2需复核"
+    },
+    {
+      "id": "S005",
+      "name": "化学方程式书写",
+      "weight": "10%",
+      "threshold": 68,
+      "rule": "≥68为合格，边界值±2需复核"
+    },
+    {
+      "id": "S006",
+      "name": "生物标本识别率",
+      "weight": "10%",
+      "threshold": 55,
+      "rule": "≥55为合格，边界值±1需复核"
+    }
+  ],
+  "sampleData": [
+    {
+      "sampleId": "SA001",
+      "boundaryId": "S001",
+      "name": "语文阅读理解得分",
+      "originalValue": 65,
+      "originalBoundary": 60,
+      "weightBoundary": 65,
+      "effectiveBoundary": 60,
+      "boundarySource": "沿用边界值说明（经人工确认）",
+      "hasConflictAudit": true,
+      "conflictAudit": {
+        "choice": "沿用边界值说明（60 → 保持60）",
+        "originalBoundary": 60,
+        "weightBoundary": 65,
+        "finalBoundary": 60,
+        "reason": "与业务组确认语文保持原始阈值",
+        "nextStep": "转交学生助教复核边界±2范围的样本",
+        "operator": "实验助理小穆",
+        "timestamp": "2026/6/19 15:23:54",
+        "needReview": true
+      },
+      "judgements": {
+        "byOriginalBoundary": "normal",
+        "byWeightTable": "normal",
+        "byEffectiveBoundary": "normal",
+        "final": "normal"
+      },
+      "finalJudgement": "normal",
+      "finalJudgementLabel": "正常",
+      "isPending": false,
+      "pendingType": null,
+      "pendingReason": null,
+      "reviewHandler": null,
+      "operationLog": "原始边界(60)判定：normal | 权重表(65)判定：normal | 冲突处理：沿用边界值说明（60 → 保持60）（与业务组确认语文保持原始阈值） | 下一步：转交学生助教复核边界±2范围的样本",
+      "reportIncluded": true
+    },
+    {
+      "sampleId": "SA002",
+      "boundaryId": "S001",
+      "name": "语文阅读理解得分",
+      "originalValue": 62,
+      "originalBoundary": 60,
+      "weightBoundary": 65,
+      "effectiveBoundary": 60,
+      "boundarySource": "沿用边界值说明（经人工确认）",
+      "hasConflictAudit": true,
+      "conflictAudit": {
+        "choice": "沿用边界值说明（60 → 保持60）",
+        "originalBoundary": 60,
+        "weightBoundary": 65,
+        "finalBoundary": 60,
+        "reason": "与业务组确认语文保持原始阈值",
+        "nextStep": "转交学生助教复核边界±2范围的样本",
+        "operator": "实验助理小穆",
+        "timestamp": "2026/6/19 15:23:54",
+        "needReview": true
+      },
+      "judgements": {
+        "byOriginalBoundary": "normal",
+        "byWeightTable": "abnormal",
+        "byEffectiveBoundary": "normal",
+        "final": "pending"
+      },
+      "finalJudgement": "pending",
+      "finalJudgementLabel": "待复核",
+      "isPending": true,
+      "pendingType": "boundary_range",
+      "pendingReason": "沿用边界值说明(阈值=60)，原始值(62)落在边界±2复核范围[58, 62]内，按处理说明(与业务组确认语文保持原始阈值)需留交学生助教复核后才能最终判定。",
+      "reviewHandler": "学生助教（边界样本复核）",
+      "operationLog": "原始边界(60)判定：normal | 权重表(65)判定：abnormal | 沿用边界值标记，值(62)在边界±2范围[58,62]内，待学生助教复核 | 冲突处理：沿用边界值说明（60 → 保持60）（与业务组确认语文保持原始阈值） | 下一步：转交学生助教复核边界±2范围的样本",
+      "reportIncluded": true
+    },
+    {
+      "sampleId": "SA003",
+      "boundaryId": "S001",
+      "name": "语文阅读理解得分",
+      "originalValue": 58,
+      "originalBoundary": 60,
+      "weightBoundary": 65,
+      "effectiveBoundary": 60,
+      "boundarySource": "沿用边界值说明（经人工确认）",
+      "hasConflictAudit": true,
+      "conflictAudit": {
+        "choice": "沿用边界值说明（60 → 保持60）",
+        "originalBoundary": 60,
+        "weightBoundary": 65,
+        "finalBoundary": 60,
+        "reason": "与业务组确认语文保持原始阈值",
+        "nextStep": "转交学生助教复核边界±2范围的样本",
+        "operator": "实验助理小穆",
+        "timestamp": "2026/6/19 15:23:54",
+        "needReview": true
+      },
+      "judgements": {
+        "byOriginalBoundary": "borderline",
+        "byWeightTable": "abnormal",
+        "byEffectiveBoundary": "borderline",
+        "final": "pending"
+      },
+      "finalJudgement": "pending",
+      "finalJudgementLabel": "待复核",
+      "isPending": true,
+      "pendingType": "boundary_range",
+      "pendingReason": "沿用边界值说明(阈值=60)，原始值(58)落在边界±2复核范围[58, 62]内，按处理说明(与业务组确认语文保持原始阈值)需留交学生助教复核后才能最终判定。",
+      "reviewHandler": "学生助教（边界样本复核）",
+      "operationLog": "原始边界(60)判定：borderline | 权重表(65)判定：abnormal | 沿用边界值标记，值(58)在边界±2范围[58,62]内，待学生助教复核 | 冲突处理：沿用边界值说明（60 → 保持60）（与业务组确认语文保持原始阈值） | 下一步：转交学生助教复核边界±2范围的样本",
+      "reportIncluded": true
+    },
+    {
+      "sampleId": "SA004",
+      "boundaryId": "S002",
+      "name": "数学计算题正确率",
+      "originalValue": 75,
+      "originalBoundary": 75,
+      "weightBoundary": 75,
+      "effectiveBoundary": 75,
+      "boundarySource": "边界值说明（首次导入）",
+      "hasConflictAudit": false,
+      "conflictAudit": null,
+      "judgements": {
+        "byOriginalBoundary": "normal",
+        "byWeightTable": "normal",
+        "byEffectiveBoundary": "normal",
+        "final": "normal"
+      },
+      "finalJudgement": "normal",
+      "finalJudgementLabel": "正常",
+      "isPending": false,
+      "pendingType": null,
+      "pendingReason": null,
+      "reviewHandler": null,
+      "operationLog": "原始边界(75)判定：normal | 权重表(75)判定：normal",
+      "reportIncluded": true
+    },
+    {
+      "sampleId": "SA005",
+      "boundaryId": "S002",
+      "name": "数学计算题正确率",
+      "originalValue": 82,
+      "originalBoundary": 75,
+      "weightBoundary": 75,
+      "effectiveBoundary": 75,
+      "boundarySource": "边界值说明（首次导入）",
+      "hasConflictAudit": false,
+      "conflictAudit": null,
+      "judgements": {
+        "byOriginalBoundary": "normal",
+        "byWeightTable": "normal",
+        "byEffectiveBoundary": "normal",
+        "final": "normal"
+      },
+      "finalJudgement": "normal",
+      "finalJudgementLabel": "正常",
+      "isPending": false,
+      "pendingType": null,
+      "pendingReason": null,
+      "reviewHandler": null,
+      "operationLog": "原始边界(75)判定：normal | 权重表(75)判定：normal",
+      "reportIncluded": true
+    },
+    {
+      "sampleId": "SA006",
+      "boundaryId": "S002",
+      "name": "数学计算题正确率",
+      "originalValue": -3,
+      "originalBoundary": 75,
+      "weightBoundary": 75,
+      "effectiveBoundary": 75,
+      "boundarySource": "边界值说明（首次导入）",
+      "hasConflictAudit": false,
+      "conflictAudit": null,
+      "judgements": {
+        "byOriginalBoundary": "missing",
+        "byWeightTable": "missing",
+        "byEffectiveBoundary": "missing",
+        "final": "pending"
+      },
+      "finalJudgement": "pending",
+      "finalJudgementLabel": "待复核",
+      "isPending": true,
+      "pendingType": "negative_value",
+      "pendingReason": "原始值(-3)为负数，被旧版判定表标记为\"缺失\"。按审计规则不急于归为正常/异常，留交学生助教复核。",
+      "reviewHandler": "学生助教（负数样本复核组）",
+      "operationLog": "原始边界(75)判定：missing | 权重表(75)判定：missing | 负数样本被旧表标为缺失，转交学生助教复核",
+      "reportIncluded": true
+    },
+    {
+      "sampleId": "SA007",
+      "boundaryId": "S003",
+      "name": "英语听力得分率",
+      "originalValue": 71,
+      "originalBoundary": 70,
+      "weightBoundary": 72,
+      "effectiveBoundary": 72,
+      "boundarySource": "按评分权重表修正（经人工确认）",
+      "hasConflictAudit": true,
+      "conflictAudit": {
+        "choice": "按评分权重表修正（70 → 72）",
+        "originalBoundary": 70,
+        "weightBoundary": 72,
+        "finalBoundary": 72,
+        "reason": "英语听力按群内补发评分权重表修正",
+        "nextStep": "自动按新阈值重算",
+        "operator": "实验助理小穆",
+        "timestamp": "2026/6/19 15:23:54",
+        "needReview": false
+      },
+      "judgements": {
+        "byOriginalBoundary": "normal",
+        "byWeightTable": "borderline",
+        "byEffectiveBoundary": "borderline",
+        "final": "borderline"
+      },
+      "finalJudgement": "borderline",
+      "finalJudgementLabel": "边界值",
+      "isPending": false,
+      "pendingType": null,
+      "pendingReason": null,
+      "reviewHandler": null,
+      "operationLog": "原始边界(70)判定：normal | 权重表(72)判定：borderline | 生效边界(72)判定：borderline | 冲突处理：按评分权重表修正（70 → 72）（英语听力按群内补发评分权重表修正） | 下一步：自动按新阈值重算",
+      "reportIncluded": true
+    },
+    {
+      "sampleId": "SA008",
+      "boundaryId": "S003",
+      "name": "英语听力得分率",
+      "originalValue": 73,
+      "originalBoundary": 70,
+      "weightBoundary": 72,
+      "effectiveBoundary": 72,
+      "boundarySource": "按评分权重表修正（经人工确认）",
+      "hasConflictAudit": true,
+      "conflictAudit": {
+        "choice": "按评分权重表修正（70 → 72）",
+        "originalBoundary": 70,
+        "weightBoundary": 72,
+        "finalBoundary": 72,
+        "reason": "英语听力按群内补发评分权重表修正",
+        "nextStep": "自动按新阈值重算",
+        "operator": "实验助理小穆",
+        "timestamp": "2026/6/19 15:23:54",
+        "needReview": false
+      },
+      "judgements": {
+        "byOriginalBoundary": "normal",
+        "byWeightTable": "normal",
+        "byEffectiveBoundary": "normal",
+        "final": "normal"
+      },
+      "finalJudgement": "normal",
+      "finalJudgementLabel": "正常",
+      "isPending": false,
+      "pendingType": null,
+      "pendingReason": null,
+      "reviewHandler": null,
+      "operationLog": "原始边界(70)判定：normal | 权重表(72)判定：normal | 生效边界(72)判定：normal | 冲突处理：按评分权重表修正（70 → 72）（英语听力按群内补发评分权重表修正） | 下一步：自动按新阈值重算",
+      "reportIncluded": true
+    },
+    {
+      "sampleId": "SA009",
+      "boundaryId": "S003",
+      "name": "英语听力得分率",
+      "originalValue": 68,
+      "originalBoundary": 70,
+      "weightBoundary": 72,
+      "effectiveBoundary": 72,
+      "boundarySource": "按评分权重表修正（经人工确认）",
+      "hasConflictAudit": true,
+      "conflictAudit": {
+        "choice": "按评分权重表修正（70 → 72）",
+        "originalBoundary": 70,
+        "weightBoundary": 72,
+        "finalBoundary": 72,
+        "reason": "英语听力按群内补发评分权重表修正",
+        "nextStep": "自动按新阈值重算",
+        "operator": "实验助理小穆",
+        "timestamp": "2026/6/19 15:23:54",
+        "needReview": false
+      },
+      "judgements": {
+        "byOriginalBoundary": "borderline",
+        "byWeightTable": "abnormal",
+        "byEffectiveBoundary": "abnormal",
+        "final": "abnormal"
+      },
+      "finalJudgement": "abnormal",
+      "finalJudgementLabel": "异常",
+      "isPending": false,
+      "pendingType": null,
+      "pendingReason": null,
+      "reviewHandler": null,
+      "operationLog": "原始边界(70)判定：borderline | 权重表(72)判定：abnormal | 生效边界(72)判定：abnormal | 冲突处理：按评分权重表修正（70 → 72）（英语听力按群内补发评分权重表修正） | 下一步：自动按新阈值重算",
+      "reportIncluded": true
+    },
+    {
+      "sampleId": "SA010",
+      "boundaryId": "S004",
+      "name": "物理实验操作分",
+      "originalValue": 80,
+      "originalBoundary": 80,
+      "weightBoundary": 80,
+      "effectiveBoundary": 80,
+      "boundarySource": "边界值说明（首次导入）",
+      "hasConflictAudit": false,
+      "conflictAudit": null,
+      "judgements": {
+        "byOriginalBoundary": "normal",
+        "byWeightTable": "normal",
+        "byEffectiveBoundary": "normal",
+        "final": "normal"
+      },
+      "finalJudgement": "normal",
+      "finalJudgementLabel": "正常",
+      "isPending": false,
+      "pendingType": null,
+      "pendingReason": null,
+      "reviewHandler": null,
+      "operationLog": "原始边界(80)判定：normal | 权重表(80)判定：normal",
+      "reportIncluded": true
+    },
+    {
+      "sampleId": "SA011",
+      "boundaryId": "S004",
+      "name": "物理实验操作分",
+      "originalValue": 88,
+      "originalBoundary": 80,
+      "weightBoundary": 80,
+      "effectiveBoundary": 80,
+      "boundarySource": "边界值说明（首次导入）",
+      "hasConflictAudit": false,
+      "conflictAudit": null,
+      "judgements": {
+        "byOriginalBoundary": "normal",
+        "byWeightTable": "normal",
+        "byEffectiveBoundary": "normal",
+        "final": "normal"
+      },
+      "finalJudgement": "normal",
+      "finalJudgementLabel": "正常",
+      "isPending": false,
+      "pendingType": null,
+      "pendingReason": null,
+      "reviewHandler": null,
+      "operationLog": "原始边界(80)判定：normal | 权重表(80)判定：normal",
+      "reportIncluded": true
+    },
+    {
+      "sampleId": "SA012",
+      "boundaryId": "S004",
+      "name": "物理实验操作分",
+      "originalValue": 78,
+      "originalBoundary": 80,
+      "weightBoundary": 80,
+      "effectiveBoundary": 80,
+      "boundarySource": "边界值说明（首次导入）",
+      "hasConflictAudit": false,
+      "conflictAudit": null,
+      "judgements": {
+        "byOriginalBoundary": "borderline",
+        "byWeightTable": "borderline",
+        "byEffectiveBoundary": "borderline",
+        "final": "borderline"
+      },
+      "finalJudgement": "borderline",
+      "finalJudgementLabel": "边界值",
+      "isPending": false,
+      "pendingType": null,
+      "pendingReason": null,
+      "reviewHandler": null,
+      "operationLog": "原始边界(80)判定：borderline | 权重表(80)判定：borderline",
+      "reportIncluded": true
+    },
+    {
+      "sampleId": "SA013",
+      "boundaryId": "S005",
+      "name": "化学方程式书写",
+      "originalValue": 67,
+      "originalBoundary": 65,
+      "weightBoundary": 68,
+      "effectiveBoundary": 68,
+      "boundarySource": "按评分权重表修正（经人工确认）",
+      "hasConflictAudit": true,
+      "conflictAudit": {
+        "choice": "按评分权重表修正（65 → 68）",
+        "originalBoundary": 65,
+        "weightBoundary": 68,
+        "finalBoundary": 68,
+        "reason": "化学方程式按最新补录材料修正",
+        "nextStep": "样本已按新阈值重算",
+        "operator": "实验助理小穆",
+        "timestamp": "2026/6/19 15:23:54",
+        "needReview": false
+      },
+      "judgements": {
+        "byOriginalBoundary": "normal",
+        "byWeightTable": "borderline",
+        "byEffectiveBoundary": "borderline",
+        "final": "borderline"
+      },
+      "finalJudgement": "borderline",
+      "finalJudgementLabel": "边界值",
+      "isPending": false,
+      "pendingType": null,
+      "pendingReason": null,
+      "reviewHandler": null,
+      "operationLog": "原始边界(65)判定：normal | 权重表(68)判定：borderline | 生效边界(68)判定：borderline | 冲突处理：按评分权重表修正（65 → 68）（化学方程式按最新补录材料修正） | 下一步：样本已按新阈值重算",
+      "reportIncluded": true
+    },
+    {
+      "sampleId": "SA014",
+      "boundaryId": "S005",
+      "name": "化学方程式书写",
+      "originalValue": 72,
+      "originalBoundary": 65,
+      "weightBoundary": 68,
+      "effectiveBoundary": 68,
+      "boundarySource": "按评分权重表修正（经人工确认）",
+      "hasConflictAudit": true,
+      "conflictAudit": {
+        "choice": "按评分权重表修正（65 → 68）",
+        "originalBoundary": 65,
+        "weightBoundary": 68,
+        "finalBoundary": 68,
+        "reason": "化学方程式按最新补录材料修正",
+        "nextStep": "样本已按新阈值重算",
+        "operator": "实验助理小穆",
+        "timestamp": "2026/6/19 15:23:54",
+        "needReview": false
+      },
+      "judgements": {
+        "byOriginalBoundary": "normal",
+        "byWeightTable": "normal",
+        "byEffectiveBoundary": "normal",
+        "final": "normal"
+      },
+      "finalJudgement": "normal",
+      "finalJudgementLabel": "正常",
+      "isPending": false,
+      "pendingType": null,
+      "pendingReason": null,
+      "reviewHandler": null,
+      "operationLog": "原始边界(65)判定：normal | 权重表(68)判定：normal | 生效边界(68)判定：normal | 冲突处理：按评分权重表修正（65 → 68）（化学方程式按最新补录材料修正） | 下一步：样本已按新阈值重算",
+      "reportIncluded": true
+    },
+    {
+      "sampleId": "SA015",
+      "boundaryId": "S005",
+      "name": "化学方程式书写",
+      "originalValue": -1,
+      "originalBoundary": 65,
+      "weightBoundary": 68,
+      "effectiveBoundary": 68,
+      "boundarySource": "按评分权重表修正（经人工确认）",
+      "hasConflictAudit": true,
+      "conflictAudit": {
+        "choice": "按评分权重表修正（65 → 68）",
+        "originalBoundary": 65,
+        "weightBoundary": 68,
+        "finalBoundary": 68,
+        "reason": "化学方程式按最新补录材料修正",
+        "nextStep": "样本已按新阈值重算",
+        "operator": "实验助理小穆",
+        "timestamp": "2026/6/19 15:23:54",
+        "needReview": false
+      },
+      "judgements": {
+        "byOriginalBoundary": "missing",
+        "byWeightTable": "missing",
+        "byEffectiveBoundary": "missing",
+        "final": "pending"
+      },
+      "finalJudgement": "pending",
+      "finalJudgementLabel": "待复核",
+      "isPending": true,
+      "pendingType": "negative_value",
+      "pendingReason": "原始值(-1)为负数，被旧版判定表标记为\"缺失\"。按审计规则不急于归为正常/异常，留交学生助教复核。",
+      "reviewHandler": "学生助教（负数样本复核组）",
+      "operationLog": "原始边界(65)判定：missing | 权重表(68)判定：missing | 生效边界(68)判定：missing | 负数样本被旧表标为缺失，转交学生助教复核",
+      "reportIncluded": true
+    },
+    {
+      "sampleId": "SA016",
+      "boundaryId": "S006",
+      "name": "生物标本识别率",
+      "originalValue": 56,
+      "originalBoundary": 55,
+      "weightBoundary": 55,
+      "effectiveBoundary": 55,
+      "boundarySource": "边界值说明（首次导入）",
+      "hasConflictAudit": false,
+      "conflictAudit": null,
+      "judgements": {
+        "byOriginalBoundary": "normal",
+        "byWeightTable": "normal",
+        "byEffectiveBoundary": "normal",
+        "final": "normal"
+      },
+      "finalJudgement": "normal",
+      "finalJudgementLabel": "正常",
+      "isPending": false,
+      "pendingType": null,
+      "pendingReason": null,
+      "reviewHandler": null,
+      "operationLog": "原始边界(55)判定：normal | 权重表(55)判定：normal",
+      "reportIncluded": true
+    },
+    {
+      "sampleId": "SA017",
+      "boundaryId": "S006",
+      "name": "生物标本识别率",
+      "originalValue": 55,
+      "originalBoundary": 55,
+      "weightBoundary": 55,
+      "effectiveBoundary": 55,
+      "boundarySource": "边界值说明（首次导入）",
+      "hasConflictAudit": false,
+      "conflictAudit": null,
+      "judgements": {
+        "byOriginalBoundary": "normal",
+        "byWeightTable": "normal",
+        "byEffectiveBoundary": "normal",
+        "final": "normal"
+      },
+      "finalJudgement": "normal",
+      "finalJudgementLabel": "正常",
+      "isPending": false,
+      "pendingType": null,
+      "pendingReason": null,
+      "reviewHandler": null,
+      "operationLog": "原始边界(55)判定：normal | 权重表(55)判定：normal",
+      "reportIncluded": true
+    },
+    {
+      "sampleId": "SA018",
+      "boundaryId": "S006",
+      "name": "生物标本识别率",
+      "originalValue": 52,
+      "originalBoundary": 55,
+      "weightBoundary": 55,
+      "effectiveBoundary": 55,
+      "boundarySource": "边界值说明（首次导入）",
+      "hasConflictAudit": false,
+      "conflictAudit": null,
+      "judgements": {
+        "byOriginalBoundary": "abnormal",
+        "byWeightTable": "abnormal",
+        "byEffectiveBoundary": "abnormal",
+        "final": "abnormal"
+      },
+      "finalJudgement": "abnormal",
+      "finalJudgementLabel": "异常",
+      "isPending": false,
+      "pendingType": null,
+      "pendingReason": null,
+      "reviewHandler": null,
+      "operationLog": "原始边界(55)判定：abnormal | 权重表(55)判定：abnormal",
+      "reportIncluded": true
+    }
+  ],
+  "resolvedConflicts": {
+    "S001": "boundary",
+    "S003": "weight",
+    "S005": "weight"
+  },
+  "negativeSamples": [
+    {
+      "sampleId": "SA006",
+      "boundaryId": "S002",
+      "name": "数学计算题正确率",
+      "originalValue": -3,
+      "effectiveBoundary": 75,
+      "finalJudgement": "pending",
+      "pendingReason": "原始值(-3)为负数，被旧版判定表标记为\"缺失\"。按审计规则不急于归为正常/异常，留交学生助教复核。",
+      "reviewHandler": "学生助教（负数样本复核组）",
+      "operationLog": "原始边界(75)判定：missing | 权重表(75)判定：missing | 负数样本被旧表标为缺失，转交学生助教复核"
+    },
+    {
+      "sampleId": "SA015",
+      "boundaryId": "S005",
+      "name": "化学方程式书写",
+      "originalValue": -1,
+      "effectiveBoundary": 68,
+      "finalJudgement": "pending",
+      "pendingReason": "原始值(-1)为负数，被旧版判定表标记为\"缺失\"。按审计规则不急于归为正常/异常，留交学生助教复核。",
+      "reviewHandler": "学生助教（负数样本复核组）",
+      "operationLog": "原始边界(65)判定：missing | 权重表(68)判定：missing | 生效边界(68)判定：missing | 负数样本被旧表标为缺失，转交学生助教复核"
+    }
+  ],
+  "pendingSamples": [
+    {
+      "sampleId": "SA002",
+      "name": "语文阅读理解得分",
+      "originalValue": 62,
+      "effectiveBoundary": 60,
+      "pendingType": "boundary_range",
+      "pendingReason": "沿用边界值说明(阈值=60)，原始值(62)落在边界±2复核范围[58, 62]内，按处理说明(与业务组确认语文保持原始阈值)需留交学生助教复核后才能最终判定。",
+      "reviewHandler": "学生助教（边界样本复核）",
+      "conflictChoice": "沿用边界值说明（60 → 保持60）"
+    },
+    {
+      "sampleId": "SA003",
+      "name": "语文阅读理解得分",
+      "originalValue": 58,
+      "effectiveBoundary": 60,
+      "pendingType": "boundary_range",
+      "pendingReason": "沿用边界值说明(阈值=60)，原始值(58)落在边界±2复核范围[58, 62]内，按处理说明(与业务组确认语文保持原始阈值)需留交学生助教复核后才能最终判定。",
+      "reviewHandler": "学生助教（边界样本复核）",
+      "conflictChoice": "沿用边界值说明（60 → 保持60）"
+    },
+    {
+      "sampleId": "SA006",
+      "name": "数学计算题正确率",
+      "originalValue": -3,
+      "effectiveBoundary": 75,
+      "pendingType": "negative_value",
+      "pendingReason": "原始值(-3)为负数，被旧版判定表标记为\"缺失\"。按审计规则不急于归为正常/异常，留交学生助教复核。",
+      "reviewHandler": "学生助教（负数样本复核组）",
+      "conflictChoice": null
+    },
+    {
+      "sampleId": "SA015",
+      "name": "化学方程式书写",
+      "originalValue": -1,
+      "effectiveBoundary": 68,
+      "pendingType": "negative_value",
+      "pendingReason": "原始值(-1)为负数，被旧版判定表标记为\"缺失\"。按审计规则不急于归为正常/异常，留交学生助教复核。",
+      "reviewHandler": "学生助教（负数样本复核组）",
+      "conflictChoice": "按评分权重表修正（65 → 68）"
+    }
+  ],
+  "compareResults": {
+    "normal": [
+      {
+        "boundaryId": "S001",
+        "name": "语文阅读理解得分",
+        "threshold": 60,
+        "total": 3,
+        "normal": 1,
+        "borderline": 0,
+        "abnormal": 0,
+        "missing": 0,
+        "pending": 2,
+        "matchRate": 100
+      },
+      {
+        "boundaryId": "S002",
+        "name": "数学计算题正确率",
+        "threshold": 75,
+        "total": 3,
+        "normal": 2,
+        "borderline": 0,
+        "abnormal": 0,
+        "missing": 0,
+        "pending": 1,
+        "matchRate": 100
+      },
+      {
+        "boundaryId": "S003",
+        "name": "英语听力得分率",
+        "threshold": 70,
+        "total": 3,
+        "normal": 2,
+        "borderline": 1,
+        "abnormal": 0,
+        "missing": 0,
+        "pending": 0,
+        "matchRate": 100
+      },
+      {
+        "boundaryId": "S004",
+        "name": "物理实验操作分",
+        "threshold": 80,
+        "total": 3,
+        "normal": 2,
+        "borderline": 1,
+        "abnormal": 0,
+        "missing": 0,
+        "pending": 0,
+        "matchRate": 100
+      },
+      {
+        "boundaryId": "S005",
+        "name": "化学方程式书写",
+        "threshold": 65,
+        "total": 3,
+        "normal": 2,
+        "borderline": 0,
+        "abnormal": 0,
+        "missing": 0,
+        "pending": 1,
+        "matchRate": 100
+      },
+      {
+        "boundaryId": "S006",
+        "name": "生物标本识别率",
+        "threshold": 55,
+        "total": 3,
+        "normal": 2,
+        "borderline": 0,
+        "abnormal": 1,
+        "missing": 0,
+        "pending": 0,
+        "matchRate": 67
+      }
+    ],
+    "wrong": [
+      {
+        "boundaryId": "S001",
+        "name": "语文阅读理解得分",
+        "threshold": 60,
+        "total": 3,
+        "normal": 2,
+        "borderline": 1,
+        "abnormal": 0,
+        "missing": 0,
+        "pending": 0,
+        "matchRate": 100
+      },
+      {
+        "boundaryId": "S002",
+        "name": "数学计算题正确率",
+        "threshold": 75,
+        "total": 3,
+        "normal": 2,
+        "borderline": 0,
+        "abnormal": 0,
+        "missing": 1,
+        "pending": 0,
+        "matchRate": 67
+      },
+      {
+        "boundaryId": "S003",
+        "name": "英语听力得分率",
+        "threshold": 70,
+        "total": 3,
+        "normal": 2,
+        "borderline": 1,
+        "abnormal": 0,
+        "missing": 0,
+        "pending": 0,
+        "matchRate": 100
+      },
+      {
+        "boundaryId": "S004",
+        "name": "物理实验操作分",
+        "threshold": 80,
+        "total": 3,
+        "normal": 2,
+        "borderline": 1,
+        "abnormal": 0,
+        "missing": 0,
+        "pending": 0,
+        "matchRate": 100
+      },
+      {
+        "boundaryId": "S005",
+        "name": "化学方程式书写",
+        "threshold": 65,
+        "total": 3,
+        "normal": 2,
+        "borderline": 0,
+        "abnormal": 0,
+        "missing": 1,
+        "pending": 0,
+        "matchRate": 67
+      },
+      {
+        "boundaryId": "S006",
+        "name": "生物标本识别率",
+        "threshold": 55,
+        "total": 3,
+        "normal": 2,
+        "borderline": 0,
+        "abnormal": 1,
+        "missing": 0,
+        "pending": 0,
+        "matchRate": 67
+      }
+    ],
+    "supplement": [
+      {
+        "boundaryId": "S001",
+        "name": "语文阅读理解得分",
+        "threshold": 60,
+        "total": 3,
+        "normal": 2,
+        "borderline": 1,
+        "abnormal": 0,
+        "missing": 0,
+        "pending": 0,
+        "matchRate": 100
+      },
+      {
+        "boundaryId": "S002",
+        "name": "数学计算题正确率",
+        "threshold": 75,
+        "total": 3,
+        "normal": 2,
+        "borderline": 0,
+        "abnormal": 0,
+        "missing": 0,
+        "pending": 1,
+        "matchRate": 100
+      },
+      {
+        "boundaryId": "S003",
+        "name": "英语听力得分率",
+        "threshold": 72,
+        "total": 3,
+        "normal": 1,
+        "borderline": 1,
+        "abnormal": 1,
+        "missing": 0,
+        "pending": 0,
+        "matchRate": 67
+      },
+      {
+        "boundaryId": "S004",
+        "name": "物理实验操作分",
+        "threshold": 80,
+        "total": 3,
+        "normal": 2,
+        "borderline": 1,
+        "abnormal": 0,
+        "missing": 0,
+        "pending": 0,
+        "matchRate": 100
+      },
+      {
+        "boundaryId": "S005",
+        "name": "化学方程式书写",
+        "threshold": 68,
+        "total": 3,
+        "normal": 1,
+        "borderline": 1,
+        "abnormal": 0,
+        "missing": 0,
+        "pending": 1,
+        "matchRate": 100
+      },
+      {
+        "boundaryId": "S006",
+        "name": "生物标本识别率",
+        "threshold": 55,
+        "total": 3,
+        "normal": 2,
+        "borderline": 0,
+        "abnormal": 1,
+        "missing": 0,
+        "pending": 0,
+        "matchRate": 67
+      }
+    ]
+  },
+  "operationHistory": [
+    {
+      "action": "导出审计报告（2026/6/19 15:23:54），共 18 样本，3 条冲突审计。 待复核样本：负数值(2) + 边界范围(2)。导出前校验已通过。",
+      "time": "15:23:54"
+    },
+    {
+      "action": "生成边界样本报告（从生效边界值统一判定，结果已写入 AppState.sampleData）",
+      "time": "15:23:54"
+    },
+    {
+      "action": "完成三种材料对比运行",
+      "time": "15:23:54"
+    },
+    {
+      "action": "检测到2个负数样本，已标记待复核",
+      "time": "15:23:54"
+    },
+    {
+      "action": "【冲突处理】化学方程式书写 - 按评分权重表修正（65 → 68） | 生效值：68 | 下一步：样本已按新阈值重算",
+      "time": "15:23:54"
+    },
+    {
+      "action": "【冲突处理】英语听力得分率 - 按评分权重表修正（70 → 72） | 生效值：72 | 下一步：自动按新阈值重算",
+      "time": "15:23:54"
+    },
+    {
+      "action": "【冲突处理】语文阅读理解得分 - 沿用边界值说明（60 → 保持60） | 生效值：60 | 下一步：转交学生助教复核边界±2范围的样本",
+      "time": "15:23:54"
+    },
+    {
+      "action": "检测到3处边界值说明与评分权重表的冲突，等待人工确认",
+      "time": "15:23:54"
+    },
+    {
+      "action": "补看评分权重表（群内补发 · 6月2日 14:30）",
+      "time": "15:23:54"
+    },
+    {
+      "action": "成功导入边界值说明，共6项指标，已建立当前生效边界值基准",
+      "time": "15:23:54"
+    },
+    {
+      "action": "系统初始化完成，准备开始审计流程",
+      "time": "15:22:55"
+    }
+  ]
+}
