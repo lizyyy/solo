@@ -188,11 +188,29 @@ def import_formula_screenshots(
         file_hash = calculate_file_hash(file_path)
         duplicate = check_duplicate_import(session, file_hash)
         if duplicate:
+            dup_batch = _refresh_batch_counts(session, duplicate.batch_id)
+            session.commit()
+            dup_records = (
+                session.query(FormulaScreenshot)
+                .filter_by(batch_id=duplicate.batch_id)
+                .order_by(FormulaScreenshot.original_row_number)
+                .all()
+            )
+            dup_abnormals = [r for r in dup_records if r.status == RecordStatus.ABNORMAL.value]
+            dup_success = sum(1 for r in dup_records if r.status != RecordStatus.REJECTED.value)
             return {
                 "success": False,
-                "message": f"文件已存在，重复导入被阻止。原导入批次: {duplicate.batch_id}",
+                "duplicate": True,
+                "message": f"文件已存在，重复导入被阻止。使用原导入批次继续处理: {duplicate.batch_id}",
                 "existing_batch": duplicate.batch_id,
-                "batch_summary": batch_summary(duplicate),
+                "batch_id": duplicate.batch_id,
+                "total_records": dup_batch.total_records,
+                "success_count": dup_success,
+                "abnormal_count": dup_batch.abnormal_count,
+                "batch_summary": batch_summary(dup_batch),
+                "abnormal_records": [record_summary(r) for r in dup_abnormals],
+                "all_records": [record_summary(r) for r in dup_records],
+                "record_ids_by_sku": {r.sku_code: r.id for r in dup_records},
             }
 
         source_format = "csv"
@@ -291,12 +309,16 @@ def import_formula_screenshots(
 
         return {
             "success": True,
+            "duplicate": False,
             "batch_id": batch_id,
+            "existing_batch": batch_id,
             "total_records": total_records,
             "success_count": success_count,
             "abnormal_count": abnormal_count,
             "batch_summary": batch_summary(batch_import),
             "abnormal_records": [record_summary(r) for r in screenshot_objs if r.status == RecordStatus.ABNORMAL.value],
+            "all_records": [record_summary(r) for r in screenshot_objs],
+            "record_ids_by_sku": {r.sku_code: r.id for r in screenshot_objs},
             "message": f"导入成功: {success_count}条, 异常: {abnormal_count}条",
         }
 

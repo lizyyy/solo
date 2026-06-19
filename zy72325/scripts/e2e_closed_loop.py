@@ -103,12 +103,43 @@ def main():
         r2.get("existing_batch") == batch_id,
         f"原批次={r2.get('existing_batch')}  期望={batch_id}",
     )
+    ok_all &= check(
+        "重复导入返回 batch_id 字段（可直接当新批次用）",
+        r2.get("batch_id") == batch_id,
+        f"batch_id={r2.get('batch_id')}",
+    )
     # 验证没有新增记录
     list_result = list_records()
     ok_all &= check(
         "总记录数仍为5（未翻倍）",
         list_result["total"] == 5,
         f"实际 total={list_result['total']}",
+    )
+    # 重复导入返回的 abnormal_records / batch_summary 与首次一致
+    bs_r1 = r1.get("batch_summary", {})
+    bs_r2 = r2.get("batch_summary", {})
+    ok_all &= check(
+        "重复导入返回的 batch_summary 异常数与首次一致",
+        bs_r2.get("abnormal_count") == bs_r1.get("abnormal_count"),
+        f"r1={bs_r1.get('abnormal_count')}  r2={bs_r2.get('abnormal_count')}",
+    )
+    ok_all &= check(
+        "重复导入返回的 abnormal_records 数量一致",
+        len(r2.get("abnormal_records", [])) == len(r1.get("abnormal_records", [])),
+        f"r1={len(r1.get('abnormal_records', []))}  r2={len(r2.get('abnormal_records', []))}",
+    )
+    ok_all &= check(
+        "重复导入返回 record_ids_by_sku（可直接按 SKU 定位）",
+        r2.get("record_ids_by_sku") is not None and "SKU002" in r2["record_ids_by_sku"],
+        f"record_ids_by_sku={r2.get('record_ids_by_sku')}",
+    )
+    # 用重复导入返回的已有批次，直接定位 SKU002 的 id，跟首次一致
+    target_id_from_dup = r2["record_ids_by_sku"]["SKU002"]
+    target_id_first = r1["record_ids_by_sku"]["SKU002"]
+    ok_all &= check(
+        "重复导入返回的 SKU002 记录ID 与首次一致（同一条记录）",
+        target_id_from_dup == target_id_first,
+        f"first={target_id_first}  dup={target_id_from_dup}",
     )
 
     # ── Step 3: 英文字段CSV导入 ──────────────────────────────────────
@@ -340,6 +371,67 @@ def main():
             f"已通过={bs_final.get('approved_count')}"
         ),
     )
+
+    # ── Step 7.5: 处理后再次重复导入 → 返回最新状态
+    section("Step 7.5: 处理后再次重复导入 — 返回同一条最新记录")
+    r_dup_final = import_formula_screenshots(
+        "data/raw/sample_formulas.csv", imported_by="运营规划阿岚"
+    )
+    ok_all &= check(
+        "仍命中重复导入（duplicate=True）",
+        r_dup_final.get("duplicate") is True,
+        f"duplicate={r_dup_final.get('duplicate')}",
+    )
+    ok_all &= check(
+        "重复导入返回的批次ID 与原批次一致",
+        r_dup_final.get("batch_id") == batch_id,
+        f"batch_id={r_dup_final.get('batch_id')}",
+    )
+    dup_sku002 = None
+    for r in (r_dup_final.get("all_records") or []):
+        if r.get("sku_code") == "SKU002":
+            dup_sku002 = r
+            break
+    ok_all &= check(
+        "重复导入返回 all_records 含 SKU002",
+        dup_sku002 is not None,
+        f"all_records 数量={len(r_dup_final.get('all_records') or [])}",
+    )
+    if dup_sku002:
+        ok_all &= check(
+            "重复导入返回的 SKU002 状态 = 已通过",
+            dup_sku002.get("status_label") == "已通过",
+            f"status={dup_sku002.get('status')} label={dup_sku002.get('status_label')}",
+        )
+        ok_all &= check(
+            "重复导入返回的 SKU002 结果值 = N/A(下架)",
+            dup_sku002.get("result_value") == "N/A(下架)",
+            f"result_value={dup_sku002.get('result_value')}",
+        )
+        ok_all &= check(
+            "重复导入返回的 SKU002 四要素齐全",
+            bool(dup_sku002.get("original_statement"))
+            and dup_sku002.get("corrected_value") == "N/A(下架)"
+            and bool(dup_sku002.get("review_reason"))
+            and bool(dup_sku002.get("next_handler")),
+            (
+                f"orig={bool(dup_sku002.get('original_statement'))} "
+                f"corrected={dup_sku002.get('corrected_value')} "
+                f"reason={bool(dup_sku002.get('review_reason'))} "
+                f"next={bool(dup_sku002.get('next_handler'))}"
+            ),
+        )
+        detail_again = get_record_detail(target_id)["screenshot"]
+        ok_all &= check(
+            "重复导入返回的 SKU002 与详情页 完全一致",
+            dup_sku002.get("result_value") == detail_again.get("result_value")
+            and dup_sku002.get("status") == detail_again.get("status")
+            and dup_sku002.get("corrected_value") == detail_again.get("corrected_value"),
+            (
+                f"dup: status={dup_sku002.get('status')} "
+                f"result={dup_sku002.get('result_value')}"
+            ),
+        )
 
     # ── Step 8: 导出 Excel / CSV ────────────────────────────────────
     section("Step 8: 导出完整数据 & 复核报告 — 使用同一份最新数据")
