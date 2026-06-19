@@ -1,0 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+.font-display {
+  font-family: 'Noto Serif SC', Georgia, serif;
+}
+
+.font-mono-data {
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium
+         border-2 border-navy-700 text-navy-700 bg-white
+         hover:bg-navy-50 hover:shadow-lift
+         active:shadow-sink active:translate-y-px
+         transition-all duration-150 select-none;
+}
+
+.btn-primary {
+  @apply bg-navy-700 text-white
+         hover:bg-navy-600;
+}
+
+.btn-danger {
+  @apply border-amber-600 text-amber-700 bg-white
+         hover:bg-amber-50;
+}
+
+.btn-sm {
+  @apply px-3 py-1.5 text-xs;
+}
+
+.card {
+  @apply bg-white border border-slate-200 rounded-none;
+}
+
+.data-table {
+  @apply w-full text-sm border-collapse;
+}
+
+.data-table th {
+  @apply bg-slate-50 text-slate-700 font-semibold text-left px-3 py-2
+         border-b border-slate-200 border-r border-slate-200 last:border-r-0;
+}
+
+.data-table td {
+  @apply px-3 py-2 border-b border-slate-200 border-r border-slate-200 last:border-r-0
+         text-slate-800;
+}
+
+.data-table tr:nth-child(even) td {
+  @apply bg-slate-50/50;
+}
+
+.data-table tr:hover td {
+  @apply bg-navy-50/40;
+}
+
+.badge {
+  @apply inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-none;
+}
+
+.badge-amber {
+  @apply bg-amber-100 text-amber-800 border border-amber-300;
+}
+
+.badge-emerald {
+  @apply bg-emerald-100 text-emerald-800 border border-emerald-300;
+}
+
+.badge-navy {
+  @apply bg-navy-100 text-navy-800 border border-navy-300;
+}
+
+.hover-float {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-float:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(30, 58, 95, 0.12);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border: none;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
