@@ -23,7 +23,7 @@ interface AppState {
   setOpenGapCount: (count: number) => void;
   setRoutesData: (data: { routes: PickingRoute[]; openGaps: GapRecord[]; openGapCount: number }) => void;
   setWeights: (weights: ScoreWeight[]) => void;
-  setWeightReviewInfo: (info: any) => void;
+  setWeightReviewInfo: (info: AppState['weightReviewInfo']) => void;
   setIsWeightReviewed: (reviewed: boolean) => void;
   setVersions: (versions: ParameterVersion[]) => void;
   setSelfCheckResult: (result: SelfCheckResult | null) => void;

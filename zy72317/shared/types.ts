@@ -6,6 +6,15 @@ export type VersionStatus = 'draft' | 'pending_review' | 'published';
 
 export type GapResolutionType = 'supplement_fill' | 'renumber' | 'accept_gap' | 'other';
 
+export interface RouteSnapshot {
+  id: string;
+  currentLineNo: number;
+  orderNo: string;
+  sku?: string;
+  originalLineNo?: number;
+  status: RouteStatus;
+}
+
 export interface GapReviewInfo {
   reviewedBy: string;
   reviewedAt: string;
@@ -17,8 +26,8 @@ export interface GapReviewInfo {
   resolutionType: GapResolutionType;
   resolutionRemark: string;
   nextHandler: string | null;
-  beforeFixValues?: any;
-  afterFixValues?: any;
+  beforeFixValues?: RouteSnapshot | null;
+  afterFixValues?: RouteSnapshot | null;
 }
 
 export interface GapRecord {
@@ -31,6 +40,15 @@ export interface GapRecord {
   status: 'open' | 'reviewed';
   detectedAt: string;
   reviewInfo: GapReviewInfo | null;
+}
+
+export interface GapBasicInfo {
+  gapId: string;
+  beforeLineNo: number;
+  afterLineNo: number;
+  missingCount: number;
+  beforeRouteId: string | null;
+  afterRouteId: string | null;
 }
 
 export interface RouteOptimizationResult {
@@ -47,8 +65,8 @@ export interface ChangeRecord {
   timestamp: string;
   operator: string;
   action: ActionType;
-  beforeValue?: any;
-  afterValue?: any;
+  beforeValue?: unknown;
+  afterValue?: unknown;
   remark: string;
 }
 

@@ -1,6 +1,6 @@
 import db from '../db';
 import { v4 as uuidv4 } from 'uuid';
-import type { PickingRoute, RouteStatus, RouteOptimizationResult, ChangeRecord, ActionType, GapReviewInfo } from '../../shared/types';
+import type { PickingRoute, RouteStatus, RouteOptimizationResult, ChangeRecord, ActionType, GapReviewInfo, GapBasicInfo } from '../../shared/types';
 import { STATUS_LABELS } from '../../shared/types';
 import { gapRecordRepository } from './GapRecordRepository';
 
@@ -152,11 +152,20 @@ export class RouteRepository {
     const route = this.findById(id);
     if (!route) return null;
 
+    const beforeSnap = {
+      id: route.id,
+      currentLineNo: route.currentLineNo,
+      originalLineNo: route.originalLineNo,
+      orderNo: route.routeData.orderNo,
+      sku: route.routeData.sku,
+      status: route.status,
+      routeData: route.routeData,
+    };
     const changeRecord: ChangeRecord = {
       timestamp: new Date().toISOString(),
       operator,
       action: 'delete',
-      beforeValue: { ...route.routeData, currentLineNo: route.currentLineNo },
+      beforeValue: beforeSnap,
       afterValue: null,
       remark: `人工删除行，原始行号=${route.originalLineNo}，当前编号=${route.currentLineNo}`,
     };
@@ -178,7 +187,7 @@ export class RouteRepository {
       id,
       operator,
       'delete',
-      JSON.stringify({ ...route.routeData, currentLineNo: route.currentLineNo }),
+      JSON.stringify(beforeSnap),
       null,
       `人工删除行，原始行号=${route.originalLineNo}，当前编号=${route.currentLineNo}`
     );
@@ -297,37 +306,45 @@ export class RouteRepository {
     return row.count;
   }
 
-  detectAndCreateGapRecords(operator: string): { gapCount: number; gaps: any[] } {
+  detectAndCreateGapRecords(operator: string): { gapCount: number; gaps: GapBasicInfo[] } {
     const routes = this.findAll(false);
     const activeRoutes = routes.filter(r => r.status !== 'deleted');
-    activeRoutes.sort((a, b) => a.currentLineNo - b.currentLineNo);
 
     gapRecordRepository.closeAllOpenGaps();
 
-    const gaps: { gapId: string; beforeLineNo: number; afterLineNo: number; missingCount: number; beforeRouteId: string | null; afterRouteId: string | null }[] = [];
+    const byBatch = new Map<string, typeof activeRoutes>();
+    for (const r of activeRoutes) {
+      if (!byBatch.has(r.sourceBatch)) byBatch.set(r.sourceBatch, []);
+      byBatch.get(r.sourceBatch)!.push(r);
+    }
 
-    for (let i = 0; i < activeRoutes.length - 1; i++) {
-      const current = activeRoutes[i];
-      const next = activeRoutes[i + 1];
-      const expectedNext = current.currentLineNo + 1;
+    const gaps: GapBasicInfo[] = [];
 
-      if (next.currentLineNo > expectedNext) {
-        const missingCount = next.currentLineNo - expectedNext;
-        const gapRecord = gapRecordRepository.create(
-          current.currentLineNo,
-          next.currentLineNo,
-          missingCount,
-          current.id,
-          next.id
-        );
-        gaps.push({
-          gapId: gapRecord.id,
-          beforeLineNo: current.currentLineNo,
-          afterLineNo: next.currentLineNo,
-          missingCount,
-          beforeRouteId: current.id,
-          afterRouteId: next.id,
-        });
+    for (const batchRoutes of byBatch.values()) {
+      batchRoutes.sort((a, b) => a.currentLineNo - b.currentLineNo);
+      for (let i = 0; i < batchRoutes.length - 1; i++) {
+        const current = batchRoutes[i];
+        const next = batchRoutes[i + 1];
+        const expectedNext = current.currentLineNo + 1;
+
+        if (next.currentLineNo > expectedNext) {
+          const missingCount = next.currentLineNo - expectedNext;
+          const gapRecord = gapRecordRepository.create(
+            current.currentLineNo,
+            next.currentLineNo,
+            missingCount,
+            current.id,
+            next.id
+          );
+          gaps.push({
+            gapId: gapRecord.id,
+            beforeLineNo: current.currentLineNo,
+            afterLineNo: next.currentLineNo,
+            missingCount,
+            beforeRouteId: current.id,
+            afterRouteId: next.id,
+          });
+        }
       }
     }
 

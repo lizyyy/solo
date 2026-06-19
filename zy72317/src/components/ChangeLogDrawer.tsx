@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Clock, User, FileText, CheckSquare, AlertTriangle } from 'lucide-react';
-import type { ChangeRecord } from '../../shared/types';
+import type { ChangeRecord, GapReviewInfo, RouteSnapshot, RouteOptimizationResult, RouteStatus } from '../../shared/types';
 import dayjs from 'dayjs';
 
 interface ChangeLogDrawerProps {
@@ -29,11 +29,46 @@ const actionColors: Record<string, string> = {
   gap_review: 'bg-indigo-500',
 };
 
-const renderChangeDetail = (change: ChangeRecord) => {
-  const before = change.beforeValue as any;
-  const after = change.afterValue as any;
+interface GapReviewAfterValue {
+  gapReviewInfo: GapReviewInfo;
+  status?: RouteStatus;
+}
 
-  if (change.action === 'gap_review' && after?.gapReviewInfo) {
+interface DeleteBeforeValue extends RouteSnapshot {
+  routeData?: RouteOptimizationResult;
+}
+
+interface SupplementAfterValue {
+  originalLineNo: number;
+  currentLineNo?: number;
+  status?: RouteStatus;
+}
+
+type UnknownRecord = Record<string, unknown>;
+
+function isRecord(v: unknown): v is UnknownRecord {
+  return typeof v === 'object' && v !== null && !Array.isArray(v);
+}
+
+function hasGapReviewInfo(v: unknown): v is GapReviewAfterValue {
+  return isRecord(v) && isRecord((v as UnknownRecord).gapReviewInfo);
+}
+
+function isDeleteBefore(v: unknown): v is DeleteBeforeValue {
+  if (!isRecord(v)) return false;
+  return typeof (v as UnknownRecord).currentLineNo === 'number';
+}
+
+function isSupplementAfter(v: unknown): v is SupplementAfterValue {
+  if (!isRecord(v)) return false;
+  return (v as UnknownRecord).originalLineNo === -1;
+}
+
+const renderChangeDetail = (change: ChangeRecord) => {
+  const before = change.beforeValue;
+  const after = change.afterValue;
+
+  if (change.action === 'gap_review' && hasGapReviewInfo(after)) {
     const info = after.gapReviewInfo;
     return (
       <div className="space-y-2 mt-2">
@@ -74,17 +109,17 @@ const renderChangeDetail = (change: ChangeRecord) => {
             </div>
           </div>
         </div>
-        {before?.status !== undefined && (
+        {isRecord(before) && typeof (before as UnknownRecord).status === 'string' && isRecord(after) && typeof (after as UnknownRecord).status === 'string' && (
           <div className="text-xs text-gray-500 flex items-center">
             <AlertTriangle className="w-3 h-3 mr-1 text-warning-500" />
-            状态：{before.status} → {after.status}
+            状态：{(before as UnknownRecord).status as string} → {(after as UnknownRecord).status as string}
           </div>
         )}
       </div>
     );
   }
 
-  if (change.action === 'delete' && before?.currentLineNo !== undefined) {
+  if (change.action === 'delete' && isDeleteBefore(before)) {
     return (
       <div className="text-xs text-gray-500 space-y-1">
         <p className="text-red-600 font-medium">删除前编号：</p>
@@ -98,7 +133,7 @@ const renderChangeDetail = (change: ChangeRecord) => {
     );
   }
 
-  if (change.action === 'supplement' && after?.originalLineNo === -1) {
+  if (change.action === 'supplement' && isSupplementAfter(after)) {
     return (
       <div className="text-xs text-gray-500 space-y-1">
         <p className="text-blue-600 font-medium">补录说明：</p>
@@ -113,21 +148,24 @@ const renderChangeDetail = (change: ChangeRecord) => {
     );
   }
 
+  const beforeRec = isRecord(before) ? before : null;
+  const afterRec = isRecord(after) ? after : null;
+
   return (
     <>
-      {before && Object.keys(before).length > 0 && (
+      {beforeRec && Object.keys(beforeRec).length > 0 && (
         <div className="text-xs text-gray-500 mb-1">
           <span className="text-red-600 font-medium">变更前：</span>
           <pre className="mt-1 bg-red-50 p-2 rounded overflow-x-auto whitespace-pre-wrap break-words">
-            {JSON.stringify(before, null, 2)}
+            {JSON.stringify(beforeRec, null, 2)}
           </pre>
         </div>
       )}
-      {after && Object.keys(after).length > 0 && (
+      {afterRec && Object.keys(afterRec).length > 0 && (
         <div className="text-xs text-gray-500">
           <span className="text-green-600 font-medium">变更后：</span>
           <pre className="mt-1 bg-green-50 p-2 rounded overflow-x-auto whitespace-pre-wrap break-words">
-            {JSON.stringify(after, null, 2)}
+            {JSON.stringify(afterRec, null, 2)}
           </pre>
         </div>
       )}

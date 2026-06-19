@@ -7,6 +7,7 @@ import type {
   GapReviewRequest,
   GapReviewResponse,
   GapRecord,
+  GapBasicInfo,
 } from '../../shared/types';
 
 interface RoutesResponse {
@@ -46,7 +47,7 @@ export const routeApi = {
   },
 
   detectGaps: (operator: string) => {
-    return apiClient.post<{ gapCount: number; openGapCount: number; gaps: any[] }>('/routes/detect-gaps', { operator });
+    return apiClient.post<{ gapCount: number; openGapCount: number; gaps: GapBasicInfo[] }>('/routes/detect-gaps', { operator });
   },
 
   getOpenGaps: () => {

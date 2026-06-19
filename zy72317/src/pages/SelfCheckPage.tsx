@@ -5,6 +5,8 @@ import { selfCheckApi } from '../api/selfCheckApi';
 import type { SelfCheckResult } from '../../shared/types';
 import dayjs from 'dayjs';
 
+type NumberGapItem = SelfCheckResult['numberGap']['details']['gaps'][number];
+
 export const SelfCheckPage: React.FC = () => {
   const { setLoading, setError } = useAppStore();
   const [checkResult, setCheckResult] = useState<SelfCheckResult | null>(null);
@@ -158,29 +160,29 @@ export const SelfCheckPage: React.FC = () => {
                   </div>
                   <div>
                     <span className="text-gray-500">待复核：</span>
-                    <span className={`font-medium ml-1 ${(checkResult.numberGap.details as any).openGapCount > 0 ? 'text-orange-600' : 'text-green-600'}`}>
-                      {(checkResult.numberGap.details as any).openGapCount ?? checkResult.numberGap.details.gapCount} 处
+                    <span className={`font-medium ml-1 ${checkResult.numberGap.details.openGapCount > 0 ? 'text-orange-600' : 'text-green-600'}`}>
+                      {checkResult.numberGap.details.openGapCount} 处
                     </span>
                   </div>
                   <div>
                     <span className="text-gray-500">已复核：</span>
                     <span className="font-medium ml-1 text-indigo-600">
-                      {(checkResult.numberGap.details as any).reviewedGapCount ?? 0} 处
+                      {checkResult.numberGap.details.reviewedGapCount} 处
                     </span>
                   </div>
                 </div>
                 {checkResult.numberGap.details.gaps.length > 0 && (
                   <div className="space-y-3 mt-3">
-                    {(checkResult.numberGap.details as any).openGapCount > 0 && (
+                    {checkResult.numberGap.details.openGapCount > 0 && (
                       <div className="bg-warning-50 border border-warning-300 rounded p-3">
                         <p className="text-sm font-medium text-warning-800 mb-2 flex items-center">
                           <AlertTriangle className="w-4 h-4 mr-1.5" />
-                          待教研组复核：{(checkResult.numberGap.details as any).openGapCount} 处
+                          待教研组复核：{checkResult.numberGap.details.openGapCount} 处
                         </p>
                         <div className="space-y-1">
                           {checkResult.numberGap.details.gaps
-                            .filter((g: any) => g.status === 'open')
-                            .map((gap: any, idx: number) => (
+                            .filter((g: NumberGapItem) => g.status === 'open')
+                            .map((gap: NumberGapItem, idx: number) => (
                             <div key={idx} className="text-sm text-warning-700 flex items-start space-x-2 bg-white/60 p-2 rounded">
                               <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                               <div>
@@ -200,16 +202,16 @@ export const SelfCheckPage: React.FC = () => {
                         </div>
                       </div>
                     )}
-                    {(checkResult.numberGap.details as any).reviewedGapCount > 0 && (
+                    {checkResult.numberGap.details.reviewedGapCount > 0 && (
                       <div className="bg-indigo-50 border border-indigo-200 rounded p-3">
                         <p className="text-sm font-medium text-indigo-800 mb-2 flex items-center">
                           <UserCheck className="w-4 h-4 mr-1.5" />
-                          已完成复核：{(checkResult.numberGap.details as any).reviewedGapCount} 处（保留变更证据，不自动归正常）
+                          已完成复核：{checkResult.numberGap.details.reviewedGapCount} 处（保留变更证据，不自动归正常）
                         </p>
                         <div className="space-y-1">
                           {checkResult.numberGap.details.gaps
-                            .filter((g: any) => g.status === 'reviewed')
-                            .map((gap: any, idx: number) => (
+                            .filter((g: NumberGapItem) => g.status === 'reviewed')
+                            .map((gap: NumberGapItem, idx: number) => (
                             <div key={idx} className="text-sm text-indigo-700 flex items-start space-x-2 bg-white/60 p-2 rounded">
                               <CheckCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-indigo-500" />
                               <div>
@@ -304,7 +306,7 @@ export const SelfCheckPage: React.FC = () => {
                   </div>
                   <div>
                     <span className="text-gray-500">数据库实际：</span>
-                    <span className="font-medium text-gray-900 ml-1">{(checkResult.exportConsistency.details as any).dbCount ?? checkResult.exportConsistency.details.pageCount} 条</span>
+                    <span className="font-medium text-gray-900 ml-1">{checkResult.exportConsistency.details.dbCount} 条</span>
                   </div>
                 </div>
                 <div className={`mt-3 p-3 rounded border ${

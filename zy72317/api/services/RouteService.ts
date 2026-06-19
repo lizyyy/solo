@@ -1,4 +1,4 @@
-import type { PickingRoute, RouteOptimizationResult, GapReviewRequest, GapReviewResponse, GapReviewInfo, GapRecord } from '../../shared/types';
+import type { PickingRoute, RouteOptimizationResult, GapReviewRequest, GapReviewResponse, GapReviewInfo, GapRecord, GapBasicInfo } from '../../shared/types';
 import { routeRepository } from '../repositories/RouteRepository';
 import { gapRecordRepository } from '../repositories/GapRecordRepository';
 
@@ -70,7 +70,11 @@ export class RouteService {
     };
   }
 
-  detectAndCreateGapRecords(operator: string): { gapCount: number; openGapCount: number; gaps: any[] } {
+  detectAndCreateGapRecords(operator: string): {
+    gapCount: number;
+    openGapCount: number;
+    gaps: GapBasicInfo[];
+  } {
     const result = routeRepository.detectAndCreateGapRecords(operator);
     const openGapCount = gapRecordRepository.countOpenGaps();
     return {
