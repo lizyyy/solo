@@ -14,7 +14,9 @@
     "cli": "tsx cli/index.ts",
     "cli:demo": "tsx cli/index.ts demo run",
     "cli:logs": "tsx cli/index.ts logs list",
-    "cli:report": "tsx cli/index.ts report generate"
+    "cli:report": "tsx cli/index.ts report generate",
+    "quality": "npm run lint && npm run check && npm run build",
+    "verify": "node scripts/verify_chain.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

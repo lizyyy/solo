@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlayCircle, CheckCircle, Clock, AlertTriangle, FileText, Table2, FileBarChart, ArrowRight, RefreshCw, StepForward, User } from 'lucide-react';
+import { PlayCircle, CheckCircle, Clock, AlertTriangle, FileText, Table2, RefreshCw, StepForward, User } from 'lucide-react';
 import { useWindStore } from '../store/useWindStore';
 import { StatusBadge } from '../components/StatusBadge';
 import { formatDateTime } from '../utils/windUtils';
@@ -210,7 +210,7 @@ export const DemoPage: React.FC = () => {
                 
                 {/* 步骤列表 */}
                 <div className="space-y-4">
-                  {steps.map((step, index) => (
+                  {steps.map((step, _) => (
                     <div 
                       key={step.id}
                       className={`relative flex gap-4 p-4 rounded-lg border-2 transition-all duration-300 ${getStepBg(step)}`}

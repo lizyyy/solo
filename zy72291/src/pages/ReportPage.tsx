@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileBarChart, Download, RefreshCw, CheckCircle, XCircle, Clock, AlertTriangle, Info, User, ChevronRight } from 'lucide-react';
+import { FileBarChart, Download, RefreshCw, CheckCircle, XCircle, Clock, AlertTriangle, Info, User } from 'lucide-react';
 import { useWindStore } from '../store/useWindStore';
 import { StatusBadge } from '../components/StatusBadge';
 import { ComparisonChart } from '../components/ComparisonChart';
@@ -339,14 +339,53 @@ ${report.results.map(r => `
           <div className="bg-industrial-800 rounded-lg p-5 text-white">
             <h3 className="font-semibold mb-3 flex items-center gap-2">
               <Info size={18} />
-              许工给施工经理的说明
+              {report.generatedBy || '设备工程师'}给施工经理的说明
             </h3>
             <div className="text-sm space-y-2 text-industrial-200">
-              <p>1. <span className="text-emerald-400">LOG-001</span> 是顺利记录，数据完整可直接用</p>
-              <p>2. <span className="text-amber-400">LOG-002</span> 告警标签被移动端截图挡住了，我标黄了，请您复核原始热成像数据后再确认</p>
-              <p>3. <span className="text-blue-400">LOG-003</span> 是从2023旧口径安全半径表补的历史数据，新旧标准差了20%，我都标清楚了</p>
+              {report.results.map((result, index) => {
+                const colorClass = result.recordType === 'success' ? 'text-emerald-400' :
+                  result.recordType === 'blocked' ? 'text-amber-400' : 'text-blue-400';
+                let description = '';
+                if (result.recordType === 'success') {
+                  description = `是顺利记录，${directionToLabel(result.windDirection)}风向${WIND_SPEED_LABELS[result.windSpeed]}，实测${result.safetyDistance}米，要求${result.requiredDistance}米，合规`;
+                } else if (result.recordType === 'blocked') {
+                  description = `存在截图遮挡，${directionToLabel(result.windDirection)}风向${WIND_SPEED_LABELS[result.windSpeed]}，实测${result.safetyDistance}米，要求${result.requiredDistance}米，请复核原始数据后再确认`;
+                } else {
+                  description = `是旧口径补录，${directionToLabel(result.windDirection)}风向${WIND_SPEED_LABELS[result.windSpeed]}，实测${result.safetyDistance}米，新口径要求${result.requiredDistance}米，请注意新旧口径差异`;
+                }
+                return (
+                  <p key={result.id}>
+                    {index + 1}. <span className={colorClass}>{result.recordId}</span> {description}
+                  </p>
+                );
+              })}
               <p className="pt-2 border-t border-industrial-700 text-industrial-400 text-xs">
-                结论：除LOG-002待您复核外，其余两条处理结果不同，LOG-001合规，LOG-003按旧口径合规按新口径不合规
+                {(() => {
+                  const pendingList = report.results.filter(r => r.recordType === 'blocked');
+                  const compliantList = report.results.filter(r => r.compliance);
+                  const nonCompliantList = report.results.filter(r => !r.compliance && r.recordType !== 'blocked');
+                  let conclusion = '结论：';
+                  if (pendingList.length > 0) {
+                    conclusion += `除${pendingList.map(r => r.recordId).join('、')}待您复核`;
+                    if (compliantList.length > 0 || nonCompliantList.length > 0) {
+                      conclusion += '外，';
+                    } else {
+                      conclusion += '。';
+                    }
+                  }
+                  if (compliantList.length > 0) {
+                    conclusion += `${compliantList.map(r => r.recordId).join('、')}合规`;
+                    if (nonCompliantList.length > 0) {
+                      conclusion += '，';
+                    } else {
+                      conclusion += '。';
+                    }
+                  }
+                  if (nonCompliantList.length > 0) {
+                    conclusion += `${nonCompliantList.map(r => r.recordId).join('、')}不合规。`;
+                  }
+                  return conclusion;
+                })()}
               </p>
             </div>
           </div>

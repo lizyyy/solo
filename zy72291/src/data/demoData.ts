@@ -11,6 +11,12 @@ export const demoLogs: PointCloudLog[] = [
     source: '机载LiDAR',
     hasScreenshotOcclusion: false,
     rerunCount: 0,
+    windDirection: 180,
+    windSpeed: 4.5,
+    measuredDistance: 185,
+    occlusionArea: 0,
+    operator: '许工',
+    notes: '机载LiDAR扫描，数据质量良好，无遮挡',
     alerts: [
       {
         id: 'A-001',
@@ -33,6 +39,12 @@ export const demoLogs: PointCloudLog[] = [
     hasScreenshotOcclusion: true,
     screenshotNote: '告警标签区域被移动端截图水印遮挡约40%，东北方向距离读数存疑，需施工经理复核原始数据',
     rerunCount: 0,
+    windDirection: 270,
+    windSpeed: 6.2,
+    measuredDistance: 88,
+    occlusionArea: 40,
+    operator: '许工',
+    notes: '移动端巡检，告警标签被截图遮挡约40%，待施工经理复核',
     alerts: [
       {
         id: 'A-002',
@@ -62,7 +74,24 @@ export const demoLogs: PointCloudLog[] = [
     source: '历史数据补录',
     hasScreenshotOcclusion: false,
     rerunCount: 1,
-    manualCorrection: '从2023版安全半径表补录旧口径数据，原记录缺失风速>12m/s工况参数',
+    windDirection: 90,
+    windSpeed: 3.8,
+    measuredDistance: 195,
+    occlusionArea: 0,
+    operator: '许工',
+    notes: '2023年历史数据，已从旧口径安全半径表补录，含1次人工修正和1次重跑',
+    manualCorrections: [
+      {
+        id: 'CORR-001',
+        logId: 'LOG-003',
+        field: 'windDirection',
+        oldValue: 85,
+        newValue: 90,
+        operator: '许工',
+        timestamp: '2024-06-15T14:35:00',
+        reason: '现场风向记录与历史数据存在5度偏差，经核实修正为90度'
+      }
+    ],
     alerts: [
       {
         id: 'A-004',
@@ -193,7 +222,7 @@ export const generateDemoReport = (): SafetyReport => {
       },
       {
         id: 'RES-003',
-        recordId: 'legacy',
+        recordId: 'LOG-003',
         safetyDistance: 195,
         requiredDistance: 220,
         recordType: 'legacy',
@@ -202,6 +231,62 @@ export const generateDemoReport = (): SafetyReport => {
         windDirection: 90,
         windSpeed: 'high'
       }
-    ]
+    ],
+    items: [
+      {
+        logId: 'LOG-001',
+        batchNo: 'PC-2024-0615-A',
+        status: 'success',
+        windDirection: 0,
+        windSpeed: 1,
+        measuredDistance: 185,
+        requiredDistance: 150,
+        diff: 35,
+        compliance: 'compliant',
+        hasScreenshotOcclusion: false,
+        occlusionArea: 0,
+        version: 'new',
+        notes: '机载LiDAR数据完整，北侧障碍物距离正常'
+      },
+      {
+        logId: 'LOG-002',
+        batchNo: 'PC-2024-0615-B',
+        status: 'blocked',
+        windDirection: 45,
+        windSpeed: 2,
+        measuredDistance: 88,
+        requiredDistance: 200,
+        diff: -112,
+        compliance: 'pending',
+        hasScreenshotOcclusion: true,
+        occlusionArea: 40,
+        version: 'new',
+        notes: '移动端巡检数据告警标签被水印遮挡约40%，需复核原始热成像数据'
+      },
+      {
+        logId: 'LOG-003',
+        batchNo: 'PC-2024-0614-A',
+        status: 'legacy',
+        windDirection: 90,
+        windSpeed: 3,
+        measuredDistance: 195,
+        requiredDistance: 220,
+        diff: -25,
+        compliance: 'non_compliant',
+        hasScreenshotOcclusion: false,
+        occlusionArea: 0,
+        version: 'legacy',
+        notes: '从2023版安全半径表补录旧口径数据，原记录缺失风速>12m/s工况参数'
+      }
+    ],
+    stats: {
+      total: 3,
+      compliant: 1,
+      warning: 0,
+      nonCompliant: 1,
+      pendingReview: 1
+    },
+    summary: '本报告包含3条点云抽稀日志评估记录，覆盖3种工况场景。LOG-001采用2024新口径评估合规，LOG-002因截图遮挡需施工经理复核原始数据，LOG-003采用2023旧口径补录数据，按新口径评估不合规。安全半径表采用新旧混合口径，共16条记录覆盖8个主要风向。',
+    generatedBy: '许工（设备工程师）'
   };
 };

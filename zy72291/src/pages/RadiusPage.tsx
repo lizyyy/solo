@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Plus, Database, RefreshCw, CheckCircle, XCircle, Info, Filter } from 'lucide-react';
+import { Plus, Database, CheckCircle, XCircle, Info, Filter } from 'lucide-react';
 import { useWindStore } from '../store/useWindStore';
 import { WindRoseChart } from '../components/WindRoseChart';
-import { formatDateTime, directionToLabel } from '../utils/windUtils';
+import { directionToLabel } from '../utils/windUtils';
 import type { SafetyRadius, RadiusVersion, WindSpeed } from '../../shared/types';
 import { WIND_SPEED_LABELS } from '../../shared/types';
 

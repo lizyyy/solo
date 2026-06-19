@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Upload, Eye, AlertTriangle, MapPin, Clock, CheckCircle, XCircle, Info, RefreshCw, Edit3 } from 'lucide-react';
 import { useWindStore } from '../store/useWindStore';
 import { StatusBadge } from '../components/StatusBadge';
-import { formatDateTime, formatNumber, getStatusBgClass } from '../utils/windUtils';
+import { formatDateTime, formatNumber } from '../utils/windUtils';
 import type { PointCloudLog, Alert } from '../../shared/types';
 import { ALERT_TYPE_LABELS, ALERT_LEVEL_LABELS } from '../../shared/types';
 
@@ -35,13 +35,21 @@ export const LogsPage: React.FC = () => {
 
   const handleManualCorrection = (log: PointCloudLog) => {
     setSelectedLog(log);
-    setCorrectionNote(log.manualCorrection || '');
+    const lastCorrection: string | undefined = log.manualCorrections?.[log.manualCorrections.length - 1]?.reason;
+    setCorrectionNote(lastCorrection || '');
     setShowCorrectionModal(true);
   };
 
   const confirmCorrection = () => {
     if (selectedLog && correctionNote.trim()) {
-      addManualCorrection(selectedLog.id, correctionNote);
+      addManualCorrection({
+        logId: selectedLog.id,
+        field: 'notes',
+        oldValue: selectedLog.notes ?? '',
+        newValue: `${selectedLog.notes ?? ''}${selectedLog.notes ? ' | ' : ''}人工修正：${correctionNote}`,
+        operator: currentRole === 'engineer' ? '许工' : '施工经理',
+        reason: correctionNote,
+      });
       setShowCorrectionModal(false);
       setSelectedLog(null);
       setCorrectionNote('');
@@ -261,14 +269,26 @@ export const LogsPage: React.FC = () => {
               )}
 
               {/* 人工修正 */}
-              {selectedLog.manualCorrection && (
+              {selectedLog.manualCorrections && selectedLog.manualCorrections.length > 0 && (
                 <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                   <h4 className="text-sm font-semibold text-blue-800 mb-2 flex items-center gap-2">
                     <Edit3 size={16} />
-                    人工修正记录
+                    人工修正记录 ({selectedLog.manualCorrections.length} 条)
                   </h4>
-                  <p className="text-sm text-blue-700">{selectedLog.manualCorrection}</p>
-                  <p className="text-xs text-blue-500 mt-2">重跑次数：{selectedLog.rerunCount} 次</p>
+                  <div className="space-y-2">
+                    {selectedLog.manualCorrections.map((corr) => (
+                      <div key={corr.id} className="text-sm">
+                        <p className="text-blue-700">
+                          <span className="font-medium">[{corr.field}]</span>{' '}
+                          {String(corr.oldValue)} → {String(corr.newValue)}
+                        </p>
+                        <p className="text-xs text-blue-500 mt-0.5">
+                          {corr.operator} · {new Date(corr.timestamp).toLocaleString('zh-CN')} · {corr.reason}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-blue-500 mt-2 pt-2 border-t border-blue-200">重跑次数：{selectedLog.rerunCount} 次</p>
                 </div>
               )}
 

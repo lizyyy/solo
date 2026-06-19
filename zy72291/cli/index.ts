@@ -15,17 +15,74 @@
 
 import fetch from 'node-fetch'
 
+interface ApiResponse<T = unknown> {
+  success: boolean
+  data?: T
+  message?: string
+  error?: string
+  note?: string
+}
+
+interface LogData {
+  id: string
+  batchNo: string
+  status: string
+  windDirection: number
+  windSpeed: number
+  measuredDistance: number
+  hasScreenshotOcclusion: boolean
+}
+
+interface RadiusData {
+  id: string
+  windDirection: number
+  windSpeedMin: number
+  windSpeedMax: number
+  requiredRadius: number
+  version: string
+}
+
+interface RadiusLookupData {
+  requiredRadius: number
+  version: string
+}
+
+interface ReportItem {
+  batchNo: string
+  status: string
+  measuredDistance: number
+  requiredDistance: number
+  diff: number
+  compliance: string
+  version: string
+}
+
+interface ReportData {
+  id: string
+  generatedAt: string
+  summary: string
+  items: ReportItem[]
+}
+
+interface TableColumn {
+  key: string
+  label: string
+  width?: number
+}
+
+type TableRow = Record<string, unknown>
+
 const API_BASE = process.env.API_BASE || 'http://localhost:3001/api'
 
-async function request(endpoint: string, options: RequestInit = {}) {
+async function request<T = unknown>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
   const res = await fetch(`${API_BASE}${endpoint}`, {
     headers: { 'Content-Type': 'application/json' },
     ...options
   })
-  return res.json()
+  return res.json() as Promise<ApiResponse<T>>
 }
 
-function printTable(data: any[], columns: { key: string; label: string; width?: number }[]) {
+function printTable(data: TableRow[], columns: TableColumn[]) {
   const widths = columns.map(c => c.width || Math.max(c.label.length, ...data.map(d => String(d[c.key] || '').length)))
   const header = columns.map((c, i) => c.label.padEnd(widths[i])).join(' | ')
   const separator = widths.map(w => '─'.repeat(w)).join('─┼─')
@@ -42,10 +99,10 @@ function printTable(data: any[], columns: { key: string; label: string; width?: 
 
 const commands: Record<string, () => Promise<void>> = {
   'logs list': async () => {
-    const res = await request('/logs') as any
+    const res = await request<LogData[]>('/logs')
     if (res.success) {
       console.log('=== 点云抽稀日志列表 ===')
-      printTable(res.data, [
+      printTable(res.data || [], [
         { key: 'id', label: 'ID', width: 10 },
         { key: 'batchNo', label: '批次号', width: 18 },
         { key: 'status', label: '状态', width: 14 },
@@ -60,10 +117,10 @@ const commands: Record<string, () => Promise<void>> = {
   'logs import': async () => {
     const fileName = process.argv[4] || 'demo-log.json'
     console.log(`正在导入日志文件: ${fileName}...`)
-    const res = await request('/logs/import', {
+    const res = await request<LogData>('/logs/import', {
       method: 'POST',
       body: JSON.stringify({ fileName, fileData: '{}' })
-    }) as any
+    })
     console.log(res.message || '导入完成')
     console.log(`  日志ID: ${res.data?.id}`)
     console.log(`  状态: ${res.data?.status}`)
@@ -82,16 +139,16 @@ const commands: Record<string, () => Promise<void>> = {
     const res = await request(`/logs/${id}/status`, {
       method: 'PUT',
       body: JSON.stringify({ status, note: 'CLI更新' })
-    }) as any
+    })
     console.log(res.success ? `状态已更新为: ${status}` : `错误: ${res.error}`)
   },
   
   'radius list': async () => {
     const version = process.argv[4] || ''
-    const res = await request(`/radius${version ? `?version=${version}` : ''}`) as any
+    const res = await request<RadiusData[]>(`/radius${version ? `?version=${version}` : ''}`)
     if (res.success) {
       console.log(`=== 安全半径表 ${version ? `(${version}版)` : ''} ===`)
-      printTable(res.data, [
+      printTable(res.data || [], [
         { key: 'id', label: 'ID', width: 10 },
         { key: 'windDirection', label: '风向', width: 6 },
         { key: 'windSpeedMin', label: '最小风速', width: 10 },
@@ -109,8 +166,8 @@ const commands: Record<string, () => Promise<void>> = {
       console.log('用法: radius lookup <风向(度)> <风速(m/s)>')
       return
     }
-    const res = await request(`/radius/lookup?windDirection=${dir}&windSpeed=${speed}`) as any
-    if (res.success) {
+    const res = await request<RadiusLookupData>(`/radius/lookup?windDirection=${dir}&windSpeed=${speed}`)
+    if (res.success && res.data) {
       console.log(`\n=== 安全半径查询结果 ===`)
       console.log(`  风向: ${dir}°`)
       console.log(`  风速: ${speed} m/s`)
@@ -125,8 +182,8 @@ const commands: Record<string, () => Promise<void>> = {
   
   'report generate': async () => {
     console.log('正在生成安全距离报告...')
-    const res = await request('/report/generate', { method: 'POST' }) as any
-    if (res.success) {
+    const res = await request<ReportData>('/report/generate', { method: 'POST' })
+    if (res.success && res.data) {
       console.log(`\n=== 安全距离报告 ===`)
       console.log(`  报告ID: ${res.data.id}`)
       console.log(`  生成时间: ${res.data.generatedAt}`)
@@ -146,7 +203,7 @@ const commands: Record<string, () => Promise<void>> = {
   
   'report export': async () => {
     console.log('正在导出安全距离报告...')
-    const res = await request('/report/export') as any
+    await request('/report/export')
     console.log('报告已导出为CSV格式')
   },
   
