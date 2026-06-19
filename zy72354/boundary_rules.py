@@ -292,6 +292,8 @@ class BoundaryRuleEngine:
         new_error.updated_at = datetime.now()
         new_error.status = ErrorStatus.ROLLED_BACK
 
+        new_error = self.re_evaluate(new_error)
+
         after_data = copy.deepcopy(new_error.to_dict())
 
         rollback_history = VersionHistory(
@@ -305,6 +307,24 @@ class BoundaryRuleEngine:
         )
 
         return new_error, rollback_history
+
+    @staticmethod
+    def find_user_initiated_history(
+        history_list: List["VersionHistory"],
+    ) -> Optional["VersionHistory"]:
+        system_markers = (
+            "system_import_update",
+            "回滚到版本",
+        )
+        for h in reversed(history_list):
+            if any(marker in h.modified_by for marker in system_markers):
+                continue
+            if any(marker in h.modification_reason for marker in system_markers):
+                continue
+            return h
+        if history_list:
+            return history_list[-1]
+        return None
 
     def re_evaluate(self, error: SolarTrackingBracketError) -> SolarTrackingBracketError:
         note = ManualInspectionNote(

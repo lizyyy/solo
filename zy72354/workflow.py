@@ -516,7 +516,14 @@ class QualityInspectionWorkflow:
                 error_codes=["NO_HISTORY"],
             )
 
-        last_history = history_list[-1]
+        last_history = self.rule_engine.find_user_initiated_history(history_list)
+        if last_history is None:
+            return WorkflowActionResult(
+                success=False,
+                step=self.current_step,
+                human_messages=["这条记录没有可回滚的用户修改动作"],
+                error_codes=["NO_USER_HISTORY"],
+            )
 
         rolled_back_error, rollback_history = self.rule_engine.rollback(
             error, last_history, modified_by=reviewer
@@ -526,10 +533,14 @@ class QualityInspectionWorkflow:
         self.import_service._history_store[error_id].append(rollback_history)
 
         human_messages = [
-            f"✅ 已回滚到版本 {last_history.version}",
+            f"✅ 已回滚用户补录动作（对应版本 v{last_history.version}）",
             f"   支架：{rolled_back_error.bracket_id}",
             f"   当前状态：{rolled_back_error.status.value}",
+            f"   回滚触发者：{reviewer}",
         ]
+
+        if rolled_back_error.human_readable_issues:
+            human_messages.append(f"   ⚠️  保留原始问题：{rolled_back_error.human_readable_issues[0]}")
 
         if last_history.fields_changed:
             field_names = {
@@ -542,7 +553,8 @@ class QualityInspectionWorkflow:
             fields_str = "、".join(
                 [field_names.get(f, f) for f in last_history.fields_changed]
             )
-            human_messages.append(f"   回滚字段：{fields_str}")
+            human_messages.append(f"   撤销修改字段：{fields_str}")
+            human_messages.append(f"   撤销原因说明：{last_history.modification_reason}")
 
         pending_errors = self.import_service.get_pending_review_errors()
 
@@ -624,19 +636,30 @@ class QualityInspectionWorkflow:
         original_issue_statement = ""
         if error.human_readable_issues:
             original_issue_statement = error.human_readable_issues[0]
+        if not original_issue_statement:
+            for h in reversed(history):
+                before_msgs = (h.before_data or {}).get("human_readable_issues", [])
+                if before_msgs:
+                    original_issue_statement = before_msgs[0]
+                    break
+                after_msgs = (h.after_data or {}).get("human_readable_issues", [])
+                if after_msgs:
+                    original_issue_statement = after_msgs[0]
+                    break
 
         modified_value_summary = {}
         processing_reason = ""
-        next_step_person = ""
+        user_initiated_history = self.rule_engine.find_user_initiated_history(history) if history else None
 
-        if history:
-            latest = history[-1]
-            processing_reason = latest.modification_reason
-            for f in latest.fields_changed:
-                if f in latest.after_data:
+        target_history_for_packet = user_initiated_history or (history[-1] if history else None)
+
+        if target_history_for_packet:
+            processing_reason = target_history_for_packet.modification_reason
+            for f in target_history_for_packet.fields_changed:
+                if f in target_history_for_packet.after_data:
                     modified_value_summary[f] = {
-                        "before": latest.before_data.get(f),
-                        "after": latest.after_data.get(f),
+                        "before": target_history_for_packet.before_data.get(f),
+                        "after": target_history_for_packet.after_data.get(f),
                     }
 
         if error.status == ErrorStatus.PENDING_REVIEW:

@@ -31,6 +31,7 @@ class ImportService:
         self._error_store: Dict[str, SolarTrackingBracketError] = {}
         self._error_by_note_hash: Dict[str, str] = {}
         self._history_store: Dict[str, List[VersionHistory]] = {}
+        self._note_id_historical_hashes: Dict[str, set] = {}
 
     def _generate_batch_id(self) -> str:
         return f"BATCH_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
@@ -65,6 +66,9 @@ class ImportService:
 
             note_hash = note.content_hash()
 
+            if note.note_id not in self._note_id_historical_hashes:
+                self._note_id_historical_hashes[note.note_id] = set()
+
             is_update = False
             old_error_id_to_reuse = None
 
@@ -72,11 +76,14 @@ class ImportService:
                 existing_note = self._note_store[note.note_id]
                 existing_hash = existing_note.content_hash()
 
-                if note_hash == existing_hash:
-                    result.duplicate_notes += 1
+                is_historical_duplicate = note_hash in self._note_id_historical_hashes[note.note_id]
 
+                if note_hash == existing_hash or is_historical_duplicate:
+                    result.duplicate_notes += 1
                     if note_hash in self._error_by_note_hash:
                         result.duplicate_errors_skipped += 1
+                    if is_historical_duplicate:
+                        self._note_store[note.note_id] = note
                     continue
                 else:
                     note.version = existing_note.version + 1
@@ -88,6 +95,7 @@ class ImportService:
             else:
                 result.new_notes += 1
 
+            self._note_id_historical_hashes[note.note_id].add(note_hash)
             self._note_store[note.note_id] = note
 
             error = self.rule_engine.create_error_from_note(note, batch_id)
@@ -144,6 +152,9 @@ class ImportService:
         if note_id not in self._note_store:
             raise ValueError(f"找不到备注 {note_id}")
 
+        if note_id not in self._note_id_historical_hashes:
+            self._note_id_historical_hashes[note_id] = set()
+
         old_note = self._note_store[note_id]
         old_hash = old_note.content_hash()
 
@@ -152,6 +163,8 @@ class ImportService:
         updated_note.source_file_hash = old_note.source_file_hash
         updated_note.calculate_sampling_duration()
 
+        new_hash = updated_note.content_hash()
+        self._note_id_historical_hashes[note_id].add(new_hash)
         self._note_store[note_id] = updated_note
 
         old_error_id = self._error_by_note_hash.get(old_hash)
@@ -161,7 +174,7 @@ class ImportService:
 
         batch_id = old_note.import_batch_id
         new_error = self.rule_engine.create_error_from_note(updated_note, batch_id)
-        new_error.source_note_hash = updated_note.content_hash()
+        new_error.source_note_hash = new_hash
 
         if old_error:
             new_error.error_id = old_error.error_id

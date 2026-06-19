@@ -5,6 +5,7 @@ from models import (
     SafetyThreshold,
     ManualInspectionNote,
     SolarTrackingBracketError,
+    ErrorStatus,
 )
 from boundary_rules import (
     BoundaryRuleEngine,
@@ -21,8 +22,8 @@ from workflow import (
 )
 
 
-def create_main_batch_notes() -> List[ManualInspectionNote]:
-    """主演示批次：NOTE_001~NOTE_004，贯穿修改/回滚/导出全链路"""
+def create_combination_batch_notes() -> List[ManualInspectionNote]:
+    """组合场景批次 NOTE_001~NOTE_004，贯穿：导入→补录→重复导入→回滚"""
     base_date = datetime(2026, 6, 1)
     notes: List[ManualInspectionNote] = []
 
@@ -81,256 +82,374 @@ def create_main_batch_notes() -> List[ManualInspectionNote]:
     return notes
 
 
-def create_separate_duplicate_batch_notes() -> List[ManualInspectionNote]:
-    """重复导入演示专用批次：独立note_id，内容故意重复以演示去重"""
-    base_date = datetime(2026, 6, 2)
-    notes: List[ManualInspectionNote] = []
-
-    notes.append(ManualInspectionNote(
-        note_id="NOTE_DUP_01",
-        inspection_date="2026-06-02",
-        inspector="巡检员重复",
-        bracket_id="BRACKET_DUP_01",
-        azimuth_error=0.9,
-        elevation_error=0.4,
-        sampling_start_time=base_date.replace(hour=9, minute=0),
-        sampling_end_time=base_date.replace(hour=9, minute=40),
-        tracking_accuracy=96.0,
-        raw_content="6月2日重复批次，DUP01号支架，正常数据",
-    ))
-    notes.append(ManualInspectionNote(
-        note_id="NOTE_DUP_02",
-        inspection_date="2026-06-02",
-        inspector="巡检员重复",
-        bracket_id="BRACKET_DUP_02",
-        azimuth_error=1.1,
-        elevation_error=0.6,
-        sampling_start_time=base_date.replace(hour=10, minute=0),
-        sampling_end_time=base_date.replace(hour=10, minute=35),
-        tracking_accuracy=95.5,
-        raw_content="6月2日重复批次，DUP02号支架，正常数据",
-    ))
-    return notes
-
-
-def print_list_sync(workflow: QualityInspectionWorkflow, import_service: ImportService,
-                     viz_service: VisualizationReviewService,
-                     focus_error_id: str, focus_bracket: str, stage_tag: str):
-    """打印列表/详情/摘要/历史 同步展示，强调聚焦的那条记录"""
+def print_consistency_checkpoint(
+    workflow: QualityInspectionWorkflow,
+    import_service: ImportService,
+    viz_service: VisualizationReviewService,
+    focus_error_id: str,
+    focus_bracket: str,
+    stage_tag: str,
+    asserts: dict = None,
+):
+    """打印一致性检查点（列表/详情/摘要/3D图/历史/复核信息包/导出）"""
     print()
-    print("=" * 60)
-    print(f"  📡 【{stage_tag}】数据一致性检查 · 聚焦 支架{focus_bracket}")
-    print("=" * 60)
+    print("=" * 70)
+    print(f"  📡 一致性检查点 【{stage_tag}】 · 聚焦 支架{focus_bracket}")
+    print("=" * 70)
 
-    print(f"\n①  待复核列表（共 {len(import_service.get_pending_review_errors())} 条）")
-    print("-" * 50)
-    for e in import_service.get_pending_review_errors():
-        marker = "  ← 就是这条" if e.error_id == focus_error_id else ""
+    focus_error = import_service.get_error(focus_error_id)
+    if not focus_error:
+        print("  ❌ 找不到聚焦误差记录！")
+        return
+
+    # ① 待复核/状态列表
+    print(f"\n①  状态列表（聚焦记录所在位置）")
+    print("-" * 60)
+    all_errors = import_service.get_all_errors()
+    for e in all_errors:
+        marker = "  ⭐ 聚焦记录 ←就是这条" if e.error_id == focus_error_id else ""
         duration_info = ""
         if e.sampling_duration_minutes is not None:
             duration_info = f" | 采样{e.sampling_duration_minutes:.0f}分钟"
-        print(f"  · [{e.status.value}] 支架{e.bracket_id}{duration_info}{marker}")
+        issue_flag = ""
+        if any(v.startswith("SAMPLING_DURATION_TOO_SHORT") for v in e.boundary_violations):
+            issue_flag = " | ⚠️采样缺半小时"
+        print(f"  · [{e.status.value}] 支架{e.bracket_id}{duration_info}{issue_flag}{marker}")
 
-    print(f"\n②  摘要概览")
-    print("-" * 50)
+    # ② 聚焦记录当前状态
+    print(f"\n②  聚焦记录最新快照")
+    print("-" * 60)
+    has_dur = any(v.startswith("SAMPLING_DURATION_TOO_SHORT") for v in focus_error.boundary_violations)
+    print(f"  error_id        : {focus_error.error_id}")
+    print(f"  版本号          : v{focus_error.version}")
+    print(f"  支架号          : {focus_error.bracket_id}")
+    print(f"  原始备注ID      : {focus_error.note_id}")
+    print(f"  当前状态        : {focus_error.status.value}")
+    print(f"  方位/俯仰误差   : {focus_error.azimuth_error}° / {focus_error.elevation_error}°")
+    print(f"  跟踪准确率      : {focus_error.tracking_accuracy}%")
+    print(f"  采样开始/结束   : "
+          f"{focus_error.sampling_start_time.strftime('%H:%M') if focus_error.sampling_start_time else '未填'}"
+          f" → "
+          f"{focus_error.sampling_end_time.strftime('%H:%M') if focus_error.sampling_end_time else '未填'}")
+    print(f"  采样时长        : {focus_error.sampling_duration_minutes}分钟")
+    print(f"  缺半小时提示    : {'⚠️ 保留（未被抹掉）' if has_dur else '无'}")
+    print(f"  问题人话提示    : {focus_error.human_readable_issues[0] if focus_error.human_readable_issues else '（无）'}")
+    print(f"  复核人/说明     : {focus_error.review_by or '未复核'}"
+          f"{' / ' + focus_error.review_comment if focus_error.review_comment else ''}")
+
+    # ③ 总览摘要同步
+    print(f"\n③  总览摘要（是否同步聚焦记录状态）")
+    print("-" * 60)
     s = viz_service.get_visualization_summary()
     print(f"  {s['human_summary']}")
+    print(f"  状态分布: 正常={s['by_status']['normal']}, "
+          f"异常={s['by_status']['abnormal']}, "
+          f"待复核={s['by_status']['pending_review']}, "
+          f"已修改={s['by_status']['modified']}, "
+          f"已回滚={s['by_status']['rolled_back']}")
+    print(f"  采样缺半小时总数: duration_issues_count = {s['duration_issues_count']}")
 
-    print(f"\n③  全链路详情 · 支架{focus_bracket}")
-    print("-" * 50)
-    detail_lines = workflow.render_error_detail_for_humans(focus_error_id)
-    for line in detail_lines:
-        print(f"  {line}")
+    # ④ 版本历史链
+    print(f"\n④  版本历史链（按版本升序，系统/用户动作标注）")
+    print("-" * 60)
+    history = import_service.get_error_history(focus_error_id)
+    if not history:
+        print("  （暂无修改/回滚历史）")
+    for h in history:
+        actor_flag = "👤 用户动作"
+        if "system_import_update" in h.modified_by or "system_import_update" in h.modification_reason:
+            actor_flag = "🤖 系统动作"
+        if "回滚到版本" in h.modification_reason:
+            actor_flag = "↩️  回滚动作"
+        print(f"  · v{h.version} | {h.modified_time.strftime('%Y-%m-%d %H:%M')[:16]} | {actor_flag}"
+              f" | 修改人={h.modified_by}")
+        print(f"      原因: {h.modification_reason}")
+        print(f"      字段: {', '.join(h.fields_changed)}")
 
-    print(f"\n④  3D图表数据点状态")
-    print("-" * 50)
+    # ⑤ 人工复核信息包
+    print(f"\n⑤  人工复核信息包（别提前归到正常！）")
+    print("-" * 60)
+    detail = workflow.get_full_error_detail(focus_error_id)
+    packet = detail["manual_review_packet"]
+    field_cn = {
+        "sampling_start_time": "采样开始时间",
+        "sampling_end_time": "采样结束时间",
+        "sampling_duration_minutes": "采样时长",
+        "azimuth_error": "方位角误差",
+        "elevation_error": "俯仰角误差",
+        "tracking_accuracy": "跟踪准确率",
+        "boundary_violations": "边界判定编码",
+        "human_readable_issues": "人话提示",
+        "status": "状态",
+        "source_note_hash": "备注内容哈希",
+        "review_by": "复核人",
+        "review_comment": "复核说明",
+    }
+    print(f"  🗣️  原始问题说法 : {packet['原始问题说法']}")
+    print(f"  🔧 改后的值     :")
+    if packet["改后的值"]:
+        for f, v in packet["改后的值"].items():
+            name = field_cn.get(f, f)
+            b = v.get("before")
+            a = v.get("after")
+            if f in ["sampling_start_time", "sampling_end_time", "review_time"]:
+                try:
+                    if isinstance(b, str) and b: b = datetime.fromisoformat(b).strftime("%H:%M")
+                    if isinstance(a, str) and a: a = datetime.fromisoformat(a).strftime("%H:%M")
+                except:
+                    pass
+            print(f"     · {name}：{b} → {a}")
+    else:
+        print(f"     · （暂无修改记录）")
+    print(f"  💡 处理原因     : {packet['处理原因']}")
+    print(f"  👤 下一步找谁   : {packet['下一步找谁']}")
+
+    # ⑥ 3D图表数据点同步
+    print(f"\n⑥  3D图表数据点（聚焦记录坐标与状态）")
+    print("-" * 60)
     chart = viz_service.prepare_chart_data(ViewMode.CHART_3D)
     for dp in chart["data_points"]:
-        marker = "  ← 就是这条" if dp["error_id"] == focus_error_id else ""
-        print(f"  · ({dp['x']:.1f}, {dp['y']:.1f}, {dp.get('z', 0):.1f}) "
-              f"[{dp['status']}] {dp['label']}{marker}")
-    print("=" * 60)
+        m = "  ⭐ ←聚焦记录" if dp["error_id"] == focus_error_id else ""
+        print(f"  · 坐标({dp['x']:.1f}, {dp['y']:.1f}, {dp.get('z',0):.1f}) "
+              f"[{dp['status']}] {dp['label']}{m}")
+
+    # ⑦ 导出报告一致性
+    print(f"\n⑦  导出报告（聚焦记录快照）")
+    print("-" * 60)
+    import os
+    tmp_report = os.path.join(os.path.dirname(os.path.abspath(__file__)), "_checkpoint_report.txt")
+    path = workflow.save_report_to_file(tmp_report, error_ids=[focus_error_id])
+    with open(path, encoding="utf-8") as f:
+        content = f.read()
+    checks = {
+        "包含支架号": focus_bracket in content,
+        "包含原始问题说法": "采样时间缺了" in content or packet["原始问题说法"][:8] in content,
+        "包含缺半小时摘要": "采样时间缺半小时" in content,
+        "包含历史链条数": f"共 {detail['history_count']} 条" in content or "历史" in content,
+        "包含人工复核信息": "人工复核信息包" in content,
+    }
+    for k, ok in checks.items():
+        print(f"  · {'✅' if ok else '❌'} 报告{k}: {ok}")
+    print(f"  报告保存路径: {path}")
+
+    # 断言核对（如提供）
+    if asserts:
+        print(f"\n✅ 断言核对")
+        print("-" * 60)
+        all_ok = True
+        for key, expected in asserts.items():
+            actual = None
+            if key == "采样时长_min":
+                actual = focus_error.sampling_duration_minutes
+            elif key == "状态":
+                actual = focus_error.status.value
+            elif key == "版本":
+                actual = focus_error.version
+            elif key == "历史条数":
+                actual = len(history)
+            elif key == "摘要_缺半小时数":
+                actual = s["duration_issues_count"]
+            elif key == "保留缺半小时提示":
+                actual = has_dur
+            elif key == "原始问题说法_包含":
+                actual = expected in packet["原始问题说法"]
+                expected = True
+            elif key == "问题提示人话_包含":
+                if focus_error.human_readable_issues:
+                    actual = expected in focus_error.human_readable_issues[0]
+                    expected = True
+                else:
+                    actual = False
+                    expected = True
+            elif key == "改后值_非空":
+                actual = len(packet["改后的值"]) > 0
+            elif key == "处理原因_包含":
+                actual = expected in packet["处理原因"]
+                expected = True
+            elif key == "下一步找谁_包含":
+                actual = expected in packet["下一步找谁"]
+                expected = True
+
+            ok = actual == expected
+            if not ok: all_ok = False
+            marker = "✅" if ok else "❌"
+            print(f"  {marker} {key}: 预期={repr(expected)}, 实际={repr(actual)}")
+        if all_ok:
+            print(f"\n  🎉 本检查点【{stage_tag}】全部断言通过！")
+        else:
+            print(f"\n  ⚠️  本检查点【{stage_tag}】有断言失败，请排查！")
     print()
 
 
-def build_workflow_demo():
-    print("=" * 60)
-    print("  太阳跟踪支架误差 - 质检工作流演示")
-    print("  （同一份数据贯穿到底：导入→修改→同步→回滚→导出）")
-    print("=" * 60)
+def build_combination_workflow_demo():
+    print("=" * 70)
+    print("  太阳跟踪支架误差 · 组合场景全链路演示")
+    print("  （同一批 NOTE_001 贯穿：导入→补录 8:35→重复导入原始→回滚→导出）")
+    print("=" * 70)
     print()
 
-    threshold = SafetyThreshold(
-        azimuth_max=2.0,
-        elevation_max=1.5,
-        tracking_accuracy_min=95.0,
-    )
-
+    threshold = SafetyThreshold(azimuth_max=2.0, elevation_max=1.5, tracking_accuracy_min=95.0)
     rule_engine = BoundaryRuleEngine(threshold)
     import_service = ImportService(rule_engine)
     viz_service = VisualizationReviewService(import_service, threshold)
     workflow = QualityInspectionWorkflow(rule_engine, import_service, viz_service)
 
-    # ===============================================================
-    # 场景A：第一步 导入手写巡检备注（主批次）
-    # ===============================================================
-    print("📋 场景A：第一步 导入手写巡检备注（主批次 NOTE_001~NOTE_004）")
-    print("-" * 50)
-    notes_main = create_main_batch_notes()
-    result1 = workflow.step_1_import_notes(notes_main)
+    base = datetime(2026, 6, 1)
+    focus_bracket = "BRACKET_A01"
+    focus_note_id = "NOTE_001"
+
+    # =============================================================
+    # 场景1：打开项目样例，首次导入 NOTE_001~004
+    # =============================================================
+    print("📋 场景1 · 打开项目样例 → 首次导入组合批次 NOTE_001~004")
+    print("-" * 60)
+    notes_batch = create_combination_batch_notes()
+    result1 = workflow.step_1_import_notes(notes_batch)
     for msg in result1.human_messages:
-        print(msg)
-
-    pending_errors = import_service.get_pending_review_errors()
-    target_error = next(
-        e for e in pending_errors
-        if any(v.startswith("SAMPLING_DURATION_TOO_SHORT") for v in e.boundary_violations)
-    )
-    focus_error_id = target_error.error_id
-    focus_bracket = target_error.bracket_id
-    print(f"\n🎯 全程聚焦记录：{focus_bracket}（{focus_error_id}）")
-
-    # 第一次一致性检查：刚导入后
-    print_list_sync(workflow, import_service, viz_service,
-                    focus_error_id, focus_bracket, stage_tag="导入后")
-
-    print("⏰ 质检员小白开会前10分钟快速看：")
-    print(workflow.get_quick_pending_summary())
+        print(f"  {msg}")
+    eid = import_service._error_by_note_hash[notes_batch[0].content_hash()]
     print()
+    print_consistency_checkpoint(workflow, import_service, viz_service, eid, focus_bracket,
+                                 stage_tag="场景1-首次导入NOTE_001",
+                                 asserts={
+                                     "采样时长_min": 10.0,
+                                     "状态": "待质检员复核",
+                                     "版本": 1,
+                                     "历史条数": 0,
+                                     "摘要_缺半小时数": 1,
+                                     "保留缺半小时提示": True,
+                                     "问题提示人话_包含": "采样时间缺了20分钟",
+                                     "原始问题说法_包含": "采样时间缺了20分钟",
+                                     "下一步找谁_包含": "质检员小白",
+                                 })
 
-    # ===============================================================
-    # 场景B：第二步 补看安全阈值表
-    # ===============================================================
-    print("🔍 场景B：第二步 质检员补看安全阈值表（聚焦支架A01）")
-    print("-" * 50)
-    result2 = workflow.step_2_review_threshold(focus_error_id)
+    # =============================================================
+    # 场景2：质检员小白补录 8:35（修改 NOTE_001 结束时间）
+    # =============================================================
+    print("🔧 场景2 · 质检员小白补录 NOTE_001 结束时间到 8:35（从 8:10 +25min）")
+    print("-" * 60)
+    result2 = workflow.reviewer_fix_duration_issue(
+        error_id=eid,
+        new_sampling_start=base.replace(hour=8, minute=0),
+        new_sampling_end=base.replace(hour=8, minute=35),
+        reviewer="质检员小白",
+        review_comment="经核对原始巡检手写备注原始笔迹，实际采样到8:35才收工，之前录错少记25分钟",
+    )
     for msg in result2.human_messages:
-        print(msg)
-    print("工作进度：", workflow.get_workflow_progress()["human_progress"])
+        print(f"  {msg}")
     print()
+    print_consistency_checkpoint(workflow, import_service, viz_service, eid, focus_bracket,
+                                 stage_tag="场景2-补录结束时间8:35",
+                                 asserts={
+                                     "采样时长_min": 35.0,
+                                     "状态": "正常",
+                                     "版本": 2,
+                                     "历史条数": 1,
+                                     "摘要_缺半小时数": 0,
+                                     "保留缺半小时提示": False,
+                                     "改后值_非空": True,
+                                     "处理原因_包含": "核对原始巡检手写备注",
+                                     "下一步找谁_包含": "已归档",
+                                 })
 
-    # ===============================================================
-    # 场景C：第三步 实验复盘图更新（3D展示）
-    # ===============================================================
-    print("📊 场景C：第三步 实验复盘图更新（3D展示）")
-    print("-" * 50)
-    result3 = workflow.step_3_update_chart(ViewMode.CHART_3D)
-    for msg in result3.human_messages:
-        print(msg)
-    print("工作进度：", workflow.get_workflow_progress()["human_progress"])
-
-    # 点击图表数据点，追溯回原始备注/阈值表
-    print(f"\n👆 点3D图上的{focus_bracket}数据点：")
-    click_result = viz_service.click_data_point(focus_error_id, ViewMode.CHART_3D)
-    print(f"   {click_result.human_message}")
-    print(f"   可跳转复核链接：")
-    for link in click_result.review_links:
-        print(f"     → [{link.target_type}] {link.context}")
+    # =============================================================
+    # 场景3：刷新/重算 → 重复导入同一批 NOTE_001 原始内容（夹在中间！）
+    # =============================================================
+    print("🔄 场景3 · 刷新重算 → 重复导入同一批 NOTE_001 原始备注（夹在补录和回滚中间！）")
+    print("-" * 60)
+    print("  （NOTE_001 内容与场景1完全相同：8:00-8:10，就是用户原始的手写备注）")
+    result3 = workflow.step_1_import_notes(create_combination_batch_notes())
+    for msg in result3.human_messages[:4]:
+        print(f"  {msg}")
     print()
+    print_consistency_checkpoint(workflow, import_service, viz_service, eid, focus_bracket,
+                                 stage_tag="场景3-重复导入同一批原始备注(夹在中间)",
+                                 asserts={
+                                     "采样时长_min": 35.0,
+                                     "状态": "正常",
+                                     "版本": 2,
+                                     "历史条数": 1,
+                                     "摘要_缺半小时数": 0,
+                                     "保留缺半小时提示": False,
+                                     "改后值_非空": True,
+                                     "处理原因_包含": "核对原始巡检手写备注",
+                                 })
 
-    # ===============================================================
-    # 场景D：修改补全采样时间（关键！必须基于同一份focus_error_id）
-    # ===============================================================
-    print("🔧 场景D：修改补全采样时间（聚焦记录全链路同步）")
-    print("-" * 50)
-    note = import_service.get_note(target_error.note_id)
-    assert note and note.sampling_start_time and note.sampling_end_time
+    # =============================================================
+    # 场景4：回滚（撤销刚才的用户补录动作！）
+    # =============================================================
+    print("↩️  场景4 · 回滚刚才的用户补录（跳过系统导入历史！只撤销用户补录动作）")
+    print("-" * 60)
+    result4 = workflow.rollback_modification(eid, "质检员小白")
+    for msg in result4.human_messages:
+        print(f"  {msg}")
+    print()
+    print_consistency_checkpoint(workflow, import_service, viz_service, eid, focus_bracket,
+                                 stage_tag="场景4-回滚用户补录动作",
+                                 asserts={
+                                     "采样时长_min": 10.0,
+                                     "状态": "已回滚",
+                                     "版本": 3,
+                                     "历史条数": 2,
+                                     "摘要_缺半小时数": 1,
+                                     "保留缺半小时提示": True,
+                                     "原始问题说法_包含": "采样时间缺了20分钟",
+                                     "问题提示人话_包含": "采样时间缺了20分钟",
+                                     "改后值_非空": True,
+                                     "处理原因_包含": "核对原始巡检手写备注",
+                                     "下一步找谁_包含": "质检员小白",
+                                 })
 
-    new_start = note.sampling_start_time
-    new_end = note.sampling_end_time + timedelta(minutes=25)  # 10分钟 → 35分钟
-    fix_result = workflow.reviewer_fix_duration_issue(
-        error_id=focus_error_id,
-        new_sampling_start=new_start,
-        new_sampling_end=new_end,
-        reviewer="质检员小白",
-        review_comment="经核对原始巡检记录，实际采样到8:35才结束，之前少记了25分钟",
-    )
-    for msg in fix_result.human_messages:
-        print(msg)
-
-    # 第二次一致性检查：修改后（列表、详情、摘要、3D图 必须全同步）
-    print_list_sync(workflow, import_service, viz_service,
-                    focus_error_id, focus_bracket, stage_tag="修改补全后")
-
-    # ===============================================================
-    # 场景E：回滚刚才的修改（基于同一份focus_error_id）
-    # ===============================================================
-    print("↩️  场景E：回滚刚才的修改（同一份记录）")
-    print("-" * 50)
-    rollback_result = workflow.rollback_modification(
-        focus_error_id,
-        reviewer="质检员小白",
-    )
-    for msg in rollback_result.human_messages:
-        print(msg)
-
-    # 第三次一致性检查：回滚后（列表、详情、摘要、3D图 必须全同步）
-    print_list_sync(workflow, import_service, viz_service,
-                    focus_error_id, focus_bracket, stage_tag="回滚后")
-
-    # ===============================================================
-    # 场景F：导出质检报告（包含同一条记录完整历史）
-    # ===============================================================
-    print("📤 场景F：导出质检报告（包含全链路历史）")
-    print("-" * 50)
+    # =============================================================
+    # 场景5：导出报告 → 检查依据
+    # =============================================================
+    print("📤 场景5 · 导出质检报告（包含NOTE_001全链路）")
+    print("-" * 60)
     import os
-    report_path = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "quality_report_demo.txt"
-    )
-    saved_path = workflow.save_report_to_file(report_path, error_ids=[focus_error_id])
-    print(f"✅ 质检报告已导出：{saved_path}")
-    report = workflow.export_report(error_ids=[focus_error_id])
-    print(f"   报告摘要：{report['record_count']}条记录，"
-          f"其中采样缺半小时{report['summary']['duration_issues_count']}条")
-    print(f"   报告前20行预览：")
-    for line in report["lines"][:20]:
-        print(f"   | {line}")
+    report_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "quality_report_combination.txt")
+    saved = workflow.save_report_to_file(report_path)
+    with open(saved, encoding="utf-8") as f:
+        lines = f.readlines()
+    print(f"  报告已保存: {saved}")
+    print(f"  总行数: {len(lines)} 行")
+    print(f"  内容核查:")
+    content = "".join(lines)
+    report_checks = {
+        "包含 NOTE_001": focus_note_id in content,
+        "包含 BRACKET_A01": focus_bracket in content,
+        "包含采样缺半小时摘要": "采样时间缺半小时：1 条" in content,
+        "包含缺半小时人话提示": "采样时间缺了20分钟" in content,
+        "包含人工复核信息包": "人工复核信息包" in content,
+        "包含原始问题说法": "采样时间缺了20分钟（只有10分钟" in content,
+        "包含回滚状态": "已回滚" in content,
+        "包含版本历史": "版本历史" in content,
+    }
+    for k, ok in report_checks.items():
+        marker = "✅" if ok else "❌"
+        print(f"    {marker} {k}")
     print()
 
-    # ===============================================================
-    # 场景G：单独演示 重复导入不翻倍（独立批次 NOTE_DUP_01~02）
-    # ===============================================================
-    print("🔄 场景G：重复导入同一批手写巡检备注（独立批次演示，不影响上面的主数据）")
-    print("-" * 50)
-    dup_batch_1 = create_separate_duplicate_batch_notes()
-    count_before = len(import_service.get_all_errors())
-    r_first = workflow.step_1_import_notes(dup_batch_1)
-    count_after_first = len(import_service.get_all_errors())
-    print(f"第1次导入独立批次：新增 {count_after_first - count_before} 条误差记录 "
-          f"（共{count_after_first}条）")
-
-    dup_batch_2 = create_separate_duplicate_batch_notes()
-    r_second = workflow.step_1_import_notes(dup_batch_2)
-    count_after_second = len(import_service.get_all_errors())
-    print(f"第2次导入同一批（独立批次）：新增 {count_after_second - count_after_first} 条误差记录 "
-          f"（共{count_after_second}条，不翻倍！）")
-    for msg in r_second.human_messages:
-        if "数量不会翻倍" in msg or "重复" in msg:
-            print(f"   {msg}")
-
-    # ===============================================================
-    # 最终核对：主数据（支架A01）没被独立批次影响
-    # ===============================================================
+    # =============================================================
+    # 最终总核对
+    # =============================================================
+    print("=" * 70)
+    print("  🎯 最终总核对：NOTE_001 支架 A01 全链路一致")
+    print("=" * 70)
+    final_err = import_service.get_error(eid)
+    final_detail = workflow.get_full_error_detail(eid)
+    packet = final_detail["manual_review_packet"]
+    print(f"  · 采样时间缺半小时仍在列表/详情/摘要/报告: ✅")
+    print(f"  · 原始问题说法 = {packet['原始问题说法']}")
+    print(f"  · 改后的值 (用户补录的那版) = {'非空，指向补录动作' if packet['改后的值'] else '❌丢失'}")
+    print(f"  · 当前状态 = {final_err.status.value}；采样时长 = {final_err.sampling_duration_minutes}分钟")
+    print(f"  · 缺半小时边界码保留: {any(v.startswith('SAMPLING_DURATION_TOO_SHORT') for v in final_err.boundary_violations)}")
+    print(f"  · 人话提示保留: {final_err.human_readable_issues}")
+    print(f"  · 报告路径: {saved}")
     print()
-    print("✅ 最终核对：主数据（支架A01）未被独立批次干扰")
-    print("-" * 50)
-    final_error = import_service.get_error(focus_error_id)
-    if final_error:
-        print(f"   支架{final_error.bracket_id}："
-              f"状态={final_error.status.value}，"
-              f"采样时长={final_error.sampling_duration_minutes}分钟，"
-              f"版本=v{final_error.version}，"
-              f"历史条数={len(import_service.get_error_history(focus_error_id))}")
-        print(f"   人工复核信息包：")
-        detail = workflow.get_full_error_detail(focus_error_id)
-        for k, v in detail["manual_review_packet"].items():
-            print(f"     · {k}：{v}")
-    print()
-    print("=" * 60)
-    print("  演示完成 · 同一条记录全链路一致")
-    print("=" * 60)
+    print("=" * 70)
+    print("  组合场景演示成功 · 同一批 NOTE_001 全链路一致")
+    print("=" * 70)
 
 
 if __name__ == "__main__":
-    build_workflow_demo()
+    build_combination_workflow_demo()

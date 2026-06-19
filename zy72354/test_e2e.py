@@ -671,6 +671,172 @@ class TestSolarTrackingBracketErrorSystem(unittest.TestCase):
         self.assertEqual(hc2, hc3, "完全重复导入不新增历史")
         print("✅ 完全重复导入：不新增历史+数量不翻倍")
 
+    def test_11_note001_combination_reimport_between_fix_and_rollback(self):
+        """组合场景：NOTE_001 导入→补录8:35→重复导入同一批原始→回滚→导出
+        完整核对清单：原始备注/改后值/当前状态/修改历史/采样缺半小时/详情复核/导出
+        """
+        print("\n🗂️  复现测试 test_11 · 组合场景 NOTE_001 导入→补录→重导原始→回滚→导出")
+        base_date = datetime(2026, 6, 1)
+
+        notes_original = [
+            ManualInspectionNote(
+                note_id="NOTE_001",
+                inspection_date="2026-06-01",
+                inspector="巡检员老王",
+                bracket_id="BRACKET_A01",
+                azimuth_error=1.2,
+                elevation_error=0.8,
+                sampling_start_time=base_date.replace(hour=8, minute=0),
+                sampling_end_time=base_date.replace(hour=8, minute=10),
+                tracking_accuracy=96.5,
+                raw_content="6月1日巡检，A01号支架，采样时间8:00-8:10，只采了10分钟就下雨了",
+            ),
+            ManualInspectionNote(
+                note_id="NOTE_002",
+                inspection_date="2026-06-01",
+                inspector="巡检员老王",
+                bracket_id="BRACKET_A02",
+                azimuth_error=2.5,
+                elevation_error=1.8,
+                sampling_start_time=base_date.replace(hour=9, minute=0),
+                sampling_end_time=base_date.replace(hour=9, minute=35),
+                tracking_accuracy=93.0,
+                raw_content="6月1日巡检，A02号支架，采样时间9:00-9:35",
+            ),
+        ]
+
+        # ===== 步骤1：导入 NOTE_001
+        r_import = self.workflow.step_1_import_notes(notes_original)
+        self.assertTrue(r_import.success, "首次导入必须成功")
+        note001_hash = notes_original[0].content_hash()
+        eid = self.import_service._error_by_note_hash.get(note001_hash)
+        self.assertIsNotNone(eid, "NOTE_001 导入后必须能找到error_id")
+        err_v1 = self.import_service.get_error(eid)
+        self.assertEqual(err_v1.note_id, "NOTE_001", "原始备注必须是 NOTE_001")
+        self.assertAlmostEqual(err_v1.sampling_duration_minutes, 10.0, places=1)
+        self.assertEqual(err_v1.status, ErrorStatus.PENDING_REVIEW)
+        has_dur_v1 = any(v.startswith("SAMPLING_DURATION_TOO_SHORT") for v in err_v1.boundary_violations)
+        self.assertTrue(has_dur_v1, "v1 必须有缺半小时提示")
+        self.assertTrue(any("采样时间缺了" in m for m in err_v1.human_readable_issues))
+        print("   ✅ 步骤1 通过：导入 NOTE_001 → 10分钟 / 待复核 / 缺半小时")
+
+        # ===== 步骤2：补录 8:35
+        r_fix = self.workflow.reviewer_fix_duration_issue(
+            error_id=eid,
+            new_sampling_start=base_date.replace(hour=8, minute=0),
+            new_sampling_end=base_date.replace(hour=8, minute=35),
+            reviewer="质检员小白",
+            review_comment="经核对原始巡检手写笔迹，实际采样到8:35，之前少记25分钟",
+        )
+        self.assertTrue(r_fix.success, "补录必须成功")
+        err_v2 = self.import_service.get_error(eid)
+        self.assertAlmostEqual(err_v2.sampling_duration_minutes, 35.0, places=1)
+        self.assertEqual(err_v2.status, ErrorStatus.NORMAL)
+        hist_v2 = self.import_service.get_error_history(eid)
+        self.assertEqual(len(hist_v2), 1, "补录后应有1条历史")
+        self.assertEqual(hist_v2[0].modified_by, "质检员小白")
+        print("   ✅ 步骤2 通过：补录 8:35 → 35分钟 / 正常 / 历史1条")
+
+        # ===== 步骤3：重复导入同一批 NOTE_001 原始（夹在补录和回滚中间！）
+        r_reimport = self.workflow.step_1_import_notes(notes_original)
+        self.assertTrue(r_reimport.success, "重复导入流程应成功")
+        import_info = r_reimport.data.get("import_result", {})
+        dup_count = import_info.get("duplicate", 0) + getattr(r_reimport, "duplicate_errors_skipped", 0)
+        self.assertGreaterEqual(dup_count, 1, "NOTE_001 原始应判为历史重复而跳过")
+        err_v3 = self.import_service.get_error(eid)
+        self.assertAlmostEqual(err_v3.sampling_duration_minutes, 35.0, places=1,
+                               msg="重导原始不应覆盖补录的35分钟！")
+        self.assertEqual(err_v3.status, ErrorStatus.NORMAL, "重导原始不应改变正常状态")
+        hist_v3 = self.import_service.get_error_history(eid)
+        self.assertEqual(len(hist_v3), 1, "重导原始不应追加 system_import_update 历史！")
+        print("   ✅ 步骤3 通过：重导同一批原始 → duplicate 跳过 / 历史仍是1条 / 35分钟未被覆盖")
+
+        # ===== 步骤4：回滚用户补录（跳过系统历史！）
+        r_rollback = self.workflow.rollback_modification(eid, "质检员小白")
+        self.assertTrue(r_rollback.success, "回滚必须成功")
+        err_v4 = self.import_service.get_error(eid)
+        self.assertAlmostEqual(err_v4.sampling_duration_minutes, 10.0, places=1,
+                               msg="回滚后应恢复10分钟（补录前状态）")
+        self.assertEqual(err_v4.status, ErrorStatus.ROLLED_BACK)
+        self.assertEqual(err_v4.version, 3, "回滚后版本号=v3")
+        hist_v4 = self.import_service.get_error_history(eid)
+        self.assertEqual(len(hist_v4), 2, "回滚后历史应为2条（补录+回滚）")
+        self.assertEqual(hist_v4[0].modified_by, "质检员小白", "v2应是用户补录动作")
+        self.assertIn("回滚到版本", hist_v4[1].modification_reason, "v3应是回滚动作")
+        has_dur_v4 = any(v.startswith("SAMPLING_DURATION_TOO_SHORT") for v in err_v4.boundary_violations)
+        self.assertTrue(has_dur_v4, "回滚后必须保留缺半小时边界码！")
+        self.assertTrue(any("采样时间缺了" in m for m in err_v4.human_readable_issues),
+                        "回滚后必须保留缺半小时人话提示！")
+        print("   ✅ 步骤4 通过：回滚用户补录 → 10分钟 / 已回滚 / 历史2条 / 缺半小时保留")
+
+        # ===== 步骤5：总览摘要同步
+        summary = self.viz_service.get_visualization_summary()
+        self.assertGreaterEqual(summary["duration_issues_count"], 1,
+                                "摘要中缺半小时记录数必须≥1")
+        self.assertEqual(summary["by_status"]["rolled_back"], 1,
+                         "摘要中已回滚数=1")
+        pending = self.import_service.get_pending_review_errors()
+        has_a01 = any(e.bracket_id == "BRACKET_A01" and
+                      any(v.startswith("SAMPLING_DURATION_TOO_SHORT") for v in e.boundary_violations)
+                      for e in self.import_service.get_all_errors())
+        self.assertTrue(has_a01, "全数据集中支架 A01 必须仍存在缺半小时记录")
+        print("   ✅ 步骤5 通过：摘要缺半小时数=1，A01 在列表中保留缺半小时")
+
+        # ===== 步骤6：人工复核信息包四要素
+        detail = self.workflow.get_full_error_detail(eid)
+        self.assertTrue(detail["success"])
+        packet = detail["manual_review_packet"]
+        self.assertIn("采样时间缺了", packet["原始问题说法"],
+                      "原始问题说法必须保留缺半小时的人话，不能被覆盖成无问题描述！")
+        self.assertTrue(len(packet["改后的值"]) > 0,
+                        "改后的值必须非空，指向用户补录动作！")
+        self.assertIn("核对原始巡检手写笔迹", packet["处理原因"],
+                      "处理原因必须是用户补录时写的说明！")
+        self.assertIn("质检员小白", packet["下一步找谁"],
+                      "下一步找谁必须指向质检员（回滚完成状态）")
+        self.assertTrue(detail["has_duration_issue"],
+                        "详情 has_duration_issue 必须为 True")
+        self.assertTrue(detail["manual_review_required"],
+                        "详情 manual_review_required 必须为 True")
+        print("   ✅ 步骤6 通过：人工复核信息包四要素齐全，原始问题说法保留")
+
+        # ===== 步骤7：导出报告内容核对
+        import os
+        import tempfile
+        tmp_dir = tempfile.mkdtemp()
+        report_path = os.path.join(tmp_dir, "test_11_report.txt")
+        saved = self.workflow.save_report_to_file(report_path)
+        self.assertTrue(os.path.exists(saved))
+        with open(saved, encoding="utf-8") as f:
+            report_content = f.read()
+        self.assertIn("NOTE_001", report_content, "报告必须包含原始备注 NOTE_001")
+        self.assertIn("BRACKET_A01", report_content, "报告必须包含支架 A01")
+        self.assertIn("采样时间缺了", report_content,
+                      "报告必须包含缺半小时人话提示（不能抹掉风险）")
+        self.assertIn("采样时间缺半小时", report_content,
+                      "报告必须包含采样缺半小时摘要条目")
+        self.assertIn("已回滚", report_content,
+                      "报告必须包含已回滚状态")
+        self.assertIn("人工复核信息包", report_content,
+                      "报告必须包含人工复核四要素")
+        self.assertIn("版本历史", report_content,
+                      "报告必须包含版本历史链")
+        print("   ✅ 步骤7 通过：报告导出包含 NOTE_001、A01、缺半小时、回滚状态、人工复核信息")
+
+        # ===== 步骤8：最终总核对 —— 回滚没抹掉 A01 缺半小时风险
+        final_err = self.import_service.get_error(eid)
+        self.assertEqual(final_err.note_id, "NOTE_001")
+        self.assertEqual(final_err.bracket_id, "BRACKET_A01")
+        self.assertAlmostEqual(final_err.sampling_duration_minutes, 10.0, places=1)
+        self.assertEqual(final_err.status, ErrorStatus.ROLLED_BACK)
+        self.assertTrue(any(v.startswith("SAMPLING_DURATION_TOO_SHORT") for v in final_err.boundary_violations),
+                        "⚠️  核心断言：回滚后边界违规码不能丢失！重复导入夹在中间时A01仍有缺时风险")
+        self.assertTrue(any("采样时间缺了" in m for m in final_err.human_readable_issues),
+                        "⚠️  核心断言：回滚后人话提示不能丢失！重复导入夹在中间时A01仍有缺时风险")
+        print("   ✅ 步骤8 核心断言通过：重复导入夹在补录和回滚中间 → 回滚不会抹掉 A01 缺半小时风险")
+
+        print("\n🎯 test_11 组合场景全链路验证完成 · 8个步骤全部通过 ✅")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
