@@ -9,6 +9,7 @@
     "test:normal": "ts-node tests/scenarios/normal-scenario.ts",
     "test:wrong": "ts-node tests/scenarios/wrong-caliber-scenario.ts",
     "test:supplement": "ts-node tests/scenarios/supplement-scenario.ts",
+    "test:zhangming": "ts-node tests/scenarios/zhangming-leave-conflict-e2e.ts",
     "self-check": "ts-node src/run-self-check.ts"
   },
   "dependencies": {

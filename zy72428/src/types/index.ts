@@ -47,6 +47,21 @@ export interface ScheduleRecord {
   updatedAt: Date;
 }
 
+export type ConflictResolveAction =
+  | 'deer-confirmed'
+  | 'deer-rejected'
+  | 'coordinator-reviewed'
+  | 'auto-fixed'
+  | 'supplement-recalculated';
+
+export interface ConflictResolution {
+  action: ConflictResolveAction;
+  operator: string;
+  timestamp: Date;
+  judgment: string;
+  finalConclusion: string;
+}
+
 export interface TrackChecklistItem {
   id: string;
   sessionDate: Date;
@@ -60,6 +75,18 @@ export interface TrackChecklistItem {
   verificationResult: VerificationResult;
   conflictEvidence?: ConflictEvidence;
   conflictId?: string;
+
+  originalConflictType?: ConflictEvidence['type'];
+  originalConflictDescription?: string;
+  originalConflictSuggestion?: string;
+  originalPhotoEvidence?: ConflictEvidence['photoEvidence'];
+  originalAliasEvidence?: ConflictEvidence['aliasEvidence'];
+  originalScheduleEvidence?: ConflictEvidence['scheduleEvidence'];
+  conflictTriggerAction?: string;
+  conflictNeedsCoordinatorReview?: boolean;
+
+  conflictResolution?: ConflictResolution;
+
   isLeave: boolean;
   leaveReviewStatus: LeaveReviewStatus;
   reviewedBy?: string;
@@ -156,12 +183,35 @@ export interface ConflictReportEntry {
   checklistItemId: string;
   type: ConflictEvidence['type'];
   source: MaterialSource;
+  sourceDescription: string;
   performerName: string;
   sessionDate: Date;
   locationName: string;
   description: string;
+  triggerAction: string;
   status: 'pending' | 'confirmed' | 'rejected' | 'reviewed';
+  currentStatus: string;
   handledBy?: string;
   handledAt?: Date;
+  processingJudgment?: string;
   conclusion?: string;
+  suggestion: string;
+  needsCoordinatorReview: boolean;
+  photoEvidence: {
+    trackName: string;
+    isLeave: boolean;
+    photoUrl: string;
+  };
+  aliasEvidence: {
+    canonicalName: string;
+    aliases: string[];
+    copyrightHolder: string;
+  };
+  scheduleEvidence?: {
+    isConsumed: boolean;
+    consumedHours: number;
+    isLeave: boolean;
+  };
+  historySummary: string[];
+  exportRow: Record<string, string>;
 }

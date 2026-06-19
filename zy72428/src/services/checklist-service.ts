@@ -8,8 +8,27 @@ import {
   ScheduleRecord,
   AuditEntry,
   ConflictReportEntry,
+  ConflictResolution,
 } from '../types';
 import { ErrorMessages } from '../utils/messages';
+
+const TRIGGER_ACTION_MAP: Record<ConflictEvidence['type'], string> = {
+  'track-name-mismatch': '曲目别名表与课时签到照片曲目名称不一致，系统自动检测',
+  'leave-counted-as-consumed': '请假课时被算进已消耗，系统自动检测',
+  'duplicate-import': '检测到重复导入记录，系统自动检测',
+};
+
+const TYPE_TEXT_MAP: Record<ConflictEvidence['type'], string> = {
+  'track-name-mismatch': '曲目名称不匹配',
+  'leave-counted-as-consumed': '请假课时被误算为已消耗',
+  'duplicate-import': '重复导入',
+};
+
+const SOURCE_TEXT_MAP: Record<MaterialSource, string> = {
+  normal: '正常材料导入',
+  'wrong-caliber': '错口径材料导入',
+  supplement: '补录材料导入',
+};
 
 export class ChecklistService {
   generateChecklist(source?: MaterialSource): {
@@ -89,6 +108,24 @@ export class ChecklistService {
         verificationResult,
         conflictEvidence,
         conflictId,
+
+        originalConflictType: conflictEvidence?.type,
+        originalConflictDescription: conflictEvidence?.description,
+        originalConflictSuggestion: conflictEvidence?.suggestion,
+        originalPhotoEvidence: conflictEvidence
+          ? { ...conflictEvidence.photoEvidence }
+          : undefined,
+        originalAliasEvidence: conflictEvidence
+          ? { ...conflictEvidence.aliasEvidence }
+          : undefined,
+        originalScheduleEvidence: conflictEvidence?.scheduleEvidence
+          ? { ...conflictEvidence.scheduleEvidence }
+          : undefined,
+        conflictTriggerAction: conflictEvidence
+          ? TRIGGER_ACTION_MAP[conflictEvidence.type]
+          : undefined,
+        conflictNeedsCoordinatorReview: conflictEvidence?.needsCoordinatorReview,
+
         isLeave: photo.isLeave,
         leaveReviewStatus,
         source: photo.source,
@@ -102,9 +139,16 @@ export class ChecklistService {
         item.id,
         'create',
         null,
-        { verificationResult, conflictId, isLeave: item.isLeave, leaveReviewStatus },
+        {
+          verificationResult,
+          conflictId,
+          originalConflictType: item.originalConflictType,
+          isLeave: item.isLeave,
+          leaveReviewStatus,
+        },
         '系统',
-        `生成核对项：${item.performerName} ${item.sessionDate.toLocaleDateString()} ${item.locationName}`
+        `生成核对项：${item.performerName} ${item.sessionDate.toLocaleDateString()} ${item.locationName}` +
+          (conflictEvidence ? `，触发冲突：${TYPE_TEXT_MAP[conflictEvidence.type]}` : '')
       );
 
       if (photo.isLeave && leaveReviewStatus === 'pending') {
@@ -125,8 +169,20 @@ export class ChecklistService {
 
     const beforeSnapshot = {
       verificationResult: item.verificationResult,
-      conflictEvidence: item.conflictEvidence ? { ...item.conflictEvidence } : null,
       trackNameFromPhoto: item.trackNameFromPhoto,
+      conflictResolution: item.conflictResolution || null,
+    };
+
+    const resolution: ConflictResolution = {
+      action: confirmed ? 'deer-confirmed' : 'deer-rejected',
+      operator: resolverName,
+      timestamp: new Date(),
+      judgment: confirmed
+        ? `${resolverName}（版权运营小鹿）确认以曲目别名表为准，采纳标准名称`
+        : `${resolverName}（版权运营小鹿）驳回别名表，保留照片原始记录`,
+      finalConclusion: confirmed
+        ? `曲目名称已统一为标准名，冲突解决`
+        : `保留照片原始记录，不做名称替换`,
     };
 
     const updated: TrackChecklistItem = {
@@ -134,11 +190,12 @@ export class ChecklistService {
       verificationResult: confirmed ? 'match' : 'pending-review',
       reviewedBy: resolverName,
       reviewedAt: new Date(),
+      conflictEvidence: item.conflictEvidence,
+      conflictResolution: resolution,
     };
 
-    if (confirmed && item.conflictEvidence) {
+    if (confirmed) {
       updated.trackNameFromPhoto = item.canonicalTrackName || item.trackNameFromAlias;
-      updated.conflictEvidence = undefined;
     }
 
     dataStore.saveChecklistItem(updated);
@@ -151,7 +208,9 @@ export class ChecklistService {
       {
         verificationResult: updated.verificationResult,
         conflictId: item.conflictId,
+        originalConflictType: item.originalConflictType,
         confirmed,
+        resolution,
         trackNameFromPhoto: updated.trackNameFromPhoto,
       },
       resolverName,
@@ -170,8 +229,16 @@ export class ChecklistService {
 
     const beforeSnapshot = {
       leaveReviewStatus: item.leaveReviewStatus,
-      isLeave: item.isLeave,
-      conflictId: item.conflictId,
+      verificationResult: item.verificationResult,
+      conflictResolution: item.conflictResolution || null,
+    };
+
+    const resolution: ConflictResolution = {
+      action: 'coordinator-reviewed',
+      operator: reviewerName,
+      timestamp: new Date(),
+      judgment: `巡演统筹 ${reviewerName} 复核：确认为请假，课时不计入已消耗`,
+      finalConclusion: `请假已复核通过，该课时标记为请假，不消耗版权配额`,
     };
 
     const updated: TrackChecklistItem = {
@@ -179,11 +246,12 @@ export class ChecklistService {
       leaveReviewStatus: 'reviewed-by-coordinator',
       reviewedBy: reviewerName,
       reviewedAt: new Date(),
+      conflictEvidence: item.conflictEvidence,
+      conflictResolution: resolution,
     };
 
     if (item.verificationResult === 'conflict' && item.conflictId) {
       updated.verificationResult = 'match';
-      updated.conflictEvidence = undefined;
     }
 
     dataStore.saveChecklistItem(updated);
@@ -197,6 +265,8 @@ export class ChecklistService {
         leaveReviewStatus: updated.leaveReviewStatus,
         verificationResult: updated.verificationResult,
         conflictId: item.conflictId,
+        originalConflictType: item.originalConflictType,
+        resolution,
       },
       reviewerName,
       `巡演统筹 ${reviewerName} 复核请假记录：${item.performerName} ${item.sessionDate.toLocaleDateString()}`
@@ -212,37 +282,136 @@ export class ChecklistService {
     for (const item of items) {
       if (!item.conflictId) continue;
 
+      const originalType = item.originalConflictType || item.conflictEvidence?.type;
+      const originalDescription =
+        item.originalConflictDescription ||
+        item.conflictEvidence?.description ||
+        `冲突ID: ${item.conflictId}`;
+      const originalSuggestion =
+        item.originalConflictSuggestion || item.conflictEvidence?.suggestion || '';
+      const originalPhoto =
+        item.originalPhotoEvidence ||
+        item.conflictEvidence?.photoEvidence || {
+          trackName: item.trackNameFromPhoto,
+          isLeave: item.isLeave,
+          photoUrl: '-',
+        };
+      const originalAlias =
+        item.originalAliasEvidence ||
+        item.conflictEvidence?.aliasEvidence || {
+          canonicalName: item.trackNameFromAlias,
+          aliases: [],
+          copyrightHolder: '-',
+        };
+      const originalSchedule =
+        item.originalScheduleEvidence || item.conflictEvidence?.scheduleEvidence;
+      const needsReview = item.conflictNeedsCoordinatorReview ??
+        item.conflictEvidence?.needsCoordinatorReview ??
+        false;
+
       let status: ConflictReportEntry['status'] = 'pending';
+      let currentStatus = '待处理';
+      let processingJudgment: string | undefined;
       let conclusion: string | undefined;
 
-      if (item.verificationResult === 'match' && item.reviewedBy) {
-        status = 'confirmed';
-        conclusion = `已由${item.reviewedBy}确认，冲突已解决`;
-      } else if (item.verificationResult === 'pending-review' && item.reviewedBy) {
-        status = 'rejected';
-        conclusion = `已由${item.reviewedBy}驳回，保留原记录`;
-      } else if (item.isLeave && item.leaveReviewStatus === 'reviewed-by-coordinator') {
-        status = 'reviewed';
-        conclusion = `巡演统筹已复核，确认为请假`;
+      if (item.conflictResolution) {
+        processingJudgment = item.conflictResolution.judgment;
+        conclusion = item.conflictResolution.finalConclusion;
+
+        switch (item.conflictResolution.action) {
+          case 'deer-confirmed':
+            status = 'confirmed';
+            currentStatus = '版权运营小鹿已确认';
+            break;
+          case 'deer-rejected':
+            status = 'rejected';
+            currentStatus = '版权运营小鹿已驳回';
+            break;
+          case 'coordinator-reviewed':
+            status = 'reviewed';
+            currentStatus = '巡演统筹已复核';
+            break;
+          case 'auto-fixed':
+            status = 'confirmed';
+            currentStatus = '系统自动修复';
+            break;
+          case 'supplement-recalculated':
+            status = 'reviewed';
+            currentStatus = '补录后重算完成';
+            break;
+        }
+      } else if (item.verificationResult === 'conflict') {
+        currentStatus = needsReview
+          ? '待巡演统筹复核'
+          : '待版权运营小鹿确认/驳回';
       }
+
+      const auditLog = dataStore.getAuditLog('checklist-item', item.id);
+      const historySummary = auditLog.map(
+        (e) =>
+          `[${e.timestamp.toLocaleString()}] ${e.operator} - ${e.action} - ${e.description}`
+      );
+
+      const exportRow = this.buildExportRow(item);
 
       entries.push({
         conflictId: item.conflictId,
         checklistItemId: item.id,
-        type: item.conflictEvidence?.type || 'track-name-mismatch',
+        type: originalType || 'track-name-mismatch',
         source: item.source,
+        sourceDescription: SOURCE_TEXT_MAP[item.source],
         performerName: item.performerName,
         sessionDate: item.sessionDate,
         locationName: item.locationName,
-        description: item.conflictEvidence?.description || `冲突ID: ${item.conflictId}`,
+        description: originalDescription,
+        triggerAction:
+          item.conflictTriggerAction ||
+          (originalType ? TRIGGER_ACTION_MAP[originalType] : '系统自动检测'),
         status,
+        currentStatus,
         handledBy: item.reviewedBy,
         handledAt: item.reviewedAt,
+        processingJudgment,
         conclusion,
+        suggestion: originalSuggestion,
+        needsCoordinatorReview: needsReview,
+        photoEvidence: originalPhoto,
+        aliasEvidence: originalAlias,
+        scheduleEvidence: originalSchedule,
+        historySummary,
+        exportRow,
       });
     }
 
     return entries;
+  }
+
+  private buildExportRow(item: TrackChecklistItem): Record<string, string> {
+    return {
+      日期: item.sessionDate.toLocaleDateString(),
+      艺人: item.performerName,
+      点位: item.locationName,
+      照片曲目: item.trackNameFromPhoto,
+      标准曲目: item.canonicalTrackName || '-',
+      冲突类型: item.originalConflictType
+        ? TYPE_TEXT_MAP[item.originalConflictType]
+        : '无',
+      冲突描述: item.originalConflictDescription || '-',
+      核对结果:
+        item.verificationResult === 'match'
+          ? '核对一致'
+          : item.verificationResult === 'conflict'
+          ? '存在冲突'
+          : '待复核',
+      是否请假: item.isLeave ? '是' : '否',
+      请假复核状态:
+        item.leaveReviewStatus === 'pending'
+          ? '待巡演统筹复核'
+          : '已复核',
+      处理人: item.reviewedBy || '-',
+      处理结论: item.conflictResolution?.finalConclusion || '-',
+      数据来源: SOURCE_TEXT_MAP[item.source],
+    };
   }
 
   getPendingConflictIds(): string[] {
@@ -384,11 +553,19 @@ export class ChecklistService {
       点位: item.locationName,
       照片曲目: item.trackNameFromPhoto,
       标准曲目: item.canonicalTrackName || '-',
+      原始冲突类型: item.originalConflictType
+        ? TYPE_TEXT_MAP[item.originalConflictType]
+        : '无',
+      原始冲突描述: item.originalConflictDescription || '-',
       核对结果: this.getVerificationResultText(item.verificationResult),
       是否请假: item.isLeave ? '是' : '否',
       请假复核状态: this.getLeaveReviewStatusText(item.leaveReviewStatus),
+      处理人: item.reviewedBy || '-',
+      处理结论: item.conflictResolution?.finalConclusion || '-',
       冲突状态: item.conflictId
-        ? (item.verificationResult === 'conflict' ? '待处理' : '已处理')
+        ? item.verificationResult === 'conflict'
+          ? '待处理'
+          : '已处理'
         : '无冲突',
       数据来源: this.getSourceText(item.source),
     }));
@@ -412,12 +589,7 @@ export class ChecklistService {
   }
 
   private getSourceText(source: MaterialSource): string {
-    const map = {
-      normal: '正常材料',
-      'wrong-caliber': '错口径材料',
-      supplement: '补录材料',
-    };
-    return map[source];
+    return SOURCE_TEXT_MAP[source];
   }
 }
 
