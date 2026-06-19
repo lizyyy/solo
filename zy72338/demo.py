@@ -7,6 +7,7 @@
           如需模拟跨批次历史导入测试，请看 demo 中"演示2-错口径材料"末尾的特别测试段落
 """
 
+from typing import Optional
 from models import MaterialType, CheckStatus, CalculationDetail
 from workflow_engine import WorkflowEngine
 from test_data import get_material_data, SUPPLEMENT_RECORDS, PERCENT_DECIMAL_MIX_SAMPLING
@@ -24,6 +25,8 @@ def verify_six_metrics(
     scenario_name: str,
     expected_pending_review_min: int = 0,
     expected_duplicate_warning_count: int = 0,
+    expect_duplicate_check_pass: bool = True,
+    expect_export_pass: Optional[bool] = True,
     do_export: bool = True
 ):
     """
@@ -94,12 +97,8 @@ def verify_six_metrics(
             if sc.passed:
                 total_pass += 1
 
-    total_checks = len(self_check)
-    for sc in self_check:
-        if sc.passed:
-            total_pass += 0  # already counted above to avoid double count? reset
-
     passed_count = sum(1 for sc in self_check if sc.passed)
+    total_checks = len(self_check)
     metrics["⑥ 自检总评"] = f"基础自检 {passed_count}/{total_checks} 通过"
 
     for k, v in metrics.items():
@@ -137,12 +136,38 @@ def verify_six_metrics(
             print(f"       {w.description[:100]}")
 
     ok_pending = len(pending) >= expected_pending_review_min
-    ok_dup = (not expected_duplicate_warning_count) or (
+    
+    ok_dup_warn_count = (not expected_duplicate_warning_count) or (
         duplicate_check_result and len(duplicate_check_result.warnings) >= expected_duplicate_warning_count
     )
+    
+    ok_dup_pass = True
+    if duplicate_check_result and expect_duplicate_check_pass is not None:
+        ok_dup_pass = duplicate_check_result.passed == expect_duplicate_check_pass
+    
+    ok_export = True
+    if export_check_result and expect_export_pass is not None:
+        ok_export = export_check_result.passed == expect_export_pass
+    
+    all_ok = ok_pending and ok_dup_warn_count and ok_dup_pass and ok_export
 
-    print_separator(f"指标核对结论: {'✓ 通过' if (ok_pending and ok_dup) else '✗ 未达预期'}", "-")
-    return ok_pending and ok_dup
+    print_separator(f"指标核对结论: {'✓ 通过' if all_ok else '✗ 未达预期'}", "-")
+    
+    if not all_ok:
+        reasons = []
+        if not ok_pending:
+            reasons.append(f"待复核数={len(pending)} < 预期最低={expected_pending_review_min}")
+        if not ok_dup_pass:
+            actual = "PASS" if (duplicate_check_result and duplicate_check_result.passed) else "FAIL"
+            expected = "PASS" if expect_duplicate_check_pass else "FAIL"
+            reasons.append(f"重复导入检查={actual} ≠ 预期={expected}")
+        if not ok_export:
+            actual = "PASS" if (export_check_result and export_check_result.passed) else "FAIL"
+            expected = "PASS" if expect_export_pass else "FAIL"
+            reasons.append(f"导出一致性={actual} ≠ 预期={expected}")
+        print(f"  ❌ 未通过原因：{'；'.join(reasons)}")
+    
+    return all_ok
 
 
 def demo_normal_material():
@@ -241,7 +266,8 @@ def demo_wrong_caliber_material():
         engine,
         scenario_name="混合口径网格样例-错口径材料",
         expected_pending_review_min=3,
-        expected_duplicate_warning_count=1
+        expected_duplicate_warning_count=1,
+        expect_duplicate_check_pass=False
     )
 
     print_separator("【关键验证】混合口径出现时状态必须不是'正常'")
@@ -332,7 +358,8 @@ def demo_supplement_material():
     verify_six_metrics(
         engine,
         scenario_name="补录网格样例",
-        expected_pending_review_min=0,
+        expected_pending_review_min=3,
+        expect_export_pass=False,
         do_export=False
     )
 

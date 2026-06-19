@@ -19,7 +19,7 @@ class ValidationEngine:
         self.history_records: List[HistoryRecord] = []
 
     def _new_batch(self) -> str:
-        ts = datetime.now().strftime('%Y%m%d%H%M%S')
+        ts = datetime.now().strftime('%Y%m%d%H%M%S%f')
         batch_id = f"batch_{ts}"
         self.current_batch_id = batch_id
         return batch_id
@@ -203,7 +203,10 @@ class ValidationEngine:
 
     def record_import(self, grid_data_list: List[GridBoundaryData]):
         now = datetime.now()
-        batch_id = self._new_batch()
+        if self.current_batch_id:
+            batch_id = self.current_batch_id
+        else:
+            batch_id = self._new_batch()
         for data in grid_data_list:
             self.imported_grid_ids.append((data.grid_id, now, batch_id))
         

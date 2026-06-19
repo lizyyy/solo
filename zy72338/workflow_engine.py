@@ -41,6 +41,7 @@ class WorkflowEngine:
         self.export_cache: Optional[List[CalculationDetail]] = None
         self._pending_manager_review: List[WarningItem] = []
         self._manager_review_conflicts: List[ConflictEvidence] = []
+        self._sampling_import_batch_id: Optional[str] = None
 
     def _add_history(self, operation_type: str, operator: str, detail: str,
                     data_before: Optional[Dict] = None, data_after: Optional[Dict] = None):
@@ -140,7 +141,7 @@ class WorkflowEngine:
         self.sampling_records = [
             SamplingRecord(**{**r.__dict__}) for r in sampling_records
         ]
-        batch_id = f"batch_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+        batch_id = f"batch_{datetime.now().strftime('%Y%m%d%H%M%S%f')}"
         self._add_history(
             "第一步：导入抽样名单",
             operator,
@@ -162,6 +163,9 @@ class WorkflowEngine:
                 source=DataSource.SAMPLING_LIST,
                 row_index=idx + 1
             ))
+        
+        self.validation_engine._new_batch()
+        self._sampling_import_batch_id = self.validation_engine.current_batch_id
         
         warnings = self.validation_engine.validate_grid_data(
             temp_grid_data,
@@ -677,9 +681,6 @@ class WorkflowEngine:
         return results
 
     def _check_duplicate_import(self) -> SelfCheckResult:
-        batch_id_before = self.validation_engine.current_batch_id
-        saved_grid_data = self.grid_data
-        
         original_sampling_grid = []
         for idx, record in enumerate(self.sampling_records):
             numeric, is_percent, _ = self.validation_engine.parse_value(
@@ -698,17 +699,19 @@ class WorkflowEngine:
         warnings = self.validation_engine.detect_duplicate_import(
             original_sampling_grid,
             DataSource.SAMPLING_LIST,
-            current_batch_override=f"selfcheck_{datetime.now().strftime('%Y%m%d%H%M%S%f')}"
+            current_batch_override=self._sampling_import_batch_id
         )
         
-        self.validation_engine.current_batch_id = batch_id_before
+        within_count = sum(1 for w in warnings if w.batch_info and "本次导入" in w.batch_info)
+        cross_count = sum(1 for w in warnings if w.batch_info and "历史批次" in w.batch_info)
         
         return SelfCheckResult(
             check_name="重复导入检查（仅检查抽样名单导入阶段）",
             passed=len(warnings) == 0,
             warnings=warnings,
             details=(f"检查第一步抽样名单共{len(self.sampling_records)}条数据，"
-                    f"发现{len(warnings)}个重复导入问题。"
+                    f"发现{len(warnings)}个重复导入问题"
+                    f"（本次导入内重复{within_count}条，跨历史批次重复{cross_count}条）。"
                     f"区分：本次导入内重复/历史批次重复")
         )
 
