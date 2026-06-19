@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import { getBatchTypeName } from "@/utils";
 import type { CheckType } from "@/types";
@@ -6,7 +6,7 @@ import { ShieldCheck, Copy, Thermometer, RefreshCw, FileCheck, Play, CheckCircle
 
 const checkConfigs: Record<CheckType, {
   name: string;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<{ size?: number | string; className?: string }>;
   description: string;
   color: string;
 }> = {
@@ -40,9 +40,7 @@ export default function SelfCheck() {
   const { 
     currentBatchType, 
     selfCheckResults,
-    runSelfCheck,
-    runAllSelfChecks,
-    workPhotos
+    runSelfCheck
   } = useAppStore();
 
   const [running, setRunning] = useState(false);
@@ -244,13 +242,26 @@ export default function SelfCheck() {
                     </p>
                   </div>
                   
-                  {result.data && Array.isArray(result.data) && result.data.length > 0 && (
+                  {result.data && type === 'duplicate_import' && result.data.duplicates && Array.isArray(result.data.duplicates) && (
                     <div className="mt-3">
-                      <p className="text-xs font-medium text-slate-600 mb-2">详细列表：</p>
+                      <p className="text-xs font-medium text-slate-600 mb-2">重复组列表：</p>
                       <div className="space-y-1">
-                        {result.data.map((item: any, idx: number) => (
+                        {(result.data.duplicates as Array<{ key: string; count: number }>).map((item, idx) => (
                           <div key={idx} className="text-xs text-slate-600 p-2 bg-slate-50 rounded">
-                            {Array.isArray(item) ? item.join(' - ') : String(item)}
+                            {item.key} ({item.count}条)
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {result.data && type === 'temperature_mixed' && result.data.mixedDetails && Array.isArray(result.data.mixedDetails) && (
+                    <div className="mt-3">
+                      <p className="text-xs font-medium text-slate-600 mb-2">混用记录：</p>
+                      <div className="space-y-1">
+                        {(result.data.mixedDetails as string[]).map((item, idx) => (
+                          <div key={idx} className="text-xs text-slate-600 p-2 bg-slate-50 rounded">
+                            {item}
                           </div>
                         ))}
                       </div>

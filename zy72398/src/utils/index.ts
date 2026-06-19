@@ -1,4 +1,4 @@
-import type { WorkPhoto, InspectionNote, Conflict, TemperatureUnit, ConflictType, DiffusionCalcResult, RecalcDiff, ExportMismatch } from '@/types';
+import type { WorkPhoto, InspectionNote, Conflict, TemperatureUnit, ConflictType, DiffusionCalcResult, RecalcDiff, ExportMismatch, VerifyExportTarget, ReportItem } from '@/types';
 
 export function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
@@ -191,13 +191,14 @@ export function verifyExportConsistency(
   photos: WorkPhoto[],
   notes: InspectionNote[],
   conflicts: Conflict[],
-  report: any
+  report: VerifyExportTarget
 ): ExportMismatch[] {
   const mismatches: ExportMismatch[] = [];
   
-  if (!report || !report.items) return mismatches;
+  const targetReport = 'report' in report ? report.report : report;
+  if (!targetReport || !targetReport.items) return mismatches;
   
-  report.items.forEach((item: any) => {
+  targetReport.items.forEach((item: ReportItem) => {
     const photo = photos.find(p => p.id === item.workPhotoId);
     if (!photo) {
       mismatches.push({
@@ -241,7 +242,7 @@ export function verifyExportConsistency(
     }
   });
   
-  const exportedPhotoIds = new Set(report.items?.map((i: any) => i.workPhotoId) || []);
+  const exportedPhotoIds = new Set(targetReport.items?.map((i: ReportItem) => i.workPhotoId) || []);
   photos.forEach(p => {
     if (!exportedPhotoIds.has(p.id)) {
       mismatches.push({
@@ -254,8 +255,8 @@ export function verifyExportConsistency(
     }
   });
   
-  const reportNotes = report.inspectionNotes || [];
-  const exportedNoteIds = new Set(reportNotes.map((n: any) => n.id));
+  const reportNotes = targetReport.inspectionNotes || [];
+  const exportedNoteIds = new Set(reportNotes.map((n: InspectionNote) => n.id));
   notes.forEach(n => {
     if (!exportedNoteIds.has(n.id)) {
       mismatches.push({
@@ -268,8 +269,8 @@ export function verifyExportConsistency(
     }
   });
   
-  const reportConflicts = report.conflicts || [];
-  const exportedConflictIds = new Set(reportConflicts.map((c: any) => c.id));
+  const reportConflicts = targetReport.conflicts || [];
+  const exportedConflictIds = new Set(reportConflicts.map((c: Conflict) => c.id));
   conflicts.forEach(c => {
     if (!exportedConflictIds.has(c.id)) {
       mismatches.push({
@@ -301,7 +302,7 @@ export function deduplicatePhotosByDeviceTime(photos: WorkPhoto[]): WorkPhoto[] 
   return Array.from(seen.values());
 }
 
-export function downloadJSON(data: any, filename: string): void {
+export function downloadJSON(data: unknown, filename: string): void {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

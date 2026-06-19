@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/store/useAppStore";
 import { getBatchTypeName, formatDateTime, getConflictTypeName, formatTemperature } from "@/utils";
 import type { ConflictStatus } from "@/types";
-import { AlertTriangle, CheckCircle, XCircle, ChevronRight, Image as ImageIcon, FileText, User, Clock, ThumbsUp, ThumbsDown, MessageSquare } from "lucide-react";
+import { AlertTriangle, CheckCircle, XCircle, ChevronRight, Image as ImageIcon, FileText, User, ThumbsUp, ThumbsDown, MessageSquare } from "lucide-react";
 
 export default function ConflictHandling() {
   const navigate = useNavigate();

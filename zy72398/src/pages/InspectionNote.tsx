@@ -9,7 +9,6 @@ export default function InspectionNote() {
   const navigate = useNavigate();
   const { 
     currentBatchType, 
-    workPhotos, 
     inspectionNotes,
     addInspectionNote,
     getWorkPhotosByBatch,

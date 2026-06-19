@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { AppState, WorkPhoto, InspectionNote, Conflict, HandoverReport, SelfCheckResult, BatchType, ConflictStatus, ReportItem, HistoryEntry, DiffusionCalcResult } from '@/types';
+import type { AppState, WorkPhoto, InspectionNote, Conflict, HandoverReport, SelfCheckResult, BatchType, ConflictStatus, ReportItem, HistoryEntry, DiffusionCalcResult, PendingHistoryEntry } from '@/types';
 import { generateId, detectConflicts, detectTemperatureMixing, computeDiffusionForPhoto, computeRecalcDiffs, deduplicatePhotosByDeviceTime, verifyExportConsistency } from '@/utils';
 
 interface AppActions {
@@ -28,6 +28,7 @@ const initialState: AppState = {
   reports: [],
   selfCheckResults: [],
   historyEntries: [],
+  pendingHistoryEntries: [],
   currentStep: 1,
   currentBatchType: 'normal'
 };
@@ -64,69 +65,101 @@ export const useAppStore = create<AppState & AppActions>()(
             newConflicts.push(...detected);
           }
           
-          return {
-            inspectionNotes: [...state.inspectionNotes, newNote],
-            conflicts: [...state.conflicts, ...newConflicts]
+          const latestReport = [...state.reports]
+            .filter(r => r.batchType === state.currentBatchType)
+            .pop();
+          
+          const historyEntry: PendingHistoryEntry | HistoryEntry = {
+            id: generateId(),
+            field: `note_${newNote.id}_content`,
+            oldValue: '',
+            newValue: note.content,
+            modifier: note.inspectorName,
+            reason: '补录巡检备注',
+            modifiedAt: new Date().toISOString(),
+            batchType: state.currentBatchType
           };
-        });
-
-        set((state) => {
-          const photo = state.workPhotos.find(p => p.id === note.workPhotoId);
-          if (photo && photo.batchType === 'supplementary') {
-            const latestReport = [...state.reports]
-              .filter(r => r.batchType === state.currentBatchType)
-              .pop();
-            if (latestReport) {
-              const newEntry: HistoryEntry = {
-                id: generateId(),
-                reportId: latestReport.id,
-                field: 'reviewStatus',
-                oldValue: 'pending',
-                newValue: 'flagged',
-                modifier: note.inspectorName,
-                reason: `补录备注：${note.content.slice(0, 50)}`,
-                modifiedAt: new Date().toISOString()
-              };
-              return {
-                historyEntries: [...state.historyEntries, newEntry]
-              };
-            }
+          
+          const statusEntry: PendingHistoryEntry | HistoryEntry = {
+            id: generateId(),
+            field: 'reviewStatus',
+            oldValue: 'pending',
+            newValue: 'flagged',
+            modifier: note.inspectorName,
+            reason: `补录备注：${note.content.slice(0, 40)}`,
+            modifiedAt: new Date().toISOString(),
+            batchType: state.currentBatchType
+          };
+          
+          if (latestReport) {
+            const he1 = { ...historyEntry, reportId: latestReport.id } as HistoryEntry;
+            const he2 = { ...statusEntry, reportId: latestReport.id } as HistoryEntry;
+            return {
+              inspectionNotes: [...state.inspectionNotes, newNote],
+              conflicts: [...state.conflicts, ...newConflicts],
+              historyEntries: [...state.historyEntries, he1, he2]
+            };
+          } else {
+            return {
+              inspectionNotes: [...state.inspectionNotes, newNote],
+              conflicts: [...state.conflicts, ...newConflicts],
+              pendingHistoryEntries: [...state.pendingHistoryEntries, historyEntry, statusEntry]
+            };
           }
-          return state;
         });
       },
 
       updateConflictStatus: (conflictId, status, resolverName, remark) => {
         set((state) => {
           const conflict = state.conflicts.find(c => c.id === conflictId);
-          const newEntries: HistoryEntry[] = [];
+          if (!conflict) return state;
           
-          if (conflict) {
-            const latestReport = [...state.reports]
-              .filter(r => r.batchType === state.currentBatchType)
-              .pop();
-            if (latestReport) {
-              newEntries.push({
-                id: generateId(),
-                reportId: latestReport.id,
-                field: `conflict_${conflictId}_status`,
-                oldValue: conflict.status,
-                newValue: status,
-                modifier: resolverName,
-                reason: remark || `${status === 'confirmed' ? '确认' : '驳回'}冲突`,
-                modifiedAt: new Date().toISOString()
-              });
-            }
-          }
+          const latestReport = [...state.reports]
+            .filter(r => r.batchType === state.currentBatchType)
+            .pop();
           
-          return {
-            conflicts: state.conflicts.map(c =>
-              c.id === conflictId
-                ? { ...c, status, resolverName, resolutionRemark: remark, resolvedAt: new Date().toISOString() }
-                : c
-            ),
-            historyEntries: [...state.historyEntries, ...newEntries]
+          const actionText = status === 'confirmed' ? '确认' : '驳回';
+          const conflictEntry: PendingHistoryEntry | HistoryEntry = {
+            id: generateId(),
+            field: `conflict_${conflictId}_status`,
+            oldValue: conflict.status,
+            newValue: status,
+            modifier: resolverName,
+            reason: remark || `${actionText}冲突：${conflict.photoValue} vs ${conflict.noteValue}`,
+            modifiedAt: new Date().toISOString(),
+            batchType: state.currentBatchType
           };
+          
+          const statusEntry: PendingHistoryEntry | HistoryEntry = {
+            id: generateId(),
+            field: 'reviewStatus',
+            oldValue: 'flagged',
+            newValue: 'reviewed',
+            modifier: resolverName,
+            reason: `冲突${actionText}：${remark || '无备注'}`,
+            modifiedAt: new Date().toISOString(),
+            batchType: state.currentBatchType
+          };
+          
+          const updatedConflicts = state.conflicts.map(c =>
+            c.id === conflictId
+              ? { ...c, status, resolverName, resolutionRemark: remark, resolvedAt: new Date().toISOString() }
+              : c
+          );
+          
+          if (latestReport) {
+            const he1 = { ...conflictEntry, reportId: latestReport.id } as HistoryEntry;
+            const he2 = { ...statusEntry, reportId: latestReport.id } as HistoryEntry;
+            return {
+              conflicts: updatedConflicts,
+              historyEntries: [...state.historyEntries, he1, he2]
+            };
+          } else {
+            return {
+              conflicts: updatedConflicts,
+              pendingHistoryEntries: [...state.pendingHistoryEntries, conflictEntry, statusEntry]
+            };
+          }
         });
       },
 
@@ -174,7 +207,25 @@ export const useAppStore = create<AppState & AppActions>()(
             temperatureMixed: mixed,
             diffusionRate: diffusion?.diffusionRate,
             reviewStatus,
-            supplementaryUpdated: hasSupplementaryNote
+            supplementaryUpdated: hasSupplementaryNote,
+            inspectionNotes: notes.map(n => ({
+              id: n.id,
+              inspectorName: n.inspectorName,
+              content: n.content,
+              temperature: n.temperature,
+              temperatureUnit: n.temperatureUnit,
+              inspectionTime: n.inspectionTime
+            })),
+            conflicts: photoConflicts.map(c => ({
+              id: c.id,
+              conflictType: c.conflictType,
+              photoValue: c.photoValue,
+              noteValue: c.noteValue,
+              status: c.status,
+              resolverName: c.resolverName,
+              resolutionRemark: c.resolutionRemark,
+              resolvedAt: c.resolvedAt
+            }))
           };
         });
         
@@ -206,9 +257,82 @@ export const useAppStore = create<AppState & AppActions>()(
         };
         
         const previousReports = state.reports.filter(r => r.batchType === state.currentBatchType);
+        const isFirstGeneration = previousReports.length === 0;
         const newHistoryEntries: HistoryEntry[] = [];
         
-        if (previousReports.length > 0) {
+        if (isFirstGeneration) {
+          const pendingForBatch = state.pendingHistoryEntries.filter(p => p.batchType === state.currentBatchType);
+          pendingForBatch.forEach(p => {
+            newHistoryEntries.push({
+              id: generateId(),
+              reportId: report.id,
+              field: p.field,
+              oldValue: p.oldValue,
+              newValue: p.newValue,
+              modifier: p.modifier,
+              reason: p.reason,
+              modifiedAt: p.modifiedAt
+            });
+          });
+          
+          reportNotes.forEach(note => {
+            const existingField = `note_${note.id}_content`;
+            if (!pendingForBatch.some(p => p.field === existingField)) {
+              newHistoryEntries.push({
+                id: generateId(),
+                reportId: report.id,
+                field: existingField,
+                oldValue: '',
+                newValue: note.content,
+                modifier: note.inspectorName,
+                reason: '首次报告生成时同步补录备注',
+                modifiedAt: new Date().toISOString()
+              });
+            }
+          });
+          
+          allConflicts.filter(c => c.status !== 'pending').forEach(conflict => {
+            const existingField = `conflict_${conflict.id}_status`;
+            if (!pendingForBatch.some(p => p.field === existingField)) {
+              newHistoryEntries.push({
+                id: generateId(),
+                reportId: report.id,
+                field: existingField,
+                oldValue: 'pending',
+                newValue: conflict.status,
+                modifier: conflict.resolverName || '未知处理人',
+                reason: conflict.resolutionRemark || `${conflict.status === 'confirmed' ? '确认' : '驳回'}冲突`,
+                modifiedAt: conflict.resolvedAt || new Date().toISOString()
+              });
+            }
+          });
+          
+          if (mixed) {
+            newHistoryEntries.push({
+              id: generateId(),
+              reportId: report.id,
+              field: 'temperatureMixed',
+              oldValue: 'false',
+              newValue: 'true',
+              modifier: '系统检测',
+              reason: '检测到摄氏度/开尔文混用，待训练教练复核',
+              modifiedAt: new Date().toISOString()
+            });
+          }
+          
+          items.forEach(item => {
+            newHistoryEntries.push({
+              id: generateId(),
+              reportId: report.id,
+              field: `item_${item.deviceNo}_reviewStatus`,
+              oldValue: 'pending',
+              newValue: item.reviewStatus,
+              modifier: '系统',
+              reason: `报告生成时自动判定：${item.reviewStatus === 'reviewed' ? '已复核' : item.reviewStatus === 'flagged' ? '需复核' : '待处理'}`,
+              modifiedAt: new Date().toISOString()
+            });
+          });
+        } else {
           const prevReport = previousReports[previousReports.length - 1];
           if (prevReport.items.length !== items.length) {
             newHistoryEntries.push({
@@ -236,9 +360,12 @@ export const useAppStore = create<AppState & AppActions>()(
           }
         }
         
+        const remainingPending = state.pendingHistoryEntries.filter(p => p.batchType !== state.currentBatchType);
+        
         set((state) => ({
           reports: [...state.reports, report],
-          historyEntries: [...state.historyEntries, ...newHistoryEntries]
+          historyEntries: [...state.historyEntries, ...newHistoryEntries],
+          pendingHistoryEntries: remainingPending
         }));
         
         return report;
@@ -260,7 +387,7 @@ export const useAppStore = create<AppState & AppActions>()(
               if (!seen.has(key)) seen.set(key, []);
               seen.get(key)!.push(p);
             });
-            const duplicates = Array.from(seen.entries()).filter(([_, arr]) => arr.length > 1);
+            const duplicates = Array.from(seen.entries()).filter(([, arr]) => arr.length > 1);
             result = {
               id: generateId(),
               checkType: 'duplicate_import',
@@ -269,12 +396,12 @@ export const useAppStore = create<AppState & AppActions>()(
                 ? '未检测到重复导入记录' 
                 : `检测到 ${duplicates.length} 组重复导入：${duplicates.map(([k, arr]) => `${k}(${arr.length}条)`).join('; ')}`,
               checkedAt: new Date().toISOString(),
-              data: duplicates.map(([key, arr]) => ({
+              data: { duplicates: duplicates.map(([key, arr]) => ({
                 key,
                 count: arr.length,
                 batchTypes: arr.map(a => a.batchType),
                 ids: arr.map(a => a.id)
-              }))
+              })) }
             };
             break;
           }
@@ -286,7 +413,7 @@ export const useAppStore = create<AppState & AppActions>()(
               passed: !mixed,
               details: mixed ? details.join('; ') : '温度单位使用一致',
               checkedAt: new Date().toISOString(),
-              data: details
+              data: { mixedDetails: details }
             };
             break;
           }
@@ -430,11 +557,7 @@ export const useAppStore = create<AppState & AppActions>()(
               batchPhotos,
               batchNotes,
               batchConflicts,
-              {
-                items: latestReport.items,
-                inspectionNotes: latestReport.inspectionNotes || [],
-                conflicts: latestReport.conflicts || []
-              }
+              latestReport
             );
             
             const allMismatches = [...mismatches, ...crossReportMismatches];
@@ -518,7 +641,8 @@ export const useAppStore = create<AppState & AppActions>()(
             reports: state.reports.filter(r => r.batchType !== batchType),
             historyEntries: state.historyEntries.filter(e => 
               !state.reports.filter(r => r.batchType === batchType).some(r => r.id === e.reportId)
-            )
+            ),
+            pendingHistoryEntries: state.pendingHistoryEntries.filter(p => p.batchType !== batchType)
           };
         });
       },
@@ -532,9 +656,8 @@ export const useAppStore = create<AppState & AppActions>()(
         set({ workPhotos: [], inspectionNotes: [], conflicts: [], reports: [], historyEntries: [] });
         
         const allPhotos: WorkPhoto[] = [];
-        const allNotes: Omit<InspectionNote, 'id' | 'createdAt'>[] = [];
         
-        batchTypes.forEach((batchType, batchIdx) => {
+        batchTypes.forEach((batchType) => {
           for (let i = 0; i < 3; i++) {
             const baseOffset = i;
             const recordTime = new Date(now.getTime() - baseOffset * 3600000).toISOString();
@@ -560,7 +683,7 @@ export const useAppStore = create<AppState & AppActions>()(
           }
         });
         
-        set((state) => ({ workPhotos: allPhotos }));
+        set(() => ({ workPhotos: allPhotos }));
         
         allPhotos.forEach((photo, idx) => {
           if (idx % 2 === 0 || photo.batchType === 'supplementary') {

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/store/useAppStore";
 import { getBatchTypeName, formatDateTime, formatTemperature } from "@/utils";
 import type { BatchType, TemperatureUnit } from "@/types";
-import { Upload, X, Plus, Image as ImageIcon, Thermometer, Droplets, Hash, Clock, ChevronRight, Trash2 } from "lucide-react";
+import { Upload, Plus, Image as ImageIcon, Thermometer, Droplets, Hash, Clock, ChevronRight, Trash2 } from "lucide-react";
 
 export default function DataImport() {
   const navigate = useNavigate();
@@ -12,7 +12,6 @@ export default function DataImport() {
   const { 
     currentBatchType, 
     setCurrentBatchType,
-    workPhotos, 
     addWorkPhoto, 
     getWorkPhotosByBatch,
     clearBatchData,

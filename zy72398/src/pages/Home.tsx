@@ -1,8 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/store/useAppStore";
 import { getBatchTypeName } from "@/utils";
-import { StepForward, Upload, FileText, AlertTriangle, FileCheck, ShieldCheck, ChevronRight, Database, Zap, Play } from "lucide-react";
-import { useEffect } from "react";
+import { Upload, FileText, AlertTriangle, FileCheck, ChevronRight, Database, Zap } from "lucide-react";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -13,7 +12,6 @@ export default function Home() {
     inspectionNotes, 
     conflicts,
     reports,
-    setCurrentStep,
     setCurrentBatchType,
     addMockData,
     runAllSelfChecks
@@ -28,11 +26,6 @@ export default function Home() {
   const pendingConflicts = conflicts.filter(c => c.status === 'pending').length;
   const totalPhotos = workPhotos.length;
   const totalNotes = inspectionNotes.length;
-
-  useEffect(() => {
-    if (workPhotos.length === 0) {
-    }
-  }, []);
 
   const handleLoadDemo = () => {
     addMockData();

@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import { getBatchTypeName, formatDateTime, formatTemperature, downloadJSON, detectTemperatureMixing } from "@/utils";
 import type { HistoryEntry } from "@/types";
-import { FileCheck, AlertTriangle, CheckCircle, XCircle, Download, Clock, User, FileText, ChevronDown, ChevronUp, History, FileDiff, Shield, Flag, Eye } from "lucide-react";
+import { FileCheck, AlertTriangle, CheckCircle, XCircle, Download, User, FileText, ChevronDown, ChevronUp, History, FileDiff, Flag, Eye } from "lucide-react";
 
 export default function HandoverReport() {
   const { 
@@ -307,7 +307,6 @@ export default function HandoverReport() {
 
           <div className="divide-y divide-slate-100">
             {currentReport.items.map((item, idx) => {
-              const photo = workPhotos.find(p => p.id === item.workPhotoId);
               const photoConflicts = getConflictsForPhoto(item.workPhotoId);
               const isExpanded = expandedItems.has(item.workPhotoId);
               const diffusion = currentReport.diffusionResults.find(d => d.workPhotoId === item.workPhotoId);
@@ -391,26 +390,60 @@ export default function HandoverReport() {
                           </div>
                         )}
                         
-                        {photoConflicts.length > 0 && (
+                        {item.inspectionNotes.length > 0 && (
                           <div className="pt-2 border-t border-slate-200">
-                            <p className="text-xs text-slate-500 mb-2">冲突详情：</p>
+                            <p className="text-xs text-slate-500 mb-2 flex items-center gap-1">
+                              <FileText size={12} />巡检备注（{item.inspectionNotes.length}条）
+                            </p>
                             <div className="space-y-2">
-                              {photoConflicts.map((c) => (
-                                <div key={c.id} className="flex items-center gap-3 text-xs p-2 bg-white rounded border border-slate-200">
-                                  <span className={`px-1.5 py-0.5 rounded ${
-                                    c.status === 'confirmed' ? 'bg-green-100 text-green-700' :
-                                    c.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                                    'bg-amber-100 text-amber-700'
-                                  }`}>
-                                    {c.status === 'confirmed' ? '已确认' : c.status === 'rejected' ? '已驳回' : '待处理'}
-                                  </span>
-                                  <span className="text-slate-600">
-                                    {c.photoValue} vs {c.noteValue}
-                                  </span>
-                                  {c.resolverName && (
-                                    <span className="text-slate-400 ml-auto">
-                                      处理人：{c.resolverName}
+                              {item.inspectionNotes.map((note) => (
+                                <div key={note.id} className="text-xs p-2 bg-white rounded border border-slate-200">
+                                  <div className="flex items-center gap-3 mb-1">
+                                    <span className="font-medium text-slate-700">{note.inspectorName}</span>
+                                    <span className="text-slate-400">{formatDateTime(note.inspectionTime)}</span>
+                                    {note.temperature !== undefined && (
+                                      <span className="text-slate-500">
+                                        备注温度：{note.temperature} {note.temperatureUnit}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-slate-600 whitespace-pre-wrap">{note.content}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {item.conflicts.length > 0 && (
+                          <div className="pt-2 border-t border-slate-200">
+                            <p className="text-xs text-slate-500 mb-2 flex items-center gap-1">
+                              <AlertTriangle size={12} />冲突处理（{item.conflicts.length}项）
+                            </p>
+                            <div className="space-y-2">
+                              {item.conflicts.map((c) => (
+                                <div key={c.id} className="text-xs p-2 bg-white rounded border border-slate-200">
+                                  <div className="flex items-center gap-3 mb-1">
+                                    <span className={`px-1.5 py-0.5 rounded ${
+                                      c.status === 'confirmed' ? 'bg-green-100 text-green-700' :
+                                      c.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                                      'bg-amber-100 text-amber-700'
+                                    }`}>
+                                      {c.status === 'confirmed' ? '已确认' : c.status === 'rejected' ? '已驳回' : '待处理'}
                                     </span>
+                                    <span className="text-slate-600 font-medium">
+                                      {c.photoValue} vs {c.noteValue}
+                                    </span>
+                                  </div>
+                                  {c.resolverName && (
+                                    <div className="flex items-center gap-2 text-slate-500 mt-1">
+                                      <span>处理人：{c.resolverName}</span>
+                                      {c.resolvedAt && <span>{formatDateTime(c.resolvedAt)}</span>}
+                                    </div>
+                                  )}
+                                  {c.resolutionRemark && (
+                                    <p className="text-slate-600 mt-1 pt-1 border-t border-slate-100">
+                                      <span className="text-slate-400">处理备注：</span>{c.resolutionRemark}
+                                    </p>
                                   )}
                                 </div>
                               ))}

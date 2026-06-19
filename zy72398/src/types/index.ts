@@ -67,6 +67,24 @@ export interface ReportItem {
   diffusionRate?: number;
   reviewStatus: 'pending' | 'reviewed' | 'flagged';
   supplementaryUpdated: boolean;
+  inspectionNotes: {
+    id: string;
+    inspectorName: string;
+    content: string;
+    temperature?: number;
+    temperatureUnit?: TemperatureUnit;
+    inspectionTime: string;
+  }[];
+  conflicts: {
+    id: string;
+    conflictType: ConflictType;
+    photoValue: string;
+    noteValue: string;
+    status: ConflictStatus;
+    resolverName?: string;
+    resolutionRemark?: string;
+    resolvedAt?: string;
+  }[];
 }
 
 export interface HistoryEntry {
@@ -79,6 +97,27 @@ export interface HistoryEntry {
   reason: string;
   modifiedAt: string;
 }
+
+export interface PendingHistoryEntry {
+  id: string;
+  field: string;
+  oldValue: string;
+  newValue: string;
+  modifier: string;
+  reason: string;
+  modifiedAt: string;
+  batchType: BatchType;
+}
+
+export interface ExportPayload {
+  report: HandoverReport;
+  workPhotos: WorkPhoto[];
+  inspectionNotes: InspectionNote[];
+  conflicts: Conflict[];
+  exportTime: string;
+}
+
+export type VerifyExportTarget = HandoverReport | ExportPayload;
 
 export interface HandoverReport {
   id: string;
@@ -120,7 +159,7 @@ export interface SelfCheckResult {
   passed: boolean;
   details: string;
   checkedAt: string;
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 export interface AppState {
@@ -130,6 +169,7 @@ export interface AppState {
   reports: HandoverReport[];
   selfCheckResults: SelfCheckResult[];
   historyEntries: HistoryEntry[];
+  pendingHistoryEntries: PendingHistoryEntry[];
   currentStep: number;
   currentBatchType: BatchType;
 }
