@@ -1,9 +1,12 @@
-from fastapi import FastAPI, Depends, UploadFile, File, HTTPException, Request
+from urllib.parse import quote
+import json
+from fastapi import FastAPI, Depends, UploadFile, File, HTTPException, Request, Form, Body
 from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-from typing import Optional, List
+from typing import Optional, List, Any, Union
+from pydantic import BaseModel
 import io
 
 from . import models, schemas
@@ -36,16 +39,46 @@ async def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
+class HolidayReviewBody(BaseModel):
+    reviewed_by: Optional[str] = "老秦"
+    adjustments: Optional[List[dict]] = None
+
+
 @app.post("/api/batches/import", response_model=schemas.ImportResult)
 async def import_batch(
-    batch_number: str,
     file: UploadFile = File(...),
-    imported_by: str = "system",
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    request: Request = None
 ):
+    final_batch_number = None
+    final_imported_by = None
+
+    query_params = request.query_params
+    if "batch_number" in query_params:
+        final_batch_number = query_params.get("batch_number")
+    if "imported_by" in query_params:
+        final_imported_by = query_params.get("imported_by")
+
+    form = None
+    try:
+        form = await request.form()
+    except Exception:
+        form = None
+
+    if form is not None:
+        if ("batch_number" in form) and (not final_batch_number):
+            final_batch_number = form.get("batch_number")
+        if ("imported_by" in form) and (not final_imported_by):
+            final_imported_by = form.get("imported_by")
+
+    final_imported_by = final_imported_by or "system"
+
+    if not final_batch_number:
+        raise HTTPException(status_code=400, detail="缺少批次号 batch_number")
+
     content = await file.read()
     try:
-        result = import_clearing_batch(db, batch_number, content, imported_by)
+        result = import_clearing_batch(db, final_batch_number, content, final_imported_by)
         return result
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"导入失败: {str(e)}")
@@ -78,11 +111,38 @@ async def get_batch_workflow(batch_id: int, db: Session = Depends(get_db)):
 @app.post("/api/batches/{batch_id}/holiday-review")
 async def holiday_review(
     batch_id: int,
-    reviewed_by: str = "老秦",
-    adjustments: Optional[List[dict]] = None,
-    db: Session = Depends(get_db)
+    reviewed_by_q: Optional[str] = None,
+    db: Session = Depends(get_db),
+    request: Request = None
 ):
-    result = review_holiday_adjustment(db, batch_id, reviewed_by, adjustments)
+    final_reviewed_by = reviewed_by_q
+    final_adjustments = None
+
+    if "reviewed_by" in request.query_params and (not final_reviewed_by):
+        final_reviewed_by = request.query_params.get("reviewed_by")
+
+    raw_body = None
+    try:
+        raw_body = await request.body()
+    except Exception:
+        raw_body = None
+
+    if raw_body:
+        try:
+            parsed = json.loads(raw_body.decode("utf-8"))
+            if isinstance(parsed, list):
+                final_adjustments = parsed
+            elif isinstance(parsed, dict):
+                if "adjustments" in parsed and isinstance(parsed["adjustments"], list):
+                    final_adjustments = parsed["adjustments"]
+                if "reviewed_by" in parsed and not final_reviewed_by:
+                    final_reviewed_by = parsed["reviewed_by"]
+        except Exception:
+            pass
+
+    final_reviewed_by = final_reviewed_by or "老秦"
+
+    result = review_holiday_adjustment(db, batch_id, final_reviewed_by, final_adjustments)
     if not result.get("success"):
         raise HTTPException(status_code=400, detail=result.get("message"))
     return result
@@ -124,21 +184,23 @@ async def get_self_check_history(batch_id: int, db: Session = Depends(get_db)):
 
 @app.get("/api/batches/{batch_id}/export/excel")
 async def export_excel(batch_id: int, db: Session = Depends(get_db)):
-    excel_content = export_to_excel(db, batch_id)
+    content = export_to_excel(db, batch_id)
+    fn = quote(f"尾佣拆分_{batch_id}.xlsx")
     return StreamingResponse(
-        io.BytesIO(excel_content),
+        io.BytesIO(content),
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": f"attachment; filename=尾佣拆分_{batch_id}.xlsx"}
+        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{fn}"}
     )
 
 
 @app.get("/api/batches/{batch_id}/export/csv")
 async def export_csv(batch_id: int, db: Session = Depends(get_db)):
-    csv_content = export_to_csv(db, batch_id)
+    content = export_to_csv(db, batch_id)
+    fn = quote(f"尾佣拆分_{batch_id}.csv")
     return StreamingResponse(
-        io.StringIO(csv_content),
-        media_type="text/csv; charset=utf-8",
-        headers={"Content-Disposition": f"attachment; filename=尾佣拆分_{batch_id}.csv"}
+        iter([content]),
+        media_type="text/csv; charset=utf-8-sig",
+        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{fn}"}
     )
 
 
