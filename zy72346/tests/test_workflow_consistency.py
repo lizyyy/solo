@@ -166,6 +166,123 @@ class TestRollbackConsistency:
         assert any("rollback_batch" in r for r in reasons)
 
 
+class TestFirstBatchRollbackDeletesNewAnnotations:
+    def test_first_batch_with_empty_denominator_rollback_removes_all_new_records(self, store):
+        rows = [
+            {"line_number": 1, "item_name": "数学A", "category": "优惠", "value": "0.85", "denominator": "100", "numerator": "85"},
+            {"line_number": 2, "item_name": "物理B", "category": "优惠", "value": "", "denominator": "", "numerator": "30"},
+        ]
+        r1, _ = step1_import_annotations(store, rows, changed_by="first_import")
+
+        anns_before = store.list_annotations(source=AnnotationSource.TEACHER_ANNOTATION)
+        assert len(anns_before) == 2
+        physics = [a for a in anns_before if a.item_name == "物理B"][0]
+        assert physics.status == ReviewStatus.FLAGGED
+        assert physics.denominator_raw == ""
+        assert physics.edge_case_type == "denominator_zero_empty_string"
+
+        results_before, state_before = step3_update_demo(store)
+        assert state_before.annotation_count == 2
+        assert state_before.flagged_count == 1
+        assert len(results_before) == 2
+
+        report_before = build_unified_report(store)
+        assert report_before["annotations_summary"]["total"] == 2
+        assert report_before["annotations_summary"]["flagged_count"] == 1
+
+        detail = store.rollback_batch_detailed(r1.batch.id, changed_by="undo_first")
+        assert detail["deleted_new_count"] == 2
+        assert detail["remaining_teacher_annotations"] == 0
+        assert detail["rolled_back"] is True
+
+        anns_after = store.list_annotations(source=AnnotationSource.TEACHER_ANNOTATION)
+        assert len(anns_after) == 0, "首批导入回滚后，新增的两条批注应整条从库里删除"
+
+        math_a_after = store.find_annotation_by_line(1, AnnotationSource.TEACHER_ANNOTATION)
+        assert math_a_after is None
+        physics_after = store.find_annotation_by_line(2, AnnotationSource.TEACHER_ANNOTATION)
+        assert physics_after is None, "空分母的 flagged 记录回滚后也必须整条删除，不能留在库里"
+
+        conn = store._get_conn()
+        cr_count = conn.execute(
+            "SELECT COUNT(*) as c FROM change_records"
+        ).fetchone()["c"]
+        assert cr_count == 0, "被删除批注对应的 change_records 也必须一起清掉"
+
+        results_after, state_after = step3_update_demo(store)
+        assert state_after.annotation_count == 0
+        assert state_after.flagged_count == 0
+        assert state_after.reviewed_count == 0
+        assert len(results_after) == 0
+
+        report_after = build_unified_report(store)
+        assert report_after["annotations_summary"]["total"] == 0
+        assert report_after["annotations_summary"]["flagged_count"] == 0
+        assert report_after["annotations_summary"]["reviewed_count"] == 0
+        assert len(report_after["calculation_results"]) == 0
+        assert len(report_after["by_status"]["flagged"]) == 0
+        assert len(report_after["by_status"]["normal_pending"]) == 0
+
+    def test_first_batch_rollback_distinct_from_reimport_field_restore(self, store):
+        batch1_rows = [
+            {"line_number": 1, "item_name": "数学A", "category": "优惠", "value": "0.85", "denominator": "100", "numerator": "85"},
+            {"line_number": 2, "item_name": "物理B", "category": "优惠", "value": "", "denominator": "", "numerator": "30"},
+        ]
+        r1, _ = step1_import_annotations(store, batch1_rows, changed_by="batch1")
+
+        batch2_rows = [
+            {"line_number": 1, "item_name": "数学A", "category": "优惠", "value": "0.95", "denominator": "100", "numerator": "95"},
+            {"line_number": 2, "item_name": "物理B", "category": "优惠", "value": "", "denominator": "", "numerator": "30"},
+            {"line_number": 3, "item_name": "化学C", "category": "叠加", "value": "0.70", "denominator": "50", "numerator": "35"},
+        ]
+        r2, _ = step1_import_annotations(store, batch2_rows, changed_by="batch2")
+        anns_batch2 = store.list_annotations(source=AnnotationSource.TEACHER_ANNOTATION)
+        assert len(anns_batch2) == 3
+        math_after_b2 = [a for a in anns_batch2 if a.item_name == "数学A"][0]
+        assert math_after_b2.current_value == "0.95"
+
+        detail2 = store.rollback_batch_detailed(r2.batch.id, changed_by="undo_batch2")
+        assert detail2["deleted_new_count"] == 1
+        assert detail2["restored_field_count"] >= 2
+        assert detail2["remaining_teacher_annotations"] == 2
+
+        anns_after_b2_rollback = store.list_annotations(source=AnnotationSource.TEACHER_ANNOTATION)
+        assert len(anns_after_b2_rollback) == 2
+        math_restored = [a for a in anns_after_b2_rollback if a.item_name == "数学A"][0]
+        assert math_restored.current_value == "0.85"
+        physics_kept = [a for a in anns_after_b2_rollback if a.item_name == "物理B"][0]
+        assert physics_kept is not None
+        assert physics_kept.status == ReviewStatus.FLAGGED
+        chem_deleted = store.find_annotation_by_line(3, AnnotationSource.TEACHER_ANNOTATION)
+        assert chem_deleted is None
+
+        detail1 = store.rollback_batch_detailed(r1.batch.id, changed_by="undo_batch1")
+        assert detail1["deleted_new_count"] == 2
+        assert detail1["remaining_teacher_annotations"] == 0
+
+        final_anns = store.list_annotations(source=AnnotationSource.TEACHER_ANNOTATION)
+        assert len(final_anns) == 0, "两批次都回滚后库里应该空了"
+
+    def test_rollback_audited_first_batch_annotation_gone_from_trail(self, store):
+        rows = [
+            {"line_number": 1, "item_name": "数学A", "category": "优惠", "value": "0.85", "denominator": "100", "numerator": "85"},
+            {"line_number": 2, "item_name": "物理B", "category": "优惠", "value": "", "denominator": "", "numerator": "30"},
+        ]
+        r1, _ = step1_import_annotations(store, rows)
+
+        anns = store.list_annotations(source=AnnotationSource.TEACHER_ANNOTATION)
+        physics_id = [a.id for a in anns if a.item_name == "物理B"][0]
+
+        trail_before = get_audit_trail(store, physics_id)
+        assert "error" not in trail_before
+        assert trail_before["evidence"]["edge_case_type"] == "denominator_zero_empty_string"
+
+        store.rollback_batch(r1.batch.id)
+
+        trail_after = get_audit_trail(store, physics_id)
+        assert "error" in trail_after, "首批被删除的记录，audit trail 应该明确返回 not found"
+
+
 class TestUnifiedReportAndExport:
     def test_build_unified_report_status_consistent(self, store):
         step1_import_annotations(store, ANNOTATIONS_V1)

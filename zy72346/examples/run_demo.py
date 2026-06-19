@@ -32,6 +32,11 @@ from rxtj.workflow import (
 from rxtj.exporter import export_report_json, export_report_csv
 
 
+TEACHER_ANNOTATIONS_FIRST_2_ROWS = [
+    {"line_number": 1, "item_name": "数学A", "category": "优惠", "value": "0.85", "denominator": "100", "numerator": "85"},
+    {"line_number": 2, "item_name": "物理B", "category": "优惠", "value": "", "denominator": "", "numerator": "30"},
+]
+
 TEACHER_ANNOTATIONS_V1 = [
     {"line_number": 1, "item_name": "数学A", "category": "优惠", "value": "0.85", "denominator": "100", "numerator": "85"},
     {"line_number": 2, "item_name": "物理B", "category": "优惠", "value": "", "denominator": "", "numerator": "30"},
@@ -78,6 +83,68 @@ def main() -> int:
     out_csv = os.path.join(tmpdir, "report.csv")
     store = Store(db_path)
     print(f"使用临时数据库: {db_path}")
+
+    # ─────────────────── 0. 首批导入含空分母 → 整条批次回滚，记录从库里消失 ───────────────────
+    banner("第0步：首批导入含空分母批注 → 整个批次回滚（新增记录整条删除，不留痕迹）")
+    r0, s0 = step1_import_annotations(store, TEACHER_ANNOTATIONS_FIRST_2_ROWS, changed_by="initial_trial")
+    print("首批2条老师批注导入结果：")
+    print(r0.summary())
+    print()
+    print(s0.summary())
+
+    assert_eq("首批总条数", r0.batch.total_rows, 2)
+    assert_eq("首批新增条数", r0.batch.new_count, 2)
+    assert_eq("首批空分母标记待复核", r0.batch.flagged_count, 1)
+
+    anns0 = store.list_annotations(source=AnnotationSource.TEACHER_ANNOTATION)
+    assert_eq("首批导入后库里批注数", len(anns0), 2)
+    physics0 = find_by_line(anns0, 2)
+    assert_eq("首批物理B状态=flagged", physics0.status, ReviewStatus.FLAGGED)
+    assert_eq("首批物理B边界类型", physics0.edge_case_type, "denominator_zero_empty_string")
+
+    results0_before, _ = step3_update_demo(store)
+    assert_eq("首批导入后计算结果条数", len(results0_before), 2)
+    report0_before = build_unified_report(store)
+    assert_eq("首批导入后报告总条数", report0_before["annotations_summary"]["total"], 2)
+
+    print(f"\n执行首批批次 {r0.batch.id} 整体回滚（新增记录整条删除）...")
+    detail0 = store.rollback_batch_detailed(r0.batch.id, changed_by="undo_initial")
+    print(f"  操作总数: {detail0['total_ops']}")
+    print(f"  整条删除的新增批注入: {detail0['deleted_new_count']}")
+    print(f"  逐字段恢复的旧批注字段: {detail0['restored_field_count']}")
+    print(f"  回滚后剩余批注: {detail0['remaining_teacher_annotations']}")
+    assert_eq("首批回滚删除新增数", detail0["deleted_new_count"], 2)
+    assert_eq("首批回滚剩余批注", detail0["remaining_teacher_annotations"], 0)
+
+    anns0_after = store.list_annotations(source=AnnotationSource.TEACHER_ANNOTATION)
+    assert_eq("首批回滚后库里批注数", len(anns0_after), 0)
+    math_deleted = store.find_annotation_by_line(1, AnnotationSource.TEACHER_ANNOTATION)
+    assert_eq("首批回滚数学A已删除", math_deleted, None)
+    physics_deleted = store.find_annotation_by_line(2, AnnotationSource.TEACHER_ANNOTATION)
+    assert_eq("首批回滚物理B已删除(含空分母flagged记录)", physics_deleted, None)
+
+    conn = store._get_conn()
+    cr_count = conn.execute("SELECT COUNT(*) as c FROM change_records").fetchone()["c"]
+    assert_eq("首批回滚后change_records也清空", cr_count, 0)
+
+    results0_after, state0_after = step3_update_demo(store)
+    assert_eq("首批回滚后计算结果条数", len(results0_after), 0)
+    assert_eq("首批回滚后状态批注数", state0_after.annotation_count, 0)
+    assert_eq("首批回滚后状态flagged数", state0_after.flagged_count, 0)
+
+    report0_after = build_unified_report(store)
+    assert_eq("首批回滚后报告总条数", report0_after["annotations_summary"]["total"], 0)
+    assert_eq("首批回滚后报告flagged数", report0_after["annotations_summary"]["flagged_count"], 0)
+    assert_eq("首批回滚后报告计算结果数", len(report0_after["calculation_results"]), 0)
+
+    json_0_after = os.path.join(tmpdir, "after_rollback_empty.json")
+    csv_0_after = os.path.join(tmpdir, "after_rollback_empty.csv")
+    export_report_json(store, json_0_after)
+    export_report_csv(store, csv_0_after)
+    with open(json_0_after, "r", encoding="utf-8") as f:
+        j0 = json.load(f)
+    assert_eq("首批回滚后JSON导出报告total=0", j0["annotations_summary"]["total"], 0)
+    print("  ✓ 首批含空分母批注已整条从存储/列表/详情/统计/历史/报告/导出里一起撤销")
 
     # ─────────────────── 1. 第一次导入老师批注 ───────────────────
     banner("第1步：第一次导入老师批注（含分母为0→空字符串）")
@@ -253,11 +320,13 @@ def main() -> int:
     banner("全链路端到端演示完成 ✅")
     print("""
   已覆盖场景：
-    ① 分母为0→空字符串：自动 flagged，不提前归正常
-    ② 批次回滚：恢复字段值 + 状态同步 + 变更记录 + 容斥统计接一致数据
-    ③ 重复导入：幂等，不翻倍，差异逐条记录
-    ④ 人工复核：原始说法 / 改后值 / 处理原因 / 下一步找谁 全程保留
-    ⑤ 计算 / 列表 / 详情 / 摘要 / 历史 / 报告 / 导出 全部接同一份最新数据
+    ① 首批含空分母导入→整条批次回滚：新增记录从存储/列表/统计/报告/导出一起删除，不留痕迹
+    ② 分母为0→空字符串：自动 flagged，不提前归正常
+    ③ 已存在记录重复导入后的字段恢复回滚：只把改回去的字段恢复，保留其他新增记录
+    ④ 批次回滚：恢复字段值 + 状态同步 + 变更记录 + 容斥统计接一致数据
+    ⑤ 重复导入：幂等，不翻倍，差异逐条记录
+    ⑥ 人工复核：原始说法 / 改后值 / 处理原因 / 下一步找谁 全程保留
+    ⑦ 计算 / 列表 / 详情 / 摘要 / 历史 / 报告 / 导出 全部接同一份最新数据
 """)
     print(f"临时文件保存在: {tmpdir} (无需保留，可自行删除)")
     return 0

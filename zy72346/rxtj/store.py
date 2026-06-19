@@ -102,6 +102,7 @@ class Store:
     def save_annotation(self, ann: Annotation, batch_id: str = "") -> None:
         conn = self._get_conn()
         ann.updated_at = datetime.now().isoformat()
+        effective_batch_id = ann.import_batch_id or batch_id
         conn.execute(
             """INSERT OR REPLACE INTO annotations
                (id, source, original_line_number, original_value, current_value,
@@ -114,7 +115,7 @@ class Store:
              ann.current_value, ann.item_name, ann.category,
              ann.denominator_raw, ann.numerator_raw,
              int(ann.is_edge_case), ann.edge_case_type, ann.status.value,
-             batch_id or ann.import_batch_id,
+             effective_batch_id,
              ann.review_reason, ann.next_contact, ann.reviewed_by, ann.reviewed_at,
              ann.created_at, ann.updated_at),
         )
@@ -205,20 +206,49 @@ class Store:
 
     def rollback_batch(self, batch_id: str, changed_by: str = "system") -> tuple[int, list[ChangeRecord]]:
         conn = self._get_conn()
-        changes = conn.execute(
+        now = datetime.now().isoformat()
+
+        diff_changes = conn.execute(
             "SELECT * FROM change_records WHERE import_batch_id = ? ORDER BY created_at DESC",
             (batch_id,),
         ).fetchall()
 
-        rolled = 0
+        modified_ann_ids = {row["annotation_id"] for row in diff_changes}
+
+        batch_ann_rows = conn.execute(
+            "SELECT * FROM annotations WHERE import_batch_id = ?",
+            (batch_id,),
+        ).fetchall()
+
+        newly_created_ids: set[str] = set()
+        modified_ids: set[str] = set()
+        for ann_row in batch_ann_rows:
+            aid = ann_row["id"]
+            if aid in modified_ann_ids:
+                modified_ids.add(aid)
+            else:
+                newly_created_ids.add(aid)
+
+        for aid in modified_ann_ids:
+            if aid not in newly_created_ids and aid not in modified_ids:
+                existing = conn.execute(
+                    "SELECT * FROM annotations WHERE id = ?", (aid,)
+                ).fetchone()
+                if existing and existing["import_batch_id"] != batch_id:
+                    modified_ids.add(aid)
+
         rollback_changes: list[ChangeRecord] = []
-        now = datetime.now().isoformat()
+        deleted_count = 0
+        restored_field_count = 0
 
-        annotation_ids_affected: set[str] = set()
-        for ch_row in changes:
-            annotation_ids_affected.add(ch_row["annotation_id"])
+        for aid in newly_created_ids:
+            conn.execute("DELETE FROM change_records WHERE annotation_id = ?", (aid,))
+            conn.execute("DELETE FROM annotations WHERE id = ?", (aid,))
+            deleted_count += 1
 
-        for ch_row in changes:
+        for ch_row in diff_changes:
+            if ch_row["annotation_id"] in newly_created_ids:
+                continue
             ann_row = conn.execute(
                 "SELECT * FROM annotations WHERE id = ?", (ch_row["annotation_id"],)
             ).fetchone()
@@ -231,7 +261,7 @@ class Store:
                     f"UPDATE annotations SET {field} = ?, updated_at = ? WHERE id = ?",
                     (old_val, now, ch_row["annotation_id"]),
                 )
-                rolled += 1
+                restored_field_count += 1
 
                 rb_ch = ChangeRecord(
                     annotation_id=ch_row["annotation_id"],
@@ -246,11 +276,14 @@ class Store:
                 self.save_change(rb_ch)
                 rollback_changes.append(rb_ch)
 
-        batch_ann_rows = conn.execute(
-            "SELECT * FROM annotations WHERE import_batch_id = ? AND source = ?",
-            (batch_id, AnnotationSource.TEACHER_ANNOTATION.value),
-        ).fetchall()
-        for ann_row in batch_ann_rows:
+        modified_ann_rows = conn.execute(
+            "SELECT * FROM annotations WHERE id IN ({})".format(
+                ",".join("?" for _ in modified_ids)
+            ) if modified_ids else "SELECT 1 WHERE 0=1",
+            tuple(modified_ids) if modified_ids else (),
+        ).fetchall() if modified_ids else []
+
+        for ann_row in modified_ann_rows:
             prior_status = conn.execute(
                 """SELECT new_value FROM change_records
                    WHERE annotation_id = ? AND field_name = 'status'
@@ -282,7 +315,41 @@ class Store:
             "UPDATE import_batches SET rolled_back = 1 WHERE id = ?", (batch_id,)
         )
         conn.commit()
-        return rolled, rollback_changes
+
+        total_ops = deleted_count + restored_field_count
+        return total_ops, rollback_changes
+
+    def rollback_batch_detailed(self, batch_id: str, changed_by: str = "system") -> dict:
+        conn = self._get_conn()
+        before_teacher_count = conn.execute(
+            "SELECT COUNT(*) as c FROM annotations WHERE source = ?",
+            (AnnotationSource.TEACHER_ANNOTATION.value,),
+        ).fetchone()["c"]
+
+        total_ops, rollback_changes = self.rollback_batch(batch_id, changed_by)
+
+        after_teacher_count = conn.execute(
+            "SELECT COUNT(*) as c FROM annotations WHERE source = ?",
+            (AnnotationSource.TEACHER_ANNOTATION.value,),
+        ).fetchone()["c"]
+
+        deleted_new_count = max(before_teacher_count - after_teacher_count, 0)
+        restored_field_count = sum(
+            1 for c in rollback_changes if "回滚到改前值" in c.reason
+        )
+
+        batch_row = conn.execute(
+            "SELECT * FROM import_batches WHERE id = ?", (batch_id,)
+        ).fetchone()
+        return {
+            "batch_id": batch_id,
+            "rolled_back": bool(batch_row["rolled_back"]) if batch_row else True,
+            "total_ops": total_ops,
+            "deleted_new_count": deleted_new_count,
+            "restored_field_count": restored_field_count,
+            "rollback_changes": [c.to_dict() for c in rollback_changes],
+            "remaining_teacher_annotations": after_teacher_count,
+        }
 
     def _row_to_annotation(self, row: sqlite3.Row) -> Annotation:
         keys = set(row.keys())
