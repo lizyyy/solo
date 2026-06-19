@@ -8,6 +8,7 @@
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
     "test": "ts-node src/tests/index.ts",
+    "verify": "ts-node src/tests/verify-fixes.ts",
     "lint": "tsc --noEmit"
   },
   "dependencies": {

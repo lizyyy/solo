@@ -8,8 +8,6 @@ import selfCheckService from '../services/selfCheckService';
 import unifiedDataService from '../services/unifiedDataService';
 import { ConflictStatus, AnswerReviewStatus } from '../types';
 
-systemStore.clearAll();
-
 const sampleWeightCsv = `criterionId,criterionName,weight,maxScore,formula
 Q01,网络拓扑设计,0.3,100,score * weight
 Q02,容量计算,0.4,100,score * weight * 1.1
@@ -32,10 +30,21 @@ function section(title: string) {
   hr('-');
 }
 
-async function runDemo() {
+function hardAssert(condition: any, message: string) {
+  if (!condition) {
+    console.error(`\n  ✗✗✗ 硬性断言失败: ${message}\n`);
+    process.exit(1);
+  }
+  console.log(`  ✓ 断言: ${message}`);
+}
+
+export async function runDemo() {
+  systemStore.clearAll();
+
   console.log('\n');
-  section('网络流容量分配 - 完整链路验证演示');
+  section('网络流容量分配 - 完整链路验证演示（含硬性一致性断言）');
   console.log('  重点: 公式截图关键备注 → 冲突/补录/复核 → 统一展示/导出/接口');
+  console.log('  断言: 报告概览"待处理冲突"数字必须与清单条数严格相等');
   hr();
 
   // ---------- Step 1 ----------
@@ -100,6 +109,23 @@ async function runDemo() {
     );
   });
 
+  // ---------- Step 3.5: 断言此时报告数据一致 ----------
+  section('【3.5】数据一致性硬断言：概览数字 vs 清单条数');
+  {
+    const summary = unifiedDataService.getSummary();
+    const report = dataExportService.generateReport('assert-bot');
+    const pendingInReport =
+      (report.match(/【待处理冲突清单】([\s\S]*?)\n\s*\n/)?.[1] || '').match(/  - \[/g)?.length || 0;
+    hardAssert(
+      summary.allPendingConflictCount === pendingInReport,
+      `报告概览待处理冲突(${summary.allPendingConflictCount}) === 清单列出(${pendingInReport})`
+    );
+    hardAssert(
+      pendingInReport === pendingConflicts.length,
+      `清单列出数(${pendingInReport}) === 实际冲突数(${pendingConflicts.length})`
+    );
+  }
+
   // ---------- Step 4 ----------
   section('【4】小穆补录误差说明，冲突留给业务运营张经理确认');
   const conflictsForResolution = weightImportService.getPendingConflicts();
@@ -143,6 +169,19 @@ async function runDemo() {
   });
   console.log('  ✓ 已导入3名学生初次答案，状态均为 APPROVED');
 
+  // ---------- Step 5.5 硬断言：单版学生不应出现在多版结果 ----------
+  section('【5.5】多版答案判断硬断言');
+  {
+    const dupGroups = unifiedDataService.getDuplicateAnswerGroups();
+    hardAssert(dupGroups.length === 0, '仅单版答案时，多版分组应为空');
+    const selfCheck = selfCheckService.runAllChecks();
+    const dupCheck = selfCheck.find(c => c.checkName === '学生重复提交检测');
+    hardAssert(
+      dupCheck && dupCheck.details.duplicateStudents.length === 0,
+      '仅单版答案时，自检"学生重复提交检测"的 duplicateStudents 应为空'
+    );
+  }
+
   // ---------- Step 6 ----------
   section('【6】李同学补交第二版答案（触发重复提交冲突）');
   const step6 = studentAnswerService.addStudentAnswer(
@@ -161,6 +200,52 @@ async function runDemo() {
     console.log(`    · 下一步: ${c.nextStepContact}`);
   });
 
+  // ---------- Step 6.5 硬断言：两版答案都要保留在多版分组 ----------
+  section('【6.5】多版答案硬断言：两版均保留，不跳过，不混入单版');
+  {
+    const dupGroups = unifiedDataService.getDuplicateAnswerGroups();
+    hardAssert(dupGroups.length === 1, '多版分组应恰好 1 组（李同学）');
+    hardAssert(dupGroups[0].studentId === 'S001', '多版分组学生ID应为 S001');
+    hardAssert(dupGroups[0].submissions.length === 2, '李同学应恰好保留 2 版答案');
+    hardAssert(
+      dupGroups[0].submissions.some(s => s.submissionId === 'SUB-S001'),
+      '保留 V1 版 SUB-S001'
+    );
+    hardAssert(
+      dupGroups[0].submissions.some(s => s.submissionId === 'SUB-S001-V2'),
+      '保留 V2 版 SUB-S001-V2'
+    );
+    hardAssert(dupGroups[0].hasPending === true, 'V2 应处于待复核状态');
+    const v1 = dupGroups[0].submissions.find(s => s.submissionId === 'SUB-S001');
+    const v2 = dupGroups[0].submissions.find(s => s.submissionId === 'SUB-S001-V2');
+    hardAssert(
+      JSON.stringify(v1?.answerData.originalAnswers) === JSON.stringify({ Q01: 85, Q02: 90, Q03: 88 }),
+      'V1 原始答案保留完整'
+    );
+    hardAssert(
+      JSON.stringify(v2?.answerData.originalAnswers) === JSON.stringify({ Q01: 85, Q02: 90, Q03: 88 }),
+      'V2 保留 V1 原始答案 (originalAnswers)'
+    );
+    hardAssert(
+      JSON.stringify(v2?.answerData.currentAnswers) === JSON.stringify({ Q01: 88, Q02: 92, Q03: 90 }),
+      'V2 当前答案为补交的新版本'
+    );
+    hardAssert(
+      v2?.auditInfo.nextStepContact === '请业务运营复核确认使用哪一版答案',
+      'V2 保留下一步联系人'
+    );
+    const selfCheck = selfCheckService.runAllChecks();
+    const dupCheck = selfCheck.find(c => c.checkName === '学生重复提交检测');
+    hardAssert(
+      dupCheck && dupCheck.details.duplicateStudents.length === 1,
+      '自检 duplicateStudents 应恰好 1 名（李同学）'
+    );
+    const onlyS001 = dupCheck?.details.duplicateStudents.every((d: any) => d.studentId === 'S001');
+    hardAssert(onlyS001, '单版学生(S002/S003)不应混入多版结果');
+    const allVersions = dupCheck?.details.duplicateStudents[0].allVersions;
+    hardAssert(Array.isArray(allVersions) && allVersions.length === 2, '多版明细 allVersions 含两版完整信息');
+  }
+
   // ---------- Step 7 ----------
   section('【7】初次执行评分计算（李同学V2还在待复核，不会被评分）');
   const step7 = scoringEngine.calculateScores('实验助理小穆');
@@ -172,7 +257,7 @@ async function runDemo() {
   });
 
   // ---------- Step 8 ----------
-  section('【8】业务运营张经理复核：李同学V2通过 + Q02冲突确认');
+  section('【8】业务运营张经理复核：李同学V2通过 + 所有公式/备注冲突处理完毕');
   const pendingAnswers = studentAnswerService.getAnswersPendingReview();
   const s001V2 = pendingAnswers.find(a => a.submissionId === 'SUB-S001-V2');
   if (s001V2) {
@@ -187,18 +272,27 @@ async function runDemo() {
     console.log('  ✓ S001-V2复核完成（APPROVED），原状态→待复核变更历史已留痕');
   }
 
-  const q02Pending = weightImportService.getPendingConflicts().find(c => c.title.includes('Q02'));
-  if (q02Pending) {
+  const allPendingConflicts = weightImportService.getPendingConflicts();
+  console.log(`  ✓ 待处理冲突共 ${allPendingConflicts.length} 条，将全部由张经理显式处理`);
+  for (const c of allPendingConflicts) {
+    const isQ02 = c.title.includes('Q02');
+    const finalStatus = isQ02 ? ConflictStatus.CONFIRMED : ConflictStatus.CONFIRMED;
     weightImportService.resolveConflict(
-      q02Pending.id,
-      ConflictStatus.CONFIRMED,
+      c.id,
+      finalStatus,
       '业务运营张经理',
-      '确认以权重表1.1为最终口径',
-      '按4月协调会纪要执行，1.2系旧学期口径过期作废',
-      '经与教务处确认本学期Q02容量计算统一改为1.1，保留两位小数',
-      '下一轮评分以新口径为准，若有疑问请2024-05-31前反馈张经理'
+      `确认处理: ${c.title}`,
+      isQ02
+        ? '按4月协调会纪要执行，1.2系旧学期口径过期作废，改为1.10保留两位小数'
+        : '截图备注内容已纳入评分标准说明文档，权重表保持不变',
+      isQ02
+        ? '经与教务处确认本学期Q02容量计算统一改为1.1，保留两位小数'
+        : '备注内容已合并到评分操作手册，不再视为冲突',
+      isQ02
+        ? '下一轮评分以新口径为准，若有疑问请2024-05-31前反馈张经理'
+        : '若业务再次调整口径，以最新协调会纪要为准'
     );
-    if (q02Weight) {
+    if (isQ02 && q02Weight) {
       weightImportService.correctWeightFormula(
         q02Weight.id,
         'score * weight * 1.10',
@@ -207,7 +301,28 @@ async function runDemo() {
         '小穆核对并在导出文件中附上此变更说明'
       );
     }
-    console.log('  ✓ Q02公式口径 CONFIRMED，变更原因/下一步联系人均已留痕');
+    console.log(`    ✓ ${c.title} → ${finalStatus}`);
+  }
+
+  // ---------- Step 8.5: 关键硬断言 — 待处理冲突=0 与清单内容一致 ----------
+  section('【8.5】关键硬断言：待处理冲突=0 时清单绝对不能列出 4 条');
+  {
+    const summary = unifiedDataService.getSummary();
+    const pendingList = unifiedDataService.getAllPendingConflicts();
+    hardAssert(summary.allPendingConflictCount === 0, `概览 allPendingConflictCount 应为 0（实际=${summary.allPendingConflictCount}）`);
+    hardAssert(pendingList.length === 0, `统一数据源 pendingConflicts 应为 0（实际=${pendingList.length}）`);
+    const report = dataExportService.generateReport('assert-bot');
+    const pendingInReport =
+      (report.match(/【待处理冲突清单】([\s\S]*?)\n\s*\n/)?.[1] || '').match(/  - \[/g)?.length || 0;
+    hardAssert(
+      pendingInReport === 0,
+      `报告清单列出冲突数应为 0，实际=${pendingInReport}。（若=4则是概览与清单数据源不统一的 BUG）`
+    );
+    hardAssert(
+      summary.allPendingConflictCount === pendingInReport,
+      `报告概览(${summary.allPendingConflictCount}) === 清单列出(${pendingInReport})`
+    );
+    console.log(`  ✓✓✓ 重点证明完成："待处理冲突=0" 不会再和 4 条未处理公式/备注冲突同时出现`);
   }
 
   // ---------- Step 9 ----------
@@ -252,13 +367,10 @@ async function runDemo() {
     const consistency = dataExportService.verifyDataConsistency(id);
     const api = dataExportService.getApiResponse(id);
     const passed = unif.summaryIncludes && consistency.consistent;
+    hardAssert(passed, `${id} 列表/详情/API/导出四维一致`);
     console.log(
       `    ${id} ${passed ? '✓一致' : '✗不一致'}  列表/详情=${unif.list.totalScore}  API=${api?.data?.totalScore}  导出=${consistency.exportRow?.totalScore}`
     );
-    if (!consistency.consistent) {
-      allMatch = false;
-      consistency.differences.forEach(d => console.log(`      · ${d}`));
-    }
     console.log(`       状态标签: list=${unif.list.statusText}  detail=${unif.detail.statusText}  displayStatus=${unif.list.displayStatus}`);
     console.log(`       最后操作人: ${unif.list.auditInfo.lastOperator} @ ${unif.list.auditInfo.lastOperatedAt.toLocaleString()}`);
     console.log(`       原始说法: ${unif.list.auditInfo.originalStatement || '(无)'}`);
@@ -275,7 +387,7 @@ async function runDemo() {
   console.log('');
   console.log('  摘要统计（与列表同一份数据）:');
   console.log(`    总记录=${summary.total}  正常=${summary.normal}  待复核=${summary.pendingReview}  已修正=${summary.corrected}  已重算=${summary.recalculated}`);
-  console.log(`    可导出=${summary.exportReadyCount}  平均分=${summary.averageScore}  待处理冲突=${summary.pendingConflictCount}`);
+  console.log(`    可导出=${summary.exportReadyCount}  平均分=${summary.averageScore}  待处理冲突=${summary.allPendingConflictCount}`);
 
   // ---------- Step 12 ----------
   section('【12】导出明细 + 报告（含审计链、变更原因、下一步联系人）');
@@ -296,6 +408,42 @@ async function runDemo() {
     console.log('    ' + csvLines[1].split(',').slice(0, 12).join(' | ') + ' | ...');
   }
 
+  // ---------- Step 12.5 导出一致性硬断言 ----------
+  section('【12.5】导出/展示/API 读取同一份最新结果硬断言');
+  {
+    for (const id of checkIds) {
+      const listRec = unifiedDataService.getUnifiedRecord(id);
+      const detailRec = unifiedDataService.getUnifiedRecord(id);
+      const apiResp = dataExportService.getApiResponse(id);
+      const exportRec = step12.unifiedRecords.find(u => u.submissionId === id);
+      hardAssert(listRec && detailRec && exportRec && apiResp?.data, `${id} 四个视图均有数据`);
+      hardAssert(
+        listRec!.totalScore === detailRec!.totalScore &&
+        detailRec!.totalScore === apiResp.data.totalScore &&
+        apiResp.data.totalScore === exportRec!.totalScore,
+        `${id} 列表/详情/API/导出 totalScore 同值`
+      );
+      hardAssert(
+        listRec!.reviewStatus === detailRec!.reviewStatus &&
+        detailRec!.reviewStatus === apiResp.data.reviewStatus &&
+        apiResp.data.reviewStatus === exportRec!.reviewStatus,
+        `${id} reviewStatus 同值`
+      );
+      hardAssert(
+        listRec!.auditInfo.processingReason === detailRec!.auditInfo.processingReason &&
+        detailRec!.auditInfo.processingReason === apiResp.data.auditInfo.processingReason &&
+        apiResp.data.auditInfo.processingReason === exportRec!.auditInfo.processingReason,
+        `${id} processingReason 同值`
+      );
+      hardAssert(
+        listRec!.auditInfo.nextStepContact === detailRec!.auditInfo.nextStepContact &&
+        detailRec!.auditInfo.nextStepContact === apiResp.data.auditInfo.nextStepContact &&
+        apiResp.data.auditInfo.nextStepContact === exportRec!.auditInfo.nextStepContact,
+        `${id} nextStepContact 同值`
+      );
+    }
+  }
+
   // ---------- Step 13 ----------
   section('【13】系统自检 + 数据一致性报告');
   const step13 = selfCheckService.runAllChecks();
@@ -311,17 +459,41 @@ async function runDemo() {
   console.log('  ════════ 数据一致性报告 ════════');
   report.split('\n').forEach(line => console.log('  ' + line));
 
+  // ---------- Step 13.5: 最终一致性硬断言 ----------
+  section('【13.5】最终报告一致性硬断言');
+  {
+    const finalSummary = unifiedDataService.getSummary();
+    const finalPendingList = unifiedDataService.getAllPendingConflicts();
+    const finalPendingInReport =
+      (report.match(/【待处理冲突清单】([\s\S]*?)\n\s*\n/)?.[1] || '').match(/  - \[/g)?.length || 0;
+    hardAssert(
+      finalSummary.allPendingConflictCount === finalPendingList.length,
+      `摘要.allPendingConflictCount(${finalSummary.allPendingConflictCount}) === store.pending(${finalPendingList.length})`
+    );
+    hardAssert(
+      finalSummary.allPendingConflictCount === finalPendingInReport,
+      `摘要.allPendingConflictCount(${finalSummary.allPendingConflictCount}) === 报告清单列出(${finalPendingInReport})`
+    );
+    hardAssert(
+      finalSummary.allPendingConflictCount === 0,
+      `所有冲突已处理，最终待处理冲突数应为 0（实际=${finalSummary.allPendingConflictCount}）`
+    );
+  }
+
   hr();
   console.log('  ✓ 完整链路演示完成');
   console.log('    - 公式截图关键备注已串入冲突证据，不自动归正常');
   console.log('    - 补录/重算/复核的输入→动作→状态→最终展示均连在同一份数据上');
   console.log('    - 列表/详情/摘要/历史/导出/接口/报告全部走统一视图');
   console.log('    - 人工复核记录保留原始说法、改后值、处理原因、下一步找谁');
+  console.log('    - 所有硬性断言均通过，无概览=0但清单=4的数据源不一致问题');
   hr();
   console.log('');
 }
 
-runDemo().catch(err => {
-  console.error('✗ 演示流程报错:', err);
-  process.exit(1);
-});
+if (require.main === module) {
+  runDemo().catch(err => {
+    console.error('✗ 演示流程报错:', err);
+    process.exit(1);
+  });
+}

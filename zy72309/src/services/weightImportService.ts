@@ -372,6 +372,16 @@ export class WeightImportService {
   public getConflictWithEvidence(conflictId: string): ConflictRecord | undefined {
     return systemStore.getConflictById(conflictId);
   }
+
+  public getWeightBatches(): ImportBatch[] {
+    return systemStore.getWeightBatches();
+  }
+
+  public getScoringWeights(batchId?: string): ScoringWeightItem[] {
+    return batchId
+      ? systemStore.getActiveScoringWeights(batchId)
+      : systemStore.getActiveScoringWeights();
+  }
 }
 
 export default new WeightImportService();

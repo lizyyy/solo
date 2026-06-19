@@ -19,7 +19,7 @@ export class UnifiedDataService {
   }
 
   private getRelatedConflicts(studentId: string, submissionId: string): ConflictRecord[] {
-    return systemStore
+    const studentSpecificConflicts = systemStore
       .getConflictRecords()
       .filter(
         c =>
@@ -34,6 +34,60 @@ export class UnifiedDataService {
                 e.expectedValue === submissionId)
             ))
       );
+
+    const weightFormulaConflicts = systemStore
+      .getConflictRecords()
+      .filter(
+        c =>
+          (c.type === 'weight_formula_mismatch' ||
+            c.type === 'import_version_conflict') &&
+          c.status === 'pending'
+      );
+
+    return [...studentSpecificConflicts, ...weightFormulaConflicts];
+  }
+
+  public getDuplicateAnswerGroups(): Array<{
+    studentId: string;
+    studentName: string;
+    submissions: UnifiedViewRecord[];
+    hasPending: boolean;
+    nextStepContact?: string;
+    processingReason?: string;
+  }> {
+    const list = this.getUnifiedList();
+    const byStudent = new Map<string, UnifiedViewRecord[]>();
+    list.forEach(r => {
+      if (!byStudent.has(r.studentId)) byStudent.set(r.studentId, []);
+      byStudent.get(r.studentId)!.push(r);
+    });
+
+    const groups: Array<{
+      studentId: string;
+      studentName: string;
+      submissions: UnifiedViewRecord[];
+      hasPending: boolean;
+      nextStepContact?: string;
+      processingReason?: string;
+    }> = [];
+
+    byStudent.forEach((submissions, studentId) => {
+      if (submissions.length <= 1) return;
+      const hasPending = submissions.some(s => s.displayStatus === 'pending_review');
+      const firstPending = submissions.find(s => s.displayStatus === 'pending_review');
+      groups.push({
+        studentId,
+        studentName: submissions[0].studentName,
+        submissions: submissions.sort((a, b) =>
+          a.submissionId.localeCompare(b.submissionId)
+        ),
+        hasPending,
+        nextStepContact: firstPending?.auditInfo.nextStepContact,
+        processingReason: firstPending?.auditInfo.processingReason
+      });
+    });
+
+    return groups;
   }
 
   public getUnifiedRecord(submissionId: string): UnifiedViewRecord | null {
@@ -171,6 +225,10 @@ export class UnifiedDataService {
     return records;
   }
 
+  public getAllPendingConflicts(): ConflictRecord[] {
+    return systemStore.getPendingConflicts();
+  }
+
   public getSummary(): {
     total: number;
     normal: number;
@@ -179,9 +237,11 @@ export class UnifiedDataService {
     recalculated: number;
     averageScore: number;
     exportReadyCount: number;
-    pendingConflictCount: number;
+    answerPendingConflictCount: number;
+    allPendingConflictCount: number;
   } {
     const list = this.getUnifiedList();
+    const allPending = this.getAllPendingConflicts();
     const summary = {
       total: list.length,
       normal: 0,
@@ -190,7 +250,8 @@ export class UnifiedDataService {
       recalculated: 0,
       averageScore: 0,
       exportReadyCount: 0,
-      pendingConflictCount: 0
+      answerPendingConflictCount: 0,
+      allPendingConflictCount: allPending.length
     };
 
     let scoreSum = 0;
@@ -202,7 +263,7 @@ export class UnifiedDataService {
               rec.displayStatus === 'corrected' ? 'corrected' : 'recalculated']++;
       if (rec.exportReady) summary.exportReadyCount++;
       if (rec.conflictInfo.hasConflict && rec.conflictInfo.conflictStatus === 'pending') {
-        summary.pendingConflictCount++;
+        summary.answerPendingConflictCount++;
       }
       if (rec.totalScore > 0) {
         scoreSum += rec.totalScore;

@@ -77,17 +77,35 @@ export class SelfCheckService {
       submissionIds: string[];
       pendingReview: boolean;
       nextStepContact?: string;
+      allVersions?: Array<{
+        submissionId: string;
+        reviewStatus: string;
+        originalAnswers?: Record<string, any>;
+        currentAnswers: Record<string, any>;
+        isResubmission: boolean;
+        nextStepContact?: string;
+        correctionReason?: string;
+      }>;
     }> = [];
 
     studentAnswerMap.forEach((studentAnswers, studentId) => {
-      if (studentAnswers.length > 1) return;
+      if (studentAnswers.length <= 1) return;
       duplicateStudents.push({
         studentId,
         studentName: studentAnswers[0].studentName,
         submissionCount: studentAnswers.length,
         submissionIds: studentAnswers.map(a => a.submissionId),
         pendingReview: studentAnswers.some(a => a.reviewStatus === 'pending_review'),
-        nextStepContact: studentAnswers.find(a => a.nextStepContact)?.nextStepContact
+        nextStepContact: studentAnswers.find(a => a.nextStepContact)?.nextStepContact,
+        allVersions: studentAnswers.map(a => ({
+          submissionId: a.submissionId,
+          reviewStatus: a.reviewStatus,
+          originalAnswers: a.originalAnswers,
+          currentAnswers: a.answers,
+          isResubmission: a.isResubmission,
+          nextStepContact: a.nextStepContact,
+          correctionReason: a.correctionReason
+        }))
       });
     });
 
@@ -198,7 +216,7 @@ export class SelfCheckService {
   }
 
   private checkPendingConflicts(): SelfCheckResult {
-    const pendingConflicts = systemStore.getPendingConflicts();
+    const pendingConflicts = unifiedDataService.getAllPendingConflicts();
 
     const enriched = pendingConflicts.map(c => ({
       id: c.id,

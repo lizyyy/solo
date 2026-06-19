@@ -224,7 +224,7 @@ export class DataExportService {
   public generateReport(operator: string): string {
     const summary = unifiedDataService.getSummary();
     const consistency = unifiedDataService.verifyAllConsistency();
-    const pendingConflicts = systemStore.getPendingConflicts();
+    const pendingConflicts = unifiedDataService.getAllPendingConflicts();
 
     const lines: string[] = [];
     lines.push('========================================');
@@ -241,7 +241,7 @@ export class DataExportService {
     lines.push(`  已重算: ${summary.recalculated}`);
     lines.push(`  可导出数: ${summary.exportReadyCount}`);
     lines.push(`  平均分: ${summary.averageScore}`);
-    lines.push(`  待处理冲突: ${summary.pendingConflictCount}`);
+    lines.push(`  待处理冲突: ${summary.allPendingConflictCount}`);
     lines.push('');
     lines.push('【一致性检查】');
     if (consistency.length === 0) {
