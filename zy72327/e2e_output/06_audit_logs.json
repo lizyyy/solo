@@ -1,0 +1,249 @@
+[
+  {
+    "id": "audit-mqkpnb9e-zy0g7",
+    "action": "forecast.calculated",
+    "actor": "指数平滑模型 v1.0",
+    "timestamp": "2026-06-19T09:12:32.450Z",
+    "productIds": [
+      "REAL-001",
+      "REAL-002",
+      "REAL-003",
+      "REAL-004",
+      "REAL-005",
+      "REAL-006"
+    ],
+    "summary": "预测计算完成，共 6 条，待复核 3 条",
+    "before": {
+      "lastCalculatedAt": null,
+      "count": null
+    },
+    "after": {
+      "count": 6,
+      "newCalculationVersion": 1
+    },
+    "nextOwner": "活动负责人复核待审核项"
+  },
+  {
+    "id": "audit-mqkpnb9a-2rgou",
+    "action": "counterexample.import",
+    "actor": "E2E-数据分析师小祁",
+    "timestamp": "2026-06-19T09:12:32.446Z",
+    "productIds": [
+      "REAL-002",
+      "REAL-003",
+      "REAL-006"
+    ],
+    "summary": "反例批次 MANUAL-20260619-003 导入，共 3 条",
+    "batchId": "MANUAL-20260619-003",
+    "after": {
+      "count": 3,
+      "fileName": "counter-examples.csv"
+    },
+    "nextOwner": "数据分析师处理冲突",
+    "reason": "用户补录手算反例"
+  },
+  {
+    "id": "audit-mqkpnb97-9pqyf",
+    "action": "parameter.update",
+    "actor": "E2E-活动负责人",
+    "timestamp": "2026-06-19T09:12:32.443Z",
+    "productIds": [
+      "REAL-003"
+    ],
+    "summary": "REAL-003 参数修正：活动负责人复核：gamma 统一为小数 0.35；并叠加抖音达人合作加成 +20 件",
+    "before": {
+      "rawAlpha": "75%",
+      "rawBeta": "0.45",
+      "rawGamma": "30%",
+      "forecastConclusion": "760",
+      "version": 2
+    },
+    "after": {
+      "rawAlpha": "75%",
+      "rawBeta": "0.45",
+      "rawGamma": "0.35",
+      "forecastConclusion": "780",
+      "version": 3
+    },
+    "reason": "活动负责人复核：gamma 统一为小数 0.35；并叠加抖音达人合作加成 +20 件",
+    "nextOwner": "活动负责人复核"
+  },
+  {
+    "id": "audit-mqkpnb8z-bt61k",
+    "action": "parameter.import",
+    "actor": "E2E-测试脚本",
+    "timestamp": "2026-06-19T09:12:32.435Z",
+    "productIds": [
+      "REAL-001",
+      "REAL-002",
+      "REAL-003",
+      "REAL-004",
+      "REAL-005",
+      "REAL-006"
+    ],
+    "summary": "参数导入批次 BATCH-20260619-002，成功 6，重复 5 覆盖 5，混合格式 1",
+    "before": {
+      "strategy": "overwrite",
+      "fileName": "params-v2.csv"
+    },
+    "after": {
+      "batchId": "BATCH-20260619-002",
+      "tableId": "tbl-mqkpnb8y-d7b1e",
+      "counts": {
+        "importedCount": 6,
+        "duplicateCount": 5,
+        "overwrittenCount": 5,
+        "skippedCount": 0,
+        "duplicateProductIds": [
+          "REAL-001",
+          "REAL-002",
+          "REAL-003",
+          "REAL-004",
+          "REAL-005"
+        ],
+        "overwrittenProductIds": [
+          "REAL-001",
+          "REAL-002",
+          "REAL-003",
+          "REAL-004",
+          "REAL-005"
+        ],
+        "skippedProductIds": [],
+        "mixedProductIds": [
+          "REAL-003"
+        ]
+      }
+    },
+    "batchId": "BATCH-20260619-002",
+    "nextOwner": "活动负责人（复核混合格式）",
+    "reason": "用户上传参数调试表"
+  },
+  {
+    "id": "audit-mqkpnb8z-wfima",
+    "action": "parameter.overwritten_duplicate",
+    "actor": "E2E-测试脚本",
+    "timestamp": "2026-06-19T09:12:32.435Z",
+    "productIds": [
+      "REAL-001"
+    ],
+    "summary": "REAL-001 重复导入，执行覆盖",
+    "before": {
+      "oldVersion": 1
+    },
+    "after": {
+      "newVersion": 2,
+      "batchId": "BATCH-20260619-002"
+    },
+    "batchId": "BATCH-20260619-002"
+  },
+  {
+    "id": "audit-mqkpnb8z-u4i94",
+    "action": "parameter.overwritten_duplicate",
+    "actor": "E2E-测试脚本",
+    "timestamp": "2026-06-19T09:12:32.435Z",
+    "productIds": [
+      "REAL-002"
+    ],
+    "summary": "REAL-002 重复导入，执行覆盖",
+    "before": {
+      "oldVersion": 1
+    },
+    "after": {
+      "newVersion": 2,
+      "batchId": "BATCH-20260619-002"
+    },
+    "batchId": "BATCH-20260619-002"
+  },
+  {
+    "id": "audit-mqkpnb8z-fq64n",
+    "action": "parameter.overwritten_duplicate",
+    "actor": "E2E-测试脚本",
+    "timestamp": "2026-06-19T09:12:32.435Z",
+    "productIds": [
+      "REAL-003"
+    ],
+    "summary": "REAL-003 重复导入，执行覆盖",
+    "before": {
+      "oldVersion": 1
+    },
+    "after": {
+      "newVersion": 2,
+      "batchId": "BATCH-20260619-002"
+    },
+    "batchId": "BATCH-20260619-002",
+    "nextOwner": "活动负责人"
+  },
+  {
+    "id": "audit-mqkpnb8z-itucv",
+    "action": "parameter.overwritten_duplicate",
+    "actor": "E2E-测试脚本",
+    "timestamp": "2026-06-19T09:12:32.435Z",
+    "productIds": [
+      "REAL-004"
+    ],
+    "summary": "REAL-004 重复导入，执行覆盖",
+    "before": {
+      "oldVersion": 1
+    },
+    "after": {
+      "newVersion": 2,
+      "batchId": "BATCH-20260619-002"
+    },
+    "batchId": "BATCH-20260619-002"
+  },
+  {
+    "id": "audit-mqkpnb8z-2qa1n",
+    "action": "parameter.overwritten_duplicate",
+    "actor": "E2E-测试脚本",
+    "timestamp": "2026-06-19T09:12:32.435Z",
+    "productIds": [
+      "REAL-005"
+    ],
+    "summary": "REAL-005 重复导入，执行覆盖",
+    "before": {
+      "oldVersion": 1
+    },
+    "after": {
+      "newVersion": 2,
+      "batchId": "BATCH-20260619-002"
+    },
+    "batchId": "BATCH-20260619-002"
+  },
+  {
+    "id": "audit-mqkpnb8w-wgb8o",
+    "action": "parameter.import",
+    "actor": "E2E-测试脚本",
+    "timestamp": "2026-06-19T09:12:32.432Z",
+    "productIds": [
+      "REAL-001",
+      "REAL-002",
+      "REAL-003",
+      "REAL-004",
+      "REAL-005"
+    ],
+    "summary": "参数导入批次 BATCH-20260619-001，成功 5，重复 0，混合格式 1",
+    "before": {
+      "strategy": "overwrite",
+      "fileName": "params-v1.csv"
+    },
+    "after": {
+      "batchId": "BATCH-20260619-001",
+      "tableId": "tbl-mqkpnb8v-mlz2f",
+      "counts": {
+        "importedCount": 5,
+        "duplicateCount": 0,
+        "overwrittenCount": 0,
+        "skippedCount": 0,
+        "duplicateProductIds": [],
+        "overwrittenProductIds": [],
+        "skippedProductIds": [],
+        "mixedProductIds": [
+          "REAL-003"
+        ]
+      }
+    },
+    "batchId": "BATCH-20260619-001",
+    "nextOwner": "活动负责人（复核混合格式）",
+    "reason": "用户上传参数调试表"
+  }
+]

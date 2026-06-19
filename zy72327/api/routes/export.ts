@@ -1,5 +1,6 @@
 import express from 'express';
 import * as XLSX from 'xlsx';
+import crypto from 'crypto';
 import * as storage from '../services/storageService';
 
 const router = express.Router();
@@ -165,6 +166,8 @@ router.get('/details', async (req: express.Request, res: express.Response): Prom
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
 
     const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+    const contentHash = crypto.createHash('sha256').update(buffer as Buffer).digest('hex');
+    await storage.recordExport(forecastData.length, contentHash);
     res.send(buffer);
   } catch (error) {
     console.error('Export error:', error);

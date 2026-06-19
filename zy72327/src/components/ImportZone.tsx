@@ -72,6 +72,15 @@ export default function ImportZone({ title, description, onImport, disabled = fa
         duplicateCount: 0,
         mixedFormatCount: 0,
         importedCount: 0,
+        overwrittenCount: 0,
+        skippedCount: 0,
+        batchId: '',
+        tableId: '',
+        duplicateProductIds: [],
+        overwrittenProductIds: [],
+        skippedProductIds: [],
+        mixedProductIds: [],
+        allProductIds: [],
       });
       return;
     }
@@ -89,6 +98,15 @@ export default function ImportZone({ title, description, onImport, disabled = fa
         duplicateCount: 0,
         mixedFormatCount: 0,
         importedCount: 0,
+        overwrittenCount: 0,
+        skippedCount: 0,
+        batchId: '',
+        tableId: '',
+        duplicateProductIds: [],
+        overwrittenProductIds: [],
+        skippedProductIds: [],
+        mixedProductIds: [],
+        allProductIds: [],
       });
     } finally {
       setIsUploading(false);

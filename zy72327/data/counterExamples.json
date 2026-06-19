@@ -1,39 +1,41 @@
 {
   "examples": [
     {
-      "id": "example-001",
-      "batch": "MANUAL-2026-001",
-      "submittedTime": "2026-06-04T11:30:00.000Z",
-      "submittedBy": "小祁"
+      "id": "example-mqkpnb9a",
+      "batch": "MANUAL-20260619-003",
+      "submittedTime": "2026-06-19T09:12:32.446Z",
+      "submittedBy": "E2E-数据分析师小祁",
+      "source": "upload",
+      "fileName": "counter-examples.csv"
     }
   ],
   "records": [
     {
-      "id": "ex-rec-001",
-      "exampleId": "example-001",
-      "productId": "PROD-002",
-      "productName": "防晒遮阳帽",
-      "manualCalculation": 1050,
-      "reasoning": "618活动期间，历史同期促销拉动销量增长23%，原参数模型未考虑活动权重加成，重新核算后预测值应为1050",
-      "createdAt": "2026-06-04T11:30:00.000Z"
+      "id": "exrec-mqkpnb9a-x9m2",
+      "exampleId": "example-mqkpnb9a",
+      "productId": "REAL-002",
+      "productName": "REAL-002",
+      "manualCalculation": 1150,
+      "reasoning": "618预热期抖音种草点击率超预期，加权上调21%",
+      "createdAt": "2026-06-19T09:12:32.446Z"
     },
     {
-      "id": "ex-rec-002",
-      "exampleId": "example-001",
-      "productId": "PROD-004",
-      "productName": "冰丝防晒衣",
-      "manualCalculation": 1750,
-      "reasoning": "近期全国高温预警提前，消费者购买周期前移，季节性指数需要下调，重新计算后预测值应为1750",
-      "createdAt": "2026-06-04T11:30:00.000Z"
+      "id": "exrec-mqkpnb9a-6v03",
+      "exampleId": "example-mqkpnb9a",
+      "productId": "REAL-003",
+      "productName": "REAL-003",
+      "manualCalculation": 680,
+      "reasoning": "南方雨季推迟、户外场景占比下降约5%，重新核算",
+      "createdAt": "2026-06-19T09:12:32.446Z"
     },
     {
-      "id": "ex-rec-003",
-      "exampleId": "example-001",
-      "productId": "PROD-001",
-      "productName": "夏季短袖T恤",
-      "manualCalculation": 1220,
-      "reasoning": "原预测值1200基本正确，微调20件为新款式预售订单",
-      "createdAt": "2026-06-04T11:30:00.000Z"
+      "id": "exrec-mqkpnb9a-evky",
+      "exampleId": "example-mqkpnb9a",
+      "productId": "REAL-006",
+      "productName": "REAL-006",
+      "manualCalculation": 2100,
+      "reasoning": "竞品同期上新导致分流，原参数预测偏乐观",
+      "createdAt": "2026-06-19T09:12:32.446Z"
     }
   ]
 }

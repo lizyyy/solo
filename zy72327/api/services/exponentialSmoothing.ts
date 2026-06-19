@@ -81,7 +81,8 @@ function buildReviewChain(
   paramRecord: ParameterRecord,
   mixed: MixedFormatInfo | null,
   conflictDecision: ConflictDecisionInfo | null,
-  finalValue: number
+  finalValue: number,
+  extraMeta: { recalculationCount: number; lastModifiedBy: string }
 ): ReviewChainEntry[] {
   const chain: ReviewChainEntry[] = [];
   const now = new Date().toISOString();
@@ -89,11 +90,53 @@ function buildReviewChain(
   chain.push({
     stage: 'import_detected',
     action: paramRecord.hasMixedFormat ? '导入时检测到百分数与小数混合' : '导入时格式一致',
-    originalValue: `alpha=${paramRecord.rawAlpha ?? getRawString(paramRecord.alpha)}, beta=${paramRecord.rawBeta ?? getRawString(paramRecord.beta)}, gamma=${paramRecord.rawGamma ?? getRawString(paramRecord.gamma)}`,
-    operator: '数据分析师小祁',
+    originalValue: `alpha=${paramRecord.rawAlpha}, beta=${paramRecord.rawBeta}, gamma=${paramRecord.rawGamma}`,
+    operator: paramRecord.lastModifiedBy || '数据分析师小祁',
     nextOwner: paramRecord.hasMixedFormat ? '活动负责人复核混合格式' : '无',
     timestamp: paramRecord.createdAt || now,
   });
+
+  const hasOverwrite =
+    paramRecord.source === 'overwritten' ||
+    (paramRecord.source === 'corrected' &&
+      paramRecord.previousValues &&
+      (paramRecord.previousValues as ParameterRecord).previousValues);
+
+  if (hasOverwrite) {
+    const overwriteRec: Partial<ParameterRecord> =
+      paramRecord.source === 'corrected'
+        ? (paramRecord.previousValues as ParameterRecord)
+        : paramRecord;
+    const origVals = (overwriteRec as ParameterRecord).previousValues;
+    chain.push({
+      stage: 'duplicate_handled',
+      action: `重复导入，策略：${overwriteRec.changeReason || '覆盖'}`,
+      originalValue: `原版本 v${((overwriteRec.version || 1) - 1)}`
+        + (origVals
+          ? ` alpha=${(origVals as Partial<ParameterRecord>).rawAlpha} beta=${(origVals as Partial<ParameterRecord>).rawBeta} gamma=${(origVals as Partial<ParameterRecord>).rawGamma}`
+          : ''),
+      updatedValue: `新版本 v${overwriteRec.version} alpha=${overwriteRec.rawAlpha} beta=${overwriteRec.rawBeta} gamma=${overwriteRec.rawGamma}`,
+      reason: overwriteRec.changeReason || '重复导入覆盖',
+      operator: overwriteRec.lastModifiedBy || '系统',
+      nextOwner: overwriteRec.nextOwner || '数据分析师确认',
+      timestamp: overwriteRec.lastModifiedAt,
+    });
+  }
+
+  if (paramRecord.source === 'corrected') {
+    chain.push({
+      stage: 'corrected',
+      action: `参数补录/修正（v${(paramRecord.version || 1) - 1} → v${paramRecord.version}）`,
+      originalValue: paramRecord.previousValues
+        ? `原参数 alpha=${paramRecord.previousValues.rawAlpha} beta=${paramRecord.previousValues.rawBeta} gamma=${paramRecord.previousValues.rawGamma} 结论=${paramRecord.previousValues.forecastConclusion}`
+        : undefined,
+      updatedValue: `修正后 alpha=${paramRecord.rawAlpha} beta=${paramRecord.rawBeta} gamma=${paramRecord.rawGamma} 结论=${paramRecord.forecastConclusion}`,
+      reason: paramRecord.changeReason || '业务补录',
+      operator: paramRecord.lastModifiedBy || '数据分析师小祁',
+      nextOwner: paramRecord.nextOwner || '活动负责人复核',
+      timestamp: paramRecord.lastModifiedAt,
+    });
+  }
 
   if (conflictDecision) {
     chain.push({
@@ -113,13 +156,13 @@ function buildReviewChain(
   chain.push({
     stage: 'calculation_completed',
     action: mixed
-      ? '三次指数平滑计算完成（已归一化混合参数）'
-      : '三次指数平滑计算完成',
+      ? `三次指数平滑计算完成（已归一化混合参数，重算第 ${extraMeta.recalculationCount} 次）`
+      : `三次指数平滑计算完成（第 ${extraMeta.recalculationCount} 次）`,
     originalValue: mixed ? mixed.originalDescription : undefined,
     updatedValue: `最终预测值：${finalValue}`,
     reason: mixed ? mixed.normalizedDescription : undefined,
-    operator: '指数平滑模型 v1.0',
-    nextOwner: mixed ? mixed.nextOwner : '业务运营查看',
+    operator: extraMeta.lastModifiedBy || '指数平滑模型 v1.0',
+    nextOwner: mixed ? mixed.nextOwner : conflictDecision ? '活动负责人复核' : '业务运营查看',
     timestamp: now,
   });
 
@@ -183,7 +226,8 @@ function generateForecast(
   paramRecord: ParameterRecord,
   exampleRecord?: ExampleRecord,
   conflict?: Conflict,
-  parameterVersion: string = 'v1.0'
+  parameterVersion: string = 'v1.0',
+  options: { importBatch?: string; recalculationCount: number } = { recalculationCount: 0 }
 ): ForecastResult {
   const alpha = parseNumericValue(paramRecord.alpha);
   const beta = parseNumericValue(paramRecord.beta);
@@ -231,9 +275,14 @@ function generateForecast(
   }
 
   const mixedFormatInfo = buildMixedFormatInfo(paramRecord, alpha, beta, gamma);
-  const reviewChain = buildReviewChain(paramRecord, mixedFormatInfo, conflictDecision, Math.round(finalValue * 100) / 100);
+  const reviewChain = buildReviewChain(paramRecord, mixedFormatInfo, conflictDecision, Math.round(finalValue * 100) / 100, {
+    recalculationCount: options.recalculationCount || 0,
+    lastModifiedBy: paramRecord.lastModifiedBy || '数据分析师小祁',
+  });
 
-  const hasSomethingToReview = paramRecord.hasMixedFormat || !!conflictDecision;
+  const hasSomethingToReview = paramRecord.hasMixedFormat || !!conflictDecision || paramRecord.source === 'corrected';
+  const finalV = Math.round(finalValue * 100) / 100;
+  const now = new Date().toISOString();
 
   return {
     id: `forecast_${paramRecord.id}_${Date.now()}`,
@@ -242,14 +291,14 @@ function generateForecast(
     parameterVersion,
     calculationDetail,
     tradeoffReason,
-    forecastValue: Math.round(finalValue * 100) / 100,
+    forecastValue: finalV,
     rawValue: paramRecord.forecastConclusion,
     valueFormat: paramRecord.valueFormat,
     isMixedFormat: paramRecord.hasMixedFormat,
     reviewStatus: hasSomethingToReview ? 'pending_review' : 'normal',
     reviewedBy: null,
     reviewedAt: null,
-    createdAt: new Date().toISOString(),
+    createdAt: now,
     historicalData,
     smoothedData: smoothed,
     rawAlpha: rawA,
@@ -261,6 +310,10 @@ function generateForecast(
     mixedFormatInfo,
     conflictDecision,
     reviewChain,
+    importBatch: options.importBatch ?? paramRecord.tableId,
+    calculatedAt: now,
+    lastModifiedBy: paramRecord.lastModifiedBy || '系统',
+    recalculationCount: options.recalculationCount || 0,
   };
 }
 

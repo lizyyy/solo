@@ -1,5 +1,5 @@
-import { RefreshCw, CheckCircle, AlertTriangle, XCircle, Info } from 'lucide-react';
-import type { SelfCheckResult, SelfCheckItem } from '../types';
+import { RefreshCw, CheckCircle, AlertTriangle, XCircle, Info, Clock } from 'lucide-react';
+import type { SelfCheckResult, SelfCheckItem, CheckStatus } from '../types';
 import { getStatusColor } from '../utils/exponentialSmoothing';
 
 interface Props {
@@ -15,52 +15,57 @@ const checkItemMap: Record<string, { name: string; icon: typeof CheckCircle }> =
   'export-consistency': { name: '导出一致性检测', icon: CheckCircle },
 };
 
-const statusIconMap = {
+const statusIconMap: Record<CheckStatus, typeof CheckCircle> = {
   pass: CheckCircle,
   warning: AlertTriangle,
   fail: XCircle,
+  pending: Clock,
 };
 
-const statusTextMap = {
+const statusTextMap: Record<CheckStatus, string> = {
   pass: '通过',
   warning: '警告',
   fail: '失败',
+  pending: '未触发',
 };
 
-const overallStatusTextMap = {
+const overallStatusTextMap: Record<CheckStatus, string> = {
   pass: '全部自检通过',
   warning: '存在警告项',
   fail: '存在失败项',
+  pending: '待触发动作',
 };
 
-function getStatusBorderColor(status: 'pass' | 'warning' | 'fail'): string {
-  const colors = {
+function getStatusBorderColor(status: CheckStatus): string {
+  const colors: Record<CheckStatus, string> = {
     pass: 'border-green-200 hover:border-green-300',
     warning: 'border-amber-200 hover:border-amber-300',
     fail: 'border-red-200 hover:border-red-300',
+    pending: 'border-gray-200 hover:border-gray-300',
   };
   return colors[status];
 }
 
-function getStatusIconColor(status: 'pass' | 'warning' | 'fail'): string {
-  const colors = {
+function getStatusIconColor(status: CheckStatus): string {
+  const colors: Record<CheckStatus, string> = {
     pass: 'text-green-500',
     warning: 'text-amber-500',
     fail: 'text-red-500',
+    pending: 'text-gray-400',
   };
   return colors[status];
 }
 
 export default function SelfCheckPanel({ selfCheckResult, onRefresh, loading = false }: Props) {
   const defaultItems: SelfCheckItem[] = [
-    { id: 'duplicate-imports', name: '重复导入检测', status: 'pass', message: '暂无数据', details: '请执行自检获取结果' },
-    { id: 'mixed-format', name: '百分数和小数混合检测', status: 'pass', message: '暂无数据', details: '请执行自检获取结果' },
-    { id: 'recalculation', name: '补录后重算检测', status: 'pass', message: '暂无数据', details: '请执行自检获取结果' },
-    { id: 'export-consistency', name: '导出一致性检测', status: 'pass', message: '暂无数据', details: '请执行自检获取结果' },
+    { id: 'duplicate-imports', name: '重复导入检测', status: 'pending', message: '尚未触发：请先完成至少一次参数导入', details: '未触发，无法判定。导入参数表后，若出现重复 productId 会自动标记并计数。' },
+    { id: 'mixed-format', name: '百分数和小数混合检测', status: 'pending', message: '尚未触发：请先导入参数表后重新自检', details: '未触发，无法判定。出现同一记录 alpha/beta/gamma 既有百分数又有小数时会预警，并标注待活动负责人复核。' },
+    { id: 'recalculation', name: '补录后重算检测', status: 'pending', message: '尚未触发：请先完成计算与至少一次补录/修正', details: '未触发，无法判定。补录/修正参数后必须重新计算，本项才会标记通过。' },
+    { id: 'export-consistency', name: '导出一致性检测', status: 'pending', message: '尚未触发：请先完成一次计算并导出明细', details: '未触发，无法判定。导出明细后会记录条数与内容哈希，重新计算未重新导出时会预警。' },
   ];
 
   const items = selfCheckResult?.items || defaultItems;
-  const overallStatus = selfCheckResult?.overallStatus || 'pass';
+  const overallStatus: CheckStatus = selfCheckResult?.overallStatus || 'pending';
 
   const getItemById = (id: string): SelfCheckItem => {
     return items.find(item => item.id === id) || defaultItems.find(item => item.id === id)!;

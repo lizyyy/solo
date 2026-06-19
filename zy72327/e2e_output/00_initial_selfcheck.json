@@ -1,0 +1,48 @@
+{
+  "success": true,
+  "data": {
+    "overallStatus": "pending",
+    "items": [
+      {
+        "id": "duplicate-imports",
+        "name": "重复导入检测",
+        "status": "pending",
+        "message": "尚未触发：请先完成至少一次参数导入",
+        "details": "未检测到导入动作，重复导入检测无法判定。请先在工作台上传参数调试表。",
+        "lastCheckedAt": "2026-06-19T09:12:32.427Z",
+        "triggeredCount": 0,
+        "affectedProducts": []
+      },
+      {
+        "id": "mixed-format",
+        "name": "百分数和小数混合检测",
+        "status": "pending",
+        "message": "尚未触发：未检测到参数记录",
+        "details": "请先导入参数调试表，系统将自动识别百分数和小数混用的产品。",
+        "lastCheckedAt": "2026-06-19T09:12:32.427Z",
+        "triggeredCount": 0,
+        "affectedProducts": []
+      },
+      {
+        "id": "recalculation",
+        "name": "补录后重算检测",
+        "status": "pending",
+        "message": "尚未触发：未执行过预测计算，也未检测到补录/修正操作",
+        "details": "请先导入参数并执行一次指数平滑计算。后续每一次补录/修正后，建议再次执行计算以同步结果。",
+        "lastCheckedAt": "2026-06-19T09:12:32.427Z",
+        "triggeredCount": 0
+      },
+      {
+        "id": "export-consistency",
+        "name": "导出一致性检测",
+        "status": "pending",
+        "message": "尚未触发：未执行过\"导出明细\"操作",
+        "details": "请先点击\"导出明细\"生成文件。系统将比对：导出结果条数 vs 最近计算结果条数、导出内容哈希、字段完整性（混合格式原始值、归一化值、复核链路等）。",
+        "lastCheckedAt": "2026-06-19T09:12:32.427Z",
+        "triggeredCount": 0
+      }
+    ],
+    "checkedAt": "2026-06-19T09:12:32.427Z",
+    "triggeredBy": "manual"
+  }
+}

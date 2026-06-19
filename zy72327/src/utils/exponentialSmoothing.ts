@@ -29,11 +29,12 @@ export function detectMixedFormat(records: any[]): number {
   }).length;
 }
 
-export function getStatusColor(status: 'pass' | 'warning' | 'fail'): string {
-  const colors = {
+export function getStatusColor(status: 'pass' | 'warning' | 'fail' | 'pending'): string {
+  const colors: Record<'pass' | 'warning' | 'fail' | 'pending', string> = {
     pass: 'text-green-600 bg-green-50',
     warning: 'text-amber-600 bg-amber-50',
-    fail: 'text-red-600 bg-red-50'
+    fail: 'text-red-600 bg-red-50',
+    pending: 'text-gray-500 bg-gray-50',
   };
   return colors[status];
 }

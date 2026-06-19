@@ -1,0 +1,56 @@
+{
+  "success": true,
+  "data": {
+    "overallStatus": "warning",
+    "items": [
+      {
+        "id": "duplicate-imports",
+        "name": "重复导入检测",
+        "status": "warning",
+        "message": "检测到 5 次重复导入处理（5 条产品记录被覆盖）",
+        "details": "涉及产品：REAL-001、REAL-002、REAL-003、REAL-004、REAL-005。共 2 个导入批次。如需查看历史请进入\"导入历史\"面板。",
+        "lastCheckedAt": "2026-06-19T09:12:32.458Z",
+        "triggeredCount": 5,
+        "affectedProducts": [
+          "REAL-001",
+          "REAL-002",
+          "REAL-003",
+          "REAL-004",
+          "REAL-005"
+        ]
+      },
+      {
+        "id": "mixed-format",
+        "name": "百分数和小数混合检测",
+        "status": "warning",
+        "message": "检测到 1 条产品存在百分数/小数混用，其中 1 条待活动负责人复核（未归入正常）",
+        "details": "产品：户外速干短裤(REAL-003) alpha=75% beta=0.45 gamma=0.35",
+        "lastCheckedAt": "2026-06-19T09:12:32.458Z",
+        "triggeredCount": 1,
+        "affectedProducts": [
+          "REAL-003"
+        ]
+      },
+      {
+        "id": "recalculation",
+        "name": "补录后重算检测",
+        "status": "pass",
+        "message": "最近一次计算：2026/6/19 17:12:32，共 6 条结果。已覆盖全部 1 次补录",
+        "details": "已产出 6 条结果，补录 1 次。重算次数：1",
+        "lastCheckedAt": "2026-06-19T09:12:32.461Z",
+        "triggeredCount": 1
+      },
+      {
+        "id": "export-consistency",
+        "name": "导出一致性检测",
+        "status": "pending",
+        "message": "尚未触发：未执行过\"导出明细\"操作",
+        "details": "请先点击\"导出明细\"生成文件。系统将比对：导出结果条数 vs 最近计算结果条数、导出内容哈希、字段完整性（混合格式原始值、归一化值、复核链路等）。",
+        "lastCheckedAt": "2026-06-19T09:12:32.461Z",
+        "triggeredCount": 0
+      }
+    ],
+    "checkedAt": "2026-06-19T09:12:32.458Z",
+    "triggeredBy": "manual"
+  }
+}

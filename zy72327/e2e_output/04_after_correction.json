@@ -1,0 +1,39 @@
+{
+  "id": "rec-mqkpnb97-qep4a",
+  "tableId": "tbl-mqkpnb8y-d7b1e",
+  "productId": "REAL-003",
+  "productName": "户外速干短裤",
+  "alpha": 0.75,
+  "beta": 0.45,
+  "gamma": 0.35,
+  "forecastConclusion": "780",
+  "valueFormat": "mixed",
+  "hasMixedFormat": true,
+  "rawAlpha": "75%",
+  "rawBeta": "0.45",
+  "rawGamma": "0.35",
+  "createdAt": "2026-06-19T09:12:32.434Z",
+  "lastModifiedAt": "2026-06-19T09:12:32.443Z",
+  "lastModifiedBy": "E2E-活动负责人",
+  "source": "corrected",
+  "version": 3,
+  "nextOwner": "活动负责人复核",
+  "changeReason": "活动负责人复核：gamma 统一为小数 0.35；并叠加抖音达人合作加成 +20 件",
+  "previousValues": {
+    "rawAlpha": "75%",
+    "rawBeta": "0.45",
+    "rawGamma": "30%",
+    "forecastConclusion": "760",
+    "version": 2,
+    "source": "overwritten",
+    "changeReason": "重复导入覆盖",
+    "previousValues": {
+      "rawAlpha": "70%",
+      "rawBeta": "0.4",
+      "rawGamma": "25%",
+      "forecastConclusion": "720",
+      "version": 1,
+      "source": "original"
+    }
+  }
+}
