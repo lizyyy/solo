@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>矩阵分解批量验算系统</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>矩阵分解批量验算系统</h1>
+            <nav class="nav">
+                <a href="#/problems" class="nav-link active" data-view="problems">题目清单</a>
+                <a href="#/tasks" class="nav-link" data-view="tasks">验算任务</a>
+                <a href="#/anomalies" class="nav-link" data-view="anomalies">异常记录</a>
+                <a href="/handover" class="nav-link">接班指引</a>
+            </nav>
+        </header>
+
+        <main class="main">
+            <div id="view-problems" class="view active">
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <input type="text" id="search-input" placeholder="搜索题目ID或标题..." class="input">
+                        <select id="status-filter" class="select">
+                            <option value="">全部状态</option>
+                            <option value="pending">待处理</option>
+                            <option value="single_covered">单答案覆盖</option>
+                            <option value="double_covered">双答案覆盖</option>
+                        </select>
+                    </div>
+                    <div class="toolbar-right">
+                        <button id="btn-add-problem" class="btn btn-primary">+ 新增题目</button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>题目ID</th>
+                                <th>标题</th>
+                                <th>状态</th>
+                                <th>版本数</th>
+                                <th>答案数</th>
+                                <th>异常</th>
+                                <th>更新时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="problems-list">
+                            <tr><td colspan="8" class="loading">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination" id="pagination"></div>
+            </div>
+
+            <div id="view-tasks" class="view">
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <h2>验算任务列表</h2>
+                    </div>
+                    <div class="toolbar-right">
+                        <button id="btn-new-task" class="btn btn-primary">+ 新建验算任务</button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>任务ID</th>
+                                <th>任务名称</th>
+                                <th>参数版本</th>
+                                <th>状态</th>
+                                <th>题目数</th>
+                                <th>异常</th>
+                                <th>待人工</th>
+                                <th>开始时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tasks-list">
+                            <tr><td colspan="9" class="loading">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-anomalies" class="view">
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <h2>异常记录</h2>
+                    </div>
+                    <div class="toolbar-right">
+                        <label class="checkbox">
+                            <input type="checkbox" id="show-resolved"> 显示已解决
+                        </label>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>题目ID</th>
+                                <th>标题</th>
+                                <th>异常类型</th>
+                                <th>描述</th>
+                                <th>检测时间</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="anomalies-list">
+                            <tr><td colspan="7" class="loading">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">标题</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-footer" id="modal-footer"></div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

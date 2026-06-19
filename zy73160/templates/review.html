@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务复核 - 矩阵分解批量验算</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>任务复核</h1>
+            <nav class="nav">
+                <a href="/#/tasks" class="nav-link">← 返回任务列表</a>
+            </nav>
+        </header>
+
+        <main class="main">
+            <div class="review-container">
+                <div class="review-header" id="task-info">
+                    <div class="loading">加载中...</div>
+                </div>
+
+                <div class="review-summary" id="task-summary">
+                </div>
+
+                <div class="review-content">
+                    <div class="review-sidebar">
+                        <h3>题目列表</h3>
+                        <div class="filter-bar">
+                            <button class="filter-btn active" data-filter="all">全部</button>
+                            <button class="filter-btn" data-filter="anomaly">异常</button>
+                            <button class="filter-btn" data-filter="manual">已改判</button>
+                            <button class="filter-btn" data-filter="failed">失败</button>
+                        </div>
+                        <div class="result-list" id="result-list"></div>
+                    </div>
+
+                    <div class="review-detail" id="review-detail">
+                        <div class="empty-state">
+                            <p>← 请从左侧选择一个题目查看详情</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-actions">
+                    <button id="btn-view-report" class="btn btn-primary">查看 Markdown 报告</button>
+                    <button id="btn-export" class="btn btn-success">导出 JSON</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">标题</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-footer" id="modal-footer"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        const TASK_ID = {{ task_id }};
+        let currentResults = [];
+        let currentFilter = 'all';
+        let selectedResultId = null;
+
+        async function loadTaskData() {
+            try {
+                const resp = await fetch(API_BASE + `/api/check/tasks/${TASK_ID}/results`);
+                const data = await resp.json();
+                currentResults = data.results;
+                renderTaskInfo(data.task, data.params_version);
+                renderSummary(data.summary);
+                renderResultList();
+            } catch (e) {
+                console.error('加载失败:', e);
+            }
+        }
+
+        function renderTaskInfo(task, paramsVersion) {
+            const el = document.getElementById('task-info');
+            el.innerHTML = `
+                <div class="task-info-grid">
+                    <div>
+                        <h2>${task.name}</h2>
+                        <p class="task-id">${task.task_id}</p>
+                    </div>
+                    <div class="task-meta">
+                        <div><span class="label">参数版本:</span> <code>${paramsVersion}</code></div>
+                        <div><span class="label">开始:</span> ${new Date(task.started_at).toLocaleString()}</div>
+                        <div><span class="label">完成:</span> ${task.completed_at ? new Date(task.completed_at).toLocaleString() : '未完成'}</div>
+                        <div><span class="label">状态:</span> <span class="badge ${task.status === 'completed' ? 'badge-success' : 'badge-warning'}">${task.status === 'completed' ? '已完成' : task.status}</span></div>
+                    </div>
+                </div>
+                <div class="task-params">
+                    <h4>验算参数</h4>
+                    <pre>${JSON.stringify(JSON.parse(task.parameters || '{}'), null, 2)}</pre>
+                </div>
+            `;
+        }
+
+        function renderSummary(summary) {
+            const el = document.getElementById('task-summary');
+            el.innerHTML = `
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-value">${summary.total}</div>
+                        <div class="stat-label">总题目</div>
+                    </div>
+                    <div class="stat-card stat-pass">
+                        <div class="stat-value">${summary.passed}</div>
+                        <div class="stat-label">通过</div>
+                    </div>
+                    <div class="stat-card stat-fail">
+                        <div class="stat-value">${summary.failed}</div>
+                        <div class="stat-label">失败</div>
+                    </div>
+                    <div class="stat-card stat-skip">
+                        <div class="stat-value">${summary.skipped}</div>
+                        <div class="stat-label">跳过</div>
+                    </div>
+                    <div class="stat-card stat-error">
+                        <div class="stat-value">${summary.error}</div>
+                        <div class="stat-label">错误</div>
+                    </div>
+                    <div class="stat-card stat-anomaly">
+                        <div class="stat-value">${summary.anomalies}</div>
+                        <div class="stat-label">异常</div>
+                    </div>
+                    <div class="stat-card stat-manual">
+                        <div class="stat-value">${summary.manual_judgments}</div>
+                        <div class="stat-label">人工改判</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderResultList() {
+            const el = document.getElementById('result-list');
+            let filtered = currentResults;
+
+            if (currentFilter === 'anomaly') {
+                filtered = currentResults.filter(r => r.is_anomaly);
+            } else if (currentFilter === 'manual') {
+                filtered = currentResults.filter(r => r.is_manual_judgment);
+            } else if (currentFilter === 'failed') {
+                filtered = currentResults.filter(r => r.processing_status === 'failed');
+            }
+
+            el.innerHTML = filtered.map(r => `
+                <div class="result-item ${selectedResultId === r.id ? 'active' : ''}" data-id="${r.id}">
+                    <div class="result-item-header">
+                        <span class="badge ${getStatusBadge(r.processing_status)}">${getStatusText(r.processing_status)}</span>
+                        ${r.is_anomaly ? '<span class="badge badge-danger">异常</span>' : ''}
+                        ${r.is_manual_judgment ? '<span class="badge badge-info">改判</span>' : ''}
+                    </div>
+                    <div class="result-item-title">${r.problem.problem_id} - ${r.problem.title}</div>
+                    ${r.anomaly_type ? `<div class="result-item-note">${r.anomaly_type}</div>` : ''}
+                </div>
+            `).join('');
+
+            el.querySelectorAll('.result-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const id = parseInt(item.dataset.id);
+                    selectedResultId = id;
+                    renderResultList();
+                    renderDetail(id);
+                });
+            });
+        }
+
+        function renderDetail(resultId) {
+            const result = currentResults.find(r => r.id === resultId);
+            if (!result) return;
+
+            const el = document.getElementById('review-detail');
+            el.innerHTML = `
+                <div class="detail-section">
+                    <h3>${result.problem.problem_id} - ${result.problem.title}</h3>
+                    <div class="detail-badges">
+                        <span class="badge ${getStatusBadge(result.processing_status)}">${getStatusText(result.processing_status)}</span>
+                        ${result.is_anomaly ? `<span class="badge badge-danger">异常: ${result.anomaly_type}</span>` : ''}
+                        ${result.is_manual_judgment ? `<span class="badge badge-info">人工改判: ${result.judgment_result}</span>` : ''}
+                    </div>
+                </div>
+
+                ${result.is_anomaly ? `
+                <div class="detail-section section-anomaly">
+                    <h4>⚠️ 异常说明</h4>
+                    <p>${result.anomaly_explanation || '无'}</p>
+                </div>
+                ` : ''}
+
+                <div class="detail-section">
+                    <h4>🔢 计算结果</h4>
+                    <pre class="json-pre">${JSON.stringify(result.calc_result, null, 2)}</pre>
+                </div>
+
+                ${result.expected_result ? `
+                <div class="detail-section">
+                    <h4>📝 预期结果</h4>
+                    <pre class="json-pre">${JSON.stringify(result.expected_result, null, 2)}</pre>
+                </div>
+                ` : ''}
+
+                ${result.diff_detail ? `
+                <div class="detail-section section-diff">
+                    <h4>🔍 差异详情</h4>
+                    <pre>${result.diff_detail}</pre>
+                </div>
+                ` : ''}
+
+                ${result.is_manual_judgment ? `
+                <div class="detail-section section-manual">
+                    <h4>✋ 人工改判记录</h4>
+                    <div class="info-item">
+                        <span class="info-label">改判结果:</span>
+                        <span class="badge ${result.judgment_result === 'passed' ? 'badge-success' : 'badge-danger'}">${result.judgment_result}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">改判原因:</span>
+                        <span>${result.judgment_reason || '无'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">改判人:</span>
+                        <span>${result.judgment_by || '未知'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">改判时间:</span>
+                        <span>${result.judgment_at ? new Date(result.judgment_at).toLocaleString() : '未知'}</span>
+                    </div>
+                </div>
+                ` : `
+                <div class="detail-section section-action">
+                    <h4>✋ 人工改判</h4>
+                    <div class="form-group">
+                        <label>改判结果:</label>
+                        <select id="judgment-result" class="select">
+                            <option value="passed">通过 (passed)</option>
+                            <option value="failed">失败 (failed)</option>
+                            <option value="skipped">跳过 (skipped)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>改判原因:</label>
+                        <textarea id="judgment-reason" class="textarea" rows="3" placeholder="请输入改判原因..."></textarea>
+                    </div>
+                    <button onclick="submitJudgment(${result.id})" class="btn btn-primary">提交改判</button>
+                </div>
+                `}
+            `;
+        }
+
+        async function submitJudgment(resultId) {
+            const resultEl = document.getElementById('judgment-result');
+            const reasonEl = document.getElementById('judgment-reason');
+            const result = resultEl.value;
+            const reason = reasonEl.value;
+
+            if (!reason.trim()) {
+                alert('请填写改判原因');
+                return;
+            }
+
+            try {
+                const resp = await fetch(API_BASE + `/api/check/results/${resultId}/judgment`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({result, reason, by: 'reviewer'})
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    alert('改判成功');
+                    loadTaskData();
+                }
+            } catch (e) {
+                alert('改判失败: ' + e.message);
+            }
+        }
+
+        function getStatusBadge(status) {
+            const map = {
+                'pending': 'badge-secondary',
+                'processing': 'badge-warning',
+                'passed': 'badge-success',
+                'failed': 'badge-danger',
+                'skipped': 'badge-info',
+                'error': 'badge-dark'
+            };
+            return map[status] || 'badge-secondary';
+        }
+
+        function getStatusText(status) {
+            const map = {
+                'pending': '待处理',
+                'processing': '处理中',
+                'passed': '通过',
+                'failed': '失败',
+                'skipped': '跳过',
+                'error': '错误'
+            };
+            return map[status] || status;
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderResultList();
+            });
+        });
+
+        document.getElementById('btn-view-report').addEventListener('click', async () => {
+            try {
+                const resp = await fetch(API_BASE + `/api/reports/${TASK_ID}/markdown`);
+                const data = await resp.json();
+                showModal('Markdown 报告', `<pre class="markdown-pre">${escapeHtml(data.content)}</pre>`);
+            } catch (e) {
+                alert('加载报告失败');
+            }
+        });
+
+        document.getElementById('btn-export').addEventListener('click', () => {
+            window.open(`/api/export/${TASK_ID}`, '_blank');
+        });
+
+        function showModal(title, bodyHtml) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-body').innerHTML = bodyHtml;
+            document.getElementById('modal-footer').innerHTML = '<button class="btn" onclick="closeModal()">关闭</button>';
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        window.closeModal = closeModal;
+        window.submitJudgment = submitJudgment;
+
+        loadTaskData();
+    </script>
+</body>
+</html>
