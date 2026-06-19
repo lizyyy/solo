@@ -1,0 +1,200 @@
+{
+  "show_id": "show_2e75f0a0",
+  "show_name": "夏日电音节",
+  "replay_generated_at": "2026-06-20T07:00:28.889125",
+  "replay_data_dir": "/Users/lzy/pro/solo/workspaces/zy72413/data_replay_show_2e75f0a0",
+  "isolation_note": "本报告来自隔离目录 data_replay_show_2e75f0a0/，不影响主数据 data/",
+  "evidence": {
+    "workflow_stage": "stage_3_authorized",
+    "workflow_stage_desc": "第三步: 授权已更新",
+    "total_batches": 3,
+    "total_tickets": 7,
+    "mixed_batch_count": 1,
+    "review_decisions_count": 1,
+    "rehearsal_imports_count": 1,
+    "contract_screenshots_count": 1,
+    "energy_points_count": 5,
+    "modification_history_count": 5
+  },
+  "batches": [
+    {
+      "name": "A区VIP",
+      "status": "resolved",
+      "ticket_count": 3,
+      "has_mixed": true
+    },
+    {
+      "name": "B区普通",
+      "status": "normal",
+      "ticket_count": 2,
+      "has_mixed": false
+    },
+    {
+      "name": "C区赠票",
+      "status": "normal",
+      "ticket_count": 2,
+      "has_mixed": false
+    }
+  ],
+  "energy_points": [
+    {
+      "track_order": 1,
+      "track_name": "暖场曲1",
+      "energy_level": 3.5,
+      "source_ref": "排练群接龙demo_rehearsal.txt:B区普通:赵六",
+      "mood": "warmup",
+      "bpm": 108,
+      "note": "暖场第一首轻柔入场"
+    },
+    {
+      "track_order": 2,
+      "track_name": "暖场曲2",
+      "energy_level": 5.0,
+      "source_ref": "排练群接龙demo_rehearsal.txt:A区VIP:张三",
+      "mood": "build",
+      "bpm": 120,
+      "note": "情绪渐起"
+    },
+    {
+      "track_order": 3,
+      "track_name": "主曲1",
+      "energy_level": 8.0,
+      "source_ref": "合同截图:data/contract_screenshot.jpg:合同第2页曲目清单",
+      "mood": "peak",
+      "bpm": 138,
+      "note": "全场高潮"
+    },
+    {
+      "track_order": 4,
+      "track_name": "主曲2",
+      "energy_level": 9.2,
+      "source_ref": "排练群接龙+合同交叉核对",
+      "mood": "peak",
+      "bpm": 140,
+      "note": "最高点Drop"
+    },
+    {
+      "track_order": 5,
+      "track_name": "收尾曲",
+      "energy_level": 4.0,
+      "source_ref": "排练群接龙demo_rehearsal.txt:C区赠票:孙八",
+      "mood": "cool",
+      "bpm": 95,
+      "note": "温柔收尾"
+    }
+  ],
+  "modification_history": [
+    {
+      "time": "2026-06-20T07:00:34.196974",
+      "modified_by": "阿梅",
+      "entity_type": "rehearsal_import",
+      "entity_id": "import_08debc41",
+      "field_name": "note",
+      "old_value": null,
+      "new_value": "6月18日排练群接龙，共3个批次7张票，A区VIP存在赠票售票混票，已标记待录音师复核",
+      "reason": "更新排练接龙备注，标注混票待复核"
+    },
+    {
+      "time": "2026-06-20T07:00:34.197014",
+      "modified_by": "录音师老王",
+      "entity_type": "batch",
+      "entity_id": "batch_8e5f0cbf",
+      "field_name": "status",
+      "old_value": "mixed",
+      "new_value": "pending_review",
+      "reason": "送录音师复核"
+    },
+    {
+      "time": "2026-06-20T07:00:34.197054",
+      "modified_by": "阿梅",
+      "entity_type": "energy_curve",
+      "entity_id": "curve_replay_show_2e75f0a0",
+      "field_name": "points",
+      "old_value": "(未设置)",
+      "new_value": "暖场曲1=3.5(source=排练群接龙demo_rehearsal.txt:B区普通:赵六)、暖场曲2=5.0(source=排练群接龙demo_rehearsal.txt:A区VIP:张三)、主曲1=8.0(source=合同截图:data/contract_screenshot.jpg:合同第2页曲目清单)、主曲2=9.2(source=排练群接龙+合同交叉核对)、收尾曲=4.0(source=排练群接龙demo_rehearsal.txt:C区赠票:孙八)",
+      "reason": "设置能量曲线，每首曲目绑定原始材料来源"
+    },
+    {
+      "time": "2026-06-20T07:00:34.197094",
+      "modified_by": "复盘脚本",
+      "entity_type": "workflow",
+      "entity_id": "show_2e75f0a0",
+      "field_name": "stage",
+      "old_value": "stage_1_imported",
+      "new_value": "stage_2_contract_reviewed",
+      "reason": "复盘自动推进"
+    },
+    {
+      "time": "2026-06-20T07:00:34.197109",
+      "modified_by": "复盘脚本",
+      "entity_type": "workflow",
+      "entity_id": "show_2e75f0a0",
+      "field_name": "stage",
+      "old_value": "stage_2_contract_reviewed",
+      "new_value": "stage_3_authorized",
+      "reason": "复盘自动推进"
+    }
+  ],
+  "replay_import_result": {
+    "success": true,
+    "show_id": "show_2e75f0a0",
+    "is_duplicate": false,
+    "existing_import_id": null,
+    "existing_import_time": null,
+    "existing_imported_by": null,
+    "batches_created": 3,
+    "tickets_imported": 7,
+    "batches_reused": 0,
+    "tickets_reused": 0,
+    "reused_batch_names": [],
+    "new_batch_names": [
+      "A区VIP",
+      "B区普通",
+      "C区赠票"
+    ],
+    "mixed_batches_found": [
+      "A区VIP: 批次 [A区VIP] 存在混票: 售票 2 张, 赠票 1 张"
+    ],
+    "warnings": [
+      "批次 [A区VIP] 存在混票: 售票 2 张, 赠票 1 张"
+    ],
+    "errors": []
+  },
+  "step_results": [
+    {
+      "step": "创建场次",
+      "ok": true,
+      "detail": "show_2e75f0a0"
+    },
+    {
+      "step": "导入接龙",
+      "ok": true,
+      "detail": "3批次 7票"
+    },
+    {
+      "step": "更新备注",
+      "ok": true,
+      "detail": "import_08debc41"
+    },
+    {
+      "step": "上传合同",
+      "ok": true,
+      "detail": "screenshot_9da60439"
+    },
+    {
+      "step": "录音师复核",
+      "ok": true,
+      "detail": "A区VIP"
+    },
+    {
+      "step": "设置能量曲线",
+      "ok": true,
+      "detail": "5 首曲目"
+    },
+    {
+      "step": "工作流推进",
+      "ok": true,
+      "detail": "stage_3_authorized"
+    }
+  ]
+}

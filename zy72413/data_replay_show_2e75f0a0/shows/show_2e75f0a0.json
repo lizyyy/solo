@@ -1,0 +1,269 @@
+{
+  "id": "show_2e75f0a0",
+  "name": "夏日电音节",
+  "date": "2026-06-18 00:00:00",
+  "venue": "梅赛德斯奔驰文化中心",
+  "dj_name": "DJ Sonic",
+  "workflow_stage": "stage_3_authorized",
+  "batches": [
+    {
+      "id": "batch_8e5f0cbf",
+      "name": "A区VIP",
+      "show_id": "show_2e75f0a0",
+      "tickets": [
+        {
+          "id": "ticket_1211022b",
+          "type": "paid",
+          "seat": "10排5座",
+          "price": 880.0,
+          "guest_name": "张三",
+          "source_ref": "import:demo_rehearsal.txt:35af75d3",
+          "note": "媒体嘉宾"
+        },
+        {
+          "id": "ticket_72eb8169",
+          "type": "paid",
+          "seat": "10排6座",
+          "price": 880.0,
+          "guest_name": "李四",
+          "source_ref": "import:demo_rehearsal.txt:35af75d3",
+          "note": null
+        },
+        {
+          "id": "ticket_55aeb8f7",
+          "type": "complimentary",
+          "seat": "10排7座",
+          "price": null,
+          "guest_name": "王五",
+          "source_ref": "import:demo_rehearsal.txt:35af75d3",
+          "note": "主办方邀请"
+        }
+      ],
+      "status": "resolved",
+      "mixed_issue_found": true,
+      "review_note": "复盘自动送审，来自批次[A区VIP]的真实混票检测",
+      "resolved_at": "2026-06-20 07:00:34.197026",
+      "rolled_back_at": null
+    },
+    {
+      "id": "batch_e57e7928",
+      "name": "B区普通",
+      "show_id": "show_2e75f0a0",
+      "tickets": [
+        {
+          "id": "ticket_8696dff7",
+          "type": "paid",
+          "seat": "20排1座",
+          "price": 380.0,
+          "guest_name": "赵六",
+          "source_ref": "import:demo_rehearsal.txt:35af75d3",
+          "note": null
+        },
+        {
+          "id": "ticket_3d3cc22c",
+          "type": "paid",
+          "seat": "20排2座",
+          "price": 380.0,
+          "guest_name": "钱七",
+          "source_ref": "import:demo_rehearsal.txt:35af75d3",
+          "note": null
+        }
+      ],
+      "status": "normal",
+      "mixed_issue_found": null,
+      "review_note": null,
+      "resolved_at": null,
+      "rolled_back_at": null
+    },
+    {
+      "id": "batch_625c886a",
+      "name": "C区赠票",
+      "show_id": "show_2e75f0a0",
+      "tickets": [
+        {
+          "id": "ticket_4c22e48d",
+          "type": "complimentary",
+          "seat": "30排1座",
+          "price": null,
+          "guest_name": "孙八",
+          "source_ref": "import:demo_rehearsal.txt:35af75d3",
+          "note": "合作方"
+        },
+        {
+          "id": "ticket_184408a7",
+          "type": "complimentary",
+          "seat": "30排2座",
+          "price": null,
+          "guest_name": "周九",
+          "source_ref": "import:demo_rehearsal.txt:35af75d3",
+          "note": null
+        }
+      ],
+      "status": "normal",
+      "mixed_issue_found": null,
+      "review_note": null,
+      "resolved_at": null,
+      "rolled_back_at": null
+    }
+  ],
+  "energy_curve": {
+    "id": "curve_replay_show_2e75f0a0",
+    "show_id": "show_2e75f0a0",
+    "points": [
+      {
+        "track_name": "暖场曲1",
+        "track_order": 1,
+        "energy_level": 3.5,
+        "bpm": 108,
+        "mood": "warmup",
+        "note": "暖场第一首轻柔入场",
+        "source_ref": "排练群接龙demo_rehearsal.txt:B区普通:赵六"
+      },
+      {
+        "track_name": "暖场曲2",
+        "track_order": 2,
+        "energy_level": 5.0,
+        "bpm": 120,
+        "mood": "build",
+        "note": "情绪渐起",
+        "source_ref": "排练群接龙demo_rehearsal.txt:A区VIP:张三"
+      },
+      {
+        "track_name": "主曲1",
+        "track_order": 3,
+        "energy_level": 8.0,
+        "bpm": 138,
+        "mood": "peak",
+        "note": "全场高潮",
+        "source_ref": "合同截图:data/contract_screenshot.jpg:合同第2页曲目清单"
+      },
+      {
+        "track_name": "主曲2",
+        "track_order": 4,
+        "energy_level": 9.2,
+        "bpm": 140,
+        "mood": "peak",
+        "note": "最高点Drop",
+        "source_ref": "排练群接龙+合同交叉核对"
+      },
+      {
+        "track_name": "收尾曲",
+        "track_order": 5,
+        "energy_level": 4.0,
+        "bpm": 95,
+        "mood": "cool",
+        "note": "温柔收尾",
+        "source_ref": "排练群接龙demo_rehearsal.txt:C区赠票:孙八"
+      }
+    ],
+    "created_at": "2026-06-20 07:00:34.197042",
+    "modified_at": "2026-06-20 07:00:34.197043",
+    "modified_by": "阿梅",
+    "version": 1
+  },
+  "rehearsal_imports": [
+    {
+      "id": "import_08debc41",
+      "show_id": "show_2e75f0a0",
+      "source_filename": "demo_rehearsal.txt",
+      "source_hash": "35af75d3c2850876d191754dda26830a18a41d6ae05c9985f400e4b225f098f4",
+      "imported_at": "2026-06-20 07:00:34.196640",
+      "imported_by": "阿梅",
+      "raw_content": "\n批次:A区VIP\n张三 售票 ¥880 10排5座 备注:媒体嘉宾\n李四 售票 ¥880 10排6座\n王五 赠票  10排7座 备注:主办方邀请\n\n批次:B区普通\n赵六 售票 ¥380 20排1座\n钱七 售票 ¥380 20排2座\n\n批次:C区赠票\n孙八 赠票  30排1座 备注:合作方\n周九 赠票  30排2座\n",
+      "batch_ids": [
+        "batch_8e5f0cbf",
+        "batch_e57e7928",
+        "batch_625c886a"
+      ],
+      "note": "6月18日排练群接龙，共3个批次7张票，A区VIP存在赠票售票混票，已标记待录音师复核"
+    }
+  ],
+  "contract_screenshots": [
+    {
+      "id": "screenshot_9da60439",
+      "show_id": "show_2e75f0a0",
+      "image_path": "data/contract_screenshot.jpg",
+      "uploaded_at": "2026-06-20 07:00:34.196990",
+      "uploaded_by": "阿梅",
+      "ocr_text": null,
+      "linked_batch_ids": [],
+      "note": "核对合同页，确认7张票总数一致"
+    }
+  ],
+  "modification_history": [
+    {
+      "id": "mod_e281c749",
+      "show_id": "show_2e75f0a0",
+      "entity_type": "rehearsal_import",
+      "entity_id": "import_08debc41",
+      "field_name": "note",
+      "old_value": null,
+      "new_value": "6月18日排练群接龙，共3个批次7张票，A区VIP存在赠票售票混票，已标记待录音师复核",
+      "modified_at": "2026-06-20 07:00:34.196974",
+      "modified_by": "阿梅",
+      "reason": "更新排练接龙备注，标注混票待复核"
+    },
+    {
+      "id": "mod_139cd79a",
+      "show_id": "show_2e75f0a0",
+      "entity_type": "batch",
+      "entity_id": "batch_8e5f0cbf",
+      "field_name": "status",
+      "old_value": "mixed",
+      "new_value": "pending_review",
+      "modified_at": "2026-06-20 07:00:34.197014",
+      "modified_by": "录音师老王",
+      "reason": "送录音师复核"
+    },
+    {
+      "id": "mod_07525702",
+      "show_id": "show_2e75f0a0",
+      "entity_type": "energy_curve",
+      "entity_id": "curve_replay_show_2e75f0a0",
+      "field_name": "points",
+      "old_value": "(未设置)",
+      "new_value": "暖场曲1=3.5(source=排练群接龙demo_rehearsal.txt:B区普通:赵六)、暖场曲2=5.0(source=排练群接龙demo_rehearsal.txt:A区VIP:张三)、主曲1=8.0(source=合同截图:data/contract_screenshot.jpg:合同第2页曲目清单)、主曲2=9.2(source=排练群接龙+合同交叉核对)、收尾曲=4.0(source=排练群接龙demo_rehearsal.txt:C区赠票:孙八)",
+      "modified_at": "2026-06-20 07:00:34.197054",
+      "modified_by": "阿梅",
+      "reason": "设置能量曲线，每首曲目绑定原始材料来源"
+    },
+    {
+      "id": "mod_d088ab02",
+      "show_id": "show_2e75f0a0",
+      "entity_type": "workflow",
+      "entity_id": "show_2e75f0a0",
+      "field_name": "stage",
+      "old_value": "stage_1_imported",
+      "new_value": "stage_2_contract_reviewed",
+      "modified_at": "2026-06-20 07:00:34.197094",
+      "modified_by": "复盘脚本",
+      "reason": "复盘自动推进"
+    },
+    {
+      "id": "mod_c589eb8d",
+      "show_id": "show_2e75f0a0",
+      "entity_type": "workflow",
+      "entity_id": "show_2e75f0a0",
+      "field_name": "stage",
+      "old_value": "stage_2_contract_reviewed",
+      "new_value": "stage_3_authorized",
+      "modified_at": "2026-06-20 07:00:34.197109",
+      "modified_by": "复盘脚本",
+      "reason": "复盘自动推进"
+    }
+  ],
+  "review_decisions": [
+    {
+      "id": "review_7c402a7a",
+      "batch_id": "batch_8e5f0cbf",
+      "show_id": "show_2e75f0a0",
+      "decided_at": "2026-06-20 07:00:34.197023",
+      "decided_by": "录音师老王",
+      "is_approved": true,
+      "resolution": "已核对合同和排练群接龙，A区VIP是主办方邀请媒体赠票混入售票批次，标记通过",
+      "split_into_batches": null
+    }
+  ],
+  "created_at": "2026-06-20 07:00:34.196481",
+  "note": null
+}

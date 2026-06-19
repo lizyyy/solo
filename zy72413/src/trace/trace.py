@@ -106,19 +106,37 @@ class TraceEngine:
         for point in show.energy_curve.points:
             if point.track_name == track_name:
                 origin = {
-                    "energy_point": point.dict(),
+                    "energy_point": point.model_dump(),
                     "sources": [],
                 }
 
                 if point.source_ref:
+                    origin["source_ref"] = point.source_ref
+                    sr = point.source_ref
                     for imp in show.rehearsal_imports:
-                        if point.source_ref in imp.raw_content:
+                        if imp.source_filename in sr or sr in imp.raw_content:
                             origin["sources"].append({
                                 "type": "rehearsal_import",
                                 "id": imp.id,
                                 "filename": imp.source_filename,
                                 "note": imp.note,
+                                "imported_by": imp.imported_by,
+                                "imported_at": imp.imported_at,
                             })
+                    for sc in show.contract_screenshots:
+                        if sc.image_path in sr or sc.note and (sc.note in sr or sr in sc.note):
+                            origin["sources"].append({
+                                "type": "contract_screenshot",
+                                "id": sc.id,
+                                "image_path": sc.image_path,
+                                "note": sc.note,
+                                "uploaded_by": sc.uploaded_by,
+                            })
+                    if not origin["sources"]:
+                        origin["sources"].append({
+                            "type": "manual_reference",
+                            "label": point.source_ref,
+                        })
 
                 return origin
         return {"error": "未找到该曲目"}

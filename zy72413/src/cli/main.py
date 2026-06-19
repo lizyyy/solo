@@ -278,11 +278,12 @@ def cmd_update_note(args):
             if imp.id == args.import_id:
                 old_note = imp.note
                 entity_label = imp.source_filename
-                ImportEngine.update_import_note(
+                ok, updated = ImportEngine.update_import_note(
                     show=show,
                     import_id=args.import_id,
                     new_note=new_note,
-                    operator=args.operator or "阿梅",
+                    modified_by=args.operator or "阿梅",
+                    reason=reason or "更新备注",
                 )
                 break
         else:
@@ -385,12 +386,21 @@ def cmd_set_energy(args):
         print(f"错误: 未找到场次 {args.show_id}")
         return 1
 
+    source_refs = args.source_refs or []
+    moods = args.moods or []
+    bpm_list = args.bpms or []
+    point_notes = args.point_notes or []
+
     points = []
     for i, (track, energy) in enumerate(zip(args.tracks, args.energies)):
         points.append(EnergyPoint(
             track_name=track,
             track_order=i + 1,
             energy_level=float(energy),
+            source_ref=source_refs[i] if i < len(source_refs) else None,
+            mood=moods[i] if i < len(moods) else None,
+            bpm=int(bpm_list[i]) if i < len(bpm_list) else None,
+            note=point_notes[i] if i < len(point_notes) else None,
         ))
 
     curve = EnergyCurve(
@@ -400,8 +410,26 @@ def cmd_set_energy(args):
         modified_by=args.operator or "阿梅",
     )
     show.energy_curve = curve
+
+    HistoryEngine.record_modification(
+        show=show,
+        entity_type="energy_curve",
+        entity_id=curve.id,
+        field_name="points",
+        old_value="(未设置)" if not curve.points else "(已更新)",
+        new_value=", ".join(f"{p.track_name}={p.energy_level}" for p in points),
+        modified_by=args.operator or "阿梅",
+        reason="设置/更新能量曲线",
+    )
+
     storage.save_show(show)
     print(f"✅ 能量曲线已设置，共 {len(points)} 首曲目")
+    for p in points:
+        src = f"  来源: {p.source_ref}" if p.source_ref else ""
+        mood = f"  氛围: {p.mood}" if p.mood else ""
+        bpm = f"  BPM: {p.bpm}" if p.bpm else ""
+        note = f"  备注: {p.note}" if p.note else ""
+        print(f"   {p.track_order}. {p.track_name} - 能量:{p.energy_level}{src}{mood}{bpm}{note}")
     return 0
 
 
@@ -627,8 +655,12 @@ def main():
 
     p_energy = subparsers.add_parser("set-energy", help="设置能量曲线")
     p_energy.add_argument("show_id", help="场次ID")
-    p_energy.add_argument("--tracks", nargs="+", required=True, help="曲目列表")
-    p_energy.add_argument("--energies", nargs="+", required=True, help="能量值列表 (0-10)")
+    p_energy.add_argument("--tracks", nargs="+", required=True, help="曲目列表（按演出顺序）")
+    p_energy.add_argument("--energies", nargs="+", required=True, help="能量值列表 (0-10)，与曲目一一对应")
+    p_energy.add_argument("--source-refs", nargs="+", help="每首曲目的材料来源（文件名或标识），与曲目一一对应")
+    p_energy.add_argument("--moods", nargs="+", help="每首曲目的氛围标签（如 warmup, build, peak）")
+    p_energy.add_argument("--bpms", nargs="+", help="每首曲目的 BPM 数值")
+    p_energy.add_argument("--point-notes", nargs="+", help="每首曲目的单独备注")
     p_energy.add_argument("--operator", default="阿梅", help="操作人")
 
     p_note = subparsers.add_parser("update-note", help="修改备注（支持导入记录/批次/票/合同截图）")

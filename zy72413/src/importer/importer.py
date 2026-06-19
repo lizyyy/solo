@@ -195,8 +195,9 @@ class ImportEngine:
         show: DJShow,
         import_id: str,
         new_note: str,
-        operator: str,
-    ) -> bool:
+        modified_by: str,
+        reason: str = "更新备注",
+    ) -> Tuple[bool, Optional[RehearsalImport]]:
         for imp in show.rehearsal_imports:
             if imp.id == import_id:
                 old_note = imp.note
@@ -211,12 +212,12 @@ class ImportEngine:
                         field_name="note",
                         old_value=old_note,
                         new_value=new_note,
-                        modified_by=operator,
-                        reason="更新备注",
+                        modified_by=modified_by,
+                        reason=reason,
                     )
                 )
-                return True
-        return False
+                return True, imp
+        return False, None
 
     @staticmethod
     def get_import_diff(

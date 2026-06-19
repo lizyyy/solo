@@ -1,0 +1,71 @@
+============================================================
+DJ 场次能量曲线复盘报告
+============================================================
+场次ID: show_2e75f0a0
+场次名称: 夏日电音节
+演出日期: 2026-06-18
+复盘生成时间: 2026-06-20 07:00:34
+隔离数据目录: /Users/lzy/pro/solo/workspaces/zy72413/data_replay_show_2e75f0a0
+
+----- 关键数字证据 -----
+工作流阶段: stage_3_authorized (第三步: 授权已更新)
+批次数: 3
+总票数: 7
+混票批次数: 1
+审核决定数: 1
+导入记录数: 1
+合同截图数: 1
+能量曲目数: 5
+修改审计记录数: 5
+
+----- 批次明细 -----
+  - A区VIP: 状态=resolved 票数=3 混票=True
+  - B区普通: 状态=normal 票数=2 混票=False
+  - C区赠票: 状态=normal 票数=2 混票=False
+
+----- 能量曲线明细（含原始材料来源） -----
+  1. 暖场曲1 - 能量:3.5  来源:排练群接龙demo_rehearsal.txt:B区普通:赵六
+  2. 暖场曲2 - 能量:5.0  来源:排练群接龙demo_rehearsal.txt:A区VIP:张三
+  3. 主曲1 - 能量:8.0  来源:合同截图:data/contract_screenshot.jpg:合同第2页曲目清单
+  4. 主曲2 - 能量:9.2  来源:排练群接龙+合同交叉核对
+  5. 收尾曲 - 能量:4.0  来源:排练群接龙demo_rehearsal.txt:C区赠票:孙八
+
+----- 修改审计链（改前/改后/原因） -----
+  [1] 2026-06-20T07:00:34.196974 - 阿梅
+      对象: rehearsal_import (import_08debc41) - note
+      改前: (空)
+      改后: 6月18日排练群接龙，共3个批次7张票，A区VIP存在赠票售票混票，已标记待录音师复核
+      原因: 更新排练接龙备注，标注混票待复核
+
+  [2] 2026-06-20T07:00:34.197014 - 录音师老王
+      对象: batch (batch_8e5f0cbf) - status
+      改前: mixed
+      改后: pending_review
+      原因: 送录音师复核
+
+  [3] 2026-06-20T07:00:34.197054 - 阿梅
+      对象: energy_curve (curve_replay_show_2e75f0a0) - points
+      改前: (未设置)
+      改后: 暖场曲1=3.5(source=排练群接龙demo_rehearsal.txt:B区普通:赵六)、暖场曲2=5.0(source=排练群接龙demo_rehearsal.txt:A区VIP:张三)、主曲1=8.0(source=合同截图:data/contract_screenshot.jpg:合同第2页曲目清单)、主曲2=9.2(source=排练群接龙+合同交叉核对)、收尾曲=4.0(source=排练群接龙demo_rehearsal.txt:C区赠票:孙八)
+      原因: 设置能量曲线，每首曲目绑定原始材料来源
+
+  [4] 2026-06-20T07:00:34.197094 - 复盘脚本
+      对象: workflow (show_2e75f0a0) - stage
+      改前: stage_1_imported
+      改后: stage_2_contract_reviewed
+      原因: 复盘自动推进
+
+  [5] 2026-06-20T07:00:34.197109 - 复盘脚本
+      对象: workflow (show_2e75f0a0) - stage
+      改前: stage_2_contract_reviewed
+      改后: stage_3_authorized
+      原因: 复盘自动推进
+
+----- 步骤结果 -----
+  [OK] 创建场次: show_2e75f0a0
+  [OK] 导入接龙: 3批次 7票
+  [OK] 更新备注: import_08debc41
+  [OK] 上传合同: screenshot_9da60439
+  [OK] 录音师复核: A区VIP
+  [OK] 设置能量曲线: 5 首曲目
+  [OK] 工作流推进: stage_3_authorized
