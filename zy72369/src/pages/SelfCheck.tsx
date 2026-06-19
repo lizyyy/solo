@@ -45,7 +45,7 @@ export default function SelfCheckPage() {
 
   const handleExportCSV = () => {
     if (!allPassed) return;
-    exportAsCSV(records);
+    exportAsCSV(records, nameplates);
   };
 
   return (

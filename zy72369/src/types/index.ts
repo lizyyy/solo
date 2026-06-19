@@ -48,6 +48,7 @@ export type ConflictStatus = 'pending' | 'confirmed_nameplate' | 'confirmed_scre
 export interface ConflictEntry {
   id: string;
   recordId: string;
+  screenshotId: string;
   nameplateValue: string;
   screenshotValue: string;
   nameplateEvidence: string;

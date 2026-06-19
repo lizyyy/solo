@@ -1,4 +1,4 @@
-import type { BendLossRecord, ConflictEntry, Nameplate, ScreenshotAttachment, SelfCheckResult, SelfCheckType, DuplicateInfo } from '@/types';
+import type { BendLossRecord, ConflictEntry, Nameplate, ScreenshotAttachment, SelfCheckResult, DuplicateInfo } from '@/types';
 
 export function checkNameplateValidation(nameplates: Nameplate[]): SelfCheckResult {
   const details: string[] = [];
@@ -43,7 +43,6 @@ export function checkDuplicateImport(records: BendLossRecord[], nameplates: Name
   const details: string[] = [];
   let passed = true;
 
-  const npMap = new Map(nameplates.map(n => [n.id, n]));
   const exactMap = new Map<string, { ids: string[]; importTimes: string[] }>();
 
   for (const r of records) {
@@ -54,7 +53,7 @@ export function checkDuplicateImport(records: BendLossRecord[], nameplates: Name
     exactMap.set(key, entry);
   }
 
-  for (const [key, { ids, importTimes }] of exactMap) {
+  for (const [, { ids, importTimes }] of exactMap) {
     if (ids.length <= 1) continue;
     passed = false;
     const matchRec = records.find(r => r.id === ids[0])!;
@@ -91,7 +90,7 @@ export function checkDuplicateImport(records: BendLossRecord[], nameplates: Name
     nearDuplicateMap.set(nearKey, existing);
   }
 
-  for (const [nearKey, ids] of nearDuplicateMap) {
+  for (const [, ids] of nearDuplicateMap) {
     if (ids.length <= 1) continue;
     const sameGroup = records.filter(r => ids.includes(r.id));
     const radii = sameGroup.map(r => r.bendRadius).sort((a, b) => a - b);
@@ -231,7 +230,6 @@ export function checkScreenshotNoteIntegrity(screenshots: ScreenshotAttachment[]
     }
   }
 
-  const recordsWithSS = new Set(screenshots.map(s => s.recordId));
   const recordsWithoutNote = new Set<string>();
   for (const ss of screenshots) {
     if (!ss.note || ss.note.trim().length < 2) recordsWithoutNote.add(ss.recordId);
@@ -269,6 +267,7 @@ export function classifyDuplicate(
   allRecords: BendLossRecord[],
   nameplates: Nameplate[]
 ): DuplicateInfo {
+  void nameplates;
   const sameExact = allRecords.filter(r =>
     r.id !== record.id &&
     r.nameplateId === record.nameplateId &&

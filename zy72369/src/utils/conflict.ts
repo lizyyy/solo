@@ -13,7 +13,6 @@ export function detectConflicts(
     const relatedScreenshots = screenshots.filter(s => s.recordId === record.id);
     for (const ss of relatedScreenshots) {
       const ssLower = ss.note.toLowerCase();
-      const npMinRadius = nameplate.minBendRadius.toString();
       if (ssLower.includes('最小弯曲半径') || ssLower.includes('minbendradius') || ssLower.includes('弯曲半径')) {
         const radiusMatch = ssLower.match(/(\d+\.?\d*)\s*(mm|毫米)/);
         if (radiusMatch) {
@@ -22,6 +21,7 @@ export function detectConflicts(
             conflicts.push({
               id: genId(),
               recordId: record.id,
+              screenshotId: ss.id,
               nameplateValue: `最小弯曲半径: ${nameplate.minBendRadius}mm`,
               screenshotValue: `最小弯曲半径: ${ssRadius}mm`,
               nameplateEvidence: `铭牌基准值 ${nameplate.minBendRadius}mm (导入时间: ${nameplate.importTime})`,
@@ -37,6 +37,7 @@ export function detectConflicts(
           conflicts.push({
             id: genId(),
             recordId: record.id,
+            screenshotId: ss.id,
             nameplateValue: `光纤类型: ${nameplate.fiberType}`,
             screenshotValue: `截图提及光纤类型与铭牌不一致`,
             nameplateEvidence: `铭牌值 "${nameplate.fiberType}" (导入时间: ${nameplate.importTime})`,
@@ -45,7 +46,6 @@ export function detectConflicts(
           });
         }
       }
-      const npDiameter = nameplate.coreDiameter.toString();
       if (ssLower.includes('芯径') || ssLower.includes('core') || ssLower.includes('直径')) {
         const diameterMatch = ssLower.match(/(\d+\.?\d*)\s*(μm|um|微米)/);
         if (diameterMatch) {
@@ -54,6 +54,7 @@ export function detectConflicts(
             conflicts.push({
               id: genId(),
               recordId: record.id,
+              screenshotId: ss.id,
               nameplateValue: `芯径: ${nameplate.coreDiameter}μm`,
               screenshotValue: `芯径: ${ssDiameter}μm`,
               nameplateEvidence: `铭牌基准值 ${nameplate.coreDiameter}μm (导入时间: ${nameplate.importTime})`,

@@ -230,7 +230,7 @@ export default function History() {
                   <div className="flex items-start gap-2">
                     <span className="text-xs font-medium text-gray-500 flex-shrink-0 w-16">变更历史:</span>
                     <div className="flex-1 space-y-1">
-                      {[...ss.changeHistory].reverse().map((ch, idx) => (
+                      {[...ss.changeHistory].reverse().map((ch) => (
                         <div key={ch.id} className="text-[11px] font-mono pl-3 border-l-2 border-[#FBBF24]/60 py-0.5">
                           <span className="text-red-500">"{ch.oldValue}"</span>
                           <span className="text-gray-400"> → </span>
