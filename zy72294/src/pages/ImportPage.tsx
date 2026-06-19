@@ -4,6 +4,7 @@ import * as XLSX from 'xlsx';
 import { useAppStore } from '@/store';
 import { cn } from '@/lib/utils';
 import type * as T from '@/types';
+import { normalizeAlarmOccluded } from '@/services';
 import { rangefinderRecords as mockRecords } from '@/mock';
 
 type ImportStatus = 'idle' | 'success' | 'duplicate';
@@ -44,7 +45,7 @@ export default function ImportPage() {
         pointY: Number(row.pointY || row.Y坐标 || 0),
         distance: Number(row.distance || row.距离 || 0),
         screenshotUrl: String(row.screenshotUrl || row.截图 || ''),
-        alarmOccluded: Boolean(row.alarmOccluded || row.遮挡告警 || false),
+        alarmOccluded: normalizeAlarmOccluded(row.alarmOccluded ?? row.遮挡告警),
         importBatch: '',
         createdAt: '',
         createdBy: '',

@@ -47,12 +47,12 @@ export default function ReviewPage() {
   const handleReview = (status: AlarmReview['reviewStatus']) => {
     if (!selectedReview) return;
     reviewAlarm(selectedReview.id, status, reviewComment, '施工经理');
+    setSelectedRecordId(selectedReview.recordId);
     setSelectedReview(null);
     setReviewComment('');
   };
 
   const getRecord = (recordId: string) => {
-    setSelectedRecordId(recordId);
     return uniqueRecords.find((r) => r.id === recordId);
   };
   const getNote = (recordId: string) => getNoteForRecord(recordId);

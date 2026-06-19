@@ -36,6 +36,7 @@ interface AppState {
   getEstimationForRecord: (recordId: string) => T.VolumeEstimation | undefined;
   getReportForRecord: (recordId: string) => T.SafetyReport | undefined;
   getUniqueRecords: () => T.RangefinderRecord[];
+  isRecordOccluded: (recordId: string) => boolean;
   getStats: () => {
     importPending: number;
     notesPending: number;
@@ -72,6 +73,7 @@ export const useAppStore = create<AppState>()(
 
         const recordsWithMeta = records.map((r) => ({
           ...r,
+          alarmOccluded: services.normalizeAlarmOccluded(r.alarmOccluded),
           importBatch,
           createdAt: now,
           createdBy: operator,
@@ -86,6 +88,7 @@ export const useAppStore = create<AppState>()(
 
         for (const record of result.newRecords) {
           const calcResult = services.autoSelectModel(record);
+          const rawAlarm = record.alarmOccluded;
           newVolumeEstimations.push({
             id: generateId(),
             recordId: record.id,
@@ -112,6 +115,16 @@ export const useAppStore = create<AppState>()(
             updatedBy: '',
           });
 
+          newChangeHistories.push(
+            services.trackChange(
+              'rangefinder_record',
+              record.id,
+              'alarmOccluded',
+              String(rawAlarm),
+              String(isOccluded),
+              operator
+            )
+          );
           newChangeHistories.push(
             services.trackChange(
               'rangefinder_record',
@@ -379,10 +392,21 @@ export const useAppStore = create<AppState>()(
 
       getUniqueRecords: () => {
         const records = get().rangefinderRecords;
-        return records.filter(
+        const unique = records.filter(
           (r, i, arr) =>
             arr.findIndex((x) => x.batchNo === r.batchNo && x.pointX === r.pointX && x.pointY === r.pointY) === i
         );
+        return unique.map((r) => ({
+          ...r,
+          alarmOccluded: services.normalizeAlarmOccluded(r.alarmOccluded),
+        }));
+      },
+
+      isRecordOccluded: (recordId: string) => {
+        const state = get();
+        const record = state.rangefinderRecords.find((r) => r.id === recordId);
+        if (!record) return false;
+        return services.normalizeAlarmOccluded(record.alarmOccluded) || services.detectOcclusion(record.screenshotUrl);
       },
 
       getStats: () => {
