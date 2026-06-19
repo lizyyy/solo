@@ -191,6 +191,19 @@ def review_complete(audio_note_id, operator_id, source_material):
     services.review_complete(audio_note_id, operator_id, source_material)
     click.echo('巡演统筹复核完成')
 
+@cli.command('export-report')
+@click.option('--audio-note-id', type=int, default=None, help='指定曲目ID，不指定则导出所有')
+@click.option('--format', 'fmt', type=click.Choice(['text', 'json']), default='text', help='导出格式')
+@click.option('--output', '-o', default=None, help='输出文件路径，默认打印到屏幕')
+def export_report(audio_note_id, fmt, output):
+    report = services.generate_report(audio_note_id, fmt)
+    if output:
+        with open(output, 'w', encoding='utf-8') as f:
+            f.write(report)
+        click.echo(f'报告已导出到: {output}')
+    else:
+        click.echo(report)
+
 @cli.command()
 def demo_setup():
     init_db()

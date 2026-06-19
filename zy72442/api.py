@@ -102,5 +102,27 @@ def api_rework_records():
     records = services.get_rework_records(audio_note_id)
     return jsonify(records)
 
+@app.route('/api/report', methods=['GET'])
+def api_report():
+    from flask import make_response
+    audio_note_id = request.args.get('audio_note_id', type=int)
+    fmt = request.args.get('format', 'text')
+    download = request.args.get('download', '0') == '1'
+    
+    report_content = services.generate_report(audio_note_id, fmt)
+    
+    if fmt == 'json':
+        resp = make_response(report_content)
+        resp.headers['Content-Type'] = 'application/json; charset=utf-8'
+        if download:
+            resp.headers['Content-Disposition'] = 'attachment; filename="rework_report.json"'
+        return resp
+    else:
+        resp = make_response(report_content)
+        resp.headers['Content-Type'] = 'text/plain; charset=utf-8'
+        if download:
+            resp.headers['Content-Disposition'] = 'attachment; filename="rework_report.txt"'
+        return resp
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
