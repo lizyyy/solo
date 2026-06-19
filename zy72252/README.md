@@ -100,6 +100,7 @@ src/
 │   ├── SketchUploadModal.tsx # 草图上传模态框
 │   └── ReportExport.tsx    # 报告导出组件
 ├── pages/                # 页面组件
+│   ├── Home.tsx            # 首页
 │   ├── ProjectsPage.tsx    # 项目总览页
 │   ├── ProjectDetailPage.tsx # 项目详情页
 │   ├── ReportPage.tsx      # 报告导出页
@@ -108,13 +109,20 @@ src/
 │   └── RouteDetectionEngine.ts # 路线检测引擎
 ├── store/                # 状态管理
 │   └── projectStore.ts     # Zustand store
-├── data/                 # 样例数据
+├── data/                 # 前端样例数据
 │   └── sampleData.ts       # 3个演示项目数据
 ├── types/                # TypeScript类型定义
 │   └── index.ts
 ├── lib/                  # 工具函数
 │   └── utils.ts
 └── App.tsx               # 应用入口
+data/                     # CLI样例数据（JSON格式）
+├── demo-project-1.json    # 车展主舞台吊点系统
+├── demo-project-2.json    # 新品发布会舞台
+└── demo-project-3.json    # 颁奖典礼多楼层舞台
+scripts/                  # CLI脚本
+├── detect.js              # 路线检测脚本
+└── export.js              # 报告导出脚本
 ```
 
 ## 🎯 核心数据模型
@@ -169,15 +177,47 @@ setSelectedIssue(issueId)         // 选中问题高亮
 
 ## 💻 命令行接口（CLI）
 
-可通过 Node.js 脚本调用核心功能：
+可通过 Node.js 脚本在终端运行检测和报告导出：
 
 ```bash
-# 检测项目问题
-node scripts/detect.js --input ./data/project.json
+# 检测样例项目问题（文本格式输出）
+npm run detect:demo
 
-# 导出报告
-node scripts/export.js --project demo-2 --output ./report.png
+# 检测任意项目问题
+node scripts/detect.js --input ./data/demo-project-2.json
+
+# 以 JSON 格式输出检测结果并保存到文件
+node scripts/detect.js --input ./data/demo-project-2.json --output result.json --json
+
+# 导出样例项目报告（文本格式输出）
+npm run export-report:demo
+
+# 导出任意项目报告为 JSON 格式
+npm run export-report:demo-json
+
+# 导出任意项目报告（支持 json 和 text 格式）
+node scripts/export.js --input ./data/demo-project-2.json --format text
+node scripts/export.js --input ./data/demo-project-2.json --output ./output/report.json --format json --notes "补充说明"
 ```
+
+### CLI 命令一览
+
+| 命令 | 说明 |
+|------|------|
+| `npm run detect:demo` | 检测新品发布会舞台样例 |
+| `npm run export-report:demo` | 导出新品发布会舞台报告（文本格式） |
+| `npm run export-report:demo-json` | 导出新品发布会舞台报告（JSON格式到 output/） |
+
+### 报告包含内容
+
+CLI 导出的报告与 Web 端一致，包含：
+- 项目摘要和统计数据
+- 每个问题的详细说明（路线名称、记录长度、实测长度）
+- 「为什么这条被留下？」的原因解释
+- 「还缺什么材料？」缺失材料清单
+- 「下一步该找谁？」责任人指引
+- 复核意见（如有）
+- 后续行动清单
 
 ## 🎨 设计规范
 
@@ -203,12 +243,15 @@ npm run lint
 
 ### 手动测试场景
 
-1. ✅ 三步核心流程是否完整
+1. ✅ 三步核心流程是否完整（导入→补录→复核→导出）
 2. ✅ 问题状态是否不会自动归为正常
-3. ✅ 报告导出是否包含完整说明
+3. ✅ 报告导出是否包含完整说明（问题原因、缺失材料、责任人、复核意见）
 4. ✅ 补录草图后3D视图是否更新
 5. ✅ 客户复核后状态是否正确流转
 6. ✅ 数据刷新后是否持久化保存
+7. ✅ CLI检测命令 `npm run detect:demo` 是否正常输出
+8. ✅ CLI报告导出 `npm run export-report:demo` 是否包含完整内容
+9. ✅ Web端导出PNG报告内容与页面预览一致
 
 ## 📝 常见问题
 

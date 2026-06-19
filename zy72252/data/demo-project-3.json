@@ -1,0 +1,68 @@
+{
+  "project": {
+    "id": "demo-project-3",
+    "name": "颁奖典礼多楼层舞台",
+    "createdAt": "2026-05-28T14:00:00Z",
+    "updatedAt": "2026-06-01T11:00:00Z",
+    "status": "warning",
+    "stage": "detection",
+    "description": "年度颁奖典礼，2楼层吊点系统，含2条补录路线未计算长度"
+  },
+  "points": [
+    { "id": "F1-P1", "name": "1F-吊点01", "x": -4, "y": 0, "z": 3, "load": 450, "status": "normal" },
+    { "id": "F1-P2", "name": "1F-吊点02", "x": 0, "y": 0, "z": 4, "load": 650, "status": "normal" },
+    { "id": "F1-P3", "name": "1F-吊点03", "x": 4, "y": 0, "z": 3, "load": 450, "status": "normal" },
+    { "id": "F2-P1", "name": "2F-吊点01", "x": -3, "y": 0, "z": 7, "load": 550, "status": "normal" },
+    { "id": "F2-P2", "name": "2F-吊点02", "x": 0, "y": 0, "z": 7.5, "load": 900, "status": "warning" },
+    { "id": "F2-P3", "name": "2F-吊点03", "x": 3, "y": 0, "z": 7, "load": 550, "status": "normal" },
+    { "id": "F2-P4", "name": "2F-吊点04", "x": 0, "y": 0, "z": 9, "load": 750, "status": "normal" }
+  ],
+  "routes": [
+    { "id": "R1", "name": "1F-主路线-1", "fromPoint": "F1-P1", "toPoint": "F1-P2", "length": 5.12, "isSupplementary": false, "recalculated": true, "hasWarning": false },
+    { "id": "R2", "name": "1F-主路线-2", "fromPoint": "F1-P2", "toPoint": "F1-P3", "length": 5.12, "isSupplementary": false, "recalculated": true, "hasWarning": false },
+    { "id": "R3", "name": "2F-补录路线-1", "fromPoint": "F2-P1", "toPoint": "F2-P2", "length": 3.91, "calculatedLength": 4.85, "isSupplementary": true, "recalculated": false, "hasWarning": true, "color": "#FF7D00" },
+    { "id": "R4", "name": "2F-主路线-3", "fromPoint": "F2-P2", "toPoint": "F2-P3", "length": 3.91, "isSupplementary": false, "recalculated": true, "hasWarning": false },
+    { "id": "R5", "name": "2F-补录路线-2", "fromPoint": "F2-P3", "toPoint": "F2-P4", "length": 2.5, "calculatedLength": 3.2, "isSupplementary": true, "recalculated": false, "hasWarning": true, "color": "#FF7D00" }
+  ],
+  "obstacles": [
+    {
+      "id": "O1",
+      "routeId": "R3",
+      "content": "二楼看台下方有空调风管遮挡，原路线需要绕行。实测绕行增加约0.94m。",
+      "createdAt": "2026-05-30T10:00:00Z",
+      "createdBy": "designer"
+    },
+    {
+      "id": "O2",
+      "routeId": "R5",
+      "content": "二层转角处新增灯光桁架，路线需下穿通过，长度需重新计算。",
+      "createdAt": "2026-05-30T10:30:00Z",
+      "createdBy": "designer"
+    }
+  ],
+  "sketches": [],
+  "issues": [
+    {
+      "id": "ISSUE-002",
+      "type": "route_not_recalculated",
+      "routeId": "R3",
+      "severity": "warning",
+      "description": "补录路线 \"2F-补录路线-1\" 没有重新计算长度",
+      "status": "open",
+      "nextAction": "contact_designer",
+      "missingMaterials": ["楼层剖面草图（避让段）", "复核确认记录"],
+      "createdAt": "2026-05-30T11:00:00Z"
+    },
+    {
+      "id": "ISSUE-003",
+      "type": "route_not_recalculated",
+      "routeId": "R5",
+      "severity": "warning",
+      "description": "补录路线 \"2F-补录路线-2\" 没有重新计算长度",
+      "status": "open",
+      "nextAction": "contact_designer",
+      "missingMaterials": ["楼层剖面草图（转角段）", "复核确认记录"],
+      "createdAt": "2026-05-30T11:00:00Z"
+    }
+  ]
+}

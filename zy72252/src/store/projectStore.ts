@@ -189,7 +189,6 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
           status: 'resolved' as const,
           resolvedAt: new Date().toISOString(),
           reviewNotes,
-          missingMaterials: [],
         };
       }
       return i;

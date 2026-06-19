@@ -8,7 +8,12 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "check": "tsc -b --noEmit"
+    "check": "tsc -b --noEmit",
+    "detect": "node scripts/detect.js",
+    "detect:demo": "node scripts/detect.js --input ./data/demo-project-2.json",
+    "export-report": "node scripts/export.js",
+    "export-report:demo": "node scripts/export.js --input ./data/demo-project-2.json --format text",
+    "export-report:demo-json": "node scripts/export.js --input ./data/demo-project-2.json --output ./output/demo-report.json --format json"
   },
   "dependencies": {
     "@react-three/drei": "^9.96.1",

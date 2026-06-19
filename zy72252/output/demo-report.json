@@ -1,0 +1,65 @@
+{
+  "reportId": "SS-DEMO-PRO-MQK9RXKI",
+  "title": "舞台吊点安全检测报告",
+  "projectId": "demo-project-2",
+  "projectName": "新品发布会舞台",
+  "projectDescription": "科技新品全球发布会，含补录路线未重新计算长度，待阿景补录草图",
+  "generatedAt": "2026-06-19T01:48:14.130Z",
+  "generatedBy": "舞台吊点安全演示系统",
+  "summary": "项目\"新品发布会舞台\"检测到 1 个待处理问题，主要为补录路线未重新计算长度，需要展陈客户复核确认。",
+  "customNotes": "",
+  "statistics": {
+    "totalRoutes": 4,
+    "supplementaryRoutes": 1,
+    "totalPoints": 6,
+    "totalObstacles": 1,
+    "totalSketches": 0,
+    "totalIssues": 1,
+    "openIssues": 1,
+    "supplementedIssues": 0,
+    "resolvedIssues": 0
+  },
+  "issues": [
+    {
+      "id": "ISSUE-001",
+      "type": "route_not_recalculated",
+      "typeLabel": "补录路线未重新计算长度",
+      "description": "补录路线 \"补录路线-1\" 没有重新计算长度",
+      "severity": "warning",
+      "status": "open",
+      "statusLabel": "待处理",
+      "createdAt": "2026-06-02T15:00:00Z",
+      "supplementedAt": null,
+      "resolvedAt": null,
+      "route": {
+        "id": "R3",
+        "name": "补录路线-1",
+        "length": 4.03,
+        "calculatedLength": 5.02,
+        "isSupplementary": true,
+        "recalculated": false
+      },
+      "obstacles": [
+        {
+          "id": "O1",
+          "content": "现场发现LED屏后方有消防管道突出，原路线无法通过，需调整高度避让。现场测量管道突出约80cm，建议重新计算避让路线长度。",
+          "createdBy": "designer",
+          "createdAt": "2026-06-02T14:30:00Z"
+        }
+      ],
+      "sketches": [],
+      "missingMaterials": [
+        "楼层剖面草图（避让段）",
+        "复核确认记录"
+      ],
+      "whyLeft": "该路线为补录路线，未重新计算长度，可能存在安全隐患。需确认实际路线长度与设计值一致后才能放行。",
+      "nextAction": "contact_designer",
+      "nextActionLabel": "请联系展陈设计师阿景",
+      "responsiblePerson": "展陈设计师阿景",
+      "reviewNotes": null
+    }
+  ],
+  "nextSteps": [
+    "【补录路线 \"补录路线-1\" 没有重新计算长度】→ 联系设计师阿景补录楼层剖面草图"
+  ]
+}

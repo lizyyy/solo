@@ -1,0 +1,48 @@
+{
+  "project": {
+    "id": "demo-project-2",
+    "name": "新品发布会舞台",
+    "createdAt": "2026-06-02T09:00:00Z",
+    "updatedAt": "2026-06-03T08:00:00Z",
+    "status": "warning",
+    "stage": "detection",
+    "description": "科技新品全球发布会，含补录路线未重新计算长度，待阿景补录草图"
+  },
+  "points": [
+    { "id": "P1", "name": "吊点A-01", "x": -4, "y": 0, "z": 3, "load": 500, "status": "normal" },
+    { "id": "P2", "name": "吊点A-02", "x": 0, "y": 0, "z": 3.5, "load": 800, "status": "normal" },
+    { "id": "P3", "name": "吊点A-03", "x": 4, "y": 0, "z": 3, "load": 500, "status": "normal" },
+    { "id": "P4", "name": "吊点B-01", "x": -4, "y": 0, "z": 6, "load": 600, "status": "normal" },
+    { "id": "P5", "name": "吊点B-02", "x": 0, "y": 0, "z": 6.5, "load": 1000, "status": "warning" },
+    { "id": "P6", "name": "吊点B-03", "x": 4, "y": 0, "z": 6, "load": 600, "status": "normal" }
+  ],
+  "routes": [
+    { "id": "R1", "name": "主路线-1", "fromPoint": "P1", "toPoint": "P2", "length": 4.03, "isSupplementary": false, "recalculated": true, "hasWarning": false },
+    { "id": "R2", "name": "主路线-2", "fromPoint": "P2", "toPoint": "P3", "length": 4.03, "isSupplementary": false, "recalculated": true, "hasWarning": false },
+    { "id": "R3", "name": "补录路线-1", "fromPoint": "P4", "toPoint": "P5", "length": 4.03, "calculatedLength": 5.02, "isSupplementary": true, "recalculated": false, "hasWarning": true, "color": "#FF7D00" },
+    { "id": "R4", "name": "主路线-4", "fromPoint": "P5", "toPoint": "P6", "length": 4.03, "isSupplementary": false, "recalculated": true, "hasWarning": false }
+  ],
+  "obstacles": [
+    {
+      "id": "O1",
+      "routeId": "R3",
+      "content": "现场发现LED屏后方有消防管道突出，原路线无法通过，需调整高度避让。现场测量管道突出约80cm，建议重新计算避让路线长度。",
+      "createdAt": "2026-06-02T14:30:00Z",
+      "createdBy": "designer"
+    }
+  ],
+  "sketches": [],
+  "issues": [
+    {
+      "id": "ISSUE-001",
+      "type": "route_not_recalculated",
+      "routeId": "R3",
+      "severity": "warning",
+      "description": "补录路线 \"补录路线-1\" 没有重新计算长度",
+      "status": "open",
+      "nextAction": "contact_designer",
+      "missingMaterials": ["楼层剖面草图（避让段）", "复核确认记录"],
+      "createdAt": "2026-06-02T15:00:00Z"
+    }
+  ]
+}

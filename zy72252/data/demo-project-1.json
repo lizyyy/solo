@@ -1,0 +1,28 @@
+{
+  "project": {
+    "id": "demo-project-1",
+    "name": "车展主舞台吊点系统",
+    "createdAt": "2026-06-01T10:00:00Z",
+    "updatedAt": "2026-06-02T15:30:00Z",
+    "status": "normal",
+    "stage": "completed",
+    "description": "2026国际车展A区主舞台，6个吊点，4条路线，全部正常"
+  },
+  "points": [
+    { "id": "P1", "name": "吊点A-01", "x": -3, "y": 0, "z": 3, "load": 400, "status": "normal" },
+    { "id": "P2", "name": "吊点A-02", "x": 0, "y": 0, "z": 3.5, "load": 600, "status": "normal" },
+    { "id": "P3", "name": "吊点A-03", "x": 3, "y": 0, "z": 3, "load": 400, "status": "normal" },
+    { "id": "P4", "name": "吊点B-01", "x": -3, "y": 0, "z": 6, "load": 500, "status": "normal" },
+    { "id": "P5", "name": "吊点B-02", "x": 0, "y": 0, "z": 6.5, "load": 700, "status": "normal" },
+    { "id": "P6", "name": "吊点B-03", "x": 3, "y": 0, "z": 6, "load": 500, "status": "normal" }
+  ],
+  "routes": [
+    { "id": "R1", "name": "主路线-1", "fromPoint": "P1", "toPoint": "P2", "length": 3.91, "isSupplementary": false, "recalculated": true, "hasWarning": false },
+    { "id": "R2", "name": "主路线-2", "fromPoint": "P2", "toPoint": "P3", "length": 3.91, "isSupplementary": false, "recalculated": true, "hasWarning": false },
+    { "id": "R3", "name": "主路线-3", "fromPoint": "P4", "toPoint": "P5", "length": 3.91, "isSupplementary": false, "recalculated": true, "hasWarning": false },
+    { "id": "R4", "name": "主路线-4", "fromPoint": "P5", "toPoint": "P6", "length": 3.91, "isSupplementary": false, "recalculated": true, "hasWarning": false }
+  ],
+  "obstacles": [],
+  "sketches": [],
+  "issues": []
+}
