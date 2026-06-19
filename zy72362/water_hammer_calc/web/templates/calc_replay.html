@@ -343,20 +343,48 @@
 </div>
 
 <script>
+const CALC_ID = '{{ calc_id }}';
+
 function submitScreenshot() {
-    const file = document.getElementById('screenshotFile').files[0];
     const desc = document.getElementById('screenshotDesc').value.trim();
-    if (!file || !desc) { alert('请填写截图文件和描述'); return; }
-    console.log('上传截图', { calc_id: '{{ calc_id }}', file: file.name, desc });
-    alert('截图已上传！');
-    document.getElementById('screenshotForm').reset();
+    const params = document.getElementById('relatedParams').value.trim();
+    const fileInput = document.getElementById('screenshotFile');
+    if (!desc) { alert('请填写截图描述'); return; }
+    const relatedParams = params ? params.split(',').map(s => s.trim()).filter(s => s) : [];
+    const sid = 'SCREEN-' + Date.now();
+    const screenshotData = {
+        screenshot_id: sid,
+        description: desc,
+        related_parameter_names: relatedParams,
+        image_path: fileInput.files[0] ? fileInput.files[0].name : null
+    };
+    fetch('/api/screenshots', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(screenshotData)
+    })
+    .then(r => { if (!r.ok) throw new Error('保存截图失败'); return r.json(); })
+    .then(() => {
+        return fetch(`/api/calculations/${CALC_ID}/link-screenshot/${sid}`, {method: 'POST'});
+    })
+    .then(r => { if (!r.ok) throw new Error('关联截图失败'); return r.json(); })
+    .then(() => {
+        alert('截图已上传并关联，参数溯源已更新！页面即将刷新');
+        location.reload();
+    })
+    .catch(err => alert('操作失败: ' + err.message));
 }
 
 function linkExistingScreenshot() {
     const sid = document.getElementById('existingScreenshot').value;
     if (!sid) { alert('请选择截图'); return; }
-    console.log('关联截图', { calc_id: '{{ calc_id }}', screenshot_id: sid });
-    alert('已关联截图：' + sid);
+    fetch(`/api/calculations/${CALC_ID}/link-screenshot/${sid}`, {method: 'POST'})
+    .then(r => { if (!r.ok) throw new Error('关联失败'); return r.json(); })
+    .then(() => {
+        alert('截图已关联，参数溯源已更新！页面即将刷新');
+        location.reload();
+    })
+    .catch(err => alert('操作失败: ' + err.message));
 }
 
 function submitOverrideReason() {
@@ -364,9 +392,17 @@ function submitOverrideReason() {
     const reviewer = document.getElementById('overrideReviewer').value.trim();
     const reason = document.getElementById('overrideReason').value.trim();
     if (!param || !reviewer || !reason) { alert('请完整填写所有字段'); return; }
-    console.log('补充改系数原因', { calc_id: '{{ calc_id }}', param, reviewer, reason });
-    alert('已提交改系数原因！');
-    document.getElementById('overrideReasonForm').reset();
+    fetch(`/api/calculations/${CALC_ID}/overrides/${param}`, {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({reason, reviewer})
+    })
+    .then(r => { if (!r.ok) throw new Error('提交失败'); return r.json(); })
+    .then(() => {
+        alert('改系数原因已提交，状态已更新！页面即将刷新');
+        location.reload();
+    })
+    .catch(err => alert('操作失败: ' + err.message));
 }
 </script>
 {% endblock %}

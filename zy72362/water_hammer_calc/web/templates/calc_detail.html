@@ -9,9 +9,17 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">计算详情 #{{ calc_id }}</h2>
-        <a href="{{ replay_link }}" class="btn btn-outline-primary">
-            <i class="bi bi-arrow-repeat"></i> 参数回放页
-        </a>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ replay_link }}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-repeat"></i> 参数回放页
+            </a>
+            <a href="/api/calculations/{{ calc_id }}/export" class="btn btn-success">
+                <i class="bi bi-file-earmark-arrow-down"></i> 导出报告
+            </a>
+            <button type="button" class="btn btn-secondary" onclick="finalizeCalc()">
+                <i class="bi bi-archive"></i> 归档
+            </button>
+        </div>
     </div>
 
     <div class="card border-{{ status_color }} mb-4">
@@ -59,7 +67,11 @@
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">计算结果</h5>
-            <div class="btn-group" role="group">
+            <div class="d-flex gap-2 align-items-center">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="refreshCalc()">
+                    <i class="bi bi-arrow-clockwise"></i> 刷新计算
+                </button>
+                <div class="btn-group" role="group">
                 <input type="radio" class="btn-check" name="viewMode" id="chartMode" autocomplete="off" checked>
                 <label class="btn btn-outline-primary btn-sm" for="chartMode">
                     <i class="bi bi-bar-chart"></i> 图表模式
@@ -72,6 +84,7 @@
                 <label class="btn btn-outline-primary btn-sm" for="view3DMode">
                     <i class="bi bi-box-seam"></i> 3D模式
                 </label>
+            </div>
             </div>
         </div>
         <div class="card-body">
@@ -253,6 +266,59 @@
 </div>
 
 <script>
+const CALC_ID = '{{ calc_id }}';
+
+function submitEngineerReview(action) {
+    const name = document.getElementById('engineerName').value.trim();
+    const comments = document.getElementById('engineerComments').value.trim();
+    if (!name) { alert('请输入设备工程师姓名'); return; }
+    if (action === 'reject' && !comments) { alert('驳回复核时请填写原因'); return; }
+    const approve = action === 'approve';
+    fetch(`/api/calculations/${CALC_ID}/status/engineer-review`, {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({approve, reviewer: name, comments})
+    })
+    .then(r => { if (!r.ok) throw new Error('请求失败: ' + r.status); return r.json(); })
+    .then(data => {
+        alert(approve ? '设备工程师已确认通过！页面即将刷新' : '已提交驳回！页面即将刷新');
+        location.reload();
+    })
+    .catch(err => alert('操作失败: ' + err.message));
+}
+
+function submitTrainerReview() {
+    const name = document.getElementById('trainerName').value.trim();
+    const comments = document.getElementById('engineerComments').value.trim();
+    if (!name) { alert('请输入训练教练姓名'); return; }
+    fetch(`/api/calculations/${CALC_ID}/status/trainer-review`, {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({reviewer: name, comments: comments || '训练教练确认'})
+    })
+    .then(r => { if (!r.ok) throw new Error('请求失败: ' + r.status); return r.json(); })
+    .then(data => {
+        alert('训练教练已确认！页面即将刷新');
+        location.reload();
+    })
+    .catch(err => alert('操作失败: ' + err.message));
+}
+
+function refreshCalc() {
+    fetch(`/api/calculations/${CALC_ID}/refresh`, {method: 'POST'})
+    .then(r => { if (!r.ok) throw new Error('请求失败'); return r.json(); })
+    .then(() => { alert('计算已刷新'); location.reload(); })
+    .catch(err => alert('刷新失败: ' + err.message));
+}
+
+function finalizeCalc() {
+    if (!confirm('确认归档？归档后不可修改。')) return;
+    fetch(`/api/calculations/${CALC_ID}/status/finalize`, {method: 'POST'})
+    .then(r => { if (!r.ok) throw new Error('请求失败'); return r.json(); })
+    .then(() => { alert('已归档'); location.reload(); })
+    .catch(err => alert('归档失败: ' + err.message));
+}
+
 document.getElementById('chartMode').addEventListener('change', function() {
     if (this.checked) {
         document.getElementById('chartView').style.display = 'block';
@@ -274,21 +340,5 @@ document.getElementById('view3DMode').addEventListener('change', function() {
         document.getElementById('view3D').style.display = 'block';
     }
 });
-
-function submitEngineerReview(action) {
-    const name = document.getElementById('engineerName').value.trim();
-    const comments = document.getElementById('engineerComments').value.trim();
-    if (!name) { alert('请输入设备工程师姓名'); return; }
-    if (action === 'reject' && !comments) { alert('驳回复核时请填写原因'); return; }
-    console.log('工程师复核', { calc_id: '{{ calc_id }}', action, name, comments });
-    alert(action === 'approve' ? '已确认通过！' : '已提交驳回！');
-}
-
-function submitTrainerReview() {
-    const name = document.getElementById('trainerName').value.trim();
-    if (!name) { alert('请输入训练教练姓名'); return; }
-    console.log('教练确认', { calc_id: '{{ calc_id }}', name });
-    alert('训练教练已确认！');
-}
 </script>
 {% endblock %}

@@ -125,13 +125,26 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-12">
+            <div class="card border-success h-100">
+                <div class="card-header bg-success bg-opacity-10">
+                    <h5 class="mb-0"><i class="bi bi-calculator"></i> 快速计算</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">粘贴 WaterHammerInput JSON</label>
+                        <textarea class="form-control" id="calcInputJson" rows="6" placeholder='粘贴计算输入JSON...'></textarea>
+                    </div>
+                    <button type="button" class="btn btn-success w-100" onclick="quickCalculate()">
+                        <i class="bi bi-play-circle"></i> 开始计算
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="text-center mb-5">
-        <a href="#" class="btn btn-outline-primary btn-lg px-5">
-            <i class="bi bi-list-ul"></i> 查看所有计算记录
-        </a>
-    </div>
+    <h4 class="mb-3"><i class="bi bi-list-ul"></i> 所有计算记录</h4>
+    <div id="calcList" class="list-group mb-5"></div>
 </div>
 
 <div class="modal fade" id="importNameplateModal" tabindex="-1" aria-hidden="true">
@@ -193,38 +206,97 @@
 </div>
 
 <script>
+function doImportNameplate(jsonStr) {
+    let data;
+    try { data = JSON.parse(jsonStr); } catch(e) { alert('JSON 格式错误: ' + e.message); return; }
+    fetch('/api/nameplates', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(r => { if (!r.ok) return r.json().then(d => { throw new Error(d.detail || '导入失败'); }); return r.json(); })
+    .then(d => { alert('铭牌导入成功: ' + d.equipment_id); location.reload(); })
+    .catch(err => alert('导入失败: ' + err.message));
+}
+
 function quickImportNameplate() {
     const file = document.getElementById('nameplateFile').files[0];
     const json = document.getElementById('nameplateJson').value.trim();
     if (!file && !json) { alert('请选择文件或粘贴JSON内容'); return; }
-    console.log('导入铭牌', { hasFile: !!file, jsonLength: json.length });
-    alert('铭牌数据导入请求已提交！');
-    document.getElementById('quickNameplateForm').reset();
-}
-
-function quickImportScreenshot() {
-    const files = document.getElementById('screenshotFiles').files;
-    if (!files || files.length === 0) { alert('请选择至少一张截图'); return; }
-    console.log('导入截图', { count: files.length });
-    alert('已提交 ' + files.length + ' 张截图上传！');
-    document.getElementById('quickScreenshotForm').reset();
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = e => doImportNameplate(e.target.result);
+        reader.readAsText(file);
+    } else {
+        doImportNameplate(json);
+    }
 }
 
 function modalImportNameplate() {
     const file = document.getElementById('modalNameplateFile').files[0];
     if (!file) { alert('请选择铭牌文件'); return; }
-    console.log('模态框导入铭牌', file.name);
-    alert('铭牌数据导入请求已提交！');
-    bootstrap.Modal.getInstance(document.getElementById('importNameplateModal')).hide();
+    const reader = new FileReader();
+    reader.onload = e => {
+        doImportNameplate(e.target.result);
+        bootstrap.Modal.getInstance(document.getElementById('importNameplateModal')).hide();
+    };
+    reader.readAsText(file);
+}
+
+function doImportScreenshot(desc, relatedParams) {
+    const sid = 'SCREEN-' + Date.now();
+    fetch('/api/screenshots', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({screenshot_id: sid, description: desc, related_parameter_names: relatedParams})
+    })
+    .then(r => { if (!r.ok) throw new Error('导入失败'); return r.json(); })
+    .then(d => { alert('截图导入成功: ' + d.screenshot_id); location.reload(); })
+    .catch(err => alert('导入失败: ' + err.message));
+}
+
+function quickImportScreenshot() {
+    const files = document.getElementById('screenshotFiles').files;
+    const prefix = document.getElementById('screenshotPrefix').value.trim() || '维修截图';
+    if (!files || files.length === 0) { alert('请选择至少一张截图'); return; }
+    doImportScreenshot(prefix + ' ' + files[0].name, []);
 }
 
 function modalImportScreenshot() {
     const files = document.getElementById('modalScreenshotFile').files;
+    const desc = document.getElementById('modalScreenshotDesc').value.trim() || '维修群截图';
     if (!files || files.length === 0) { alert('请选择截图文件'); return; }
-    const desc = document.getElementById('modalScreenshotDesc').value.trim();
-    console.log('模态框导入截图', { count: files.length, desc });
-    alert('已提交 ' + files.length + ' 张截图上传！');
+    doImportScreenshot(desc + ' ' + files[0].name, []);
     bootstrap.Modal.getInstance(document.getElementById('importScreenshotModal')).hide();
 }
+
+function quickCalculate() {
+    const json = document.getElementById('calcInputJson').value.trim();
+    if (!json) { alert('请粘贴计算输入JSON'); return; }
+    let data;
+    try { data = JSON.parse(json); } catch(e) { alert('JSON格式错误: ' + e.message); return; }
+    fetch('/api/calculate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(r => { if (!r.ok) throw new Error('计算失败'); return r.json(); })
+    .then(d => { alert('计算完成！即将跳转详情页'); window.location.href = '/calculations/' + d.calc_id; })
+    .catch(err => alert('计算失败: ' + err.message));
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+    fetch('/api/calculations').then(r=>r.json()).then(d => {
+        const list = document.getElementById('calcList');
+        if (!list) return;
+        if (!d.calc_ids || d.calc_ids.length === 0) {
+            list.innerHTML = '<p class="text-muted">暂无计算记录</p>';
+            return;
+        }
+        list.innerHTML = d.calc_ids.map(id =>
+            '<a href="/calculations/' + id + '" class="list-group-item list-group-item-action d-flex justify-content-between"><span>' + id + '</span><i class="bi bi-chevron-right"></i></a>'
+        ).join('');
+    });
+});
 </script>
 {% endblock %}
