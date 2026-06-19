@@ -136,6 +136,10 @@ class Database:
         self._conn.row_factory = sqlite3.Row
         self._init_schema()
 
+    @property
+    def conn(self):
+        return self._conn
+
     def _init_schema(self):
         self._conn.executescript(_SCHEMA)
         self._conn.commit()

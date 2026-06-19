@@ -50,7 +50,11 @@ records = [
     }
 ]
 
-batch_id, created, updated = import_records(db, records, source_file="20260604.csv")
+# 4 元组返回：batch_id, created_count, updated_count, details_list
+batch_id, created, updated, details = import_records(
+    db, records, source_file="20260604.csv", operator="system"
+)
+# details 包含每条记录的 action: new / duplicate_exact
 ```
 
 **导入后状态**：记录状态为 `imported`
@@ -60,13 +64,13 @@ batch_id, created, updated = import_records(db, records, source_file="20260604.c
 ```python
 from em_calibrator.workflow import engineer_review
 
-# 工程师审核每条记录
+# 工程师审核每条记录（单次调用直接推进到工程师审核阶段终态）
 for rec in db.get_records_by_batch(batch_id):
     engineer_review(db, rec.id, operator="何工", note="传感器编号已核对")
 ```
 
-**审核后状态**：
-- 如果该设备位号上次记录的传感器编号一致 → `safety_review`（待安全员审核）
+**审核后状态**（工程师单次调用即抵达终态，无需再额外调一次）：
+- 如果该设备位号上次记录的传感器编号一致 → 直接 `safety_review`（待安全员审核）
 - 如果传感器编号不一致（重启过）→ `sensor_changed`（标记异常，等待安全员复核）
 
 ### 第三步：安全员复核
@@ -74,10 +78,10 @@ for rec in db.get_records_by_batch(batch_id):
 ```python
 from em_calibrator.workflow import safety_review
 
-# 审核通过
+# 审核通过（正常/传感器变更批准 → completed）
 safety_review(db, record_id, operator="安全员", approve=True)
 
-# 审核不通过（回滚）
+# 审核不通过（传感器变更被拒绝 → 回滚 sensor_id 并回到 engineer_review）
 safety_review(db, record_id, operator="安全员", approve=False, note="传感器编号变更未确认")
 ```
 
@@ -85,6 +89,42 @@ safety_review(db, record_id, operator="安全员", approve=False, note="传感�
 - 正常审核通过 → `completed`
 - 传感器变更被批准 → `completed`
 - 被拒绝 → 回滚传感器编号，状态回到 `engineer_review`
+
+### 第四步：吸力标定计算 + 生成报告
+
+```python
+from em_calibrator.report import generate_report, recompute_and_export
+
+# 计算每条记录的吸力并生成报告
+report = generate_report(db, batch_id)
+
+# 打印摘要
+report.print_summary()
+
+# 刷新/重算 + 导出 JSON 报告
+report = recompute_and_export(
+    db, batch_id, operator="system",
+    output_json_path="./em_calibration_report.json"
+)
+```
+
+**吸力计算公式**（基准温度 20°C，每超 1°C 降额 0.3%，容差 ±10%）：
+
+| 口径 | 额定吸力 (kN) |
+|------|---------------|
+| DN32 | 4.0 |
+| DN40 | 6.0 |
+| DN50 | 10.0 |
+| DN65 | 16.0 |
+| DN80 | 25.0 |
+| DN100 | 40.0 |
+| DN125 | 63.0 |
+| DN150 | 100.0 |
+
+```
+actual = nominal × max(0.5, 1 − max(0, T − 20°C) × 0.003)
+pass?  nominal × 0.9 ≤ actual ≤ nominal × 1.1
+```
 
 ## 边界规则（Boundary Rules）
 
@@ -243,11 +283,34 @@ rollback_to_engineer_review(
 )
 ```
 
-## 运行测试
+## 可复现的运行方式
+
+### 1. 单元测试（11 个场景全部通过）
 
 ```bash
+cd /Users/lzy/pro/solo/workspaces/zy72364
 python3 -m unittest tests.test_em_calibrator -v
 ```
+
+覆盖：幂等导入 / 正常工作流 / 传感器变更批准与拒绝 / 补录返工四区分 / 口径不一致检测 / 工作流回滚 / 状态转移规则 / 证据链查询 / 边界规则字典 / 回滚机制。
+
+### 2. 完整链路可复现脚本（同一真实样例打通导入→改备注→工程师审核→安全复核→重算→导出报告）
+
+```bash
+cd /Users/lzy/pro/solo/workspaces/zy72364
+python3 scripts/demo_full_pipeline.py
+```
+
+脚本中内嵌 7 组自动断言验证：
+- ✅ **7a 记录数量**：补录返工后 batch 内记录数仍为 3（未翻倍）
+- ✅ **7b 处理状态**：3 条记录全部抵达 `completed`
+- ✅ **7c 备注最终值**：4 种访问路径读到同一条最终 remark
+- ✅ **7d 备注变更历史**：改前" B 位标定"、改后" B 位标定·何工确认…"、修改人"何工"、修改原因"补录返工：何工核对后只改 line=3 的备注"
+- ✅ **7e 工作流日志**：`imported → sensor_changed → safety_review → completed，每次状态转移有操作人留痕
+- ✅ **7f 报告内容**：报告源自同一条更新后的记录（batch_id / 条数 / POS-02 备注 / 吸力标定值（DN50@26.1°C ≈ 9.82kN）
+- ✅ **7g 导出 JSON**：文件存在且 batch_id / report_id 正确
+
+最终 JSON 报告输出到：`/tmp/em_calibration_report.json`。
 
 ## 数据模型
 

@@ -92,10 +92,6 @@ class TestEMCalibrator(unittest.TestCase):
 
         for rec in recs:
             result = engineer_review(self.db, rec.id, "何工", "engineer reviewed")
-            self.assertEqual(result.status, RecordStatus.ENGINEER_REVIEW.value)
-
-        for rec in self.db.get_records_by_batch(batch_id):
-            result = engineer_review(self.db, rec.id, "何工", "move to safety")
             self.assertEqual(result.status, RecordStatus.SAFETY_REVIEW.value)
 
         for rec in self.db.get_records_by_batch(batch_id):
@@ -128,7 +124,6 @@ class TestEMCalibrator(unittest.TestCase):
         self.assertEqual(recs_1[0].sensor_id, "S-001")
 
         engineer_review(self.db, recs_1[0].id, "何工", "review")
-        engineer_review(self.db, recs_1[0].id, "何工", "to safety")
         safety_review(self.db, recs_1[0].id, "安全员", approve=True, note="done")
         self.assertEqual(self.db.get_record(recs_1[0].id).status, RecordStatus.COMPLETED.value)
 
@@ -180,7 +175,6 @@ class TestEMCalibrator(unittest.TestCase):
         batch_id_1, _, _, _ = import_records(self.db, batch1_records, "b1.csv", "admin")
         recs_1 = self.db.get_records_by_batch(batch_id_1)
         engineer_review(self.db, recs_1[0].id, "何工", "review")
-        engineer_review(self.db, recs_1[0].id, "何工", "to safety")
         safety_review(self.db, recs_1[0].id, "安全员", approve=True, note="done")
 
         batch2_records = [
@@ -468,7 +462,6 @@ class TestEMCalibrator(unittest.TestCase):
         record_id = recs[0].id
 
         engineer_review(self.db, record_id, "何工", "review")
-        engineer_review(self.db, record_id, "何工", "to safety")
 
         result = rollback_to_engineer_review(self.db, record_id, "安全员", "need recheck")
         self.assertEqual(result.status, RecordStatus.ENGINEER_REVIEW.value)

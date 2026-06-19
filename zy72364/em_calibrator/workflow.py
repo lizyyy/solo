@@ -81,7 +81,10 @@ def engineer_review(db: Database, record_id: int, operator: str, note: str = "")
         rec.updated_at = datetime.datetime.now().isoformat()
         db.update_record(rec)
         return rec
-    return advance_status(db, record_id, operator, note or "engineer review passed")
+    rec = advance_status(db, record_id, operator, note or "engineer review passed")
+    if rec.status == RecordStatus.ENGINEER_REVIEW.value:
+        rec = advance_status(db, record_id, operator, note or "engineer review passed")
+    return rec
 
 
 def safety_review(db: Database, record_id: int, operator: str, approve: bool, note: str = "") -> TemperatureRecord:
@@ -106,10 +109,10 @@ def safety_review(db: Database, record_id: int, operator: str, approve: bool, no
                 db.update_sensor_mapping_verdict(
                     target_mapping.id, SafetyVerdict.APPROVED.value, operator
                 )
-            rec.status = RecordStatus.SAFETY_REVIEW.value
-            rec.updated_at = datetime.datetime.now().isoformat()
-            db.update_record(rec)
-            return advance_status(db, record_id, operator, note or "safety review approved after sensor change")
+            rec = advance_status(db, record_id, operator, note or "safety review approved after sensor change")
+            if rec.status == RecordStatus.SAFETY_REVIEW.value:
+                rec = advance_status(db, record_id, operator, note or "safety review approved after sensor change")
+            return rec
         else:
             if target_mapping:
                 db.update_sensor_mapping_verdict(
@@ -207,3 +210,8 @@ def get_full_audit_trail(db: Database, record_id: int) -> dict:
         "change_history": history,
         "workflow_log": workflow,
     }
+
+
+def validate_transition(current_status: str, target_status: str) -> bool:
+    allowed = STATUS_TRANSITIONS.get(current_status, [])
+    return target_status in allowed
