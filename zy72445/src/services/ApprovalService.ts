@@ -14,7 +14,8 @@ import {
   TrackRemark,
   ClassCheckinPhoto,
   RehearsalChangeRecord,
-  ReworkApplication
+  ReworkApplication,
+  ChangeHistory
 } from '../types';
 
 export class ApprovalService {
@@ -294,11 +295,11 @@ export class ApprovalService {
     return this.historyService.getDiffForEntity(entityType, entityId);
   }
 
-  getChangeHistoryByBatch(importBatchId: string) {
+  getChangeHistoryByBatch(importBatchId: string): ChangeHistory[] {
     return this.historyService.getHistoryByImportBatch(importBatchId);
   }
 
-  getChangeHistoryByAffected(entityType: 'approval_record' | 'track_alias', entityId: string) {
+  getChangeHistoryByAffected(entityType: 'approval_record' | 'track_alias', entityId: string): ChangeHistory[] {
     return this.historyService.getHistoryByAffectedEntity(entityType, entityId);
   }
 

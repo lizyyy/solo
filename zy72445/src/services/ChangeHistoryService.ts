@@ -57,6 +57,8 @@ export class ChangeHistoryService {
   }
 
   getDiffForEntity(entityType: ChangeHistory['entityType'], entityId: string): Array<{
+    entityType: ChangeHistory['entityType'];
+    entityId: string;
     fieldName: string;
     oldValue: string;
     newValue: string;
@@ -70,6 +72,8 @@ export class ChangeHistoryService {
   }> {
     const histories = this.store.getChangeHistoryByEntity(entityType, entityId);
     return histories.map(h => ({
+      entityType: h.entityType,
+      entityId: h.entityId,
       fieldName: h.fieldName,
       oldValue: h.oldValue,
       newValue: h.newValue,

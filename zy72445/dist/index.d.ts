@@ -1,10 +1,27 @@
+import { ApprovalService } from './services/ApprovalService';
+import { DataStore } from './store/DataStore';
+import { BOUNDARY_RULES } from './constants/boundaryRules';
+import { ChangeHistory } from './types';
+export declare function runFullDemo(): {
+    success: boolean;
+    report: {
+        exportTime: string;
+        batchId: string;
+        batchIdentifier: string;
+        importedBy: string;
+        summary: {
+            totalTracks: number;
+            newRecords: number;
+            thisTimeDuplicates: number;
+            historicalDuplicates: number;
+            approvalStatuses: Record<string, number>;
+            changeHistoryCount: number;
+        };
+        tracks: any[];
+        changeHistory: ChangeHistory[];
+    };
+    approvalCount: number;
+    changeHistoryCount: number;
+};
+export { ApprovalService, DataStore, BOUNDARY_RULES };
 export * from './types';
-export { BOUNDARY_RULES } from './constants/boundaryRules';
-export { errorMessages, getHumanReadableError } from './constants/errorMessages';
-export { DataStore } from './store/DataStore';
-export { ImportService } from './services/ImportService';
-export { BoundaryRulesEngine } from './services/BoundaryRulesEngine';
-export { WorkflowEngine } from './services/WorkflowEngine';
-export { DisplayModeService } from './services/DisplayModeService';
-export { ChangeHistoryService } from './services/ChangeHistoryService';
-export { ApprovalService } from './services/ApprovalService';

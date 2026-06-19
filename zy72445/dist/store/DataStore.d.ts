@@ -1,4 +1,4 @@
-import { TrackAlias, TrackRemark, ClassCheckinPhoto, RehearsalChangeRecord, ApprovalRecord, ChangeHistory, ImportBatch } from '../types';
+import { TrackAlias, TrackRemark, ClassCheckinPhoto, RehearsalChangeRecord, ApprovalRecord, ChangeHistory, ImportBatch, Snapshot, ReworkApplication } from '../types';
 export declare class DataStore {
     private trackAliases;
     private trackRemarks;
@@ -7,6 +7,8 @@ export declare class DataStore {
     private approvalRecords;
     private changeHistories;
     private importBatches;
+    private snapshots;
+    private reworkApplications;
     private static instance;
     static getInstance(): DataStore;
     generateId(): string;
@@ -17,6 +19,10 @@ export declare class DataStore {
     getTrackAliasesByBatch(batchId: string): TrackAlias[];
     getAllTrackAliases(): TrackAlias[];
     trackAliasExists(trackId: string, aliases: string[]): boolean;
+    findExistingTrackAlias(trackId: string, aliases: string[]): {
+        alias: TrackAlias;
+        batch: ImportBatch;
+    } | undefined;
     createTrackRemark(data: Omit<TrackRemark, 'id' | 'createdAt' | 'updatedAt'>): TrackRemark;
     updateTrackRemark(id: string, updates: Partial<TrackRemark>): TrackRemark | undefined;
     getTrackRemark(id: string): TrackRemark | undefined;
@@ -39,6 +45,15 @@ export declare class DataStore {
     updateImportBatch(id: string, updates: Partial<ImportBatch>): ImportBatch | undefined;
     addChangeHistory(data: Omit<ChangeHistory, 'id' | 'changedAt'>): ChangeHistory;
     getChangeHistoryByEntity(entityType: ChangeHistory['entityType'], entityId: string): ChangeHistory[];
+    getChangeHistoryByBatch(importBatchId: string): ChangeHistory[];
+    getChangeHistoryByAffectedEntity(entityType: 'approval_record' | 'track_alias', entityId: string): ChangeHistory[];
     getAllChangeHistory(): ChangeHistory[];
+    createSnapshot(data: Omit<Snapshot, 'id' | 'createdAt'>): Snapshot;
+    getSnapshot(id: string): Snapshot | undefined;
+    getLatestSnapshotForApproval(approvalId: string): Snapshot | undefined;
+    createReworkApplication(data: Omit<ReworkApplication, 'id' | 'appliedAt'>): ReworkApplication;
+    getReworkApplication(id: string): ReworkApplication | undefined;
+    getReworkApplicationsByApproval(approvalId: string): ReworkApplication[];
+    updateReworkApplication(id: string, updates: Partial<ReworkApplication>): ReworkApplication | undefined;
     clearAll(): void;
 }

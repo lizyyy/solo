@@ -78,7 +78,7 @@ export class ImportService {
       return {
         success: true,
         batchId: existingBatch.id,
-        importedCount: 0,
+        importedCount: trackDataList.length,
         skippedCount: trackDataList.length,
         newRecordCount: 0,
         thisTimeDuplicateCount,
@@ -165,7 +165,7 @@ export class ImportService {
     return {
       success: true,
       batchId: batch.id,
-      importedCount: importedTracks.length,
+      importedCount: trackDataList.length,
       skippedCount: thisTimeDuplicateCount + historicalDuplicateCount,
       newRecordCount,
       thisTimeDuplicateCount,

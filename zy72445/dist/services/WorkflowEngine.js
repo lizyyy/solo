@@ -13,7 +13,7 @@ class WorkflowEngine {
         this.rulesEngine = new BoundaryRulesEngine_1.BoundaryRulesEngine();
         this.historyService = new ChangeHistoryService_1.ChangeHistoryService();
     }
-    initializeWorkflow(trackId, createdBy) {
+    initializeWorkflow(trackId, createdBy, importBatchId) {
         return this.store.createApprovalRecord({
             trackId,
             status: types_1.ApprovalStatus.PENDING,
@@ -21,7 +21,28 @@ class WorkflowEngine {
             displayMode: types_1.DisplayMode.LIST,
             remarks: '曲目别名表已导入，等待审批',
             reviewedBy: undefined,
-            reviewedAt: undefined
+            reviewedAt: undefined,
+            importBatchId
+        });
+    }
+    takeSnapshot(approvalId, createdBy) {
+        const approval = this.store.getApprovalRecord(approvalId);
+        if (!approval)
+            return undefined;
+        const remarks = this.store.getTrackRemarksByTrackId(approval.trackId);
+        const trackRemarkSnapshots = remarks.map(r => ({
+            id: r.id,
+            content: r.content,
+            hasReworkReason: r.hasReworkReason,
+            reworkReason: r.reworkReason
+        }));
+        return this.store.createSnapshot({
+            approvalId,
+            step: approval.currentStep,
+            status: approval.status,
+            trackRemarkSnapshots,
+            importBatchId: approval.importBatchId,
+            createdBy
         });
     }
     advanceStep(approvalId, nextStep, operator) {
@@ -48,13 +69,14 @@ class WorkflowEngine {
                 return { success: false, error: (0, errorMessages_1.getHumanReadableError)('missing_checkin_photo') };
             }
         }
+        const snapshot = this.takeSnapshot(approvalId, operator);
         const oldStep = approval.currentStep;
         const updated = this.store.updateApprovalRecord(approvalId, {
             currentStep: nextStep,
             status: types_1.ApprovalStatus.REVIEWING
         });
         if (updated) {
-            this.historyService.recordChange('approval_record', approvalId, 'currentStep', oldStep, nextStep, operator, '工作流推进');
+            this.historyService.recordChange('approval_record', approvalId, 'currentStep', oldStep, nextStep, operator, '工作流推进', approval.importBatchId, 'approval_record', approvalId, snapshot?.id);
         }
         return { success: true, record: updated };
     }
@@ -72,6 +94,7 @@ class WorkflowEngine {
             if (!this.rulesEngine.canMarkNormal(approval, operator)) {
                 return { success: false, error: (0, errorMessages_1.getHumanReadableError)('rework_reason_pending') };
             }
+            const snapshot = this.takeSnapshot(approvalId, operator);
             const oldStatus = approval.status;
             updated = this.store.updateApprovalRecord(approvalId, {
                 status: types_1.ApprovalStatus.NORMAL,
@@ -80,7 +103,7 @@ class WorkflowEngine {
                 remarks: remarks || approval.remarks
             });
             if (updated) {
-                this.historyService.recordChange('approval_record', approvalId, 'status', oldStatus, types_1.ApprovalStatus.NORMAL, operator, '审批完成，标记为正常');
+                this.historyService.recordChange('approval_record', approvalId, 'status', oldStatus, types_1.ApprovalStatus.NORMAL, operator, '审批完成，标记为正常', approval.importBatchId, 'approval_record', approvalId, snapshot?.id);
             }
         }
         else {
@@ -88,6 +111,90 @@ class WorkflowEngine {
             return this.advanceStep(approvalId, nextStep, operator);
         }
         return { success: true, record: updated };
+    }
+    executeRollback(approvalId, operator, reason) {
+        const approval = this.store.getApprovalRecord(approvalId);
+        if (!approval) {
+            return { success: false, error: (0, errorMessages_1.getHumanReadableError)('track_not_found') };
+        }
+        if (approval.status === types_1.ApprovalStatus.NORMAL) {
+            return { success: false, error: (0, errorMessages_1.getHumanReadableError)('cannot_rollback_normal') };
+        }
+        if (!this.rulesEngine.canRollback(approval.status)) {
+            return { success: false, error: (0, errorMessages_1.getHumanReadableError)('invalid_status_transition') };
+        }
+        const snapshot = this.store.getLatestSnapshotForApproval(approvalId);
+        if (!snapshot) {
+            return { success: false, error: (0, errorMessages_1.getHumanReadableError)('rollback_no_snapshot') };
+        }
+        let restoredRemarks = 0;
+        for (const remarkSnapshot of snapshot.trackRemarkSnapshots) {
+            const currentRemark = this.store.getTrackRemark(remarkSnapshot.id);
+            if (currentRemark) {
+                this.store.updateTrackRemark(remarkSnapshot.id, {
+                    content: remarkSnapshot.content,
+                    hasReworkReason: remarkSnapshot.hasReworkReason,
+                    reworkReason: remarkSnapshot.reworkReason
+                });
+                restoredRemarks++;
+            }
+        }
+        const oldStatus = approval.status;
+        const oldStep = approval.currentStep;
+        const updated = this.store.updateApprovalRecord(approvalId, {
+            status: snapshot.status,
+            currentStep: snapshot.step
+        });
+        if (updated) {
+            this.historyService.recordChange('approval_record', approvalId, 'status', oldStatus, snapshot.status, operator, `回滚: ${reason}`, approval.importBatchId, 'approval_record', approvalId, snapshot.id);
+            this.historyService.recordChange('approval_record', approvalId, 'currentStep', oldStep, snapshot.step, operator, `回滚: ${reason}`, approval.importBatchId, 'approval_record', approvalId, snapshot.id);
+        }
+        return { success: true, record: updated, restoredRemarks };
+    }
+    applyForRework(approvalId, reason, appliedBy) {
+        const approval = this.store.getApprovalRecord(approvalId);
+        if (!approval) {
+            return { success: false, error: (0, errorMessages_1.getHumanReadableError)('track_not_found') };
+        }
+        if (!reason || reason.trim() === '') {
+            return { success: false, error: (0, errorMessages_1.getHumanReadableError)('rework_application_reason_required') };
+        }
+        const existingApps = this.store.getReworkApplicationsByApproval(approvalId);
+        const pendingApp = existingApps.find(a => a.status === 'pending_review');
+        if (pendingApp) {
+            return { success: false, error: (0, errorMessages_1.getHumanReadableError)('rework_application_already_exists') };
+        }
+        this.store.createReworkApplication({
+            approvalId,
+            trackId: approval.trackId,
+            reason,
+            appliedBy,
+            previousStatus: approval.status,
+            status: 'pending_review'
+        });
+        return { success: true };
+    }
+    approveReworkApplication(applicationId, approvedBy) {
+        const app = this.store.getReworkApplication(applicationId);
+        if (!app) {
+            return { success: false, error: (0, errorMessages_1.getHumanReadableError)('track_not_found') };
+        }
+        this.store.updateReworkApplication(applicationId, { status: 'approved' });
+        const snapshot = this.takeSnapshot(app.approvalId, approvedBy);
+        const oldStatus = app.previousStatus;
+        this.store.updateApprovalRecord(app.approvalId, {
+            status: types_1.ApprovalStatus.REWORK_REQUIRED
+        });
+        this.historyService.recordChange('approval_record', app.approvalId, 'status', oldStatus, types_1.ApprovalStatus.REWORK_REQUIRED, approvedBy, `返工申请已批准: ${app.reason}`, undefined, 'approval_record', app.approvalId, snapshot?.id);
+        return { success: true };
+    }
+    rejectReworkApplication(applicationId, rejectedBy) {
+        const app = this.store.getReworkApplication(applicationId);
+        if (!app) {
+            return { success: false, error: (0, errorMessages_1.getHumanReadableError)('track_not_found') };
+        }
+        this.store.updateReworkApplication(applicationId, { status: 'rejected' });
+        return { success: true };
     }
     getCurrentStepInfo(approvalId) {
         const approval = this.store.getApprovalRecord(approvalId);
@@ -103,6 +210,12 @@ class WorkflowEngine {
             const hasReviewedPhoto = photos.some(p => p.reviewed);
             if (!hasReviewedPhoto) {
                 blockers.push((0, errorMessages_1.getHumanReadableError)('missing_checkin_photo'));
+            }
+        }
+        if (approval.currentStep === types_1.WorkflowStep.REHEARSAL_UPDATE && boundaryRules_1.BOUNDARY_RULES.workflow.requireRehearsalUpdate) {
+            const changes = this.store.getRehearsalChangesByTrack(approval.trackId);
+            if (changes.length === 0) {
+                blockers.push((0, errorMessages_1.getHumanReadableError)('missing_rehearsal_change'));
             }
         }
         const stepNames = {

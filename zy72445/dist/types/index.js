@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DisplayMode = exports.WorkflowStep = exports.ApprovalStatus = void 0;
+exports.ImportItemCategory = exports.DisplayMode = exports.WorkflowStep = exports.ApprovalStatus = void 0;
 var ApprovalStatus;
 (function (ApprovalStatus) {
     ApprovalStatus["PENDING"] = "pending";
@@ -22,4 +22,10 @@ var DisplayMode;
     DisplayMode["CHART"] = "chart";
     DisplayMode["THREE_D"] = "three_d";
 })(DisplayMode || (exports.DisplayMode = DisplayMode = {}));
+var ImportItemCategory;
+(function (ImportItemCategory) {
+    ImportItemCategory["NEW_RECORD"] = "new_record";
+    ImportItemCategory["THIS_TIME_DUPLICATE"] = "this_time_duplicate";
+    ImportItemCategory["HISTORICAL_DUPLICATE"] = "historical_duplicate";
+})(ImportItemCategory || (exports.ImportItemCategory = ImportItemCategory = {}));
 //# sourceMappingURL=index.js.map

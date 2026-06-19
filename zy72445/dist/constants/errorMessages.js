@@ -38,6 +38,26 @@ exports.errorMessages = {
     'cannot_rollback_normal': {
         message: '已标记为"正常"的记录无法直接回滚',
         suggestion: '如需修改请使用"申请返工"功能，由版权运营复核后处理'
+    },
+    'rollback_no_snapshot': {
+        message: '没有可用的快照，无法回滚',
+        suggestion: '该记录没有历史快照，无法恢复到之前版本'
+    },
+    'rework_application_already_exists': {
+        message: '该审批已有一条待审核的返工申请',
+        suggestion: '请等待版权运营小鹿处理现有申请后再提交新申请'
+    },
+    'rework_application_rejected': {
+        message: '返工申请已被驳回',
+        suggestion: '请联系版权运营小鹿了解驳回原因，修改后重新提交'
+    },
+    'missing_rehearsal_change': {
+        message: '还没有添加排练变更记录',
+        suggestion: '请先添加排练变更记录，再推进到下一步'
+    },
+    'rework_application_reason_required': {
+        message: '申请返工必须填写原因',
+        suggestion: '请说明为什么需要对已完成的审批重新返工'
     }
 };
 function getHumanReadableError(errorCode, fieldName) {

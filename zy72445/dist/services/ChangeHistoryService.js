@@ -6,7 +6,7 @@ class ChangeHistoryService {
     constructor() {
         this.store = DataStore_1.DataStore.getInstance();
     }
-    recordChange(entityType, entityId, fieldName, oldValue, newValue, changedBy, changeReason) {
+    recordChange(entityType, entityId, fieldName, oldValue, newValue, changedBy, changeReason, importBatchId, affectedEntityType, affectedEntityId, snapshotId) {
         return this.store.addChangeHistory({
             entityType,
             entityId,
@@ -14,7 +14,11 @@ class ChangeHistoryService {
             oldValue,
             newValue,
             changedBy,
-            changeReason
+            changeReason,
+            importBatchId,
+            affectedEntityType,
+            affectedEntityId,
+            snapshotId
         });
     }
     getHistoryForTrackRemark(remarkId) {
@@ -26,15 +30,27 @@ class ChangeHistoryService {
     getHistoryForTrackAlias(aliasId) {
         return this.store.getChangeHistoryByEntity('track_alias', aliasId);
     }
+    getHistoryByImportBatch(importBatchId) {
+        return this.store.getChangeHistoryByBatch(importBatchId);
+    }
+    getHistoryByAffectedEntity(entityType, entityId) {
+        return this.store.getChangeHistoryByAffectedEntity(entityType, entityId);
+    }
     getDiffForEntity(entityType, entityId) {
         const histories = this.store.getChangeHistoryByEntity(entityType, entityId);
         return histories.map(h => ({
+            entityType: h.entityType,
+            entityId: h.entityId,
             fieldName: h.fieldName,
             oldValue: h.oldValue,
             newValue: h.newValue,
             changedBy: h.changedBy,
             changedAt: h.changedAt,
-            changeReason: h.changeReason
+            changeReason: h.changeReason,
+            importBatchId: h.importBatchId,
+            affectedEntityType: h.affectedEntityType,
+            affectedEntityId: h.affectedEntityId,
+            snapshotId: h.snapshotId
         }));
     }
     compareFieldChanges(entityType, entityId, fieldName) {
@@ -45,7 +61,8 @@ class ChangeHistoryService {
             oldValue: h.oldValue,
             newValue: h.newValue,
             changedBy: h.changedBy,
-            changedAt: h.changedAt
+            changedAt: h.changedAt,
+            importBatchId: h.importBatchId
         }));
     }
 }

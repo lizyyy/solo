@@ -1,5 +1,5 @@
 import { ImportTrackData } from './ImportService';
-import { WorkflowStep, DisplayMode, HumanReadableError, ApprovalRecord, TrackRemark, ClassCheckinPhoto, RehearsalChangeRecord } from '../types';
+import { WorkflowStep, DisplayMode, HumanReadableError, ApprovalRecord, TrackRemark, ClassCheckinPhoto, RehearsalChangeRecord, ReworkApplication, ChangeHistory } from '../types';
 export declare class ApprovalService {
     private store;
     private importService;
@@ -29,6 +29,25 @@ export declare class ApprovalService {
         record?: ApprovalRecord;
         error?: HumanReadableError;
     };
+    rollback(approvalId: string, operator: string, reason: string): {
+        success: boolean;
+        record?: ApprovalRecord;
+        restoredRemarks?: number;
+        error?: HumanReadableError;
+    };
+    applyForRework(approvalId: string, reason: string, appliedBy: string): {
+        success: boolean;
+        error?: HumanReadableError;
+    };
+    approveReworkApplication(applicationId: string, approvedBy: string): {
+        success: boolean;
+        error?: HumanReadableError;
+    };
+    rejectReworkApplication(applicationId: string, rejectedBy: string): {
+        success: boolean;
+        error?: HumanReadableError;
+    };
+    getReworkApplications(approvalId: string): ReworkApplication[];
     getWorkflowStepInfo(approvalId: string): {
         step: WorkflowStep;
         stepName: string;
@@ -50,14 +69,22 @@ export declare class ApprovalService {
         context?: import("./DisplayModeService").NavigationContext;
         error?: HumanReadableError;
     };
-    getChangeHistory(entityType: 'track_alias' | 'track_remark' | 'approval_record', entityId: string): {
+    getChangeHistory(entityType: 'track_alias' | 'track_remark' | 'approval_record' | 'rehearsal_change', entityId: string): {
+        entityType: ChangeHistory["entityType"];
+        entityId: string;
         fieldName: string;
         oldValue: string;
         newValue: string;
         changedBy: string;
         changedAt: string;
         changeReason?: string;
+        importBatchId?: string;
+        affectedEntityType?: "approval_record" | "track_alias";
+        affectedEntityId?: string;
+        snapshotId?: string;
     }[];
+    getChangeHistoryByBatch(importBatchId: string): ChangeHistory[];
+    getChangeHistoryByAffected(entityType: 'approval_record' | 'track_alias', entityId: string): ChangeHistory[];
     getApprovalRecord(approvalId: string): ApprovalRecord | undefined;
     getApprovalByTrackId(trackId: string): ApprovalRecord | undefined;
     getAllApprovals(): ApprovalRecord[];
