@@ -112,7 +112,14 @@ async function loadComparison() {
     };
     
     results.forEach((r, idx) => {
-        const typeKey = ['normal', 'gap', 'old'][idx] || 'normal';
+        let typeKey;
+        if (r.has_gap) {
+            typeKey = 'gap';
+        } else if (r.is_old_caliber) {
+            typeKey = 'old';
+        } else {
+            typeKey = 'normal';
+        }
         const type = types[typeKey];
         
         const extraInfo = [];
@@ -373,6 +380,25 @@ async function viewLedger(id) {
             </div>
         </div>
     `;
+    
+    const screenshots = record.screenshots || [];
+    const screenshotsHtml = screenshots.length > 0 ? screenshots.map(s => `
+        <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <span class="badge badge-info">📸 截图 #${s.id}</span>
+                <strong>${s.description || '旧公式截图'}</strong>
+                <span style="margin-left: auto; font-size: 12px; color: #6b7280;">上传人: ${s.uploaded_by} | ${formatDate(s.created_at)}</span>
+            </div>
+            <div style="font-family: monospace; background: white; padding: 8px; border-radius: 4px; color: #7c3aed;">
+                📐 ${s.formula_content || '-'}
+            </div>
+        </div>
+    `).join('') : '<p style="color: #6b7280; padding: 12px;">暂无关联截图</p>';
+    
+    const screenshotsSection = document.getElementById('detail-screenshots');
+    if (screenshotsSection) {
+        screenshotsSection.innerHTML = screenshotsHtml;
+    }
     
     const reviewsDiv = document.getElementById('detail-reviews');
     const reviews = record.reviews || [];

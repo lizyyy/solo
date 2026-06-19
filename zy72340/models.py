@@ -437,6 +437,8 @@ class LedgerRecord:
         has_suspended_pv = any(pv.get('is_suspended') for pv in versions)
         record['is_suspended'] = has_suspended or has_suspended_pv or (record.get('review_status') == 'pending_review')
         
+        record['latest_version'] = max((pv['version_no'] for pv in versions), default=None)
+        
         summary_items = {
             'total': len(record['items']) + len(record['deleted_items']),
             'active': len(record['items']),
@@ -646,6 +648,13 @@ class LedgerRecord:
             WHERE ledger_id = ? AND is_suspended = 1
         ''', (operator, ledger_id))
         
+        if new_status != 'pending_review' and new_status != 'suspended':
+            c.execute('''
+                UPDATE param_versions
+                SET is_suspended = 0
+                WHERE ledger_id = ? AND is_suspended = 1
+            ''', (ledger_id,))
+        
         c.execute('''
             INSERT INTO history_logs (ledger_id, change_trace_id, action, 
                                      detail_json, operator)
@@ -803,7 +812,7 @@ class LedgerRecord:
             writer.writerow([])
             
             writer.writerow(['八、参数版本历史'])
-            writer.writerow(['版本', '斜率', '截距', 'R²', '变更类型', '说明', '暂停', '暂停说明', '操作人', '时间'])
+            writer.writerow(['版本', '斜率', '截距', 'R²', '变更类型', '说明', '暂停', '暂停说明', '下一步找谁', '操作人', '时间'])
             for pv in record.get('param_versions', []):
                 p = pv.get('params') or {}
                 writer.writerow([
@@ -815,6 +824,7 @@ class LedgerRecord:
                     clean_val(pv.get('change_note')),
                     '是' if pv.get('is_suspended') else '否',
                     clean_val(pv.get('suspension_note')),
+                    clean_val(pv.get('next_handler')),
                     pv.get('created_by'),
                     pv.get('created_at')
                 ])

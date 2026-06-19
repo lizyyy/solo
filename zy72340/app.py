@@ -115,6 +115,13 @@ def add_screenshot(ledger_id):
         operator=data.get('uploaded_by', 'admin')
     )
     
+    conn = models.get_conn()
+    c = conn.cursor()
+    c.execute('UPDATE ledger_records SET formula_screenshot_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', 
+              (new_id, ledger_id))
+    conn.commit()
+    conn.close()
+    
     return jsonify({'id': new_id, 'status': 'success'})
 
 @app.route('/api/ledgers/<int:ledger_id>/param-versions', methods=['GET'])
@@ -283,6 +290,17 @@ def init_demo_data():
         items=demo_items_gap,
         created_by=operator
     )
+    models.HistoryLog.create(ledger_2_id, '第一步：导入评分权重表',
+                            {'weight_table_id': wt_id_v2, 'version': 'v2.0'},
+                            operator)
+    fs_id_2 = models.FormulaScreenshot.create(
+        ledger_2_id, '2025旧公式截图（断档记录关联）',
+        'y = 1.05x + 0.98 (2025赛季)',
+        operator
+    )
+    models.HistoryLog.create(ledger_2_id, '第二步：唐老师补看旧公式截图',
+                            {'screenshot_id': fs_id_2, 'formula': 'y = 1.05x + 0.98'},
+                            operator)
     record2 = models.LedgerRecord.get(ledger_2_id)
     if record2 and len(record2['items']) >= 3:
         item_to_delete = record2['items'][2]['id']
@@ -322,8 +340,17 @@ def init_demo_data():
         operator, wt_id, fs_id_3
     )
     
+    conn = models.get_conn()
+    c = conn.cursor()
+    c.execute('UPDATE ledger_records SET formula_screenshot_id = ? WHERE id = ?', (fs_id_1, ledger_1_id))
+    c.execute('UPDATE ledger_records SET formula_screenshot_id = ? WHERE id = ?', (fs_id_2, ledger_2_id))
+    c.execute('UPDATE ledger_records SET formula_screenshot_id = ? WHERE id = ?', (fs_id_3, ledger_3_id))
+    conn.commit()
+    conn.close()
+    
     models.run_calculation(ledger_1_id, operator)
     models.run_calculation(ledger_3_id, operator)
+    models.run_calculation(ledger_2_id, operator)
     
     return jsonify({
         'status': 'success',
