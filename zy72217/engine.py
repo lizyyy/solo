@@ -16,7 +16,7 @@ class SelfCheckEngine:
         return {
             'check_name': '重复导入检测',
             'passed': not is_duplicate,
-            'message': '文件已导入过' if is_duplicate else '无重复导入',
+            'message': f'{file_name} 已导入过，本次未写入明细' if is_duplicate else '无重复导入',
             'level': 'error' if is_duplicate else 'info'
         }
 

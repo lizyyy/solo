@@ -63,7 +63,13 @@ class DataStore:
             1 for record in self._import_history
             if record['file_name'] == file_name and record['warning_id'] == warning_id
         )
-        return count > 1
+        return count >= 1
+
+    def get_import_count(self, file_name: str, warning_id: str) -> int:
+        return sum(
+            1 for record in self._import_history
+            if record['file_name'] == file_name and record['warning_id'] == warning_id
+        )
 
 
 store = DataStore()
