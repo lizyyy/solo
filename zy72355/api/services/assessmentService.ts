@@ -206,18 +206,26 @@ export async function updateRemark(
     currentBoundaryFlag = refreshed.boundary_flag
 
     let newStatus = existing.status
+    const remarkChanged = remark !== existing.remark
     if (existing.status === '待补看') {
       newStatus = currentBoundaryFlag ? '待实验老师复核' : '已补看'
-    } else if (existing.status === '退回' && remark !== existing.remark) {
+    } else if (existing.status === '退回' && remarkChanged) {
+      newStatus = currentBoundaryFlag ? '待实验老师复核' : '已补看'
+    } else if (existing.status === '待实验老师复核' && remarkChanged) {
       newStatus = currentBoundaryFlag ? '待实验老师复核' : '已补看'
     }
 
     if (newStatus !== existing.status) {
       const statusReason = currentBoundaryFlag
-        ? '质检员补看备注后，检测到非标方向，状态进入待实验老师复核（不提前归正常）'
+        ? '质检员补看备注后，仍存在非标方向，保持待实验老师复核（不提前归正常）'
         : '质检员补看备注完成，状态更新为已补看'
       recordChangeSync(itemId, 'status', existing.status, newStatus, operator, statusReason)
       changes.push({ field: 'status', old: existing.status, new: newStatus })
+    } else if (remarkChanged && existing.status === '待实验老师复核' && currentBoundaryFlag) {
+      recordChangeSync(
+        itemId, 'status', existing.status, newStatus, operator,
+        '质检员补录了手写巡检备注，边界标记仍在，状态保持待实验老师复核（不提前归正常）',
+      )
     }
 
     db.prepare(`UPDATE assessment_items SET remark = ?, status = ?, updated_at = datetime('now', 'localtime') WHERE id = ?`)

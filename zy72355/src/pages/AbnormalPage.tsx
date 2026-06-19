@@ -164,7 +164,9 @@ export default function AbnormalPage() {
                       <td className="px-4 py-3 text-zinc-600 max-w-xs" title={item.remark}>
                         {item.remark
                           ? <span className="inline-block max-w-xs truncate">{item.remark}</span>
-                          : <span className="text-zinc-300">—</span>
+                          : <span className={item.status === '待实验老师复核' ? 'text-amber-500 text-xs' : 'text-zinc-300'}>
+                              {item.status === '待实验老师复核' ? '⚠ 质检员未补' : '—'}
+                            </span>
                         }
                       </td>
                       <td className="px-4 py-3">
@@ -310,7 +312,10 @@ export default function AbnormalPage() {
                 </div>
               )}
               <div className="flex"><span className="w-20 text-zinc-400 shrink-0">巡检备注：</span>
-                <span className="text-zinc-700 break-all">{reviewingItem.remark || '（无）'}</span>
+                {reviewingItem.remark
+                  ? <span className="text-zinc-700 break-all">{reviewingItem.remark}</span>
+                  : <span className="text-amber-600">（质检员尚未补录手写巡检备注）</span>
+                }
               </div>
               {reviewingItem.review_reason && (
                 <div className="flex"><span className="w-20 text-zinc-400 shrink-0">历史原因：</span>

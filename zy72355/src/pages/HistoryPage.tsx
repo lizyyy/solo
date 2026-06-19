@@ -176,7 +176,7 @@ export default function HistoryPage() {
           <li>所有改动均保留：原始行号、改前值、改后值、改动人、时间、处理原因</li>
           <li>人工复核项额外保留：原始说法（raw_direction_original）、改后值（direction）、处理原因（review_reason）、下一步责任人（review_by）</li>
           <li>边界命中（如"向左"）不归入正常，必须实验老师人工判定后才能进入"归正常"状态</li>
-          <li>列表、详情、异常表、摘要、导出/报告均读取同一条记录的最新数据，与变更历史完全一致</li>
+          <li>列表、详情、异常工况表、摘要卡片、历史记录均读取同一条记录的最新数据，与变更历史完全一致</li>
         </ul>
       </div>
     </div>

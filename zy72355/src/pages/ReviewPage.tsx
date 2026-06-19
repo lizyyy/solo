@@ -25,7 +25,12 @@ export default function ReviewPage() {
     }
   }, [selected?.id])
 
-  const pendingItems = items.filter(i => i.status === '待补看' || i.status === '退回')
+  const needsRemark = (i: AssessmentItem) => !i.remark || i.remark.trim().length === 0
+  const pendingItems = items.filter(i =>
+    i.status === '待补看' ||
+    i.status === '退回' ||
+    (i.status === '待实验老师复核' && needsRemark(i))
+  )
 
   const checkBoundary = (dir: string) => {
     return boundaryRules.some(r => dir.includes(r.pattern))
@@ -68,14 +73,14 @@ export default function ReviewPage() {
     <div className="p-8">
       <div className="mb-6">
         <h1 className="text-xl font-bold text-zinc-800">巡检备注补看</h1>
-        <p className="text-sm text-zinc-500 mt-1">第 2 / 3 步：质检员逐条补看手写巡检备注，对照原始行号补全。保存后列表、详情、历史、异常表同步更新同一份数据。</p>
+        <p className="text-sm text-zinc-500 mt-1">第 2 / 3 步：质检员逐条补看手写巡检备注，对照原始行号补全。含"向左/向右"等非标方向、导入即进入待复核但备注为空的记录，也会出现在此处等待补录。保存后列表、详情、历史、异常工况表同步更新同一份数据。</p>
       </div>
 
       <div className="flex gap-6">
         <div className="w-80 shrink-0">
           <div className="bg-white rounded-lg border border-zinc-200 overflow-hidden">
             <div className="px-4 py-3 border-b border-zinc-100 bg-zinc-50">
-              <span className="text-sm font-medium text-zinc-700">待补看列表 ({pendingItems.length})</span>
+              <span className="text-sm font-medium text-zinc-700">待补看 / 待复核空备注 ({pendingItems.length})</span>
             </div>
             <div className="max-h-[60vh] overflow-auto">
               {pendingItems.length === 0 ? (
@@ -100,6 +105,7 @@ export default function ReviewPage() {
                     <div className="text-xs flex items-center gap-1 text-zinc-400 mt-1">
                       <FileText size={11} />
                       备注：{item.remark ? '已补' : '未补'}
+                      {item.status === '待实验老师复核' && needsRemark(item) && <span className="text-amber-600 font-medium">· 待复核（先补备注）</span>}
                       {item.direction && ` · 方向：${item.direction}`}
                     </div>
                   </div>
