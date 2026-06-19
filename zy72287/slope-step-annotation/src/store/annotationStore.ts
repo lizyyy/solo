@@ -47,10 +47,12 @@ function createEmptyAnnotation(): SlopeStepAnnotation {
 
 const COORD_METRIC_PATTERN = /[xXyY]\s*[:=]\s*[\d.]+/
 const COORD_LNG_LAT_PATTERN = /(?:经度|纬度|lng|lat|longitude|latitude)\s*[:/=：]\s*[\d.]+/i
+const LNG_LAT_COMPOUND_PATTERN = /(经度\s*\/\s*纬度|纬度\s*\/\s*经度)\s*[:=：]\s*([\d.]+)\s*\/\s*([\d.]+)/i
 
 function parseCoord(raw: string): CoordValue {
   const hasMetric = COORD_METRIC_PATTERN.test(raw)
-  const hasLngLat = COORD_LNG_LAT_PATTERN.test(raw)
+  const hasLngLat =
+    COORD_LNG_LAT_PATTERN.test(raw) || LNG_LAT_COMPOUND_PATTERN.test(raw)
 
   const isMixed = hasMetric && hasLngLat
   let mixedDetail: string | undefined
@@ -65,10 +67,24 @@ function parseCoord(raw: string): CoordValue {
     mixedDetail,
   }
 
-  const lngMatch = raw.match(/(?:经度|lng|longitude)\s*[:/=：]\s*([\d.]+)/i)
-  const latMatch = raw.match(/(?:纬度|lat|latitude)\s*[:/=：]\s*([\d.]+)/i)
-  if (lngMatch) coord.lng = parseFloat(lngMatch[1])
-  if (latMatch) coord.lat = parseFloat(latMatch[1])
+  const compoundMatch = raw.match(LNG_LAT_COMPOUND_PATTERN)
+  if (compoundMatch) {
+    const firstIsLng = /^经度/.test(compoundMatch[1])
+    const firstVal = parseFloat(compoundMatch[2])
+    const secondVal = parseFloat(compoundMatch[3])
+    if (firstIsLng) {
+      coord.lng = firstVal
+      coord.lat = secondVal
+    } else {
+      coord.lat = firstVal
+      coord.lng = secondVal
+    }
+  } else {
+    const lngMatch = raw.match(/(?:经度|lng|longitude)\s*[:=：]\s*([\d.]+)/i)
+    const latMatch = raw.match(/(?:纬度|lat|latitude)\s*[:=：]\s*([\d.]+)/i)
+    if (lngMatch) coord.lng = parseFloat(lngMatch[1])
+    if (latMatch) coord.lat = parseFloat(latMatch[1])
+  }
 
   const xMatch = raw.match(/[xX]\s*[:=]\s*([\d.]+)/)
   const yMatch = raw.match(/[yY]\s*[:=]\s*([\d.]+)/)
