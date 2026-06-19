@@ -150,6 +150,15 @@ class DataImporter:
             )
 
         self._calculate_residuals(record, trigger=f"首次导入:{source_name}")
+        if record.regression_params:
+            record.regression_params_history.append(
+                {
+                    "params_version": record.params_version,
+                    "snapshot_time": datetime.now().isoformat(),
+                    "params": record.regression_params.copy(),
+                    "trigger": f"首次导入:{source_name}",
+                }
+            )
         self.storage.save_record(record)
         return record, False
 
@@ -196,6 +205,14 @@ class DataImporter:
         version_before = record.params_version
         self._calculate_residuals(record, trigger=trigger or f"手动触发重算")
         record.params_version += 1
+        record.regression_params_history.append(
+            {
+                "params_version": record.params_version,
+                "snapshot_time": datetime.now().isoformat(),
+                "params": record.regression_params.copy() if record.regression_params else {},
+                "trigger": trigger or "手动触发残差重算",
+            }
+        )
 
         record.add_change_log(
             ChangeLogEntry(

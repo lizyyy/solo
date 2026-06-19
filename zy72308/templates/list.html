@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>复盘记录列表</h1>
+
+<div class="card" id="upload">
+  <h2>导入 CSV / Excel（多源字段自动归一：x/X/自变量/x值；y/Y/因变量/y值/label 等）</h2>
+  <form method="post" action="/api/import" enctype="multipart/form-data" id="uploadForm">
+    <div class="row">
+      <input type="file" name="file" accept=".csv,.xlsx,.xls" required>
+      <input type="text" name="author" placeholder="操作人（默认阿岚）" value="阿岚" style="width:160px">
+      <input type="text" name="source_name" placeholder="源名称（可选）" style="width:200px">
+      <button type="submit">导入并开始复盘</button>
+    </div>
+    <div class="muted" style="margin-top:8px">支持 .csv / .xlsx / .xls；列名中英文均可自动识别。</div>
+  </form>
+</div>
+
+<div class="card">
+  <h2>已导入记录（与接口 /api/records 同源）</h2>
+  {% if records %}
+  <table>
+    <thead>
+      <tr>
+        <th>导入ID</th><th>源文件</th><th>状态</th>
+        <th>总数/有效/断档/待复核</th><th>参数版本</th><th>一致性校验</th><th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for d in records %}
+      <tr>
+        <td><code>{{ d['导入ID'] }}</code></td>
+        <td>{{ d['源文件'] }}</td>
+        <td>{{ d['状态'] }}</td>
+        <td>{{ d['总行数'] }} / {{ d['有效行数'] }} / {{ d['断档行数'] }} / {{ d['待复核行数'] }}</td>
+        <td>v{{ d['参数版本'] }}</td>
+        <td class="muted">{{ d['数据一致性校验'] }}</td>
+        <td>
+          <a class="btn" href="/record/{{ d['导入ID'] }}">查看详情</a>
+          <a class="btn secondary" href="/record/{{ d['导入ID'] }}/params">参数版本</a>
+          <a class="btn success" href="/api/records/{{ d['导入ID'] }}">JSON接口</a>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p class="muted">暂无记录，先从上方导入一份 CSV/Excel。</p>
+  {% endif %}
+</div>
+
+<script>
+document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const fd = new FormData(form);
+  const r = await fetch(form.action, { method:'POST', body: fd });
+  const j = await r.json();
+  if (j.error) { alert(j.error); return; }
+  window.location.href = j.display_url || `/record/${j.import_id}`;
+});
+</script>
+
+{% endblock %}

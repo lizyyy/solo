@@ -32,6 +32,7 @@ class UnifiedExporter:
                     "残差": round(row.residual, 6) if row.residual is not None else None,
                     "状态": row.status.value,
                     "状态说明": self._status_description(row.status.value),
+                    "状态标签": self._status_label(row.status.value),
                     "是否参与计算": "是" if is_valid else "否",
                     "删除时间": row.deleted_at.isoformat() if row.deleted_at else None,
                     "补录时间": row.supplemented_at.isoformat() if row.supplemented_at else None,
@@ -66,15 +67,16 @@ class UnifiedExporter:
             "断档行数": len(gap_rows),
             "待复核行数": len(pending_rows),
             "已复核行数": len(reviewed_rows),
-            "回归参数": record.regression_params,
-            "参数历史快照": record.regression_params_history,
-            "变更历史": [c.to_dict() for c in record.change_log],
+            "回归参数": self._normalize_regression_params(record.regression_params),
+            "参数历史快照": self._normalize_params_history(record.regression_params_history),
+            "变更历史": self._normalize_change_log(record.change_log),
             "行明细": row_details,
             "待处理摘要": {
                 "gap": [
                     {
                         "原始行号": r.original_line_no,
                         "状态": r.status.value,
+                        "状态标签": self._status_label(r.status.value),
                         "原始值": [r.original_x_value, r.original_y_value],
                         "当前值": [r.x_value, r.y_value],
                         "下一步处理人": r.next_owner,
@@ -86,6 +88,7 @@ class UnifiedExporter:
                     {
                         "原始行号": r.original_line_no,
                         "状态": r.status.value,
+                        "状态标签": self._status_label(r.status.value),
                         "原始值": [r.original_x_value, r.original_y_value],
                         "当前值": [r.x_value, r.y_value],
                         "下一步处理人": r.next_owner,
@@ -105,6 +108,78 @@ class UnifiedExporter:
             },
         }
         return summary
+
+    def _status_label(self, status: str) -> str:
+        mapping = {
+            "normal": "正常",
+            "deleted": "已删除",
+            "gap": "断档（缺失）",
+            "supplemented": "补录",
+            "pending_review": "待复核",
+            "reviewed": "已复核",
+            "modified": "已修正",
+        }
+        return mapping.get(status, status)
+
+    def _normalize_regression_params(self, params):
+        if not params:
+            return {}
+        p = dict(params)
+        if "r_squared" in p and "r2_score" not in p:
+            p["r2_score"] = p["r_squared"]
+        if "valid_rows_count" in p and "n_samples" not in p:
+            p["n_samples"] = p["valid_rows_count"]
+        if "total_rows" in p and "sample_count" not in p:
+            p["sample_count"] = p["total_rows"]
+        return p
+
+    def _normalize_params_history(self, history):
+        out = []
+        for snap in history or []:
+            entry = {
+                "版本": snap.get("params_version"),
+                "时间": snap.get("snapshot_time"),
+                "触发原因": snap.get("trigger"),
+            }
+            pp = snap.get("params") or {}
+            entry.update(self._normalize_regression_params(pp))
+            for k, v in pp.items():
+                if k not in entry:
+                    entry[k] = v
+            out.append(entry)
+        return out
+
+    def _normalize_change_log(self, change_log):
+        type_label = {
+            "import": "导入", "delete": "删除", "supplement": "补录",
+            "modify": "修正", "annotate": "批注", "review": "复核",
+            "recalc": "重算", "param_update": "参数更新",
+        }
+        out = []
+        for c in change_log:
+            raw = c if isinstance(c, dict) else c.to_dict()
+            ov = None
+            if raw.get("original_value_x") is not None:
+                ov = (raw.get("original_value_x"), raw.get("original_value_y"))
+            nv = None
+            if raw.get("new_value_x") is not None:
+                nv = (raw.get("new_value_x"), raw.get("new_value_y"))
+            out.append({
+                "时间": raw.get("timestamp"),
+                "类型": type_label.get(raw.get("change_type"), raw.get("change_type")),
+                "类型代码": raw.get("change_type"),
+                "行号": raw.get("original_line_no"),
+                "操作人": raw.get("author"),
+                "原始值": ov,
+                "新值": nv,
+                "原始状态": raw.get("original_status"),
+                "新状态": raw.get("new_status"),
+                "原因": raw.get("reason"),
+                "下一步": raw.get("next_action"),
+                "原版本": raw.get("params_version_before"),
+                "新版本": raw.get("params_version_after"),
+            })
+        return out
 
     def _status_description(self, status: str) -> str:
         mapping = {
@@ -214,9 +289,11 @@ class UnifiedExporter:
             lines.append("参数历史快照 (共{}个版本):".format(len(data["参数历史快照"])))
             for snap in data["参数历史快照"]:
                 lines.append(
-                    f"  v{snap['params_version']} @ {snap['snapshot_time']} | trigger={snap['trigger']}"
+                    f"  v{snap['版本']} @ {snap['时间']} | trigger={snap.get('触发原因', '')}"
                 )
-                for pk, pv in snap["params"].items():
+                for pk, pv in snap.items():
+                    if pk in ("版本", "时间", "触发原因"):
+                        continue
                     lines.append(f"    {pk}: {pv}")
             lines.append("-" * 72)
 
@@ -247,25 +324,19 @@ class UnifiedExporter:
         if data["变更历史"]:
             lines.append("变更历史 (共{}条):".format(len(data["变更历史"])))
             for ch in data["变更历史"]:
-                who = ch["author"]
-                when = ch["timestamp"]
-                ct = ch["change_type"]
-                line = ch["original_line_no"]
-                reason = ch["reason"]
-                next_act = ch["next_action"]
+                who = ch["操作人"]
+                when = ch["时间"]
+                ct = ch["类型"]
+                line = ch["行号"]
+                reason = ch["原因"] or ""
+                next_act = ch["下一步"] or ""
                 lines.append(f"  [{when}] {ct} @ 行{line} | 操作人:{who}")
-                if ch["original_value_x"] is not None:
-                    lines.append(
-                        f"    原值({ch['original_value_x']},{ch['original_value_y']}"
-                    )
-                if ch["new_value_x"] is not None:
-                    lines.append(
-                        f"    → 新值({ch['new_value_x']},{ch['new_value_y']})"
-                    )
-                if ch["original_status"] or ch["new_status"]:
-                    lines.append(
-                    f"    状态: {ch['original_status']} → {ch['new_status']}"
-                )
+                if ch.get("原始值"):
+                    lines.append(f"    原值({ch['原始值'][0]},{ch['原始值'][1]})")
+                if ch.get("新值"):
+                    lines.append(f"    → 新值({ch['新值'][0]},{ch['新值'][1]})")
+                if ch.get("原始状态") or ch.get("新状态"):
+                    lines.append(f"    状态: {ch.get('原始状态')} → {ch.get('新状态')}")
                 lines.append(f"    原因: {reason}")
                 if next_act:
                     lines.append(f"    下一步: {next_act}")
@@ -290,7 +361,7 @@ class UnifiedExporter:
                 f"{row['原始X值'] if row['原始X值'] is not None else '-':<10.2f}"
                 + f"{row['原始Y值'] if row['原始Y值'] is not None else '-':<10.2f} "
                 f"{row['当前X值']:<10.2f} {row['当前Y值']:<10.2f} {residual:<12} "
-                f"{row['状态']:<14} {row['下一步处理人']:<10}"
+                f"{row['状态标签']:<14} {row['下一步处理人']:<10}"
             )
         lines.append("=" * 72)
 

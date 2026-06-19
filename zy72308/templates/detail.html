@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>复盘详情 - <code>{{ import_id }}</code> &nbsp;
+  <a class="btn secondary" href="/">← 返回列表</a>
+  <a class="btn" href="/record/{{ import_id }}/params">参数版本页 →</a>
+  <a class="btn success" href="/api/records/{{ import_id }}">JSON接口</a>
+</h1>
+
+<div class="card">
+  <h2>概览（与 API / 导出同源）</h2>
+  <div class="grid-2">
+    <div>
+      <div><strong>源文件</strong>：{{ data['源文件'] }}</div>
+      <div><strong>状态</strong>：{{ data['状态'] }} <span class="tag normal">v{{ data['参数版本'] }}</span></div>
+      <div><strong>创建人</strong>：{{ data['创建人'] }}</div>
+      <div><strong>创建时间</strong>：{{ data['创建时间'] }}</div>
+    </div>
+    <div>
+      <div><strong>总行数/有效/断档/待复核</strong>：{{ data['总行数'] }} / {{ data['有效行数'] }} / {{ data['断档行数'] }} / {{ data['待复核行数'] }}</div>
+      <div><strong>回归参数</strong>：slope={{ '%.6f'|format(data['回归参数']['slope']) }}, intercept={{ '%.6f'|format(data['回归参数']['intercept']) }}, R²={{ '%.6f'|format(data['回归参数']['r2_score']) }}</div>
+      <div><strong>字段映射</strong>：{{ data['字段映射'] }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>操作（保存后自动重算 + 页面同步刷新）</h2>
+  <div class="row">
+    <form id="recalcForm">
+      <input type="hidden" name="import_id" value="{{ import_id }}">
+      <button type="submit">重新计算残差</button>
+    </form>
+
+    <a class="btn secondary" href="/api/records/{{ import_id }}/export/json">导出 JSON</a>
+    <a class="btn secondary" href="/api/records/{{ import_id }}/export/csv">导出 CSV 明细</a>
+    <a class="btn secondary" href="/api/records/{{ import_id }}/export/changelog_csv">导出 CSV 变更历史</a>
+    <a class="btn secondary" href="/api/records/{{ import_id }}/export/report">导出 TXT 摘要报告</a>
+    <a class="btn success" href="/api/records/{{ import_id }}/export_all">一键导出全部</a>
+  </div>
+</div>
+
+<div class="card">
+  <h2>补录表单</h2>
+  <form id="suppForm" class="row">
+    <input type="number" step="any" name="line_no" placeholder="行号" required>
+    <input type="number" step="any" name="x_value" placeholder="x 值" required>
+    <input type="number" step="any" name="y_value" placeholder="y 值" required>
+    <input type="text" name="reason" placeholder="处理原因" style="width:220px">
+    <input type="text" name="author" placeholder="操作人" value="阿岚" style="width:120px">
+    <button type="submit" class="success">保存并自动重算</button>
+  </form>
+  <div class="muted">补录后状态为 <code>pending_review</code>（待复核），不提前参与残差计算，待教研组通过后再纳入。</div>
+</div>
+
+<div class="card">
+  <h2>行明细（与 API / 导出 JSON/CSV/TXT 同源）</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>原始行号</th><th>当前行号</th><th>状态</th>
+        <th>原始X</th><th>当前X</th>
+        <th>原始Y</th><th>当前Y</th>
+        <th>预测值</th><th>残差</th>
+        <th>参与计算</th><th>批注</th>
+        <th>下一步/复核</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for r in data['行明细'] %}
+      {% set st = r['状态标签'] %}
+      <tr class="{% if st == '断档（缺失）' %}gap{% elif st == '待复核' %}pending{% elif '补录' in st or '已复核' in st or '已修正' in st %}supp{% endif %}">
+        <td>{{ r['原始行号'] }}</td>
+        <td>{{ r['当前行号'] or '-' }}</td>
+        <td><span class="tag {% if st=='正常' %}normal{% elif st=='断档（缺失）' %}gap{% elif st=='待复核' %}pending{% else %}supp{% endif %}">{{ st }}</span></td>
+        <td>{{ r['原始X值'] }}</td>
+        <td>{{ r['当前X值'] }}</td>
+        <td>{{ r['原始Y值'] }}</td>
+        <td>{{ r['当前Y值'] }}</td>
+        <td>{% if r['预测值'] != None %}{{ '%.4f'|format(r['预测值']) }}{% else %}-{% endif %}</td>
+        <td>{% if r['残差'] != None %}{{ '%.4f'|format(r['残差']) }}{% else %}-{% endif %}</td>
+        <td>{{ r['是否参与计算'] }}</td>
+        <td class="muted">{{ r['批注'] or '-' }}</td>
+        <td class="muted">
+          {% if r['下一步处理人'] %}→{{ r['下一步处理人'] }}{% endif %}
+          {% if r['复核人'] %}<div>复核：{{ r['复核人'] }} / {{ r['复核意见'] or '-' }}</div>{% endif %}
+        </td>
+        <td>
+          {% if st == '待复核' %}
+          <form class="inline" onsubmit="return approve({{ r['原始行号'] }}, true)">
+            <button type="submit" class="success" style="padding:4px 10px;">复核通过</button>
+          </form>
+          <form class="inline" onsubmit="return approve({{ r['原始行号'] }}, false)">
+            <button type="submit" class="danger" style="padding:4px 10px;">退回</button>
+          </form>
+          {% endif %}
+          <form class="inline" onsubmit="return del({{ r['原始行号'] }})">
+            <button type="submit" class="danger" style="padding:4px 10px;">删除</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>待处理摘要</h2>
+  <pre>{{ data['待处理摘要'] }}</pre>
+</div>
+
+<div class="card">
+  <h2>变更历史（所有 delete/supplement/review/recalc/annotate 记录，与 changelog CSV 同源）</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>时间</th><th>类型</th><th>行号</th><th>操作人</th>
+        <th>原值 → 新值</th><th>状态变化</th><th>原因</th><th>下一步</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for c in data['变更历史'] %}
+      <tr>
+        <td>{{ c['时间'] }}</td>
+        <td>{{ c['类型'] }}</td>
+        <td>{{ c['行号'] or '-' }}</td>
+        <td>{{ c['操作人'] }}</td>
+        <td>{{ c['原始值'] or '-' }} → {{ c['新值'] or '-' }}</td>
+        <td>{{ c['原始状态'] or '-' }} → {{ c['新状态'] }}</td>
+        <td class="muted">{{ c['原因'] or '-' }}</td>
+        <td class="muted">{{ c['下一步'] or '-' }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>数据一致性自校验（每次刷新/保存都会重新从磁盘读取同一份结果）</h2>
+  <pre>{{ data['数据一致性校验'] }}</pre>
+</div>
+
+<script>
+async function approve(line, ok) {
+  const comment = prompt(ok ? "复核意见（可留空）" : "退回原因");
+  const j = await postJSON(`/api/records/{{ import_id }}/review`, {
+    line_no: line, approve: ok, comment: comment || "", reviewer: "教研组（页面）"
+  });
+  if (j.error) alert(j.error); else window.location.reload();
+  return false;
+}
+async function del(line) {
+  if (!confirm("确认删除这一行？将作为断档保留原始值与历史。")) return false;
+  const reason = prompt("删除原因") || "人工删除";
+  const j = await postJSON(`/api/records/{{ import_id }}/delete_row`, {
+    line_no: line, reason, author: "页面操作"
+  });
+  if (j.error) alert(j.error); else window.location.reload();
+  return false;
+}
+document.getElementById('recalcForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const j = await postJSON(`/api/records/{{ import_id }}/recalc`, {
+    trigger: "详情页点击重算", author: "页面"
+  });
+  if (j.error) alert(j.error); else window.location.reload();
+});
+document.getElementById('suppForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const body = {
+    line_no: parseFloat(f.line_no.value),
+    x_value: parseFloat(f.x_value.value),
+    y_value: parseFloat(f.y_value.value),
+    reason: f.reason.value,
+    author: f.author.value,
+  };
+  const j = await postJSON(`/api/records/{{ import_id }}/supplement`, body);
+  if (j.error) alert(j.error); else window.location.reload();
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,152 @@
+{
+  "import_id": "IMP20260619152520",
+  "import_time": "2026-06-19T15:25:20.180534",
+  "source_file": "中文列名Excel",
+  "file_hash": "71beedb7d6fd27673246974de996a82f",
+  "status": "initial",
+  "total_rows": 3,
+  "rows": [
+    {
+      "original_line_no": 1,
+      "current_line_no": 1,
+      "x_value": 1.0,
+      "y_value": 2.2,
+      "status": "normal",
+      "original_x_value": 1.0,
+      "original_y_value": 2.2,
+      "residual": -0.0333333333333341,
+      "predicted": 2.2333333333333343,
+      "deleted_at": null,
+      "supplemented_at": null,
+      "reviewed_at": null,
+      "reviewed_by": "",
+      "review_comment": "",
+      "next_owner": "",
+      "notes": "",
+      "source_field_x": "自变量",
+      "source_field_y": "因变量",
+      "source_file_ref": "中文列名Excel"
+    },
+    {
+      "original_line_no": 2,
+      "current_line_no": 2,
+      "x_value": 2.0,
+      "y_value": 4.1,
+      "status": "normal",
+      "original_x_value": 2.0,
+      "original_y_value": 4.1,
+      "residual": 0.06666666666666643,
+      "predicted": 4.033333333333333,
+      "deleted_at": null,
+      "supplemented_at": null,
+      "reviewed_at": null,
+      "reviewed_by": "",
+      "review_comment": "",
+      "next_owner": "",
+      "notes": "",
+      "source_field_x": "自变量",
+      "source_field_y": "因变量",
+      "source_file_ref": "中文列名Excel"
+    },
+    {
+      "original_line_no": 3,
+      "current_line_no": 3,
+      "x_value": 3.0,
+      "y_value": 5.8,
+      "status": "normal",
+      "original_x_value": 3.0,
+      "original_y_value": 5.8,
+      "residual": -0.03333333333333233,
+      "predicted": 5.833333333333332,
+      "deleted_at": null,
+      "supplemented_at": null,
+      "reviewed_at": null,
+      "reviewed_by": "",
+      "review_comment": "",
+      "next_owner": "",
+      "notes": "",
+      "source_field_x": "自变量",
+      "source_field_y": "因变量",
+      "source_file_ref": "中文列名Excel"
+    }
+  ],
+  "annotations": [],
+  "regression_params": {
+    "slope": 1.7999999999999987,
+    "intercept": 0.4333333333333358,
+    "r_squared": 0.998972250770812,
+    "valid_rows_count": 3,
+    "total_rows": 3
+  },
+  "regression_params_history": [
+    {
+      "params_version": 1,
+      "snapshot_time": "2026-06-19T15:25:20.181259",
+      "params": {
+        "slope": 1.7999999999999987,
+        "intercept": 0.4333333333333358,
+        "r_squared": 0.998972250770812,
+        "valid_rows_count": 3,
+        "total_rows": 3
+      },
+      "trigger": "首次导入:中文列名Excel"
+    }
+  ],
+  "params_version": 1,
+  "change_log": [
+    {
+      "timestamp": "2026-06-19T15:25:20.180536",
+      "change_type": "import",
+      "original_line_no": 1,
+      "author": "阿岚",
+      "original_value_x": null,
+      "original_value_y": null,
+      "new_value_x": 1.0,
+      "new_value_y": 2.2,
+      "original_status": null,
+      "new_status": "normal",
+      "reason": "首次导入 中文列名Excel 第1行",
+      "next_action": "",
+      "params_version_before": null,
+      "params_version_after": null
+    },
+    {
+      "timestamp": "2026-06-19T15:25:20.180541",
+      "change_type": "import",
+      "original_line_no": 2,
+      "author": "阿岚",
+      "original_value_x": null,
+      "original_value_y": null,
+      "new_value_x": 2.0,
+      "new_value_y": 4.1,
+      "original_status": null,
+      "new_status": "normal",
+      "reason": "首次导入 中文列名Excel 第2行",
+      "next_action": "",
+      "params_version_before": null,
+      "params_version_after": null
+    },
+    {
+      "timestamp": "2026-06-19T15:25:20.180543",
+      "change_type": "import",
+      "original_line_no": 3,
+      "author": "阿岚",
+      "original_value_x": null,
+      "original_value_y": null,
+      "new_value_x": 3.0,
+      "new_value_y": 5.8,
+      "original_status": null,
+      "new_status": "normal",
+      "reason": "首次导入 中文列名Excel 第3行",
+      "next_action": "",
+      "params_version_before": null,
+      "params_version_after": null
+    }
+  ],
+  "field_mapping": {
+    "自变量": "x",
+    "因变量": "y"
+  },
+  "source_format": "xlsx",
+  "data_owner": "阿岚"
+}

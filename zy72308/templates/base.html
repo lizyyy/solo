@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>线性回归残差复盘</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; margin: 0; background:#f5f6f8; color:#1f2937; }
+  header { background:#1f2937; color:#fff; padding: 14px 24px; display:flex; align-items:center; justify-content:space-between; }
+  header a { color:#fff; text-decoration:none; margin-right:14px; font-size:14px; }
+  main { padding: 24px; max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 18px; }
+  .card { background:#fff; border:1px solid #e5e7eb; border-radius: 8px; padding:18px; margin-bottom:16px; }
+  .card h2 { font-size:16px; margin: 0 0 12px; color:#111827; }
+  table { width:100%; border-collapse: collapse; font-size:13px; }
+  th, td { border:1px solid #e5e7eb; padding: 8px 10px; text-align:left; }
+  th { background:#f9fafb; }
+  tr.gap td { background:#fef2f2; color:#991b1b; }
+  tr.pending td { background:#fffbeb; color:#92400e; }
+  tr.supp td { background:#ecfdf5; color:#065f46; }
+  button, .btn {
+    background:#2563eb; color:#fff; border:0; border-radius:6px; padding:8px 14px;
+    cursor:pointer; font-size:13px; text-decoration:none; display:inline-block;
+  }
+  button.secondary, .btn.secondary { background:#6b7280; }
+  button.danger, .btn.danger { background:#dc2626; }
+  button.success, .btn.success { background:#059669; }
+  button:disabled { opacity:.6; cursor:not-allowed; }
+  input, select, textarea {
+    border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-size:13px;
+  }
+  form.inline { display:inline; }
+  .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  .row > * { margin:4px 0; }
+  .muted { color:#6b7280; font-size:12px; }
+  .tag { display:inline-block; padding:2px 8px; border-radius:10px; font-size:12px; }
+  .tag.normal { background:#dbeafe; color:#1e40af; }
+  .tag.gap { background:#fee2e2; color:#991b1b; }
+  .tag.pending { background:#fef3c7; color:#92400e; }
+  .tag.supp { background:#d1fae5; color:#065f46; }
+  details { margin-top:8px; }
+  pre { background:#f3f4f6; padding:10px; border-radius:6px; overflow:auto; font-size:12px; }
+  .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+  @media (max-width: 800px) { .grid-2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <div><strong>线性回归残差复盘</strong></div>
+  <div>
+    <a href="/">记录列表</a>
+    <a href="/#upload">导入新数据</a>
+  </div>
+</header>
+<main>
+{% block content %}{% endblock %}
+</main>
+<script>
+async function postJSON(url, body) {
+  const r = await fetch(url, {
+    method:'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(body),
+  });
+  return await r.json();
+}
+async function refreshPage(url) {
+  // 简单起见刷新当前页面
+  if (!url) window.location.reload();
+  else window.location.href = url;
+}
+</script>
+</body>
+</html>

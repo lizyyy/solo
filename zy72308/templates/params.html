@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>参数版本页 - <code>{{ import_id }}</code> &nbsp;
+  <a class="btn secondary" href="/record/{{ import_id }}">← 返回详情</a>
+  <a class="btn success" href="/api/records/{{ import_id }}">JSON接口</a>
+</h1>
+
+<div class="card">
+  <h2>当前回归参数（与详情页 / JSON 接口同源）</h2>
+  <div class="grid-2">
+    <div>
+      <div><strong>参数版本</strong>：<span class="tag normal">v{{ data['参数版本'] }}</span></div>
+      <div><strong>slope</strong>：{{ '%.8f'|format(data['回归参数']['slope']) }}</div>
+      <div><strong>intercept</strong>：{{ '%.8f'|format(data['回归参数']['intercept']) }}</div>
+      <div><strong>R²</strong>：{{ '%.8f'|format(data['回归参数']['r2_score']) }}</div>
+      <div><strong>样本数</strong>：{{ data['回归参数']['n_samples'] }}</div>
+    </div>
+    <div>
+      <form id="paramForm">
+        <button type="submit" class="success" style="padding:10px 18px; font-size:15px;">
+          更新参数版本并重新计算残差
+        </button>
+        <div class="muted" style="margin-top:6px">
+          点击后：①参数版本号 +1，②快照旧参数到历史快照，③按当前有效行重新拟合残差，④刷新页面/API/导出全链路数据
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>参数历史快照（每次重算/更新都会新增一条，不可覆盖）</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>版本</th><th>时间</th><th>触发原因</th><th>slope</th><th>intercept</th><th>R²</th><th>样本数</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for p in data['参数历史快照'] %}
+      <tr>
+        <td>v{{ p['版本'] }}</td>
+        <td>{{ p['时间'] }}</td>
+        <td class="muted">{{ p['触发原因'] or '-' }}</td>
+        <td>{{ '%.6f'|format(p['slope']) }}</td>
+        <td>{{ '%.6f'|format(p['intercept']) }}</td>
+        <td>{{ '%.6f'|format(p['r2_score']) }}</td>
+        <td>{{ p['n_samples'] }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>参数一致性校验</h2>
+  <pre>{{ data['数据一致性校验'] }}</pre>
+</div>
+
+<script>
+document.getElementById('paramForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const j = await postJSON(`/api/records/{{ import_id }}/recalc`, {
+    trigger: "参数版本页点击『更新参数版本』", author: "参数页"
+  });
+  if (j.error) alert(j.error); else window.location.reload();
+});
+</script>
+
+{% endblock %}
