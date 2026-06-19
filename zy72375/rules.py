@@ -110,15 +110,16 @@ class BoundaryRuleEngine:
                     哈希值已存在于系统中
                 """,
                 action="""
-                    1. 不创建新的 UniformZoneRecord
-                    2. 对比新旧 raw_data，如有差异则更新 raw_data
-                    3. 只更新 import_batch_id 为最新批次
-                    4. 记录一条 MANUAL_EDIT 类型的历史变更
-                    5. 状态保持不变
+                    1. 不创建新的 UniformZoneRecord（防止数量翻倍）
+                    2. 保留首次导入的 import_batch_id 不变
+                    3. 将重复导入的批次号追加到 duplicate_import_batches
+                    4. 对比新旧 raw_data，如有差异则更新 raw_data 并记录 manual_edit
+                    5. 记录一条 IMPORT 类型的历史变更，reason 中注明首次批次和重复批次
+                    6. 处理状态保持不变
                 """,
                 rollback_action="""
                     1. 恢复 raw_data 到重复导入前的版本
-                    2. 恢复 import_batch_id 到之前的批次
+                    2. 从 duplicate_import_batches 中移除该重复批次号
                     3. 移除本次重复导入产生的历史记录
                 """,
             ),

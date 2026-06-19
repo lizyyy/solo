@@ -11,7 +11,7 @@
 1. **证据双轨制**：传感器编号的原始行号、人工改动、处理状态永久留存
 2. **边界规则代码化**：所有判定逻辑写在代码中，不依赖口头约定
 3. **历史可追溯**：每条变更记录改前改后的值，训练教练追问时能回到原始证据
-4. **防重复机制**：重复导入不新增记录，只更新批次号和差异字段
+4. **防重复机制**：重复导入不新增记录，保留首次批次号，重复批次追加到 `duplicate_import_batches`
 5. **晚到材料保护**：工况照片晚上补进时，只刷新相关明细，不洗掉已确认内容
 
 ---
@@ -110,14 +110,15 @@
 
 **执行动作**：
 1. **不创建新的** `UniformZoneRecord`（防止数量翻倍）
-2. 对比新旧 `raw_data`，如有差异则更新
-3. 只更新 `import_batch_id` 为最新批次
-4. 记录一条 `MANUAL_EDIT` 类型的历史变更
-5. 状态保持不变
+2. **保留首次导入的** `import_batch_id` **不变**
+3. 将重复导入的批次号追加到 `duplicate_import_batches`
+4. 对比新旧 `raw_data`，如有差异则更新并记录 `manual_edit`
+5. 记录一条 `IMPORT` 类型的历史变更，`reason` 中注明首次批次和重复批次
+6. 处理状态保持不变
 
 **回滚动作**：
 1. 恢复 `raw_data` 到重复导入前的版本
-2. 恢复 `import_batch_id` 到之前的批次
+2. 从 `duplicate_import_batches` 中移除该重复批次号
 3. 移除本次重复导入产生的历史记录
 
 ---
@@ -236,8 +237,9 @@ python3 main.py coach-review \
 重复导入同一批传感器数据时，系统通过 `sensor_id + original_line_number + source_file` 的哈希值判断重复：
 
 1. **哈希匹配** → 不创建新记录，数量不翻倍
-2. **数据有差异** → 更新 `raw_data`，记录 `MANUAL_EDIT` 历史
-3. **数据无差异** → 仅更新 `import_batch_id`，保留原始导入时间
+2. **保留首次** `import_batch_id` **不变**，重复批次号追加到 `duplicate_import_batches`
+3. **数据有差异** → 更新 `raw_data`，记录 `manual_edit` 历史
+4. **数据无差异** → 仅追加批次号到 `duplicate_import_batches`
 
 **验证方式**：
 ```bash
@@ -276,10 +278,13 @@ python3 main.py history --uz-id <记录ID> --replay
 输出示例：
 ```
 # [2026-06-04T10:00:00] 导入 - 数据员: 首次导入，批次: BATCH-20260604100000
-python3 main.py import-sensors --source sensors.csv --sensor-id S001 --line 5
+python3 main.py import-sensors --input-file test_data/sensors.json --operator "数据员"
 
-# [2026-06-04T11:00:00] 工况照片关联 - 何工: 工况照片复核: 线圈A区温度均匀
-python3 main.py attach-photo --uz-id xxx --photo-id P001
+# [2026-06-04T11:00:00] 工况照片关联 - 何工: 工况照片复核: A区中心磁场线圈安装照片
+python3 main.py review-photos --input-file test_data/photos.json --operator "何工"
+
+# [2026-06-04T12:00:00] 交接报告更新 - 何工: 交接报告更新
+python3 main.py update-report --uz-id xxx --notes "现场核验完成" --operator "何工"
 ```
 
 ### 导出完整复盘报告
@@ -448,7 +453,8 @@ python run_full_demo.py
 | `original_line_number` | 传感器编号在原始文件中的行号 | 传感器编号主流程 |
 | `sensor_record_key` | 传感器记录唯一哈希键 | 传感器编号主流程 |
 | `source_file` | 原始数据文件路径 | 传感器编号主流程 |
-| `import_batch_id` | 导入批次号 | 导入操作 |
+| `import_batch_id` | 首次导入批次号（重复导入时保持不变） | 导入操作 |
+| `duplicate_import_batches` | 后续重复导入的批次号列表 | 重复导入操作 |
 | `related_photo_ids` | 关联的工况照片ID列表 | 工况照片现场说法 |
 | `review_notes` | 所有复核备注汇总 | 何工、教练 |
 | `manual_annotation` | 人工改动说明 | 何工 |

@@ -101,7 +101,7 @@ class UniformZoneProcessor:
             json.dump([r.to_dict() for r in self.uniform_zone_records.values()], f, ensure_ascii=False, indent=2)
 
     def _generate_batch_id(self) -> str:
-        return f"BATCH-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+        return f"BATCH-{datetime.now().strftime('%Y%m%d%H%M%S%f')}"
 
     def step1_import_sensors(
         self,
@@ -306,10 +306,20 @@ class UniformZoneProcessor:
         self,
         photo_data_list: List[Dict[str, Any]],
         operator: str = "何工",
+        input_file: Optional[str] = None,
     ) -> Dict[str, Any]:
         processed_count = 0
         late_arrival_count = 0
         updated_uz_ids: List[str] = []
+
+        if input_file:
+            command = (
+                f"python3 main.py review-photos "
+                f"--input-file {input_file} "
+                f"--operator \"{operator}\""
+            )
+        else:
+            command = None
 
         for data in photo_data_list:
             photo_id = data.get("photo_id") or str(uuid.uuid4())
@@ -342,12 +352,6 @@ class UniformZoneProcessor:
 
                 uz = self.uniform_zone_records[uz_id]
                 before = uz.to_dict()
-
-                command = (
-                    f"python3 main.py review-photos "
-                    f"--input-file {source_file} "
-                    f"--operator \"{operator}\""
-                )
 
                 if is_late_arrival:
                     self.rule_engine.execute_rule(
@@ -382,8 +386,8 @@ class UniformZoneProcessor:
                     after_value=after,
                     operator=operator,
                     reason=reason,
-                    evidence_ref=f"photo_id={photo_id}, source={source_file}",
-                    command_used=command,
+                    evidence_ref=f"photo_id={photo_id}, input_file={input_file or source_file}",
+                    command_used=command or "",
                 )
                 uz.history_ids.append(history_entry.entry_id)
                 uz.last_updated_at = datetime.now().isoformat()

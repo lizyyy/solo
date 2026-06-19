@@ -48,6 +48,7 @@ def cmd_review_photos(args):
     result = processor.step2_review_photos(
         photo_data,
         operator=args.operator,
+        input_file=args.input_file,
     )
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0

@@ -1,0 +1,2572 @@
+{
+  "export_time": "2026-06-19T22:05:04.776860",
+  "total_records": 5,
+  "boundary_rules": [
+    {
+      "rule_id": "TEMP_MIX_001",
+      "description": "检测摄氏度(°C)与开尔文(K)混用",
+      "rule_type": "temperature_validation",
+      "condition": "\n                    同一批导入的传感器记录中，同时存在温度单位为°C和K的记录；\n                    或单条记录的温度值与单位明显不匹配（如25K应是25°C，300°C应是300K）\n                ",
+      "action": "\n                    1. 设置 has_mixed_temp_units = True\n                    2. 设置 coach_review_required = True\n                    3. 状态流转为 TEMP_MIXED（温度单位混用待复核）\n                    4. 不自动修正，必须等待训练教练复核\n                    5. 记录混用详情到 review_notes\n                ",
+      "rollback_action": "\n                    1. 清除 has_mixed_temp_units 标记\n                    2. 清除 coach_review_required 标记\n                    3. 恢复到前一个有效状态（通常是 IMPORTED）\n                    4. 清空因混用添加的 review_notes\n                ",
+      "is_active": true
+    },
+    {
+      "rule_id": "TEMP_MIX_002",
+      "description": "温度值范围合理性校验",
+      "rule_type": "temperature_validation",
+      "condition": "\n                    - 单位为°C时，温度值 < -273.15 或 > 1000\n                    - 单位为K时，温度值 < 0 或 > 1273\n                    - 缺少单位但有数值\n                ",
+      "action": "\n                    1. 标记为 coach_review_required = True\n                    2. 状态流转为 TEMP_MIXED\n                    3. 在 review_notes 中记录异常值详情\n                ",
+      "rollback_action": "\n                    1. 清除 coach_review_required 标记\n                    2. 恢复到 IMPORTED 状态\n                    3. 清空异常值相关的 review_notes\n                ",
+      "is_active": true
+    },
+    {
+      "rule_id": "TEMP_CORR_001",
+      "description": "训练教练复核后温度单位修正",
+      "rule_type": "temperature_correction",
+      "condition": "\n                    训练教练明确确认修正方向，支持两种模式：\n                    模式1 - convert（数值转换）：\n                    - °C -> K: value + 273.15\n                    - K -> °C: value - 273.15\n                    模式2 - fix_unit（标签修正）：\n                    - 仅修正单位标签，数值不变\n                    - 例如：25K实为25°C（记录错误），修正为25°C\n                ",
+      "action": "\n                    1. 按教练确认的模式和目标单位修正\n                    2. 更新 temperature_value 和 temperature_unit\n                    3. 设置 processing_status = COACH_REVIEWED\n                    4. 记录修改前后值到历史记录\n                    5. 在 manual_annotation 中记录修正依据和模式\n                    6. 设置 coach_review_required = False\n                ",
+      "rollback_action": "\n                    1. 从历史记录恢复 temperature_value 和 temperature_unit\n                    2. 恢复 processing_status = TEMP_MIXED\n                    3. 设置 coach_review_required = True\n                    4. 清空本次修正的 manual_annotation\n                ",
+      "is_active": true
+    },
+    {
+      "rule_id": "LATE_ARRIVAL_001",
+      "description": "晚到工况照片处理规则",
+      "rule_type": "photo_processing",
+      "condition": "\n                    工况照片上传时间晚于传感器编号导入时间超过4小时；\n                    或明确标记为 is_late_arrival = True\n                ",
+      "action": "\n                    1. 只更新 related_photo_ids 字段\n                    2. 只刷新 review_notes 中与该照片相关的内容\n                    3. 不修改 sensor_id、temperature_value、uniform_zone_flag\n                    4. 不修改已为 CONFIRMED 状态的记录\n                    5. 状态流转为 PHOTO_REVIEWED（如果之前低于此状态）\n                    6. 在 review_notes 中标注\"晚到材料\"\n                ",
+      "rollback_action": "\n                    1. 移除该 photo_id 从 related_photo_ids\n                    2. 移除 review_notes 中与该照片相关的内容\n                    3. 如果状态是 PHOTO_REVIEWED 且没有其他照片，回退到 IMPORTED\n                ",
+      "is_active": true
+    },
+    {
+      "rule_id": "DUPLICATE_001",
+      "description": "重复导入防翻倍规则",
+      "rule_type": "import_validation",
+      "condition": "\n                    传感器记录的 sensor_id + original_line_number + source_file\n                    哈希值已存在于系统中\n                ",
+      "action": "\n                    1. 不创建新的 UniformZoneRecord（防止数量翻倍）\n                    2. 保留首次导入的 import_batch_id 不变\n                    3. 将重复导入的批次号追加到 duplicate_import_batches\n                    4. 对比新旧 raw_data，如有差异则更新 raw_data 并记录 manual_edit\n                    5. 记录一条 IMPORT 类型的历史变更，reason 中注明首次批次和重复批次\n                    6. 处理状态保持不变\n                ",
+      "rollback_action": "\n                    1. 恢复 raw_data 到重复导入前的版本\n                    2. 从 duplicate_import_batches 中移除该重复批次号\n                    3. 移除本次重复导入产生的历史记录\n                ",
+      "is_active": true
+    }
+  ],
+  "records": [
+    {
+      "uniform_zone": {
+        "uniform_zone_id": "31ebb24c-066b-47fb-8976-a278dd4f35ee",
+        "sensor_id": "MAG-COIL-001",
+        "sensor_record_key": "1ed0b45a1e99312ae08a62c484d44c6c8ed0de0279790dc03588194af28b60c2",
+        "original_line_number": 5,
+        "source_file": "test_data/sensors.json",
+        "temperature_value": 25.0,
+        "temperature_unit": "°C",
+        "uniform_zone_flag": true,
+        "processing_status": "温度单位混用待复核",
+        "related_photo_ids": [
+          "PHOTO-2026-0604-001"
+        ],
+        "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] A区中心磁场线圈安装照片，线圈排列整齐，无明显变形: 现场确认线圈安装符合工艺要求，温度传感器位置正确",
+        "manual_annotation": null,
+        "has_mixed_temp_units": true,
+        "coach_review_required": true,
+        "history_ids": [
+          "f5aa50ea-11e0-4a51-b471-40346c808cc2",
+          "afed78b4-d8a6-4bb1-9512-55ffed83eda7",
+          "0c84cd36-971c-4cd2-99b0-037e374af063",
+          "93ba3d87-562f-4b5d-b674-3fd688c8f891"
+        ],
+        "created_at": "2026-06-19T22:05:04.256432",
+        "last_updated_at": "2026-06-19T22:05:04.387535",
+        "import_batch_id": "BATCH-20260619220504256361",
+        "duplicate_import_batches": [
+          "BATCH-20260619220504386088"
+        ]
+      },
+      "sensor_evidence": {
+        "sensor_id": "MAG-COIL-001",
+        "original_line_number": 5,
+        "raw_data": {
+          "position": "A区-中心",
+          "calibration_date": "2026-05-15",
+          "operator": "数据员A"
+        },
+        "source_file": "test_data/sensors.json",
+        "import_batch_id": "BATCH-20260619220504256361",
+        "temperature_value": 25.0,
+        "temperature_unit": "°C",
+        "uniform_zone_flag": true,
+        "processing_status": "已导入",
+        "manual_edits": [],
+        "created_at": "2026-06-19T22:05:04.256379"
+      },
+      "photo_evidences": [
+        {
+          "photo_id": "PHOTO-2026-0604-001",
+          "scene_description": "A区中心磁场线圈安装照片，线圈排列整齐，无明显变形",
+          "source_file": "/photos/20260604/A-001.jpg",
+          "upload_time": "2026-06-04T10:30:00",
+          "related_sensor_ids": [
+            "MAG-COIL-001"
+          ],
+          "reviewer": "何工",
+          "review_notes": "现场确认线圈安装符合工艺要求，温度传感器位置正确",
+          "is_late_arrival": false,
+          "created_at": "2026-06-19T22:05:04.320417"
+        }
+      ],
+      "duplicate_import_info": {
+        "is_duplicate_touched": true,
+        "first_import_batch": "BATCH-20260619220504256361",
+        "duplicate_batches": [
+          "BATCH-20260619220504386088"
+        ],
+        "total_import_attempts": 2,
+        "dedup_conclusion": "传感器MAG-COIL-001首次导入批次BATCH-20260619220504256361，后续重复导入批次: ['BATCH-20260619220504386088']。去重后数量未翻倍，当前记录为首次导入的原始记录。"
+      },
+      "history": [
+        {
+          "entry_id": "f5aa50ea-11e0-4a51-b471-40346c808cc2",
+          "uniform_zone_id": "31ebb24c-066b-47fb-8976-a278dd4f35ee",
+          "change_type": "导入",
+          "before_value": null,
+          "after_value": {
+            "uniform_zone_id": "31ebb24c-066b-47fb-8976-a278dd4f35ee",
+            "sensor_id": "MAG-COIL-001",
+            "sensor_record_key": "1ed0b45a1e99312ae08a62c484d44c6c8ed0de0279790dc03588194af28b60c2",
+            "original_line_number": 5,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "已导入",
+            "related_photo_ids": [],
+            "review_notes": null,
+            "manual_annotation": null,
+            "has_mixed_temp_units": false,
+            "coach_review_required": false,
+            "history_ids": [],
+            "created_at": "2026-06-19T22:05:04.256432",
+            "last_updated_at": "2026-06-19T22:05:04.256433",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "operator": "数据员",
+          "timestamp": "2026-06-19T22:05:04.256477",
+          "reason": "首次导入，批次: BATCH-20260619220504256361",
+          "evidence_ref": "source_file=test_data/sensors.json, line=5",
+          "command_used": "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\""
+        },
+        {
+          "entry_id": "afed78b4-d8a6-4bb1-9512-55ffed83eda7",
+          "uniform_zone_id": "31ebb24c-066b-47fb-8976-a278dd4f35ee",
+          "change_type": "温度单位修正",
+          "before_value": {
+            "uniform_zone_id": "31ebb24c-066b-47fb-8976-a278dd4f35ee",
+            "sensor_id": "MAG-COIL-001",
+            "sensor_record_key": "1ed0b45a1e99312ae08a62c484d44c6c8ed0de0279790dc03588194af28b60c2",
+            "original_line_number": 5,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "已导入",
+            "related_photo_ids": [],
+            "review_notes": null,
+            "manual_annotation": null,
+            "has_mixed_temp_units": false,
+            "coach_review_required": false,
+            "history_ids": [
+              "f5aa50ea-11e0-4a51-b471-40346c808cc2"
+            ],
+            "created_at": "2026-06-19T22:05:04.256432",
+            "last_updated_at": "2026-06-19T22:05:04.256433",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "after_value": {
+            "uniform_zone_id": "31ebb24c-066b-47fb-8976-a278dd4f35ee",
+            "sensor_id": "MAG-COIL-001",
+            "sensor_record_key": "1ed0b45a1e99312ae08a62c484d44c6c8ed0de0279790dc03588194af28b60c2",
+            "original_line_number": 5,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "f5aa50ea-11e0-4a51-b471-40346c808cc2"
+            ],
+            "created_at": "2026-06-19T22:05:04.256432",
+            "last_updated_at": "2026-06-19T22:05:04.256433",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "operator": "系统",
+          "timestamp": "2026-06-19T22:05:04.257927",
+          "reason": "温度单位校验自动触发规则: TEMP_MIX_001，单位混用，当前批次同时存在: {'°C', 'K'}。不自动修正，等待训练教练复核。",
+          "evidence_ref": "TEMP_MIX_001",
+          "command_used": "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\""
+        },
+        {
+          "entry_id": "0c84cd36-971c-4cd2-99b0-037e374af063",
+          "uniform_zone_id": "31ebb24c-066b-47fb-8976-a278dd4f35ee",
+          "change_type": "工况照片关联",
+          "before_value": {
+            "uniform_zone_id": "31ebb24c-066b-47fb-8976-a278dd4f35ee",
+            "sensor_id": "MAG-COIL-001",
+            "sensor_record_key": "1ed0b45a1e99312ae08a62c484d44c6c8ed0de0279790dc03588194af28b60c2",
+            "original_line_number": 5,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "f5aa50ea-11e0-4a51-b471-40346c808cc2",
+              "afed78b4-d8a6-4bb1-9512-55ffed83eda7"
+            ],
+            "created_at": "2026-06-19T22:05:04.256432",
+            "last_updated_at": "2026-06-19T22:05:04.258337",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "after_value": {
+            "uniform_zone_id": "31ebb24c-066b-47fb-8976-a278dd4f35ee",
+            "sensor_id": "MAG-COIL-001",
+            "sensor_record_key": "1ed0b45a1e99312ae08a62c484d44c6c8ed0de0279790dc03588194af28b60c2",
+            "original_line_number": 5,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-001"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] A区中心磁场线圈安装照片，线圈排列整齐，无明显变形: 现场确认线圈安装符合工艺要求，温度传感器位置正确",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "f5aa50ea-11e0-4a51-b471-40346c808cc2",
+              "afed78b4-d8a6-4bb1-9512-55ffed83eda7"
+            ],
+            "created_at": "2026-06-19T22:05:04.256432",
+            "last_updated_at": "2026-06-19T22:05:04.258337",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "operator": "何工",
+          "timestamp": "2026-06-19T22:05:04.320515",
+          "reason": "工况照片复核: A区中心磁场线圈安装照片，线圈排列整齐，无明显变形",
+          "evidence_ref": "photo_id=PHOTO-2026-0604-001, input_file=test_data/photos.json",
+          "command_used": "python3 main.py review-photos --input-file test_data/photos.json --operator \"何工\""
+        },
+        {
+          "entry_id": "93ba3d87-562f-4b5d-b674-3fd688c8f891",
+          "uniform_zone_id": "31ebb24c-066b-47fb-8976-a278dd4f35ee",
+          "change_type": "导入",
+          "before_value": {
+            "uniform_zone_id": "31ebb24c-066b-47fb-8976-a278dd4f35ee",
+            "sensor_id": "MAG-COIL-001",
+            "sensor_record_key": "1ed0b45a1e99312ae08a62c484d44c6c8ed0de0279790dc03588194af28b60c2",
+            "original_line_number": 5,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-001"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] A区中心磁场线圈安装照片，线圈排列整齐，无明显变形: 现场确认线圈安装符合工艺要求，温度传感器位置正确",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "f5aa50ea-11e0-4a51-b471-40346c808cc2",
+              "afed78b4-d8a6-4bb1-9512-55ffed83eda7",
+              "0c84cd36-971c-4cd2-99b0-037e374af063"
+            ],
+            "created_at": "2026-06-19T22:05:04.256432",
+            "last_updated_at": "2026-06-19T22:05:04.321413",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "after_value": {
+            "uniform_zone_id": "31ebb24c-066b-47fb-8976-a278dd4f35ee",
+            "sensor_id": "MAG-COIL-001",
+            "sensor_record_key": "1ed0b45a1e99312ae08a62c484d44c6c8ed0de0279790dc03588194af28b60c2",
+            "original_line_number": 5,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-001"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] A区中心磁场线圈安装照片，线圈排列整齐，无明显变形: 现场确认线圈安装符合工艺要求，温度传感器位置正确",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "f5aa50ea-11e0-4a51-b471-40346c808cc2",
+              "afed78b4-d8a6-4bb1-9512-55ffed83eda7",
+              "0c84cd36-971c-4cd2-99b0-037e374af063"
+            ],
+            "created_at": "2026-06-19T22:05:04.256432",
+            "last_updated_at": "2026-06-19T22:05:04.321413",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": [
+              "BATCH-20260619220504386088"
+            ]
+          },
+          "operator": "数据员",
+          "timestamp": "2026-06-19T22:05:04.386231",
+          "reason": "重复导入处理: 传感器MAG-COIL-001已存在于首次导入批次BATCH-20260619220504256361，本次批次BATCH-20260619220504386088为重复导入。数据无变化仅更新批次号",
+          "evidence_ref": "source_file=test_data/sensors.json, line=5, 首次批次=BATCH-20260619220504256361, 重复批次=BATCH-20260619220504386088",
+          "command_used": "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\""
+        }
+      ],
+      "change_comparisons": [
+        {
+          "entry_id": "f5aa50ea-11e0-4a51-b471-40346c808cc2",
+          "change_type": "导入",
+          "timestamp": "2026-06-19T22:05:04.256477",
+          "operator": "数据员",
+          "reason": "首次导入，批次: BATCH-20260619220504256361",
+          "added": {
+            "uniform_zone_flag": true,
+            "sensor_id": "MAG-COIL-001",
+            "temperature_value": 25.0,
+            "related_photo_ids": [],
+            "coach_review_required": false,
+            "source_file": "test_data/sensors.json",
+            "duplicate_import_batches": [],
+            "sensor_record_key": "1ed0b45a1e99312ae08a62c484d44c6c8ed0de0279790dc03588194af28b60c2",
+            "processing_status": "已导入",
+            "original_line_number": 5,
+            "last_updated_at": "2026-06-19T22:05:04.256433",
+            "created_at": "2026-06-19T22:05:04.256432",
+            "manual_annotation": null,
+            "has_mixed_temp_units": false,
+            "temperature_unit": "°C",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "uniform_zone_id": "31ebb24c-066b-47fb-8976-a278dd4f35ee",
+            "history_ids": [],
+            "review_notes": null
+          },
+          "removed": {},
+          "modified": {}
+        },
+        {
+          "entry_id": "afed78b4-d8a6-4bb1-9512-55ffed83eda7",
+          "change_type": "温度单位修正",
+          "timestamp": "2026-06-19T22:05:04.257927",
+          "operator": "系统",
+          "reason": "温度单位校验自动触发规则: TEMP_MIX_001，单位混用，当前批次同时存在: {'°C', 'K'}。不自动修正，等待训练教练复核。",
+          "added": {},
+          "removed": {},
+          "modified": {
+            "coach_review_required": {
+              "before": false,
+              "after": true
+            },
+            "processing_status": {
+              "before": "已导入",
+              "after": "温度单位混用待复核"
+            },
+            "has_mixed_temp_units": {
+              "before": false,
+              "after": true
+            },
+            "review_notes": {
+              "before": null,
+              "after": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核"
+            }
+          }
+        },
+        {
+          "entry_id": "0c84cd36-971c-4cd2-99b0-037e374af063",
+          "change_type": "工况照片关联",
+          "timestamp": "2026-06-19T22:05:04.320515",
+          "operator": "何工",
+          "reason": "工况照片复核: A区中心磁场线圈安装照片，线圈排列整齐，无明显变形",
+          "added": {},
+          "removed": {},
+          "modified": {
+            "related_photo_ids": {
+              "before": [],
+              "after": [
+                "PHOTO-2026-0604-001"
+              ]
+            },
+            "review_notes": {
+              "before": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核",
+              "after": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] A区中心磁场线圈安装照片，线圈排列整齐，无明显变形: 现场确认线圈安装符合工艺要求，温度传感器位置正确"
+            }
+          }
+        },
+        {
+          "entry_id": "93ba3d87-562f-4b5d-b674-3fd688c8f891",
+          "change_type": "导入",
+          "timestamp": "2026-06-19T22:05:04.386231",
+          "operator": "数据员",
+          "reason": "重复导入处理: 传感器MAG-COIL-001已存在于首次导入批次BATCH-20260619220504256361，本次批次BATCH-20260619220504386088为重复导入。数据无变化仅更新批次号",
+          "added": {},
+          "removed": {},
+          "modified": {
+            "duplicate_import_batches": {
+              "before": [],
+              "after": [
+                "BATCH-20260619220504386088"
+              ]
+            }
+          }
+        }
+      ],
+      "audit_summary": {
+        "uniform_zone_id": "31ebb24c-066b-47fb-8976-a278dd4f35ee",
+        "total_changes": 4,
+        "change_types": {
+          "导入": 2,
+          "温度单位修正": 1,
+          "工况照片关联": 1
+        },
+        "operators": {
+          "数据员": 2,
+          "系统": 1,
+          "何工": 1
+        },
+        "first_change": "2026-06-19T22:05:04.256477",
+        "last_change": "2026-06-19T22:05:04.386231"
+      },
+      "replay_commands": [
+        "# [2026-06-19T22:05:04.256477] 导入 - 数据员: 首次导入，批次: BATCH-20260619220504256361",
+        "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\"",
+        "# [2026-06-19T22:05:04.257927] 温度单位修正 - 系统: 温度单位校验自动触发规则: TEMP_MIX_001，单位混用，当前批次同时存在: {'°C', 'K'}。不自动修正，等待训练教练复核。",
+        "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\"",
+        "# [2026-06-19T22:05:04.320515] 工况照片关联 - 何工: 工况照片复核: A区中心磁场线圈安装照片，线圈排列整齐，无明显变形",
+        "python3 main.py review-photos --input-file test_data/photos.json --operator \"何工\"",
+        "# [2026-06-19T22:05:04.386231] 导入 - 数据员: 重复导入处理: 传感器MAG-COIL-001已存在于首次导入批次BATCH-20260619220504256361，本次批次BATCH-20260619220504386088为重复导入。数据无变化仅更新批次号",
+        "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\""
+      ]
+    },
+    {
+      "uniform_zone": {
+        "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+        "sensor_id": "MAG-COIL-002",
+        "sensor_record_key": "6a837bee79d7d2bb0f7556c3ec422c9a8ed9c8cfe4be203ab7b9d16228c8eca9",
+        "original_line_number": 6,
+        "source_file": "test_data/sensors.json",
+        "temperature_value": 25.0,
+        "temperature_unit": "°C",
+        "uniform_zone_flag": true,
+        "processing_status": "交接报告已更新",
+        "related_photo_ids": [
+          "PHOTO-2026-0604-002"
+        ],
+        "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] A区边缘磁场线圈照片，可见轻微振动痕迹: 振动痕迹在允许范围内，不影响磁场均匀性\n[交接报告更新][何工] 现场核验完成",
+        "manual_annotation": "教练修正[convert]: 数值转换: 298.15K -> 25.0°C。依据: 298.15K按公式转25°C。操作人: 训练教练",
+        "has_mixed_temp_units": true,
+        "coach_review_required": false,
+        "history_ids": [
+          "216bd66f-0539-42e3-affb-c211f301db04",
+          "2451ab80-4d31-4883-af75-2de373ba655c",
+          "efafc4d4-347d-4b7c-9fd0-08ac80cf1183",
+          "c1152957-fad2-48f0-8bcd-3c9152bac96f",
+          "cb5da055-f11d-4cce-be1c-500b0211fc03",
+          "236c522f-2f1d-433a-96ff-f8191f638a10"
+        ],
+        "created_at": "2026-06-19T22:05:04.256695",
+        "last_updated_at": "2026-06-19T22:05:04.652666",
+        "import_batch_id": "BATCH-20260619220504256361",
+        "duplicate_import_batches": [
+          "BATCH-20260619220504386088"
+        ]
+      },
+      "sensor_evidence": {
+        "sensor_id": "MAG-COIL-002",
+        "original_line_number": 6,
+        "raw_data": {
+          "position": "A区-边缘",
+          "calibration_date": "2026-05-15",
+          "operator": "数据员A"
+        },
+        "source_file": "test_data/sensors.json",
+        "import_batch_id": "BATCH-20260619220504256361",
+        "temperature_value": 298.15,
+        "temperature_unit": "K",
+        "uniform_zone_flag": true,
+        "processing_status": "已导入",
+        "manual_edits": [],
+        "created_at": "2026-06-19T22:05:04.256682"
+      },
+      "photo_evidences": [
+        {
+          "photo_id": "PHOTO-2026-0604-002",
+          "scene_description": "A区边缘磁场线圈照片，可见轻微振动痕迹",
+          "source_file": "/photos/20260604/A-002.jpg",
+          "upload_time": "2026-06-04T10:35:00",
+          "related_sensor_ids": [
+            "MAG-COIL-002"
+          ],
+          "reviewer": "何工",
+          "review_notes": "振动痕迹在允许范围内，不影响磁场均匀性",
+          "is_late_arrival": false,
+          "created_at": "2026-06-19T22:05:04.321417"
+        }
+      ],
+      "duplicate_import_info": {
+        "is_duplicate_touched": true,
+        "first_import_batch": "BATCH-20260619220504256361",
+        "duplicate_batches": [
+          "BATCH-20260619220504386088"
+        ],
+        "total_import_attempts": 2,
+        "dedup_conclusion": "传感器MAG-COIL-002首次导入批次BATCH-20260619220504256361，后续重复导入批次: ['BATCH-20260619220504386088']。去重后数量未翻倍，当前记录为首次导入的原始记录。"
+      },
+      "history": [
+        {
+          "entry_id": "216bd66f-0539-42e3-affb-c211f301db04",
+          "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+          "change_type": "导入",
+          "before_value": null,
+          "after_value": {
+            "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+            "sensor_id": "MAG-COIL-002",
+            "sensor_record_key": "6a837bee79d7d2bb0f7556c3ec422c9a8ed9c8cfe4be203ab7b9d16228c8eca9",
+            "original_line_number": 6,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 298.15,
+            "temperature_unit": "K",
+            "uniform_zone_flag": true,
+            "processing_status": "已导入",
+            "related_photo_ids": [],
+            "review_notes": null,
+            "manual_annotation": null,
+            "has_mixed_temp_units": false,
+            "coach_review_required": false,
+            "history_ids": [],
+            "created_at": "2026-06-19T22:05:04.256695",
+            "last_updated_at": "2026-06-19T22:05:04.256696",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "operator": "数据员",
+          "timestamp": "2026-06-19T22:05:04.256728",
+          "reason": "首次导入，批次: BATCH-20260619220504256361",
+          "evidence_ref": "source_file=test_data/sensors.json, line=6",
+          "command_used": "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\""
+        },
+        {
+          "entry_id": "2451ab80-4d31-4883-af75-2de373ba655c",
+          "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+          "change_type": "温度单位修正",
+          "before_value": {
+            "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+            "sensor_id": "MAG-COIL-002",
+            "sensor_record_key": "6a837bee79d7d2bb0f7556c3ec422c9a8ed9c8cfe4be203ab7b9d16228c8eca9",
+            "original_line_number": 6,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 298.15,
+            "temperature_unit": "K",
+            "uniform_zone_flag": true,
+            "processing_status": "已导入",
+            "related_photo_ids": [],
+            "review_notes": null,
+            "manual_annotation": null,
+            "has_mixed_temp_units": false,
+            "coach_review_required": false,
+            "history_ids": [
+              "216bd66f-0539-42e3-affb-c211f301db04"
+            ],
+            "created_at": "2026-06-19T22:05:04.256695",
+            "last_updated_at": "2026-06-19T22:05:04.256696",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "after_value": {
+            "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+            "sensor_id": "MAG-COIL-002",
+            "sensor_record_key": "6a837bee79d7d2bb0f7556c3ec422c9a8ed9c8cfe4be203ab7b9d16228c8eca9",
+            "original_line_number": 6,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 298.15,
+            "temperature_unit": "K",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "216bd66f-0539-42e3-affb-c211f301db04"
+            ],
+            "created_at": "2026-06-19T22:05:04.256695",
+            "last_updated_at": "2026-06-19T22:05:04.256696",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "operator": "系统",
+          "timestamp": "2026-06-19T22:05:04.259559",
+          "reason": "温度单位校验自动触发规则: TEMP_MIX_001，单位混用，当前批次同时存在: {'°C', 'K'}。不自动修正，等待训练教练复核。",
+          "evidence_ref": "TEMP_MIX_001",
+          "command_used": "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\""
+        },
+        {
+          "entry_id": "efafc4d4-347d-4b7c-9fd0-08ac80cf1183",
+          "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+          "change_type": "工况照片关联",
+          "before_value": {
+            "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+            "sensor_id": "MAG-COIL-002",
+            "sensor_record_key": "6a837bee79d7d2bb0f7556c3ec422c9a8ed9c8cfe4be203ab7b9d16228c8eca9",
+            "original_line_number": 6,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 298.15,
+            "temperature_unit": "K",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "216bd66f-0539-42e3-affb-c211f301db04",
+              "2451ab80-4d31-4883-af75-2de373ba655c"
+            ],
+            "created_at": "2026-06-19T22:05:04.256695",
+            "last_updated_at": "2026-06-19T22:05:04.260166",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "after_value": {
+            "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+            "sensor_id": "MAG-COIL-002",
+            "sensor_record_key": "6a837bee79d7d2bb0f7556c3ec422c9a8ed9c8cfe4be203ab7b9d16228c8eca9",
+            "original_line_number": 6,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 298.15,
+            "temperature_unit": "K",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-002"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] A区边缘磁场线圈照片，可见轻微振动痕迹: 振动痕迹在允许范围内，不影响磁场均匀性",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "216bd66f-0539-42e3-affb-c211f301db04",
+              "2451ab80-4d31-4883-af75-2de373ba655c"
+            ],
+            "created_at": "2026-06-19T22:05:04.256695",
+            "last_updated_at": "2026-06-19T22:05:04.260166",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "operator": "何工",
+          "timestamp": "2026-06-19T22:05:04.321466",
+          "reason": "工况照片复核: A区边缘磁场线圈照片，可见轻微振动痕迹",
+          "evidence_ref": "photo_id=PHOTO-2026-0604-002, input_file=test_data/photos.json",
+          "command_used": "python3 main.py review-photos --input-file test_data/photos.json --operator \"何工\""
+        },
+        {
+          "entry_id": "c1152957-fad2-48f0-8bcd-3c9152bac96f",
+          "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+          "change_type": "导入",
+          "before_value": {
+            "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+            "sensor_id": "MAG-COIL-002",
+            "sensor_record_key": "6a837bee79d7d2bb0f7556c3ec422c9a8ed9c8cfe4be203ab7b9d16228c8eca9",
+            "original_line_number": 6,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 298.15,
+            "temperature_unit": "K",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-002"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] A区边缘磁场线圈照片，可见轻微振动痕迹: 振动痕迹在允许范围内，不影响磁场均匀性",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "216bd66f-0539-42e3-affb-c211f301db04",
+              "2451ab80-4d31-4883-af75-2de373ba655c",
+              "efafc4d4-347d-4b7c-9fd0-08ac80cf1183"
+            ],
+            "created_at": "2026-06-19T22:05:04.256695",
+            "last_updated_at": "2026-06-19T22:05:04.322311",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "after_value": {
+            "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+            "sensor_id": "MAG-COIL-002",
+            "sensor_record_key": "6a837bee79d7d2bb0f7556c3ec422c9a8ed9c8cfe4be203ab7b9d16228c8eca9",
+            "original_line_number": 6,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 298.15,
+            "temperature_unit": "K",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-002"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] A区边缘磁场线圈照片，可见轻微振动痕迹: 振动痕迹在允许范围内，不影响磁场均匀性",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "216bd66f-0539-42e3-affb-c211f301db04",
+              "2451ab80-4d31-4883-af75-2de373ba655c",
+              "efafc4d4-347d-4b7c-9fd0-08ac80cf1183"
+            ],
+            "created_at": "2026-06-19T22:05:04.256695",
+            "last_updated_at": "2026-06-19T22:05:04.322311",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": [
+              "BATCH-20260619220504386088"
+            ]
+          },
+          "operator": "数据员",
+          "timestamp": "2026-06-19T22:05:04.387619",
+          "reason": "重复导入处理: 传感器MAG-COIL-002已存在于首次导入批次BATCH-20260619220504256361，本次批次BATCH-20260619220504386088为重复导入。数据无变化仅更新批次号",
+          "evidence_ref": "source_file=test_data/sensors.json, line=6, 首次批次=BATCH-20260619220504256361, 重复批次=BATCH-20260619220504386088",
+          "command_used": "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\""
+        },
+        {
+          "entry_id": "cb5da055-f11d-4cce-be1c-500b0211fc03",
+          "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+          "change_type": "教练复核",
+          "before_value": {
+            "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+            "sensor_id": "MAG-COIL-002",
+            "sensor_record_key": "6a837bee79d7d2bb0f7556c3ec422c9a8ed9c8cfe4be203ab7b9d16228c8eca9",
+            "original_line_number": 6,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 298.15,
+            "temperature_unit": "K",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-002"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] A区边缘磁场线圈照片，可见轻微振动痕迹: 振动痕迹在允许范围内，不影响磁场均匀性",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "216bd66f-0539-42e3-affb-c211f301db04",
+              "2451ab80-4d31-4883-af75-2de373ba655c",
+              "efafc4d4-347d-4b7c-9fd0-08ac80cf1183",
+              "c1152957-fad2-48f0-8bcd-3c9152bac96f"
+            ],
+            "created_at": "2026-06-19T22:05:04.256695",
+            "last_updated_at": "2026-06-19T22:05:04.388840",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": [
+              "BATCH-20260619220504386088"
+            ]
+          },
+          "after_value": {
+            "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+            "sensor_id": "MAG-COIL-002",
+            "sensor_record_key": "6a837bee79d7d2bb0f7556c3ec422c9a8ed9c8cfe4be203ab7b9d16228c8eca9",
+            "original_line_number": 6,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "教练已复核",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-002"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] A区边缘磁场线圈照片，可见轻微振动痕迹: 振动痕迹在允许范围内，不影响磁场均匀性",
+            "manual_annotation": "教练修正[convert]: 数值转换: 298.15K -> 25.0°C。依据: 298.15K按公式转25°C。操作人: 训练教练",
+            "has_mixed_temp_units": true,
+            "coach_review_required": false,
+            "history_ids": [
+              "216bd66f-0539-42e3-affb-c211f301db04",
+              "2451ab80-4d31-4883-af75-2de373ba655c",
+              "efafc4d4-347d-4b7c-9fd0-08ac80cf1183",
+              "c1152957-fad2-48f0-8bcd-3c9152bac96f"
+            ],
+            "created_at": "2026-06-19T22:05:04.256695",
+            "last_updated_at": "2026-06-19T22:05:04.388840",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": [
+              "BATCH-20260619220504386088"
+            ]
+          },
+          "operator": "训练教练",
+          "timestamp": "2026-06-19T22:05:04.591763",
+          "reason": "温度单位复核完成[convert]: 298.15K按公式转25°C",
+          "evidence_ref": "TEMP_CORR_001",
+          "command_used": "python3 main.py coach-review --uz-id 26a62cff-750a-4289-b10a-238c8d8e126b --target-unit °C --correction-mode convert --remark \"298.15K按公式转25°C\" --operator \"训练教练\""
+        },
+        {
+          "entry_id": "236c522f-2f1d-433a-96ff-f8191f638a10",
+          "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+          "change_type": "交接报告更新",
+          "before_value": {
+            "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+            "sensor_id": "MAG-COIL-002",
+            "sensor_record_key": "6a837bee79d7d2bb0f7556c3ec422c9a8ed9c8cfe4be203ab7b9d16228c8eca9",
+            "original_line_number": 6,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "教练已复核",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-002"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] A区边缘磁场线圈照片，可见轻微振动痕迹: 振动痕迹在允许范围内，不影响磁场均匀性",
+            "manual_annotation": "教练修正[convert]: 数值转换: 298.15K -> 25.0°C。依据: 298.15K按公式转25°C。操作人: 训练教练",
+            "has_mixed_temp_units": true,
+            "coach_review_required": false,
+            "history_ids": [
+              "216bd66f-0539-42e3-affb-c211f301db04",
+              "2451ab80-4d31-4883-af75-2de373ba655c",
+              "efafc4d4-347d-4b7c-9fd0-08ac80cf1183",
+              "c1152957-fad2-48f0-8bcd-3c9152bac96f",
+              "cb5da055-f11d-4cce-be1c-500b0211fc03"
+            ],
+            "created_at": "2026-06-19T22:05:04.256695",
+            "last_updated_at": "2026-06-19T22:05:04.593611",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": [
+              "BATCH-20260619220504386088"
+            ]
+          },
+          "after_value": {
+            "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+            "sensor_id": "MAG-COIL-002",
+            "sensor_record_key": "6a837bee79d7d2bb0f7556c3ec422c9a8ed9c8cfe4be203ab7b9d16228c8eca9",
+            "original_line_number": 6,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "交接报告已更新",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-002"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] A区边缘磁场线圈照片，可见轻微振动痕迹: 振动痕迹在允许范围内，不影响磁场均匀性\n[交接报告更新][何工] 现场核验完成",
+            "manual_annotation": "教练修正[convert]: 数值转换: 298.15K -> 25.0°C。依据: 298.15K按公式转25°C。操作人: 训练教练",
+            "has_mixed_temp_units": true,
+            "coach_review_required": false,
+            "history_ids": [
+              "216bd66f-0539-42e3-affb-c211f301db04",
+              "2451ab80-4d31-4883-af75-2de373ba655c",
+              "efafc4d4-347d-4b7c-9fd0-08ac80cf1183",
+              "c1152957-fad2-48f0-8bcd-3c9152bac96f",
+              "cb5da055-f11d-4cce-be1c-500b0211fc03"
+            ],
+            "created_at": "2026-06-19T22:05:04.256695",
+            "last_updated_at": "2026-06-19T22:05:04.593611",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": [
+              "BATCH-20260619220504386088"
+            ]
+          },
+          "operator": "何工",
+          "timestamp": "2026-06-19T22:05:04.650782",
+          "reason": "交接报告更新: 现场核验完成",
+          "evidence_ref": null,
+          "command_used": "python3 main.py update-report --uz-ids 26a62cff-750a-4289-b10a-238c8d8e126b --notes \"现场核验完成\" --operator \"何工\""
+        }
+      ],
+      "change_comparisons": [
+        {
+          "entry_id": "216bd66f-0539-42e3-affb-c211f301db04",
+          "change_type": "导入",
+          "timestamp": "2026-06-19T22:05:04.256728",
+          "operator": "数据员",
+          "reason": "首次导入，批次: BATCH-20260619220504256361",
+          "added": {
+            "uniform_zone_flag": true,
+            "sensor_id": "MAG-COIL-002",
+            "temperature_value": 298.15,
+            "related_photo_ids": [],
+            "coach_review_required": false,
+            "source_file": "test_data/sensors.json",
+            "duplicate_import_batches": [],
+            "sensor_record_key": "6a837bee79d7d2bb0f7556c3ec422c9a8ed9c8cfe4be203ab7b9d16228c8eca9",
+            "processing_status": "已导入",
+            "original_line_number": 6,
+            "last_updated_at": "2026-06-19T22:05:04.256696",
+            "created_at": "2026-06-19T22:05:04.256695",
+            "manual_annotation": null,
+            "has_mixed_temp_units": false,
+            "temperature_unit": "K",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+            "history_ids": [],
+            "review_notes": null
+          },
+          "removed": {},
+          "modified": {}
+        },
+        {
+          "entry_id": "2451ab80-4d31-4883-af75-2de373ba655c",
+          "change_type": "温度单位修正",
+          "timestamp": "2026-06-19T22:05:04.259559",
+          "operator": "系统",
+          "reason": "温度单位校验自动触发规则: TEMP_MIX_001，单位混用，当前批次同时存在: {'°C', 'K'}。不自动修正，等待训练教练复核。",
+          "added": {},
+          "removed": {},
+          "modified": {
+            "coach_review_required": {
+              "before": false,
+              "after": true
+            },
+            "processing_status": {
+              "before": "已导入",
+              "after": "温度单位混用待复核"
+            },
+            "has_mixed_temp_units": {
+              "before": false,
+              "after": true
+            },
+            "review_notes": {
+              "before": null,
+              "after": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核"
+            }
+          }
+        },
+        {
+          "entry_id": "efafc4d4-347d-4b7c-9fd0-08ac80cf1183",
+          "change_type": "工况照片关联",
+          "timestamp": "2026-06-19T22:05:04.321466",
+          "operator": "何工",
+          "reason": "工况照片复核: A区边缘磁场线圈照片，可见轻微振动痕迹",
+          "added": {},
+          "removed": {},
+          "modified": {
+            "related_photo_ids": {
+              "before": [],
+              "after": [
+                "PHOTO-2026-0604-002"
+              ]
+            },
+            "review_notes": {
+              "before": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核",
+              "after": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] A区边缘磁场线圈照片，可见轻微振动痕迹: 振动痕迹在允许范围内，不影响磁场均匀性"
+            }
+          }
+        },
+        {
+          "entry_id": "c1152957-fad2-48f0-8bcd-3c9152bac96f",
+          "change_type": "导入",
+          "timestamp": "2026-06-19T22:05:04.387619",
+          "operator": "数据员",
+          "reason": "重复导入处理: 传感器MAG-COIL-002已存在于首次导入批次BATCH-20260619220504256361，本次批次BATCH-20260619220504386088为重复导入。数据无变化仅更新批次号",
+          "added": {},
+          "removed": {},
+          "modified": {
+            "duplicate_import_batches": {
+              "before": [],
+              "after": [
+                "BATCH-20260619220504386088"
+              ]
+            }
+          }
+        },
+        {
+          "entry_id": "cb5da055-f11d-4cce-be1c-500b0211fc03",
+          "change_type": "教练复核",
+          "timestamp": "2026-06-19T22:05:04.591763",
+          "operator": "训练教练",
+          "reason": "温度单位复核完成[convert]: 298.15K按公式转25°C",
+          "added": {},
+          "removed": {},
+          "modified": {
+            "temperature_value": {
+              "before": 298.15,
+              "after": 25.0
+            },
+            "coach_review_required": {
+              "before": true,
+              "after": false
+            },
+            "processing_status": {
+              "before": "温度单位混用待复核",
+              "after": "教练已复核"
+            },
+            "manual_annotation": {
+              "before": null,
+              "after": "教练修正[convert]: 数值转换: 298.15K -> 25.0°C。依据: 298.15K按公式转25°C。操作人: 训练教练"
+            },
+            "temperature_unit": {
+              "before": "K",
+              "after": "°C"
+            }
+          }
+        },
+        {
+          "entry_id": "236c522f-2f1d-433a-96ff-f8191f638a10",
+          "change_type": "交接报告更新",
+          "timestamp": "2026-06-19T22:05:04.650782",
+          "operator": "何工",
+          "reason": "交接报告更新: 现场核验完成",
+          "added": {},
+          "removed": {},
+          "modified": {
+            "processing_status": {
+              "before": "教练已复核",
+              "after": "交接报告已更新"
+            },
+            "review_notes": {
+              "before": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] A区边缘磁场线圈照片，可见轻微振动痕迹: 振动痕迹在允许范围内，不影响磁场均匀性",
+              "after": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] A区边缘磁场线圈照片，可见轻微振动痕迹: 振动痕迹在允许范围内，不影响磁场均匀性\n[交接报告更新][何工] 现场核验完成"
+            }
+          }
+        }
+      ],
+      "audit_summary": {
+        "uniform_zone_id": "26a62cff-750a-4289-b10a-238c8d8e126b",
+        "total_changes": 6,
+        "change_types": {
+          "导入": 2,
+          "温度单位修正": 1,
+          "工况照片关联": 1,
+          "教练复核": 1,
+          "交接报告更新": 1
+        },
+        "operators": {
+          "数据员": 2,
+          "系统": 1,
+          "何工": 2,
+          "训练教练": 1
+        },
+        "first_change": "2026-06-19T22:05:04.256728",
+        "last_change": "2026-06-19T22:05:04.650782"
+      },
+      "replay_commands": [
+        "# [2026-06-19T22:05:04.256728] 导入 - 数据员: 首次导入，批次: BATCH-20260619220504256361",
+        "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\"",
+        "# [2026-06-19T22:05:04.259559] 温度单位修正 - 系统: 温度单位校验自动触发规则: TEMP_MIX_001，单位混用，当前批次同时存在: {'°C', 'K'}。不自动修正，等待训练教练复核。",
+        "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\"",
+        "# [2026-06-19T22:05:04.321466] 工况照片关联 - 何工: 工况照片复核: A区边缘磁场线圈照片，可见轻微振动痕迹",
+        "python3 main.py review-photos --input-file test_data/photos.json --operator \"何工\"",
+        "# [2026-06-19T22:05:04.387619] 导入 - 数据员: 重复导入处理: 传感器MAG-COIL-002已存在于首次导入批次BATCH-20260619220504256361，本次批次BATCH-20260619220504386088为重复导入。数据无变化仅更新批次号",
+        "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\"",
+        "# [2026-06-19T22:05:04.591763] 教练复核 - 训练教练: 温度单位复核完成[convert]: 298.15K按公式转25°C",
+        "python3 main.py coach-review --uz-id 26a62cff-750a-4289-b10a-238c8d8e126b --target-unit °C --correction-mode convert --remark \"298.15K按公式转25°C\" --operator \"训练教练\"",
+        "# [2026-06-19T22:05:04.650782] 交接报告更新 - 何工: 交接报告更新: 现场核验完成",
+        "python3 main.py update-report --uz-ids 26a62cff-750a-4289-b10a-238c8d8e126b --notes \"现场核验完成\" --operator \"何工\""
+      ]
+    },
+    {
+      "uniform_zone": {
+        "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+        "sensor_id": "MAG-COIL-003",
+        "sensor_record_key": "1ba9ced5828b13efdd88c53557c4a6199033f233deac20435d3aceec23a6fc3a",
+        "original_line_number": 7,
+        "source_file": "test_data/sensors.json",
+        "temperature_value": 25.0,
+        "temperature_unit": "°C",
+        "uniform_zone_flag": true,
+        "processing_status": "交接报告已更新",
+        "related_photo_ids": [
+          "PHOTO-2026-0604-003"
+        ],
+        "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] B区中心线圈照片，温度显示仪表读数25°C: 照片显示现场仪表读数为25°C，确认传感器记录单位错误，应为摄氏度\n[交接报告更新][何工] 现场核验完成",
+        "manual_annotation": "教练修正[fix_unit]: 标签修正: 25.0K -> 25.0°C（仅修正单位标签，数值不变）。依据: 现场照片确认25K实为25°C。操作人: 训练教练",
+        "has_mixed_temp_units": true,
+        "coach_review_required": false,
+        "history_ids": [
+          "1b13531c-fe05-470e-996e-2172b54bed3e",
+          "c41da2f1-e686-4198-aee3-7d318f388fd5",
+          "eeda5853-a37a-482e-a8da-7264f913f1f7",
+          "8bb6f72d-2c8d-45d3-bed6-9afbf6457c07",
+          "0ca83a85-d002-4966-b0d3-f04f6cb560c4",
+          "908e2163-b93b-4f85-8118-47e10155141a"
+        ],
+        "created_at": "2026-06-19T22:05:04.256923",
+        "last_updated_at": "2026-06-19T22:05:04.654531",
+        "import_batch_id": "BATCH-20260619220504256361",
+        "duplicate_import_batches": [
+          "BATCH-20260619220504386088"
+        ]
+      },
+      "sensor_evidence": {
+        "sensor_id": "MAG-COIL-003",
+        "original_line_number": 7,
+        "raw_data": {
+          "position": "B区-中心",
+          "calibration_date": "2026-05-15",
+          "operator": "数据员A",
+          "note": "疑似单位记录错误，25K明显不合理"
+        },
+        "source_file": "test_data/sensors.json",
+        "import_batch_id": "BATCH-20260619220504256361",
+        "temperature_value": 25.0,
+        "temperature_unit": "K",
+        "uniform_zone_flag": true,
+        "processing_status": "已导入",
+        "manual_edits": [],
+        "created_at": "2026-06-19T22:05:04.256913"
+      },
+      "photo_evidences": [
+        {
+          "photo_id": "PHOTO-2026-0604-003",
+          "scene_description": "B区中心线圈照片，温度显示仪表读数25°C",
+          "source_file": "/photos/20260604/B-001.jpg",
+          "upload_time": "2026-06-04T10:40:00",
+          "related_sensor_ids": [
+            "MAG-COIL-003"
+          ],
+          "reviewer": "何工",
+          "review_notes": "照片显示现场仪表读数为25°C，确认传感器记录单位错误，应为摄氏度",
+          "is_late_arrival": false,
+          "created_at": "2026-06-19T22:05:04.322314"
+        }
+      ],
+      "duplicate_import_info": {
+        "is_duplicate_touched": true,
+        "first_import_batch": "BATCH-20260619220504256361",
+        "duplicate_batches": [
+          "BATCH-20260619220504386088"
+        ],
+        "total_import_attempts": 2,
+        "dedup_conclusion": "传感器MAG-COIL-003首次导入批次BATCH-20260619220504256361，后续重复导入批次: ['BATCH-20260619220504386088']。去重后数量未翻倍，当前记录为首次导入的原始记录。"
+      },
+      "history": [
+        {
+          "entry_id": "1b13531c-fe05-470e-996e-2172b54bed3e",
+          "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+          "change_type": "导入",
+          "before_value": null,
+          "after_value": {
+            "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+            "sensor_id": "MAG-COIL-003",
+            "sensor_record_key": "1ba9ced5828b13efdd88c53557c4a6199033f233deac20435d3aceec23a6fc3a",
+            "original_line_number": 7,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "K",
+            "uniform_zone_flag": true,
+            "processing_status": "已导入",
+            "related_photo_ids": [],
+            "review_notes": null,
+            "manual_annotation": null,
+            "has_mixed_temp_units": false,
+            "coach_review_required": false,
+            "history_ids": [],
+            "created_at": "2026-06-19T22:05:04.256923",
+            "last_updated_at": "2026-06-19T22:05:04.256923",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "operator": "数据员",
+          "timestamp": "2026-06-19T22:05:04.256948",
+          "reason": "首次导入，批次: BATCH-20260619220504256361",
+          "evidence_ref": "source_file=test_data/sensors.json, line=7",
+          "command_used": "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\""
+        },
+        {
+          "entry_id": "c41da2f1-e686-4198-aee3-7d318f388fd5",
+          "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+          "change_type": "温度单位修正",
+          "before_value": {
+            "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+            "sensor_id": "MAG-COIL-003",
+            "sensor_record_key": "1ba9ced5828b13efdd88c53557c4a6199033f233deac20435d3aceec23a6fc3a",
+            "original_line_number": 7,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "K",
+            "uniform_zone_flag": true,
+            "processing_status": "已导入",
+            "related_photo_ids": [],
+            "review_notes": null,
+            "manual_annotation": null,
+            "has_mixed_temp_units": false,
+            "coach_review_required": false,
+            "history_ids": [
+              "1b13531c-fe05-470e-996e-2172b54bed3e"
+            ],
+            "created_at": "2026-06-19T22:05:04.256923",
+            "last_updated_at": "2026-06-19T22:05:04.256923",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "after_value": {
+            "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+            "sensor_id": "MAG-COIL-003",
+            "sensor_record_key": "1ba9ced5828b13efdd88c53557c4a6199033f233deac20435d3aceec23a6fc3a",
+            "original_line_number": 7,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "K",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "1b13531c-fe05-470e-996e-2172b54bed3e"
+            ],
+            "created_at": "2026-06-19T22:05:04.256923",
+            "last_updated_at": "2026-06-19T22:05:04.256923",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "operator": "系统",
+          "timestamp": "2026-06-19T22:05:04.260233",
+          "reason": "温度单位校验自动触发规则: TEMP_MIX_001，单位混用，当前批次同时存在: {'°C', 'K'}。不自动修正，等待训练教练复核。",
+          "evidence_ref": "TEMP_MIX_001",
+          "command_used": "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\""
+        },
+        {
+          "entry_id": "eeda5853-a37a-482e-a8da-7264f913f1f7",
+          "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+          "change_type": "工况照片关联",
+          "before_value": {
+            "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+            "sensor_id": "MAG-COIL-003",
+            "sensor_record_key": "1ba9ced5828b13efdd88c53557c4a6199033f233deac20435d3aceec23a6fc3a",
+            "original_line_number": 7,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "K",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "1b13531c-fe05-470e-996e-2172b54bed3e",
+              "c41da2f1-e686-4198-aee3-7d318f388fd5"
+            ],
+            "created_at": "2026-06-19T22:05:04.256923",
+            "last_updated_at": "2026-06-19T22:05:04.260911",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "after_value": {
+            "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+            "sensor_id": "MAG-COIL-003",
+            "sensor_record_key": "1ba9ced5828b13efdd88c53557c4a6199033f233deac20435d3aceec23a6fc3a",
+            "original_line_number": 7,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "K",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-003"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] B区中心线圈照片，温度显示仪表读数25°C: 照片显示现场仪表读数为25°C，确认传感器记录单位错误，应为摄氏度",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "1b13531c-fe05-470e-996e-2172b54bed3e",
+              "c41da2f1-e686-4198-aee3-7d318f388fd5"
+            ],
+            "created_at": "2026-06-19T22:05:04.256923",
+            "last_updated_at": "2026-06-19T22:05:04.260911",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "operator": "何工",
+          "timestamp": "2026-06-19T22:05:04.322356",
+          "reason": "工况照片复核: B区中心线圈照片，温度显示仪表读数25°C",
+          "evidence_ref": "photo_id=PHOTO-2026-0604-003, input_file=test_data/photos.json",
+          "command_used": "python3 main.py review-photos --input-file test_data/photos.json --operator \"何工\""
+        },
+        {
+          "entry_id": "8bb6f72d-2c8d-45d3-bed6-9afbf6457c07",
+          "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+          "change_type": "导入",
+          "before_value": {
+            "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+            "sensor_id": "MAG-COIL-003",
+            "sensor_record_key": "1ba9ced5828b13efdd88c53557c4a6199033f233deac20435d3aceec23a6fc3a",
+            "original_line_number": 7,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "K",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-003"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] B区中心线圈照片，温度显示仪表读数25°C: 照片显示现场仪表读数为25°C，确认传感器记录单位错误，应为摄氏度",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "1b13531c-fe05-470e-996e-2172b54bed3e",
+              "c41da2f1-e686-4198-aee3-7d318f388fd5",
+              "eeda5853-a37a-482e-a8da-7264f913f1f7"
+            ],
+            "created_at": "2026-06-19T22:05:04.256923",
+            "last_updated_at": "2026-06-19T22:05:04.323270",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "after_value": {
+            "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+            "sensor_id": "MAG-COIL-003",
+            "sensor_record_key": "1ba9ced5828b13efdd88c53557c4a6199033f233deac20435d3aceec23a6fc3a",
+            "original_line_number": 7,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "K",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-003"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] B区中心线圈照片，温度显示仪表读数25°C: 照片显示现场仪表读数为25°C，确认传感器记录单位错误，应为摄氏度",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "1b13531c-fe05-470e-996e-2172b54bed3e",
+              "c41da2f1-e686-4198-aee3-7d318f388fd5",
+              "eeda5853-a37a-482e-a8da-7264f913f1f7"
+            ],
+            "created_at": "2026-06-19T22:05:04.256923",
+            "last_updated_at": "2026-06-19T22:05:04.323270",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": [
+              "BATCH-20260619220504386088"
+            ]
+          },
+          "operator": "数据员",
+          "timestamp": "2026-06-19T22:05:04.388933",
+          "reason": "重复导入处理: 传感器MAG-COIL-003已存在于首次导入批次BATCH-20260619220504256361，本次批次BATCH-20260619220504386088为重复导入。数据无变化仅更新批次号",
+          "evidence_ref": "source_file=test_data/sensors.json, line=7, 首次批次=BATCH-20260619220504256361, 重复批次=BATCH-20260619220504386088",
+          "command_used": "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\""
+        },
+        {
+          "entry_id": "0ca83a85-d002-4966-b0d3-f04f6cb560c4",
+          "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+          "change_type": "教练复核",
+          "before_value": {
+            "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+            "sensor_id": "MAG-COIL-003",
+            "sensor_record_key": "1ba9ced5828b13efdd88c53557c4a6199033f233deac20435d3aceec23a6fc3a",
+            "original_line_number": 7,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "K",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-003"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] B区中心线圈照片，温度显示仪表读数25°C: 照片显示现场仪表读数为25°C，确认传感器记录单位错误，应为摄氏度",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "1b13531c-fe05-470e-996e-2172b54bed3e",
+              "c41da2f1-e686-4198-aee3-7d318f388fd5",
+              "eeda5853-a37a-482e-a8da-7264f913f1f7",
+              "8bb6f72d-2c8d-45d3-bed6-9afbf6457c07"
+            ],
+            "created_at": "2026-06-19T22:05:04.256923",
+            "last_updated_at": "2026-06-19T22:05:04.390212",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": [
+              "BATCH-20260619220504386088"
+            ]
+          },
+          "after_value": {
+            "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+            "sensor_id": "MAG-COIL-003",
+            "sensor_record_key": "1ba9ced5828b13efdd88c53557c4a6199033f233deac20435d3aceec23a6fc3a",
+            "original_line_number": 7,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "教练已复核",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-003"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] B区中心线圈照片，温度显示仪表读数25°C: 照片显示现场仪表读数为25°C，确认传感器记录单位错误，应为摄氏度",
+            "manual_annotation": "教练修正[fix_unit]: 标签修正: 25.0K -> 25.0°C（仅修正单位标签，数值不变）。依据: 现场照片确认25K实为25°C。操作人: 训练教练",
+            "has_mixed_temp_units": true,
+            "coach_review_required": false,
+            "history_ids": [
+              "1b13531c-fe05-470e-996e-2172b54bed3e",
+              "c41da2f1-e686-4198-aee3-7d318f388fd5",
+              "eeda5853-a37a-482e-a8da-7264f913f1f7",
+              "8bb6f72d-2c8d-45d3-bed6-9afbf6457c07"
+            ],
+            "created_at": "2026-06-19T22:05:04.256923",
+            "last_updated_at": "2026-06-19T22:05:04.390212",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": [
+              "BATCH-20260619220504386088"
+            ]
+          },
+          "operator": "训练教练",
+          "timestamp": "2026-06-19T22:05:04.531563",
+          "reason": "温度单位复核完成[fix_unit]: 现场照片确认25K实为25°C",
+          "evidence_ref": "TEMP_CORR_001",
+          "command_used": "python3 main.py coach-review --uz-id 332b7958-a2ef-4cc2-947f-cb8bf1814169 --target-unit °C --correction-mode fix_unit --remark \"现场照片确认25K实为25°C\" --operator \"训练教练\""
+        },
+        {
+          "entry_id": "908e2163-b93b-4f85-8118-47e10155141a",
+          "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+          "change_type": "交接报告更新",
+          "before_value": {
+            "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+            "sensor_id": "MAG-COIL-003",
+            "sensor_record_key": "1ba9ced5828b13efdd88c53557c4a6199033f233deac20435d3aceec23a6fc3a",
+            "original_line_number": 7,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "教练已复核",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-003"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] B区中心线圈照片，温度显示仪表读数25°C: 照片显示现场仪表读数为25°C，确认传感器记录单位错误，应为摄氏度",
+            "manual_annotation": "教练修正[fix_unit]: 标签修正: 25.0K -> 25.0°C（仅修正单位标签，数值不变）。依据: 现场照片确认25K实为25°C。操作人: 训练教练",
+            "has_mixed_temp_units": true,
+            "coach_review_required": false,
+            "history_ids": [
+              "1b13531c-fe05-470e-996e-2172b54bed3e",
+              "c41da2f1-e686-4198-aee3-7d318f388fd5",
+              "eeda5853-a37a-482e-a8da-7264f913f1f7",
+              "8bb6f72d-2c8d-45d3-bed6-9afbf6457c07",
+              "0ca83a85-d002-4966-b0d3-f04f6cb560c4"
+            ],
+            "created_at": "2026-06-19T22:05:04.256923",
+            "last_updated_at": "2026-06-19T22:05:04.533340",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": [
+              "BATCH-20260619220504386088"
+            ]
+          },
+          "after_value": {
+            "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+            "sensor_id": "MAG-COIL-003",
+            "sensor_record_key": "1ba9ced5828b13efdd88c53557c4a6199033f233deac20435d3aceec23a6fc3a",
+            "original_line_number": 7,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 25.0,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "交接报告已更新",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-003"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] B区中心线圈照片，温度显示仪表读数25°C: 照片显示现场仪表读数为25°C，确认传感器记录单位错误，应为摄氏度\n[交接报告更新][何工] 现场核验完成",
+            "manual_annotation": "教练修正[fix_unit]: 标签修正: 25.0K -> 25.0°C（仅修正单位标签，数值不变）。依据: 现场照片确认25K实为25°C。操作人: 训练教练",
+            "has_mixed_temp_units": true,
+            "coach_review_required": false,
+            "history_ids": [
+              "1b13531c-fe05-470e-996e-2172b54bed3e",
+              "c41da2f1-e686-4198-aee3-7d318f388fd5",
+              "eeda5853-a37a-482e-a8da-7264f913f1f7",
+              "8bb6f72d-2c8d-45d3-bed6-9afbf6457c07",
+              "0ca83a85-d002-4966-b0d3-f04f6cb560c4"
+            ],
+            "created_at": "2026-06-19T22:05:04.256923",
+            "last_updated_at": "2026-06-19T22:05:04.533340",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": [
+              "BATCH-20260619220504386088"
+            ]
+          },
+          "operator": "何工",
+          "timestamp": "2026-06-19T22:05:04.652715",
+          "reason": "交接报告更新: 现场核验完成",
+          "evidence_ref": null,
+          "command_used": "python3 main.py update-report --uz-ids 332b7958-a2ef-4cc2-947f-cb8bf1814169 --notes \"现场核验完成\" --operator \"何工\""
+        }
+      ],
+      "change_comparisons": [
+        {
+          "entry_id": "1b13531c-fe05-470e-996e-2172b54bed3e",
+          "change_type": "导入",
+          "timestamp": "2026-06-19T22:05:04.256948",
+          "operator": "数据员",
+          "reason": "首次导入，批次: BATCH-20260619220504256361",
+          "added": {
+            "uniform_zone_flag": true,
+            "sensor_id": "MAG-COIL-003",
+            "temperature_value": 25.0,
+            "related_photo_ids": [],
+            "coach_review_required": false,
+            "source_file": "test_data/sensors.json",
+            "duplicate_import_batches": [],
+            "sensor_record_key": "1ba9ced5828b13efdd88c53557c4a6199033f233deac20435d3aceec23a6fc3a",
+            "processing_status": "已导入",
+            "original_line_number": 7,
+            "last_updated_at": "2026-06-19T22:05:04.256923",
+            "created_at": "2026-06-19T22:05:04.256923",
+            "manual_annotation": null,
+            "has_mixed_temp_units": false,
+            "temperature_unit": "K",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+            "history_ids": [],
+            "review_notes": null
+          },
+          "removed": {},
+          "modified": {}
+        },
+        {
+          "entry_id": "c41da2f1-e686-4198-aee3-7d318f388fd5",
+          "change_type": "温度单位修正",
+          "timestamp": "2026-06-19T22:05:04.260233",
+          "operator": "系统",
+          "reason": "温度单位校验自动触发规则: TEMP_MIX_001，单位混用，当前批次同时存在: {'°C', 'K'}。不自动修正，等待训练教练复核。",
+          "added": {},
+          "removed": {},
+          "modified": {
+            "coach_review_required": {
+              "before": false,
+              "after": true
+            },
+            "processing_status": {
+              "before": "已导入",
+              "after": "温度单位混用待复核"
+            },
+            "has_mixed_temp_units": {
+              "before": false,
+              "after": true
+            },
+            "review_notes": {
+              "before": null,
+              "after": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核"
+            }
+          }
+        },
+        {
+          "entry_id": "eeda5853-a37a-482e-a8da-7264f913f1f7",
+          "change_type": "工况照片关联",
+          "timestamp": "2026-06-19T22:05:04.322356",
+          "operator": "何工",
+          "reason": "工况照片复核: B区中心线圈照片，温度显示仪表读数25°C",
+          "added": {},
+          "removed": {},
+          "modified": {
+            "related_photo_ids": {
+              "before": [],
+              "after": [
+                "PHOTO-2026-0604-003"
+              ]
+            },
+            "review_notes": {
+              "before": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核",
+              "after": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] B区中心线圈照片，温度显示仪表读数25°C: 照片显示现场仪表读数为25°C，确认传感器记录单位错误，应为摄氏度"
+            }
+          }
+        },
+        {
+          "entry_id": "8bb6f72d-2c8d-45d3-bed6-9afbf6457c07",
+          "change_type": "导入",
+          "timestamp": "2026-06-19T22:05:04.388933",
+          "operator": "数据员",
+          "reason": "重复导入处理: 传感器MAG-COIL-003已存在于首次导入批次BATCH-20260619220504256361，本次批次BATCH-20260619220504386088为重复导入。数据无变化仅更新批次号",
+          "added": {},
+          "removed": {},
+          "modified": {
+            "duplicate_import_batches": {
+              "before": [],
+              "after": [
+                "BATCH-20260619220504386088"
+              ]
+            }
+          }
+        },
+        {
+          "entry_id": "0ca83a85-d002-4966-b0d3-f04f6cb560c4",
+          "change_type": "教练复核",
+          "timestamp": "2026-06-19T22:05:04.531563",
+          "operator": "训练教练",
+          "reason": "温度单位复核完成[fix_unit]: 现场照片确认25K实为25°C",
+          "added": {},
+          "removed": {},
+          "modified": {
+            "coach_review_required": {
+              "before": true,
+              "after": false
+            },
+            "processing_status": {
+              "before": "温度单位混用待复核",
+              "after": "教练已复核"
+            },
+            "manual_annotation": {
+              "before": null,
+              "after": "教练修正[fix_unit]: 标签修正: 25.0K -> 25.0°C（仅修正单位标签，数值不变）。依据: 现场照片确认25K实为25°C。操作人: 训练教练"
+            },
+            "temperature_unit": {
+              "before": "K",
+              "after": "°C"
+            }
+          }
+        },
+        {
+          "entry_id": "908e2163-b93b-4f85-8118-47e10155141a",
+          "change_type": "交接报告更新",
+          "timestamp": "2026-06-19T22:05:04.652715",
+          "operator": "何工",
+          "reason": "交接报告更新: 现场核验完成",
+          "added": {},
+          "removed": {},
+          "modified": {
+            "processing_status": {
+              "before": "教练已复核",
+              "after": "交接报告已更新"
+            },
+            "review_notes": {
+              "before": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] B区中心线圈照片，温度显示仪表读数25°C: 照片显示现场仪表读数为25°C，确认传感器记录单位错误，应为摄氏度",
+              "after": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] B区中心线圈照片，温度显示仪表读数25°C: 照片显示现场仪表读数为25°C，确认传感器记录单位错误，应为摄氏度\n[交接报告更新][何工] 现场核验完成"
+            }
+          }
+        }
+      ],
+      "audit_summary": {
+        "uniform_zone_id": "332b7958-a2ef-4cc2-947f-cb8bf1814169",
+        "total_changes": 6,
+        "change_types": {
+          "导入": 2,
+          "温度单位修正": 1,
+          "工况照片关联": 1,
+          "教练复核": 1,
+          "交接报告更新": 1
+        },
+        "operators": {
+          "数据员": 2,
+          "系统": 1,
+          "何工": 2,
+          "训练教练": 1
+        },
+        "first_change": "2026-06-19T22:05:04.256948",
+        "last_change": "2026-06-19T22:05:04.652715"
+      },
+      "replay_commands": [
+        "# [2026-06-19T22:05:04.256948] 导入 - 数据员: 首次导入，批次: BATCH-20260619220504256361",
+        "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\"",
+        "# [2026-06-19T22:05:04.260233] 温度单位修正 - 系统: 温度单位校验自动触发规则: TEMP_MIX_001，单位混用，当前批次同时存在: {'°C', 'K'}。不自动修正，等待训练教练复核。",
+        "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\"",
+        "# [2026-06-19T22:05:04.322356] 工况照片关联 - 何工: 工况照片复核: B区中心线圈照片，温度显示仪表读数25°C",
+        "python3 main.py review-photos --input-file test_data/photos.json --operator \"何工\"",
+        "# [2026-06-19T22:05:04.388933] 导入 - 数据员: 重复导入处理: 传感器MAG-COIL-003已存在于首次导入批次BATCH-20260619220504256361，本次批次BATCH-20260619220504386088为重复导入。数据无变化仅更新批次号",
+        "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\"",
+        "# [2026-06-19T22:05:04.531563] 教练复核 - 训练教练: 温度单位复核完成[fix_unit]: 现场照片确认25K实为25°C",
+        "python3 main.py coach-review --uz-id 332b7958-a2ef-4cc2-947f-cb8bf1814169 --target-unit °C --correction-mode fix_unit --remark \"现场照片确认25K实为25°C\" --operator \"训练教练\"",
+        "# [2026-06-19T22:05:04.652715] 交接报告更新 - 何工: 交接报告更新: 现场核验完成",
+        "python3 main.py update-report --uz-ids 332b7958-a2ef-4cc2-947f-cb8bf1814169 --notes \"现场核验完成\" --operator \"何工\""
+      ]
+    },
+    {
+      "uniform_zone": {
+        "uniform_zone_id": "fa93c327-f1a8-413e-b888-de48e6499608",
+        "sensor_id": "MAG-COIL-004",
+        "sensor_record_key": "006e637b3e92d3f7c5135b5dc4b63e8844b057ce67091a1cc6d8d28580ee5c3f",
+        "original_line_number": 8,
+        "source_file": "test_data/sensors.json",
+        "temperature_value": 24.5,
+        "temperature_unit": "°C",
+        "uniform_zone_flag": true,
+        "processing_status": "温度单位混用待复核",
+        "related_photo_ids": [
+          "PHOTO-2026-0604-005"
+        ],
+        "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[晚到材料][照片:PHOTO-2026-0604-005] B区边缘线圈夜间补拍照片，确认无异常发热. 夜间现场复核，B区边缘温度稳定，无异常发热点。补充：当日下午对该区域进行了二次测温，确认24.5°C读数准确。",
+        "manual_annotation": null,
+        "has_mixed_temp_units": true,
+        "coach_review_required": true,
+        "history_ids": [
+          "8e7aa6dc-011b-48d9-a2e7-f20dc1a43832",
+          "beaf6e30-a781-463e-9586-2cdee40ba2b9",
+          "89639d20-177d-4626-aa37-c51f6d01fc7a",
+          "2ba258e7-dff2-4daf-be44-6e61ab09a181"
+        ],
+        "created_at": "2026-06-19T22:05:04.257172",
+        "last_updated_at": "2026-06-19T22:05:04.716111",
+        "import_batch_id": "BATCH-20260619220504256361",
+        "duplicate_import_batches": [
+          "BATCH-20260619220504386088"
+        ]
+      },
+      "sensor_evidence": {
+        "sensor_id": "MAG-COIL-004",
+        "original_line_number": 8,
+        "raw_data": {
+          "position": "B区-边缘",
+          "calibration_date": "2026-05-15",
+          "operator": "数据员A"
+        },
+        "source_file": "test_data/sensors.json",
+        "import_batch_id": "BATCH-20260619220504256361",
+        "temperature_value": 24.5,
+        "temperature_unit": "°C",
+        "uniform_zone_flag": true,
+        "processing_status": "已导入",
+        "manual_edits": [],
+        "created_at": "2026-06-19T22:05:04.257164"
+      },
+      "photo_evidences": [
+        {
+          "photo_id": "PHOTO-2026-0604-005",
+          "scene_description": "B区边缘线圈夜间补拍照片，确认无异常发热",
+          "source_file": "/photos/20260604/B-002-LATE.jpg",
+          "upload_time": "2026-06-04T18:30:00",
+          "related_sensor_ids": [
+            "MAG-COIL-004"
+          ],
+          "reviewer": "何工",
+          "review_notes": "夜间现场复核，B区边缘温度稳定，无异常发热点。补充：当日下午对该区域进行了二次测温，确认24.5°C读数准确。",
+          "is_late_arrival": true,
+          "created_at": "2026-06-19T22:05:04.713634"
+        }
+      ],
+      "duplicate_import_info": {
+        "is_duplicate_touched": true,
+        "first_import_batch": "BATCH-20260619220504256361",
+        "duplicate_batches": [
+          "BATCH-20260619220504386088"
+        ],
+        "total_import_attempts": 2,
+        "dedup_conclusion": "传感器MAG-COIL-004首次导入批次BATCH-20260619220504256361，后续重复导入批次: ['BATCH-20260619220504386088']。去重后数量未翻倍，当前记录为首次导入的原始记录。"
+      },
+      "history": [
+        {
+          "entry_id": "8e7aa6dc-011b-48d9-a2e7-f20dc1a43832",
+          "uniform_zone_id": "fa93c327-f1a8-413e-b888-de48e6499608",
+          "change_type": "导入",
+          "before_value": null,
+          "after_value": {
+            "uniform_zone_id": "fa93c327-f1a8-413e-b888-de48e6499608",
+            "sensor_id": "MAG-COIL-004",
+            "sensor_record_key": "006e637b3e92d3f7c5135b5dc4b63e8844b057ce67091a1cc6d8d28580ee5c3f",
+            "original_line_number": 8,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 24.5,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "已导入",
+            "related_photo_ids": [],
+            "review_notes": null,
+            "manual_annotation": null,
+            "has_mixed_temp_units": false,
+            "coach_review_required": false,
+            "history_ids": [],
+            "created_at": "2026-06-19T22:05:04.257172",
+            "last_updated_at": "2026-06-19T22:05:04.257173",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "operator": "数据员",
+          "timestamp": "2026-06-19T22:05:04.257205",
+          "reason": "首次导入，批次: BATCH-20260619220504256361",
+          "evidence_ref": "source_file=test_data/sensors.json, line=8",
+          "command_used": "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\""
+        },
+        {
+          "entry_id": "beaf6e30-a781-463e-9586-2cdee40ba2b9",
+          "uniform_zone_id": "fa93c327-f1a8-413e-b888-de48e6499608",
+          "change_type": "温度单位修正",
+          "before_value": {
+            "uniform_zone_id": "fa93c327-f1a8-413e-b888-de48e6499608",
+            "sensor_id": "MAG-COIL-004",
+            "sensor_record_key": "006e637b3e92d3f7c5135b5dc4b63e8844b057ce67091a1cc6d8d28580ee5c3f",
+            "original_line_number": 8,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 24.5,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "已导入",
+            "related_photo_ids": [],
+            "review_notes": null,
+            "manual_annotation": null,
+            "has_mixed_temp_units": false,
+            "coach_review_required": false,
+            "history_ids": [
+              "8e7aa6dc-011b-48d9-a2e7-f20dc1a43832"
+            ],
+            "created_at": "2026-06-19T22:05:04.257172",
+            "last_updated_at": "2026-06-19T22:05:04.257173",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "after_value": {
+            "uniform_zone_id": "fa93c327-f1a8-413e-b888-de48e6499608",
+            "sensor_id": "MAG-COIL-004",
+            "sensor_record_key": "006e637b3e92d3f7c5135b5dc4b63e8844b057ce67091a1cc6d8d28580ee5c3f",
+            "original_line_number": 8,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 24.5,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "8e7aa6dc-011b-48d9-a2e7-f20dc1a43832"
+            ],
+            "created_at": "2026-06-19T22:05:04.257172",
+            "last_updated_at": "2026-06-19T22:05:04.257173",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "operator": "系统",
+          "timestamp": "2026-06-19T22:05:04.258408",
+          "reason": "温度单位校验自动触发规则: TEMP_MIX_001，单位混用，当前批次同时存在: {'°C', 'K'}。不自动修正，等待训练教练复核。",
+          "evidence_ref": "TEMP_MIX_001",
+          "command_used": "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\""
+        },
+        {
+          "entry_id": "89639d20-177d-4626-aa37-c51f6d01fc7a",
+          "uniform_zone_id": "fa93c327-f1a8-413e-b888-de48e6499608",
+          "change_type": "导入",
+          "before_value": {
+            "uniform_zone_id": "fa93c327-f1a8-413e-b888-de48e6499608",
+            "sensor_id": "MAG-COIL-004",
+            "sensor_record_key": "006e637b3e92d3f7c5135b5dc4b63e8844b057ce67091a1cc6d8d28580ee5c3f",
+            "original_line_number": 8,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 24.5,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "8e7aa6dc-011b-48d9-a2e7-f20dc1a43832",
+              "beaf6e30-a781-463e-9586-2cdee40ba2b9"
+            ],
+            "created_at": "2026-06-19T22:05:04.257172",
+            "last_updated_at": "2026-06-19T22:05:04.258884",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "after_value": {
+            "uniform_zone_id": "fa93c327-f1a8-413e-b888-de48e6499608",
+            "sensor_id": "MAG-COIL-004",
+            "sensor_record_key": "006e637b3e92d3f7c5135b5dc4b63e8844b057ce67091a1cc6d8d28580ee5c3f",
+            "original_line_number": 8,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 24.5,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "8e7aa6dc-011b-48d9-a2e7-f20dc1a43832",
+              "beaf6e30-a781-463e-9586-2cdee40ba2b9"
+            ],
+            "created_at": "2026-06-19T22:05:04.257172",
+            "last_updated_at": "2026-06-19T22:05:04.258884",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": [
+              "BATCH-20260619220504386088"
+            ]
+          },
+          "operator": "数据员",
+          "timestamp": "2026-06-19T22:05:04.390304",
+          "reason": "重复导入处理: 传感器MAG-COIL-004已存在于首次导入批次BATCH-20260619220504256361，本次批次BATCH-20260619220504386088为重复导入。数据无变化仅更新批次号",
+          "evidence_ref": "source_file=test_data/sensors.json, line=8, 首次批次=BATCH-20260619220504256361, 重复批次=BATCH-20260619220504386088",
+          "command_used": "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\""
+        },
+        {
+          "entry_id": "2ba258e7-dff2-4daf-be44-6e61ab09a181",
+          "uniform_zone_id": "fa93c327-f1a8-413e-b888-de48e6499608",
+          "change_type": "工况照片关联",
+          "before_value": {
+            "uniform_zone_id": "fa93c327-f1a8-413e-b888-de48e6499608",
+            "sensor_id": "MAG-COIL-004",
+            "sensor_record_key": "006e637b3e92d3f7c5135b5dc4b63e8844b057ce67091a1cc6d8d28580ee5c3f",
+            "original_line_number": 8,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 24.5,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "8e7aa6dc-011b-48d9-a2e7-f20dc1a43832",
+              "beaf6e30-a781-463e-9586-2cdee40ba2b9",
+              "89639d20-177d-4626-aa37-c51f6d01fc7a"
+            ],
+            "created_at": "2026-06-19T22:05:04.257172",
+            "last_updated_at": "2026-06-19T22:05:04.391668",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": [
+              "BATCH-20260619220504386088"
+            ]
+          },
+          "after_value": {
+            "uniform_zone_id": "fa93c327-f1a8-413e-b888-de48e6499608",
+            "sensor_id": "MAG-COIL-004",
+            "sensor_record_key": "006e637b3e92d3f7c5135b5dc4b63e8844b057ce67091a1cc6d8d28580ee5c3f",
+            "original_line_number": 8,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 24.5,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": true,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-005"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[晚到材料][照片:PHOTO-2026-0604-005] B区边缘线圈夜间补拍照片，确认无异常发热. 夜间现场复核，B区边缘温度稳定，无异常发热点。补充：当日下午对该区域进行了二次测温，确认24.5°C读数准确。",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "8e7aa6dc-011b-48d9-a2e7-f20dc1a43832",
+              "beaf6e30-a781-463e-9586-2cdee40ba2b9",
+              "89639d20-177d-4626-aa37-c51f6d01fc7a"
+            ],
+            "created_at": "2026-06-19T22:05:04.257172",
+            "last_updated_at": "2026-06-19T22:05:04.391668",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": [
+              "BATCH-20260619220504386088"
+            ]
+          },
+          "operator": "何工",
+          "timestamp": "2026-06-19T22:05:04.713866",
+          "reason": "晚到工况照片关联: B区边缘线圈夜间补拍照片，确认无异常发热",
+          "evidence_ref": "photo_id=PHOTO-2026-0604-005, input_file=test_data/late_photos.json",
+          "command_used": "python3 main.py review-photos --input-file test_data/late_photos.json --operator \"何工\""
+        }
+      ],
+      "change_comparisons": [
+        {
+          "entry_id": "8e7aa6dc-011b-48d9-a2e7-f20dc1a43832",
+          "change_type": "导入",
+          "timestamp": "2026-06-19T22:05:04.257205",
+          "operator": "数据员",
+          "reason": "首次导入，批次: BATCH-20260619220504256361",
+          "added": {
+            "uniform_zone_flag": true,
+            "sensor_id": "MAG-COIL-004",
+            "temperature_value": 24.5,
+            "related_photo_ids": [],
+            "coach_review_required": false,
+            "source_file": "test_data/sensors.json",
+            "duplicate_import_batches": [],
+            "sensor_record_key": "006e637b3e92d3f7c5135b5dc4b63e8844b057ce67091a1cc6d8d28580ee5c3f",
+            "processing_status": "已导入",
+            "original_line_number": 8,
+            "last_updated_at": "2026-06-19T22:05:04.257173",
+            "created_at": "2026-06-19T22:05:04.257172",
+            "manual_annotation": null,
+            "has_mixed_temp_units": false,
+            "temperature_unit": "°C",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "uniform_zone_id": "fa93c327-f1a8-413e-b888-de48e6499608",
+            "history_ids": [],
+            "review_notes": null
+          },
+          "removed": {},
+          "modified": {}
+        },
+        {
+          "entry_id": "beaf6e30-a781-463e-9586-2cdee40ba2b9",
+          "change_type": "温度单位修正",
+          "timestamp": "2026-06-19T22:05:04.258408",
+          "operator": "系统",
+          "reason": "温度单位校验自动触发规则: TEMP_MIX_001，单位混用，当前批次同时存在: {'°C', 'K'}。不自动修正，等待训练教练复核。",
+          "added": {},
+          "removed": {},
+          "modified": {
+            "coach_review_required": {
+              "before": false,
+              "after": true
+            },
+            "processing_status": {
+              "before": "已导入",
+              "after": "温度单位混用待复核"
+            },
+            "has_mixed_temp_units": {
+              "before": false,
+              "after": true
+            },
+            "review_notes": {
+              "before": null,
+              "after": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核"
+            }
+          }
+        },
+        {
+          "entry_id": "89639d20-177d-4626-aa37-c51f6d01fc7a",
+          "change_type": "导入",
+          "timestamp": "2026-06-19T22:05:04.390304",
+          "operator": "数据员",
+          "reason": "重复导入处理: 传感器MAG-COIL-004已存在于首次导入批次BATCH-20260619220504256361，本次批次BATCH-20260619220504386088为重复导入。数据无变化仅更新批次号",
+          "added": {},
+          "removed": {},
+          "modified": {
+            "duplicate_import_batches": {
+              "before": [],
+              "after": [
+                "BATCH-20260619220504386088"
+              ]
+            }
+          }
+        },
+        {
+          "entry_id": "2ba258e7-dff2-4daf-be44-6e61ab09a181",
+          "change_type": "工况照片关联",
+          "timestamp": "2026-06-19T22:05:04.713866",
+          "operator": "何工",
+          "reason": "晚到工况照片关联: B区边缘线圈夜间补拍照片，确认无异常发热",
+          "added": {},
+          "removed": {},
+          "modified": {
+            "related_photo_ids": {
+              "before": [],
+              "after": [
+                "PHOTO-2026-0604-005"
+              ]
+            },
+            "review_notes": {
+              "before": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核",
+              "after": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[晚到材料][照片:PHOTO-2026-0604-005] B区边缘线圈夜间补拍照片，确认无异常发热. 夜间现场复核，B区边缘温度稳定，无异常发热点。补充：当日下午对该区域进行了二次测温，确认24.5°C读数准确。"
+            }
+          }
+        }
+      ],
+      "audit_summary": {
+        "uniform_zone_id": "fa93c327-f1a8-413e-b888-de48e6499608",
+        "total_changes": 4,
+        "change_types": {
+          "导入": 2,
+          "温度单位修正": 1,
+          "工况照片关联": 1
+        },
+        "operators": {
+          "数据员": 2,
+          "系统": 1,
+          "何工": 1
+        },
+        "first_change": "2026-06-19T22:05:04.257205",
+        "last_change": "2026-06-19T22:05:04.713866"
+      },
+      "replay_commands": [
+        "# [2026-06-19T22:05:04.257205] 导入 - 数据员: 首次导入，批次: BATCH-20260619220504256361",
+        "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\"",
+        "# [2026-06-19T22:05:04.258408] 温度单位修正 - 系统: 温度单位校验自动触发规则: TEMP_MIX_001，单位混用，当前批次同时存在: {'°C', 'K'}。不自动修正，等待训练教练复核。",
+        "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\"",
+        "# [2026-06-19T22:05:04.390304] 导入 - 数据员: 重复导入处理: 传感器MAG-COIL-004已存在于首次导入批次BATCH-20260619220504256361，本次批次BATCH-20260619220504386088为重复导入。数据无变化仅更新批次号",
+        "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\"",
+        "# [2026-06-19T22:05:04.713866] 工况照片关联 - 何工: 晚到工况照片关联: B区边缘线圈夜间补拍照片，确认无异常发热",
+        "python3 main.py review-photos --input-file test_data/late_photos.json --operator \"何工\""
+      ]
+    },
+    {
+      "uniform_zone": {
+        "uniform_zone_id": "50b1ea41-7df5-47e5-b34c-8c2b4b5c7db3",
+        "sensor_id": "MAG-COIL-005",
+        "sensor_record_key": "c0169a84d8d3c5a82f54611e10a7e2079f1b2441e0891006190971d7fd0d63e1",
+        "original_line_number": 9,
+        "source_file": "test_data/sensors.json",
+        "temperature_value": 300,
+        "temperature_unit": "°C",
+        "uniform_zone_flag": false,
+        "processing_status": "温度单位混用待复核",
+        "related_photo_ids": [
+          "PHOTO-2026-0604-004"
+        ],
+        "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] C区入口高温区域照片，可见散热风扇工作中: C区为高温过渡区，不属于均匀区范围，标记正确",
+        "manual_annotation": null,
+        "has_mixed_temp_units": true,
+        "coach_review_required": true,
+        "history_ids": [
+          "f1e11351-3ba5-4d7e-bcb0-1fbd8c2f3155",
+          "a9ff5eb5-68aa-400b-8c08-8219ae75ef1a",
+          "59681beb-03fd-428d-8f15-77a57f562af0",
+          "cb2fdc7e-8991-498f-8692-a2129e4e13c1"
+        ],
+        "created_at": "2026-06-19T22:05:04.257492",
+        "last_updated_at": "2026-06-19T22:05:04.393242",
+        "import_batch_id": "BATCH-20260619220504256361",
+        "duplicate_import_batches": [
+          "BATCH-20260619220504386088"
+        ]
+      },
+      "sensor_evidence": {
+        "sensor_id": "MAG-COIL-005",
+        "original_line_number": 9,
+        "raw_data": {
+          "position": "C区-入口",
+          "calibration_date": "2026-05-15",
+          "operator": "数据员A",
+          "note": "温度过高，不属于均匀区"
+        },
+        "source_file": "test_data/sensors.json",
+        "import_batch_id": "BATCH-20260619220504256361",
+        "temperature_value": 300,
+        "temperature_unit": "°C",
+        "uniform_zone_flag": false,
+        "processing_status": "已导入",
+        "manual_edits": [],
+        "created_at": "2026-06-19T22:05:04.257483"
+      },
+      "photo_evidences": [
+        {
+          "photo_id": "PHOTO-2026-0604-004",
+          "scene_description": "C区入口高温区域照片，可见散热风扇工作中",
+          "source_file": "/photos/20260604/C-001.jpg",
+          "upload_time": "2026-06-04T10:45:00",
+          "related_sensor_ids": [
+            "MAG-COIL-005"
+          ],
+          "reviewer": "何工",
+          "review_notes": "C区为高温过渡区，不属于均匀区范围，标记正确",
+          "is_late_arrival": false,
+          "created_at": "2026-06-19T22:05:04.323273"
+        }
+      ],
+      "duplicate_import_info": {
+        "is_duplicate_touched": true,
+        "first_import_batch": "BATCH-20260619220504256361",
+        "duplicate_batches": [
+          "BATCH-20260619220504386088"
+        ],
+        "total_import_attempts": 2,
+        "dedup_conclusion": "传感器MAG-COIL-005首次导入批次BATCH-20260619220504256361，后续重复导入批次: ['BATCH-20260619220504386088']。去重后数量未翻倍，当前记录为首次导入的原始记录。"
+      },
+      "history": [
+        {
+          "entry_id": "f1e11351-3ba5-4d7e-bcb0-1fbd8c2f3155",
+          "uniform_zone_id": "50b1ea41-7df5-47e5-b34c-8c2b4b5c7db3",
+          "change_type": "导入",
+          "before_value": null,
+          "after_value": {
+            "uniform_zone_id": "50b1ea41-7df5-47e5-b34c-8c2b4b5c7db3",
+            "sensor_id": "MAG-COIL-005",
+            "sensor_record_key": "c0169a84d8d3c5a82f54611e10a7e2079f1b2441e0891006190971d7fd0d63e1",
+            "original_line_number": 9,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 300,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": false,
+            "processing_status": "已导入",
+            "related_photo_ids": [],
+            "review_notes": null,
+            "manual_annotation": null,
+            "has_mixed_temp_units": false,
+            "coach_review_required": false,
+            "history_ids": [],
+            "created_at": "2026-06-19T22:05:04.257492",
+            "last_updated_at": "2026-06-19T22:05:04.257493",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "operator": "数据员",
+          "timestamp": "2026-06-19T22:05:04.257519",
+          "reason": "首次导入，批次: BATCH-20260619220504256361",
+          "evidence_ref": "source_file=test_data/sensors.json, line=9",
+          "command_used": "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\""
+        },
+        {
+          "entry_id": "a9ff5eb5-68aa-400b-8c08-8219ae75ef1a",
+          "uniform_zone_id": "50b1ea41-7df5-47e5-b34c-8c2b4b5c7db3",
+          "change_type": "温度单位修正",
+          "before_value": {
+            "uniform_zone_id": "50b1ea41-7df5-47e5-b34c-8c2b4b5c7db3",
+            "sensor_id": "MAG-COIL-005",
+            "sensor_record_key": "c0169a84d8d3c5a82f54611e10a7e2079f1b2441e0891006190971d7fd0d63e1",
+            "original_line_number": 9,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 300,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": false,
+            "processing_status": "已导入",
+            "related_photo_ids": [],
+            "review_notes": null,
+            "manual_annotation": null,
+            "has_mixed_temp_units": false,
+            "coach_review_required": false,
+            "history_ids": [
+              "f1e11351-3ba5-4d7e-bcb0-1fbd8c2f3155"
+            ],
+            "created_at": "2026-06-19T22:05:04.257492",
+            "last_updated_at": "2026-06-19T22:05:04.257493",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "after_value": {
+            "uniform_zone_id": "50b1ea41-7df5-47e5-b34c-8c2b4b5c7db3",
+            "sensor_id": "MAG-COIL-005",
+            "sensor_record_key": "c0169a84d8d3c5a82f54611e10a7e2079f1b2441e0891006190971d7fd0d63e1",
+            "original_line_number": 9,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 300,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": false,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "f1e11351-3ba5-4d7e-bcb0-1fbd8c2f3155"
+            ],
+            "created_at": "2026-06-19T22:05:04.257492",
+            "last_updated_at": "2026-06-19T22:05:04.257493",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "operator": "系统",
+          "timestamp": "2026-06-19T22:05:04.258952",
+          "reason": "温度单位校验自动触发规则: TEMP_MIX_001，单位混用，当前批次同时存在: {'°C', 'K'}。不自动修正，等待训练教练复核。",
+          "evidence_ref": "TEMP_MIX_001",
+          "command_used": "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\""
+        },
+        {
+          "entry_id": "59681beb-03fd-428d-8f15-77a57f562af0",
+          "uniform_zone_id": "50b1ea41-7df5-47e5-b34c-8c2b4b5c7db3",
+          "change_type": "工况照片关联",
+          "before_value": {
+            "uniform_zone_id": "50b1ea41-7df5-47e5-b34c-8c2b4b5c7db3",
+            "sensor_id": "MAG-COIL-005",
+            "sensor_record_key": "c0169a84d8d3c5a82f54611e10a7e2079f1b2441e0891006190971d7fd0d63e1",
+            "original_line_number": 9,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 300,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": false,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "f1e11351-3ba5-4d7e-bcb0-1fbd8c2f3155",
+              "a9ff5eb5-68aa-400b-8c08-8219ae75ef1a"
+            ],
+            "created_at": "2026-06-19T22:05:04.257492",
+            "last_updated_at": "2026-06-19T22:05:04.259481",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "after_value": {
+            "uniform_zone_id": "50b1ea41-7df5-47e5-b34c-8c2b4b5c7db3",
+            "sensor_id": "MAG-COIL-005",
+            "sensor_record_key": "c0169a84d8d3c5a82f54611e10a7e2079f1b2441e0891006190971d7fd0d63e1",
+            "original_line_number": 9,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 300,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": false,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-004"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] C区入口高温区域照片，可见散热风扇工作中: C区为高温过渡区，不属于均匀区范围，标记正确",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "f1e11351-3ba5-4d7e-bcb0-1fbd8c2f3155",
+              "a9ff5eb5-68aa-400b-8c08-8219ae75ef1a"
+            ],
+            "created_at": "2026-06-19T22:05:04.257492",
+            "last_updated_at": "2026-06-19T22:05:04.259481",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "operator": "何工",
+          "timestamp": "2026-06-19T22:05:04.323323",
+          "reason": "工况照片复核: C区入口高温区域照片，可见散热风扇工作中",
+          "evidence_ref": "photo_id=PHOTO-2026-0604-004, input_file=test_data/photos.json",
+          "command_used": "python3 main.py review-photos --input-file test_data/photos.json --operator \"何工\""
+        },
+        {
+          "entry_id": "cb2fdc7e-8991-498f-8692-a2129e4e13c1",
+          "uniform_zone_id": "50b1ea41-7df5-47e5-b34c-8c2b4b5c7db3",
+          "change_type": "导入",
+          "before_value": {
+            "uniform_zone_id": "50b1ea41-7df5-47e5-b34c-8c2b4b5c7db3",
+            "sensor_id": "MAG-COIL-005",
+            "sensor_record_key": "c0169a84d8d3c5a82f54611e10a7e2079f1b2441e0891006190971d7fd0d63e1",
+            "original_line_number": 9,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 300,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": false,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-004"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] C区入口高温区域照片，可见散热风扇工作中: C区为高温过渡区，不属于均匀区范围，标记正确",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "f1e11351-3ba5-4d7e-bcb0-1fbd8c2f3155",
+              "a9ff5eb5-68aa-400b-8c08-8219ae75ef1a",
+              "59681beb-03fd-428d-8f15-77a57f562af0"
+            ],
+            "created_at": "2026-06-19T22:05:04.257492",
+            "last_updated_at": "2026-06-19T22:05:04.324532",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": []
+          },
+          "after_value": {
+            "uniform_zone_id": "50b1ea41-7df5-47e5-b34c-8c2b4b5c7db3",
+            "sensor_id": "MAG-COIL-005",
+            "sensor_record_key": "c0169a84d8d3c5a82f54611e10a7e2079f1b2441e0891006190971d7fd0d63e1",
+            "original_line_number": 9,
+            "source_file": "test_data/sensors.json",
+            "temperature_value": 300,
+            "temperature_unit": "°C",
+            "uniform_zone_flag": false,
+            "processing_status": "温度单位混用待复核",
+            "related_photo_ids": [
+              "PHOTO-2026-0604-004"
+            ],
+            "review_notes": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] C区入口高温区域照片，可见散热风扇工作中: C区为高温过渡区，不属于均匀区范围，标记正确",
+            "manual_annotation": null,
+            "has_mixed_temp_units": true,
+            "coach_review_required": true,
+            "history_ids": [
+              "f1e11351-3ba5-4d7e-bcb0-1fbd8c2f3155",
+              "a9ff5eb5-68aa-400b-8c08-8219ae75ef1a",
+              "59681beb-03fd-428d-8f15-77a57f562af0"
+            ],
+            "created_at": "2026-06-19T22:05:04.257492",
+            "last_updated_at": "2026-06-19T22:05:04.324532",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "duplicate_import_batches": [
+              "BATCH-20260619220504386088"
+            ]
+          },
+          "operator": "数据员",
+          "timestamp": "2026-06-19T22:05:04.391746",
+          "reason": "重复导入处理: 传感器MAG-COIL-005已存在于首次导入批次BATCH-20260619220504256361，本次批次BATCH-20260619220504386088为重复导入。数据无变化仅更新批次号",
+          "evidence_ref": "source_file=test_data/sensors.json, line=9, 首次批次=BATCH-20260619220504256361, 重复批次=BATCH-20260619220504386088",
+          "command_used": "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\""
+        }
+      ],
+      "change_comparisons": [
+        {
+          "entry_id": "f1e11351-3ba5-4d7e-bcb0-1fbd8c2f3155",
+          "change_type": "导入",
+          "timestamp": "2026-06-19T22:05:04.257519",
+          "operator": "数据员",
+          "reason": "首次导入，批次: BATCH-20260619220504256361",
+          "added": {
+            "uniform_zone_flag": false,
+            "sensor_id": "MAG-COIL-005",
+            "temperature_value": 300,
+            "related_photo_ids": [],
+            "coach_review_required": false,
+            "source_file": "test_data/sensors.json",
+            "duplicate_import_batches": [],
+            "sensor_record_key": "c0169a84d8d3c5a82f54611e10a7e2079f1b2441e0891006190971d7fd0d63e1",
+            "processing_status": "已导入",
+            "original_line_number": 9,
+            "last_updated_at": "2026-06-19T22:05:04.257493",
+            "created_at": "2026-06-19T22:05:04.257492",
+            "manual_annotation": null,
+            "has_mixed_temp_units": false,
+            "temperature_unit": "°C",
+            "import_batch_id": "BATCH-20260619220504256361",
+            "uniform_zone_id": "50b1ea41-7df5-47e5-b34c-8c2b4b5c7db3",
+            "history_ids": [],
+            "review_notes": null
+          },
+          "removed": {},
+          "modified": {}
+        },
+        {
+          "entry_id": "a9ff5eb5-68aa-400b-8c08-8219ae75ef1a",
+          "change_type": "温度单位修正",
+          "timestamp": "2026-06-19T22:05:04.258952",
+          "operator": "系统",
+          "reason": "温度单位校验自动触发规则: TEMP_MIX_001，单位混用，当前批次同时存在: {'°C', 'K'}。不自动修正，等待训练教练复核。",
+          "added": {},
+          "removed": {},
+          "modified": {
+            "coach_review_required": {
+              "before": false,
+              "after": true
+            },
+            "processing_status": {
+              "before": "已导入",
+              "after": "温度单位混用待复核"
+            },
+            "has_mixed_temp_units": {
+              "before": false,
+              "after": true
+            },
+            "review_notes": {
+              "before": null,
+              "after": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核"
+            }
+          }
+        },
+        {
+          "entry_id": "59681beb-03fd-428d-8f15-77a57f562af0",
+          "change_type": "工况照片关联",
+          "timestamp": "2026-06-19T22:05:04.323323",
+          "operator": "何工",
+          "reason": "工况照片复核: C区入口高温区域照片，可见散热风扇工作中",
+          "added": {},
+          "removed": {},
+          "modified": {
+            "related_photo_ids": {
+              "before": [],
+              "after": [
+                "PHOTO-2026-0604-004"
+              ]
+            },
+            "review_notes": {
+              "before": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核",
+              "after": "[温度单位混用] 发现单位混用情况: ['°C', 'K']。请训练教练复核\n[照片复核][何工] C区入口高温区域照片，可见散热风扇工作中: C区为高温过渡区，不属于均匀区范围，标记正确"
+            }
+          }
+        },
+        {
+          "entry_id": "cb2fdc7e-8991-498f-8692-a2129e4e13c1",
+          "change_type": "导入",
+          "timestamp": "2026-06-19T22:05:04.391746",
+          "operator": "数据员",
+          "reason": "重复导入处理: 传感器MAG-COIL-005已存在于首次导入批次BATCH-20260619220504256361，本次批次BATCH-20260619220504386088为重复导入。数据无变化仅更新批次号",
+          "added": {},
+          "removed": {},
+          "modified": {
+            "duplicate_import_batches": {
+              "before": [],
+              "after": [
+                "BATCH-20260619220504386088"
+              ]
+            }
+          }
+        }
+      ],
+      "audit_summary": {
+        "uniform_zone_id": "50b1ea41-7df5-47e5-b34c-8c2b4b5c7db3",
+        "total_changes": 4,
+        "change_types": {
+          "导入": 2,
+          "温度单位修正": 1,
+          "工况照片关联": 1
+        },
+        "operators": {
+          "数据员": 2,
+          "系统": 1,
+          "何工": 1
+        },
+        "first_change": "2026-06-19T22:05:04.257519",
+        "last_change": "2026-06-19T22:05:04.391746"
+      },
+      "replay_commands": [
+        "# [2026-06-19T22:05:04.257519] 导入 - 数据员: 首次导入，批次: BATCH-20260619220504256361",
+        "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\"",
+        "# [2026-06-19T22:05:04.258952] 温度单位修正 - 系统: 温度单位校验自动触发规则: TEMP_MIX_001，单位混用，当前批次同时存在: {'°C', 'K'}。不自动修正，等待训练教练复核。",
+        "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\"",
+        "# [2026-06-19T22:05:04.323323] 工况照片关联 - 何工: 工况照片复核: C区入口高温区域照片，可见散热风扇工作中",
+        "python3 main.py review-photos --input-file test_data/photos.json --operator \"何工\"",
+        "# [2026-06-19T22:05:04.391746] 导入 - 数据员: 重复导入处理: 传感器MAG-COIL-005已存在于首次导入批次BATCH-20260619220504256361，本次批次BATCH-20260619220504386088为重复导入。数据无变化仅更新批次号",
+        "python3 main.py import-sensors --input-file test_data/sensors.json --operator \"数据员\""
+      ]
+    }
+  ],
+  "audit_logs": [
+    {
+      "command": "import-sensors",
+      "parameters": {
+        "source_file": "test_data/sensors.json",
+        "batch_id": "BATCH-20260619220504256361"
+      },
+      "result_summary": "导入完成: 新增5条, 重复0条, 更新0条。温度单位待复核: 5条",
+      "log_id": "faf610bd-a967-4d6d-ab5a-e06343c319dc",
+      "timestamp": "2026-06-19T22:05:04.261370",
+      "operator": "数据员"
+    },
+    {
+      "command": "review-photos",
+      "parameters": {
+        "operator": "何工",
+        "photo_count": 4
+      },
+      "result_summary": "照片复核完成: 处理4条关联, 其中晚到材料0条。涉及4个均匀区记录",
+      "log_id": "f28925f0-e4a6-4dac-86d2-7ef5e37bb289",
+      "timestamp": "2026-06-19T22:05:04.325089",
+      "operator": "何工"
+    },
+    {
+      "command": "import-sensors",
+      "parameters": {
+        "source_file": "test_data/sensors.json",
+        "batch_id": "BATCH-20260619220504386088"
+      },
+      "result_summary": "导入完成: 新增0条, 重复5条, 更新0条。温度单位待复核: 0条",
+      "log_id": "cd00a6d8-f17c-4c9f-b8c6-dbae088d4e3e",
+      "timestamp": "2026-06-19T22:05:04.393733",
+      "operator": "数据员"
+    },
+    {
+      "command": "update-report",
+      "parameters": {
+        "uniform_zone_ids": [
+          "26a62cff-750a-4289-b10a-238c8d8e126b",
+          "332b7958-a2ef-4cc2-947f-cb8bf1814169"
+        ]
+      },
+      "result_summary": "交接报告更新完成: 成功2条, 失败0条",
+      "log_id": "d91d1480-0deb-4f95-aeb7-266a29fd07f1",
+      "timestamp": "2026-06-19T22:05:04.654995",
+      "operator": "何工"
+    },
+    {
+      "command": "review-photos",
+      "parameters": {
+        "operator": "何工",
+        "photo_count": 1
+      },
+      "result_summary": "照片复核完成: 处理1条关联, 其中晚到材料1条。涉及1个均匀区记录",
+      "log_id": "55d58dcf-9161-432c-a689-6929f4a84564",
+      "timestamp": "2026-06-19T22:05:04.716644",
+      "operator": "何工"
+    }
+  ]
+}
