@@ -95,5 +95,6 @@ class WorkflowState(BaseModel):
     has_ramp_supplement: bool = False
     score_changed_after_supplement: Optional[bool] = None
     status: RecordStatus = RecordStatus.PENDING_REVIEW
+    status_reason: str = ""
     current_assignee: Optional[Role] = None
     history: List[Dict[str, Any]] = Field(default_factory=list)

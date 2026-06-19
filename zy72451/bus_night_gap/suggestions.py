@@ -138,37 +138,96 @@ def _explain_why_kept_with_notes(
     return enhanced_reason, explanations
 
 
+def _check_structural_data(ramp_records: List[RampRecord]) -> Dict[str, bool]:
+    """检查正式字段是否有数据（只要有值就算有，不评价合格不合格）"""
+    has_any_record = len(ramp_records) > 0
+    has_ramp_condition = any(r.ramp_condition for r in ramp_records if r.has_ramp)
+    has_width_data = any(r.width_cm for r in ramp_records if r.has_ramp)
+    has_any_raw_notes = any(r.raw_notes.strip() for r in ramp_records)
+
+    has_photo_uploaded = any("已附" in r.raw_notes or "已上传" in r.raw_notes or "照片" in r.raw_notes and "已" in r.raw_notes
+                             for r in ramp_records if r.raw_notes)
+    has_plan_approved = any("已审批" in r.raw_notes or "已通过" in r.raw_notes or "已确认" in r.raw_notes or "方案已" in r.raw_notes
+                            for r in ramp_records if r.raw_notes)
+    has_night_assessment_done = any("夜间通行安全评估" in r.raw_notes and ("已" in r.raw_notes or "完成" in r.raw_notes)
+                                    for r in ramp_records if r.raw_notes)
+
+    return {
+        "has_any_record": has_any_record,
+        "has_ramp_condition": has_ramp_condition,
+        "has_width_data": has_width_data,
+        "has_any_raw_notes": has_any_raw_notes,
+        "has_photo_uploaded": has_photo_uploaded,
+        "has_plan_approved": has_plan_approved,
+        "has_night_assessment_done": has_night_assessment_done,
+    }
+
+
+def _material_name_mapping() -> Dict[str, str]:
+    """
+    材料名 → 正式字段/明确完成标志 的检查键映射
+    只有当：
+      - 有对应正式字段值（宽度、状况等）
+      - 或备注明确说"已完成/已通过/已审批/已附"
+    才算"不缺"。
+    纯靠备注推断的需求（如"需要施工方案"）不算已有材料。
+    """
+    return {
+        "坡道宽度实际测量数据（厘米）": "has_width_data",
+        "坡道宽度测量数据（厘米）": "has_width_data",
+        "坡道宽度测量数据": "has_width_data",
+        "坡道状况正式评估（good/fair/poor）": "has_ramp_condition",
+        "坡道状况评估（good/fair/poor）": "has_ramp_condition",
+        "坡道状况评估": "has_ramp_condition",
+        "现场原始备注（不要洗成干净数据）": "has_any_raw_notes",
+        "夜间通行安全评估": "has_night_assessment_done",
+        "新增坡道施工方案": "has_plan_approved",
+        "施工方正式审批材料": "has_plan_approved",
+        "临时通道设置方案": "has_plan_approved",
+        "坡道状况照片备注": "has_photo_uploaded",
+    }
+
+
 def _collect_all_missing(
     notice_raw_notes: str,
     ramp_records: List[RampRecord],
     structural_missing: List[str],
 ) -> Tuple[List[str], Dict[str, List[str]]]:
     """
-    汇总所有缺材料：
-    - 结构性缺失（没有记录、没有宽度等）
-    - 从备注中推断出的缺失
+    汇总所有缺材料（注意：有正式数据了就不算"缺"，不合格是整改问题不是缺材料问题）
+    - 结构性缺失（正式字段根本没有值）
+    - 从备注中推断出的缺失（仅当正式字段也为空时才列入）
     返回 (材料清单, 每项材料为什么被列入的说明)
     """
+    data_check = _check_structural_data(ramp_records)
+    name_map = _material_name_mapping()
+
     reasons: Dict[str, List[str]] = {}
     all_missing = list(structural_missing)
 
     for m in structural_missing:
-        reasons[m] = ["结构性缺失：未采集到该字段数据"]
+        reasons[m] = ["结构性缺失：正式字段未采集到数据"]
 
     notice_analysis = _analyze_notes_for_missing(notice_raw_notes)
     for m in notice_analysis["inferred_missing"]:
+        check_key = name_map.get(m)
+        if check_key and data_check.get(check_key, False):
+            continue
         if m not in all_missing:
             all_missing.append(m)
             reasons[m] = []
         for exp in notice_analysis["processing_explanations"]:
             if m in reasons:
-                reasons[m].append(f"[施工告示备注推断] {exp}")
+                reasons[m].append(f"[施工告示备注提示] {exp}")
 
     for r in ramp_records:
         if not r.raw_notes:
             continue
         analysis = _analyze_notes_for_missing(r.raw_notes)
         for m in analysis["inferred_missing"]:
+            check_key = name_map.get(m)
+            if check_key and data_check.get(check_key, False):
+                continue
             if m not in all_missing:
                 all_missing.append(m)
                 reasons[m] = []
@@ -177,12 +236,9 @@ def _collect_all_missing(
             for exp in analysis["processing_explanations"]:
                 reasons[m].append(f"[{r.location}处理逻辑] {exp}")
 
-    if any(r.raw_notes.strip() for r in ramp_records):
-        notes_based = [m for m, _ in reasons.items() if any("备注" in r for r in reasons[m])]
-    else:
-        if "现场原始备注（不要洗成干净数据）" not in all_missing:
-            all_missing.append("现场原始备注（不要洗成干净数据）")
-            reasons["现场原始备注（不要洗成干净数据）"] = ["所有坡道记录都缺少原始备注，无法支持复核"]
+    if not data_check["has_any_raw_notes"] and "现场原始备注（不要洗成干净数据）" not in all_missing:
+        all_missing.append("现场原始备注（不要洗成干净数据）")
+        reasons["现场原始备注（不要洗成干净数据）"] = ["所有坡道记录都缺少原始备注，无法支持复核"]
 
     return all_missing, reasons
 
@@ -197,13 +253,16 @@ def generate_suggestion(notice_id: str) -> RectificationSuggestion:
     all_scores = store.get_all_scores(notice_id)
     workflow = store.get_workflow(notice_id)
     previous_suggestion = store.get_latest_suggestion(notice_id)
-
     previous_missing = previous_suggestion.missing_materials if previous_suggestion else []
+
     structural_missing: List[str] = []
     base_why = ""
     next_action = NextAction.COLLECT_MORE_MATERIALS
     next_action_person = "社区书记周姐"
     status = RecordStatus.PENDING_REVIEW
+    status_reason = ""
+
+    score_changed, _, _ = check_score_changed(notice_id)
 
     if not ramp_records:
         status = RecordStatus.NEEDS_SUPPLEMENT
@@ -211,61 +270,63 @@ def generate_suggestion(notice_id: str) -> RectificationSuggestion:
         structural_missing = ["无障碍坡道现场核查记录", "坡道宽度测量数据", "坡道状况照片备注"]
         next_action = NextAction.CONTACT_COMMUNITY_SECRETARY
         next_action_person = "社区书记周姐"
+        status_reason = "没有坡道记录，需要先补录"
     else:
         supplement_records = [r for r in ramp_records if r.is_supplement]
-        score_changed, _, _ = check_score_changed(notice_id)
 
-        if workflow and workflow.status == RecordStatus.RESOLVED:
-            status = RecordStatus.RESOLVED
-            base_why = "所有材料已齐全，整改建议已生成，流程完成。"
-            structural_missing = []
-            next_action = NextAction.RESOLVED
-            next_action_person = "已完成"
-        elif workflow and workflow.has_ramp_supplement and not score_changed and len(all_scores) >= 2:
+        if not any(r.ramp_condition for r in ramp_records if r.has_ramp):
+            structural_missing.append("坡道状况评估（good/fair/poor）")
+        if not any(r.width_cm for r in ramp_records if r.has_ramp):
+            structural_missing.append("坡道宽度测量数据（厘米）")
+        if not any(r.raw_notes.strip() for r in ramp_records):
+            structural_missing.append("现场原始备注（不要洗成干净数据）")
+
+        if workflow and workflow.has_ramp_supplement and not score_changed and len(all_scores) >= 2:
             status = RecordStatus.SCORE_UNCHANGED
             base_why = (
                 "补录了无障碍坡道记录，但评分没有变化。"
                 "这说明补录的信息可能和原有记录描述的是同一情况，"
                 "或者补录的坡道信息不影响评分，需要交通协管确认是否还有遗漏。"
             )
-            structural_missing = ["交通协管对评分未变化的复核确认", "是否还有未登记的坡道点位说明"]
+            structural_missing.insert(0, "交通协管对评分未变化的复核确认")
+            structural_missing.insert(1, "是否还有未登记的坡道点位说明")
             next_action = NextAction.CONTACT_TRAFFIC_COORDINATOR
             next_action_person = "交通协管"
+            status_reason = "补录后评分未变化，需交通协管复核"
         elif supplement_records:
             status = RecordStatus.PENDING_REVIEW
             base_why = "已经补录了无障碍坡道记录，需要重新评估整改建议，确认材料是否齐全。"
-            if not any(r.ramp_condition for r in ramp_records if r.has_ramp):
-                structural_missing.append("坡道状况评估（good/fair/poor）")
-            if not any(r.width_cm for r in ramp_records if r.has_ramp):
-                structural_missing.append("坡道宽度测量数据（厘米）")
-
-            if structural_missing:
-                next_action = NextAction.CONTACT_COMMUNITY_SECRETARY
-                next_action_person = "社区书记周姐"
-            else:
-                next_action = NextAction.CONTACT_TRAFFIC_COORDINATOR
-                next_action_person = "交通协管"
-                status = RecordStatus.READY_FOR_COORDINATOR
+            status_reason = "已有补录记录，待评估是否齐全"
         else:
             status = RecordStatus.NEEDS_SUPPLEMENT
             base_why = "已有初步坡道记录，但信息不够完整，需要社区书记周姐补看现场，补充更详细的备注和测量数据。"
-            if not any(r.ramp_condition for r in ramp_records if r.has_ramp):
-                structural_missing.append("坡道状况评估")
-            if not any(r.width_cm for r in ramp_records if r.has_ramp):
-                structural_missing.append("坡道宽度测量数据")
-            if not any(r.raw_notes.strip() for r in ramp_records):
-                structural_missing.append("现场原始备注（不要洗成干净数据）")
-
-            if structural_missing:
-                next_action = NextAction.CONTACT_COMMUNITY_SECRETARY
-                next_action_person = "社区书记周姐"
-            else:
-                next_action = NextAction.CONTACT_TRAFFIC_COORDINATOR
-                next_action_person = "交通协管"
-                status = RecordStatus.READY_FOR_COORDINATOR
+            status_reason = "只有初步记录，需要补录更多信息"
 
     enhanced_why, note_explanations = _explain_why_kept_with_notes(base_why, notice.raw_notes, ramp_records)
     all_missing, missing_reasons = _collect_all_missing(notice.raw_notes, ramp_records, structural_missing)
+
+    if workflow and workflow.status == RecordStatus.RESOLVED:
+        if all_missing:
+            status = RecordStatus.PENDING_REVIEW
+            status_reason = f"状态曾标记为已完成，但仍缺{len(all_missing)}项材料，已自动回退"
+            enhanced_why += f" 注意：原状态标记为已完成，但系统检测到仍缺{len(all_missing)}项材料，已自动回退为待处理。"
+        else:
+            status = RecordStatus.RESOLVED
+            base_why = "所有材料已齐全，整改建议已生成，流程完成。"
+            next_action = NextAction.RESOLVED
+            next_action_person = "已完成"
+            status_reason = "所有材料均已补齐，流程完成"
+            enhanced_why = base_why
+
+    if not all_missing and status != RecordStatus.RESOLVED:
+        status = RecordStatus.READY_FOR_COORDINATOR
+        next_action = NextAction.CONTACT_TRAFFIC_COORDINATOR
+        next_action_person = "交通协管"
+        status_reason = "所有字段材料已齐全，可转交通协管做最终复核"
+
+    if status == RecordStatus.READY_FOR_COORDINATOR and not base_why.endswith("可转交通协管做最终复核。"):
+        base_why += " 所有基本字段已补齐，可转交通协管做最终复核。"
+        enhanced_why, _ = _explain_why_kept_with_notes(base_why, notice.raw_notes, ramp_records)
 
     if notice.raw_notes and "夜班" in notice.raw_notes:
         enhanced_why += " 施工告示原始备注提到了夜班公交相关内容，这部分很重要，不能洗掉。"
@@ -334,6 +395,27 @@ def generate_suggestion(notice_id: str) -> RectificationSuggestion:
         Role.SYSTEM,
         f"生成整改建议v{version}：还缺什么材料从[{prev_miss_str}]变为[{curr_miss_str}]，原因：{base_why[:60]}",
     )
+
+    if workflow and workflow.status != status:
+        old_status = workflow.status.value
+        workflow.status = status
+        workflow.status_reason = status_reason
+        if status == RecordStatus.RESOLVED:
+            workflow.current_assignee = None
+        elif status in (RecordStatus.SCORE_UNCHANGED, RecordStatus.READY_FOR_COORDINATOR):
+            workflow.current_assignee = Role.TRAFFIC_COORDINATOR
+        else:
+            workflow.current_assignee = Role.COMMUNITY_SECRETARY
+        store.set_workflow(workflow)
+        store.log_audit(
+            "workflow",
+            notice_id,
+            "status_sync",
+            {"status": old_status},
+            {"status": status.value, "reason": status_reason, "missing_count": len(all_missing)},
+            Role.SYSTEM,
+            f"工作流状态从{old_status}同步为{status.value}（依据：缺材料{len(all_missing)}项，{status_reason}）",
+        )
 
     return suggestion
 
