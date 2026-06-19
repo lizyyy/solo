@@ -56,13 +56,34 @@ export class CardService {
     return updated as PlaylistColdStartCard | null;
   }
 
-  updateCardFields(cardId: string, fields: Partial<PlaylistColdStartCard>): PlaylistColdStartCard | null {
+  updateCardFields(
+    cardId: string, 
+    fields: Partial<PlaylistColdStartCard>, 
+    options?: { incrementVersion?: boolean; createSnapshot?: boolean; updatedBy?: string }
+  ): PlaylistColdStartCard | null {
+    const card = this.getCard(cardId);
+    if (!card) return null;
+
     const now = new Date().toISOString();
+    const updateData: any = { ...fields, updatedAt: now };
+    
+    if (options?.incrementVersion) {
+      updateData.currentVersion = card.currentVersion + 1;
+    }
+
     const updated = updateOne(
       'cards',
       (c: any) => c.id === cardId,
-      { ...fields, updatedAt: now }
+      updateData
     );
+
+    if (updated && options?.createSnapshot && options?.updatedBy) {
+      const updatedCard = this.getCard(cardId);
+      if (updatedCard) {
+        this.createSnapshot(updatedCard, options.updatedBy);
+      }
+    }
+
     return updated as PlaylistColdStartCard | null;
   }
 
@@ -70,7 +91,7 @@ export class CardService {
     return this.updateCardFields(cardId, { selfCheckResults: results });
   }
 
-  private createSnapshot(card: PlaylistColdStartCard, createdBy: string): CardVersionSnapshot {
+  createSnapshot(card: PlaylistColdStartCard, createdBy: string): CardVersionSnapshot {
     const now = new Date().toISOString();
     const snapshot: CardVersionSnapshot = {
       id: uuidv4(),

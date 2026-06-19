@@ -40,9 +40,22 @@ class CardService {
         }
         return updated;
     }
-    updateCardFields(cardId, fields) {
+    updateCardFields(cardId, fields, options) {
+        const card = this.getCard(cardId);
+        if (!card)
+            return null;
         const now = new Date().toISOString();
-        const updated = (0, database_1.updateOne)('cards', (c) => c.id === cardId, { ...fields, updatedAt: now });
+        const updateData = { ...fields, updatedAt: now };
+        if (options?.incrementVersion) {
+            updateData.currentVersion = card.currentVersion + 1;
+        }
+        const updated = (0, database_1.updateOne)('cards', (c) => c.id === cardId, updateData);
+        if (updated && options?.createSnapshot && options?.updatedBy) {
+            const updatedCard = this.getCard(cardId);
+            if (updatedCard) {
+                this.createSnapshot(updatedCard, options.updatedBy);
+            }
+        }
         return updated;
     }
     updateSelfCheckResults(cardId, results) {

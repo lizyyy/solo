@@ -122,18 +122,22 @@ class ImportService {
             const isManualSupplement = !!record.supplementNote;
             if (existingKeyToRecord.has(key)) {
                 const existing = existingKeyToRecord.get(key);
-                if (isManualSupplement) {
+                const hasChanges = (record.ticketHours !== undefined && record.ticketHours !== existing.ticketHours) ||
+                    (record.ticketPrice !== undefined && record.ticketPrice !== existing.ticketPrice) ||
+                    (record.ticketCount !== undefined && record.ticketCount !== existing.ticketCount);
+                if (isManualSupplement || hasChanges) {
+                    const updatedRecord = {
+                        ...existing,
+                        ...record,
+                        exportedAt: now,
+                        exportBatchId: batchId
+                    };
+                    (0, database_1.updateOne)('tickets', (t) => t.id === existing.id, updatedRecord);
+                    importedRecords.push(updatedRecord);
                     details.push({
-                        record: {
-                            id: '',
-                            cardId,
-                            ...record,
-                            exportedAt: now,
-                            exportBatchId: batchId,
-                        },
-                        importStatus: 'DUPLICATE_HISTORICAL',
-                        duplicateOf: `历史记录(${existing.exportBatchId.substring(0, 8)}...)`,
-                        supplementNote: record.supplementNote,
+                        record: updatedRecord,
+                        importStatus: hasChanges ? 'UPDATED' : 'MANUAL_SUPPLEMENT',
+                        supplementNote: record.supplementNote || '票务数据更新',
                     });
                 }
                 else {
@@ -187,6 +191,7 @@ class ImportService {
             duplicateCurrentBatchCount: details.filter(d => d.importStatus === 'DUPLICATE_CURRENT_BATCH').length,
             duplicateHistoricalCount: details.filter(d => d.importStatus === 'DUPLICATE_HISTORICAL').length,
             manualSupplementCount: details.filter(d => d.importStatus === 'MANUAL_SUPPLEMENT').length,
+            updatedCount: details.filter(d => d.importStatus === 'UPDATED').length,
         };
         return { batchId, records: importedRecords, details, summary };
     }

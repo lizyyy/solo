@@ -16,7 +16,7 @@ class RevenueService {
         this.SUBSTITUTE_ADJUSTMENT = -20;
         this.MAKEUP_MULTIPLIER = 1.2;
     }
-    calculateRevenue(cardId, calculatedBy) {
+    calculateRevenue(cardId, calculatedBy, recalculationNote) {
         const card = this.cardService.getCard(cardId);
         if (!card)
             throw new Error('Card not found');
@@ -26,14 +26,28 @@ class RevenueService {
         if (unresolvedConflicts.length > 0) {
             throw new Error('存在未解决的冲突，请先处理冲突后再计算分账');
         }
+        const previousVersion = card.revenueVersion || null;
+        const newVersion = (card.revenueVersion || 0) + 1;
+        const now = new Date().toISOString();
+        if (previousVersion && previousVersion > 0) {
+            const oldRevenues = (0, database_1.findMany)('revenue', (r) => r.cardId === cardId && r.version === previousVersion && !r.isWithdrawn);
+            oldRevenues.forEach((r) => {
+                (0, database_1.updateOne)('revenue', (x) => x.id === r.id, { isWithdrawn: true });
+            });
+        }
         const ticketMap = new Map();
         for (const ticket of ticketRecords) {
             const key = `${ticket.classDate}_${ticket.className}_${ticket.studentName}`;
             ticketMap.set(key, ticket);
         }
-        const newVersion = (card.revenueVersion || 0) + 1;
-        const now = new Date().toISOString();
         const details = [];
+        let note = recalculationNote || '';
+        if (!note && previousVersion) {
+            note = `第${newVersion}次重算，基于最新票务补录数据`;
+        }
+        else if (!note) {
+            note = '首次计算分账';
+        }
         for (const attendance of attendanceRecords) {
             const key = `${attendance.classDate}_${attendance.className}_${attendance.studentName}`;
             const ticket = ticketMap.get(key);
@@ -50,7 +64,11 @@ class RevenueService {
                 finalAmount: calculation.finalAmount,
                 calculationParams: {
                     formulaVersion: this.FORMULA_VERSION,
-                    assumptions: calculation.assumptions,
+                    assumptions: [
+                        ...calculation.assumptions,
+                        `分账版本: v${newVersion}${previousVersion ? ` (取代v${previousVersion})` : ''}`,
+                        `重算说明: ${note}`,
+                    ],
                     tradeoffs: calculation.tradeoffs,
                 },
                 calculatedAt: now,
@@ -63,8 +81,18 @@ class RevenueService {
         this.cardService.updateCardFields(cardId, {
             revenueVersion: newVersion,
             status: 'REVENUE_CALCULATED',
+            notes: note,
+        }, {
+            incrementVersion: true,
+            createSnapshot: true,
+            updatedBy: calculatedBy,
         });
-        return { version: newVersion, details };
+        return {
+            version: newVersion,
+            details,
+            previousVersion,
+            recalculationNote: note,
+        };
     }
     calculateSingleRecord(attendance, ticket) {
         const assumptions = [];
@@ -107,12 +135,23 @@ class RevenueService {
         };
     }
     getRevenueByCardId(cardId, version) {
+        const card = this.cardService.getCard(cardId);
+        let targetVersion = version;
+        if (targetVersion === undefined && card && card.revenueVersion) {
+            targetVersion = card.revenueVersion;
+        }
         let records = (0, database_1.findMany)('revenue', (r) => r.cardId === cardId && !r.isWithdrawn);
-        if (version !== undefined) {
-            records = records.filter((r) => r.version === version);
+        if (targetVersion !== undefined) {
+            records = records.filter((r) => r.version === targetVersion);
+        }
+        else {
+            const maxVersion = records.reduce((max, r) => Math.max(max, r.version || 0), 0);
+            if (maxVersion > 0) {
+                records = records.filter((r) => r.version === maxVersion);
+            }
         }
         return records
-            .sort((a, b) => a.classDate.localeCompare(b.classDate) || b.version - a.version);
+            .sort((a, b) => a.classDate.localeCompare(b.classDate));
     }
     getLatestRevenue(cardId) {
         const card = this.cardService.getCard(cardId);

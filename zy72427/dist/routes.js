@@ -158,11 +158,11 @@ router.post('/cards/:cardId/self-check', (req, res) => {
 });
 router.post('/cards/:cardId/calculate-revenue', (req, res) => {
     try {
-        const { calculatedBy } = req.body;
+        const { calculatedBy, recalculationNote } = req.body;
         if (!calculatedBy) {
             return res.status(400).json({ error: 'calculatedBy 必填' });
         }
-        const result = revenueService.calculateRevenue(req.params.cardId, calculatedBy);
+        const result = revenueService.calculateRevenue(req.params.cardId, calculatedBy, recalculationNote);
         res.json(result);
     }
     catch (err) {
@@ -256,6 +256,23 @@ router.get('/cards/:cardId/full-details', (req, res) => {
                 isUnresolved: relatedConflict ? conflictService.isUnresolved(relatedConflict) : false,
             };
         });
+        const dataSourceInfo = {
+            currentRevenueVersion: card.revenueVersion || null,
+            isRecalculation: (card.revenueVersion || 0) > 1,
+            recalculationCount: Math.max(0, (card.revenueVersion || 0) - 1),
+            lastRecalculationNote: card.notes || null,
+            revenueDetailsCount: revenue.length,
+            exportCount: revenueExport.length,
+            versionsMatch: revenue.length > 0 && revenue.every(r => r.version === card.revenueVersion),
+            allDetailsSameVersion: revenue.length > 0 &&
+                new Set(revenue.map(r => r.version)).size === 1,
+            noOldVersionsMixed: revenue.length > 0 &&
+                revenue.every(r => r.version === card.revenueVersion && !r.isWithdrawn),
+        };
+        const versionChangeSummary = versionHistory
+            .filter(h => h.changeDescription)
+            .map(h => `v${h.version}: ${h.changeDescription}`)
+            .join(' | ');
         res.json({
             card: {
                 ...card,
@@ -271,6 +288,22 @@ router.get('/cards/:cardId/full-details', (req, res) => {
             revenue,
             revenueExport,
             versionHistory,
+            dataSourceInfo,
+            versionChangeSummary,
+            consistencyChecks: {
+                revenueVersionMatch: revenue.length === 0 ||
+                    revenue.every(r => r.version === card.revenueVersion),
+                exportAndDetailsMatch: JSON.stringify(revenueExport.map(e => ({
+                    classDate: e['日期'],
+                    studentName: e['学员'],
+                    finalAmount: e['最终金额'],
+                }))) === JSON.stringify(revenue.map(r => ({
+                    classDate: r.classDate,
+                    studentName: r.studentName,
+                    finalAmount: r.finalAmount,
+                }))),
+                versionHistoryShowsRevenueUpdates: versionHistory.some(h => h.hasRevenue && h.revenueVersion === card.revenueVersion),
+            },
         });
     }
     catch (err) {

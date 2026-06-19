@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { insertMany, findMany } from '../database';
+import { insertMany, findMany, updateOne } from '../database';
 import { CardService } from './cardService';
 import {
   ClassAttendanceRecord,
@@ -131,8 +131,10 @@ export class ImportService {
       classDate: string;
       className: string;
       studentName: string;
-      ticketCount: number;
-      ticketType: string;
+      ticketHours?: number;
+      ticketPrice?: number;
+      ticketCount?: number;
+      ticketType?: string;
       supplementNote?: string;
     }>,
     supplementedBy: string
@@ -141,7 +143,7 @@ export class ImportService {
     records: TicketExportRecord[];
     details: Array<{
       record: TicketExportRecord;
-      importStatus: 'NEW' | 'DUPLICATE_CURRENT_BATCH' | 'DUPLICATE_HISTORICAL' | 'MANUAL_SUPPLEMENT';
+      importStatus: 'NEW' | 'DUPLICATE_CURRENT_BATCH' | 'DUPLICATE_HISTORICAL' | 'MANUAL_SUPPLEMENT' | 'UPDATED';
       duplicateOf?: string;
       supplementNote?: string;
     }>;
@@ -150,6 +152,7 @@ export class ImportService {
       duplicateCurrentBatchCount: number;
       duplicateHistoricalCount: number;
       manualSupplementCount: number;
+      updatedCount: number;
     };
   } {
     const batchId = uuidv4();
@@ -189,18 +192,23 @@ export class ImportService {
       
       if (existingKeyToRecord.has(key)) {
         const existing = existingKeyToRecord.get(key)!;
-        if (isManualSupplement) {
+        const hasChanges = (record.ticketHours !== undefined && record.ticketHours !== existing.ticketHours) ||
+                          (record.ticketPrice !== undefined && record.ticketPrice !== existing.ticketPrice) ||
+                          (record.ticketCount !== undefined && record.ticketCount !== existing.ticketCount);
+        
+        if (isManualSupplement || hasChanges) {
+          const updatedRecord = { 
+            ...existing, 
+            ...record, 
+            exportedAt: now, 
+            exportBatchId: batchId 
+          };
+          updateOne('tickets', (t: any) => t.id === existing.id, updatedRecord);
+          importedRecords.push(updatedRecord);
           details.push({
-            record: {
-              id: '',
-              cardId,
-              ...record,
-              exportedAt: now,
-              exportBatchId: batchId,
-            },
-            importStatus: 'DUPLICATE_HISTORICAL',
-            duplicateOf: `历史记录(${existing.exportBatchId.substring(0, 8)}...)`,
-            supplementNote: record.supplementNote,
+            record: updatedRecord,
+            importStatus: hasChanges ? 'UPDATED' : 'MANUAL_SUPPLEMENT',
+            supplementNote: record.supplementNote || '票务数据更新',
           });
         } else {
           details.push({
@@ -259,6 +267,7 @@ export class ImportService {
       duplicateCurrentBatchCount: details.filter(d => d.importStatus === 'DUPLICATE_CURRENT_BATCH').length,
       duplicateHistoricalCount: details.filter(d => d.importStatus === 'DUPLICATE_HISTORICAL').length,
       manualSupplementCount: details.filter(d => d.importStatus === 'MANUAL_SUPPLEMENT').length,
+      updatedCount: details.filter(d => d.importStatus === 'UPDATED').length,
     };
 
     return { batchId, records: importedRecords, details, summary };
