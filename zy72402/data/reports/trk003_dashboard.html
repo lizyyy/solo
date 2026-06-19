@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>录音棚工时尾差核对 - 看板</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px 32px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-card .label { color: #666; font-size: 14px; margin-top: 4px; }
+        .stat-card.warning .number { color: #f59e0b; }
+        .stat-card.pending .number { color: #3b82f6; }
+        .stat-card.success .number { color: #10b981; }
+
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            background: white;
+            padding: 20px 32px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+        .step.active .step-circle {
+            background: #667eea;
+            color: white;
+        }
+        .step.done .step-circle {
+            background: #10b981;
+            color: white;
+        }
+        .step-label { font-size: 13px; color: #666; }
+        .step.active .step-label { color: #333; font-weight: 500; }
+
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .section h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section h2 .badge {
+            background: #fef3c7;
+            color: #d97706;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+        th {
+            background: #f9fafb;
+            color: #666;
+            font-weight: 500;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+        .rework-row {
+            background: #fffbeb;
+        }
+        .rework-row:hover {
+            background: #fef3c7;
+        }
+        .remark-cell {
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+            color: #667eea;
+        }
+        .remark-cell:hover { text-decoration: underline; }
+        .audio-remark { color: #8b5cf6; }
+        .judgment-cell {
+            cursor: pointer;
+            color: #667eea;
+            font-size: 13px;
+            max-width: 220px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .judgment-cell:hover { text-decoration: underline; }
+        .keyword-badge {
+            display: inline-block;
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+        .source-badge {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #4f46e5;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+        .status-normal { color: #10b981; }
+        .status-pending { color: #3b82f6; }
+        .status-rework { color: #f59e0b; }
+        .status-approved { color: #10b981; font-weight: 500; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            max-width: 620px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .modal-content h3 {
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modal-label {
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 6px;
+            color: #666;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .modal-value {
+            color: #1f2937;
+            line-height: 1.7;
+            padding: 14px 16px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .modal-value.audio { border-left-color: #8b5cf6; }
+        .modal-value.judgment {
+            background: #eef2ff;
+            border-left-color: #4f46e5;
+            font-size: 13px;
+        }
+        .modal-content button {
+            margin-top: 20px;
+            padding: 9px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .modal-content button:hover {
+            background: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎵 录音棚工时尾差核对</h1>
+        <p>生成时间: 2026-06-20 00:42:19 | 当前步骤: 第 4 步 | 票务备注或音频备注任一含返工即标记待复核</p>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <div class="number">8</div>
+            <div class="label">总轨道数</div>
+        </div>
+        <div class="stat-card warning">
+            <div class="number">5</div>
+            <div class="label">含返工原因（票务或音频）</div>
+        </div>
+        <div class="stat-card pending">
+            <div class="number">5</div>
+            <div class="label">待版权复核</div>
+        </div>
+        <div class="stat-card success">
+            <div class="number">0</div>
+            <div class="label">已通过</div>
+        </div>
+    </div>
+
+    <div class="steps">
+        
+        <div class="step active done">
+            <div class="step-circle">1</div>
+            <div class="step-label">票务导出表导入</div>
+        </div>
+        
+        <div class="step active done">
+            <div class="step-circle">2</div>
+            <div class="step-label">阿梅补看音频备注</div>
+        </div>
+        
+        <div class="step active done">
+            <div class="step-circle">3</div>
+            <div class="step-label">排练变更记录更新</div>
+        </div>
+        
+        <div class="step active ">
+            <div class="step-circle">4</div>
+            <div class="step-label">版权运营复核</div>
+        </div>
+        
+    </div>
+
+    <div class="section">
+        <h2>⚠️ 含返工原因（票务或音频） <span class="badge">点击任一备注查看详情</span></h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>轨道编号</th>
+                    <th>曲目名称</th>
+                    <th>工时尾差</th>
+                    <th>来源 + 关键词</th>
+                    <th>票务备注（点击查看）</th>
+                    <th>音频备注（点击查看）</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+        <tr class="rework-row">
+            <td>TRK002</td>
+            <td>逆光奔跑</td>
+            <td>+3.5h</td>
+            <td><span class="source-badge">票务备注、音频备注</span><br/><span class="keyword-badge">修正, 补录, 走音重录, 重录</span></td>
+            <td class="remark-cell" onclick="showDetail('TRK002', 'ticket', this)" title="点击查看完整票务备注">
+                歌手走音重录2次，副歌部分补录
+            </td>
+            <td class="remark-cell audio-remark" onclick="showDetail('TRK002', 'audio', this)" title="点击查看完整音频备注">
+                重录后音质OK，走音问题已修正，待版权确认工时
+            </td>
+            <td><span class="status-pending">待复核</span></td>
+        </tr>
+        
+        <tr class="rework-row">
+            <td>TRK003</td>
+            <td>夏日回忆</td>
+            <td>+0.2h</td>
+            <td><span class="source-badge">音频备注</span><br/><span class="keyword-badge">重录</span></td>
+            <td class="remark-cell" onclick="showDetail('TRK003', 'ticket', this)" title="点击查看完整票务备注">
+                正常
+            </td>
+            <td class="remark-cell audio-remark" onclick="showDetail('TRK003', 'audio', this)" title="点击查看完整音频备注">
+                副歌重录一次，需版权确认
+            </td>
+            <td><span class="status-pending">待复核</span></td>
+        </tr>
+        
+        <tr class="rework-row">
+            <td>TRK004</td>
+            <td>午夜旋律</td>
+            <td>+4.0h</td>
+            <td><span class="source-badge">票务备注、音频备注</span><br/><span class="keyword-badge">重录, 噪音重录, 后期返工, 重新配音, 返工</span></td>
+            <td class="remark-cell" onclick="showDetail('TRK004', 'ticket', this)" title="点击查看完整票务备注">
+                背景噪音重录，后期返工调整，部分段落重新配音
+            </td>
+            <td class="remark-cell audio-remark" onclick="showDetail('TRK004', 'audio', this)" title="点击查看完整音频备注">
+                三次返工后噪音问题解决，建议版权运营重点复核工时合...
+            </td>
+            <td><span class="status-pending">待复核</span></td>
+        </tr>
+        
+        <tr class="rework-row">
+            <td>TRK006</td>
+            <td>风的方向</td>
+            <td>+1.5h</td>
+            <td><span class="source-badge">票务备注、音频备注</span><br/><span class="keyword-badge">瑕疵重录, 重录</span></td>
+            <td class="remark-cell" onclick="showDetail('TRK006', 'ticket', this)" title="点击查看完整票务备注">
+                乐器瑕疵重录了一遍
+            </td>
+            <td class="remark-cell audio-remark" onclick="showDetail('TRK006', 'audio', this)" title="点击查看完整音频备注">
+                乐器重录后效果达标，工时差异需备注
+            </td>
+            <td><span class="status-pending">待复核</span></td>
+        </tr>
+        
+        <tr class="rework-row">
+            <td>TRK008</td>
+            <td>远方的你</td>
+            <td>+3.0h</td>
+            <td><span class="source-badge">票务备注、音频备注</span><br/><span class="keyword-badge">补录, 修改, 重拍</span></td>
+            <td class="remark-cell" onclick="showDetail('TRK008', 'ticket', this)" title="点击查看完整票务备注">
+                情绪不对重拍，歌词修改后补录
+            </td>
+            <td class="remark-cell audio-remark" onclick="showDetail('TRK008', 'audio', this)" title="点击查看完整音频备注">
+                情绪和歌词调整后效果好，补录部分已标记
+            </td>
+            <td><span class="status-pending">待复核</span></td>
+        </tr>
+        
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>📋 排练变更记录 <span class="badge">点击备注/判定查看详情</span></h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>轨道编号</th>
+                    <th>曲目名称</th>
+                    <th>票务备注（点击）</th>
+                    <th>音频备注（点击）</th>
+                    <th>为什么留下</th>
+                    <th>还缺材料</th>
+                    <th>下一步找谁</th>
+                    <th>判定说明（点击查看）</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+        <tr>
+            <td>TRK001</td>
+            <td>星辰大海</td>
+            <td class="remark-cell" onclick="showDetail('TRK001', 'ticket', this)" title="点击查看完整票务备注">
+                正常录制，无返工
+            </td>
+            <td class="remark-cell audio-remark" onclick="showDetail('TRK001', 'audio', this)" title="点击查看完整音频备注">
+                音质清晰，已通过质检
+            </td>
+            <td>工时尾差在正常范围内，票务和音频备注均无返工记录</td>
+            <td>-</td>
+            <td><strong>版权运营</strong></td>
+            <td class="judgment-cell" onclick="showJudgment('TRK001', this)" title="点击查看为什么这样处理">
+                【票务备注】虽包含关键词 返工，但均为否定语境（正常录制...
+            </td>
+            <td><span class="status-normal">✅ 正常</span></td>
+        </tr>
+        
+        <tr>
+            <td>TRK002</td>
+            <td>逆光奔跑</td>
+            <td class="remark-cell" onclick="showDetail('TRK002', 'ticket', this)" title="点击查看完整票务备注">
+                歌手走音重录2次，副歌部分补录
+            </td>
+            <td class="remark-cell audio-remark" onclick="showDetail('TRK002', 'audio', this)" title="点击查看完整音频备注">
+                重录后音质OK，走音问题已修正，待版权确认工...
+            </td>
+            <td>工时尾差较大(+3.5小时)，需进一步确认</td>
+            <td>版权运营复核意见</td>
+            <td><strong>版权运营</strong></td>
+            <td class="judgment-cell" onclick="showJudgment('TRK002', this)" title="点击查看为什么这样处理">
+                【票务备注】检测到返工关键词: 走音重录, 重录, 补录...
+            </td>
+            <td><span class="status-pending">⏳ 待版权运营复核</span></td>
+        </tr>
+        
+        <tr>
+            <td>TRK003</td>
+            <td>夏日回忆</td>
+            <td class="remark-cell" onclick="showDetail('TRK003', 'ticket', this)" title="点击查看完整票务备注">
+                正常
+            </td>
+            <td class="remark-cell audio-remark" onclick="showDetail('TRK003', 'audio', this)" title="点击查看完整音频备注">
+                副歌重录一次，需版权确认
+            </td>
+            <td>音频备注含: 重录，需版权运营复核后确认</td>
+            <td>版权运营复核意见</td>
+            <td><strong>版权运营</strong></td>
+            <td class="judgment-cell" onclick="showJudgment('TRK003', this)" title="点击查看为什么这样处理">
+                【票务备注】未检测到返工相关关键词；【音频备注】检测到返...
+            </td>
+            <td><span class="status-pending">⏳ 待版权运营复核</span></td>
+        </tr>
+        
+        <tr>
+            <td>TRK004</td>
+            <td>午夜旋律</td>
+            <td class="remark-cell" onclick="showDetail('TRK004', 'ticket', this)" title="点击查看完整票务备注">
+                背景噪音重录，后期返工调整，部分段落重新配音
+            </td>
+            <td class="remark-cell audio-remark" onclick="showDetail('TRK004', 'audio', this)" title="点击查看完整音频备注">
+                三次返工后噪音问题解决，建议版权运营重点复核...
+            </td>
+            <td>工时尾差较大(+4.0小时)，需进一步确认</td>
+            <td>版权运营复核意见</td>
+            <td><strong>版权运营</strong></td>
+            <td class="judgment-cell" onclick="showJudgment('TRK004', this)" title="点击查看为什么这样处理">
+                【票务备注】检测到返工关键词: 后期返工, 重新配音, ...
+            </td>
+            <td><span class="status-pending">⏳ 待版权运营复核</span></td>
+        </tr>
+        
+        <tr>
+            <td>TRK005</td>
+            <td>梦想起航</td>
+            <td class="remark-cell" onclick="showDetail('TRK005', 'ticket', this)" title="点击查看完整票务备注">
+                无异常
+            </td>
+            <td class="remark-cell audio-remark" onclick="showDetail('TRK005', 'audio', this)" title="点击查看完整音频备注">
+                正常通过
+            </td>
+            <td>工时尾差在正常范围内，票务和音频备注均无返工记录</td>
+            <td>-</td>
+            <td><strong>版权运营</strong></td>
+            <td class="judgment-cell" onclick="showJudgment('TRK005', this)" title="点击查看为什么这样处理">
+                【票务备注】未检测到返工相关关键词；【音频备注】未检测到...
+            </td>
+            <td><span class="status-normal">✅ 正常</span></td>
+        </tr>
+        
+        <tr>
+            <td>TRK006</td>
+            <td>风的方向</td>
+            <td class="remark-cell" onclick="showDetail('TRK006', 'ticket', this)" title="点击查看完整票务备注">
+                乐器瑕疵重录了一遍
+            </td>
+            <td class="remark-cell audio-remark" onclick="showDetail('TRK006', 'audio', this)" title="点击查看完整音频备注">
+                乐器重录后效果达标，工时差异需备注
+            </td>
+            <td>票务备注含: 瑕疵重录, 重录、音频备注含: 重录，需版权运营复核后确认</td>
+            <td>版权运营复核意见</td>
+            <td><strong>版权运营</strong></td>
+            <td class="judgment-cell" onclick="showJudgment('TRK006', this)" title="点击查看为什么这样处理">
+                【票务备注】检测到返工关键词: 瑕疵重录, 重录；【音频...
+            </td>
+            <td><span class="status-pending">⏳ 待版权运营复核</span></td>
+        </tr>
+        
+        <tr>
+            <td>TRK007</td>
+            <td>青春纪念册</td>
+            <td class="remark-cell" onclick="showDetail('TRK007', 'ticket', this)" title="点击查看完整票务备注">
+                正常
+            </td>
+            <td class="remark-cell audio-remark" onclick="showDetail('TRK007', 'audio', this)" title="点击查看完整音频备注">
+                一切正常
+            </td>
+            <td>工时尾差在正常范围内，票务和音频备注均无返工记录</td>
+            <td>-</td>
+            <td><strong>版权运营</strong></td>
+            <td class="judgment-cell" onclick="showJudgment('TRK007', this)" title="点击查看为什么这样处理">
+                【票务备注】未检测到返工相关关键词；【音频备注】未检测到...
+            </td>
+            <td><span class="status-normal">✅ 正常</span></td>
+        </tr>
+        
+        <tr>
+            <td>TRK008</td>
+            <td>远方的你</td>
+            <td class="remark-cell" onclick="showDetail('TRK008', 'ticket', this)" title="点击查看完整票务备注">
+                情绪不对重拍，歌词修改后补录
+            </td>
+            <td class="remark-cell audio-remark" onclick="showDetail('TRK008', 'audio', this)" title="点击查看完整音频备注">
+                情绪和歌词调整后效果好，补录部分已标记
+            </td>
+            <td>工时尾差较大(+3.0小时)，需进一步确认</td>
+            <td>版权运营复核意见</td>
+            <td><strong>版权运营</strong></td>
+            <td class="judgment-cell" onclick="showJudgment('TRK008', this)" title="点击查看为什么这样处理">
+                【票务备注】检测到返工关键词: 补录, 重拍, 修改；【...
+            </td>
+            <td><span class="status-pending">⏳ 待版权运营复核</span></td>
+        </tr>
+        
+            </tbody>
+        </table>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title">备注详情</h3>
+            <div id="modal-body"></div>
+            <button onclick="closeModal()">关闭</button>
+        </div>
+    </div>
+
+    <script>
+        const ticketRemarks = {"TRK001": "正常录制，无返工", "TRK002": "歌手走音重录2次，副歌部分补录", "TRK003": "正常", "TRK004": "背景噪音重录，后期返工调整，部分段落重新配音", "TRK005": "无异常", "TRK006": "乐器瑕疵重录了一遍", "TRK007": "正常", "TRK008": "情绪不对重拍，歌词修改后补录"};
+        const audioRemarks = {"TRK001": "音质清晰，已通过质检", "TRK002": "重录后音质OK，走音问题已修正，待版权确认工时", "TRK003": "副歌重录一次，需版权确认", "TRK004": "三次返工后噪音问题解决，建议版权运营重点复核工时合理性", "TRK005": "正常通过", "TRK006": "乐器重录后效果达标，工时差异需备注", "TRK007": "一切正常", "TRK008": "情绪和歌词调整后效果好，补录部分已标记"};
+        const judgmentData = {"TRK001": "【票务备注】虽包含关键词 返工，但均为否定语境（正常录制，无返工），不判定为返工；【音频备注】未检测到返工相关关键词；【综合判定】票务备注和音频备注均未检测到有效返工原因，判定为正常", "TRK002": "【票务备注】检测到返工关键词: 走音重录, 重录, 补录；【音频备注】检测到返工关键词: 重录, 修正；【综合判定】票务或音频备注中检测到返工原因，标记为待版权运营复核，不归为正常；工时尾差+3.5小时超过阈值，需关注", "TRK003": "【票务备注】未检测到返工相关关键词；【音频备注】检测到返工关键词: 重录；【综合判定】票务或音频备注中检测到返工原因，标记为待版权运营复核，不归为正常", "TRK004": "【票务备注】检测到返工关键词: 后期返工, 重新配音, 噪音重录, 返工, 重录；【音频备注】检测到返工关键词: 返工；【综合判定】票务或音频备注中检测到返工原因，标记为待版权运营复核，不归为正常；工时尾差+4.0小时超过阈值，需关注", "TRK005": "【票务备注】未检测到返工相关关键词；【音频备注】未检测到返工相关关键词；【综合判定】票务备注和音频备注均未检测到有效返工原因，判定为正常", "TRK006": "【票务备注】检测到返工关键词: 瑕疵重录, 重录；【音频备注】检测到返工关键词: 重录；【综合判定】票务或音频备注中检测到返工原因，标记为待版权运营复核，不归为正常", "TRK007": "【票务备注】未检测到返工相关关键词；【音频备注】未检测到返工相关关键词；【综合判定】票务备注和音频备注均未检测到有效返工原因，判定为正常", "TRK008": "【票务备注】检测到返工关键词: 补录, 重拍, 修改；【音频备注】检测到返工关键词: 补录；【综合判定】票务或音频备注中检测到返工原因，标记为待版权运营复核，不归为正常；工时尾差+3.0小时超过阈值，需关注"};
+
+        function renderDetail(kind, trackId) {
+            const parts = [];
+
+            if (kind === 'ticket' || kind === 'all') {
+                const v = ticketRemarks[trackId] || '无';
+                parts.push('<span class="modal-label">📝 票务导出表备注</span>');
+                parts.push('<div class="modal-value">' + escapeHtml(v) + '</div>');
+            }
+
+            if (kind === 'audio' || kind === 'all') {
+                const v = audioRemarks[trackId] || '（未补录）';
+                parts.push('<span class="modal-label">🎵 音频文件备注</span>');
+                parts.push('<div class="modal-value audio">' + escapeHtml(v) + '</div>');
+            }
+
+            if (kind === 'judgment' || kind === 'all') {
+                const v = judgmentData[trackId] || '暂无说明';
+                parts.push('<span class="modal-label">🔍 判定说明 - 为什么这样处理？</span>');
+                parts.push('<div class="modal-value judgment">' + escapeHtml(v).replace(/；/g, '；<br/>').replace(/【/g, '<br/>【') + '</div>');
+            }
+
+            return parts.join('');
+        }
+
+        function showDetail(trackId, type, el) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+
+            if (type === 'ticket') {
+                title.innerHTML = '📝 票务导出表 - 轨道备注详情 | ' + trackId;
+                body.innerHTML = renderDetail('ticket', trackId)
+                    + '<span class="modal-label">🎵 关联音频备注（对照查看）</span>'
+                    + '<div class="modal-value audio">' + escapeHtml(audioRemarks[trackId] || '（未补录）') + '</div>'
+                    + '<span class="modal-label">🔍 本条判定说明</span>'
+                    + '<div class="modal-value judgment">' + escapeHtml(judgmentData[trackId] || '暂无说明').replace(/；/g, '；<br/>').replace(/【/g, '<br/>【') + '</div>';
+            } else {
+                title.innerHTML = '🎵 音频文件 - 备注详情 | ' + trackId;
+                body.innerHTML = renderDetail('audio', trackId)
+                    + '<span class="modal-label">📝 关联票务备注（对照查看）</span>'
+                    + '<div class="modal-value">' + escapeHtml(ticketRemarks[trackId] || '无') + '</div>'
+                    + '<span class="modal-label">🔍 本条判定说明</span>'
+                    + '<div class="modal-value judgment">' + escapeHtml(judgmentData[trackId] || '暂无说明').replace(/；/g, '；<br/>').replace(/【/g, '<br/>【') + '</div>';
+            }
+            modal.classList.add('show');
+        }
+
+        function showJudgment(trackId, el) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            title.innerHTML = '🔍 判定说明 - 为什么这样处理？ | ' + trackId;
+            body.innerHTML = renderDetail('judgment', trackId)
+                + '<span class="modal-label">📝 判定依据 - 票务备注</span>'
+                + '<div class="modal-value">' + escapeHtml(ticketRemarks[trackId] || '无') + '</div>'
+                + '<span class="modal-label">🎵 判定依据 - 音频备注</span>'
+                + '<div class="modal-value audio">' + escapeHtml(audioRemarks[trackId] || '（未补录）') + '</div>';
+            modal.classList.add('show');
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>

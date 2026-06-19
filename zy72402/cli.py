@@ -2,8 +2,9 @@
 import argparse
 import sys
 import os
-from core import WorkflowEngine
+from core import WorkflowEngine, detect_rework_reason
 from report import generate_text_report, generate_dashboard_html
+from models import TrackStatus, DetectionDetail
 
 
 def cmd_import(args):
@@ -120,14 +121,25 @@ def cmd_status(args):
     print()
 
     if engine.tickets:
-        rework = sum(1 for t in engine.tickets.values() if t.has_rework_reason)
+        rework_count = 0
+        for tid, t in engine.tickets.items():
+            t_det = t.detection_detail
+            audio = engine.audio_files.get(tid)
+            audio_remark = audio.audio_remark if audio else ""
+            a_det = detect_rework_reason(audio_remark) if audio_remark else DetectionDetail(False, [], [], "", [])
+            if t_det.is_rework or a_det.is_rework:
+                rework_count += 1
         print(f"   已导入轨道: {len(engine.tickets)} 条")
-        print(f"   含返工原因: {rework} 条")
+        print(f"   含返工原因(票务或音频): {rework_count} 条")
 
     if engine.rehearsal_changes:
+        def _is_pending(s):
+            if hasattr(s, 'value'):
+                return s.value == "pending_copyright_review"
+            return s == "pending_copyright_review" or s == TrackStatus.PENDING_COPYRIGHT_REVIEW
         pending = sum(
             1 for c in engine.rehearsal_changes.values()
-            if c.status.value == "pending_copyright_review"
+            if _is_pending(c.status)
         )
         print(f"   排练变更记录: {len(engine.rehearsal_changes)} 条")
         print(f"   待版权复核: {pending} 条")
@@ -150,31 +162,37 @@ def cmd_detail(args):
     print()
     print(f"📝 票务导出表备注:")
     print(f"   {detail['ticket_remark']}")
+    t_det = detail.get('ticket_detection_detail')
+    if t_det:
+        t_rework = "✅ 含返工原因" if t_det.is_rework else "✅ 正常"
+        print(f"   判定: {t_rework} | 依据: {t_det.judgment_basis}")
     print()
     print(f"🎵 音频文件备注:")
     print(f"   {detail['audio_remark'] or '（未补录）'}")
+    a_det = detail.get('audio_detection_detail')
+    if a_det and detail['audio_remark']:
+        a_rework = "✅ 含返工原因" if a_det.is_rework else "✅ 正常"
+        print(f"   判定: {a_rework} | 依据: {a_det.judgment_basis}")
     print()
 
     det = detail['detection_detail']
     if det:
-        print(f"🔎 返工原因检测:")
+        print(f"🔎 综合判定（票务+音频）:")
         print(f"   是否判定为返工: {'是' if det.is_rework else '否'}")
-        print(f"   匹配的关键词: {', '.join(det.matched_keywords) if det.matched_keywords else '无'}")
+        print(f"   综合匹配关键词: {', '.join(det.matched_keywords) if det.matched_keywords else '无'}")
         if det.excluded_by_negation:
             print(f"   被否定语境排除: {', '.join(det.excluded_by_negation)}")
-            print(f"   否定语境: {'; '.join(det.negation_contexts)}")
-        print(f"   判定依据: {det.judgment_basis}")
         print()
 
     rc = detail['rehearsal_change']
     if rc:
         print(f"📋 排练变更记录:")
-        print(f"   状态: {rc.status}")
+        print(f"   状态: {'⚠️ 待版权运营复核' if rc.status == TrackStatus.PENDING_COPYRIGHT_REVIEW else rc.status}")
         print(f"   为什么留下: {rc.kept_why}")
         print(f"   还缺材料: {', '.join(rc.missing_materials) if rc.missing_materials else '无'}")
         print(f"   下一步找谁: {rc.next_contact}")
         if rc.judgment_explanation:
-            print(f"   判定说明: {rc.judgment_explanation}")
+            print(f"   判定说明（点击可查看）: {rc.judgment_explanation}")
         print()
 
     logs = detail['change_logs']

@@ -171,47 +171,80 @@ class WorkflowEngine:
         if not ticket:
             return
 
-        if ticket.track_id in self.rehearsal_changes:
-            change = self.rehearsal_changes[ticket.track_id]
-            change.notes = f"音频备注: {audio.audio_remark}\n{change.notes}"
-            change.updated_at = datetime.now()
+        if audio.track_id in self.rehearsal_changes:
+            old_created = self.rehearsal_changes[audio.track_id].created_at
+            old_status = self.rehearsal_changes[audio.track_id].status
+            new_change = self._create_rehearsal_change(ticket, audio)
+            new_change.created_at = old_created
+            new_change.status = old_status if old_status == TrackStatus.APPROVED else new_change.status
+            self.rehearsal_changes[audio.track_id] = new_change
         else:
             change = self._create_rehearsal_change(ticket, audio)
             self.rehearsal_changes[ticket.track_id] = change
 
     def _create_rehearsal_change(self, ticket: TicketExport, audio: Optional[AudioFile] = None) -> RehearsalChange:
+        ticket_detail = ticket.detection_detail or detect_rework_reason(ticket.track_remark)
+        audio_remark = audio.audio_remark if audio else ""
+        audio_detail = detect_rework_reason(audio_remark)
+
+        has_rework_overall = ticket_detail.is_rework or audio_detail.is_rework
+
+        all_matched = list(set(ticket_detail.matched_keywords + audio_detail.matched_keywords))
+        all_excluded = list(set(ticket_detail.excluded_by_negation + audio_detail.excluded_by_negation))
+        all_negation_contexts = list(set(ticket_detail.negation_contexts + audio_detail.negation_contexts))
+
         missing = []
         next_contact = NextContact.COPYRIGHT_OPERATIONS
         kept_why = ""
-        change_reason = ticket.track_remark
+        change_reason_parts = []
         explanation_parts = []
 
-        if ticket.detection_detail:
-            explanation_parts.append(f"判定依据: {ticket.detection_detail.judgment_basis}")
+        explanation_parts.append(f"【票务备注】{ticket_detail.judgment_basis}")
+        if audio_remark:
+            explanation_parts.append(f"【音频备注】{audio_detail.judgment_basis}")
+        else:
+            explanation_parts.append("【音频备注】尚未补录")
 
-        if ticket.has_rework_reason:
+        if ticket.track_remark:
+            change_reason_parts.append(ticket.track_remark)
+        if audio_remark:
+            change_reason_parts.append(audio_remark)
+        change_reason = " / ".join(change_reason_parts) if change_reason_parts else ""
+
+        if has_rework_overall:
             status = TrackStatus.PENDING_COPYRIGHT_REVIEW
-            kept_why = "轨道备注包含返工原因，需版权运营复核后确认"
+            kept_why = "轨道备注或音频备注包含返工原因，需版权运营复核后确认"
             missing.append("版权运营复核意见")
-            explanation_parts.append("因含返工原因，标记为待版权运营复核，不归为正常")
+            explanation_parts.append("【综合判定】票务或音频备注中检测到返工原因，标记为待版权运营复核，不归为正常")
+
+            rework_source = []
+            if ticket_detail.is_rework:
+                rework_source.append(f"票务备注含: {', '.join(ticket_detail.matched_keywords)}")
+            if audio_detail.is_rework:
+                rework_source.append(f"音频备注含: {', '.join(audio_detail.matched_keywords)}")
+            if rework_source:
+                kept_why = f"{'、'.join(rework_source)}，需版权运营复核后确认"
+
             if not audio or not audio.audio_remark:
                 missing.append("音频文件备注")
                 next_contact = NextContact.TOUR_COORDINATOR_AMEI
                 explanation_parts.append("缺少音频备注，下一步找巡演统筹阿梅补录")
         else:
             status = TrackStatus.NORMAL
-            kept_why = "工时尾差在正常范围内，无返工记录"
-            explanation_parts.append("未检测到有效返工原因，判定为正常")
+            kept_why = "工时尾差在正常范围内，票务和音频备注均无返工记录"
+            explanation_parts.append("【综合判定】票务备注和音频备注均未检测到有效返工原因，判定为正常")
 
         if abs(ticket.hour_diff) > 2:
             kept_why = f"工时尾差较大({ticket.hour_diff:+.1f}小时)，需进一步确认"
             explanation_parts.append(f"工时尾差{ticket.hour_diff:+.1f}小时超过阈值，需关注")
-            if not ticket.has_rework_reason:
+            if not has_rework_overall:
                 missing.append("工时差异原因说明")
 
         notes = f"票务备注: {ticket.track_remark}"
         if audio and audio.audio_remark:
             notes += f"\n音频备注: {audio.audio_remark}"
+        if all_matched:
+            notes += f"\n返工关键词(综合): {', '.join(all_matched)}"
 
         judgment_explanation = "；".join(explanation_parts) if explanation_parts else ""
 
@@ -360,13 +393,44 @@ class WorkflowEngine:
         if not ticket:
             raise ValueError(f"未找到轨道 {track_id}")
 
+        ticket_detail = ticket.detection_detail or detect_rework_reason(ticket.track_remark)
+        audio_remark = audio.audio_remark if audio else ""
+        audio_detail = detect_rework_reason(audio_remark)
+
+        has_rework_overall = ticket_detail.is_rework or audio_detail.is_rework
+        all_matched = list(set(ticket_detail.matched_keywords + audio_detail.matched_keywords))
+        all_excluded = list(set(ticket_detail.excluded_by_negation + audio_detail.excluded_by_negation))
+        all_negation_contexts = list(set(ticket_detail.negation_contexts + audio_detail.negation_contexts))
+
+        basis_parts = []
+        basis_parts.append(f"【票务备注】{ticket_detail.judgment_basis}")
+        if audio_remark:
+            basis_parts.append(f"【音频备注】{audio_detail.judgment_basis}")
+        else:
+            basis_parts.append("【音频备注】尚未补录")
+
+        if has_rework_overall:
+            basis_parts.append("【综合】票务或音频备注检测到返工原因")
+        else:
+            basis_parts.append("【综合】票务和音频备注均无有效返工原因")
+
+        combined_detail = DetectionDetail(
+            is_rework=has_rework_overall,
+            matched_keywords=all_matched,
+            excluded_by_negation=all_excluded,
+            judgment_basis="；".join(basis_parts),
+            negation_contexts=all_negation_contexts
+        )
+
         return {
             "track_id": track_id,
             "track_name": ticket.track_name,
             "ticket_remark": ticket.track_remark,
-            "audio_remark": audio.audio_remark if audio else "",
-            "has_rework": ticket.has_rework_reason,
-            "detection_detail": ticket.detection_detail,
+            "audio_remark": audio_remark,
+            "has_rework": has_rework_overall,
+            "detection_detail": combined_detail,
+            "ticket_detection_detail": ticket_detail,
+            "audio_detection_detail": audio_detail,
             "rehearsal_change": self.rehearsal_changes.get(track_id),
             "change_logs": self.get_change_logs(track_id)
         }
