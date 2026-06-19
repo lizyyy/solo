@@ -48,7 +48,7 @@ export default function SelfCheckPage() {
   };
 
   const getNavigatePath = (issue: SelfCheckIssue & { checkType?: string }, checkType?: string) => {
-    const ct = checkType || (issue as any).checkType;
+    const ct = checkType || (issue as SelfCheckIssue & { checkType?: string }).checkType;
     const rid = issue.recordId;
     const { records } = usePipelineStore.getState();
     const record = records.find((r) => r.id === rid);

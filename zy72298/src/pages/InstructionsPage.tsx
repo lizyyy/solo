@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { usePipelineStore } from '@/store/pipelineStore';
 import { MATERIAL_LABELS, STATUS_LABELS } from '@/types';
-import type { WorkflowStatus, PipelineRecord } from '@/types';
+import type { WorkflowStatus, PipelineRecord, Conflict } from '@/types';
 import { saveAs } from 'file-saver';
 import {
   FileText,
@@ -30,8 +30,15 @@ const STATUS_TAG: Record<WorkflowStatus, string> = {
   rejected: 'bg-red-100 text-red-800',
 };
 
-function getNextStepHint(record: PipelineRecord): { label: string; link: string; action: string } | null {
+function getNextStepHint(record: PipelineRecord, hasPendingConflict: boolean): { label: string; link: string; action: string } | null {
   if (record.status === 'rejected') return null;
+  if (hasPendingConflict) {
+    return {
+      label: '照片-CAD冲突未裁决，必须人工确认',
+      link: '/conflicts',
+      action: '去冲突裁决',
+    };
+  }
   if (record.isCoordinateMixed) {
     return {
       label: '坐标混合，待巡检组复核',
@@ -71,7 +78,7 @@ function getNextStepHint(record: PipelineRecord): { label: string; link: string;
 }
 
 export default function InstructionsPage() {
-  const { records, history, updateSiteInstruction, exportData, clearAll } = usePipelineStore();
+  const { records, history, conflicts, updateSiteInstruction, exportData, clearAll } = usePipelineStore();
   const visibleRecords = records.filter(
     (r) => r.status !== 'rejected'
   );
@@ -144,6 +151,7 @@ export default function InstructionsPage() {
     if (record.status === 'rejected') return false;
     if (record.isCoordinateMixed) return false;
     if (!record.cadLayer) return false;
+    if (conflicts.some((c: Conflict) => c.recordId === record.id && c.status === 'pending')) return false;
     return true;
   };
 
@@ -214,7 +222,8 @@ export default function InstructionsPage() {
           </div>
           <div className="divide-y divide-orange-100">
             {workInProgress.map((record) => {
-              const nextStep = getNextStepHint(record);
+              const recordHasConflict = conflicts.some((c: Conflict) => c.recordId === record.id && c.status === 'pending');
+              const nextStep = getNextStepHint(record, recordHasConflict);
               return (
                 <div key={record.id} className="px-5 py-3 flex items-center justify-between hover:bg-orange-50/50">
                   <div className="flex items-center gap-4">
@@ -415,7 +424,7 @@ export default function InstructionsPage() {
                           </button>
                         </div>
 
-                        {!editable && (record.isCoordinateMixed || record.status === 'pending_review') && (
+                        {!editable && (record.isCoordinateMixed || record.status === 'pending_review') && !conflicts.some((c: Conflict) => c.recordId === record.id && c.status === 'pending') && (
                           <div className="text-xs text-orange-600 bg-orange-50 border border-orange-200 p-3 rounded flex items-start gap-2">
                             <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
                             <div>
@@ -427,6 +436,21 @@ export default function InstructionsPage() {
                                 坐标复核
                               </Link>
                               页
+                            </div>
+                          </div>
+                        )}
+
+                        {!editable && conflicts.some((c: Conflict) => c.recordId === record.id && c.status === 'pending') && (
+                          <div className="text-xs text-red-600 bg-red-50 border border-red-200 p-3 rounded flex items-start gap-2">
+                            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                            <div>
+                              说明编辑已锁定：该记录存在
+                              <strong>未裁决的照片-CAD冲突</strong>
+                              ，必须由老梁在
+                              <Link to="/conflicts" className="underline mx-1">
+                                冲突处理
+                              </Link>
+                              页确认或驳回后才能继续填写现场说明。未裁决前不能生成给现场班组的说明。
                             </div>
                           </div>
                         )}

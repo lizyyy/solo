@@ -213,7 +213,9 @@ export default function Home() {
 }
 
 function RecordRow({ record }: { record: PipelineRecord }) {
-  const { actionPath, actionLabel, nextHint } = getActionContext(record);
+  const { conflicts } = usePipelineStore();
+  const hasPendingConflict = conflicts.some((c) => c.recordId === record.id && c.status === 'pending');
+  const { actionPath, actionLabel, nextHint } = getActionContext(record, hasPendingConflict);
   const curStep = getCurrentStep(record);
 
   return (
@@ -305,13 +307,20 @@ function RecordRow({ record }: { record: PipelineRecord }) {
   );
 }
 
-function getActionContext(record: PipelineRecord): {
+function getActionContext(record: PipelineRecord, hasPendingConflict: boolean): {
   actionPath: string;
   actionLabel: string;
   nextHint: string;
 } {
   if (record.status === 'rejected') {
     return { actionPath: '/history', actionLabel: '查看追溯', nextHint: '已驳回，追溯处理记录' };
+  }
+  if (hasPendingConflict) {
+    return {
+      actionPath: '/conflicts',
+      actionLabel: '去裁决',
+      nextHint: '照片-CAD冲突未裁决 → 必须人工确认',
+    };
   }
   if (record.isCoordinateMixed || record.status === 'pending_review') {
     return {

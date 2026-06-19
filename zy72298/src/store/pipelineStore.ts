@@ -7,7 +7,6 @@ import type {
   SelfCheckReport,
   ConflictResolution,
   MaterialType,
-  CoordinateType,
   Coordinate,
   WorkflowStatus,
   SelfCheckCategory,
@@ -21,13 +20,14 @@ function now(): string {
   return new Date().toISOString();
 }
 
-function computeNextStatus(record: PipelineRecord, allRecords: PipelineRecord[]): WorkflowStatus {
+function computeNextStatus(
+  record: PipelineRecord,
+  allRecords: PipelineRecord[],
+  conflicts: Conflict[] = []
+): WorkflowStatus {
   if (record.status === 'rejected') return 'rejected';
   if (record.isCoordinateMixed) return 'pending_review';
-
-  const hasPendingConflict = (recordId: string, conflicts: Conflict[]) =>
-    conflicts.some((c) => c.recordId === recordId && c.status === 'pending');
-
+  if (conflicts.some((c) => c.recordId === record.id && c.status === 'pending')) return 'pending_review';
   if (!record.cadLayer) return 'step1';
   if (record.siteInstruction) return 'step3';
   return 'step2';
@@ -50,7 +50,6 @@ interface PipelineStore {
   resolveConflict: (conflictId: string, resolution: ConflictResolution, note?: string) => void;
   updateSiteInstruction: (recordId: string, instruction: string) => void;
   markCoordinateReviewed: (recordId: string, reviewNote: string) => void;
-  advanceStatus: (recordId: string, status: WorkflowStatus) => void;
   detectConflicts: () => void;
   detectCoordinateMixed: () => void;
   recalcStatus: (recordId: string) => void;
@@ -144,7 +143,7 @@ export const usePipelineStore = create<PipelineStore>()(
               : r
           );
           const updatedRecord = updatedRecords.find((r) => r.id === recordId)!;
-          const newStatus = computeNextStatus(updatedRecord, updatedRecords);
+          const newStatus = computeNextStatus(updatedRecord, updatedRecords, s.conflicts);
 
           return {
             records: updatedRecords.map((r) =>
@@ -188,7 +187,7 @@ export const usePipelineStore = create<PipelineStore>()(
           });
 
           const updatedRecord = updatedRecords.find((r) => r.id === conflict.recordId)!;
-          const newStatus = computeNextStatus(updatedRecord, updatedRecords);
+          const newStatus = computeNextStatus(updatedRecord, updatedRecords, updatedConflicts);
 
           const finalRecords = updatedRecords.map((r) =>
             r.id === conflict.recordId ? { ...r, status: newStatus } : r
@@ -222,6 +221,9 @@ export const usePipelineStore = create<PipelineStore>()(
       updateSiteInstruction: (recordId, instruction) => {
         const record = get().records.find((r) => r.id === recordId);
         if (!record) return;
+        if (record.status === 'rejected') return;
+        if (record.isCoordinateMixed) return;
+        if (get().conflicts.some((c) => c.recordId === recordId && c.status === 'pending')) return;
 
         const oldInstruction = record.siteInstruction;
         const oldStatus = record.status;
@@ -233,7 +235,7 @@ export const usePipelineStore = create<PipelineStore>()(
               : r
           );
           const updatedRecord = updatedRecords.find((r) => r.id === recordId)!;
-          const newStatus = computeNextStatus(updatedRecord, updatedRecords);
+          const newStatus = computeNextStatus(updatedRecord, updatedRecords, s.conflicts);
 
           return {
             records: updatedRecords.map((r) =>
@@ -271,7 +273,7 @@ export const usePipelineStore = create<PipelineStore>()(
               : r
           );
           const updatedRecord = updatedRecords.find((r) => r.id === recordId)!;
-          const newStatus = computeNextStatus(updatedRecord, updatedRecords);
+          const newStatus = computeNextStatus(updatedRecord, updatedRecords, s.conflicts);
 
           return {
             records: updatedRecords.map((r) =>
@@ -297,37 +299,29 @@ export const usePipelineStore = create<PipelineStore>()(
         });
       },
 
-      advanceStatus: (recordId, status) => {
-        const record = get().records.find((r) => r.id === recordId);
-        if (!record) return;
-
-        const oldStatus = record.status;
-        set((s) => ({
-          records: s.records.map((r) =>
-            r.id === recordId
-              ? { ...r, status, updatedBy: s.currentUser, updatedAt: now() }
-              : r
-          ),
-          history: [
-            ...s.history,
-            {
-              id: uid(),
-              recordId,
-              action: 'update_instruction' as const,
-              operator: s.currentUser,
-              timestamp: now(),
-              changes: [{ field: 'status', oldValue: oldStatus, newValue: status }],
-            },
-          ],
-        }));
-      },
-
       recalcStatus: (recordId) => {
         const record = get().records.find((r) => r.id === recordId);
         if (!record) return;
-        const newStatus = computeNextStatus(record, get().records);
+        const newStatus = computeNextStatus(record, get().records, get().conflicts);
         if (record.status !== newStatus) {
-          get().advanceStatus(recordId, newStatus);
+          const oldStatus = record.status;
+          set((s) => ({
+            records: s.records.map((r) =>
+              r.id === recordId ? { ...r, status: newStatus, updatedBy: s.currentUser, updatedAt: now() } : r
+            ),
+            history: [
+              ...s.history,
+              {
+                id: uid(),
+                recordId,
+                action: 'review_coordinate' as const,
+                operator: s.currentUser,
+                timestamp: now(),
+                changes: [{ field: 'status', oldValue: oldStatus, newValue: newStatus }],
+                evidence: `状态重算: ${oldStatus} → ${newStatus}`,
+              },
+            ],
+          }));
         }
       },
 
@@ -393,12 +387,24 @@ export const usePipelineStore = create<PipelineStore>()(
         });
 
         if (newConflicts.length > 0) {
-          set((s) => ({ conflicts: [...s.conflicts, ...newConflicts] }));
+          set((s) => {
+            const updatedConflicts = [...s.conflicts, ...newConflicts];
+            const affectedIds = new Set(newConflicts.map((c) => c.recordId));
+            const updatedRecords = s.records.map((r) => {
+              if (!affectedIds.has(r.id)) return r;
+              const newStatus = computeNextStatus(r, s.records, updatedConflicts);
+              if (r.status !== newStatus) {
+                return { ...r, status: newStatus, updatedAt: now() };
+              }
+              return r;
+            });
+            return { conflicts: updatedConflicts, records: updatedRecords };
+          });
         }
       },
 
       detectCoordinateMixed: () => {
-        const { records, conflicts } = get();
+        const { records } = get();
         const hasLatlng = records.some((r) => r.coordinate.type === 'latlng');
         const hasMetric = records.some((r) => r.coordinate.type === 'metric');
 
@@ -419,7 +425,7 @@ export const usePipelineStore = create<PipelineStore>()(
           });
 
           const finalRecords = updatedRecords.map((r) => {
-            const newStatus = computeNextStatus(r, updatedRecords);
+            const newStatus = computeNextStatus(r, updatedRecords, s.conflicts);
             if (r.status !== newStatus) {
               return { ...r, status: newStatus };
             }
@@ -571,7 +577,3 @@ export const usePipelineStore = create<PipelineStore>()(
     }
   )
 );
-
-if (typeof window !== 'undefined') {
-  (window as any).__PIPELINE_STORE__ = usePipelineStore;
-}
