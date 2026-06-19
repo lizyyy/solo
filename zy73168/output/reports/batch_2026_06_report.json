@@ -1,0 +1,695 @@
+{
+  "batch_id": "batch_2026_06",
+  "received": "2026-06-19",
+  "summary": {
+    "OK": 2,
+    "PENDING_PM": 1,
+    "STUCK_THRESHOLD": 1,
+    "STUCK_FORMULA": 1,
+    "STUCK_UNIT": 1
+  },
+  "questions": [
+    {
+      "question_id": "Q-2026-001",
+      "title": "弹簧伸长量与拉力关系",
+      "status": "OK",
+      "status_label": "成功（给稳定结论）",
+      "status_reason": "拟合成功，单位齐全，R² 达标。（口头备注仅作说明用，未改变结论；详见报告口头备注栏）",
+      "influenced_by": [
+        "normal_record"
+      ],
+      "audit_sources": [
+        "normal_record",
+        "student_draft_old",
+        "verbal_note"
+      ],
+      "conflict": true,
+      "conflict_detail": "题 Q-2026-001 存在版本冲突：学生草稿旧版与正式记录不一致。 草稿备注：旧版草稿：y轴单位误记为mm，点数与正式记录(cm)不一致，属版本冲突，保留备查不覆盖正式结论。\n  - y轴单位不同：正式「cm」/ 草稿「mm」\n  - 数据点数量不同（正式 6 个 / 草稿 5 个）\n处理：以正式记录为基准；草稿旧版保留备查，不覆盖正式结论。",
+      "pending_items": [],
+      "chart_path": "/Users/maca/pro/solo/workspaces/zy73168/output/charts/Q-2026-001.svg",
+      "canonical": {
+        "model": "linear",
+        "x_unit": "N",
+        "y_unit": "cm",
+        "points": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            1.0,
+            2.0
+          ],
+          [
+            2.0,
+            4.0
+          ],
+          [
+            3.0,
+            6.0
+          ],
+          [
+            4.0,
+            8.0
+          ],
+          [
+            5.0,
+            10.0
+          ]
+        ],
+        "threshold": {
+          "min_r2": 0.95
+        },
+        "source": "normal_record"
+      },
+      "verbal_notes": [
+        {
+          "note": "学生口述y轴单位应为mm而非cm，无书面凭证，不单独确认单位。",
+          "source_meta": {
+            "received": "2026-06-12",
+            "by": "口头转述"
+          }
+        }
+      ],
+      "parameter_sets": [
+        {
+          "label": "参数集A：正式记录（基准）",
+          "source": "normal_record",
+          "source_meta": {
+            "version": "v2",
+            "received": "2026-06-15",
+            "author": "实验室正式记录"
+          },
+          "unit_x": "N",
+          "unit_y": "cm",
+          "fit": {
+            "model": "linear",
+            "success": true,
+            "coefficients": {
+              "intercept": 0.0,
+              "slope": 2.0
+            },
+            "coefficient_order": [
+              "intercept",
+              "slope"
+            ],
+            "formula": "y = 0 + 2·x",
+            "r_squared": 1.0,
+            "ss_res": 0.0,
+            "ss_tot": 70.0,
+            "error": ""
+          },
+          "unit_conversion": {},
+          "intermediate_calculations": [
+            "=== 参数集A：正式记录（基准）（来源：正式记录）===",
+            "文件来源：samples/batch_2026_06/normal_record/records.jsonl",
+            "来源元数据：{\"version\": \"v2\", \"received\": \"2026-06-15\", \"author\": \"实验室正式记录\"}",
+            "模型：linear，x单位「N」，y单位「cm」",
+            "拟合中间计算：",
+            "模型：y = intercept + slope·x",
+            "  · 选主元：第 1 列，交换第 1 行 ↔ 第 2 行",
+            "  · 消元：第 2 行 -= 0.4 × 第 1 行",
+            "  · 回代：c1 = 2",
+            "  · 回代：c0 = 0",
+            "  · 解得 intercept(截距) = 0",
+            "  · 解得 slope(斜率) = 2",
+            "  · SS_res = 0，SS_tot = 70，R² = 1"
+          ]
+        },
+        {
+          "label": "参数集B：学生草稿旧版（备查）",
+          "source": "student_draft_old",
+          "source_meta": {
+            "version": "v1",
+            "received": "2026-06-10",
+            "author": "学生A草稿",
+            "note": "旧版草稿：y轴单位误记为mm，点数与正式记录(cm)不一致，属版本冲突，保留备查不覆盖正式结论。"
+          },
+          "unit_x": "N",
+          "unit_y": "mm",
+          "fit": {
+            "model": "linear",
+            "success": true,
+            "coefficients": {
+              "intercept": 0.0,
+              "slope": 20.1
+            },
+            "coefficient_order": [
+              "intercept",
+              "slope"
+            ],
+            "formula": "y = 0 + 20.1·x",
+            "r_squared": 0.9993321460373998,
+            "ss_res": 2.7,
+            "ss_tot": 4042.8,
+            "error": ""
+          },
+          "unit_conversion": {
+            "from_unit": "mm",
+            "to_unit": "cm",
+            "factor": 0.1,
+            "formula": "1 mm = 0.1 cm，故 y(cm) = 0.1 × y(mm)",
+            "converted_coefficients": {
+              "intercept": 0.0,
+              "slope": 2.0100000000000002
+            },
+            "r_squared": 0.9993321460373998,
+            "steps": [
+              "换算目标：y 由「mm」→「cm」",
+              "  · 1 mm = 0.1 cm，故 y(cm) = 0.1 × y(mm)",
+              "  · intercept：0 × 0.1 = 0",
+              "  · slope：20.1 × 0.1 = 2.01"
+            ]
+          },
+          "intermediate_calculations": [
+            "=== 参数集B：学生草稿旧版（备查）（来源：学生草稿旧版）===",
+            "文件来源：samples/batch_2026_06/student_draft_old/drafts.jsonl",
+            "来源元数据：{\"version\": \"v1\", \"received\": \"2026-06-10\", \"author\": \"学生A草稿\", \"note\": \"旧版草稿：y轴单位误记为mm，点数与正式记录(cm)不一致，属版本冲突，保留备查不覆盖正式结论。\"}",
+            "模型：linear，x单位「N」，y单位「mm」",
+            "拟合中间计算：",
+            "模型：y = intercept + slope·x",
+            "  · 选主元：第 1 列，交换第 1 行 ↔ 第 2 行",
+            "  · 消元：第 2 行 -= 0.5 × 第 1 行",
+            "  · 回代：c1 = 20.1",
+            "  · 回代：c0 = 0",
+            "  · 解得 intercept(截距) = 0",
+            "  · 解得 slope(斜率) = 20.1",
+            "  · SS_res = 2.7，SS_tot = 4042.8，R² = 0.999332",
+            "",
+            "单位换算（用于与基准单位「cm」对齐）：",
+            "换算目标：y 由「mm」→「cm」",
+            "  · 1 mm = 0.1 cm，故 y(cm) = 0.1 × y(mm)",
+            "  · intercept：0 × 0.1 = 0",
+            "  · slope：20.1 × 0.1 = 2.01",
+            "换算后系数：{\"intercept\": 0.0, \"slope\": 2.0100000000000002}"
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "Q-2026-002",
+      "title": "自由落体下落距离与时间",
+      "status": "OK",
+      "status_label": "成功（给稳定结论）",
+      "status_reason": "拟合成功，单位齐全，R² 达标。（口头备注仅作说明用，未改变结论；详见报告口头备注栏）",
+      "influenced_by": [
+        "normal_record"
+      ],
+      "audit_sources": [
+        "normal_record",
+        "verbal_note"
+      ],
+      "conflict": false,
+      "conflict_detail": "",
+      "pending_items": [],
+      "chart_path": "/Users/maca/pro/solo/workspaces/zy73168/output/charts/Q-2026-002.svg",
+      "canonical": {
+        "model": "quadratic",
+        "x_unit": "s",
+        "y_unit": "m",
+        "points": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.1,
+            0.049
+          ],
+          [
+            0.2,
+            0.196
+          ],
+          [
+            0.3,
+            0.441
+          ],
+          [
+            0.4,
+            0.784
+          ],
+          [
+            0.5,
+            1.225
+          ]
+        ],
+        "threshold": {
+          "min_r2": 0.95
+        },
+        "source": "normal_record"
+      },
+      "verbal_notes": [
+        {
+          "note": "正式记录确认g取9.8，曲线已按此拟合。",
+          "source_meta": {
+            "received": "2026-06-12",
+            "by": "口头转述"
+          }
+        }
+      ],
+      "parameter_sets": [
+        {
+          "label": "参数集A：正式记录（基准）",
+          "source": "normal_record",
+          "source_meta": {
+            "version": "v1",
+            "received": "2026-06-15",
+            "author": "实验室正式记录"
+          },
+          "unit_x": "s",
+          "unit_y": "m",
+          "fit": {
+            "model": "quadratic",
+            "success": true,
+            "coefficients": {
+              "c0": 7.401486830834377e-16,
+              "c1": -1.0150610510858571e-14,
+              "c2": 4.90000000000002
+            },
+            "coefficient_order": [
+              "c0",
+              "c1",
+              "c2"
+            ],
+            "formula": "y = 7.401e-16 + -1.015e-14·x + 4.9·x²",
+            "r_squared": 1.0,
+            "ss_res": 1.2939734817743721e-30,
+            "ss_tot": 1.1400748333333335,
+            "error": ""
+          },
+          "unit_conversion": {},
+          "intermediate_calculations": [
+            "=== 参数集A：正式记录（基准）（来源：正式记录）===",
+            "文件来源：samples/batch_2026_06/normal_record/records.jsonl",
+            "来源元数据：{\"version\": \"v1\", \"received\": \"2026-06-15\", \"author\": \"实验室正式记录\"}",
+            "模型：quadratic，x单位「s」，y单位「m」",
+            "拟合中间计算：",
+            "模型：y = c0 + c1·x + c2·x²",
+            "  · 消元：第 2 行 -= 0.25 × 第 1 行",
+            "  · 消元：第 3 行 -= 0.0916667 × 第 1 行",
+            "  · 消元：第 3 行 -= 0.5 × 第 2 行",
+            "  · 回代：c2 = 4.9",
+            "  · 回代：c1 = -1.01506e-14",
+            "  · 回代：c0 = 7.40149e-16",
+            "  · 解得 c0 = 7.40149e-16",
+            "  · 解得 c1 = -1.01506e-14",
+            "  · 解得 c2 = 4.9",
+            "  · SS_res = 1.29397e-30，SS_tot = 1.14007，R² = 1"
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "Q-2026-003",
+      "title": "电阻随温度衰减",
+      "status": "PENDING_PM",
+      "status_label": "挂起，等项目经理确认",
+      "status_reason": "单位缺失（y轴单位）：挂起等项目经理确认，暂不给稳定结论。",
+      "influenced_by": [
+        "normal_record",
+        "verbal_note"
+      ],
+      "audit_sources": [
+        "normal_record",
+        "verbal_note"
+      ],
+      "conflict": false,
+      "conflict_detail": "",
+      "pending_items": [
+        "确认题 Q-2026-003 的 y轴单位（口头备注不作为确认依据）",
+        "2026-06-12 口头提及「Ω」：听说电阻单位是kΩ，但无书面凭证，需项目经理确认。"
+      ],
+      "chart_path": "/Users/maca/pro/solo/workspaces/zy73168/output/charts/Q-2026-003.svg",
+      "canonical": {
+        "model": "exponential",
+        "x_unit": "℃",
+        "y_unit": "",
+        "points": [
+          [
+            0.0,
+            100.0
+          ],
+          [
+            10.0,
+            82.0
+          ],
+          [
+            20.0,
+            67.0
+          ],
+          [
+            30.0,
+            55.0
+          ],
+          [
+            40.0,
+            45.0
+          ],
+          [
+            50.0,
+            37.0
+          ]
+        ],
+        "threshold": {
+          "min_r2": 0.9
+        },
+        "source": "normal_record"
+      },
+      "verbal_notes": [
+        {
+          "note": "听说电阻单位是kΩ，但无书面凭证，需项目经理确认。",
+          "source_meta": {
+            "received": "2026-06-12",
+            "by": "口头转述"
+          }
+        }
+      ],
+      "parameter_sets": [
+        {
+          "label": "参数集A：正式记录（基准）",
+          "source": "normal_record",
+          "source_meta": {
+            "version": "v1",
+            "received": "2026-06-15",
+            "author": "实验室正式记录"
+          },
+          "unit_x": "℃",
+          "unit_y": "",
+          "fit": {
+            "model": "exponential",
+            "success": true,
+            "coefficients": {
+              "a": 99.95166618600899,
+              "b": -0.01991083163817048
+            },
+            "coefficient_order": [
+              "a",
+              "b"
+            ],
+            "formula": "y = 99.95·exp(-0.01991·x)",
+            "r_squared": 0.9999875983221679,
+            "ss_res": 0.03471643014471739,
+            "ss_tot": 2799.3333333333335,
+            "error": ""
+          },
+          "unit_conversion": {},
+          "intermediate_calculations": [
+            "=== 参数集A：正式记录（基准）（来源：正式记录）===",
+            "文件来源：samples/batch_2026_06/normal_record/records.jsonl",
+            "来源元数据：{\"version\": \"v1\", \"received\": \"2026-06-15\", \"author\": \"实验室正式记录\"}",
+            "模型：exponential，x单位「℃」，y单位「(缺失)」",
+            "拟合中间计算：",
+            "模型：y = a·exp(b·x)",
+            "线性化：z = ln(y) = ln(a) + b·x，对 (x, ln y) 做线性最小二乘",
+            "  · 选主元：第 1 列，交换第 1 行 ↔ 第 2 行",
+            "  · 消元：第 2 行 -= 0.04 × 第 1 行",
+            "  · 回代：c1 = -0.0199108",
+            "  · 回代：c0 = 4.60469",
+            "  · ln(a) = A = 4.60469，故 a = exp(A) = 99.9517",
+            "  · b = -0.0199108",
+            "  · SS_res = 0.0347164（原 y 量纲），SS_tot = 2799.33，R² = 0.999988"
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "Q-2026-004",
+      "title": "反应物浓度随时间",
+      "status": "STUCK_THRESHOLD",
+      "status_label": "卡在阈值",
+      "status_reason": "R² = 0.9399 低于阈值 0.95：拟合质量不达标。",
+      "influenced_by": [
+        "normal_record"
+      ],
+      "audit_sources": [
+        "normal_record"
+      ],
+      "conflict": false,
+      "conflict_detail": "",
+      "pending_items": [
+        "复核题 Q-2026-004 数据点或更换模型后重跑（目标 R² ≥ 0.95）"
+      ],
+      "chart_path": "/Users/maca/pro/solo/workspaces/zy73168/output/charts/Q-2026-004.svg",
+      "canonical": {
+        "model": "linear",
+        "x_unit": "min",
+        "y_unit": "mol/L",
+        "points": [
+          [
+            0.0,
+            1.0
+          ],
+          [
+            1.0,
+            0.92
+          ],
+          [
+            2.0,
+            0.81
+          ],
+          [
+            3.0,
+            0.62
+          ],
+          [
+            4.0,
+            0.45
+          ],
+          [
+            5.0,
+            0.2
+          ],
+          [
+            6.0,
+            0.3
+          ]
+        ],
+        "threshold": {
+          "min_r2": 0.95
+        },
+        "source": "normal_record"
+      },
+      "verbal_notes": [],
+      "parameter_sets": [
+        {
+          "label": "参数集A：正式记录（基准）",
+          "source": "normal_record",
+          "source_meta": {
+            "version": "v1",
+            "received": "2026-06-15",
+            "author": "实验室正式记录"
+          },
+          "unit_x": "min",
+          "unit_y": "mol/L",
+          "fit": {
+            "model": "linear",
+            "success": true,
+            "coefficients": {
+              "intercept": 1.0321428571428573,
+              "slope": -0.1392857142857143
+            },
+            "coefficient_order": [
+              "intercept",
+              "slope"
+            ],
+            "formula": "y = 1.032 + -0.1393·x",
+            "r_squared": 0.939863562212665,
+            "ss_res": 0.03475714285714287,
+            "ss_tot": 0.5779714285714286,
+            "error": ""
+          },
+          "unit_conversion": {},
+          "intermediate_calculations": [
+            "=== 参数集A：正式记录（基准）（来源：正式记录）===",
+            "文件来源：samples/batch_2026_06/normal_record/records.jsonl",
+            "来源元数据：{\"version\": \"v1\", \"received\": \"2026-06-15\", \"author\": \"实验室正式记录\"}",
+            "模型：linear，x单位「min」，y单位「mol/L」",
+            "拟合中间计算：",
+            "模型：y = intercept + slope·x",
+            "  · 选主元：第 1 列，交换第 1 行 ↔ 第 2 行",
+            "  · 消元：第 2 行 -= 0.333333 × 第 1 行",
+            "  · 回代：c1 = -0.139286",
+            "  · 回代：c0 = 1.03214",
+            "  · 解得 intercept(截距) = 1.03214",
+            "  · 解得 slope(斜率) = -0.139286",
+            "  · SS_res = 0.0347571，SS_tot = 0.577971，R² = 0.939864"
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "Q-2026-005",
+      "title": "待定模型实验曲线",
+      "status": "STUCK_FORMULA",
+      "status_label": "卡在公式",
+      "status_reason": "模型字段为空：无法确定拟合公式。建议补充 linear/quadratic/exponential 之一后重跑。",
+      "influenced_by": [
+        "normal_record"
+      ],
+      "audit_sources": [
+        "normal_record"
+      ],
+      "conflict": false,
+      "conflict_detail": "",
+      "pending_items": [
+        "确认题 Q-2026-005 的拟合模型"
+      ],
+      "chart_path": "/Users/maca/pro/solo/workspaces/zy73168/output/charts/Q-2026-005.svg",
+      "canonical": {
+        "model": "",
+        "x_unit": "s",
+        "y_unit": "V",
+        "points": [
+          [
+            1.0,
+            2.0
+          ],
+          [
+            2.0,
+            5.0
+          ],
+          [
+            3.0,
+            10.0
+          ],
+          [
+            4.0,
+            17.0
+          ]
+        ],
+        "threshold": {
+          "min_r2": 0.9
+        },
+        "source": "normal_record"
+      },
+      "verbal_notes": [],
+      "parameter_sets": [
+        {
+          "label": "参数集A：正式记录（基准）",
+          "source": "normal_record",
+          "source_meta": {
+            "version": "v1",
+            "received": "2026-06-15",
+            "author": "实验室正式记录"
+          },
+          "unit_x": "s",
+          "unit_y": "V",
+          "fit": {
+            "model": "",
+            "success": false,
+            "coefficients": {},
+            "coefficient_order": [],
+            "formula": "",
+            "r_squared": null,
+            "ss_res": null,
+            "ss_tot": null,
+            "error": "未知或缺失模型「(空)」，无法确定拟合公式"
+          },
+          "unit_conversion": {},
+          "intermediate_calculations": [
+            "=== 参数集A：正式记录（基准）（来源：正式记录）===",
+            "文件来源：samples/batch_2026_06/normal_record/records.jsonl",
+            "来源元数据：{\"version\": \"v1\", \"received\": \"2026-06-15\", \"author\": \"实验室正式记录\"}",
+            "模型：(空)，x单位「s」，y单位「V」",
+            "拟合中间计算：",
+            "（无中间步骤）"
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "Q-2026-006",
+      "title": "铜丝长度随温度变化",
+      "status": "STUCK_UNIT",
+      "status_label": "卡在单位",
+      "status_reason": "y轴单位有歧义：「cm/mm」，需明确单一单位。",
+      "influenced_by": [
+        "normal_record"
+      ],
+      "audit_sources": [
+        "normal_record"
+      ],
+      "conflict": false,
+      "conflict_detail": "",
+      "pending_items": [
+        "明确题 Q-2026-006 的 y 轴单位"
+      ],
+      "chart_path": "/Users/maca/pro/solo/workspaces/zy73168/output/charts/Q-2026-006.svg",
+      "canonical": {
+        "model": "linear",
+        "x_unit": "℃",
+        "y_unit": "cm/mm",
+        "points": [
+          [
+            20.0,
+            0.0
+          ],
+          [
+            40.0,
+            0.4
+          ],
+          [
+            60.0,
+            0.8
+          ],
+          [
+            80.0,
+            1.2
+          ]
+        ],
+        "threshold": {
+          "min_r2": 0.9
+        },
+        "source": "normal_record"
+      },
+      "verbal_notes": [],
+      "parameter_sets": [
+        {
+          "label": "参数集A：正式记录（基准）",
+          "source": "normal_record",
+          "source_meta": {
+            "version": "v1",
+            "received": "2026-06-15",
+            "author": "实验室正式记录",
+            "note": "现场把y轴单位写成了cm/mm，不知取哪个，需明确"
+          },
+          "unit_x": "℃",
+          "unit_y": "cm/mm",
+          "fit": {
+            "model": "linear",
+            "success": true,
+            "coefficients": {
+              "intercept": -0.39999999999999986,
+              "slope": 0.019999999999999997
+            },
+            "coefficient_order": [
+              "intercept",
+              "slope"
+            ],
+            "formula": "y = -0.4 + 0.02·x",
+            "r_squared": 1.0,
+            "ss_res": 1.0477058897466563e-31,
+            "ss_tot": 0.7999999999999999,
+            "error": ""
+          },
+          "unit_conversion": {},
+          "intermediate_calculations": [
+            "=== 参数集A：正式记录（基准）（来源：正式记录）===",
+            "文件来源：samples/batch_2026_06/normal_record/records.jsonl",
+            "来源元数据：{\"version\": \"v1\", \"received\": \"2026-06-15\", \"author\": \"实验室正式记录\", \"note\": \"现场把y轴单位写成了cm/mm，不知取哪个，需明确\"}",
+            "模型：linear，x单位「℃」，y单位「cm/mm」",
+            "拟合中间计算：",
+            "模型：y = intercept + slope·x",
+            "  · 选主元：第 1 列，交换第 1 行 ↔ 第 2 行",
+            "  · 消元：第 2 行 -= 0.02 × 第 1 行",
+            "  · 回代：c1 = 0.02",
+            "  · 回代：c0 = -0.4",
+            "  · 解得 intercept(截距) = -0.4",
+            "  · 解得 slope(斜率) = 0.02",
+            "  · SS_res = 1.04771e-31，SS_tot = 0.8，R² = 1"
+          ]
+        }
+      ]
+    }
+  ]
+}
