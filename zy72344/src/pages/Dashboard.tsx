@@ -23,11 +23,13 @@ const Dashboard: React.FC = () => {
     parameterTables,
     mealPlanResults,
     getLatestMealPlan,
+    getStats,
   } = useAppStore();
 
   const latestPlan = getLatestMealPlan();
   const unresolvedErrors = latestPlan?.errors.filter(e => !e.resolved).length || 0;
   const resolvedErrors = latestPlan?.errors.filter(e => e.resolved).length || 0;
+  const globalStats = getStats();
 
   const stats = {
     total: studentAnswers.length,
@@ -37,11 +39,7 @@ const Dashboard: React.FC = () => {
     normal: studentAnswers.filter(a => a.status === 'normal').length,
   };
 
-  const multiVersionStudents = new Set(
-    studentAnswers.filter(a =>
-      studentAnswers.filter(x => x.studentId === a.studentId).length > 1
-    ).map(a => a.studentId)
-  ).size;
+  const multiVersionStudents = globalStats.multiVersionStudentCount;
 
   const recentAnswers = [...studentAnswers]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())

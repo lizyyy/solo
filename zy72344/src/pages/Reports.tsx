@@ -43,6 +43,10 @@ const Reports: React.FC = () => {
     currentUser,
     resolveError,
     updateAnswerStatus,
+    getLatestMealPlan,
+    getStats,
+    getMultiVersionStudents,
+    getHistoryByTargetId,
   } = useAppStore();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [resolveNote, setResolveNote] = useState<Record<string, string>>({});
@@ -55,15 +59,13 @@ const Reports: React.FC = () => {
     normal: studentAnswers.filter((a) => a.status === 'normal').length,
   };
 
-  const multiVersionCount = new Set(studentAnswers.map((a) => a.studentId)).size;
-  const multiVersionAnswers = studentAnswers.filter(
-    (a, _, arr) => arr.filter((x) => x.studentId === a.studentId).length > 1
-  ).length;
+  const globalStats = getStats();
+  const totalStudents = globalStats.totalStudents;
+  const multiVersionStudentCount = globalStats.multiVersionStudentCount;
+  const multiVersionAnswers = globalStats.multiVersionAnswersCount;
+  const multiVersionStudentsList = getMultiVersionStudents();
 
-  const latestResult = [...mealPlanResults].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )[0];
-
+  const latestResult = getLatestMealPlan();
   const latestTable = [...parameterTables].sort(
     (a, b) => new Date(b.importedAt).getTime() - new Date(a.importedAt).getTime()
   )[0];
@@ -114,6 +116,184 @@ const Reports: React.FC = () => {
     }
   };
 
+  const generateReportContent = (): string => {
+    if (!latestResult) return '';
+
+    const now = new Date().toLocaleString('zh-CN');
+    const lines: string[] = [];
+
+    lines.push('# 拉格朗日乘子配餐 - 完整分析报告');
+    lines.push('');
+    lines.push(`> 导出时间：${now}`);
+    lines.push(`> 导出人：${currentUser}（教研负责人）`);
+    lines.push(`> 参数版本：${latestResult.parameterVersion}`);
+    lines.push(`> 参数表：${latestTable?.name || '未导入'}`);
+    lines.push(`> 报告生成时间：${latestResult.createdAt}`);
+    lines.push('');
+    lines.push('---');
+    lines.push('');
+
+    lines.push('## 📊 统计摘要');
+    lines.push('');
+    lines.push('| 指标 | 数值 | 说明 |');
+    lines.push('|------|------|------|');
+    lines.push(`| 学生总人数 | ${totalStudents} | 去重后独立学生数量 |`);
+    lines.push(`| 答案总数 | ${stats.total} | 所有提交的答案份数 |`);
+    lines.push(`| 多版答案学生 | **${multiVersionStudentCount} 人** | 同一学生提交多版答案（仅统计真正有多版的学生） |`);
+    lines.push(`| 多版答案份数 | ${multiVersionAnswers} | 多版学生提交的答案总份数 |`);
+    lines.push(`| 已补手算反例 | ${globalStats.answersWithManualCount} | 吴老师已补充手算验证的答案数 |`);
+    lines.push(`| 待复核总数 | ${stats.pending + stats.reviewing} | 未归档的误差项 |`);
+    lines.push(`| 误差已处理 | ${resolvedCount} | 运营已复核通过 |`);
+    lines.push(`| 保留待处理 | ${unresolvedCount} | 未归档，先别急着归正常 |`);
+    lines.push('');
+
+    if (multiVersionStudentsList.length > 0) {
+      lines.push('## ⚠️ 多版答案学生详情（仅统计真正有多版的学生）');
+      lines.push('');
+      multiVersionStudentsList.forEach((student, idx) => {
+        lines.push(`### ${idx + 1}. ${student.studentName}（${student.studentId}）`);
+        lines.push('');
+        lines.push(`- 提交版本数：${student.versions.length} 版`);
+        lines.push('- 各版本明细：');
+        student.versions.forEach((v) => {
+          const statusLabel = v.status === 'normal' ? '✅ 正常' : v.status === 'reviewing' ? '⏳ 复核中' : v.status === 'pending' ? '⏳ 待审核' : '❌ 异常';
+          const manualLabel = v.manualExample ? '✅ 已补手算反例' : '⏳ 待补充手算反例';
+          lines.push(`  - v${v.version}（${v.createdAt}）：${statusLabel} · ${manualLabel}`);
+          lines.push(`    > ${v.content.substring(0, 80)}${v.content.length > 80 ? '...' : ''}`);
+          if (v.remark) lines.push(`    > 备注：${v.remark}`);
+        });
+        lines.push('');
+      });
+    }
+
+    lines.push('## 🧮 配餐结果（含参数版本和取舍理由）');
+    lines.push('');
+    lines.push(`> 计算方法：${latestResult.calculationReason}`);
+    lines.push('');
+    Object.entries(latestResult.result).forEach(([key, value], idx) => {
+      const param = latestTable?.records[idx];
+      lines.push(`- **${key}**：${value}%`);
+      if (param) {
+        lines.push(`  > 取舍依据：${param.name} = ${param.value} ${param.constraint}`);
+      }
+      lines.push('');
+    });
+
+    lines.push('---');
+    lines.push('');
+    lines.push('## ❌ 误差说明（完整复核链路 - 非冷冰冰系统日志）');
+    lines.push('');
+    lines.push(`> 共 ${latestResult.errors.length} 条误差，${resolvedCount} 条已归档，${unresolvedCount} 条未归档`);
+    lines.push('');
+
+    latestResult.errors.forEach((error, idx) => {
+      const answer = answerById(error.answerId);
+      const history = error.answerId ? getHistoryByTargetId(error.answerId) : [];
+
+      lines.push(`### ${idx + 1}. ${error.description}`);
+      lines.push('');
+      lines.push(`- **误差ID**：${error.id}`);
+      if (error.studentName) lines.push(`- **关联学生**：${error.studentName} v${error.studentVersion}`);
+      if (error.answerId) lines.push(`- **关联答案**：${error.answerId}`);
+      lines.push(`- **当前状态**：${error.resolved ? '✅ 已归档 · 纳入正常结果' : '⏳ 保留在异常列表 · 待复核'}`);
+      lines.push(`- **下一步找谁**：${getNextStepLabel(error.nextStep)}`);
+      lines.push('');
+
+      if (error.originalContent) {
+        lines.push('#### ① 原始说法（保留用于对照）');
+        lines.push('```');
+        lines.push(error.originalContent);
+        lines.push('```');
+        lines.push('');
+      }
+
+      if (error.correctedContent) {
+        lines.push('#### ② 改后的值 / 正确解');
+        lines.push('```');
+        lines.push(error.correctedContent);
+        lines.push('```');
+        lines.push('');
+      }
+
+      lines.push('#### ③ 为什么这条被留下（处理原因 / 复核经过）');
+      lines.push(`> ${error.reviewProcess || error.reason}`);
+      lines.push('');
+
+      lines.push('#### ④ 还缺什么材料');
+      error.missingMaterials.forEach((m) => {
+        lines.push(`- ${m}`);
+      });
+      lines.push('');
+
+      lines.push('#### ⑤ 当前处理判断');
+      lines.push(`- **是否保留**：${error.kept ? '是' : '否'}`);
+      lines.push(`- **是否已归档**：${error.resolved ? '是（运营已复核通过）' : '否（留待业务运营复核，勿提前归正常）'}`);
+      if (error.nextStep === 'business') {
+        lines.push('- **职责说明**：业务运营团队负责业务确认、收集纸质材料、与学生沟通');
+      } else {
+        lines.push('- **职责说明**：教研负责人吴老师负责专业复核、补充手算反例、最终判定');
+      }
+      lines.push('');
+
+      if (history.length > 0) {
+        lines.push('#### 📜 处理历史记录');
+        history.forEach((h, hi) => {
+          lines.push(`- ${h.operatedAt} · ${h.operator} · 修改了「${h.fieldName}」`);
+          if (h.oldValue && h.newValue) {
+            lines.push(`  > 改前：${h.oldValue}`);
+            lines.push(`  > 改后：${h.newValue}`);
+          }
+        });
+        lines.push('');
+      }
+
+      if (answer) {
+        lines.push('#### 🔗 关联答案详情');
+        lines.push(`- 答案ID：${answer.id}`);
+        lines.push(`- 版本：v${answer.version}`);
+        lines.push(`- 提交时间：${answer.createdAt}`);
+        lines.push(`- 当前状态：${answer.status}`);
+        if (answer.manualExample) {
+          lines.push('- ✅ 已附手算反例');
+        } else {
+          lines.push('- ⏳ 待吴老师补充手算反例');
+        }
+        lines.push('');
+      }
+
+      lines.push('---');
+      lines.push('');
+    });
+
+    lines.push('## ✅ 闭环状态');
+    lines.push('');
+    lines.push(`- 所有${latestResult.errors.length}条误差均已录入系统，并保留原始说法、改后值、处理原因、下一步找谁四要素`);
+    lines.push(`- ${resolvedCount}条已由业务运营复核通过，纳入正常结果`);
+    lines.push(`- ${unresolvedCount}条保留在异常列表，留待业务运营复核，勿提前归正常`);
+    lines.push('- 数据链路一致性：参数导入→反例补充→误差更新→运营复核→报告导出，全程串到同一份最新记录');
+    lines.push('');
+
+    return lines.join('\n');
+  };
+
+  const handleExportReport = () => {
+    const content = generateReportContent();
+    if (!content) {
+      alert('暂无报告数据，请先导入参数表');
+      return;
+    }
+
+    const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `拉格朗日乘子配餐报告-${latestResult?.parameterVersion || 'v1.0'}-${new Date().toISOString().split('T')[0]}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -141,7 +321,10 @@ const Reports: React.FC = () => {
             <ArrowLeft className="w-4 h-4" />
             返回答案列表
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors">
+          <button
+            onClick={handleExportReport}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors"
+          >
             <Download className="w-4 h-4" />
             导出完整报告
           </button>
@@ -205,7 +388,7 @@ const Reports: React.FC = () => {
             </p>
           </div>
           <p className="text-3xl font-bold text-slate-800 mt-3">
-            {multiVersionAnswers > 0 ? multiVersionCount : 0}
+            {multiVersionAnswers > 0 ? multiVersionStudentCount : 0}
           </p>
           <p className="text-xs text-slate-500 mt-1">
             人 · {multiVersionAnswers} 份待运营复核
@@ -534,7 +717,7 @@ const Reports: React.FC = () => {
             <div className="space-y-3.5">
               {[
                 { label: '参数调试表版本', value: parameterTables.length, color: 'text-slate-800' },
-                { label: '学生总人数', value: multiVersionCount, color: 'text-blue-600' },
+                { label: '学生总人数', value: totalStudents, color: 'text-blue-600' },
                 { label: '答案总数', value: stats.total, color: 'text-slate-800' },
                 { label: '多版答案冲突', value: multiVersionAnswers, color: 'text-amber-600' },
                 { label: '待复核总数', value: stats.pending + stats.reviewing, color: 'text-red-600' },

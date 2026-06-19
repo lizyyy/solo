@@ -51,6 +51,15 @@ interface AppState {
   getErrorsByAnswerId: (answerId: string) => ErrorItem[];
   getLatestMealPlan: () => MealPlanResult | undefined;
   clearLastImportStatus: () => void;
+  getStats: () => {
+    totalStudents: number;
+    multiVersionStudentCount: number;
+    multiVersionStudentIds: Set<string>;
+    multiVersionAnswersCount: number;
+    answersWithManualCount: number;
+    pendingReviewCount: number;
+  };
+  getMultiVersionStudents: () => { studentId: string; studentName: string; versions: StudentAnswer[] }[];
 }
 
 const generateId = () => Math.random().toString(36).substring(2, 11);
@@ -410,6 +419,41 @@ export const useAppStore = create<AppState>((set, get) => ({
   getErrorsByAnswerId: (answerId) => {
     const latest = get().getLatestMealPlan();
     return latest?.errors.filter((e) => e.answerId === answerId) || [];
+  },
+
+  getStats: () => {
+    const { studentAnswers } = get();
+    const allStudentIds = new Set(studentAnswers.map((a) => a.studentId));
+    const multiVersionStudentIds = new Set(
+      studentAnswers
+        .filter((a) => studentAnswers.filter((x) => x.studentId === a.studentId).length > 1)
+        .map((a) => a.studentId)
+    );
+    return {
+      totalStudents: allStudentIds.size,
+      multiVersionStudentCount: multiVersionStudentIds.size,
+      multiVersionStudentIds,
+      multiVersionAnswersCount: studentAnswers.filter((a) => multiVersionStudentIds.has(a.studentId)).length,
+      answersWithManualCount: studentAnswers.filter((a) => a.manualExample).length,
+      pendingReviewCount: studentAnswers.filter((a) => a.status === 'pending' || a.status === 'reviewing').length,
+    };
+  },
+
+  getMultiVersionStudents: () => {
+    const { studentAnswers } = get();
+    const groups = new Map<string, StudentAnswer[]>();
+    studentAnswers.forEach((a) => {
+      const arr = groups.get(a.studentId) || [];
+      arr.push(a);
+      groups.set(a.studentId, arr);
+    });
+    return Array.from(groups.entries())
+      .filter(([_, versions]) => versions.length > 1)
+      .map(([studentId, versions]) => ({
+        studentId,
+        studentName: versions[0].studentName,
+        versions: versions.sort((a, b) => a.version - b.version),
+      }));
   },
 
   getLatestMealPlan: () => {

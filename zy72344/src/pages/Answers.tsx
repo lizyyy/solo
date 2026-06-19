@@ -25,6 +25,7 @@ const Answers: React.FC = () => {
     getStudentAnswersByStudentId,
     getErrorsByAnswerId,
     getLatestMealPlan,
+    getStats,
   } = useAppStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<AnswerStatus | 'all'>('all');
@@ -33,6 +34,7 @@ const Answers: React.FC = () => {
   const unresolvedErrors =
     latestMealPlan?.errors.filter((e) => !e.resolved).length || 0;
   const totalErrors = latestMealPlan?.errors.length || 0;
+  const globalStats = getStats();
 
   const filteredAnswers = studentAnswers.filter((answer) => {
     const matchesSearch = answer.studentName.includes(searchTerm);
@@ -44,13 +46,8 @@ const Answers: React.FC = () => {
     return getStudentAnswersByStudentId(studentId).length;
   };
 
-  const multiVersionStudents = new Set(
-    studentAnswers
-      .filter((a) => getStudentAnswersByStudentId(a.studentId).length > 1)
-      .map((a) => a.studentId)
-  ).size;
-
-  const answersWithManual = studentAnswers.filter((a) => a.manualExample).length;
+  const multiVersionStudents = globalStats.multiVersionStudentCount;
+  const answersWithManual = globalStats.answersWithManualCount;
 
   const stats = {
     total: studentAnswers.length,
