@@ -47,7 +47,6 @@ export function parseGroupSignupFile(filePath: string, batchId: string): ParsedG
     const tempMatch = line.match(/(替补|代班|临时|替上)/i);
     if (tempMatch) {
       isTemporarySubstitute = true;
-      substituteNote = tempMatch[0];
     }
 
     const performerMatch = line.match(/(?:表演者|演员|歌手|演奏者|学员)[:：\s]+([^\s,，|]+)/i);
@@ -63,13 +62,36 @@ export function parseGroupSignupFile(filePath: string, batchId: string): ParsedG
       performerName = performerName.replace(/[（(].*?[）)]/g, '').trim();
     }
 
+    const parts = line.split(/[-—~]/).map((p) => p.trim()).filter((p) => p);
+    const partsAfterName = parts.slice(1);
+
     const songMatch = line.match(/(?:曲目|歌曲|演奏|演唱)[:：\s]+([^\s,，|]+)/i);
     if (songMatch) {
       songName = songMatch[1].trim();
-    } else {
-      const afterDash = line.split(/[-—~]/)[1];
-      if (afterDash) {
-        songName = afterDash.trim().split(/[,，|]/)[0].trim();
+    } else if (partsAfterName.length === 1) {
+      songName = partsAfterName[0].split(/[,，|]/)[0].trim();
+    } else if (partsAfterName.length >= 2) {
+      const firstPart = partsAfterName[0];
+      const lastPart = partsAfterName[partsAfterName.length - 1];
+      if (isTemporarySubstitute && tempMatch) {
+        if (firstPart.match(/(替补|代班|临时|替上)/i)) {
+          substituteNote = firstPart;
+          songName = lastPart.split(/[,，|]/)[0].trim();
+        } else if (lastPart.match(/(替补|代班|临时|替上)/i)) {
+          substituteNote = lastPart;
+          songName = firstPart.split(/[,，|]/)[0].trim();
+        } else {
+          songName = lastPart.split(/[,，|]/)[0].trim();
+        }
+      } else {
+        songName = lastPart.split(/[,，|]/)[0].trim();
+      }
+    }
+
+    if (isTemporarySubstitute && !substituteNote) {
+      const noteMatch = line.match(/([^-—~,，|]*?(?:替补|代班|临时|替上)[^-—~,，|]*)/i);
+      if (noteMatch) {
+        substituteNote = noteMatch[1].trim();
       }
     }
 
