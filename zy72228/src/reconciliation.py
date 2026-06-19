@@ -5,6 +5,7 @@ from .models import (
     ReconciliationNote,
     MarginRecord,
     CounterFlow,
+    ConflictRecord,
     ApprovalStatus,
     RecordSource
 )
@@ -146,12 +147,18 @@ class ReconciliationManager:
         self,
         trade_date: date,
         records: List[MarginRecord],
-        flows: List[CounterFlow]
+        flows: List[CounterFlow],
+        conflicts: List[ConflictRecord] = None
     ) -> str:
         notes = self.get_notes_by_date(trade_date)
         approved_records = [r for r in records if r.approval_status in [ApprovalStatus.APPROVED, ApprovalStatus.REVIEWED]]
         pending_records = [r for r in records if r.approval_status in [ApprovalStatus.PENDING, ApprovalStatus.PENDING_REVIEW]]
         rejected_records = [r for r in records if r.approval_status == ApprovalStatus.REJECTED]
+        
+        conflict_list = conflicts or []
+        pending_conflicts = [c for c in conflict_list if c.resolution == ApprovalStatus.PENDING]
+        approved_conflicts = [c for c in conflict_list if c.resolution == ApprovalStatus.APPROVED]
+        rejected_conflicts = [c for c in conflict_list if c.resolution == ApprovalStatus.REJECTED]
         
         lines = [
             "=" * 70,
@@ -167,6 +174,22 @@ class ReconciliationManager:
             f"   对账说明条数: {len(notes)}",
             "",
         ]
+        
+        if conflict_list:
+            lines.extend([
+                f"⚠️  尾号冲突状态:",
+                f"   总冲突: {len(conflict_list)}",
+                f"   待确认: {len(pending_conflicts)}",
+                f"   已确认: {len(approved_conflicts)}",
+                f"   已驳回: {len(rejected_conflicts)}",
+                "",
+            ])
+            for c in conflict_list:
+                status_label = c.resolution.value
+                lines.append(
+                    f"   流水号 {c.flow_id}: 柜台尾号={c.flow_tail_counter} 邮件尾号={c.flow_tail_email} -> {status_label}"
+                )
+            lines.append("")
         
         if notes:
             lines.extend([

@@ -9,11 +9,15 @@ from .models import (
 )
 
 
+from .conflict_detector import ConflictDetector
+
+
 class ApprovalFlow:
-    def __init__(self):
+    def __init__(self, conflict_detector: Optional[ConflictDetector] = None):
         self.pending_approvals: List[Dict[str, any]] = []
         self.approval_history: List[Dict[str, any]] = []
         self.on_approval_callback: Optional[Callable] = None
+        self.conflict_detector = conflict_detector
 
     def submit_for_approval(
         self,
@@ -71,6 +75,14 @@ class ApprovalFlow:
                 record.approved_by = "林姐"
                 record.approved_time = datetime.now()
                 
+                if item.get("conflict") and self.conflict_detector:
+                    self.conflict_detector.resolve_conflict(
+                        item["conflict"].conflict_id,
+                        ApprovalStatus.APPROVED,
+                        "林姐",
+                        approval_note
+                    )
+                
                 if item["type"] == "手工改T+2复核":
                     item["status"] = ApprovalStatus.PENDING_REVIEW
                     item["approver"] = "基金经理"
@@ -100,6 +112,14 @@ class ApprovalFlow:
                 record.approval_status = ApprovalStatus.REJECTED
                 record.approved_by = "林姐"
                 record.approved_time = datetime.now()
+                
+                if item.get("conflict") and self.conflict_detector:
+                    self.conflict_detector.resolve_conflict(
+                        item["conflict"].conflict_id,
+                        ApprovalStatus.REJECTED,
+                        "林姐",
+                        reject_reason
+                    )
                 
                 self._record_history(item)
                 if self.on_approval_callback:

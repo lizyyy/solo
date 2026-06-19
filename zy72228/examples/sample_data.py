@@ -119,7 +119,7 @@ def demo_workflow():
     importer = DataImporter()
     conflict_detector = ConflictDetector(importer)
     self_checker = SelfChecker(conflict_detector)
-    approval_flow = ApprovalFlow()
+    approval_flow = ApprovalFlow(conflict_detector=conflict_detector)
     recon_manager = ReconciliationManager()
 
     # ====== 步骤1: 柜台流水第一次导入 ======
@@ -164,9 +164,25 @@ def demo_workflow():
             approval_item = approval_flow.submit_for_approval(record, conflict, flows[0])
             success = approval_flow.approve_by_linjie(record.record_id, "柜台尾号0001为准确值，邮件尾号0005为客户经理笔误")
             print(f"  林姐审批结果: {'通过' if success else '失败'}")
-            print(f"  记录状态: {record.approval_status.value}")
+            print(f"  保证金记录状态: {record.approval_status.value}")
             assert record.approval_status == ApprovalStatus.APPROVED
-            print("  >> 断言通过：记录状态=已确认")
+            print("  >> 断言通过：保证金记录状态=已确认")
+
+            conflict_after = conflict_detector.conflicts[0]
+            print(f"  冲突记录状态: {conflict_after.resolution.value}")
+            assert conflict_after.resolution == ApprovalStatus.APPROVED, \
+                f"冲突确认后resolution应为'已确认'，实际为'{conflict_after.resolution.value}'"
+            print("  >> 断言通过：冲突记录状态=已确认（与保证金记录一致）")
+
+            conflict_summary = conflict_detector.get_conflict_summary()
+            print(f"  冲突汇总: 总冲突={conflict_summary['总冲突数']}, "
+                  f"待确认={conflict_summary['待确认']}, 已确认={conflict_summary['已确认']}, "
+                  f"已驳回={conflict_summary['已驳回']}")
+            assert conflict_summary["待确认"] == 0, \
+                f"林姐确认后冲突待确认数应为0，实际为{conflict_summary['待确认']}"
+            assert conflict_summary["已确认"] == 1, \
+                f"林姐确认后冲突已确认数应为1，实际为{conflict_summary['已确认']}"
+            print("  >> 断言通过：冲突汇总 待确认=0, 已确认=1（与明细一致）")
     print()
 
     # ====== 步骤4: 导入补录材料 ======
@@ -255,11 +271,39 @@ def demo_workflow():
     print("  >> 断言通过：T+1→T+2检查检出手工修改，FLOW202606080004在受影响列表中")
     print()
 
-    # ====== 步骤9: 生成对账报告 ======
-    print("[步骤9] 生成对账报告")
+    # ====== 步骤9: 生成对账报告（含冲突状态） ======
+    print("[步骤9] 生成对账报告（含冲突状态）")
     print("-" * 70)
-    report = recon_manager.generate_reconciliation_report(date(2026, 6, 8), records, flows)
+    report = recon_manager.generate_reconciliation_report(
+        date(2026, 6, 8), records, flows,
+        conflicts=conflict_detector.conflicts
+    )
     print(report)
+    print()
+
+    # ====== 交叉核对：明细、汇总、报告状态一致性 ======
+    print("交叉核对：明细状态 vs 汇总 vs 报告")
+    print("-" * 70)
+
+    conflict_detail_status = conflict_detector.conflicts[0].resolution.value
+    conflict_summary_data = conflict_detector.get_conflict_summary()
+    conflict_summary_pending = conflict_summary_data["待确认"]
+    conflict_summary_approved = conflict_summary_data["已确认"]
+    print(f"  铜保证金冲突明细状态: {conflict_detail_status}")
+    print(f"  冲突汇总: 待确认={conflict_summary_pending}, 已确认={conflict_summary_approved}")
+
+    assert conflict_detail_status == "已确认", \
+        f"冲突明细状态应为'已确认'，实际为'{conflict_detail_status}'"
+    assert conflict_summary_pending == 0, \
+        f"冲突汇总待确认应为0，实际为{conflict_summary_pending}"
+    assert conflict_summary_approved == 1, \
+        f"冲突汇总已确认应为1，实际为{conflict_summary_approved}"
+    print("  >> 断言通过：明细=已确认, 汇总待确认=0, 汇总已确认=1（三者一致）")
+
+    record_status = records[0].approval_status.value
+    print(f"  铜保证金记录审批状态: {record_status}")
+    assert record_status == "已确认", f"铜保证金记录状态应为'已确认'，实际为'{record_status}'"
+    print("  >> 断言通过：冲突明细=已确认, 保证金记录=已确认（跨系统一致）")
     print()
 
     # ====== 审批状态汇总 ======
@@ -280,7 +324,9 @@ def demo_workflow():
     for key, value in conflict_summary.items():
         print(f"  {key}: {value}")
     assert conflict_summary["总冲突数"] == 1, f"总冲突数应为1，实际为{conflict_summary['总冲突数']}"
-    print("  >> 断言通过：总冲突数=1")
+    assert conflict_summary["待确认"] == 0, f"待确认应为0，实际为{conflict_summary['待确认']}"
+    assert conflict_summary["已确认"] == 1, f"已确认应为1，实际为{conflict_summary['已确认']}"
+    print("  >> 断言通过：总冲突=1, 待确认=0, 已确认=1")
     print()
 
     print("=" * 70)
