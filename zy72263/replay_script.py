@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # 机场廊桥停靠预演 - 重放脚本
-# 生成时间: 2026-06-08T21:37:44.578678
+# 生成时间: 2026-06-19T10:59:59.749270
 
 import sys
 import json
@@ -11,7 +11,7 @@ from airbridge import PreflightManager, ReviewManager, Visualizer, WorkflowEngin
 from airbridge.models import CoordinateOrigin, InspectionPhoto
 
 
-REPLAY_DATA = json.loads('{\n  "coordinate_origins": [\n    {\n      "id": "origin_001",\n      "name": "T2航站楼D10廊桥",\n      "x": 125.6,\n      "y": 89.3,\n      "z": 5.2,\n      "description": "主廊桥停靠点，安全距离要求3.5米",\n      "metadata": {},\n      "created_at": "2026-06-08T21:37:44.578207",\n      "version": 1\n    },\n    {\n      "id": "origin_002",\n      "name": "T2航站楼D12廊桥",\n      "x": 156.8,\n      "y": 92.1,\n      "z": 5.2,\n      "description": "备用廊桥停靠点",\n      "metadata": {},\n      "created_at": "2026-06-08T21:37:44.578209",\n      "version": 1\n    }\n  ],\n  "inspection_photos": [\n    {\n      "id": "photo_001",\n      "photo_number": "INSP-2024-001",\n      "coordinate_origin_id": "origin_001",\n      "url": "",\n      "remark": "D10廊桥初始巡检 - 展陈设计师阿景复核确认",\n      "has_mobile_screenshot": false,\n      "alert_label_visible": true,\n      "alert_label_area": null,\n      "metadata": {},\n      "created_at": "2026-06-08T21:37:44.578381",\n      "updated_at": "2026-06-08T21:37:44.578398"\n    },\n    {\n      "id": "photo_002",\n      "photo_number": "INSP-2024-002",\n      "coordinate_origin_id": "origin_001",\n      "url": "",\n      "remark": "移动端复核截图 - 告警标签被遮挡，需施工经理确认",\n      "has_mobile_screenshot": true,\n      "alert_label_visible": false,\n      "alert_label_area": null,\n      "metadata": {},\n      "created_at": "2026-06-08T21:37:44.578383",\n      "updated_at": "2026-06-08T21:37:44.578400"\n    },\n    {\n      "id": "photo_003",\n      "photo_number": "INSP-2024-003",\n      "coordinate_origin_id": "origin_002",\n      "url": "",\n      "remark": "D12廊桥正常",\n      "has_mobile_screenshot": false,\n      "alert_label_visible": true,\n      "alert_label_area": null,\n      "metadata": {},\n      "created_at": "2026-06-08T21:37:44.578384",\n      "updated_at": "2026-06-08T21:37:44.578384"\n    }\n  ],\n  "remark_updates": [\n    {\n      "photo_id": "photo_001",\n      "old_remark": "D10廊桥初始巡检",\n      "new_remark": "D10廊桥初始巡检 - 展陈设计师阿景复核确认",\n      "actor": "designer_ajing"\n    },\n    {\n      "photo_id": "photo_002",\n      "old_remark": "移动端复核截图",\n      "new_remark": "移动端复核截图 - 告警标签被遮挡，需施工经理确认",\n      "actor": "designer_ajing"\n    }\n  ]\n}')
+REPLAY_DATA = json.loads('{\n  "coordinate_origins": [\n    {\n      "id": "origin_001",\n      "name": "T2航站楼D10廊桥",\n      "x": 125.6,\n      "y": 89.3,\n      "z": 5.2,\n      "description": "主廊桥",\n      "metadata": {},\n      "created_at": "2026-06-19T10:59:59.748751",\n      "version": 1\n    }\n  ],\n  "inspection_photos": [\n    {\n      "id": "photo_002",\n      "photo_number": "INSP-2024-002",\n      "coordinate_origin_id": "origin_001",\n      "url": "",\n      "remark": "移动端复核截图",\n      "has_mobile_screenshot": true,\n      "alert_label_visible": false,\n      "alert_label_area": null,\n      "metadata": {},\n      "created_at": "2026-06-19T10:59:59.748916",\n      "updated_at": "2026-06-19T10:59:59.748972"\n    }\n  ],\n  "remark_updates": []\n}')
 
 def replay():
     pm = PreflightManager()

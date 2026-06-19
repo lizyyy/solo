@@ -39,7 +39,7 @@ class ReviewManager:
         if not photo:
             return None
 
-        self._take_snapshot(record_id)
+        self._take_snapshot(record_id, photo_id)
 
         record.status = "manager_review"
         record.review_status = "pending"
@@ -62,6 +62,7 @@ class ReviewManager:
         is_blocked: bool,
         reviewer: str = "construction_manager",
         comment: str = "",
+        photo_id: Optional[str] = None,
     ) -> Tuple[Optional[PreflightRecord], str]:
         record = self.preflight_manager.get_preflight_record(record_id)
         if not record:
@@ -70,7 +71,16 @@ class ReviewManager:
         if record.review_status != "pending" or record.status != "manager_review":
             return None, "not_in_review_state"
 
-        self._take_snapshot(record_id)
+        if photo_id is None:
+            photos = self.preflight_manager.get_photos_by_origin_id(record.coordinate_origin_id)
+            for p in photos:
+                if p.is_alert_label_blocked():
+                    photo_id = p.id
+                    break
+            if photo_id is None and photos:
+                photo_id = photos[0].id
+
+        self._take_snapshot(record_id, photo_id)
 
         record.block_verified = is_blocked
         record.reviewer = reviewer
@@ -113,7 +123,15 @@ class ReviewManager:
         if not photo:
             return None
 
-        self._take_snapshot(record_id)
+        self._take_snapshot(record_id, photo_id)
+
+        photo_changes = {
+            "photo_id": photo_id,
+            "before": {
+                "has_mobile_screenshot": photo.has_mobile_screenshot,
+                "alert_label_visible": photo.alert_label_visible,
+            },
+        }
 
         if resolution == "rephoto":
             photo.has_mobile_screenshot = False
@@ -121,10 +139,16 @@ class ReviewManager:
             photo.updated_at = datetime.now()
             record.block_detected = False
             record.status = "resolved"
+            photo_changes["after"] = {
+                "has_mobile_screenshot": False,
+                "alert_label_visible": True,
+            }
         elif resolution == "accept_as_is":
             record.status = "resolved_with_exceptions"
+            photo_changes["after"] = photo_changes["before"]
         else:
             record.status = "resolved"
+            photo_changes["after"] = photo_changes["before"]
 
         record.updated_at = datetime.now()
         record.add_history_entry(
@@ -133,6 +157,7 @@ class ReviewManager:
             {
                 "photo_id": photo_id,
                 "resolution": resolution,
+                "photo_changes": photo_changes,
             },
         )
 
@@ -154,11 +179,31 @@ class ReviewManager:
         record.block_verified = snapshot["block_verified"]
         record.updated_at = datetime.now()
 
+        rolled_back_photos = {}
+        for pid, photo_snap in snapshot.get("photos", {}).items():
+            photo = self.preflight_manager.get_inspection_photo(pid)
+            if photo:
+                before = {
+                    "has_mobile_screenshot": photo.has_mobile_screenshot,
+                    "alert_label_visible": photo.alert_label_visible,
+                }
+                photo.has_mobile_screenshot = photo_snap["has_mobile_screenshot"]
+                photo.alert_label_visible = photo_snap["alert_label_visible"]
+                photo.updated_at = datetime.now()
+                rolled_back_photos[pid] = {
+                    "before": before,
+                    "after": {
+                        "has_mobile_screenshot": photo_snap["has_mobile_screenshot"],
+                        "alert_label_visible": photo_snap["alert_label_visible"],
+                    },
+                }
+
         record.add_history_entry(
             "rollback",
             actor,
             {
                 "rolled_back_from": snapshot,
+                "rolled_back_photos": rolled_back_photos,
             },
         )
 
@@ -166,16 +211,29 @@ class ReviewManager:
 
         return record
 
-    def _take_snapshot(self, record_id: str):
+    def _take_snapshot(self, record_id: str, photo_id: Optional[str] = None):
         record = self.preflight_manager.get_preflight_record(record_id)
-        if record:
-            self._rollback_snapshots[record_id] = {
-                "status": record.status,
-                "review_status": record.review_status,
-                "block_detected": record.block_detected,
-                "block_verified": record.block_verified,
-                "timestamp": datetime.now().isoformat(),
-            }
+        if not record:
+            return
+
+        snapshot_photos = {}
+        if photo_id:
+            photo = self.preflight_manager.get_inspection_photo(photo_id)
+            if photo:
+                snapshot_photos[photo_id] = {
+                    "has_mobile_screenshot": photo.has_mobile_screenshot,
+                    "alert_label_visible": photo.alert_label_visible,
+                }
+
+        self._rollback_snapshots[record_id] = {
+            "status": record.status,
+            "review_status": record.review_status,
+            "block_detected": record.block_detected,
+            "block_verified": record.block_verified,
+            "target_photo_id": photo_id,
+            "photos": snapshot_photos,
+            "timestamp": datetime.now().isoformat(),
+        }
 
     def get_rollback_history(self) -> List[str]:
         return list(self._rollback_snapshots.keys())
