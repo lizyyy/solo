@@ -6,6 +6,8 @@ import copy
 import sys
 sys.path.insert(0, '.')
 
+from config import Config
+
 
 @dataclass
 class RevisionHistory:
@@ -199,13 +201,17 @@ class DuplicateDetector:
 class WeightUpdater:
     @staticmethod
     def calculate_error(
-        answer: StudentAnswer, weight: WeightTable
+        answer: StudentAnswer, weight: WeightTable,
+        old_status_label: str = "NORMAL",
+        operator: str = "系统（运营规划阿岚补录权重表触发）",
+        is_rerun: bool = False,
     ) -> Optional[ErrorLog]:
-        if weight.standard_version not in answer.import_batch:
+        if weight.standard_version not in answer.import_batch or is_rerun:
             old_score = answer.score
             adjusted_score = answer.score * weight.weight
+            run_kind = "重跑" if is_rerun else "补录"
             error_desc = (
-                f"评分权重表补录说明：原评分标准版本{weight.standard_version}，"
+                f"评分权重表{run_kind}说明：原评分标准版本{weight.standard_version}，"
                 f"权重系数{weight.weight}，原得分{old_score}，"
                 f"调整后得分{adjusted_score:.2f}。{weight.remarks}"
                 f"（维度：{weight.dimension}，生效日期：{weight.effective_date}）"
@@ -214,21 +220,22 @@ class WeightUpdater:
             log = ErrorLog(
                 log_id=time_str,
                 answer_id=answer.id,
-                error_type="OLD_STANDARD",
+                error_type="OLD_STANDARD" if not is_rerun else "RERUN",
                 description=error_desc,
                 weight_version=weight.standard_version,
-                source="评分权重表补录",
+                source=f"评分权重表{run_kind}",
                 original_score=old_score,
                 adjusted_score=adjusted_score,
                 weight_factor=weight.weight,
             )
+            new_status_label = "RERUN_DONE" if is_rerun else "OLD_STANDARD"
             revision = RevisionHistory(
                 revision_id="",
                 field_name="status/误差说明",
-                old_value=f"NORMAL，得分{old_score}",
-                new_value=f"OLD_STANDARD，调整后得分{adjusted_score:.2f}",
-                operator="系统（运营规划阿岚补录权重表触发）",
-                reason=f"根据评分权重表{weight.standard_version}口径补录：{weight.remarks}",
+                old_value=f"{old_status_label}，得分{old_score}",
+                new_value=f"{new_status_label}，调整后得分{adjusted_score:.2f}",
+                operator=operator,
+                reason=f"根据评分权重表{weight.standard_version}口径{run_kind}：{weight.remarks}",
                 next_step="如需申诉，联系运营规划阿岚核对权重口径",
                 next_contact="运营规划阿岚"
             )
@@ -246,15 +253,32 @@ class WeightUpdater:
         for answer in answers:
             if answer.question_id in weight_map:
                 weight = weight_map[answer.question_id]
-                error_log = WeightUpdater.calculate_error(answer, weight)
+                old_status = answer.status
+                old_status_label = Config.STATUS_TYPES.get(old_status, old_status)
+                error_log = WeightUpdater.calculate_error(
+                    answer, weight,
+                    old_status_label=old_status_label,
+                    operator=f"{operator}（运营规划阿岚补录权重表触发）",
+                    is_rerun=rerun,
+                )
                 if error_log:
-                    answer.status = "OLD_STANDARD"
+                    if rerun:
+                        answer.status = "RERUN_DONE"
+                    else:
+                        if answer.status == "NORMAL" or answer.status == "BOUNDARY_ALERT":
+                            answer.status = "OLD_STANDARD"
                     answer.adjusted_score = error_log.adjusted_score
-                    answer.notes = (
-                        f"根据评分权重表{weight.standard_version}口径补录，"
-                        f"调整后得分{error_log.adjusted_score:.2f}。"
+                    run_kind = "重跑" if rerun else "补录"
+                    existing_notes = answer.notes or ""
+                    append_note = (
+                        f"【评分权重表{run_kind}·第{answer.rerun_count + 1}次】"
+                        f"根据{weight.standard_version}口径，调整后得分{error_log.adjusted_score:.2f}。"
                         f"备注：{weight.remarks}"
                     )
+                    if existing_notes:
+                        answer.notes = f"{existing_notes}\n{append_note}"
+                    else:
+                        answer.notes = append_note
                     answer.rerun_count += 1
                     answer.last_rerun_at = datetime.now().isoformat()
                     weight.applied_count += 1
