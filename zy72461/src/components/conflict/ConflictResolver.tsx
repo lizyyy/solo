@@ -133,6 +133,8 @@ export default function ConflictResolver({ recordId, conflicts }: ConflictResolv
                 rejected: 'bg-gray-100 text-gray-800 border-gray-200',
               }[conflict.status]
 
+              const StatusIcon = conflict.status === 'rejected' ? XCircle : CheckCircle
+
               return (
                 <div
                   key={conflict.id}
@@ -140,7 +142,7 @@ export default function ConflictResolver({ recordId, conflicts }: ConflictResolv
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <CheckCircle className="w-4 h-4" />
+                      <StatusIcon className={`w-4 h-4 ${conflict.status === 'rejected' ? 'text-gray-500' : ''}`} />
                       <span className="font-medium text-sm">{conflict.fieldLabel}</span>
                       <span className="text-xs">→</span>
                       <span className="text-sm">

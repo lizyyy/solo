@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useRecordStore } from '../store/useRecordStore'
 import { useNavigate } from 'react-router-dom'
-import { FileText, Upload, MapPin, Building2, AlertTriangle, CheckCircle, Eye, ArrowRight, ArrowLeft } from 'lucide-react'
-import { statusLabels, statusColors } from '../types'
+import { FileText, Upload, AlertTriangle, CheckCircle, Eye, ArrowRight } from 'lucide-react'
+import { statusLabels, statusColors, Conflict, RecordStatus } from '../types'
 import ConflictResolver from '../components/conflict/ConflictResolver'
 import ChangeTimeline from '../components/record/ChangeTimeline'
 
@@ -50,8 +50,8 @@ export default function WizardPage() {
 
   const [matchResult, setMatchResult] = useState<{
     matched: boolean
-    conflicts: any[]
-    status: string
+    conflicts: Conflict[]
+    status: RecordStatus
     oldName?: string
   } | null>(null)
 
@@ -381,26 +381,51 @@ export default function WizardPage() {
                     </div>
                   )}
 
-                  {record.conflicts.every((c) => c.status !== 'pending') && record.conflicts.length > 0 && (
-                    <div className="mt-4">
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                        <div className="flex items-center space-x-2">
-                          <CheckCircle className="w-5 h-5 text-green-600" />
-                          <span className="font-medium text-green-800">所有冲突已处理</span>
+                  {record.conflicts.every((c) => c.status !== 'pending') && record.conflicts.length > 0 && (() => {
+                    const hasRejected = record.conflicts.some((c) => c.status === 'rejected')
+                    if (hasRejected) {
+                      return (
+                        <div className="mt-4">
+                          <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-4">
+                            <div className="flex items-center space-x-2">
+                              <AlertTriangle className="w-5 h-5 text-gray-600" />
+                              <span className="font-medium text-gray-800">存在驳回待查项</span>
+                            </div>
+                            <p className="text-sm text-gray-600 mt-1">
+                              记录状态保持为「{statusLabels[record.status]}」，不进入街道摘要，需继续核实。
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => { setStep(3); setCurrentStep(3) }}
+                            className="flex items-center space-x-2 bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded text-sm font-medium"
+                          >
+                            <span>查看街道摘要预览</span>
+                            <ArrowRight className="w-4 h-4" />
+                          </button>
                         </div>
-                        <p className="text-sm text-green-700 mt-1">
-                          记录状态已更新为「{statusLabels[record.status]}」，可进入街道摘要。
-                        </p>
+                      )
+                    }
+                    return (
+                      <div className="mt-4">
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                          <div className="flex items-center space-x-2">
+                            <CheckCircle className="w-5 h-5 text-green-600" />
+                            <span className="font-medium text-green-800">所有冲突已处理</span>
+                          </div>
+                          <p className="text-sm text-green-700 mt-1">
+                            记录状态已更新为「{statusLabels[record.status]}」，可进入街道摘要。
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => { setStep(3); setCurrentStep(3) }}
+                          className="flex items-center space-x-2 bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded text-sm font-medium"
+                        >
+                          <span>下一步：生成街道摘要</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </button>
                       </div>
-                      <button
-                        onClick={() => { setStep(3); setCurrentStep(3) }}
-                        className="flex items-center space-x-2 bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded text-sm font-medium"
-                      >
-                        <span>下一步：生成街道摘要</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
+                    )
+                  })()}
                 </div>
               )}
 

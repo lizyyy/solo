@@ -250,12 +250,15 @@ export const useRecordStore = create<RecordState>()(
           }
         })
 
-        const allResolved = updatedConflicts.every((c) => c.status !== 'pending')
+        const noPendingConflicts = updatedConflicts.every((c) => c.status !== 'pending')
+        const hasRejected = updatedConflicts.some((c) => c.status === 'rejected')
         const hasRampSupplement = updatedConflicts.some((c) => c.status === 'resolved_ramp')
 
         let newStatus = record.status
-        if (allResolved) {
+        if (noPendingConflicts && !hasRejected) {
           newStatus = hasRampSupplement ? 'ramp_supplemented' : 'completed'
+        } else if (hasRejected) {
+          newStatus = 'data_conflict'
         }
 
         const actionText = {
@@ -266,6 +269,17 @@ export const useRecordStore = create<RecordState>()(
 
         const conflict = record.conflicts.find((c) => c.id === conflictId)
 
+        let impactText = '继续处理剩余冲突项'
+        if (noPendingConflicts) {
+          if (hasRejected) {
+            impactText = '该记录存在驳回待查项，保持待核实状态，不进入街道摘要'
+          } else if (hasRampSupplement) {
+            impactText = '该记录已补录坡道数据，复核完成，可进入街道摘要'
+          } else {
+            impactText = '该记录复核完成，可进入街道摘要'
+          }
+        }
+
         const newHistory: ChangeHistory = {
           id: `ch-${recordId}-${Date.now()}`,
           recordId,
@@ -275,11 +289,7 @@ export const useRecordStore = create<RecordState>()(
           oldValue: choice === 'ramp' ? conflict?.constructionValue : conflict?.rampValue,
           newValue: choice === 'ramp' ? conflict?.rampValue : conflict?.constructionValue,
           reason: choice === 'reject' ? '双方说法不一致，需进一步现场核实' : '人工核对后确认以此口径为准',
-          impact: allResolved
-            ? newStatus === 'ramp_supplemented'
-              ? '该记录已补录坡道数据，复核完成，可进入街道摘要'
-              : '该记录复核完成，可进入街道摘要'
-            : '继续处理剩余冲突项',
+          impact: impactText,
           changedAt: now,
         }
 
@@ -303,12 +313,32 @@ export const useRecordStore = create<RecordState>()(
       records: state.records.map((record) => {
         if (record.id !== recordId) return record
 
-        const updatedConflicts = record.conflicts.map((c) => ({
-          ...c,
-          status: 'resolved_construction' as const,
-          resolvedBy: '市政巡检员',
-          resolvedAt: now,
-        }))
+        const updatedConflicts = record.conflicts.map((c) => {
+          if (c.fieldName === 'communityName') {
+            return {
+              ...c,
+              status: 'resolved_construction' as const,
+              resolvedBy: '市政巡检员',
+              resolvedAt: now,
+            }
+          }
+          return c
+        })
+
+        const remainingConflicts = updatedConflicts.filter((c) => c.status === 'pending')
+        const hasRejected = updatedConflicts.some((c) => c.status === 'rejected')
+
+        let newStatus = record.status
+        let impactText = '名称冲突已解决，仍有其他冲突待处理，不进入街道摘要'
+        if (remainingConflicts.length === 0 && !hasRejected) {
+          newStatus = 'completed'
+          impactText = '所有冲突已解决，该记录可进入街道摘要'
+        } else if (hasRejected || remainingConflicts.length > 0) {
+          newStatus = 'data_conflict'
+          impactText = hasRejected
+            ? '名称冲突已解决，但存在驳回待查项，保持待核实状态，不进入街道摘要'
+            : '名称冲突已解决，仍有其他冲突待处理，不进入街道摘要'
+        }
 
         const newHistory: ChangeHistory = {
           id: `ch-${recordId}-${Date.now()}`,
@@ -319,7 +349,7 @@ export const useRecordStore = create<RecordState>()(
           oldValue: `${record.communityName} / ${record.oldCommunityName}`,
           newValue: confirmedName,
           reason: '经现场核实，确认小区标准名称',
-          impact: '名称冲突已解决，该记录可进入街道摘要',
+          impact: impactText,
           changedAt: now,
         }
 
@@ -327,7 +357,7 @@ export const useRecordStore = create<RecordState>()(
           ...record,
           communityName: confirmedName,
           conflicts: updatedConflicts,
-          status: 'completed',
+          status: newStatus,
           changeHistory: [...record.changeHistory, newHistory],
           reviewer: '市政巡检员',
           updatedAt: now,
@@ -430,9 +460,12 @@ export const useRecordStore = create<RecordState>()(
   },
 
   getStreetSummaries: () => {
-    const records = get().records.filter(
-      (r) => r.status === 'normal' || r.status === 'completed' || r.status === 'ramp_supplemented'
-    )
+    const records = get().records.filter((r) => {
+      const validStatus = r.status === 'normal' || r.status === 'completed' || r.status === 'ramp_supplemented'
+      const hasRejected = r.conflicts.some((c) => c.status === 'rejected')
+      const hasPending = r.conflicts.some((c) => c.status === 'pending')
+      return validStatus && !hasRejected && !hasPending
+    })
     const streetMap = new Map<string, DetourRecord[]>()
 
     records.forEach((record) => {
@@ -450,9 +483,14 @@ export const useRecordStore = create<RecordState>()(
   },
 
   getExcludedFromSummary: () => {
-    return get().records.filter(
-      (r) => r.status === 'name_conflict' || r.status === 'data_conflict'
-    )
+    return get().records.filter((r) => {
+      if (r.status === 'name_conflict' || r.status === 'data_conflict') {
+        return true
+      }
+      const hasRejected = r.conflicts.some((c) => c.status === 'rejected')
+      const hasPending = r.conflicts.some((c) => c.status === 'pending')
+      return hasRejected || hasPending
+    })
   },
 
   getFilteredRecords: () => {
