@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 from pathlib import Path
 from datetime import datetime
 import json
@@ -45,7 +45,7 @@ class ReportGenerator:
             checklist_summary=checklist_summary,
             self_check_results=self_check_results
         )
-
+        report._tickets = tickets
         return report
 
     def export_report_text(self, report: VerificationReport, output_path: str):
@@ -69,19 +69,56 @@ class ReportGenerator:
 
         lines.append("二、冲突详情")
         lines.append("-" * 40)
-        if report.conflicts:
-            for i, conflict in enumerate(report.conflicts, 1):
-                lines.append(f"冲突 #{i}: {conflict.description}")
-                lines.append(f"  类型: {conflict.conflict_type.value}")
-                lines.append(f"  票号: {conflict.ticket_id}")
-                lines.append(f"  字段: {conflict.field_name}")
-                lines.append(f"  票务表值: {conflict.ticket_value}")
-                lines.append(f"  音频备注值: {conflict.audio_value}")
-                lines.append(f"  状态: {'已解决' if conflict.resolved else '未解决'}")
-                if conflict.evidence:
-                    lines.append(f"  证据:")
-                    for k, v in conflict.evidence.items():
-                        lines.append(f"    - {k}: {v}")
+        tickets = getattr(report, '_tickets', [])
+        ticket_by_id = {t.ticket_id: t for t in tickets}
+        conflicts_by_ticket: Dict[str, List[Conflict]] = {}
+        for c in report.conflicts:
+            if c.ticket_id not in conflicts_by_ticket:
+                conflicts_by_ticket[c.ticket_id] = []
+            conflicts_by_ticket[c.ticket_id].append(c)
+
+        total_conflict_tickets = len(conflicts_by_ticket)
+        lines.append(f"冲突总数: {len(report.conflicts)} 条，涉及 {total_conflict_tickets} 张票")
+        lines.append("")
+
+        if report.conflicts and total_conflict_tickets > 0:
+            for idx, tid in enumerate(sorted(conflicts_by_ticket.keys()), 1):
+                t_conflicts = conflicts_by_ticket[tid]
+                ticket = ticket_by_id.get(tid)
+                lines.append(f"【票 {idx}】票号: {tid}"
+                             + (f" | 学员: {ticket.student_name}" if ticket else ""))
+                if ticket:
+                    lines.append(f"  映射后状态: 票务原始={ticket.status} → 映射={ticket.normalized_status}")
+                    lines.append(f"  当前核验状态: {ticket.verification_status.value}")
+                for j, c in enumerate(t_conflicts, 1):
+                    lines.append(f"  冲突 {j}: {c.description}")
+                    lines.append(f"    类型: {c.conflict_type.value}")
+                    lines.append(f"    字段: {c.field_name}")
+                    lines.append(f"    票务表值: {c.ticket_value}")
+                    lines.append(f"    音频备注值: {c.audio_value}")
+                    if c.normalized_ticket_status or c.normalized_audio_status:
+                        lines.append(f"    映射值对比: 票务={c.normalized_ticket_status} vs 音频={c.normalized_audio_status}")
+                    lines.append(f"    当前判断: {c.current_verdict}")
+                    lines.append(f"    负责人可处理状态: {c.handler_status}")
+                    lines.append(f"    冲突状态: {'已解决' if c.resolved else '未解决'}")
+                    if c.resolution:
+                        lines.append(f"    处理结论: {c.resolution} (by {c.resolved_by})")
+                    if c.evidence:
+                        lines.append(f"    证据:")
+                        for k, v in c.evidence.items():
+                            v_str = str(v)
+                            if len(v_str) > 160:
+                                v_str = v_str[:160] + "..."
+                            lines.append(f"      - {k}: {v_str}")
+                if ticket and ticket.history:
+                    lines.append(f"  历史记录:")
+                    for h in ticket.history:
+                        h_line = f"    [{h.timestamp.strftime('%Y-%m-%d %H:%M:%S')}] {h.action} by {h.operator}"
+                        if h.affected_field:
+                            h_line += f" | {h.affected_field}: {h.before_value} → {h.after_value}"
+                        if h.details:
+                            h_line += f" | {h.details}"
+                        lines.append(h_line)
                 lines.append("")
         else:
             lines.append("无冲突")

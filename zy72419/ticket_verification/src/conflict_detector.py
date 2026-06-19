@@ -24,6 +24,7 @@ class ConflictDetector:
         for ticket in tickets:
             ticket_conflicts = self.detect_ticket_conflicts(ticket, remarks_by_ticket)
             ticket.conflicts = ticket_conflicts
+            all_conflicts.extend(ticket_conflicts)
 
             if ticket_conflicts:
                 has_real_conflict = any(
@@ -136,7 +137,11 @@ class ConflictDetector:
                 "audio_raw_remark": remark.raw_remark,
                 "audio_parsed_value": remark.parsed_repertoire,
                 "similarity": self._similarity(ticket.repertoire, remark.parsed_repertoire or "")
-            }
+            },
+            current_verdict="待负责人判断（曲目以哪个为准？）",
+            handler_status="可处理（确认以音频/票务为准 或 驳回）",
+            normalized_ticket_status=ticket.normalized_status,
+            normalized_audio_status=normalize_status(remark.parsed_status) if remark.parsed_status else ""
         )
 
     def _create_status_conflict(self, ticket: TicketRecord, remark: AudioRemark) -> Conflict:
@@ -158,7 +163,11 @@ class ConflictDetector:
                 "audio_parsed_status": remark.parsed_status,
                 "audio_normalized_status": audio_norm,
                 "status_mapping": TICKET_STATUS_TO_AUDIO
-            }
+            },
+            current_verdict="待负责人判断（状态以哪个为准？）",
+            handler_status="可处理（确认以音频/票务为准 或 驳回）",
+            normalized_ticket_status=ticket_norm,
+            normalized_audio_status=audio_norm
         )
 
     def _create_date_conflict(self, ticket: TicketRecord, remark: AudioRemark) -> Conflict:
@@ -193,7 +202,11 @@ class ConflictDetector:
                 "student_name": ticket.student_name,
                 "repertoire": ticket.repertoire,
                 "performance_date": ticket.performance_date
-            }
+            },
+            current_verdict="待巡演统筹复核（请假不应算已消耗）",
+            handler_status="待巡演统筹复核，暂不可自动确认",
+            normalized_ticket_status=ticket.normalized_status,
+            normalized_audio_status=""
         )
 
     def _create_leave_conflict(self, ticket: TicketRecord, remark: AudioRemark) -> Conflict:
@@ -210,7 +223,11 @@ class ConflictDetector:
                 "audio_file": remark.audio_file,
                 "audio_raw_remark": remark.raw_remark,
                 "audio_parsed_is_leave": remark.parsed_is_leave
-            }
+            },
+            current_verdict="待负责人判断（是否实际请假？）",
+            handler_status="待巡演统筹复核",
+            normalized_ticket_status=ticket.normalized_status,
+            normalized_audio_status=normalize_status(remark.parsed_status) if remark.parsed_status else ""
         )
 
     def resolve_conflict(

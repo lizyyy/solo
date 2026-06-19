@@ -1,0 +1,687 @@
+{
+  "saved_at": "2026-06-20T01:00:15.613657",
+  "tickets": [
+    {
+      "ticket_id": "T001",
+      "student_name": "张小明",
+      "repertoire": "小星星变奏曲",
+      "performance_date": "2026-06-01",
+      "status": "已核销",
+      "is_consumed": true,
+      "leave_status": "正常",
+      "verification_status": "已确认",
+      "audio_remarks": "曲目：小星星变奏曲，状态：已完成，老师：王老师，时长：5分钟，得分：92.5。演奏流畅，感情表达到位。",
+      "normalized_status": "已完成",
+      "mapped_status": "已完成",
+      "review_notes": "",
+      "history": [
+        {
+          "action": "票务导入",
+          "operator": "系统",
+          "details": "原始状态=已核销, 映射状态=已完成",
+          "affected_field": "status",
+          "before_value": null,
+          "after_value": "已完成",
+          "timestamp": "2026-06-20T01:00:15.610185"
+        },
+        {
+          "action": "音频备注补充",
+          "operator": "老周",
+          "details": "补充 1 条音频备注",
+          "affected_field": "audio_remarks",
+          "before_value": null,
+          "after_value": "曲目：小星星变奏曲，状态：已完成，老师：王老师，时长：5分钟，得分：92.5。演奏流畅，感情表达到位。",
+          "timestamp": "2026-06-20T01:00:15.611657"
+        },
+        {
+          "action": "核对通过",
+          "operator": "老周",
+          "details": "",
+          "affected_field": "verification_status",
+          "before_value": "待核对",
+          "after_value": "已确认",
+          "timestamp": "2026-06-20T01:00:15.613577"
+        }
+      ]
+    },
+    {
+      "ticket_id": "T002",
+      "student_name": "李小红",
+      "repertoire": "土耳其进行曲",
+      "performance_date": "2026-06-01",
+      "status": "已核销",
+      "is_consumed": true,
+      "leave_status": "正常",
+      "verification_status": "存在冲突",
+      "audio_remarks": "曲目：致爱丽丝，状态：已完成，老师：王老师，时长：4分钟，得分：88。注意：票务表写的土耳其进行曲，但实际演奏是致爱丽丝！学员自己改了曲子没报备。",
+      "normalized_status": "已完成",
+      "mapped_status": "已完成",
+      "review_notes": "",
+      "history": [
+        {
+          "action": "票务导入",
+          "operator": "系统",
+          "details": "原始状态=已核销, 映射状态=已完成",
+          "affected_field": "status",
+          "before_value": null,
+          "after_value": "已完成",
+          "timestamp": "2026-06-20T01:00:15.610192"
+        },
+        {
+          "action": "音频备注补充",
+          "operator": "老周",
+          "details": "补充 1 条音频备注",
+          "affected_field": "audio_remarks",
+          "before_value": null,
+          "after_value": "曲目：致爱丽丝，状态：已完成，老师：王老师，时长：4分钟，得分：88。注意：票务表写的土耳其进行曲，但实际演奏是致爱丽丝！学员自己改了曲子没报备。",
+          "timestamp": "2026-06-20T01:00:15.611669"
+        }
+      ]
+    },
+    {
+      "ticket_id": "T003",
+      "student_name": "王小华",
+      "repertoire": "月光奏鸣曲",
+      "performance_date": "2026-06-01",
+      "status": "已核销",
+      "is_consumed": true,
+      "leave_status": "请假",
+      "verification_status": "待巡演统筹复核",
+      "audio_remarks": "曲目：月光奏鸣曲，状态：请假，老师：李老师。学员当天发烧没来，已请假，不应该算已消耗！",
+      "normalized_status": "已完成",
+      "mapped_status": "已完成",
+      "review_notes": "",
+      "history": [
+        {
+          "action": "票务导入",
+          "operator": "系统",
+          "details": "原始状态=已核销, 映射状态=已完成",
+          "affected_field": "status",
+          "before_value": null,
+          "after_value": "已完成",
+          "timestamp": "2026-06-20T01:00:15.610194"
+        },
+        {
+          "action": "音频备注补充",
+          "operator": "老周",
+          "details": "补充 1 条音频备注",
+          "affected_field": "audio_remarks",
+          "before_value": null,
+          "after_value": "曲目：月光奏鸣曲，状态：请假，老师：李老师。学员当天发烧没来，已请假，不应该算已消耗！",
+          "timestamp": "2026-06-20T01:00:15.611674"
+        }
+      ]
+    },
+    {
+      "ticket_id": "T004",
+      "student_name": "陈小芳",
+      "repertoire": "水边的阿狄丽娜",
+      "performance_date": "2026-06-01",
+      "status": "已核销",
+      "is_consumed": true,
+      "leave_status": "正常",
+      "verification_status": "存在冲突",
+      "audio_remarks": "曲目：童年的回忆，状态：已完成，老师：李老师，时长：6分钟，得分：95。票务表写的水边的阿狄丽娜不对，实际是童年的回忆。",
+      "normalized_status": "已完成",
+      "mapped_status": "已完成",
+      "review_notes": "",
+      "history": [
+        {
+          "action": "票务导入",
+          "operator": "系统",
+          "details": "原始状态=已核销, 映射状态=已完成",
+          "affected_field": "status",
+          "before_value": null,
+          "after_value": "已完成",
+          "timestamp": "2026-06-20T01:00:15.610196"
+        },
+        {
+          "action": "音频备注补充",
+          "operator": "老周",
+          "details": "补充 1 条音频备注",
+          "affected_field": "audio_remarks",
+          "before_value": null,
+          "after_value": "曲目：童年的回忆，状态：已完成，老师：李老师，时长：6分钟，得分：95。票务表写的水边的阿狄丽娜不对，实际是童年的回忆。",
+          "timestamp": "2026-06-20T01:00:15.611679"
+        }
+      ]
+    },
+    {
+      "ticket_id": "T005",
+      "student_name": "刘小伟",
+      "repertoire": "梦中的婚礼",
+      "performance_date": "2026-06-01",
+      "status": "已核销",
+      "is_consumed": true,
+      "leave_status": "请假",
+      "verification_status": "待巡演统筹复核",
+      "audio_remarks": "曲目：梦中的婚礼，状态：请假，老师：王老师。学员家里有事请假了，怎么算成已核销了？需要巡演统筹复核。",
+      "normalized_status": "已完成",
+      "mapped_status": "已完成",
+      "review_notes": "",
+      "history": [
+        {
+          "action": "票务导入",
+          "operator": "系统",
+          "details": "原始状态=已核销, 映射状态=已完成",
+          "affected_field": "status",
+          "before_value": null,
+          "after_value": "已完成",
+          "timestamp": "2026-06-20T01:00:15.610199"
+        },
+        {
+          "action": "音频备注补充",
+          "operator": "老周",
+          "details": "补充 1 条音频备注",
+          "affected_field": "audio_remarks",
+          "before_value": null,
+          "after_value": "曲目：梦中的婚礼，状态：请假，老师：王老师。学员家里有事请假了，怎么算成已核销了？需要巡演统筹复核。",
+          "timestamp": "2026-06-20T01:00:15.611684"
+        }
+      ]
+    },
+    {
+      "ticket_id": "T006",
+      "student_name": "赵小刚",
+      "repertoire": "蓝色多瑙河",
+      "performance_date": "2026-06-01",
+      "status": "待核销",
+      "is_consumed": false,
+      "leave_status": "正常",
+      "verification_status": "已确认",
+      "audio_remarks": "曲目：蓝色多瑙河，状态：未开始，老师：张老师。下周演出，先占位。",
+      "normalized_status": "未开始",
+      "mapped_status": "未开始",
+      "review_notes": "",
+      "history": [
+        {
+          "action": "票务导入",
+          "operator": "系统",
+          "details": "原始状态=待核销, 映射状态=未开始",
+          "affected_field": "status",
+          "before_value": null,
+          "after_value": "未开始",
+          "timestamp": "2026-06-20T01:00:15.610201"
+        },
+        {
+          "action": "音频备注补充",
+          "operator": "老周",
+          "details": "补充 1 条音频备注",
+          "affected_field": "audio_remarks",
+          "before_value": null,
+          "after_value": "曲目：蓝色多瑙河，状态：未开始，老师：张老师。下周演出，先占位。",
+          "timestamp": "2026-06-20T01:00:15.611689"
+        },
+        {
+          "action": "核对通过",
+          "operator": "老周",
+          "details": "",
+          "affected_field": "verification_status",
+          "before_value": "待核对",
+          "after_value": "已确认",
+          "timestamp": "2026-06-20T01:00:15.613589"
+        }
+      ]
+    }
+  ],
+  "import_batches": [
+    {
+      "batch_id": "VERIFY_A",
+      "file_name": "wrong_caliber_tickets.csv",
+      "import_time": "2026-06-20T01:00:15.609726",
+      "record_count": 6,
+      "is_duplicate": false,
+      "duplicate_of": null
+    }
+  ],
+  "audio_remarks": [
+    {
+      "audio_file": "audio_T001_20260601.mp3",
+      "ticket_id": "T001",
+      "student_name": "张小明",
+      "raw_remark": "曲目：小星星变奏曲，状态：已完成，老师：王老师，时长：5分钟，得分：92.5。演奏流畅，感情表达到位。",
+      "parsed_repertoire": "小星星变奏曲",
+      "parsed_date": null,
+      "parsed_status": "已完成",
+      "parsed_is_leave": false
+    },
+    {
+      "audio_file": "audio_T002_20260601.mp3",
+      "ticket_id": "T002",
+      "student_name": "李小红",
+      "raw_remark": "曲目：致爱丽丝，状态：已完成，老师：王老师，时长：4分钟，得分：88。注意：票务表写的土耳其进行曲，但实际演奏是致爱丽丝！学员自己改了曲子没报备。",
+      "parsed_repertoire": "致爱丽丝",
+      "parsed_date": null,
+      "parsed_status": "已完成",
+      "parsed_is_leave": false
+    },
+    {
+      "audio_file": "audio_T003_20260601.mp3",
+      "ticket_id": "T003",
+      "student_name": "王小华",
+      "raw_remark": "曲目：月光奏鸣曲，状态：请假，老师：李老师。学员当天发烧没来，已请假，不应该算已消耗！",
+      "parsed_repertoire": "月光奏鸣曲",
+      "parsed_date": null,
+      "parsed_status": "请假",
+      "parsed_is_leave": true
+    },
+    {
+      "audio_file": "audio_T004_20260601.mp3",
+      "ticket_id": "T004",
+      "student_name": "陈小芳",
+      "raw_remark": "曲目：童年的回忆，状态：已完成，老师：李老师，时长：6分钟，得分：95。票务表写的水边的阿狄丽娜不对，实际是童年的回忆。",
+      "parsed_repertoire": "童年的回忆",
+      "parsed_date": null,
+      "parsed_status": "已完成",
+      "parsed_is_leave": false
+    },
+    {
+      "audio_file": "audio_T005_20260601.mp3",
+      "ticket_id": "T005",
+      "student_name": "刘小伟",
+      "raw_remark": "曲目：梦中的婚礼，状态：请假，老师：王老师。学员家里有事请假了，怎么算成已核销了？需要巡演统筹复核。",
+      "parsed_repertoire": "梦中的婚礼",
+      "parsed_date": null,
+      "parsed_status": "请假",
+      "parsed_is_leave": true
+    },
+    {
+      "audio_file": "audio_T006_20260601.mp3",
+      "ticket_id": "T006",
+      "student_name": "赵小刚",
+      "raw_remark": "曲目：蓝色多瑙河，状态：未开始，老师：张老师。下周演出，先占位。",
+      "parsed_repertoire": "蓝色多瑙河",
+      "parsed_date": null,
+      "parsed_status": "未开始",
+      "parsed_is_leave": false
+    }
+  ],
+  "conflicts": [
+    {
+      "conflict_id": "3e3d1360-dc43-49e6-89e9-91320a3a9408",
+      "conflict_type": "曲目不符",
+      "ticket_id": "T002",
+      "field_name": "曲目",
+      "ticket_value": "土耳其进行曲",
+      "audio_value": "致爱丽丝",
+      "description": "票号T002曲目不一致",
+      "evidence": {
+        "ticket_source": "票务导出表",
+        "ticket_value": "土耳其进行曲",
+        "audio_file": "audio_T002_20260601.mp3",
+        "audio_raw_remark": "曲目：致爱丽丝，状态：已完成，老师：王老师，时长：4分钟，得分：88。注意：票务表写的土耳其进行曲，但实际演奏是致爱丽丝！学员自己改了曲子没报备。",
+        "audio_parsed_value": "致爱丽丝",
+        "similarity": 0.0
+      },
+      "resolved": false,
+      "resolution": "",
+      "resolved_by": "",
+      "resolved_time": null,
+      "current_verdict": "待负责人判断（曲目以哪个为准？）",
+      "handler_status": "可处理（确认以音频/票务为准 或 驳回）",
+      "normalized_ticket_status": "已完成",
+      "normalized_audio_status": "已完成"
+    },
+    {
+      "conflict_id": "26878cb1-4f45-4d1c-9c3c-ca5b1837822e",
+      "conflict_type": "请假课时被算进已消耗",
+      "ticket_id": "T003",
+      "field_name": "请假状态",
+      "ticket_value": "请假但已标记为消耗",
+      "audio_value": null,
+      "description": "票号T003请假课时被算进已消耗，需巡演统筹复核",
+      "evidence": {
+        "ticket_source": "票务导出表",
+        "leave_status": "请假",
+        "is_consumed": true,
+        "student_name": "王小华",
+        "repertoire": "月光奏鸣曲",
+        "performance_date": "2026-06-01"
+      },
+      "resolved": false,
+      "resolution": "",
+      "resolved_by": "",
+      "resolved_time": null,
+      "current_verdict": "待巡演统筹复核（请假不应算已消耗）",
+      "handler_status": "待巡演统筹复核，暂不可自动确认",
+      "normalized_ticket_status": "已完成",
+      "normalized_audio_status": ""
+    },
+    {
+      "conflict_id": "1a8cdb2a-fce6-415e-85f9-d1d1b02370d7",
+      "conflict_type": "状态不符",
+      "ticket_id": "T003",
+      "field_name": "状态",
+      "ticket_value": "已核销",
+      "audio_value": "请假",
+      "description": "票号T003状态不一致（映射后: 已完成 vs 请假）",
+      "evidence": {
+        "ticket_source": "票务导出表",
+        "ticket_raw_status": "已核销",
+        "ticket_normalized_status": "已完成",
+        "audio_file": "audio_T003_20260601.mp3",
+        "audio_raw_remark": "曲目：月光奏鸣曲，状态：请假，老师：李老师。学员当天发烧没来，已请假，不应该算已消耗！",
+        "audio_parsed_status": "请假",
+        "audio_normalized_status": "请假",
+        "status_mapping": {
+          "已核销": "已完成",
+          "待核销": "未开始",
+          "已使用": "已完成",
+          "已取消": "已取消"
+        }
+      },
+      "resolved": false,
+      "resolution": "",
+      "resolved_by": "",
+      "resolved_time": null,
+      "current_verdict": "待负责人判断（状态以哪个为准？）",
+      "handler_status": "可处理（确认以音频/票务为准 或 驳回）",
+      "normalized_ticket_status": "已完成",
+      "normalized_audio_status": "请假"
+    },
+    {
+      "conflict_id": "e4e46f66-af8f-4724-918c-f2d756c306b2",
+      "conflict_type": "曲目不符",
+      "ticket_id": "T004",
+      "field_name": "曲目",
+      "ticket_value": "水边的阿狄丽娜",
+      "audio_value": "童年的回忆",
+      "description": "票号T004曲目不一致",
+      "evidence": {
+        "ticket_source": "票务导出表",
+        "ticket_value": "水边的阿狄丽娜",
+        "audio_file": "audio_T004_20260601.mp3",
+        "audio_raw_remark": "曲目：童年的回忆，状态：已完成，老师：李老师，时长：6分钟，得分：95。票务表写的水边的阿狄丽娜不对，实际是童年的回忆。",
+        "audio_parsed_value": "童年的回忆",
+        "similarity": 0.16666666666666666
+      },
+      "resolved": false,
+      "resolution": "",
+      "resolved_by": "",
+      "resolved_time": null,
+      "current_verdict": "待负责人判断（曲目以哪个为准？）",
+      "handler_status": "可处理（确认以音频/票务为准 或 驳回）",
+      "normalized_ticket_status": "已完成",
+      "normalized_audio_status": "已完成"
+    },
+    {
+      "conflict_id": "565883c9-fd29-4f28-8627-21a47e89db25",
+      "conflict_type": "请假课时被算进已消耗",
+      "ticket_id": "T005",
+      "field_name": "请假状态",
+      "ticket_value": "请假但已标记为消耗",
+      "audio_value": null,
+      "description": "票号T005请假课时被算进已消耗，需巡演统筹复核",
+      "evidence": {
+        "ticket_source": "票务导出表",
+        "leave_status": "请假",
+        "is_consumed": true,
+        "student_name": "刘小伟",
+        "repertoire": "梦中的婚礼",
+        "performance_date": "2026-06-01"
+      },
+      "resolved": false,
+      "resolution": "",
+      "resolved_by": "",
+      "resolved_time": null,
+      "current_verdict": "待巡演统筹复核（请假不应算已消耗）",
+      "handler_status": "待巡演统筹复核，暂不可自动确认",
+      "normalized_ticket_status": "已完成",
+      "normalized_audio_status": ""
+    },
+    {
+      "conflict_id": "154c34b9-b6d1-49a2-b809-abac3da5f7e7",
+      "conflict_type": "状态不符",
+      "ticket_id": "T005",
+      "field_name": "状态",
+      "ticket_value": "已核销",
+      "audio_value": "请假",
+      "description": "票号T005状态不一致（映射后: 已完成 vs 请假）",
+      "evidence": {
+        "ticket_source": "票务导出表",
+        "ticket_raw_status": "已核销",
+        "ticket_normalized_status": "已完成",
+        "audio_file": "audio_T005_20260601.mp3",
+        "audio_raw_remark": "曲目：梦中的婚礼，状态：请假，老师：王老师。学员家里有事请假了，怎么算成已核销了？需要巡演统筹复核。",
+        "audio_parsed_status": "请假",
+        "audio_normalized_status": "请假",
+        "status_mapping": {
+          "已核销": "已完成",
+          "待核销": "未开始",
+          "已使用": "已完成",
+          "已取消": "已取消"
+        }
+      },
+      "resolved": false,
+      "resolution": "",
+      "resolved_by": "",
+      "resolved_time": null,
+      "current_verdict": "待负责人判断（状态以哪个为准？）",
+      "handler_status": "可处理（确认以音频/票务为准 或 驳回）",
+      "normalized_ticket_status": "已完成",
+      "normalized_audio_status": "请假"
+    }
+  ],
+  "audit_entries": [
+    {
+      "action": "票务导入",
+      "operator": "系统",
+      "details": "原始状态=已核销 → 映射=已完成",
+      "affected_field": "status",
+      "affected_ticket_id": "T001",
+      "before_value": "已核销",
+      "after_value": "已完成",
+      "timestamp": "2026-06-20T01:00:15.610189"
+    },
+    {
+      "action": "票务导入",
+      "operator": "系统",
+      "details": "原始状态=已核销 → 映射=已完成",
+      "affected_field": "status",
+      "affected_ticket_id": "T002",
+      "before_value": "已核销",
+      "after_value": "已完成",
+      "timestamp": "2026-06-20T01:00:15.610193"
+    },
+    {
+      "action": "票务导入",
+      "operator": "系统",
+      "details": "原始状态=已核销 → 映射=已完成",
+      "affected_field": "status",
+      "affected_ticket_id": "T003",
+      "before_value": "已核销",
+      "after_value": "已完成",
+      "timestamp": "2026-06-20T01:00:15.610195"
+    },
+    {
+      "action": "票务导入",
+      "operator": "系统",
+      "details": "原始状态=已核销 → 映射=已完成",
+      "affected_field": "status",
+      "affected_ticket_id": "T004",
+      "before_value": "已核销",
+      "after_value": "已完成",
+      "timestamp": "2026-06-20T01:00:15.610197"
+    },
+    {
+      "action": "票务导入",
+      "operator": "系统",
+      "details": "原始状态=已核销 → 映射=已完成",
+      "affected_field": "status",
+      "affected_ticket_id": "T005",
+      "before_value": "已核销",
+      "after_value": "已完成",
+      "timestamp": "2026-06-20T01:00:15.610200"
+    },
+    {
+      "action": "票务导入",
+      "operator": "系统",
+      "details": "原始状态=待核销 → 映射=未开始",
+      "affected_field": "status",
+      "affected_ticket_id": "T006",
+      "before_value": "待核销",
+      "after_value": "未开始",
+      "timestamp": "2026-06-20T01:00:15.610202"
+    },
+    {
+      "action": "音频备注补充",
+      "operator": "老周",
+      "details": "补充 1 条音频备注",
+      "affected_field": "audio_remarks",
+      "affected_ticket_id": "T001",
+      "before_value": null,
+      "after_value": "曲目：小星星变奏曲，状态：已完成，老师：王老师，时长：5分钟，得分：92.5。演奏流畅，感情表达到位。",
+      "timestamp": "2026-06-20T01:00:15.611665"
+    },
+    {
+      "action": "音频备注补充",
+      "operator": "老周",
+      "details": "补充 1 条音频备注",
+      "affected_field": "audio_remarks",
+      "affected_ticket_id": "T002",
+      "before_value": null,
+      "after_value": "曲目：致爱丽丝，状态：已完成，老师：王老师，时长：4分钟，得分：88。注意：票务表写的土耳其进行曲，但实际演奏是致爱丽丝！学员自己改了曲子没报备。",
+      "timestamp": "2026-06-20T01:00:15.611671"
+    },
+    {
+      "action": "音频备注补充",
+      "operator": "老周",
+      "details": "补充 1 条音频备注",
+      "affected_field": "audio_remarks",
+      "affected_ticket_id": "T003",
+      "before_value": null,
+      "after_value": "曲目：月光奏鸣曲，状态：请假，老师：李老师。学员当天发烧没来，已请假，不应该算已消耗！",
+      "timestamp": "2026-06-20T01:00:15.611676"
+    },
+    {
+      "action": "音频备注补充",
+      "operator": "老周",
+      "details": "补充 1 条音频备注",
+      "affected_field": "audio_remarks",
+      "affected_ticket_id": "T004",
+      "before_value": null,
+      "after_value": "曲目：童年的回忆，状态：已完成，老师：李老师，时长：6分钟，得分：95。票务表写的水边的阿狄丽娜不对，实际是童年的回忆。",
+      "timestamp": "2026-06-20T01:00:15.611682"
+    },
+    {
+      "action": "音频备注补充",
+      "operator": "老周",
+      "details": "补充 1 条音频备注",
+      "affected_field": "audio_remarks",
+      "affected_ticket_id": "T005",
+      "before_value": null,
+      "after_value": "曲目：梦中的婚礼，状态：请假，老师：王老师。学员家里有事请假了，怎么算成已核销了？需要巡演统筹复核。",
+      "timestamp": "2026-06-20T01:00:15.611686"
+    },
+    {
+      "action": "音频备注补充",
+      "operator": "老周",
+      "details": "补充 1 条音频备注",
+      "affected_field": "audio_remarks",
+      "affected_ticket_id": "T006",
+      "before_value": null,
+      "after_value": "曲目：蓝色多瑙河，状态：未开始，老师：张老师。下周演出，先占位。",
+      "timestamp": "2026-06-20T01:00:15.611691"
+    },
+    {
+      "action": "标记待巡演统筹复核",
+      "operator": "系统",
+      "details": "请假课时被算进已消耗",
+      "affected_field": "verification_status",
+      "affected_ticket_id": "T003",
+      "before_value": "待巡演统筹复核",
+      "after_value": "待巡演统筹复核",
+      "timestamp": "2026-06-20T01:00:15.613477"
+    },
+    {
+      "action": "标记待巡演统筹复核",
+      "operator": "系统",
+      "details": "请假课时被算进已消耗",
+      "affected_field": "verification_status",
+      "affected_ticket_id": "T005",
+      "before_value": "待巡演统筹复核",
+      "after_value": "待巡演统筹复核",
+      "timestamp": "2026-06-20T01:00:15.613485"
+    },
+    {
+      "action": "音频备注补充到核对表",
+      "operator": "老周",
+      "details": "补充 1 条音频备注到核对表",
+      "affected_field": "remarks",
+      "affected_ticket_id": "T001",
+      "before_value": "",
+      "after_value": "曲目：小星星变奏曲，状态：已完成，老师：王老师，时长：5分钟，得分：92.5。演奏流畅，感情表达到位。",
+      "timestamp": "2026-06-20T01:00:15.613553"
+    },
+    {
+      "action": "音频备注补充到核对表",
+      "operator": "老周",
+      "details": "补充 1 条音频备注到核对表",
+      "affected_field": "remarks",
+      "affected_ticket_id": "T002",
+      "before_value": "",
+      "after_value": "曲目：致爱丽丝，状态：已完成，老师：王老师，时长：4分钟，得分：88。注意：票务表写的土耳其进行曲，但实际演奏是致爱丽丝！学员自己改了曲子没报备。\n[曲目差异] 票务表: 土耳其进行曲 | 音频解析: 致爱丽丝",
+      "timestamp": "2026-06-20T01:00:15.613557"
+    },
+    {
+      "action": "音频备注补充到核对表",
+      "operator": "老周",
+      "details": "补充 1 条音频备注到核对表",
+      "affected_field": "remarks",
+      "affected_ticket_id": "T003",
+      "before_value": "",
+      "after_value": "曲目：月光奏鸣曲，状态：请假，老师：李老师。学员当天发烧没来，已请假，不应该算已消耗！",
+      "timestamp": "2026-06-20T01:00:15.613560"
+    },
+    {
+      "action": "音频备注补充到核对表",
+      "operator": "老周",
+      "details": "补充 1 条音频备注到核对表",
+      "affected_field": "remarks",
+      "affected_ticket_id": "T004",
+      "before_value": "",
+      "after_value": "曲目：童年的回忆，状态：已完成，老师：李老师，时长：6分钟，得分：95。票务表写的水边的阿狄丽娜不对，实际是童年的回忆。\n[曲目差异] 票务表: 水边的阿狄丽娜 | 音频解析: 童年的回忆",
+      "timestamp": "2026-06-20T01:00:15.613563"
+    },
+    {
+      "action": "音频备注补充到核对表",
+      "operator": "老周",
+      "details": "补充 1 条音频备注到核对表",
+      "affected_field": "remarks",
+      "affected_ticket_id": "T005",
+      "before_value": "",
+      "after_value": "曲目：梦中的婚礼，状态：请假，老师：王老师。学员家里有事请假了，怎么算成已核销了？需要巡演统筹复核。",
+      "timestamp": "2026-06-20T01:00:15.613566"
+    },
+    {
+      "action": "音频备注补充到核对表",
+      "operator": "老周",
+      "details": "补充 1 条音频备注到核对表",
+      "affected_field": "remarks",
+      "affected_ticket_id": "T006",
+      "before_value": "",
+      "after_value": "曲目：蓝色多瑙河，状态：未开始，老师：张老师。下周演出，先占位。",
+      "timestamp": "2026-06-20T01:00:15.613569"
+    },
+    {
+      "action": "核对通过",
+      "operator": "老周",
+      "details": "状态映射后自动核对通过",
+      "affected_field": "verification_status",
+      "affected_ticket_id": "T001",
+      "before_value": "待核对",
+      "after_value": "已确认",
+      "timestamp": "2026-06-20T01:00:15.613584"
+    },
+    {
+      "action": "核对通过",
+      "operator": "老周",
+      "details": "状态映射后自动核对通过",
+      "affected_field": "verification_status",
+      "affected_ticket_id": "T006",
+      "before_value": "待核对",
+      "after_value": "已确认",
+      "timestamp": "2026-06-20T01:00:15.613591"
+    }
+  ]
+}

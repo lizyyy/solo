@@ -134,6 +134,10 @@ class Conflict:
     resolution: str = ""
     resolved_by: str = ""
     resolved_time: Optional[datetime] = None
+    current_verdict: str = "待负责人判断"
+    handler_status: str = "可处理（确认/驳回）"
+    normalized_ticket_status: str = ""
+    normalized_audio_status: str = ""
 
 
 @dataclass
