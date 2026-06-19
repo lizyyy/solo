@@ -270,13 +270,16 @@ export const useAppStore = create<AppState & AppActions>()(
           return c;
         }) as ConflictData[];
 
+        const resolvedVersion = decision === 'confirm' ? 'v1.3' : 'v1.0';
+        const resolvedSourceLabel =
+          decision === 'confirm'
+            ? '安全阈值表 v1.3'
+            : '设备铭牌 #EQ-2024-001';
+
         const newVersion: UnitConversion['historyVersions'][0] = {
-          version: `v${parseInt(unitConversion.parameterVersion.slice(1)) + 0.1}`,
+          version: resolvedVersion,
           formula: unitConversion.formula,
-          parameterSource:
-            decision === 'confirm'
-              ? '安全阈值表 v1.3'
-              : '设备铭牌 #EQ-2024-001',
+          parameterSource: resolvedSourceLabel,
           updateTime: now,
           reason: `何工${decision === 'confirm' ? '确认' : '驳回'}阈值冲突：${reason}`,
         };
@@ -284,11 +287,8 @@ export const useAppStore = create<AppState & AppActions>()(
         const updatedConversion: UnitConversion = {
           ...unitConversion,
           parameterSource: decision === 'confirm' ? 'threshold' : 'nameplate',
-          parameterSourceLabel:
-            decision === 'confirm'
-              ? '安全阈值表 v1.3'
-              : '设备铭牌 #EQ-2024-001',
-          parameterVersion: newVersion.version,
+          parameterSourceLabel: resolvedSourceLabel,
+          parameterVersion: resolvedVersion,
           tradeOffReason: `何工于 ${now} ${decision === 'confirm' ? '确认' : '驳回'}阈值冲突，决策理由：${reason}`,
           updateTime: now,
           updatedBy: roleLabels.engineer,
