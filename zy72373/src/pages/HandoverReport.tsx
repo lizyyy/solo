@@ -13,7 +13,9 @@ import {
   ThermometerSun,
   Image as ImageIcon,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Download,
+  Check
 } from 'lucide-react';
 import { useState } from 'react';
 import { format } from 'date-fns';
@@ -27,6 +29,8 @@ export function HandoverReport() {
   const navigate = useNavigate();
   const { getCurrentTask, setCurrentTask } = useDiagnosisStore();
   const [expandedVersions, setExpandedVersions] = useState<Set<number>>(new Set([1]));
+  const [exporting, setExporting] = useState(false);
+  const [exported, setExported] = useState(false);
 
   const task = getCurrentTask();
   const report = task?.report;
@@ -58,6 +62,68 @@ export function HandoverReport() {
       setCurrentTask(taskId);
       navigate(`/diagnosis/${taskId}/replay`);
     }
+  };
+
+  const handleExportReport = () => {
+    if (!task || !report) return;
+    setExporting(true);
+    
+    const reportContent = `
+风扇叶片平衡诊断 - 交接报告 v${report.version}
+=====================================
+任务: ${task.title}
+任务ID: ${task.id}
+创建人: ${task.createdBy}
+生成时间: ${new Date(report.updatedAt).toLocaleString('zh-CN')}
+
+【问题说明】
+${report.problemStatement}
+
+【缺失材料】
+${report.missingMaterials.length > 0 ? report.missingMaterials.join('\n') : '无（全部齐全）'}
+
+【缺失材料触发源追溯】
+${report.missingMaterialTriggers.map(t => `- ${t.material} (${t.sourceType}):\n${t.sourceDescriptions.map(d => `  * ${d}`).join('\n')}`).join('\n') || '无'}
+
+【下一步对接人】
+${report.nextHandler} (${formatNextAction(report.nextAction)})
+
+【温度单位人工复核确认记录】
+${task.corrections.length > 0 
+  ? task.corrections.map(c => `- ${c.sensorNo}: ${c.oldValue} → ${c.newValue}\n  修正人: ${c.correctedBy}\n  时间: ${new Date(c.correctedAt).toLocaleString('zh-CN')}\n  原因: ${c.reason}`).join('\n\n')
+  : '无修正记录'}
+
+【当前传感器数据】
+${task.sensorData.map(s => `- ${s.sensorNo} (${s.position}): ${s.temperature}${s.temperatureUnit === 'K' ? 'K' : '°C'}${s.needsReview ? ' (待复核)' : ''}`).join('\n')}
+
+【工况照片】
+${task.photos.length > 0
+  ? task.photos.map(p => `- ${p.filename}\n  上传人: ${p.uploadBy}\n  描述: ${p.description}\n  时间: ${new Date(p.uploadTime).toLocaleString('zh-CN')}`).join('\n\n')
+  : '无照片'}
+
+【版本历史追溯】
+${report.versionHistory.map(v => `v${v.version} (${new Date(v.updatedAt).toLocaleString('zh-CN')})\n  触发: ${v.triggeredBy}\n  变更: ${v.changes.join('; ')}\n  缺失材料: ${v.snapshot.missingMaterials.join(', ') || '无'}\n  对接人: ${v.snapshot.nextHandler}`).join('\n\n')}
+
+---
+报告由 fan-diagnosis 系统自动生成
+CLI 复现命令: fan-diagnosis report --task-id ${task.id} --version ${report.version} --output 交接报告_v${report.version}.txt
+`.trim();
+
+    const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `交接报告_${task.id}_v${report.version}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    setTimeout(() => {
+      setExporting(false);
+      setExported(true);
+      setTimeout(() => setExported(false), 2000);
+    }, 500);
   };
 
   const buildDiffWithPrev = (versions: ReportVersion[], idx: number) => {
@@ -123,13 +189,32 @@ export function HandoverReport() {
               </p>
             </div>
           </div>
-          <button
-            onClick={handleReplay}
-            className="btn-secondary flex items-center gap-2"
-          >
-            <History className="w-4 h-4" />
-            流程复盘
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleExportReport}
+              disabled={exporting}
+              className="btn-secondary flex items-center gap-2"
+            >
+              {exported ? (
+                <>
+                  <Check className="w-4 h-4" />
+                  已导出
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4" />
+                  导出报告
+                </>
+              )}
+            </button>
+            <button
+              onClick={handleReplay}
+              className="btn-secondary flex items-center gap-2"
+            >
+              <History className="w-4 h-4" />
+              流程复盘
+            </button>
+          </div>
         </div>
 
         <div className="space-y-6">

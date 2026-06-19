@@ -26,15 +26,19 @@ export function DataImport() {
       complete: (results) => {
         const data: SensorData[] = results.data
           .filter((row: any) => row.sensorNo)
-          .map((row: any, index: number) => ({
-            id: `imported-${index}`,
-            sensorNo: row.sensorNo || row['传感器编号'] || '',
-            timestamp: row.timestamp || row['时间'] || new Date().toISOString(),
-            temperature: parseFloat(row.temperature || row['温度'] || 0),
-            temperatureUnit: (row.unit || row['单位'] || 'C') as 'C' | 'K',
-            vibration: parseFloat(row.vibration || row['振动'] || 0),
-            position: row.position || row['位置'] || '',
-          }));
+          .map((row: any, index: number) => {
+            const rawUnit = (row.unit || row['单位'] || 'C').toString().toUpperCase().trim();
+            const temperatureUnit: 'C' | 'K' = rawUnit === 'K' ? 'K' : 'C';
+            return {
+              id: `imported-${index}`,
+              sensorNo: row.sensorNo || row['传感器编号'] || '',
+              timestamp: row.timestamp || row['时间'] || new Date().toISOString(),
+              temperature: parseFloat(row.temperature || row['温度'] || 0),
+              temperatureUnit,
+              vibration: parseFloat(row.vibration || row['振动'] || 0),
+              position: row.position || row['位置'] || '',
+            };
+          });
         setImportedData(data);
       },
     });
@@ -66,10 +70,10 @@ export function DataImport() {
 
   const handleLoadDemoData = () => {
     const demoData: SensorData[] = [
-      { id: 's1', sensorNo: 'FAN-001-A', timestamp: new Date().toISOString(), temperature: 85, temperatureUnit: 'C', vibration: 2.3, position: '叶片A' },
-      { id: 's2', sensorNo: 'FAN-001-B', timestamp: new Date().toISOString(), temperature: 358, temperatureUnit: 'K', vibration: 2.1, position: '叶片B' },
-      { id: 's3', sensorNo: 'FAN-001-C', timestamp: new Date().toISOString(), temperature: 82, temperatureUnit: 'C', vibration: 2.5, position: '叶片C' },
-      { id: 's4', sensorNo: 'FAN-001-D', timestamp: new Date().toISOString(), temperature: 355, temperatureUnit: 'K', vibration: 2.2, position: '叶片D' },
+      { id: 's1', sensorNo: 'FAN-REAL-A', timestamp: new Date().toISOString(), temperature: 85, temperatureUnit: 'C', vibration: 2.3, position: '叶片A' },
+      { id: 's2', sensorNo: 'FAN-REAL-B', timestamp: new Date().toISOString(), temperature: 358, temperatureUnit: 'K', vibration: 2.1, position: '叶片B' },
+      { id: 's3', sensorNo: 'FAN-REAL-C', timestamp: new Date().toISOString(), temperature: 82, temperatureUnit: 'C', vibration: 2.5, position: '叶片C' },
+      { id: 's4', sensorNo: 'FAN-REAL-D', timestamp: new Date().toISOString(), temperature: 355, temperatureUnit: 'K', vibration: 2.2, position: '叶片D' },
     ];
     setImportedData(demoData);
   };

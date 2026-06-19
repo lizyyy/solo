@@ -3,11 +3,17 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "bin": {
+    "fan-diagnosis": "./bin/fan-diagnosis.js"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cli": "node ./bin/fan-diagnosis.js",
+    "cli:link": "npm link",
+    "verify:flow": "node ./scripts/verify_full_flow.mjs"
   },
   "dependencies": {
     "react": "^19.2.6",
