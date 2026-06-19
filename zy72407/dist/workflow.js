@@ -146,6 +146,9 @@ function step2ReviewGroupSignup(groupLines, operator, currentWorkflow) {
 function step3UpdateSettlement(operator, currentWorkflow) {
     let records = unifiedResult_1.unifiedStore.getRecords();
     records = records.map(record => {
+        if (record.status === types_1.RecordStatus.SETTLED || record.status === types_1.RecordStatus.EXPORTED) {
+            return record;
+        }
         if (record.status === types_1.RecordStatus.MATCHED) {
             return {
                 ...record,
@@ -162,8 +165,8 @@ function step3UpdateSettlement(operator, currentWorkflow) {
         }
         return record;
     });
-    records = (0, audit_1.settleRecords)(records, operator);
     records = (0, selfCheck_1.recalculateAfterSupplement)(records);
+    records = (0, audit_1.settleRecords)(records, operator);
     unifiedResult_1.unifiedStore.setRecords(records);
     const workflow = finishWorkflow(advanceStep(currentWorkflow, 'review_group', operator), operator);
     return {

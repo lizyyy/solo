@@ -140,6 +140,23 @@ export function mergeGroupSignupToRecords(
   const usedGroupIds = new Set<string>()
 
   updatedRecords.forEach(record => {
+    if (record.status === RecordStatus.SETTLED || record.status === RecordStatus.EXPORTED) {
+      const existingMatch = groupRecords.find(group => {
+        if (usedGroupIds.has(group.id)) return false
+        return (
+          group.studentName === record.studentName &&
+          group.courseDate === record.courseDate &&
+          (group.courseTime === record.courseTime || 
+           group.courseTime === record.groupCourseTime) &&
+          group.teacherName === record.teacherName
+        )
+      })
+      if (existingMatch) {
+        usedGroupIds.add(existingMatch.id)
+      }
+      return
+    }
+
     const exactMatch = groupRecords.find(group => {
       if (usedGroupIds.has(group.id)) return false
       return (

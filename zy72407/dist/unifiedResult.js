@@ -8,6 +8,10 @@ class UnifiedResultStore {
         this.records = [];
         this.batches = [];
     }
+    reset() {
+        this.records = [];
+        this.batches = [];
+    }
     setRecords(records) {
         this.records = JSON.parse(JSON.stringify(records));
     }

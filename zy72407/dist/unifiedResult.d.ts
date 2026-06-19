@@ -2,6 +2,7 @@ import { ConsumptionRecord, UnifiedResult, ImportBatch } from './types';
 export declare class UnifiedResultStore {
     private records;
     private batches;
+    reset(): void;
     setRecords(records: ConsumptionRecord[]): void;
     getRecords(): ConsumptionRecord[];
     setBatches(batches: ImportBatch[]): void;

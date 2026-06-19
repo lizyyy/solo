@@ -189,6 +189,9 @@ export function step3UpdateSettlement(
   let records = unifiedStore.getRecords()
   
   records = records.map(record => {
+    if (record.status === RecordStatus.SETTLED || record.status === RecordStatus.EXPORTED) {
+      return record
+    }
     if (record.status === RecordStatus.MATCHED) {
       return {
         ...record,
@@ -206,8 +209,8 @@ export function step3UpdateSettlement(
     return record
   })
   
-  records = settleRecords(records, operator)
   records = recalculateAfterSupplement(records)
+  records = settleRecords(records, operator)
   
   unifiedStore.setRecords(records)
 

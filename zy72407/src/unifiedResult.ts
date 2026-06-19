@@ -11,6 +11,11 @@ export class UnifiedResultStore {
   private records: ConsumptionRecord[] = []
   private batches: ImportBatch[] = []
 
+  reset(): void {
+    this.records = []
+    this.batches = []
+  }
+
   setRecords(records: ConsumptionRecord[]): void {
     this.records = JSON.parse(JSON.stringify(records))
   }

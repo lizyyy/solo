@@ -105,6 +105,21 @@ function mergeGroupSignupToRecords(existingRecords, groupRecords) {
     const updatedRecords = existingRecords.map(r => ({ ...r }));
     const usedGroupIds = new Set();
     updatedRecords.forEach(record => {
+        if (record.status === types_1.RecordStatus.SETTLED || record.status === types_1.RecordStatus.EXPORTED) {
+            const existingMatch = groupRecords.find(group => {
+                if (usedGroupIds.has(group.id))
+                    return false;
+                return (group.studentName === record.studentName &&
+                    group.courseDate === record.courseDate &&
+                    (group.courseTime === record.courseTime ||
+                        group.courseTime === record.groupCourseTime) &&
+                    group.teacherName === record.teacherName);
+            });
+            if (existingMatch) {
+                usedGroupIds.add(existingMatch.id);
+            }
+            return;
+        }
         const exactMatch = groupRecords.find(group => {
             if (usedGroupIds.has(group.id))
                 return false;

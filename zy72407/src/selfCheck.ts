@@ -102,7 +102,7 @@ export function detectMismatches(records: ConsumptionRecord[]): SelfCheckIssue[]
       if (tunerTime !== groupTime && tunerTime && groupTime) {
         issues.push(generateIssue(
           'mismatch',
-          'high',
+          'medium',
           `口径不一致: ${record.studentName} ${record.courseDate}，调音师留言记录${tunerTime}，群接龙记录${groupTime}`,
           [record.id],
           {
@@ -131,6 +131,10 @@ export function detectMissingData(records: ConsumptionRecord[]): SelfCheckIssue[
     if (!record.courseDate) missing.push('上课日期')
     if (!record.teacherName) missing.push('老师姓名')
     if (record.durationMinutes <= 0) missing.push('课时时长')
+    
+    if (!record.tunerMessageId && !record.groupSignupId) {
+      missing.push('至少需要调音师留言或群接龙任一来源')
+    }
 
     if (missing.length > 0) {
       issues.push(generateIssue(
@@ -204,6 +208,19 @@ export function recalculateAfterSupplement(records: ConsumptionRecord[]): Consum
   const now = new Date().toISOString()
 
   return records.map(record => {
+    if (record.status === RecordStatus.SETTLED || record.status === RecordStatus.EXPORTED) {
+      return { ...record, updatedAt: now }
+    }
+
+    if (record.status === RecordStatus.CONFIRMED) {
+      const updated = { ...record, updatedAt: now }
+      if (updated.durationMinutes > 0 && !updated.settlementAmount) {
+        const ratePerMinute = 2
+        updated.settlementAmount = updated.durationMinutes * ratePerMinute
+      }
+      return updated
+    }
+
     const updated = { ...record, updatedAt: now }
 
     if (record.status === RecordStatus.NEEDS_REVIEW && record.reviewFlag === ReviewFlag.MISMATCH) {
@@ -259,6 +276,9 @@ export function markDuplicates(records: ConsumptionRecord[]): ConsumptionRecord[
   const now = new Date().toISOString()
 
   records.forEach(record => {
+    if (record.status === RecordStatus.SETTLED || record.status === RecordStatus.EXPORTED) {
+      return
+    }
     const key = `${record.studentName}|${record.courseDate}|${record.courseTime}|${record.teacherName}`
     if (seen.has(key)) {
       seen.get(key)!.push(record.id)
@@ -268,6 +288,9 @@ export function markDuplicates(records: ConsumptionRecord[]): ConsumptionRecord[
   })
 
   return records.map(record => {
+    if (record.status === RecordStatus.SETTLED || record.status === RecordStatus.EXPORTED) {
+      return record
+    }
     const key = `${record.studentName}|${record.courseDate}|${record.courseTime}|${record.teacherName}`
     const duplicates = seen.get(key) || []
     

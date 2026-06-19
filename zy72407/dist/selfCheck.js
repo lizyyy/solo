@@ -74,7 +74,7 @@ function detectMismatches(records) {
             const tunerTime = record.courseTime;
             const groupTime = record.groupCourseTime;
             if (tunerTime !== groupTime && tunerTime && groupTime) {
-                issues.push(generateIssue('mismatch', 'high', `口径不一致: ${record.studentName} ${record.courseDate}，调音师留言记录${tunerTime}，群接龙记录${groupTime}`, [record.id], {
+                issues.push(generateIssue('mismatch', 'medium', `口径不一致: ${record.studentName} ${record.courseDate}，调音师留言记录${tunerTime}，群接龙记录${groupTime}`, [record.id], {
                     tunerTime,
                     groupTime,
                     tunerLine: record.tunerOriginalLineNumber,
@@ -99,6 +99,9 @@ function detectMissingData(records) {
             missing.push('老师姓名');
         if (record.durationMinutes <= 0)
             missing.push('课时时长');
+        if (!record.tunerMessageId && !record.groupSignupId) {
+            missing.push('至少需要调音师留言或群接龙任一来源');
+        }
         if (missing.length > 0) {
             issues.push(generateIssue('missing_data', 'high', `记录缺少必要字段: ${record.studentName || '未知学生'}，缺少 ${missing.join(', ')}`, [record.id], { missingFields: missing }));
         }
@@ -144,6 +147,17 @@ function verifyExportConsistency(records, exportedData) {
 function recalculateAfterSupplement(records) {
     const now = new Date().toISOString();
     return records.map(record => {
+        if (record.status === types_1.RecordStatus.SETTLED || record.status === types_1.RecordStatus.EXPORTED) {
+            return { ...record, updatedAt: now };
+        }
+        if (record.status === types_1.RecordStatus.CONFIRMED) {
+            const updated = { ...record, updatedAt: now };
+            if (updated.durationMinutes > 0 && !updated.settlementAmount) {
+                const ratePerMinute = 2;
+                updated.settlementAmount = updated.durationMinutes * ratePerMinute;
+            }
+            return updated;
+        }
         const updated = { ...record, updatedAt: now };
         if (record.status === types_1.RecordStatus.NEEDS_REVIEW && record.reviewFlag === types_1.ReviewFlag.MISMATCH) {
             return updated;
@@ -183,6 +197,9 @@ function markDuplicates(records) {
     const seen = new Map();
     const now = new Date().toISOString();
     records.forEach(record => {
+        if (record.status === types_1.RecordStatus.SETTLED || record.status === types_1.RecordStatus.EXPORTED) {
+            return;
+        }
         const key = `${record.studentName}|${record.courseDate}|${record.courseTime}|${record.teacherName}`;
         if (seen.has(key)) {
             seen.get(key).push(record.id);
@@ -192,6 +209,9 @@ function markDuplicates(records) {
         }
     });
     return records.map(record => {
+        if (record.status === types_1.RecordStatus.SETTLED || record.status === types_1.RecordStatus.EXPORTED) {
+            return record;
+        }
         const key = `${record.studentName}|${record.courseDate}|${record.courseTime}|${record.teacherName}`;
         const duplicates = seen.get(key) || [];
         if (duplicates.length > 1 && duplicates[0] !== record.id) {
