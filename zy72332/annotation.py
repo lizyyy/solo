@@ -111,7 +111,7 @@ class AnnotationManager:
             record.status = RecordStatus.NORMAL
             old_error = record.error_explanation.current_text
             record.error_explanation.update(
-                f"业务运营已复核，采纳学生{approved.student_name}的第{approved.version}版答案",
+                f"业务运营{reviewer}已复核，采纳学生{approved.student_name}的第{approved.version}版答案",
                 reviewer
             )
             record.log_operation("复核完成", reviewer, {

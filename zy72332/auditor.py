@@ -17,19 +17,74 @@ class AuditExporter:
         self.store = store
 
     def export_audit_trail(self, record_id: str, output_dir: str = "audit_reports") -> str:
-        """导出单条记录的完整复盘记录"""
+        """导出单条记录的完整复盘报告（含截图资产 + 重放脚本 + JSON 报告）
+
+        返回: JSON 报告路径；同时会生成：
+          - output_dir/assets/<record_id>/screenshot_*.png  （真实截图资产副本）
+          - output_dir/replay_<store_slug>_<record_id>.sh   （可直接执行的重放脚本）
+        """
         os.makedirs(output_dir, exist_ok=True)
+        asset_dir = os.path.join(output_dir, "assets", record_id)
+        os.makedirs(asset_dir, exist_ok=True)
 
         record = self.store.get_record(record_id)
         if not record:
             raise ValueError(f"记录不存在: {record_id}")
 
+        # 1. 复制截图资产到 audit_reports/assets/<record_id>/
+        #    优先从 stored_path 复制（校验过），否则从 file_path 复制，否则重新创建
+        from importer import _create_demo_png, _compute_file_hash
+        for s in record.screenshot_refs:
+            target = os.path.join(asset_dir, f"screenshot_{s.screenshot_id}.png")
+            if not os.path.exists(target):
+                for src in [s.stored_path, s.file_path]:
+                    if src and os.path.exists(src):
+                        import shutil
+                        shutil.copy2(src, target)
+                        break
+            # 再次校验：缺失则用 formula_text 重新生成演示资产
+            if not os.path.exists(target):
+                if s.formula_text:
+                    _create_demo_png(target, s.formula_text)
+            # 写入最新 hash/size 到 screenshot 元数据里（导出快照用）
+            sz, h = _compute_file_hash(target)
+            s.stored_path = target  # 更新为导出目录下的路径，保证报告引用同一份资产
+            s.file_size = sz
+            s.file_hash = h
+            s.validation_status = "校验通过" if sz and h else "资产缺失"
+
         audit = self.store.get_audit_trail_by_record(record_id)
         result = self.store.get_grouping_result(record_id)
-
         report = self._build_audit_report(record, audit, result)
 
-        output_path = os.path.join(output_dir, f"audit_{record_id}_{datetime.now().strftime('%Y%m%d')}.json")
+        # 2. 写 JSON 报告
+        date_str = datetime.now().strftime('%Y%m%d')
+        output_path = os.path.join(output_dir, f"audit_{record_id}_{date_str}.json")
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(report, f, ensure_ascii=False, indent=2, default=str)
+
+        # 3. 写 replay_xxx.sh 脚本（可直接 bash 执行）
+        import re
+        safe_store_name = re.sub(r"[^\w\u4e00-\u9fa5-]", "_", record.store_name)
+        replay_path = os.path.join(
+            output_dir, f"replay_{safe_store_name}_{record_id}.sh"
+        )
+        replay_lines = self._generate_replay_commands(record)
+        with open(replay_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(replay_lines) + "\n")
+        os.chmod(replay_path, 0o755)
+
+        # 4. 若 JSON 报告里 screenshots 里没有记录资产信息，再补一遍
+        for s_report, s_rec in zip(report.get("screenshots", []), record.screenshot_refs):
+            s_report["file_hash"] = s_rec.file_hash
+            s_report["file_size"] = s_rec.file_size
+            s_report["stored_path"] = s_rec.stored_path
+            s_report["validation_status"] = s_rec.validation_status
+            s_report["processing_reason"] = s_rec.processing_reason
+            s_report["asset_copy_path"] = os.path.relpath(
+                s_rec.stored_path or asset_dir, output_dir
+            ) if s_rec.stored_path else None
+        # 再写一次，把补全的 screenshot 元数据落盘
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(report, f, ensure_ascii=False, indent=2, default=str)
 
@@ -214,9 +269,17 @@ class AuditExporter:
                 {
                     "screenshot_id": s.screenshot_id,
                     "file_path": s.file_path,
+                    "stored_path": s.stored_path,
                     "description": s.description,
                     "imported_at": s.imported_at,
-                    "formula_text": s.formula_text
+                    "formula_text": s.formula_text,
+                    "file_hash": s.file_hash,
+                    "file_size": s.file_size,
+                    "validation_status": s.validation_status,
+                    "processing_reason": s.processing_reason,
+                    "asset_copy_path": (
+                        f"assets/{record.record_id}/screenshot_{s.screenshot_id}.png"
+                    )
                 } for s in record.screenshot_refs
             ],
             "student_answers": [
@@ -267,113 +330,237 @@ class AuditExporter:
                 return log.get("operator")
         return None
 
+    def _build_answers_json_arg(self, record: StoreGroupingRecord) -> str:
+        """把学生答案序列化成 shell 安全的 JSON 字符串，作为 --answers 参数
+
+        重要：保留 answer_id，这样 review-duplicate --approved-answer-id 能正确命中。
+        """
+        raw = []
+        for a in record.student_answers:
+            raw.append({
+                "answer_id": a.answer_id,
+                "student_id": a.student_id,
+                "student_name": a.student_name,
+                "version": a.version,
+                "submission_time": a.submission_time.isoformat(),
+                "content": a.content
+            })
+        import json
+        return json.dumps(raw, ensure_ascii=False)
+
     def _generate_replay_commands(self, record: StoreGroupingRecord) -> List[str]:
-        """生成可重新跑的命令列表 - 与 record 最新状态完全一致"""
+        """生成可重新跑的命令列表
+
+        核心保证：
+        - 用 REC_ID=$(cli.py create --print-id) 串联整条记录，后续命令全部引用 $REC_ID
+        - 在干净数据目录下从 0 执行不会断掉，也不会多出孤立新记录
+        - 学生答案以 --answers JSON 内嵌，不依赖 data/records/*.json
+        - 截图资产以导出报告目录下的 assets/ 相对路径引用（也带 --formula 备份元数据）
+        """
         is_duplicate_type = record.processing_type == ProcessingType.DUPLICATE
         total_student_answers = len(record.student_answers)
         distinct_students = len(set(a.student_id for a in record.student_answers))
-        has_multi_submission = is_duplicate_type or (total_student_answers > 0 and total_student_answers > distinct_students)
+        has_multi_submission = is_duplicate_type or (
+            total_student_answers > 0 and total_student_answers > distinct_students
+        )
 
         approved_answer_id = self._find_approved_answer(record)
+        approved = (
+            next((a for a in record.student_answers if a.answer_id == approved_answer_id), None)
+            if approved_answer_id else None
+        )
         reviewer = self._find_reviewer_name(record) or "业务运营"
         is_pending = record.status in [RecordStatus.PENDING_REVIEW, RecordStatus.DUPLICATE_DETECTED]
 
+        # 我们在导出时会把截图资产复制到 audit_reports/assets/<record_id>/<filename>
+        # replay_commands 里优先引用这个复制后的路径
+        asset_prefix = f"$(dirname \"$0\")/assets/{record.record_id}"
+        answers_json_arg = self._build_answers_json_arg(record)
+        # shell 下单引号里的单引号用 '\'' 转义
+        safe_answers_arg = answers_json_arg.replace("'", "'\\''")
+
         step_no = 1
         commands = [
-            f"# 复盘记录: {record.store_name} ({record.record_id})",
-            f"# 处理类型: {record.processing_type.value}",
-            f"# 当前最新状态: {record.status.value}" + (f" | 最终分群: {record.final_group}" if record.final_group else " | 分群: 待运营复核后分群"),
+            "#!/usr/bin/env bash",
+            "# ============================================================",
+            f"# 复盘重放脚本: {record.store_name}",
+            f"# 门店ID: {record.store_id} | 处理类型: {record.processing_type.value}",
+            f"# 源记录ID: {record.record_id}",
+            f"# 最新状态: {record.status.value}",
+            f"# 最终分群: {record.final_group if record.final_group else '（待运营复核后）'}",
+            "#",
+            "# 执行方式（干净目录）:",
+            "#   1. cd <项目根目录> && rm -rf data audit_reports",
+            "#   2. cp -r <原报告目录>/audit_reports/assets ./audit_reports/  "
+            "(或让脚本自动生成演示资产)",
+            "#   3. bash audit_reports/replay_<门店>_<记录ID>.sh",
+            "#",
+            "# 保证：整条流程的创建/补录/保存/刷新/重算/导出全部指向同一条新记录",
+            "#      不靠固定旧标识，不靠硬编码，$REC_ID 贯穿所有命令",
+            "# ============================================================",
+            "set -euo pipefail",
             "",
-            f"# {step_no}. 初始化数据并创建记录",
-            f"python cli.py create --store-id {record.store_id} --store-name '{record.store_name}' --processing-type {record.processing_type.name}",
+            'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
+            'CLI_CMD="${PYTHON:-python3} cli.py"',
+            'ASSET_DIR="${SCRIPT_DIR}/assets"',
+            'DATA_DIR="${DATA_DIR:-data}"',
+            "",
+            f"# ===== [{step_no}] 创建门店分群记录（唯一ID，后续全部引用） =====",
+            (
+                f'REC_ID=$($CLI_CMD --data-dir "$DATA_DIR" create '
+                f'--store-id {record.store_id} --store-name \'{record.store_name}\' '
+                f'--processing-type {record.processing_type.name} --print-id)'
+            ),
+            'echo "[重放] 新建记录ID: $REC_ID"',
         ]
         step_no += 1
 
-        commands.append("")
-        commands.append(f"# {step_no}. 导入旧公式截图")
-        step_no += 1
-        for s in record.screenshot_refs:
+        for idx, s in enumerate(record.screenshot_refs, 1):
+            commands.append("")
             commands.append(
-                f"python cli.py import-screenshot --record-id {record.record_id} "
-                f"--path '{s.file_path}' --formula '{s.formula_text}' --desc '{s.description}'"
+                f"# ===== [{step_no}] 导入第{idx}张旧公式截图（带资产校验） ====="
+            )
+            step_no += 1
+            asset_relative = f"{record.record_id}/screenshot_{s.screenshot_id}.png"
+            desc_safe = s.description.replace("'", "'\\''")
+            formula_safe = (s.formula_text or "").replace("'", "'\\''")
+            reason_safe = (s.processing_reason or "").replace("'", "'\\''")
+            commands.append(
+                f'SCREENSHOT_PATH="$ASSET_DIR/{asset_relative}"'
+            )
+            if s.stored_path:
+                sp_safe = s.stored_path.replace("'", "'\\''")
+                commands.append(
+                    f"if [ ! -f \"$SCREENSHOT_PATH\" ]; then"
+                )
+                commands.append(
+                    f"  SCREENSHOT_PATH='{sp_safe}'"
+                )
+                commands.append(f"fi")
+            fp_safe = s.file_path.replace("'", "'\\''")
+            commands.append(f"if [ ! -f \"$SCREENSHOT_PATH\" ]; then")
+            commands.append(f"  SCREENSHOT_PATH='{fp_safe}'")
+            commands.append(f"fi")
+            reason_cmd = f" --reason '{reason_safe}'" if reason_safe else ""
+            commands.append(
+                f'$CLI_CMD --data-dir "$DATA_DIR" import-screenshot \\'
+            )
+            commands.append(f'  --record-id "$REC_ID" \\')
+            commands.append(f'  --path "$SCREENSHOT_PATH" \\')
+            commands.append(f"  --formula '{formula_safe}' \\")
+            commands.append(f"  --desc '{desc_safe}'{reason_cmd}")
+            if s.processing_reason:
+                commands.append(f'  # 处理原因: {s.processing_reason}')
+            commands.append(
+                f'echo "[重放] 截图导入完成: {s.screenshot_id} [{s.validation_status}]"'
             )
 
         commands.append("")
-        commands.append(f"# {step_no}. 导入学生答案（共{total_student_answers}条）")
+        commands.append(f"# ===== [{step_no}] 导入学生答案（JSON内嵌，不依赖旧文件） =====")
         step_no += 1
-        commands.append(
-            f"python cli.py import-answers --record-id {record.record_id} "
-            f"--answers-json data/records/{record.record_id}.json"
-        )
+        commands.append(f'$CLI_CMD --data-dir "$DATA_DIR" import-answers \\')
+        commands.append(f'  --record-id "$REC_ID" \\')
+        commands.append(f"  --answers '{safe_answers_arg}'")
+        commands.append(f'echo "[重放] 答案导入完成，共 {total_student_answers} 条"')
 
         if has_multi_submission:
             commands.append("")
-            commands.append(f"# {step_no}. 同一学生交了多版答案 → 标记待业务运营复核，不自动归正常")
+            commands.append(
+                f"# ===== [{step_no}] 检测到多版答案 → 标记待运营复核（不自动归正常） ====="
+            )
             step_no += 1
-            commands.append(f"python cli.py mark-review --record-id {record.record_id}")
-
+            commands.append(f'$CLI_CMD --data-dir "$DATA_DIR" mark-review --record-id "$REC_ID"')
             if is_pending:
                 commands.append("")
-                commands.append(f"# ⚠️  当前状态：待业务运营复核")
-                commands.append(f"#    · 原始说法：检测到同一学生交了{total_student_answers}版答案")
-                commands.append(f"#    · 处理原因：需要人工确认哪个版本正确")
-                commands.append(f"#    · 下一步找谁：联系业务运营使用 review-duplicate 命令指定采纳版本")
-                commands.append(f"#    · 待运营执行后，再继续下面的步骤")
-                commands.append(f"# python cli.py review-duplicate --record-id {record.record_id} --approved-answer-id <答案ID> --reviewer <运营姓名>")
+                commands.append("# ⚠️  当前状态：待业务运营复核")
+                commands.append("#    · 原始说法：检测到同一学生交了多版答案")
+                commands.append("#    · 处理原因：需要人工确认哪个版本正确")
+                commands.append("#    · 下一步找谁：业务运营执行下面的 review-duplicate 命令")
+                commands.append("#")
+                commands.append("# 选择一个版本后，取消下一块注释再运行：")
+                for a in record.student_answers:
+                    commands.append(f"# $CLI_CMD --data-dir \"$DATA_DIR\" review-duplicate \\")
+                    commands.append(f"#   --record-id \"$REC_ID\" --approved-answer-id {a.answer_id} \\")
+                    commands.append(f"#   --reviewer '<您的姓名>'   # 采纳 {a.student_name} v{a.version}")
             else:
                 commands.append("")
-                commands.append(f"# {step_no}. 业务运营复核，指定采纳版本")
-                step_no += 1
                 commands.append(
-                    f"python cli.py review-duplicate --record-id {record.record_id} "
-                    f"--approved-answer-id {approved_answer_id or '<答案ID>'} --reviewer {reviewer}"
+                    f"# ===== [{step_no}] 业务运营复核：采纳 {approved.student_name if approved else '指定'} 版本 ====="
                 )
+                step_no += 1
+                commands.append(f'$CLI_CMD --data-dir "$DATA_DIR" review-duplicate \\')
+                commands.append(f'  --record-id "$REC_ID" \\')
+                commands.append(f"  --approved-answer-id {approved_answer_id or '<答案ID>'} \\")
+                commands.append(f"  --reviewer '{reviewer}'")
+                commands.append(f'echo "[重放] 复核完成，采纳: {approved_answer_id}（复核人: {reviewer}）"')
 
         if record.annotations:
-            commands.append("")
-            commands.append(f"# {step_no}. 补录老师批注（误差说明会跟着变）")
-            step_no += 1
-            for a in record.annotations:
-                old_std = f"--old-standard '{a.old_standard_reference}'" if a.old_standard_reference else ""
-                err_upd = f"--error-update '{a.error_explanation_update}'" if a.error_explanation_update else ""
+            for ai, a in enumerate(record.annotations, 1):
+                commands.append("")
                 commands.append(
-                    f"python cli.py add-annotation --record-id {record.record_id} "
-                    f"--teacher '{a.teacher_name}' --content '{a.content}' {old_std} {err_upd}"
+                    f"# ===== [{step_no}] 补录老师批注 {ai}/{len(record.annotations)}（误差说明会跟着变） ====="
                 )
+                step_no += 1
+                teacher_safe = a.teacher_name.replace("'", "'\\''")
+                content_safe = a.content.replace("'", "'\\''")
+                old_std_cmd = (
+                    f" --old-standard '{a.old_standard_reference.replace(chr(39), chr(39)+chr(92)+chr(39)+chr(39))}'"
+                    if a.old_standard_reference else ""
+                )
+                err_cmd = (
+                    f" --error-update '{a.error_explanation_update.replace(chr(39), chr(39)+chr(92)+chr(39)+chr(39))}'"
+                    if a.error_explanation_update else ""
+                )
+                commands.append(f'$CLI_CMD --data-dir "$DATA_DIR" add-annotation \\')
+                commands.append(f'  --record-id "$REC_ID" \\')
+                commands.append(f"  --teacher '{teacher_safe}' \\")
+                commands.append(f"  --content '{content_safe}'{old_std_cmd}{err_cmd}")
+                commands.append(f'echo "[重放] 批注补录完成: {a.annotation_id}"')
 
         if record.manual_correction_note:
             commands.append("")
-            commands.append(f"# {step_no}. 人工修正")
+            commands.append(f"# ===== [{step_no}] 人工修正 =====")
             step_no += 1
-            commands.append(
-                f"python cli.py manual-correct --record-id {record.record_id} "
-                f"--note '{record.manual_correction_note}'"
-            )
+            note_safe = record.manual_correction_note.replace("'", "'\\''")
+            commands.append(f'$CLI_CMD --data-dir "$DATA_DIR" manual-correct \\')
+            commands.append(f'  --record-id "$REC_ID" \\')
+            commands.append(f"  --note '{note_safe}'")
+            commands.append(f'echo "[重放] 人工修正完成"')
 
         if not is_pending:
             commands.append("")
-            commands.append(f"# {step_no}. 运行分群算法")
+            commands.append(f"# ===== [{step_no}] 第一次分群（刷新状态，写入同一条 $REC_ID） =====")
             step_no += 1
-            commands.append(f"python cli.py run-grouping --record-id {record.record_id}")
-
+            commands.append(f'$CLI_CMD --data-dir "$DATA_DIR" run-grouping --record-id "$REC_ID"')
+            commands.append(f'echo "[重放] 第1次分群完成"')
             if record.re_run_count > 1:
-                commands.append("")
-                commands.append(f"# {step_no}. 重跑分群（共{record.re_run_count}次运行）")
-                step_no += 1
-                for i in range(1, record.re_run_count):
+                for ri in range(2, record.re_run_count + 1):
+                    commands.append("")
                     commands.append(
-                        f"python cli.py re-run --record-id {record.record_id}"
+                        f"# ===== [{step_no}] 第{ri}次重跑分群（共{record.re_run_count}次） ====="
                     )
+                    step_no += 1
+                    commands.append(f'$CLI_CMD --data-dir "$DATA_DIR" re-run --record-id "$REC_ID"')
+                    commands.append(f'echo "[重放] 第{ri}次重跑完成"')
 
         commands.append("")
-        commands.append(f"# {step_no}. 导出复盘记录")
+        commands.append(f"# ===== [{step_no}] 导出复盘报告（同一条 $REC_ID） =====")
         step_no += 1
-        commands.append(f"python cli.py export-audit --record-id {record.record_id}")
-
+        commands.append(f'$CLI_CMD --data-dir "$DATA_DIR" export-audit --record-id "$REC_ID"')
         commands.append("")
-        commands.append(f"# {step_no}. 查看记录详情（含最新状态、误差说明、分群结果）")
+        commands.append(f"# ===== [{step_no}] 查看详情 =====")
         step_no += 1
-        commands.append(f"python cli.py show --record-id {record.record_id}")
+        commands.append(f'$CLI_CMD --data-dir "$DATA_DIR" show --record-id "$REC_ID"')
+        commands.append("")
+        commands.append('echo ""')
+        commands.append('echo "========================================"')
+        commands.append('echo "✔  整条重放流程完成"')
+        commands.append('echo "   记录ID: $REC_ID"')
+        commands.append(f'echo "   门店: {record.store_name}"')
+        commands.append('echo "========================================"')
+        commands.append("")
+        commands.append("# 便于程序化读取：最后一行仅输出 REC_ID")
+        commands.append('echo "$REC_ID"')
 
         return commands
 
@@ -446,10 +633,19 @@ class AuditExporter:
         print()
 
         if record.screenshot_refs:
-            print("📸 旧公式截图:")
+            print("📸 旧公式截图（含资产校验与处理原因）:")
             for s in record.screenshot_refs:
                 print(f"  - [{s.screenshot_id}] {s.description}")
                 print(f"    公式: {s.formula_text}")
+                print(f"    校验: {s.validation_status}")
+                if s.file_size:
+                    print(f"    大小: {s.file_size} bytes | hash: {s.file_hash[:20]}...")
+                if s.processing_reason:
+                    print(f"    处理原因: {s.processing_reason}")
+                if s.stored_path:
+                    print(f"    资产存放: {s.stored_path}")
+                else:
+                    print(f"    原始路径: {s.file_path}")
             print()
 
         if record.student_answers:

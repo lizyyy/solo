@@ -26,12 +26,17 @@ class ProcessingType(str, Enum):
 
 @dataclass
 class ScreenshotReference:
-    """旧公式截图引用"""
+    """旧公式截图引用 - 含真实资产校验"""
     screenshot_id: str
     file_path: str
     description: str
     imported_at: datetime
     formula_text: Optional[str] = None
+    file_hash: Optional[str] = None
+    file_size: Optional[int] = None
+    stored_path: Optional[str] = None
+    validation_status: str = "未校验"
+    processing_reason: Optional[str] = None
 
 
 @dataclass

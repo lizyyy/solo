@@ -125,7 +125,12 @@ class DataStore:
                     "file_path": s.file_path,
                     "description": s.description,
                     "imported_at": s.imported_at.isoformat() if isinstance(s.imported_at, datetime) else s.imported_at,
-                    "formula_text": s.formula_text
+                    "formula_text": s.formula_text,
+                    "file_hash": s.file_hash,
+                    "file_size": s.file_size,
+                    "stored_path": s.stored_path,
+                    "validation_status": s.validation_status,
+                    "processing_reason": s.processing_reason
                 } for s in record.screenshot_refs
             ],
             "error_explanation": {
@@ -193,7 +198,12 @@ class DataStore:
                 file_path=s["file_path"],
                 description=s["description"],
                 imported_at=datetime.fromisoformat(s["imported_at"]),
-                formula_text=s.get("formula_text")
+                formula_text=s.get("formula_text"),
+                file_hash=s.get("file_hash"),
+                file_size=s.get("file_size"),
+                stored_path=s.get("stored_path"),
+                validation_status=s.get("validation_status", "未校验"),
+                processing_reason=s.get("processing_reason")
             ) for s in data.get("screenshot_refs", [])
         ]
 

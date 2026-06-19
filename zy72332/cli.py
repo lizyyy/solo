@@ -59,7 +59,10 @@ class StoreGroupingCLI:
             processing_type=ptype,
             operator=args.operator
         )
-        print(f"✅ 创建记录成功: {record.record_id} ({record.store_name})")
+        if args.print_id:
+            print(record.record_id)
+        else:
+            print(f"✅ 创建记录成功: {record.record_id} ({record.store_name})")
         return 0
 
     def cmd_import_screenshot(self, args):
@@ -70,10 +73,18 @@ class StoreGroupingCLI:
                 screenshot_path=args.path,
                 formula_text=args.formula,
                 description=args.desc,
-                operator=args.operator
+                operator=args.operator,
+                processing_reason=args.reason,
+                create_asset_if_missing=not args.no_create_asset
             )
             print(f"✅ 导入截图成功: {screenshot.screenshot_id}")
             print(f"   描述: {screenshot.description}")
+            print(f"   资产校验: {screenshot.validation_status}")
+            print(f"   文件hash: {screenshot.file_hash[:16]}...")
+            print(f"   文件大小: {screenshot.file_size} bytes")
+            print(f"   存放到: {screenshot.stored_path}")
+            if screenshot.processing_reason:
+                print(f"   处理原因: {screenshot.processing_reason}")
             return 0
         except ValueError as e:
             print(f"❌ {e}")
@@ -412,6 +423,8 @@ def main():
     p_create.add_argument("--processing-type", required=True,
                           choices=[t.name for t in ProcessingType], help="处理类型")
     p_create.add_argument("--operator", default="小祁", help="操作人")
+    p_create.add_argument("--print-id", action="store_true",
+                          help="仅输出新记录的ID（用于shell脚本串联$REC_ID）")
     p_create.set_defaults(func="cmd_create")
 
     p_shot = subparsers.add_parser("import-screenshot", help="导入旧公式截图")
@@ -420,6 +433,9 @@ def main():
     p_shot.add_argument("--formula", required=True, help="公式文本")
     p_shot.add_argument("--desc", required=True, help="描述")
     p_shot.add_argument("--operator", default="小祁", help="操作人")
+    p_shot.add_argument("--reason", help="处理原因（例如：业务运营晚上催结果翻到旧公式）")
+    p_shot.add_argument("--no-create-asset", action="store_true",
+                        help="文件不存在时不自动创建演示资产")
     p_shot.set_defaults(func="cmd_import_screenshot")
 
     p_ans = subparsers.add_parser("import-answers", help="导入学生答案")
