@@ -1,4 +1,4 @@
-import { Edit3, User, ArrowRight, Sparkles } from 'lucide-react';
+import { Edit3, User, ArrowRight, Sparkles, Upload, MousePointer } from 'lucide-react';
 import type { NoteHistory } from '@/types';
 import { diffContent, formatDateTime } from '@/utils';
 
@@ -41,7 +41,23 @@ export default function NoteHistoryList({ histories, onLocate }: NoteHistoryList
                     <User className="w-3 h-3" />
                     {history.operatorName}
                   </div>
+                  <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                    history.source === 'import'
+                      ? 'bg-violet-100 text-violet-700'
+                      : 'bg-slate-100 text-slate-700'
+                  }`}>
+                    {history.source === 'import' ? (
+                      <><Upload className="w-3 h-3" />导入触发</>
+                    ) : (
+                      <><MousePointer className="w-3 h-3" />手动修改</>
+                    )}
+                  </div>
                   <span className="text-xs text-primary-400 font-mono">{history.id}</span>
+                  {history.importSessionId && (
+                    <span className="text-xs text-violet-500 font-mono">
+                      会话: {history.importSessionId}
+                    </span>
+                  )}
                   <span className="text-xs text-primary-400">
                     {formatDateTime(history.modifiedAt)}
                   </span>

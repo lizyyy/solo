@@ -14,6 +14,8 @@ import type {
   ImportSourceType,
   TicketType,
   ExportBundle,
+  ParsedPhotoRow,
+  ParsedTicketRow,
 } from '@/types';
 import {
   mockBatches,
@@ -25,7 +27,7 @@ import {
   mockCalcParams,
   mockImportSessions,
 } from '@/data/mockData';
-import { detectMixedType, countByType, generateId, generateHash } from '@/utils';
+import { detectMixedType, countByType, generateId, generateHash, generateMaterialFingerprint } from '@/utils';
 
 type AttendanceInput = { name: string; type: TicketType; sourcePhotoRef: string; remark?: string };
 type TicketInput = { ticketNo: string; type: TicketType; purchaser: string; sourceExportRef: string };
@@ -128,7 +130,13 @@ export const useAppStore = create<AppState>()(
         const state = get();
         const sessionId = `sess-${generateId()}`;
         const now = new Date().toISOString();
-        const fileHash = generateHash(fileContent + fileName);
+        const materialFingerprint = generateMaterialFingerprint('photo', fileContent);
+
+        const priorSessions = state.importSessions.filter(
+          (s) => s.batchId === batchId && s.sourceType === 'photo' && s.materialFingerprint === materialFingerprint
+        );
+        const isResameMaterialImport = priorSessions.length > 0;
+        const priorSessionId = priorSessions.length > 0 ? priorSessions[priorSessions.length - 1].id : undefined;
 
         const existingRecords = state.attendanceRecords.filter((r) => r.batchId === batchId);
         const existingDedupMap = new Map(
@@ -139,6 +147,7 @@ export const useAppStore = create<AppState>()(
         const details: ImportDetailItem[] = [];
         const newRecordsToAdd: AttendanceRecord[] = [];
         const recordsToUpdate: AttendanceRecord[] = [];
+        const noteHistoriesToAdd: NoteHistory[] = [];
 
         let newCount = 0;
         let dupThis = 0;
@@ -164,20 +173,45 @@ export const useAppStore = create<AppState>()(
 
           const existing = existingDedupMap.get(dedupKey);
           if (existing) {
-            if (row.remark && row.remark !== existing.remark) {
+            const oldRemark = existing.remark || '';
+            const newRemark = row.remark || '';
+            if (newRemark && newRemark !== oldRemark) {
               updatedCount++;
               recordsToUpdate.push({
                 ...existing,
-                remark: row.remark,
+                remark: newRemark,
                 updatedAt: now,
               });
+
+              const affected: string[] = ['remark'];
+              if (newRemark.includes('赠票') || oldRemark.includes('赠票')) {
+                affected.push('赠票来源统计');
+              }
+              if (newRemark.includes('媒体') || newRemark.includes('员工') || newRemark.includes('合作')) {
+                affected.push('报表分类汇总');
+              }
+
+              noteHistoriesToAdd.push({
+                id: `nh-${generateId()}`,
+                batchId,
+                recordId: existing.id,
+                oldContent: oldRemark,
+                newContent: newRemark,
+                modifiedBy: state.currentRole,
+                modifiedAt: now,
+                affectedResultFields: affected,
+                operatorName: state.currentRole === 'copyright' ? '版权运营小鹿' : '录音师',
+                source: 'import',
+                importSessionId: sessionId,
+              });
+
               details.push({
                 lineNo,
                 dedupKey,
                 displayName: row.name,
                 status: 'updated',
                 existingRecordId: existing.id,
-                message: `历史已有记录，但备注已更新：${existing.remark || '(空)'} → ${row.remark}`,
+                message: `历史已有记录，但备注已更新：${oldRemark || '(空)'} → ${newRemark}`,
               });
               return;
             }
@@ -231,7 +265,8 @@ export const useAppStore = create<AppState>()(
           batchId,
           sourceType: 'photo',
           fileName,
-          fileHash,
+          fileContent,
+          materialFingerprint,
           importedBy: state.currentRole,
           importedAt: now,
           totalInputCount: rows.length,
@@ -241,13 +276,15 @@ export const useAppStore = create<AppState>()(
           updatedCount,
           details,
           calcParamsVersion: state.calcParams.version,
+          isResameMaterialImport,
+          priorSessionId,
         };
 
         let updatedBatch = state.batches.map((b) =>
           b.id === batchId
             ? {
                 ...b,
-                attendancePhotoHash: fileHash,
+                attendancePhotoHash: materialFingerprint,
                 hasMixedType: hasMixed,
                 totalCount,
                 freeTicketCount: counts.free,
@@ -289,7 +326,7 @@ export const useAppStore = create<AppState>()(
             id: `alert-${generateId()}`,
             batchId,
             title: '存在赠票与售票混批，需要录音师复核',
-            reason: `导入会话 ${sessionId} 本批次共 ${totalCount} 人，其中赠票 ${counts.free} 人、售票 ${counts.paid} 人，两种类型混合。已按要求不归为正常，留待录音师复核。本次新增 ${newCount} 条，历史重复 ${dupHistory} 条，本次内部重复 ${dupThis} 条，备注更新 ${updatedCount} 条。`,
+            reason: `导入会话 ${sessionId}${isResameMaterialImport ? `（同材料重复导入，源自 ${priorSessionId}）` : ''} 本批次共 ${totalCount} 人，其中赠票 ${counts.free} 人、售票 ${counts.paid} 人，两种类型混合。已按要求不归为正常，留待录音师复核。本次新增 ${newCount} 条，历史重复 ${dupHistory} 条，本次内部重复 ${dupThis} 条，备注更新 ${updatedCount} 条。`,
             missingMaterials: [
               ...(counts.free > 0 ? [`赠票(${counts.free}人)需标注来源渠道并补盖章确认函`] : []),
               '需核对票务导出表与签到照片是否一一对应',
@@ -321,6 +358,7 @@ export const useAppStore = create<AppState>()(
             ...newRecordsToAdd,
           ],
           importSessions: [...s.importSessions, session],
+          noteHistories: [...s.noteHistories, ...noteHistoriesToAdd],
           batches: updatedBatch,
           processSteps: updatedProcessSteps,
           authorizationAlerts: updatedAlerts,
@@ -336,7 +374,13 @@ export const useAppStore = create<AppState>()(
         const state = get();
         const sessionId = `sess-${generateId()}`;
         const now = new Date().toISOString();
-        const fileHash = generateHash(fileContent + fileName);
+        const materialFingerprint = generateMaterialFingerprint('ticket', fileContent);
+
+        const priorSessions = state.importSessions.filter(
+          (s) => s.batchId === batchId && s.sourceType === 'ticket' && s.materialFingerprint === materialFingerprint
+        );
+        const isResameMaterialImport = priorSessions.length > 0;
+        const priorSessionId = priorSessions.length > 0 ? priorSessions[priorSessions.length - 1].id : undefined;
 
         const existingTickets = state.ticketRecords.filter((r) => r.batchId === batchId);
         const existingDedup = new Map(existingTickets.map((t) => [t.dedupKey, t]));
@@ -406,7 +450,8 @@ export const useAppStore = create<AppState>()(
           batchId,
           sourceType: 'ticket',
           fileName,
-          fileHash,
+          fileContent,
+          materialFingerprint,
           importedBy: state.currentRole,
           importedAt: now,
           totalInputCount: rows.length,
@@ -416,13 +461,15 @@ export const useAppStore = create<AppState>()(
           updatedCount: 0,
           details,
           calcParamsVersion: state.calcParams.version,
+          isResameMaterialImport,
+          priorSessionId,
         };
 
         set((s) => ({
           ticketRecords: [...s.ticketRecords, ...newTickets],
           importSessions: [...s.importSessions, session],
           batches: s.batches.map((b) =>
-            b.id === batchId ? { ...b, ticketExportHash: fileHash, updatedAt: now } : b
+            b.id === batchId ? { ...b, ticketExportHash: materialFingerprint, updatedAt: now } : b
           ),
           processSteps: s.processSteps.map((p) =>
             p.batchId === batchId
@@ -439,7 +486,7 @@ export const useAppStore = create<AppState>()(
               ? {
                   ...a,
                   assignee: 'recorder' as UserRole,
-                  nextStep: `票务导出表已通过会话 ${sessionId} 补入（新增${newCount}条/历史重复${dupHistory}条/内部重复${dupThis}条）。请录音师在10分钟内完成混批复核并授权。`,
+                  nextStep: `票务导出表已通过会话 ${sessionId}${isResameMaterialImport ? `（同材料重复导入，源自 ${priorSessionId}）` : ''} 补入（新增${newCount}条/历史重复${dupHistory}条/内部重复${dupThis}条）。请录音师在10分钟内完成混批复核并授权。`,
                 }
               : a
           ),
@@ -477,6 +524,7 @@ export const useAppStore = create<AppState>()(
           modifiedAt: now,
           affectedResultFields: affected,
           operatorName: modifiedBy === 'copyright' ? '版权运营小鹿' : '录音师',
+          source: 'manual',
         };
 
         set((s) => ({
@@ -607,6 +655,8 @@ export const useAppStore = create<AppState>()(
       exportAttendanceCSV(batchId) {
         const s = get();
         const records = s.getAttendanceByBatchId(batchId);
+        const sessions = s.getImportSessionsByBatchId(batchId);
+        const sessionMap = new Map(sessions.map(sess => [sess.id, sess]));
         const headers = [
           '记录ID',
           '姓名',
@@ -615,11 +665,14 @@ export const useAppStore = create<AppState>()(
           '备注',
           '去重Key',
           '导入会话ID',
+          '材料指纹',
+          '导入时间',
           '创建时间',
           '更新时间',
         ];
         const lines = [headers.join(',')];
         records.forEach((r) => {
+          const session = r.importSessionId ? sessionMap.get(r.importSessionId) : undefined;
           const row = [
             r.id,
             r.name,
@@ -628,6 +681,8 @@ export const useAppStore = create<AppState>()(
             `"${(r.remark || '').replace(/"/g, '""')}"`,
             r.dedupKey,
             r.importSessionId || '',
+            session?.materialFingerprint || '',
+            session?.importedAt || '',
             r.createdAt,
             r.updatedAt,
           ];

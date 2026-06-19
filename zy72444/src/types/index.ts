@@ -6,6 +6,22 @@ export type UserRole = 'recorder' | 'copyright';
 
 export type ImportResultStatus = 'new' | 'duplicate-this-session' | 'duplicate-history' | 'updated';
 
+export type MaterialSource = 'photo' | 'ticket';
+
+export interface ParsedPhotoRow {
+  name: string;
+  type: TicketType;
+  sourcePhotoRef: string;
+  remark?: string;
+}
+
+export interface ParsedTicketRow {
+  ticketNo: string;
+  type: TicketType;
+  purchaser: string;
+  sourceExportRef: string;
+}
+
 export interface Batch {
   id: string;
   name: string;
@@ -55,6 +71,8 @@ export interface NoteHistory {
   modifiedAt: string;
   affectedResultFields: string[];
   operatorName: string;
+  source: 'manual' | 'import';
+  importSessionId?: string;
 }
 
 export interface AuthorizationAlert {
@@ -114,7 +132,8 @@ export interface ImportSession {
   batchId: string;
   sourceType: ImportSourceType;
   fileName: string;
-  fileHash: string;
+  fileContent: string;
+  materialFingerprint: string;
   importedBy: UserRole;
   importedAt: string;
   totalInputCount: number;
@@ -124,6 +143,8 @@ export interface ImportSession {
   updatedCount: number;
   details: ImportDetailItem[];
   calcParamsVersion: string;
+  isResameMaterialImport: boolean;
+  priorSessionId?: string;
 }
 
 export interface ExportBundle {

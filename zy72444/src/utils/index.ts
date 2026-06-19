@@ -1,4 +1,4 @@
-import type { AttendanceRecord, DiffSegment, TicketType } from '@/types';
+import type { AttendanceRecord, DiffSegment, TicketType, ParsedPhotoRow, ParsedTicketRow } from '@/types';
 
 export const generateHash = (content: string): string => {
   let hash = 0;
@@ -8,6 +8,12 @@ export const generateHash = (content: string): string => {
     hash = hash & hash;
   }
   return Math.abs(hash).toString(16).padStart(8, '0');
+};
+
+export const generateMaterialFingerprint = (sourceType: 'photo' | 'ticket', content: string): string => {
+  const normalized = content.trim().replace(/\r\n/g, '\n').replace(/\s+/g, ' ');
+  const hash = generateHash(normalized);
+  return `mat-${sourceType}-${hash}`;
 };
 
 export const detectMixedType = (records: AttendanceRecord[]): boolean => {
@@ -119,4 +125,96 @@ export const getRoleLabel = (role: 'recorder' | 'copyright'): string => {
 
 export const generateId = (): string => {
   return Math.random().toString(36).substring(2, 11);
+};
+
+const parseCSVLine = (line: string): string[] => {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (c === ',' && !inQuotes) {
+      result.push(current.trim());
+      current = '';
+    } else {
+      current += c;
+    }
+  }
+  result.push(current.trim());
+  return result;
+};
+
+export const parsePhotoCSV = (content: string): ParsedPhotoRow[] => {
+  const lines = content.trim().split('\n').filter(l => l.trim());
+  if (lines.length === 0) return [];
+
+  const headers = parseCSVLine(lines[0].toLowerCase());
+  const nameIdx = headers.findIndex(h => h.includes('姓名') || h.includes('name'));
+  const typeIdx = headers.findIndex(h => h.includes('类型') || h.includes('票种') || h.includes('type'));
+  const refIdx = headers.findIndex(h => h.includes('位置') || h.includes('照片') || h.includes('ref') || h.includes('photo'));
+  const remarkIdx = headers.findIndex(h => h.includes('备注') || h.includes('remark') || h.includes('说明'));
+
+  if (nameIdx === -1) {
+    return lines.slice(1).map((line, i) => {
+      const cols = parseCSVLine(line);
+      return {
+        name: cols[0] || `学员${i + 1}`,
+        type: (cols[1]?.includes('赠') || cols[1]?.includes('free') ? 'free' : 'paid') as TicketType,
+        sourcePhotoRef: cols[2] || `row-${i + 1}`,
+        remark: cols[3] || '',
+      };
+    });
+  }
+
+  return lines.slice(1).map((line) => {
+    const cols = parseCSVLine(line);
+    const typeStr = (cols[typeIdx] || '').toLowerCase();
+    return {
+      name: cols[nameIdx] || '',
+      type: (typeStr.includes('赠') || typeStr.includes('free') ? 'free' : 'paid') as TicketType,
+      sourcePhotoRef: cols[refIdx] || '',
+      remark: cols[remarkIdx] || '',
+    };
+  }).filter(r => r.name);
+};
+
+export const parseTicketCSV = (content: string): ParsedTicketRow[] => {
+  const lines = content.trim().split('\n').filter(l => l.trim());
+  if (lines.length === 0) return [];
+
+  const headers = parseCSVLine(lines[0].toLowerCase());
+  const noIdx = headers.findIndex(h => h.includes('票号') || h.includes('ticket') || h.includes('no'));
+  const typeIdx = headers.findIndex(h => h.includes('类型') || h.includes('票种') || h.includes('type'));
+  const purchaserIdx = headers.findIndex(h => h.includes('购票人') || h.includes('purchaser') || h.includes('姓名'));
+  const refIdx = headers.findIndex(h => h.includes('位置') || h.includes('ref') || h.includes('行号'));
+
+  if (noIdx === -1) {
+    return lines.slice(1).map((line, i) => {
+      const cols = parseCSVLine(line);
+      return {
+        ticketNo: cols[0] || `T${i + 1}`,
+        type: (cols[1]?.includes('赠') || cols[1]?.includes('free') ? 'free' : 'paid') as TicketType,
+        purchaser: cols[2] || '',
+        sourceExportRef: cols[3] || `row-${i + 1}`,
+      };
+    });
+  }
+
+  return lines.slice(1).map((line) => {
+    const cols = parseCSVLine(line);
+    const typeStr = (cols[typeIdx] || '').toLowerCase();
+    return {
+      ticketNo: cols[noIdx] || '',
+      type: (typeStr.includes('赠') || typeStr.includes('free') ? 'free' : 'paid') as TicketType,
+      purchaser: cols[purchaserIdx] || '',
+      sourceExportRef: cols[refIdx] || '',
+    };
+  }).filter(r => r.ticketNo);
 };

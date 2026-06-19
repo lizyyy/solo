@@ -100,6 +100,7 @@ export const mockNoteHistories: NoteHistory[] = [
     modifiedAt: '2024-03-15T11:20:00Z',
     affectedResultFields: ['remark', '赠票来源统计'],
     operatorName: '版权运营小鹿',
+    source: 'manual',
   },
   {
     id: 'nh-002',
@@ -111,6 +112,7 @@ export const mockNoteHistories: NoteHistory[] = [
     modifiedAt: '2024-03-15T11:25:00Z',
     affectedResultFields: ['remark', '赠票来源统计'],
     operatorName: '版权运营小鹿',
+    source: 'manual',
   },
 ];
 
@@ -183,7 +185,8 @@ export const mockImportSessions: ImportSession[] = [
     batchId: 'batch-001',
     sourceType: 'photo',
     fileName: '第3周签到照片-0315.jpg',
-    fileHash: 'abc123xyz',
+    fileContent: 'photo-mock-content-batch001-week3',
+    materialFingerprint: 'mat-photo-w3-20240315',
     importedBy: 'copyright',
     importedAt: '2024-03-15T09:05:00Z',
     totalInputCount: 24,
@@ -192,6 +195,7 @@ export const mockImportSessions: ImportSession[] = [
     duplicateHistoryCount: 0,
     updatedCount: 0,
     calcParamsVersion: 'v1.2.0',
+    isResameMaterialImport: false,
     details: mockAttendanceRecords.map((r, i) => ({
       lineNo: i + 1,
       dedupKey: r.dedupKey,
@@ -206,7 +210,8 @@ export const mockImportSessions: ImportSession[] = [
     batchId: 'batch-001',
     sourceType: 'ticket',
     fileName: '票务导出-2024W11.xlsx',
-    fileHash: 'def456uvw',
+    fileContent: 'ticket-mock-content-batch001-w11',
+    materialFingerprint: 'mat-ticket-2024w11',
     importedBy: 'copyright',
     importedAt: '2024-03-15T11:30:00Z',
     totalInputCount: 4,
@@ -215,6 +220,7 @@ export const mockImportSessions: ImportSession[] = [
     duplicateHistoryCount: 0,
     updatedCount: 0,
     calcParamsVersion: 'v1.2.0',
+    isResameMaterialImport: false,
     details: mockTicketRecords.map((r, i) => ({
       lineNo: i + 1,
       dedupKey: r.dedupKey,

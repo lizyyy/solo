@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react';
-import { Upload, Image, FileSpreadsheet, CheckCircle, AlertTriangle, Repeat, Sparkles, FileDown, FolderOpen } from 'lucide-react';
+import { Upload, Image, FileSpreadsheet, CheckCircle, AlertTriangle, Repeat, Sparkles, FileDown, FolderOpen, Fingerprint, RefreshCw } from 'lucide-react';
 import { useAppStore } from '@/stores/useAppStore';
-import type { ImportSession, ImportResultStatus, TicketType } from '@/types';
-import { formatDateTime } from '@/utils';
+import type { ImportSession, ImportResultStatus, TicketType, ParsedPhotoRow, ParsedTicketRow } from '@/types';
+import { formatDateTime, parsePhotoCSV, parseTicketCSV, generateMaterialFingerprint } from '@/utils';
 
 interface ImportPanelProps {
   batchId: string;
@@ -19,21 +19,19 @@ const statusStyle: Record<ImportResultStatus, { label: string; iconBg: string; i
   updated: { label: '备注已更新', iconBg: 'bg-violet-100', icon: '✎', text: 'text-violet-800', dot: 'bg-violet-500' },
 };
 
-const samplePhotoRowsTemplate = [
-  { name: '钱小乐', type: 'paid' as TicketType, sourcePhotoRef: 'A-row1-1', remark: '' },
-  { name: '钱小乐', type: 'paid' as TicketType, sourcePhotoRef: 'A-row1-1', remark: '' }, // 本次重复
-  { name: '孙小丽', type: 'free' as TicketType, sourcePhotoRef: 'photo-row-3-col-1', remark: '' }, // 历史重复
-  { name: '李小红', type: 'free' as TicketType, sourcePhotoRef: 'photo-row-1-col-2', remark: '赠票-合作机构(补录来源)' }, // 历史存在但备注不同
-  { name: '金小悦', type: 'paid' as TicketType, sourcePhotoRef: 'A-row1-2', remark: '' }, // 新增
-  { name: '魏小宁', type: 'free' as TicketType, sourcePhotoRef: 'A-row2-1', remark: '赠票-媒体' }, // 新增
-];
+const STANDARD_SAMPLE_PHOTO_CSV = `姓名,类型,照片位置,备注
+钱小乐,售票,A-row1-1,
+钱小乐,售票,A-row1-1,
+孙小丽,赠票,photo-row-3-col-1,
+李小红,赠票,photo-row-1-col-2,赠票-合作机构(补录来源)
+金小悦,售票,A-row1-2,
+魏小宁,赠票,A-row2-1,赠票-媒体`;
 
-const sampleTicketRowsTemplate = [
-  { ticketNo: 'T20240315009', type: 'paid' as TicketType, purchaser: '金先生', sourceExportRef: 'e-r9' },
-  { ticketNo: 'T20240315009', type: 'paid' as TicketType, purchaser: '金先生(重复)', sourceExportRef: 'e-r9' },
-  { ticketNo: 'T20240315001', type: 'paid' as TicketType, purchaser: '张先生', sourceExportRef: 'e-r2' },
-  { ticketNo: 'F20240315005', type: 'free' as TicketType, purchaser: '媒体伙伴B', sourceExportRef: 'e-r10' },
-];
+const STANDARD_SAMPLE_TICKET_CSV = `票号,类型,购票人,导出位置
+T20240315009,售票,金先生,e-r9
+T20240315009,售票,金先生(重复),e-r9
+T20240315001,售票,张先生,e-r2
+F20240315005,赠票,媒体伙伴B,e-r10`;
 
 export default function ImportPanel({ batchId, type, onImported }: ImportPanelProps) {
   const { importAttendanceFromFile, importTicketsFromFile, currentRole } = useAppStore();
@@ -41,19 +39,39 @@ export default function ImportPanel({ batchId, type, onImported }: ImportPanelPr
   const [stage, setStage] = useState<Stage>('idle');
   const [lastSession, setLastSession] = useState<ImportSession | null>(null);
   const [chosenFile, setChosenFile] = useState<{ name: string; content: string } | null>(null);
+  const [parseError, setParseError] = useState<string | null>(null);
 
-  const runImport = async (fileName: string, content: string, sampleMode: boolean) => {
+  const runImport = async (fileName: string, content: string) => {
     setStage('parsing');
-    await new Promise((r) => setTimeout(r, 600));
+    setParseError(null);
+    await new Promise((r) => setTimeout(r, 400));
+
     let session: ImportSession;
-    if (type === 'photo') {
-      session = importAttendanceFromFile(batchId, fileName, content, samplePhotoRowsTemplate).session;
-    } else {
-      session = importTicketsFromFile(batchId, fileName, content, sampleTicketRowsTemplate).session;
+    try {
+      if (type === 'photo') {
+        const rows = parsePhotoCSV(content);
+        if (rows.length === 0) {
+          setParseError('未能从文件中解析出签到记录，请检查文件格式');
+          setStage('idle');
+          return;
+        }
+        session = importAttendanceFromFile(batchId, fileName, content, rows).session;
+      } else {
+        const rows = parseTicketCSV(content);
+        if (rows.length === 0) {
+          setParseError('未能从文件中解析出票务记录，请检查文件格式');
+          setStage('idle');
+          return;
+        }
+        session = importTicketsFromFile(batchId, fileName, content, rows).session;
+      }
+      setLastSession(session);
+      setStage('done');
+      onImported?.(session);
+    } catch (e) {
+      setParseError(`解析失败：${e instanceof Error ? e.message : '未知错误'}`);
+      setStage('idle');
     }
-    setLastSession(session);
-    setStage('done');
-    onImported?.(session);
   };
 
   const onFilePick = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,29 +81,31 @@ export default function ImportPanel({ batchId, type, onImported }: ImportPanelPr
     reader.onload = () => {
       const content = String(reader.result || '');
       setChosenFile({ name: f.name, content });
-      runImport(f.name, content, false);
+      runImport(f.name, content);
     };
     reader.readAsText(f);
   };
 
   const onRunSample = () => {
-    const stamp = Date.now().toString(36);
-    const sampleName =
-      type === 'photo'
-        ? `样例签到_${stamp}.jpg`
-        : `样例票务_${stamp}.xlsx`;
-    const content =
-      type === 'photo'
-        ? 'photo-sample::' + stamp
-        : 'ticket-sample::' + stamp;
-    setChosenFile({ name: sampleName, content });
-    runImport(sampleName, content, true);
+    const content = type === 'photo' ? STANDARD_SAMPLE_PHOTO_CSV : STANDARD_SAMPLE_TICKET_CSV;
+    const fileName = type === 'photo' ? '样例签到照片数据.csv' : '样例票务导出数据.csv';
+    setChosenFile({ name: fileName, content });
+    runImport(fileName, content);
+  };
+
+  const onReimportSameMaterial = () => {
+    if (!chosenFile) {
+      onRunSample();
+      return;
+    }
+    runImport(chosenFile.name, chosenFile.content);
   };
 
   const reset = () => {
     setStage('idle');
     setLastSession(null);
     setChosenFile(null);
+    setParseError(null);
     if (fileRef.current) fileRef.current.value = '';
   };
 
@@ -113,11 +133,18 @@ export default function ImportPanel({ batchId, type, onImported }: ImportPanelPr
               {chosenFile
                 ? `已选择: ${chosenFile.name}`
                 : type === 'photo'
-                ? '支持 JPG/PNG 或 一键跑样例(包含新增/本次重复/历史重复/备注更新四种场景)'
-                : '支持 CSV/XLSX 或 一键跑样例(四种去重场景)'}
+                ? '支持 CSV/TXT 解析导入，或一键跑样例（含新增/本次重复/历史重复/备注更新四种场景）'
+                : '支持 CSV/TXT 解析导入，或一键跑样例（四种去重场景）'}
             </p>
           </div>
         </div>
+
+        {parseError && (
+          <div className="mt-3 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+            {parseError}
+          </div>
+        )}
 
         {stage === 'idle' && (
           <div className="mt-4 grid grid-cols-3 gap-2">
@@ -136,7 +163,7 @@ export default function ImportPanel({ batchId, type, onImported }: ImportPanelPr
               <span className="text-xs font-medium">跑样例(含重复)</span>
             </button>
             <button
-              onClick={onRunSample}
+              onClick={onReimportSameMaterial}
               className="flex flex-col items-center gap-2 py-3 px-2 rounded-xl bg-sky-50 text-sky-700 hover:bg-sky-100 transition-colors border border-sky-100"
             >
               <Repeat className="w-5 h-5" />
@@ -146,7 +173,7 @@ export default function ImportPanel({ batchId, type, onImported }: ImportPanelPr
               ref={fileRef}
               type="file"
               className="hidden"
-              accept={type === 'photo' ? 'image/*,.csv,.txt' : '.csv,.xlsx,.txt,image/*'}
+              accept={type === 'photo' ? '.csv,.txt,.tsv' : '.csv,.xlsx,.txt,.tsv'}
               onChange={onFilePick}
             />
           </div>
@@ -155,7 +182,7 @@ export default function ImportPanel({ batchId, type, onImported }: ImportPanelPr
         {stage === 'parsing' && (
           <div className="mt-5 flex items-center gap-3 text-primary-600">
             <Upload className="w-5 h-5 animate-bounce" />
-            <span className="text-sm font-medium">正在解析并执行去重判断…</span>
+            <span className="text-sm font-medium">正在解析文件并执行去重判断…</span>
           </div>
         )}
 
@@ -166,9 +193,20 @@ export default function ImportPanel({ batchId, type, onImported }: ImportPanelPr
                 <CheckCircle className="w-3.5 h-3.5" />
                 导入完成 · 会话 {lastSession.id}
               </span>
+              {lastSession.isResameMaterialImport && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-medium">
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  同材料重复导入
+                </span>
+              )}
               <span className="text-xs text-primary-400">
-                {formatDateTime(lastSession.importedAt)} · 参数版本 {lastSession.calcParamsVersion}
+                {formatDateTime(lastSession.importedAt)} · 参数 {lastSession.calcParamsVersion}
               </span>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs text-primary-500 bg-primary-50 px-3 py-2 rounded-lg">
+              <Fingerprint className="w-4 h-4 flex-shrink-0 text-primary-400" />
+              <span className="font-mono">材料指纹: {lastSession.materialFingerprint}</span>
             </div>
 
             <div className="grid grid-cols-4 gap-2 text-center text-xs">
@@ -191,6 +229,13 @@ export default function ImportPanel({ batchId, type, onImported }: ImportPanelPr
                 <p className="text-amber-600">本次内部重复</p>
               </div>
             </div>
+
+            {lastSession.updatedCount > 0 && (
+              <div className="p-2 rounded-lg bg-violet-50 text-center">
+                <p className="font-bold text-lg text-violet-700">{lastSession.updatedCount}</p>
+                <p className="text-violet-600 text-xs">备注已更新（已记入备注变更历史）</p>
+              </div>
+            )}
 
             <div className="max-h-64 overflow-auto rounded-xl border border-primary-100 divide-y divide-primary-50">
               {lastSession.details.map((d) => {
@@ -225,7 +270,7 @@ export default function ImportPanel({ batchId, type, onImported }: ImportPanelPr
 
             <div className="flex gap-2 pt-1">
               <button
-                onClick={onRunSample}
+                onClick={onReimportSameMaterial}
                 className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm bg-primary-50 text-primary-700 rounded-lg hover:bg-primary-100 transition-colors"
               >
                 <Repeat className="w-4 h-4" />
