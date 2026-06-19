@@ -169,7 +169,7 @@ export function RecordDetail() {
                 </span>
               </div>
               <p className="text-xs text-industrial-500 text-center font-mono">
-                伸缩量 = 温差 × 桥长(1000mm) × 线膨胀系数(1.2e-5/K)
+                伸缩量 = 温差 × 桥长(100m / 100000mm) × 线膨胀系数(1.2e-5/K)
               </p>
             </div>
           )}

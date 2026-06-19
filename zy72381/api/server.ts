@@ -1,10 +1,10 @@
 import express from 'express'
 import cors from 'cors'
-import type { TemperatureRecord, ExceptionRecord, Sensor } from '@/types'
-import { mockRecords, mockExceptions, mockSensors } from '@/data/mockData'
-import { validateDirection } from '@/utils/calibration'
-import { performEstimation } from '@/utils/estimation'
-import { generateId, generateRecordNo } from '@/utils/formatters'
+import type { TemperatureRecord, ExceptionRecord, Sensor } from '../src/types'
+import { mockRecords, mockExceptions, mockSensors } from '../src/data/mockData'
+import { validateDirection } from '../src/utils/calibration'
+import { performEstimation } from '../src/utils/estimation'
+import { generateId, generateRecordNo } from '../src/utils/formatters'
 
 const app = express()
 const PORT = 3001
@@ -147,6 +147,8 @@ app.post('/api/records/:id/supplement', (req, res) => {
     return res.status(404).json({ error: '传感器不存在' })
   }
 
+  const hasOldCalibration = sensor.oldCalibrationData && sensor.oldCalibrationData.length > 0
+
   record.sensorId = sensorNo
   record.status = 'supplemented'
   record.oldCalibrationData = sensor.oldCalibrationData
@@ -155,11 +157,23 @@ app.post('/api/records/:id/supplement', (req, res) => {
     id: generateId(),
     type: 'supplement',
     operator: '何工',
-    description: `补录传感器编号：${sensorNo}`,
+    description: `补录传感器编号：${sensorNo}${hasOldCalibration ? '，已关联' + sensorNo + '的2020版旧口径数据' : ''}`,
     timestamp: new Date().toISOString(),
     oldValue: null,
     newValue: sensorNo
   })
+
+  if (record.normalizedDirection) {
+    const result = performEstimation(record)
+    record.estimatedValue = result.expansionValue
+    record.operationHistory.push({
+      id: generateId(),
+      type: 'rerun',
+      operator: '系统',
+      description: `补录后重算完成：伸缩量 ${result.expansionValue.toFixed(2)}mm`,
+      timestamp: new Date().toISOString()
+    })
+  }
 
   const missingException = exceptions.find(
     (e) => e.recordId === record.id && e.exceptionType === 'missing_sensor'
@@ -168,7 +182,7 @@ app.post('/api/records/:id/supplement', (req, res) => {
     missingException.exceptionType = 'supplemented'
     missingException.status = 'supplemented'
     missingException.sensorId = sensorNo
-    missingException.description = `缺失传感器编号后补录${sensor.oldCalibrationData && sensor.oldCalibrationData.length > 0 ? '，已关联' + sensorNo + '的旧口径数据' : ''}`
+    missingException.description = `缺失传感器编号后补录，已关联${sensorNo}${hasOldCalibration ? '的2020版旧口径数据' : ''}`
     missingException.operator = '何工'
     missingException.updatedAt = new Date().toISOString()
   }
@@ -241,6 +255,16 @@ app.post('/api/records/:id/correct', (req, res) => {
     oldValue: oldDirection,
     newValue: newDirection,
     reason: reason || '现场师傅口径不规范，何工根据实际情况修正'
+  })
+
+  const result = performEstimation(record)
+  record.estimatedValue = result.expansionValue
+  record.operationHistory.push({
+    id: generateId(),
+    type: 'rerun',
+    operator: '何工',
+    description: `重跑估算完成：伸缩量 ${result.expansionValue.toFixed(2)}mm`,
+    timestamp: new Date().toISOString()
   })
 
   const directionException = exceptions.find(

@@ -63,14 +63,14 @@ export const mockRecords: TemperatureRecord[] = [
     directionMark: '负方向',
     sensorId: 'SNS-BR-001',
     status: 'success',
-    estimatedValue: -12.40,
+    estimatedValue: -17.64,
     normalizedDirection: 'negative',
     operationHistory: [
       {
         id: 'op-001',
         type: 'import',
         operator: '何工',
-        description: '导入温度校准记录',
+        description: '导入温度校准记录，估算伸缩量 -17.64mm',
         timestamp: time(0)
       },
       {
@@ -79,17 +79,10 @@ export const mockRecords: TemperatureRecord[] = [
         operator: '系统',
         description: '口径校验通过：负方向 → 负方向',
         timestamp: time(1)
-      },
-      {
-        id: 'op-003',
-        type: 'rerun',
-        operator: '系统',
-        description: '估算完成：伸缩量 -12.40mm',
-        timestamp: time(2)
       }
     ],
     createdAt: time(0),
-    updatedAt: time(2)
+    updatedAt: time(1)
   },
   {
     id: 'rec-002',
@@ -100,10 +93,10 @@ export const mockRecords: TemperatureRecord[] = [
     startTemp: 21.0,
     endTemp: 35.8,
     tempDiff: 14.8,
-    directionMark: '向左',
+    directionMark: '负方向',
     sensorId: 'SNS-BR-002',
     status: 'manual_corrected',
-    estimatedValue: -12.50,
+    estimatedValue: -17.76,
     normalizedDirection: 'negative',
     operationHistory: [
       {
@@ -127,13 +120,14 @@ export const mockRecords: TemperatureRecord[] = [
         description: '人工修正方向：向左 → 负方向',
         timestamp: time(20),
         oldValue: '向左',
-        newValue: '负方向'
+        newValue: '负方向',
+        reason: '现场师傅口径不规范，向左实际就是负方向，已与现场确认'
       },
       {
         id: 'op-007',
         type: 'rerun',
         operator: '何工',
-        description: '重跑估算完成：伸缩量 -12.50mm',
+        description: '重跑估算完成：伸缩量 -17.76mm',
         timestamp: time(25)
       }
     ],
@@ -152,7 +146,7 @@ export const mockRecords: TemperatureRecord[] = [
     directionMark: '负方向',
     sensorId: 'SNS-BR-003',
     status: 'supplemented',
-    estimatedValue: -12.30,
+    estimatedValue: -17.52,
     normalizedDirection: 'negative',
     operationHistory: [
       {
@@ -166,7 +160,7 @@ export const mockRecords: TemperatureRecord[] = [
         id: 'op-009',
         type: 'supplement',
         operator: '何工',
-        description: '补录传感器编号：SNS-BR-003，自动关联历史口径数据',
+        description: '补录传感器编号：SNS-BR-003，自动关联2020版旧口径数据',
         timestamp: time(30),
         oldValue: null,
         newValue: 'SNS-BR-003'
@@ -175,7 +169,7 @@ export const mockRecords: TemperatureRecord[] = [
         id: 'op-010',
         type: 'rerun',
         operator: '系统',
-        description: '补录旧口径后重算完成：伸缩量 -12.30mm',
+        description: '补录旧口径后重算完成：伸缩量 -17.52mm',
         timestamp: time(31)
       }
     ],
@@ -191,12 +185,12 @@ export const mockExceptions: ExceptionRecord[] = [
     recordId: 'rec-002',
     recordNo: 'REC-002',
     exceptionType: 'direction_mismatch',
-    status: 'pending_review',
+    status: 'resolved',
     sensorId: 'SNS-BR-002',
-    description: '方向口径不统一：现场师傅填写"向左"，需实验老师复核是否等同于"负方向"',
-    operator: '系统',
+    description: '何工人工修正：向左 → 负方向，原因：现场师傅口径不规范，向左实际就是负方向，已与现场确认',
+    operator: '何工',
     createdAt: time(6),
-    updatedAt: time(6)
+    updatedAt: time(20)
   },
   {
     id: 'exc-002',

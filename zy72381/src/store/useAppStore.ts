@@ -205,7 +205,7 @@ export const useAppStore = create<AppState & AppActions>((set, get) => ({
   },
 
   supplementSensor: (recordId, sensorNo) => {
-    const { addOperationLog, addToast, currentOperator, sensors } = get()
+    const { addOperationLog, addToast, currentOperator, sensors, records } = get()
     const sensor = sensors.find((s) => s.sensorNo === sensorNo)
     
     if (!sensor) {
@@ -214,8 +214,16 @@ export const useAppStore = create<AppState & AppActions>((set, get) => ({
     }
 
     let oldCalibrationData: OldCalibration[] | undefined
-    if (sensor.oldCalibrationData && sensor.oldCalibrationData.length > 0) {
+    const hasOldCalibration = sensor.oldCalibrationData && sensor.oldCalibrationData.length > 0
+    if (hasOldCalibration) {
       oldCalibrationData = sensor.oldCalibrationData
+    }
+
+    const currentRecord = records.find((r) => r.id === recordId)
+    let estimatedValue: number | undefined
+    if (currentRecord && currentRecord.normalizedDirection) {
+      const result = performEstimation(currentRecord)
+      estimatedValue = result.expansionValue
     }
 
     set((state) => ({
@@ -226,6 +234,7 @@ export const useAppStore = create<AppState & AppActions>((set, get) => ({
               sensorId: sensorNo,
               status: 'supplemented',
               oldCalibrationData,
+              estimatedValue,
               updatedAt: new Date().toISOString()
             }
           : r
@@ -235,10 +244,18 @@ export const useAppStore = create<AppState & AppActions>((set, get) => ({
     addOperationLog(recordId, {
       type: 'supplement',
       operator: currentOperator,
-      description: `补录传感器编号：${sensorNo}${oldCalibrationData ? '，已关联旧口径数据' : ''}`,
+      description: `补录传感器编号：${sensorNo}${hasOldCalibration ? '，已关联' + sensorNo + '的2020版旧口径数据' : ''}`,
       oldValue: null,
       newValue: sensorNo
     })
+
+    if (estimatedValue !== undefined) {
+      addOperationLog(recordId, {
+        type: 'rerun',
+        operator: '系统',
+        description: `补录后重算完成：伸缩量 ${estimatedValue.toFixed(2)}mm`
+      })
+    }
 
     const { exceptions } = get()
     const missingException = exceptions.find(
@@ -249,7 +266,7 @@ export const useAppStore = create<AppState & AppActions>((set, get) => ({
         exceptionType: 'supplemented',
         status: 'supplemented',
         sensorId: sensorNo,
-        description: `缺失传感器编号后补录${oldCalibrationData ? '，已关联旧口径数据' : ''}`,
+        description: `缺失传感器编号后补录，已关联${sensorNo}${hasOldCalibration ? '的2020版旧口径数据' : ''}`,
         operator: currentOperator
       })
     }

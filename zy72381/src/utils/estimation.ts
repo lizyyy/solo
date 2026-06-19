@@ -1,11 +1,12 @@
 import type { EstimationResult, TemperatureRecord } from '@/types'
 
-const STEEL_EXPANSION_COEFFICIENT = 0.000012
-const DEFAULT_BRIDGE_LENGTH = 100000
+export const STEEL_EXPANSION_COEFFICIENT = 0.000012
+export const DEFAULT_BRIDGE_LENGTH_MM = 100000
+export const DEFAULT_BRIDGE_LENGTH_DISPLAY = '100000mm（100米）'
 
 export function calculateExpansion(
   tempDiff: number,
-  length: number = DEFAULT_BRIDGE_LENGTH,
+  length: number = DEFAULT_BRIDGE_LENGTH_MM,
   alpha: number = STEEL_EXPANSION_COEFFICIENT
 ): number {
   return tempDiff * length * alpha
@@ -35,7 +36,7 @@ export function performEstimation(
   }
 
   const signedValue = direction === 'negative' ? -expansionValue : expansionValue
-  const formula = `伸缩量 = 温差(${record.tempDiff}K) × 桥长(${DEFAULT_BRIDGE_LENGTH}mm) × 线膨胀系数(${STEEL_EXPANSION_COEFFICIENT}/K) × 方向(${direction === 'positive' ? '+' : '-'})`
+  const formula = `伸缩量 = 温差(${record.tempDiff}K) × 桥长(${DEFAULT_BRIDGE_LENGTH_DISPLAY}) × 线膨胀系数(${STEEL_EXPANSION_COEFFICIENT}/K) × 方向系数(${direction === 'positive' ? '+1' : '-1'})`
 
   return {
     recordId: record.id,
