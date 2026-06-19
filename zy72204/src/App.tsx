@@ -7,12 +7,14 @@ import {
   BarChartOutlined,
   HistoryOutlined,
   SettingOutlined,
+  FileSearchOutlined,
 } from '@ant-design/icons';
 import TransactionList from './pages/TransactionList';
 import CalculationView from './pages/CalculationView';
 import ChartView from './pages/ChartView';
 import HistoryView from './pages/HistoryView';
 import RulesView from './pages/RulesView';
+import ReportView from './pages/ReportView';
 
 const { Header, Content, Sider, Footer } = Layout;
 
@@ -37,6 +39,11 @@ const App: React.FC = () => {
       key: '/history',
       icon: <HistoryOutlined />,
       label: <Link to="/history">历史版本</Link>,
+    },
+    {
+      key: '/report',
+      icon: <FileSearchOutlined />,
+      label: <Link to="/report">试算报告</Link>,
     },
     {
       key: '/rules',
@@ -67,6 +74,7 @@ const App: React.FC = () => {
               <Route path="/calculation" element={<CalculationView />} />
               <Route path="/charts" element={<ChartView />} />
               <Route path="/history" element={<HistoryView />} />
+              <Route path="/report" element={<ReportView />} />
               <Route path="/rules" element={<RulesView />} />
             </Routes>
           </Content>

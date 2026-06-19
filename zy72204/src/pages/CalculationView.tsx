@@ -22,8 +22,6 @@ import {
   RollbackOutlined,
   CalculatorOutlined,
   EyeOutlined,
-  FileTextOutlined,
-  DownloadOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useCalculationStore } from '../store/calculationStore';
@@ -42,16 +40,11 @@ const CalculationView: React.FC = () => {
     rollbackCalculation,
     confirmSplit,
     resolveDiff,
-    generateReport,
-    exportReportToCSV,
-    exportReportToJSON,
   } = useCalculationStore();
 
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedCalculation, setSelectedCalculation] = useState<MarginCalculation | null>(null);
   const [selectedScenario, setSelectedScenario] = useState('中度压力');
-  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [reportData, setReportData] = useState<any>(null);
 
   const handleCalculation = async (businessNumber: string) => {
     try {
@@ -84,47 +77,6 @@ const CalculationView: React.FC = () => {
     try {
       await resolveDiff(diffId, '以柜台流水为准');
       message.success('差异已解决');
-    } catch (error) {
-      message.error(getUserFriendlyError(error));
-    }
-  };
-
-  const handleGenerateReport = () => {
-    try {
-      const report = generateReport();
-      setReportData(report);
-      setIsReportModalOpen(true);
-      message.success('报告生成成功');
-    } catch (error) {
-      message.error(getUserFriendlyError(error));
-    }
-  };
-
-  const handleExportCSV = () => {
-    try {
-      const csv = exportReportToCSV();
-      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `期权保证金压力试算报告_${dayjs().format('YYYYMMDD_HHmmss')}.csv`;
-      link.click();
-      URL.revokeObjectURL(link.href);
-      message.success('CSV报告导出成功');
-    } catch (error) {
-      message.error(getUserFriendlyError(error));
-    }
-  };
-
-  const handleExportJSON = () => {
-    try {
-      const json = exportReportToJSON();
-      const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `期权保证金压力试算报告_${dayjs().format('YYYYMMDD_HHmmss')}.json`;
-      link.click();
-      URL.revokeObjectURL(link.href);
-      message.success('JSON报告导出成功');
     } catch (error) {
       message.error(getUserFriendlyError(error));
     }
@@ -305,30 +257,7 @@ const CalculationView: React.FC = () => {
 
   return (
     <div className="page-container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h2 className="section-title" style={{ margin: 0 }}>保证金试算</h2>
-        <Space>
-          <Button 
-            type="primary" 
-            icon={<FileTextOutlined />} 
-            onClick={handleGenerateReport}
-          >
-            生成报告
-          </Button>
-          <Button 
-            icon={<DownloadOutlined />} 
-            onClick={handleExportCSV}
-          >
-            导出CSV
-          </Button>
-          <Button 
-            icon={<DownloadOutlined />} 
-            onClick={handleExportJSON}
-          >
-            导出JSON
-          </Button>
-        </Space>
-      </div>
+      <h2 className="section-title">保证金试算</h2>
 
       <Row gutter={16} style={{ marginBottom: 24 }}>
         <Col span={6}>
@@ -538,142 +467,6 @@ const CalculationView: React.FC = () => {
                 ))}
               </Card>
             )}
-          </div>
-        )}
-      </Modal>
-
-      <Modal
-        title="期权保证金压力试算报告"
-        open={isReportModalOpen}
-        onCancel={() => setIsReportModalOpen(false)}
-        footer={[
-          <Button key="csv" icon={<DownloadOutlined />} onClick={handleExportCSV}>
-            导出CSV
-          </Button>,
-          <Button key="json" icon={<DownloadOutlined />} onClick={handleExportJSON}>
-            导出JSON
-          </Button>,
-          <Button key="close" onClick={() => setIsReportModalOpen(false)}>
-            关闭
-          </Button>,
-        ]}
-        width={1000}
-      >
-        {reportData && (
-          <div>
-            <Descriptions title="报告概览" bordered size="small" column={2} style={{ marginBottom: 16 }}>
-              <Descriptions.Item label="生成时间">
-                {dayjs(reportData.generatedAt).format('YYYY-MM-DD HH:mm:ss')}
-              </Descriptions.Item>
-              <Descriptions.Item label="生成人">
-                {reportData.generatedBy}
-              </Descriptions.Item>
-            </Descriptions>
-
-            <Card title="汇总统计" size="small" style={{ marginBottom: 16 }} type="inner">
-              <Row gutter={16}>
-                <Col span={6}>
-                  <Statistic title="柜台流水数" value={reportData.summary.totalTransactions} />
-                </Col>
-                <Col span={6}>
-                  <Statistic title="流水总金额" value={reportData.summary.totalAmount} precision={2} prefix="¥" />
-                </Col>
-                <Col span={6}>
-                  <Statistic title="试算记录数" value={reportData.summary.totalCalculations} />
-                </Col>
-                <Col span={6}>
-                  <Statistic title="历史版本数" value={reportData.summary.totalHistoryVersions} />
-                </Col>
-              </Row>
-              <Row gutter={16} style={{ marginTop: 16 }}>
-                <Col span={6}>
-                  <Statistic title="基础保证金合计" value={reportData.summary.totalBaseMargin} precision={2} prefix="¥" valueStyle={{ color: '#1890ff' }} />
-                </Col>
-                <Col span={6}>
-                  <Statistic title="压力保证金合计" value={reportData.summary.totalStressMargin} precision={2} prefix="¥" valueStyle={{ color: '#fa8c16' }} />
-                </Col>
-                <Col span={6}>
-                  <Statistic title="已解决差异" value={reportData.summary.resolvedDiffs} valueStyle={{ color: '#52c41a' }} />
-                </Col>
-                <Col span={6}>
-                  <Statistic title="待解决差异" value={reportData.summary.unresolvedDiffs} valueStyle={{ color: '#ff4d4f' }} />
-                </Col>
-              </Row>
-              <Row gutter={16} style={{ marginTop: 16 }}>
-                <Col span={6}>
-                  <Statistic title="补充邮件数" value={reportData.summary.totalEmails} />
-                </Col>
-                <Col span={6}>
-                  <Statistic title="拆分记录数" value={reportData.summary.totalSplits} />
-                </Col>
-                <Col span={6}>
-                  <Statistic title="已确认拆分" value={reportData.summary.confirmedSplits} valueStyle={{ color: '#52c41a' }} />
-                </Col>
-                <Col span={6}>
-                  <Statistic title="有争议拆分" value={reportData.summary.rejectedSplits} valueStyle={{ color: '#ff4d4f' }} />
-                </Col>
-              </Row>
-            </Card>
-
-            <Card title="状态分布" size="small" style={{ marginBottom: 16 }} type="inner">
-              <Space wrap>
-                {Object.entries<number>(reportData.summary.statusCounts as Record<string, number>).map(([status, count]) => {
-                  const statusInfo = STATUS_LABELS[status as keyof typeof STATUS_LABELS];
-                  return (
-                    <Tag key={status} color={statusInfo?.color || 'default'}>
-                      {statusInfo?.label || status}: {count}
-                    </Tag>
-                  );
-                })}
-              </Space>
-            </Card>
-
-            <Card title="流程步骤分布" size="small" style={{ marginBottom: 16 }} type="inner">
-              <Space wrap>
-                {Object.entries<number>(reportData.summary.stepCounts as Record<string, number>).map(([step, count]) => {
-                  const stepInfo = WORKFLOW_STEP_LABELS[step as keyof typeof WORKFLOW_STEP_LABELS];
-                  return (
-                    <Tag key={step} color="blue">
-                      {stepInfo?.label || step}: {count}
-                    </Tag>
-                  );
-                })}
-              </Space>
-            </Card>
-
-            <Card title="试算明细" size="small" type="inner">
-              <Table
-                dataSource={reportData.calculations}
-                rowKey="id"
-                size="small"
-                pagination={{ pageSize: 5 }}
-                scroll={{ x: 1200 }}
-                columns={[
-                  { title: '业务号', dataIndex: 'businessNumber', key: 'businessNumber', width: 140 },
-                  { title: '场景', dataIndex: 'scenario', key: 'scenario', width: 100 },
-                  { title: '基础保证金', dataIndex: 'baseMargin', key: 'baseMargin', width: 140, 
-                    render: (v: number) => formatCurrency(v) },
-                  { title: '压力保证金', dataIndex: 'stressMargin', key: 'stressMargin', width: 140,
-                    render: (v: number) => formatCurrency(v) },
-                  { title: '比例', dataIndex: 'marginRatio', key: 'marginRatio', width: 100,
-                    render: (v: number) => `${(v * 100).toFixed(1)}%` },
-                  { title: '状态', dataIndex: 'status', key: 'status', width: 100,
-                    render: (s: string) => {
-                      const info = STATUS_LABELS[s];
-                      return <Tag color={info?.color}>{info?.label}</Tag>;
-                    }},
-                  { title: '流程步骤', dataIndex: 'workflowStep', key: 'workflowStep', width: 140,
-                    render: (s: string) => {
-                      const info = WORKFLOW_STEP_LABELS[s];
-                      return <Tag color="blue">{info?.label}</Tag>;
-                    }},
-                  { title: '流水数', key: 'transCount', width: 80,
-                    render: (_: any, r: any) => r.transactions?.length || 0 },
-                  { title: '差异数', key: 'diffCount', width: 80,
-                    render: (_: any, r: any) => r.diffs?.length || 0 },
-                ]}
-              />
-            </Card>
           </div>
         )}
       </Modal>

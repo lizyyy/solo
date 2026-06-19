@@ -14,7 +14,7 @@ import {
   WorkflowStep,
   TransactionType,
 } from '../types';
-import { detectSplit, validateImport, generateDiffRecords, normalizeImportRow, mapColumnHeaders } from '../services/businessLogic';
+import { detectSplit, validateImport, generateDiffRecords, normalizeImportRow, mapColumnHeaders, formatCurrency } from '../services/businessLogic';
 
 interface CalculationState {
   transactions: CounterTransaction[];
@@ -39,10 +39,8 @@ interface CalculationState {
   getTransactionHistory: (transactionId: string) => HistoryVersion[];
   getCalculationByBusinessNumber: (businessNumber: string) => MarginCalculation | undefined;
   getSplitInfo: (businessNumber: string) => SplitInfo | undefined;
-  generateReport: () => any;
-  exportReportToCSV: () => string;
-  exportReportToJSON: () => string;
-  clearAllData: () => void;
+  generateReport: () => string;
+  exportReportCSV: () => void;
 }
 
 export const useCalculationStore = create<CalculationState>()(
@@ -143,7 +141,6 @@ export const useCalculationStore = create<CalculationState>()(
         changedFields: {
           all: { old: null, new: transaction },
         },
-        fullSnapshot: transaction,
         operatedBy: currentUser,
         operatedAt: importedAt,
         remark: `柜台流水导入（来源行 ${rowNumber}）`,
@@ -165,7 +162,7 @@ export const useCalculationStore = create<CalculationState>()(
 
       if (!existingCalc) {
         const hasSplit = !!splitInfo;
-        const newCalc: MarginCalculation = {
+        const calc: MarginCalculation = {
           id: uuidv4(),
           businessNumber,
           calculationDate: dayjs().toISOString(),
@@ -180,21 +177,20 @@ export const useCalculationStore = create<CalculationState>()(
           createdAt: importedAt,
           updatedAt: importedAt,
         };
-        newCalculations.push(newCalc);
+        newCalculations.push(calc);
 
         newHistoryVersions.push({
           id: uuidv4(),
           entityType: 'CALCULATION',
-          entityId: newCalc.id,
+          entityId: calc.id,
           version: 1,
           action: 'CREATE',
           changedFields: {
-            all: { old: null, new: newCalc },
+            all: { old: null, new: calc },
           },
-          fullSnapshot: newCalc,
           operatedBy: currentUser,
           operatedAt: importedAt,
-          remark: `业务号 ${businessNumber} 初始试算记录创建`,
+          remark: `创建初始试算记录（${hasSplit ? '待拆分复核' : '待复核'}）`,
         });
       }
     }
@@ -226,7 +222,7 @@ export const useCalculationStore = create<CalculationState>()(
   },
 
   importEmailSupplement: async (emailData) => {
-    const { currentUser, calculations } = get();
+    const { currentUser } = get();
     const importedAt = dayjs().toISOString();
 
     const supplement: EmailSupplement = {
@@ -253,8 +249,6 @@ export const useCalculationStore = create<CalculationState>()(
       createdAt: importedAt,
     }));
 
-    const existingCalc = calculations.find(c => c.businessNumber === emailData.businessNumber);
-
     set(state => {
       const updatedCalculations = state.calculations.map(c => {
         if (c.businessNumber === emailData.businessNumber) {
@@ -267,46 +261,24 @@ export const useCalculationStore = create<CalculationState>()(
         return c;
       });
 
-      const updatedCalc = updatedCalculations.find(c => c.businessNumber === emailData.businessNumber);
-
-      const newHistoryVersions: HistoryVersion[] = [
-        {
-          id: uuidv4(),
-          entityType: 'EMAIL',
-          entityId: supplement.id,
-          version: 1,
-          action: 'CREATE',
-          changedFields: { all: { old: null, new: supplement } },
-          fullSnapshot: supplement,
-          operatedBy: currentUser,
-          operatedAt: importedAt,
-          remark: '客户经理补充邮件导入',
-        },
-      ];
-
-      if (updatedCalc && existingCalc) {
-        newHistoryVersions.push({
-          id: uuidv4(),
-          entityType: 'CALCULATION',
-          entityId: updatedCalc.id,
-          version: state.historyVersions.filter(h => h.entityId === updatedCalc.id && h.entityType === 'CALCULATION').length + 1,
-          action: 'UPDATE',
-          changedFields: {
-            workflowStep: { old: existingCalc.workflowStep, new: updatedCalc.workflowStep },
-            updatedAt: { old: existingCalc.updatedAt, new: updatedCalc.updatedAt },
-          },
-          fullSnapshot: updatedCalc,
-          operatedBy: currentUser,
-          operatedAt: importedAt,
-          remark: '邮件补录完成，工作流进入STEP2',
-        });
-      }
-
       return {
         emailSupplements: [...state.emailSupplements, supplement],
         diffRecords: [...state.diffRecords, ...newDiffs],
         calculations: updatedCalculations,
-        historyVersions: [...state.historyVersions, ...newHistoryVersions],
+        historyVersions: [
+          ...state.historyVersions,
+          {
+            id: uuidv4(),
+            entityType: 'EMAIL',
+            entityId: supplement.id,
+            version: 1,
+            action: 'CREATE',
+            changedFields: { all: { old: null, new: supplement } },
+            operatedBy: currentUser,
+            operatedAt: importedAt,
+            remark: '客户经理补充邮件导入',
+          },
+        ],
       };
     });
   },
@@ -320,16 +292,14 @@ export const useCalculationStore = create<CalculationState>()(
     const updatedAt = dayjs().toISOString();
 
     set(state => {
-      const updatedTransactions = state.transactions.map(t =>
-        t.id === transactionId ? { ...t, remark: newRemark } : t
-      );
-      const updatedTransaction = updatedTransactions.find(t => t.id === transactionId);
       const version = state.historyVersions.filter(
         h => h.entityId === transactionId
       ).length + 1;
 
       return {
-        transactions: updatedTransactions,
+        transactions: state.transactions.map(t =>
+          t.id === transactionId ? { ...t, remark: newRemark } : t
+        ),
         historyVersions: [
           ...state.historyVersions,
           {
@@ -341,7 +311,6 @@ export const useCalculationStore = create<CalculationState>()(
             changedFields: {
               remark: { old: oldRemark, new: newRemark },
             },
-            fullSnapshot: updatedTransaction,
             operatedBy: currentUser,
             operatedAt: updatedAt,
             remark: '修改备注',
@@ -367,6 +336,7 @@ export const useCalculationStore = create<CalculationState>()(
 
     const updatedAt = dayjs().toISOString();
     const existingCalc = calculations.find(c => c.businessNumber === businessNumber);
+    const oldCalc = existingCalc ? { ...existingCalc } : null;
 
     const newCalc: MarginCalculation = {
       id: existingCalc?.id || uuidv4(),
@@ -380,13 +350,15 @@ export const useCalculationStore = create<CalculationState>()(
       workflowStep: existingCalc?.workflowStep || 'STEP1_IMPORTED',
       hasSplit: existingCalc?.hasSplit || false,
       isPendingReview: existingCalc?.isPendingReview || false,
+      reviewedBy: existingCalc?.reviewedBy,
+      reviewedAt: existingCalc?.reviewedAt,
       createdAt: existingCalc?.createdAt || updatedAt,
       updatedAt,
     };
 
-    const version = historyVersions.filter(
+    const currentVersions = historyVersions.filter(
       h => h.entityId === newCalc.id && h.entityType === 'CALCULATION'
-    ).length + 1;
+    );
 
     set(state => ({
       calculations: existingCalc
@@ -398,17 +370,14 @@ export const useCalculationStore = create<CalculationState>()(
           id: uuidv4(),
           entityType: 'CALCULATION',
           entityId: newCalc.id,
-          version,
+          version: currentVersions.length + 1,
           action: 'UPDATE',
           changedFields: {
+            snapshot: { old: oldCalc, new: newCalc },
             scenario: { old: existingCalc?.scenario, new: scenario },
             baseMargin: { old: existingCalc?.baseMargin, new: newCalc.baseMargin },
             stressMargin: { old: existingCalc?.stressMargin, new: newCalc.stressMargin },
-            marginRatio: { old: existingCalc?.marginRatio, new: newCalc.marginRatio },
-            calculationDate: { old: existingCalc?.calculationDate, new: updatedAt },
-            updatedAt: { old: existingCalc?.updatedAt, new: updatedAt },
           },
-          fullSnapshot: newCalc,
           operatedBy: currentUser,
           operatedAt: updatedAt,
           remark: `执行${scenario}试算`,
@@ -426,45 +395,53 @@ export const useCalculationStore = create<CalculationState>()(
       .filter(h => h.entityId === calculationId && h.entityType === 'CALCULATION')
       .sort((a, b) => b.version - a.version);
 
-    if (versions.length < 1) return;
-
-    const latestVersion = versions[0];
-    let targetSnapshot: any;
-    let rollbackRemark: string;
-    let changedFields: Record<string, { old: any; new: any }>;
-
-    if (versions.length === 1) {
-      targetSnapshot = latestVersion.fullSnapshot;
-      rollbackRemark = '回滚到初始创建状态';
-      changedFields = {
-        status: { old: calc.status, new: targetSnapshot.status },
-        workflowStep: { old: calc.workflowStep, new: targetSnapshot.workflowStep },
-        scenario: { old: calc.scenario, new: targetSnapshot.scenario },
-        baseMargin: { old: calc.baseMargin, new: targetSnapshot.baseMargin },
-        stressMargin: { old: calc.stressMargin, new: targetSnapshot.stressMargin },
-        marginRatio: { old: calc.marginRatio, new: targetSnapshot.marginRatio },
-        isPendingReview: { old: calc.isPendingReview, new: targetSnapshot.isPendingReview },
-        hasSplit: { old: calc.hasSplit, new: targetSnapshot.hasSplit },
-      };
-    } else {
-      const previousVersion = versions[1];
-      targetSnapshot = previousVersion.fullSnapshot;
-      rollbackRemark = `回滚到版本 ${previousVersion.version}（${previousVersion.remark}）`;
-      changedFields = {};
-      for (const key of Object.keys(latestVersion.changedFields)) {
-        changedFields[key] = {
-          old: latestVersion.changedFields[key].new,
-          new: previousVersion.changedFields[key]?.old ?? targetSnapshot[key],
-        };
-      }
+    if (versions.length < 2) {
+      throw new Error('无可回滚的历史版本');
     }
 
+    const currentVersion = versions[0];
+    const targetVersion = versions[1];
     const rolledBackAt = dayjs().toISOString();
+
+    let restoredState: Partial<MarginCalculation> = {};
+
+    if (targetVersion.changedFields.snapshot?.old) {
+      restoredState = { ...targetVersion.changedFields.snapshot.old };
+    } else if (targetVersion.action === 'CREATE' && targetVersion.changedFields.all?.new) {
+      restoredState = { ...targetVersion.changedFields.all.new };
+    } else {
+      restoredState = {
+        scenario: targetVersion.changedFields.scenario?.old || calc.scenario,
+        baseMargin: targetVersion.changedFields.baseMargin?.old ?? calc.baseMargin,
+        stressMargin: targetVersion.changedFields.stressMargin?.old ?? calc.stressMargin,
+        marginRatio: targetVersion.changedFields.marginRatio?.old ?? calc.marginRatio,
+        status: targetVersion.changedFields.status?.old || calc.status,
+        workflowStep: targetVersion.changedFields.workflowStep?.old || calc.workflowStep,
+        hasSplit: targetVersion.changedFields.hasSplit?.old ?? calc.hasSplit,
+        isPendingReview: targetVersion.changedFields.isPendingReview?.old ?? calc.isPendingReview,
+      };
+    }
+
+    delete restoredState.updatedAt;
+    delete restoredState.createdAt;
+
     const rolledBackCalc: MarginCalculation = {
-      ...targetSnapshot,
-      id: calc.id,
+      ...calc,
+      ...restoredState,
+      status: 'ROLLBACKED' as RecordStatus,
       updatedAt: rolledBackAt,
     };
+
+    const diffFields: Record<string, { old: any; new: any }> = {};
+    for (const key of Object.keys(calc) as Array<keyof MarginCalculation>) {
+      if (key === 'updatedAt') continue;
+      const oldVal = calc[key];
+      const newVal = rolledBackCalc[key];
+      if (oldVal !== newVal) {
+        diffFields[key] = { old: oldVal, new: newVal };
+      }
+    }
+    diffFields.snapshot = { old: calc, new: rolledBackCalc };
 
     set(state => ({
       calculations: state.calculations.map(c =>
@@ -476,13 +453,15 @@ export const useCalculationStore = create<CalculationState>()(
           id: uuidv4(),
           entityType: 'CALCULATION',
           entityId: calculationId,
-          version: latestVersion.version + 1,
+          version: versions.length + 1,
           action: 'ROLLBACK',
-          changedFields,
-          fullSnapshot: rolledBackCalc,
+          changedFields: {
+            ...diffFields,
+            _targetVersion: { old: currentVersion.version, new: targetVersion.version },
+          },
           operatedBy: currentUser,
           operatedAt: rolledBackAt,
-          remark: rollbackRemark,
+          remark: `回滚到版本 ${targetVersion.version}（${targetVersion.remark}）`,
         },
       ],
     }));
@@ -492,11 +471,18 @@ export const useCalculationStore = create<CalculationState>()(
     const { currentUser, calculations, historyVersions } = get();
     const confirmedAt = dayjs().toISOString();
     const existingCalc = calculations.find(c => c.businessNumber === businessNumber);
+    const oldCalc = existingCalc ? { ...existingCalc } : null;
+
+    const currentVersions = existingCalc
+      ? historyVersions.filter(
+          h => h.entityId === existingCalc.id && h.entityType === 'CALCULATION'
+        )
+      : [];
 
     set(state => {
-      const updatedCalculations = state.calculations.map(c =>
+      const newCalculations = state.calculations.map(c =>
         c.businessNumber === businessNumber
-          ? {
+          ? ({
               ...c,
               status: (confirmed ? 'NORMAL' : 'DISPUTED') as RecordStatus,
               isPendingReview: !confirmed,
@@ -504,39 +490,11 @@ export const useCalculationStore = create<CalculationState>()(
               reviewedBy: currentUser,
               reviewedAt: confirmedAt,
               updatedAt: confirmedAt,
-            }
+            } as MarginCalculation)
           : c
       );
 
-      const updatedCalc = updatedCalculations.find(c => c.businessNumber === businessNumber);
-
-      const newHistoryVersions: HistoryVersion[] = [];
-
-      if (updatedCalc && existingCalc) {
-        const version = historyVersions.filter(
-          h => h.entityId === updatedCalc.id && h.entityType === 'CALCULATION'
-        ).length + 1;
-
-        newHistoryVersions.push({
-          id: uuidv4(),
-          entityType: 'CALCULATION',
-          entityId: updatedCalc.id,
-          version,
-          action: 'UPDATE',
-          changedFields: {
-            status: { old: existingCalc.status, new: updatedCalc.status },
-            isPendingReview: { old: existingCalc.isPendingReview, new: updatedCalc.isPendingReview },
-            workflowStep: { old: existingCalc.workflowStep, new: updatedCalc.workflowStep },
-            reviewedBy: { old: existingCalc.reviewedBy, new: updatedCalc.reviewedBy },
-            reviewedAt: { old: existingCalc.reviewedAt, new: updatedCalc.reviewedAt },
-            updatedAt: { old: existingCalc.updatedAt, new: updatedCalc.updatedAt },
-          },
-          fullSnapshot: updatedCalc,
-          operatedBy: currentUser,
-          operatedAt: confirmedAt,
-          remark: confirmed ? '拆分确认无误，状态更新为正常' : '拆分标记为有争议',
-        });
-      }
+      const newCalc = newCalculations.find(c => c.businessNumber === businessNumber);
 
       return {
         splitInfos: state.splitInfos.map(s =>
@@ -549,8 +507,32 @@ export const useCalculationStore = create<CalculationState>()(
               }
             : s
         ),
-        calculations: updatedCalculations,
-        historyVersions: [...state.historyVersions, ...newHistoryVersions],
+        calculations: newCalculations,
+        historyVersions: [
+          ...state.historyVersions,
+          ...(existingCalc && newCalc
+            ? [
+                {
+                  id: uuidv4(),
+                  entityType: 'CALCULATION' as const,
+                  entityId: existingCalc.id,
+                  version: currentVersions.length + 1,
+                  action: 'UPDATE' as const,
+                  changedFields: {
+                    snapshot: { old: oldCalc, new: newCalc },
+                    status: { old: oldCalc?.status, new: newCalc.status },
+                    workflowStep: { old: oldCalc?.workflowStep, new: newCalc.workflowStep },
+                    isPendingReview: { old: oldCalc?.isPendingReview, new: newCalc.isPendingReview },
+                    reviewedBy: { old: oldCalc?.reviewedBy, new: newCalc.reviewedBy },
+                    reviewedAt: { old: oldCalc?.reviewedAt, new: newCalc.reviewedAt },
+                  },
+                  operatedBy: currentUser,
+                  operatedAt: confirmedAt,
+                  remark: confirmed ? '结算主管确认拆分正常' : '结算主管标记为有争议',
+                },
+              ]
+            : []),
+        ],
       };
     });
   },
@@ -589,91 +571,157 @@ export const useCalculationStore = create<CalculationState>()(
   },
 
   generateReport: () => {
-    const { transactions, calculations, diffRecords, historyVersions, emailSupplements, splitInfos } = get();
+    const state = get();
+    const { transactions, calculations, diffRecords, emailSupplements, splitInfos, historyVersions } = state;
+
+    const totalTransactions = transactions.length;
     const totalAmount = transactions.reduce((sum, t) => sum + t.amount, 0);
+    const splitCount = calculations.filter(c => c.hasSplit).length;
+    const normalCount = calculations.filter(c => c.status === 'NORMAL').length;
+    const disputedCount = calculations.filter(c => c.status === 'DISPUTED').length;
+    const pendingReviewCount = calculations.filter(c => c.isPendingReview || c.status === 'SPLIT_PENDING').length;
+    const rollbackedCount = calculations.filter(c => c.status === 'ROLLBACKED').length;
     const totalBaseMargin = calculations.reduce((sum, c) => sum + c.baseMargin, 0);
     const totalStressMargin = calculations.reduce((sum, c) => sum + c.stressMargin, 0);
-    
-    const statusCounts: Record<string, number> = {};
-    calculations.forEach(c => {
-      statusCounts[c.status] = (statusCounts[c.status] || 0) + 1;
+    const unresolvedDiffs = diffRecords.filter(d => !d.resolved).length;
+    const totalHistoryVersions = historyVersions.length;
+
+    const reportLines = [
+      '========================================',
+      '        期权保证金压力试算报告',
+      '========================================',
+      '',
+      `生成时间: ${dayjs().format('YYYY-MM-DD HH:mm:ss')}`,
+      `操作用户: ${state.currentUser}`,
+      '',
+      '----------------------------------------',
+      '一、柜台流水统计',
+      '----------------------------------------',
+      `柜台流水记录总数: ${totalTransactions} 条`,
+      `交易总金额: ${formatCurrency(totalAmount)}`,
+      `涉及业务号数量: ${calculations.length} 个`,
+      `拆分记录数量: ${splitCount} 个`,
+      '',
+      '----------------------------------------',
+      '二、保证金试算统计',
+      '----------------------------------------',
+      `试算记录总数: ${calculations.length} 条`,
+      `基础保证金总额: ${formatCurrency(totalBaseMargin)}`,
+      `压力保证金总额: ${formatCurrency(totalStressMargin)}`,
+      `正常: ${normalCount} 条`,
+      `待复核: ${pendingReviewCount} 条`,
+      `有争议: ${disputedCount} 条`,
+      `已回滚: ${rollbackedCount} 条`,
+      '',
+      '----------------------------------------',
+      '三、流程进度统计',
+      '----------------------------------------',
+      `STEP1 已导入: ${calculations.filter(c => c.workflowStep === 'STEP1_IMPORTED').length} 条`,
+      `STEP2 已补录邮件: ${calculations.filter(c => c.workflowStep === 'STEP2_EMAIL_SUPPLEMENTED').length} 条`,
+      `STEP3 差异已更新: ${calculations.filter(c => c.workflowStep === 'STEP3_DIFF_UPDATED').length} 条`,
+      `补充邮件总数: ${emailSupplements.length} 条`,
+      `差异记录总数: ${diffRecords.length} 条`,
+      `未解决差异: ${unresolvedDiffs} 条`,
+      '',
+      '----------------------------------------',
+      '四、历史版本统计',
+      '----------------------------------------',
+      `历史版本总数: ${totalHistoryVersions} 条`,
+      `创建操作: ${historyVersions.filter(h => h.action === 'CREATE').length} 条`,
+      `更新操作: ${historyVersions.filter(h => h.action === 'UPDATE').length} 条`,
+      `回滚操作: ${historyVersions.filter(h => h.action === 'ROLLBACK').length} 条`,
+      '',
+      '----------------------------------------',
+      '五、试算明细',
+      '----------------------------------------',
+      '',
+    ];
+
+    calculations.forEach((calc, idx) => {
+      const businessTransactions = transactions.filter(t => t.businessNumber === calc.businessNumber);
+      const splitInfo = splitInfos.find(s => s.businessNumber === calc.businessNumber);
+      const statusLabel = calc.status === 'NORMAL' ? '正常' :
+                         calc.status === 'DISPUTED' ? '有争议' :
+                         calc.status === 'SPLIT_PENDING' ? '待拆分复核' :
+                         calc.status === 'ROLLBACKED' ? '已回滚' : '待复核';
+      const stepLabel = calc.workflowStep === 'STEP1_IMPORTED' ? '已导入' :
+                       calc.workflowStep === 'STEP2_EMAIL_SUPPLEMENTED' ? '已补录邮件' : '差异已更新';
+
+      reportLines.push(`${idx + 1}. 业务号: ${calc.businessNumber}`);
+      reportLines.push(`   试算场景: ${calc.scenario}`);
+      reportLines.push(`   状态: ${statusLabel} | 流程: ${stepLabel}`);
+      reportLines.push(`   基础保证金: ${formatCurrency(calc.baseMargin)}`);
+      reportLines.push(`   压力保证金: ${formatCurrency(calc.stressMargin)}`);
+      reportLines.push(`   保证金比例: ${(calc.marginRatio * 100).toFixed(1)}%`);
+      reportLines.push(`   关联流水: ${businessTransactions.length} 条`);
+      if (splitInfo) {
+        reportLines.push(`   拆分信息: 本金 ${formatCurrency(splitInfo.principalAmount)} + 手续费 ${formatCurrency(splitInfo.feeAmount)} = ${formatCurrency(splitInfo.totalAmount)}`);
+      }
+      reportLines.push('');
     });
 
-    const stepCounts: Record<string, number> = {};
-    calculations.forEach(c => {
-      stepCounts[c.workflowStep] = (stepCounts[c.workflowStep] || 0) + 1;
-    });
+    reportLines.push('========================================');
+    reportLines.push('                报告结束');
+    reportLines.push('========================================');
 
-    return {
-      generatedAt: dayjs().toISOString(),
-      generatedBy: get().currentUser,
-      summary: {
-        totalTransactions: transactions.length,
-        totalAmount,
-        totalCalculations: calculations.length,
-        totalBaseMargin,
-        totalStressMargin,
-        totalDiffs: diffRecords.length,
-        resolvedDiffs: diffRecords.filter(d => d.resolved).length,
-        unresolvedDiffs: diffRecords.filter(d => !d.resolved).length,
-        totalEmails: emailSupplements.length,
-        totalSplits: splitInfos.length,
-        confirmedSplits: splitInfos.filter(s => s.status === 'CONFIRMED').length,
-        rejectedSplits: splitInfos.filter(s => s.status === 'REJECTED').length,
-        statusCounts,
-        stepCounts,
-        totalHistoryVersions: historyVersions.length,
-      },
-      calculations: calculations.map(c => ({
-        ...c,
-        transactions: transactions.filter(t => t.businessNumber === c.businessNumber),
-        diffs: diffRecords.filter(d => d.businessNumber === c.businessNumber),
-        emails: emailSupplements.filter(e => e.businessNumber === c.businessNumber),
-        splitInfo: splitInfos.find(s => s.businessNumber === c.businessNumber),
-      })),
-      transactions,
-      diffRecords,
-      emailSupplements,
-      splitInfos,
-      historyVersions,
-    };
+    return reportLines.join('\n');
   },
 
-  exportReportToCSV: () => {
-    const { calculations, transactions } = get();
-    let csv = '业务号,场景,基础保证金,压力保证金,比例,状态,流程步骤,是否拆分,流水数量,总金额\n';
-    
-    calculations.forEach(c => {
-      const trans = transactions.filter(t => t.businessNumber === c.businessNumber);
-      const total = trans.reduce((sum, t) => sum + t.amount, 0);
-      csv += `${c.businessNumber},${c.scenario},${c.baseMargin.toFixed(2)},${c.stressMargin.toFixed(2)},${(c.marginRatio * 100).toFixed(1)}%,${c.status},${c.workflowStep},${c.hasSplit ? '是' : '否'},${trans.length},${total.toFixed(2)}\n`;
+  exportReportCSV: () => {
+    const state = get();
+    const { calculations, transactions } = state;
+
+    const headers = [
+      '业务号',
+      '试算场景',
+      '计算时间',
+      '基础保证金',
+      '压力保证金',
+      '保证金比例',
+      '是否拆分',
+      '状态',
+      '流程进度',
+      '关联流水条数',
+      '创建时间',
+      '更新时间',
+    ];
+
+    const rows = calculations.map(calc => {
+      const businessTransactions = transactions.filter(t => t.businessNumber === calc.businessNumber);
+      const statusLabel = calc.status === 'NORMAL' ? '正常' :
+                         calc.status === 'DISPUTED' ? '有争议' :
+                         calc.status === 'SPLIT_PENDING' ? '待拆分复核' :
+                         calc.status === 'ROLLBACKED' ? '已回滚' : '待复核';
+      const stepLabel = calc.workflowStep === 'STEP1_IMPORTED' ? '已导入' :
+                       calc.workflowStep === 'STEP2_EMAIL_SUPPLEMENTED' ? '已补录邮件' : '差异已更新';
+
+      return [
+        calc.businessNumber,
+        calc.scenario,
+        dayjs(calc.calculationDate).format('YYYY-MM-DD HH:mm:ss'),
+        calc.baseMargin.toFixed(2),
+        calc.stressMargin.toFixed(2),
+        `${(calc.marginRatio * 100).toFixed(1)}%`,
+        calc.hasSplit ? '是' : '否',
+        statusLabel,
+        stepLabel,
+        businessTransactions.length,
+        dayjs(calc.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+        dayjs(calc.updatedAt).format('YYYY-MM-DD HH:mm:ss'),
+      ].join(',');
     });
 
-    csv += '\n\n柜台流水明细\n';
-    csv += '流水尾号,业务号,交易日期,金额,类型,对手方,备注,来源行\n';
-    transactions.forEach(t => {
-      const type = t.transactionType === 'FEE' ? '手续费' : t.transactionType === 'PRINCIPAL' ? '本金' : '合计';
-      csv += `${t.tailNumber},${t.businessNumber},${t.transactionDate},${t.amount.toFixed(2)},${type},${t.counterparty},"${t.remark}",${t.sourceRowNumber}\n`;
-    });
-
-    return csv;
-  },
-
-  exportReportToJSON: () => {
-    const report = get().generateReport();
-    return JSON.stringify(report, null, 2);
-  },
-
-  clearAllData: () => {
-    set({
-      transactions: [],
-      emailSupplements: [],
-      calculations: [],
-      diffRecords: [],
-      historyVersions: [],
-      importBatches: [],
-      splitInfos: [],
-    });
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `期权保证金压力试算报告_${dayjs().format('YYYYMMDD_HHmmss')}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   },
 }),
 {
