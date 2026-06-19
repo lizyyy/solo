@@ -146,11 +146,21 @@ def run_full_demo():
         cd = t.get("change_detail", {})
         sc = cd.get("status_change", "-")
         print(f"  [{t['source_text']}] {t['action_text']} -> 状态变化: {sc}")
+        if t.get("processing_result"):
+            print(f"     处理结果: {t['processing_result']}")
         if cd.get("field_changes"):
             for fc in cd["field_changes"]:
-                ov = str(fc["old"])[:20] if fc["old"] else "(空)"
-                nv = str(fc["new"])[:20] if fc["new"] else "(空)"
-                print(f"     字段 {fc['field']}: '{ov}' -> '{nv}'")
+                ov = str(fc["old_value"])[:20] if fc["old_value"] is not None else "(空)"
+                nv = str(fc["new_value"])[:20] if fc["new_value"] is not None else "(空)"
+                field_label = fc.get("field_label", fc.get("field_key", "未知字段"))
+                print(f"     字段 {field_label}: '{ov}' -> '{nv}'")
+
+    print("\n记录最终处理判断:")
+    final_detail = api.get_record(rid_a)
+    print(f"  can_generate_weekly_report: {final_detail['can_generate_weekly_report']}")
+    print(f"  processing_judgment: {final_detail['processing_judgment']}")
+    print(f"  unresolved_conflict_count: {final_detail['unresolved_conflict_count']}")
+    print(f"  latest_action_text: {final_detail['latest_action_text']}")
 
     print("\n" + "=" * 50)
     print("导出一致性验证")

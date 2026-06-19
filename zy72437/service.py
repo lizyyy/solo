@@ -632,15 +632,78 @@ class ClaimRecordService:
                 change["status_change"] = (
                     f"{log.old_value.get('status')} -> {log.new_value.get('status')}"
                 )
+                change["old_status"] = log.old_value.get("status")
+                change["new_status"] = log.new_value.get("status")
                 changed_fields = []
-                for k in ["song_live_name", "song_copyright_name", "attendance_count", "raw_remark", "ticket_remark"]:
+                tracked_fields = [
+                    ("song_live_name", "歌曲现场名"),
+                    ("song_copyright_name", "歌曲版权名"),
+                    ("attendance_count", "出勤课时数"),
+                    ("raw_remark", "签到原始备注"),
+                    ("ticket_remark", "票务备注"),
+                    ("status", "记录状态"),
+                    ("duplicate_type", "重复类型"),
+                ]
+                for k, field_label in tracked_fields:
                     ov = log.old_value.get(k)
                     nv = log.new_value.get(k)
                     if ov != nv:
                         changed_fields.append(
-                            {"field": k, "old": ov, "new": nv}
+                            {
+                                "field_key": k,
+                                "field_label": field_label,
+                                "old_value": ov,
+                                "new_value": nv,
+                            }
                         )
                 change["field_changes"] = changed_fields
+                change["field_change_count"] = len(changed_fields)
+            else:
+                change["field_changes"] = []
+                change["field_change_count"] = 0
+
+            conflict_reason = ""
+            if record.conflicts and log.action in ("import_ticket", "resolve_conflict", "confirm_song_alias"):
+                unresolved_at_time = [
+                    c.description for c in record.conflicts if not c.resolved
+                ]
+                if unresolved_at_time:
+                    conflict_reason = "；".join(unresolved_at_time)
+
+            processing_result = ""
+            if log.action == "import_sign_in":
+                processing_result = "课时签到照片导入完成，记录已建立"
+            elif log.action == "import_ticket":
+                processing_result = (
+                    f"票务补录完成；冲突数={len(record.conflicts)}；"
+                    f"状态: {change.get('new_status', '未知')}"
+                )
+            elif log.action == "resolve_conflict":
+                remaining = sum(1 for c in record.conflicts if not c.resolved)
+                processing_result = f"冲突已处理；剩余未解决冲突数={remaining}"
+            elif log.action == "confirm_song_alias":
+                remaining = sum(1 for c in record.conflicts if not c.resolved)
+                if remaining > 0:
+                    processing_result = f"别名已确认，但仍有 {remaining} 条票务冲突未解决，暂不能生成周报"
+                else:
+                    processing_result = "别名已确认，且无未解决票务冲突，可生成周报"
+            elif log.action == "generate_weekly_report":
+                processing_result = "已纳入店长周报生成"
+            elif log.action == "reject_record":
+                processing_result = "记录已驳回"
+
+            change_reason = ""
+            if log.action == "confirm_song_alias":
+                if record.calculation_meta:
+                    change_reason = record.calculation_meta.decision_reason
+            elif log.action == "resolve_conflict":
+                resolved_log = next(
+                    (c for c in record.conflicts if c.resolution),
+                    None,
+                )
+                if resolved_log:
+                    change_reason = resolved_log.resolution
+
             trail.append(
                 {
                     "log_id": log.log_id,
@@ -652,6 +715,9 @@ class ClaimRecordService:
                     "timestamp": log.timestamp.isoformat(),
                     "remark": log.remark,
                     "change_detail": change,
+                    "conflict_reason": conflict_reason,
+                    "processing_result": processing_result,
+                    "change_reason": change_reason,
                 }
             )
         return trail
@@ -663,6 +729,39 @@ class ClaimRecordService:
         return self._record_to_unified_dict(record)
 
     def _record_to_unified_dict(self, record: ClaimRecord) -> Dict:
+        unresolved_conflicts = [c for c in record.conflicts if not c.resolved]
+        resolved_conflicts = [c for c in record.conflicts if c.resolved]
+        has_song_alias = bool(
+            record.song_live_name
+            and record.song_copyright_name
+            and record.song_live_name != record.song_copyright_name
+        )
+        can_generate_weekly_report = (
+            len(unresolved_conflicts) == 0
+            and not has_song_alias
+            and record.status in (RecordStatus.CONFIRMED, RecordStatus.NORMAL)
+        )
+
+        last_audit = record.audit_logs[-1] if record.audit_logs else None
+        latest_operator = last_audit.operator if last_audit else None
+        latest_action = last_audit.action if last_audit else None
+        latest_action_text = self._get_action_text_for_trail(latest_action) if latest_action else ""
+        latest_remark = last_audit.remark if last_audit else ""
+
+        processing_judgment = ""
+        if unresolved_conflicts:
+            processing_judgment = (
+                f"仍有 {len(unresolved_conflicts)} 条票务冲突未解决，不能生成周报，请先处理。"
+            )
+        elif has_song_alias:
+            processing_judgment = "歌曲现场名与版权名不一致（别名），待许老师确认后才能生成周报。"
+        elif record.status == RecordStatus.PENDING_REVIEW:
+            processing_judgment = "记录处于待复核状态，请人工确认后再生成周报。"
+        elif record.status == RecordStatus.REJECTED:
+            processing_judgment = "该记录已驳回，不纳入周报。"
+        elif record.status in (RecordStatus.CONFIRMED, RecordStatus.NORMAL):
+            processing_judgment = "无冲突、无别名、状态正常，可生成周报。"
+
         result = {
             "record_id": record.record_id,
             "lesson_date": record.lesson_date,
@@ -677,16 +776,22 @@ class ClaimRecordService:
             "status_text": self._get_status_text(record.status),
             "has_conflicts": len(record.conflicts) > 0,
             "conflict_count": len(record.conflicts),
+            "unresolved_conflict_count": len(unresolved_conflicts),
+            "resolved_conflict_count": len(resolved_conflicts),
             "ticket_imported": record.ticket_imported,
             "weekly_report_generated": record.weekly_report_generated,
             "duplicate_type": record.duplicate_type.value if record.duplicate_type else None,
             "duplicate_type_text": self._get_duplicate_type_text(record.duplicate_type),
             "duplicate_of_record_id": record.duplicate_of_record_id,
-            "has_song_alias": bool(
-                record.song_live_name
-                and record.song_copyright_name
-                and record.song_live_name != record.song_copyright_name
-            ),
+            "has_song_alias": has_song_alias,
+            "can_generate_weekly_report": can_generate_weekly_report,
+            "processing_judgment": processing_judgment,
+            "latest_operator": latest_operator,
+            "latest_action": latest_action,
+            "latest_action_text": latest_action_text,
+            "latest_remark": latest_remark,
+            "created_at": record.created_at.isoformat(),
+            "updated_at": record.updated_at.isoformat(),
         }
 
         if record.calculation_meta:

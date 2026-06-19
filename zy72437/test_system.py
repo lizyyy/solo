@@ -1,3 +1,5 @@
+import csv
+import io
 import json
 from api import APIHandler
 
@@ -399,9 +401,10 @@ def test_d_state_change_trail():
             print(f"    状态变化: {cd['status_change']}")
         if cd.get("field_changes"):
             for fc in cd["field_changes"]:
-                ov = str(fc["old"])[:30] if fc["old"] else "(空)"
-                nv = str(fc["new"])[:30] if fc["new"] else "(空)"
-                print(f"    字段 {fc['field']}: '{ov}' -> '{nv}'")
+                ov = str(fc["old_value"])[:30] if fc["old_value"] is not None else "(空)"
+                nv = str(fc["new_value"])[:30] if fc["new_value"] is not None else "(空)"
+                field_label = fc.get("field_label", fc.get("field_key", "未知字段"))
+                print(f"    字段 {field_label}: '{ov}' -> '{nv}'")
 
     audit = api.get_audit_trail(rid)
     sign_in_logs = api.get_audit_trail(rid, source="sign_in_photo")
@@ -559,13 +562,212 @@ def test_e_consistency_verification():
     print("  ✅ E组测试全部通过\n")
 
 
+def test_f_xiaoxingxing_full_flow():
+    print("=" * 70)
+    print("测试 F: 小星星样例全链路贯通 - 别名+票务冲突叠加场景")
+    print("=" * 70)
+
+    api = APIHandler()
+    workflow = api.create_workflow()
+    wid = workflow["workflow_id"]
+
+    print("\n【第1步】导入课时签到照片")
+    print("  歌曲: 现场名='现场演出版-小星星' 版权名='小星星官方版权名'")
+    step1 = api.workflow_step1(
+        wid,
+        {
+            "operator": "许老师",
+            "records": [
+                {
+                    "lesson_date": "2026-06-15",
+                    "teacher": "许老师",
+                    "student": "小星",
+                    "song_live_name": "现场演出版-小星星",
+                    "song_copyright_name": "小星星官方版权名",
+                    "attendance_count": 1,
+                    "raw_remark": "签到备注：学生小星今天演奏小星星，左手和弦配合有进步",
+                },
+            ],
+        },
+    )
+    rid = step1["records"][0]["record_id"]
+    r1 = step1["records"][0]
+    print(f"  导入后: 状态={r1['status']}({r1['status_text']}), has_song_alias={r1['has_song_alias']}")
+    assert r1["status"] == "pending_review"
+    assert r1["has_song_alias"] == True
+    print("  ✅ 签到导入后别名已识别，状态为待复核")
+
+    print("\n【第2步】补录票务导出表")
+    print("  票务歌曲名='小星星'（与现场名、版权名都不一样，会产生票务冲突）")
+    step2 = api.workflow_step2(
+        wid,
+        {
+            "operator": "许老师",
+            "ticket_mapping": {
+                rid: {
+                    "song_name": "小星星",
+                    "attendance_count": 1,
+                    "remark": "票务备注：2026暑期汇演-小星星节目，已核销1课时",
+                }
+            },
+        },
+    )
+    r2 = api.get_record(rid)
+    print(f"  补录后: 状态={r2['status']}({r2['status_text']})")
+    print(f"         冲突数={r2['conflict_count']}, 未解决={r2['unresolved_conflict_count']}")
+    print(f"         has_song_alias={r2['has_song_alias']}, 可生成周报={r2['can_generate_weekly_report']}")
+    for c in r2["conflicts"]:
+        print(f"         - 冲突字段[{c['field_name']}]: 签到='{c['sign_in_value']}' vs 票务='{c['ticket_value']}'")
+    assert r2["status"] == "conflict", "票务冲突产生后状态应为 conflict"
+    assert r2["unresolved_conflict_count"] >= 1
+    assert r2["has_song_alias"] == True
+    assert r2["can_generate_weekly_report"] == False
+    print("  ✅ 票务冲突正确识别，别名仍保留，暂不可生成周报")
+
+    print("\n【第3步】许老师先确认别名（但票务冲突还未解决！）")
+    alias_result = api.confirm_song_alias(
+        rid,
+        {
+            "operator": "许老师",
+            "confirm_live_name_as_official": True,
+            "decision_note": "家长确认以演出版名称为准，现场名统一为正式名",
+        },
+    )
+    print(f"  别名确认返回:")
+    print(f"    状态变化: {alias_result['old_status']} -> {alias_result['new_status']}")
+    print(f"    最终歌曲名: '{alias_result['final_song_name']}'")
+    print(f"    未解决冲突数: {alias_result['unresolved_conflict_count']}")
+    print(f"    可生成周报: {alias_result['can_generate_weekly_report']}")
+    print(f"    处理判断: {alias_result['processing_judgment'][:80]}...")
+    assert alias_result["new_status"] == "conflict", "别名确认后仍有未解决票务冲突，状态必须保持 conflict!"
+    assert alias_result["unresolved_conflict_count"] >= 1
+    assert alias_result["can_generate_weekly_report"] == False
+    print("  ✅ 别名已确认但状态未放行！因为仍有未解决票务冲突，保持 CONFLICT，不能进周报")
+
+    r3 = api.get_record(rid)
+    print(f"\n  别名确认后记录详情:")
+    print(f"    歌曲: 现场名='{r3['song_live_name']}' 版权名='{r3['song_copyright_name']}'")
+    print(f"    has_song_alias={r3['has_song_alias']}, 状态={r3['status']}")
+    print(f"    未解决冲突数={r3['unresolved_conflict_count']}, 可生成周报={r3['can_generate_weekly_report']}")
+    print(f"    processing_judgment: {r3['processing_judgment'][:80]}...")
+    assert r3["has_song_alias"] == False
+    assert r3["status"] == "conflict"
+    assert r3["unresolved_conflict_count"] >= 1
+    assert r3["can_generate_weekly_report"] == False
+    print("  ✅ 别名字段已统一，但冲突仍在，状态仍为 CONFLICT，正确拦截")
+
+    print("\n【第4步】尝试直接生成周报（应该被阻止！）")
+    try:
+        api.workflow_step3(wid, {"operator": "许老师"})
+        print("  ❌ 错误：还有未解决票务冲突，但周报生成竟然通过了！")
+        assert False, "未解决冲突时不应允许生成周报"
+    except ValueError as e:
+        err_msg = str(e)
+        print(f"  ✅ 周报生成被正确阻止，错误信息包含冲突详情:")
+        for line in err_msg.split("\n")[:5]:
+            print(f"     {line[:100]}")
+        assert "未解决" in err_msg or "票务冲突" in err_msg
+
+    print("\n【第5步】解决票务冲突（选择采用签到值）")
+    conflict_to_resolve = r3["conflicts"][0]
+    print(f"  解决冲突字段[{conflict_to_resolve['field_name']}]: 签到='{conflict_to_resolve['sign_in_value']}' vs 票务='{conflict_to_resolve['ticket_value']}'")
+    api.resolve_conflict(
+        rid,
+        {
+            "conflict_id": conflict_to_resolve["conflict_id"],
+            "resolution": "现场演出版-小星星是该曲的正式演出用名，票务的'小星星'是简称，以签到照片的完整名称为准",
+            "operator": "许老师",
+            "use_sign_in_value": True,
+        },
+    )
+    r4 = api.get_record(rid)
+    print(f"  冲突解决后: 状态={r4['status']}, 未解决={r4['unresolved_conflict_count']}, 可生成周报={r4['can_generate_weekly_report']}")
+    assert r4["unresolved_conflict_count"] == 0
+    assert r4["status"] == "confirmed"
+    assert r4["can_generate_weekly_report"] == True
+    print("  ✅ 票务冲突全部解决后，状态变为已确认，可生成周报")
+
+    print("\n【第6步】再次生成周报（这次应该成功！）")
+    step3 = api.workflow_step3(wid, {"operator": "许老师"})
+    print(f"  周报生成成功: 步骤={step3['step_name']}")
+    report = step3["weekly_report"]
+    print(f"  周报汇总: 总记录={report['summary']['total_records']}, 已确认={report['summary']['confirmed']}")
+    assert report["summary"]["confirmed"] >= 1
+    assert report["summary"]["with_song_alias"] == 0
+    print("  ✅ 周报生成成功，小星星记录正确纳入")
+
+    print("\n【第7步】导出审计明细 CSV，核对每步字段快照")
+    audit_csv = api.export_audit_csv(rid)
+    csv_lines = audit_csv.strip().split("\n")
+    print(f"  审计CSV行数: {len(csv_lines)} (含表头)")
+    print(f"  表头列: {csv_lines[0]}")
+    assert "old_value" in csv_lines[0], "审计导出必须有 old_value 列"
+    assert "new_value" in csv_lines[0], "审计导出必须有 new_value 列"
+    assert "field_label" in csv_lines[0], "审计导出必须有 field_label 列"
+    assert "change_reason" in csv_lines[0], "审计导出必须有 change_reason 列"
+    assert "processing_result" in csv_lines[0], "审计导出必须有 processing_result 列"
+    assert "conflict_reason" in csv_lines[0], "审计导出必须有 conflict_reason 列"
+
+    has_import_sign_in_snapshot = False
+    has_import_ticket_snapshot = False
+    has_confirm_alias_snapshot = False
+    has_resolve_conflict_snapshot = False
+    has_generate_report_snapshot = False
+    print(f"\n  审计明细快照内容:")
+    reader = csv.DictReader(io.StringIO(audit_csv))
+    for i, row in enumerate(reader, 1):
+        action_text = row.get("action_text", "")
+        field_label = row.get("field_label", "")
+        old_v = row.get("old_value", "")
+        new_v = row.get("new_value", "")
+        processing = row.get("processing_result", "")
+        print(f"  #{i}: action={action_text[:20]}, field={field_label[:15]}, old={old_v[:20]}, new={new_v[:20]}, result={processing[:30]}")
+        if "导入课时签到" in action_text:
+            has_import_sign_in_snapshot = True
+        if "导入票务导出" in action_text:
+            has_import_ticket_snapshot = True
+        if "人工确认歌曲别名" in action_text and (old_v or new_v):
+            has_confirm_alias_snapshot = True
+        if "人工解决冲突" in action_text and (old_v or new_v):
+            has_resolve_conflict_snapshot = True
+        if "生成店长周报" in action_text:
+            has_generate_report_snapshot = True
+
+    assert has_import_sign_in_snapshot, "签到导入步骤快照缺失"
+    assert has_import_ticket_snapshot, "票务补录步骤快照缺失"
+    assert has_confirm_alias_snapshot, "别名确认步骤字段快照缺失"
+    assert has_resolve_conflict_snapshot, "冲突解决步骤字段快照缺失"
+    assert has_generate_report_snapshot, "周报生成步骤快照缺失"
+    print("  ✅ 审计导出完整覆盖签到/票务/别名确认/冲突解决/周报生成 各步的字段快照")
+
+    print("\n【第8步】导出统一记录CSV，核对新增判断字段")
+    records_csv = api.export_records_csv([rid])
+    assert "unresolved_conflict_count" in records_csv
+    assert "can_generate_weekly_report" in records_csv
+    assert "processing_judgment" in records_csv
+    assert "latest_action_text" in records_csv
+    print("  ✅ 统一导出CSV包含新增判断字段：未解决冲突数、可否生成周报、处理判断、最近操作")
+
+    print("\n【第9步】运行自检确认整体一致")
+    check = api.run_self_check(rid)
+    print(f"  自检结果: 通过 {check['passed_count']}/{check['check_count']}")
+    for r in check["results"]:
+        flag = "✅" if r["passed"] else "❌"
+        print(f"    {flag} {r['check_type']}: {r['message'][:80]}")
+    assert check["passed_count"] == check["check_count"], "自检应全部通过"
+    print("  ✅ 全量自检通过")
+
+    print("\n  ✅ F组（小星星别名+票务冲突叠加）全链路测试全部通过！\n")
+
+
 if __name__ == "__main__":
     test_a_song_alias_not_normalized()
     test_b_remark_not_overwritten()
     test_c_duplicate_classification()
     test_d_state_change_trail()
     test_e_consistency_verification()
+    test_f_xiaoxingxing_full_flow()
 
     print("=" * 70)
-    print("🎉 A/B/C/D/E 五大组修复验证测试 全部通过！")
+    print("🎉 A/B/C/D/E/F 六大组修复验证测试 全部通过！")
     print("=" * 70)

@@ -32,8 +32,17 @@ class ExportService:
             "status_text",
             "has_conflicts",
             "conflict_count",
+            "unresolved_conflict_count",
+            "resolved_conflict_count",
+            "can_generate_weekly_report",
+            "processing_judgment",
+            "latest_operator",
+            "latest_action_text",
+            "latest_remark",
             "ticket_imported",
             "weekly_report_generated",
+            "created_at",
+            "updated_at",
             "param_version",
             "decision_reason",
         ]
@@ -61,8 +70,17 @@ class ExportService:
                     "status_text": row.get("status_text", ""),
                     "has_conflicts": row.get("has_conflicts", ""),
                     "conflict_count": row.get("conflict_count", ""),
+                    "unresolved_conflict_count": row.get("unresolved_conflict_count", ""),
+                    "resolved_conflict_count": row.get("resolved_conflict_count", ""),
+                    "can_generate_weekly_report": row.get("can_generate_weekly_report", ""),
+                    "processing_judgment": row.get("processing_judgment", ""),
+                    "latest_operator": row.get("latest_operator", ""),
+                    "latest_action_text": row.get("latest_action_text", ""),
+                    "latest_remark": row.get("latest_remark", ""),
                     "ticket_imported": row.get("ticket_imported", ""),
                     "weekly_report_generated": row.get("weekly_report_generated", ""),
+                    "created_at": row.get("created_at", ""),
+                    "updated_at": row.get("updated_at", ""),
                     "param_version": calc_meta.get("param_version", ""),
                     "decision_reason": calc_meta.get("decision_reason", ""),
                 }
@@ -114,44 +132,94 @@ class ExportService:
         return output.getvalue()
 
     def export_audit_trail_to_csv(self, record_id: str) -> str:
-        trail = self.data_access.get_audit_trail(record_id)
+        trail = self.data_access.get_state_change_trail(record_id)
+        record_detail = self.data_access.get_record_detail(record_id)
 
         output = io.StringIO()
         fieldnames = [
+            "record_id",
+            "student",
+            "song_live_name",
+            "song_copyright_name",
             "log_id",
+            "step_order",
             "source",
             "source_text",
             "action",
             "action_text",
             "operator",
             "timestamp",
-            "remark",
+            "status_change",
+            "field_key",
+            "field_label",
             "old_value",
             "new_value",
+            "change_reason",
+            "conflict_reason",
+            "processing_result",
+            "remark",
         ]
 
         writer = csv.DictWriter(output, fieldnames=fieldnames)
         writer.writeheader()
 
-        for row in trail:
-            writer.writerow(
-                {
-                    "log_id": row.get("log_id", ""),
-                    "source": row.get("source", ""),
-                    "source_text": row.get("source_text", ""),
-                    "action": row.get("action", ""),
-                    "action_text": row.get("action_text", ""),
-                    "operator": row.get("operator", ""),
-                    "timestamp": row.get("timestamp", ""),
-                    "remark": row.get("remark", ""),
-                    "old_value": json.dumps(row.get("old_value"), ensure_ascii=False)
-                    if row.get("old_value")
-                    else "",
-                    "new_value": json.dumps(row.get("new_value"), ensure_ascii=False)
-                    if row.get("new_value")
-                    else "",
-                }
-            )
+        for step_idx, row in enumerate(trail, start=1):
+            change_detail = row.get("change_detail", {})
+            field_changes = change_detail.get("field_changes", [])
+
+            if not field_changes:
+                writer.writerow(
+                    {
+                        "record_id": record_id,
+                        "student": record_detail.get("student", ""),
+                        "song_live_name": record_detail.get("song_live_name", ""),
+                        "song_copyright_name": record_detail.get("song_copyright_name", ""),
+                        "log_id": row.get("log_id", ""),
+                        "step_order": step_idx,
+                        "source": row.get("source", ""),
+                        "source_text": row.get("source_text", ""),
+                        "action": row.get("action", ""),
+                        "action_text": row.get("action_text", ""),
+                        "operator": row.get("operator", ""),
+                        "timestamp": row.get("timestamp", ""),
+                        "status_change": change_detail.get("status_change", ""),
+                        "field_key": "",
+                        "field_label": "",
+                        "old_value": "",
+                        "new_value": "",
+                        "change_reason": row.get("change_reason", ""),
+                        "conflict_reason": row.get("conflict_reason", ""),
+                        "processing_result": row.get("processing_result", ""),
+                        "remark": row.get("remark", ""),
+                    }
+                )
+            else:
+                for fc in field_changes:
+                    writer.writerow(
+                        {
+                            "record_id": record_id,
+                            "student": record_detail.get("student", ""),
+                            "song_live_name": record_detail.get("song_live_name", ""),
+                            "song_copyright_name": record_detail.get("song_copyright_name", ""),
+                            "log_id": row.get("log_id", ""),
+                            "step_order": step_idx,
+                            "source": row.get("source", ""),
+                            "source_text": row.get("source_text", ""),
+                            "action": row.get("action", ""),
+                            "action_text": row.get("action_text", ""),
+                            "operator": row.get("operator", ""),
+                            "timestamp": row.get("timestamp", ""),
+                            "status_change": change_detail.get("status_change", ""),
+                            "field_key": fc.get("field_key", ""),
+                            "field_label": fc.get("field_label", ""),
+                            "old_value": "" if fc.get("old_value") is None else str(fc.get("old_value")),
+                            "new_value": "" if fc.get("new_value") is None else str(fc.get("new_value")),
+                            "change_reason": row.get("change_reason", ""),
+                            "conflict_reason": row.get("conflict_reason", ""),
+                            "processing_result": row.get("processing_result", ""),
+                            "remark": row.get("remark", ""),
+                        }
+                    )
 
         return output.getvalue()
 

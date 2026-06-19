@@ -272,17 +272,27 @@ class WorkflowService:
             final_name = record.song_copyright_name
             decision = "确认以版权名为最终名称，现场名同步为版权名"
 
-        record.status = RecordStatus.CONFIRMED
-        record.calculation_meta = self.record_service.param_version
-        record.calculation_meta = __import__("models").CalculationMeta(
-            param_version=self.record_service.param_version,
-            decision_reason=(
-                f"人工确认别名处理: {decision}。"
-                f"原因: {decision_note}。操作人: {operator}。"
-                f"最终歌曲名: '{final_name}'。"
-            ),
-        )
-        record.updated_at = datetime.now()
+        unresolved_conflicts = [c for c in record.conflicts if not c.resolved]
+        if unresolved_conflicts:
+            record.status = RecordStatus.CONFLICT
+            conflict_descriptions = "; ".join(
+                f"[{c.field_name}] 签到值='{c.sign_in_value}' vs 票务值='{c.ticket_value}'"
+                for c in unresolved_conflicts
+            )
+            status_remark = (
+                f"别名已确认统一为 '{final_name}'，"
+                f"但仍有 {len(unresolved_conflicts)} 条票务冲突未解决："
+                f"{conflict_descriptions}。"
+                f"状态保持 CONFLICT，不能进入周报，需先解决票务冲突。"
+            )
+            can_generate_report = False
+        else:
+            record.status = RecordStatus.CONFIRMED
+            status_remark = (
+                f"别名已确认统一为 '{final_name}'，"
+                f"且无未解决票务冲突，状态归为已确认，可进入周报。"
+            )
+            can_generate_report = True
 
         from models import CalculationMeta
         record.calculation_meta = CalculationMeta(
@@ -291,8 +301,10 @@ class WorkflowService:
                 f"人工确认别名处理: {decision}。"
                 f"原因: {decision_note}。操作人: {operator}。"
                 f"最终歌曲名: '{final_name}'。"
+                f"处理判断: {status_remark}"
             ),
         )
+        record.updated_at = datetime.now()
 
         self.record_service._add_audit_log(
             record,
@@ -304,14 +316,16 @@ class WorkflowService:
             remark=(
                 f"人工确认歌曲别名: {decision}。"
                 f"状态变化: [{old_status} -> {record.status.value}]。"
-                f"原因: {decision_note}"
+                f"原因: {decision_note}。"
+                f"冲突情况: 未解决冲突数={len(unresolved_conflicts)}。"
+                f"处理判断: {status_remark}"
             ),
         )
 
         self.record_service._add_remark_history(
             record,
             RecordSource.MANUAL_CONFIRM,
-            f"别名确认说明: {decision_note}",
+            f"别名确认说明: {decision_note}；处理判断: {status_remark}",
             modified_by=operator,
             change_reason=decision,
         )
@@ -324,6 +338,19 @@ class WorkflowService:
             "final_song_name": final_name,
             "decision": decision,
             "note": decision_note,
+            "unresolved_conflict_count": len(unresolved_conflicts),
+            "unresolved_conflicts": [
+                {
+                    "conflict_id": c.conflict_id,
+                    "field_name": c.field_name,
+                    "sign_in_value": c.sign_in_value,
+                    "ticket_value": c.ticket_value,
+                    "description": c.description,
+                }
+                for c in unresolved_conflicts
+            ],
+            "can_generate_weekly_report": can_generate_report,
+            "processing_judgment": status_remark,
             "detail": self.data_access.get_record_detail(record_id),
         }
 
@@ -340,30 +367,69 @@ class WorkflowService:
             self.record_service.get_record(rid) for rid in workflow.current_records
         ]
 
+        records_with_unresolved_conflicts = []
         for record in records:
-            if record.status == RecordStatus.CONFLICT:
-                unresolved = [c for c in record.conflicts if not c.resolved]
-                if unresolved:
-                    raise ValueError(
-                        f"记录 {record.record_id} ({record.student}) 仍有未解决的冲突，请先处理"
+            unresolved = [c for c in record.conflicts if not c.resolved]
+            if unresolved:
+                conflict_details = []
+                for c in unresolved:
+                    conflict_details.append(
+                        f"字段[{c.field_name}]: 签到值='{c.sign_in_value}' vs 票务值='{c.ticket_value}' - {c.description}"
                     )
+                last_operator = None
+                last_audit = record.audit_logs[-1] if record.audit_logs else None
+                if last_audit:
+                    last_operator = last_audit.operator
+                records_with_unresolved_conflicts.append(
+                    {
+                        "record_id": record.record_id,
+                        "student": record.student,
+                        "status": record.status.value,
+                        "unresolved_count": len(unresolved),
+                        "unresolved_conflicts": conflict_details,
+                        "last_operator": last_operator,
+                        "processing_judgment": (
+                            f"该记录当前状态为 {record.status.value}，"
+                            f"仍有 {len(unresolved)} 条票务冲突未解决，"
+                            "不能生成周报，请先逐一处理冲突后再试。"
+                        ),
+                    }
+                )
+        if records_with_unresolved_conflicts:
+            detail_lines = []
+            for r in records_with_unresolved_conflicts:
+                detail_lines.append(
+                    f"- {r['student']}({r['record_id'][:8]}): 状态={r['status']}, "
+                    f"未解决冲突数={r['unresolved_count']}, 最近操作人={r['last_operator'] or '未知'}; "
+                    + "; ".join(r["unresolved_conflicts"])
+                )
+            raise ValueError(
+                f"共 {len(records_with_unresolved_conflicts)} 条记录存在未解决的票务冲突，"
+                "不能生成周报。请先处理以下冲突：\n" + "\n".join(detail_lines)
+            )
 
         still_pending_alias = [
             r
             for r in records
-            if r.status == RecordStatus.PENDING_REVIEW
-            and r.song_live_name
+            if r.song_live_name
             and r.song_copyright_name
             and r.song_live_name != r.song_copyright_name
         ]
         if still_pending_alias:
+            alias_details = []
+            for r in still_pending_alias:
+                last_operator = None
+                last_audit = r.audit_logs[-1] if r.audit_logs else None
+                if last_audit:
+                    last_operator = last_audit.operator
+                alias_details.append(
+                    f"- {r.student}({r.record_id[:8]}): 现场名='{r.song_live_name}' vs 版权名='{r.song_copyright_name}', "
+                    f"状态={r.status.value}, 最近操作人={last_operator or '未知'}; "
+                    f"处理判断: 歌曲别名仍未确认，状态未归为已确认，不能生成周报，请许老师确认后再试。"
+                )
             raise ValueError(
                 f"仍有 {len(still_pending_alias)} 条歌曲别名记录待许老师复核，"
-                "请先对以下记录逐一确认后再生成周报: "
-                + ", ".join(
-                    f"{r.student}({r.record_id[:8]})"
-                    for r in still_pending_alias
-                )
+                "请先对以下记录逐一确认后再生成周报：\n" + "\n".join(alias_details)
             )
 
         for record in records:
