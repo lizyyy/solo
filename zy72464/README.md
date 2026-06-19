@@ -89,9 +89,10 @@ def compute_batch_hash(rows):
         ↓
    process_status: initial → complaint_added
         ↓
-第三步：导出地图更新（GeoJSON/CSV）
+第三步：统一导出（GeoJSON + CSV 同一条链路）
         ↓
    process_status: complaint_added → map_exported
+   GeoJSON和CSV数据完全一致，不会出现CSV保留旧空值
    边界待复核点位在GeoJSON中标记 needs_review=true
 ```
 
@@ -123,20 +124,37 @@ result = update_complaint_codes(point_id=5, complaint_codes="TS-2026-002,TS-2026
 - 改前值、改后值
 - 修改原因
 
-### 第三步：导出地图更新
+### 第三步：统一导出（GeoJSON + CSV 同一条链路）
 
 ```python
-from park_night_run.exporter import export_to_geojson
+from park_night_run.exporter import export_all
 
-result = export_to_geojson("data/output.geojson", include_pending_boundary=True, operator="阿宁")
-# 返回: {total_exported, boundary_points, pending_review}
+result = export_all(
+    geojson_path="data/output.geojson",
+    csv_path="data/output.csv",
+    include_pending_boundary=True,
+    operator="阿宁"
+)
+# 返回: {geojson_path, csv_path, total_exported, geojson_empty_streets, csv_empty_streets, data_snapshot}
 ```
+
+**export_all 保证：**
+- 一次性从数据库读取当前最新状态 → GeoJSON 和 CSV 数据完全一致
+- 统一更新 `process_status = 'map_exported'`
+- `csv_empty_streets` 和 `geojson_empty_streets` 都应为 0
 
 **导出的GeoJSON包含：**
 - `properties.original_row`：原始行号
 - `properties.is_boundary`：是否边界点
 - `properties.needs_review`：是否待复核（项目经理一眼就能看到）
 - `properties.boundary_status`：复核状态
+- `properties.street_name`：街道名称（不会为空）
+
+**导出的CSV包含：**
+- `street_name`：街道名称（不会保留旧空值）
+- `boundary_review_status`：复核状态
+- `process_status`：处理状态
+- 所有字段与数据库当前值一致
 
 ---
 
@@ -198,19 +216,38 @@ for item in results:
 python3 run_demo.py
 ```
 
-演示内容：
-1. 初始化数据库
-2. 导入8个夜间采样点（含边界点位自动识别）
-3. 查看待复核的边界点位列表
-4. 验证重复导入不翻倍
-5. 阿宁补录8个点位的居民投诉编号
-6. 阿宁修改单条备注，查看历史记录差别
-7. 处理边界点位复核（确认/驳回）
-8. 导出GeoJSON和CSV地图数据
-9. 演示回滚操作
-10. 最终汇总报告
+演示内容（按使用者路线实际复现）：
+1. 启动项目、初始化数据库
+2. 夜间采样点第一次导入（8个点位，自动识别边界）
+3. 重复导入同一批数据（验证不翻倍，报告复用/新增）
+4. 修改版CSV重复导入（验证历史留痕、原话保留）
+5. 阿宁补看/补录居民投诉编号
+6. 反查望京公园正门、东湖街道健身区（改前改后、状态）
+7. 补录街道（边界复核确认）
+8. 保存、刷新重算报告
+9. 统一导出 GeoJSON + CSV（同一条链路）
+10. 实际打开CSV逐行核对（重点确认：CSV不再保留旧空值）
+11. 望京公园正门、东湖街道健身区三端核对（CSV/GeoJSON/数据库）
 
-### 5.2 数据文件位置
+### 5.2 运行端到端测试
+
+```bash
+python3 test_e2e.py
+```
+
+43 项断言覆盖：
+- 第一次导入 8 条 → 数据库无空街道
+- 重复导入同批 → 跳过、8 条复用、0 新增
+- 修改版 CSV 导入 → 历史留痕、原话保留
+- 补录投诉 → process_status 更新
+- 边界复核 → 空街道=0
+- export_all 统一导出 → GeoJSON 和 CSV 空街道都为 0
+- **CSV 文件逐行读取核对 → street_name 全部非空**
+- 望京公园正门 CSV street_name=望京街道
+- 东湖街道健身区 CSV street_name=东湖街道
+- GeoJSON 同样核对
+
+### 5.3 数据文件位置
 
 | 文件 | 说明 |
 |------|------|
@@ -292,3 +329,4 @@ rollback_point(point_id=5, history_id=17, reason="备注写错了", operator="�
 2. **导出时边界点有标记**：GeoJSON 中 `needs_review=true`，不会被汇总数字盖过去
 3. **所有改动留痕**：没有能偷偷改的字段，每条修改都能找到人、找到原因
 4. **原始行号一直保留**：从导入到导出，`original_row_number` 始终在，随时能回到原始表格
+5. **GeoJSON 和 CSV 同一条链路**：使用 `export_all()` 统一导出，保证数据一致，CSV 不会保留旧空值

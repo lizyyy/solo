@@ -1,7 +1,7 @@
 {
   "type": "FeatureCollection",
   "name": "公园夜跑路线安全_夜间采样点",
-  "export_time": "2026-06-12T21:09:48.412187",
+  "export_time": "2026-06-20T07:38:56.750359",
   "export_by": "阿宁",
   "crs": {
     "type": "name",
@@ -199,21 +199,22 @@
         "point_code": "P153708",
         "original_row": 9,
         "street_name": "花家地街道",
-        "second_street": "大屯街道",
+        "second_street": null,
         "is_boundary": true,
-        "boundary_status": "pending",
+        "boundary_status": "confirmed",
         "safety_level": "high",
         "lighting": "昏暗",
         "complaint_codes": "TS-2026-008",
         "remark": "大屯望京交界桥底",
-        "process_status": "complaint_added",
-        "needs_review": true
+        "process_status": "boundary_review",
+        "needs_review": false
       }
     }
   ],
   "summary": {
     "total": 8,
     "boundary_points": 2,
-    "pending_review": 1
+    "pending_review": 0,
+    "empty_streets": 0
   }
 }
