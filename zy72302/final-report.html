@@ -1,0 +1,359 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>排队论窗口配置 - 边界样本报告</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; background: #f5f5f5; }
+    .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    h1 { color: #333; border-bottom: 3px solid #4a90d9; padding-bottom: 10px; margin-bottom: 20px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
+    .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; }
+    .stat-card .number { font-size: 32px; font-weight: bold; }
+    .stat-card .label { font-size: 14px; opacity: 0.9; }
+    .sample-card { border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 20px; overflow: hidden; }
+    .sample-header { background: #f8f9fa; padding: 15px; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; }
+    .sample-id { font-weight: bold; color: #333; }
+    .status { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    .status-pending_ta { background: #fff3cd; color: #856404; }
+    .status-pending_coach { background: #cce5ff; color: #004085; }
+    .status-coach_verified { background: #d4edda; color: #155724; }
+    .status-dismissed { background: #f8d7da; color: #721c24; }
+    .sample-body { padding: 20px; }
+    .section { margin-bottom: 15px; }
+    .section-title { font-weight: 600; color: #4a90d9; margin-bottom: 8px; }
+    .evidence-box { background: #fff8e1; border-left: 4px solid #ff9800; padding: 10px 15px; margin: 10px 0; }
+    .missing-item { color: #e65100; }
+    .next-action { background: #e3f2fd; border-left: 4px solid #2196f3; padding: 10px 15px; font-weight: 500; }
+    .assignee { display: inline-block; background: #4a90d9; color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px; margin-top: 8px; }
+    .delta-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    .delta-table th, .delta-table td { border: 1px solid #e0e0e0; padding: 8px 12px; text-align: left; }
+    .delta-table th { background: #f5f5f5; }
+    .delta-table .neg { color: #c62828; font-weight: bold; }
+    .timeline { border-left: 2px solid #e0e0e0; padding-left: 20px; margin-top: 10px; }
+    .timeline-item { position: relative; padding-bottom: 15px; }
+    .timeline-item::before { content: ''; position: absolute; left: -27px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: #667eea; border: 2px solid white; box-shadow: 0 0 0 2px #667eea; }
+    .timeline-time { font-size: 12px; color: #999; }
+    .timeline-body { margin-top: 4px; }
+    .badge { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: 6px; }
+    .muted { color: #666; font-size: 13px; margin-top: 4px; }
+    .empty { text-align: center; padding: 60px 20px; color: #999; }
+    .empty .tip-box { background: #fafafa; border: 1px dashed #ccc; padding: 20px; border-radius: 8px; margin-top: 15px; text-align: left; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>排队论窗口配置 - 边界样本报告</h1>
+    <p style="color: #666; margin-bottom: 20px;">
+      报告编号: report_mqkkqzg1_m6sj94 | 生成时间: 2026/6/19 14:55:25 |
+      数据条数: 3（基于同一份最新状态）
+    </p>
+
+    <div class="stats">
+      <div class="stat-card"><div class="number">3</div><div class="label">总样本数</div></div>
+      <div class="stat-card"><div class="number">1</div><div class="label">待学生助教</div></div>
+      <div class="stat-card"><div class="number">0</div><div class="label">待唐老师</div></div>
+      <div class="stat-card"><div class="number">2</div><div class="label">已确认</div></div>
+      <div class="stat-card"><div class="number">0</div><div class="label">已解决</div></div>
+    </div>
+
+    <h2 style="margin: 30px 0 20px; color: #333;">边界样本详情</h2>
+
+    
+      <div class="sample-card" id="sample-SAMPLE-001">
+        <div class="sample-header">
+          <span class="sample-id">样本: SAMPLE-001</span>
+          <span class="status status-coach_verified">唐老师已确认</span>
+        </div>
+        <div class="sample-body">
+          <div class="section">
+            <div class="section-title">负数样本信息</div>
+            <div class="evidence-box">
+              <strong>异常原因:</strong> 等待时间为负数(-5分钟)；旧系统标记为缺失；窗口临时关闭；主流程证据: 主流程步骤3异常，系统记录等待时间为负，可能与临时关窗有关<br>
+              <strong>检测来源:</strong> 旧表系统<br>
+              <strong>是否标记为缺失:</strong> 否
+            </div>
+          </div>
+
+          
+          <div class="section">
+            <div class="section-title">手算反例（主流程证据）</div>
+            <div>窗口号: 1 | 时间: 2024/1/15 10:30:00</div>
+            <div>到达人数: 15 | 等待时间: 15分钟</div>
+            <div class="evidence-box">主流程证据: 主流程步骤3异常，系统记录等待时间为负，可能与临时关窗有关</div>
+          </div>
+
+          
+          <div class="section">
+            <div class="section-title">问卷原始行（现场说法）</div>
+            <div class="evidence-box" style="background: #e8f5e9; border-left-color: #4caf50;">
+              <strong>现场说法:</strong> 窗口1在10:20-10:40临时关闭处理紧急事务，实际等待时间应为15分钟，有3位同学可作证<br>
+              <strong>证人:</strong> 张三、李四、王五
+            </div>
+            <div>临时关窗: 是 ⚠️ | 排队溢出: 否</div>
+          </div>
+
+          <div class="section"><div class="section-title">为什么留下</div><div>包含主流程关键证据；包含现场说法记录；旧表异常样本，需要人工复核确认；涉及特殊现场情况（临时关窗/排队溢出）</div></div>
+
+          <div class="section"><div class="section-title">还缺什么材料</div><div style="color: #4caf50;">✅ 材料齐全</div></div>
+
+          <div class="next-action">
+            <strong>下一步:</strong> 可以标记为已解决
+            
+          </div>
+
+          
+          <div class="section">
+            <div class="section-title">原始负数值 ↔ 修正后（保留原始说法，不归入正常）</div>
+            <table class="delta-table">
+              <tr><th>指标</th><th>原始负数</th><th>修正后</th></tr>
+              <tr><td>等待时间</td><td class="neg">-5分钟</td><td>15分钟</td></tr>
+              
+            </table>
+          </div>
+
+          
+          <div class="section">
+            <div class="section-title">最终处理结果</div>
+            <div class="evidence-box" style="background: #f1f8e9; border-left-color: #7cb342;">
+              <div><strong>最终等待时间:</strong> 15分钟</div>
+              <div><strong>最终到达人数:</strong> 15人</div>
+              <div><strong>处理原因:</strong> README验证-唐老师确认：临时关窗影响核实，建议该时段预留1个机动窗口</div>
+              <div><strong>后续找谁:</strong> 竞赛教练唐老师（用于窗口排班优化）</div>
+              <div><strong>处理人:</strong> 竞赛教练唐老师</div>
+            </div>
+          </div>
+
+          <div class="section"><div class="section-title">学生助教备注</div><div>README验证-已核实：窗口1在10:20-10:40临时关闭，实际等待15分钟，问卷已补录</div></div>
+          <div class="section"><div class="section-title">唐老师备注</div><div>README验证-唐老师确认：临时关窗影响核实，建议该时段预留1个机动窗口</div></div>
+
+          
+          <div class="section">
+            <div class="section-title">复核历史（完整轨迹）</div>
+            <div class="timeline">
+              
+                <div class="timeline-item">
+                  <div class="timeline-time">2026/6/19 14:55:15</div>
+                  <div class="timeline-body">
+                    <strong>旧表系统</strong> 执行【创建边界样本】
+                    
+                    
+                    <div class="muted">原因: 等待时间为负数(-5分钟)；旧系统标记为缺失；窗口临时关闭；主流程证据: 主流程步骤3异常，系统记录等待时间为负，可能与临时关窗有关</div>
+                    
+                  </div>
+                </div>
+              
+                <div class="timeline-item">
+                  <div class="timeline-time">2026/6/19 14:55:19</div>
+                  <div class="timeline-body">
+                    <strong>学生助教</strong> 执行【学生助教复核】
+                    <span class="badge">待学生助教复核 → 待竞赛教练唐老师复核</span>
+                    <div class="muted">备注: README验证-已核实：窗口1在10:20-10:40临时关闭，实际等待15分钟，问卷已补录</div>
+                    <div class="muted">原因: 学生助教确认通过</div>
+                    <div style="color:#2e7d32;">☑ 补录了现场说法（问卷原始行）</div>
+                  </div>
+                </div>
+              
+                <div class="timeline-item">
+                  <div class="timeline-time">2026/6/19 14:55:21</div>
+                  <div class="timeline-body">
+                    <strong>竞赛教练唐老师</strong> 执行【唐老师复核】
+                    <span class="badge">待竞赛教练唐老师复核 → 唐老师已确认</span>
+                    <div class="muted">备注: README验证-唐老师确认：临时关窗影响核实，建议该时段预留1个机动窗口</div>
+                    <div class="muted">原因: 唐老师确认通过</div>
+                    
+                  </div>
+                </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sample-card" id="sample-SAMPLE-002">
+        <div class="sample-header">
+          <span class="sample-id">样本: SAMPLE-002</span>
+          <span class="status status-coach_verified">唐老师已确认</span>
+        </div>
+        <div class="sample-body">
+          <div class="section">
+            <div class="section-title">负数样本信息</div>
+            <div class="evidence-box">
+              <strong>异常原因:</strong> 到达人数为负数(-3人)；旧系统标记为缺失；排队溢出；主流程证据: 到达人数统计为负数，怀疑排队溢出时系统统计出错<br>
+              <strong>检测来源:</strong> 旧表系统<br>
+              <strong>是否标记为缺失:</strong> 否
+            </div>
+          </div>
+
+          
+          <div class="section">
+            <div class="section-title">手算反例（主流程证据）</div>
+            <div>窗口号: 2 | 时间: 2024/1/15 14:00:00</div>
+            <div>到达人数: 25 | 等待时间: 12分钟</div>
+            <div class="evidence-box">主流程证据: 到达人数统计为负数，怀疑排队溢出时系统统计出错</div>
+          </div>
+
+          
+          <div class="section">
+            <div class="section-title">问卷原始行（现场说法）</div>
+            <div class="evidence-box" style="background: #e8f5e9; border-left-color: #4caf50;">
+              <strong>现场说法:</strong> 下午2点窗口2排队溢出，队伍排到门外，系统统计时可能重复计数或漏记<br>
+              <strong>证人:</strong> 赵六
+            </div>
+            <div>临时关窗: 否 | 排队溢出: 是 ⚠️</div>
+          </div>
+
+          <div class="section"><div class="section-title">为什么留下</div><div>包含主流程关键证据；包含现场说法记录；旧表异常样本，需要人工复核确认；涉及特殊现场情况（临时关窗/排队溢出）</div></div>
+
+          <div class="section"><div class="section-title">还缺什么材料</div><div style="color: #4caf50;">✅ 材料齐全</div></div>
+
+          <div class="next-action">
+            <strong>下一步:</strong> 可以标记为已解决
+            
+          </div>
+
+          
+          <div class="section">
+            <div class="section-title">原始负数值 ↔ 修正后（保留原始说法，不归入正常）</div>
+            <table class="delta-table">
+              <tr><th>指标</th><th>原始负数</th><th>修正后</th></tr>
+              
+              <tr><td>到达人数</td><td class="neg">-3人</td><td>25人</td></tr>
+            </table>
+          </div>
+
+          
+          <div class="section">
+            <div class="section-title">最终处理结果</div>
+            <div class="evidence-box" style="background: #f1f8e9; border-left-color: #7cb342;">
+              <div><strong>最终等待时间:</strong> 25分钟</div>
+              <div><strong>最终到达人数:</strong> 25人</div>
+              <div><strong>处理原因:</strong> README验证-唐老师确认：排队溢出属实，建议下午2点时段增至3窗口</div>
+              <div><strong>后续找谁:</strong> 竞赛教练唐老师（用于窗口排班优化）</div>
+              <div><strong>处理人:</strong> 竞赛教练唐老师</div>
+            </div>
+          </div>
+
+          <div class="section"><div class="section-title">学生助教备注</div><div>README验证-已核实：下午2点窗口2排队溢出，实际到达25人、等待25分钟</div></div>
+          <div class="section"><div class="section-title">唐老师备注</div><div>README验证-唐老师确认：排队溢出属实，建议下午2点时段增至3窗口</div></div>
+
+          
+          <div class="section">
+            <div class="section-title">复核历史（完整轨迹）</div>
+            <div class="timeline">
+              
+                <div class="timeline-item">
+                  <div class="timeline-time">2026/6/19 14:55:15</div>
+                  <div class="timeline-body">
+                    <strong>旧表系统</strong> 执行【创建边界样本】
+                    
+                    
+                    <div class="muted">原因: 到达人数为负数(-3人)；旧系统标记为缺失；排队溢出；主流程证据: 到达人数统计为负数，怀疑排队溢出时系统统计出错</div>
+                    
+                  </div>
+                </div>
+              
+                <div class="timeline-item">
+                  <div class="timeline-time">2026/6/19 14:55:20</div>
+                  <div class="timeline-body">
+                    <strong>学生助教</strong> 执行【学生助教复核】
+                    <span class="badge">待学生助教复核 → 待竞赛教练唐老师复核</span>
+                    <div class="muted">备注: README验证-已核实：下午2点窗口2排队溢出，实际到达25人、等待25分钟</div>
+                    <div class="muted">原因: 学生助教确认通过</div>
+                    <div style="color:#2e7d32;">☑ 补录了现场说法（问卷原始行）</div>
+                  </div>
+                </div>
+              
+                <div class="timeline-item">
+                  <div class="timeline-time">2026/6/19 14:55:21</div>
+                  <div class="timeline-body">
+                    <strong>竞赛教练唐老师</strong> 执行【唐老师复核】
+                    <span class="badge">待竞赛教练唐老师复核 → 唐老师已确认</span>
+                    <div class="muted">备注: README验证-唐老师确认：排队溢出属实，建议下午2点时段增至3窗口</div>
+                    <div class="muted">原因: 唐老师确认通过</div>
+                    
+                  </div>
+                </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sample-card" id="sample-SAMPLE-004">
+        <div class="sample-header">
+          <span class="sample-id">样本: SAMPLE-004</span>
+          <span class="status status-pending_ta">待学生助教复核</span>
+        </div>
+        <div class="sample-body">
+          <div class="section">
+            <div class="section-title">负数样本信息</div>
+            <div class="evidence-box">
+              <strong>异常原因:</strong> 等待时间为负数(-2分钟)；旧系统标记为缺失；主流程证据: 午休期间窗口关闭，系统仍在统计，导致等待时间计算异常<br>
+              <strong>检测来源:</strong> 旧表系统<br>
+              <strong>是否标记为缺失:</strong> 是 ⚠️（旧表当成缺失，待学生助教先复核）
+            </div>
+          </div>
+
+          
+          <div class="section">
+            <div class="section-title">手算反例（主流程证据）</div>
+            <div>窗口号: 3 | 时间: 2024/1/15 12:15:00</div>
+            <div>到达人数: 8 | 等待时间: -2分钟</div>
+            <div class="evidence-box">主流程证据: 午休期间窗口关闭，系统仍在统计，导致等待时间计算异常</div>
+          </div>
+
+          
+
+          <div class="section"><div class="section-title">为什么留下</div><div>包含主流程关键证据；旧表异常样本，需要人工复核确认；保留原始负数证据，不归入正常统计</div></div>
+
+          
+          <div class="section">
+            <div class="section-title">还缺什么材料</div>
+            <div class="missing-item">⭕ 缺少问卷原始行（现场说法）</div><div class="missing-item">⭕ 旧表标记为缺失，需核实数据来源</div>
+          </div>
+
+          <div class="next-action">
+            <strong>下一步:</strong> 需要收集更多现场数据补充完整
+            <div class="assignee">当前负责人: 学生助教</div>
+          </div>
+
+          
+          <div class="section">
+            <div class="section-title">原始负数值 ↔ 修正后（保留原始说法，不归入正常）</div>
+            <table class="delta-table">
+              <tr><th>指标</th><th>原始负数</th><th>修正后</th></tr>
+              <tr><td>等待时间</td><td class="neg">-2分钟</td><td>-2分钟</td></tr>
+              
+            </table>
+          </div>
+
+          
+
+          
+          
+
+          
+          <div class="section">
+            <div class="section-title">复核历史（完整轨迹）</div>
+            <div class="timeline">
+              
+                <div class="timeline-item">
+                  <div class="timeline-time">2026/6/19 14:55:15</div>
+                  <div class="timeline-body">
+                    <strong>旧表系统</strong> 执行【创建边界样本】
+                    
+                    
+                    <div class="muted">原因: 等待时间为负数(-2分钟)；旧系统标记为缺失；主流程证据: 午休期间窗口关闭，系统仍在统计，导致等待时间计算异常</div>
+                    
+                  </div>
+                </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</body>
+</html>

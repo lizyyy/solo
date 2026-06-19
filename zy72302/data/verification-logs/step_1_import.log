@@ -1,0 +1,51 @@
+[14:55:13] 开始验证 README 新人路径
+[14:55:13] 日志文件: data/verification-logs/20260619_145513_run.log
+[14:55:13] 
+[14:55:13] ▌预演：复现 README 旧写法的问题（不加 --）
+[14:55:13] ===== STEP: wrong_ta_review_no_doubledash =====
+[14:55:13] CMD: npx ts-node src/cli/index.ts ta-review SAMPLE-001
+--- begin output ---
+error: required option '-v, --verified <true|false>' not specified
+--- end output (exit=1) ---
+[14:55:14] ✅ 断言通过: 不加 -- 时，输出确实是 'required option -v --verified not specified'（新人看到的"终端评估"）
+[14:55:14] 
+[14:55:14] ===== STEP: 1_import =====
+[14:55:14] CMD: npx ts-node src/cli/index.ts import -m ./data/manualCounterExamples.json -q ./data/questionnaireRows.json
+--- begin output ---
+=== 开始导入数据 ===
+
+✓ 手算反例: 5 条
+✓ 问卷原始行: 2 条
+
+=== 检测负数样本 ===
+
+检测到 3 个负数样本
+
+
+✓ 创建/更新 3 个边界样本
+
+  📌 SAMPLE-001 [缺1项]
+     状态: 待学生助教复核
+     原因: 等待时间为负数(-5分钟)；旧系统标记为缺失；窗口临时关闭；主流程证据: 主流程步骤3异常，系统记录等待时间为负，可能与临时关窗有关
+     ⚠️  旧表当成缺失
+     负责人: 学生助教
+  📌 SAMPLE-002 [缺1项]
+     状态: 待学生助教复核
+     原因: 到达人数为负数(-3人)；旧系统标记为缺失；排队溢出；主流程证据: 到达人数统计为负数，怀疑排队溢出时系统统计出错
+     ⚠️  旧表当成缺失
+     负责人: 学生助教
+  📌 SAMPLE-004 [缺2项]
+     状态: 待学生助教复核
+     原因: 等待时间为负数(-2分钟)；旧系统标记为缺失；主流程证据: 午休期间窗口关闭，系统仍在统计，导致等待时间计算异常
+     ⚠️  旧表当成缺失
+     负责人: 学生助教
+[90m┌────────[39m[90m┬────────────[39m[90m┬──────────[39m[90m┬────────[39m[90m┬────────┐[39m
+[90m│[39m[31m 总样本 [39m[90m│[39m[31m 待学生助教 [39m[90m│[39m[31m 待唐老师 [39m[90m│[39m[31m 已确认 [39m[90m│[39m[31m 已解决 [39m[90m│[39m
+[90m├────────[39m[90m┼────────────[39m[90m┼──────────[39m[90m┼────────[39m[90m┼────────┤[39m
+[90m│[39m 3      [90m│[39m 3          [90m│[39m 0        [90m│[39m 0      [90m│[39m 0      [90m│[39m
+[90m└────────[39m[90m┴────────────[39m[90m┴──────────[39m[90m┴────────[39m[90m┴────────┘[39m
+
+  状态文件: /Users/lzy/pro/solo/workspaces/zy72302/data/app-state.json
+  后续命令：queue-config list / queue-config ta-review / queue-config report
+
+--- end output (exit=0) ---

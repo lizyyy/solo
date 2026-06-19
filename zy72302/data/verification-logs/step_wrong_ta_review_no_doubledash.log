@@ -1,0 +1,9 @@
+[14:55:13] 开始验证 README 新人路径
+[14:55:13] 日志文件: data/verification-logs/20260619_145513_run.log
+[14:55:13] 
+[14:55:13] ▌预演：复现 README 旧写法的问题（不加 --）
+[14:55:13] ===== STEP: wrong_ta_review_no_doubledash =====
+[14:55:13] CMD: npx ts-node src/cli/index.ts ta-review SAMPLE-001
+--- begin output ---
+error: required option '-v, --verified <true|false>' not specified
+--- end output (exit=1) ---

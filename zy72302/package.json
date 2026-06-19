@@ -14,7 +14,8 @@
     "web:dev": "ts-node src/cli/index.ts web",
     "test": "ts-node src/tests/integration.test.ts",
     "lint": "eslint src --ext .ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "verify:readme": "bash scripts/verify-readme-path.sh"
   },
   "dependencies": {
     "express": "^4.18.2",
