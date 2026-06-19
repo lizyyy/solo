@@ -1,0 +1,167 @@
+import type { GraphData, ErrorRecord, RecordState } from '@/types';
+
+const now = new Date();
+const hoursAgo = (h: number) => new Date(now.getTime() - h * 3600 * 1000).toISOString();
+
+export const seedGraph: GraphData = {
+  nodes: [
+    {
+      id: 'n1',
+      name: '图论基础',
+      category: '基础概念',
+      errorCount: 1,
+      attributionType: 'concept',
+      x: 300,
+      y: 60,
+    },
+    {
+      id: 'n2',
+      name: '最短路径',
+      category: '典型算法',
+      errorCount: 2,
+      attributionType: 'calculation',
+      x: 120,
+      y: 180,
+    },
+    {
+      id: 'n3',
+      name: '拓扑排序',
+      category: '典型算法',
+      errorCount: 0,
+      attributionType: 'thinking',
+      x: 300,
+      y: 180,
+    },
+    {
+      id: 'n4',
+      name: '最小生成树',
+      category: '典型算法',
+      errorCount: 1,
+      attributionType: 'concept',
+      x: 480,
+      y: 180,
+    },
+    {
+      id: 'n5',
+      name: '网络流',
+      category: '进阶专题',
+      errorCount: 0,
+      attributionType: 'thinking',
+      x: 300,
+      y: 300,
+    },
+  ],
+  edges: [
+    { id: 'e1', from: 'n1', to: 'n2', label: '前置依赖', weight: 1 },
+    { id: 'e2', from: 'n1', to: 'n3', label: '前置依赖', weight: 1 },
+    { id: 'e3', from: 'n1', to: 'n4', label: '前置依赖', weight: 1 },
+    { id: 'e4', from: 'n2', to: 'n5', label: '递进到', weight: 2 },
+    { id: 'e5', from: 'n3', to: 'n5', label: '递进到', weight: 1 },
+    { id: 'e6', from: 'n4', to: 'n5', label: '递进到', weight: 1 },
+  ],
+};
+
+export const seedRecords: RecordState = {
+  processed: [
+    {
+      id: 'r001',
+      studentId: 's001',
+      studentName: '林小雅',
+      questionId: 'q101',
+      questionTitle: '有向图中最短路径的 Dijkstra 算法应用',
+      studentAnswer: '使用 Floyd 算法，时间复杂度 O(n³)',
+      correctAnswer: '使用 Dijkstra 算法，时间复杂度 O((n+m)logn)',
+      nodeId: 'n2',
+      status: 'processed',
+      attribution: '算法选型错误',
+      attributionType: 'concept',
+      note: '混淆了单源最短路径与多源最短路径的算法选型',
+      createdAt: hoursAgo(48),
+      updatedAt: hoursAgo(46),
+      isWithdrawn: false,
+      isDuplicate: false,
+      duplicateReason: '',
+    },
+    {
+      id: 'r002',
+      studentId: 's002',
+      studentName: '王浩然',
+      questionId: 'q203',
+      questionTitle: 'Prim 算法与 Kruskal 算法的适用场景辨析',
+      studentAnswer: 'Prim 适用于稀疏图',
+      correctAnswer: 'Prim 适用于稠密图，Kruskal 适用于稀疏图',
+      nodeId: 'n4',
+      status: 'processed',
+      attribution: '概念辨析不清',
+      attributionType: 'concept',
+      note: '对两种最小生成树算法的时间复杂度与适用场景区分不明确',
+      createdAt: hoursAgo(36),
+      updatedAt: hoursAgo(34),
+      isWithdrawn: false,
+      isDuplicate: false,
+      duplicateReason: '',
+    },
+  ],
+  pending: [
+    {
+      id: 'r003',
+      studentId: 's003',
+      studentName: '陈思琪',
+      questionId: 'q105',
+      questionTitle: '带负权边的最短路径求解',
+      studentAnswer: '直接用 Dijkstra 算法求解',
+      correctAnswer: '负权边图需用 Bellman-Ford 或 SPFA',
+      nodeId: 'n2',
+      status: 'pending',
+      attribution: '思路偏差',
+      attributionType: 'thinking',
+      note: '该记录为撤回后补录，需人工核验归因是否准确',
+      createdAt: hoursAgo(12),
+      updatedAt: hoursAgo(2),
+      isWithdrawn: true,
+      isDuplicate: false,
+      duplicateReason: '',
+    },
+  ],
+  manual: [
+    {
+      id: 'r004',
+      studentId: 's001',
+      studentName: '林小雅',
+      questionId: 'q101',
+      questionTitle: '有向图中最短路径的 Dijkstra 算法应用（重测）',
+      studentAnswer: '使用 Floyd 算法，时间复杂度 O(n³)',
+      correctAnswer: '使用 Dijkstra 算法，时间复杂度 O((n+m)logn)',
+      nodeId: 'n2',
+      status: 'manual',
+      attribution: '重复样本-需人工确认',
+      attributionType: 'concept',
+      note: '该学生同一题目重复提交，疑似样本重复，请教研老师确认是否纳入统计',
+      createdAt: hoursAgo(6),
+      updatedAt: hoursAgo(1),
+      isWithdrawn: false,
+      isDuplicate: true,
+      duplicateReason: '学生 s001 + 题目 q101 组合已有记录（r001），样本重复',
+    },
+  ],
+};
+
+export const attributionTypeColors: Record<string, string> = {
+  concept: '#0F4C5C',
+  calculation: '#E36414',
+  thinking: '#5E8B99',
+  reading: '#93B4BE',
+};
+
+export const attributionTypeLabels: Record<string, string> = {
+  concept: '概念误解',
+  calculation: '计算错误',
+  thinking: '思路偏差',
+  reading: '审题不清',
+};
+
+export const statusLabels: Record<string, string> = {
+  processed: '已处理',
+  pending: '待补材料',
+  manual: '人工改判',
+};
