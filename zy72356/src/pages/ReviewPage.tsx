@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useStore } from '@/store'
 import { fetchRecords, reviewRecord, confirmRecord, rollbackRecord, fetchAuditLogs, uploadPhoto, fetchPhotos } from '@/api'
 import { StatusBadge, CredibilityBadge, UnitBadge, SourceBadge } from '@/components/Badges'
-import { ClipboardCheck, Camera, History, RotateCcw, CheckCircle, Image, X, Eye, ArrowRight, Shield, UserCheck } from 'lucide-react'
+import { ClipboardCheck, Camera, History, RotateCcw, CheckCircle, Image, X, Eye, ArrowRight, Shield, UserCheck, AlertTriangle, FileWarning } from 'lucide-react'
 import type { RecordDetail, AuditLogEntry, PhotoEntry } from '@/store'
 import { cn } from '@/lib/utils'
 
@@ -176,6 +176,7 @@ export default function ReviewPage() {
               >
                 <option value="">全部状态</option>
                 <option value="mixed_unit">混用待复核</option>
+                <option value="anomaly">已修正待确认</option>
                 <option value="normal">正常</option>
                 <option value="confirmed">已确认</option>
                 <option value="rolled_back">已回滚</option>
@@ -285,16 +286,55 @@ export default function ReviewPage() {
                   <NextStepPanel record={selectedRecord} />
 
                   <div>
-                    <p className="text-xs text-slate-500 mb-1">工况照片</p>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <p className="text-xs text-slate-500">工况照片</p>
+                      <span className={`text-[11px] font-mono px-1.5 py-0.5 rounded flex items-center gap-1 ${photos.length === 0
+                          ? 'bg-slate-100 text-slate-500'
+                          : photos.some(p => p.accessStatus !== 'accessible')
+                            ? 'bg-red-50 text-red-700 border border-red-200'
+                            : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        }`}>
+                        {photos.length === 0 ? <FileWarning size={10} /> : photos.some(p => p.accessStatus !== 'accessible') ? <AlertTriangle size={10} /> : <Image size={10} />}
+                        {photos.length === 0
+                          ? '未上传'
+                          : photos.some(p => p.accessStatus !== 'accessible')
+                            ? `${photos.filter(p => p.accessStatus === 'missing').length}张缺失 / ${photos.filter(p => p.accessStatus === 'inaccessible').length}张无权限`
+                            : `${photos.length}张可访问`}
+                      </span>
+                    </div>
                     <div className="grid grid-cols-3 gap-2 mb-2">
+                      {photos.length === 0 && (
+                        <div className="col-span-3 text-center text-xs text-slate-400 py-6 border-2 border-dashed border-slate-200 rounded">
+                          <Camera size={20} className="mx-auto mb-1.5 opacity-40" />
+                          未上传工况照片
+                        </div>
+                      )}
                       {photos.map((p) => (
-                        <div key={p.id} className="relative">
-                          <img
-                            src={`/${p.filePath}`}
-                            alt={p.description || '工况照片'}
-                            className="w-full h-16 object-cover rounded cursor-pointer border border-slate-200"
-                            onClick={() => setPhotoPreview(`/${p.filePath}`)}
-                          />
+                        <div key={p.id} className="relative group">
+                          {p.accessStatus === 'accessible' ? (
+                            <img
+                              src={p.fileUrl}
+                              alt={p.description || '工况照片'}
+                              className="w-full h-20 object-cover rounded cursor-pointer border border-slate-200 hover:border-indigo-400 transition-colors"
+                              onClick={() => setPhotoPreview(p.fileUrl)}
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none'
+                              }}
+                            />
+                          ) : (
+                            <div
+                              className="w-full h-20 rounded cursor-pointer border border-red-300 bg-red-50 flex flex-col items-center justify-center text-[10px] text-red-600"
+                              title={`${p.accessStatus === 'missing' ? '文件不存在' : '无读取权限'}: ${p.filePath}`}
+                            >
+                              <AlertTriangle size={18} className="mb-1" />
+                              <p>{p.accessStatus === 'missing' ? '文件缺失' : '无法读取'}</p>
+                            </div>
+                          )}
+                          {p.description && (
+                            <p className="mt-1 text-[10px] text-slate-500 line-clamp-1" title={p.description}>
+                              {p.description}
+                            </p>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -489,10 +529,16 @@ export default function ReviewPage() {
 }
 
 function NextStepPanel({ record }: { record: RecordDetail }) {
+  const photos = useStore((s) => s.photos)
+  const hasAccessiblePhoto = photos.some(p => p.accessStatus === 'accessible')
+  const hasBrokenPhoto = photos.some(p => p.accessStatus !== 'accessible')
+
   const { text, action, iconClass, bgClass, borderClass, owner } = (() => {
     if (record.status === 'confirmed') {
       return {
-        text: '训练教练已确认，记录完成，可纳入交接报告。',
+        text: hasBrokenPhoto
+          ? '训练教练已确认，但部分工况照片无法访问，如需追溯证据请重新上传。'
+          : '训练教练已确认，记录完成，可纳入交接报告。',
         action: '无待办',
         iconClass: 'text-emerald-700',
         bgClass: 'bg-emerald-50',
@@ -512,18 +558,28 @@ function NextStepPanel({ record }: { record: RecordDetail }) {
     }
     if (record.correctedValue !== null && record.credibility === 'photo_trusted') {
       return {
-        text: '维修师傅已通过工况照片补看，标记为照片可信。请训练教练查看修正结果并确认。',
-        action: '等待训练教练确认',
-        iconClass: 'text-indigo-700',
-        bgClass: 'bg-indigo-50',
-        borderClass: 'border-indigo-200',
-        owner: '训练教练',
+        text: hasBrokenPhoto
+          ? '已标记照片可信，但部分照片文件不可访问/已缺失。请维修师傅重新上传工况照片后，再由训练教练确认。'
+          : hasAccessiblePhoto
+            ? '维修师傅已上传工况照片并标记可信，请训练教练查看照片与修正值后确认。'
+            : '已标记为照片可信但尚未上传工况照片证据，请维修师傅补上传后再确认。',
+        action: hasBrokenPhoto || !hasAccessiblePhoto
+          ? '维修师傅重新上传照片 → 训练教练确认'
+          : '等待训练教练确认',
+        iconClass: hasBrokenPhoto || !hasAccessiblePhoto ? 'text-orange-700' : 'text-indigo-700',
+        bgClass: hasBrokenPhoto || !hasAccessiblePhoto ? 'bg-orange-50' : 'bg-indigo-50',
+        borderClass: hasBrokenPhoto || !hasAccessiblePhoto ? 'border-orange-200' : 'border-indigo-200',
+        owner: hasBrokenPhoto || !hasAccessiblePhoto ? '维修师傅 → 训练教练' : '训练教练',
       }
     }
     if (record.status === 'mixed_unit' || record.credibility === 'pending_confirmation') {
       return {
-        text: '同一传感器编号存在摄氏度/开尔文混用，请维修师傅先补看工况照片，再交由训练教练复核。',
-        action: '① 维修师傅补看照片 → ② 训练教练复核确认',
+        text: hasAccessiblePhoto
+          ? '工况照片已上传，请维修师傅查看后标记可信度并填写修正值，再交由训练教练复核。'
+          : '同一传感器编号存在摄氏度/开尔文混用，请维修师傅先上传工况照片作为证据，再交由训练教练复核。',
+        action: hasAccessiblePhoto
+          ? '① 维修师傅填写修正值 → ② 训练教练复核确认'
+          : '① 维修师傅上传工况照片 → ② 填写修正值 → ③ 训练教练复核确认',
         iconClass: 'text-amber-700',
         bgClass: 'bg-amber-50',
         borderClass: 'border-amber-200',

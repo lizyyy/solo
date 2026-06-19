@@ -14,6 +14,7 @@ export interface RecordDetail {
   source: 'sensor_original' | 'photo_corrected' | 'coach_confirmed' | 'rolled_back'
   note: string | null
   batchId: string
+  photoCount?: number
   createdAt: string
   updatedAt: string
 }
@@ -33,6 +34,8 @@ export interface PhotoEntry {
   id: string
   recordId: string
   filePath: string
+  fileUrl: string
+  accessStatus: 'accessible' | 'inaccessible' | 'missing'
   description: string | null
   uploadedAt: string
 }

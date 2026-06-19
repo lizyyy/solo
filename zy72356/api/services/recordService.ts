@@ -2,6 +2,8 @@ import { getDb, saveDb } from '../db.js'
 import { v4 as uuidv4 } from 'uuid'
 import { parse } from 'csv-parse/sync'
 import { createAuditLog } from './auditService.js'
+import { getPhotosByRecordId, filePathToUrl } from './photoService.js'
+import fs from 'fs'
 import type {
   RecordDetail,
   BatchImport,
@@ -12,6 +14,7 @@ import type {
   RecordSource,
   TemperatureUnit,
   Credibility,
+  PhotoEntry,
 } from '../types.js'
 
 function parseRow(row: Record<string, string>, index: number): {
@@ -234,8 +237,15 @@ export async function getRecords(filters: {
     [...params, pageSize, offset]
   )[0]?.values || []
 
+  const photoRows = db.exec('SELECT record_id, COUNT(*) as cnt FROM photos GROUP BY record_id')[0]?.values || []
+  const photoCountMap = new Map<string, number>()
+  photoRows.forEach((r: any[]) => { photoCountMap.set(r[0] as string, r[1] as number) })
+
+  const records = rows.map(mapRowToRecord)
+  records.forEach(r => { r.photoCount = photoCountMap.get(r.id) ?? 0 })
+
   return {
-    records: rows.map(mapRowToRecord),
+    records,
     total: countResult as number,
   }
 }
@@ -243,7 +253,11 @@ export async function getRecords(filters: {
 export async function getRecordById(id: string): Promise<RecordDetail | null> {
   const db = await getDb()
   const row = db.exec('SELECT * FROM records WHERE id = ?', [id])[0]?.values[0]
-  return row ? mapRowToRecord(row) : null
+  if (!row) return null
+  const record = mapRowToRecord(row)
+  const photos = await getPhotosByRecordId(id)
+  record.photoCount = photos.length
+  return record
 }
 
 export async function reviewRecord(
@@ -416,6 +430,11 @@ export async function getReport(): Promise<ReportResponse> {
 
   const records = allRecords.map(mapRowToRecord)
 
+  const photoRows = db.exec('SELECT record_id, COUNT(*) as cnt FROM photos GROUP BY record_id')[0]?.values || []
+  const photoCountMap = new Map<string, number>()
+  photoRows.forEach((r: any[]) => { photoCountMap.set(r[0] as string, r[1] as number) })
+  records.forEach(r => { r.photoCount = photoCountMap.get(r.id) ?? 0 })
+
   const isPending = (r: RecordDetail) =>
     r.status === 'mixed_unit' ||
     r.status === 'anomaly' ||
@@ -449,6 +468,29 @@ export async function getReport(): Promise<ReportResponse> {
 export async function getReportCsv(): Promise<string> {
   const report = await getReport()
 
+  const db = await getDb()
+  const photoRows = db.exec('SELECT id, record_id, file_path, description, uploaded_at FROM photos ORDER BY record_id, uploaded_at')[0]?.values || []
+  const photoMap = new Map<string, PhotoEntry[]>()
+  photoRows.forEach((r: any[]) => {
+    const rid = r[1] as string
+    const filePath = r[2] as string
+    const desc = r[3] as string | null
+    const uploadedAt = r[4] as string
+    const fileUrl = filePathToUrl(filePath)
+    const accessStatus = (() => {
+      try {
+        if (!fs.existsSync(filePath)) return 'missing'
+        fs.accessSync(filePath, fs.constants.R_OK)
+        return 'accessible'
+      } catch (_e) {
+        return 'inaccessible'
+      }
+    })()
+    const entry: PhotoEntry = { id: r[0] as string, recordId: rid, filePath, fileUrl, accessStatus, description: desc, uploadedAt }
+    if (!photoMap.has(rid)) photoMap.set(rid, [])
+    photoMap.get(rid)!.push(entry)
+  })
+
   const statusToLabel: Record<string, string> = {
     normal: '正常',
     mixed_unit: '混用待复核',
@@ -476,6 +518,19 @@ export async function getReportCsv(): Promise<string> {
     if (r.status === 'anomaly') return '请训练教练确认'
     return '数据正常，无需处理'
   }
+  const photoStatusFor = (r: RecordDetail, photos: PhotoEntry[]): string => {
+    if (photos.length === 0) return '未上传'
+    const hasInaccessible = photos.some(p => p.accessStatus !== 'accessible')
+    if (hasInaccessible) {
+      const missing = photos.filter(p => p.accessStatus === 'missing').length
+      const inaccessible = photos.filter(p => p.accessStatus === 'inaccessible').length
+      const reasons: string[] = []
+      if (missing > 0) reasons.push(`${missing}张文件不存在`)
+      if (inaccessible > 0) reasons.push(`${inaccessible}张无法读取`)
+      return `异常：${reasons.join('，')}`
+    }
+    return `正常（${photos.length}张）`
+  }
 
   const header = [
     '传感器ID',
@@ -489,6 +544,10 @@ export async function getReportCsv(): Promise<string> {
     '处理状态',
     '可信度结论',
     '数据来源',
+    '工况照片数',
+    '照片访问状态',
+    '照片地址',
+    '照片说明',
     '单位混用风险',
     '处理备注',
     '下一步找谁',
@@ -498,25 +557,41 @@ export async function getReportCsv(): Promise<string> {
   ].join(',')
 
   const rows = report.groups.flatMap(group =>
-    group.records.map(r => [
-      r.sensorId,
-      r.originalLineNo,
-      r.temperatureValue,
-      r.temperatureUnit === 'C' ? '°C' : 'K',
-      r.correctedValue !== null ? r.correctedValue : '',
-      r.correctedUnit !== null ? (r.correctedUnit === 'C' ? '°C' : 'K') : '',
-      r.correctedValue ?? r.temperatureValue,
-      (r.correctedUnit ?? r.temperatureUnit) === 'C' ? '°C' : 'K',
-      statusToLabel[r.status] ?? r.status,
-      r.credibility ? (credibilityToLabel[r.credibility] ?? r.credibility) : '',
-      sourceToLabel[r.source] ?? r.source,
-      r.status === 'mixed_unit' ? '是 - 同一传感器两种单位混用' : (r.credibility === 'pending_confirmation' ? '待复核确认' : '否'),
-      r.note ?? '',
-      nextStepFor(r),
-      r.batchId,
-      r.createdAt,
-      r.updatedAt,
-    ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+    group.records.map(r => {
+      const photos = photoMap.get(r.id) || []
+      const photoUrls = photos.map(p => p.fileUrl).join('; ')
+      const photoDescs = photos.map(p => p.description || '(无说明)').join('; ')
+      const photoStatus = photoStatusFor(r, photos)
+      const photoMissingWarning = (() => {
+        if (r.credibility === 'photo_trusted' && photos.length === 0) return '⚠️ 标记为照片可信但无照片'
+        if (r.credibility === 'photo_trusted' && photos.some(p => p.accessStatus !== 'accessible')) return '⚠️ 标记为照片可信但部分照片不可访问'
+        if (r.status === 'mixed_unit' && photos.length === 0) return '⚠️ 单位混用待补工况照片'
+        return ''
+      })()
+      return [
+        r.sensorId,
+        r.originalLineNo,
+        r.temperatureValue,
+        r.temperatureUnit === 'C' ? '°C' : 'K',
+        r.correctedValue !== null ? r.correctedValue : '',
+        r.correctedUnit !== null ? (r.correctedUnit === 'C' ? '°C' : 'K') : '',
+        r.correctedValue ?? r.temperatureValue,
+        (r.correctedUnit ?? r.temperatureUnit) === 'C' ? '°C' : 'K',
+        statusToLabel[r.status] ?? r.status,
+        r.credibility ? (credibilityToLabel[r.credibility] ?? r.credibility) : '',
+        sourceToLabel[r.source] ?? r.source,
+        r.photoCount ?? 0,
+        photoStatus,
+        photoUrls,
+        photoDescs,
+        r.status === 'mixed_unit' ? '是 - 同一传感器两种单位混用' : (r.credibility === 'pending_confirmation' ? '待复核确认' : '否'),
+        [r.note, photoMissingWarning].filter(Boolean).join(' | '),
+        nextStepFor(r),
+        r.batchId,
+        r.createdAt,
+        r.updatedAt,
+      ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')
+    })
   )
 
   return [header, ...rows].join('\n')

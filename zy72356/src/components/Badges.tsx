@@ -5,7 +5,7 @@ export function StatusBadge({ status }: { status: RecordDetail['status'] }) {
   const configs: Record<RecordDetail['status'], { label: string; className: string }> = {
     normal: { label: '正常', className: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
     mixed_unit: { label: '混用待复核', className: 'bg-amber-100 text-amber-700 border-amber-200' },
-    anomaly: { label: '异常', className: 'bg-red-100 text-red-700 border-red-200' },
+    anomaly: { label: '已修正待确认', className: 'bg-red-100 text-red-700 border-red-200' },
     confirmed: { label: '已确认', className: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
     rolled_back: { label: '已回滚', className: 'bg-slate-200 text-slate-700 border-slate-300' },
   }

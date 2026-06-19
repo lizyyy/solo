@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useStore } from '@/store'
-import { fetchReport, getReportExportUrl } from '@/api'
+import { fetchReport, getReportExportUrl, fetchPhotos } from '@/api'
 import { StatusBadge, CredibilityBadge, SourceBadge, UnitBadge } from '@/components/Badges'
-import { FileBarChart, Download, AlertTriangle, CheckCircle2, Clock, AlertCircle, RotateCcw, ChevronDown, ChevronUp, ArrowRight, UserCheck } from 'lucide-react'
-import type { RecordDetail } from '@/store'
+import { FileBarChart, Download, AlertTriangle, CheckCircle2, Clock, AlertCircle, RotateCcw, ChevronDown, ChevronUp, ArrowRight, UserCheck, Image as ImageIcon, FileWarning } from 'lucide-react'
+import type { RecordDetail, PhotoEntry } from '@/store'
 
 const statusToLabel: Record<string, string> = {
   normal: '正常',
@@ -17,12 +17,37 @@ export default function ReportPage() {
   const { reportSummary, reportGroups, setReport, currentRole, refreshReport } = useStore()
   const [expandedSensor, setExpandedSensor] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [photosMap, setPhotosMap] = useState<Map<string, PhotoEntry[]>>(new Map())
 
   useEffect(() => {
     loadReport()
     const timer = setInterval(() => refreshReport(), 15000)
     return () => clearInterval(timer)
   }, [])
+
+  useEffect(() => {
+    const ids = new Set<string>()
+    reportGroups.forEach(g => g.records.forEach(r => { if ((r.photoCount ?? 0) > 0) ids.add(r.id) }))
+    if (ids.size === 0) return
+    let cancelled = false
+    Promise.all(Array.from(ids).map(id =>
+      fetchPhotos(id).then(ps => ({ id, ps })).catch(() => ({ id, ps: [] as PhotoEntry[] }))
+    )).then(results => {
+      if (cancelled) return
+      const m = new Map<string, PhotoEntry[]>()
+      results.forEach(r => m.set(r.id, r.ps))
+      setPhotosMap(m)
+    })
+    return () => { cancelled = true }
+  }, [reportGroups])
+
+  const photoSummary = (r: RecordDetail) => {
+    const ps = photosMap.get(r.id) ?? []
+    const accessible = ps.filter(p => p.accessStatus === 'accessible').length
+    const missing = ps.filter(p => p.accessStatus === 'missing').length
+    const inaccessible = ps.filter(p => p.accessStatus === 'inaccessible').length
+    return { total: r.photoCount ?? 0, accessible, missing, inaccessible, ps }
+  }
 
   async function loadReport() {
     setLoading(true)
@@ -216,7 +241,9 @@ export default function ReportPage() {
                           <th className="px-5 py-2 text-left font-medium text-slate-500">状态</th>
                           <th className="px-5 py-2 text-left font-medium text-slate-500">可信度</th>
                           <th className="px-5 py-2 text-left font-medium text-slate-500">数据来源</th>
-                          <th className="px-5 py-2 text-left font-medium text-slate-500">处理状态</th>
+                          <th className="px-5 py-2 text-left font-medium text-slate-500">工况照片</th>
+                          <th className="px-5 py-2 text-left font-medium text-slate-500">照片地址</th>
+                          <th className="px-5 py-2 text-left font-medium text-slate-500">照片说明</th>
                           <th className="px-5 py-2 text-left font-medium text-slate-500">下一步找谁</th>
                           <th className="px-5 py-2 text-left font-medium text-slate-500">备注</th>
                         </tr>
@@ -224,6 +251,7 @@ export default function ReportPage() {
                       <tbody className="divide-y divide-slate-200">
                         {group.records.map((r) => {
                           const step = nextStepFor(r)
+                          const ps = photoSummary(r)
                           return (
                           <tr key={r.id} className={r.status === 'mixed_unit' ? 'bg-amber-50/60' : ''}>
                             <td className="px-5 py-2.5 font-mono text-slate-500">{r.originalLineNo}</td>
@@ -236,7 +264,44 @@ export default function ReportPage() {
                             <td className="px-5 py-2.5"><StatusBadge status={r.status} /></td>
                             <td className="px-5 py-2.5"><CredibilityBadge credibility={r.credibility} /></td>
                             <td className="px-5 py-2.5"><SourceBadge source={r.source} /></td>
-                            <td className="px-5 py-2.5 text-xs font-mono">{statusToLabel[r.status] || r.status}</td>
+                            <td className="px-5 py-2.5">
+                              {ps.total === 0 ? (
+                                <span className="inline-flex items-center gap-1 text-xs text-slate-400">
+                                  <FileWarning size={12} /> 未上传
+                                </span>
+                              ) : (
+                                <span className={`inline-flex items-center gap-1 text-xs font-medium ${ps.missing + ps.inaccessible > 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+                                  <ImageIcon size={12} />
+                                  {ps.total}张
+                                  {ps.missing > 0 && ` · ${ps.missing}缺失`}
+                                  {ps.inaccessible > 0 && ` · ${ps.inaccessible}无权限`}
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-5 py-2.5 text-xs font-mono text-slate-500 max-w-[200px]">
+                              {ps.ps.length === 0 ? (
+                                <span className="text-slate-400">-</span>
+                              ) : (
+                                <div className="space-y-0.5 truncate" title={ps.ps.map(p => p.fileUrl).join('\n')}>
+                                  {ps.ps.map((p, i) => (
+                                    <div key={i} className={p.accessStatus !== 'accessible' ? 'text-red-500 line-through' : ''}>
+                                      {p.fileUrl}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-5 py-2.5 text-xs text-slate-600 max-w-[200px]">
+                              {ps.ps.length === 0 ? (
+                                <span className="text-slate-400">-</span>
+                              ) : (
+                                <div className="space-y-0.5">
+                                  {ps.ps.map((p, i) => (
+                                    <div key={i}>{p.description || '—'}</div>
+                                  ))}
+                                </div>
+                              )}
+                            </td>
                             <td className="px-5 py-2.5">
                               <div className="text-xs">
                                 <p className={`font-medium ${step.colorClass} flex items-center gap-1`}>

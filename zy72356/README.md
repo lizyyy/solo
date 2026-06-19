@@ -39,9 +39,11 @@ pnpm run check
 pnpm run build
 ```
 
-- 前端地址：http://localhost:5173
-- 后端地址：http://localhost:3001
-- API 代理：前端 `/api` 自动代理到后端
+- 前端地址：http://localhost:5173（若被占用会自动使用 5174/5175，详见启动日志）
+- 后端地址：http://localhost:3002
+- 健康检查：http://localhost:3002/api/health
+- 工况照片静态目录：http://localhost:3002/uploads/
+- API 代理：前端 `/api` 自动代理到后端 `3002` 端口
 
 ## 三步标准工作流
 
@@ -149,17 +151,44 @@ S002,26.2,C
 
 ```bash
 # 启动服务器后，验证 API 健康检查
-curl http://localhost:3001/api/health
+curl http://localhost:3002/api/health
 
 # 导入测试数据
-curl -X POST -F "file=@test.csv" http://localhost:3001/api/records/import
+curl -X POST -F "file=@test.csv" http://localhost:3002/api/records/import
 
 # 获取交接报告
-curl http://localhost:3001/api/report
+curl http://localhost:3002/api/report
 
-# 导出 CSV
-curl -O http://localhost:3001/api/report/export
+# 导出 CSV（含工况照片地址、照片访问状态、照片说明列）
+curl -O http://localhost:3002/api/report/export?format=csv
+
+# 访问工况照片（上传后路径）
+curl -I http://localhost:3002/uploads/{照片文件名}
 ```
+
+## 角色值映射与权限
+
+| 前端选择 | 规范化值 | 历史兼容值 | 权限 |
+|---|---|---|---|
+| 实验工程师 | engineer | engineer_lead | 导入数据 |
+| 维修师傅 | maintenance_worker | maintenance, repair | 上传照片、标记可信度、填修正值 |
+| 训练教练 | training_coach | coach, senior, trainer | 确认/回滚，最终复核 |
+
+禁止混用演示分支：角色值在 `normalizeRole()` 中统一规范化，所有审计日志写入前都会规范化。
+
+## CSV 导出列说明（21 列）
+
+1. 传感器ID / 2. 原始行号 / 3. 原始温度 / 4. 原始单位
+5. 修正后温度 / 6. 修正后单位 / 7. 展示温度 / 8. 展示单位
+9. 处理状态（中文） / 10. 可信度结论 / 11. 数据来源
+12. **工况照片数** / 13. **照片访问状态**（未上传/正常N张/异常N张缺失M张无权限）/ 14. **照片地址**（可直接访问的 `/uploads/xxx.jpg` URL）/ 15. **照片说明**
+16. 单位混用风险 / 17. 处理备注（含照片缺失警告）/ 18. 下一步找谁
+19. 批次ID / 20. 创建时间 / 21. 更新时间
+
+照片缺失时会在「处理备注」列附加警告：
+- `⚠️ 单位混用待补工况照片`
+- `⚠️ 标记为照片可信但无照片`
+- `⚠️ 标记为照片可信但部分照片不可访问`
 
 ## 规则修改须知
 
