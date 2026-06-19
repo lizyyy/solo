@@ -98,9 +98,9 @@ export const useStore = create<AppState>()(
           {
             id: generateId(),
             recordId: r.id,
-            fieldName: 'status',
+            fieldName: 'originalLineNumber',
             oldValue: '',
-            newValue: r.status,
+            newValue: String(r.originalLineNumber),
             operator,
             changedAt: now,
             changeReason: '合同页截图导入（首次新增）'
@@ -121,6 +121,26 @@ export const useStore = create<AppState>()(
             fieldName: 'shortageQuantity',
             oldValue: '',
             newValue: String(r.shortageQuantity),
+            operator,
+            changedAt: now,
+            changeReason: '合同页截图导入（首次新增）'
+          },
+          {
+            id: generateId(),
+            recordId: r.id,
+            fieldName: 'currentNote',
+            oldValue: '',
+            newValue: r.currentNote || '',
+            operator,
+            changedAt: now,
+            changeReason: '合同页截图导入（首次新增）'
+          },
+          {
+            id: generateId(),
+            recordId: r.id,
+            fieldName: 'status',
+            oldValue: '',
+            newValue: r.status,
             operator,
             changedAt: now,
             changeReason: '合同页截图导入（首次新增）'

@@ -13,6 +13,8 @@ export function diffRecords(
 ): FieldDiff[] {
   const diffs: FieldDiff[] = [];
   const fieldsToTrack: (keyof ShortageRecord)[] = [
+    'originalLineNumber',
+    'originalContent',
     'trackName',
     'standardTrackName',
     'shortageQuantity',
@@ -79,6 +81,8 @@ export function groupChangesByTime(changelogs: ChangeLog[]): Array<{ timestamp: 
 
 export function getFieldDisplayName(fieldName: string): string {
   const displayNames: Record<string, string> = {
+    originalLineNumber: '原始行号',
+    originalContent: '原始内容',
     trackName: '曲目名',
     standardTrackName: '标准曲目名',
     shortageQuantity: '缺货数量',

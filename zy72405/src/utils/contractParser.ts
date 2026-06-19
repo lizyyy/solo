@@ -6,7 +6,14 @@ export function parseContractText(text: string): ParsedContractLine[] {
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
-    const lineNumber = i + 1;
+
+    let lineNumber: number;
+    const explicitLineMatch = line.match(/第\s*(\d+)\s*行/);
+    if (explicitLineMatch) {
+      lineNumber = parseInt(explicitLineMatch[1], 10);
+    } else {
+      lineNumber = i + 1;
+    }
 
     const quantityMatch = line.match(/(\d+)\s*(张|个|份|课时)/);
     const quantity = quantityMatch ? parseInt(quantityMatch[1], 10) : 0;
