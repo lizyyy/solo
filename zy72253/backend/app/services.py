@@ -284,6 +284,8 @@ def generate_report_text(db: Session, report_id: str) -> str:
     lines.append(f"坐标类型: {record.coord_type.value}")
     if record.coord_type == CoordType.MIXED:
         lines.append("⚠️  本条记录经纬度与米制坐标混用，已标记待巡检组复核，请勿直接判正常。")
+    elif record.coord_type == CoordType.LATLNG_WITH_DISTANCE:
+        lines.append("ℹ️  本条为经纬度+测距距离组合，坐标清晰可解释，不归入混用。")
     lines.append(f"录入时间: {record.imported_at}")
     lines.append("")
 

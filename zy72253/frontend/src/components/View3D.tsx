@@ -19,7 +19,16 @@ interface Props {
 }
 
 function Box({ container, onClick }: { container: ContainerBox; onClick: () => void }) {
-  const edgeColor = container.needsReview ? '#fbbf24' : '#3b82f6';
+  let edgeColor = '#3b82f6';
+  let labelColor = '#333';
+  if (container.needsReview) {
+    edgeColor = '#fbbf24';
+    labelColor = '#d97706';
+  } else if (container.coordType === 'latlng_with_distance') {
+    edgeColor = '#16a34a';
+  } else if (container.coordType === 'metric') {
+    edgeColor = '#06b6d4';
+  }
   const geo = useMemo(() => new THREE.BoxGeometry(...container.size), [container.size]);
 
   return (

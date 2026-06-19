@@ -10,6 +10,7 @@ const COORD_LABEL: Record<string, string> = {
   latlng: '经纬度',
   metric: '米制',
   mixed: '⚠️ 混用',
+  latlng_with_distance: '经纬度+测距',
 };
 
 const STAGE_ORDER = ['imported', 'engineer_reviewed', 'crew_briefed'];

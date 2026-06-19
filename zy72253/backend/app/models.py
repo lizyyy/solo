@@ -20,6 +20,7 @@ class CoordType(str, enum.Enum):
     LATLNG = "latlng"
     METRIC = "metric"
     MIXED = "mixed"
+    LATLNG_WITH_DISTANCE = "latlng_with_distance"
 
 
 class ReplayStage(str, enum.Enum):

@@ -19,6 +19,7 @@ const COORD_LABEL: Record<string, string> = {
   latlng: '经纬度',
   metric: '米制',
   mixed: '⚠️ 经纬度与米制混用',
+  latlng_with_distance: '经纬度+测距距离',
 };
 
 export default function RecordDetail({ recordId, onBack }: Props) {
@@ -91,6 +92,10 @@ export default function RecordDetail({ recordId, onBack }: Props) {
 
   const record = data.record;
   const isMixed = record.coord_type === 'mixed';
+  const isLatLngWithDistance = record.coord_type === 'latlng_with_distance';
+
+  const coordBoxBg = isMixed ? '#fffbeb' : isLatLngWithDistance ? '#f0fdf4' : '#f8fafc';
+  const coordBoxBorder = isMixed ? '#fbbf24' : isLatLngWithDistance ? '#86efac' : '#e2e8f0';
 
   return (
     <div style={{ background: '#fff', borderRadius: 8, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
@@ -101,7 +106,7 @@ export default function RecordDetail({ recordId, onBack }: Props) {
         <h3 style={{ fontSize: 16, color: '#1a1a2e' }}>🔍 记录详情与溯源</h3>
       </div>
 
-      <div style={{ background: isMixed ? '#fffbeb' : '#f8fafc', borderRadius: 6, padding: 14, marginBottom: 16, border: isMixed ? '1px solid #fbbf24' : '1px solid #e2e8f0' }}>
+      <div style={{ background: coordBoxBg, borderRadius: 6, padding: 14, marginBottom: 16, border: `1px solid ${coordBoxBorder}` }}>
         <div style={{ fontSize: 13, marginBottom: 6 }}>
           <strong>批次：</strong>{record.batch_id} &nbsp;|&nbsp;
           <strong>坐标类型：</strong>{COORD_LABEL[record.coord_type]}
@@ -112,6 +117,11 @@ export default function RecordDetail({ recordId, onBack }: Props) {
         {isMixed && (
           <div style={{ color: '#d97706', fontSize: 13, marginTop: 6 }}>
             ⚠️ 本条经纬度与米制坐标混用，不急于归正常，留给巡检组复核。
+          </div>
+        )}
+        {isLatLngWithDistance && (
+          <div style={{ color: '#16a34a', fontSize: 13, marginTop: 6 }}>
+            ✅ 经纬度正常，已补充测距距离，不归入坐标混用。
           </div>
         )}
       </div>

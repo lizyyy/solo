@@ -16,8 +16,16 @@ interface Props {
 
 const COORD_COLORS: Record<string, string> = {
   latlng: '#3b82f6',
-  metric: '#16a34a',
+  metric: '#06b6d4',
   mixed: '#f59e0b',
+  latlng_with_distance: '#16a34a',
+};
+
+const COORD_LABELS: Record<string, string> = {
+  latlng: '经纬度',
+  metric: '米制',
+  mixed: '混用',
+  latlng_with_distance: '经纬度+测距',
 };
 
 export default function ViewChart({ data, onClickBar }: Props) {
@@ -48,7 +56,7 @@ export default function ViewChart({ data, onClickBar }: Props) {
                 return (
                   <div style={{ background: '#fff', padding: 10, borderRadius: 6, border: '1px solid #e2e8f0', fontSize: 12 }}>
                     <div>编号: {d.name}</div>
-                    <div>坐标类型: {d.coordType === 'mixed' ? '混用' : d.coordType === 'latlng' ? '经纬度' : '米制'}</div>
+                    <div>坐标类型: {COORD_LABELS[d.coordType] || d.coordType}</div>
                     <div>距离: {d.distance}</div>
                     {d.needsReview && <div style={{ color: '#d97706' }}>待复核</div>}
                   </div>
@@ -69,7 +77,7 @@ export default function ViewChart({ data, onClickBar }: Props) {
         </ResponsiveContainer>
       </div>
       <div style={{ marginTop: 8, fontSize: 12, color: '#888' }}>
-        点击柱子可溯源到测距仪记录；黄色 = 坐标混用待复核
+        点击柱子可溯源到测距仪记录；黄色 = 坐标混用待复核；绿色 = 经纬度+测距距离
       </div>
     </div>
   );
