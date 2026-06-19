@@ -1,15 +1,41 @@
 import { useState } from 'react';
-import { X, Save, History, RotateCcw } from 'lucide-react';
+import { X, Save, History, RotateCcw, ArrowRight, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { TaxNote, ProcessingStatus } from '@/types';
+import { TaxNote, ProcessingStatus, ProcessStep, BalanceChangeRecord } from '@/types';
 import { useAppStore, useStatusHistoryByTaxNoteId, useVersionsByTaxNoteId } from '@/store';
 import { StatusBadge } from './StatusBadge';
 import { ProcessStepIndicator } from './ProcessStepIndicator';
 import { getStatusDisplayName, getNextAllowedStatuses } from '@/utils/stateMachine';
+import { checkBalanceUpdatePrerequisite } from '@/utils/boundaryRules';
+import { generateUUID } from '@/utils/versionControl';
 
 interface TaxNoteDetailModalProps {
   taxNote: TaxNote;
   onClose: () => void;
+}
+
+function getNextAction(step: ProcessStep, status: ProcessingStatus): { title: string; description: string; targetStatus?: ProcessingStatus } {
+  if (status === ProcessingStatus.REVERSAL_PENDING_REVIEW) {
+    return { title: '此记录需先经风控复核', description: '请前往风控复核页面处理' };
+  }
+  switch (step) {
+    case ProcessStep.STEP_1_IMPORT:
+      return { title: '补看柜台流水尾号', description: '请输入柜台流水尾号，完成后将状态变更为"补看完成"', targetStatus: ProcessingStatus.SUPPLEMENT_COMPLETED };
+    case ProcessStep.STEP_2_SUPPLEMENT:
+      return { title: '确认余额更新', description: '系统将检查前置条件并自动生成余额变更记录，完成后状态变更为"余额已更新"', targetStatus: ProcessingStatus.BALANCE_UPDATED };
+    case ProcessStep.STEP_3_BALANCE:
+      return { title: '填写摘要', description: '请填写摘要信息，完成后将状态变更为"待负责人审阅"', targetStatus: ProcessingStatus.PENDING_APPROVAL };
+    case ProcessStep.STEP_4_SUMMARY:
+      if (status === ProcessingStatus.PENDING_APPROVAL) {
+        return { title: '等待负责人审阅', description: '摘要已提交，等待负责人审阅通过' };
+      }
+      if (status === ProcessingStatus.COMPLETED) {
+        return { title: '已完成', description: '此记录所有流程已完成' };
+      }
+      return { title: '标记为已完成', description: '确认无误后可标记为已完成', targetStatus: ProcessingStatus.COMPLETED };
+    default:
+      return { title: '未知步骤', description: '' };
+  }
 }
 
 export function TaxNoteDetailModal({ taxNote, onClose }: TaxNoteDetailModalProps) {
@@ -28,8 +54,18 @@ export function TaxNoteDetailModal({ taxNote, onClose }: TaxNoteDetailModalProps
   const [statusRemark, setStatusRemark] = useState('');
   const [rollbackReason, setRollbackReason] = useState('');
   const [showRollback, setShowRollback] = useState(false);
+  const [blockedReason, setBlockedReason] = useState('');
 
   const nextAllowedStatuses = getNextAllowedStatuses(taxNote.processingStatus);
+  const isReversalPending = taxNote.processingStatus === ProcessingStatus.REVERSAL_PENDING_REVIEW;
+  const nextAction = getNextAction(taxNote.currentStep, taxNote.processingStatus);
+
+  const isHighlightedField = (fieldName: string) => {
+    if (!editMode) return false;
+    if (fieldName === 'counterTailNumber' && taxNote.currentStep === ProcessStep.STEP_1_IMPORT) return true;
+    if (fieldName === 'summary' && taxNote.currentStep === ProcessStep.STEP_3_BALANCE) return true;
+    return false;
+  };
 
   const handleSave = () => {
     if (!editReason.trim()) {
@@ -54,11 +90,98 @@ export function TaxNoteDetailModal({ taxNote, onClose }: TaxNoteDetailModalProps
     setEditReason('');
   };
 
+  const handleGuidedAction = () => {
+    if (nextAction.targetStatus === ProcessingStatus.SUPPLEMENT_COMPLETED) {
+      if (!counterTailNumber.trim()) {
+        setBlockedReason('请先填写柜台流水尾号');
+        return;
+      }
+      setBlockedReason('');
+      dispatch({
+        type: 'CHANGE_STATUS',
+        payload: {
+          id: taxNote.id,
+          toStatus: ProcessingStatus.SUPPLEMENT_COMPLETED,
+          remark: `补看柜台流水尾号: ${counterTailNumber}`,
+        },
+      });
+    } else if (nextAction.targetStatus === ProcessingStatus.BALANCE_UPDATED) {
+      const check = checkBalanceUpdatePrerequisite(taxNote);
+      if (!check.canProceed) {
+        setBlockedReason(check.reason);
+        return;
+      }
+      setBlockedReason('');
+
+      const balanceChange: BalanceChangeRecord = {
+        id: generateUUID(),
+        taxNoteId: taxNote.id,
+        previousBalance: taxNote.currentAmount,
+        changeAmount: taxNote.currentAmount,
+        newBalance: 0,
+        changeType: taxNote.currentAmount === 0 ? 'REVERSAL' : 'TAX',
+        changeDate: new Date().toISOString(),
+        remark: `余额更新: ${taxNote.stockCode} ${taxNote.tradeDate}`,
+        generatedBy: currentUser,
+        generatedAt: new Date().toISOString(),
+        version: taxNote.version + 1,
+      };
+
+      dispatch({
+        type: 'GENERATE_BALANCE_CHANGE',
+        payload: {
+          balanceChange,
+          taxNoteUpdates: {
+            id: taxNote.id,
+            updates: {
+              processingStatus: ProcessingStatus.BALANCE_UPDATED,
+              currentStep: ProcessStep.STEP_3_BALANCE,
+            },
+            reason: '确认余额更新，生成余额变更记录',
+          },
+        },
+      });
+    } else if (nextAction.targetStatus === ProcessingStatus.PENDING_APPROVAL) {
+      if (!summary.trim()) {
+        setBlockedReason('请先填写摘要信息');
+        return;
+      }
+      setBlockedReason('');
+      dispatch({
+        type: 'CHANGE_STATUS',
+        payload: {
+          id: taxNote.id,
+          toStatus: ProcessingStatus.PENDING_APPROVAL,
+          remark: `提交摘要: ${summary}`,
+        },
+      });
+    } else if (nextAction.targetStatus === ProcessingStatus.COMPLETED) {
+      setBlockedReason('');
+      dispatch({
+        type: 'CHANGE_STATUS',
+        payload: {
+          id: taxNote.id,
+          toStatus: ProcessingStatus.COMPLETED,
+          remark: '标记为已完成',
+        },
+      });
+    }
+  };
+
   const handleStatusChange = () => {
     if (!selectedStatus || !statusRemark.trim()) {
       alert('请选择目标状态并填写备注');
       return;
     }
+
+    if (selectedStatus === ProcessingStatus.BALANCE_UPDATED) {
+      const check = checkBalanceUpdatePrerequisite(taxNote);
+      if (!check.canProceed) {
+        setBlockedReason(check.reason);
+        return;
+      }
+    }
+    setBlockedReason('');
 
     dispatch({
       type: 'CHANGE_STATUS',
@@ -117,6 +240,58 @@ export function TaxNoteDetailModal({ taxNote, onClose }: TaxNoteDetailModalProps
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {isReversalPending && (
+            <div className="bg-orange-50 border-2 border-orange-400 rounded-lg p-4">
+              <div className="flex items-start space-x-3">
+                <AlertTriangle className="w-6 h-6 text-orange-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h3 className="text-base font-bold text-orange-800">此记录需先经风控复核，请前往风控复核页面处理</h3>
+                  <p className="text-sm text-orange-700 mt-1">
+                    该记录为冲正待复核状态，状态变更和编辑操作已被禁用。
+                  </p>
+                  <Link
+                    to="/review"
+                    className="inline-flex items-center space-x-1 mt-2 px-4 py-2 bg-orange-600 text-white text-sm rounded hover:bg-orange-700 transition-colors"
+                  >
+                    <span>前往风控复核页面</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className={`rounded-lg p-4 ${isReversalPending ? 'bg-slate-50 opacity-60' : 'bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200'}`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-start space-x-3">
+                {isReversalPending ? (
+                  <AlertTriangle className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
+                ) : taxNote.processingStatus === ProcessingStatus.COMPLETED ? (
+                  <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <ArrowRight className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                )}
+                <div>
+                  <h3 className="text-sm font-bold text-slate-800">{nextAction.title}</h3>
+                  <p className="text-sm text-slate-600 mt-0.5">{nextAction.description}</p>
+                  {blockedReason && (
+                    <div className="mt-2 px-3 py-2 bg-red-50 border border-red-300 rounded text-sm text-red-700 font-medium">
+                      ⛔ {blockedReason}
+                    </div>
+                  )}
+                </div>
+              </div>
+              {nextAction.targetStatus && !isReversalPending && (
+                <button
+                  onClick={handleGuidedAction}
+                  className="flex-shrink-0 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors"
+                >
+                  {nextAction.title}
+                </button>
+              )}
+            </div>
+          </div>
+
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <StatusBadge status={taxNote.processingStatus} />
@@ -177,14 +352,19 @@ export function TaxNoteDetailModal({ taxNote, onClose }: TaxNoteDetailModalProps
                     </p>
                   )}
                 </div>
-                <div>
-                  <label className="block text-sm text-slate-600 mb-1">柜台流水尾号</label>
+                <div className={isHighlightedField('counterTailNumber') ? 'ring-2 ring-blue-400 ring-offset-2 rounded-lg p-2 -m-2' : ''}>
+                  <label className="block text-sm text-slate-600 mb-1">
+                    柜台流水尾号
+                    {isHighlightedField('counterTailNumber') && (
+                      <span className="ml-2 text-xs text-blue-600 font-medium">← 当前步骤重点填写</span>
+                    )}
+                  </label>
                   {editMode ? (
                     <input
                       type="text"
                       value={counterTailNumber}
                       onChange={(e) => setCounterTailNumber(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono"
+                      className={`w-full px-3 py-2 text-sm border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono ${isHighlightedField('counterTailNumber') ? 'border-blue-400 bg-blue-50' : 'border-slate-300'}`}
                     />
                   ) : (
                     <p className="text-sm font-mono text-slate-800 bg-white p-2 rounded border border-slate-200">
@@ -192,13 +372,18 @@ export function TaxNoteDetailModal({ taxNote, onClose }: TaxNoteDetailModalProps
                     </p>
                   )}
                 </div>
-                <div>
-                  <label className="block text-sm text-slate-600 mb-1">摘要</label>
+                <div className={isHighlightedField('summary') ? 'ring-2 ring-blue-400 ring-offset-2 rounded-lg p-2 -m-2' : ''}>
+                  <label className="block text-sm text-slate-600 mb-1">
+                    摘要
+                    {isHighlightedField('summary') && (
+                      <span className="ml-2 text-xs text-blue-600 font-medium">← 当前步骤重点填写</span>
+                    )}
+                  </label>
                   {editMode ? (
                     <textarea
                       value={summary}
                       onChange={(e) => setSummary(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className={`w-full px-3 py-2 text-sm border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${isHighlightedField('summary') ? 'border-blue-400 bg-blue-50' : 'border-slate-300'}`}
                       rows={2}
                       placeholder="给负责人看的摘要信息"
                     />
@@ -235,7 +420,10 @@ export function TaxNoteDetailModal({ taxNote, onClose }: TaxNoteDetailModalProps
                   <label className="block text-sm text-slate-600 mb-1">目标状态</label>
                   <select
                     value={selectedStatus || ''}
-                    onChange={(e) => setSelectedStatus(e.target.value as ProcessingStatus)}
+                    onChange={(e) => {
+                      setSelectedStatus(e.target.value as ProcessingStatus);
+                      setBlockedReason('');
+                    }}
                     className="w-full px-3 py-2 text-sm border border-slate-300 rounded focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                   >
                     <option value="">请选择</option>
@@ -257,9 +445,14 @@ export function TaxNoteDetailModal({ taxNote, onClose }: TaxNoteDetailModalProps
                   />
                 </div>
               </div>
+              {blockedReason && (
+                <div className="mt-3 px-3 py-2 bg-red-50 border border-red-300 rounded text-sm text-red-700 font-medium">
+                  ⛔ {blockedReason}
+                </div>
+              )}
               <div className="flex justify-end space-x-2 mt-4">
                 <button
-                  onClick={() => setShowStatusChange(false)}
+                  onClick={() => { setShowStatusChange(false); setBlockedReason(''); }}
                   className="px-4 py-2 text-sm bg-slate-200 hover:bg-slate-300 rounded transition-colors"
                 >
                   取消
@@ -376,7 +569,7 @@ export function TaxNoteDetailModal({ taxNote, onClose }: TaxNoteDetailModalProps
               <>
                 <button
                   onClick={() => setShowRollback(true)}
-                  disabled={statusHistory.length < 2}
+                  disabled={statusHistory.length < 2 || isReversalPending}
                   className="flex items-center space-x-1 px-3 py-2 text-sm bg-red-100 text-red-700 hover:bg-red-200 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <RotateCcw className="w-4 h-4" />
@@ -384,14 +577,15 @@ export function TaxNoteDetailModal({ taxNote, onClose }: TaxNoteDetailModalProps
                 </button>
                 <button
                   onClick={() => setShowStatusChange(true)}
-                  disabled={nextAllowedStatuses.length === 0}
+                  disabled={nextAllowedStatuses.length === 0 || isReversalPending}
                   className="flex items-center space-x-1 px-3 py-2 text-sm bg-purple-100 text-purple-700 hover:bg-purple-200 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <span>变更状态</span>
                 </button>
                 <button
                   onClick={() => setEditMode(true)}
-                  className="flex items-center space-x-1 px-4 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded transition-colors"
+                  disabled={isReversalPending}
+                  className="flex items-center space-x-1 px-4 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <span>编辑</span>
                 </button>

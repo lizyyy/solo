@@ -4,6 +4,7 @@ import ImportPage from "@/pages/ImportPage";
 import HistoryPage from "@/pages/HistoryPage";
 import ReviewPage from "@/pages/ReviewPage";
 import RulesPage from "@/pages/RulesPage";
+import BalanceChangePage from "@/pages/BalanceChangePage";
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/history/:id" element={<HistoryPage />} />
         <Route path="/review" element={<ReviewPage />} />
         <Route path="/rules" element={<RulesPage />} />
+        <Route path="/balance-changes" element={<BalanceChangePage />} />
       </Routes>
     </Router>
   );

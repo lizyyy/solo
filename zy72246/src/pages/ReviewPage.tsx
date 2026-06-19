@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
-import { ShieldAlert, Check, X, AlertTriangle, FileText } from 'lucide-react';
+import { ShieldAlert, Check, X, AlertTriangle, FileText, ArrowRight, Link as LinkIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { usePendingReviewNotes, useAppStore } from '@/store';
 import { StatusBadge } from '@/components/StatusBadge';
 import { ProcessStepIndicator } from '@/components/ProcessStepIndicator';
@@ -11,10 +12,19 @@ export default function ReviewPage() {
   const dispatch = useAppStore(state => state.dispatch);
   const currentUser = useAppStore(state => state.currentUser);
   const allReviewRecords = useAppStore(state => state.reviewRecords);
+  const allTaxNotes = useAppStore(state => state.taxNotes);
   const [selectedNote, setSelectedNote] = useState<TaxNote | null>(null);
   const [reviewOpinion, setReviewOpinion] = useState('');
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [reviewType, setReviewType] = useState<'APPROVED' | 'REJECTED' | null>(null);
+
+  const reviewedNotes = useMemo(() => {
+    const reviewedIds = new Set(allReviewRecords.map(r => r.taxNoteId));
+    return allTaxNotes.filter(n =>
+      reviewedIds.has(n.id)
+      && n.processingStatus !== ProcessingStatus.REVERSAL_PENDING_REVIEW
+    );
+  }, [allTaxNotes, allReviewRecords]);
 
   const reviewRecordsByNoteId = useMemo(() => {
     const map: Record<string, ReviewRecord[]> = {};
@@ -242,6 +252,65 @@ export default function ReviewPage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {reviewedNotes.length > 0 && (
+        <div className="mt-6">
+          <h3 className="text-lg font-medium text-slate-800 mb-3">已复核记录</h3>
+          <div className="space-y-2">
+            {reviewedNotes.map((note) => {
+              const noteReviews = allReviewRecords
+                .filter(r => r.taxNoteId === note.id)
+                .sort((a, b) => new Date(b.reviewedAt).getTime() - new Date(a.reviewedAt).getTime());
+              const latestReview = noteReviews[0];
+
+              return (
+                <div
+                  key={note.id}
+                  className="bg-white rounded-lg border border-slate-200 p-4 flex items-center justify-between"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div>
+                      <p className="text-sm font-medium text-slate-800">
+                        {note.stockCode} {note.stockName}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {note.tradeDate} · 流水号: {note.serialNumber}
+                      </p>
+                    </div>
+                    <StatusBadge status={note.processingStatus} />
+                    <ProcessStepIndicator currentStep={note.currentStep} />
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    {latestReview && (
+                      <span className={`text-xs px-2 py-1 rounded ${
+                        latestReview.reviewResult === 'APPROVED'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-red-100 text-red-700'
+                      }`}>
+                        {latestReview.reviewResult === 'APPROVED' ? '复核通过' : '已驳回'}
+                      </span>
+                    )}
+                    <Link
+                      to={`/history/${note.id}`}
+                      className="flex items-center space-x-1 text-xs text-blue-600 hover:text-blue-800"
+                    >
+                      <LinkIcon className="w-3 h-3" />
+                      <span>查看历史</span>
+                    </Link>
+                    {note.processingStatus === ProcessingStatus.NORMAL && (
+                      <span className="text-xs text-slate-500 flex items-center">
+                        下一步：补看流水
+                        <ArrowRight className="w-3 h-3 ml-1" />
+                        <Link to="/" className="text-blue-600 hover:text-blue-800 ml-1">去首页</Link>
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 

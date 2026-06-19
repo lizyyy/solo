@@ -7,6 +7,7 @@ import {
   BookOpen,
   Database,
   User,
+  DollarSign,
 } from 'lucide-react';
 import { useAppStore } from '@/store';
 
@@ -18,6 +19,7 @@ const navItems = [
   { path: '/', label: '复盘主界面', icon: FileText },
   { path: '/import', label: '导入数据', icon: Upload },
   { path: '/review', label: '风控复核', icon: ShieldAlert },
+  { path: '/balance-changes', label: '余额变化', icon: DollarSign },
   { path: '/rules', label: '边界规则', icon: BookOpen },
 ];
 

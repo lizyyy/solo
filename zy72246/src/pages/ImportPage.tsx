@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useMemo } from 'react';
 import {
   Upload,
   FileSpreadsheet,
@@ -7,18 +7,26 @@ import {
   XCircle,
   Download,
   Info,
+  RefreshCw,
+  ArrowRight,
+  Merge,
+  SkipForward,
+  Edit3,
+  Eye,
 } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useAppStore } from '@/store';
 import { parseFile, generateSampleCSV } from '@/utils/fileParser';
-import { processImportData } from '@/utils/deduplication';
+import { processImportData, analyzeDuplicates } from '@/utils/deduplication';
 import { checkReversalRule, generateBusinessKey } from '@/utils/boundaryRules';
 import {
   ImportRowData,
   ImportResult,
   ImportDetail,
   ProcessingStatus,
+  DuplicateAction,
+  DuplicateResolution,
 } from '@/types';
 
 type PageStep = 'upload' | 'preview' | 'result';
@@ -35,6 +43,23 @@ export default function ImportPage() {
   const [fileName, setFileName] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [duplicateResolutions, setDuplicateResolutions] = useState<Map<string, DuplicateResolution>>(new Map());
+
+  const duplicateAnalysis = useMemo(() => {
+    return analyzeDuplicates(taxNotes, parsedRows);
+  }, [taxNotes, parsedRows]);
+
+  const hasDuplicates = duplicateAnalysis.potentialDuplicates.length > 0;
+
+  const allDuplicatesResolved = useMemo(() => {
+    if (!hasDuplicates) return true;
+    return duplicateAnalysis.potentialDuplicates.every((_, index) => {
+      const key = `dup_${index}`;
+      const resolution = duplicateResolutions.get(key);
+      return resolution && resolution.action;
+    });
+  }, [hasDuplicates, duplicateAnalysis.potentialDuplicates, duplicateResolutions]);
+
   const resetState = useCallback(() => {
     setPageStep('upload');
     setParsedRows([]);
@@ -44,6 +69,7 @@ export default function ImportPage() {
     setIsProcessing(false);
     setIsDragOver(false);
     setFileName('');
+    setDuplicateResolutions(new Map());
   }, []);
 
   const handleFile = useCallback(async (file: File) => {
@@ -116,10 +142,50 @@ export default function ImportPage() {
     [taxNotes],
   );
 
+  const handleDuplicateActionChange = (dupIndex: number, action: DuplicateAction) => {
+    const key = `dup_${dupIndex}`;
+    const dup = duplicateAnalysis.potentialDuplicates[dupIndex];
+    const newResolutions = new Map(duplicateResolutions);
+    newResolutions.set(key, {
+      rowIndex: dup.rowIndex,
+      recordId: dup.existing.id,
+      action,
+    });
+    setDuplicateResolutions(newResolutions);
+  };
+
+  const handleMergeRemarkChange = (dupIndex: number, remark: string) => {
+    const key = `dup_${dupIndex}`;
+    const existing = duplicateResolutions.get(key);
+    if (existing) {
+      const newResolutions = new Map(duplicateResolutions);
+      newResolutions.set(key, { ...existing, mergeRemark: remark });
+      setDuplicateResolutions(newResolutions);
+    }
+  };
+
+  const buildResolutionArray = (): DuplicateResolution[] => {
+    const resolutions: DuplicateResolution[] = [];
+    duplicateAnalysis.potentialDuplicates.forEach((dup, index) => {
+      const key = `dup_${index}`;
+      const resolution = duplicateResolutions.get(key);
+      if (resolution) {
+        resolutions.push(resolution);
+      }
+    });
+    return resolutions;
+  };
+
   const handleImport = useCallback(() => {
+    if (hasDuplicates && !allDuplicatesResolved) {
+      alert('请先处理所有重复记录，选择更新、跳过或合并');
+      return;
+    }
+
     setIsProcessing(true);
 
-    const result = processImportData(taxNotes, parsedRows, currentUser);
+    const resolutions = buildResolutionArray();
+    const result = processImportData(taxNotes, parsedRows, currentUser, resolutions);
 
     dispatch({
       type: 'IMPORT_DATA',
@@ -134,7 +200,7 @@ export default function ImportPage() {
     setImportDetails(result.importResult.details);
     setIsProcessing(false);
     setPageStep('result');
-  }, [taxNotes, parsedRows, currentUser, dispatch]);
+  }, [taxNotes, parsedRows, currentUser, dispatch, hasDuplicates, allDuplicatesResolved, duplicateAnalysis.potentialDuplicates, duplicateResolutions]);
 
   const handleDownloadSample = useCallback(() => {
     const csvContent = generateSampleCSV();
@@ -154,9 +220,9 @@ export default function ImportPage() {
       case 'NEW':
         return <CheckCircle className="w-4 h-4 text-green-600" />;
       case 'UPDATE':
-        return <CheckCircle className="w-4 h-4 text-blue-600" />;
+        return <RefreshCw className="w-4 h-4 text-blue-600" />;
       case 'SKIP':
-        return <Info className="w-4 h-4 text-slate-400" />;
+        return <SkipForward className="w-4 h-4 text-slate-400" />;
       case 'ERROR':
         return <XCircle className="w-4 h-4 text-red-600" />;
       case 'DUPLICATE':
@@ -175,7 +241,7 @@ export default function ImportPage() {
       case 'ERROR':
         return '错误';
       case 'DUPLICATE':
-        return '重复';
+        return '重复待处理';
     }
   };
 
@@ -229,6 +295,7 @@ export default function ImportPage() {
               <li>• 可选列：证券名称、税费金额、备注、柜台流水尾号</li>
               <li>• 重复判定：交易日期 + 证券代码 + 流水号 作为业务主键</li>
               <li>• 金额为 0 且备注含「冲正」的记录将自动标记为「已冲正待复核」</li>
+              <li>• 重复记录可选择：更新（覆盖）、跳过（保留原记录）、合并（备注合并）</li>
             </ul>
           </div>
         </div>
@@ -301,12 +368,17 @@ export default function ImportPage() {
                 <span className="text-sm text-slate-500">
                   共 {parsedRows.length} 条记录
                 </span>
+                {hasDuplicates && (
+                  <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">
+                    {duplicateAnalysis.potentialDuplicates.length} 条重复
+                  </span>
+                )}
               </div>
               <button
                 onClick={handleImport}
-                disabled={parsedRows.length === 0 || isProcessing}
+                disabled={parsedRows.length === 0 || isProcessing || (hasDuplicates && !allDuplicatesResolved)}
                 className={`px-6 py-2 rounded-lg text-white text-sm font-medium transition-colors ${
-                  parsedRows.length === 0 || isProcessing
+                  parsedRows.length === 0 || isProcessing || (hasDuplicates && !allDuplicatesResolved)
                     ? 'bg-slate-400 cursor-not-allowed'
                     : 'bg-blue-600 hover:bg-blue-700'
                 }`}
@@ -325,6 +397,135 @@ export default function ImportPage() {
                       <li key={i}>• {err}</li>
                     ))}
                   </ul>
+                </div>
+              </div>
+            )}
+
+            {hasDuplicates && (
+              <div className="bg-orange-50 border border-orange-300 rounded-lg p-4">
+                <div className="flex items-start space-x-3 mb-3">
+                  <AlertCircle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="font-medium text-orange-800">
+                      检测到 {duplicateAnalysis.potentialDuplicates.length} 条重复记录，请选择处理方式
+                    </p>
+                    <p className="text-sm text-orange-700 mt-1">
+                      业务主键：交易日期 + 证券代码 + 流水号
+                    </p>
+                  </div>
+                  {!allDuplicatesResolved && (
+                    <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded">
+                      未全部处理
+                    </span>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  {duplicateAnalysis.potentialDuplicates.map((dup, idx) => {
+                    const key = `dup_${idx}`;
+                    const resolution = duplicateResolutions.get(key);
+                    const selectedAction = resolution?.action;
+
+                    return (
+                      <div
+                        key={idx}
+                        className="bg-white rounded-lg border border-orange-200 p-4"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <p className="font-medium text-slate-800">
+                              {dup.row.stockCode} {dup.row.stockName}
+                            </p>
+                            <p className="text-xs text-slate-500 mt-0.5">
+                              交易日期: {dup.row.tradeDate} · 流水号: {dup.row.serialNumber}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              记录ID: <span className="font-mono">{dup.existing.id}</span>
+                            </p>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => handleDuplicateActionChange(idx, DuplicateAction.CONFIRM_UPDATE)}
+                              className={`flex items-center space-x-1 px-3 py-1.5 text-xs rounded transition-colors ${
+                                selectedAction === DuplicateAction.CONFIRM_UPDATE
+                                  ? 'bg-blue-600 text-white'
+                                  : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                              }`}
+                            >
+                              <Edit3 className="w-3 h-3" />
+                              <span>更新</span>
+                            </button>
+                            <button
+                              onClick={() => handleDuplicateActionChange(idx, DuplicateAction.SKIP)}
+                              className={`flex items-center space-x-1 px-3 py-1.5 text-xs rounded transition-colors ${
+                                selectedAction === DuplicateAction.SKIP
+                                  ? 'bg-slate-600 text-white'
+                                  : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
+                              }`}
+                            >
+                              <SkipForward className="w-3 h-3" />
+                              <span>跳过</span>
+                            </button>
+                            <button
+                              onClick={() => handleDuplicateActionChange(idx, DuplicateAction.MERGE)}
+                              className={`flex items-center space-x-1 px-3 py-1.5 text-xs rounded transition-colors ${
+                                selectedAction === DuplicateAction.MERGE
+                                  ? 'bg-purple-600 text-white'
+                                  : 'bg-purple-50 text-purple-700 hover:bg-purple-100'
+                              }`}
+                            >
+                              <Merge className="w-3 h-3" />
+                              <span>合并</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          <div className="bg-slate-50 p-3 rounded">
+                            <p className="text-xs text-slate-500 mb-1 font-medium">原有记录</p>
+                            <p className="text-xs text-slate-400">金额: HK$ {dup.existing.currentAmount.toFixed(2)}</p>
+                            <p className="text-xs text-slate-600 mt-1">备注: {dup.existing.currentRemark}</p>
+                            <p className="text-xs text-slate-400 mt-1">
+                              尾号: {dup.existing.counterTailNumber || '-'}
+                            </p>
+                            <p className="text-xs mt-1">
+                              <StatusBadge status={dup.existing.processingStatus} />
+                            </p>
+                          </div>
+                          <div className="bg-blue-50 p-3 rounded">
+                            <p className="text-xs text-blue-600 mb-1 font-medium">新导入</p>
+                            <p className="text-xs text-slate-500">金额: HK$ {dup.row.amount.toFixed(2)}</p>
+                            <p className="text-xs text-slate-700 mt-1">备注: {dup.row.remark}</p>
+                            <p className="text-xs text-slate-500 mt-1">
+                              尾号: {dup.row.counterTailNumber || '-'}
+                            </p>
+                            <p className="text-xs mt-1">
+                              {checkReversalRule(dup.row.amount, dup.row.remark) ? (
+                                <StatusBadge status={ProcessingStatus.REVERSAL_PENDING_REVIEW} />
+                              ) : (
+                                <StatusBadge status={ProcessingStatus.PENDING} />
+                              )}
+                            </p>
+                          </div>
+                        </div>
+
+                        {selectedAction === DuplicateAction.MERGE && (
+                          <div className="mt-3 bg-purple-50 p-3 rounded">
+                            <label className="block text-xs font-medium text-purple-700 mb-1">
+                              合并说明（可选，将插入到两条备注之间）
+                            </label>
+                            <input
+                              type="text"
+                              value={resolution?.mergeRemark || ''}
+                              onChange={(e) => handleMergeRemarkChange(idx, e.target.value)}
+                              placeholder="如：2024-01-16补充导入"
+                              className="w-full px-3 py-2 text-sm border border-purple-200 rounded focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -362,19 +563,22 @@ export default function ImportPage() {
                         流水尾号
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                        预计状态
+                        预计处理
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
                     {parsedRows.map((row, idx) => {
                       const predicted = getPredictedStatus(row);
+                      const isDup = duplicateAnalysis.potentialDuplicates.some(d => d.rowIndex === idx);
                       return (
                         <tr
                           key={idx}
                           className={`hover:bg-slate-50 transition-colors ${
                             predicted.status === ProcessingStatus.REVERSAL_PENDING_REVIEW
                               ? 'bg-orange-50/50'
+                              : isDup
+                              ? 'bg-yellow-50/30'
                               : ''
                           }`}
                         >
@@ -408,7 +612,12 @@ export default function ImportPage() {
                             {row.counterTailNumber || '-'}
                           </td>
                           <td className="px-4 py-3">
-                            {predicted.label === '将更新' ? (
+                            {isDup ? (
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium border bg-orange-100 text-orange-800 border-orange-300">
+                                <AlertCircle className="w-3 h-3 mr-1" />
+                                重复待处理
+                              </span>
+                            ) : predicted.label === '将更新' ? (
                               <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium border bg-blue-100 text-blue-800 border-blue-300">
                                 将更新
                               </span>
@@ -438,6 +647,16 @@ export default function ImportPage() {
 
         {pageStep === 'result' && importResult && (
           <div className="space-y-6">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center space-x-3">
+              <CheckCircle className="w-6 h-6 text-green-600" />
+              <div>
+                <p className="font-medium text-green-800">导入完成</p>
+                <p className="text-sm text-green-700">
+                  共处理 {importResult.totalRecords} 条记录，新增 {importResult.newRecords} 条，更新 {importResult.updatedRecords} 条
+                </p>
+              </div>
+            </div>
+
             <div className="grid grid-cols-6 gap-4">
               <div className="bg-white rounded-lg p-4 border border-slate-200 shadow-sm text-center">
                 <p className="text-sm text-slate-500">总记录数</p>
@@ -478,8 +697,11 @@ export default function ImportPage() {
             </div>
 
             <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
-              <div className="px-4 py-3 border-b border-slate-200 bg-slate-50">
+              <div className="px-4 py-3 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
                 <h3 className="text-sm font-medium text-slate-700">导入明细</h3>
+                <span className="text-xs text-slate-500">
+                  共 {importDetails.length} 条
+                </span>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
@@ -492,10 +714,10 @@ export default function ImportPage() {
                         处理结果
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                        说明
+                        处理说明
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                        记录ID
+                        记录编号
                       </th>
                     </tr>
                   </thead>
@@ -520,7 +742,7 @@ export default function ImportPage() {
                         <td className="px-4 py-3 text-sm text-slate-700">
                           {detail.reason}
                         </td>
-                        <td className="px-4 py-3 text-sm font-mono text-slate-500 max-w-xs truncate">
+                        <td className="px-4 py-3 text-sm font-mono text-slate-500 max-w-xs truncate" title={detail.recordId}>
                           {detail.recordId || '-'}
                         </td>
                       </tr>
@@ -538,6 +760,23 @@ export default function ImportPage() {
                   </tbody>
                 </table>
               </div>
+            </div>
+
+            <div className="flex items-center justify-end space-x-3">
+              <button
+                onClick={resetState}
+                className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg transition-colors text-sm"
+              >
+                继续导入
+              </button>
+              <button
+                onClick={() => window.location.hash = '#/'}
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm"
+              >
+                <Eye className="w-4 h-4" />
+                <span>查看记录列表</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
         )}

@@ -1,16 +1,18 @@
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Clock, User, RotateCcw, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Clock, User, RotateCcw, ChevronRight, DollarSign } from 'lucide-react';
 import {
   useTaxNoteById,
   useVersionsByTaxNoteId,
   useStatusHistoryByTaxNoteId,
   useReviewRecordsByTaxNoteId,
+  useAppStore,
 } from '@/store';
+import { useShallow } from 'zustand/react/shallow';
 import { StatusBadge } from '@/components/StatusBadge';
 import { ProcessStepIndicator } from '@/components/ProcessStepIndicator';
 import { Layout } from '@/components/Layout';
 import { getStatusDisplayName } from '@/utils/stateMachine';
-import { TaxNoteVersion, StatusHistory, ReviewRecord } from '@/types';
+import { TaxNoteVersion, StatusHistory, ReviewRecord, BalanceChangeRecord } from '@/types';
 
 export default function HistoryPage() {
   const { id } = useParams<{ id: string }>();
@@ -18,6 +20,11 @@ export default function HistoryPage() {
   const versions = useVersionsByTaxNoteId(id || '');
   const statusHistory = useStatusHistoryByTaxNoteId(id || '');
   const reviewRecords = useReviewRecordsByTaxNoteId(id || '');
+  const balanceChanges = useAppStore(
+    useShallow((state: { balanceChanges: BalanceChangeRecord[] }) =>
+      state.balanceChanges.filter((bc: BalanceChangeRecord) => bc.taxNoteId === id)
+    )
+  );
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleString('zh-CN');
@@ -244,6 +251,95 @@ export default function HistoryPage() {
           )}
         </div>
       </div>
+
+      <div className="bg-white rounded-lg border border-slate-200 p-6">
+        <h3 className="text-lg font-medium text-slate-800 mb-4">最终状态总结</h3>
+        <div className="grid grid-cols-4 gap-4">
+          <div className="bg-slate-50 p-4 rounded-lg">
+            <h4 className="text-sm font-medium text-slate-500 mb-2">当前状态</h4>
+            <StatusBadge status={taxNote.processingStatus} />
+          </div>
+          <div className="bg-slate-50 p-4 rounded-lg">
+            <h4 className="text-sm font-medium text-slate-500 mb-2">流程阶段</h4>
+            <ProcessStepIndicator currentStep={taxNote.currentStep} />
+          </div>
+          <div className="bg-slate-50 p-4 rounded-lg">
+            <h4 className="text-sm font-medium text-slate-500 mb-2">当前税费金额</h4>
+            <p className={`text-lg font-mono ${
+              taxNote.currentAmount !== taxNote.originalAmount ? 'text-amber-600' : 'text-slate-800'
+            }`}>
+              HK$ {taxNote.currentAmount.toFixed(2)}
+            </p>
+          </div>
+          <div className="bg-slate-50 p-4 rounded-lg">
+            <h4 className="text-sm font-medium text-slate-500 mb-2">摘要</h4>
+            <p className="text-sm text-slate-800">
+              {taxNote.summary || '（未填写）'}
+            </p>
+          </div>
+        </div>
+        {statusHistory.length > 0 && (
+          <div className="mt-4 bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <p className="text-sm text-blue-800 font-medium">最近状态变更原因</p>
+            <p className="text-sm text-blue-700 mt-1">
+              {statusHistory[0].remark}
+            </p>
+            <p className="text-xs text-blue-500 mt-1">
+              {statusHistory[0].operatedBy} · {formatDate(statusHistory[0].operatedAt)}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {balanceChanges.length > 0 && (
+        <div className="bg-white rounded-lg border border-slate-200 p-6">
+          <h3 className="text-lg font-medium text-slate-800 mb-4 flex items-center space-x-2">
+            <DollarSign className="w-5 h-5 text-cyan-600" />
+            <span>余额变化明细</span>
+          </h3>
+          <div className="space-y-3">
+            {balanceChanges.map((bc: BalanceChangeRecord) => (
+              <div key={bc.id} className="bg-cyan-50 border border-cyan-200 rounded-lg p-4">
+                <div className="grid grid-cols-5 gap-3 text-sm">
+                  <div>
+                    <p className="text-xs text-slate-500">变更前余额</p>
+                    <p className="font-mono text-slate-800">HK$ {bc.previousBalance.toFixed(2)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500">变更金额</p>
+                    <p className={`font-mono ${bc.changeAmount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {bc.changeAmount >= 0 ? '+' : ''}HK$ {bc.changeAmount.toFixed(2)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500">变更后余额</p>
+                    <p className="font-mono text-slate-800">HK$ {bc.newBalance.toFixed(2)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500">变更类型</p>
+                    <span className={`text-xs px-2 py-0.5 rounded ${
+                      bc.changeType === 'TAX' ? 'bg-blue-100 text-blue-700'
+                      : bc.changeType === 'ADJUSTMENT' ? 'bg-amber-100 text-amber-700'
+                      : bc.changeType === 'REVERSAL' ? 'bg-red-100 text-red-700'
+                      : 'bg-purple-100 text-purple-700'
+                    }`}>
+                      {bc.changeType === 'TAX' ? '税费' : bc.changeType === 'ADJUSTMENT' ? '调整' : bc.changeType === 'REVERSAL' ? '冲正' : '节假日'}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500">备注</p>
+                    <p className="text-slate-700 text-xs">{bc.remark}</p>
+                  </div>
+                </div>
+                <div className="mt-2 text-xs text-slate-400 flex items-center justify-between">
+                  <span>{bc.generatedBy} · {formatDate(bc.generatedAt)}</span>
+                  <span>版本: v{bc.version}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="bg-white rounded-lg border border-slate-200 p-6">
         <h3 className="text-lg font-medium text-slate-800 mb-4">原始证据保留</h3>
