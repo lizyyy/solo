@@ -181,6 +181,7 @@ class ConflictRecordService {
             createdAt: now,
             createdBy,
             recordIds: activeRecords.map((r) => r.id),
+            snapshotRecordIds: activeRecords.map((r) => r.id),
             summary,
             totalCount,
             normalCount: normalRecords.length,
@@ -281,8 +282,23 @@ class ConflictRecordService {
         const previousVersion = this.store.reportVersions[currentIndex - 1];
         this.store.currentReportVersionId = previousVersion.id;
         const now = new Date();
-        for (const record of this.getActiveRecords()) {
-            if (record.workflowStep === types_1.WorkflowStep.WEEKLY_REPORT_UPDATED) {
+        const snapshotSet = new Set(previousVersion.snapshotRecordIds);
+        const activeRecords = this.getActiveRecords();
+        for (const record of activeRecords) {
+            if (!snapshotSet.has(record.id)) {
+                record.isRolledBack = true;
+                record.updatedAt = now;
+                const change = {
+                    changedBy: '琴行店长老周',
+                    changedAt: now,
+                    field: 'isRolledBack',
+                    oldValue: 'false',
+                    newValue: 'true',
+                    reason: `周报撤回：该记录在目标版本「${previousVersion.id}」时尚未导入，随周报撤回一并标记为撤回`,
+                };
+                record.manualChanges.push(change);
+            }
+            else if (record.workflowStep === types_1.WorkflowStep.WEEKLY_REPORT_UPDATED) {
                 record.workflowStep = record.engineerMessage
                     ? types_1.WorkflowStep.ENGINEER_MESSAGE_ADDED
                     : types_1.WorkflowStep.INITIAL_IMPORT;

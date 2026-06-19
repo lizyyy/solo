@@ -60,6 +60,7 @@ export interface WeeklyReportVersion {
   createdAt: Date;
   createdBy: string;
   recordIds: string[];
+  snapshotRecordIds: string[];
   summary: string;
   totalCount: number;
   normalCount: number;

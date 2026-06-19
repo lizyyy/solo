@@ -219,6 +219,101 @@ describe('ConflictRecordService', () => {
 
       const recordsAfterRollback = service.getAllUnifiedRecords();
       expect(recordsAfterRollback[0].workflowStep).not.toBe(WorkflowStep.WEEKLY_REPORT_UPDATED);
+      expect(recordsAfterRollback).toHaveLength(1);
+      const allRecordsInclRolled = service.getAllUnifiedRecords(true);
+      const rolledBackRecord = allRecordsInclRolled.find((r) => r.id === record2Id);
+      expect(rolledBackRecord?.isRolledBack).toBe(true);
+      const rollbackChange = rolledBackRecord?.manualChanges.find(
+        (c) => c.field === 'isRolledBack' && c.reason.includes('周报撤回')
+      );
+      expect(rollbackChange).toBeDefined();
+      expect(rollbackChange?.changedBy).toBe('琴行店长老周');
+    });
+
+    it('周报撤回后新增误导入记录应从活动数据中清除，页面/接口/导出都排除该记录', () => {
+      const { records: records1 } = service.importRecords(
+        [
+          {
+            originalRowNumber: 1,
+            liveName: '晴天',
+            copyrightName: '晴天',
+            band: 'CH1',
+            conflictDescription: '正常',
+          },
+        ],
+        '老周'
+      );
+      const id1 = records1[0].id;
+      service.updateStatus(id1, ProcessingStatus.NORMAL, '老周', '检查过没问题');
+
+      const report1 = service.createWeeklyReport('老周');
+      const previousVersionId = report1.id;
+      expect(report1.totalCount).toBe(1);
+      expect(report1.snapshotRecordIds).toEqual([id1]);
+      expect(service.getAllUnifiedRecords()).toHaveLength(1);
+
+      const { records: records2 } = service.importRecords(
+        [
+          {
+            originalRowNumber: 2,
+            liveName: '青花瓷(即兴版)',
+            copyrightName: '青花瓷',
+            band: 'CH2',
+            conflictDescription: '频段冲突',
+          },
+        ],
+        '老周'
+      );
+      const idDual = records2[0].id;
+      expect(records2[0].song.hasDualNames).toBe(true);
+      expect(records2[0].processingStatus).toBe(ProcessingStatus.NEEDS_TEACHER_REVIEW);
+
+      const report2 = service.createWeeklyReport('老周');
+      expect(report2.totalCount).toBe(2);
+      expect(report2.teacherReviewCount).toBe(1);
+      expect(service.getAllUnifiedRecords()).toHaveLength(2);
+
+      const apiDataBeforeRollback = service.getAllUnifiedRecords();
+      expect(apiDataBeforeRollback.find((r) => r.id === idDual)).toBeDefined();
+      const exportBeforeRollback = service.exportRecords();
+      expect(exportBeforeRollback).toContain('青花瓷(即兴版)');
+
+      const rolledBack = service.rollbackToPreviousReport();
+      expect(rolledBack?.id).toBe(report1.id);
+
+      const activeAfterRollback = service.getAllUnifiedRecords();
+      expect(activeAfterRollback).toHaveLength(1);
+      expect(activeAfterRollback[0].id).toBe(id1);
+      expect(activeAfterRollback.find((r) => r.id === idDual)).toBeUndefined();
+
+      const apiAfterRollback = service.getAllUnifiedRecords();
+      expect(apiAfterRollback).toHaveLength(1);
+      expect(apiAfterRollback.find((r) => r.id === idDual)).toBeUndefined();
+
+      const exportAfterRollback = service.exportRecords();
+      expect(exportAfterRollback).not.toContain('青花瓷(即兴版)');
+      expect(exportAfterRollback).toContain('晴天');
+
+      const allInclRolled = service.getAllUnifiedRecords(true);
+      const dualRecordRolled = allInclRolled.find((r) => r.id === idDual);
+      expect(dualRecordRolled?.isRolledBack).toBe(true);
+      expect(dualRecordRolled?.song.liveName).toBe('青花瓷(即兴版)');
+      expect(dualRecordRolled?.song.copyrightName).toBe('青花瓷');
+
+      const history = dualRecordRolled?.manualChanges || [];
+      const rollbackEntry = history.find(
+        (c) => c.field === 'isRolledBack' && c.reason.includes('周报撤回')
+      );
+      expect(rollbackEntry).toBeDefined();
+      expect(rollbackEntry?.oldValue).toBe('false');
+      expect(rollbackEntry?.newValue).toBe('true');
+      expect(rollbackEntry?.changedBy).toBe('琴行店长老周');
+      expect(rollbackEntry?.reason).toContain(previousVersionId.slice(0, 8));
+
+      const currentReport = service.getCurrentWeeklyReport();
+      expect(currentReport?.totalCount).toBe(1);
+      expect(currentReport?.content).not.toContain('青花瓷(即兴版)');
+      expect(currentReport?.content).toContain('晴天');
     });
 
     it('撤回单条双名歌曲状态应该回到待老师复核', () => {
