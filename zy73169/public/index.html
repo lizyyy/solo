@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>曲线拟合参数回放</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 24px; font-weight: 600; }
+    .header .subtitle { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+    .container { display: flex; height: calc(100vh - 88px); }
+    .sidebar { width: 320px; background: white; border-right: 1px solid #e8e8e8; padding: 20px; overflow-y: auto; }
+    .main { flex: 1; padding: 20px; overflow-y: auto; }
+    .right-panel { width: 380px; background: white; border-left: 1px solid #e8e8e8; padding: 20px; overflow-y: auto; }
+    
+    .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .card h3 { font-size: 15px; color: #333; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+    .card h3 .icon { width: 6px; height: 16px; border-radius: 3px; background: linear-gradient(135deg, #667eea, #764ba2); }
+    
+    .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+    .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-secondary { background: #f0f2f5; color: #333; }
+    .btn-secondary:hover { background: #e8eaed; }
+    .btn-danger { background: #ff4d4f; color: white; }
+    .btn-danger:hover { background: #ff7875; }
+    .btn-success { background: #52c41a; color: white; }
+    .btn-success:hover { background: #73d13d; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
+    .form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px; }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: #667eea; }
+    .form-row { display: flex; gap: 10px; }
+    .form-row .form-group { flex: 1; }
+    
+    .chart-container { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px; }
+    .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .chart-title { font-size: 16px; font-weight: 600; color: #333; }
+    .chart-equation { font-family: 'Courier New', monospace; background: #f0f2f5; padding: 8px 12px; border-radius: 4px; font-size: 13px; color: #667eea; }
+    canvas { width: 100%; height: 400px; cursor: crosshair; }
+    
+    .anomaly-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+    .anomaly-badge { padding: 12px; border-radius: 8px; text-align: center; }
+    .anomaly-badge.duplicate { background: #fff1f0; color: #cf1322; border: 1px solid #ffa39e; }
+    .anomaly-badge.outlier { background: #fff7e6; color: #d46b08; border: 1px solid #ffd591; }
+    .anomaly-badge.boundary { background: #e6f7ff; color: #096dd9; border: 1px solid #91d5ff; }
+    .anomaly-badge.withdrawn { background: #f9f0ff; color: #531dab; border: 1px solid #d3adf7; }
+    .anomaly-badge .count { font-size: 24px; font-weight: 700; display: block; }
+    .anomaly-badge .label { font-size: 12px; margin-top: 4px; }
+    
+    .sample-list { max-height: 300px; overflow-y: auto; }
+    .sample-item { padding: 12px; border-radius: 6px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+    .sample-item:hover { background: #f5f7fa; }
+    .sample-item.selected { background: #f0f5ff; border-color: #667eea; }
+    .sample-item.anomalous { background: #fff1f0; }
+    .sample-item.anomalous:hover { background: #ffe3e1; }
+    .sample-item.confirmed { border-left: 3px solid #52c41a; }
+    .sample-item.withdrawn { border-left: 3px solid #8c8c8c; opacity: 0.6; }
+    .sample-header { display: flex; justify-content: space-between; align-items: center; }
+    .sample-coords { font-family: 'Courier New', monospace; font-size: 13px; color: #333; }
+    .sample-status { font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+    .status-raw { background: #e6f7ff; color: #096dd9; }
+    .status-dirty { background: #fff7e6; color: #d46b08; }
+    .status-clean { background: #f6ffed; color: #389e0d; }
+    .status-confirmed { background: #f6ffed; color: #389e0d; }
+    .status-withdrawn { background: #f5f5f5; color: #8c8c8c; }
+    .sample-source { font-size: 11px; color: #999; margin-top: 4px; }
+    .sample-anomalies { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+    .anomaly-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; }
+    .tag-duplicate { background: #ffa39e; color: #fff; }
+    .tag-outlier { background: #ffd591; color: #fff; }
+    .tag-boundary { background: #91d5ff; color: #fff; }
+    .tag-withdrawn { background: #d3adf7; color: #fff; }
+    
+    .detail-panel { font-size: 13px; }
+    .detail-section { margin-bottom: 20px; }
+    .detail-section h4 { font-size: 14px; color: #333; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; }
+    .detail-row { display: flex; justify-content: space-between; padding: 6px 0; }
+    .detail-label { color: #999; }
+    .detail-value { color: #333; font-family: 'Courier New', monospace; }
+    
+    .history-list { max-height: 200px; overflow-y: auto; }
+    .history-item { padding: 10px; background: #fafafa; border-radius: 6px; margin-bottom: 8px; }
+    .history-header { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
+    .history-field { color: #667eea; font-weight: 500; }
+    .history-time { color: #999; }
+    .history-diff { font-size: 12px; color: #666; }
+    .diff-old { text-decoration: line-through; color: #ff4d4f; }
+    .diff-new { color: #52c41a; font-weight: 500; }
+    
+    .action-buttons { display: flex; gap: 8px; margin-top: 15px; }
+    .action-buttons .btn { flex: 1; }
+    
+    .diff-panel { background: #fafafa; padding: 15px; border-radius: 8px; margin-top: 15px; }
+    .diff-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+    .diff-row:last-child { border-bottom: none; }
+    
+    .tooltip { position: absolute; background: rgba(0,0,0,0.85); color: white; padding: 10px 14px; border-radius: 6px; font-size: 12px; pointer-events: none; z-index: 1000; max-width: 300px; }
+    .tooltip-title { font-weight: 600; margin-bottom: 6px; }
+    .tooltip-row { margin-top: 4px; }
+    
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+    .modal { background: white; border-radius: 12px; padding: 24px; width: 500px; max-width: 90vw; max-height: 80vh; overflow-y: auto; }
+    .modal h2 { font-size: 18px; margin-bottom: 20px; }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    
+    .empty { text-align: center; color: #999; padding: 40px; font-size: 13px; }
+    .tabs { display: flex; border-bottom: 1px solid #f0f0f0; margin-bottom: 15px; }
+    .tab { padding: 10px 20px; cursor: pointer; font-size: 13px; color: #999; border-bottom: 2px solid transparent; }
+    .tab.active { color: #667eea; border-bottom-color: #667eea; font-weight: 500; }
+    
+    .r2-value { font-size: 14px; color: #666; }
+    .r2-value strong { color: #52c41a; font-size: 18px; }
+
+    .session-info { font-size: 12px; color: #999; margin-bottom: 15px; }
+    .session-info strong { color: #333; }
+    
+    .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>📈 曲线拟合参数回放</h1>
+      <div class="subtitle">支持数据溯源 · 异常检测 · 变更对比 · 口径一致性校验</div>
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <button class="btn btn-secondary btn-sm" onclick="loadDemoData()">加载演示数据</button>
+      <button class="btn btn-secondary btn-sm" onclick="showReadme()">使用说明</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="sidebar">
+      <div class="card">
+        <h3><span class="icon"></span>创建会话</h3>
+        <div class="form-group">
+          <label>会话名称</label>
+          <input type="text" id="sessionName" placeholder="例如：2024级物理实验A组">
+        </div>
+        <div class="form-group">
+          <label>操作人</label>
+          <input type="text" id="operatorName" placeholder="阿宁">
+        </div>
+        <button class="btn btn-primary" style="width: 100%;" onclick="createSession()">创建会话</button>
+      </div>
+
+      <div class="card" id="sessionCard" style="display: none;">
+        <h3><span class="icon"></span>当前会话</h3>
+        <div class="session-info">
+          <div>名称: <strong id="currentSessionName">-</strong></div>
+          <div>样本数: <strong id="sampleCount">0</strong></div>
+          <div>创建人: <strong id="sessionCreator">-</strong></div>
+        </div>
+      </div>
+
+      <div class="card" id="fittingCard" style="display: none;">
+        <h3><span class="icon"></span>曲线拟合</h3>
+        <div class="form-group">
+          <label>拟合方法</label>
+          <select id="fittingMethod">
+            <option value="linear">线性拟合</option>
+            <option value="polynomial">多项式拟合</option>
+            <option value="exponential">指数拟合</option>
+            <option value="logarithmic">对数拟合</option>
+          </select>
+        </div>
+        <div class="form-group" id="degreeGroup" style="display: none;">
+          <label>多项式阶数</label>
+          <input type="number" id="polynomialDegree" value="2" min="1" max="5">
+        </div>
+        <div class="form-group">
+          <label style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="excludeAnomalies" checked>
+            排除高风险异常样本
+          </label>
+        </div>
+        <button class="btn btn-primary" style="width: 100%;" onclick="runFitting()">开始拟合</button>
+      </div>
+
+      <div class="card" id="actionsCard" style="display: none;">
+        <h3><span class="icon"></span>快捷操作</h3>
+        <div class="quick-actions">
+          <button class="btn btn-secondary btn-sm" onclick="addDuplicateSample()">混入重复样本</button>
+          <button class="btn btn-secondary btn-sm" onclick="testWithdrawReplay()">撤回记录复算</button>
+          <button class="btn btn-secondary btn-sm" onclick="verifyConsistency()">校验口径一致</button>
+          <button class="btn btn-secondary btn-sm" onclick="showAllDiffs()">查看变更对比</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="anomaly-summary" id="anomalySummary" style="display: none;">
+        <div class="anomaly-badge duplicate">
+          <span class="count" id="duplicateCount">0</span>
+          <span class="label">重复样本</span>
+        </div>
+        <div class="anomaly-badge outlier">
+          <span class="count" id="outlierCount">0</span>
+          <span class="label">离群值</span>
+        </div>
+        <div class="anomaly-badge boundary">
+          <span class="count" id="boundaryCount">0</span>
+          <span class="label">边界样本</span>
+        </div>
+        <div class="anomaly-badge withdrawn">
+          <span class="count" id="withdrawnCount">0</span>
+          <span class="label">已撤回</span>
+        </div>
+      </div>
+
+      <div class="chart-container" id="chartContainer" style="display: none;">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">拟合曲线</div>
+            <div class="r2-value">R² = <strong id="r2Value">-</strong></div>
+          </div>
+          <div class="chart-equation" id="equation">-</div>
+        </div>
+        <canvas id="chartCanvas"></canvas>
+      </div>
+
+      <div class="card" id="samplesCard" style="display: none;">
+        <h3><span class="icon"></span>样本列表 <span style="font-size: 12px; color: #999; font-weight: normal;">点击查看详情</span></h3>
+        <div class="sample-list" id="sampleList"></div>
+      </div>
+    </div>
+
+    <div class="right-panel" id="detailPanel" style="display: none;">
+      <div class="card">
+        <h3><span class="icon"></span>样本详情</h3>
+        <div class="detail-panel" id="sampleDetail">
+          <div class="empty">请点击左侧样本查看详情</div>
+        </div>
+      </div>
+
+      <div class="card" id="historyCard" style="display: none;">
+        <h3><span class="icon"></span>变更历史</h3>
+        <div class="history-list" id="historyList"></div>
+      </div>
+
+      <div class="card" id="sourceCard" style="display: none;">
+        <h3><span class="icon"></span>原始来源</h3>
+        <div id="sourceInfo" style="font-size: 12px; line-height: 1.8;"></div>
+      </div>
+
+      <div class="card" id="confirmDiffCard" style="display: none;">
+        <h3><span class="icon"></span>人工确认对比</h3>
+        <div id="confirmDiffs"></div>
+      </div>
+
+      <div class="card" id="withdrawReplayCard" style="display: none;">
+        <h3><span class="icon"></span>撤回复算对比</h3>
+        <div id="withdrawReplayResult"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tooltip" id="tooltip" style="display: none;"></div>
+
+  <div class="modal-overlay" id="readmeModal" style="display: none;">
+    <div class="modal">
+      <h2>📖 曲线拟合参数回放 - 使用说明</h2>
+      <div style="font-size: 13px; line-height: 1.8;">
+        <h3 style="margin-top: 15px; color: #667eea;">三步操作指南</h3>
+        <p><strong>1. 创建会话</strong> - 填写名称和操作人，点击创建</p>
+        <p><strong>2. 加载数据</strong> - 点击"加载演示数据"或手动导入学生草稿</p>
+        <p><strong>3. 查看结果</strong> - 选择拟合方法，点击"开始拟合"</p>
+        
+        <h3 style="margin-top: 20px; color: #ff4d4f;">坏材料来了该看哪里？</h3>
+        <p>⚠️ <strong>红色重复样本</strong> - 查看顶部异常统计，点击可追溯原始文件行号</p>
+        <p>⚠️ <strong>橙色离群值</strong> - 残差过大的点，查看来源确认是否录入错误</p>
+        <p>⚠️ <strong>蓝色边界样本</strong> - 样本量不足5个时全部标记，建议补充数据</p>
+        <p>⚠️ <strong>紫色已撤回</strong> - 点击"撤回记录复算"对比撤回前后参数变化</p>
+        
+        <h3 style="margin-top: 20px; color: #52c41a;">评审会复盘必备</h3>
+        <p>✅ <strong>变更对比</strong> - 查看人工确认前后改了什么，谁改的，什么时候改的</p>
+        <p>✅ <strong>口径校验</strong> - 一键确认图表和明细数据口径一致</p>
+        <p>✅ <strong>来源追溯</strong> - 每个点都能追溯到学生ID、草稿ID、原始文件行号</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="hideReadme()">知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentSession = null;
+    let currentFittingResult = null;
+    let selectedSampleId = null;
+    let canvas, ctx;
+
+    document.getElementById('fittingMethod').addEventListener('change', function() {
+      document.getElementById('degreeGroup').style.display = this.value === 'polynomial' ? 'block' : 'none';
+    });
+
+    async function api(url, method = 'GET', body = null) {
+      const options = { method, headers: { 'Content-Type': 'application/json' } };
+      if (body) options.body = JSON.stringify(body);
+      const res = await fetch(url, options);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '请求失败');
+      return data;
+    }
+
+    async function createSession() {
+      const name = document.getElementById('sessionName').value.trim();
+      const createdBy = document.getElementById('operatorName').value.trim();
+      if (!name || !createdBy) {
+        alert('请填写会话名称和操作人');
+        return;
+      }
+      currentSession = await api('/api/sessions', 'POST', { name, createdBy });
+      updateSessionUI();
+    }
+
+    function updateSessionUI() {
+      if (!currentSession) return;
+      document.getElementById('sessionCard').style.display = 'block';
+      document.getElementById('fittingCard').style.display = 'block';
+      document.getElementById('actionsCard').style.display = 'block';
+      document.getElementById('currentSessionName').textContent = currentSession.name;
+      document.getElementById('sampleCount').textContent = currentSession.samples.length;
+      document.getElementById('sessionCreator').textContent = currentSession.createdBy;
+    }
+
+    async function loadDemoData() {
+      if (!currentSession) {
+        await createSessionForDemo();
+      }
+
+      const samples = [
+        { x: 1, y: 2.1, source: { studentId: 'S001', draftId: 'D001', fileName: '实验报告-张三.docx', uploadedAt: Date.now(), uploader: '阿宁', originalLine: 5, notes: '第一组实验数据' } },
+        { x: 2, y: 4.2, source: { studentId: 'S001', draftId: 'D001', fileName: '实验报告-张三.docx', uploadedAt: Date.now(), uploader: '阿宁', originalLine: 6 } },
+        { x: 3, y: 5.8, source: { studentId: 'S002', draftId: 'D002', fileName: '实验报告-李四.docx', uploadedAt: Date.now(), uploader: '阿宁', originalLine: 8, notes: '第二组实验数据' } },
+        { x: 4, y: 8.1, source: { studentId: 'S002', draftId: 'D002', fileName: '实验报告-李四.docx', uploadedAt: Date.now(), uploader: '阿宁', originalLine: 9 } },
+        { x: 5, y: 9.9, source: { studentId: 'S003', draftId: 'D003', fileName: '实验报告-王五.docx', uploadedAt: Date.now(), uploader: '阿宁', originalLine: 12 } },
+        { x: 5, y: 9.9, source: { studentId: 'S003', draftId: 'D003', fileName: '实验报告-王五.docx', uploadedAt: Date.now(), uploader: '阿宁', originalLine: 12, notes: '重复录入' } },
+        { x: 6, y: 15.0, source: { studentId: 'S004', draftId: 'D004', fileName: '实验报告-赵六.docx', uploadedAt: Date.now(), uploader: '阿宁', originalLine: 15, notes: '疑似录入错误' } },
+        { x: 7, y: 14.2, source: { studentId: 'S004', draftId: 'D004', fileName: '实验报告-赵六.docx', uploadedAt: Date.now(), uploader: '阿宁', originalLine: 16 } },
+        { x: 8, y: 16.1, source: { studentId: 'S005', draftId: 'D005', fileName: '实验报告-钱七.docx', uploadedAt: Date.now(), uploader: '阿宁', originalLine: 18 } },
+        { x: 9, y: 18.3, source: { studentId: 'S005', draftId: 'D005', fileName: '实验报告-钱七.docx', uploadedAt: Date.now(), uploader: '阿宁', originalLine: 19 } },
+      ];
+
+      const result = await api(`/api/sessions/${currentSession.id}/samples`, 'POST', {
+        samples,
+        addedBy: document.getElementById('operatorName').value.trim() || '阿宁'
+      });
+
+      currentSession.samples = result;
+      updateSessionUI();
+      updateSampleList();
+      alert('演示数据已加载！包含10个样本，其中1条重复、1条离群值');
+    }
+
+    async function createSessionForDemo() {
+      currentSession = await api('/api/sessions', 'POST', {
+        name: '演示会话 - ' + new Date().toLocaleString(),
+        createdBy: '演示用户'
+      });
+      document.getElementById('sessionName').value = currentSession.name;
+      document.getElementById('operatorName').value = currentSession.createdBy;
+      updateSessionUI();
+    }
+
+    async function runFitting() {
+      if (!currentSession) {
+        alert('请先创建会话并加载数据');
+        return;
+      }
+
+      const method = document.getElementById('fittingMethod').value;
+      const degree = method === 'polynomial' ? parseInt(document.getElementById('polynomialDegree').value) : undefined;
+      const excludeAnomalies = document.getElementById('excludeAnomalies').checked;
+
+      try {
+        const result = await api(`/api/sessions/${currentSession.id}/fitting`, 'POST', {
+          method,
+          calculatedBy: document.getElementById('operatorName').value.trim() || '阿宁',
+          excludeAnomalies,
+          degree
+        });
+
+        currentFittingResult = result;
+        currentSession = result.session;
+        renderChart(result);
+        updateAnomalySummary(result.anomalySummary);
+        updateSampleList();
+        document.getElementById('chartContainer').style.display = 'block';
+        document.getElementById('anomalySummary').style.display = 'grid';
+        document.getElementById('samplesCard').style.display = 'block';
+        document.getElementById('detailPanel').style.display = 'block';
+        document.getElementById('equation').textContent = result.equation;
+        document.getElementById('r2Value').textContent = result.params.rSquared.toFixed(4);
+      } catch (e) {
+        alert(e.message);
+      }
+    }
+
+    function renderChart(result) {
+      canvas = document.getElementById('chartCanvas');
+      ctx = canvas.getContext('2d');
+      
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const width = rect.width;
+      const height = rect.height;
+      const padding = { top: 20, right: 20, bottom: 40, left: 50 };
+      const plotWidth = width - padding.left - padding.right;
+      const plotHeight = height - padding.top - padding.bottom;
+
+      const allXs = [...result.session.samples.map(s => s.x), ...result.fittingResult.predictedValues.map(p => p.x)];
+      const allYs = [...result.session.samples.map(s => s.y), ...result.fittingResult.predictedValues.map(p => p.y)];
+      const minX = Math.min(...allXs) - 0.5;
+      const maxX = Math.max(...allXs) + 0.5;
+      const minY = Math.min(...allYs) - 1;
+      const maxY = Math.max(...allYs) + 1;
+
+      ctx.clearRect(0, 0, width, height);
+
+      ctx.strokeStyle = '#f0f0f0';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 5; i++) {
+        const y = padding.top + (plotHeight / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(padding.left, y);
+        ctx.lineTo(width - padding.right, y);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = '#d9d9d9';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padding.left, padding.top);
+      ctx.lineTo(padding.left, height - padding.bottom);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(padding.left, height - padding.bottom);
+      ctx.lineTo(width - padding.right, height - padding.bottom);
+      ctx.stroke();
+
+      ctx.fillStyle = '#999';
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'right';
+      for (let i = 0; i <= 5; i++) {
+        const y = padding.top + (plotHeight / 5) * i;
+        const value = maxY - ((maxY - minY) / 5) * i;
+        ctx.fillText(value.toFixed(1), padding.left - 8, y + 4);
+      }
+
+      ctx.textAlign = 'center';
+      for (let i = 0; i <= 5; i++) {
+        const x = padding.left + (plotWidth / 5) * i;
+        const value = minX + ((maxX - minX) / 5) * i;
+        ctx.fillText(value.toFixed(1), x, height - padding.bottom + 20);
+      }
+
+      if (result.fittingResult.predictedValues.length > 0) {
+        ctx.strokeStyle = '#667eea';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        result.fittingResult.predictedValues.forEach((p, i) => {
+          const x = padding.left + ((p.x - minX) / (maxX - minX)) * plotWidth;
+          const y = padding.top + ((maxY - p.y) / (maxY - minY)) * plotHeight;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+      }
+
+      canvas._pointData = [];
+      result.session.samples.forEach(sample => {
+        const x = padding.left + ((sample.x - minX) / (maxX - minX)) * plotWidth;
+        const y = padding.top + ((maxY - sample.y) / (maxY - minY)) * plotHeight;
+
+        let color = '#52c41a';
+        let size = 6;
+        if (sample.status === 'withdrawn') {
+          color = '#8c8c8c';
+        } else if (sample.anomalies.some(a => !a.resolved && a.type === 'duplicate')) {
+          color = '#ff4d4f';
+          size = 8;
+        } else if (sample.anomalies.some(a => !a.resolved && a.type === 'outlier')) {
+          color = '#fa8c16';
+          size = 8;
+        } else if (sample.anomalies.some(a => !a.resolved && a.type === 'boundary')) {
+          color = '#1890ff';
+          size = 7;
+        }
+
+        if (sample.status === 'withdrawn') {
+          ctx.fillStyle = '#fff';
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(x, y, size, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.arc(x, y, size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        if (selectedSampleId === sample.id) {
+          ctx.strokeStyle = '#000';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(x, y, size + 4, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        canvas._pointData.push({ x, y, sampleId: sample.id, sample });
+      });
+
+      canvas.onclick = handleChartClick;
+      canvas.onmousemove = handleChartHover;
+      canvas.onmouseleave = () => { document.getElementById('tooltip').style.display = 'none'; };
+    }
+
+    function handleChartClick(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      for (const point of canvas._pointData || []) {
+        const dist = Math.sqrt((clickX - point.x) ** 2 + (clickY - point.y) ** 2);
+        if (dist < 12) {
+          selectSample(point.sampleId);
+          return;
+        }
+      }
+    }
+
+    function handleChartHover(e) {
+      const rect = canvas.getBoundingClientRect();
+      const hoverX = e.clientX - rect.left;
+      const hoverY = e.clientY - rect.top;
+      const tooltip = document.getElementById('tooltip');
+
+      for (const point of canvas._pointData || []) {
+        const dist = Math.sqrt((hoverX - point.x) ** 2 + (hoverY - point.y) ** 2);
+        if (dist < 12) {
+          const s = point.sample;
+          tooltip.style.display = 'block';
+          tooltip.style.left = (e.clientX + 15) + 'px';
+          tooltip.style.top = (e.clientY + 15) + 'px';
+          tooltip.innerHTML = `
+            <div class="tooltip-title">坐标: (${s.x.toFixed(2)}, ${s.y.toFixed(2)})</div>
+            <div class="tooltip-row">状态: <span class="status-${s.status}" style="padding:2px 6px;border-radius:4px;">${s.status}</span></div>
+            <div class="tooltip-row">学生: ${s.source.studentId}</div>
+            <div class="tooltip-row">文件: ${s.source.fileName}</div>
+            ${s.source.originalLine ? `<div class="tooltip-row">行号: ${s.source.originalLine}</div>` : ''}
+            ${s.anomalies.length > 0 ? `<div class="tooltip-row" style="color:#ff4d4f;">异常: ${s.anomalies.map(a => a.type).join(', ')}</div>` : ''}
+          `;
+          return;
+        }
+      }
+      tooltip.style.display = 'none';
+    }
+
+    function selectSample(sampleId) {
+      selectedSampleId = sampleId;
+      updateSampleList();
+      showSampleDetail(sampleId);
+      renderChart(currentFittingResult);
+    }
+
+    function updateSampleList() {
+      const list = document.getElementById('sampleList');
+      if (!currentSession || currentSession.samples.length === 0) {
+        list.innerHTML = '<div class="empty">暂无样本数据</div>';
+        return;
+      }
+
+      list.innerHTML = currentSession.samples.map(s => {
+        const hasHighAnomaly = s.anomalies.some(a => !a.resolved && a.severity === 'high');
+        const selected = selectedSampleId === s.id ? 'selected' : '';
+        const anomalous = hasHighAnomaly ? 'anomalous' : '';
+        const confirmed = s.status === 'confirmed' ? 'confirmed' : '';
+        const withdrawn = s.status === 'withdrawn' ? 'withdrawn' : '';
+
+        const anomalyTags = s.anomalies.filter(a => !a.resolved).map(a => 
+          `<span class="anomaly-tag tag-${a.type}">${a.type}</span>`
+        ).join('');
+
+        return `
+          <div class="sample-item ${selected} ${anomalous} ${confirmed} ${withdrawn}" onclick="selectSample('${s.id}')">
+            <div class="sample-header">
+              <span class="sample-coords">(${s.x.toFixed(2)}, ${s.y.toFixed(2)})</span>
+              <span class="sample-status status-${s.status}">${s.status}</span>
+            </div>
+            <div class="sample-source">${s.source.studentId} · ${s.source.fileName}${s.source.originalLine ? ` · 行${s.source.originalLine}` : ''}</div>
+            ${s.anomalies.length > 0 ? `<div class="sample-anomalies">${anomalyTags}</div>` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function showSampleDetail(sampleId) {
+      const sample = currentSession.samples.find(s => s.id === sampleId);
+      if (!sample) return;
+
+      const detail = document.getElementById('sampleDetail');
+      detail.innerHTML = `
+        <div class="detail-section">
+          <div class="detail-row"><span class="detail-label">X坐标</span><span class="detail-value">${sample.x.toFixed(4)}</span></div>
+          <div class="detail-row"><span class="detail-label">Y坐标</span><span class="detail-value">${sample.y.toFixed(4)}</span></div>
+          <div class="detail-row"><span class="detail-label">状态</span><span class="sample-status status-${sample.status}" style="padding:2px 8px;border-radius:10px;">${sample.status}</span></div>
+          <div class="detail-row"><span class="detail-label">创建时间</span><span style="font-size:12px;">${new Date(sample.createdAt).toLocaleString()}</span></div>
+          ${sample.confirmedBy ? `<div class="detail-row"><span class="detail-label">确认人</span><span>${sample.confirmedBy}</span></div>` : ''}
+          ${sample.confirmedAt ? `<div class="detail-row"><span class="detail-label">确认时间</span><span style="font-size:12px;">${new Date(sample.confirmedAt).toLocaleString()}</span></div>` : ''}
+          ${sample.withdrawnReason ? `<div class="detail-row"><span class="detail-label">撤回原因</span><span style="color:#ff4d4f;font-size:12px;">${sample.withdrawnReason}</span></div>` : ''}
+        </div>
+        ${sample.anomalies.length > 0 ? `
+          <div class="detail-section">
+            <h4>异常标记</h4>
+            ${sample.anomalies.map(a => `
+              <div style="padding:8px;background:${a.resolved ? '#f6ffed' : '#fff1f0'};border-radius:4px;margin-bottom:6px;font-size:12px;">
+                <div style="color:${a.resolved ? '#389e0d' : '#cf1322'};font-weight:500;">${a.type} ${a.resolved ? '(已处理)' : '(待处理)'}</div>
+                <div style="color:#666;margin-top:4px;">${a.description}</div>
+                <div style="color:#999;margin-top:4px;font-size:11px;">${new Date(a.detectedAt).toLocaleString()}</div>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+        <div class="action-buttons">
+          ${sample.status !== 'confirmed' && sample.status !== 'withdrawn' ? `<button class="btn btn-success btn-sm" onclick="confirmSample('${sample.id}')">确认有效</button>` : ''}
+          ${sample.status !== 'withdrawn' ? `<button class="btn btn-danger btn-sm" onclick="withdrawSample('${sample.id}')">撤回样本</button>` : ''}
+        </div>
+      `;
+
+      document.getElementById('historyCard').style.display = 'block';
+      document.getElementById('sourceCard').style.display = 'block';
+
+      const history = await api(`/api/sessions/${currentSession.id}/samples/${sampleId}/history`);
+      
+      document.getElementById('historyList').innerHTML = history.history.length > 0 ? history.history.map(h => `
+        <div class="history-item">
+          <div class="history-header">
+            <span class="history-field">${h.field}</span>
+            <span class="history-time">${new Date(h.changedAt).toLocaleString()}</span>
+          </div>
+          <div class="history-diff">
+            <span class="diff-old">${JSON.stringify(h.oldValue)}</span>
+            →
+            <span class="diff-new">${JSON.stringify(h.newValue)}</span>
+          </div>
+          <div style="font-size:11px;color:#999;margin-top:4px;">操作人: ${h.changedBy}${h.reason ? ` · ${h.reason}` : ''}</div>
+        </div>
+      `).join('') : '<div class="empty">暂无变更记录</div>';
+
+      document.getElementById('sourceInfo').innerHTML = `
+        <div class="detail-row"><span class="detail-label">学生ID</span><span>${sample.source.studentId}</span></div>
+        <div class="detail-row"><span class="detail-label">草稿ID</span><span>${sample.source.draftId}</span></div>
+        <div class="detail-row"><span class="detail-label">文件名</span><span>${sample.source.fileName}</span></div>
+        ${sample.source.originalLine ? `<div class="detail-row"><span class="detail-label">原始行号</span><span>第 ${sample.source.originalLine} 行</span></div>` : ''}
+        <div class="detail-row"><span class="detail-label">上传人</span><span>${sample.source.uploader}</span></div>
+        <div class="detail-row"><span class="detail-label">上传时间</span><span style="font-size:11px;">${new Date(sample.source.uploadedAt).toLocaleString()}</span></div>
+        ${sample.source.notes ? `<div class="detail-row"><span class="detail-label">备注</span><span style="font-size:11px;color:#667eea;">${sample.source.notes}</span></div>` : ''}
+      `;
+
+      if (history.confirmationDiffs.length > 0) {
+        document.getElementById('confirmDiffCard').style.display = 'block';
+        document.getElementById('confirmDiffs').innerHTML = history.confirmationDiffs.map(d => `
+          <div class="diff-panel">
+            <div class="diff-row">
+              <span class="detail-label">字段</span>
+              <span style="color:#667eea;font-weight:500;">${d.field}</span>
+            </div>
+            <div class="diff-row">
+              <span class="detail-label">变更前</span>
+              <span class="diff-old">${JSON.stringify(d.before)}</span>
+            </div>
+            <div class="diff-row">
+              <span class="detail-label">变更后</span>
+              <span class="diff-new">${JSON.stringify(d.after)}</span>
+            </div>
+            <div class="diff-row">
+              <span class="detail-label">操作人</span>
+              <span>${d.changedBy}</span>
+            </div>
+            <div class="diff-row">
+              <span class="detail-label">时间</span>
+              <span style="font-size:11px;">${new Date(d.changedAt).toLocaleString()}</span>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        document.getElementById('confirmDiffCard').style.display = 'none';
+      }
+    }
+
+    function updateAnomalySummary(summary) {
+      document.getElementById('duplicateCount').textContent = summary.duplicate || 0;
+      document.getElementById('outlierCount').textContent = summary.outlier || 0;
+      document.getElementById('boundaryCount').textContent = summary.boundary || 0;
+      document.getElementById('withdrawnCount').textContent = summary.withdrawn || 0;
+    }
+
+    async function confirmSample(sampleId) {
+      const confirmedBy = document.getElementById('operatorName').value.trim() || '阿宁';
+      await api(`/api/sessions/${currentSession.id}/samples/${sampleId}/confirm`, 'POST', { confirmedBy });
+      currentSession = await api(`/api/sessions/${currentSession.id}`);
+      updateSampleList();
+      showSampleDetail(sampleId);
+      alert('样本已确认有效');
+    }
+
+    async function withdrawSample(sampleId) {
+      const reason = prompt('请输入撤回原因：');
+      if (!reason) return;
+      const withdrawnBy = document.getElementById('operatorName').value.trim() || '阿宁';
+      await api(`/api/sessions/${currentSession.id}/samples/${sampleId}/withdraw`, 'POST', { withdrawnBy, reason });
+      currentSession = await api(`/api/sessions/${currentSession.id}`);
+      updateSampleList();
+      showSampleDetail(sampleId);
+      alert('样本已撤回');
+    }
+
+    async function addDuplicateSample() {
+      if (!currentSession || currentSession.samples.length === 0) {
+        alert('请先加载数据');
+        return;
+      }
+      const existing = currentSession.samples[0];
+      const samples = [{
+        x: existing.x,
+        y: existing.y,
+        source: { ...existing.source, originalLine: existing.source.originalLine ? existing.source.originalLine + 100 : 100, notes: '测试重复样本' }
+      }];
+      const result = await api(`/api/sessions/${currentSession.id}/samples`, 'POST', {
+        samples,
+        addedBy: document.getElementById('operatorName').value.trim() || '阿宁'
+      });
+      currentSession.samples = result;
+      updateSessionUI();
+      updateSampleList();
+      alert('已混入一条重复样本，查看异常检测结果！');
+    }
+
+    async function testWithdrawReplay() {
+      if (!currentSession || !currentFittingResult) {
+        alert('请先完成一次拟合');
+        return;
+      }
+      
+      const withdrawnSample = currentSession.samples.find(s => s.status === 'withdrawn');
+      if (!withdrawnSample) {
+        alert('请先撤回一个样本再进行复算对比');
+        return;
+      }
+
+      const method = document.getElementById('fittingMethod').value;
+      const degree = method === 'polynomial' ? parseInt(document.getElementById('polynomialDegree').value) : undefined;
+
+      const result = await api(`/api/sessions/${currentSession.id}/replay-withdrawn`, 'POST', {
+        withdrawnSampleId: withdrawnSample.id,
+        method,
+        calculatedBy: document.getElementById('operatorName').value.trim() || '阿宁',
+        degree
+      });
+
+      document.getElementById('withdrawReplayCard').style.display = 'block';
+      document.getElementById('withdrawReplayResult').innerHTML = `
+        <div class="diff-panel">
+          <div style="text-align:center;margin-bottom:15px;">
+            <span style="color:#ff4d4f;">撤回前</span>
+            <span style="margin:0 10px;">→</span>
+            <span style="color:#52c41a;">撤回后</span>
+          </div>
+          <div class="diff-row">
+            <span class="detail-label">方程</span>
+            <div style="text-align:right;">
+              <div style="color:#ff4d4f;font-family:monospace;font-size:11px;">${result.before.equation}</div>
+              <div style="color:#52c41a;font-family:monospace;font-size:11px;">${result.after.equation}</div>
+            </div>
+          </div>
+          <div class="diff-row">
+            <span class="detail-label">R²</span>
+            <div style="text-align:right;">
+              <div style="color:#ff4d4f;">${result.before.rSquared.toFixed(4)}</div>
+              <div style="color:#52c41a;">${result.after.rSquared.toFixed(4)}</div>
+              <div style="font-size:11px;color:${result.diff.rSquaredChange >= 0 ? '#52c41a' : '#ff4d4f'};">
+                变化: ${result.diff.rSquaredChange >= 0 ? '+' : ''}${result.diff.rSquaredChange.toFixed(4)}
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid #f0f0f0;">
+            <div style="font-size:12px;color:#999;margin-bottom:8px;">系数变化:</div>
+            ${result.diff.coefficientChanges.map(c => `
+              <div class="diff-row">
+                <span class="detail-label">a${c.index}</span>
+                <div style="text-align:right;font-family:monospace;font-size:11px;">
+                  <span style="color:#ff4d4f;">${c.before.toFixed(4)}</span>
+                  →
+                  <span style="color:#52c41a;">${c.after.toFixed(4)}</span>
+                  <span style="color:${c.change >= 0 ? '#52c41a' : '#ff4d4f'};margin-left:8px;">
+                    (${c.change >= 0 ? '+' : ''}${c.change.toFixed(4)})
+                  </span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    async function verifyConsistency() {
+      if (!currentSession || !currentFittingResult) {
+        alert('请先完成一次拟合');
+        return;
+      }
+
+      const result = await api(`/api/sessions/${currentSession.id}/fitting/${currentFittingResult.params.id}/verify`);
+      if (result.consistent) {
+        alert('✅ 口径一致性校验通过！图表和明细数据完全一致');
+      } else {
+        alert(`❌ 发现 ${result.mismatches.length} 处数据不一致！`);
+        console.log('不一致详情:', result.mismatches);
+      }
+    }
+
+    async function showAllDiffs() {
+      if (!currentSession) {
+        alert('请先创建会话');
+        return;
+      }
+
+      const confirmedSamples = currentSession.samples.filter(s => s.status === 'confirmed');
+      if (confirmedSamples.length === 0) {
+        alert('暂无已确认的样本，请先确认样本后查看变更对比');
+        return;
+      }
+
+      let allDiffs = [];
+      for (const s of confirmedSamples) {
+        const diffs = await api(`/api/sessions/${currentSession.id}/samples/${s.id}/diffs`);
+        allDiffs = allDiffs.concat(diffs);
+      }
+
+      if (allDiffs.length === 0) {
+        alert('暂无变更记录');
+        return;
+      }
+
+      alert(`共发现 ${allDiffs.length} 条变更记录，请查看控制台详情`);
+      console.log('所有变更记录:', allDiffs);
+    }
+
+    function showReadme() {
+      document.getElementById('readmeModal').style.display = 'flex';
+    }
+
+    function hideReadme() {
+      document.getElementById('readmeModal').style.display = 'none';
+    }
+
+    window.addEventListener('resize', () => {
+      if (currentFittingResult) {
+        renderChart(currentFittingResult);
+      }
+    });
+  </script>
+</body>
+</html>
