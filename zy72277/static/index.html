@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>农机作业轨迹回看</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--fg:#e0e0e0;--fg2:#a0a0b0;--accent:#e94560;--accent2:#533483;--green:#4CAF50;--orange:#FF9800;--red:#F44336;--yellow:#FFEB3B;--border:#2a2a4a;--card:#1e1e3a;--hover:#2d2d5a}
+body{font-family:'PingFang SC','Microsoft YaHei','Hiragino Sans GB',sans-serif;background:var(--bg);color:var(--fg);overflow:hidden;height:100vh;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;gap:12px;padding:8px 16px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap}
+.topbar .title{font-size:18px;font-weight:700;color:var(--accent);white-space:nowrap}
+.topbar .badge{background:var(--bg3);padding:3px 10px;border-radius:4px;font-size:12px;color:var(--fg2)}
+.topbar .badge span{color:var(--fg);font-weight:600}
+.topbar button{padding:5px 14px;border:1px solid var(--border);border-radius:4px;background:var(--bg3);color:var(--fg);cursor:pointer;font-size:13px;transition:all .2s;white-space:nowrap}
+.topbar button:hover{background:var(--hover);border-color:var(--accent)}
+.topbar button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.topbar button.primary:hover{background:#c73550}
+.main{display:flex;flex:1;overflow:hidden}
+.left-panel{flex:1;position:relative;min-width:300px;background:#111}
+.left-panel canvas{display:block}
+.left-panel .overlay-info{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.7);padding:8px 12px;border-radius:6px;font-size:12px;color:var(--fg2);pointer-events:none}
+.left-panel .overlay-info b{color:var(--fg)}
+.obstacle-popup{position:absolute;display:none;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;min-width:260px;max-width:360px;z-index:100;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+.obstacle-popup h3{margin-bottom:6px;font-size:15px}
+.obstacle-popup .row{display:flex;gap:8px;margin-bottom:4px;font-size:13px}
+.obstacle-popup .row .label{color:var(--fg2);min-width:60px}
+.obstacle-popup .row .val{color:var(--fg)}
+.obstacle-popup .issues{margin-top:6px;padding-top:6px;border-top:1px solid var(--border)}
+.obstacle-popup .issues div{font-size:12px;color:var(--orange);margin-bottom:2px}
+.right-panel{width:420px;flex-shrink:0;display:flex;flex-direction:column;background:var(--bg2);border-left:1px solid var(--border)}
+.tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto}
+.tabs button{flex:1;padding:10px 4px;border:none;background:transparent;color:var(--fg2);cursor:pointer;font-size:13px;white-space:nowrap;border-bottom:2px solid transparent;transition:all .2s}
+.tabs button:hover{color:var(--fg);background:rgba(255,255,255,.03)}
+.tabs button.active{color:var(--accent);border-bottom-color:var(--accent);background:rgba(233,69,96,.05)}
+.tab-content{flex:1;overflow-y:auto;padding:12px}
+.tab-content::-webkit-scrollbar{width:6px}
+.tab-content::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--border)}
+th{color:var(--fg2);font-weight:600;position:sticky;top:0;background:var(--bg2)}
+tr:hover td{background:rgba(255,255,255,.02)}
+.tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600}
+.tag.red{background:rgba(244,67,54,.2);color:var(--red)}
+.tag.orange{background:rgba(255,152,0,.2);color:var(--orange)}
+.tag.green{background:rgba(76,175,80,.2);color:var(--green)}
+.tag.yellow{background:rgba(255,235,59,.2);color:var(--yellow)}
+.decision-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px}
+.decision-card .dtype{font-size:11px;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.decision-card h4{font-size:14px;margin-bottom:6px}
+.decision-card .desc{font-size:12px;color:var(--fg2);margin-bottom:8px;line-height:1.5}
+.decision-card .evidence{font-size:12px;margin-bottom:8px}
+.decision-card .evidence .item{padding:4px 0;display:flex;gap:6px}
+.decision-card .evidence .item .elabel{color:var(--fg2);min-width:80px}
+.decision-card .actions{display:flex;gap:8px}
+.decision-card .actions button{padding:5px 16px;border-radius:4px;border:1px solid var(--border);cursor:pointer;font-size:13px;transition:all .2s}
+.btn-confirm{background:rgba(76,175,80,.15);color:var(--green);border-color:var(--green)!important}
+.btn-confirm:hover{background:rgba(76,175,80,.3)}
+.btn-reject{background:rgba(244,67,54,.15);color:var(--red);border-color:var(--red)!important}
+.btn-reject:hover{background:rgba(244,67,54,.3)}
+.check-item{padding:8px;margin-bottom:8px;border-radius:6px;font-size:13px;line-height:1.5}
+.check-item.passed{background:rgba(76,175,80,.08);border-left:3px solid var(--green)}
+.check-item.failed{background:rgba(244,67,54,.08);border-left:3px solid var(--red)}
+.check-item .cname{font-weight:600}
+.check-item .cmsg{color:var(--fg2);margin-top:2px}
+.check-item .cdetail{font-size:12px;color:var(--fg2);margin-top:4px;padding-left:12px}
+.export-btns{display:flex;flex-direction:column;gap:10px}
+.export-btns button{padding:14px;border:1px dashed var(--border);border-radius:8px;background:var(--card);color:var(--fg);cursor:pointer;font-size:14px;transition:all .2s;text-align:left}
+.export-btns button:hover{border-color:var(--accent);background:var(--hover)}
+.export-btns button small{display:block;color:var(--fg2);margin-top:4px;font-size:12px}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:1000;display:none;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;min-width:420px;max-width:560px;max-height:80vh;overflow-y:auto}
+.modal h2{font-size:16px;margin-bottom:16px;color:var(--accent)}
+.modal label{display:block;font-size:13px;color:var(--fg2);margin-bottom:4px;margin-top:10px}
+.modal input,.modal textarea,.modal select{width:100%;padding:8px;border:1px solid var(--border);border-radius:4px;background:var(--card);color:var(--fg);font-size:13px;font-family:inherit}
+.modal textarea{min-height:120px;resize:vertical;font-family:monospace}
+.modal .modal-actions{display:flex;gap:8px;margin-top:18px;justify-content:flex-end}
+.modal .modal-actions button{padding:8px 20px;border-radius:4px;border:1px solid var(--border);cursor:pointer;font-size:13px}
+.version-bar{padding:8px 16px;background:var(--bg2);border-top:1px solid var(--border);font-size:12px;color:var(--fg2);flex-shrink:0;max-height:60px;overflow-y:auto}
+.version-bar .vitem{display:inline-block;margin-right:16px}
+.version-bar .vitem.latest{color:var(--green);font-weight:600}
+.empty-state{text-align:center;padding:40px 20px;color:var(--fg2);font-size:14px}
+.loading{text-align:center;padding:40px;color:var(--fg2)}
+.dup-yes{color:var(--red);font-weight:600}
+.dup-no{color:var(--green)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="title">农机作业轨迹回看</div>
+  <div class="badge">任务 <span id="taskId">DEMO-001</span></div>
+  <div class="badge">版本 <span id="versionDisplay">--</span></div>
+  <button class="primary" onclick="openDialog('importRangefinder')">导入测距仪记录</button>
+  <button onclick="openDialog('addRemark')">补录障碍物备注</button>
+  <button onclick="openDialog('addRangefinder')">添加测距仪记录</button>
+  <button onclick="reimportBatch()">重复导入</button>
+  <button onclick="refreshAll()">刷新</button>
+</div>
+
+<div class="main">
+  <div class="left-panel" id="threeContainer">
+    <div class="overlay-info" id="overlayInfo">
+      <b>轨迹点:</b> <span id="tpCount">0</span> &nbsp;
+      <b>障碍物:</b> <span id="obsCount">0</span>
+    </div>
+    <div class="obstacle-popup" id="obstaclePopup"></div>
+  </div>
+
+  <div class="right-panel">
+    <div class="tabs" id="tabs">
+      <button class="active" data-tab="rangefinder">测距仪记录</button>
+      <button data-tab="remarks">障碍物备注</button>
+      <button data-tab="conflicts">冲突决策</button>
+      <button data-tab="aliases">同物异名</button>
+      <button data-tab="selfcheck">自检报告</button>
+      <button data-tab="export">导出</button>
+    </div>
+    <div class="tab-content" id="tabContent"></div>
+  </div>
+</div>
+
+<div class="version-bar" id="versionBar">版本历史加载中...</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+var TASK_ID = 'DEMO-001';
+var API_BASE = '/api/tasks/' + TASK_ID;
+var scene, camera, renderer, controls;
+var obstacleMeshes = [];
+var raycaster, mouse;
+var lastBatch = 'BATCH-DEMO-001';
+var appData = {
+  trajectory: [],
+  rangefinder: [],
+  remarks: [],
+  conflicts: [],
+  aliases: [],
+  annotations: [],
+  selfCheck: {},
+  versionHistory: [],
+  summary: {}
+};
+
+function init() {
+  initThree();
+  initTabs();
+  refreshAll();
+  window.addEventListener('resize', onResize);
+}
+
+function initThree() {
+  var container = document.getElementById('threeContainer');
+  var w = container.clientWidth;
+  var h = container.clientHeight;
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x111122);
+  camera = new THREE.PerspectiveCamera(50, w / h, 0.1, 10000);
+  camera.position.set(50, 80, 50);
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  container.appendChild(renderer.domElement);
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2();
+  renderer.domElement.addEventListener('click', onCanvasClick);
+  var gridHelper = new THREE.GridHelper(200, 20, 0x333355, 0x222244);
+  scene.add(gridHelper);
+  var ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+  scene.add(ambientLight);
+  var dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  dirLight.position.set(50, 100, 50);
+  scene.add(dirLight);
+  animate();
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+function onResize() {
+  var container = document.getElementById('threeContainer');
+  var w = container.clientWidth;
+  var h = container.clientHeight;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+}
+
+function latlonToLocal(lat, lon, alt) {
+  if (!appData.trajectory.length) return { x: 0, y: alt || 0, z: 0 };
+  var ref = appData.trajectory[0];
+  var dLat = lat - ref.latitude;
+  var dLon = lon - ref.longitude;
+  var R = 6371000;
+  var x = dLon * Math.PI / 180 * R * Math.cos(ref.latitude * Math.PI / 180);
+  var z = -dLat * Math.PI / 180 * R;
+  var y = (alt || 0) - (ref.altitude || 0);
+  return { x: x, y: y, z: z };
+}
+
+function update3DView() {
+  while (scene.children.length > 0) {
+    scene.remove(scene.children[0]);
+  }
+  obstacleMeshes = [];
+  var gridHelper = new THREE.GridHelper(200, 20, 0x333355, 0x222244);
+  scene.add(gridHelper);
+  var ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+  scene.add(ambientLight);
+  var dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  dirLight.position.set(50, 100, 50);
+  scene.add(dirLight);
+
+  if (appData.trajectory.length > 1) {
+    var points = appData.trajectory.map(function(tp) {
+      var local = latlonToLocal(tp.latitude, tp.longitude, tp.altitude);
+      return new THREE.Vector3(local.x, local.y, local.z);
+    });
+    var geometry = new THREE.BufferGeometry().setFromPoints(points);
+    var material = new THREE.LineBasicMaterial({ color: 0x4CAF50, linewidth: 2 });
+    var line = new THREE.Line(geometry, material);
+    scene.add(line);
+    var sphereGeo = new THREE.SphereGeometry(0.5, 8, 8);
+    var sphereMat = new THREE.MeshBasicMaterial({ color: 0x4CAF50 });
+    points.forEach(function(p) {
+      var s = new THREE.Mesh(sphereGeo, sphereMat);
+      s.position.copy(p);
+      scene.add(s);
+    });
+  }
+
+  appData.annotations.forEach(function(ann) {
+    var color = getStatusColor(ann);
+    var local = latlonToLocal(ann.latitude, ann.longitude, ann.altitude);
+    var radius = Math.max(ann.radius || 1.5, 0.5);
+    var geo = new THREE.SphereGeometry(radius, 16, 16);
+    var mat = new THREE.MeshPhongMaterial({
+      color: new THREE.Color(color),
+      transparent: true,
+      opacity: 0.75,
+      shininess: 60
+    });
+    var mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(local.x, local.y, local.z);
+    mesh.userData = {
+      id: ann.annotation_id,
+      name: ann.canonical_name,
+      type: ann.obstacle_type,
+      conclusion: ann.final_conclusion,
+      radius: ann.radius,
+      needs_review: ann.needs_review,
+      has_alias_issue: ann.has_name_alias_issue,
+      latitude: ann.latitude,
+      longitude: ann.longitude,
+      altitude: ann.altitude,
+      version: ann.version,
+      change_reason: ann.change_reason,
+      source_records: ann.source_records,
+      source_remarks: ann.source_remarks,
+      calculation_meta: ann.calculation_meta
+    };
+    scene.add(mesh);
+    obstacleMeshes.push(mesh);
+  });
+
+  document.getElementById('tpCount').textContent = appData.trajectory.length;
+  document.getElementById('obsCount').textContent = appData.annotations.length;
+}
+
+function getStatusColor(ann) {
+  if (ann.needs_review) return '#FF9800';
+  if (ann.has_name_alias_issue) return '#FFEB3B';
+  if (ann.final_conclusion && ann.final_conclusion.indexOf('绕行') >= 0) return '#F44336';
+  return '#4CAF50';
+}
+
+function getStatusLabel(ann) {
+  if (ann.needs_review) return '待复核';
+  if (ann.has_name_alias_issue) return '同物异名';
+  if (ann.final_conclusion && ann.final_conclusion.indexOf('绕行') >= 0) return '绕行';
+  return '正常';
+}
+
+function onCanvasClick(event) {
+  var container = document.getElementById('threeContainer');
+  var rect = container.getBoundingClientRect();
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  var intersects = raycaster.intersectObjects(obstacleMeshes);
+  var popup = document.getElementById('obstaclePopup');
+  if (intersects.length > 0) {
+    var data = intersects[0].object.userData;
+    var statusColor = getStatusColor(data);
+    var statusLabel = getStatusLabel(data);
+    var html = '<h3 style="color:' + statusColor + '">' + data.name + '</h3>';
+    html += '<div class="row"><span class="label">状态</span><span class="val"><span class="tag" style="background:' + statusColor + '22;color:' + statusColor + '">' + statusLabel + '</span></span></div>';
+    html += '<div class="row"><span class="label">类型</span><span class="val">' + data.type + '</span></div>';
+    html += '<div class="row"><span class="label">结论</span><span class="val">' + data.conclusion + '</span></div>';
+    html += '<div class="row"><span class="label">位置</span><span class="val">' + data.latitude.toFixed(6) + ', ' + data.longitude.toFixed(6) + '</span></div>';
+    if (data.altitude != null) html += '<div class="row"><span class="label">高度</span><span class="val">' + data.altitude.toFixed(1) + 'm</span></div>';
+    html += '<div class="row"><span class="label">半径</span><span class="val">' + data.radius + 'm</span></div>';
+    html += '<div class="row"><span class="label">版本</span><span class="val">v' + data.version + '</span></div>';
+    if (data.change_reason) html += '<div class="row"><span class="label">变更</span><span class="val">' + data.change_reason + '</span></div>';
+
+    var conflictItems = appData.conflicts.filter(function(c) {
+      return data.source_records && data.source_records.indexOf(c.rangefinder_record_id) >= 0;
+    });
+    var aliasItems = appData.aliases.filter(function(a) {
+      return data.source_records && (data.source_records.indexOf(a.primary_record_id) >= 0 || data.source_records.indexOf(a.alias_record_id) >= 0);
+    });
+
+    if (conflictItems.length || aliasItems.length || data.has_alias_issue) {
+      html += '<div class="issues">';
+      if (data.has_alias_issue) {
+        aliasItems.forEach(function(a) {
+          if (a.confirm_status === 'pending') html += '<div>⚠ 同物异名: ' + a.primary_name + ' vs ' + a.alias_name + '</div>';
+        });
+      }
+      conflictItems.forEach(function(c) {
+        if (c.confirm_status === 'pending') html += '<div>⚠ ' + c.conflict_type + ': ' + c.description + '</div>';
+      });
+      html += '</div>';
+    }
+
+    if (data.calculation_meta && data.calculation_meta.parameter_version) {
+      html += '<div style="margin-top:6px;font-size:11px;color:var(--fg2)">参数版本: ' + data.calculation_meta.parameter_version + '</div>';
+    }
+
+    popup.innerHTML = html;
+    popup.style.display = 'block';
+    popup.style.left = Math.min(event.clientX - container.getBoundingClientRect().left + 10, container.clientWidth - 280) + 'px';
+    popup.style.top = Math.min(event.clientY - container.getBoundingClientRect().top + 10, container.clientHeight - 200) + 'px';
+  } else {
+    popup.style.display = 'none';
+  }
+}
+
+function initTabs() {
+  var tabs = document.querySelectorAll('#tabs button');
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      tabs.forEach(function(t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+      renderTab(tab.getAttribute('data-tab'));
+    });
+  });
+}
+
+function renderTab(tabName) {
+  var content = document.getElementById('tabContent');
+  switch (tabName) {
+    case 'rangefinder': content.innerHTML = renderRangefinder(); break;
+    case 'remarks': content.innerHTML = renderRemarks(); break;
+    case 'conflicts': content.innerHTML = renderConflicts(); break;
+    case 'aliases': content.innerHTML = renderAliases(); break;
+    case 'selfcheck': content.innerHTML = renderSelfCheck(); break;
+    case 'export': content.innerHTML = renderExport(); break;
+  }
+}
+
+function renderRangefinder() {
+  if (!appData.rangefinder.length) return '<div class="empty-state">暂无测距仪记录，请点击"导入测距仪记录"按钮</div>';
+  var html = '<table><thead><tr><th>名称</th><th>类型</th><th>距离</th><th>角度</th><th>结论</th><th>置信度</th><th>重复</th></tr></thead><tbody>';
+  appData.rangefinder.forEach(function(r) {
+    var dupCls = r.is_duplicate ? 'dup-yes' : 'dup-no';
+    var dupTxt = r.is_duplicate ? '是' : '否';
+    html += '<tr>';
+    html += '<td>' + esc(r.obstacle_name) + '</td>';
+    html += '<td>' + esc(r.obstacle_type) + '</td>';
+    html += '<td>' + r.distance + 'm</td>';
+    html += '<td>' + r.angle + '°</td>';
+    html += '<td>' + esc(r.raw_conclusion) + '</td>';
+    html += '<td>' + (r.confidence || 0).toFixed(2) + '</td>';
+    html += '<td class="' + dupCls + '">' + dupTxt + '</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  return html;
+}
+
+function renderRemarks() {
+  if (!appData.remarks.length) return '<div class="empty-state">暂无障碍物备注，请点击"补录障碍物备注"按钮</div>';
+  var html = '<table><thead><tr><th>名称</th><th>类型</th><th>现场备注</th><th>结论</th><th>来源</th></tr></thead><tbody>';
+  appData.remarks.forEach(function(r) {
+    html += '<tr>';
+    html += '<td>' + esc(r.obstacle_name) + '</td>';
+    html += '<td>' + esc(r.obstacle_type) + '</td>';
+    html += '<td title="' + esc(r.field_remark) + '">' + esc(truncate(r.field_remark, 20)) + '</td>';
+    html += '<td>' + esc(r.conclusion) + '</td>';
+    html += '<td>' + esc(r.source || '群聊补充') + '</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  return html;
+}
+
+function renderConflicts() {
+  var pending = appData.conflicts.filter(function(c) { return c.confirm_status === 'pending'; });
+  var decided = appData.conflicts.filter(function(c) { return c.confirm_status !== 'pending'; });
+  var html = '';
+  if (!appData.conflicts.length) return '<div class="empty-state">暂无冲突记录</div>';
+  if (pending.length) {
+    html += '<h4 style="margin-bottom:10px;color:var(--orange)">待处理冲突 (' + pending.length + ')</h4>';
+    pending.forEach(function(c) {
+      html += '<div class="decision-card">';
+      html += '<div class="dtype">' + conflictTypeLabel(c.conflict_type) + '</div>';
+      html += '<h4>' + esc(c.description || '') + '</h4>';
+      html += '<div class="evidence">';
+      html += '<div class="item"><span class="elabel">测距仪值:</span><span>' + esc(jsonVal(c.rangefinder_value)) + '</span></div>';
+      html += '<div class="item"><span class="elabel">现场备注值:</span><span>' + esc(jsonVal(c.remark_value)) + '</span></div>';
+      html += '</div>';
+      html += '<div class="actions">';
+      html += '<button class="btn-confirm" onclick="decideConflict(\'' + c.conflict_id + '\', true)">确认</button>';
+      html += '<button class="btn-reject" onclick="decideConflict(\'' + c.conflict_id + '\', false)">驳回</button>';
+      html += '</div>';
+      html += '</div>';
+    });
+  }
+  if (decided.length) {
+    html += '<h4 style="margin:16px 0 10px;color:var(--fg2)">已处理冲突 (' + decided.length + ')</h4>';
+    decided.forEach(function(c) {
+      var cls = c.confirm_status === 'confirmed' ? 'tag green' : 'tag red';
+      var lbl = c.confirm_status === 'confirmed' ? '已确认' : '已驳回';
+      html += '<div style="padding:6px 0;font-size:13px;border-bottom:1px solid var(--border)">';
+      html += esc(c.description || '') + ' <span class="' + cls + '">' + lbl + '</span>';
+      if (c.decided_by) html += ' <span style="color:var(--fg2);font-size:11px">by ' + esc(c.decided_by) + '</span>';
+      html += '</div>';
+    });
+  }
+  return html;
+}
+
+function renderAliases() {
+  var pending = appData.aliases.filter(function(a) { return a.confirm_status === 'pending'; });
+  var decided = appData.aliases.filter(function(a) { return a.confirm_status !== 'pending'; });
+  var html = '';
+  if (!appData.aliases.length) return '<div class="empty-state">暂无同物异名候选</div>';
+  if (pending.length) {
+    html += '<h4 style="margin-bottom:10px;color:var(--yellow)">待复核同物异名 (' + pending.length + ')</h4>';
+    pending.forEach(function(a) {
+      html += '<div class="decision-card">';
+      html += '<div class="dtype">同物异名候选</div>';
+      html += '<h4>「' + esc(a.primary_name) + '」vs「' + esc(a.alias_name) + '」</h4>';
+      html += '<div class="desc">相似度: ' + (a.similarity || 0).toFixed(2) + '，距离: ' + (a.distance_meters || 0).toFixed(2) + '米</div>';
+      html += '<div class="actions">';
+      html += '<button class="btn-confirm" onclick="reviewAlias(\'' + a.candidate_id + '\', true)">确认同物</button>';
+      html += '<button class="btn-reject" onclick="reviewAlias(\'' + a.candidate_id + '\', false)">判定不同</button>';
+      html += '</div>';
+      html += '</div>';
+    });
+  }
+  if (decided.length) {
+    html += '<h4 style="margin:16px 0 10px;color:var(--fg2)">已复核 (' + decided.length + ')</h4>';
+    decided.forEach(function(a) {
+      var cls = a.confirm_status === 'confirmed' ? 'tag green' : 'tag red';
+      var lbl = a.confirm_status === 'confirmed' ? '同物异名' : '不同物体';
+      html += '<div style="padding:6px 0;font-size:13px;border-bottom:1px solid var(--border)">';
+      html += '「' + esc(a.primary_name) + '」vs「' + esc(a.alias_name) + '」 <span class="' + cls + '">' + lbl + '</span>';
+      if (a.reviewed_by) html += ' <span style="color:var(--fg2);font-size:11px">by ' + esc(a.reviewed_by) + '</span>';
+      html += '</div>';
+    });
+  }
+  return html;
+}
+
+function renderSelfCheck() {
+  var checks = appData.selfCheck && appData.selfCheck.checks;
+  if (!checks || !checks.length) return '<div class="empty-state">暂无自检报告，请先导入数据</div>';
+  var html = '';
+  var overall = appData.selfCheck.overall_passed;
+  html += '<div style="margin-bottom:12px;padding:8px;border-radius:6px;background:' + (overall ? 'rgba(76,175,80,.1)' : 'rgba(244,67,54,.1)') + '">';
+  html += '<strong>' + (overall ? '✅ 全部通过' : '❌ 存在问题') + '</strong></div>';
+  checks.forEach(function(c) {
+    var cls = c.passed ? 'passed' : 'failed';
+    html += '<div class="check-item ' + cls + '">';
+    html += '<span class="cname">' + (c.passed ? '✅ ' : '❌ ') + esc(c.check_name) + '</span>';
+    html += '<div class="cmsg">' + esc(c.message) + '</div>';
+    if (c.details && c.details.length) {
+      html += '<div class="cdetail">';
+      c.details.forEach(function(d) { html += '• ' + esc(d) + '<br>'; });
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+  return html;
+}
+
+function renderExport() {
+  var html = '<div class="export-btns">';
+  html += '<button onclick="exportJSON()"><strong>📦 导出 JSON</strong><small>完整结构化数据，包含所有标注、冲突、同物异名记录</small></button>';
+  html += '<button onclick="exportCSV()"><strong>📊 导出 CSV</strong><small>表格格式，可用Excel打开，包含障碍物明细和参数取舍理由</small></button>';
+  html += '</div>';
+  if (appData.summary && appData.summary.calculation_meta) {
+    var meta = appData.summary.calculation_meta;
+    html += '<div style="margin-top:20px;padding:12px;background:var(--card);border-radius:8px;border:1px solid var(--border)">';
+    html += '<h4 style="margin-bottom:8px">计算参数</h4>';
+    html += '<div style="font-size:12px;color:var(--fg2)">';
+    html += '<div>模型版本: ' + esc(meta.model_version || '-') + '</div>';
+    html += '<div>参数版本: ' + esc(meta.parameter_version || '-') + '</div>';
+    if (meta.algorithm_description) html += '<div style="margin-top:6px">算法: ' + esc(meta.algorithm_description) + '</div>';
+    if (meta.justification) {
+      html += '<div style="margin-top:6px"><strong>参数取舍理由:</strong></div>';
+      Object.keys(meta.justification).forEach(function(k) {
+        html += '<div style="padding-left:12px;margin-top:2px">• ' + esc(k) + ': ' + esc(meta.justification[k]) + '</div>';
+      });
+    }
+    html += '</div></div>';
+  }
+  return html;
+}
+
+function conflictTypeLabel(t) {
+  var map = { name_conflict: '名称冲突', type_conflict: '类型冲突', conclusion_conflict: '结论冲突', position_conflict: '位置冲突' };
+  return map[t] || t;
+}
+
+function jsonVal(v) {
+  if (v == null) return '-';
+  if (typeof v === 'object') return JSON.stringify(v);
+  return String(v);
+}
+
+function truncate(s, n) {
+  if (!s) return '';
+  return s.length > n ? s.substring(0, n) + '...' : s;
+}
+
+function esc(s) {
+  if (s == null) return '';
+  var d = document.createElement('div');
+  d.textContent = String(s);
+  return d.innerHTML;
+}
+
+function refreshAll() {
+  Promise.all([
+    fetchJSON(API_BASE + '/trajectory-points'),
+    fetchJSON(API_BASE + '/rangefinder-records'),
+    fetchJSON(API_BASE + '/obstacle-remarks'),
+    fetchJSON(API_BASE + '/conflicts'),
+    fetchJSON(API_BASE + '/alias-candidates'),
+    fetchJSON(API_BASE + '/annotations'),
+    fetchJSON(API_BASE + '/self-check'),
+    fetchJSON(API_BASE + '/version-history'),
+    fetchJSON(API_BASE + '/export')
+  ]).then(function(results) {
+    appData.trajectory = results[0] || [];
+    appData.rangefinder = results[1] || [];
+    appData.remarks = results[2] || [];
+    appData.conflicts = results[3] || [];
+    appData.aliases = results[4] || [];
+    appData.annotations = results[5] || [];
+    appData.selfCheck = results[6] || {};
+    appData.versionHistory = results[7] || [];
+    var exportData = results[8] || {};
+    appData.summary = exportData.summary || {};
+    if (exportData.version != null) {
+      document.getElementById('versionDisplay').textContent = 'v' + exportData.version;
+    }
+    update3DView();
+    updateVersionBar();
+    var activeTab = document.querySelector('#tabs button.active');
+    if (activeTab) renderTab(activeTab.getAttribute('data-tab'));
+  }).catch(function(err) {
+    console.error('刷新失败:', err);
+  });
+}
+
+function fetchJSON(url) {
+  return fetch(url).then(function(r) {
+    if (!r.ok) throw new Error(r.status);
+    return r.json();
+  }).catch(function(e) {
+    console.warn('请求失败 ' + url, e);
+    return null;
+  });
+}
+
+function updateVersionBar() {
+  var bar = document.getElementById('versionBar');
+  if (!appData.versionHistory.length) {
+    bar.textContent = '暂无版本历史';
+    return;
+  }
+  var html = '';
+  appData.versionHistory.forEach(function(v) {
+    var cls = v.is_latest ? 'latest' : '';
+    var reason = v.change_reason ? ' - ' + esc(v.change_reason) : '';
+    html += '<span class="vitem ' + cls + '">v' + v.version + ' (' + (v.obstacle_count || 0) + '障碍物' + ')' + reason + '</span>';
+  });
+  bar.innerHTML = html;
+}
+
+function openDialog(type) {
+  var overlay = document.getElementById('modalOverlay');
+  var modal = document.getElementById('modalContent');
+  var html = '';
+  if (type === 'importRangefinder') {
+    html = '<h2>导入测距仪记录</h2>';
+    html += '<label>JSON 数据</label>';
+    html += '<textarea id="importJson" placeholder=\'[{"obstacle_name":"电线杆","obstacle_type":"utility_pole","distance":12.5,"angle":35,"latitude":39.9042,"longitude":116.4074,"altitude":45,"raw_conclusion":"正常通过","confidence":0.92}]\'></textarea>';
+    html += '<label>批次号</label>';
+    html += '<input id="importBatch" value="BATCH-DEMO-001" />';
+    html += '<label>导入人</label>';
+    html += '<input id="importBy" value="laoliang" />';
+    html += '<div class="modal-actions"><button onclick="closeDialog()">取消</button><button class="primary" onclick="doImportRangefinder()">导入</button></div>';
+  } else if (type === 'addRemark') {
+    html = '<h2>补录障碍物备注</h2>';
+    html += '<label>障碍物名称</label><input id="rmName" />';
+    html += '<label>障碍物类型</label><input id="rmType" value="utility_pole" />';
+    html += '<label>纬度</label><input id="rmLat" type="number" step="0.000001" value="39.9042" />';
+    html += '<label>经度</label><input id="rmLon" type="number" step="0.000001" value="116.4074" />';
+    html += '<label>高度</label><input id="rmAlt" type="number" step="0.1" value="45.0" />';
+    html += '<label>现场备注</label><textarea id="rmRemark"></textarea>';
+    html += '<label>结论</label><input id="rmConclusion" value="需要绕行" />';
+    html += '<label>来源</label><input id="rmSource" value="group_chat_supplement" />';
+    html += '<label>提交人</label><input id="rmBy" value="laoliang" />';
+    html += '<div class="modal-actions"><button onclick="closeDialog()">取消</button><button class="primary" onclick="doAddRemark()">提交</button></div>';
+  } else if (type === 'addRangefinder') {
+    html = '<h2>添加测距仪记录</h2>';
+    html += '<label>障碍物名称</label><input id="rfName" />';
+    html += '<label>障碍物类型</label><input id="rfType" value="utility_pole" />';
+    html += '<label>距离(m)</label><input id="rfDist" type="number" step="0.1" value="10" />';
+    html += '<label>角度(°)</label><input id="rfAngle" type="number" step="0.1" value="0" />';
+    html += '<label>纬度</label><input id="rfLat" type="number" step="0.000001" value="39.9042" />';
+    html += '<label>经度</label><input id="rfLon" type="number" step="0.000001" value="116.4074" />';
+    html += '<label>高度</label><input id="rfAlt" type="number" step="0.1" value="45.0" />';
+    html += '<label>原始结论</label><input id="rfConclusion" value="正常通过" />';
+    html += '<label>置信度</label><input id="rfConf" type="number" step="0.01" value="0.9" />';
+    html += '<label>批次号</label><input id="rfBatch" value="BATCH-DEMO-001" />';
+    html += '<label>导入人</label><input id="rfBy" value="laoliang" />';
+    html += '<div class="modal-actions"><button onclick="closeDialog()">取消</button><button class="primary" onclick="doAddRangefinder()">添加</button></div>';
+  }
+  modal.innerHTML = html;
+  overlay.classList.add('show');
+}
+
+function closeDialog() {
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeDialog();
+});
+
+function doImportRangefinder() {
+  var jsonStr = document.getElementById('importJson').value.trim();
+  var batch = document.getElementById('importBatch').value.trim();
+  var importedBy = document.getElementById('importBy').value.trim();
+  if (!jsonStr) { alert('请输入JSON数据'); return; }
+  try {
+    var records = JSON.parse(jsonStr);
+  } catch (e) { alert('JSON格式错误: ' + e.message); return; }
+  lastBatch = batch;
+  fetch(API_BASE + '/import_rangefinder', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ records: records, source_batch: batch, imported_by: importedBy })
+  }).then(function(r) { return r.json(); }).then(function() {
+    closeDialog();
+    refreshAll();
+  }).catch(function(e) { alert('导入失败: ' + e.message); });
+}
+
+function doAddRemark() {
+  var data = {
+    obstacle_name: document.getElementById('rmName').value,
+    obstacle_type: document.getElementById('rmType').value,
+    latitude: parseFloat(document.getElementById('rmLat').value),
+    longitude: parseFloat(document.getElementById('rmLon').value),
+    altitude: parseFloat(document.getElementById('rmAlt').value) || null,
+    field_remark: document.getElementById('rmRemark').value,
+    conclusion: document.getElementById('rmConclusion').value,
+    source: document.getElementById('rmSource').value || 'group_chat_supplement',
+    submitted_by: document.getElementById('rmBy').value
+  };
+  fetch(API_BASE + '/add_remark', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(function(r) { return r.json(); }).then(function() {
+    closeDialog();
+    refreshAll();
+  }).catch(function(e) { alert('提交失败: ' + e.message); });
+}
+
+function doAddRangefinder() {
+  var data = {
+    obstacle_name: document.getElementById('rfName').value,
+    obstacle_type: document.getElementById('rfType').value,
+    distance: parseFloat(document.getElementById('rfDist').value),
+    angle: parseFloat(document.getElementById('rfAngle').value),
+    latitude: parseFloat(document.getElementById('rfLat').value),
+    longitude: parseFloat(document.getElementById('rfLon').value),
+    altitude: parseFloat(document.getElementById('rfAlt').value) || null,
+    raw_conclusion: document.getElementById('rfConclusion').value,
+    confidence: parseFloat(document.getElementById('rfConf').value) || 0.9
+  };
+  var batch = document.getElementById('rfBatch').value;
+  var importedBy = document.getElementById('rfBy').value;
+  lastBatch = batch;
+  fetch(API_BASE + '/add_rangefinder', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ record: data, source_batch: batch, imported_by: importedBy })
+  }).then(function(r) { return r.json(); }).then(function() {
+    closeDialog();
+    refreshAll();
+  }).catch(function(e) { alert('添加失败: ' + e.message); });
+}
+
+function decideConflict(conflictId, confirm) {
+  fetch(API_BASE + '/decide', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ conflict_id: conflictId, confirm: confirm, operator: 'laoliang' })
+  }).then(function(r) { return r.json(); }).then(function() {
+    refreshAll();
+  }).catch(function(e) { alert('操作失败: ' + e.message); });
+}
+
+function reviewAlias(candidateId, isSame) {
+  fetch(API_BASE + '/review', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ candidate_id: candidateId, is_same_object: isSame, reviewer: 'xueyuan01' })
+  }).then(function(r) { return r.json(); }).then(function() {
+    refreshAll();
+  }).catch(function(e) { alert('操作失败: ' + e.message); });
+}
+
+function reimportBatch() {
+  if (!appData.rangefinder.length) {
+    alert('没有可重复导入的记录');
+    return;
+  }
+  var nonDup = appData.rangefinder.filter(function(r) { return !r.is_duplicate; });
+  if (!nonDup.length) { alert('没有非重复记录可导入'); return; }
+  var records = nonDup.map(function(r) {
+    return {
+      obstacle_name: r.obstacle_name,
+      obstacle_type: r.obstacle_type,
+      distance: r.distance,
+      angle: r.angle,
+      latitude: r.latitude,
+      longitude: r.longitude,
+      altitude: r.altitude,
+      raw_conclusion: r.raw_conclusion,
+      confidence: r.confidence
+    };
+  });
+  fetch(API_BASE + '/import_rangefinder', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ records: records, source_batch: lastBatch + '-reimport', imported_by: 'laoliang' })
+  }).then(function(r) { return r.json(); }).then(function() {
+    refreshAll();
+  }).catch(function(e) { alert('重复导入失败: ' + e.message); });
+}
+
+function exportJSON() {
+  fetch(API_BASE + '/export').then(function(r) { return r.json(); }).then(function(data) {
+    var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    downloadBlob(blob, 'trajectory_export_' + TASK_ID + '.json');
+  }).catch(function(e) { alert('导出失败: ' + e.message); });
+}
+
+function exportCSV() {
+  fetch(API_BASE + '/export/csv').then(function(r) { return r.text(); }).then(function(text) {
+    var blob = new Blob([text], { type: 'text/csv;charset=utf-8' });
+    downloadBlob(blob, 'trajectory_export_' + TASK_ID + '.csv');
+  }).catch(function(e) { alert('导出失败: ' + e.message); });
+}
+
+function downloadBlob(blob, filename) {
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+init();
+</script>
+</body>
+</html>
