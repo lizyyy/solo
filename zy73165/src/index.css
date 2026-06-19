@@ -1,0 +1,102 @@
+@import "katex/dist/katex.min.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: '"Noto Sans SC"', '"PingFang SC"', '"Microsoft YaHei"', system-ui, sans-serif;
+  line-height: 1.55;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #faf8f4;
+  color: #152a47;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #faf8f4;
+}
+
+.katex {
+  font-size: 1.02em;
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-ink-800 text-white rounded-sm2 text-sm font-medium hover:bg-ink-700 active:bg-ink-900 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-white text-ink-800 border border-ink-200 rounded-sm2 text-sm font-medium hover:bg-ink-50 active:bg-ink-100 transition-colors;
+  }
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-ember-500 text-white rounded-sm2 text-sm font-medium hover:bg-ember-600 active:bg-ember-700 transition-colors;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-ink-700 rounded-sm2 text-sm hover:bg-ink-50 transition-colors;
+  }
+  .card {
+    @apply bg-white rounded-sm2 border border-ink-100 shadow-card;
+  }
+  .card-header {
+    @apply px-4 py-3 border-b border-ink-100 flex items-center justify-between;
+  }
+  .card-title {
+    @apply font-serif text-base text-ink-900 tracking-wide;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-sm2 font-medium;
+  }
+  .chip-neutral {
+    @apply chip bg-ink-50 text-ink-700 border border-ink-100;
+  }
+  .chip-warn {
+    @apply chip bg-ember-50 text-ember-700 border border-ember-200;
+  }
+  .chip-pass {
+    @apply chip bg-emerald-50 text-verdict-pass border border-emerald-200;
+  }
+  .chip-fail {
+    @apply chip bg-red-50 text-verdict-fail border border-red-200;
+  }
+  .input-base {
+    @apply w-full px-3 py-2 text-sm bg-white border border-ink-200 rounded-sm2 focus:outline-none focus:ring-2 focus:ring-ink-300 focus:border-ink-400 placeholder:text-ink-300;
+  }
+  .label-base {
+    @apply block text-xs font-medium text-ink-700 mb-1;
+  }
+  .divider-dot::before {
+    content: "·";
+    @apply mx-1.5 text-ink-300;
+  }
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #c9d4e2;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9aadc4;
+}
+
+/* 打印样式 */
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; }
+}
+
+/* 表格斑马纹 */
+.row-zebra:nth-child(even) { background: #faf8f4; }
+.row-zebra:hover { background: #f2efe6 !important; }
