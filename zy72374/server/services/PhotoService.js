@@ -12,9 +12,12 @@ class PhotoService {
       errors: []
     };
 
-    const existingKeys = new Set(
-      store.findAll('photos').map(p => `${p.hash}_${p.timestamp || p.uploadTime}`)
-    );
+    const allPhotos = store.findAll('photos');
+    const existingMap = new Map();
+    allPhotos.forEach(p => {
+      const key = `${p.hash}_${p.timestamp || p.uploadTime}`;
+      existingMap.set(key, p);
+    });
 
     photoDataList.forEach(photoData => {
       try {
@@ -26,15 +29,20 @@ class PhotoService {
 
         const dedupKey = photo.getDeduplicationKey();
         
-        if (existingKeys.has(dedupKey)) {
+        if (existingMap.has(dedupKey)) {
+          const existing = existingMap.get(dedupKey);
           results.duplicates.push({
             fileName: photo.fileName,
             hash: photo.hash,
-            reason: '图片已存在（相同内容和时间戳）'
+            reason: '图片已存在（相同内容和时间戳）',
+            existingBatchId: existing.importBatchId,
+            existingUploadedBy: existing.uploadedBy,
+            existingUploadTime: existing.uploadTime,
+            existingPhotoId: existing.id
           });
         } else {
           const saved = store.create('photos', photo.toJSON());
-          existingKeys.add(dedupKey);
+          existingMap.set(dedupKey, saved);
           results.imported.push(saved);
         }
       } catch (error) {

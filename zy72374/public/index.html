@@ -299,7 +299,7 @@
         const completedRecords = records.filter(r => r.status === 'completed');
         if (completedRecords.length > 0) {
           const latest = completedRecords.sort((a, b) => b.recordDate.localeCompare(a.recordDate))[0];
-          document.getElementById('3d-heat-value').innerHTML = `${latest.heatLoad}<span class="heat-unit"> kW</span>`;
+          document.getElementById('3d-heat-value').innerHTML = `${latest.heatLoad != null ? latest.heatLoad : '计算中...'}<span class="heat-unit"> kW</span>`;
           document.getElementById('3d-sensor-warnings').innerHTML = latest.hasSensorRestart ? '⚠️ 本记录包含传感器重启事件，已完成安全复核' : '';
         }
         
@@ -414,7 +414,7 @@
             <tr>
               <td>${r.recordDate}</td>
               <td>${r.poolName}</td>
-              <td>${r.heatLoad} kW</td>
+              <td>${r.heatLoad != null ? r.heatLoad : '计算中'} kW</td>
               <td><span class="badge ${badgeClass}">${statusText}</span></td>
               <td>${r.hasSensorRestart ? '<span class="badge badge-sensor">是</span>' : '否'}</td>
               <td>
@@ -463,20 +463,23 @@
             <table>
               <tr><td style="width: 150px;">记录日期</td><td>${record.recordDate}</td></tr>
               <tr><td>泳池</td><td>${record.poolName}</td></tr>
-              <tr><td>换热负荷</td><td style="font-size: 24px; font-weight: 700; color: #1e3a5f;">${record.heatLoad} kW</td></tr>
+              <tr><td>换热负荷</td><td style="font-size: 24px; font-weight: 700; color: #1e3a5f;">${record.heatLoad != null ? record.heatLoad : '计算中...'} kW</td></tr>
               <tr><td>计算公式</td><td><code>${record.calculationFormula || 'Q = G × C × ΔT'}</code></td></tr>
               <tr><td>状态</td><td><span class="badge ${record.workflowStep === 1 ? 'badge-draft' : record.workflowStep === 2 ? 'badge-engineering' : record.workflowStep === 3 ? 'badge-safety' : 'badge-completed'}">${record.workflowStep === 1 ? '草稿' : record.workflowStep === 2 ? '待工程审核' : record.workflowStep === 3 ? '待安全复核' : '已完成'}</span></td></tr>
               ${record.engineerReviewedBy ? `<tr><td>工程审核人</td><td>${record.engineerReviewedBy} (${record.engineerReviewedAt})</td></tr>` : ''}
               ${record.safetyReviewedBy ? `<tr><td>安全复核人</td><td>${record.safetyReviewedBy} (${record.safetyReviewedAt})</td></tr>` : ''}
             </table>
             
-            ${record.workflowStep < 4 ? `
-              <div style="margin-top: 20px;">
+            <div style="margin-top: 20px; display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="btn btn-outline" onclick="recalculateHeatLoad('${record.id}')">🔄 重算换热负荷</button>
+              <button class="btn btn-outline" onclick="exportReport('${record.id}')">📄 导出报告 (HTML)</button>
+              <button class="btn btn-outline" onclick="exportReportJSON('${record.id}')">📋 导出报告 (JSON)</button>
+              ${record.workflowStep < 4 ? `
                 ${record.workflowStep === 1 ? `<button class="btn btn-success" onclick="submitForEngineering('${record.id}')">提交工程审核</button>` : ''}
                 ${record.workflowStep === 2 ? `<button class="btn btn-success" onclick="engineerApprove('${record.id}')">工程审核通过</button><button class="btn btn-danger" onclick="engineerReject('${record.id}')">工程审核驳回</button>` : ''}
                 ${record.workflowStep === 3 ? `<button class="btn btn-success" onclick="safetyApprove('${record.id}')">安全复核通过</button><button class="btn btn-danger" onclick="safetyReject('${record.id}')">安全复核驳回</button>` : ''}
-              </div>
-            ` : ''}
+              ` : ''}
+            </div>
           </div>
           
           <div class="tab-content" id="tab-evidence">
@@ -840,51 +843,52 @@
         showToast(`导入完成：成功 ${result.imported.length} 张，跳过重复 ${result.duplicates.length} 张`, 'success');
         
         if (result.imported.length > 0) {
-          const inletTemp = 25.5;
-          const outletTemp = 28.3;
-          const flowRate = 120;
-          const heatLoad = await apiRequest('/heat-loads/calculate', {
-            method: 'POST',
-            body: JSON.stringify({ inletTemp, outletTemp, flowRate })
-          });
-          
           const firstPhotoDate = result.imported[0].timestamp?.split('T')[0] || new Date().toISOString().split('T')[0];
           
-          const hasSensorRestart = result.imported.some(p => {
-            const hasF201 = p.sensorNumbers.some(s => s.includes('F-201'));
-            const hasF200 = p.sensorNumbers.some(s => s.includes('F-200'));
-            return hasF201 || hasF200;
+          const allSensorNumbers = [];
+          result.imported.forEach(p => {
+            if (Array.isArray(p.sensorNumbers)) {
+              p.sensorNumbers.forEach(s => {
+                if (!allSensorNumbers.includes(s)) allSensorNumbers.push(s);
+              });
+            }
           });
           
-          const newRecord = await apiRequest('/heat-loads', {
-            method: 'POST',
-            body: JSON.stringify({
-              recordDate: firstPhotoDate,
-              poolId: 'main',
-              poolName: '主游泳池',
-              heatLoad: heatLoad.heatLoad,
-              unit: 'kW',
-              calculationMethod: 'standard',
-              calculationFormula: 'Q = G × C × ΔT = 120 × 4.186 × (28.3 - 25.5)',
-              sensorData: [
-                { sensorNumber: 'T-101', value: inletTemp, type: 'inlet' },
-                { sensorNumber: 'T-102', value: outletTemp, type: 'outlet' },
-                { sensorNumber: 'F-201', value: flowRate, type: 'flow' }
-              ],
-              photoIds: result.imported.map(p => p.id),
-              noteIds: [],
-              hasSensorRestart,
-              createdBy: currentUser.name
-            })
-          });
+          showToast(`检测到传感器编号: ${allSensorNumbers.join(', ')}. 正在创建换热负荷记录...`, 'info');
           
-          showToast(`已自动创建换热负荷记录，点击查看详情`, 'info');
-          
-          setTimeout(() => {
-            closeModal();
-            showRecordDetail(newRecord.id);
-            loadPhotos();
-          }, 1000);
+          try {
+            const newRecord = await apiRequest('/heat-loads/from-photos', {
+              method: 'POST',
+              body: JSON.stringify({
+                photoIds: result.imported.map(p => p.id),
+                batchId: importBatchId,
+                createdBy: currentUser.name,
+                poolName: '主游泳池',
+                poolArea: 500,
+                targetTemp: 28,
+                ambientTemp: 20,
+                recordDate: firstPhotoDate
+              })
+            });
+            
+            if (newRecord && newRecord.id) {
+              showToast(`已自动创建换热负荷记录: ${newRecord.heatLoad} kW${newRecord.hasSensorRestart ? ' (包含传感器重启，需安全员复核)' : ''}`, newRecord.hasSensorRestart ? 'warning' : 'success');
+              
+              setTimeout(() => {
+                closeModal();
+                showRecordDetail(newRecord.id);
+                loadPhotos();
+                if (currentPage === 'records') loadRecords();
+                if (currentPage === 'dashboard') loadDashboard();
+              }, 1000);
+            } else {
+                closeModal();
+                loadPhotos();
+            }
+          } catch (e) {
+            console.error('创建换热负荷记录失败:', e);
+            showToast('创建换热负荷记录失败: ' + (e.message || '未知错误'), 'error');
+          }
         } else {
           closeModal();
           loadPhotos();
@@ -1084,12 +1088,53 @@
       }
     }
     
-    function showSensorRollbackForm(sensorId) {
-      apiRequest(`/sensors/${sensorId}`).then(sensor => {
+    async function showSensorRollbackForm(sensorId) {
+      try {
+        const sensor = await apiRequest(`/sensors/${sensorId}`);
+        currentRollbackSensor = sensor;
         const previousNumbers = sensor.previousNumbers.map(p => p.number);
         const uniqueNumbers = [...new Set(previousNumbers)];
+        let rollbackHistoryHtml = '';
+        try {
+          const rollbackHistory = await apiRequest(`/sensors/${sensorId}/rollback-history`);
+          if (rollbackHistory && rollbackHistory.length > 0) {
+            rollbackHistoryHtml = `
+              <h4 style="margin: 20px 0 12px; font-size: 14px;">📋 回滚历史记录</h4>
+              ${rollbackHistory.map(h => `
+                <div class="history-item">
+                  <div style="display: flex; justify-content: space-between;">
+                    <strong>${h.oldNumber} → ${h.newNumber}</strong>
+                    <span class="badge badge-draft">回滚</span>
+                  </div>
+                  <div style="margin-top: 4px; color: #666;">原因: ${h.reason}</div>
+                  <div class="history-meta">操作人: ${h.operator} | ${h.timestamp}</div>
+                </div>
+              `).join('')}
+            `;
+          }
+        } catch (e) {
+          console.warn('加载回滚历史失败:', e);
+        }
+        let previousNumbersHtml = '';
+        if (sensor.previousNumbers && sensor.previousNumbers.length > 0) {
+          previousNumbersHtml = `
+            <h4 style="margin: 20px 0 12px; font-size: 14px;">📋 编号变更历史</h4>
+            ${sensor.previousNumbers.map((p, i) => `
+              <div class="history-item">
+                <div style="display: flex; justify-content: space-between;">
+                  <strong>编号: ${p.number}</strong>
+                  <span class="badge badge-engineering">第 ${i + 1} 次</span>
+                </div>
+                <div class="history-meta">生效时间: ${p.startTime}</div>
+                ${p.endTime ? `<div class="history-meta">失效时间: ${p.endTime}</div>` : ''}
+                ${p.reason ? `<div style="margin-top: 4px; color: #666;">原因: ${p.reason}</div>` : ''}
+                ${p.operator ? `<div class="history-meta">操作人: ${p.operator}</div>` : ''}
+              </div>
+            `).join('')}
+          `;
+        }
         
-        document.getElementById('modal-title').textContent = '回滚传感器编号';
+        document.getElementById('modal-title').textContent = `回滚传感器编号 - ${sensor.physicalId}`;
         document.getElementById('modal-body').innerHTML = `
           <div class="sensor-warning" style="margin-bottom: 16px;">
             ⚠️ <strong>警告</strong>：回滚操作会永久留痕，不可删除。请谨慎操作。
@@ -1097,25 +1142,30 @@
           
           <div class="rollback-form">
             <div class="form-group">
+              <label>物理ID（不可变）</label>
+              <input type="text" value="${sensor.physicalId}" disabled style="background: #f5f5f5;">
+            </div>
+            <div class="form-group">
               <label>当前编号</label>
-              <input type="text" value="${sensor.currentNumber}" disabled>
+              <input type="text" value="${sensor.currentNumber}" disabled style="background: #f5f5f5;">
             </div>
             
             <div class="form-group">
-              <label>回滚到目标编号</label>
-              <select id="rollback-target">
+              <label>回滚到目标编号 *</label>
+              <select id="rollback-target-number">
                 ${uniqueNumbers.map(n => `<option value="${n}">${n}</option>`).join('')}
               </select>
+              <small style="color: #666; margin-top: 4px; display: block;">只能选择历史上使用过的编号</small>
             </div>
             
             <div class="form-group">
-              <label>回滚原因</label>
-              <textarea id="rollback-reason" placeholder="请输入回滚原因，如：传感器重启后编号变更错误，需恢复到F-200"></textarea>
+              <label>回滚原因 *</label>
+              <textarea id="rollback-reason" rows="3" placeholder="请详细说明回滚原因，如：传感器重启后编号变更错误，经安全员复核需恢复"></textarea>
             </div>
             
             <div class="form-group">
-              <label>操作人</label>
-              <input type="text" id="rollback-operator" value="何工">
+              <label>操作人 *</label>
+              <input type="text" id="rollback-operator" value="${currentUser.name}">
             </div>
             
             <div class="btn-group" style="margin-top: 16px;">
@@ -1123,10 +1173,14 @@
               <button class="btn btn-secondary" onclick="closeModal()">取消</button>
             </div>
           </div>
-        </div>
-      </div>
-    `;
-      });
+          ${previousNumbersHtml}
+          ${rollbackHistoryHtml}
+        `;
+        document.getElementById('detail-modal').classList.add('active');
+      } catch (e) {
+        console.error('加载传感器信息失败:', e);
+        showToast('加载传感器信息失败', 'error');
+      }
     }
 
     function openModal(modalId) {
@@ -1149,11 +1203,13 @@
       currentAddNoteRecordId = null;
     }
 
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      event.target.classList.add('active');
-      document.getElementById(tabId).classList.add('active');
+    function switchTab(tabElement, tabName) {
+      const parent = tabElement.closest('.tab-view') || document;
+      parent.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
+      parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      tabElement.classList.add('active');
+      const content = document.getElementById('tab-' + tabName);
+      if (content) content.classList.add('active');
     }
 
     function getStatusText(status) {
@@ -1574,6 +1630,46 @@
 
       document.querySelector('#detail-modal .modal-body').innerHTML = detailHtml;
       openModal('detail-modal');
+    }
+
+    async function recalculateHeatLoad(recordId) {
+      if (!confirm('确认重新计算换热负荷？当前值将被覆盖并记入历史。')) return;
+      try {
+        const updated = await apiRequest(`/heat-loads/${recordId}/recalculate`, {
+          method: 'POST',
+          body: JSON.stringify({ editor: currentUser.name, reason: '手动触发重新计算' })
+        });
+        showToast(`重新计算完成: ${updated.heatLoad} kW`, 'success');
+        closeModal();
+        setTimeout(() => showRecordDetail(recordId), 200);
+        if (currentPage === 'dashboard') loadDashboard();
+        if (currentPage === 'records') loadRecords();
+      } catch (e) {
+        console.error('重算失败:', e);
+        showToast('重算失败: ' + (e.message || '未知错误'), 'error');
+      }
+    }
+
+    function exportReport(recordId) {
+      window.open(`/api/heat-loads/${recordId}/export`, '_blank');
+      showToast('正在生成 HTML 报告...', 'info');
+    }
+
+    async function exportReportJSON(recordId) {
+      try {
+        const report = await apiRequest(`/heat-loads/${recordId}/export`);
+        const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `heat-load-report-${report.record.recordDate}-${report.record.id}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('JSON 报告已下载', 'success');
+      } catch (e) {
+        console.error('导出失败:', e);
+        showToast('导出失败: ' + (e.message || '未知错误'), 'error');
+      }
     }
 
     document.addEventListener('DOMContentLoaded', () => {

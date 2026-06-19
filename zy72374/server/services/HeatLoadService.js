@@ -10,7 +10,7 @@ class HeatLoadService {
     return store.create('heatLoads', record.toJSON());
   }
 
-  static createRecordFromPhotos(photoIds, batchId, createdBy) {
+  static createRecordFromPhotos(photoIds, batchId, createdBy, extraData = {}) {
     if (!photoIds || photoIds.length === 0) {
       return { error: '请至少选择一张照片' };
     }
@@ -27,36 +27,81 @@ class HeatLoadService {
       }
     });
 
+    const allSensors = [];
     const hasSensorRestart = Array.from(sensorNumbers).some(sn => {
       const sensor = SensorService.getSensorByCurrentNumber(sn);
-      return sensor && sensor.previousNumbers && sensor.previousNumbers.length > 0;
+      if (sensor) {
+        allSensors.push(sensor);
+        return sensor.previousNumbers && sensor.previousNumbers.length > 0;
+      }
+      return false;
     });
+
+    const inletTemp = extraData.inletTemp || (25 + Math.random() * 5);
+    const outletTemp = extraData.outletTemp || (35 + Math.random() * 5);
+    const flowRate = extraData.flowRate || (10 + Math.random() * 5);
+    const specificHeat = 4.186;
+    const deltaT = Math.abs(outletTemp - inletTemp);
+    const heatLoad = parseFloat((flowRate * specificHeat * deltaT).toFixed(2));
+    const calculationFormula = `Q = G × C × ΔT = ${flowRate} × ${specificHeat} × ${deltaT.toFixed(2)} = ${heatLoad} kW`;
+
+    const sensorData = [];
+    const sensorNumberArray = Array.from(sensorNumbers);
+    if (sensorNumberArray.length >= 2) {
+      sensorData.push({
+        sensorNumber: sensorNumberArray[0],
+        inletTemp: inletTemp,
+        outletTemp: null,
+        flowRate: null,
+        type: 'inlet'
+      });
+      sensorData.push({
+        sensorNumber: sensorNumberArray[1],
+        inletTemp: null,
+        outletTemp: outletTemp,
+        flowRate: null,
+        type: 'outlet'
+      });
+      if (sensorNumberArray.length >= 3) {
+        sensorData.push({
+          sensorNumber: sensorNumberArray[2],
+          inletTemp: null,
+          outletTemp: null,
+          flowRate: flowRate,
+          type: 'flow'
+        });
+      }
+    } else {
+      sensorData.push({
+        sensorNumber: sensorNumberArray[0] || 'T-UNKNOWN',
+        inletTemp: inletTemp,
+        outletTemp: outletTemp,
+        flowRate: flowRate,
+        type: 'combo'
+      });
+    }
 
     const recordData = {
       photoIds: photoIds,
       importBatchId: batchId,
       createdBy: createdBy,
-      poolId: 'pool-main',
-      poolArea: 500,
-      targetTemp: 28,
-      ambientTemp: 20,
-      recordDate: new Date().toISOString().split('T')[0],
+      poolId: extraData.poolId || 'pool-main',
+      poolName: extraData.poolName || '主游泳池',
+      poolArea: extraData.poolArea || 500,
+      targetTemp: extraData.targetTemp || 28,
+      ambientTemp: extraData.ambientTemp || 20,
+      recordDate: extraData.recordDate || new Date().toISOString().split('T')[0],
       hasSensorRestart: hasSensorRestart,
-      sensorData: Array.from(sensorNumbers).map(sn => ({
-        sensorNumber: sn,
-        inletTemp: 25 + Math.random() * 5,
-        outletTemp: 35 + Math.random() * 5,
-        flowRate: 10 + Math.random() * 5
-      }))
+      sensorData: sensorData,
+      heatLoad: heatLoad,
+      unit: 'kW',
+      calculationMethod: 'standard',
+      calculationFormula: calculationFormula
     };
 
     const record = new HeatLoadRecord(recordData);
+    record.saveHistory(createdBy, `从工况照片创建记录，导入批次: ${batchId}`);
     const saved = store.create('heatLoads', record.toJSON());
-    
-    if (hasSensorRestart) {
-      saved.hasSensorRestart = true;
-      store.update('heatLoads', saved.id, saved);
-    }
     
     return saved;
   }

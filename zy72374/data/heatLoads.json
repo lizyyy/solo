@@ -1,143 +1,225 @@
 [
   {
-    "id": "e10e80c4-21c3-4ae9-881a-c155e21fa979",
-    "recordDate": "2026-06-11",
+    "id": "df08bb8e-523f-4b81-8bc8-458a896ddf4a",
+    "recordDate": "2026-06-19",
     "poolId": "pool-main",
+    "poolName": "主游泳池",
     "poolArea": 500,
     "targetTemp": 28,
     "ambientTemp": 20,
+    "heatLoad": 541.88,
     "unit": "kW",
     "sensorData": [
       {
         "sensorNumber": "T-201",
-        "inletTemp": 29.212757093323575,
-        "outletTemp": 36.300765962374975,
-        "flowRate": 10.586713876422882
+        "inletTemp": 25.872074067613358,
+        "outletTemp": null,
+        "flowRate": null,
+        "type": "inlet"
       },
       {
         "sensorNumber": "T-202",
-        "inletTemp": 26.306662630430154,
-        "outletTemp": 38.00617740727954,
-        "flowRate": 14.53427684300438
+        "inletTemp": null,
+        "outletTemp": 38.27068034015228,
+        "flowRate": null,
+        "type": "outlet"
       },
       {
-        "sensorNumber": "P-101",
-        "inletTemp": 27.158908320745745,
-        "outletTemp": 39.11565084962127,
-        "flowRate": 12.171226039313051
+        "sensorNumber": "F-201",
+        "inletTemp": null,
+        "outletTemp": null,
+        "flowRate": 10.440696247997462,
+        "type": "flow"
       }
     ],
     "photoIds": [
-      "f07f3ab5-fd13-48d9-96de-4c21397b705f",
-      "57dbc8a1-ac74-4a0c-a7d6-f3d78ce6fe22",
-      "c4634586-ff05-45af-bd28-ac415f04579f"
+      "db5de8c2-571e-4469-8aff-2a3b4dafa675",
+      "fa373494-742f-4c67-b7d6-6b3fc1b8d32f",
+      "c257df00-cfc8-4b8b-9298-dd098d4eb702"
     ],
     "noteIds": [
-      "db7e8e51-f1a4-4bc0-897e-cbd39f3c0e2f"
+      "c2cf00f9-4ca8-4bea-8673-2fdd3b84b65f"
     ],
-    "importBatchId": "batch-20260611-001",
+    "importBatchId": "BATCH-VERIFY-001",
     "calculationMethod": "standard",
-    "calculationFormula": "",
+    "calculationFormula": "Q = G × C × ΔT = 10.440696247997462 × 4.186 × 12.40 = 541.88 kW",
     "status": "completed",
     "hasSensorRestart": true,
     "sensorRestartDetails": [],
     "workflowStep": 4,
     "createdBy": "何工",
-    "createdAt": "2026-06-11T00:41:07.713Z",
-    "updatedAt": "2026-06-11T00:42:30.642Z",
+    "createdAt": "2026-06-19T14:43:18.961Z",
+    "updatedAt": "2026-06-19T14:43:18.969Z",
     "engineerReviewedBy": "何工",
-    "engineerReviewedAt": "2026-06-11T00:42:22.884Z",
-    "safetyReviewedBy": "安全员",
-    "safetyReviewedAt": "2026-06-11T00:42:30.642Z",
+    "engineerReviewedAt": "2026-06-19T14:43:18.965Z",
+    "safetyReviewedBy": "安全员王工",
+    "safetyReviewedAt": "2026-06-19T14:43:18.969Z",
     "safetyReminders": [
-      "传感器重启编号变更已复核，已记录追溯链",
-      "下次巡检时重点关注T-201稳定性"
+      "T-201传感器编号已回滚至T-100，异常标记解除",
+      "何工巡检备注内容完整，照片证据链可追溯",
+      "下次巡检重点关注该传感器稳定性"
     ],
-    "version": 4,
+    "version": 6,
     "history": [
       {
         "version": 1,
         "status": "draft",
         "workflowStep": 1,
+        "heatLoad": 541.88,
         "sensorData": [
           {
             "sensorNumber": "T-201",
-            "inletTemp": 29.212757093323575,
-            "outletTemp": 36.300765962374975,
-            "flowRate": 10.586713876422882
+            "inletTemp": 25.872074067613358,
+            "outletTemp": null,
+            "flowRate": null,
+            "type": "inlet"
           },
           {
             "sensorNumber": "T-202",
-            "inletTemp": 26.306662630430154,
-            "outletTemp": 38.00617740727954,
-            "flowRate": 14.53427684300438
+            "inletTemp": null,
+            "outletTemp": 38.27068034015228,
+            "flowRate": null,
+            "type": "outlet"
           },
           {
-            "sensorNumber": "P-101",
-            "inletTemp": 27.158908320745745,
-            "outletTemp": 39.11565084962127,
-            "flowRate": 12.171226039313051
+            "sensorNumber": "F-201",
+            "inletTemp": null,
+            "outletTemp": null,
+            "flowRate": 10.440696247997462,
+            "type": "flow"
+          }
+        ],
+        "editor": "何工",
+        "changeDescription": "从工况照片创建记录，导入批次: BATCH-VERIFY-001",
+        "timestamp": "2026-06-19T14:43:18.961Z"
+      },
+      {
+        "version": 2,
+        "status": "draft",
+        "workflowStep": 1,
+        "heatLoad": 541.88,
+        "sensorData": [
+          {
+            "sensorNumber": "T-201",
+            "inletTemp": 25.872074067613358,
+            "outletTemp": null,
+            "flowRate": null,
+            "type": "inlet"
+          },
+          {
+            "sensorNumber": "T-202",
+            "inletTemp": null,
+            "outletTemp": 38.27068034015228,
+            "flowRate": null,
+            "type": "outlet"
+          },
+          {
+            "sensorNumber": "F-201",
+            "inletTemp": null,
+            "outletTemp": null,
+            "flowRate": 10.440696247997462,
+            "type": "flow"
           }
         ],
         "editor": "何工",
         "changeDescription": "提交工程审核",
-        "timestamp": "2026-06-11T00:42:12.708Z"
-      },
-      {
-        "version": 2,
-        "status": "pending_engineer_review",
-        "workflowStep": 2,
-        "sensorData": [
-          {
-            "sensorNumber": "T-201",
-            "inletTemp": 29.212757093323575,
-            "outletTemp": 36.300765962374975,
-            "flowRate": 10.586713876422882
-          },
-          {
-            "sensorNumber": "T-202",
-            "inletTemp": 26.306662630430154,
-            "outletTemp": 38.00617740727954,
-            "flowRate": 14.53427684300438
-          },
-          {
-            "sensorNumber": "P-101",
-            "inletTemp": 27.158908320745745,
-            "outletTemp": 39.11565084962127,
-            "flowRate": 12.171226039313051
-          }
-        ],
-        "editor": "何工",
-        "changeDescription": "工程审核通过: 已复核工况照片和巡检备注，数据准确，传感器重启记录已备注需安全员复核",
-        "timestamp": "2026-06-11T00:42:22.884Z"
+        "timestamp": "2026-06-19T14:43:18.965Z"
       },
       {
         "version": 3,
-        "status": "pending_safety_review",
-        "workflowStep": 3,
+        "status": "pending_engineer_review",
+        "workflowStep": 2,
+        "heatLoad": 541.88,
         "sensorData": [
           {
             "sensorNumber": "T-201",
-            "inletTemp": 29.212757093323575,
-            "outletTemp": 36.300765962374975,
-            "flowRate": 10.586713876422882
+            "inletTemp": 25.872074067613358,
+            "outletTemp": null,
+            "flowRate": null,
+            "type": "inlet"
           },
           {
             "sensorNumber": "T-202",
-            "inletTemp": 26.306662630430154,
-            "outletTemp": 38.00617740727954,
-            "flowRate": 14.53427684300438
+            "inletTemp": null,
+            "outletTemp": 38.27068034015228,
+            "flowRate": null,
+            "type": "outlet"
           },
           {
-            "sensorNumber": "P-101",
-            "inletTemp": 27.158908320745745,
-            "outletTemp": 39.11565084962127,
-            "flowRate": 12.171226039313051
+            "sensorNumber": "F-201",
+            "inletTemp": null,
+            "outletTemp": null,
+            "flowRate": 10.440696247997462,
+            "type": "flow"
           }
         ],
-        "editor": "安全员",
+        "editor": "何工",
+        "changeDescription": "工程审核通过: 工况照片完整，巡检备注清晰。注意T-201存在重启记录，需安全员复核编号问题。",
+        "timestamp": "2026-06-19T14:43:18.965Z"
+      },
+      {
+        "version": 4,
+        "status": "pending_safety_review",
+        "workflowStep": 3,
+        "heatLoad": 541.88,
+        "sensorData": [
+          {
+            "sensorNumber": "T-201",
+            "inletTemp": 25.872074067613358,
+            "outletTemp": null,
+            "flowRate": null,
+            "type": "inlet"
+          },
+          {
+            "sensorNumber": "T-202",
+            "inletTemp": null,
+            "outletTemp": 38.27068034015228,
+            "flowRate": null,
+            "type": "outlet"
+          },
+          {
+            "sensorNumber": "F-201",
+            "inletTemp": null,
+            "outletTemp": null,
+            "flowRate": 10.440696247997462,
+            "type": "flow"
+          }
+        ],
+        "editor": "安全员王工",
         "changeDescription": "安全复核通过",
-        "timestamp": "2026-06-11T00:42:30.642Z"
+        "timestamp": "2026-06-19T14:43:18.969Z"
+      },
+      {
+        "version": 5,
+        "status": "completed",
+        "workflowStep": 4,
+        "heatLoad": 541.88,
+        "sensorData": [
+          {
+            "sensorNumber": "T-201",
+            "inletTemp": 25.872074067613358,
+            "outletTemp": null,
+            "flowRate": null,
+            "type": "inlet"
+          },
+          {
+            "sensorNumber": "T-202",
+            "inletTemp": null,
+            "outletTemp": 38.27068034015228,
+            "flowRate": null,
+            "type": "outlet"
+          },
+          {
+            "sensorNumber": "F-201",
+            "inletTemp": null,
+            "outletTemp": null,
+            "flowRate": 10.440696247997462,
+            "type": "flow"
+          }
+        ],
+        "editor": "何工",
+        "changeDescription": "安全员复核后重新确认计算值",
+        "timestamp": "2026-06-19T14:43:18.969Z"
       }
     ]
   }
