@@ -1,0 +1,148 @@
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    "records": [
+      {
+        "id": "EXP-002",
+        "attributes": {
+          "recordId": "EXP-002",
+          "mainProcess": "",
+          "sceneStatement": "运营阿岚现场确认：分母漏填，应为300",
+          "numerator": 89,
+          "numerator_original": 89,
+          "numerator_changed": false,
+          "denominator": 200,
+          "denominator_original": "",
+          "denominator_changed": true,
+          "displayValue": "0.4450",
+          "evaluationRule": "NORMAL",
+          "evaluationRuleDesc": "正常计算",
+          "reviewStatus": "approved",
+          "reviewer": "复核主管老王",
+          "reviewComment": "数据已核实，同意改动",
+          "currentStatus": "pending_handler_review",
+          "boundaryLineNumber": 5,
+          "scoringLineNumber": "",
+          "manualChangeCount": 2,
+          "hasRollbackPending": true,
+          "hasBothEvidence": true,
+          "reviewRequired": "否",
+          "severity": "normal",
+          "nextHandler": "阿岚",
+          "lastModifiedAt": "2026-06-19T08:23:20.365Z",
+          "lastModifiedBy": "数据复核人老李"
+        },
+        "evaluation": {
+          "ruleId": "NORMAL",
+          "ruleDescription": "正常计算",
+          "severity": "normal",
+          "notes": [],
+          "rawInputs": {
+            "numerator": 89,
+            "denominator": 200
+          }
+        },
+        "traceability": {
+          "originalValues": {
+            "numerator": 89,
+            "denominator": "",
+            "metric": "点击率"
+          },
+          "currentValues": {
+            "numerator": 89,
+            "denominator": 200,
+            "metric": "点击率"
+          },
+          "diff": [
+            {
+              "field": "denominator",
+              "original": "",
+              "current": 200
+            }
+          ],
+          "manualChanges": [
+            {
+              "field": "boundaryEvidence.rawData.denominator",
+              "oldValue": "",
+              "newValue": 300,
+              "operator": "数据复核人老李",
+              "reason": "阿岚现场确认分母漏填，实际曝光数300",
+              "nextHandler": "运营规划阿岚",
+              "timestamp": "2026-06-19T08:23:20.365Z",
+              "canRollback": false,
+              "previousValueSnapshot": "",
+              "rolledBackAt": "2026-06-19T08:23:20.365Z",
+              "rolledBackBy": "课堂演示-回滚测试"
+            },
+            {
+              "field": "boundaryEvidence.rawData.denominator",
+              "oldValue": "",
+              "newValue": 200,
+              "operator": "数据复核人老李",
+              "reason": "二次确认分母为200",
+              "nextHandler": "阿岚",
+              "timestamp": "2026-06-19T08:23:20.365Z",
+              "canRollback": true,
+              "previousValueSnapshot": ""
+            }
+          ],
+          "reviewHistory": [
+            {
+              "status": "approved",
+              "reviewer": "复核主管老王",
+              "comment": "数据已核实，同意改动",
+              "nextHandler": null,
+              "timestamp": "2026-06-19T08:23:20.365Z",
+              "dataSnapshot": {
+                "boundaryRawData": {
+                  "numerator": 89,
+                  "denominator": 300,
+                  "metric": "点击率"
+                },
+                "scoringRawData": {
+                  "sceneStatement": "运营阿岚现场确认：分母漏填，应为300",
+                  "weight": "medium",
+                  "reviewer": "阿岚"
+                },
+                "reviewStatus": "approved",
+                "currentStatus": "pending_handler_review",
+                "nextHandler": "运营规划阿岚"
+              }
+            }
+          ],
+          "nextHandler": "阿岚"
+        },
+        "relationships": {
+          "boundaryEvidence": {
+            "id": 5,
+            "source": "boundary_value_spec",
+            "importedAt": "2026-06-19T08:23:20.364Z"
+          },
+          "scoringEvidence": {
+            "source": "scoring_weight_table",
+            "importedAt": "2026-06-19T08:23:20.364Z"
+          }
+        },
+        "_links": {
+          "detail": "/api/records/EXP-002",
+          "traceability": "/api/records/EXP-002/trace",
+          "audit": "/api/records/EXP-002/audit"
+        }
+      }
+    ],
+    "pagination": {
+      "total": 1
+    },
+    "statistics": {
+      "total": 1,
+      "needsReview": 0,
+      "approved": 1,
+      "withBothEvidence": 1,
+      "modified": 1,
+      "withRollbackPending": 1,
+      "withHandler": 1
+    }
+  },
+  "timestamp": "2026-06-19T08:23:20.366Z"
+}

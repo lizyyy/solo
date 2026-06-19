@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const UnifiedEvidenceStore = require('../models/UnifiedEvidenceStore');
 const BoundaryRuleEngine = require('../engine/BoundaryRuleEngine');
 const UnifiedResultExporter = require('../output/UnifiedResultExporter');
@@ -13,13 +15,14 @@ class ThreeStepWorkflow {
       { id: 2, name: '运营规划阿岚补看评分权重表', completed: false },
       { id: 3, name: '课堂演示结果更新（含复核/改动/回滚）', completed: false }
     ];
+    this.meta = { createdAt: new Date().toISOString(), version: '1.0.0' };
   }
 
   async executeStep1(boundaryDataList, operator = 'import_operator') {
     console.log(`\n========== 步骤1: 边界值说明第一次导入 ==========`);
 
     boundaryDataList.forEach((data, index) => {
-      const recordId = `EXP-${String(index + 1).padStart(3, '0')}`;
+      const recordId = data.recordId || `EXP-${String(index + 1).padStart(3, '0')}`;
       this.store.addBoundaryRecord(recordId, {
         ...data,
         lineNumber: data.lineNumber || (index + 2),
@@ -86,6 +89,10 @@ class ThreeStepWorkflow {
     };
   }
 
+  applyManualChange(recordId, field, oldValue, newValue, operator, reason, nextHandler = null) {
+    return this.applyManualFix(recordId, { field, oldValue, newValue, reason, nextHandler }, operator);
+  }
+
   rollbackManualFix(recordId, changeIndex, operator = 'system') {
     const before = this._getCurrentSnapshot(recordId);
     const { change, record } = this.store.rollbackChange(recordId, changeIndex, operator);
@@ -97,6 +104,14 @@ class ThreeStepWorkflow {
     return { change, before, after, valuesRestored: before.displayValue !== after.displayValue };
   }
 
+  rollbackManualChange(recordId, changeIndex, operator = 'system') {
+    return this.rollbackManualFix(recordId, changeIndex, operator);
+  }
+
+  rollbackChange(recordId, changeIndex, operator = 'system') {
+    return this.rollbackManualFix(recordId, changeIndex, operator);
+  }
+
   updateReview(recordId, status, reviewer, comment = '', nextHandler = null) {
     const record = this.store.updateReviewStatus(recordId, status, reviewer, comment, nextHandler);
     const eval_ = this.ruleEngine.evaluate(record);
@@ -106,6 +121,10 @@ class ThreeStepWorkflow {
     if (nextHandler) console.log(`     移交: ${nextHandler}`);
     console.log(`     结果值: ${eval_.displayValue}`);
     return { record, evaluation: eval_ };
+  }
+
+  updateReviewStatus(recordId, status, reviewer, comment = '', nextHandler = null) {
+    return this.updateReview(recordId, status, reviewer, comment, nextHandler);
   }
 
   async executeStep3(operations = [], operator = 'classroom_demo') {
@@ -195,6 +214,7 @@ class ThreeStepWorkflow {
     return this.exporter.formatForAPI_Detail(this._wrapForExport(record));
   }
   export_Summary(format = 'text') { return this.exporter.exportSummaryReport(this.getUnifiedRecords(), format); }
+  export_Report(format = 'text') { return this.export_Summary(format); }
 
   getFullTraceability(recordId) { return this.store.getFullTraceability(recordId); }
   getAuditTrail(recordId) {
@@ -235,6 +255,82 @@ class ThreeStepWorkflow {
       && listEval.displayValue === api.displayValue;
 
     return { recordId, eval_consistent, diffs, checkValues: { list: listEval.displayValue, csv: csv.displayValue, page: page.displayValue, api: api.displayValue } };
+  }
+
+  saveToFile(filePath) {
+    const data = {
+      meta: { ...this.meta, savedAt: new Date().toISOString() },
+      workflow: {
+        currentStep: this.currentStep,
+        steps: this.workflowSteps
+      },
+      records: Array.from(this.store.records.entries()).map(([id, rec]) => ({ id, record: rec })),
+      auditLog: this.store.auditLog
+    };
+    const dir = path.dirname(filePath);
+    if (dir && dir !== '.' && !fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+    console.log(`💾 已保存到: ${filePath}`);
+    return { filePath, recordCount: this.store.records.size, byteSize: fs.statSync(filePath).size };
+  }
+
+  loadFromFile(filePath) {
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`文件不存在: ${filePath}`);
+    }
+    const raw = fs.readFileSync(filePath, 'utf-8');
+    const data = JSON.parse(raw);
+
+    this.store = new UnifiedEvidenceStore();
+    data.records.forEach(({ id, record }) => {
+      this.store.records.set(id, record);
+    });
+    this.store.auditLog = data.auditLog || [];
+
+    this.currentStep = data.workflow?.currentStep || 0;
+    this.workflowSteps = data.workflow?.steps || this.workflowSteps;
+    this.meta = data.meta || this.meta;
+
+    console.log(`📂 已从 ${filePath} 加载`);
+    console.log(`   记录数: ${this.store.records.size}, 当前步骤: ${this.currentStep}`);
+    return { recordCount: this.store.records.size, currentStep: this.currentStep };
+  }
+
+  exportAllArtifacts(outputDir = './output', recordId = null) {
+    if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
+    const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const files = {};
+
+    files.json = path.join(outputDir, `workflow_${ts}.json`);
+    this.saveToFile(files.json);
+
+    files.csv = path.join(outputDir, `records_${ts}.csv`);
+    fs.writeFileSync(files.csv, this.export_ListCSV(), 'utf-8');
+    console.log(`📄 CSV 已导出: ${files.csv}`);
+
+    files.api = path.join(outputDir, `api_response_${ts}.json`);
+    fs.writeFileSync(files.api, JSON.stringify(this.export_ListAPI(), null, 2), 'utf-8');
+    console.log(`🔌 API 响应已导出: ${files.api}`);
+
+    const targetId = recordId || (this.store.records.size > 0 ? this.store.records.keys().next().value : null);
+    if (targetId) {
+      const safeId = targetId.replace(/[^a-zA-Z0-9_-]/g, '_');
+      files.detail = path.join(outputDir, `detail_${safeId}_${ts}.json`);
+      fs.writeFileSync(files.detail, JSON.stringify(this.export_DetailAPI(targetId), null, 2), 'utf-8');
+      console.log(`📋 详情已导出: ${files.detail}`);
+
+      files.trace = path.join(outputDir, `traceability_${safeId}_${ts}.json`);
+      fs.writeFileSync(files.trace, JSON.stringify(this.getFullTraceability(targetId), null, 2), 'utf-8');
+      console.log(`� 追溯链已导出: ${files.trace}`);
+    }
+
+    files.report = path.join(outputDir, `summary_report_${ts}.txt`);
+    fs.writeFileSync(files.report, this.export_Summary('text'), 'utf-8');
+    console.log(`� 汇总报告已导出: ${files.report}`);
+
+    return files;
   }
 }
 

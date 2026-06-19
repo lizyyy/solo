@@ -1,0 +1,349 @@
+{
+  "meta": {
+    "createdAt": "2026-06-19T08:23:20.362Z",
+    "version": "1.0.0",
+    "savedAt": "2026-06-19T08:23:20.366Z"
+  },
+  "workflow": {
+    "currentStep": 2,
+    "steps": [
+      {
+        "id": 1,
+        "name": "边界值说明第一次导入",
+        "completed": true
+      },
+      {
+        "id": 2,
+        "name": "运营规划阿岚补看评分权重表",
+        "completed": true
+      },
+      {
+        "id": 3,
+        "name": "课堂演示结果更新（含复核/改动/回滚）",
+        "completed": false
+      }
+    ]
+  },
+  "records": [
+    {
+      "id": "EXP-002",
+      "record": {
+        "recordId": "EXP-002",
+        "boundaryEvidence": {
+          "recordId": "EXP-002",
+          "lineNumber": 5,
+          "experimentName": "首页弹窗优化",
+          "metric": "点击率",
+          "numerator": 89,
+          "denominator": "",
+          "rawData": {
+            "numerator": 89,
+            "denominator": 200,
+            "metric": "点击率"
+          },
+          "operator": "数据导入员",
+          "originalLineNumber": 5,
+          "importTimestamp": "2026-06-19T08:23:20.364Z",
+          "originalRawData": {
+            "numerator": 89,
+            "denominator": "",
+            "metric": "点击率"
+          }
+        },
+        "scoringEvidence": {
+          "recordId": "EXP-002",
+          "sceneStatement": "运营阿岚现场确认：分母漏填，应为300",
+          "weight": "medium",
+          "reviewer": "阿岚",
+          "rawData": {
+            "sceneStatement": "运营阿岚现场确认：分母漏填，应为300",
+            "weight": "medium",
+            "reviewer": "阿岚"
+          },
+          "operator": "阿岚",
+          "importTimestamp": "2026-06-19T08:23:20.364Z",
+          "originalRawData": {
+            "sceneStatement": "运营阿岚现场确认：分母漏填，应为300",
+            "weight": "medium",
+            "reviewer": "阿岚"
+          }
+        },
+        "unifiedResult": null,
+        "auditTrail": [
+          {
+            "action": "boundary_imported",
+            "timestamp": "2026-06-19T08:23:20.364Z",
+            "operator": "数据导入员",
+            "note": "从边界值说明导入，原始行号: 5",
+            "snapshot": {
+              "rawData": {
+                "numerator": 89,
+                "denominator": "",
+                "metric": "点击率"
+              }
+            }
+          },
+          {
+            "action": "scoring_imported",
+            "timestamp": "2026-06-19T08:23:20.364Z",
+            "operator": "阿岚",
+            "note": "从评分权重表导入，原始行号: undefined",
+            "snapshot": {
+              "rawData": {
+                "sceneStatement": "运营阿岚现场确认：分母漏填，应为300",
+                "weight": "medium",
+                "reviewer": "阿岚"
+              }
+            }
+          },
+          {
+            "action": "manual_change_applied",
+            "timestamp": "2026-06-19T08:23:20.365Z",
+            "operator": "数据复核人老李",
+            "note": "已修改 boundaryEvidence.rawData.denominator: \"\" → 300",
+            "detail": {
+              "field": "boundaryEvidence.rawData.denominator",
+              "oldValue": "",
+              "newValue": 300,
+              "reason": "阿岚现场确认分母漏填，实际曝光数300",
+              "nextHandler": "运营规划阿岚"
+            },
+            "snapshot": {
+              "boundaryRawData": {
+                "numerator": 89,
+                "denominator": 300,
+                "metric": "点击率"
+              },
+              "scoringRawData": {
+                "sceneStatement": "运营阿岚现场确认：分母漏填，应为300",
+                "weight": "medium",
+                "reviewer": "阿岚"
+              },
+              "reviewStatus": "pending",
+              "currentStatus": "scoring_imported",
+              "nextHandler": null
+            }
+          },
+          {
+            "action": "handover_assigned",
+            "timestamp": "2026-06-19T08:23:20.365Z",
+            "operator": "数据复核人老李",
+            "note": "下一步处理人: 运营规划阿岚",
+            "snapshot": {
+              "boundaryRawData": {
+                "numerator": 89,
+                "denominator": 300,
+                "metric": "点击率"
+              },
+              "scoringRawData": {
+                "sceneStatement": "运营阿岚现场确认：分母漏填，应为300",
+                "weight": "medium",
+                "reviewer": "阿岚"
+              },
+              "reviewStatus": "pending",
+              "currentStatus": "pending_handler_review",
+              "nextHandler": "运营规划阿岚"
+            }
+          },
+          {
+            "action": "review_status_updated",
+            "timestamp": "2026-06-19T08:23:20.365Z",
+            "operator": "复核主管老王",
+            "note": "复核状态: approved, 备注: 数据已核实，同意改动",
+            "detail": {
+              "status": "approved",
+              "comment": "数据已核实，同意改动",
+              "nextHandler": null
+            },
+            "snapshot": {
+              "boundaryRawData": {
+                "numerator": 89,
+                "denominator": 300,
+                "metric": "点击率"
+              },
+              "scoringRawData": {
+                "sceneStatement": "运营阿岚现场确认：分母漏填，应为300",
+                "weight": "medium",
+                "reviewer": "阿岚"
+              },
+              "reviewStatus": "approved",
+              "currentStatus": "pending_handler_review",
+              "nextHandler": "运营规划阿岚"
+            }
+          },
+          {
+            "action": "rollback_applied",
+            "timestamp": "2026-06-19T08:23:20.365Z",
+            "operator": "课堂演示-回滚测试",
+            "note": "已回滚 boundaryEvidence.rawData.denominator: 300 → \"\"",
+            "detail": {
+              "changeIndex": 0,
+              "field": "boundaryEvidence.rawData.denominator",
+              "restoredValue": ""
+            },
+            "snapshot": {
+              "boundaryRawData": {
+                "numerator": 89,
+                "denominator": "",
+                "metric": "点击率"
+              },
+              "scoringRawData": {
+                "sceneStatement": "运营阿岚现场确认：分母漏填，应为300",
+                "weight": "medium",
+                "reviewer": "阿岚"
+              },
+              "reviewStatus": "approved",
+              "currentStatus": "review_approved",
+              "nextHandler": "运营规划阿岚"
+            }
+          },
+          {
+            "action": "manual_change_applied",
+            "timestamp": "2026-06-19T08:23:20.365Z",
+            "operator": "数据复核人老李",
+            "note": "已修改 boundaryEvidence.rawData.denominator: \"\" → 200",
+            "detail": {
+              "field": "boundaryEvidence.rawData.denominator",
+              "oldValue": "",
+              "newValue": 200,
+              "reason": "二次确认分母为200",
+              "nextHandler": "阿岚"
+            },
+            "snapshot": {
+              "boundaryRawData": {
+                "numerator": 89,
+                "denominator": 200,
+                "metric": "点击率"
+              },
+              "scoringRawData": {
+                "sceneStatement": "运营阿岚现场确认：分母漏填，应为300",
+                "weight": "medium",
+                "reviewer": "阿岚"
+              },
+              "reviewStatus": "approved",
+              "currentStatus": "rolled_back",
+              "nextHandler": "运营规划阿岚"
+            }
+          },
+          {
+            "action": "handover_assigned",
+            "timestamp": "2026-06-19T08:23:20.365Z",
+            "operator": "数据复核人老李",
+            "note": "下一步处理人: 阿岚",
+            "snapshot": {
+              "boundaryRawData": {
+                "numerator": 89,
+                "denominator": 200,
+                "metric": "点击率"
+              },
+              "scoringRawData": {
+                "sceneStatement": "运营阿岚现场确认：分母漏填，应为300",
+                "weight": "medium",
+                "reviewer": "阿岚"
+              },
+              "reviewStatus": "approved",
+              "currentStatus": "pending_handler_review",
+              "nextHandler": "阿岚"
+            }
+          }
+        ],
+        "currentStatus": "pending_handler_review",
+        "manualChanges": [
+          {
+            "field": "boundaryEvidence.rawData.denominator",
+            "oldValue": "",
+            "newValue": 300,
+            "operator": "数据复核人老李",
+            "reason": "阿岚现场确认分母漏填，实际曝光数300",
+            "nextHandler": "运营规划阿岚",
+            "timestamp": "2026-06-19T08:23:20.365Z",
+            "canRollback": false,
+            "previousValueSnapshot": "",
+            "rolledBackAt": "2026-06-19T08:23:20.365Z",
+            "rolledBackBy": "课堂演示-回滚测试"
+          },
+          {
+            "field": "boundaryEvidence.rawData.denominator",
+            "oldValue": "",
+            "newValue": 200,
+            "operator": "数据复核人老李",
+            "reason": "二次确认分母为200",
+            "nextHandler": "阿岚",
+            "timestamp": "2026-06-19T08:23:20.365Z",
+            "canRollback": true,
+            "previousValueSnapshot": ""
+          }
+        ],
+        "reviewStatus": "approved",
+        "reviewer": "复核主管老王",
+        "reviewComment": "数据已核实，同意改动",
+        "nextHandler": "阿岚",
+        "reviewTimeline": [
+          {
+            "status": "approved",
+            "reviewer": "复核主管老王",
+            "comment": "数据已核实，同意改动",
+            "nextHandler": null,
+            "timestamp": "2026-06-19T08:23:20.365Z",
+            "dataSnapshot": {
+              "boundaryRawData": {
+                "numerator": 89,
+                "denominator": 300,
+                "metric": "点击率"
+              },
+              "scoringRawData": {
+                "sceneStatement": "运营阿岚现场确认：分母漏填，应为300",
+                "weight": "medium",
+                "reviewer": "阿岚"
+              },
+              "reviewStatus": "approved",
+              "currentStatus": "pending_handler_review",
+              "nextHandler": "运营规划阿岚"
+            }
+          }
+        ],
+        "lastModifiedAt": "2026-06-19T08:23:20.365Z",
+        "lastModifiedBy": "数据复核人老李",
+        "reviewedAt": "2026-06-19T08:23:20.365Z"
+      }
+    }
+  ],
+  "auditLog": [
+    {
+      "action": "add_boundary",
+      "recordId": "EXP-002",
+      "operator": "数据导入员",
+      "timestamp": "2026-06-19T08:23:20.364Z"
+    },
+    {
+      "action": "add_scoring",
+      "recordId": "EXP-002",
+      "operator": "阿岚",
+      "timestamp": "2026-06-19T08:23:20.364Z"
+    },
+    {
+      "action": "manual_change_applied",
+      "recordId": "EXP-002",
+      "operator": "数据复核人老李",
+      "timestamp": "2026-06-19T08:23:20.365Z"
+    },
+    {
+      "action": "review_updated",
+      "recordId": "EXP-002",
+      "operator": "复核主管老王",
+      "timestamp": "2026-06-19T08:23:20.365Z"
+    },
+    {
+      "action": "rollback_applied",
+      "recordId": "EXP-002",
+      "operator": "课堂演示-回滚测试",
+      "timestamp": "2026-06-19T08:23:20.365Z"
+    },
+    {
+      "action": "manual_change_applied",
+      "recordId": "EXP-002",
+      "operator": "数据复核人老李",
+      "timestamp": "2026-06-19T08:23:20.365Z"
+    }
+  ]
+}

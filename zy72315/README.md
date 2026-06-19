@@ -145,6 +145,9 @@ rollbackChange()
 # 运行完整工作流演示
 npm run demo
 
+# 运行端到端全链路验证（补录→保存→复核→回滚→导出→报告）
+npm run verify
+
 # 运行测试
 npm test
 ```
@@ -168,22 +171,68 @@ await workflow.executeStep2([
   { recordId: 'EXP-002', lineNumber: 3, sceneStatement: '中权重' }
 ], '阿岚');
 
-// 步骤3：复核更新
+// 步骤3：课堂演示结果更新（支持人工改动/回滚/复核多种操作）
 await workflow.executeStep3([
   {
+    type: 'manual_fix',
     recordId: 'EXP-002',
-    reviewStatus: { status: 'approved', reviewer: '复核人A', comment: '确认分母为空是业务场景' }
+    payload: {
+      field: 'boundaryEvidence.rawData.denominator',
+      oldValue: '',
+      newValue: 200,
+      reason: '现场确认分母漏填，实际200',
+      nextHandler: '阿岚'
+    },
+    operator: '复核人A'
+  },
+  {
+    type: 'review',
+    recordId: 'EXP-002',
+    status: 'approved',
+    reviewer: '复核人A',
+    comment: '数据核实无误',
+    nextHandler: null
   }
 ]);
 
 // 统一获取结果（页面、接口、导出使用同一份数据）
-const results = workflow.getUnifiedResults();
+const results = workflow.getUnifiedRecords();
+
+// 各种输出格式，全部读取同一份底层数据
+const csvContent = workflow.export_ListCSV();       // CSV 导出
+const pageData = workflow.export_ListPage();         // 页面列表
+const apiResponse = workflow.export_ListAPI();       // API 响应
+const summaryReport = workflow.export_Summary();     // 汇总报告
+const detail = workflow.export_DetailPage('EXP-002'); // 详情页
 ```
 
 ### 人工修改与回滚
 
+> 所有改动和回滚都会**真正写入底层数据**，不是只改状态标记。列表、详情、导出、报告全链路同步更新。
+
 ```javascript
-// 人工修改
+// ═══ 方式一：通过 workflow 层（推荐，带前后快照对比）═══
+
+// 人工修改（API 别名：applyManualChange / applyManualFix 均可）
+const fixResult = workflow.applyManualChange(
+  'EXP-002',                         // 记录ID
+  'boundaryEvidence.rawData.denominator', // 字段路径（支持嵌套）
+  '',                                 // 原值
+  300,                                // 新值
+  '复核人A',                          // 操作人
+  '确认空分母应为300，业务漏填',       // 处理原因
+  '运营规划阿岚'                       // 下一步处理人（可选）
+);
+
+console.log(fixResult.valuesChanged);   // 值是否真的变化了
+console.log(fixResult.before.displayValue);  // 改前 displayValue
+console.log(fixResult.after.displayValue);   // 改后 displayValue
+
+// 回滚修改（API 别名：rollbackManualChange / rollbackManualFix / rollbackChange 均可）
+const rollbackResult = workflow.rollbackManualChange('EXP-002', 0, '操作人B');
+console.log(rollbackResult.valuesRestored);  // 值是否真的恢复了
+
+// ═══ 方式二：直接操作 store 层 ═══
 workflow.store.applyManualChange(
   'EXP-002',
   'boundaryEvidence.rawData.denominator',
@@ -192,24 +241,57 @@ workflow.store.applyManualChange(
   '复核人A',
   '确认空分母应为0'
 );
+workflow.store.rollbackChange('EXP-002', 0);
 
-// 回滚修改
-workflow.rollbackManualChange('EXP-002', 0);
+// ═══ 一致性校验（随时可调用）═══
+const cv = workflow.crossValidateOutputs('EXP-002');
+console.log(cv.eval_consistent);  // true 表示 list/csv/page/api 四地 displayValue 完全一致
+
+// ═══ 完整追溯链 ═══
+const trace = workflow.getFullTraceability('EXP-002');
+// 返回：证据来源 + 原始/当前值对比 + 改动历史 + 复核时间线 + 审计日志
 ```
 
 ---
 
 ## 输出一致性保证
 
-### 三处使用同一份数据
+### 所有出口使用同一份数据
 
-| 输出方式 | 数据来源 | 特殊记录处理 |
-|----------|----------|--------------|
-| 页面展示 | getPageDisplayData() | 分母为空 → 显示黄色警告 "[需复核 - 分母为空]" |
-| 导出明细 | exportDetails() → CSV | 分母为空 → 保留空值 + 显示 "[需复核 - 分母为空]" |
-| 接口返回 | getApiResponse() | 分母为空 → 返回原始空值 + reviewRequired=true |
+| 输出方式 | 调用方法 | 数据来源 | 特殊记录处理 |
+|----------|----------|----------|--------------|
+| 页面列表 | `workflow.export_ListPage()` | `boundaryEvidence.rawData` | 分母为空 → 显示黄色警告 "[需复核 - 分母为空]" |
+| 页面详情 | `workflow.export_DetailPage(id)` | 同上 + `manualChanges` + `reviewTimeline` | 显示原始值/当前值差异、改动历史、可回滚列表 |
+| CSV 导出 | `workflow.export_ListCSV()` | 同上 | 分母为空 → 保留空值 + 显示 "[需复核 - 分母为空]" |
+| API 列表 | `workflow.export_ListAPI()` | 同上 | 分母为空 → 返回原始空值 + reviewRequired=true |
+| API 详情 | `workflow.export_DetailAPI(id)` | 同上 + 追溯链 | 含完整追溯信息 |
+| 汇总报告 | `workflow.export_Summary()` | 同上 + 统计 | 需关注清单 + 统计概览 |
 
-**关键点**：不会出现「页面显示异常、导出消失」的不一致情况。
+**关键点**：所有输出都从同一份 `rawData` 读取，不会出现「页面显示异常、导出消失」的不一致情况。
+
+### 一致性自校验工具
+
+```javascript
+// 实时核对 list/csv/page/api 四地 displayValue 是否一致
+const result = workflow.crossValidateOutputs('EXP-002');
+
+console.log(result.eval_consistent);  // true/false
+console.log(result.checkValues);      // { list, csv, page, api } 四个值
+console.log(result.diffs);            // 不一致的字段列表
+```
+
+### 持久化与可复现
+
+```javascript
+// 保存完整工作状态（所有记录+审计日志+工作流进度）
+workflow.saveToFile('./output/workflow-state.json');
+
+// 从文件加载，恢复完整现场
+workflow.loadFromFile('./output/workflow-state.json');
+
+// 一键导出所有工件（JSON/CSV/API/详情/报告/追溯链）
+const files = workflow.exportAllArtifacts('./output');
+```
 
 ---
 
@@ -227,9 +309,17 @@ workflow.rollbackManualChange('EXP-002', 0);
 │   │   └── UnifiedResultExporter.js   # 统一结果输出
 │   └── index.js
 ├── examples/
-│   └── demo-workflow.js               # 完整演示
+│   ├── demo-workflow.js               # 完整演示（5条记录）
+│   └── full-e2e-verification.js       # 端到端全链路验证（12项检查）
 ├── tests/
 │   └── run-tests.js                   # 测试用例
+├── output/                            # 导出工件目录（运行时生成）
+│   ├── workflow_*.json                # 持久化工作状态
+│   ├── records_*.csv                  # 导出明细
+│   ├── api_response_*.json            # API 响应快照
+│   ├── detail_EXP-002_*.json          # 详情快照
+│   ├── summary_report_*.txt           # 汇总报告
+│   └── traceability_EXP-002_*.json    # 追溯链
 └── README.md                          # 本文档
 ```
 

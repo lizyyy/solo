@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/index.js",
     "test": "node tests/run-tests.js",
-    "demo": "node examples/demo-workflow.js"
+    "demo": "node examples/demo-workflow.js",
+    "verify": "node examples/full-e2e-verification.js"
   },
   "keywords": ["ab-test", "experiment", "statistics"],
   "author": "",
