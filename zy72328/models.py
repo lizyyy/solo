@@ -79,6 +79,31 @@ class SampleRecord:
             "next_handler": self.next_handler,
         }
 
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "SampleRecord":
+        return cls(
+            sample_id=d["sample_id"],
+            equation_param=d["equation_param"],
+            threshold=d["threshold"],
+            root_value=d.get("root_value"),
+            status=SampleStatus(d["status"]) if d.get("status") else SampleStatus.NORMAL,
+            source=ImportSource(d["source"]) if d.get("source") else None,
+            import_time=datetime.fromisoformat(d["import_time"]) if d.get("import_time") else None,
+            reviewer=d.get("reviewer"),
+            review_time=datetime.fromisoformat(d["review_time"]) if d.get("review_time") else None,
+            notes=d.get("notes"),
+            is_boundary_case=d.get("is_boundary_case", False),
+            original_equation_param=d.get("original_equation_param"),
+            original_threshold=d.get("original_threshold"),
+            original_root_value=d.get("original_root_value"),
+            original_is_boundary_case=d.get("original_is_boundary_case"),
+            proposed_equation_param=d.get("proposed_equation_param"),
+            proposed_threshold=d.get("proposed_threshold"),
+            proposed_notes=d.get("proposed_notes"),
+            resolution_reason=d.get("resolution_reason"),
+            next_handler=d.get("next_handler"),
+        )
+
 
 @dataclass
 class ConflictEvidence:
@@ -105,6 +130,20 @@ class ConflictEvidence:
             "resolved_time": self.resolved_time.isoformat() if self.resolved_time else None,
         }
 
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "ConflictEvidence":
+        return cls(
+            sample_id=d["sample_id"],
+            conflict_type=ConflictType(d["conflict_type"]),
+            sample_list_value=d["sample_list_value"],
+            parameter_table_value=d["parameter_table_value"],
+            description=d["description"],
+            resolved=d.get("resolved", False),
+            resolution=d.get("resolution"),
+            resolved_by=d.get("resolved_by"),
+            resolved_time=datetime.fromisoformat(d["resolved_time"]) if d.get("resolved_time") else None,
+        )
+
 
 @dataclass
 class HistoryRecord:
@@ -120,6 +159,15 @@ class HistoryRecord:
             "timestamp": self.timestamp.isoformat(),
             "details": self.details,
         }
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "HistoryRecord":
+        return cls(
+            operation=d["operation"],
+            operator=d["operator"],
+            timestamp=datetime.fromisoformat(d["timestamp"]),
+            details=d.get("details", {}),
+        )
 
 
 @dataclass
@@ -160,3 +208,16 @@ class AntiExample:
             "resolved_by": self.resolved_by,
             "resolved_time": self.resolved_time.isoformat() if self.resolved_time else None,
         }
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "AntiExample":
+        return cls(
+            sample_id=d["sample_id"],
+            description=d["description"],
+            root_cause=d["root_cause"],
+            detected_time=datetime.fromisoformat(d["detected_time"]),
+            status=AntiExampleStatus(d["status"]) if d.get("status") else AntiExampleStatus.OPEN,
+            resolution_note=d.get("resolution_note"),
+            resolved_by=d.get("resolved_by"),
+            resolved_time=datetime.fromisoformat(d["resolved_time"]) if d.get("resolved_time") else None,
+        )

@@ -4,6 +4,7 @@
 import warnings
 import sys
 import json
+import os
 from typing import List, Dict, Any
 
 from root_tracker import NonlinearRootTracker
@@ -16,6 +17,31 @@ from test_data import TEST_SCENARIOS
 
 
 warnings.filterwarnings("always", category=BoundaryValueWarning)
+
+SAVE_FILE = "tracker_state.json"
+
+
+def print_help():
+    print_header("非线性方程根追踪系统 - 帮助")
+    print("\n使用方法:")
+    print(f"  python {sys.argv[0]} test                    - 运行自动化测试")
+    print(f"  python {sys.argv[0]} normal [--auto]         - 正常材料场景")
+    print(f"  python {sys.argv[0]} wrong_calibration [--auto] - 错口径材料场景")
+    print(f"  python {sys.argv[0]} supplement [--auto]     - 补录材料场景")
+    print(f"  python {sys.argv[0]} all  [--auto]           - 所有场景依次运行")
+    print(f"  python {sys.argv[0]} interactive             - 进入交互式模式（支持暂停续局跨会话）")
+    print()
+    print("核心链路:")
+    print("  抽样名单(原始快照) → 参数调试表(冲突暂存提案) → 吴老师(确认/驳回)")
+    print("  → 任课老师(边界值复核) → 补录修正 → 重算根值 → 自检 → 导出报告")
+    print()
+    print("暂停续局:")
+    print("  冲突的 proposed_* 字段、待复核列表、反例状态全部持久化到 tracker_state.json")
+    print("  退出时自动保存，下次启动交互模式自动加载，从断点接着走")
+    print()
+    print("四项基础自检:")
+    print("  1. 重复导入检查    2. 边界值检查    3. 补录后重算检查    4. 导出一致性检查")
+    print()
 
 
 def print_separator(char: str = "=", length: int = 70) -> None:
@@ -330,15 +356,25 @@ def run_scenario(scenario_name: str, tracker: NonlinearRootTracker, auto_resolve
 def interactive_mode() -> None:
     print_header("交互式模式 - 非线性方程根追踪系统")
     print("\n欢迎使用非线性方程根追踪系统！（已接入暂停续局、完整历史、同一份数据）")
-    print("请选择要执行的操作：\n")
-    
+    print("退出时会自动保存状态，下次启动自动加载，从断点接着走。\n")
+
     tracker = NonlinearRootTracker()
-    
+    if tracker.has_saved_state(SAVE_FILE):
+        loaded = tracker.load_state(SAVE_FILE)
+        if loaded:
+            unresolved_count = len(tracker.get_unresolved_samples())
+            pending_count = len(tracker.get_pending_review())
+            print(f"✅ 已自动加载上次保存的状态：样本={len(tracker.get_all_samples())}, "
+                  f"待处理冲突={unresolved_count}, 待任课复核={pending_count}")
+            if unresolved_count or pending_count:
+                print(f"💡 你可以直接从上次暂停的地方继续处理\n")
+
     while True:
         unresolved_count = len(tracker.get_unresolved_samples())
         pending_count = len(tracker.get_pending_review())
+        sample_count = len(tracker.get_all_samples())
         print("\n" + "=" * 60)
-        print(f"  主菜单  |  ⚖️  待处理冲突: {unresolved_count}  |  🟡 待任课复核: {pending_count}")
+        print(f"  主菜单  |  📋 样本: {sample_count}  |  ⚖️  待处理冲突: {unresolved_count}  |  🟡 待任课复核: {pending_count}")
         print("=" * 60)
         print("  1. 导入抽样名单（会保存原始快照）")
         print("  2. 导入参数调试表（有冲突则暂存提案，支持暂停续局）")
@@ -355,10 +391,14 @@ def interactive_mode() -> None:
         print(" 13. 运行系统自检")
         print(" 14. 导出数据（含原始值/提案/原因/下一步）")
         print(" 15. 导出完整报告（含summary+所有模块）")
-        print("  0. 退出")
+        print(" 16. 保存当前状态（暂停续局）")
+        print(" 17. 重新加载上次保存的状态")
+        print(" 18. 显示帮助说明")
+        print(" 19. 清空所有数据（重置）")
+        print("  0. 退出（自动保存）")
         print("=" * 60)
-        
-        choice = input("\n请输入选项 (0-15): ").strip()
+
+        choice = input("\n请输入选项 (0-19): ").strip()
         
         try:
             if choice == "1":
@@ -669,10 +709,52 @@ def interactive_mode() -> None:
                       f"待复核={s['pending_review']}, 未解决冲突={s['unresolved_conflicts']}, "
                       f"反例(开/关)={s['anti_examples_open']}/{s['anti_examples_resolved']}, "
                       f"自检通过={s['self_check_passed']}")
-            
+
+            elif choice == "16":
+                print(f"\n💾 保存当前状态（暂停续局） → {SAVE_FILE}")
+                path = tracker.save_state(SAVE_FILE)
+                print(f"✅ 已保存：样本={len(tracker.get_all_samples())}, "
+                      f"待处理冲突={len(tracker.get_unresolved_samples())}, "
+                      f"待任课复核={len(tracker.get_pending_review())}")
+                print(f"  💡 下次进入交互模式会自动加载该文件，从断点继续")
+
+            elif choice == "17":
+                print(f"\n🔄 重新加载上次保存的状态 ← {SAVE_FILE}")
+                if not tracker.has_saved_state(SAVE_FILE):
+                    print("  ⚠️  没有找到保存的状态文件")
+                else:
+                    ok = tracker.load_state(SAVE_FILE)
+                    if ok:
+                        print(f"✅ 加载成功：样本={len(tracker.get_all_samples())}, "
+                              f"待处理冲突={len(tracker.get_unresolved_samples())}, "
+                              f"待任课复核={len(tracker.get_pending_review())}")
+                    else:
+                        print("  ❌ 加载失败，文件版本不匹配或损坏")
+
+            elif choice == "18":
+                print()
+                print_help()
+
+            elif choice == "19":
+                confirm = input(f"\n⚠️  确认清空所有数据并删除 {SAVE_FILE}？([Y]是 / [N]否): ").strip().upper()
+                if confirm == 'Y':
+                    tracker.__init__()
+                    if os.path.exists(SAVE_FILE):
+                        os.remove(SAVE_FILE)
+                    print("✅ 已清空所有数据，重置为初始状态")
+                else:
+                    print("  已取消")
+
             elif choice == "0":
                 unresolved = tracker.get_unresolved_samples()
                 pending = tracker.get_pending_review()
+                saved = False
+                try:
+                    tracker.save_state(SAVE_FILE)
+                    saved = True
+                except Exception:
+                    saved = False
+                print(f"\n💾 自动保存状态 → {SAVE_FILE}" + (" ✅" if saved else " ❌ 保存失败"))
                 if unresolved or pending:
                     print(f"\n⏸️  【暂停续局提示】")
                     if unresolved:
@@ -681,7 +763,7 @@ def interactive_mode() -> None:
                     if pending:
                         print(f"  • 还有 {len(pending)} 个边界值待任课老师复核")
                         print(f"    样本: {', '.join(pending)}")
-                    print(f"  下次启动系统，所有暂存状态都会保留，可以直接从断点接着走。")
+                    print(f"  下次启动交互模式会自动从 {SAVE_FILE} 加载，直接从断点接着走。")
                 print("\n👋 感谢使用非线性方程根追踪系统，再见！")
                 break
             
@@ -701,52 +783,45 @@ def interactive_mode() -> None:
 def main():
     if len(sys.argv) > 1:
         mode = sys.argv[1].lower()
-        
+
+        if mode in ("-h", "--help", "help", "?", "h"):
+            print_help()
+            sys.exit(0)
+
         if mode == "test":
             print_header("运行自动化测试")
             import unittest
             from test_root_tracker import TestNonlinearRootTracker
-            
+
             suite = unittest.TestLoader().loadTestsFromTestCase(TestNonlinearRootTracker)
             runner = unittest.TextTestRunner(verbosity=2)
             result = runner.run(suite)
-            
+
             sys.exit(0 if result.wasSuccessful() else 1)
-        
+
         elif mode in TEST_SCENARIOS:
             tracker = NonlinearRootTracker()
             auto = "--auto" in sys.argv or len(sys.argv) > 2 and sys.argv[2] == "--auto"
             run_scenario(mode, tracker, auto_resolve_all=auto)
-        
+
         elif mode == "all":
             tracker = NonlinearRootTracker()
             auto = "--auto" in sys.argv
             for scenario_name in TEST_SCENARIOS:
                 run_scenario(scenario_name, tracker, auto_resolve_all=auto)
                 tracker = NonlinearRootTracker()
-        
+
         elif mode == "interactive":
             interactive_mode()
-        
+
         else:
             print(f"❌ 未知模式: {mode}")
-            print(f"可用模式: test, {', '.join(TEST_SCENARIOS.keys())}, all, interactive")
+            print(f"可用模式: test, {', '.join(TEST_SCENARIOS.keys())}, all, interactive, help")
             print(f"附加参数: --auto 自动处理冲突和边界值（演示用）")
+            print(f"帮助: python {sys.argv[0]} --help 或 -h")
             sys.exit(1)
     else:
-        print_header("非线性方程根追踪系统")
-        print("\n使用方法:")
-        print(f"  python {sys.argv[0]} test                    - 运行自动化测试")
-        print(f"  python {sys.argv[0]} normal [--auto]         - 正常材料场景")
-        print(f"  python {sys.argv[0]} wrong_calibration [--auto] - 错口径材料场景")
-        print(f"  python {sys.argv[0]} supplement [--auto]     - 补录材料场景")
-        print(f"  python {sys.argv[0]} all  [--auto]           - 所有场景依次运行")
-        print(f"  python {sys.argv[0]} interactive             - 进入交互式模式")
-        print()
-        print(f"核心链路: 抽样名单(原始快照)→参数调试表(冲突暂存提案)→吴老师(确认/驳回,同步参数+反例+历史)")
-        print(f"          →任课老师(边界值复核,不自动归正常)→补录修正→重算根值→自检→导出报告")
-        print(f"暂停续局: 冲突的 proposed_* 字段、待复核列表、反例状态都支持随时中断后继续")
-        print()
+        print_help()
 
 
 if __name__ == "__main__":

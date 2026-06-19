@@ -1,5 +1,7 @@
 import math
 import warnings
+import json
+import os
 from typing import List, Dict, Optional, Tuple, Any
 from datetime import datetime
 import copy
@@ -780,3 +782,43 @@ class NonlinearRootTracker:
             message="导出数据与原始数据完全一致（含列表、详情、报告摘要、历史记录）。",
             details={}
         )
+
+    DEFAULT_SAVE_FILE = "tracker_state.json"
+
+    def save_state(self, filepath: Optional[str] = None) -> str:
+        filepath = filepath or self.DEFAULT_SAVE_FILE
+        state = {
+            "version": 1,
+            "saved_at": datetime.now().isoformat(),
+            "samples": {sid: s.to_dict() for sid, s in self._samples.items()},
+            "conflicts": [c.to_dict() for c in self._conflicts],
+            "history": [h.to_dict() for h in self._history],
+            "anti_examples": [ae.to_dict() for ae in self._anti_examples],
+            "pending_review": list(self._pending_review),
+            "supplemented_samples": list(self._supplemented_samples),
+            "unresolved_samples": list(self._unresolved_samples),
+        }
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(state, f, ensure_ascii=False, indent=2)
+        return filepath
+
+    def load_state(self, filepath: Optional[str] = None) -> bool:
+        filepath = filepath or self.DEFAULT_SAVE_FILE
+        if not os.path.exists(filepath):
+            return False
+        with open(filepath, 'r', encoding='utf-8') as f:
+            state = json.load(f)
+        if state.get("version") != 1:
+            return False
+        self._samples = {sid: SampleRecord.from_dict(d) for sid, d in state.get("samples", {}).items()}
+        self._conflicts = [ConflictEvidence.from_dict(d) for d in state.get("conflicts", [])]
+        self._history = [HistoryRecord.from_dict(d) for d in state.get("history", [])]
+        self._anti_examples = [AntiExample.from_dict(d) for d in state.get("anti_examples", [])]
+        self._pending_review = state.get("pending_review", [])
+        self._supplemented_samples = set(state.get("supplemented_samples", []))
+        self._unresolved_samples = set(state.get("unresolved_samples", []))
+        return True
+
+    def has_saved_state(self, filepath: Optional[str] = None) -> bool:
+        filepath = filepath or self.DEFAULT_SAVE_FILE
+        return os.path.exists(filepath)
