@@ -24,6 +24,7 @@ export default function SensorDetailSidebar({
   const [isLoadingPhotos, setIsLoadingPhotos] = useState(false)
   const [isEditingRemark, setIsEditingRemark] = useState(false)
   const [remarkInput, setRemarkInput] = useState('')
+  const [remarkReason, setRemarkReason] = useState('')
   const [isSavingRemark, setIsSavingRemark] = useState(false)
   const [isModifyModalOpen, setIsModifyModalOpen] = useState(false)
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
@@ -36,6 +37,7 @@ export default function SensorDetailSidebar({
   useEffect(() => {
     if (isOpen && sensor) {
       setRemarkInput(sensor.remark)
+      setRemarkReason('')
       setIsEditingRemark(false)
       setError(null)
       setUploadError(null)
@@ -61,13 +63,18 @@ export default function SensorDetailSidebar({
 
   const handleSaveRemark = async () => {
     if (!sensor) return
+    if (!remarkReason.trim()) {
+      setError('请填写修改原因')
+      return
+    }
 
     setIsSavingRemark(true)
     setError(null)
 
     try {
-      await updateSensorRemark(sensor.id, remarkInput.trim())
+      await updateSensorRemark(sensor.id, remarkInput.trim(), remarkReason.trim(), '实验老师林老师')
       setIsEditingRemark(false)
+      setRemarkReason('')
       onUpdate()
     } catch (err) {
       setError(err instanceof Error ? err.message : '保存备注失败')
@@ -241,13 +248,27 @@ export default function SensorDetailSidebar({
               )}
             </div>
             {isEditingRemark ? (
-              <textarea
-                value={remarkInput}
-                onChange={(e) => setRemarkInput(e.target.value)}
-                placeholder="请输入备注信息"
-                rows={3}
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none text-sm"
-              />
+              <div className="space-y-3">
+                <textarea
+                  value={remarkInput}
+                  onChange={(e) => setRemarkInput(e.target.value)}
+                  placeholder="请输入备注信息"
+                  rows={3}
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none text-sm"
+                />
+                <div>
+                  <label className="block text-xs text-muted mb-1">
+                    修改原因 <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={remarkReason}
+                    onChange={(e) => setRemarkReason(e.target.value)}
+                    placeholder="例如：林老师补看工况照片添加关键备注"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
+                  />
+                </div>
+              </div>
             ) : (
               <p className="text-sm text-gray-700 bg-gray-50 rounded-lg px-3 py-2 min-h-[60px]">
                 {sensor.remark || <span className="text-muted">暂无备注</span>}

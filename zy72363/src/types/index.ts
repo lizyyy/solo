@@ -38,6 +38,10 @@ export interface SafetyZone {
   version: number;
   created_at: string;
   updated_at: string;
+  sensor_code?: string;
+  material_type?: string;
+  remark?: string;
+  batch_id?: string;
   sensor?: SensorData;
 }
 

@@ -102,14 +102,14 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
     const total = (countStmt.get(...params) as { cnt: number }).cnt
 
     const query = `
-      SELECT sz.*, s.sensor_code
+      SELECT sz.*, s.sensor_code, s.material_type, s.remark, s.batch_id, s.coefficient_manual, s.coefficient_reason as sensor_coefficient_reason
       FROM safety_zone sz
       LEFT JOIN sensor_data s ON sz.sensor_id = s.id
       ${whereClause}
       ORDER BY sz.created_at DESC
       LIMIT ? OFFSET ?
     `
-    const zones = db.prepare(query).all(...params, pageSize, offset) as Array<SafetyZone & { sensor_code: string }>
+    const zones = db.prepare(query).all(...params, pageSize, offset) as Array<SafetyZone & { sensor_code: string; material_type: string; remark: string; batch_id: string; coefficient_manual: number; sensor_coefficient_reason: string | null }>
 
     res.status(200).json({
       success: true,

@@ -290,30 +290,79 @@ router.post('/:id/rollback', async (req: Request, res: Response): Promise<void> 
 
 router.get('/export', async (req: Request, res: Response): Promise<void> => {
   try {
-    const records = db.prepare('SELECT * FROM change_record ORDER BY created_at ASC').all() as ChangeRecord[]
+    const fmt = (req.query.format as string) || 'shell'
+    const targetType = req.query.target_type as string | undefined
 
-    const baseUrl = process.env.API_BASE_URL || 'http://localhost:3000'
+    let whereClause = ''
+    const params: unknown[] = []
+    if (targetType) {
+      whereClause = 'WHERE cr.target_type = ?'
+      params.push(targetType)
+    }
+
+    const stmt = db.prepare(`
+      SELECT cr.*,
+        CASE
+          WHEN cr.target_type = 'sensor' THEN s.sensor_code
+          WHEN cr.target_type = 'safety_zone' THEN sz_s.sensor_code
+          ELSE NULL
+        END as sensor_code,
+        CASE
+          WHEN cr.target_type = 'sensor' THEN s.material_type
+          WHEN cr.target_type = 'safety_zone' THEN sz_s.material_type
+          ELSE NULL
+        END as material_type
+      FROM change_record cr
+      LEFT JOIN sensor_data s ON cr.target_type = 'sensor' AND cr.target_id = s.id
+      LEFT JOIN safety_zone sz ON cr.target_type = 'safety_zone' AND cr.target_id = sz.id
+      LEFT JOIN sensor_data sz_s ON sz.sensor_id = sz_s.id
+      ${whereClause}
+      ORDER BY cr.created_at ASC
+    `)
+    const records = stmt.all(...params) as (ChangeRecord & { sensor_code: string | null; material_type: string | null })[]
+
+    const baseUrl = process.env.API_BASE_URL || 'http://localhost:3001'
+
+    if (fmt === 'json') {
+      res.setHeader('Content-Type', 'application/json')
+      res.status(200).json({
+        success: true,
+        data: { records, generatedAt: new Date().toISOString() },
+      })
+      return
+    }
 
     let script = '#!/bin/bash\n'
-    script += '# Centrifuge Safety Zone System - Change Replay Script\n'
-    script += `# Generated at ${new Date().toISOString()}\n`
-    script += `# Total changes: ${records.length}\n\n`
+    script += '# ================================================================\n'
+    script += '# 离心机转速安全区 - 变更记录回放脚本\n'
+    script += `# 生成时间: ${new Date().toLocaleString('zh-CN')}\n`
+    script += `# 变更条目总数: ${records.length}\n`
+    script += '# 使用方法: bash replay_changes.sh（需目标服务已启动）\n'
+    script += '# ================================================================\n\n'
     script += `BASE_URL="${baseUrl}"\n\n`
 
     for (let i = 0; i < records.length; i++) {
       const record = records[i]
-      script += `# Change ${i + 1}: ${record.target_type} - ${record.field} (${record.created_at})\n`
-      script += `# Operator: ${record.operator}\n`
+      script += `# ============== Change ${i + 1} ==============\n`
+      script += `# 传感器编号: ${record.sensor_code || '(根表无关联)'}\n`
+      script += `# 物料类型:   ${record.material_type || '(根表无关联)'}\n`
+      script += `# 变更模块:   ${record.target_type} / ${record.field}\n`
+      script += `# 操作人:     ${record.operator}\n`
+      script += `# 创建时间:   ${record.created_at}\n`
       if (record.reason) {
-        script += `# Reason: ${record.reason}\n`
+        script += `# 修改原因:   ${record.reason}\n`
       }
+      script += `# 改前文本:   ${record.old_value}\n`
+      script += `# 改后文本:   ${record.new_value}\n`
 
       let endpoint = ''
+      let httpMethod = 'PUT'
       let payload: Record<string, unknown> = {}
 
       if (record.target_type === 'sensor') {
         if (record.field === 'remark') {
           endpoint = `/api/sensors/${record.target_id}/remark`
+          httpMethod = 'PUT'
           payload = {
             remark: record.new_value,
             operator: record.operator,
@@ -321,6 +370,7 @@ router.get('/export', async (req: Request, res: Response): Promise<void> => {
           }
         } else if (record.field === 'coefficient') {
           endpoint = `/api/sensors/${record.target_id}/coefficient`
+          httpMethod = 'PUT'
           payload = {
             coefficient: parseFloat(record.new_value),
             reason: record.reason || '',
@@ -330,6 +380,7 @@ router.get('/export', async (req: Request, res: Response): Promise<void> => {
       } else if (record.target_type === 'safety_zone') {
         if (record.field === 'review_status') {
           endpoint = `/api/safety-zones/${record.target_id}/review`
+          httpMethod = 'POST'
           const action = record.new_value === 'approved' ? 'approve' : 'rollback'
           payload = {
             action,
@@ -340,19 +391,17 @@ router.get('/export', async (req: Request, res: Response): Promise<void> => {
       }
 
       if (endpoint) {
-        const jsonPayload = JSON.stringify(payload)
-        script += `curl -X PUT "${baseUrl}${endpoint}" \\\n`
+        const jsonPayload = JSON.stringify(payload).replace(/'/g, "'\\''")
+        script += `curl -X ${httpMethod} "${baseUrl}${endpoint}" \\\n`
         script += `  -H "Content-Type: application/json" \\\n`
         script += `  -d '${jsonPayload}'\n`
       } else {
-        script += `# Field "${record.field}" - manual intervention required\n`
-        script += `# Old value: ${record.old_value}\n`
-        script += `# New value: ${record.new_value}\n`
+        script += `# 字段 "${record.field}" 目前需手动处理，建议在前端对应页面操作\n`
       }
       script += '\n'
     }
 
-    script += 'echo "All changes replayed successfully!"\n'
+    script += 'echo "✅  All changes replayed!"\n'
 
     res.setHeader('Content-Type', 'text/x-shellscript')
     res.setHeader('Content-Disposition', 'attachment; filename="replay_changes.sh"')

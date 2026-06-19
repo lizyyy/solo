@@ -162,7 +162,8 @@ function HoverLabel({
   const zone = zones.find((z) => z.id === hoveredZone)
   if (!zone) return null
 
-  const sensor = zone.safetyZone.sensor
+  const sz = zone.safetyZone
+  const sensor = sz.sensor
   const labelPosition: [number, number, number] = [
     zone.position[0],
     zone.position[1] + zone.height / 2 + 0.5,
@@ -173,10 +174,10 @@ function HoverLabel({
     <Html position={labelPosition}>
       <div className="bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-xl border border-gray-200 whitespace-nowrap">
         <p className="text-xs font-mono font-semibold text-gray-900">
-          {sensor?.sensor_code || zone.id}
+          {sz.sensor_code || sensor?.sensor_code || zone.id}
         </p>
         <p className="text-xs text-muted">
-          {sensor?.material_type || '未知'} | {zone.safetyZone.rpm_min}-{zone.safetyZone.rpm_max} RPM
+          {sz.material_type || sensor?.material_type || '未知'} | {sz.rpm_min}-{sz.rpm_max} RPM
         </p>
       </div>
     </Html>
@@ -197,6 +198,8 @@ function DetailPanel({
   if (!selectedZone) return null
 
   const sensor = selectedZone.sensor
+  const sensorCode = selectedZone.sensor_code || sensor?.sensor_code || '-'
+  const materialType = selectedZone.material_type || sensor?.material_type || '-'
   const statusColor = getZoneColor(selectedZone)
   const statusLabel = selectedZone.coefficient_source === 'manual' && !selectedZone.coefficient_reason
     ? STATUS_LABELS.manual_no_reason
@@ -228,12 +231,12 @@ function DetailPanel({
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted">传感器编号</span>
             <span className="font-mono text-sm font-semibold text-gray-900">
-              {sensor?.sensor_code || '-'}
+              {sensorCode}
             </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted">物料类型</span>
-            <span className="text-sm text-gray-700">{sensor?.material_type || '-'}</span>
+            <span className="text-sm text-gray-700">{materialType}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted">转速范围</span>
@@ -383,16 +386,19 @@ function Scene({
   const navigate = useNavigate()
 
   const { zoneInstances, materialTypes, batchIds } = useMemo(() => {
-    const types = Array.from(new Set(safetyZones.map((z) => z.sensor?.material_type).filter(Boolean)))
-    const batches = Array.from(new Set(safetyZones.map((z) => z.sensor?.batch_id).filter(Boolean)))
+    const resolveMaterial = (z: SafetyZone) => z.material_type || z.sensor?.material_type || '未知'
+    const resolveBatch = (z: SafetyZone) => z.batch_id || z.sensor?.batch_id || '未分组'
+
+    const types = Array.from(new Set(safetyZones.map(resolveMaterial).filter(Boolean)))
+    const batches = Array.from(new Set(safetyZones.map(resolveBatch).filter(Boolean)))
 
     const maxRpm = Math.max(...safetyZones.map((z) => z.rpm_max), 1)
     const minRpm = Math.min(...safetyZones.map((z) => z.rpm_min), 0)
     const rpmRange = maxRpm - minRpm || 1
 
     const instances: ZoneInstanceData[] = safetyZones.map((zone) => {
-      const materialIndex = types.indexOf(zone.sensor?.material_type || '')
-      const batchIndex = batches.indexOf(zone.sensor?.batch_id || '')
+      const materialIndex = types.indexOf(resolveMaterial(zone))
+      const batchIndex = batches.indexOf(resolveBatch(zone))
 
       const x = (materialIndex - (types.length - 1) / 2) * 2
       const z = (batchIndex - (batches.length - 1) / 2) * 2

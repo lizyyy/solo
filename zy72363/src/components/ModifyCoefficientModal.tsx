@@ -49,7 +49,7 @@ export default function ModifyCoefficientModal({
     setError(null)
 
     try {
-      await updateSensorCoefficient(sensor.id, numCoefficient, reason.trim())
+      await updateSensorCoefficient(sensor.id, numCoefficient, reason.trim(), '设备工程师')
       onSuccess()
       handleClose()
     } catch (err) {

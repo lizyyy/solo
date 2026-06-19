@@ -157,7 +157,7 @@ export default function Review() {
       isOpen: true,
       zoneId: zone.id,
       action,
-      sensorCode: zone.sensor?.sensor_code || '',
+      sensorCode: zone.sensor_code || '',
     })
   }
 
@@ -176,7 +176,7 @@ export default function Review() {
     navigate('/sensors', {
       state: {
         expandSensorId: zone.sensor_id,
-        expandSensorCode: zone.sensor?.sensor_code,
+        expandSensorCode: zone.sensor_code,
       },
     })
   }
@@ -185,7 +185,7 @@ export default function Review() {
     navigate('/sensors', {
       state: {
         expandSensorId: zone.sensor_id,
-        expandSensorCode: zone.sensor?.sensor_code,
+        expandSensorCode: zone.sensor_code,
       },
     })
   }
@@ -194,7 +194,7 @@ export default function Review() {
     navigate('/sensors', {
       state: {
         expandSensorId: zone.sensor_id,
-        expandSensorCode: zone.sensor?.sensor_code,
+        expandSensorCode: zone.sensor_code,
         showPhotos: true,
       },
     })
@@ -314,14 +314,14 @@ export default function Review() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-mono text-sm font-semibold text-gray-900">
-                            {zone.sensor?.sensor_code || `ID: ${zone.sensor_id}`}
+                            {zone.sensor_code || `ID: ${zone.sensor_id}`}
                           </span>
                           <Badge type="source" source={zone.coefficient_source} />
                           {isManualNoReason && (
                             <span
                               onClick={(e) => handleNoReasonClick(e, zone)}
                               className="cursor-pointer"
-                              title="点击跳转到传感器详情"
+                              title="点击跳转到传感器详情补写原因"
                             >
                               <Badge type="noReason" />
                             </span>
@@ -329,7 +329,7 @@ export default function Review() {
                           <Badge type="reviewStatus" status={zone.review_status} />
                         </div>
                         <p className="mt-1 text-sm text-muted">
-                          {zone.sensor?.material_type || '未知物料'} · 版本 v{zone.version} ·{' '}
+                          {zone.material_type || '未知物料'} · 版本 v{zone.version} ·{' '}
                           {new Date(zone.updated_at).toLocaleString('zh-CN')}
                         </p>
                       </div>
