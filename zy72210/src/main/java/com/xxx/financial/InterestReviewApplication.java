@@ -1,9 +1,10 @@
 package com.xxx.financial;
 
 import com.xxx.financial.cli.InterestReviewCli;
-import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 
 @SpringBootApplication(scanBasePackages = "com.xxx.financial", exclude = {DataSourceAutoConfiguration.class})
 public class InterestReviewApplication {
@@ -13,7 +14,10 @@ public class InterestReviewApplication {
             InterestReviewCli.main(args);
             return;
         }
-        SpringApplication.run(InterestReviewApplication.class, args);
+        new SpringApplicationBuilder(InterestReviewApplication.class)
+                .web(WebApplicationType.SERVLET)
+                .registerShutdownHook(true)
+                .run(args);
     }
 
     private static boolean isCliMode(String firstArg) {
@@ -26,6 +30,10 @@ public class InterestReviewApplication {
             case "interactive":
                 return true;
             default:
+                return false;
+        }
+    }
+}
                 return false;
         }
     }

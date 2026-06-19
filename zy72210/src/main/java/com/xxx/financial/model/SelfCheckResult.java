@@ -1,11 +1,9 @@
 package com.xxx.financial.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.xxx.financial.enums.CheckSeverity;
 import com.xxx.financial.enums.SelfCheckItem;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class SelfCheckResult {
     private SelfCheckItem checkItem;
     private CheckSeverity severity;

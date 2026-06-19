@@ -1,12 +1,10 @@
 package com.xxx.financial.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.xxx.financial.enums.ReviewStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class InterestReviewContext {
     private String reviewNo;
     private CommercialBill commercialBill;

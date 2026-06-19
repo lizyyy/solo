@@ -1,12 +1,10 @@
 package com.xxx.financial.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.xxx.financial.enums.ApproverType;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class TailAdjustment {
     private String adjustmentNo;
     private String billNo;

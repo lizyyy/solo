@@ -1,11 +1,9 @@
 package com.xxx.financial.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.xxx.financial.enums.ReviewStatus;
 
 import java.util.List;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ReviewResult {
     private boolean success;
     private ReviewStatus finalStatus;

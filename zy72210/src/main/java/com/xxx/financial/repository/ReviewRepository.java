@@ -57,21 +57,20 @@ public class ReviewRepository {
                 logger.info("从磁盘加载导入记录{}条", importedAdjustments.size());
             }
 
-            File[] ctxFiles = dir.toFile().listFiles((d, name) -> name.endsWith(".json"));
-            if (ctxFiles != null) {
-                for (File ctxFile : ctxFiles) {
-                    try {
+            File indexFile = Paths.get(storageDir, REVIEWS_INDEX).toFile();
+            if (indexFile.exists()) {
+                List<String> reviewNos = objectMapper.readValue(indexFile,
+                        objectMapper.getTypeFactory().constructCollectionType(List.class, String.class));
+                for (String reviewNo : reviewNos) {
+                    File ctxFile = dir.resolve(reviewNo + ".json").toFile();
+                    if (ctxFile.exists()) {
                         InterestReviewContext ctx = objectMapper.readValue(ctxFile, InterestReviewContext.class);
-                        if (ctx != null && ctx.getReviewNo() != null) {
-                            contexts.put(ctx.getReviewNo(), ctx);
-                        }
-                    } catch (Exception ex) {
-                        logger.error("加载上下文文件{}失败: {}", ctxFile.getName(), ex.getMessage());
+                        contexts.put(reviewNo, ctx);
                     }
                 }
                 logger.info("从磁盘加载复核上下文{}个", contexts.size());
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.error("加载持久化数据失败: {}", e.getMessage(), e);
         }
     }
@@ -106,9 +105,12 @@ public class ReviewRepository {
             Files.createDirectories(dir);
             objectMapper.writeValue(dir.resolve(context.getReviewNo() + ".json").toFile(), context);
 
+            List<String> reviewNos = new ArrayList<>(contexts.keySet());
+            objectMapper.writeValue(Paths.get(storageDir, REVIEWS_INDEX).toFile(), reviewNos);
+
             objectMapper.writeValue(Paths.get(storageDir, IMPORTED_FILE).toFile(),
                     new ArrayList<>(importedAdjustments));
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.error("保存上下文{}失败: {}", context.getReviewNo(), e.getMessage());
         }
     }

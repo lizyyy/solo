@@ -1,0 +1,59 @@
+{
+  "reviewNo" : "REV79DF7664",
+  "commercialBill" : {
+    "billNo" : "CD-API-001B",
+    "billType" : "银行承兑汇票",
+    "faceAmount" : null,
+    "discountRate" : null,
+    "discountDate" : "2026-06-19 12:18:08",
+    "maturityDate" : "2026-09-17 12:18:08",
+    "discountInterest" : 9000.00,
+    "drawer" : "贸易公司",
+    "drawee" : "承兑银行"
+  },
+  "tailAdjustment" : {
+    "adjustmentNo" : "ADJ-API-001",
+    "billNo" : "CD-API-001B",
+    "adjustmentAmount" : 12.50,
+    "adjustmentReason" : "尾差调整",
+    "approver" : "张明",
+    "approverType" : null,
+    "importTime" : "2026-06-19 12:18:08",
+    "importBatchNo" : "API_BATCH",
+    "remark" : "",
+    "pinyinApproverFlag" : false
+  },
+  "trusteeConfirmation" : null,
+  "balanceHistory" : [ {
+    "recordNo" : "BALREV79DF7664",
+    "billNo" : "CD-API-001B",
+    "previousBalance" : 0,
+    "changeAmount" : 9000.00,
+    "currentBalance" : 9000.00,
+    "changeTime" : "2026-06-19 12:18:08",
+    "changeReason" : "贴现利息入账",
+    "operator" : "产品阿南",
+    "relatedBusinessNo" : "INTREV79DF7664"
+  } ],
+  "status" : "CALIBER_ERROR",
+  "selfCheckResults" : [ {
+    "passed" : false,
+    "resolved" : false,
+    "resolutionRemark" : null,
+    "message" : "检测到重复导入",
+    "detail" : "调整单号ADJ-API-001已存在于导入记录中",
+    "checkItemDescription" : "重复导入检查",
+    "severityDescription" : "错误-阻断流程，必须修正数据",
+    "checkItemName" : "DUPLICATE_IMPORT",
+    "severityName" : "ERROR",
+    "blocking" : true
+  } ],
+  "conflicts" : [ ],
+  "operator" : "产品阿南",
+  "managerReviewRemark" : null,
+  "productDecision" : null,
+  "step1ImportCompleted" : false,
+  "step2TrusteeReviewed" : false,
+  "step3BalanceUpdated" : false,
+  "allSelfCheckPassed" : false
+}

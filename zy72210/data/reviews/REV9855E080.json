@@ -1,0 +1,70 @@
+{
+  "reviewNo" : "REV9855E080",
+  "commercialBill" : {
+    "billNo" : "CD-TEST-003",
+    "billType" : "银行承兑汇票",
+    "faceAmount" : null,
+    "discountRate" : null,
+    "discountDate" : "2026-06-19 12:22:55",
+    "maturityDate" : "2026-09-17 12:22:55",
+    "discountInterest" : 9000.00,
+    "drawer" : "贸易公司",
+    "drawee" : "承兑银行"
+  },
+  "tailAdjustment" : {
+    "adjustmentNo" : "ADJ-API-003",
+    "billNo" : "CD-TEST-003",
+    "adjustmentAmount" : 10.50,
+    "adjustmentReason" : "尾差调整",
+    "approver" : "张明",
+    "approverType" : "FULL_NAME",
+    "importTime" : "2026-06-19 12:22:55",
+    "importBatchNo" : "API_BATCH",
+    "remark" : "",
+    "pinyinApproverFlag" : false
+  },
+  "trusteeConfirmation" : null,
+  "balanceHistory" : [ {
+    "recordNo" : "BALREV9855E080",
+    "billNo" : "CD-TEST-003",
+    "previousBalance" : 0,
+    "changeAmount" : 9000.00,
+    "currentBalance" : 9000.00,
+    "changeTime" : "2026-06-19 12:22:55",
+    "changeReason" : "贴现利息入账",
+    "operator" : "api_user",
+    "relatedBusinessNo" : "INTREV9855E080"
+  } ],
+  "status" : "NORMAL",
+  "selfCheckResults" : [ {
+    "passed" : true,
+    "resolved" : false,
+    "resolutionRemark" : null,
+    "message" : "无重复导入",
+    "detail" : null,
+    "checkItemName" : "DUPLICATE_IMPORT",
+    "severityName" : "ERROR",
+    "checkItemDescription" : "重复导入检查",
+    "severityDescription" : "错误-阻断流程，必须修正数据",
+    "blocking" : false
+  }, {
+    "passed" : true,
+    "resolved" : false,
+    "resolutionRemark" : null,
+    "message" : "审批人信息完整",
+    "detail" : null,
+    "checkItemName" : "APPROVER_PINYIN",
+    "severityName" : "WARN",
+    "checkItemDescription" : "审批人拼音检查",
+    "severityDescription" : "警告-不阻断但需人工处理，处理后可继续",
+    "blocking" : false
+  } ],
+  "conflicts" : [ ],
+  "operator" : "api_user",
+  "managerReviewRemark" : null,
+  "productDecision" : null,
+  "step1ImportCompleted" : true,
+  "step2TrusteeReviewed" : false,
+  "step3BalanceUpdated" : false,
+  "allSelfCheckPassed" : true
+}
