@@ -191,11 +191,13 @@ class Storage:
             batch_id = f.stem
             batch = self.load_batch(batch_id)
             if batch:
+                truly_abnormal = [r for r in batch.abnormal_records if r.is_truly_abnormal]
                 batches.append({
                     "id": batch.id,
                     "name": batch.name,
                     "created_at": batch.created_at,
                     "status": batch.status,
-                    "abnormal_count": len(batch.abnormal_records),
+                    "abnormal_count": len(truly_abnormal),
+                    "total_records": len(batch.abnormal_records),
                 })
         return sorted(batches, key=lambda x: x["created_at"], reverse=True)

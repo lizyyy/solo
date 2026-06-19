@@ -1,0 +1,337 @@
+{
+  "id": "3e081ce1",
+  "name": "验证批次-06200017-口径验证",
+  "created_at": "2026-06-20T00:17:49.824386",
+  "status": "复核中",
+  "run_count": 3,
+  "repair_screenshots": [
+    {
+      "id": "fd7d93f6",
+      "batch_id": "3e081ce1",
+      "filename": "维修群截图-演示.jpg",
+      "upload_time": "2026-06-20T00:17:49.824904",
+      "uploader": "质检员小白",
+      "content": {
+        "screenshot_time": "2024-06-01 14:30:00",
+        "group_name": "光伏逆变器维修讨论群",
+        "sender": "现场王师傅",
+        "raw_text": "各位老师，今天下午测的3号逆变器散热数据有点问题，T001测点负方向温度偏高，T002测点向左散热好像不太对，T003正常。T001温度到68度了，麻烦帮忙看看。",
+        "points": [
+          {
+            "id": "T001",
+            "name": "逆变器入口散热",
+            "direction": "负方向",
+            "temperature": 68,
+            "field_mention": "现场师傅说负方向温度偏高"
+          },
+          {
+            "id": "T002",
+            "name": "IGBT模块散热",
+            "direction": "向左",
+            "temperature": 62,
+            "field_mention": "现场师傅说向左散热好像不对"
+          },
+          {
+            "id": "T003",
+            "name": "散热器出风口",
+            "direction": "正常方向",
+            "temperature": 45,
+            "field_mention": "现场师傅说正常"
+          }
+        ]
+      },
+      "raw_text": "演示用维修群截图文本"
+    }
+  ],
+  "sampling_notes": [
+    {
+      "id": "bedbbd89",
+      "batch_id": "3e081ce1",
+      "filename": "采样间隔说明-演示.txt",
+      "upload_time": "2026-06-20T00:17:49.825514",
+      "uploader": "质检员小白",
+      "content": {
+        "note_time": "2024-06-01 16:45:00",
+        "author": "质检员小白",
+        "title": "关于3号逆变器散热测试的采样间隔说明",
+        "raw_text": "针对下午维修群里提到的3号逆变器散热测试问题，补充采样间隔说明如下：T001测点采样间隔为5分钟，连续3次测得温度超过65℃，确认负方向散热异常；T002测点现场师傅表述的'向左'实为'负方向'的口误，采样数据显示该测点温度波动较大，需进一步确认；T003测点采样间隔正常，温度稳定，无异常。",
+        "points": {
+          "T001": {
+            "sampling_interval": "5分钟",
+            "sample_count": 3,
+            "explanation": "连续3次测得温度超阈值，确认负方向散热异常，数据可靠"
+          },
+          "T002": {
+            "sampling_interval": "5分钟",
+            "sample_count": 5,
+            "explanation": "现场师傅口误将'负方向'说成'向左'，温度波动较大，需实验老师复核方向判定是否影响结论"
+          },
+          "T003": {
+            "sampling_interval": "10分钟",
+            "sample_count": 2,
+            "explanation": "采样间隔正常，温度稳定在45℃左右，确认正常"
+          }
+        },
+        "supplementary_info": "已与现场王师傅电话确认，T002测点的'向左'就是平时说的'负方向'，属于习惯性表述差异，具体是否影响判定请实验老师把关。"
+      },
+      "raw_text": "演示用采样间隔说明"
+    }
+  ],
+  "abnormal_records": [
+    {
+      "id": "70b5ca30",
+      "batch_id": "3e081ce1",
+      "point_id": "T001",
+      "point_name": "逆变器入口散热",
+      "status": "待复核",
+      "direction_status": "异常",
+      "keep_reason": "维修群截图与采样间隔说明双重确认异常：连续3次测得温度超阈值，确认负方向散热异常，数据可靠",
+      "missing_materials": [],
+      "next_handler": "实验老师",
+      "evidence_sources": [
+        "维修群截图:维修群截图-演示.jpg",
+        "采样间隔说明"
+      ],
+      "created_at": "2026-06-20T00:17:49.824921",
+      "updated_at": "2026-06-20T00:17:49.825527",
+      "notes": "",
+      "field_mention": "现场师傅说负方向温度偏高；采样间隔说明：连续3次测得温度超阈值，确认负方向散热异常，数据可靠",
+      "direction_field_text": "负方向",
+      "is_field_dispute": false,
+      "trigger_source": "维修群截图原始标注：方向=负方向, 温度=68℃, 现场说法=现场师傅说负方向温度偏高",
+      "resolution_trace": [
+        {
+          "step": "导入维修群截图",
+          "status_before": "无",
+          "status_after": "缺材料",
+          "evidence": "维修群截图:维修群截图-演示.jpg",
+          "content": "方向=负方向, 温度=68℃, 缺料=['采样间隔说明']"
+        },
+        {
+          "step": "补录采样间隔说明",
+          "status_before": "缺材料",
+          "status_after": "待复核",
+          "evidence": "采样间隔说明",
+          "content": "连续3次测得温度超阈值，确认负方向散热异常，数据可靠",
+          "missing_before": "['采样间隔说明']",
+          "missing_after": "[]"
+        }
+      ]
+    },
+    {
+      "id": "91100de9",
+      "batch_id": "3e081ce1",
+      "point_id": "T002",
+      "point_name": "IGBT模块散热",
+      "status": "已解决",
+      "direction_status": "正常",
+      "keep_reason": "现场师傅将'负方向'表述为'向左'，存在表述争议，需实验老师复核确认方向是否正确",
+      "missing_materials": [],
+      "next_handler": "质检员小白",
+      "evidence_sources": [
+        "维修群截图:维修群截图-演示.jpg",
+        "采样间隔说明"
+      ],
+      "created_at": "2026-06-20T00:17:49.824937",
+      "updated_at": "2026-06-20T00:17:49.826462",
+      "notes": "实验老师复核结论：现场师傅口误，不影响结论，温度在正常范围，确认正常",
+      "field_mention": "现场师傅口误：将负方向说成向左；采样间隔说明：现场师傅口误将'负方向'说成'向左'，温度波动较大，需实验老师复核方向判定是否影响结论",
+      "direction_field_text": "向左",
+      "is_field_dispute": true,
+      "trigger_source": "维修群截图原始标注：方向=向左, 温度=62℃, 现场说法=现场师傅说向左散热好像不对",
+      "resolution_trace": [
+        {
+          "step": "导入维修群截图",
+          "status_before": "无",
+          "status_after": "缺材料",
+          "evidence": "维修群截图:维修群截图-演示.jpg",
+          "content": "方向=向左, 温度=62℃, 缺料=['实验老师对方向表述的复核意见', '采样间隔说明']"
+        },
+        {
+          "step": "补录采样间隔说明",
+          "status_before": "缺材料",
+          "status_after": "有争议",
+          "evidence": "采样间隔说明",
+          "content": "现场师傅口误将'负方向'说成'向左'，温度波动较大，需实验老师复核方向判定是否影响结论",
+          "missing_before": "['实验老师对方向表述的复核意见', '采样间隔说明']",
+          "missing_after": "['实验老师对方向表述的复核意见']"
+        },
+        {
+          "step": "实验老师复核",
+          "status_before": "有争议",
+          "status_after": "已解决",
+          "evidence": "实验老师复核",
+          "content": "现场师傅口误，不影响结论，温度在正常范围，确认正常",
+          "missing_before": "['实验老师对方向表述的复核意见']",
+          "missing_after": "[]"
+        }
+      ]
+    },
+    {
+      "id": "9d81cf1e",
+      "batch_id": "3e081ce1",
+      "point_id": "T003",
+      "point_name": "散热器出风口",
+      "status": "已确认正常",
+      "direction_status": "正常",
+      "keep_reason": "维修群截图已确认正常，采样间隔说明进一步确认：采样间隔正常，温度稳定在45℃左右，确认正常",
+      "missing_materials": [],
+      "next_handler": "质检员小白",
+      "evidence_sources": [
+        "维修群截图:维修群截图-演示.jpg",
+        "采样间隔说明"
+      ],
+      "created_at": "2026-06-20T00:17:49.824945",
+      "updated_at": "2026-06-20T00:17:49.825550",
+      "notes": "",
+      "field_mention": "现场师傅说正常；采样间隔说明：采样间隔正常，温度稳定在45℃左右，确认正常",
+      "direction_field_text": "正常方向",
+      "is_field_dispute": false,
+      "trigger_source": "维修群截图原始标注：方向=正常方向, 温度=45℃, 现场说法=现场师傅说正常",
+      "resolution_trace": [
+        {
+          "step": "导入维修群截图",
+          "status_before": "无",
+          "status_after": "已确认正常",
+          "evidence": "维修群截图:维修群截图-演示.jpg",
+          "content": "方向=正常方向, 温度=45℃, 现场说法=现场师傅说正常"
+        },
+        {
+          "step": "补录采样间隔说明",
+          "status_before": "已确认正常",
+          "status_after": "已确认正常",
+          "evidence": "采样间隔说明",
+          "content": "采样间隔正常，温度稳定在45℃左右，确认正常",
+          "missing_before": "[]",
+          "missing_after": "[]"
+        }
+      ]
+    }
+  ],
+  "audit_logs": [
+    {
+      "id": "f05e2816",
+      "batch_id": "3e081ce1",
+      "timestamp": "2026-06-20T00:17:49.824399",
+      "operator": "验证脚本",
+      "action": "创建批次",
+      "field_changed": "批次状态",
+      "old_value": "无",
+      "new_value": "新建",
+      "reason": "创建新批次：验证批次-06200017-口径验证",
+      "affected_results": []
+    },
+    {
+      "id": "81bdfdf8",
+      "batch_id": "3e081ce1",
+      "timestamp": "2026-06-20T00:17:49.824912",
+      "operator": "质检员小白",
+      "action": "导入维修群截图",
+      "field_changed": "维修群截图",
+      "old_value": "无",
+      "new_value": "维修群截图-演示.jpg",
+      "reason": "导入维修群截图：维修群截图-演示.jpg",
+      "affected_results": []
+    },
+    {
+      "id": "c0a1ed59",
+      "batch_id": "3e081ce1",
+      "timestamp": "2026-06-20T00:17:49.824952",
+      "operator": "质检员小白",
+      "action": "标记已确认正常",
+      "field_changed": "异常:散热器出风口.状态",
+      "old_value": "无",
+      "new_value": "已确认正常",
+      "reason": "维修群截图明确标注正常，直接标记为已确认正常",
+      "affected_results": [
+        "散热器出风口"
+      ]
+    },
+    {
+      "id": "32cd9ffb",
+      "batch_id": "3e081ce1",
+      "timestamp": "2026-06-20T00:17:49.824957",
+      "operator": "质检员小白",
+      "action": "生成异常工况",
+      "field_changed": "异常记录表",
+      "old_value": "无",
+      "new_value": "异常2条, 已确认正常1条",
+      "reason": "根据维修群截图生成记录：异常2条，已确认正常1条",
+      "affected_results": [
+        "逆变器入口散热",
+        "IGBT模块散热",
+        "散热器出风口"
+      ]
+    },
+    {
+      "id": "b7b116c3",
+      "batch_id": "3e081ce1",
+      "timestamp": "2026-06-20T00:17:49.825522",
+      "operator": "质检员小白",
+      "action": "补录采样间隔说明",
+      "field_changed": "采样间隔说明",
+      "old_value": "无",
+      "new_value": "采样间隔说明-演示.txt",
+      "reason": "补录采样间隔说明",
+      "affected_results": []
+    },
+    {
+      "id": "cb632aad",
+      "batch_id": "3e081ce1",
+      "timestamp": "2026-06-20T00:17:49.825537",
+      "operator": "质检员小白",
+      "action": "补录采样后更新",
+      "field_changed": "异常:逆变器入口散热",
+      "old_value": "缺材料; ['采样间隔说明']; 质检员小白",
+      "new_value": "待复核; []; 实验老师",
+      "reason": "补录采样间隔说明后更新：状态:缺材料→待复核, 缺料:['采样间隔说明']→[], 处理人:质检员小白→实验老师, 原因更新",
+      "affected_results": [
+        "逆变器入口散热"
+      ]
+    },
+    {
+      "id": "fd56dcfb",
+      "batch_id": "3e081ce1",
+      "timestamp": "2026-06-20T00:17:49.825548",
+      "operator": "质检员小白",
+      "action": "补录采样后更新",
+      "field_changed": "异常:IGBT模块散热",
+      "old_value": "缺材料; ['实验老师对方向表述的复核意见', '采样间隔说明']; 实验老师",
+      "new_value": "有争议; ['实验老师对方向表述的复核意见']; 实验老师",
+      "reason": "补录采样间隔说明后更新：状态:缺材料→有争议, 缺料:['实验老师对方向表述的复核意见', '采样间隔说明']→['实验老师对方向表述的复核意见']",
+      "affected_results": [
+        "IGBT模块散热"
+      ]
+    },
+    {
+      "id": "390e3fcf",
+      "batch_id": "3e081ce1",
+      "timestamp": "2026-06-20T00:17:49.826042",
+      "operator": "质检员小白",
+      "action": "重跑分析",
+      "field_changed": "批次状态",
+      "old_value": "run_count=2",
+      "new_value": "run_count=3",
+      "reason": "重新执行质检分析：异常2条，已确认正常1条",
+      "affected_results": [
+        "逆变器入口散热",
+        "IGBT模块散热",
+        "散热器出风口"
+      ]
+    },
+    {
+      "id": "1fe49ec3",
+      "batch_id": "3e081ce1",
+      "timestamp": "2026-06-20T00:17:49.826472",
+      "operator": "实验老师",
+      "action": "复核解决",
+      "field_changed": "IGBT模块散热.状态",
+      "old_value": "有争议",
+      "new_value": "已解决",
+      "reason": "现场师傅口误，不影响结论，温度在正常范围，确认正常；缺料变更：['实验老师对方向表述的复核意见']→[]",
+      "affected_results": [
+        "IGBT模块散热"
+      ]
+    }
+  ]
+}

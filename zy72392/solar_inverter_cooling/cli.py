@@ -20,10 +20,7 @@ def get_engine():
 
 
 def _count_abnormal(batch):
-    return sum(
-        1 for r in batch.abnormal_records
-        if r.status not in (AbnormalStatus.CONFIRMED_NORMAL, AbnormalStatus.RESOLVED)
-    )
+    return sum(1 for r in batch.abnormal_records if r.is_truly_abnormal)
 
 
 @click.group()

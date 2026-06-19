@@ -259,7 +259,7 @@ HTML_TEMPLATE = """
                             <div class="batch-meta">
                                 <span>ID: ${b.id}</span>
                                 <span>状态: ${b.status}</span>
-                                <span>异常: ${b.abnormal_count} 条</span>
+                                <span>异常: ${b.abnormal_count} 条（共 ${b.total_records} 条记录）</span>
                             </div>
                         </div>
                     `).join('');
@@ -286,7 +286,9 @@ HTML_TEMPLATE = """
         }
 
         function renderBatchDetail(data) {
-            const abnormalRecords = data.abnormal_records;
+            const trulyAbnormal = data.truly_abnormal_records;
+            const confirmedNormal = data.confirmed_normal_records;
+            const resolved = data.resolved_records;
             const auditLogs = data.audit_logs;
 
             const statusBadge = (s) => {
@@ -307,7 +309,7 @@ HTML_TEMPLATE = """
                 return `<span class="handler-tag">${h}</span>`;
             };
 
-            const abnormalHtml = abnormalRecords.map((r, i) => {
+            const renderRecordCard = (r, idx) => {
                 let cardClass = '';
                 if (r.status === '有争议') cardClass = 'dispute';
                 else if (r.status === '待复核') cardClass = 'ready';
@@ -317,7 +319,7 @@ HTML_TEMPLATE = """
                 return `
                     <div class="abnormal-card ${cardClass}">
                         <div class="abnormal-header">
-                            <h4>【${i+1}】${r.point_name}（${r.point_id}）</h4>
+                            <h4>【${idx+1}】${r.point_name}（${r.point_id}）</h4>
                             ${statusBadge(r.status)}
                         </div>
                         <div style="margin-bottom: 8px;">
@@ -351,6 +353,24 @@ HTML_TEMPLATE = """
                                 <value>${r.evidence_sources.map(e => `<span class="evidence-tag">${e}</span>`).join('')}</value>
                             </div>
                         </div>
+                        ${r.trigger_source ? `
+                            <div style="margin-top: 10px; padding: 8px; background: #fff9e6; border-radius: 4px; font-size: 13px;">
+                                <strong>🔗 触发来源：</strong>${r.trigger_source}
+                            </div>
+                        ` : ''}
+                        ${r.resolution_trace && r.resolution_trace.length > 0 ? `
+                            <div style="margin-top: 10px;">
+                                <strong>📊 状态追踪：</strong>
+                                <div style="margin-top: 5px; font-size: 13px; color: #555;">
+                                    ${r.resolution_trace.map(t => `
+                                        <div style="margin-bottom: 4px;">
+                                            • ${t.step || ''}：${t.before || '无'} → ${t.after || ''}
+                                            ${t.reason ? `（${t.reason}）` : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
                         ${r.notes ? `
                             <div style="margin-top: 10px; padding: 8px; background: #f0f0f0; border-radius: 4px;">
                                 📝 ${r.notes}
@@ -358,7 +378,19 @@ HTML_TEMPLATE = """
                         ` : ''}
                     </div>
                 `;
-            }).join('');
+            };
+
+            const abnormalHtml = trulyAbnormal.length > 0
+                ? trulyAbnormal.map((r, i) => renderRecordCard(r, i)).join('')
+                : '<div style="padding: 30px; text-align: center; color: #999;">暂无异常测点</div>';
+
+            const confirmedHtml = confirmedNormal.length > 0
+                ? confirmedNormal.map((r, i) => renderRecordCard(r, i)).join('')
+                : '<div style="padding: 30px; text-align: center; color: #999;">暂无已确认正常的测点</div>';
+
+            const resolvedHtml = resolved.length > 0
+                ? resolved.map((r, i) => renderRecordCard(r, i)).join('')
+                : '<div style="padding: 30px; text-align: center; color: #999;">暂无已解决的测点</div>';
 
             const auditHtml = auditLogs.map(log => `
                 <div class="timeline-item">
@@ -408,18 +440,59 @@ HTML_TEMPLATE = """
                             <label>采样间隔说明</label>
                             <value>${data.sampling_count} 份</value>
                         </div>
+                        <div class="info-item">
+                            <label><span style="color: #e74c3c;">异常测点</span></label>
+                            <value><strong style="color: #e74c3c;">${data.truly_abnormal_count} 条</strong></value>
+                        </div>
+                        <div class="info-item">
+                            <label>已确认正常</label>
+                            <value>${data.confirmed_normal_count} 条</value>
+                        </div>
+                        <div class="info-item">
+                            <label>已解决</label>
+                            <value>${data.resolved_count} 条</value>
+                        </div>
+                        <div class="info-item">
+                            <label>总记录数</label>
+                            <value>${data.total_records} 条</value>
+                        </div>
                     </div>
                 </div>
 
                 <div class="tabs">
-                    <button class="tab active" onclick="switchTab('abnormal')">🔍 异常工况表（${abnormalRecords.length}）</button>
+                    <button class="tab active" onclick="switchTab('abnormal')">🔍 异常工况表（${data.truly_abnormal_count}）</button>
+                    <button class="tab" onclick="switchTab('confirmed')">✅ 已确认正常（${data.confirmed_normal_count}）</button>
+                    <button class="tab" onclick="switchTab('resolved')">✔️ 已解决（${data.resolved_count}）</button>
                     <button class="tab" onclick="switchTab('audit')">📜 操作轨迹</button>
                 </div>
 
                 <div id="tab-abnormal" class="tab-content active">
                     <div class="detail-section">
-                        <h2>🔍 异常工况表</h2>
+                        <h2>🔍 异常工况表（${data.truly_abnormal_count} 条异常）</h2>
+                        <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+                            以下测点存在异常或待复核，需关注处理。已确认正常和已解决的测点请查看对应 Tab。
+                        </p>
                         ${abnormalHtml}
+                    </div>
+                </div>
+
+                <div id="tab-confirmed" class="tab-content">
+                    <div class="detail-section">
+                        <h2>✅ 已确认正常（${data.confirmed_normal_count} 条）</h2>
+                        <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+                            以下测点经双证据确认正常，不计入异常。可追溯原始触发材料和确认过程。
+                        </p>
+                        ${confirmedHtml}
+                    </div>
+                </div>
+
+                <div id="tab-resolved" class="tab-content">
+                    <div class="detail-section">
+                        <h2>✔️ 已解决（${data.resolved_count} 条）</h2>
+                        <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+                            以下测点的问题已复核解决，不计入当前异常。可追溯完整处理链路。
+                        </p>
+                        ${resolvedHtml}
                     </div>
                 </div>
 
@@ -469,6 +542,30 @@ def api_batch(batch_id):
     if not batch:
         return jsonify({"error": "批次不存在"}), 404
 
+    from core.models import AbnormalStatus
+
+    truly_abnormal = [r for r in batch.abnormal_records if r.is_truly_abnormal]
+    confirmed_normal = [r for r in batch.abnormal_records if r.status == AbnormalStatus.CONFIRMED_NORMAL]
+    resolved = [r for r in batch.abnormal_records if r.status == AbnormalStatus.RESOLVED]
+
+    def record_to_dict(r):
+        return {
+            "point_id": r.point_id,
+            "point_name": r.point_name,
+            "status": r.status.value,
+            "direction_status": r.direction_status.value,
+            "keep_reason": r.keep_reason,
+            "missing_materials": r.missing_materials,
+            "next_handler": r.next_handler.value,
+            "evidence_sources": r.evidence_sources,
+            "is_field_dispute": r.is_field_dispute,
+            "direction_field_text": r.direction_field_text,
+            "field_mention": r.field_mention,
+            "notes": r.notes,
+            "trigger_source": r.trigger_source,
+            "resolution_trace": r.resolution_trace,
+        }
+
     return jsonify({
         "id": batch.id,
         "name": batch.name,
@@ -476,25 +573,14 @@ def api_batch(batch_id):
         "run_count": batch.run_count,
         "repair_count": len(batch.repair_screenshots),
         "sampling_count": len(batch.sampling_notes),
-        "abnormal_records": [
-            {
-                "point_id": r.point_id,
-                "point_name": r.point_name,
-                "status": r.status.value,
-                "direction_status": r.direction_status.value,
-                "keep_reason": r.keep_reason,
-                "missing_materials": r.missing_materials,
-                "next_handler": r.next_handler.value,
-                "evidence_sources": r.evidence_sources,
-                "is_field_dispute": r.is_field_dispute,
-                "direction_field_text": r.direction_field_text,
-                "field_mention": r.field_mention,
-                "notes": r.notes,
-                "trigger_source": r.trigger_source,
-                "resolution_trace": r.resolution_trace,
-            }
-            for r in batch.abnormal_records
-        ],
+        "truly_abnormal_count": len(truly_abnormal),
+        "total_records": len(batch.abnormal_records),
+        "confirmed_normal_count": len(confirmed_normal),
+        "resolved_count": len(resolved),
+        "truly_abnormal_records": [record_to_dict(r) for r in truly_abnormal],
+        "confirmed_normal_records": [record_to_dict(r) for r in confirmed_normal],
+        "resolved_records": [record_to_dict(r) for r in resolved],
+        "abnormal_records": [record_to_dict(r) for r in batch.abnormal_records],
         "audit_logs": [
             {
                 "timestamp": l.timestamp.strftime('%Y-%m-%d %H:%M:%S'),

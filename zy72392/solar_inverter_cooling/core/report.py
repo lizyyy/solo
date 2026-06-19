@@ -15,10 +15,7 @@ class ReportGenerator:
         lines.append("=" * 60)
         lines.append("")
 
-        truly_abnormal = [
-            r for r in batch.abnormal_records
-            if r.status not in (AbnormalStatus.CONFIRMED_NORMAL, AbnormalStatus.RESOLVED)
-        ]
+        truly_abnormal = [r for r in batch.abnormal_records if r.is_truly_abnormal]
         confirmed_normal = [
             r for r in batch.abnormal_records
             if r.status == AbnormalStatus.CONFIRMED_NORMAL
@@ -181,10 +178,7 @@ class ReportGenerator:
         ))
         lines.append("+" + "-" * 10 + "+" + "-" * 20 + "+" + "-" * 14 + "+" + "-" * 12 + "+" + "-" * 30 + "+")
 
-        truly_abnormal = [
-            r for r in batch.abnormal_records
-            if r.status not in (AbnormalStatus.CONFIRMED_NORMAL, AbnormalStatus.RESOLVED)
-        ]
+        truly_abnormal = [r for r in batch.abnormal_records if r.is_truly_abnormal]
         confirmed_normal = [
             r for r in batch.abnormal_records
             if r.status == AbnormalStatus.CONFIRMED_NORMAL

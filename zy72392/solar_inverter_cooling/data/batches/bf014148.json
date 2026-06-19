@@ -1,0 +1,24 @@
+{
+  "id": "bf014148",
+  "name": "验证批次-06200016-口径验证",
+  "created_at": "2026-06-20T00:16:42.936657",
+  "status": "新建",
+  "run_count": 0,
+  "repair_screenshots": [],
+  "sampling_notes": [],
+  "abnormal_records": [],
+  "audit_logs": [
+    {
+      "id": "0e75da94",
+      "batch_id": "bf014148",
+      "timestamp": "2026-06-20T00:16:42.936665",
+      "operator": "验证脚本",
+      "action": "创建批次",
+      "field_changed": "批次状态",
+      "old_value": "无",
+      "new_value": "新建",
+      "reason": "创建新批次：验证批次-06200016-口径验证",
+      "affected_results": []
+    }
+  ]
+}

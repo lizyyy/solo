@@ -69,6 +69,10 @@ class AbnormalRecord:
     trigger_source: str = ""
     resolution_trace: List[Dict[str, str]] = field(default_factory=list)
 
+    @property
+    def is_truly_abnormal(self) -> bool:
+        return self.status not in (AbnormalStatus.CONFIRMED_NORMAL, AbnormalStatus.RESOLVED)
+
 
 @dataclass
 class AuditLog:
