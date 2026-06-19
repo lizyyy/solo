@@ -95,6 +95,27 @@
 - 状态变更前后
 - 可通过 `get_version_diff(record_id)` / `get_detail_view(record_id)` 查看任意两次版本差异
 
+### 字段级保护：人工确认值不被重复导入覆盖
+
+**核心规则（硬编码）**：已由学生助教复核（`ta_review`）或人工修改（`manual_edit`）确认的字段，重复导入时**绝对不覆盖**。
+
+| 字段最后修改来源 | 重复导入相同字段 | 处理方式 |
+|----------------|-----------------|---------|
+| `initial_import` / `re_import` / `boundary_detection` | 值不同 | 正常更新，记录历史 |
+| **`ta_review`**（学生助教复核） | 值不同 | **保留人工确认值，不覆盖** |
+| **`manual_edit`**（运营手动修改） | 值不同 | **保留人工确认值，不覆盖** |
+
+### 冲突承接：不留下空的待复核状态
+
+当重复导入的值与人工确认值冲突时：
+1. 保留人工确认值（不覆盖）
+2. 生成新的复核任务，分配给 `ta_conflict_resolver`
+3. 任务备注写清：冲突字段、人工确认值、导入值、处理建议
+4. 状态保持 `pending_review`，有明确的待办承接链路
+
+**验证方式**：运行 [verify_reimport_protection.py](file:///Users/lzy/pro/solo/workspaces/zy72314/verify_reimport_protection.py) 完整复现：
+导入→TA复核恢复P10=-500→重复导入→P10仍为-500→冲突待办已生成→所有视图同源一致
+
 ---
 
 ## 统一视图层：同源一致

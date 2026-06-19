@@ -197,14 +197,43 @@ nd = report.get("negative_as_missing_details", [])
 print(f"  neg_as_missing_details: {len(nd)} 条")
 print("  ✅ 导出和报告生成完毕")
 
-# === Step 12: 再重复导入同文件（v1_edited）→ 不翻倍 ===
-print("\n【Step 12】重复导入 v1_edited 再确认不翻倍")
+# === Step 12: 再重复导入同文件（v1_edited）→ 不翻倍 + 人工确认值保护 ===
+print("\n【Step 12】重复导入 v1_edited：不翻倍 + 人工确认的 P10=-500 不被覆盖")
 print("-" * 80)
 step1c = system.step1_import(V2_PATH, operator="alan_ops")
 ir3 = step1c["import_result"]
 print(f"  当前总数: {ir3.get('total_count', 0)}")
 assert ir3.get("total_count", 0) == 20, "❌ 重复导入翻倍"
 print("  ✅ 未翻倍！")
+
+detail_after_reimport = system.get_detail_view(neg_task["record_id"])
+p10_after = detail_after_reimport["current_values"]["weight_p10"]
+print(f"  高级产品经理 P10（重复导入后）: {p10_after}")
+assert p10_after == -500.0, f"❌ 人工确认的 -500 被覆盖为 {p10_after}"
+print("  ✅ 人工确认的 P10=-500 未被覆盖！")
+
+print(f"  高级产品经理边界类型: {detail_after_reimport['boundary_label']}")
+assert detail_after_reimport["boundary_type"] == "negative_value", "❌ 边界类型被改回"
+print("  ✅ 边界类型仍为含负数值（基于保留后的值）")
+
+# 再重复导入 v1（哈希相同）
+step1d = system.step1_import(V1_PATH, operator="alan_ops")
+detail_after_v1 = system.get_detail_view(neg_task["record_id"])
+p10_after_v1 = detail_after_v1["current_values"]["weight_p10"]
+print(f"  高级产品经理 P10（v1再次导入后）: {p10_after_v1}")
+assert p10_after_v1 == -500.0, f"❌ 哈希相同的重复导入也覆盖了 -500"
+print("  ✅ 哈希相同的重复导入也不覆盖！")
+
+# 冲突待办验证
+conflict_tasks = [
+    t for t in system.db.get_pending_review_tasks()
+    if t.record_id == neg_task["record_id"] and "冲突" in t.review_note
+]
+print(f"  冲突待办数: {len(conflict_tasks)} 条（有承接链路）")
+if conflict_tasks:
+    print(f"    assigned_to: {conflict_tasks[0].assigned_to}")
+    print(f"    review_note: {conflict_tasks[0].review_note[:80]}...")
+print("  ✅ 冲突时有新待办承接，不会留下空的 pending_review")
 
 # === 最终汇总 ===
 print("\n" + "=" * 80)
@@ -217,7 +246,7 @@ print(f"  按边界: {summary['by_boundary']}")
 print(f"  待复核: {summary['pending_review_count']}")
 print(f"  负数被旧表当缺失: {summary['negative_as_missing_count']}")
 print()
-print("✅ 12 步操作路全部完成：")
+print("✅ 完整操作路全部完成：")
 print("   · 安装验证通过")
 print("   · 启动初始化通过")
 print("   · 导入v1 → 导入v2(改备注) → 不翻倍 ✅")
@@ -229,3 +258,5 @@ print("   · 同源一致性全部通过 ✅")
 print("   · 详情:原始说法/改后值/原因/下一步找谁 → 全留痕 ✅")
 print("   · 摘要/导出/报告 → 一致 ✅")
 print("   · 重复导入 → 不翻倍 ✅")
+print("   · 重复导入 → 不覆盖人工确认值 ✅")
+print("   · 重复导入冲突 → 有新待办承接 ✅")

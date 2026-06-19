@@ -368,6 +368,108 @@ class TestQuantileCalibrationSystem(unittest.TestCase):
         pending_tasks = self.system.get_pending_review_tasks("ta_xiaoming")
         self.assertGreaterEqual(pending_tasks["pending_count"], len(negative_as_missing))
 
+    def test_reimport_does_not_overwrite_ta_confirmed_value(self):
+        """
+        关键测试：学生助教确认修正的值，重复导入不能覆盖。
+        场景：导入→TA复核恢复P10=-500→重复导入→P10仍为-500，不回None。
+        """
+        step1 = self.system.step1_import(self.test_file_v1, "alan_ops")
+        batch_id = step1["batch_id"]
+
+        self.system.step2_review_formula(batch_id, "alan_ops", "已复核", "截图.png")
+        self.system.step3_boundary_report(batch_id, "alan_ops", "ta_xiaoming")
+
+        pending = self.system.get_pending_review_tasks("ta_xiaoming")
+        neg_task = next(
+            (t for t in pending["tasks"]
+             if t["boundary_type"] == "negative_treated_as_missing"),
+            None
+        )
+        self.assertIsNotNone(neg_task, "应找到负数当缺失的复核任务")
+
+        review = self.system.ta_review_record(
+            task_id=neg_task["task_id"],
+            record_id=neg_task["record_id"],
+            review_result="P10确实是-500",
+            correction_decision="restore_negative",
+            corrected_values={"weight_p10": -500},
+            ta_name="xiaoming"
+        )
+        self.assertEqual(review["updated_boundary_type"], "negative_value")
+
+        detail_before = self.system.get_detail_view(neg_task["record_id"])
+        self.assertEqual(detail_before["current_values"]["weight_p10"], -500.0)
+
+        step1_repeat = self.system.step1_import(self.test_file_v1, "alan_ops")
+
+        detail_after = self.system.get_detail_view(neg_task["record_id"])
+        self.assertEqual(
+            detail_after["current_values"]["weight_p10"], -500.0,
+            "重复导入不应覆盖TA确认的P10=-500"
+        )
+
+        self.assertEqual(
+            detail_after["boundary_type"], "negative_value",
+            "边界类型应基于保留后的值（negative_value），不是负数被旧表当缺失"
+        )
+
+        conflict_tasks = [
+            t for t in self.system.db.get_pending_review_tasks()
+            if t.record_id == neg_task["record_id"]
+            and "冲突" in t.review_note
+        ]
+        self.assertGreater(
+            len(conflict_tasks), 0,
+            "重复导入与人工确认冲突时，应生成新待办任务"
+        )
+
+        consistency = self.system.verify_consistency(batch_id)
+        self.assertTrue(consistency["consistency_passed"])
+
+    def test_reimport_different_hash_does_not_overwrite_ta_confirmed_value(self):
+        """
+        关键测试：哈希不同（v1_edited）的重复导入也不能覆盖TA确认值。
+        """
+        step1 = self.system.step1_import(self.test_file_v1, "alan_ops")
+        batch_id = step1["batch_id"]
+
+        step1b = self.system.step1_import(self.test_file_v1_edited, "alan_ops")
+
+        self.system.step2_review_formula(batch_id, "alan_ops", "已复核", "截图.png")
+        self.system.step3_boundary_report(batch_id, "alan_ops", "ta_xiaoming")
+
+        pending = self.system.get_pending_review_tasks("ta_xiaoming")
+        neg_task = next(
+            (t for t in pending["tasks"]
+             if t["boundary_type"] == "negative_treated_as_missing"),
+            None
+        )
+        self.assertIsNotNone(neg_task)
+
+        self.system.ta_review_record(
+            task_id=neg_task["task_id"],
+            record_id=neg_task["record_id"],
+            review_result="P10确实是-500",
+            correction_decision="restore_negative",
+            corrected_values={"weight_p10": -500},
+            ta_name="xiaoming"
+        )
+
+        detail_before = self.system.get_detail_view(neg_task["record_id"])
+        self.assertEqual(detail_before["current_values"]["weight_p10"], -500.0)
+
+        step1_repeat = self.system.step1_import(self.test_file_v1_edited, "alan_ops")
+        self.assertTrue(step1_repeat["import_result"]["is_duplicate"])
+
+        detail_after = self.system.get_detail_view(neg_task["record_id"])
+        self.assertEqual(
+            detail_after["current_values"]["weight_p10"], -500.0,
+            "哈希不同的重复导入也不应覆盖TA确认的P10=-500"
+        )
+
+        consistency = self.system.verify_consistency(batch_id)
+        self.assertTrue(consistency["consistency_passed"])
+
 
 if __name__ == "__main__":
     unittest.main()

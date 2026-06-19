@@ -14,7 +14,7 @@ from datetime import datetime
 import logging
 
 from .models import (
-    RatingWeightRecord, ImportBatch, RecordHistory,
+    RatingWeightRecord, ImportBatch, RecordHistory, ReviewTask,
     ProcessingStatus, BoundaryType, ChangeSource
 )
 from .database import Database
@@ -170,7 +170,7 @@ class RatingWeightImporter:
             else:
                 differences = self._compare_row_to_record(row, existing)
                 if differences:
-                    self._update_record_from_diff(
+                    conflicts = self._update_record_from_diff(
                         existing, differences, imported_by, raw_data,
                         change_source_override=ChangeSource.RE_IMPORT
                     )
@@ -178,7 +178,8 @@ class RatingWeightImporter:
                         "record_id": existing.id,
                         "original_row_number": original_row_number,
                         "position": existing.position,
-                        "differences": differences
+                        "differences": differences,
+                        "protected_conflicts": conflicts
                     })
                 else:
                     unchanged_count += 1
@@ -245,12 +246,15 @@ class RatingWeightImporter:
 
             differences = self._compare_row_to_record(row, existing)
             if differences:
+                conflicts = self._update_record_from_diff(
+                    existing, differences, imported_by, row.to_dict()
+                )
                 changes_detected.append({
                     "record_id": existing.id,
                     "original_row_number": original_row_number,
-                    "differences": differences
+                    "differences": differences,
+                    "protected_conflicts": conflicts
                 })
-                self._update_record_from_diff(existing, differences, imported_by, row.to_dict())
 
         if existing_batch.is_deduplicated:
             note = "文件已多次导入，本次为重复导入，数据未变更"
@@ -299,6 +303,16 @@ class RatingWeightImporter:
 
         return differences
 
+    PROTECTED_CHANGE_SOURCES = {ChangeSource.TA_REVIEW, ChangeSource.MANUAL_EDIT}
+
+    def _get_field_last_source(self, record_id: int, field_name: str) -> Optional[ChangeSource]:
+        """查询指定字段最后一次修改的来源，用于判断是否受保护"""
+        histories = self.db.get_record_histories(record_id)
+        for h in reversed(histories):
+            if h.field_name == field_name and h.change_source in self.PROTECTED_CHANGE_SOURCES:
+                return h.change_source
+        return None
+
     def _update_record_from_diff(
         self,
         record: RatingWeightRecord,
@@ -307,7 +321,11 @@ class RatingWeightImporter:
         new_raw_data: Dict[str, Any],
         change_source_override: Optional[ChangeSource] = None
     ):
-        """根据差异更新记录，并记录历史用于版本对比"""
+        """根据差异更新记录，并记录历史用于版本对比
+
+        关键保护：已由学生助教或人工确认修正的字段，重复导入不能覆盖。
+        如果重复导入的值与人工确认值冲突，保留人工确认值，生成新复核任务。
+        """
         change_source = change_source_override or ChangeSource.RE_IMPORT
         snapshot_before = {
             "position": record.position,
@@ -325,22 +343,34 @@ class RatingWeightImporter:
         }
 
         old_status = record.status
+        protected_conflicts = []
 
         for field, (old_val, new_val) in differences.items():
-            setattr(record, field, new_val)
-            record.current_data[field] = new_val
+            last_source = self._get_field_last_source(record.id, field)
+            if last_source in self.PROTECTED_CHANGE_SOURCES:
+                protected_conflicts.append({
+                    "field": field,
+                    "confirmed_value": old_val,
+                    "import_value": new_val,
+                    "confirmed_by": last_source.value,
+                    "resolution": "保留人工确认值，不覆盖"
+                })
+            else:
+                setattr(record, field, new_val)
+                record.current_data[field] = new_val
 
         record.raw_data = new_raw_data
+
         record.updated_at = datetime.now()
         record.updated_by = operator
 
         new_boundary, _ = self.boundary_engine.analyze_record(record)
         if new_boundary != record.boundary_type:
             record.boundary_type = new_boundary
-            if new_boundary in (BoundaryType.NEGATIVE_TREATED_AS_MISSING,
-                               BoundaryType.NEGATIVE_VALUE,
-                               BoundaryType.MISSING_VALUE):
-                record.status = ProcessingStatus.PENDING_REVIEW
+
+        needs_new_review = bool(protected_conflicts)
+        if needs_new_review:
+            record.status = ProcessingStatus.PENDING_REVIEW
 
         self.db.update_rating_record(record)
 
@@ -357,25 +387,71 @@ class RatingWeightImporter:
             "status": record.status.value,
             "raw_data": new_raw_data,
             "current_data": dict(record.current_data),
-            "changed_fields": list(differences.keys())
+            "changed_fields": list(differences.keys()),
+            "protected_conflicts": protected_conflicts
         }
 
         for field, (old_val, new_val) in differences.items():
-            history = RecordHistory(
-                record_id=record.id,
-                change_source=change_source,
-                field_name=field,
-                old_value=str(old_val),
-                new_value=str(new_val),
-                old_status=old_status,
-                new_status=record.status,
-                snapshot_before=snapshot_before,
-                snapshot_after=snapshot_after,
-                changed_by=operator,
-                change_reason=f"导入合并时检测到字段变更: {field}",
-                changed_at=datetime.now()
+            last_source = self._get_field_last_source(record.id, field)
+            if last_source in self.PROTECTED_CHANGE_SOURCES:
+                history = RecordHistory(
+                    record_id=record.id,
+                    change_source=change_source,
+                    field_name=field,
+                    old_value=str(old_val),
+                    new_value=str(new_val),
+                    old_status=old_status,
+                    new_status=record.status,
+                    snapshot_before=snapshot_before,
+                    snapshot_after=snapshot_after,
+                    changed_by=operator,
+                    change_reason=(
+                        f"重复导入检测到字段变更({field}: {old_val} → {new_val})，"
+                        f"但该字段已由{last_source.value}确认修正为{old_val}，"
+                        f"保留人工确认值不覆盖"
+                    ),
+                    changed_at=datetime.now()
+                )
+                self.db.add_history(history)
+            else:
+                history = RecordHistory(
+                    record_id=record.id,
+                    change_source=change_source,
+                    field_name=field,
+                    old_value=str(old_val),
+                    new_value=str(new_val),
+                    old_status=old_status,
+                    new_status=record.status,
+                    snapshot_before=snapshot_before,
+                    snapshot_after=snapshot_after,
+                    changed_by=operator,
+                    change_reason=f"导入合并时检测到字段变更: {field}",
+                    changed_at=datetime.now()
+                )
+                self.db.add_history(history)
+
+        if needs_new_review:
+            conflict_desc = "; ".join(
+                f"{c['field']}: 人工确认为{c['confirmed_value']}，"
+                f"导入值为{c['import_value']}"
+                for c in protected_conflicts
             )
-            self.db.add_history(history)
+            task = ReviewTask(
+                record_id=record.id,
+                boundary_type=record.boundary_type,
+                assigned_to="ta_conflict_resolver",
+                review_note=(
+                    f"【重复导入与人工确认冲突】\n"
+                    f"岗位: {record.position}，原始行号: {record.original_row_number}\n"
+                    f"冲突字段: {conflict_desc}\n"
+                    f"处理建议: 人工确认值已保留，请判断导入值是否需要采纳\n"
+                    f"如需采纳导入值，请手动修正该字段"
+                ),
+                created_at=datetime.now()
+            )
+            self.db.create_review_task(task)
+
+        return protected_conflicts
 
     def _read_file(self, file_path: str) -> pd.DataFrame:
         """读取 Excel 或 CSV 文件"""
