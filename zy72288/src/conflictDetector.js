@@ -142,6 +142,12 @@ class ConflictDetector {
     return this.conflicts.filter(c => c.status === 'pending');
   }
 
+  getPendingConflictsForObstacle(obstacleId) {
+    return this.conflicts.filter(
+      c => c.obstacleId === obstacleId && c.status === 'pending'
+    );
+  }
+
   resolveConflict(conflictId, resolution, resolvedBy) {
     const conflict = this.conflicts.find(c => c.conflictId === conflictId);
     if (conflict) {

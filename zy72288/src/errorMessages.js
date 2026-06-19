@@ -28,6 +28,11 @@ const ERROR_MESSAGES = {
     code: 'E006',
     message: '自检发现 {count} 个问题，请看详细报告',
     suggestion: '建议每次导入后都跑一遍自检，省得后面返工'
+  },
+  PENDING_CAD_RANGE_CONFLICT: {
+    code: 'E007',
+    message: '障碍物【{obstacleId}】还有 {count} 条待处理的CAD与测距仪冲突，不能更新三维视图。先把证据交给老梁确认或驳回！',
+    suggestion: '每条测距冲突都要老梁亲自确认或驳回后，才能进入三维视图更新'
   }
 };
 
@@ -36,16 +41,14 @@ function getErrorMessage(errorKey, params = {}) {
   if (!error) {
     return {
       code: 'E999',
-      message: `未知错误：${errorKey}`,
+      message: '未知错误：' + errorKey,
       suggestion: '请联系技术支持'
     };
   }
-  
   let message = error.message;
   for (const [key, value] of Object.entries(params)) {
-    message = message.replace(new RegExp(`\\{${key}\\}`, 'g'), value);
+    message = message.replace(new RegExp('\\{' + key + '\\}', 'g'), value);
   }
-  
   return {
     code: error.code,
     message,
@@ -55,10 +58,11 @@ function getErrorMessage(errorKey, params = {}) {
 }
 
 function formatError(errorObj) {
-  return `
-⚠️  【${errorObj.code}】${errorObj.message}
-💡  提示：${errorObj.suggestion}
-  `.trim();
+  return (
+    '\n⚠️  【' + errorObj.code + '】' + errorObj.message +
+    '\n💡  提示：' + errorObj.suggestion +
+    '\n  '
+  ).trim();
 }
 
 module.exports = {

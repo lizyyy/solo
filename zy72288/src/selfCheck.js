@@ -8,7 +8,8 @@ class SelfChecker {
       { id: 'duplicate_names', name: '同一障碍物多名称检测', run: this.checkDuplicateNames.bind(this) },
       { id: 'recalc_after_supplement', name: '补录后重算验证', run: this.checkRecalcAfterSupplement.bind(this) },
       { id: 'export_consistency', name: '导出一致性检查', run: this.checkExportConsistency.bind(this) },
-      { id: 'view_history_sync', name: '视图与历史记录同步', run: this.checkViewHistorySync.bind(this) }
+      { id: 'view_history_sync', name: '视图与历史记录同步', run: this.checkViewHistorySync.bind(this) },
+      { id: 'pending_conflict_blocks_view', name: '待处理冲突阻断三维视图确认', run: this.checkPendingConflictBlocksView.bind(this) }
     ];
   }
 
@@ -223,6 +224,42 @@ class SelfChecker {
     return {
       status: 'pass',
       message: result.summary
+    };
+  }
+
+  checkPendingConflictBlocksView() {
+    const issues = [];
+    const pendingConflicts = this.system.conflictDetector.getPendingConflicts();
+    const pendingByObstacle = {};
+    for (const c of pendingConflicts) {
+      if (!pendingByObstacle[c.obstacleId]) pendingByObstacle[c.obstacleId] = [];
+      pendingByObstacle[c.obstacleId].push(c);
+    }
+
+    const annotations = this.system.viewSync.viewState.annotations;
+    for (const ann of annotations) {
+      if (ann.status === 'confirmed' && pendingByObstacle[ann.obstacleId]) {
+        issues.push({
+          obstacleId: ann.obstacleId,
+          annotationId: ann.annotationId,
+          annotationName: ann.name,
+          annotationStatus: ann.status,
+          pendingConflictTypes: pendingByObstacle[ann.obstacleId].map(c => c.type),
+          pendingConflictCount: pendingByObstacle[ann.obstacleId].length
+        });
+      }
+    }
+
+    if (issues.length > 0) {
+      return {
+        status: 'fail',
+        message: issues.length + ' 个障碍物还有待处理冲突，但三维视图已经被标记为 confirmed',
+        issues
+      };
+    }
+    return {
+      status: 'pass',
+      message: '没有出现"有待处理冲突但视图已确认"的非法状态'
     };
   }
 

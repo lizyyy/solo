@@ -297,11 +297,20 @@ class SortingLineWorkflow {
       this.conflictDetector.resolveConflict(conflict.conflictId, 'trainee_reviewed', traineeName);
     }
 
-    const message = `培训学员「${traineeName}」已完成复核，选择名称：${selectedName}`;
+    const pendingForThis = this.conflictDetector.getPendingConflictsForObstacle(obstacleId);
+
+    let message = `培训学员「${traineeName}」已完成复核，选择名称：${selectedName}`;
+    let note = '';
+    if (pendingForThis.length > 0) {
+      note = `名称复核完成，但障碍物 ${obstacleId} 还有 ${pendingForThis.length} 条待处理的测距冲突，不能更新三维视图`;
+    } else {
+      note = '学员复核完成，等待老梁最终确认后更新三维视图';
+    }
 
     return this._buildResult('trainee_review', true, message, {
       review: JSON.parse(JSON.stringify(review)),
-      note: '学员复核完成，等待老梁最终确认后更新三维视图'
+      note,
+      remainingConflictsForObstacle: pendingForThis.length
     });
   }
 
@@ -320,6 +329,23 @@ class SortingLineWorkflow {
           hint: '碰到同一障碍物被标了两个名字时，别急着归正常，留给培训学员复核'
         });
       }
+    }
+
+    const pendingForThis = this.conflictDetector.getPendingConflictsForObstacle(obstacleId);
+    if (pendingForThis.length > 0) {
+      const error = getErrorMessage('PENDING_CAD_RANGE_CONFLICT', {
+        obstacleId,
+        count: pendingForThis.length
+      });
+      return this._buildResult('update_3d_view', false, formatError(error), {
+        error,
+        blockedConflicts: pendingForThis.map(c => ({
+          conflictId: c.conflictId,
+          type: c.type,
+          description: c.description
+        })),
+        hint: '有未处理的CAD与测距仪冲突，不能进入三维视图更新，更不能把分拣口_A01_侧挡写成已确认'
+      });
     }
     
     this.currentStep = 'update_view';
