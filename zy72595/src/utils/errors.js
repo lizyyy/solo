@@ -49,6 +49,11 @@ const ERROR_MESSAGES = {
     message: '还有未复核的"离线和线上分数差了一个桶"记录，不能推进到实验对比更新',
     suggestion: '请先让评测运营逐条复核所有差一个桶的记录，全部复核通过后才能继续'
   },
+  ABNORMAL_REVIEW_BLOCKED: {
+    code: 'ABNORMAL_REVIEW_BLOCKED',
+    message: '存在复核判定为异常的差一个桶记录，不能再推进工作流',
+    suggestion: '该记录已自动回滚到导入步骤，请重新导入修正后的数据后再走工作流'
+  },
   ROLLBACK_STEP_INVALID: {
     code: 'ROLLBACK_STEP_INVALID',
     message: '回滚的目标步骤不合法',

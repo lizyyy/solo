@@ -122,6 +122,15 @@ class EvalService {
           requestedStep: nextStep
         });
       }
+      if (e.message === 'ABNORMAL_REVIEW_BLOCKED') {
+        const abnormalNoteIds = evalObj.getAbnormalReviewedNoteIds();
+        throw new FriendlyError('ABNORMAL_REVIEW_BLOCKED', {
+          abnormalNoteIds,
+          abnormalCount: abnormalNoteIds.length,
+          currentStep: evalObj.workflowStep,
+          requestedStep: nextStep
+        });
+      }
       throw e;
     }
     

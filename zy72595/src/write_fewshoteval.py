@@ -1,4 +1,6 @@
-const { generateId, EVAL_STATUS, WORKFLOW_STEP, DISPLAY_MODE, getBucketIndex, getBucketName } = require('./types');
+import os
+
+content = r"""const { generateId, EVAL_STATUS, WORKFLOW_STEP, DISPLAY_MODE, getBucketIndex, getBucketName } = require('./types');
 
 class FewShotEval {
   constructor(data) {
@@ -55,6 +57,9 @@ class FewShotEval {
       if (this.workflowStep !== WORKFLOW_STEP.IMPORTED) {
         throw new Error('INVALID_WORKFLOW_ORDER');
       }
+      if (this.hasAbnormalReview()) {
+        throw new Error('ABNORMAL_REVIEW_BLOCKED');
+      }
       const diffs = this.checkBucketDiffs(thresholdNotes);
       if (diffs.length > 0) {
         this.status = EVAL_STATUS.NEEDS_RECHECK;
@@ -70,6 +75,9 @@ class FewShotEval {
     } else if (nextStep === WORKFLOW_STEP.COMPARISON_UPDATED) {
       if (this.workflowStep !== WORKFLOW_STEP.ONLINE_BUCKET_REVIEWED) {
         throw new Error('INVALID_WORKFLOW_ORDER');
+      }
+      if (this.hasAbnormalReview()) {
+        throw new Error('ABNORMAL_REVIEW_BLOCKED');
       }
       const pendingDiffs = this.checkBucketDiffsAfterReview();
       if (pendingDiffs.length > 0) {
@@ -123,12 +131,12 @@ class FewShotEval {
   }
 
   checkBucketDiffsAfterReview() {
-    const reviewedNoteIds = this.reviewComments
-      .filter(c => c.decision && c.noteId)
+    const normalReviewedNoteIds = this.reviewComments
+      .filter(c => c.decision === 'normal' && c.noteId)
       .map(c => c.noteId);
     return this.reviewComments
       .flatMap(c => c.diffDetails || [])
-      .filter(d => !reviewedNoteIds.includes(d.noteId));
+      .filter(d => !normalReviewedNoteIds.includes(d.noteId));
   }
 
   rollback(toStep, operator, reason) {
@@ -171,3 +179,20 @@ class FewShotEval {
 }
 
 module.exports = FewShotEval;
+"""
+
+target = '/Users/lzy/pro/solo/workspaces/zy72595/src/models/FewShotEval.js'
+os.makedirs(os.path.dirname(target), exist_ok=True)
+with open(target, 'w') as f:
+    f.write(content)
+
+with open(target, 'r') as f:
+    readback = f.read()
+
+has_abnormal_review = 'hasAbnormalReview' in readback
+has_abnormal_blocked = 'ABNORMAL_REVIEW_BLOCKED' in readback
+
+print(f'File written successfully.')
+print(f'Contains "hasAbnormalReview": {has_abnormal_review}')
+print(f'Contains "ABNORMAL_REVIEW_BLOCKED": {has_abnormal_blocked}')
+print(f'File size: {len(readback)} bytes')
