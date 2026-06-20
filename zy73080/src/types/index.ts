@@ -125,14 +125,42 @@ export interface DiffItem {
   summary: string;
 }
 
+export interface ReviewContext {
+  filteredMaterials: MaterialItem[];
+  filteredComponents: Component[];
+  filteredRemarks: Remark[];
+  filteredAnomalies: Anomaly[];
+  filteredTimelineEvents: TimelineEvent[];
+  activeRevision: MaterialRevision | undefined;
+  currentConclusion: ReviewConclusion | undefined;
+  currentEvent: TimelineEvent | undefined;
+  selectedComponent: Component | undefined;
+  activeRevisionMaterials: MaterialItem[];
+  materialMismatches: MaterialItem[];
+  relatedTimelineEventIds: string[];
+}
+
 export interface ReportData {
   generatedAt: string;
+  context: {
+    selectedComponent: Component | undefined;
+    activeRevision: MaterialRevision | undefined;
+    currentEvent: TimelineEvent | undefined;
+    filters: Filters;
+  };
   conclusion: ReviewConclusion | undefined;
+  previousConclusion: ReviewConclusion | undefined;
   materialMismatches: MaterialItem[];
   remarks: Remark[];
-  anomalies: Anomaly[];
+  historicalRemarks: Remark[];
+  anomalies: Array<Anomaly & { componentName?: string; componentPosition?: { x: number; y: number; z: number } }>;
   influenceChain: InfluenceNode[];
+  diffSinceLastRemark: DiffItem[];
+  diffSinceLastReview: DiffItem[];
+  snapshotBeforeLastRemark: Snapshot | null;
+  snapshotCurrent: Snapshot;
   timelineSummary: string[];
+  relevantTimelineEvents: TimelineEvent[];
 }
 
 export interface UIState {
@@ -183,4 +211,5 @@ export interface ReviewStoreState {
   computeDiff: () => DiffItem[];
   loadMockData: () => void;
   flyToComponent: (id: string) => void;
+  getReviewContext: () => ReviewContext;
 }

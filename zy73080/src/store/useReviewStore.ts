@@ -10,6 +10,7 @@ import type {
   TimelineEventType,
   DiffItem,
   ReportData,
+  ReviewContext,
 } from '@/types';
 import {
   MOCK_ANOMALIES,
@@ -279,18 +280,101 @@ function makeActions(set: (partial: any) => void, get: () => ReviewStoreState) {
 
     exportReport: (): ReportData => {
       const s = get();
-      const latestConclusion = [...s.conclusions].sort((a, b) => b.generatedAt.localeCompare(a.generatedAt))[0];
+      const ctx = s.getReviewContext();
+      const sortedConclusions = [...s.conclusions].sort((a, b) => b.generatedAt.localeCompare(a.generatedAt));
+      const latestConclusion = sortedConclusions[0];
+      const previousConclusion = sortedConclusions[1];
+
       const chain = s.computeInfluenceChain(latestConclusion?.id);
+      const remarkEvents = s.timelineEvents.filter((e) => e.type === '备注').sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+      const lastRemarkEvent = remarkEvents[0];
+      const previousSnapshot = s.uiState.previousSnapshot;
+
+      const currentSnapshot: Snapshot = {
+        materialItems: s.materialItems,
+        remarks: s.remarks,
+        conclusions: s.conclusions,
+        activeRevisionId: s.activeRevisionId,
+      };
+
+      let diffSinceLastRemark: DiffItem[] = [];
+      if (previousSnapshot) {
+        diffSinceLastRemark = computeSnapshotDiff(previousSnapshot, currentSnapshot);
+      }
+
+      let diffSinceLastReview: DiffItem[] = [];
+      if (previousConclusion && latestConclusion) {
+        const before: Snapshot = {
+          materialItems: s.materialItems,
+          remarks: s.remarks.filter((r) => new Date(r.createdAt) < new Date(previousConclusion.generatedAt)),
+          conclusions: sortedConclusions.filter((c) => c.id !== latestConclusion.id),
+          activeRevisionId: s.activeRevisionId,
+        };
+        diffSinceLastReview = computeSnapshotDiff(before, currentSnapshot);
+      }
+
+      const anomaliesWithMeta = s.anomalies.map((a) => {
+        const cmp = s.components.find((c) => c.id === a.componentId);
+        return {
+          ...a,
+          componentName: cmp?.name,
+          componentPosition: cmp ? { x: cmp.positionX, y: cmp.positionY, z: cmp.positionZ } : undefined,
+        };
+      });
+
+      const relevantEventIds = new Set<string>();
+      latestConclusion?.affectedMaterialIds.forEach((id) => {
+        const mat = s.materialItems.find((m) => m.id === id);
+        if (mat?.componentId) relevantEventIds.add(mat.componentId);
+        relevantEventIds.add(id);
+      });
+      latestConclusion?.affectedRemarkIds.forEach((id) => {
+        relevantEventIds.add(id);
+        const rmk = s.remarks.find((r) => r.id === id);
+        if (rmk?.linkedComponentId) relevantEventIds.add(rmk.linkedComponentId);
+        if (rmk?.linkedTimelineEventId) relevantEventIds.add(rmk.linkedTimelineEventId);
+      });
+      latestConclusion?.affectedAnomalyIds.forEach((id) => {
+        relevantEventIds.add(id);
+        const anom = s.anomalies.find((a) => a.id === id);
+        if (anom?.componentId) relevantEventIds.add(anom.componentId);
+        if (anom?.linkedTimelineEventId) relevantEventIds.add(anom.linkedTimelineEventId);
+      });
+      s.timelineEvents.forEach((e) => {
+        if (e.linkedObjectId && relevantEventIds.has(e.linkedObjectId)) {
+          relevantEventIds.add(e.id);
+        }
+      });
+
+      const relevantTimelineEvents = s.timelineEvents
+        .filter((e) => relevantEventIds.has(e.id))
+        .sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+
+      const historicalRemarks = s.remarks.filter((r) => r.reappliedAt !== undefined);
+
       return {
         generatedAt: new Date().toISOString(),
+        context: {
+          selectedComponent: ctx.selectedComponent,
+          activeRevision: ctx.activeRevision,
+          currentEvent: ctx.currentEvent,
+          filters: s.filters,
+        },
         conclusion: latestConclusion,
+        previousConclusion,
         materialMismatches: s.materialItems.filter((m) => m.isMismatch),
         remarks: s.remarks,
-        anomalies: s.anomalies,
+        historicalRemarks,
+        anomalies: anomaliesWithMeta,
         influenceChain: chain,
+        diffSinceLastRemark,
+        diffSinceLastReview,
+        snapshotBeforeLastRemark: previousSnapshot,
+        snapshotCurrent: currentSnapshot,
         timelineSummary: s.timelineEvents.map(
           (e) => `${new Date(e.timestamp).toLocaleString('zh-CN')} · ${e.type} · ${e.title}（${e.operator}）`,
         ),
+        relevantTimelineEvents,
       };
     },
 
@@ -330,6 +414,95 @@ function makeActions(set: (partial: any) => void, get: () => ReviewStoreState) {
         cameraTarget: { x: cmp.positionX, y: cmp.positionY, z: cmp.positionZ },
       });
     },
+
+    getReviewContext: (): ReviewContext => {
+      const s = get();
+
+      const activeRevision = s.materialRevisions.find((r) => r.id === s.activeRevisionId);
+      const currentConclusion = [...s.conclusions].sort((a, b) => b.generatedAt.localeCompare(a.generatedAt))[0];
+      const currentEvent = s.timelineEvents.find((e) => e.id === s.currentEventId);
+      const selectedComponent = s.components.find((c) => c.id === s.selectedComponentId);
+
+      const activeRevisionMaterials = s.activeRevisionId
+        ? s.materialItems.filter((m) => m.revisionId === s.activeRevisionId)
+        : s.materialItems;
+
+      const materialMismatches = activeRevisionMaterials.filter((m) => m.isMismatch);
+
+      const anomalyComponentIds = s.anomalies.map((a) => a.componentId);
+      const mismatchComponentIds = materialMismatches.map((m) => m.componentId).filter(Boolean) as string[];
+
+      let filteredMaterials = activeRevisionMaterials;
+      let filteredComponents = s.components;
+      let filteredRemarks = s.remarks;
+      let filteredAnomalies = s.anomalies;
+
+      if (s.filters.mismatchOnly) {
+        filteredMaterials = filteredMaterials.filter((m) => m.isMismatch);
+        const relatedCompIds = new Set(mismatchComponentIds);
+        filteredComponents = filteredComponents.filter((c) => relatedCompIds.has(c.id));
+        filteredRemarks = filteredRemarks.filter((r) => r.linkedMaterialId && materialMismatches.some((m) => m.id === r.linkedMaterialId));
+      }
+
+      if (s.filters.anomalyOnly) {
+        filteredMaterials = filteredMaterials.filter((m) => m.componentId && anomalyComponentIds.includes(m.componentId));
+        const relatedCompIds = new Set(anomalyComponentIds);
+        filteredComponents = filteredComponents.filter((c) => relatedCompIds.has(c.id));
+        filteredAnomalies = filteredAnomalies;
+        filteredRemarks = filteredRemarks.filter((r) => r.linkedComponentId && anomalyComponentIds.includes(r.linkedComponentId));
+      }
+
+      if (s.selectedComponentId) {
+        filteredMaterials = filteredMaterials.filter((m) => m.componentId === s.selectedComponentId);
+        filteredComponents = filteredComponents.filter((c) => c.id === s.selectedComponentId);
+        filteredRemarks = filteredRemarks.filter((r) => r.linkedComponentId === s.selectedComponentId);
+        filteredAnomalies = filteredAnomalies.filter((a) => a.componentId === s.selectedComponentId);
+      }
+
+      const relatedCompIds = new Set<string>();
+      filteredMaterials.forEach((m) => m.componentId && relatedCompIds.add(m.componentId));
+      filteredAnomalies.forEach((a) => a.componentId && relatedCompIds.add(a.componentId));
+      filteredRemarks.forEach((r) => r.linkedComponentId && relatedCompIds.add(r.linkedComponentId));
+
+      const relatedMatIds = new Set(filteredMaterials.map((m) => m.id));
+      const relatedRmkIds = new Set(filteredRemarks.map((r) => r.id));
+      const relatedAnomIds = new Set(filteredAnomalies.map((a) => a.id));
+
+      let filteredTimelineEvents = s.timelineEvents;
+      if (s.filters.eventTypes.length > 0) {
+        filteredTimelineEvents = filteredTimelineEvents.filter((e) => s.filters.eventTypes.includes(e.type));
+      }
+      if (s.selectedComponentId || s.filters.mismatchOnly || s.filters.anomalyOnly) {
+        filteredTimelineEvents = filteredTimelineEvents.filter((e) => {
+          const oid = e.linkedObjectId;
+          if (!oid) return false;
+          if (relatedCompIds.has(oid)) return true;
+          if (relatedMatIds.has(oid)) return true;
+          if (relatedRmkIds.has(oid)) return true;
+          if (relatedAnomIds.has(oid)) return true;
+          if (s.conclusions.some((c) => c.id === oid)) return true;
+          if (s.materialRevisions.some((r) => r.id === oid)) return true;
+          return false;
+        });
+      }
+
+      const relatedTimelineEventIds = filteredTimelineEvents.map((e) => e.id);
+
+      return {
+        filteredMaterials,
+        filteredComponents,
+        filteredRemarks,
+        filteredAnomalies,
+        filteredTimelineEvents,
+        activeRevision,
+        currentConclusion,
+        currentEvent,
+        selectedComponent,
+        activeRevisionMaterials,
+        materialMismatches,
+        relatedTimelineEventIds,
+      };
+    },
   };
 }
 
@@ -340,11 +513,11 @@ export const useReviewStore = create<ReviewStoreState>((set, get) => ({
 
 useReviewStore.subscribe((state) => {
   try {
-    const { computeInfluenceChain, computeDiff, loadMockData, runReview, addRemark, exportReport, openRemark, closeRemark, openDiff, closeDiff, takeSnapshot, flyToComponent, gotoTimelineEvent, setActiveRevision, setCameraTarget, selectComponent, setAnomalyOnly, setMismatchOnly, toggleFilterType, ...persistable } = state;
+    const { computeInfluenceChain, computeDiff, loadMockData, runReview, addRemark, exportReport, openRemark, closeRemark, openDiff, closeDiff, takeSnapshot, flyToComponent, gotoTimelineEvent, setActiveRevision, setCameraTarget, selectComponent, setAnomalyOnly, setMismatchOnly, toggleFilterType, getReviewContext, ...persistable } = state;
     void computeInfluenceChain; void computeDiff; void loadMockData; void runReview; void addRemark; void exportReport;
     void openRemark; void closeRemark; void openDiff; void closeDiff; void takeSnapshot; void flyToComponent;
     void gotoTimelineEvent; void setActiveRevision; void setCameraTarget; void selectComponent;
-    void setAnomalyOnly; void setMismatchOnly; void toggleFilterType;
+    void setAnomalyOnly; void setMismatchOnly; void toggleFilterType; void getReviewContext;
     persistable.uiState = {
       ...persistable.uiState,
       openRemarkModal: false,

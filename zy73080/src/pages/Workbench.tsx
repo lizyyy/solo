@@ -64,7 +64,20 @@ function Header() {
   const runReview = useReviewStore((s) => s.runReview);
   const exportReport = useReviewStore((s) => s.exportReport);
   const conclusions = useReviewStore((s) => s.conclusions);
-  const latestConclusion = [...conclusions].sort((a, b) => b.generatedAt.localeCompare(a.generatedAt))[0];
+  const filters = useReviewStore((s) => s.filters);
+  const selectedComponentId = useReviewStore((s) => s.selectedComponentId);
+  const components = useReviewStore((s) => s.components);
+  const activeRevisionId = useReviewStore((s) => s.activeRevisionId);
+
+  const ctx = useMemo(() => {
+    const store = useReviewStore.getState();
+    return store.getReviewContext();
+  }, [activeRevisionId, filters, selectedComponentId]);
+
+  const sortedConclusions = [...conclusions].sort((a, b) => b.generatedAt.localeCompare(a.generatedAt));
+  const latestConclusion = sortedConclusions[0];
+  const previousConclusion = sortedConclusions[1];
+  const selectedComponent = components.find((c) => c.id === selectedComponentId);
 
   const conclusionStyle = useMemo(() => {
     if (!latestConclusion) return { text: 'text-metal', label: '未复核' };
@@ -72,6 +85,17 @@ function Header() {
     if (latestConclusion.status === '不通过') return { text: 'text-accent-red', label: '不通过' };
     return { text: 'text-accent-orange', label: '有条件通过' };
   }, [latestConclusion]);
+
+  const contextLabel = useMemo(() => {
+    const parts: string[] = [];
+    if (selectedComponent) parts.push(`构件：${selectedComponent.name}`);
+    if (filters.mismatchOnly) parts.push('仅口径不一致');
+    if (filters.anomalyOnly) parts.push('仅异常构件');
+    if (filters.eventTypes.length > 0) parts.push(`${filters.eventTypes.length} 类事件`);
+    return parts.length > 0 ? `筛选：${parts.join(' · ')}` : null;
+  }, [selectedComponent, filters]);
+
+  const conclusionChanged = previousConclusion && latestConclusion && previousConclusion.status !== latestConclusion.status;
 
   return (
     <header className="panel flex items-center justify-between px-5 h-12">
@@ -88,6 +112,15 @@ function Header() {
           <FileText className="w-3.5 h-3.5" />
           <span>项目：东立面幕墙节点 M1-M2</span>
         </div>
+        {contextLabel && (
+          <>
+            <div className="divider-v h-5" />
+            <div className="flex items-center gap-1.5 text-[11px] text-accent-blue">
+              <Filter className="w-3 h-3" />
+              <span>{contextLabel}</span>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="flex items-center gap-3">
@@ -95,6 +128,11 @@ function Header() {
           <div className={cn('w-2 h-2 rounded-sm', latestConclusion?.status === '通过' ? 'bg-accent-green' : latestConclusion?.status === '不通过' ? 'bg-accent-red' : 'bg-accent-orange anomaly-blink')} />
           <span className="text-[11px] text-metal">当前结论</span>
           <span className={cn('text-xs font-semibold', conclusionStyle.text)}>{conclusionStyle.label}</span>
+          {conclusionChanged && (
+            <span className="chip !py-0 !px-1.5 text-[9px] bg-accent-orange/15 text-accent-orange border-accent-orange/40 ml-1">
+              较上次变化
+            </span>
+          )}
           <ChevronDown className="w-3 h-3 text-metal-dark" />
         </div>
         <div className="divider-v h-5" />
@@ -125,7 +163,6 @@ function MaterialPanel() {
   const revisions = useReviewStore((s) => s.materialRevisions);
   const activeRevisionId = useReviewStore((s) => s.activeRevisionId);
   const setActiveRevision = useReviewStore((s) => s.setActiveRevision);
-  const materialItems = useReviewStore((s) => s.materialItems);
   const components = useReviewStore((s) => s.components);
   const filters = useReviewStore((s) => s.filters);
   const toggleFilterType = useReviewStore((s) => s.toggleFilterType);
@@ -136,15 +173,13 @@ function MaterialPanel() {
   const openRemark = useReviewStore((s) => s.openRemark);
   const remarks = useReviewStore((s) => s.remarks);
 
-  const activeMaterials = useMemo(() => {
-    let list = activeRevisionId ? materialItems.filter((m) => m.revisionId === activeRevisionId) : materialItems;
-    if (filters.mismatchOnly) list = list.filter((m) => m.isMismatch);
-    if (filters.anomalyOnly) {
-      const anomalyCompIds = components.filter((c) => c.isAnomaly).map((c) => c.id);
-      list = list.filter((m) => m.componentId && anomalyCompIds.includes(m.componentId));
-    }
-    return list;
-  }, [activeRevisionId, materialItems, filters, components]);
+  const ctx = useMemo(() => {
+    const store = useReviewStore.getState();
+    return store.getReviewContext();
+  }, [activeRevisionId, filters, selectedComponentId]);
+
+  const activeMaterials = ctx.filteredMaterials;
+  const activeRevisionMaterials = ctx.activeRevisionMaterials;
 
   const getComponent = (cid?: string) => components.find((c) => c.id === cid);
   const getMatchedRemark = (mid: string) => remarks.find((r) => r.linkedMaterialId === mid);
@@ -283,7 +318,7 @@ function MaterialPanel() {
       </div>
 
       <div className="px-3 py-2 border-t border-metal/10 text-[10px] text-metal-dark flex items-center justify-between bg-metal/[0.03]">
-        <span>共 {activeMaterials.length} 条 · 差异 {activeMaterials.filter(m => m.isMismatch).length} 条</span>
+        <span>共 {activeMaterials.length} 条 · 差异 {activeRevisionMaterials.filter(m => m.isMismatch).length} 条</span>
         <span>{activeRevisionId ? revisions.find(r => r.id === activeRevisionId)?.sourceFile : '-'}</span>
       </div>
     </div>
@@ -293,14 +328,17 @@ function MaterialPanel() {
 function ComponentMesh({
   component,
   selected,
+  dimmed,
   onClick,
 }: {
   component: Component;
   selected: boolean;
+  dimmed: boolean;
   onClick: () => void;
 }) {
   const color = CATEGORY_COLORS[component.category];
   const isGlass = component.category === '玻璃';
+  const baseOpacity = dimmed ? 0.2 : 0.75;
 
   return (
     <group
@@ -311,8 +349,8 @@ function ComponentMesh({
         <boxGeometry args={[component.sizeW, component.sizeH, component.sizeD]} />
         <meshStandardMaterial
           color={color}
-          transparent={isGlass || selected || component.isAnomaly}
-          opacity={isGlass ? 0.35 : selected ? 0.9 : 0.75}
+          transparent
+          opacity={isGlass ? (dimmed ? 0.15 : 0.35) : selected ? 0.9 : baseOpacity}
           emissive={selected ? '#5B8DEF' : component.isAnomaly ? '#E5484D' : '#000000'}
           emissiveIntensity={selected ? 0.35 : component.isAnomaly ? 0.6 : 0}
           roughness={isGlass ? 0.1 : 0.55}
@@ -321,7 +359,7 @@ function ComponentMesh({
       </mesh>
       <lineSegments>
         <edgesGeometry args={[new THREE.BoxGeometry(component.sizeW, component.sizeH, component.sizeD)]} />
-        <lineBasicMaterial color={selected ? '#5B8DEF' : component.isAnomaly ? '#E5484D' : '#8A9BA8'} transparent opacity={0.53} linewidth={1} />
+        <lineBasicMaterial color={selected ? '#5B8DEF' : component.isAnomaly ? '#E5484D' : '#8A9BA8'} transparent opacity={dimmed ? 0.15 : 0.53} linewidth={1} />
       </lineSegments>
       {(selected || component.isAnomaly) && (
         <Html position={[0, component.sizeH / 2 + 0.3, 0]} center distanceFactor={10} zIndexRange={[10, 0]}>
@@ -361,12 +399,21 @@ function Scene3D() {
   const anomalies = useReviewStore((s) => s.anomalies);
   const remarks = useReviewStore((s) => s.remarks);
   const activeRevisionId = useReviewStore((s) => s.activeRevisionId);
-  const materialItems = useReviewStore((s) => s.materialItems);
+  const filters = useReviewStore((s) => s.filters);
+  const ctx = useMemo(() => {
+    const store = useReviewStore.getState();
+    return store.getReviewContext();
+  }, [activeRevisionId, selectedComponentId, filters]);
 
-  const activeMats = activeRevisionId ? materialItems.filter(m => m.revisionId === activeRevisionId) : materialItems;
-  const anomalyCount = anomalies.length;
-  const mismatchCount = activeMats.filter(m => m.isMismatch).length;
-  const remarkCount = remarks.length;
+  const filteredComponentIds = new Set(ctx.filteredComponents.map((c) => c.id));
+  const anomalyCount = ctx.filteredAnomalies.length;
+  const mismatchCount = ctx.materialMismatches.length;
+  const remarkCount = ctx.filteredRemarks.length;
+
+  const isFilteredOut = (cid: string) => {
+    if (filteredComponentIds.size === components.length) return false;
+    return !filteredComponentIds.has(cid);
+  };
 
   return (
     <div className="panel flex flex-col col-span-3 overflow-hidden relative">
@@ -465,6 +512,7 @@ function Scene3D() {
               key={c.id}
               component={c}
               selected={selectedComponentId === c.id}
+              dimmed={isFilteredOut(c.id)}
               onClick={() => selectComponent(c.id)}
             />
           ))}
@@ -560,17 +608,21 @@ function InfluenceNodeCard({ node, depth = 0 }: { node: InfluenceNode; depth?: n
 function InfluencePanel() {
   const conclusions = useReviewStore((s) => s.conclusions);
   const computeInfluenceChain = useReviewStore((s) => s.computeInfluenceChain);
+  const activeRevisionId = useReviewStore((s) => s.activeRevisionId);
   const selectedComponentId = useReviewStore((s) => s.selectedComponentId);
+  const filters = useReviewStore((s) => s.filters);
   const components = useReviewStore((s) => s.components);
-  const remarks = useReviewStore((s) => s.remarks);
-  const anomalies = useReviewStore((s) => s.anomalies);
-  const materialItems = useReviewStore((s) => s.materialItems);
+
+  const ctx = useMemo(() => {
+    const store = useReviewStore.getState();
+    return store.getReviewContext();
+  }, [activeRevisionId, filters, selectedComponentId]);
 
   const chain = useMemo(() => computeInfluenceChain(), [conclusions, computeInfluenceChain]);
-  const selectedCmp = components.find((c) => c.id === selectedComponentId);
-  const cmpMats = materialItems.filter((m) => m.componentId === selectedComponentId);
-  const cmpRemarks = remarks.filter((r) => r.linkedComponentId === selectedComponentId);
-  const cmpAnomalies = anomalies.filter((a) => a.componentId === selectedComponentId);
+  const selectedCmp = ctx.selectedComponent;
+  const cmpMats = ctx.filteredMaterials;
+  const cmpRemarks = ctx.filteredRemarks;
+  const cmpAnomalies = ctx.filteredAnomalies;
 
   return (
     <div className="panel flex flex-col col-span-2 overflow-hidden">
@@ -612,6 +664,50 @@ function InfluencePanel() {
         </div>
       )}
 
+      {selectedCmp && (
+        <div className="mx-2 mt-2 p-2 border border-accent-orange/30 bg-accent-orange/5">
+          <div className="flex items-center gap-1 mb-1.5">
+            <Activity className="w-3 h-3 text-accent-orange" />
+            <span className="text-[11px] font-semibold text-accent-orange">结论影响分析</span>
+          </div>
+          <div className="space-y-1.5">
+            {cmpMats.filter((m) => m.isMismatch).map((m) => {
+              const rmk = cmpRemarks.find((r) => r.linkedMaterialId === m.id);
+              return (
+                <div key={m.id} className="text-[10px]">
+                  <div className="flex items-center gap-1 mb-0.5">
+                    <span className={cn('w-1.5 h-1.5 rounded-sm', rmk ? 'bg-accent-green' : 'bg-accent-red')} />
+                    <span className="text-metal-light font-medium">{m.materialName}</span>
+                  </div>
+                  {rmk ? (
+                    <div className="pl-2.5 text-metal-dark">
+                      <span className="text-accent-green">已备注修正</span> · {rmk.type}备注「{rmk.content.slice(0, 15)}...」
+                      {rmk.affectsConclusion && <span className="text-accent-orange ml-1">· 影响结论</span>}
+                    </div>
+                  ) : (
+                    <div className="pl-2.5 text-accent-red">未备注 · 口径不一致导致结论降级</div>
+                  )}
+                </div>
+              );
+            })}
+            {cmpAnomalies.map((a) => (
+              <div key={a.id} className="text-[10px]">
+                <div className="flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-sm bg-accent-red" />
+                  <span className="text-accent-red font-medium">{a.type}</span>
+                </div>
+                <div className="pl-2.5 text-metal-dark">
+                  坐标偏移{a.offsetY > 0 ? 'Y+' : 'Y'}{a.offsetY}mm · 结论需现场复核
+                </div>
+              </div>
+            ))}
+            {cmpMats.filter((m) => m.isMismatch).length === 0 && cmpAnomalies.length === 0 && (
+              <div className="text-[10px] text-accent-green">该构件无影响结论的风险项</div>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="px-3 py-2 border-b border-metal/10 text-[10px] text-metal-dark flex items-center gap-2">
         <ArrowRight className="w-3 h-3 text-accent-orange" />
         <span>复核结论 → 影响材料 → 修正备注</span>
@@ -641,16 +737,15 @@ function Timeline() {
   const gotoTimelineEvent = useReviewStore((s) => s.gotoTimelineEvent);
   const filters = useReviewStore((s) => s.filters);
   const toggleFilterType = useReviewStore((s) => s.toggleFilterType);
-  const setMismatchOnly = useReviewStore((s) => s.setMismatchOnly);
-  const setAnomalyOnly = useReviewStore((s) => s.setAnomalyOnly);
+  const activeRevisionId = useReviewStore((s) => s.activeRevisionId);
+  const selectedComponentId = useReviewStore((s) => s.selectedComponentId);
 
-  const filteredEvents = useMemo(() => {
-    let list = events;
-    if (filters.eventTypes.length > 0) {
-      list = list.filter((e) => filters.eventTypes.includes(e.type));
-    }
-    return list;
-  }, [events, filters]);
+  const ctx = useMemo(() => {
+    const store = useReviewStore.getState();
+    return store.getReviewContext();
+  }, [activeRevisionId, filters, selectedComponentId]);
+
+  const filteredEvents = ctx.filteredTimelineEvents;
 
   return (
     <div className="panel flex flex-col col-span-7 overflow-hidden">
@@ -765,12 +860,20 @@ function Timeline() {
 }
 
 function AnomalyCard() {
-  const anomalies = useReviewStore((s) => s.anomalies);
   const components = useReviewStore((s) => s.components);
   const flyToComponent = useReviewStore((s) => s.flyToComponent);
   const selectedComponentId = useReviewStore((s) => s.selectedComponentId);
+  const activeRevisionId = useReviewStore((s) => s.activeRevisionId);
+  const filters = useReviewStore((s) => s.filters);
 
-  if (anomalies.length === 0) return null;
+  const ctx = useMemo(() => {
+    const store = useReviewStore.getState();
+    return store.getReviewContext();
+  }, [activeRevisionId, filters, selectedComponentId]);
+
+  const anomalies = ctx.filteredAnomalies;
+  if (anomalies.length === 0 && !filters.anomalyOnly) return null;
+  if (anomalies.length === 0 && filters.anomalyOnly) return null;
 
   return (
     <div className="fixed top-16 right-4 z-50 w-80 panel shadow-2xl overflow-hidden">
