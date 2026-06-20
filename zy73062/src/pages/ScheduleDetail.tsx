@@ -7,6 +7,7 @@ import ComparePanel from '@/components/detail/ComparePanel';
 import PendingReasonBox from '@/components/detail/PendingReasonBox';
 import ChangeTimeline from '@/components/detail/ChangeTimeline';
 import { useScheduleStore } from '@/store/useScheduleStore';
+import { dedupAndAggregate } from '@/utils/dedup';
 import { formatDate } from '@/utils/formatters';
 import { cn } from '@/lib/utils';
 
@@ -20,13 +21,12 @@ export default function ScheduleDetail() {
   const { bizKey: rawBizKey } = useParams<{ bizKey: string }>();
   const bizKey = useMemo(() => rawBizKey ? decodeURIComponent(rawBizKey) : '', [rawBizKey]);
 
-  const getAggregates = useScheduleStore((s) => s.aggregates);
   const setSelectedBizKey = useScheduleStore((s) => s.setSelectedBizKey);
 
-  const agg = useMemo(() => {
+  const agg = useScheduleStore((s) => {
     if (!bizKey) return null;
-    return getAggregates().find((a) => a.bizKey === bizKey) || null;
-  }, [bizKey, getAggregates]);
+    return dedupAndAggregate(s.versions, s.histories, s.evidences).find((a) => a.bizKey === bizKey) || null;
+  });
 
   useEffect(() => {
     if (bizKey) setSelectedBizKey(bizKey);

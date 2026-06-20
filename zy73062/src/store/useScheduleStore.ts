@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type { ScheduleVersion, ChangeHistoryItem, EvidenceItem, MaterialLocation, ScheduleStatus, ScheduleAggregate } from '../types/schedule';
 import { defaultVersions, defaultHistories, defaultEvidences } from '../data/schedules';
 import { defaultLocations } from '../data/locations';
-import { trialVersions, trialWithdrawnEmbedVersion } from '../data/trialDataset';
+import { trialVersions, trialHistories, trialEvidences, trialWithdrawnEmbedVersion } from '../data/trialDataset';
 import { dedupAndAggregate } from '../utils/dedup';
 
 interface ScheduleState {
@@ -15,6 +15,8 @@ interface ScheduleState {
   searchKeyword: string;
   trialMode: boolean;
   trialVersions: ScheduleVersion[];
+  trialHistories: ChangeHistoryItem[];
+  trialEvidences: EvidenceItem[];
   trialWithdrawnEmbedVersion: ScheduleVersion;
 
   aggregates: () => ScheduleAggregate[];
@@ -50,12 +52,13 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
   searchKeyword: '',
   trialMode: true,
   trialVersions: trialVersions,
+  trialHistories: trialHistories,
+  trialEvidences: trialEvidences,
   trialWithdrawnEmbedVersion: trialWithdrawnEmbedVersion,
 
   aggregates: () => {
     const state = get();
-    const src = state.trialMode ? state.trialVersions : state.versions;
-    return dedupAndAggregate(src);
+    return dedupAndAggregate(state.versions, state.histories, state.evidences);
   },
 
   filteredAggregates: () => {
@@ -79,12 +82,12 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
 
   trialAggregates: () => {
     const state = get();
-    return dedupAndAggregate(state.trialVersions);
+    return dedupAndAggregate(state.trialVersions, state.trialHistories, state.trialEvidences);
   },
 
   cleanTrialAggregates: () => {
     const state = get();
-    const aggs = dedupAndAggregate(state.trialVersions);
+    const aggs = dedupAndAggregate(state.trialVersions, state.trialHistories, state.trialEvidences);
     return aggs.filter(a => a.latest.status !== 'withdrawn');
   },
 
@@ -95,7 +98,8 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
   submitDuplicate: (bizKey) => set((state) => {
     const isTrial = state.trialMode;
     const srcVersions = isTrial ? state.trialVersions : state.versions;
-    const aggs = dedupAndAggregate(srcVersions);
+    const srcHistories = isTrial ? state.trialHistories : state.histories;
+    const aggs = dedupAndAggregate(srcVersions, srcHistories, isTrial ? state.trialEvidences : state.evidences);
     const agg = aggs.find(a => a.bizKey === bizKey);
     if (!agg) return {};
 
@@ -122,7 +126,7 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
     if (isTrial) {
       return {
         trialVersions: [...state.trialVersions, newVersion],
-        histories: [...state.histories, historyItem],
+        trialHistories: [...state.trialHistories, historyItem],
       };
     } else {
       return {
@@ -139,6 +143,8 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
 
   resetTrialData: () => set({
     trialVersions: trialVersions,
+    trialHistories: trialHistories,
+    trialEvidences: trialEvidences,
     filterStatus: 'all',
     searchKeyword: '',
     selectedBizKey: null,

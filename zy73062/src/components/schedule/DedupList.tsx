@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronDown, ChevronUp, Search, Filter } from 'lucide-react';
+import { ChevronDown, ChevronUp, Search, Filter, ArrowLeftRight, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useScheduleStore } from '@/store/useScheduleStore';
 import { formatDate, formatStatus, statusColor } from '@/utils/formatters';
@@ -242,6 +242,19 @@ export default function DedupList() {
                     {isExpanded && agg.versions.length > 1 && (
                       <div className="px-4 pb-4 pl-8 md:pl-8 animate-expand">
                         <VersionsTable agg={agg} />
+                      </div>
+                    )}
+                    {agg.latest.status === 'pending' && agg.latest.modelReplace && (
+                      <div className="mx-4 mb-3 flex items-start gap-2 rounded-lg border border-orange-200 bg-orange-50/70 px-3 py-2 text-xs">
+                        <AlertTriangle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-orange-500" />
+                        <div className="min-w-0 flex-1">
+                          <span className="font-semibold text-orange-700">型号替换待确认</span>
+                          <span className="mx-1.5 text-orange-300">·</span>
+                          <span className="font-mono text-orange-700">{agg.latest.modelReplace.oldModel}</span>
+                          <ArrowLeftRight className="mx-1 inline h-3 w-3 text-orange-400" />
+                          <span className="font-mono font-semibold text-orange-800">{agg.latest.modelReplace.newModel}</span>
+                          <p className="mt-0.5 text-slate-600">原因：{agg.latest.modelReplace.reason}</p>
+                        </div>
                       </div>
                     )}
                   </div>

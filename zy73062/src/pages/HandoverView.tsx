@@ -9,6 +9,8 @@ import {
   Camera,
   FileCheck,
   CircleDot,
+  ArrowLeftRight,
+  MapPin,
 } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import { useScheduleStore } from '@/store/useScheduleStore';
@@ -79,7 +81,7 @@ function ConfirmedCard({ agg }: { agg: ScheduleAggregate }) {
         </span>
       </div>
 
-      {confirmedCount > 0 && (
+      {confirmedCount > 0 ? (
         <div className="pt-3 border-t border-green-100">
           <div className="flex items-center gap-1.5 mb-2">
             <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
@@ -88,13 +90,14 @@ function ConfirmedCard({ agg }: { agg: ScheduleAggregate }) {
             </span>
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {confirmedEvidences.slice(0, 3).map((evi) => (
+            {confirmedEvidences.map((evi) => (
               <EvidenceDot key={evi.id} type={evi.type} confirmed={true} />
             ))}
-            {confirmedCount === 0 && (
-              <span className="text-xs text-green-600 italic">系统自动核验通过</span>
-            )}
           </div>
+        </div>
+      ) : (
+        <div className="pt-3 border-t border-green-100">
+          <span className="text-xs text-green-600 italic">无附加证据，系统核验通过</span>
         </div>
       )}
     </div>
@@ -102,24 +105,9 @@ function ConfirmedCard({ agg }: { agg: ScheduleAggregate }) {
 }
 
 function PendingCard({ agg }: { agg: ScheduleAggregate }) {
-  const allEvidences = agg.evidences;
-  const missingEvidenceReasons: { label: string; type: EvidenceItem['type'] }[] = [];
-
-  if (agg.latest.status === 'draft') {
-    missingEvidenceReasons.push({ label: '尚未正式提交，需补充基本信息', type: 'doc' });
-  }
-  if (allEvidences.filter((e) => e.type === 'photo').length === 0) {
-    missingEvidenceReasons.push({ label: '缺少现场照片', type: 'photo' });
-  }
-  if (allEvidences.filter((e) => e.type === 'report').length === 0 && agg.latest.status !== 'draft') {
-    missingEvidenceReasons.push({ label: '缺少检测报告', type: 'report' });
-  }
-  if (allEvidences.filter((e) => !e.confirmed).length > 0) {
-    missingEvidenceReasons.push({ label: '部分证据待审核确认', type: 'doc' });
-  }
-  if (missingEvidenceReasons.length === 0 && agg.latest.status === 'pending') {
-    missingEvidenceReasons.push({ label: '等待主管最终审批', type: 'report' });
-  }
+  const unconfirmed = agg.evidences.filter((e) => !e.confirmed);
+  const confirmedEvidences = agg.evidences.filter((e) => e.confirmed);
+  const modelReplace = agg.latest.modelReplace;
 
   return (
     <div className="bg-white rounded-xl border border-orange-200 p-4 shadow-sm hover:shadow-md hover:translate-y-[-2px] transition-all duration-200">
@@ -142,6 +130,21 @@ function PendingCard({ agg }: { agg: ScheduleAggregate }) {
             </div>
           </div>
 
+          {modelReplace && (
+            <div className="mb-3 rounded-lg border border-orange-200 bg-orange-50/60 px-3 py-2 text-xs">
+              <div className="flex items-center gap-1.5 font-semibold text-orange-700 mb-1">
+                <ArrowLeftRight className="w-3.5 h-3.5" />
+                型号替换待确认
+              </div>
+              <div className="flex items-center gap-1.5 flex-wrap text-slate-700">
+                <span className="font-mono line-through text-slate-400">{modelReplace.oldModel}</span>
+                <ArrowLeftRight className="w-3 h-3 text-orange-400" />
+                <span className="font-mono font-semibold text-orange-800">{modelReplace.newModel}</span>
+              </div>
+              <p className="mt-1 text-slate-600">原因：{modelReplace.reason}</p>
+            </div>
+          )}
+
           <div className="flex items-center gap-4 text-xs text-gray-500 mb-3 flex-wrap">
             <span className="flex items-center gap-1">
               <Calendar className="w-3 h-3" />
@@ -160,19 +163,44 @@ function PendingCard({ agg }: { agg: ScheduleAggregate }) {
             <div className="flex items-center gap-1.5 mb-2">
               <AlertTriangle className="w-3.5 h-3.5 text-orange-600" />
               <span className="text-xs font-medium text-orange-700">
-                需补充证据 ({missingEvidenceReasons.length})
+                待补证据 ({unconfirmed.length})
               </span>
             </div>
-            <div className="flex flex-wrap gap-1.5">
-              {missingEvidenceReasons.map((item, idx) => (
-                <EvidenceDot key={idx} type={item.type} confirmed={false} />
-              ))}
-            </div>
-            {allEvidences.filter((e) => e.type === 'photo' || e.type === 'report').length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-1.5 pt-1.5 border-t border-orange-50">
-                {allEvidences.map((evi) => (
-                  <EvidenceDot key={evi.id} type={evi.type} confirmed={evi.confirmed} />
+            {unconfirmed.length > 0 ? (
+              <div className="space-y-1.5">
+                {unconfirmed.map((evi) => (
+                  <div key={evi.id} className="flex items-start gap-2 rounded-md bg-orange-50/70 border border-orange-100 px-2 py-1.5">
+                    <CircleDot className="w-3.5 h-3.5 mt-0.5 text-orange-500 flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs font-medium text-slate-800 truncate">{evi.name}</div>
+                      <div className="text-[10px] text-slate-500 mt-0.5 flex items-center gap-1">
+                        <MapPin className="w-2.5 h-2.5" />
+                        {evi.location}
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-orange-700 font-medium flex-shrink-0">待补</span>
+                  </div>
                 ))}
+              </div>
+            ) : (
+              <p className="text-xs text-slate-500">
+                {agg.latest.status === 'draft'
+                  ? '尚未正式提交，需补充基本信息后提交审核'
+                  : '暂无未确认证据，等待主管最终审批改判'}
+              </p>
+            )}
+
+            {confirmedEvidences.length > 0 && (
+              <div className="mt-2 pt-2 border-t border-orange-50">
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <CheckCircle2 className="w-3 h-3 text-green-600" />
+                  <span className="text-[11px] text-green-700">已确认证据 × {confirmedEvidences.length}</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {confirmedEvidences.map((evi) => (
+                    <EvidenceDot key={evi.id} type={evi.type} confirmed={true} />
+                  ))}
+                </div>
               </div>
             )}
           </div>

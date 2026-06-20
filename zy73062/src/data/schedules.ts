@@ -1,4 +1,5 @@
 import type { ScheduleVersion, ChangeHistoryItem, EvidenceItem } from '../types/schedule';
+import { buildBizKey } from '../utils/dedup';
 
 export const defaultVersions: ScheduleVersion[] = [
   {
@@ -246,11 +247,32 @@ export const defaultHistories: ChangeHistoryItem[] = [
     newMaterial: '缓冲垫 CUSHION-B12',
     reason: 'B10已停产，升级为B12加厚款',
   },
+  {
+    id: 'HIST-009',
+    scheduleId: 'SCH-002-v1',
+    changeType: 'update',
+    timestamp: '2026-06-08 16:10:00',
+    operator: '巡检员-小王',
+    oldRemark: 'B型密封圈待确认更换',
+    newRemark: 'B型密封圈待确认更换（已补录现场磨损照片与型号兼容说明，待主管核验）',
+    reason: '补录证据：上传密封圈磨损现场照片及 B 型兼容说明文档，等待主管确认改判',
+  },
+  {
+    id: 'HIST-010',
+    scheduleId: 'SCH-010-v1',
+    changeType: 'update',
+    timestamp: '2026-06-09 18:30:00',
+    operator: '巡检员-小张',
+    oldRemark: '管道缓冲垫老化脱落',
+    newRemark: '管道缓冲垫老化脱落（B12 加厚款已到货，待补入库照片）',
+    reason: '补录证据：B12 加厚款到货，待补一张入库验收照片后即可改判确认',
+  },
 ];
 
 export const defaultEvidences: EvidenceItem[] = [
   {
     id: 'EVI-001',
+    bizKey: buildBizKey('PIPELINE-001', 'M100'),
     type: 'photo',
     name: '密封泄漏现场照片.jpg',
     location: 'A区货架-03',
@@ -260,6 +282,7 @@ export const defaultEvidences: EvidenceItem[] = [
   },
   {
     id: 'EVI-002',
+    bizKey: buildBizKey('PIPELINE-001', 'M100'),
     type: 'report',
     name: '压力检测报告.pdf',
     location: '文件柜-01抽屉',
@@ -269,6 +292,7 @@ export const defaultEvidences: EvidenceItem[] = [
   },
   {
     id: 'EVI-003',
+    bizKey: buildBizKey('PIPELINE-002', 'SEAL-A20'),
     type: 'photo',
     name: '密封圈磨损照片.jpg',
     location: 'A区货架-05',
@@ -278,6 +302,7 @@ export const defaultEvidences: EvidenceItem[] = [
   },
   {
     id: 'EVI-004',
+    bizKey: buildBizKey('PIPELINE-002', 'SEAL-A20'),
     type: 'doc',
     name: '型号兼容说明.docx',
     location: '文件柜-02抽屉',
@@ -287,6 +312,7 @@ export const defaultEvidences: EvidenceItem[] = [
   },
   {
     id: 'EVI-005',
+    bizKey: buildBizKey('PIPELINE-004', 'GASKET-F150'),
     type: 'photo',
     name: '垫片渗油痕迹.jpg',
     location: 'B区货架-02',
@@ -296,12 +322,23 @@ export const defaultEvidences: EvidenceItem[] = [
   },
   {
     id: 'EVI-006',
+    bizKey: buildBizKey('PIPELINE-003', 'M200'),
     type: 'report',
     name: '异响检测分析.pdf',
     location: '文件柜-01抽屉',
     url: '#',
     uploadedAt: '2026-06-08 11:30:00',
     confirmed: true,
+  },
+  {
+    id: 'EVI-007',
+    bizKey: buildBizKey('PIPELINE-010', 'CUSHION-B10'),
+    type: 'photo',
+    name: '缓冲垫老化脱落照片.jpg',
+    location: 'C区货架-01',
+    url: '#',
+    uploadedAt: '2026-06-09 16:40:00',
+    confirmed: false,
   },
 ];
 

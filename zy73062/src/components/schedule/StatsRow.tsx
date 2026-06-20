@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { List, CheckCircle2, AlertTriangle, XCircle, FileWarning } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useScheduleStore } from '@/store/useScheduleStore';
+import { hasPendingEvidence } from '@/utils/dedup';
 
 interface StatCardProps {
   icon: React.ReactNode;
@@ -27,39 +28,29 @@ function StatCard({ icon, label, value, iconBg, iconColor, valueColor }: StatCar
 }
 
 export default function StatsRow() {
-  const { aggregates, evidences } = useScheduleStore((state) => ({
-    aggregates: state.aggregates(),
-    evidences: state.evidences,
-  }));
+  const aggregates = useScheduleStore((state) => state.aggregates());
 
   const stats = useMemo(() => {
     const countByStatus = { confirmed: 0, pending: 0, withdrawn: 0, draft: 0 };
-    let withdrawnAggCount = 0;
+    let pendingEvidenceAggCount = 0;
 
     for (const agg of aggregates) {
       const status = agg.latest.status;
       if (status in countByStatus) {
         countByStatus[status as keyof typeof countByStatus]++;
       }
-      if (agg.withdrawnCount > 0) {
-        withdrawnAggCount++;
-      }
-    }
-
-    const bizKeysWithPendingEvidence = new Set<string>();
-    for (const ev of evidences) {
-      if (!ev.confirmed) {
-        bizKeysWithPendingEvidence.add(ev.location);
+      if (hasPendingEvidence(agg)) {
+        pendingEvidenceAggCount++;
       }
     }
 
     return {
       total: aggregates.length,
       countByStatus,
-      withdrawnAggCount,
-      pendingEvidenceCount: bizKeysWithPendingEvidence.size,
+      withdrawnAggCount: countByStatus.withdrawn,
+      pendingEvidenceCount: pendingEvidenceAggCount,
     };
-  }, [aggregates, evidences]);
+  }, [aggregates]);
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">

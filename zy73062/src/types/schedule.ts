@@ -25,6 +25,7 @@ export interface ChangeHistoryItem {
 
 export interface EvidenceItem {
   id: string;
+  bizKey: string;
   type: 'photo' | 'doc' | 'report';
   name: string;
   location: string;
