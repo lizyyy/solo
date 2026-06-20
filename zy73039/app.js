@@ -1,10 +1,9 @@
 /* ========================================================================
-   流浪动物救助回访追踪 - 本地数据层 + 核心 API + 交互
-   数据存储：localStorage['stray_tracker_v1']
+   流浪动物救助回访追踪 - 前端
+   数据来源：Node.js + SQLite 后端 (/api/...)
    核心 API：importRecord / confirmRecord / revokeRecord / getSummary
    ======================================================================== */
 
-const STORE_KEY = 'stray_tracker_v1';
 const STATUS = {
   PENDING: 'pending',
   CLEARED: 'cleared',
@@ -18,411 +17,6 @@ const STATUS_LABEL = {
   hang:    '挂起中',
 };
 
-/* ---------- 存储 ---------- */
-const Store = {
-  load() {
-    try {
-      const raw = localStorage.getItem(STORE_KEY);
-      return raw ? JSON.parse(raw) : { records: [] };
-    } catch (e) {
-      return { records: [] };
-    }
-  },
-  save(state) {
-    localStorage.setItem(STORE_KEY, JSON.stringify(state));
-  },
-  clear() {
-    localStorage.removeItem(STORE_KEY);
-  },
-};
-
-let state = Store.load();
-if (!state.records) state.records = [];
-
-function persist() { Store.save(state); }
-
-/* ---------- 工具 ---------- */
-const uid = () => 'r_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-const nowISO = () => new Date().toISOString();
-const fmtDate = (iso) => {
-  if (!iso) return '—';
-  const d = new Date(iso);
-  const pad = (n) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-};
-
-function parseWeight(raw) {
-  if (!raw) return { value: null, unit: null, raw: '' };
-  const str = String(raw).trim().toLowerCase();
-  const m = str.match(/^([\d.]+)\s*(kg|kilogram|kilograms|公斤|千克|g|gram|grams|克|lb|lbs|pound|pounds|磅)?$/);
-  if (!m) return { value: null, unit: null, raw: str };
-  const v = parseFloat(m[1]);
-  let u = m[2] || '';
-  if (['kg', 'kilogram', 'kilograms', '公斤', '千克'].includes(u)) u = 'kg';
-  else if (['g', 'gram', 'grams', '克'].includes(u)) u = 'g';
-  else if (['lb', 'lbs', 'pound', 'pounds', '磅'].includes(u)) u = 'lb';
-  return { value: isNaN(v) ? null : v, unit: u || null, raw: str };
-}
-
-function detectWeightMix(raw) {
-  if (!raw) return false;
-  const str = String(raw).toLowerCase();
-  const has = {
-    kg: /(kg|kilogram|公斤|千克)/.test(str),
-    g:  /(^|[\d\s.,])(g|克)(?![a-z])/.test(str),
-    lb: /(lb|pound|磅)/.test(str),
-  };
-  return [has.kg, has.g, has.lb].filter(Boolean).length >= 2;
-}
-
-function pickKeyFields(d) {
-  return {
-    weight: d.weight || '',
-    weightUnit: d.weightUnit || null,
-    medReminder: d.medReminder || '',
-    wechatNote: d.wechatNote || '',
-    attachment: d.attachment || '',
-    verbalNote: d.verbalNote || '',
-  };
-}
-
-function diffFields(a, b) {
-  const ka = pickKeyFields(a);
-  const kb = pickKeyFields(b);
-  const diffs = [];
-  for (const k of Object.keys(ka)) {
-    const va = ka[k];
-    const vb = kb[k];
-    if (String(va).trim() !== String(vb).trim()) {
-      diffs.push({ field: k, before: va, after: vb });
-    }
-  }
-  return diffs;
-}
-
-/* ========================================================================
-   核心 API（保持克制）
-   ======================================================================== */
-
-/**
- * 导入一条记录（或向同一主人追加新版本材料）
- * @param {Object} payload 表单原始数据
- * @returns {Object} { record, warnings, created: boolean }
- */
-function importRecord(payload) {
-  const ownerWechat = (payload.ownerWechat || '').trim();
-  if (!ownerWechat) throw new Error('主人微信备注不能为空');
-
-  const wp = parseWeight(payload.weight);
-  const weightMix = detectWeightMix(payload.weight);
-
-  const version = {
-    vid: 'v_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
-    createdAt: nowISO(),
-    weight: payload.weight || '',
-    weightParsed: wp,
-    weightUnit: wp.unit,
-    weightValue: wp.value,
-    animalName: payload.animalName || '',
-    visitDate: payload.visitDate || '',
-    medReminder: payload.medReminder || '',
-    wechatNote: payload.wechatNote || '',
-    attachment: payload.attachment || '',
-    verbalNote: payload.verbalNote || '',
-    source: payload._source || 'import',
-    anomalies: [],
-  };
-
-  const existing = state.records.find(
-    (r) => r.ownerWechat === ownerWechat && r.status !== STATUS.REVOKED
-  );
-
-  let record;
-  let created = false;
-  const warnings = [];
-
-  if (existing) {
-    record = existing;
-    const lastVer = record.versions[record.versions.length - 1];
-    const diffs = diffFields(lastVer, version);
-
-    if (diffs.length > 0) {
-      version.anomalies.push({
-        type: 'version_conflict',
-        message: `与上一版相比有 ${diffs.length} 处口径变更`,
-        diffs,
-        at: version.createdAt,
-      });
-      record.anomalies.push({
-        type: 'version_conflict',
-        vid: version.vid,
-        message: `版本 ${version.vid} 口径变更 ${diffs.length} 处`,
-        diffs,
-        at: version.createdAt,
-      });
-      warnings.push(`检测到与上一版的口径变更 ${diffs.length} 处`);
-    }
-
-    if (weightMix) {
-      version.anomalies.push({
-        type: 'weight_mix',
-        message: '体重字段单位混写（kg/g/lb 同时出现），已挂起请确认',
-        at: version.createdAt,
-      });
-      record.anomalies.push({
-        type: 'weight_mix',
-        vid: version.vid,
-        message: '体重单位混写，挂起中',
-        at: version.createdAt,
-      });
-      warnings.push('体重单位混写，已自动挂起，请接手同事确认');
-    }
-
-    const units = record.versions
-      .map((v) => v.weightUnit)
-      .filter(Boolean)
-      .concat(version.weightUnit ? [version.weightUnit] : []);
-    const uniqueUnits = [...new Set(units)];
-    if (uniqueUnits.length >= 2) {
-      version.anomalies.push({
-        type: 'weight_mix',
-        message: `历史版本体重单位不一致（${uniqueUnits.join(' / ')}），已挂起`,
-        at: version.createdAt,
-      });
-      record.anomalies.push({
-        type: 'weight_mix',
-        vid: version.vid,
-        message: `跨版本体重单位不一致（${uniqueUnits.join(' / ')}）`,
-        at: version.createdAt,
-      });
-      warnings.push('与历史版本体重单位不一致，已自动挂起');
-    }
-
-    record.versions.push(version);
-    record.updatedAt = version.createdAt;
-    record.latest = summarizeLatest(record);
-
-    const hasWeightIssue = record.anomalies.some((a) => a.type === 'weight_mix');
-    if (hasWeightIssue) {
-      record.status = STATUS.HANG;
-    }
-  } else {
-    created = true;
-    record = {
-      id: uid(),
-      ownerWechat,
-      status: STATUS.PENDING,
-      createdAt: version.createdAt,
-      updatedAt: version.createdAt,
-      anomalies: [],
-      versions: [version],
-      flags: { humanEdited: false },
-    };
-
-    if (weightMix) {
-      version.anomalies.push({
-        type: 'weight_mix',
-        message: '体重字段单位混写，已挂起请确认',
-        at: version.createdAt,
-      });
-      record.anomalies.push({
-        type: 'weight_mix',
-        vid: version.vid,
-        message: '体重单位混写，挂起中',
-        at: version.createdAt,
-      });
-      record.status = STATUS.HANG;
-      warnings.push('体重单位混写，已自动挂起');
-    }
-    record.latest = summarizeLatest(record);
-    state.records.unshift(record);
-  }
-
-  persist();
-  return { record, warnings, created };
-}
-
-function summarizeLatest(record) {
-  const v = record.versions[record.versions.length - 1];
-  return {
-    animalName: v.animalName,
-    visitDate: v.visitDate,
-    weight: v.weight,
-    weightUnit: v.weightUnit,
-    weightValue: v.weightValue,
-    medReminder: v.medReminder,
-    wechatNote: v.wechatNote,
-    attachment: v.attachment,
-    verbalNote: v.verbalNote,
-    vid: v.vid,
-  };
-}
-
-/**
- * 确认（放行）记录：pending → cleared；hang → cleared（同时视为已人工处理体重问题）
- */
-function confirmRecord(id, options = {}) {
-  const record = state.records.find((r) => r.id === id);
-  if (!record) throw new Error('记录不存在');
-  if (record.status === STATUS.REVOKED) throw new Error('已撤回的记录不能再确认');
-
-  if (record.status === STATUS.HANG) {
-    record.anomalies.push({
-      type: 'human_edit',
-      message: options.note
-        ? `人工确认放行（挂起）：${options.note}`
-        : '人工确认放行（从挂起状态确认）',
-      at: nowISO(),
-    });
-    record.flags.humanEdited = true;
-  }
-
-  record.status = STATUS.CLEARED;
-  record.updatedAt = nowISO();
-  persist();
-  return record;
-}
-
-/**
- * 撤回记录：cleared / pending / hang → revoked（保留历史版本留痕）
- */
-function revokeRecord(id, options = {}) {
-  const record = state.records.find((r) => r.id === id);
-  if (!record) throw new Error('记录不存在');
-  record.status = STATUS.REVOKED;
-  record.updatedAt = nowISO();
-  record.anomalies.push({
-    type: 'human_edit',
-    message: options.reason
-      ? `撤回：${options.reason}`
-      : '撤回（未填原因）',
-    at: nowISO(),
-  });
-  record.flags.humanEdited = true;
-  persist();
-  return record;
-}
-
-/**
- * 人工编辑某个最新版本的关键字段（保留痕迹，标记为人工改过）
- */
-function humanPatchRecord(id, patch, options = {}) {
-  const record = state.records.find((r) => r.id === id);
-  if (!record) throw new Error('记录不存在');
-  if (record.status === STATUS.REVOKED) throw new Error('已撤回的记录不可编辑');
-
-  const lastVer = record.versions[record.versions.length - 1];
-  const newVer = {
-    ...lastVer,
-    vid: 'v_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
-    createdAt: nowISO(),
-    source: 'human_edit',
-    anomalies: [],
-  };
-  Object.assign(newVer, patch);
-
-  const wp = parseWeight(patch.weight != null ? patch.weight : newVer.weight);
-  newVer.weightParsed = wp;
-  newVer.weightUnit = wp.unit;
-  newVer.weightValue = wp.value;
-
-  const diffs = diffFields(lastVer, newVer);
-  if (diffs.length === 0) return record;
-
-  newVer.anomalies.push({
-    type: 'human_edit',
-    message: `人工修改 ${diffs.length} 处字段` + (options.reason ? `：${options.reason}` : ''),
-    diffs,
-    at: newVer.createdAt,
-  });
-  record.anomalies.push({
-    type: 'human_edit',
-    vid: newVer.vid,
-    message: `人工修改 ${diffs.length} 处`,
-    diffs,
-    at: newVer.createdAt,
-  });
-
-  record.versions.push(newVer);
-  record.flags.humanEdited = true;
-  record.latest = summarizeLatest(record);
-  record.updatedAt = newVer.createdAt;
-
-  const stillWeightIssue = record.versions.some((v) =>
-    v.anomalies.some((a) => a.type === 'weight_mix')
-  );
-  if (stillWeightIssue && record.status !== STATUS.CLEARED && record.status !== STATUS.REVOKED) {
-    record.status = STATUS.HANG;
-  } else if (record.status === STATUS.HANG && !stillWeightIssue) {
-    record.status = STATUS.PENDING;
-  }
-
-  persist();
-  return record;
-}
-
-/**
- * 页面摘要
- */
-function getSummary() {
-  const out = {
-    total: state.records.length,
-    cleared: 0,
-    pending: 0,
-    human: 0,
-    hang: 0,
-    revoked: 0,
-    weightIssues: 0,
-    versionConflicts: 0,
-  };
-  for (const r of state.records) {
-    if (r.status === STATUS.CLEARED) out.cleared++;
-    else if (r.status === STATUS.PENDING) out.pending++;
-    else if (r.status === STATUS.HANG) out.hang++;
-    else if (r.status === STATUS.REVOKED) out.revoked++;
-    if (r.flags && r.flags.humanEdited) out.human++;
-    for (const a of r.anomalies) {
-      if (a.type === 'weight_mix') out.weightIssues++;
-      if (a.type === 'version_conflict') out.versionConflicts++;
-    }
-  }
-  return out;
-}
-
-function listRecords(filter = 'all') {
-  let rs = [...state.records];
-  if (filter === 'human') {
-    rs = rs.filter((r) => r.flags && r.flags.humanEdited);
-  } else if (filter !== 'all') {
-    rs = rs.filter((r) => r.status === filter);
-  }
-  return rs.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
-}
-
-function listAnomalies() {
-  const items = [];
-  for (const r of state.records) {
-    for (const a of r.anomalies) {
-      items.push({
-        recordId: r.id,
-        ownerWechat: r.ownerWechat,
-        animalName: r.latest && r.latest.animalName,
-        status: r.status,
-        vid: a.vid,
-        type: a.type,
-        message: a.message,
-        diffs: a.diffs || null,
-        at: a.at,
-      });
-    }
-  }
-  return items.sort((a, b) => (b.at || '').localeCompare(a.at || ''));
-}
-
-/* ========================================================================
-   UI 渲染
-   ======================================================================== */
-
 const FIELD_LABEL = {
   weight: '回访体重',
   weightUnit: '体重单位',
@@ -433,13 +27,89 @@ const FIELD_LABEL = {
 };
 
 const ANOMALY_LABEL = {
-  weight_mix: { label: '体重单位冲突', cls: 'tag-hang' },
-  version_conflict: { label: '口径变更', cls: 'tag-warn' },
-  human_edit: { label: '人工处理', cls: 'tag-human' },
+  weight_mix:       { label: '体重单位冲突', cls: 'tag-hang' },
+  version_conflict: { label: '口径变更',     cls: 'tag-warn' },
+  human_edit:       { label: '人工处理',     cls: 'tag-human' },
 };
 
-function renderSummary() {
-  const s = getSummary();
+let currentFilter = 'all';
+
+/* ---------- API 封装 ---------- */
+
+async function api(path, options = {}) {
+  const res = await fetch(`/api${path}`, {
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    ...options,
+  });
+  let data = {};
+  try { data = await res.json(); } catch (e) { data = {}; }
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  return data.data;
+}
+
+async function importRecord(payload) {
+  return api('/records', { method: 'POST', body: JSON.stringify(payload) });
+}
+async function confirmRecord(id, options = {}) {
+  return api(`/records/${encodeURIComponent(id)}/confirm`, {
+    method: 'POST', body: JSON.stringify(options || {}),
+  });
+}
+async function revokeRecord(id, options = {}) {
+  return api(`/records/${encodeURIComponent(id)}/revoke`, {
+    method: 'POST', body: JSON.stringify(options || {}),
+  });
+}
+async function humanPatchRecord(id, patch, options = {}) {
+  return api(`/records/${encodeURIComponent(id)}/patch`, {
+    method: 'POST', body: JSON.stringify({ ...patch, reason: options.reason }),
+  });
+}
+async function getSummary() {
+  return api('/summary');
+}
+async function listRecords(filter = 'all') {
+  return api(`/records?filter=${encodeURIComponent(filter)}`);
+}
+async function listAnomalies() {
+  return api('/anomalies');
+}
+async function getRecordDetail(id) {
+  return api(`/records/${encodeURIComponent(id)}`);
+}
+
+/* ---------- 工具 ---------- */
+const fmtDate = (iso) => {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function diffFields(a, b) {
+  const keys = ['weight', 'medReminder', 'wechatNote', 'attachment', 'verbalNote'];
+  const diffs = [];
+  for (const k of keys) {
+    const va = (a && a[k] != null ? a[k] : '') || '';
+    const vb = (b && b[k] != null ? b[k] : '') || '';
+    if (String(va).trim() !== String(vb).trim()) {
+      diffs.push({ field: k, label: FIELD_LABEL[k] || k, before: va, after: vb });
+    }
+  }
+  return diffs;
+}
+
+/* ---------- 渲染 ---------- */
+
+function renderSummary(s) {
   document.getElementById('sum-cleared').textContent = s.cleared;
   document.getElementById('sum-pending').textContent = s.pending;
   document.getElementById('sum-human').textContent   = s.human;
@@ -468,12 +138,11 @@ function anomalyBadges(record) {
 }
 
 function humanFlag(record) {
-  return (record.flags && record.flags.humanEdited)
+  return (record.flags && record.flags.humanEdited) || record.humanEdited
     ? `<span class="tag tag-human">人工改过</span>` : '';
 }
 
-function renderList(filter = 'all') {
-  const list = listRecords(filter);
+function renderList(list) {
   const host = document.getElementById('record-list');
   if (list.length === 0) {
     host.innerHTML = `<div class="empty-tip">当前筛选条件下暂无记录。</div>`;
@@ -481,6 +150,7 @@ function renderList(filter = 'all') {
   }
   host.innerHTML = list.map((r) => {
     const L = r.latest || {};
+    const verCount = r.versionCount != null ? r.versionCount : (r.versions ? r.versions.length : 1);
     return `
     <article class="record-card ${statusCls(r.status)}">
       <header class="rc-head">
@@ -506,7 +176,7 @@ function renderList(filter = 'all') {
       </div>
       <footer class="rc-foot">
         <div class="rc-meta">
-          版本 ${r.versions.length} · 创建 ${fmtDate(r.createdAt)} · 更新 ${fmtDate(r.updatedAt)}
+          版本 ${verCount} · 创建 ${fmtDate(r.createdAt)} · 更新 ${fmtDate(r.updatedAt)}
         </div>
         <div class="rc-actions">
           <button class="btn btn-sm" data-act="detail" data-id="${r.id}">详情/变更溯源</button>
@@ -525,8 +195,7 @@ function renderList(filter = 'all') {
   });
 }
 
-function renderAnomalies() {
-  const items = listAnomalies();
+function renderAnomalies(items) {
   const host = document.getElementById('anomaly-list');
   if (items.length === 0) {
     host.innerHTML = `<div class="empty-tip">暂无异常。所有材料口径与体重单位都一致。</div>`;
@@ -538,7 +207,7 @@ function renderAnomalies() {
       <div class="diff-box">
         ${it.diffs.map((d) => `
           <div class="diff-row">
-            <div class="diff-field">${FIELD_LABEL[d.field] || d.field}</div>
+            <div class="diff-field">${d.label || FIELD_LABEL[d.field] || d.field}</div>
             <div class="diff-before" title="前值">${escapeHtml(String(d.before || '(空)'))}</div>
             <div class="diff-arrow">→</div>
             <div class="diff-after"  title="后值">${escapeHtml(String(d.after  || '(空)'))}</div>
@@ -552,7 +221,7 @@ function renderAnomalies() {
         <strong class="ac-owner">${escapeHtml(it.ownerWechat)}</strong>
         ${it.animalName ? `<span class="ac-sub">${escapeHtml(it.animalName)}</span>` : ''}
         <span class="status-pill sp-${it.status} small">${STATUS_LABEL[it.status]}</span>
-        <span class="ac-time">${fmtDate(it.at)}</span>
+        <span class="ac-time">${fmtDate(it.createdAt)}</span>
       </header>
       <div class="ac-msg">${escapeHtml(it.message)}</div>
       ${diffHtml}
@@ -567,39 +236,35 @@ function renderAnomalies() {
   });
 }
 
-function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+/* ---------- 刷新 ---------- */
+
+async function refresh() {
+  const [summary, records, anomalies] = await Promise.all([
+    getSummary(),
+    listRecords(currentFilter),
+    listAnomalies(),
+  ]);
+  renderSummary(summary);
+  renderList(records);
+  renderAnomalies(anomalies);
 }
 
 /* ---------- 交互 ---------- */
 
-let currentFilter = 'all';
-
-function refresh() {
-  renderSummary();
-  renderList(currentFilter);
-  renderAnomalies();
-}
-
-function handleCardAction(act, id) {
+async function handleCardAction(act, id) {
   if (act === 'detail') return openDetail(id);
   if (act === 'patch')  return openPatch(id);
   if (act === 'confirm') {
-    const record = state.records.find((r) => r.id === id);
-    let note = '';
-    if (record && record.status === STATUS.HANG) {
-      note = prompt('从挂起状态确认，请输入确认说明（会留痕）：', '体重单位已人工核对');
-      if (note === null) return;
-    }
     try {
-      confirmRecord(id, { note });
+      const detail = await getRecordDetail(id);
+      let note = '';
+      if (detail && detail.status === STATUS.HANG) {
+        note = prompt('从挂起状态确认，请输入确认说明（会留痕）：', '体重单位已人工核对');
+        if (note === null) return;
+      }
+      await confirmRecord(id, { note });
       flash('已确认放行');
-      refresh();
+      await refresh();
     } catch (e) { alert(e.message); }
     return;
   }
@@ -607,15 +272,15 @@ function handleCardAction(act, id) {
     const reason = prompt('撤回原因（会留痕）：', '材料不实/重复导入/其他');
     if (reason === null) return;
     try {
-      revokeRecord(id, { reason });
+      await revokeRecord(id, { reason });
       flash('已撤回，保留历史留痕');
-      refresh();
+      await refresh();
     } catch (e) { alert(e.message); }
   }
 }
 
-function openDetail(id) {
-  const r = state.records.find((x) => x.id === id);
+async function openDetail(id) {
+  const r = await getRecordDetail(id);
   if (!r) return;
   const L = r.latest;
   const historyHtml = r.versions.slice().reverse().map((v, idx, arr) => {
@@ -626,7 +291,7 @@ function openDetail(id) {
       <div class="diff-box small">
         ${diffs.map((d) => `
           <div class="diff-row">
-            <div class="diff-field">${FIELD_LABEL[d.field] || d.field}</div>
+            <div class="diff-field">${d.label || FIELD_LABEL[d.field] || d.field}</div>
             <div class="diff-before">${escapeHtml(String(d.before || '(空)'))}</div>
             <div class="diff-arrow">→</div>
             <div class="diff-after">${escapeHtml(String(d.after || '(空)'))}</div>
@@ -658,13 +323,13 @@ function openDetail(id) {
       </div>`;
   }).join('');
 
-  const anomHtml = r.anomalies.length > 0 ? `
+  const anomHtml = r.anomalies && r.anomalies.length > 0 ? `
     <h4>异常时间线</h4>
     <ul class="anom-timeline">
       ${r.anomalies.map((a) => {
         const info = ANOMALY_LABEL[a.type] || { label: a.type, cls: 'tag-warn' };
         return `<li><span class="tag ${info.cls}">${info.label}</span>
-          <span class="muted">${fmtDate(a.at)}</span>
+          <span class="muted">${fmtDate(a.createdAt)}</span>
           <div>${escapeHtml(a.message)}</div>
         </li>`;
       }).join('')}
@@ -673,7 +338,7 @@ function openDetail(id) {
   const body = `
     <div class="detail-head">
       <div>
-        <h3 style="margin:0">${escapeHtml(r.ownerWechat)} ${L.animalName ? '· ' + escapeHtml(L.animalName) : ''}</h3>
+        <h3 style="margin:0">${escapeHtml(r.ownerWechat)} ${L && L.animalName ? '· ' + escapeHtml(L.animalName) : ''}</h3>
         <div class="muted small">创建 ${fmtDate(r.createdAt)} · 更新 ${fmtDate(r.updatedAt)}</div>
       </div>
       <div>
@@ -688,10 +353,10 @@ function openDetail(id) {
   openModal(`记录详情 · ${escapeHtml(r.ownerWechat)}`, body);
 }
 
-function openPatch(id) {
-  const r = state.records.find((x) => x.id === id);
+async function openPatch(id) {
+  const r = await getRecordDetail(id);
   if (!r) return;
-  const L = r.latest;
+  const L = r.latest || {};
   const body = `
     <p class="muted small">人工补改会生成新版本并标记「人工改过」。可用于：体重单位确认、补充说明、修正录入错误等。</p>
     <form id="form-patch" class="patch-form">
@@ -741,7 +406,7 @@ function openPatch(id) {
   `;
   openModal(`人工补改 · ${escapeHtml(r.ownerWechat)}`, body);
   const form = document.getElementById('form-patch');
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const fd = new FormData(form);
     const reason = fd.get('reason') || '';
@@ -752,13 +417,12 @@ function openPatch(id) {
       wechatNote: fd.get('wechatNote'),
       attachment: fd.get('attachment'),
       verbalNote: fd.get('verbalNote'),
-      animalName: L.animalName,
     };
     try {
-      humanPatchRecord(id, patch, { reason });
+      await humanPatchRecord(id, patch, { reason });
       closeModal();
       flash('已保存，生成新版本并标记人工改过');
-      refresh();
+      await refresh();
     } catch (err) { alert(err.message); }
   });
 }
@@ -796,59 +460,60 @@ function flash(msg) {
 
 /* ---------- 初始化 ---------- */
 
-document.addEventListener('DOMContentLoaded', () => {
-  refresh();
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    await refresh();
+  } catch (err) {
+    alert('无法加载数据，请确认后端服务已启动：' + err.message);
+  }
 
   document.getElementById('btn-import-entry').addEventListener('click', () => {
     document.getElementById('import-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
   document.getElementById('btn-clear').addEventListener('click', () => {
-    if (confirm('确定清空全部本地数据？此操作不可恢复。')) {
-      Store.clear();
-      state = { records: [] };
-      refresh();
-      flash('已清空本地数据');
-    }
+    if (!confirm('确定清空全部数据？此操作不可恢复。')) return;
+    alert('清空数据功能暂未开放（API 面保持克制，如需可调用 db.js 直接处理）。');
   });
 
   document.querySelectorAll('.filter-bar .chip').forEach((ch) => {
-    ch.addEventListener('click', () => {
+    ch.addEventListener('click', async () => {
       document.querySelectorAll('.filter-bar .chip').forEach((x) => x.classList.remove('active'));
       ch.classList.add('active');
       currentFilter = ch.dataset.filter;
-      renderList(currentFilter);
+      const records = await listRecords(currentFilter);
+      renderList(records);
     });
   });
 
   const form = document.getElementById('form-import');
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const fd = new FormData(form);
     const payload = {};
     fd.forEach((v, k) => { payload[k] = v; });
     try {
-      const res = importRecord(payload);
+      const res = await importRecord(payload);
       let msg = res.created ? '已导入新记录' : '已追加到现有主人记录';
-      if (res.warnings.length) msg += `（${res.warnings.join('；')}）`;
+      if (res.warnings && res.warnings.length) msg += `（${res.warnings.join('；')}）`;
       flash(msg);
       form.reset();
-      refresh();
+      await refresh();
     } catch (err) {
       alert('导入失败：' + err.message);
     }
   });
 });
 
-/* 暴露到 window，便于调试 / 被其他脚本调用（API 面保持克制） */
+/* 暴露到 window，便于调试（API 面保持克制） */
 window.StrayTracker = {
   importRecord,
   confirmRecord,
   revokeRecord,
-  getSummary,
   humanPatchRecord,
+  getSummary,
   listRecords,
   listAnomalies,
-  _clearAll: () => { Store.clear(); state = { records: [] }; refresh(); },
-  _state: () => state,
+  getRecordDetail,
+  refresh,
 };
