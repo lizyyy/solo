@@ -41,7 +41,7 @@ router.post('/import', (req, res) => {
   }
 })
 
-router.post('/:id/export', (req, res) => {
+router.get('/:id/export', (req, res) => {
   try {
     const { id } = req.params
     const detail = batchService.getBatchDetail(id)
