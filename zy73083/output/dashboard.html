@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>幕墙节点方案比选 · 看板</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f5f7fa;
+    color: #1f2329;
+    line-height: 1.6;
+    padding: 24px;
+}
+.container { max-width: 1200px; margin: 0 auto; }
+
+/* 顶部标题区 */
+.header {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: white;
+    padding: 32px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+.header h1 { font-size: 26px; margin-bottom: 8px; }
+.header .subtitle { opacity: 0.9; font-size: 14px; }
+
+/* 统计卡片 */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border-left: 4px solid #3b82f6;
+}
+.stat-card.warn { border-left-color: #f59e0b; }
+.stat-card.danger { border-left-color: #ef4444; }
+.stat-card.success { border-left-color: #10b981; }
+.stat-card .label { font-size: 13px; color: #6b7280; margin-bottom: 6px; }
+.stat-card .value { font-size: 28px; font-weight: 600; }
+
+/* Tab 切换 */
+.tabs {
+    display: flex;
+    gap: 4px;
+    background: white;
+    padding: 6px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.tab-btn {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #4b5563;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.tab-btn:hover { background: #f3f4f6; }
+.tab-btn.active {
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-weight: 600;
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* 节点卡片 */
+.node-card {
+    background: white;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+}
+.node-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.node-card.abnormal { border-top: 3px solid #ef4444; }
+.node-card.normal { border-top: 3px solid #10b981; }
+
+.node-header {
+    padding: 18px 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+.node-header:hover { background: #f9fafb; }
+.node-id { font-size: 13px; color: #6b7280; font-family: monospace; }
+.node-name { font-size: 16px; font-weight: 600; margin-top: 2px; }
+.node-info { display: flex; align-items: center; gap: 24px; flex: 1; }
+.node-status { display: flex; flex-direction: column; gap: 6px; }
+
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+.badge-normal { background: #d1fae5; color: #065f46; }
+.badge-warn { background: #fef3c7; color: #92400e; }
+.badge-danger { background: #fee2e2; color: #991b1b; }
+.badge-info { background: #dbeafe; color: #1e40af; }
+.badge-gray { background: #e5e7eb; color: #374151; }
+
+.node-stats { display: flex; gap: 16px; font-size: 13px; color: #6b7280; }
+.node-stats span { display: flex; align-items: center; gap: 4px; }
+.expand-icon { font-size: 20px; color: #9ca3af; transition: transform 0.2s; }
+.node-card.expanded .expand-icon { transform: rotate(180deg); }
+
+/* 节点详情 */
+.node-detail {
+    padding: 0 24px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+.node-card.expanded .node-detail { max-height: 3000px; }
+.detail-section {
+    padding: 18px 0;
+    border-top: 1px solid #f3f4f6;
+}
+.detail-section h4 {
+    font-size: 14px;
+    color: #374151;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.detail-section h4::before {
+    content: '';
+    width: 3px;
+    height: 16px;
+    background: #3b82f6;
+    border-radius: 2px;
+}
+
+.calc-spec {
+    background: #f8fafc;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #475569;
+    border-left: 3px solid #3b82f6;
+}
+
+/* 纪要卡片 */
+.minute-card {
+    background: #fafafa;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 10px;
+}
+.minute-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.minute-meta { font-size: 12px; color: #6b7280; margin-bottom: 8px; }
+.minute-content {
+    font-size: 13px;
+    color: #4b5563;
+    white-space: pre-line;
+    margin-bottom: 10px;
+}
+.minute-note {
+    background: #fef3c7;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #92400e;
+    margin-bottom: 8px;
+}
+.minute-source {
+    background: #f1f5f9;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #475569;
+    font-family: monospace;
+    white-space: pre-line;
+}
+.minute-screenshot {
+    margin-top: 8px;
+    padding: 10px;
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* 碰撞点卡片 */
+.collision-card {
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 10px;
+}
+.collision-card.excluded {
+    border: 1px dashed #f59e0b;
+    background: #fffbeb;
+}
+.collision-title { font-size: 14px; font-weight: 600; color: #991b1b; margin-bottom: 6px; }
+.collision-card.excluded .collision-title { color: #92400e; }
+.collision-scope {
+    font-size: 13px;
+    color: #4b5563;
+    margin-bottom: 8px;
+}
+.collision-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    background: #fee2e2;
+    color: #991b1b;
+}
+.collision-tag.excluded-tag {
+    background: #fde68a;
+    color: #78350f;
+}
+
+/* 变更记录卡片 */
+.change-card {
+    border: 1px solid #e0e7ff;
+    background: #eef2ff;
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 10px;
+}
+.change-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.change-type { font-size: 13px; font-weight: 600; color: #3730a3; }
+.change-time { font-size: 12px; color: #6366f1; }
+.change-compare {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.change-before, .change-after {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+.change-before { background: #fef2f2; color: #991b1b; text-decoration: line-through; }
+.change-after { background: #dcfce7; color: #166534; font-weight: 500; }
+.change-arrow { color: #6b7280; font-size: 18px; }
+.change-reason {
+    background: white;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #4b5563;
+    margin-bottom: 8px;
+}
+.change-materials {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 6px;
+}
+.change-materials strong { color: #374151; }
+
+/* 材料清单 */
+.material-list {
+    list-style: none;
+    font-size: 13px;
+    color: #4b5563;
+}
+.material-list li {
+    padding: 6px 0;
+    padding-left: 20px;
+    position: relative;
+}
+.material-list li::before {
+    content: '📎';
+    position: absolute;
+    left: 0;
+}
+
+/* 隔离区标题 */
+.isolation-banner {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    padding: 16px 20px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+}
+.isolation-banner h3 { font-size: 16px; margin-bottom: 4px; }
+.isolation-banner p { font-size: 13px; opacity: 0.95; }
+
+/* 历史列表 */
+.history-item {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border-left: 4px solid #8b5cf6;
+}
+.history-item h4 { font-size: 15px; margin-bottom: 6px; }
+.history-item .meta { font-size: 12px; color: #6b7280; margin-bottom: 10px; }
+
+/* 导出按钮 */
+.export-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}
+.export-btn {
+    padding: 10px 20px;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+.export-btn:hover { background: #059669; }
+
+/* 空状态 */
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+/* 底部说明 */
+.footer-note {
+    margin-top: 32px;
+    padding: 16px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #64748b;
+    text-align: center;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .node-header { flex-wrap: wrap; }
+    .change-compare { grid-template-columns: 1fr; }
+    .change-arrow { transform: rotate(90deg); text-align: center; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+    <!-- 顶部标题 -->
+    <div class="header">
+        <h1>🏗️ 幕墙节点方案比选 · 看板</h1>
+        <div class="subtitle">结构工程师老叶不用再临时解释版本 — 异常一眼看得到、历史都留得住、重复碰撞不混进</div>
+    </div>
+
+    <!-- 统计卡片 -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="label">节点总数</div>
+            <div class="value">3</div>
+        </div>
+        <div class="stat-card warn">
+            <div class="label">异常节点</div>
+            <div class="value">2</div>
+        </div>
+        <div class="stat-card success">
+            <div class="label">已确认最新版</div>
+            <div class="value">1</div>
+        </div>
+        <div class="stat-card danger">
+            <div class="label">待复核重复碰撞</div>
+            <div class="value">1</div>
+        </div>
+    </div>
+
+    <!-- 导出按钮 -->
+    <div class="export-bar">
+        <button class="export-btn" onclick="exportCSV()">
+            📤 导出当前比选结果 (CSV)
+        </button>
+    </div>
+
+    <!-- Tab 切换 -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('normal')">① 正常汇总看板</button>
+        <button class="tab-btn" onclick="switchTab('abnormal')">② 异常标记视图</button>
+        <button class="tab-btn" onclick="switchTab('history')">③ 历史追溯视图</button>
+    </div>
+
+    <!-- Tab 1: 正常汇总 -->
+    <div id="tab-normal" class="tab-content active">
+        <div style="margin-bottom:12px; font-size:13px; color:#6b7280;">
+            💡 本视图只显示「图纸版本 = 已确认最新版」的记录，看到这张视图就代表是确认过的版本。
+        </div>
+        
+            
+                
+<div id="node-MQ-001" class="node-card normal">
+    <div class="node-header" onclick="toggleNode('MQ-001')">
+        <div>
+            <div class="node-id">MQ-001</div>
+            <div class="node-name">东立面转角铝合金幕墙节点</div>
+        </div>
+        <div class="node-info">
+            <div class="node-status">
+                <div>
+                    <span class="badge badge-normal">
+                        已通过
+                    </span>
+                </div>
+                <div>
+                    <span class="badge badge-success">
+                        📋 已确认最新版
+                    </span>
+                </div>
+            </div>
+            <div class="node-stats">
+                <span>📝 纪要 0</span>
+                <span>💥 碰撞 0</span>
+                <span>🔄 变更 0</span>
+            </div>
+        </div>
+        <div class="expand-icon">▼</div>
+    </div>
+
+    <div class="node-detail">
+        <!-- 计算口径 -->
+        <div class="detail-section">
+            <h4>📐 计算口径</h4>
+            <div class="calc-spec">GB50210-2018 幕墙工程验收规范，铝合金型材壁厚≥3mm，埋件间距≤1200mm</div>
+        </div>
+
+        <!-- 比选材料 -->
+        <div class="detail-section">
+            <h4>📎 比选材料附件</h4>
+            
+                <ul class="material-list">
+                    
+                        <li>节点大样图V3-20260601.pdf</li>
+                    
+                        <li>计算书-铝合金型材强度校核.xlsx</li>
+                    
+                </ul>
+            
+            <div style="margin-top:8px; font-size:12px; color:#6b7280;">
+                👤 结构工程师：老叶
+            </div>
+        </div>
+
+        <!-- 会议纪要 -->
+        
+
+        <!-- 碰撞点 -->
+        
+
+        <!-- 历史变更 -->
+        
+
+    </div>
+</div>
+            
+        
+
+        <!-- 重复碰撞点隔离区（始终显示在正常汇总下方） -->
+        
+        <div style="margin-top: 32px;">
+            <div class="isolation-banner">
+                <h3>⚠️ 重复碰撞点隔离区（已排除正常汇总）</h3>
+                <p>以下碰撞点标记了「排除正常汇总」，绝对不能直接合并进方案比选结论，必须单独复核。</p>
+            </div>
+            
+                <div class="collision-card excluded">
+                    <div class="collision-title">
+                        密封胶与型材相容性重复发现（图纸版本冲突）
+                        <span class="collision-tag excluded-tag">🔒 已排除正常汇总</span>
+                    </div>
+                    <div class="collision-scope"><strong>影响范围：</strong>南立面开启扇全部胶缝（约280米），且已送检批次与现场实装批次不一致，影响整个南立面施工进度安排。需复核图纸V2和V3版差异。</div>
+                    <div style="font-size:12px; color:#6b7280;">
+                        关联节点：MQ-003 — 
+                        来源纪要：MIN-002
+                    </div>
+                </div>
+            
+        </div>
+        
+    </div>
+
+    <!-- Tab 2: 异常标记 -->
+    <div id="tab-abnormal" class="tab-content">
+        <div style="margin-bottom:12px; font-size:13px; color:#6b7280;">
+            🚨 所有异常节点汇总在此，点击展开查看会议纪要来源、碰撞点详情、历史变更。
+        </div>
+        
+            
+                
+<div id="node-MQ-002" class="node-card abnormal">
+    <div class="node-header" onclick="toggleNode('MQ-002')">
+        <div>
+            <div class="node-id">MQ-002</div>
+            <div class="node-name">西立面入口玻璃肋驳接节点</div>
+        </div>
+        <div class="node-info">
+            <div class="node-status">
+                <div>
+                    <span class="badge badge-danger">
+                        存在碰撞待协调
+                    </span>
+                </div>
+                <div>
+                    <span class="badge badge-warn">
+                        📋 待确认版本
+                    </span>
+                </div>
+            </div>
+            <div class="node-stats">
+                <span>📝 纪要 1</span>
+                <span>💥 碰撞 1</span>
+                <span>🔄 变更 0</span>
+            </div>
+        </div>
+        <div class="expand-icon">▼</div>
+    </div>
+
+    <div class="node-detail">
+        <!-- 计算口径 -->
+        <div class="detail-section">
+            <h4>📐 计算口径</h4>
+            <div class="calc-spec">JGJ102-2003 玻璃幕墙工程技术规范，钢化玻璃厚度≥12mm，驳接头间距≤300mm</div>
+        </div>
+
+        <!-- 比选材料 -->
+        <div class="detail-section">
+            <h4>📎 比选材料附件</h4>
+            
+                <ul class="material-list">
+                    
+                        <li>玻璃肋驳接节点图V2.pdf</li>
+                    
+                        <li>驳接件荷载计算书.pdf</li>
+                    
+                </ul>
+            
+            <div style="margin-top:8px; font-size:12px; color:#6b7280;">
+                👤 结构工程师：老叶
+            </div>
+        </div>
+
+        <!-- 会议纪要 -->
+        
+        <div class="detail-section">
+            <h4>📝 关联会议纪要（点击异常能回到这里）</h4>
+            
+                <div class="minute-card">
+                    <div class="minute-title">西立面玻璃肋第一次技术评审会</div>
+                    <div class="minute-meta">
+                        🕒 2026-06-08 14:00
+                        
+                            · <span class="badge badge-danger">
+                                有碰撞待协调
+                            </span>
+                        
+                    </div>
+                    <div class="minute-content">西立面入口玻璃肋驳接节点第一次评审：
+发现驳接头与钢龙骨间距不足，需要调整驳接位置。
+方案A建议增加垫块厚度，方案B建议下移驳接头20mm。</div>
+
+                    
+                    <div class="minute-note">
+                        <strong>📌 后续补充备注：</strong>补充备注：设计院反馈方案B会影响外观线条，方案A成本可接受，但需要确认垫块耐久性。
+                    </div>
+                    
+
+                    
+                    <div class="minute-source">
+                        <strong>📍 来源位置：</strong><br>
+                        文档：幕墙专项评审会议纪要.docx
+段落：第二章 2.1 节
+原文："驳接头与钢龙骨净距仅15mm，低于规范要求30mm"
+                    </div>
+                    
+
+                    
+                    <div class="minute-screenshot">
+                        🖼️ 旧版本截图占位：旧版节点图V1对比截图（占位图）.png
+                    </div>
+                    
+                </div>
+            
+        </div>
+        
+
+        <!-- 碰撞点 -->
+        
+        <div class="detail-section">
+            <h4>💥 异常碰撞点</h4>
+            
+                <div class="collision-card ">
+                    <div class="collision-title">
+                        驳接头与钢龙骨净距不足
+                        
+                        
+                    </div>
+                    <div class="collision-scope"><strong>影响范围：</strong>西立面入口玻璃肋全部驳接点（共12个）受影响，需逐一复核调整方案。不影响其他立面。</div>
+                    <div style="font-size:12px; color:#6b7280;">
+                        来源纪要：MIN-001
+                    </div>
+                </div>
+            
+        </div>
+        
+
+        <!-- 历史变更 -->
+        
+
+    </div>
+</div>
+            
+                
+<div id="node-MQ-003" class="node-card abnormal">
+    <div class="node-header" onclick="toggleNode('MQ-003')">
+        <div>
+            <div class="node-id">MQ-003</div>
+            <div class="node-name">南立面开启扇密封胶缝节点</div>
+        </div>
+        <div class="node-info">
+            <div class="node-status">
+                <div>
+                    <span class="badge badge-danger">
+                        需补录后判断
+                    </span>
+                </div>
+                <div>
+                    <span class="badge badge-danger">
+                        📋 版本存疑需复核
+                    </span>
+                </div>
+            </div>
+            <div class="node-stats">
+                <span>📝 纪要 1</span>
+                <span>💥 碰撞 1</span>
+                <span>🔄 变更 1</span>
+            </div>
+        </div>
+        <div class="expand-icon">▼</div>
+    </div>
+
+    <div class="node-detail">
+        <!-- 计算口径 -->
+        <div class="detail-section">
+            <h4>📐 计算口径</h4>
+            <div class="calc-spec">GB/T14683-2017 硅酮建筑密封胶，胶缝厚度≥8mm宽度≥10mm</div>
+        </div>
+
+        <!-- 比选材料 -->
+        <div class="detail-section">
+            <h4>📎 比选材料附件</h4>
+            
+                <ul class="material-list">
+                    
+                        <li>开启扇密封节点图V3-20260609.pdf</li>
+                    
+                        <li>密封胶产品说明书.pdf</li>
+                    
+                </ul>
+            
+            <div style="margin-top:8px; font-size:12px; color:#6b7280;">
+                👤 结构工程师：老叶
+            </div>
+        </div>
+
+        <!-- 会议纪要 -->
+        
+        <div class="detail-section">
+            <h4>📝 关联会议纪要（点击异常能回到这里）</h4>
+            
+                <div class="minute-card">
+                    <div class="minute-title">南立面密封胶缝第二轮评审</div>
+                    <div class="minute-meta">
+                        🕒 2026-06-09 10:30
+                        
+                            · <span class="badge badge-danger">
+                                碰撞重复出现
+                            </span>
+                        
+                    </div>
+                    <div class="minute-content">南立面开启扇密封胶缝节点第二轮评审：
+第一轮推荐方案A低模量胶，第二轮复核时发现该批次胶的相容性报告缺失。
+需要补录材料相容性检测报告后再判断。</div>
+
+                    
+                    <div class="minute-note">
+                        <strong>📌 后续补充备注：</strong>补充备注：施工方承诺6月11日前补齐报告；第一轮图纸V2版与第二轮V3版标注不一致，以V3版为准（见旧版本截图对比）。
+                    </div>
+                    
+
+                    
+                    <div class="minute-source">
+                        <strong>📍 来源位置：</strong><br>
+                        文档：南立面开启扇专项评审纪要-V2.docx
+段落：附录B 第3条
+原文："低模量硅酮密封胶需提供与铝合金型材的相容性试验报告"
+                    </div>
+                    
+
+                    
+                    <div class="minute-screenshot">
+                        🖼️ 旧版本截图占位：V2与V3版胶缝标注对比截图（占位图）.png
+                    </div>
+                    
+                </div>
+            
+        </div>
+        
+
+        <!-- 碰撞点 -->
+        
+        <div class="detail-section">
+            <h4>💥 异常碰撞点</h4>
+            
+                <div class="collision-card excluded">
+                    <div class="collision-title">
+                        密封胶与型材相容性重复发现（图纸版本冲突）
+                        
+                            <span class="collision-tag">🔁 重复碰撞</span>
+                        
+                        
+                            <span class="collision-tag excluded-tag">🔒 排除正常汇总</span>
+                        
+                    </div>
+                    <div class="collision-scope"><strong>影响范围：</strong>南立面开启扇全部胶缝（约280米），且已送检批次与现场实装批次不一致，影响整个南立面施工进度安排。需复核图纸V2和V3版差异。</div>
+                    <div style="font-size:12px; color:#6b7280;">
+                        来源纪要：MIN-002
+                    </div>
+                </div>
+            
+        </div>
+        
+
+        <!-- 历史变更 -->
+        
+        <div class="detail-section">
+            <h4>🔄 历史变更记录（补录/改判可追溯）</h4>
+            
+                <div class="change-card">
+                    <div class="change-header">
+                        <span class="change-type">结论改判</span>
+                        <span class="change-time">2026-06-09 16:20</span>
+                    </div>
+                    <div class="change-compare">
+                        <div class="change-before">推荐方案A（低模量硅酮密封胶）</div>
+                        <div class="change-arrow">→</div>
+                        <div class="change-after">需补录后判断</div>
+                    </div>
+                    <div class="change-reason"><strong>改判原因：</strong>第二轮复核发现方案A所用批次密封胶与铝合金型材的相容性检测报告缺失，且图纸V2/V3版本标注不一致，需补录检测报告并重新核图后再判断。</div>
+                    <div class="change-materials">
+                        <strong>旧材料摘要：</strong>第一轮提交的比选材料：方案A低模量胶20年质保+相容性送检回执（非最终报告），方案B高模量胶15年质保无报告；成本对比方案A比方案B低约8%。
+                    </div>
+                    <div class="change-materials">
+                        <strong>新备注/补录内容：</strong>补录要求：1）6月11日前提交该批次胶与6063-T5铝合金型材的正式相容性试验报告；2）设计院出具图纸V2与V3版差异说明，确认最新版标注。
+                    </div>
+                </div>
+            
+        </div>
+        
+
+    </div>
+</div>
+            
+        
+    </div>
+
+    <!-- Tab 3: 历史追溯 -->
+    <div id="tab-history" class="tab-content">
+        <div style="margin-bottom:12px; font-size:13px; color:#6b7280;">
+            📜 所有补录和结论改判记录，旧材料、新备注、改判原因都在这里。
+        </div>
+        
+            
+                <div class="history-item">
+                    <h4>🔄 结论改判 · MQ-003</h4>
+                    <div class="meta">变更时间：2026-06-09 16:20</div>
+                    <div class="change-compare">
+                        <div class="change-before">推荐方案A（低模量硅酮密封胶）</div>
+                        <div class="change-arrow">→</div>
+                        <div class="change-after">需补录后判断</div>
+                    </div>
+                    <div class="change-reason"><strong>改判原因：</strong>第二轮复核发现方案A所用批次密封胶与铝合金型材的相容性检测报告缺失，且图纸V2/V3版本标注不一致，需补录检测报告并重新核图后再判断。</div>
+                    <div class="change-materials">
+                        <strong>旧材料摘要：</strong>第一轮提交的比选材料：方案A低模量胶20年质保+相容性送检回执（非最终报告），方案B高模量胶15年质保无报告；成本对比方案A比方案B低约8%。
+                    </div>
+                    <div class="change-materials">
+                        <strong>新备注/补录要求：</strong>补录要求：1）6月11日前提交该批次胶与6063-T5铝合金型材的正式相容性试验报告；2）设计院出具图纸V2与V3版差异说明，确认最新版标注。
+                    </div>
+                </div>
+            
+        
+    </div>
+
+    <div class="footer-note">
+        幕墙节点方案比选看板 · 静态生成 · 可离线打开 · 支持 CSV 导出 · 运营接手即用
+    </div>
+</div>
+
+<script>
+// Tab 切换
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + tabName).classList.add('active');
+    event.target.classList.add('active');
+}
+
+// 展开/折叠节点卡片
+function toggleNode(nodeId) {
+    const card = document.getElementById('node-' + nodeId);
+    card.classList.toggle('expanded');
+}
+
+// 导出 CSV
+function exportCSV() {
+    const data = [{"节点编号": "MQ-001", "节点名称": "东立面转角铝合金幕墙节点", "当前结论": "已通过", "图纸版本状态": "已确认最新版", "计算口径": "GB50210-2018 幕墙工程验收规范，铝合金型材壁厚≥3mm，埋件间距≤1200mm", "异常状态": "正常", "关联纪要数": 0, "异常碰撞点数": 0, "历史变更次数": 0, "结构工程师": "老叶"}, {"节点编号": "MQ-002", "节点名称": "西立面入口玻璃肋驳接节点", "当前结论": "存在碰撞待协调", "图纸版本状态": "待确认版本", "计算口径": "JGJ102-2003 玻璃幕墙工程技术规范，钢化玻璃厚度≥12mm，驳接头间距≤300mm", "异常状态": "⚠️ 异常", "关联纪要数": 1, "异常碰撞点数": 1, "历史变更次数": 0, "结构工程师": "老叶"}, {"节点编号": "MQ-003", "节点名称": "南立面开启扇密封胶缝节点", "当前结论": "需补录后判断", "图纸版本状态": "版本存疑需复核", "计算口径": "GB/T14683-2017 硅酮建筑密封胶，胶缝厚度≥8mm宽度≥10mm", "异常状态": "⚠️ 异常", "关联纪要数": 1, "异常碰撞点数": 1, "历史变更次数": 1, "结构工程师": "老叶"}];
+    if (!data || data.length === 0) {
+        alert('暂无数据可导出');
+        return;
+    }
+    const headers = Object.keys(data[0]);
+    const csvRows = [headers.join(',')];
+    data.forEach(row => {
+        const values = headers.map(h => {
+            let val = row[h];
+            if (typeof val === 'string' && (val.includes(',') || val.includes('"') || val.includes('\n'))) {
+                val = '"' + val.replace(/"/g, '""') + '"';
+            }
+            return val;
+        });
+        csvRows.push(values.join(','));
+    });
+    const csvContent = '\ufeff' + csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = '幕墙节点方案比选结果_' + new Date().toISOString().slice(0,10) + '.csv';
+    link.click();
+}
+</script>
+</body>
+</html>
