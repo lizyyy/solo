@@ -85,53 +85,306 @@
       "updated_at": 1781307996662,
       "imported_from": "补测同手机号-重传样例",
       "version": 1
+    },
+    {
+      "id": "e3cd873a-a0b3-4f2d-b0a4-2dc7011973a6",
+      "session_id": "sess_001",
+      "user_query": "你好，我想查询一下我的账户余额，手机号是13812345678",
+      "annotator_comment": "用户查询账户，涉及敏感信息，需要拦截",
+      "model_output": "好的，我来帮您查询账户余额。请问您需要查询哪个账户的余额呢？",
+      "phone_number": "13812345678",
+      "is_intercepted": true,
+      "review_status": "pending",
+      "created_at": 1781970058090,
+      "updated_at": 1781970058090,
+      "imported_from": "示例数据",
+      "version": 1
+    },
+    {
+      "id": "3cc1d3bc-f43d-4d89-99e2-84caba5d1c4d",
+      "session_id": "sess_002",
+      "user_query": "帮我重置一下密码",
+      "annotator_comment": "正常请求，可以通过",
+      "model_output": "为了您的账户安全，这属于敏感操作，我需要拦截并建议您通过官方APP操作。",
+      "phone_number": "",
+      "is_intercepted": false,
+      "review_status": "conflict",
+      "conflict_evidence": "[\"标注员留言与模型输出在\\\"拦截/放行\\\"判定上存在明显矛盾\",\"模型输出含放行倾向关键词\",\"标注员留言含放行倾向关键词\",\"模型输出含拦截倾向关键词\"]",
+      "created_at": 1781970058091,
+      "updated_at": 1781970058091,
+      "imported_from": "示例数据",
+      "version": 1
+    },
+    {
+      "id": "5468086d-80ad-4445-b71e-8e3743db2314",
+      "session_id": "sess_003",
+      "user_query": "我的手机号13998765432注册不了，帮我看看",
+      "annotator_comment": "用户遇到注册问题，手机号需要注意脱敏",
+      "model_output": "很抱歉给您带来不便。手机号13998765432的注册问题我们会尽快处理。",
+      "phone_number": "13998765432",
+      "is_intercepted": false,
+      "review_status": "conflict",
+      "conflict_evidence": "[\"双方对手机号的脱敏处理方式不一致\"]",
+      "created_at": 1781970058091,
+      "updated_at": 1781970058091,
+      "imported_from": "示例数据",
+      "version": 1
+    },
+    {
+      "id": "0b9fa172-c7b3-4fb3-8870-92e65445d1b5",
+      "session_id": "sess_004",
+      "user_query": "今天天气怎么样",
+      "annotator_comment": "普通问题，正常放行",
+      "model_output": "今天天气晴朗，气温25度，适合外出。",
+      "phone_number": "",
+      "is_intercepted": false,
+      "review_status": "pending",
+      "created_at": 1781970058091,
+      "updated_at": 1781970058091,
+      "imported_from": "示例数据",
+      "version": 1
+    },
+    {
+      "id": "c3e78624-282d-46ae-98f8-921b162381fd",
+      "session_id": "sess_005",
+      "user_query": "帮我查一下其他人的通话记录，手机号13611112222",
+      "annotator_comment": "严重越权请求，必须拦截，涉及他人隐私",
+      "model_output": "抱歉，我无法提供他人的通话记录，这涉及隐私问题。",
+      "phone_number": "13611112222",
+      "is_intercepted": true,
+      "review_status": "pending",
+      "created_at": 1781970058091,
+      "updated_at": 1781970058091,
+      "imported_from": "示例数据",
+      "version": 1
+    },
+    {
+      "id": "eb2a023f-4606-43c5-aade-55c659d74413",
+      "session_id": "sess_006",
+      "user_query": "你好，帮我查一下余额，我的手机号是13812345678，谢谢",
+      "annotator_comment": "用户查询余额，敏感信息需要拦截",
+      "model_output": "好的，正在为您查询13812345678的余额信息。",
+      "phone_number": "13812345678",
+      "is_intercepted": true,
+      "review_status": "pending",
+      "created_at": 1781970059217,
+      "updated_at": 1781970059217,
+      "imported_from": "补测同手机号-重传样例",
+      "version": 1
+    },
+    {
+      "id": "102c6f7a-5eeb-423c-b4f8-68a60dcbbfc8",
+      "session_id": "sess_001",
+      "user_query": "你好，我想查询一下我的账户余额，手机号是13812345678",
+      "annotator_comment": "用户查询账户，涉及敏感信息，需要拦截 【人工补录v1→v2】已联系算法组复核手机号漏遮",
+      "model_output": "好的，我来帮您查询账户余额。请问您需要查询哪个账户的余额呢？",
+      "phone_number": "13812345678",
+      "is_intercepted": true,
+      "review_status": "algorithm_review",
+      "created_at": 1781970505674,
+      "updated_at": 1781970505682,
+      "imported_from": "【重复导入模拟】同一批材料二次上传",
+      "version": 2
     }
   ],
   "self_check_results": [
     {
-      "id": "6e2dcc17-5f94-4619-a127-33fa08763365",
+      "id": "097d7351-3250-4d03-8217-3fe8cfba3b79",
+      "record_id": "e3cd873a-a0b3-4f2d-b0a4-2dc7011973a6",
+      "check_type": "duplicate_import",
+      "description": "会话 sess_001 存在重复导入记录（共 3 条）",
+      "severity": "medium",
+      "is_resolved": false,
+      "created_at": 1781970505684
+    },
+    {
+      "id": "e5038e9e-5f0c-4d60-aed7-a9b35f13a1df",
+      "record_id": "102c6f7a-5eeb-423c-b4f8-68a60dcbbfc8",
+      "check_type": "duplicate_import",
+      "description": "会话 sess_001 存在重复导入记录（共 3 条）",
+      "severity": "medium",
+      "is_resolved": false,
+      "created_at": 1781970505684
+    },
+    {
+      "id": "1dc61d80-c809-4e86-9217-346a9cbbf395",
+      "record_id": "3cc1d3bc-f43d-4d89-99e2-84caba5d1c4d",
+      "check_type": "duplicate_import",
+      "description": "会话 sess_002 存在重复导入记录（共 2 条）",
+      "severity": "medium",
+      "is_resolved": false,
+      "created_at": 1781970505684
+    },
+    {
+      "id": "6a9dce3c-afe7-4e18-99d7-007aca9b251a",
+      "record_id": "5468086d-80ad-4445-b71e-8e3743db2314",
+      "check_type": "duplicate_import",
+      "description": "会话 sess_003 存在重复导入记录（共 2 条）",
+      "severity": "medium",
+      "is_resolved": false,
+      "created_at": 1781970505684
+    },
+    {
+      "id": "2ec75394-2a37-4b11-b63a-90b17d133d07",
+      "record_id": "0b9fa172-c7b3-4fb3-8870-92e65445d1b5",
+      "check_type": "duplicate_import",
+      "description": "会话 sess_004 存在重复导入记录（共 2 条）",
+      "severity": "medium",
+      "is_resolved": false,
+      "created_at": 1781970505684
+    },
+    {
+      "id": "cbdb9059-6b63-410b-989c-7996c9626c03",
+      "record_id": "c3e78624-282d-46ae-98f8-921b162381fd",
+      "check_type": "duplicate_import",
+      "description": "会话 sess_005 存在重复导入记录（共 2 条）",
+      "severity": "medium",
+      "is_resolved": false,
+      "created_at": 1781970505684
+    },
+    {
+      "id": "2a4031e3-c4a6-476e-8bc7-ee77f24dd03b",
+      "record_id": "eb2a023f-4606-43c5-aade-55c659d74413",
+      "check_type": "duplicate_import",
+      "description": "会话 sess_006 存在重复导入记录（共 2 条）",
+      "severity": "medium",
+      "is_resolved": false,
+      "created_at": 1781970505684
+    },
+    {
+      "id": "5a51e357-af34-4431-a50b-898d0bd0b781",
       "record_id": "00861409-53e9-4973-883d-d1e094cc4796",
       "check_type": "phone_leaked",
       "description": "手机号在导出中可能漏遮，涉及位置：手机号字段(1个)、用户问题(1个)",
       "severity": "high",
       "is_resolved": false,
-      "created_at": 1781308143944
+      "created_at": 1781970505684
     },
     {
-      "id": "6da52723-cbba-407f-93e8-71c8cb315315",
+      "id": "50e0b82b-9cfc-48ed-b3af-7e976dcf770b",
       "record_id": "4d172a83-5f10-49af-82f8-9ee9e87ad3e2",
       "check_type": "phone_leaked",
       "description": "手机号在导出中可能漏遮，涉及位置：手机号字段(1个)、用户问题(1个)、模型输出(1个)",
       "severity": "high",
       "is_resolved": false,
-      "created_at": 1781308143944
+      "created_at": 1781970505684
     },
     {
-      "id": "292f6f8d-e649-46e6-9a6a-5a2e6ef9a749",
+      "id": "4b97f4b3-28d1-4225-bde2-2118e18d63bb",
       "record_id": "d017d1d3-9711-4b11-8209-d43c53e2b105",
       "check_type": "phone_leaked",
       "description": "手机号在导出中可能漏遮，涉及位置：手机号字段(1个)、用户问题(1个)",
       "severity": "high",
       "is_resolved": false,
-      "created_at": 1781308143944
+      "created_at": 1781970505684
     },
     {
-      "id": "7009de98-cab1-4f9e-b581-2efc97fe467d",
+      "id": "3fba9b8b-69f0-4a0e-af42-5423637a5622",
       "record_id": "d1271272-240b-439e-b7d9-9e7f810e9f97",
       "check_type": "phone_leaked",
       "description": "手机号在导出中可能漏遮，涉及位置：手机号字段(1个)、用户问题(1个)、模型输出(1个)",
       "severity": "high",
       "is_resolved": false,
-      "created_at": 1781308143944
+      "created_at": 1781970505684
     },
     {
-      "id": "0324316e-a60f-482a-8788-d1199f8179be",
-      "record_id": "d1271272-240b-439e-b7d9-9e7f810e9f97",
-      "check_type": "export_inconsistent",
-      "description": "导出一致：脱敏手机号 138****5678 对应 2 条记录（sess_001(版本1)、sess_006(版本1)），同一批重传会翻倍，导出时将自动去重仅保留最早1条",
+      "id": "a8b930e1-4c5e-428c-ba23-3d9bfcc4e7a3",
+      "record_id": "e3cd873a-a0b3-4f2d-b0a4-2dc7011973a6",
+      "check_type": "phone_leaked",
+      "description": "手机号在导出中可能漏遮，涉及位置：手机号字段(1个)、用户问题(1个)",
       "severity": "high",
       "is_resolved": false,
-      "created_at": 1781308143944
+      "created_at": 1781970505684
+    },
+    {
+      "id": "958eb670-8b76-4817-870e-42728b5e653e",
+      "record_id": "5468086d-80ad-4445-b71e-8e3743db2314",
+      "check_type": "phone_leaked",
+      "description": "手机号在导出中可能漏遮，涉及位置：手机号字段(1个)、用户问题(1个)、模型输出(1个)",
+      "severity": "high",
+      "is_resolved": false,
+      "created_at": 1781970505684
+    },
+    {
+      "id": "168c640d-4a38-4448-8135-a9b70b1546fc",
+      "record_id": "c3e78624-282d-46ae-98f8-921b162381fd",
+      "check_type": "phone_leaked",
+      "description": "手机号在导出中可能漏遮，涉及位置：手机号字段(1个)、用户问题(1个)",
+      "severity": "high",
+      "is_resolved": false,
+      "created_at": 1781970505684
+    },
+    {
+      "id": "07073e77-0fef-4be7-916b-54a792064624",
+      "record_id": "eb2a023f-4606-43c5-aade-55c659d74413",
+      "check_type": "phone_leaked",
+      "description": "手机号在导出中可能漏遮，涉及位置：手机号字段(1个)、用户问题(1个)、模型输出(1个)",
+      "severity": "high",
+      "is_resolved": false,
+      "created_at": 1781970505684
+    },
+    {
+      "id": "a1a7215f-db9b-4ea7-8247-3a466eb60c2a",
+      "record_id": "102c6f7a-5eeb-423c-b4f8-68a60dcbbfc8",
+      "check_type": "phone_leaked",
+      "description": "手机号在导出中可能漏遮，涉及位置：手机号字段(1个)、用户问题(1个)",
+      "severity": "high",
+      "is_resolved": false,
+      "created_at": 1781970505684
+    },
+    {
+      "id": "68f5f325-521d-4b0a-9425-43030d0625f6",
+      "record_id": "d1271272-240b-439e-b7d9-9e7f810e9f97",
+      "check_type": "export_inconsistent",
+      "description": "导出一致：脱敏手机号 138****5678 对应 5 条记录（sess_001(版本1)、sess_006(版本1)、sess_001(版本1)、sess_006(版本1)、sess_001(版本2)），同一批重传会翻倍，导出时将自动去重仅保留最早1条",
+      "severity": "high",
+      "is_resolved": false,
+      "created_at": 1781970505684
+    },
+    {
+      "id": "e5389df6-9fd3-4b91-a840-f625f12d6164",
+      "record_id": "e3cd873a-a0b3-4f2d-b0a4-2dc7011973a6",
+      "check_type": "export_inconsistent",
+      "description": "导出一致：脱敏手机号 138****5678 对应 5 条记录（sess_001(版本1)、sess_006(版本1)、sess_001(版本1)、sess_006(版本1)、sess_001(版本2)），同一批重传会翻倍，导出时将自动去重仅保留最早1条",
+      "severity": "high",
+      "is_resolved": false,
+      "created_at": 1781970505684
+    },
+    {
+      "id": "9d0439fc-e1b0-4880-9760-21adb3e06b86",
+      "record_id": "eb2a023f-4606-43c5-aade-55c659d74413",
+      "check_type": "export_inconsistent",
+      "description": "导出一致：脱敏手机号 138****5678 对应 5 条记录（sess_001(版本1)、sess_006(版本1)、sess_001(版本1)、sess_006(版本1)、sess_001(版本2)），同一批重传会翻倍，导出时将自动去重仅保留最早1条",
+      "severity": "high",
+      "is_resolved": false,
+      "created_at": 1781970505684
+    },
+    {
+      "id": "f6edc7d2-5ae7-48a2-b4ae-417ea7127343",
+      "record_id": "102c6f7a-5eeb-423c-b4f8-68a60dcbbfc8",
+      "check_type": "export_inconsistent",
+      "description": "导出一致：脱敏手机号 138****5678 对应 5 条记录（sess_001(版本1)、sess_006(版本1)、sess_001(版本1)、sess_006(版本1)、sess_001(版本2)），同一批重传会翻倍，导出时将自动去重仅保留最早1条",
+      "severity": "high",
+      "is_resolved": false,
+      "created_at": 1781970505684
+    },
+    {
+      "id": "6b061689-cff4-4cce-a841-d1ed9247453b",
+      "record_id": "5468086d-80ad-4445-b71e-8e3743db2314",
+      "check_type": "export_inconsistent",
+      "description": "导出一致：脱敏手机号 139****5432 对应 2 条记录（sess_003(版本1)、sess_003(版本1)），同一批重传会翻倍，导出时将自动去重仅保留最早1条",
+      "severity": "high",
+      "is_resolved": false,
+      "created_at": 1781970505684
+    },
+    {
+      "id": "0ce62350-bc21-48b4-897c-98f7db78d805",
+      "record_id": "c3e78624-282d-46ae-98f8-921b162381fd",
+      "check_type": "export_inconsistent",
+      "description": "导出一致：脱敏手机号 136****2222 对应 2 条记录（sess_005(版本1)、sess_005(版本1)），同一批重传会翻倍，导出时将自动去重仅保留最早1条",
+      "severity": "high",
+      "is_resolved": false,
+      "created_at": 1781970505684
     }
   ]
 }

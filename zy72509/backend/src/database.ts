@@ -11,12 +11,12 @@ let dbPath: string;
 let data: DatabaseData;
 
 export function initDatabase() {
-  const dataDir = path.join(process.cwd(), 'data');
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
+  const DATA_DIR = path.resolve(__dirname, '..', 'data');
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
   }
 
-  dbPath = path.join(dataDir, 'chatbot.json');
+  dbPath = path.join(DATA_DIR, 'chatbot.json');
 
   if (fs.existsSync(dbPath)) {
     try {
