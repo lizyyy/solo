@@ -14,8 +14,11 @@ interface ScheduleState {
   filters: ScheduleListFilters;
   batches: ScheduleBatch[];
   items: ScheduleItem[];
+  matchedBatchIds: string[];
+  matchedItemIds: string[];
   loading: boolean;
   error: string | null;
+  signatureMismatch: { expectedBatches: number; expectedItems: number; currentBatches: number; currentItems: number } | null;
   activeBatchDetail: null | {
     batch: ScheduleBatch;
     items: ScheduleItem[];
@@ -25,6 +28,7 @@ interface ScheduleState {
   snapshots: Snapshot[];
   replaceActions: ReplaceAction[];
   lastExportSignature: string | null;
+  lastExportMeta: { matchedItemCount: number; matchedBatchCount: number; exportedAt: string } | null;
 
   setFilters: (f: Partial<ScheduleListFilters>) => void;
   resetFilters: () => void;
@@ -35,8 +39,13 @@ interface ScheduleState {
   submitOverride: (p: api.CreateOverridePayload) => Promise<void>;
   rerunBatch: (batchId: string, notes: Array<{ note: string }>) => Promise<void>;
   patchAction: (id: string, patch: Partial<ReplaceAction>) => Promise<void>;
-  exportCSV: (filters: ScheduleListFilters) => Promise<{ signature: string; fileName: string }>;
-  applySignatureFilters: (sig: string) => Promise<{ matchedItemIds: string[]; matchedBatchIds: string[] }>;
+  exportCSV: (filters: ScheduleListFilters) => Promise<{ signature: string; fileName: string; matchedItemCount: number; matchedBatchCount: number }>;
+  applySignatureFilters: (sig: string) => Promise<{
+    matchedItemIds: string[];
+    matchedBatchIds: string[];
+    mismatch: ScheduleState['signatureMismatch'];
+    exportedAt: string;
+  }>;
 }
 
 const DEFAULT_FILTERS: ScheduleListFilters = {};
@@ -45,21 +54,31 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
   filters: { ...DEFAULT_FILTERS },
   batches: [],
   items: [],
+  matchedBatchIds: [],
+  matchedItemIds: [],
   loading: false,
   error: null,
+  signatureMismatch: null,
   activeBatchDetail: null,
   snapshots: [],
   replaceActions: [],
   lastExportSignature: null,
+  lastExportMeta: null,
 
-  setFilters: (f) => set((s) => ({ filters: { ...s.filters, ...f } })),
-  resetFilters: () => set({ filters: { ...DEFAULT_FILTERS } }),
+  setFilters: (f) => set((s) => ({ filters: { ...s.filters, ...f }, signatureMismatch: null })),
+  resetFilters: () => set({ filters: { ...DEFAULT_FILTERS }, signatureMismatch: null }),
 
   loadList: async () => {
     set({ loading: true, error: null });
     try {
       const res = await api.fetchList(get().filters);
-      set({ batches: res.batches, items: res.items, loading: false });
+      set({
+        batches: res.batches,
+        items: res.items,
+        matchedBatchIds: res.matchedBatchIds || [],
+        matchedItemIds: res.matchedItemIds || [],
+        loading: false,
+      });
     } catch (e: any) {
       set({ error: e.message, loading: false });
     }
@@ -149,18 +168,42 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
     a.download = fileName;
     a.click();
     URL.revokeObjectURL(url);
-    set({ lastExportSignature: res.signature });
-    return { signature: res.signature, fileName };
+    const meta = res.signatureMeta || {};
+    const matchedItemCount = Number((meta as any)?.matchedItemCount || 0);
+    const matchedBatchCount = Number((meta as any)?.matchedBatchCount || 0);
+    const exportedAt = String((meta as any)?.exportedAt || '');
+    set({
+      lastExportSignature: res.signature,
+      lastExportMeta: { matchedItemCount, matchedBatchCount, exportedAt },
+    });
+    return { signature: res.signature, fileName, matchedItemCount, matchedBatchCount };
   },
 
   applySignatureFilters: async (sig) => {
     const res = await api.retrieveBySignature(sig);
     const filters = { ...res.filters };
-    set({ filters });
+    const expectedItems = res.matchedItemIds || [];
+    const expectedBatches = res.matchedBatchIds || [];
+    set({ filters, lastExportSignature: sig, signatureMismatch: null });
     await get().loadList();
+    const current = get();
+    const currentBatches = current.matchedBatchIds || [];
+    const currentItems = current.matchedItemIds || [];
+    const mismatch =
+      currentBatches.length !== expectedBatches.length || currentItems.length !== expectedItems.length
+        ? {
+            expectedBatches: expectedBatches.length,
+            expectedItems: expectedItems.length,
+            currentBatches: currentBatches.length,
+            currentItems: currentItems.length,
+          }
+        : null;
+    if (mismatch) set({ signatureMismatch: mismatch });
     return {
-      matchedItemIds: res.matchedItemIds || [],
-      matchedBatchIds: (filters.batchIds && filters.batchIds.length ? filters.batchIds : []),
+      matchedItemIds: expectedItems,
+      matchedBatchIds: expectedBatches,
+      mismatch,
+      exportedAt: res.exportedAt,
     };
   },
 }));

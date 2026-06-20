@@ -319,6 +319,8 @@ export default function ScheduleList() {
     exportCSV,
     rerunBatch,
     lastExportSignature,
+    lastExportMeta,
+    signatureMismatch,
     loading,
     error,
   } = useScheduleStore();
@@ -451,7 +453,7 @@ export default function ScheduleList() {
                         ? 'bg-mint-400/15 text-mint-200 border-mint-300'
                         : 'bg-ink-700/60 text-ink-200 border-ink-500 hover:border-warn-400 hover:text-warn-100'
                     )}
-                    title={`签名：${lastExportSignature}`}
+                    title={`签名：${lastExportSignature}${lastExportMeta ? ` · 导出时 ${lastExportMeta.matchedBatchCount} 批次 / ${lastExportMeta.matchedItemCount} 条排程 · ${lastExportMeta.exportedAt}` : ''}`}
                   >
                     {copySigOk ? (
                       <Check className="w-3 h-3" />
@@ -459,6 +461,11 @@ export default function ScheduleList() {
                       <Copy className="w-3 h-3" />
                     )}
                     {lastExportSignature.slice(0, 8)}...
+                    {lastExportMeta && (
+                      <span className="text-ink-400 ml-0.5">
+                        {lastExportMeta.matchedBatchCount}b/{lastExportMeta.matchedItemCount}r
+                      </span>
+                    )}
                   </button>
                 )}
               </div>
@@ -470,6 +477,23 @@ export default function ScheduleList() {
           <div className="p-3 bg-rust-400/10 border-2 border-rust-400/50 rounded-sm text-sm text-rust-300 flex items-center gap-2">
             <AlertTriangle className="w-4 h-4" />
             {error}
+          </div>
+        )}
+
+        {signatureMismatch && (
+          <div className="p-3 bg-warn-400/10 border-2 border-warn-400/50 rounded-sm text-sm text-warn-100 flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <div>
+              <div className="font-medium mb-0.5">追回时记录数与签名不一致</div>
+              <div className="text-xs text-warn-200/90 font-mono">
+                签名保存时：{signatureMismatch.expectedBatches} 批次 · {signatureMismatch.expectedItems} 条排程
+                {'  ·  '}
+                当前：{signatureMismatch.currentBatches} 批次 · {signatureMismatch.currentItems} 条排程
+              </div>
+              <div className="text-xs text-warn-200/70 mt-1">
+                可能是补录重跑或新增批次，导致同一筛选条件在不同时间结果不同；导出的 CSV 以签名保存时的记录数为准。
+              </div>
+            </div>
           </div>
         )}
 

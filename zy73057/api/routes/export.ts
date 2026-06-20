@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from 'express';
-import { getItems, getFilteredBatches } from '../services/scheduleService.js';
+import { applyFilters } from '../services/scheduleService.js';
 import { signFilters, toCSV } from '../services/exportService.js';
 import type { ScheduleListFilters } from '../../shared/types.js';
 
@@ -45,26 +45,22 @@ router.post('/schedules', (req: Request, res: Response): void => {
   const body = (req.body ?? {}) as Record<string, unknown>;
   const filters = parseFilters(body.filters ? (body.filters as Record<string, unknown>) : body);
 
-  const items = getItems(filters);
-  const matchedItemIds = items.map((it) => it.id);
-  const batchIdsFromItems = [...new Set(items.map((it) => it.batchId))];
-  const allBatches = getFilteredBatches(filters);
-  const batches = allBatches.filter(
-    (b) => batchIdsFromItems.includes(b.batchId) || (filters.batchIds?.includes(b.batchId) ?? true),
-  );
-
-  const signaturePayload = signFilters(filters, matchedItemIds);
+  const result = applyFilters(filters);
+  const items = result.items;
+  const batches = result.batches;
+  const signaturePayload = signFilters(filters, result.matchedItemIds, result.matchedBatchIds);
 
   const csv = toCSV(items, batches);
 
   const signatureMeta = {
     signature: signaturePayload.signature,
     exportedAt: signaturePayload.exportedAt,
-    matchedItemCount: matchedItemIds.length,
+    matchedItemCount: result.matchedItemIds.length,
+    matchedBatchCount: result.matchedBatchIds.length,
   };
 
   res.setHeader('X-Filter-Signature', signaturePayload.signature);
-  res.setHeader('X-Filter-Signature-Meta', JSON.stringify(signatureMeta));
+  res.setHeader('X-Filter-Signature-Meta', encodeURIComponent(JSON.stringify(signatureMeta)));
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename=schedules.csv');
 

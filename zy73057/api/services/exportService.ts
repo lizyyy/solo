@@ -38,9 +38,10 @@ function base64Decode(str: string): string | null {
 export function signFilters(
   filters: ScheduleListFilters,
   matchedItemIds: string[],
+  matchedBatchIds: string[],
 ): FilterSignaturePayload {
   const ts = Date.now();
-  const payloadObj = { filters, matchedItemIds, ts };
+  const payloadObj = { filters, matchedItemIds, matchedBatchIds, ts };
   const jsonStr = JSON.stringify(payloadObj);
   const hash = crc32Hash(jsonStr);
   const combined = jsonStr + '|' + hash;
@@ -52,6 +53,7 @@ export function signFilters(
     signature,
     filters,
     matchedItemIds,
+    matchedBatchIds,
     exportedAt,
   };
 
@@ -61,7 +63,7 @@ export function signFilters(
 
 export function retrieveBySignature(
   sig: string,
-): FilterSignaturePayload | { filters: ScheduleListFilters; matchedItemIds: string[]; decoded: true } | null {
+): FilterSignaturePayload | null {
   const stored = store.signatures.find((s) => s.signature === sig);
   if (stored) {
     return stored;
@@ -78,12 +80,15 @@ export function retrieveBySignature(
     const parsed = JSON.parse(jsonPart) as {
       filters: ScheduleListFilters;
       matchedItemIds: string[];
+      matchedBatchIds?: string[];
       ts: number;
     };
     return {
+      signature: sig,
       filters: parsed.filters,
       matchedItemIds: parsed.matchedItemIds,
-      decoded: true,
+      matchedBatchIds: parsed.matchedBatchIds || [],
+      exportedAt: new Date(parsed.ts).toISOString().slice(0, 16).replace('T', ' '),
     };
   } catch {
     return null;

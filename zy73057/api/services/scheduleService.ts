@@ -25,79 +25,92 @@ function partPrice(code: string): number {
   return PART_PRICES[code] ?? 100;
 }
 
-function getMatchedBatchIdsByItems(filters: ScheduleListFilters): Set<string> {
-  const matched = new Set<string>();
-  for (const item of store.items) {
-    let hit = false;
-    if (filters.elevatorNos && filters.elevatorNos.includes(item.elevatorNo)) {
-      hit = true;
-    }
-    if (
-      filters.partNos &&
-      (filters.partNos.includes(item.recommendedPartNo) ||
-        filters.partNos.includes(item.finalPartNo))
-    ) {
-      hit = true;
-    }
-    if (hit) {
-      matched.add(item.batchId);
-    }
-  }
-  return matched;
+export interface FilterResult {
+  batches: ScheduleBatch[];
+  items: ScheduleItem[];
+  matchedBatchIds: string[];
+  matchedItemIds: string[];
 }
 
-export function getFilteredBatches(filters: ScheduleListFilters): ScheduleBatch[] {
-  let result = [...store.batches];
+function normalizeDateTo(s: string): string {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    return s + ' 23:59';
+  }
+  return s;
+}
+
+export function applyFilters(filters: ScheduleListFilters): FilterResult {
+  const dateTo = filters.dateTo ? normalizeDateTo(filters.dateTo) : undefined;
+
+  let matchedBatches = [...store.batches];
 
   if (filters.dateFrom) {
-    result = result.filter((b) => b.createdAt >= filters.dateFrom!);
+    matchedBatches = matchedBatches.filter((b) => b.createdAt >= filters.dateFrom!);
   }
-  if (filters.dateTo) {
-    result = result.filter((b) => b.createdAt <= filters.dateTo!);
+  if (dateTo) {
+    matchedBatches = matchedBatches.filter((b) => b.createdAt <= dateTo);
   }
   if (filters.batchIds && filters.batchIds.length > 0) {
-    result = result.filter((b) => filters.batchIds!.includes(b.batchId));
+    matchedBatches = matchedBatches.filter((b) => filters.batchIds!.includes(b.batchId));
   }
   if (filters.statuses && filters.statuses.length > 0) {
-    result = result.filter((b) => filters.statuses!.includes(b.status));
+    matchedBatches = matchedBatches.filter((b) => filters.statuses!.includes(b.status));
   }
   if (filters.isOverridden !== undefined) {
-    result = result.filter((b) =>
+    matchedBatches = matchedBatches.filter((b) =>
       filters.isOverridden ? b.overrideCount > 0 : b.overrideCount === 0,
     );
   }
-  if (
-    (filters.elevatorNos && filters.elevatorNos.length > 0) ||
-    (filters.partNos && filters.partNos.length > 0)
-  ) {
-    const matchedBatchIds = getMatchedBatchIdsByItems(filters);
-    result = result.filter((b) => matchedBatchIds.has(b.batchId));
+
+  const itemLevelBatchIds = new Set<string>();
+  if ((filters.elevatorNos && filters.elevatorNos.length > 0) || (filters.partNos && filters.partNos.length > 0)) {
+    for (const item of store.items) {
+      let hit = true;
+      if (filters.elevatorNos && filters.elevatorNos.length > 0) {
+        hit = hit && filters.elevatorNos.includes(item.elevatorNo);
+      }
+      if (hit && filters.partNos && filters.partNos.length > 0) {
+        hit = filters.partNos.includes(item.recommendedPartNo) || filters.partNos.includes(item.finalPartNo);
+      }
+      if (hit) itemLevelBatchIds.add(item.batchId);
+    }
+    matchedBatches = matchedBatches.filter((b) => itemLevelBatchIds.has(b.batchId));
   }
 
-  return result;
-}
+  const matchedBatchIds = matchedBatches.map((b) => b.batchId);
+  const batchIdSet = new Set(matchedBatchIds);
 
-export function getItems(filters: ScheduleListFilters): ScheduleItem[] {
-  let result = [...store.items];
+  let matchedItems = store.items.filter((it) => batchIdSet.has(it.batchId));
 
-  if (filters.batchIds && filters.batchIds.length > 0) {
-    result = result.filter((it) => filters.batchIds!.includes(it.batchId));
-  }
   if (filters.elevatorNos && filters.elevatorNos.length > 0) {
-    result = result.filter((it) => filters.elevatorNos!.includes(it.elevatorNo));
+    matchedItems = matchedItems.filter((it) => filters.elevatorNos!.includes(it.elevatorNo));
   }
   if (filters.partNos && filters.partNos.length > 0) {
-    result = result.filter(
+    matchedItems = matchedItems.filter(
       (it) =>
-        filters.partNos!.includes(it.recommendedPartNo) ||
-        filters.partNos!.includes(it.finalPartNo),
+        filters.partNos!.includes(it.recommendedPartNo) || filters.partNos!.includes(it.finalPartNo),
     );
   }
   if (filters.isOverridden !== undefined) {
-    result = result.filter((it) => it.isOverridden === filters.isOverridden);
+    matchedItems = matchedItems.filter((it) => it.isOverridden === filters.isOverridden);
   }
 
-  return result;
+  const matchedItemIds = matchedItems.map((it) => it.id);
+
+  return {
+    batches: matchedBatches,
+    items: matchedItems,
+    matchedBatchIds,
+    matchedItemIds,
+  };
+}
+
+export function getFilteredBatches(filters: ScheduleListFilters): ScheduleBatch[] {
+  return applyFilters(filters).batches;
+}
+
+export function getItems(filters: ScheduleListFilters): ScheduleItem[] {
+  return applyFilters(filters).items;
 }
 
 export interface BatchDetail {

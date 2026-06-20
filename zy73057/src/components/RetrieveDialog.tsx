@@ -1,16 +1,18 @@
 import { useState } from 'react';
-import { SearchCheck, AlertCircle, CheckCircle2, Copy, ArrowRight } from 'lucide-react';
+import { SearchCheck, AlertCircle, CheckCircle2, Copy, ArrowRight, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useScheduleStore } from '@/store/scheduleStore';
 import { cn } from '@/lib/utils';
 
 export default function RetrieveDialog() {
-  const { applySignatureFilters, loading, items, batches } = useScheduleStore();
+  const { applySignatureFilters, loading, items, batches, signatureMismatch } = useScheduleStore();
   const [signature, setSignature] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<{
     matchedBatchIds: string[];
     matchedItemIds: string[];
+    mismatch: { expectedBatches: number; expectedItems: number; currentBatches: number; currentItems: number } | null;
+    exportedAt: string;
   } | null>(null);
 
   const navigate = useNavigate();
@@ -28,6 +30,8 @@ export default function RetrieveDialog() {
       setResult({
         matchedBatchIds: res.matchedBatchIds,
         matchedItemIds: res.matchedItemIds,
+        mismatch: res.mismatch,
+        exportedAt: res.exportedAt,
       });
     } catch (e: any) {
       setError(e.message || '签名无效，请检查后重试');
@@ -97,22 +101,45 @@ export default function RetrieveDialog() {
           </div>
 
           {result && !error && (
-            <div className="mt-4 p-4 bg-mint-400/10 border border-mint-300/50 rounded-sm space-y-3 animate-fadeInStagger">
+            <div className={cn(
+              'mt-4 p-4 border rounded-sm space-y-3 animate-fadeInStagger',
+              result.mismatch ? 'bg-warn-400/10 border-warn-400/50' : 'bg-mint-400/10 border-mint-300/50',
+            )}>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-mint-300" />
-                <span className="text-sm font-medium text-mint-200">签名匹配成功</span>
+                {result.mismatch ? (
+                  <AlertTriangle className="w-4 h-4 text-warn-400" />
+                ) : (
+                  <CheckCircle2 className="w-4 h-4 text-mint-300" />
+                )}
+                <span className={cn(
+                  'text-sm font-medium',
+                  result.mismatch ? 'text-warn-200' : 'text-mint-200',
+                )}>
+                  {result.mismatch ? '记录数有差异，已还原签名时的筛选口径' : '签名匹配成功，记录数一致'}
+                </span>
+                {result.exportedAt && (
+                  <span className="ml-auto text-xs text-ink-400 font-mono">
+                    导出时间 {result.exportedAt}
+                  </span>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-ink-800/60 border border-ink-600 rounded-sm p-3">
-                  <div className="text-xs text-ink-400 mb-1">命中批次</div>
-                  <div className="font-mono text-2xl font-semibold text-mint-200">
+                  <div className="text-xs text-ink-400 mb-1">命中批次 {result.mismatch ? `(签名时 ${result.mismatch.expectedBatches} / 当前 ${result.mismatch.currentBatches})` : ''}</div>
+                  <div className={cn(
+                    'font-mono text-2xl font-semibold',
+                    result.mismatch ? 'text-warn-200' : 'text-mint-200',
+                  )}>
                     {matchedBatches.length}
                   </div>
                 </div>
                 <div className="bg-ink-800/60 border border-ink-600 rounded-sm p-3">
-                  <div className="text-xs text-ink-400 mb-1">命中排程行数</div>
-                  <div className="font-mono text-2xl font-semibold text-mint-200">
+                  <div className="text-xs text-ink-400 mb-1">命中排程行数 {result.mismatch ? `(签名时 ${result.mismatch.expectedItems} / 当前 ${result.mismatch.currentItems})` : ''}</div>
+                  <div className={cn(
+                    'font-mono text-2xl font-semibold',
+                    result.mismatch ? 'text-warn-200' : 'text-mint-200',
+                  )}>
                     {matchedCount || items.length}
                   </div>
                 </div>

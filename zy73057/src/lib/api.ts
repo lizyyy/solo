@@ -38,6 +38,8 @@ async function request<T = any>(path: string, init?: RequestInit): Promise<T> {
 export interface ListResult {
   batches: ScheduleBatch[];
   items: ScheduleItem[];
+  matchedBatchIds: string[];
+  matchedItemIds: string[];
 }
 
 export function fetchList(filters: ScheduleListFilters): Promise<ListResult> {
@@ -145,9 +147,14 @@ export async function exportSchedules(filters: ScheduleListFilters): Promise<Exp
 }
 
 // ====== Retrieve ======
-export function retrieveBySignature(signature: string) {
-  return request<FilterSignaturePayload & { matchedItems?: ScheduleItem[]; matchedBatches?: ScheduleBatch[] }>(
-    '/retrieve',
-    { method: 'POST', body: JSON.stringify({ signature }) },
-  );
+export interface RetrieveResult extends FilterSignaturePayload {
+  matchedItems?: ScheduleItem[];
+  matchedBatches?: ScheduleBatch[];
+}
+
+export function retrieveBySignature(signature: string): Promise<RetrieveResult> {
+  return request<RetrieveResult>('/retrieve', {
+    method: 'POST',
+    body: JSON.stringify({ signature }),
+  });
 }

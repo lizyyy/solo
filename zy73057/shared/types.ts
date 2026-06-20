@@ -111,6 +111,7 @@ export interface FilterSignaturePayload {
   signature: string;
   filters: ScheduleListFilters;
   matchedItemIds: string[];
+  matchedBatchIds: string[];
   exportedAt: string;
 }
 

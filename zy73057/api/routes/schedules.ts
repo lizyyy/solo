@@ -1,7 +1,6 @@
 import { Router, type Request, type Response } from 'express';
 import {
-  getFilteredBatches,
-  getItems,
+  applyFilters,
   getBatchDetail,
   rerunBatch,
   getSnapshots,
@@ -48,14 +47,15 @@ function parseFilters(query: Record<string, unknown>): ScheduleListFilters {
 
 router.get('/', (req: Request, res: Response): void => {
   const filters = parseFilters(req.query as Record<string, unknown>);
-  const batches = getFilteredBatches(filters);
-  const items = getItems(filters);
+  const result = applyFilters(filters);
 
   res.json({
     success: true,
     data: {
-      batches,
-      items,
+      batches: result.batches,
+      items: result.items,
+      matchedBatchIds: result.matchedBatchIds,
+      matchedItemIds: result.matchedItemIds,
     },
   });
 });
