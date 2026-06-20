@@ -1,9 +1,9 @@
 [
   {
-    "id": "HIS_20260615083931_26b6f108",
+    "id": "HIS_20260621004112_47190814",
     "operation_type": "import",
     "operator": "system",
-    "operate_time": "2026-06-15T08:39:31.731576",
+    "operate_time": "2026-06-21T00:41:12.230053",
     "target_id": "WO_001",
     "target_type": "work_order",
     "before_state": null,
@@ -14,7 +14,7 @@
       "category": "功能异常",
       "source": "线上反馈",
       "feedback_time": "2026-06-01T10:30:00",
-      "import_time": "2026-06-15T08:39:31.731540",
+      "import_time": "2026-06-21T00:41:12.230032",
       "status": "pending",
       "reference_links": [
         "https://example.com/ticket/12345",
@@ -30,19 +30,19 @@
         "reference_links": "https://example.com/ticket/12345|https://example.com/wiki/login-issue",
         "original_note": "客户投诉级别：P2，影响范围：约5%用户"
       },
-      "import_batch": "BATCH_20260615083931",
+      "import_batch": "BATCH_20260621004112",
       "is_supplementary": false,
       "reviewer": null,
       "review_time": null,
       "review_notes": ""
     },
-    "notes": "批次 BATCH_20260615083931, 导入类型: normal"
+    "notes": "批次 BATCH_20260621004112, 导入类型: normal"
   },
   {
-    "id": "HIS_20260615083931_6967d5d8",
+    "id": "HIS_20260621004112_5d5102d1",
     "operation_type": "import",
     "operator": "system",
-    "operate_time": "2026-06-15T08:39:31.731601",
+    "operate_time": "2026-06-21T00:41:12.230072",
     "target_id": "WO_002",
     "target_type": "work_order",
     "before_state": null,
@@ -53,7 +53,7 @@
       "category": "性能问题",
       "source": "线上反馈",
       "feedback_time": "2026-06-02T14:20:00",
-      "import_time": "2026-06-15T08:39:31.731589",
+      "import_time": "2026-06-21T00:41:12.230061",
       "status": "classified",
       "reference_links": [
         "https://example.com/ticket/12346"
@@ -72,19 +72,19 @@
         "review_time": "2026-06-02T17:00:00",
         "review_notes": "初判为性能问题，已完成分类标注"
       },
-      "import_batch": "BATCH_20260615083931",
+      "import_batch": "BATCH_20260621004112",
       "is_supplementary": false,
       "reviewer": "标注员A",
       "review_time": "2026-06-02T17:00:00",
       "review_notes": "初判为性能问题，已完成分类标注"
     },
-    "notes": "批次 BATCH_20260615083931, 导入类型: normal"
+    "notes": "批次 BATCH_20260621004112, 导入类型: normal"
   },
   {
-    "id": "HIS_20260615083931_0b5f2739",
+    "id": "HIS_20260621004112_432e2dc1",
     "operation_type": "import",
     "operator": "system",
-    "operate_time": "2026-06-15T08:39:31.731615",
+    "operate_time": "2026-06-21T00:41:12.230084",
     "target_id": "WO_003",
     "target_type": "work_order",
     "before_state": null,
@@ -95,7 +95,7 @@
       "category": "展示问题",
       "source": "线上反馈",
       "feedback_time": "2026-06-03T09:15:00",
-      "import_time": "2026-06-15T08:39:31.731606",
+      "import_time": "2026-06-21T00:41:12.230076",
       "status": "pending",
       "reference_links": [],
       "original_raw_data": {
@@ -108,19 +108,19 @@
         "reference_links": "",
         "original_note": ""
       },
-      "import_batch": "BATCH_20260615083931",
+      "import_batch": "BATCH_20260621004112",
       "is_supplementary": false,
       "reviewer": null,
       "review_time": null,
       "review_notes": ""
     },
-    "notes": "批次 BATCH_20260615083931, 导入类型: normal"
+    "notes": "批次 BATCH_20260621004112, 导入类型: normal"
   },
   {
-    "id": "HIS_20260615083931_aee4b35a",
+    "id": "HIS_20260621004112_bc7c0370",
     "operation_type": "import",
     "operator": "system",
-    "operate_time": "2026-06-15T08:39:31.731627",
+    "operate_time": "2026-06-21T00:41:12.230096",
     "target_id": "WO_006",
     "target_type": "work_order",
     "before_state": null,
@@ -131,7 +131,7 @@
       "category": "物流问题",
       "source": "线上反馈",
       "feedback_time": "2026-06-04T08:00:00",
-      "import_time": "2026-06-15T08:39:31.731619",
+      "import_time": "2026-06-21T00:41:12.230088",
       "status": "resolved",
       "reference_links": [
         "https://example.com/ticket/12349",
@@ -151,19 +151,19 @@
         "review_time": "2026-06-04T12:30:00",
         "review_notes": "已联系物流商核实，工单标记为已解决"
       },
-      "import_batch": "BATCH_20260615083931",
+      "import_batch": "BATCH_20260621004112",
       "is_supplementary": false,
       "reviewer": "标注员B",
       "review_time": "2026-06-04T12:30:00",
       "review_notes": "已联系物流商核实，工单标记为已解决"
     },
-    "notes": "批次 BATCH_20260615083931, 导入类型: normal"
+    "notes": "批次 BATCH_20260621004112, 导入类型: normal"
   },
   {
-    "id": "HIS_20260615083931_edf63232",
+    "id": "HIS_20260621004112_e24e2bc8",
     "operation_type": "import",
     "operator": "system",
-    "operate_time": "2026-06-15T08:39:31.733010",
+    "operate_time": "2026-06-21T00:41:12.230345",
     "target_id": "WO_004",
     "target_type": "work_order",
     "before_state": null,
@@ -174,7 +174,7 @@
       "category": "功能异常",
       "source": "线上反馈",
       "feedback_time": "2026-06-04T16:45:00",
-      "import_time": "2026-06-15T08:39:31.732986",
+      "import_time": "2026-06-21T00:41:12.230335",
       "status": "pending",
       "reference_links": [
         "https://example.com/ticket/12348"
@@ -189,19 +189,19 @@
         "reference_links": "https://example.com/ticket/12348",
         "original_note": "此工单被错误归类为功能异常，实际应为服务投诉"
       },
-      "import_batch": "BATCH_20260615083931",
+      "import_batch": "BATCH_20260621004112",
       "is_supplementary": false,
       "reviewer": null,
       "review_time": null,
       "review_notes": ""
     },
-    "notes": "批次 BATCH_20260615083931, 导入类型: wrong_caliber"
+    "notes": "批次 BATCH_20260621004112, 导入类型: wrong_caliber"
   },
   {
-    "id": "HIS_20260615083931_fb81b896",
+    "id": "HIS_20260621004112_c3ee7a56",
     "operation_type": "supplementary_import",
     "operator": "system",
-    "operate_time": "2026-06-15T08:39:31.733698",
+    "operate_time": "2026-06-21T00:41:12.230516",
     "target_id": "WO_001",
     "target_type": "work_order",
     "before_state": {
@@ -211,7 +211,7 @@
       "category": "功能异常",
       "source": "线上反馈",
       "feedback_time": "2026-06-01T10:30:00",
-      "import_time": "2026-06-15T08:39:31.731540",
+      "import_time": "2026-06-21T00:41:12.230032",
       "status": "pending",
       "reference_links": [
         "https://example.com/ticket/12345",
@@ -227,7 +227,7 @@
         "reference_links": "https://example.com/ticket/12345|https://example.com/wiki/login-issue",
         "original_note": "客户投诉级别：P2，影响范围：约5%用户"
       },
-      "import_batch": "BATCH_20260615083931",
+      "import_batch": "BATCH_20260621004112",
       "is_supplementary": false,
       "reviewer": null,
       "review_time": null,
@@ -240,7 +240,7 @@
       "category": "功能异常",
       "source": "补录",
       "feedback_time": "2026-06-01T10:30:00",
-      "import_time": "2026-06-15T08:39:31.731540",
+      "import_time": "2026-06-21T00:41:12.230032",
       "status": "pending",
       "reference_links": [
         "https://example.com/ticket/12345",
@@ -256,19 +256,19 @@
         "reference_links": "https://example.com/ticket/12345|https://example.com/wiki/login-issue",
         "original_note": "补充了版本信息和影响范围"
       },
-      "import_batch": "BATCH_20260615083931",
+      "import_batch": "BATCH_20260621004112",
       "is_supplementary": true,
       "reviewer": null,
       "review_time": null,
       "review_notes": ""
     },
-    "notes": "批次 BATCH_20260615083931, 导入类型: supplementary"
+    "notes": "批次 BATCH_20260621004112, 导入类型: supplementary"
   },
   {
-    "id": "HIS_20260615083931_f36d3ddd",
+    "id": "HIS_20260621004112_de7bd5ed",
     "operation_type": "supplementary_import",
     "operator": "system",
-    "operate_time": "2026-06-15T08:39:31.733719",
+    "operate_time": "2026-06-21T00:41:12.230528",
     "target_id": "WO_005",
     "target_type": "work_order",
     "before_state": null,
@@ -279,7 +279,7 @@
       "category": "功能异常",
       "source": "补录",
       "feedback_time": "2026-06-05T11:00:00",
-      "import_time": "2026-06-15T08:39:31.733707",
+      "import_time": "2026-06-21T00:41:12.230521",
       "status": "pending",
       "reference_links": [],
       "original_raw_data": {
@@ -292,19 +292,19 @@
         "reference_links": "",
         "original_note": "遗漏工单补录"
       },
-      "import_batch": "BATCH_20260615083931",
+      "import_batch": "BATCH_20260621004112",
       "is_supplementary": true,
       "reviewer": null,
       "review_time": null,
       "review_notes": ""
     },
-    "notes": "批次 BATCH_20260615083931, 导入类型: supplementary"
+    "notes": "批次 BATCH_20260621004112, 导入类型: supplementary"
   },
   {
-    "id": "HIS_20260615083931_c19608c9",
+    "id": "HIS_20260621004112_207886ce",
     "operation_type": "review_remark",
     "operator": "周姐",
-    "operate_time": "2026-06-15T08:39:31.734690",
+    "operate_time": "2026-06-21T00:41:12.230647",
     "target_id": "DR_001",
     "target_type": "desensitization_remark",
     "before_state": null,
@@ -330,10 +330,10 @@
     "notes": "脱敏规则备注导入/更新"
   },
   {
-    "id": "HIS_20260615083931_4a41c992",
+    "id": "HIS_20260621004112_92cfffab",
     "operation_type": "review_remark",
     "operator": "周姐",
-    "operate_time": "2026-06-15T08:39:31.734704",
+    "operate_time": "2026-06-21T00:41:12.230656",
     "target_id": "DR_002",
     "target_type": "desensitization_remark",
     "before_state": null,
@@ -358,10 +358,10 @@
     "notes": "脱敏规则备注导入/更新"
   },
   {
-    "id": "HIS_20260615083931_adadd629",
+    "id": "HIS_20260621004112_ff84357c",
     "operation_type": "review_remark",
     "operator": "周姐",
-    "operate_time": "2026-06-15T08:39:31.734713",
+    "operate_time": "2026-06-21T00:41:12.230664",
     "target_id": "DR_003",
     "target_type": "desensitization_remark",
     "before_state": null,
@@ -384,10 +384,10 @@
     "notes": "脱敏规则备注导入/更新"
   },
   {
-    "id": "HIS_20260615083931_8811fe9d",
+    "id": "HIS_20260621004112_f1af6057",
     "operation_type": "review_remark",
     "operator": "周姐",
-    "operate_time": "2026-06-15T08:39:31.734721",
+    "operate_time": "2026-06-21T00:41:12.230672",
     "target_id": "DR_004",
     "target_type": "desensitization_remark",
     "before_state": null,
@@ -409,10 +409,10 @@
     "notes": "脱敏规则备注导入/更新"
   },
   {
-    "id": "HIS_20260615083931_706293b2",
+    "id": "HIS_20260621004112_19471e33",
     "operation_type": "review_remark",
     "operator": "周姐",
-    "operate_time": "2026-06-15T08:39:31.734764",
+    "operate_time": "2026-06-21T00:41:12.230695",
     "target_id": "WO_001",
     "target_type": "work_order",
     "before_state": {
@@ -422,7 +422,7 @@
       "category": "功能异常",
       "source": "补录",
       "feedback_time": "2026-06-01T10:30:00",
-      "import_time": "2026-06-15T08:39:31.731540",
+      "import_time": "2026-06-21T00:41:12.230032",
       "status": "pending",
       "reference_links": [
         "https://example.com/ticket/12345",
@@ -438,7 +438,7 @@
         "reference_links": "https://example.com/ticket/12345|https://example.com/wiki/login-issue",
         "original_note": "补充了版本信息和影响范围"
       },
-      "import_batch": "BATCH_20260615083931",
+      "import_batch": "BATCH_20260621004112",
       "is_supplementary": true,
       "reviewer": null,
       "review_time": null,
@@ -451,7 +451,7 @@
       "category": "功能异常",
       "source": "补录",
       "feedback_time": "2026-06-01T10:30:00",
-      "import_time": "2026-06-15T08:39:31.731540",
+      "import_time": "2026-06-21T00:41:12.230032",
       "status": "need_review",
       "reference_links": [
         "https://example.com/ticket/12345",
@@ -467,19 +467,19 @@
         "reference_links": "https://example.com/ticket/12345|https://example.com/wiki/login-issue",
         "original_note": "补充了版本信息和影响范围"
       },
-      "import_batch": "BATCH_20260615083931",
+      "import_batch": "BATCH_20260621004112",
       "is_supplementary": true,
       "reviewer": "周姐",
-      "review_time": "2026-06-15T08:39:31.734753",
+      "review_time": "2026-06-21T00:41:12.230687",
       "review_notes": "周姐已审阅，重要备注: 此工单涉及用户登录日志，包含手机号等敏感信息。导出时需脱敏处理，不对外公开原始数据。重要：此问题涉及..."
     },
     "notes": "审阅备注 DR_001"
   },
   {
-    "id": "HIS_20260615083931_620cbfcb",
+    "id": "HIS_20260621004112_3ea5dc82",
     "operation_type": "review_remark",
     "operator": "周姐",
-    "operate_time": "2026-06-15T08:39:31.734778",
+    "operate_time": "2026-06-21T00:41:12.230706",
     "target_id": "WO_002",
     "target_type": "work_order",
     "before_state": {
@@ -489,7 +489,7 @@
       "category": "性能问题",
       "source": "线上反馈",
       "feedback_time": "2026-06-02T14:20:00",
-      "import_time": "2026-06-15T08:39:31.731589",
+      "import_time": "2026-06-21T00:41:12.230061",
       "status": "classified",
       "reference_links": [
         "https://example.com/ticket/12346"
@@ -508,7 +508,7 @@
         "review_time": "2026-06-02T17:00:00",
         "review_notes": "初判为性能问题，已完成分类标注"
       },
-      "import_batch": "BATCH_20260615083931",
+      "import_batch": "BATCH_20260621004112",
       "is_supplementary": false,
       "reviewer": "标注员A",
       "review_time": "2026-06-02T17:00:00",
@@ -521,7 +521,7 @@
       "category": "性能问题",
       "source": "线上反馈",
       "feedback_time": "2026-06-02T14:20:00",
-      "import_time": "2026-06-15T08:39:31.731589",
+      "import_time": "2026-06-21T00:41:12.230061",
       "status": "classified",
       "reference_links": [
         "https://example.com/ticket/12346"
@@ -540,19 +540,19 @@
         "review_time": "2026-06-02T17:00:00",
         "review_notes": "初判为性能问题，已完成分类标注"
       },
-      "import_batch": "BATCH_20260615083931",
+      "import_batch": "BATCH_20260621004112",
       "is_supplementary": false,
       "reviewer": "周姐",
-      "review_time": "2026-06-15T08:39:31.734770",
+      "review_time": "2026-06-21T00:41:12.230700",
       "review_notes": "初判为性能问题，已完成分类标注 | 周姐审阅备注: 支付相关工单，涉及交易金额和用户银行卡信息（已脱敏）。注意：此工单分类错误，应为'资金安全'而非'性..."
     },
     "notes": "审阅备注 DR_002"
   },
   {
-    "id": "HIS_20260615083931_ff4da433",
+    "id": "HIS_20260621004112_ebb421e4",
     "operation_type": "review_remark",
     "operator": "周姐",
-    "operate_time": "2026-06-15T08:39:31.734788",
+    "operate_time": "2026-06-21T00:41:12.230716",
     "target_id": "WO_004",
     "target_type": "work_order",
     "before_state": {
@@ -562,7 +562,7 @@
       "category": "功能异常",
       "source": "线上反馈",
       "feedback_time": "2026-06-04T16:45:00",
-      "import_time": "2026-06-15T08:39:31.732986",
+      "import_time": "2026-06-21T00:41:12.230335",
       "status": "pending",
       "reference_links": [
         "https://example.com/ticket/12348"
@@ -577,7 +577,7 @@
         "reference_links": "https://example.com/ticket/12348",
         "original_note": "此工单被错误归类为功能异常，实际应为服务投诉"
       },
-      "import_batch": "BATCH_20260615083931",
+      "import_batch": "BATCH_20260621004112",
       "is_supplementary": false,
       "reviewer": null,
       "review_time": null,
@@ -590,7 +590,7 @@
       "category": "功能异常",
       "source": "线上反馈",
       "feedback_time": "2026-06-04T16:45:00",
-      "import_time": "2026-06-15T08:39:31.732986",
+      "import_time": "2026-06-21T00:41:12.230335",
       "status": "pending",
       "reference_links": [
         "https://example.com/ticket/12348"
@@ -605,19 +605,19 @@
         "reference_links": "https://example.com/ticket/12348",
         "original_note": "此工单被错误归类为功能异常，实际应为服务投诉"
       },
-      "import_batch": "BATCH_20260615083931",
+      "import_batch": "BATCH_20260621004112",
       "is_supplementary": false,
       "reviewer": "周姐",
-      "review_time": "2026-06-15T08:39:31.734782",
+      "review_time": "2026-06-21T00:41:12.230711",
       "review_notes": ""
     },
     "notes": "审阅备注 DR_003"
   },
   {
-    "id": "HIS_20260615083931_a848761b",
+    "id": "HIS_20260621004112_a7e410f9",
     "operation_type": "review_remark",
     "operator": "周姐",
-    "operate_time": "2026-06-15T08:39:31.734798",
+    "operate_time": "2026-06-21T00:41:12.230726",
     "target_id": "WO_005",
     "target_type": "work_order",
     "before_state": {
@@ -627,7 +627,7 @@
       "category": "功能异常",
       "source": "补录",
       "feedback_time": "2026-06-05T11:00:00",
-      "import_time": "2026-06-15T08:39:31.733707",
+      "import_time": "2026-06-21T00:41:12.230521",
       "status": "pending",
       "reference_links": [],
       "original_raw_data": {
@@ -640,7 +640,7 @@
         "reference_links": "",
         "original_note": "遗漏工单补录"
       },
-      "import_batch": "BATCH_20260615083931",
+      "import_batch": "BATCH_20260621004112",
       "is_supplementary": true,
       "reviewer": null,
       "review_time": null,
@@ -653,7 +653,7 @@
       "category": "功能异常",
       "source": "补录",
       "feedback_time": "2026-06-05T11:00:00",
-      "import_time": "2026-06-15T08:39:31.733707",
+      "import_time": "2026-06-21T00:41:12.230521",
       "status": "pending",
       "reference_links": [],
       "original_raw_data": {
@@ -666,24 +666,24 @@
         "reference_links": "",
         "original_note": "遗漏工单补录"
       },
-      "import_batch": "BATCH_20260615083931",
+      "import_batch": "BATCH_20260621004112",
       "is_supplementary": true,
       "reviewer": "周姐",
-      "review_time": "2026-06-15T08:39:31.734793",
+      "review_time": "2026-06-21T00:41:12.230720",
       "review_notes": ""
     },
     "notes": "审阅备注 DR_004"
   },
   {
-    "id": "HIS_20260615083933_49945927",
+    "id": "HIS_20260621004114_6dca24e6",
     "operation_type": "detect_conflict",
     "operator": "system",
-    "operate_time": "2026-06-15T08:39:33.329353",
-    "target_id": "CONF_20260615083932_f81bee81",
+    "operate_time": "2026-06-21T00:41:14.636963",
+    "target_id": "CONF_20260621004114_341a7e29",
     "target_type": "conflict_sample",
     "before_state": null,
     "after_state": {
-      "id": "CONF_20260615083932_f81bee81",
+      "id": "CONF_20260621004114_341a7e29",
       "work_order_id": "WO_002",
       "conflict_type": "category_mismatch",
       "status": "pending_confirm",
@@ -700,7 +700,7 @@
           }
         }
       ],
-      "detect_time": "2026-06-15T08:39:32.803985",
+      "detect_time": "2026-06-21T00:41:14.095600",
       "handler": null,
       "handle_time": null,
       "handle_notes": "",
@@ -709,15 +709,15 @@
     "notes": "检测到冲突: category_mismatch"
   },
   {
-    "id": "HIS_20260615083933_6db0743b",
+    "id": "HIS_20260621004114_c835d231",
     "operation_type": "detect_conflict",
     "operator": "system",
-    "operate_time": "2026-06-15T08:39:33.329381",
-    "target_id": "CONF_20260615083933_2a05e42a",
+    "operate_time": "2026-06-21T00:41:14.637006",
+    "target_id": "CONF_20260621004114_27e3b039",
     "target_type": "conflict_sample",
     "before_state": null,
     "after_state": {
-      "id": "CONF_20260615083933_2a05e42a",
+      "id": "CONF_20260621004114_27e3b039",
       "work_order_id": "WO_002",
       "conflict_type": "link_404_passed",
       "status": "need_product_review",
@@ -738,24 +738,24 @@
           }
         }
       ],
-      "detect_time": "2026-06-15T08:39:33.329339",
-      "handler": null,
+      "detect_time": "2026-06-21T00:41:14.636945",
+      "handler": "产品经理复核",
       "handle_time": null,
-      "handle_notes": "",
+      "handle_notes": "引用链接404但工单状态为classified，转产品经理复核",
       "resolution": null
     },
     "notes": "检测到冲突: link_404_passed"
   },
   {
-    "id": "HIS_20260615083934_9963c865",
+    "id": "HIS_20260621004115_8257b0d7",
     "operation_type": "detect_conflict",
     "operator": "system",
-    "operate_time": "2026-06-15T08:39:34.378633",
-    "target_id": "CONF_20260615083934_16f922fb",
+    "operate_time": "2026-06-21T00:41:15.670500",
+    "target_id": "CONF_20260621004115_e53716e0",
     "target_type": "conflict_sample",
     "before_state": null,
     "after_state": {
-      "id": "CONF_20260615083934_16f922fb",
+      "id": "CONF_20260621004115_e53716e0",
       "work_order_id": "WO_006",
       "conflict_type": "link_404_passed",
       "status": "need_product_review",
@@ -781,24 +781,24 @@
           }
         }
       ],
-      "detect_time": "2026-06-15T08:39:34.378615",
-      "handler": null,
+      "detect_time": "2026-06-21T00:41:15.670482",
+      "handler": "产品经理复核",
       "handle_time": null,
-      "handle_notes": "",
+      "handle_notes": "引用链接404但工单状态为resolved，转产品经理复核",
       "resolution": null
     },
     "notes": "检测到冲突: link_404_passed"
   },
   {
-    "id": "HIS_20260615083934_13188009",
+    "id": "HIS_20260621004116_5bbe7d7e",
     "operation_type": "detect_conflict",
     "operator": "system",
-    "operate_time": "2026-06-15T08:39:34.992312",
-    "target_id": "CONF_20260615083934_6bbf3be9",
+    "operate_time": "2026-06-21T00:41:16.190328",
+    "target_id": "CONF_20260621004115_9f2c7e9f",
     "target_type": "conflict_sample",
     "before_state": null,
     "after_state": {
-      "id": "CONF_20260615083934_6bbf3be9",
+      "id": "CONF_20260621004115_9f2c7e9f",
       "work_order_id": "WO_004",
       "conflict_type": "category_mismatch",
       "status": "pending_confirm",
@@ -815,199 +815,12 @@
           }
         }
       ],
-      "detect_time": "2026-06-15T08:39:34.378656",
+      "detect_time": "2026-06-21T00:41:15.670529",
       "handler": null,
       "handle_time": null,
       "handle_notes": "",
       "resolution": null
     },
     "notes": "检测到冲突: category_mismatch"
-  },
-  {
-    "id": "HIS_20260615083934_2b80f0d4",
-    "operation_type": "confirm_conflict",
-    "operator": "周姐",
-    "operate_time": "2026-06-15T08:39:34.994326",
-    "target_id": "WO_002",
-    "target_type": "work_order",
-    "before_state": {
-      "id": "WO_002",
-      "title": "支付页面加载缓慢",
-      "content": "用户反映在支付环节页面加载需要10秒以上，部分用户因此放弃支付。需要优化支付网关响应速度。",
-      "category": "性能问题",
-      "source": "线上反馈",
-      "feedback_time": "2026-06-02T14:20:00",
-      "import_time": "2026-06-15T08:39:31.731589",
-      "status": "classified",
-      "reference_links": [
-        "https://example.com/ticket/12346"
-      ],
-      "original_raw_data": {
-        "id": "WO_002",
-        "title": "支付页面加载缓慢",
-        "content": "用户反映在支付环节页面加载需要10秒以上，部分用户因此放弃支付。需要优化支付网关响应速度。",
-        "category": "性能问题",
-        "source": "线上反馈",
-        "feedback_time": "2026-06-02T14:20:00",
-        "reference_links": "https://example.com/ticket/12346",
-        "original_note": "涉及金额敏感，需要谨慎处理相关日志",
-        "status": "classified",
-        "reviewer": "标注员A",
-        "review_time": "2026-06-02T17:00:00",
-        "review_notes": "初判为性能问题，已完成分类标注"
-      },
-      "import_batch": "BATCH_20260615083931",
-      "is_supplementary": false,
-      "reviewer": "周姐",
-      "review_time": "2026-06-15T08:39:31.734770",
-      "review_notes": "初判为性能问题，已完成分类标注 | 周姐审阅备注: 支付相关工单，涉及交易金额和用户银行卡信息（已脱敏）。注意：此工单分类错误，应为'资金安全'而非'性..."
-    },
-    "after_state": {
-      "id": "WO_002",
-      "title": "支付页面加载缓慢",
-      "content": "用户反映在支付环节页面加载需要10秒以上，部分用户因此放弃支付。需要优化支付网关响应速度。",
-      "category": "性能问题",
-      "source": "线上反馈",
-      "feedback_time": "2026-06-02T14:20:00",
-      "import_time": "2026-06-15T08:39:31.731589",
-      "status": "conflict",
-      "reference_links": [
-        "https://example.com/ticket/12346"
-      ],
-      "original_raw_data": {
-        "id": "WO_002",
-        "title": "支付页面加载缓慢",
-        "content": "用户反映在支付环节页面加载需要10秒以上，部分用户因此放弃支付。需要优化支付网关响应速度。",
-        "category": "性能问题",
-        "source": "线上反馈",
-        "feedback_time": "2026-06-02T14:20:00",
-        "reference_links": "https://example.com/ticket/12346",
-        "original_note": "涉及金额敏感，需要谨慎处理相关日志",
-        "status": "classified",
-        "reviewer": "标注员A",
-        "review_time": "2026-06-02T17:00:00",
-        "review_notes": "初判为性能问题，已完成分类标注"
-      },
-      "import_batch": "BATCH_20260615083931",
-      "is_supplementary": false,
-      "reviewer": "周姐",
-      "review_time": "2026-06-15T08:39:34.994304",
-      "review_notes": "冲突已确认: category_mismatch"
-    },
-    "notes": "关联冲突 CONF_20260615083932_f81bee81: 经核实，此冲突确实存在，需要重新分类"
-  },
-  {
-    "id": "HIS_20260615083934_189cfd04",
-    "operation_type": "confirm_conflict",
-    "operator": "周姐",
-    "operate_time": "2026-06-15T08:39:34.994338",
-    "target_id": "CONF_20260615083932_f81bee81",
-    "target_type": "conflict_sample",
-    "before_state": {
-      "id": "CONF_20260615083932_f81bee81",
-      "work_order_id": "WO_002",
-      "conflict_type": "category_mismatch",
-      "status": "pending_confirm",
-      "evidence": [
-        {
-          "type": "category_mismatch",
-          "description": "工单分类 '性能问题' 与脱敏规则备注冲突",
-          "source": "desensitization_remark",
-          "details": {
-            "work_order_category": "性能问题",
-            "remark_id": "DR_002",
-            "remark_content": "支付相关工单，涉及交易金额和用户银行卡信息（已脱敏）。注意：此工单分类错误，应为'资金安全'而非'性能问题'。分类不符，需要重新判定。",
-            "remark_owner": "周姐"
-          }
-        }
-      ],
-      "detect_time": "2026-06-15T08:39:32.803985",
-      "handler": null,
-      "handle_time": null,
-      "handle_notes": "",
-      "resolution": null
-    },
-    "after_state": {
-      "id": "CONF_20260615083932_f81bee81",
-      "work_order_id": "WO_002",
-      "conflict_type": "category_mismatch",
-      "status": "confirmed",
-      "evidence": [
-        {
-          "type": "category_mismatch",
-          "description": "工单分类 '性能问题' 与脱敏规则备注冲突",
-          "source": "desensitization_remark",
-          "details": {
-            "work_order_category": "性能问题",
-            "remark_id": "DR_002",
-            "remark_content": "支付相关工单，涉及交易金额和用户银行卡信息（已脱敏）。注意：此工单分类错误，应为'资金安全'而非'性能问题'。分类不符，需要重新判定。",
-            "remark_owner": "周姐"
-          }
-        }
-      ],
-      "detect_time": "2026-06-15T08:39:32.803985",
-      "handler": "周姐",
-      "handle_time": "2026-06-15T08:39:34.994297",
-      "handle_notes": "经核实，此冲突确实存在，需要重新分类",
-      "resolution": null
-    },
-    "notes": "经核实，此冲突确实存在，需要重新分类"
-  },
-  {
-    "id": "HIS_20260615083934_a8efffb6",
-    "operation_type": "reject_conflict",
-    "operator": "周姐",
-    "operate_time": "2026-06-15T08:39:34.994763",
-    "target_id": "CONF_20260615083934_6bbf3be9",
-    "target_type": "conflict_sample",
-    "before_state": {
-      "id": "CONF_20260615083934_6bbf3be9",
-      "work_order_id": "WO_004",
-      "conflict_type": "category_mismatch",
-      "status": "pending_confirm",
-      "evidence": [
-        {
-          "type": "category_mismatch",
-          "description": "工单分类 '功能异常' 与脱敏规则备注冲突",
-          "source": "desensitization_remark",
-          "details": {
-            "work_order_category": "功能异常",
-            "remark_id": "DR_003",
-            "remark_content": "此工单分类错误，应为'服务投诉'而非'功能异常'。分类不符，需要更正。",
-            "remark_owner": "周姐"
-          }
-        }
-      ],
-      "detect_time": "2026-06-15T08:39:34.378656",
-      "handler": null,
-      "handle_time": null,
-      "handle_notes": "",
-      "resolution": null
-    },
-    "after_state": {
-      "id": "CONF_20260615083934_6bbf3be9",
-      "work_order_id": "WO_004",
-      "conflict_type": "category_mismatch",
-      "status": "rejected",
-      "evidence": [
-        {
-          "type": "category_mismatch",
-          "description": "工单分类 '功能异常' 与脱敏规则备注冲突",
-          "source": "desensitization_remark",
-          "details": {
-            "work_order_category": "功能异常",
-            "remark_id": "DR_003",
-            "remark_content": "此工单分类错误，应为'服务投诉'而非'功能异常'。分类不符，需要更正。",
-            "remark_owner": "周姐"
-          }
-        }
-      ],
-      "detect_time": "2026-06-15T08:39:34.378656",
-      "handler": "周姐",
-      "handle_time": "2026-06-15T08:39:34.994752",
-      "handle_notes": "经核实，分类是正确的，备注描述有误",
-      "resolution": null
-    },
-    "notes": "经核实，分类是正确的，备注描述有误"
   }
 ]

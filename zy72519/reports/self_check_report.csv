@@ -1,6 +1,6 @@
 ﻿检查项,是否通过,严重程度,消息,详情
-重复导入检测,是,info,未发现重复导入,{'batch_counts': {'BATCH_20260615083931': 6}}
+重复导入检测,是,info,未发现重复导入,{'batch_counts': {'BATCH_20260621004112': 6}}
 引用链接404仍被判通过检测,否,error,发现 6 个链接问题,"{'problematic_orders': [{'work_order_id': 'WO_001', 'work_order_title': '用户反馈APP登录异常-补充', 'broken_link': 'https://example.com/ticket/12345', 'status_code': 404, 'reason': 'status_404', 'work_order_sta"
 补录后重算检测,是,info,补录工单重算逻辑正常,{'supplementary_count': 2}
 导出一致性检测,是,info,数据引用一致,"{'work_order_count': 6, 'remark_count': 4, 'conflict_count': 4}"
-冲突样本表与历史记录一致性,是,info,冲突样本表与工单状态一致,{}
+冲突样本表与历史记录一致性,否,warning,发现 2 个工单状态与冲突状态不一致,"{'mismatches': [{'work_order_id': 'WO_002', 'work_order_status': 'classified', 'conflict_status': 'pending_confirm', 'conflict_type': 'category_mismatch'}, {'work_order_id': 'WO_004', 'work_order_stat"

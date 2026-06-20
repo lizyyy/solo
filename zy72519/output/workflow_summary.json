@@ -1,5 +1,5 @@
 {
-  "workflow_time": "2026-06-15T08:39:34.993403",
+  "workflow_time": "2026-06-21T00:41:16.191217",
   "step_results": {
     "step1": {
       "normal": {
@@ -27,7 +27,7 @@
       "need_product_review": 2,
       "conflicts": [
         {
-          "id": "CONF_20260615083932_f81bee81",
+          "id": "CONF_20260621004114_341a7e29",
           "work_order_id": "WO_002",
           "conflict_type": "category_mismatch",
           "status": "pending_confirm",
@@ -44,14 +44,14 @@
               }
             }
           ],
-          "detect_time": "2026-06-15T08:39:32.803985",
+          "detect_time": "2026-06-21T00:41:14.095600",
           "handler": null,
           "handle_time": null,
           "handle_notes": "",
           "resolution": null
         },
         {
-          "id": "CONF_20260615083933_2a05e42a",
+          "id": "CONF_20260621004114_27e3b039",
           "work_order_id": "WO_002",
           "conflict_type": "link_404_passed",
           "status": "need_product_review",
@@ -72,14 +72,14 @@
               }
             }
           ],
-          "detect_time": "2026-06-15T08:39:33.329339",
-          "handler": null,
+          "detect_time": "2026-06-21T00:41:14.636945",
+          "handler": "产品经理复核",
           "handle_time": null,
-          "handle_notes": "",
+          "handle_notes": "引用链接404但工单状态为classified，转产品经理复核",
           "resolution": null
         },
         {
-          "id": "CONF_20260615083934_16f922fb",
+          "id": "CONF_20260621004115_e53716e0",
           "work_order_id": "WO_006",
           "conflict_type": "link_404_passed",
           "status": "need_product_review",
@@ -105,14 +105,14 @@
               }
             }
           ],
-          "detect_time": "2026-06-15T08:39:34.378615",
-          "handler": null,
+          "detect_time": "2026-06-21T00:41:15.670482",
+          "handler": "产品经理复核",
           "handle_time": null,
-          "handle_notes": "",
+          "handle_notes": "引用链接404但工单状态为resolved，转产品经理复核",
           "resolution": null
         },
         {
-          "id": "CONF_20260615083934_6bbf3be9",
+          "id": "CONF_20260621004115_9f2c7e9f",
           "work_order_id": "WO_004",
           "conflict_type": "category_mismatch",
           "status": "pending_confirm",
@@ -129,7 +129,7 @@
               }
             }
           ],
-          "detect_time": "2026-06-15T08:39:34.378656",
+          "detect_time": "2026-06-21T00:41:15.670529",
           "handler": null,
           "handle_time": null,
           "handle_notes": "",

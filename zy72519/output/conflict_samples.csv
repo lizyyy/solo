@@ -1,5 +1,5 @@
 ﻿冲突ID,工单ID,工单标题,冲突类型,状态,检测时间,处理人,处理时间,处理备注,解决方案,失效链接,拦截原因说明,当前责任方,是否完成确认
-CONF_20260615083932_f81bee81,WO_002,支付页面加载缓慢,category_mismatch,confirmed,2026-06-15T08:39:32.803985,周姐,2026-06-15T08:39:34.994297,经核实，此冲突确实存在，需要重新分类,,,,周姐,是
-CONF_20260615083933_2a05e42a,WO_002,支付页面加载缓慢,link_404_passed,need_product_review,2026-06-15T08:39:33.329339,,,,,"https://example.com/ticket/12346 (状态码:404, 原因:status_404)",工单引用了 1 个无效链接，但工单已被标记为完成,,否
-CONF_20260615083934_16f922fb,WO_006,物流信息长时间不更新,link_404_passed,need_product_review,2026-06-15T08:39:34.378615,,,,,"https://example.com/ticket/12349 (状态码:404, 原因:status_404) | https://example.com/invalid-logistics-page (状态码:404, 原因:status_404)",工单引用了 2 个无效链接，但工单已被标记为完成,,否
-CONF_20260615083934_6bbf3be9,WO_004,客服态度问题投诉,category_mismatch,rejected,2026-06-15T08:39:34.378656,周姐,2026-06-15T08:39:34.994752,经核实，分类是正确的，备注描述有误,,,,周姐,是
+CONF_20260621004114_341a7e29,WO_002,支付页面加载缓慢,category_mismatch,pending_confirm,2026-06-21T00:41:14.095600,,,,,,,,否
+CONF_20260621004114_27e3b039,WO_002,支付页面加载缓慢,link_404_passed,need_product_review,2026-06-21T00:41:14.636945,产品经理复核,,引用链接404但工单状态为classified，转产品经理复核,,"https://example.com/ticket/12346 (状态码:404, 原因:status_404)",工单引用了 1 个无效链接，但工单已被标记为完成,产品经理复核,否
+CONF_20260621004115_e53716e0,WO_006,物流信息长时间不更新,link_404_passed,need_product_review,2026-06-21T00:41:15.670482,产品经理复核,,引用链接404但工单状态为resolved，转产品经理复核,,"https://example.com/ticket/12349 (状态码:404, 原因:status_404) | https://example.com/invalid-logistics-page (状态码:404, 原因:status_404)",工单引用了 2 个无效链接，但工单已被标记为完成,产品经理复核,否
+CONF_20260621004115_9f2c7e9f,WO_004,客服态度问题投诉,category_mismatch,pending_confirm,2026-06-21T00:41:15.670529,,,,,,,,否

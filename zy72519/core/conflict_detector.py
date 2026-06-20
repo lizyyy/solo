@@ -146,6 +146,8 @@ class ConflictDetector:
                 conflict_type=ConflictType.LINK_404_PASSED,
                 status=ConflictStatus.NEED_PRODUCT_REVIEW,
                 evidence=[evidence],
+                handler="产品经理复核",
+                handle_notes=f"引用链接404但工单状态为{work_order.status.value}，转产品经理复核",
             )
             return conflict
         return None

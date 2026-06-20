@@ -1,11 +1,11 @@
 {
-  "check_time": "2026-06-15T08:39:37.974118",
+  "check_time": "2026-06-21T00:41:19.030023",
   "summary": {
     "total": 5,
-    "passed": 4,
-    "failed": 1,
+    "passed": 3,
+    "failed": 2,
     "errors": 1,
-    "warnings": 0
+    "warnings": 1
   },
   "results": [
     {
@@ -15,7 +15,7 @@
       "severity": "info",
       "details": {
         "batch_counts": {
-          "BATCH_20260615083931": 6
+          "BATCH_20260621004112": 6
         }
       }
     },
@@ -50,7 +50,7 @@
             "broken_link": "https://example.com/ticket/12346",
             "status_code": 404,
             "reason": "status_404",
-            "work_order_status": "conflict",
+            "work_order_status": "classified",
             "issue_type": "LINK_404冲突待产品复核",
             "conflict_status": "need_product_review"
           },
@@ -108,10 +108,25 @@
     },
     {
       "check_name": "冲突样本表与历史记录一致性",
-      "passed": true,
-      "message": "冲突样本表与工单状态一致",
-      "severity": "info",
-      "details": {}
+      "passed": false,
+      "message": "发现 2 个工单状态与冲突状态不一致",
+      "severity": "warning",
+      "details": {
+        "mismatches": [
+          {
+            "work_order_id": "WO_002",
+            "work_order_status": "classified",
+            "conflict_status": "pending_confirm",
+            "conflict_type": "category_mismatch"
+          },
+          {
+            "work_order_id": "WO_004",
+            "work_order_status": "pending",
+            "conflict_status": "pending_confirm",
+            "conflict_type": "category_mismatch"
+          }
+        ]
+      }
     }
   ]
 }

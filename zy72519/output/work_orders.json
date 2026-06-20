@@ -6,7 +6,7 @@
     "category": "功能异常",
     "source": "补录",
     "feedback_time": "2026-06-01T10:30:00",
-    "import_time": "2026-06-15T08:39:31.731540",
+    "import_time": "2026-06-21T00:41:12.230032",
     "status": "need_review",
     "reference_links": [
       "https://example.com/ticket/12345",
@@ -22,10 +22,10 @@
       "reference_links": "https://example.com/ticket/12345|https://example.com/wiki/login-issue",
       "original_note": "补充了版本信息和影响范围"
     },
-    "import_batch": "BATCH_20260615083931",
+    "import_batch": "BATCH_20260621004112",
     "is_supplementary": true,
     "reviewer": "周姐",
-    "review_time": "2026-06-15T08:39:31.734753",
+    "review_time": "2026-06-21T00:41:12.230687",
     "review_notes": "周姐已审阅，重要备注: 此工单涉及用户登录日志，包含手机号等敏感信息。导出时需脱敏处理，不对外公开原始数据。重要：此问题涉及..."
   },
   {
@@ -35,8 +35,8 @@
     "category": "性能问题",
     "source": "线上反馈",
     "feedback_time": "2026-06-02T14:20:00",
-    "import_time": "2026-06-15T08:39:31.731589",
-    "status": "conflict",
+    "import_time": "2026-06-21T00:41:12.230061",
+    "status": "classified",
     "reference_links": [
       "https://example.com/ticket/12346"
     ],
@@ -54,11 +54,11 @@
       "review_time": "2026-06-02T17:00:00",
       "review_notes": "初判为性能问题，已完成分类标注"
     },
-    "import_batch": "BATCH_20260615083931",
+    "import_batch": "BATCH_20260621004112",
     "is_supplementary": false,
     "reviewer": "周姐",
-    "review_time": "2026-06-15T08:39:34.994304",
-    "review_notes": "冲突已确认: category_mismatch"
+    "review_time": "2026-06-21T00:41:12.230700",
+    "review_notes": "初判为性能问题，已完成分类标注 | 周姐审阅备注: 支付相关工单，涉及交易金额和用户银行卡信息（已脱敏）。注意：此工单分类错误，应为'资金安全'而非'性..."
   },
   {
     "id": "WO_003",
@@ -67,7 +67,7 @@
     "category": "展示问题",
     "source": "线上反馈",
     "feedback_time": "2026-06-03T09:15:00",
-    "import_time": "2026-06-15T08:39:31.731606",
+    "import_time": "2026-06-21T00:41:12.230076",
     "status": "pending",
     "reference_links": [],
     "original_raw_data": {
@@ -80,7 +80,7 @@
       "reference_links": "",
       "original_note": ""
     },
-    "import_batch": "BATCH_20260615083931",
+    "import_batch": "BATCH_20260621004112",
     "is_supplementary": false,
     "reviewer": null,
     "review_time": null,
@@ -93,7 +93,7 @@
     "category": "物流问题",
     "source": "线上反馈",
     "feedback_time": "2026-06-04T08:00:00",
-    "import_time": "2026-06-15T08:39:31.731619",
+    "import_time": "2026-06-21T00:41:12.230088",
     "status": "resolved",
     "reference_links": [
       "https://example.com/ticket/12349",
@@ -113,7 +113,7 @@
       "review_time": "2026-06-04T12:30:00",
       "review_notes": "已联系物流商核实，工单标记为已解决"
     },
-    "import_batch": "BATCH_20260615083931",
+    "import_batch": "BATCH_20260621004112",
     "is_supplementary": false,
     "reviewer": "标注员B",
     "review_time": "2026-06-04T12:30:00",
@@ -126,7 +126,7 @@
     "category": "功能异常",
     "source": "线上反馈",
     "feedback_time": "2026-06-04T16:45:00",
-    "import_time": "2026-06-15T08:39:31.732986",
+    "import_time": "2026-06-21T00:41:12.230335",
     "status": "pending",
     "reference_links": [
       "https://example.com/ticket/12348"
@@ -141,10 +141,10 @@
       "reference_links": "https://example.com/ticket/12348",
       "original_note": "此工单被错误归类为功能异常，实际应为服务投诉"
     },
-    "import_batch": "BATCH_20260615083931",
+    "import_batch": "BATCH_20260621004112",
     "is_supplementary": false,
     "reviewer": "周姐",
-    "review_time": "2026-06-15T08:39:31.734782",
+    "review_time": "2026-06-21T00:41:12.230711",
     "review_notes": ""
   },
   {
@@ -154,7 +154,7 @@
     "category": "功能异常",
     "source": "补录",
     "feedback_time": "2026-06-05T11:00:00",
-    "import_time": "2026-06-15T08:39:31.733707",
+    "import_time": "2026-06-21T00:41:12.230521",
     "status": "pending",
     "reference_links": [],
     "original_raw_data": {
@@ -167,10 +167,10 @@
       "reference_links": "",
       "original_note": "遗漏工单补录"
     },
-    "import_batch": "BATCH_20260615083931",
+    "import_batch": "BATCH_20260621004112",
     "is_supplementary": true,
     "reviewer": "周姐",
-    "review_time": "2026-06-15T08:39:31.734793",
+    "review_time": "2026-06-21T00:41:12.230720",
     "review_notes": ""
   }
 ]
