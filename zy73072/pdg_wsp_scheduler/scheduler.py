@@ -358,3 +358,68 @@ class TemperatureRiseScheduler:
             change_description="".join(change_desc_parts),
             boundary_samples_added=boundary,
         )
+
+    @staticmethod
+    def _photo_mismatch_impact_from_dict(
+        d: Optional[Dict[str, Any]]
+    ) -> Optional[PhotoMismatchImpact]:
+        if not d:
+            return None
+        return PhotoMismatchImpact(
+            affected_result_ids=list(d.get("affected_result_ids", [])),
+            affected_device_ids=list(d.get("affected_device_ids", [])),
+            impact_scope=str(d.get("impact_scope", "")),
+            wrap_up_action=str(d.get("wrap_up_action", "")),
+        )
+
+    @staticmethod
+    def import_report_from_dict(d: Dict[str, Any]) -> ImportReport:
+        start = datetime.fromisoformat(d["start_time"])
+        end = None
+        if d.get("end_time"):
+            end = datetime.fromisoformat(d["end_time"])
+        return ImportReport(
+            import_run_id=d.get("import_run_id", ""),
+            start_time=start,
+            end_time=end,
+            records_read=int(d.get("records_read", 0)),
+            records_new=int(d.get("records_new", 0)),
+            records_duplicate_skipped=int(d.get("records_duplicate_skipped", 0)),
+            records_bad_data=int(d.get("records_bad_data", 0)),
+            bad_data_trace_ids=list(d.get("bad_data_trace_ids", [])),
+            preserved_manual_remarks=int(d.get("preserved_manual_remarks", 0)),
+            overwritten_remark_rejected=int(d.get("overwritten_remark_rejected", 0)),
+            photo_mismatch_impact=TemperatureRiseScheduler._photo_mismatch_impact_from_dict(
+                d.get("photo_mismatch_impact")
+            ),
+            failure_code=d.get("failure_code", "OK"),
+            failure_reason=d.get("failure_reason", ""),
+        )
+
+    def dump_persist_extra(self) -> Dict[str, Any]:
+        return {
+            "last_import_report": (
+                self._last_import_report.to_dict()
+                if self._last_import_report
+                else None
+            ),
+            "previous_result_ids": sorted(self._previous_result_ids),
+        }
+
+    def load_persist_extra(self, data: Dict[str, Any]) -> None:
+        report_raw = data.get("last_import_report")
+        if report_raw:
+            try:
+                self._last_import_report = (
+                    TemperatureRiseScheduler.import_report_from_dict(report_raw)
+                )
+            except Exception:
+                self._last_import_report = None
+        else:
+            self._last_import_report = None
+
+        prev = data.get("previous_result_ids", [])
+        if isinstance(prev, list):
+            self._previous_result_ids = set(prev)
+        else:
+            self._previous_result_ids = set()

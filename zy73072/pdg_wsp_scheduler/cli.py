@@ -17,6 +17,7 @@ EXIT_PHOTO_MISMATCH = 5
 
 
 STATE_FILE_DEFAULT = "pdg_state.json"
+STATE_SCHEMA_VERSION = 2
 
 
 def _load_state(path: str, scheduler: TemperatureRiseScheduler) -> None:
@@ -58,15 +59,20 @@ def _load_state(path: str, scheduler: TemperatureRiseScheduler) -> None:
                 source_dedup_count=rd.get("source_dedup_count", 1),
             )
             scheduler._results[dk] = sr
+
+        extra = data.get("persist_extra", {})
+        scheduler.load_persist_extra(extra)
     except Exception:
         pass
 
 
 def _save_state(path: str, scheduler: TemperatureRiseScheduler) -> None:
     data = {
+        "schema_version": STATE_SCHEMA_VERSION,
         "saved_at": datetime.now().isoformat(),
         "results": {dk: r.to_dict() for dk, r in scheduler._results.items()},
         "bad_data": {tid: b.to_dict() for tid, b in scheduler._bad_data.items()},
+        "persist_extra": scheduler.dump_persist_extra(),
     }
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
@@ -165,14 +171,49 @@ def cmd_summary(args) -> int:
 
     summary = scheduler.build_page_summary(tonight=tonight)
 
+    last_report = scheduler._last_import_report
+    import_diagnostic: Dict[str, Any] = {
+        "available": last_report is not None,
+    }
+    if last_report is not None:
+        import_diagnostic.update(
+            {
+                "import_run_id": last_report.import_run_id,
+                "records_read": last_report.records_read,
+                "records_new": last_report.records_new,
+                "records_duplicate_skipped": last_report.records_duplicate_skipped,
+                "records_bad_data": last_report.records_bad_data,
+                "preserved_manual_remarks": last_report.preserved_manual_remarks,
+                "overwritten_remark_rejected": last_report.overwritten_remark_rejected,
+                "failure_code": last_report.failure_code,
+                "failure_reason": last_report.failure_reason,
+                "photo_mismatch": (
+                    last_report.photo_mismatch_impact.to_dict()
+                    if last_report.photo_mismatch_impact
+                    else None
+                ),
+            }
+        )
+
     output = {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "command": "summary",
         "page_summary": summary.to_dict(),
+        "import_diagnostic": import_diagnostic,
     }
 
     sys.stdout.write(json.dumps(output, ensure_ascii=False, indent=2) + "\n")
-    return EXIT_OK
+
+    exit_code = EXIT_OK
+    if last_report is not None:
+        if last_report.records_bad_data > 0:
+            exit_code = EXIT_BAD_DATA_PRESENT
+        if last_report.photo_mismatch_impact is not None:
+            if exit_code == EXIT_OK:
+                exit_code = EXIT_PHOTO_MISMATCH
+            else:
+                exit_code = max(exit_code, EXIT_PHOTO_MISMATCH)
+    return exit_code
 
 
 def cmd_remark(args) -> int:
