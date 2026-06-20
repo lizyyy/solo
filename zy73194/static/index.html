@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数列递推参数回放</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  background: #f5f7fa;
+  color: #1f2937;
+  line-height: 1.6;
+}
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+.header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 24px 28px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(102,126,234,0.25);
+}
+.header h1 { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+.header p { opacity: 0.9; font-size: 14px; }
+
+.toolbar {
+  background: white;
+  padding: 16px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.toolbar label { font-size: 13px; color: #6b7280; margin-right: 4px; }
+.toolbar select, .toolbar button, .toolbar input {
+  padding: 8px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  background: white;
+}
+.toolbar button {
+  background: #4f46e5;
+  color: white;
+  border-color: #4f46e5;
+  cursor: pointer;
+  font-weight: 500;
+}
+.toolbar button:hover { background: #4338ca; }
+.toolbar button.secondary {
+  background: white;
+  color: #4f46e5;
+  border-color: #4f46e5;
+}
+.toolbar button.secondary:hover { background: #eef2ff; }
+
+.grid { display: grid; grid-template-columns: 380px 1fr; gap: 20px; }
+.panel {
+  background: white;
+  border-radius: 10px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.panel h2 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.panel h2 .count {
+  background: #eef2ff;
+  color: #4f46e5;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.record-list { list-style: none; max-height: 70vh; overflow-y: auto; }
+.record-item {
+  padding: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 8px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.15s;
+}
+.record-item:hover { border-color: #6366f1; background: #f8faff; }
+.record-item.active {
+  border-color: #4f46e5;
+  background: #eef2ff;
+  box-shadow: inset 3px 0 0 #4f46e5;
+}
+.record-item .title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+.record-item .meta { font-size: 12px; color: #6b7280; }
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  margin-right: 6px;
+}
+.badge-released { background: #dcfce7; color: #166534; }
+.badge-pending { background: #fef3c7; color: #92400e; }
+.badge-manual { background: #fee2e2; color: #991b1b; }
+.badge-divzero { background: #fecaca; color: #991b1b; }
+
+.detail-section { margin-bottom: 24px; }
+.detail-row { display: grid; grid-template-columns: 110px 1fr; gap: 10px; margin-bottom: 8px; font-size: 13px; }
+.detail-row .label { color: #6b7280; }
+.detail-row .value { font-weight: 500; }
+.formula-box {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 14px 16px;
+  border-radius: 8px;
+  font-family: "SF Mono", Monaco, monospace;
+  font-size: 15px;
+  color: #1f2937;
+  margin: 10px 0;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 16px;
+}
+.tab {
+  padding: 10px 18px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.tab.active { color: #4f46e5; border-bottom-color: #4f46e5; }
+
+.chart-wrap { height: 280px; margin-bottom: 16px; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+table th, table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+}
+table th { background: #f9fafb; font-weight: 600; color: #374151; }
+table tr.divzero-row { background: #fef2f2; }
+table tr.divzero-row td { color: #991b1b; font-weight: 500; }
+
+.lifecycle-item, .history-item {
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 13px;
+}
+.lifecycle-item:last-child, .history-item:last-child { border-bottom: none; }
+.lifecycle-item .action { font-weight: 600; color: #111827; }
+.lifecycle-item .operator, .lifecycle-item .time { color: #6b7280; font-size: 12px; }
+.history-item {
+  background: #fafafa;
+  padding: 12px 14px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  border: 1px solid #eee;
+}
+.history-item .version { font-weight: 600; color: #4f46e5; }
+
+.division-banner {
+  background: linear-gradient(90deg, #fee2e2, #fecaca);
+  border-left: 4px solid #ef4444;
+  padding: 10px 14px;
+  border-radius: 6px;
+  color: #991b1b;
+  font-size: 13px;
+  margin-bottom: 14px;
+  font-weight: 500;
+}
+.unit-change {
+  background: #fff7ed;
+  border-left: 4px solid #f97316;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: #9a3412;
+  font-size: 12.5px;
+  margin: 8px 0;
+}
+.screenshot {
+  max-width: 100%;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  margin-top: 8px;
+}
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #9ca3af;
+  font-size: 13px;
+}
+.params-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.params-grid div {
+  background: #f3f4f6;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 12.5px;
+}
+.params-grid div strong { color: #4f46e5; margin-right: 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>数列递推参数回放</h1>
+    <p>教研编辑专用 — 历史答案回溯 · 单位变更追踪 · 除零边界留痕 · 口径一致导出</p>
+  </div>
+
+  <div class="toolbar">
+    <label>状态筛选：</label>
+    <select id="statusFilter">
+      <option value="">全部</option>
+      <option value="已放行">已放行</option>
+      <option value="待补证据">待补证据</option>
+      <option value="人工改过">人工改过</option>
+    </select>
+    <button id="exportAllBtn" class="secondary">导出全部CSV</button>
+    <button id="exportCurrentBtn" class="secondary">导出当前回放CSV</button>
+    <button id="recomputeBtn">晚到附件复算</button>
+    <button id="newBtn">新建回放</button>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <h2>回放列表 <span class="count" id="recordCount">0</span></h2>
+      <ul class="record-list" id="recordList"></ul>
+    </div>
+
+    <div>
+      <div id="detailArea">
+        <div class="empty-state">← 请选择左侧回放记录查看详情</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentRecordId = null;
+let currentRecord = null;
+let chartInstance = null;
+let activeTab = 'chart';
+
+const statusClass = {
+  '已放行': 'badge-released',
+  '待补证据': 'badge-pending',
+  '人工改过': 'badge-manual'
+};
+
+function fetchJSON(url) { return fetch(url).then(r => r.json()); }
+
+async function loadRecords() {
+  const filter = document.getElementById('statusFilter').value;
+  const url = filter ? `/api/records?status=${encodeURIComponent(filter)}` : '/api/records';
+  const records = await fetchJSON(url);
+  document.getElementById('recordCount').textContent = records.length;
+  const list = document.getElementById('recordList');
+  list.innerHTML = records.map(r => `
+    <li class="record-item ${r.id === currentRecordId ? 'active' : ''}" data-id="${r.id}">
+      <div class="title">
+        <span class="badge ${statusClass[r.status]}">${r.status}</span>
+        ${r.has_division_by_zero ? '<span class="badge badge-divzero">⚠️除零</span>' : ''}
+        ${r.title}
+      </div>
+      <div class="meta">ID: ${r.id} · v${r.current_version} · ${r.unit} · ${r.last_operator} ${r.last_action} · ${r.updated_at.slice(0,16)}</div>
+    </li>
+  `).join('');
+  list.querySelectorAll('.record-item').forEach(el => {
+    el.onclick = () => loadDetail(el.dataset.id);
+  });
+}
+
+async function loadDetail(id) {
+  currentRecordId = id;
+  currentRecord = await fetchJSON(`/api/records/${id}`);
+  const history = await fetchJSON(`/api/records/${id}/history`);
+  renderDetail(currentRecord, history);
+  loadRecords();
+}
+
+function renderDetail(r, history) {
+  const summary = r.result_summary;
+  const area = document.getElementById('detailArea');
+
+  const unitChanges = r.unit_change_log.length > 0 ? r.unit_change_log.map(c => `
+    <div class="unit-change">
+      🔄 单位变更：<strong>${c.from_unit}</strong> → <strong>${c.to_unit}</strong>
+      · 操作人：${c.operator} · ${c.time.slice(0,16)}
+      <div style="margin-top:4px;opacity:0.85;">备注：${c.remark || '无'}</div>
+    </div>
+  `).join('') : '<div style="color:#9ca3af;font-size:12.5px;">暂无单位变更记录</div>';
+
+  area.innerHTML = `
+    <div class="panel detail-section">
+      <h2>回放详情
+        <span class="badge ${statusClass[r.status]}" style="margin-left:auto;">${r.status}</span>
+        ${r.has_division_by_zero ? '<span class="badge badge-divzero">含除零边界</span>' : ''}
+      </h2>
+
+      ${r.has_division_by_zero ? `<div class="division-banner">⚠️ 本次回放包含除零边界，共 ${summary.division_by_zero_steps} 步触发，已在明细与CSV中标记</div>` : ''}
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+          <div class="detail-row"><div class="label">回放ID</div><div class="value">${r.id}</div></div>
+          <div class="detail-row"><div class="label">标题</div><div class="value">${r.title}</div></div>
+          <div class="detail-row"><div class="label">当前版本</div><div class="value">v${r.current_version}</div></div>
+          <div class="detail-row"><div class="label">单位</div><div class="value">${r.unit}</div></div>
+          <div class="detail-row"><div class="label">总步数</div><div class="value">${summary.total_steps} 步</div></div>
+        </div>
+        <div>
+          <div class="detail-row"><div class="label">状态</div><div class="value">${r.status}</div></div>
+          <div class="detail-row"><div class="label">除零步数</div><div class="value">${summary.division_by_zero_steps} 步</div></div>
+          <div class="detail-row"><div class="label">首项值</div><div class="value">${summary.first_value ?? '-'} ${r.unit}</div></div>
+          <div class="detail-row"><div class="label">末项值</div><div class="value">${summary.last_finite_value ?? '-'} ${r.unit}</div></div>
+          <div class="detail-row"><div class="label">更新时间</div><div class="value">${r.updated_at.slice(0,19)}</div></div>
+        </div>
+      </div>
+
+      <div class="detail-row" style="margin-top:12px;"><div class="label">递推公式</div><div class="value"></div></div>
+      <div class="formula-box">${r.formula}</div>
+
+      <div class="detail-row" style="margin-top:4px;"><div class="label">当前参数</div><div class="value"></div></div>
+      <div class="params-grid">
+        ${Object.entries(r.params).map(([k,v]) => `<div><strong>${k}:</strong> ${v}</div>`).join('')}
+      </div>
+
+      <div class="detail-row"><div class="label">单位变更历史</div><div class="value"></div></div>
+      ${unitChanges}
+
+      ${r.screenshot_url ? `
+        <div class="detail-row" style="margin-top:8px;"><div class="label">旧版本截图</div><div class="value"></div></div>
+        <img class="screenshot" src="${r.screenshot_url}" alt="历史截图" onerror="this.style.display='none'">
+      ` : ''}
+
+      ${r.attachments.length > 0 ? `
+        <div class="detail-row" style="margin-top:8px;"><div class="label">晚到附件</div><div class="value"></div></div>
+        ${r.attachments.map(a => `<div style="font-size:12.5px;color:#4f46e5;">📎 ${a.name} · ${a.operator} · ${a.time.slice(0,16)}</div>`).join('')}
+      ` : ''}
+    </div>
+
+    <div class="panel detail-section">
+      <div class="tabs">
+        <div class="tab ${activeTab==='chart'?'active':''}" data-tab="chart">📈 图表 & 明细</div>
+        <div class="tab ${activeTab==='history'?'active':''}" data-tab="history">📜 历史版本快照</div>
+        <div class="tab ${activeTab==='lifecycle'?'active':''}" data-tab="lifecycle">🔁 生命周期操作流</div>
+      </div>
+      <div id="tabContent"></div>
+    </div>
+  `;
+
+  document.querySelectorAll('.tab').forEach(t => {
+    t.onclick = () => { activeTab = t.dataset.tab; renderDetail(r, history); };
+  });
+
+  renderTabContent(r, history);
+}
+
+function renderTabContent(r, history) {
+  const tc = document.getElementById('tabContent');
+  if (activeTab === 'chart') {
+    tc.innerHTML = `
+      <div class="chart-wrap"><canvas id="chart"></canvas></div>
+      <h3 style="font-size:13px;margin-bottom:10px;color:#374151;">明细数据（与图表、CSV口径一致）</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>序号</th><th>值</th><th>单位</th><th>除零边界</th><th>状态标签</th><th>备注</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${r.result_details.map(d => `
+            <tr class="${d.division_by_zero ? 'divzero-row' : ''}">
+              <td>${d.index}</td>
+              <td>${d.value_str}</td>
+              <td>${d.unit}</td>
+              <td>${d.division_by_zero ? '⚠️ 是' : '否'}</td>
+              <td><span class="badge ${statusClass[r.status]}">${r.status}</span></td>
+              <td>${d.step_note || '-'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+    drawChart(r.result_details);
+  } else if (activeTab === 'history') {
+    tc.innerHTML = history.length ? history.slice().reverse().map(h => `
+      <div class="history-item">
+        <div>
+          <span class="version">v${h.version}</span>
+          <span class="badge ${statusClass[h.status]}">${h.status}</span>
+          ${h.unit_changed ? `<span class="badge" style="background:#ffedd5;color:#9a3412;">单位变更 ${h.old_unit}→${h.unit}</span>` : ''}
+        </div>
+        <div style="font-size:12.5px;margin-top:4px;">
+          <strong>${h.action}</strong> · ${h.operator} · ${h.time.slice(0,19)}
+        </div>
+        <div style="font-size:12px;color:#6b7280;margin-top:4px;">备注：${h.remark || '无'}</div>
+        <div style="font-family:monospace;font-size:12px;background:white;padding:6px 8px;border-radius:4px;margin-top:6px;border:1px solid #eee;">
+          ${h.formula}
+        </div>
+        <div style="font-size:12px;margin-top:4px;color:#374151;">
+          参数：${Object.entries(h.params).map(([k,v])=>`${k}=${v}`).join(', ')}
+        </div>
+        ${h.screenshot_url ? `<div style="margin-top:4px;font-size:12px;color:#4f46e5;">📷 含历史版本截图</div>` : ''}
+        <details style="margin-top:6px;">
+          <summary style="cursor:pointer;font-size:12px;color:#4f46e5;">展开当时明细快照</summary>
+          <table style="margin-top:6px;font-size:11.5px;">
+            <tr><th>序号</th><th>值</th><th>除零</th></tr>
+            ${h.result_details_snapshot.map(d=>`
+              <tr class="${d.division_by_zero?'divzero-row':''}">
+                <td>${d.index}</td><td>${d.value_str}</td><td>${d.division_by_zero?'⚠️':'-'}</td>
+              </tr>`).join('')}
+          </table>
+        </details>
+      </div>
+    `).join('') : '<div class="empty-state">暂无历史版本</div>';
+  } else {
+    tc.innerHTML = r.lifecycle.length ? r.lifecycle.slice().reverse().map(l => `
+      <div class="lifecycle-item">
+        <div class="action">${l.action}</div>
+        <div style="font-size:12.5px;">${l.remark || '无备注'}</div>
+        <div class="operator">${l.operator} · ${l.time.slice(0,19)}</div>
+      </div>
+    `).join('') : '<div class="empty-state">暂无操作记录</div>';
+  }
+}
+
+function drawChart(details) {
+  if (chartInstance) chartInstance.destroy();
+  const finite = details.filter(d => !d.division_by_zero && isFinite(d.value));
+  const divZeroIndices = details.filter(d => d.division_by_zero).map(d => d.index);
+  const ctx = document.getElementById('chart');
+  if (!ctx) return;
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: finite.map(d => d.index),
+      datasets: [{
+        label: `递推值 (${details[0]?.unit || ''})`,
+        data: finite.map(d => d.value),
+        borderColor: '#4f46e5',
+        backgroundColor: 'rgba(79,70,229,0.08)',
+        fill: true,
+        tension: 0.2,
+        pointRadius: 3,
+        pointBackgroundColor: '#4f46e5',
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: { display: true, text: '递推结果走势（除零点已在表格中标红，不参与绘图）' },
+        tooltip: {
+          callbacks: {
+            afterLabel: (ctx) => divZeroIndices.includes(ctx.label) ? '⚠️ 除零边界点（原始数据见表格）' : ''
+          }
+        }
+      },
+      scales: { x: { title: { display: true, text: '步数 n' } }, y: { title: { display: true, text: '值' } } }
+    }
+  });
+}
+
+document.getElementById('statusFilter').onchange = loadRecords;
+document.getElementById('exportAllBtn').onclick = () => {
+  const filter = document.getElementById('statusFilter').value;
+  const url = filter ? `/api/records/csv?status=${encodeURIComponent(filter)}` : '/api/records/csv';
+  window.open(url, '_blank');
+};
+document.getElementById('exportCurrentBtn').onclick = () => {
+  if (!currentRecordId) return alert('请先选择一条回放记录');
+  window.open(`/api/records/${currentRecordId}/csv`, '_blank');
+};
+document.getElementById('newBtn').onclick = () => {
+  const title = prompt('请输入回放标题：', '新建数列递推回放');
+  if (!title) return;
+  const formula = prompt('请输入递推公式（例如 a_n = a_{n-1} + d）：', 'a_n = a_{n-1} + d');
+  if (formula === null) return;
+  const n = parseInt(prompt('步数 n =', '10')) || 10;
+  const a0 = parseFloat(prompt('首项 a0 =', '0')) || 0;
+  const d = parseFloat(prompt('参数 d =', '1')) || 1;
+  const unit = prompt('单位（个/厘米/%...）：', '个') || '个';
+  const status = prompt('状态（已放行/待补证据/人工改过）：', '待补证据') || '待补证据';
+  fetch('/api/records', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, formula, params: { a0, d, n }, unit, status, remark: '新建', operator: '阿宁', has_division_by_zero: false })
+  }).then(r => r.json()).then(rec => { loadDetail(rec.id); });
+};
+document.getElementById('recomputeBtn').onclick = async () => {
+  if (!currentRecordId) return alert('请先选择一条回放记录');
+  const name = prompt('请输入晚到附件名称：', '晚到证据_' + new Date().toISOString().slice(0,10));
+  if (!name) return;
+  const changeParams = confirm('是否同时调整参数进行复算？\n（取消则使用当前参数重算）');
+  let params = null;
+  if (changeParams) {
+    const nStr = prompt('步数 n（当前 ' + currentRecord.params.n + '）：', currentRecord.params.n);
+    params = { ...currentRecord.params };
+    if (nStr) params.n = parseInt(nStr);
+    if (params.d !== undefined) {
+      const dStr = prompt('参数 d（当前 ' + currentRecord.params.d + '）：', currentRecord.params.d);
+      if (dStr) params.d = parseFloat(dStr);
+    }
+  }
+  await fetch(`/api/records/${currentRecordId}/recompute`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ attachment_name: name, attachment_url: `/static/attachments/${encodeURIComponent(name)}`, params, operator: '阿宁' })
+  }).then(r => r.json()).then(() => loadDetail(currentRecordId));
+};
+
+loadRecords();
+</script>
+</body>
+</html>
