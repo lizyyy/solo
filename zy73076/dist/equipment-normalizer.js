@@ -8,13 +8,16 @@ exports.EquipmentNormalizer = void 0;
 class EquipmentNormalizer {
     mappings = [];
     aliasIndex = new Map(); // alias(小写) -> canonicalId
+    canonicalIndex = new Map(); // canonicalId -> 完整映射
     constructor(initialMappings = []) {
         this.loadMappings(initialMappings);
     }
     loadMappings(mappings) {
         this.mappings = mappings;
         this.aliasIndex.clear();
+        this.canonicalIndex.clear();
         for (const m of mappings) {
+            this.canonicalIndex.set(m.canonicalId, m);
             const key = this.normalizeForLookup(m.canonicalId);
             if (!this.aliasIndex.has(key)) {
                 this.aliasIndex.set(key, m.canonicalId);
@@ -35,6 +38,38 @@ class EquipmentNormalizer {
     }
     getAllMappings() {
         return [...this.mappings];
+    }
+    // ---------- projectId 相关查询 ----------
+    getProjectOfCanonical(canonicalId) {
+        return this.canonicalIndex.get(canonicalId)?.projectId ?? null;
+    }
+    // 判断某原始写法属于哪个/哪些项目（ambiguous 时可能多个）
+    getProjectsOfRaw(rawId) {
+        const norm = this.normalize(rawId);
+        if (norm.canonical) {
+            const p = this.getProjectOfCanonical(norm.canonical);
+            return p ? [p] : [];
+        }
+        // ambiguous：每个候选都查
+        const projects = new Set();
+        for (const c of norm.candidates) {
+            const p = this.getProjectOfCanonical(c);
+            if (p)
+                projects.add(p);
+        }
+        return Array.from(projects);
+    }
+    // 某设备是否属于指定项目
+    // - 有明确 canonical 且项目匹配 → true
+    // - ambiguous 且任意候选匹配 → true（保守：宁可多放，后面再由人确认）
+    // - unknown → false
+    isRawBelongsToProject(rawId, projectId) {
+        const projects = this.getProjectsOfRaw(rawId);
+        return projects.includes(projectId);
+    }
+    // 列出所有项目
+    listAllProjects() {
+        return Array.from(new Set(this.mappings.map(m => m.projectId)));
     }
     // 核心：把原始写法规范化
     normalize(rawId) {

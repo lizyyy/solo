@@ -12,6 +12,7 @@ import {
 export class EquipmentNormalizer {
   private mappings: EquipmentIdMapping[] = [];
   private aliasIndex: Map<string, string> = new Map(); // alias(小写) -> canonicalId
+  private canonicalIndex: Map<string, EquipmentIdMapping> = new Map(); // canonicalId -> 完整映射
 
   constructor(initialMappings: EquipmentIdMapping[] = []) {
     this.loadMappings(initialMappings);
@@ -20,7 +21,9 @@ export class EquipmentNormalizer {
   loadMappings(mappings: EquipmentIdMapping[]): void {
     this.mappings = mappings;
     this.aliasIndex.clear();
+    this.canonicalIndex.clear();
     for (const m of mappings) {
+      this.canonicalIndex.set(m.canonicalId, m);
       const key = this.normalizeForLookup(m.canonicalId);
       if (!this.aliasIndex.has(key)) {
         this.aliasIndex.set(key, m.canonicalId);
@@ -42,6 +45,42 @@ export class EquipmentNormalizer {
 
   getAllMappings(): EquipmentIdMapping[] {
     return [...this.mappings];
+  }
+
+  // ---------- projectId 相关查询 ----------
+
+  getProjectOfCanonical(canonicalId: string): string | null {
+    return this.canonicalIndex.get(canonicalId)?.projectId ?? null;
+  }
+
+  // 判断某原始写法属于哪个/哪些项目（ambiguous 时可能多个）
+  getProjectsOfRaw(rawId: string): string[] {
+    const norm = this.normalize(rawId);
+    if (norm.canonical) {
+      const p = this.getProjectOfCanonical(norm.canonical);
+      return p ? [p] : [];
+    }
+    // ambiguous：每个候选都查
+    const projects = new Set<string>();
+    for (const c of norm.candidates) {
+      const p = this.getProjectOfCanonical(c);
+      if (p) projects.add(p);
+    }
+    return Array.from(projects);
+  }
+
+  // 某设备是否属于指定项目
+  // - 有明确 canonical 且项目匹配 → true
+  // - ambiguous 且任意候选匹配 → true（保守：宁可多放，后面再由人确认）
+  // - unknown → false
+  isRawBelongsToProject(rawId: string, projectId: string): boolean {
+    const projects = this.getProjectsOfRaw(rawId);
+    return projects.includes(projectId);
+  }
+
+  // 列出所有项目
+  listAllProjects(): string[] {
+    return Array.from(new Set(this.mappings.map(m => m.projectId)));
   }
 
   // 核心：把原始写法规范化

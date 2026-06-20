@@ -186,25 +186,28 @@ export class CutterheadWarningEngine {
     // ===== 步骤 4：生成判断变更记录 =====
     const judgmentChanges = this.buildJudgmentChanges(intermediateDetails, inspections, ts);
 
-    // ===== 步骤 5：应用筛选条件，得到最终明细 =====
-    const filteredDetails = this.applyFilter(
+    // ===== 步骤 5：应用筛选条件（details / queue / changes 同步过滤，口径一致）=====
+    const filtered = this.applyFullFilter(
       intermediateDetails,
-      criteria,
-      anomalyQueue
+      anomalyQueue,
+      judgmentChanges,
+      criteria
     );
 
-    // ===== 步骤 6：统计数字（从 filteredDetails 生成，口径一致） =====
-    const statistics = this.computeStatistics(filteredDetails, anomalyQueue, criteria);
+    // ===== 步骤 6：统计数字（从过滤后的数据生成，口径一致） =====
+    const statistics = this.computeStatistics(
+      filtered.details,
+      filtered.queue,
+      criteria
+    );
 
     return {
       generatedAt: ts,
       filterCriteria: criteria,
       statistics,
-      details: filteredDetails,
-      anomalyQueue: criteria.includeSuspended
-        ? anomalyQueue
-        : anomalyQueue.filter(q => q.status !== 'pending_confirmation'),
-      judgmentChanges,
+      details: filtered.details,
+      anomalyQueue: filtered.queue,
+      judgmentChanges: filtered.changes,
     };
   }
 
@@ -452,37 +455,77 @@ export class CutterheadWarningEngine {
     return changes;
   }
 
-  // ---------- 内部：应用筛选条件 ----------
-  private applyFilter(
+  // ---------- 内部：统一应用筛选（details / queue / changes 同源过滤） ----------
+  private applyFullFilter(
     details: WarningDetail[],
-    criteria: FilterCriteria,
-    queue: AnomalyQueueItem[]
-  ): WarningDetail[] {
-    let out = details;
-    if (criteria.dateRange) {
-      out = out.filter(d => {
-        return (
-          d.inspectionDate >= criteria.dateRange!.start &&
-          d.inspectionDate <= criteria.dateRange!.end
-        );
-      });
+    queue: AnomalyQueueItem[],
+    changes: JudgmentChange[],
+    criteria: FilterCriteria
+  ): {
+    details: WarningDetail[];
+    queue: AnomalyQueueItem[];
+    changes: JudgmentChange[];
+  } {
+    // 构造一个 detailId → 是否保留 的 Set，供 queue 和 changes 复用
+    const keptRecordIds = new Set<string>();
+
+    let outDetails = details;
+
+    // 1. projectId 过滤
+    if (criteria.projectId) {
+      outDetails = outDetails.filter(d =>
+        this.normalizer.isRawBelongsToProject(d.rawEquipmentId, criteria.projectId!)
+      );
     }
+
+    // 2. 日期过滤
+    if (criteria.dateRange) {
+      outDetails = outDetails.filter(d =>
+        d.inspectionDate >= criteria.dateRange!.start &&
+        d.inspectionDate <= criteria.dateRange!.end
+      );
+    }
+
+    // 3. 设备编号过滤
     if (criteria.equipmentIds && criteria.equipmentIds.length > 0) {
       const set = new Set(criteria.equipmentIds);
-      out = out.filter(d => set.has(d.equipmentId) || set.has(d.rawEquipmentId));
+      outDetails = outDetails.filter(
+        d => set.has(d.equipmentId) || set.has(d.rawEquipmentId)
+      );
     }
+
+    // 4. 预警级别过滤
     if (criteria.warningLevels && criteria.warningLevels.length > 0) {
       const set = new Set(criteria.warningLevels);
-      out = out.filter(d => set.has(d.level));
+      outDetails = outDetails.filter(d => set.has(d.level));
     }
+
+    // 5. 挂起项过滤（includeSuspended=false 时，排除涉及 pending_confirmation 队列的 detail）
+    //    注意：这里要基于"过滤后 queue"的概念，所以先从原始 queue 中找出挂起的设备，
+    //    再把对应 details 去掉
     if (!criteria.includeSuspended) {
-      // 排除挂起队列对应的 detail
-      const suspendedEquipment = new Set(
-        queue.filter(q => q.status === 'pending_confirmation').map(q => q.equipmentId)
+      const suspendedEquipmentIds = new Set(
+        queue
+          .filter(q => q.status === 'pending_confirmation')
+          .map(q => q.equipmentId)
       );
-      out = out.filter(d => !suspendedEquipment.has(d.equipmentId));
+      outDetails = outDetails.filter(d => !suspendedEquipmentIds.has(d.equipmentId));
     }
-    return out;
+
+    for (const d of outDetails) keptRecordIds.add(d.recordId);
+
+    // ---- 过滤 queue：只要队列关联的任意一条 detail 被保留，队列就保留 ----
+    const outQueue = queue.filter(q => {
+      const detailIds = q.warningDetailId.split(',');
+      return detailIds.some(id => keptRecordIds.has(id));
+    });
+
+    // ---- 过滤 judgmentChanges：只要 affectedRecordIds 中有被保留的，就保留 ----
+    const outChanges = changes.filter(c =>
+      c.affectedRecordIds.some(id => keptRecordIds.has(id))
+    );
+
+    return { details: outDetails, queue: outQueue, changes: outChanges };
   }
 
   // ---------- 内部：统计（从筛选后的 details 生成，口径一致） ----------

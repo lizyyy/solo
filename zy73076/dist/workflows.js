@@ -327,19 +327,21 @@ class HandoverPackager {
     buildChecklist(rs, index) {
         const items = [];
         const { anomalyQueue, judgmentChanges } = rs;
-        // Step 1: 核对巡检表原始编号 → 规范编号映射是否均已解决
-        const unconfirmed = index.filter(i => i.canonicalEquipmentId === null);
-        const unconfirmedRecIds = unconfirmed.map(i => i.inspectionRecordId);
-        const unconfirmedQueueIds = Array.from(new Set(unconfirmed.flatMap(i => i.anomalyQueueIds)));
+        // Step 1: 设备编号待确认项（duplicate / ambiguous / unknown 都算，即所有 pending_confirmation 且与设备编号相关的）
+        const equipmentPendingQueues = anomalyQueue.filter(q => q.status === 'pending_confirmation' &&
+            (q.suspensionReason === 'duplicate_equipment' ||
+                q.suspensionReason === 'ambiguous_equipment'));
+        const step1RecIds = Array.from(new Set(equipmentPendingQueues.flatMap(q => q.warningDetailId.split(','))));
         items.push({
             step: 1,
-            description: unconfirmedRecIds.length === 0
-                ? '[完成前置] 巡检表中所有设备编号均已规范化，无需项目经理追加确认。'
-                : `[待办] 请项目经理确认 ${unconfirmedRecIds.length} 条巡检记录的设备编号归属（涉及队列：${unconfirmedQueueIds.join('、') || '无'}）。` +
+            description: equipmentPendingQueues.length === 0
+                ? '[完成前置] 所有设备编号均已确认（无重复/歧义），无需项目经理追加确认。'
+                : `[待办] 请项目经理确认 ${equipmentPendingQueues.length} 条挂起队列的设备编号归属` +
+                    `（涉及 ${step1RecIds.length} 条巡检记录；队列：${equipmentPendingQueues.map(q => q.id).slice(0, 3).join('、')}${equipmentPendingQueues.length > 3 ? '...' : ''}）。` +
                     ' 方法：打开项目经理视图 → "待确认清单" → 逐条确认规范编号。',
-            completed: unconfirmedRecIds.length === 0,
-            relatedInspectionRecordIds: unconfirmedRecIds,
-            relatedAnomalyQueueIds: unconfirmedQueueIds,
+            completed: equipmentPendingQueues.length === 0,
+            relatedInspectionRecordIds: step1RecIds,
+            relatedAnomalyQueueIds: equipmentPendingQueues.map(q => q.id),
         });
         // Step 2: 巡检表备注补充（达到 warning/critical 但没备注的）
         const remarkMissingRecs = rs.details.filter(d => (d.level === 'warning' || d.level === 'critical') &&

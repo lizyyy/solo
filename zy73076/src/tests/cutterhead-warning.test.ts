@@ -520,3 +520,144 @@ describe('证据缺口（WarningDetail.evidenceGap）', () => {
     assert.ok(d!.evidenceGap.some(g => g.type === 'followup_needed'));
   });
 });
+
+// ============================================================
+// projectId 筛选链路验证（新增）
+// ============================================================
+
+describe('Filter - projectId 全链路一致性（P-001 / P-002 混合）', () => {
+  const normalizer = new EquipmentNormalizer(TEST_MAPPINGS);
+  const engine = new CutterheadWarningEngine(normalizer, TEST_THRESHOLDS);
+
+  // 造混合数据：P-001 有 SD-001/SD-002，P-002 有 SD-003
+  function mkMixedInspections(): InspectionRecord[] {
+    const ts = new Date().toISOString();
+    return [
+      // --- P-001 ---
+      { id: 'P1-01', inspectionDate: '2026-06-01', rawEquipmentId: 'SD-001',
+        inspector: '张', itemName: '刀盘磨损量', measuredValue: 12, unit: 'mm',
+        remark: '', createdAt: ts },
+      { id: 'P1-02', inspectionDate: '2026-06-02', rawEquipmentId: '盾构2号',
+        inspector: '李', itemName: '刀盘磨损量', measuredValue: 20, unit: 'mm',
+        remark: '磨损较快', createdAt: ts },
+      { id: 'P1-03', inspectionDate: '2026-06-03', rawEquipmentId: 'SD-001',
+        inspector: '张', itemName: '主驱动油温', measuredValue: 70, unit: '℃',
+        createdAt: ts },
+      // --- P-002 ---
+      { id: 'P2-01', inspectionDate: '2026-06-02', rawEquipmentId: 'SD-003',
+        inspector: '王', itemName: '刀盘磨损量', measuredValue: 30, unit: 'mm',
+        remark: '超限', createdAt: ts },
+      { id: 'P2-02', inspectionDate: '2026-06-03', rawEquipmentId: '盾构3号',
+        inspector: '王', itemName: '主驱动油温', measuredValue: 80, unit: '℃',
+        createdAt: ts },
+    ];
+  }
+
+  it('全量结果应包含 P-001 和 P-002 的设备', () => {
+    const r = engine.generate(mkMixedInspections());
+    const equipIds = Array.from(new Set(r.details.map(d => d.equipmentId)));
+    assert.ok(equipIds.includes('SD-001'));
+    assert.ok(equipIds.includes('SD-002'));
+    assert.ok(equipIds.includes('SD-003'));
+  });
+
+  it('筛选 projectId=P-001 → 明细中只出现 P-001 的设备', () => {
+    const r = engine.generate(mkMixedInspections(), {
+      dateRange: null, projectId: 'P-001', equipmentIds: null,
+      warningLevels: null, includeSuspended: true,
+    });
+    const equipIds = Array.from(new Set(r.details.map(d => d.equipmentId)));
+    assert.ok(equipIds.includes('SD-001'));
+    assert.ok(equipIds.includes('SD-002'));
+    assert.equal(equipIds.includes('SD-003'), false, 'P-002 的 SD-003 不应出现在 P-001 筛选结果中');
+    assert.equal(r.details.length, 3);
+  });
+
+  it('筛选 projectId=P-001 → 异常队列中只出现 P-001 的队列', () => {
+    const r = engine.generate(mkMixedInspections(), {
+      dateRange: null, projectId: 'P-001', equipmentIds: null,
+      warningLevels: null, includeSuspended: true,
+    });
+    for (const q of r.anomalyQueue) {
+      // 队列的 equipmentId 或 rawEquipmentIds 都不能属于 P-002
+      const allRawIds = [q.equipmentId, ...q.rawEquipmentIds];
+      for (const id of allRawIds) {
+        const projects = normalizer.getProjectsOfRaw(id);
+        assert.equal(
+          projects.includes('P-002'),
+          false,
+          `队列 ${q.id} 涉及 P-002 设备 ${id}，不应出现在 P-001 筛选中`
+        );
+      }
+    }
+  });
+
+  it('筛选 projectId=P-002 → 判断变更也只来自 P-002', () => {
+    const r = engine.generate(mkMixedInspections(), {
+      dateRange: null, projectId: 'P-002', equipmentIds: null,
+      warningLevels: null, includeSuspended: true,
+    });
+    for (const jc of r.judgmentChanges) {
+      const projects = normalizer.getProjectsOfRaw(jc.equipmentId);
+      assert.ok(
+        projects.includes('P-002'),
+        `判断变更 ${jc.id} 的设备 ${jc.equipmentId} 不属于 P-002`
+      );
+      assert.equal(
+        projects.includes('P-001'),
+        false,
+        `判断变更 ${jc.id} 混入了 P-001 设备`
+      );
+    }
+  });
+
+  it('统计数字与明细条数严格一致（projectId 筛选后）', () => {
+    const r = engine.generate(mkMixedInspections(), {
+      dateRange: null, projectId: 'P-002', equipmentIds: null,
+      warningLevels: null, includeSuspended: true,
+    });
+    const totalByLevel = Object.values(r.statistics.byLevel).reduce((a, b) => a + b, 0);
+    assert.equal(totalByLevel, r.details.length);
+  });
+
+  it('项目经理视图在 projectId 筛选后也一致', () => {
+    const r = engine.generate(mkMixedInspections(), {
+      dateRange: null, projectId: 'P-001', equipmentIds: null,
+      warningLevels: null, includeSuspended: true,
+    });
+    const view = new ManagerViewBuilder().build(r);
+    // 汇总下钻能反查出同样数量
+    for (const row of view.summaryBreakdown) {
+      const sub = engine.generate(mkMixedInspections(), {
+        dateRange: row.drillDownFilter.dateRange ?? null,
+        projectId: 'P-001',
+        equipmentIds: row.drillDownFilter.equipmentIds ?? null,
+        warningLevels: row.drillDownFilter.warningLevels ?? null,
+        includeSuspended: row.drillDownFilter.includeSuspended ?? true,
+      });
+      assert.equal(sub.details.length, row.count);
+    }
+    // 证据缺口设备都属于 P-001
+    for (const g of view.outstandingEvidenceGaps) {
+      for (const eid of g.relatedEquipments) {
+        const projects = normalizer.getProjectsOfRaw(eid);
+        assert.equal(projects.includes('P-002'), false,
+          `证据缺口 ${g.gapType} 中混入 P-002 设备 ${eid}`);
+      }
+    }
+  });
+
+  it('小林交接清单在 projectId 筛选后也一致', () => {
+    const r = engine.generate(mkMixedInspections(), {
+      dateRange: null, projectId: 'P-002', equipmentIds: null,
+      warningLevels: null, includeSuspended: true,
+    });
+    const pkg = new HandoverPackager().build(r);
+    assert.equal(pkg.inspectionIndex.length, r.details.length);
+    for (const idx of pkg.inspectionIndex) {
+      const projs = normalizer.getProjectsOfRaw(idx.rawEquipmentId);
+      assert.ok(projs.includes('P-002'));
+      assert.equal(projs.includes('P-001'), false);
+    }
+  });
+});

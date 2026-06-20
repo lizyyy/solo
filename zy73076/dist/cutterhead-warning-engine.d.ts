@@ -12,7 +12,7 @@ export declare class CutterheadWarningEngine {
     private buildThresholdBreach;
     private buildAnomalyQueue;
     private buildJudgmentChanges;
-    private applyFilter;
+    private applyFullFilter;
     private computeStatistics;
     private levelLabel;
     private describeEquipmentIssue;
