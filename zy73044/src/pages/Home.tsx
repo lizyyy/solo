@@ -107,7 +107,7 @@ export default function Home() {
         ),
       }));
 
-      const { records: merged, createdCount, mergedCount, skippedCount } = mergeRecords(records, incoming);
+      const { records: merged, createdCount, mergedCount, skippedCount, decisions } = mergeRecords(records, incoming);
       const { records: finalRecords } = detectAnomalies(merged);
       setStoredRecords(finalRecords);
 
@@ -124,6 +124,22 @@ export default function Home() {
 
       const parts: string[] = [`✅ 导入完成：${file.name}`];
       parts.push(`新增 ${createdCount} · 合并 ${mergedCount} · 跳过 ${skippedCount}`);
+
+      let statusProtected = 0;
+      let remarkProtected = 0;
+      for (const recDecisions of decisions.values()) {
+        for (const d of recDecisions) {
+          if (d.field === "status" && d.action === "keep_old" && d.reason.includes("人工处理结果")) {
+            statusProtected++;
+          }
+          if (d.field === "remark" && (d.action === "keep_old" || d.action === "append_history")) {
+            remarkProtected++;
+          }
+        }
+      }
+      if (statusProtected > 0) parts.push(`🔒 保住状态 ${statusProtected} 条（确认/撤回不被覆盖）`);
+      if (remarkProtected > 0) parts.push(`🔒 保住备注 ${remarkProtected} 条（人工备注不被覆盖）`);
+
       if (warnings.length) parts.push(`⚠ ${warnings[0]}`);
       showToast(parts.join(" · "));
     } catch (e) {

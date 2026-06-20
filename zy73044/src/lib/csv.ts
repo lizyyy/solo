@@ -56,7 +56,9 @@ export function exportCsv(records: SpareRecord[]): string {
   const headerLine = EXPORT_HEADERS.map((h) => escapeCsv(h.label)).join(",");
   const bodyLines = records.map((r) =>
     EXPORT_HEADERS.map((h) => {
-      if (h.key === "_statusLabel") return escapeCsv(STATUS_LABEL_EXPORT[r.status]);
+      if (h.key === "_statusLabel") {
+        return escapeCsv(STATUS_LABEL_EXPORT[r.status]);
+      }
       return escapeCsv(r[h.key as keyof SpareRecord]);
     }).join(",")
   );

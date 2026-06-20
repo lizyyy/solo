@@ -14,6 +14,10 @@ function parseStatus(raw: string | null | undefined): RecordStatus {
   return STATUS_LABEL[raw.trim()] ?? "pending";
 }
 
+function isManualStatus(status: RecordStatus): boolean {
+  return status === "confirmed" || status === "withdrawn";
+}
+
 export interface IncomingRecord {
   partNo: string;
   partDesc: string;
@@ -26,10 +30,16 @@ export interface IncomingRecord {
   mappedFields: Record<string, string>;
 }
 
+export interface MergeFieldDecision {
+  field: "status" | "remark" | "partDesc" | "sampling";
+  action: "overwrite" | "keep_old" | "append_history";
+  reason: string;
+}
+
 export function mergeRecords(
   existing: SpareRecord[],
   incoming: IncomingRecord[]
-): MergeResult {
+): MergeResult & { decisions: Map<string, MergeFieldDecision[]> } {
   const existingMap = new Map<string, SpareRecord>();
   for (const r of existing) {
     existingMap.set(dedupKey(r.partNo, r.sourceFile), { ...r });
@@ -39,6 +49,7 @@ export function mergeRecords(
   let mergedCount = 0;
   let skippedCount = 0;
   const now = Date.now();
+  const decisions = new Map<string, MergeFieldDecision[]>();
 
   for (const inc of incoming) {
     if (!inc.partNo.trim()) {
@@ -67,24 +78,83 @@ export function mergeRecords(
       };
       existingMap.set(key, newRec);
       createdCount++;
+      decisions.set(newRec.id, [
+        { field: "status", action: "overwrite", reason: "新记录，使用CSV原始状态" },
+        { field: "remark", action: "overwrite", reason: "新记录，使用CSV原始备注" },
+      ]);
     } else {
+      const recordDecisions: MergeFieldDecision[] = [];
+      const recordId = old.id;
+
       const oldRemark = old.remark.trim();
       const newRemark = (inc.remark ?? "").trim();
-      if (oldRemark && !newRemark) {
-        // 保留旧备注
-      } else if (!oldRemark && newRemark) {
+      if (oldRemark) {
+        if (newRemark && oldRemark !== newRemark) {
+          old.rawRowHistory = [...(old.rawRowHistory ?? []), inc.rawRow];
+          recordDecisions.push({
+            field: "remark",
+            action: "append_history",
+            reason: "本地已有备注（人工锁定），新备注追加到原始说法历史，永不覆盖",
+          });
+        } else {
+          recordDecisions.push({
+            field: "remark",
+            action: "keep_old",
+            reason: "本地已有备注（人工锁定），新备注为空或相同，保留原值",
+          });
+        }
+      } else if (newRemark) {
         old.remark = newRemark;
-      } else if (oldRemark && newRemark && oldRemark !== newRemark) {
-        // 两边都有备注且不同：保留旧的，新的追加到原始说法历史
-        old.rawRowHistory = [...(old.rawRowHistory ?? []), inc.rawRow];
+        recordDecisions.push({
+          field: "remark",
+          action: "overwrite",
+          reason: "本地无备注，使用CSV备注",
+        });
       }
 
-      if (old.status !== "confirmed") {
-        old.status = parseStatus(inc.status);
+      if (isManualStatus(old.status)) {
+        recordDecisions.push({
+          field: "status",
+          action: "keep_old",
+          reason: `本地状态"${old.status}"为人工处理结果（确认/撤回），永不被CSV原始状态覆盖`,
+        });
+      } else {
+        const newStatus = parseStatus(inc.status);
+        if (newStatus !== old.status) {
+          old.status = newStatus;
+          recordDecisions.push({
+            field: "status",
+            action: "overwrite",
+            reason: `本地状态"${old.status}"非人工处理，更新为CSV状态"${newStatus}"`,
+          });
+        } else {
+          recordDecisions.push({
+            field: "status",
+            action: "keep_old",
+            reason: `本地状态"${old.status}"与CSV状态一致，无需更新`,
+          });
+        }
       }
 
-      old.partDesc = inc.partDesc.trim() || old.partDesc;
-      old.sampling = inc.sampling?.trim() ?? old.sampling;
+      if (inc.partDesc.trim() && inc.partDesc.trim() !== old.partDesc) {
+        old.partDesc = inc.partDesc.trim();
+        recordDecisions.push({
+          field: "partDesc",
+          action: "overwrite",
+          reason: "CSV备件描述有更新，覆盖本地（不影响人工处理状态）",
+        });
+      }
+
+      const newSampling = inc.sampling?.trim() ?? null;
+      if (newSampling !== old.sampling) {
+        old.sampling = newSampling;
+        recordDecisions.push({
+          field: "sampling",
+          action: "overwrite",
+          reason: "CSV采样值有更新，覆盖本地（不影响人工处理状态）",
+        });
+      }
+
       old.mappedFields = { ...old.mappedFields, ...inc.mappedFields };
       old.sourceBatch = inc.sourceBatch;
       old.updatedAt = now;
@@ -96,6 +166,7 @@ export function mergeRecords(
 
       existingMap.set(key, old);
       mergedCount++;
+      decisions.set(recordId, recordDecisions);
     }
   }
 
@@ -103,5 +174,5 @@ export function mergeRecords(
     (a, b) => b.updatedAt - a.updatedAt
   );
 
-  return { records, createdCount, mergedCount, skippedCount };
+  return { records, createdCount, mergedCount, skippedCount, decisions };
 }
