@@ -1,7 +1,7 @@
 {
   "inspections": [
     {
-      "id": "insp_mq6nam70_rocimj",
+      "id": "insp_mqmiu1cj_z5l1sj",
       "deviceCode": "PUMP-01-A3",
       "deviceName": "3号给水泵",
       "stationName": "北郊泵站",
@@ -19,7 +19,7 @@
       "createdAt": "2026-06-01T09:15:00.000Z"
     },
     {
-      "id": "insp_mq6nam70_kctydi",
+      "id": "insp_mqmiu1cj_qayf4n",
       "deviceCode": "PUMP-01-A3",
       "deviceName": "3号给水泵(重复录入)",
       "stationName": "北郊泵站",
@@ -37,7 +37,7 @@
       "createdAt": "2026-06-02T14:10:00.000Z"
     },
     {
-      "id": "insp_mq6nam70_zkwd6j",
+      "id": "insp_mqmiu1cj_r0efd4",
       "deviceCode": "VALVE-07-B2",
       "deviceName": "2号出水电动阀",
       "stationName": "北郊泵站",
@@ -49,7 +49,7 @@
       "createdAt": "2026-06-03T10:40:00.000Z"
     },
     {
-      "id": "insp_mq6nam70_bioi69",
+      "id": "insp_mqmiu1cj_7qvbbi",
       "deviceCode": "PUMP-04-C1",
       "deviceName": "1号循环泵",
       "stationName": "南郊泵站",
@@ -69,8 +69,8 @@
   ],
   "schedules": [
     {
-      "id": "sched_mq6nam70_7wn739",
-      "inspectionId": "insp_mq6nam70_rocimj",
+      "id": "sched_mqmiu1cj_h503vo",
+      "inspectionId": "insp_mqmiu1cj_z5l1sj",
       "deviceCode": "PUMP-01-A3",
       "deviceName": "3号给水泵",
       "stationName": "北郊泵站",
@@ -93,8 +93,8 @@
       "updatedAt": "2026-06-01T09:20:00.000Z"
     },
     {
-      "id": "sched_mq6nam70_dr099r",
-      "inspectionId": "insp_mq6nam70_kctydi",
+      "id": "sched_mqmiu1cj_ljuncf",
+      "inspectionId": "insp_mqmiu1cj_qayf4n",
       "deviceCode": "PUMP-01-A3",
       "deviceName": "3号给水泵(重复录入)",
       "stationName": "北郊泵站",
@@ -117,8 +117,8 @@
       "updatedAt": "2026-06-02T14:15:00.000Z"
     },
     {
-      "id": "sched_mq6nam70_kdse55",
-      "inspectionId": "insp_mq6nam70_zkwd6j",
+      "id": "sched_mqmiu1cj_6swkn7",
+      "inspectionId": "insp_mqmiu1cj_r0efd4",
       "deviceCode": "VALVE-07-B2",
       "deviceName": "2号出水电动阀",
       "stationName": "北郊泵站",
@@ -134,14 +134,14 @@
         "start": "2026-06-10 00:00",
         "end": "2026-06-10 04:00"
       },
-      "status": "已排程",
-      "source": "灰度补录备注",
+      "status": "备件已到货",
+      "source": "维修照片手工核",
       "summary": "电动阀执行器齿圈磨损升级，6月8日备件到货，6月10日零点拆检",
       "createdAt": "2026-06-03T10:45:00.000Z",
-      "updatedAt": "2026-06-04T21:05:00.000Z",
+      "updatedAt": "2026-06-20T15:39:47.669Z",
       "notes": [
         {
-          "id": "note_mq6nam70_8khkmj",
+          "id": "note_mqmiu1cj_x600ds",
           "timestamp": "2026-06-04T21:05:00.000Z",
           "source": "灰度补录备注",
           "author": "老何",
@@ -165,12 +165,41 @@
             "补充停机窗口：备件预计6月8日到货，建议6月10日零点窗口",
             "状态变更：待排程 → 已排程"
           ]
+        },
+        {
+          "id": "note_mqmix6c4_acepxx",
+          "timestamp": "2026-06-20T15:39:47.668Z",
+          "source": "维修照片手工核",
+          "author": "老何",
+          "content": "备件到库照片见 IMG_20260620_0733.jpg，条码与采购单一致，齿圈外观无磕碰。原 ETA 6月8日实际6月20日到，略晚于原计划但仍在6月10日停机窗口之后，需要把状态改为备件已到货并协调新的停机窗口。",
+          "altersVerdict": true,
+          "affectedFields": [
+            "status"
+          ],
+          "beforeSnapshot": {
+            "verdict": "需停机执行器拆检换齿圈",
+            "parts": [
+              {
+                "name": "弗兰德齿圈组件K-88",
+                "qty": 1,
+                "eta": "2026-06-08"
+              }
+            ],
+            "shutdownWindow": {
+              "start": "2026-06-10 00:00",
+              "end": "2026-06-10 04:00"
+            },
+            "status": "已排程"
+          },
+          "changesExplained": [
+            "状态：已排程 → 备件已到货"
+          ]
         }
       ]
     },
     {
-      "id": "sched_mq6nam70_ue90ox",
-      "inspectionId": "insp_mq6nam70_bioi69",
+      "id": "sched_mqmiu1cj_2lv6ii",
+      "inspectionId": "insp_mqmiu1cj_7qvbbi",
       "deviceCode": "PUMP-04-C1",
       "deviceName": "1号循环泵",
       "stationName": "南郊泵站",
@@ -193,7 +222,7 @@
       "updatedAt": "2026-06-08T17:20:00.000Z",
       "notes": [
         {
-          "id": "note_mq6nam70_3g0gv5",
+          "id": "note_mqmiu1cj_7wk1w2",
           "timestamp": "2026-06-08T17:20:00.000Z",
           "source": "维修照片手工核",
           "author": "设备工程师老何",
@@ -227,8 +256,8 @@
   ],
   "changeHistory": [
     {
-      "id": "chg_mq6nam70_glys67",
-      "scheduleId": "sched_mq6nam70_7wn739",
+      "id": "chg_mqmiu1cj_f79oxy",
+      "scheduleId": "sched_mqmiu1cj_h503vo",
       "timestamp": "2026-06-01T09:20:00.000Z",
       "operator": "系统",
       "source": "自动巡检判读",
@@ -248,8 +277,8 @@
       "note": null
     },
     {
-      "id": "chg_mq6nam70_680bow",
-      "scheduleId": "sched_mq6nam70_kdse55",
+      "id": "chg_mqmiu1cj_qvtpyk",
+      "scheduleId": "sched_mqmiu1cj_6swkn7",
       "timestamp": "2026-06-03T10:45:00.000Z",
       "operator": "系统",
       "source": "自动巡检判读",
@@ -263,8 +292,8 @@
       "note": null
     },
     {
-      "id": "chg_mq6nam70_g8tcio",
-      "scheduleId": "sched_mq6nam70_kdse55",
+      "id": "chg_mqmiu1cj_oa9pc6",
+      "scheduleId": "sched_mqmiu1cj_6swkn7",
       "timestamp": "2026-06-04T21:05:00.000Z",
       "operator": "老何",
       "source": "灰度补录备注",
@@ -282,7 +311,7 @@
       "newStatus": "已排程",
       "reason": "灰度补录维修照片后结论升级",
       "note": {
-        "id": "note_mq6nam70_8khkmj",
+        "id": "note_mqmiu1cj_x600ds",
         "timestamp": "2026-06-04T21:05:00.000Z",
         "source": "灰度补录备注",
         "author": "老何",
@@ -309,8 +338,8 @@
       }
     },
     {
-      "id": "chg_mq6nam70_7jjq2r",
-      "scheduleId": "sched_mq6nam70_ue90ox",
+      "id": "chg_mqmiu1cj_k9ejby",
+      "scheduleId": "sched_mqmiu1cj_2lv6ii",
       "timestamp": "2026-06-05T08:35:00.000Z",
       "operator": "系统",
       "source": "自动巡检判读",
@@ -330,8 +359,8 @@
       "note": null
     },
     {
-      "id": "chg_mq6nam70_n862k3",
-      "scheduleId": "sched_mq6nam70_ue90ox",
+      "id": "chg_mqmiu1cj_lgvn6d",
+      "scheduleId": "sched_mqmiu1cj_2lv6ii",
       "timestamp": "2026-06-08T17:20:00.000Z",
       "operator": "设备工程师老何",
       "source": "维修照片手工核",
@@ -355,7 +384,7 @@
       "newStatus": "到货滞后",
       "reason": "维修照片核对后确认备件延迟，到货窗口滞后",
       "note": {
-        "id": "note_mq6nam70_3g0gv5",
+        "id": "note_mqmiu1cj_7wk1w2",
         "timestamp": "2026-06-08T17:20:00.000Z",
         "source": "维修照片手工核",
         "author": "设备工程师老何",
@@ -384,15 +413,70 @@
           "建议：协调是否将停机窗口延后到6月11日晚，或先借调临检备件库存垫用"
         ]
       }
+    },
+    {
+      "id": "chg_mqmix6c5_ofzxm6",
+      "scheduleId": "sched_mqmiu1cj_6swkn7",
+      "timestamp": "2026-06-20T15:39:47.669Z",
+      "operator": "老何",
+      "source": "维修照片手工核",
+      "oldVerdict": "需停机执行器拆检换齿圈",
+      "newVerdict": "需停机执行器拆检换齿圈",
+      "oldParts": [
+        {
+          "name": "弗兰德齿圈组件K-88",
+          "qty": 1,
+          "eta": "2026-06-08"
+        }
+      ],
+      "newParts": [
+        {
+          "name": "弗兰德齿圈组件K-88",
+          "qty": 1,
+          "eta": "2026-06-08"
+        }
+      ],
+      "oldStatus": "已排程",
+      "newStatus": "备件已到货",
+      "reason": "维修照片核对：齿圈备件已于今晨到库，条码 SN-20260620-07 已扫码入库",
+      "note": {
+        "id": "note_mqmix6c4_acepxx",
+        "timestamp": "2026-06-20T15:39:47.668Z",
+        "source": "维修照片手工核",
+        "author": "老何",
+        "content": "备件到库照片见 IMG_20260620_0733.jpg，条码与采购单一致，齿圈外观无磕碰。原 ETA 6月8日实际6月20日到，略晚于原计划但仍在6月10日停机窗口之后，需要把状态改为备件已到货并协调新的停机窗口。",
+        "altersVerdict": true,
+        "affectedFields": [
+          "status"
+        ],
+        "beforeSnapshot": {
+          "verdict": "需停机执行器拆检换齿圈",
+          "parts": [
+            {
+              "name": "弗兰德齿圈组件K-88",
+              "qty": 1,
+              "eta": "2026-06-08"
+            }
+          ],
+          "shutdownWindow": {
+            "start": "2026-06-10 00:00",
+            "end": "2026-06-10 04:00"
+          },
+          "status": "已排程"
+        },
+        "changesExplained": [
+          "状态：已排程 → 备件已到货"
+        ]
+      }
     }
   ],
   "duplicateWarnings": [
     {
-      "id": "dup_mq6nam70_uqrk83",
+      "id": "dup_mqmiu1cj_qoyk6q",
       "deviceCode": "PUMP-01-A3",
       "relatedScheduleIds": [
-        "sched_mq6nam70_7wn739",
-        "sched_mq6nam70_dr099r"
+        "sched_mqmiu1cj_h503vo",
+        "sched_mqmiu1cj_ljuncf"
       ],
       "suggestion": "同一设备存在两条排程，建议：① 合并停机窗口；② 轴承与机封一次出库同步更换；③ 只保留一次\"已排程\"状态，另一条标记\"合并处理\"后归档。",
       "firstFoundAt": "2026-06-02T14:16:00.000Z",

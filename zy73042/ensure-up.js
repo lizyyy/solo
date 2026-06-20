@@ -1,5 +1,5 @@
 // 稳定启动脚本：每次确保在端口并持久化
-const { execSync, spawn } = require('child_process');
+const { spawn } = require('child_process');
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -9,7 +9,17 @@ function check(port) {
     const req = http.get(`http://localhost:${port}/api/health`, (res) => {
       let d = '';
       res.on('data', c => d += c);
-      res.on('end', () => resolve({ok: true, body: d}));
+      res.on('end', () => {
+        try {
+          const health = JSON.parse(d);
+          resolve({
+            ok: res.statusCode === 200 && health.ok === true,
+            body: d
+          });
+        } catch (e) {
+          resolve({ok: false, body: d});
+        }
+      });
     });
     req.on('error', () => resolve({ok: false}));
     req.setTimeout(2000, () => req.destroy());
@@ -18,22 +28,31 @@ function check(port) {
 
 (async function main() {
   const PROJECT = process.cwd();
-  let r = await check(3000);
+  const PORT = Number(process.env.PORT || 3000);
+  let r = await check(PORT);
   if (!r.ok) {
-    console.log('服务未启动，启动中...');
-    try { execSync('pkill -9 -f "node server.js" 2>/dev/null || true'); } catch(e) {}
+    console.log(`服务未在端口 ${PORT} 正常响应，启动中...`);
     await new Promise(res => setTimeout(res, 800));
     const proc = spawn('node', ['server.js'], {
-      cwd: PROJECT, detached: true, stdio: ['ignore', 'pipe', 'pipe']
+      cwd: PROJECT,
+      detached: true,
+      env: { ...process.env, PORT: String(PORT) },
+      stdio: 'ignore'
     });
-    let log = '';
-    proc.stdout.on('data', d => log += d.toString());
-    proc.stderr.on('data', d => log += d.toString());
     proc.unref();
+    let started = false;
     for (let i=0; i<10; i++) {
       await new Promise(res => setTimeout(res, 500));
-      const rr = await check(3000);
-      if (rr.ok) { console.log('启动成功', rr.body); break; }
+      const rr = await check(PORT);
+      if (rr.ok) {
+        started = true;
+        console.log('启动成功', rr.body);
+        break;
+      }
+    }
+    if (!started) {
+      console.error(`端口 ${PORT} 没有返回本服务健康状态，请确认端口未被其他服务占用，或用 PORT=其他端口 node ensure-up.js 启动。`);
+      process.exit(1);
     }
   } else {
     console.log('服务已在运行', r.body);

@@ -270,10 +270,10 @@
       <div class="form-row">
         <label>改判原因 <span class="req">*</span></label>
         <input id="fReason" placeholder="必填：简述为什么要改变结论 / 状态"/>
-        <div class="hint">例如："维修照片复核齿圈已有碎屑掉落</div>
+        <div class="hint">例如：维修照片复核发现齿圈已有碎屑掉落</div>
       </div>
       <div class="form-row">
-        <label>备注内容（灰度/维修照片备注</label>
+        <label>备注内容（灰度 / 维修照片备注）</label>
         <textarea id="fNote" placeholder="详细说明，会留存历史：照片编号、现场情况、与初判差异等"></textarea>
         <div class="hint">填写后系统自动对比变更会自动生成"改判说明"清单</div>
       </div>
@@ -297,7 +297,7 @@
       </div>
       <div class="form-row">
         <label>备件清单（改判后，JSON 格式：[{"name":"xx","qty":1,"eta":"2026-06-10"}]）</label>
-        <textarea id="fParts" style="font-family: monospace; font-size: 12px;" placeholder='[{"name":"零件名","qty":1,"eta":"YYYY-MM-DD"}]"></textarea>
+        <textarea id="fParts" style="font-family: monospace; font-size: 12px;" placeholder='[{"name":"零件名","qty":1,"eta":"YYYY-MM-DD"}]'></textarea>
       </div>
       <div class="form-grid">
         <div class="form-row">
@@ -318,7 +318,25 @@
 </div>
 
 <script>
-const API = 'http://localhost:3000/api';
+(function () {
+  window.onerror = function (msg, url, line, col, err) {
+    try {
+      var badge = document.getElementById('healthBadge');
+      if (badge) {
+        badge.className = 'pill pill-red';
+        badge.innerHTML = '● 脚本错误 L' + line + ': ' + String(msg).slice(0, 40);
+      }
+    } catch (e) {}
+    return false;
+  };
+})();
+
+const API = (function () {
+  try {
+    if (window.location.protocol === 'file:') return 'http://localhost:3000/api';
+    return '/api';
+  } catch (e) { return '/api'; }
+})();
 let state = {
   schedules: [],
   duplicates: [],
@@ -352,20 +370,37 @@ function fmtTime(iso) {
 }
 
 async function loadList() {
-  const r = await fetch(`${API}/schedules`).then(x => x.json());
-  state.schedules = r.schedules;
-  state.duplicates = r.duplicates;
-  state.statusTypes = r.statusTypes;
-  state.sourceTypes = r.sourceTypes;
-  renderDupList();
-  renderScheduleList();
-  if (!state.activeId && state.schedules.length) {
-    selectSchedule(state.schedules[2].id);
+  try {
+    const badge = document.getElementById('healthBadge');
+    if (badge) { badge.className = 'pill pill-yellow'; badge.innerHTML = '● 数据加载中...'; }
+    const r = await fetch(`${API}/schedules`).then(x => x.json());
+    state.schedules = r.schedules;
+    state.duplicates = r.duplicates;
+    state.statusTypes = r.statusTypes;
+    state.sourceTypes = r.sourceTypes;
+    renderDupList();
+    renderScheduleList();
+    if (!state.activeId && state.schedules.length) {
+      const preferNote = state.schedules.find(s => s.notes && s.notes.length);
+      selectSchedule((preferNote || state.schedules[0]).id);
+    }
+    const h = await fetch(`${API}/health`).then(x => x.json());
+    if (badge) {
+      badge.className = 'pill pill-green';
+      badge.innerHTML = `● 服务正常 · ${h.schedulesCount}条排程·${h.historyCount}条历史·${h.duplicatesCount}条重复预警`;
+    }
+    const dataBadge = document.getElementById('dataBadge');
+    if (dataBadge) {
+      dataBadge.innerHTML = h.persisted ? '💾 数据已持久化（重启不丢）' : '📋 内存数据';
+    }
+  } catch (e) {
+    console.error(e);
+    const badge = document.getElementById('healthBadge');
+    if (badge) {
+      badge.className = 'pill pill-red';
+      badge.innerHTML = '● 加载失败: ' + String(e.message || e).slice(0, 40);
+    }
   }
-  const h = await fetch(`${API}/health`).then(x => x.json());
-  document.getElementById('healthBadge').className = 'pill pill-green';
-  document.getElementById('healthBadge').innerHTML = `● 服务正常 · ${h.schedulesCount}条排程·${h.historyCount}条历史·${h.duplicatesCount}条重复预警`;
-  document.getElementById('dataBadge').innerHTML = h.persisted ? '💾 数据已持久化（重启不丢' : '📋 内存数据';
 }
 
 function renderDupList() {
@@ -412,12 +447,18 @@ function renderScheduleList() {
 }
 
 async function selectSchedule(id) {
-  state.activeId = id;
-  renderScheduleList();
-  renderDupList();
-  const d = await fetch(`${API}/schedules/${id}`).then(x => x.json());
-  state.detailCache[id] = d;
-  renderDetail(d);
+  try {
+    state.activeId = id;
+    renderScheduleList();
+    renderDupList();
+    const d = await fetch(`${API}/schedules/${id}`).then(x => x.json());
+    state.detailCache[id] = d;
+    renderDetail(d);
+  } catch (e) {
+    console.error(e);
+    const el = document.getElementById('detailArea');
+    if (el) el.innerHTML = '<div class="empty-state"><div class="big">❌</div><div>详情加载失败：' + (e.message || e) + '</div></div>';
+  }
 }
 
 function renderDetail(d) {
@@ -585,54 +626,74 @@ function closeModal() {
 }
 
 async function submitRejudge() {
-  const operator = document.getElementById('fOperator').value.trim();
-  const source = document.getElementById('fSource').value;
-  const reason = document.getElementById('fReason').value.trim();
-  if (!operator || !reason) {
-    alert('请填写：操作人、改判原因');
-    return;
-  }
-  const note = document.getElementById('fNote').value.trim();
-  const verdict = document.getElementById('fVerdict').value.trim();
-  const status = document.getElementById('fStatus').value;
-  let parts = undefined;
-  const partsRaw = document.getElementById('fParts').value.trim();
-  if (partsRaw) {
-    try { parts = JSON.parse(partsRaw); }
-    catch(e) { alert('备件JSON格式错误'); return; }
-  }
-  const winS = document.getElementById('fWinStart').value.trim();
-  const winE = document.getElementById('fWinEnd').value.trim();
-  let shutdownWindow = undefined;
-  if (winS || winE) {
-    shutdownWindow = { start: winS || null, end: winE || null };
-  }
-  const d = state.detailCache[state.activeId];
-  const s = d.schedule;
-  const payload = {
-    operator, source, reason,
-    note: note || undefined,
-    verdict: verdict || s.currentVerdict,
-    parts: parts || s.currentParts,
-    shutdownWindow: shutdownWindow || s.shutdownWindow,
-    status: status || s.status
-  };
-  const r = await fetch(`${API}/schedules/${state.activeId}/rejudge`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  }).then(x => x.json());
-  if (r.success) {
-    alert(`改判记录已保存！\n溯源ID：${r.trace.historyId}\n变更字段：${r.trace.fieldsChanged.join(', ')}\n当前状态：${r.trace.currentStatus}`);
-    closeModal();
-    await loadList();
-    await selectSchedule(state.activeId);
-  } else {
-    alert('失败：' + (r.error || '未知错误');
+  try {
+    const operator = document.getElementById('fOperator').value.trim();
+    const source = document.getElementById('fSource').value;
+    const reason = document.getElementById('fReason').value.trim();
+    if (!operator || !reason) {
+      alert('请填写：操作人、改判原因');
+      return;
+    }
+    const note = document.getElementById('fNote').value.trim();
+    const verdict = document.getElementById('fVerdict').value.trim();
+    const status = document.getElementById('fStatus').value;
+    let parts = undefined;
+    const partsRaw = document.getElementById('fParts').value.trim();
+    if (partsRaw) {
+      try { parts = JSON.parse(partsRaw); }
+      catch(e) { alert('备件JSON格式错误：' + e.message); return; }
+    }
+    const winS = document.getElementById('fWinStart').value.trim();
+    const winE = document.getElementById('fWinEnd').value.trim();
+    let shutdownWindow = undefined;
+    if (winS || winE) {
+      shutdownWindow = { start: winS || null, end: winE || null };
+    }
+    const d = state.detailCache[state.activeId];
+    const s = d.schedule;
+    const payload = {
+      operator, source, reason,
+      note: note || undefined,
+      verdict: verdict || s.currentVerdict,
+      parts: parts || s.currentParts,
+      shutdownWindow: shutdownWindow || s.shutdownWindow,
+      status: status || s.status
+    };
+    const r = await fetch(`${API}/schedules/${state.activeId}/rejudge`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(x => x.json());
+    if (r.success) {
+      alert('改判记录已保存！\n溯源ID：' + r.trace.historyId + '\n变更字段：' + r.trace.fieldsChanged.join(', ') + '\n当前状态：' + r.trace.currentStatus);
+      closeModal();
+      await loadList();
+      await selectSchedule(state.activeId);
+    } else {
+      alert('失败：' + (r.error || '未知错误'));
+    }
+  } catch (e) {
+    console.error(e);
+    alert('提交出错：' + (e.message || e));
   }
 }
 
-loadList();
+(function boot() {
+  function start() {
+    try {
+      loadList();
+    } catch (e) {
+      console.error(e);
+      var badge = document.getElementById('healthBadge');
+      if (badge) { badge.className = 'pill pill-red'; badge.innerHTML = '● 启动失败: ' + String(e.message || e).slice(0, 40); }
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start);
+  } else {
+    start();
+  }
+})();
 </script>
 </body>
 </html>
