@@ -77,8 +77,8 @@ class ManualJudgment(db.Model):
             'review_time': self.review_time.isoformat() if self.review_time else None,
             'boundary_status': self.boundary_status,
             'boundary_note': self.boundary_note,
-            'created_at': self.created_at.isoformat(),
-            'updated_at': self.updated_at.isoformat(),
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
             'version_number': self.version_number,
             'workflow_step': self.workflow_step,
             'is_latest': self.is_latest
@@ -151,8 +151,19 @@ class ImportBatch(db.Model):
         }
 
 
-def calculate_content_hash(row_data):
-    content = json.dumps(row_data, sort_keys=True, ensure_ascii=False)
+CONTENT_FIELDS = [
+    'batch_id', 'original_row_number', 'sample_id', 'model_version',
+    'prompt_version', 'original_answer', 'manual_answer',
+    'manual_changes', 'remarks'
+]
+
+
+def calculate_content_hash(data):
+    if isinstance(data, dict):
+        payload = {k: data.get(k, '') for k in CONTENT_FIELDS}
+    else:
+        payload = {k: str(getattr(data, k, '') or '') for k in CONTENT_FIELDS}
+    content = json.dumps(payload, sort_keys=True, ensure_ascii=False)
     return hashlib.sha256(content.encode('utf-8')).hexdigest()
 
 
@@ -182,6 +193,15 @@ def get_next_version_number(record_key):
     return max(r.version_number for r in records) + 1
 
 
+def _safe_getattr(obj, field, default=''):
+    virtual_fields = {'initial', 'create'}
+    if not obj:
+        return default
+    if field in virtual_fields:
+        return default
+    return getattr(obj, field, default)
+
+
 def create_version_record(record_key, old_record, new_record, field_name, 
                          changed_by='system', change_reason='', change_type='update'):
     version = VersionHistory()
@@ -189,8 +209,8 @@ def create_version_record(record_key, old_record, new_record, field_name,
     version.from_record_id = old_record.id if old_record else None
     version.to_record_id = new_record.id if new_record else None
     version.field_name = field_name
-    version.old_value = getattr(old_record, field_name) if old_record else ''
-    version.new_value = getattr(new_record, field_name) if new_record else ''
+    version.old_value = _safe_getattr(old_record, field_name, '')
+    version.new_value = '(记录创建)' if field_name in ('initial','create') else _safe_getattr(new_record, field_name, '')
     version.changed_by = changed_by
     version.change_reason = change_reason
     version.change_type = change_type
@@ -238,6 +258,12 @@ def import_file():
 
     df = pd.read_excel(file_path) if file.filename.endswith('.xlsx') else pd.read_csv(file_path)
 
+    def _clean(v):
+        s = str(v) if v is not None else ''
+        if s in ('nan', 'None', 'NaN', 'nat', '<NA>'):
+            return ''
+        return s
+
     new_count = 0
     updated_count = 0
     duplicate_count = 0
@@ -245,18 +271,18 @@ def import_file():
 
     for idx, row in df.iterrows():
         original_row_number = idx + 2
-        sample_id = str(row.get('样本编号', row.get('sample_id', '')))
+        sample_id = _clean(row.get('样本编号', row.get('sample_id', '')))
         
         row_data = {
             'batch_id': batch_id,
             'original_row_number': original_row_number,
             'sample_id': sample_id,
-            'model_version': str(row.get('模型版本', row.get('model_version', ''))),
-            'prompt_version': str(row.get('提示词版本', row.get('prompt_version', ''))),
-            'original_answer': str(row.get('原始回答', row.get('original_answer', ''))),
-            'manual_answer': str(row.get('人工改判回答', row.get('manual_answer', ''))),
-            'manual_changes': str(row.get('人工改动说明', row.get('manual_changes', ''))),
-            'remarks': str(row.get('备注', row.get('remarks', ''))),
+            'model_version': _clean(row.get('模型版本', row.get('model_version', ''))),
+            'prompt_version': _clean(row.get('提示词版本', row.get('prompt_version', ''))),
+            'original_answer': _clean(row.get('原始回答', row.get('original_answer', ''))),
+            'manual_answer': _clean(row.get('人工改判回答', row.get('manual_answer', ''))),
+            'manual_changes': _clean(row.get('人工改动说明', row.get('manual_changes', ''))),
+            'remarks': _clean(row.get('备注', row.get('remarks', ''))),
         }
         
         record_key = build_record_key(batch_id, sample_id, original_row_number)
@@ -266,6 +292,12 @@ def import_file():
         existing = get_latest_record(record_key)
 
         if existing:
+            preserve_fields_when_empty = ['prompt_version', 'remarks']
+            for f in preserve_fields_when_empty:
+                if not row_data.get(f) and getattr(existing, f):
+                    row_data[f] = getattr(existing, f)
+            row_data['content_hash'] = calculate_content_hash(row_data)
+
             if existing.content_hash == row_data['content_hash']:
                 duplicate_count += 1
                 continue
@@ -292,6 +324,7 @@ def import_file():
                         new_record.workflow_step = 'step2_prompt_updated'
                 
                 db.session.add(new_record)
+                db.session.flush()
                 
                 for field in ['model_version', 'prompt_version', 'original_answer', 
                             'manual_answer', 'manual_changes', 'remarks']:
@@ -312,6 +345,9 @@ def import_file():
             new_record.import_id = ImportBatch.query.count() + 1
             new_record.version_number = 1
             
+            db.session.add(new_record)
+            db.session.flush()
+            
             create_version_record(
                 record_key, None, new_record, 'initial',
                 changed_by=imported_by,
@@ -319,7 +355,6 @@ def import_file():
                 change_type='create'
             )
             
-            db.session.add(new_record)
             new_count += 1
 
     batch = ImportBatch(
@@ -408,7 +443,8 @@ def update_prompt_version(record_id):
     record.is_latest = False
     
     new_record_data = record.to_dict()
-    del new_record_data['id']
+    for field in ['id', 'created_at', 'updated_at', 'review_time']:
+        new_record_data.pop(field, None)
     new_record_data['prompt_version'] = new_prompt
     new_record_data['is_latest'] = True
     new_record_data['workflow_step'] = 'step2_prompt_updated'
@@ -425,6 +461,7 @@ def update_prompt_version(record_id):
     
     new_record = ManualJudgment(**new_record_data)
     db.session.add(new_record)
+    db.session.flush()
 
     create_version_record(
         record.record_key, record, new_record, 'prompt_version',
@@ -510,7 +547,8 @@ def update_remark(record_id):
     record.is_latest = False
     
     new_record_data = record.to_dict()
-    del new_record_data['id']
+    for field in ['id', 'created_at', 'updated_at', 'review_time']:
+        new_record_data.pop(field, None)
     new_record_data['remarks'] = new_remark
     new_record_data['is_latest'] = True
     new_record_data['version_number'] = get_next_version_number(record.record_key)
@@ -524,6 +562,7 @@ def update_remark(record_id):
     
     new_record = ManualJudgment(**new_record_data)
     db.session.add(new_record)
+    db.session.flush()
 
     create_version_record(
         record.record_key, record, new_record, 'remarks',
@@ -618,8 +657,63 @@ def export_batch(batch_id):
     return send_file(output, download_name=f'batch_{batch_id}_export.xlsx', as_attachment=True)
 
 
+def migrate_database():
+    inspector = db.inspect(db.engine)
+    existing_tables = inspector.get_table_names()
+
+    required_tables = ['manual_judgment', 'version_history', 'import_batch']
+    required_columns = {
+        'manual_judgment': [
+            'record_key', 'version_number', 'status_note',
+            'original_row_number', 'sample_id', 'model_version',
+            'prompt_version', 'manual_changes', 'remarks',
+            'processing_status', 'boundary_status', 'boundary_note',
+            'workflow_step', 'is_latest', 'content_hash'
+        ],
+        'import_batch': [
+            'import_id', 'boundary_alert_count', 'import_note'
+        ],
+        'version_history': [
+            'record_key', 'change_type', 'full_snapshot_before',
+            'full_snapshot_after', 'from_record_id', 'to_record_id'
+        ]
+    }
+
+    needs_migration = False
+
+    if set(required_tables).issubset(set(existing_tables)):
+        for table, cols in required_columns.items():
+            existing_cols = [c['name'] for c in inspector.get_columns(table)]
+            missing = set(cols) - set(existing_cols)
+            if missing:
+                needs_migration = True
+                print(f"[DB迁移] 表 {table} 缺少列: {missing}")
+                break
+    else:
+        missing_tables = set(required_tables) - set(existing_tables)
+        if missing_tables:
+            needs_migration = True
+            print(f"[DB迁移] 缺少表: {missing_tables}")
+
+    if needs_migration:
+        import shutil
+        db_path = app.config['SQLALCHEMY_DATABASE_URI'].replace('sqlite:///', '')
+        if db_path and os.path.exists(db_path):
+            backup_path = f"{db_path}.bak_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            shutil.copy2(db_path, backup_path)
+            print(f"[DB迁移] 旧数据库已备份: {backup_path}")
+            db.drop_all()
+            print(f"[DB迁移] 旧结构已清除")
+
+        db.create_all()
+        print(f"[DB迁移] 新结构已创建")
+    else:
+        db.create_all()
+        print(f"[DB] 结构验证通过，无需迁移")
+
+
 with app.app_context():
-    db.create_all()
+    migrate_database()
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
