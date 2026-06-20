@@ -328,17 +328,29 @@ def show(record_id):
 @click.option("--output", "-o", required=True, help="输出文件路径")
 @click.option("--status", "-s", default=None, help="按状态过滤")
 @click.option("--conflict", "-c", default=None, help="按冲突类型过滤")
-def export(batch_id, output, status, conflict):
+@click.option("--no-sync", is_flag=True, default=False, help="不同步生成output/校验明细.xlsx")
+def export(batch_id, output, status, conflict, no_sync):
     """导出校验明细（与页面、接口同一份数据）"""
     status_filter = [VerificationStatus(status)] if status else None
     conflict_filter = [ConflictType(conflict)] if conflict else None
 
     try:
+        import shutil
+        from datetime import datetime
         out_path = result_reader.export_to_excel(batch_id, output, status_filter, conflict_filter)
         console.print(f"[green]导出成功:[/green] {out_path}")
 
+        if not no_sync:
+            canonical_path = os.path.join(os.path.dirname(out_path) or ".", "校验明细.xlsx") \
+                if os.path.isabs(out_path) or os.path.dirname(out_path) else os.path.join("output", "校验明细.xlsx")
+            if os.path.abspath(canonical_path) != os.path.abspath(out_path):
+                os.makedirs(os.path.dirname(canonical_path) or ".", exist_ok=True)
+                shutil.copy2(out_path, canonical_path)
+                console.print(f"[cyan]同步更新:[/cyan] {canonical_path} (与{os.path.basename(out_path)}字节完全一致)")
+
         summary = result_reader.get_batch_summary(batch_id)
         console.print(f"\n批次汇总:")
+        console.print(f"  导出时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         console.print(f"  总样本数: {summary['total_samples']}")
         for step, cnt in summary["by_step"].items():
             if cnt > 0:

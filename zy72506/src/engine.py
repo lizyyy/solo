@@ -293,7 +293,15 @@ def get_processing_explanation(record_id: str) -> Dict[str, Any]:
 
     if record.operation_reviewed_by:
         reasons.append(f"运营复核人 {record.operation_reviewed_by} 于 {record.operation_reviewed_at} 给出意见: {record.operation_review_comment or '无'}")
-        decisions.append(f"运营复核{'通过' if record.status == VerificationStatus.OPERATION_APPROVED else '驳回'} → 进入第三步")
+        op_approved = False
+        for h in reversed(record.status_history):
+            if h.get("new_status") == VerificationStatus.OPERATION_APPROVED:
+                op_approved = True
+                break
+            if h.get("new_status") == VerificationStatus.OPERATION_REJECTED:
+                op_approved = False
+                break
+        decisions.append(f"运营复核{'通过' if op_approved else '驳回'} → 进入第三步")
 
     if record.status == VerificationStatus.COMPLETED:
         decisions.append("产品复盘页已更新 → 流程完成")
