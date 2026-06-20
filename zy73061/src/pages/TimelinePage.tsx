@@ -1,6 +1,18 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronUp, Clock, GitCompare, AlertTriangle, CheckCircle2, OctagonX, Sparkles, Link2 } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  GitCompare,
+  AlertTriangle,
+  CheckCircle2,
+  OctagonX,
+  Sparkles,
+  Link2,
+  Ban,
+  UserCheck,
+} from 'lucide-react';
 import PageContainer from '@/components/layout/PageContainer';
 import { useAppStore } from '@/store/useAppStore';
 import { LevelBadge } from '@/components/common/Badges';
@@ -96,19 +108,35 @@ function VersionGroup({
                   >
                     <div
                       className={`absolute -left-[29px] top-3 w-[24px] h-[24px] rounded-full border-2 border-white flex items-center justify-center shadow-card ${
-                        item.level === 'red'
-                          ? 'bg-alert-red'
-                          : item.level === 'yellow'
-                            ? 'bg-alert-orange'
-                            : 'bg-alert-green'
+                        item.event_type === 'confirm'
+                          ? 'bg-alert-blue'
+                          : item.event_type === 'void'
+                            ? 'bg-industrial-300'
+                            : item.event_type === 'late-upload'
+                              ? 'bg-alert-orange'
+                              : item.level === 'red'
+                                ? 'bg-alert-red'
+                                : item.level === 'yellow'
+                                  ? 'bg-alert-orange'
+                                  : 'bg-alert-green'
                       }`}
                     >
-                      <div className="w-2 h-2 rounded-full bg-white/90" />
+                      {item.event_type === 'confirm' ? (
+                        <UserCheck className="w-3.5 h-3.5 text-white" />
+                      ) : item.event_type === 'void' ? (
+                        <Ban className="w-3.5 h-3.5 text-white" />
+                      ) : item.event_type === 'late-upload' ? (
+                        <Clock className="w-3.5 h-3.5 text-white" />
+                      ) : (
+                        <div className="w-2 h-2 rounded-full bg-white/90" />
+                      )}
                     </div>
                     <div
                       onClick={() => onSelectRecord(item.record_id)}
                       className={`card-base p-4 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-hover ${
                         !item.is_current_version ? 'ring-1 ring-industrial-200/70' : ''
+                      } ${
+                        item.event_type === 'void' ? 'opacity-60' : ''
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3 mb-2">
@@ -116,20 +144,43 @@ function VersionGroup({
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <Clock className="w-3.5 h-3.5 text-industrial-400" />
                             <span className="num text-xs font-semibold text-industrial-600">{item.date}</span>
-                            <LevelBadge level={item.level} />
+                            {item.event_type === 'confirm' ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-alert-blue/10 text-alert-blue">
+                                <UserCheck className="w-3 h-3" />
+                                人工确认
+                              </span>
+                            ) : item.event_type === 'void' ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-industrial-100 text-industrial-400 line-through">
+                                <Ban className="w-3 h-3" />
+                                已作废
+                              </span>
+                            ) : item.event_type === 'late-upload' ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-alert-orange/10 text-alert-orange">
+                                <Clock className="w-3 h-3" />
+                                附件晚到
+                              </span>
+                            ) : (
+                              <LevelBadge level={item.level} />
+                            )}
                             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-industrial-100 text-industrial-600 num">
                               {item.formula_version}
                             </span>
                           </div>
                           <div className="flex items-baseline gap-2">
                             <span className="num text-xs text-industrial-400">{item.equipment_no}</span>
-                            <span className="text-sm font-medium text-industrial-700 truncate max-w-xs">
+                            <span className={`text-sm font-medium text-industrial-700 truncate max-w-xs ${
+                              item.event_type === 'void' ? 'line-through text-industrial-400' : ''
+                            }`}>
                               {item.pipeline_name}
                             </span>
                           </div>
                         </div>
                         <div className="text-right shrink-0">
-                          <div className="num text-xl font-bold text-industrial-800 leading-none">
+                          <div className={`num text-xl font-bold leading-none ${
+                            item.event_type === 'void'
+                              ? 'text-industrial-400 line-through'
+                              : 'text-industrial-800'
+                          }`}>
                             {item.value.toFixed(2)}
                           </div>
                           <div className="text-[11px] text-industrial-400 mt-0.5">{item.unit}</div>
@@ -145,9 +196,28 @@ function VersionGroup({
                             </div>
                           )}
                           {item.change_reason && (
-                            <div className="flex items-start gap-2 text-[11px] text-alert-orange leading-relaxed">
-                              <AlertTriangle className="w-3 h-3 shrink-0 mt-0.5" />
-                              <span>变动原因：{item.change_reason}</span>
+                            <div className={`flex items-start gap-2 text-[11px] leading-relaxed ${
+                              item.event_type === 'void'
+                                ? 'text-industrial-400'
+                                : item.event_type === 'confirm'
+                                  ? 'text-alert-blue'
+                                  : 'text-alert-orange'
+                            }`}>
+                              {item.event_type === 'void' ? (
+                                <Ban className="w-3 h-3 shrink-0 mt-0.5" />
+                              ) : item.event_type === 'confirm' ? (
+                                <UserCheck className="w-3 h-3 shrink-0 mt-0.5" />
+                              ) : (
+                                <AlertTriangle className="w-3 h-3 shrink-0 mt-0.5" />
+                              )}
+                              <span>
+                                {item.event_type === 'confirm'
+                                  ? '确认采信：'
+                                  : item.event_type === 'void'
+                                    ? '作废说明：'
+                                    : '变动原因：'}
+                                {item.change_reason}
+                              </span>
                             </div>
                           )}
                         </div>

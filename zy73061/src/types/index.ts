@@ -16,6 +16,7 @@ export interface InspectionNote {
 
 export type WarningLevel = 'green' | 'yellow' | 'red';
 export type RecordStatus = 'normal' | 'pending' | 'confirmed';
+export type WarningStatus = 'active' | 'voided';
 
 export interface InspectionRecord {
   id: string;
@@ -58,7 +59,9 @@ export interface WarningAlert {
   calculated_value: number;
   formula_version: string;
   created_at: string;
+  status: WarningStatus;
   change_reason?: string;
+  voided_reason?: string;
 }
 
 export interface FormulaVersion {
@@ -98,4 +101,5 @@ export interface TimelineItem {
   is_current_version: boolean;
   diff_note?: string;
   change_reason?: string;
+  event_type?: 'inspection' | 'confirm' | 'void' | 'late-upload';
 }

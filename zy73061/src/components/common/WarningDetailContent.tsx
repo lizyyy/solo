@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   Clock3,
   User,
+  Ban,
 } from 'lucide-react';
 import type { InspectionRecord, WarningAlert, ThresholdRule } from '@/types';
 import { LevelBadge, StatusBadge } from '@/components/common/Badges';
@@ -293,11 +294,13 @@ export default function WarningDetailContent({ record, warnings, rule: propRule 
               <div className="flex flex-col items-center">
                 <div
                   className={`w-2 h-2 rounded-full mt-1.5 ${
-                    w.level === 'red'
-                      ? 'bg-alert-red'
-                      : w.level === 'yellow'
-                        ? 'bg-alert-orange'
-                        : 'bg-alert-green'
+                    w.status === 'voided'
+                      ? 'bg-industrial-300'
+                      : w.level === 'red'
+                        ? 'bg-alert-red'
+                        : w.level === 'yellow'
+                          ? 'bg-alert-orange'
+                          : 'bg-alert-green'
                   }`}
                 />
               </div>
@@ -306,7 +309,14 @@ export default function WarningDetailContent({ record, warnings, rule: propRule 
                   <span className="num text-xs font-semibold text-industrial-700">
                     {formatDateTime(w.created_at)}
                   </span>
-                  <LevelBadge level={w.level} />
+                  {w.status === 'voided' ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-industrial-100 text-industrial-400 line-through">
+                      <Ban className="w-3 h-3" />
+                      已作废 · 移出统计
+                    </span>
+                  ) : (
+                    <LevelBadge level={w.level} />
+                  )}
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-industrial-100 text-industrial-600 num">
                     预警 {w.id}
                   </span>
@@ -314,14 +324,20 @@ export default function WarningDetailContent({ record, warnings, rule: propRule 
                     口径 {w.formula_version}
                   </span>
                 </div>
-                <p className="text-xs text-industrial-500 mb-1">
+                <p className={`text-xs mb-1 ${w.status === 'voided' ? 'text-industrial-400 line-through' : 'text-industrial-500'}`}>
                   计算值{' '}
                   <span className="font-mono num text-industrial-700 font-semibold">
                     {w.calculated_value.toFixed(2)} {rule?.unit}
                   </span>{' '}
-                  触发预警
+                  {w.status === 'voided' ? '（本条已不计入汇总）' : '触发预警'}
                 </p>
-                {w.change_reason && (
+                {w.status === 'voided' && w.voided_reason && (
+                  <p className="text-xs text-industrial-400 flex items-start gap-1.5">
+                    <ArrowRight className="w-3 h-3 shrink-0 mt-0.5" />
+                    {w.voided_reason}
+                  </p>
+                )}
+                {w.status !== 'voided' && w.change_reason && (
                   <p className="text-xs text-alert-orange flex items-start gap-1.5">
                     <ArrowRight className="w-3 h-3 shrink-0 mt-0.5" />
                     {w.change_reason}

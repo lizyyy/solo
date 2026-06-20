@@ -37,13 +37,12 @@ export default function RiskBarChart({ warnings, records }: RiskBarChartProps) {
   });
 
   groupsMap.forEach((g) => {
-    const recs = records.filter((r) => r.pipeline_name === g.pipeline);
-    const withWarningIds = new Set(warnings.filter((w) => recs.some((r) => r.id === w.record_id)).map((w) => w.record_id));
-    g.green = Math.max(0, recs.length - Array.from(withWarningIds).length);
-    g.total = recs.length;
+    g.total = g.red + g.yellow + g.green;
   });
 
-  const groups = Array.from(groupsMap.values()).sort((a, b) => b.red + b.yellow - (a.red + a.yellow));
+  const groups = Array.from(groupsMap.values())
+    .filter((g) => g.total > 0)
+    .sort((a, b) => b.red + b.yellow - (a.red + a.yellow));
   const maxTotal = Math.max(...groups.map((g) => g.total), 1);
 
   return (

@@ -1,4 +1,4 @@
-import type { InspectionRecord, FormulaVersion, ThresholdRule, WarningAlert, TimelineItem } from '@/types';
+import type { InspectionRecord, FormulaVersion, ThresholdRule, TimelineItem } from '@/types';
 
 export const formulaVersions: FormulaVersion[] = [
   {
@@ -300,75 +300,6 @@ export const inspectionRecords: InspectionRecord[] = [
   },
 ];
 
-export const warningAlerts: WarningAlert[] = [
-  {
-    id: 'warn-001',
-    record_id: 'rec-001',
-    rule_id: 'rule-pressure',
-    level: 'yellow',
-    calculated_value: 4.12,
-    formula_version: 'v2.3',
-    created_at: '2026-06-08 09:20:00',
-  },
-  {
-    id: 'warn-002',
-    record_id: 'rec-003',
-    rule_id: 'rule-pressure',
-    level: 'yellow',
-    calculated_value: 3.83,
-    formula_version: 'v2.3',
-    created_at: '2026-06-10 14:30:00',
-    change_reason: '附件晚到，10号补传后触发重新计算',
-  },
-  {
-    id: 'warn-003',
-    record_id: 'rec-004',
-    rule_id: 'rule-pressure',
-    level: 'red',
-    calculated_value: 3.96,
-    formula_version: 'v2.3',
-    created_at: '2026-06-08 14:10:00',
-    change_reason: '设备编号重复，待人工确认后数值可能变更',
-  },
-  {
-    id: 'warn-004',
-    record_id: 'rec-005',
-    rule_id: 'rule-pressure',
-    level: 'yellow',
-    calculated_value: 3.76,
-    formula_version: 'v2.3',
-    created_at: '2026-06-08 14:20:00',
-    change_reason: '设备编号重复，待人工确认后数值可能变更',
-  },
-  {
-    id: 'warn-005',
-    record_id: 'rec-006',
-    rule_id: 'rule-temperature',
-    level: 'red',
-    calculated_value: 158,
-    formula_version: 'v2.3',
-    created_at: '2026-06-07 15:40:00',
-  },
-  {
-    id: 'warn-006',
-    record_id: 'rec-007',
-    rule_id: 'rule-vibration',
-    level: 'red',
-    calculated_value: 8.92,
-    formula_version: 'v2.3',
-    created_at: '2026-06-06 09:00:00',
-  },
-  {
-    id: 'warn-007',
-    record_id: 'rec-008',
-    rule_id: 'rule-pressure',
-    level: 'yellow',
-    calculated_value: 0.38,
-    formula_version: 'v2.3',
-    created_at: '2026-06-05 10:30:00',
-  },
-];
-
 export const timelineItems: TimelineItem[] = [
   {
     id: 'tl-001',
@@ -376,11 +307,12 @@ export const timelineItems: TimelineItem[] = [
     date: '2026-06-08 09:20',
     equipment_no: 'PL-A-001',
     pipeline_name: 'A区主蒸汽管线',
-    value: 4.12,
+    value: 4.0,
     unit: 'MPa',
     level: 'yellow',
     formula_version: 'v2.3',
     is_current_version: true,
+    event_type: 'inspection',
   },
   {
     id: 'tl-002',
@@ -393,8 +325,9 @@ export const timelineItems: TimelineItem[] = [
     level: 'yellow',
     formula_version: 'v2.3',
     is_current_version: true,
-    diff_note: '该记录在v2.2口径下为3.95，v2.3增加温度补偿系数0.97后调整为3.83',
+    diff_note: '该记录在v2.2口径下为3.95（无温度补偿），v2.3应用系数0.97后调整为3.83',
     change_reason: '附件晚到补传 + 口径v2.3温度补偿',
+    event_type: 'late-upload',
   },
   {
     id: 'tl-003',
@@ -402,11 +335,13 @@ export const timelineItems: TimelineItem[] = [
     date: '2026-06-07 15:40',
     equipment_no: 'PL-D-021',
     pipeline_name: 'D区热油输送管线',
-    value: 158,
+    value: 161,
     unit: '℃',
-    level: 'red',
+    level: 'yellow',
     formula_version: 'v2.3',
     is_current_version: true,
+    diff_note: 'T_rated=168-32+25=161，处于预警区间(145,180]，判定黄警（未超上限）',
+    event_type: 'inspection',
   },
   {
     id: 'tl-004',
@@ -416,10 +351,11 @@ export const timelineItems: TimelineItem[] = [
     pipeline_name: 'E区循环水泵出口管',
     value: 8.92,
     unit: 'mm/s',
-    level: 'red',
+    level: 'yellow',
     formula_version: 'v2.3',
     is_current_version: true,
-    diff_note: 'v2.1口径下该指标单位为in/s，已自动换算为mm/s且阈值同步调整',
+    diff_note: 'v2.1口径下该指标单位为in/s，已自动换算为mm/s且阈值同步调整；8.92处于预警区间(7.1,15]，黄警',
+    event_type: 'inspection',
   },
   {
     id: 'tl-005-hist',

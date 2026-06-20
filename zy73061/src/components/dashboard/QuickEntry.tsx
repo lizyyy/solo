@@ -3,6 +3,7 @@ import { PlusCircle, FileWarning, BookOpen, ArrowRight, FileText } from 'lucide-
 import { useAppStore } from '@/store/useAppStore';
 import { LevelBadge } from '@/components/common/Badges';
 import { formatDateTime } from '@/utils/unitConverter';
+import { getEffectiveWarnings } from '@/utils/stats';
 
 export default function QuickEntry() {
   const navigate = useNavigate();
@@ -11,7 +12,8 @@ export default function QuickEntry() {
   const currentVersion = useAppStore((s) => s.getCurrentVersion());
   const openRecord = useAppStore((s) => s.setSelectedRecordId);
 
-  const topAlerts = [...warnings]
+  const effective = getEffectiveWarnings(warnings, records);
+  const topAlerts = [...effective]
     .sort((a, b) => {
       const order = { red: 0, yellow: 1, green: 2 } as const;
       return order[a.level] - order[b.level] || new Date(b.created_at).getTime() - new Date(a.created_at).getTime();

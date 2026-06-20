@@ -3,57 +3,55 @@ import StatCard from '@/components/dashboard/StatCard';
 import RiskBarChart from '@/components/dashboard/RiskBarChart';
 import QuickEntry from '@/components/dashboard/QuickEntry';
 import { useAppStore } from '@/store/useAppStore';
+import { getDashboardStats, getEffectiveWarnings } from '@/utils/stats';
 import { OctagonAlert, AlertTriangle, CheckCircle2, UserCheck } from 'lucide-react';
 
 export default function DashboardPage() {
   const warnings = useAppStore((s) => s.warnings);
   const records = useAppStore((s) => s.records);
-  const duplicates = useAppStore((s) => s.duplicates);
 
-  const redCount = warnings.filter((w) => w.level === 'red').length;
-  const yellowCount = warnings.filter((w) => w.level === 'yellow').length;
-  const greenCount = records.length - warnings.length;
-  const pendingCount = duplicates.reduce((sum, d) => sum + d.count, 0);
+  const stats = getDashboardStats(warnings, records);
+  const effectiveWarnings = getEffectiveWarnings(warnings, records);
 
   return (
     <PageContainer
       title="管线阈值预警总览"
-      subtitle="实时汇总各管线预警状态、异常分布与待办事项。先扫汇总卡片，再点异常数字追明细。"
+      subtitle="实时汇总各管线预警状态、异常分布与待办事项。先扫汇总卡片，再点异常数字追明细。设备编号重复未确认前，对应记录不计入红/黄/绿最终数字。"
       breadcrumb={[{ label: '汇总仪表盘' }]}
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <StatCard
           title="红警（超标）"
-          value={redCount}
+          value={stats.red}
           unit="条"
-          delta={{ value: 1, label: '较上周' }}
+          delta={{ value: 0, label: '按公式核算' }}
           accentStyle="red"
           icon={<OctagonAlert className="w-5 h-5" />}
           clickTo="/inspections"
         />
         <StatCard
           title="黄警（预警区间）"
-          value={yellowCount}
+          value={stats.yellow}
           unit="条"
-          delta={{ value: 2, label: '较上周' }}
+          delta={{ value: 0, label: '已剔除待确认' }}
           accentStyle="orange"
           icon={<AlertTriangle className="w-5 h-5" />}
           clickTo="/inspections"
         />
         <StatCard
           title="正常绿区"
-          value={greenCount}
+          value={stats.green}
           unit="条"
-          delta={{ value: -1, label: '较上周' }}
+          delta={{ value: 0, label: '同一口径' }}
           accentStyle="green"
           icon={<CheckCircle2 className="w-5 h-5" />}
           clickTo="/inspections"
         />
         <StatCard
           title="待人工确认"
-          value={pendingCount}
+          value={stats.pending}
           unit="条"
-          delta={{ value: 0, label: '较昨日' }}
+          delta={{ value: 0, label: '重复设备' }}
           accentStyle="yellow"
           icon={<UserCheck className="w-5 h-5" />}
           clickTo="/inspections"
@@ -61,7 +59,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
-        <RiskBarChart warnings={warnings} records={records} />
+        <RiskBarChart warnings={effectiveWarnings} records={records} />
         <div className="card-base p-5">
           <h3 className="section-title">计算口径与单位说明</h3>
           <div className="space-y-3 text-sm">
@@ -71,7 +69,7 @@ export default function DashboardPage() {
                 <span className="font-semibold text-industrial-700">所有指标统一当前口径 v2.3</span>
               </div>
               <p className="text-xs text-industrial-600 leading-relaxed pl-4">
-                历史数据已按当前口径重新折算，页面与文件中显示的数值为同一版本。
+                汇总、明细、时间线均由同一套 calculator 实时核算，等级与边界值一致；历史数据已按当前口径重新折算。
               </p>
             </div>
             <div className="grid grid-cols-2 gap-2 text-xs">
@@ -96,7 +94,7 @@ export default function DashboardPage() {
             </div>
             <p className="text-[11px] text-industrial-400 pt-1.5 border-t border-surface-border leading-relaxed">
               新手提示：从左上"红警"数字点进去 → 自动跳到巡检明细并筛选红警记录 → 点击记录行打开"异常详情抽屉"
-              → 追完整计算链路。若看到⚠️黄条，先处理设备编号重复的人工确认。
+              → 追完整计算链路。若看到⚠️黄条，先处理设备编号重复的人工确认——确认前该设备不计入最终汇总。
             </p>
           </div>
         </div>

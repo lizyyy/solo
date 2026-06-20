@@ -1,9 +1,9 @@
-import type { ThresholdRule, WarningLevel, CalculationStep } from '@/types';
+import type { ThresholdRule, WarningLevel, CalculationStep, InspectionRecord, WarningAlert } from '@/types';
 
 export function evaluateWarning(
   value: number,
   rule: ThresholdRule,
-): { level: WarningLevel; steps: CalculationStep[] } {
+): { level: WarningLevel; steps: CalculationStep[]; calculated: number } {
   const steps: CalculationStep[] = [];
   let calculated = value;
 
@@ -74,7 +74,7 @@ export function evaluateWarning(
     unit: rule.unit,
   });
 
-  return { level, steps };
+  return { level, steps, calculated };
 }
 
 export function getCurrentVersionRules(rules: ThresholdRule[]): ThresholdRule[] {
@@ -88,4 +88,40 @@ export function findRuleByMetric(
   version = 'v2.3',
 ): ThresholdRule | undefined {
   return rules.find((r) => r.metric === metric && r.formula_version === version);
+}
+
+const changeReasonMap: Record<string, string> = {
+  'rec-003': '附件晚到，10号补传后触发重新计算',
+};
+
+export function buildWarnings(records: InspectionRecord[], rules: ThresholdRule[]): WarningAlert[] {
+  return records.map((record) => {
+    const rule = findRuleByMetric(rules, record.metric_type);
+    if (!rule) {
+      return {
+        id: `warn-${record.id}`,
+        record_id: record.id,
+        rule_id: '',
+        level: 'green' as WarningLevel,
+        calculated_value: record.measured_value,
+        formula_version: 'v2.3',
+        created_at: record.inspect_time,
+        status: 'active',
+      };
+    }
+    const { level, calculated } = evaluateWarning(record.measured_value, rule);
+    const lateAtt = record.attachments.find((a) => a.is_late);
+    const createdAt = lateAtt ? lateAtt.upload_time : record.inspect_time;
+    return {
+      id: `warn-${record.id}`,
+      record_id: record.id,
+      rule_id: rule.id,
+      level,
+      calculated_value: calculated,
+      formula_version: rule.formula_version,
+      created_at: createdAt,
+      status: 'active',
+      change_reason: changeReasonMap[record.id],
+    };
+  });
 }
