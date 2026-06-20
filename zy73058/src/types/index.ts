@@ -1,5 +1,12 @@
 export type ReviewStatus = 'confirmed' | 'pending' | 'rejected';
 export type ChangeType = 'rename' | 'threshold' | 'supplement' | 'none';
+export type SparePartRole = 'primary-anomaly' | 'corrected' | 'normal';
+
+export interface SparePartRef {
+  id: string;
+  role: SparePartRole;
+  roleLabel?: string;
+}
 
 export interface ChangeLogEntry {
   id: string;
@@ -10,6 +17,8 @@ export interface ChangeLogEntry {
   afterValue: string;
   impactExplanation: string;
   changeType: ChangeType;
+  sparePartRefBeforeId?: string;
+  sparePartRefAfterId?: string;
 }
 
 export interface SparePart {
@@ -36,6 +45,8 @@ export interface ReviewRecord {
     notes: string;
   };
   sparePartIds: string[];
+  sparePartRefs: SparePartRef[];
+  primarySourceSparePartId?: string;
   hasThresholdAdjustment: boolean;
   summary: string;
   thresholdInfo?: {

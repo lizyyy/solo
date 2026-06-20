@@ -19,6 +19,10 @@ import {
   Hash,
   ListTree,
   AlertTriangle,
+  AlertCircle,
+  BadgeAlert,
+  ArrowRight,
+  Search,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -39,9 +43,30 @@ export function DetailDrawer() {
 
   if (!record) return null;
 
-  const linkedParts = record.sparePartIds
-    .map((id) => getSparePartById(id))
-    .filter((x): x is NonNullable<typeof x> => !!x);
+  const partsByRole = {
+    anomaly: (record.sparePartRefs || [])
+      .filter((r) => r.role === 'primary-anomaly')
+      .map((r) => ({ ref: r, part: getSparePartById(r.id) }))
+      .filter((x): x is { ref: typeof x.ref; part: NonNullable<typeof x.part> } => !!x.part),
+    corrected: (record.sparePartRefs || [])
+      .filter((r) => r.role === 'corrected')
+      .map((r) => ({ ref: r, part: getSparePartById(r.id) }))
+      .filter((x): x is { ref: typeof x.ref; part: NonNullable<typeof x.part> } => !!x.part),
+    normal: (record.sparePartRefs || [])
+      .filter((r) => r.role === 'normal')
+      .map((r) => ({ ref: r, part: getSparePartById(r.id) }))
+      .filter((x): x is { ref: typeof x.ref; part: NonNullable<typeof x.part> } => !!x.part),
+  };
+
+  const hasTraceableParts = partsByRole.anomaly.length + partsByRole.corrected.length + partsByRole.normal.length > 0;
+  const primarySourceId = record.primarySourceSparePartId || partsByRole.anomaly[0]?.part.id;
+
+  const jumpToSource = (highlightId: string) => {
+    setShowSource(true);
+    const { setHighlightSparePartId } = useReviewStore.getState();
+    setHighlightSparePartId(highlightId);
+    setTimeout(() => useReviewStore.getState().setHighlightSparePartId(null), 3500);
+  };
 
   const handleUpdateStatus = (s: ReviewStatus) => {
     if (s === 'rejected') {
@@ -189,51 +214,157 @@ export function DetailDrawer() {
                 </div>
               )}
 
-              <div className="rounded border border-zinc-200 bg-white overflow-hidden">
-                <div className="px-4 py-2.5 bg-zinc-100 flex items-center justify-between">
-                  <div className="text-xs font-bold text-zinc-700 flex items-center gap-1.5">
-                    <Hash className="w-3.5 h-3.5" />
-                    备件清单关联 · 点击按钮跳转原始对象
-                  </div>
-                  <button
-                    onClick={() => setShowSource(true)}
-                    className="text-xs inline-flex items-center gap-1 px-2.5 py-1 rounded border border-blue-600 text-blue-700 bg-white hover:bg-blue-50 font-semibold"
-                  >
-                    <ExternalLink className="w-3 h-3" />
-                    打开备件清单溯源
-                  </button>
-                </div>
-                {linkedParts.length === 0 ? (
-                  <div className="p-4 text-sm text-zinc-500 text-center">
-                    该记录未关联备件（阈值调整类）
-                  </div>
-                ) : (
-                  <ul className="divide-y divide-zinc-100">
-                    {linkedParts.map((p) => (
-                      <li
-                        key={p.id}
-                        className="px-4 py-3 flex items-center gap-3 text-sm hover:bg-blue-50/30 cursor-pointer"
-                        onClick={() => {
-                          setShowSource(true);
-                          const { setHighlightSparePartId } = useReviewStore.getState();
-                          setHighlightSparePartId(p.id);
-                          setTimeout(
-                            () => useReviewStore.getState().setHighlightSparePartId(null),
-                            3000
-                          );
-                        }}
-                      >
-                        <span className="font-mono font-bold text-blue-700 w-14">{p.id}</span>
-                        <span className="font-medium text-zinc-800">{p.name}</span>
-                        <span className="font-mono text-xs text-zinc-500">
-                          {p.spec || '⚠️ 空字段'}
+              <div className="space-y-4">
+                {partsByRole.anomaly.length > 0 && (
+                  <div className="rounded border-2 border-red-400 bg-gradient-to-br from-red-50 to-amber-50 overflow-hidden shadow-sm">
+                    <div className="px-4 py-2.5 bg-red-500 text-white flex items-center justify-between gap-3 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <BadgeAlert className="w-4 h-4" />
+                        <span className="text-xs font-bold tracking-wide uppercase">
+                          🔴 溯源终点 · 用于解释异常的原始备件对象
                         </span>
-                        <span className="ml-auto text-[11px] text-blue-600 inline-flex items-center gap-1 font-medium">
-                          跳转原始对象 →
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                      </div>
+                      {primarySourceId && (
+                        <button
+                          onClick={() => jumpToSource(primarySourceId)}
+                          className="text-[11px] inline-flex items-center gap-1 px-3 py-1.5 rounded border-2 border-white text-white bg-red-600 hover:bg-red-700 font-bold shadow-sm"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          跳转 {primarySourceId} · 备件清单原始对象
+                        </button>
+                      )}
+                    </div>
+                    <ul className="divide-y divide-red-200/70">
+                      {partsByRole.anomaly.map(({ ref, part }) => (
+                        <li
+                          key={part.id}
+                          onClick={() => jumpToSource(part.id)}
+                          className="px-4 py-3.5 flex items-start gap-3 text-sm hover:bg-white/60 cursor-pointer transition-colors"
+                        >
+                          <div className="w-9 h-9 rounded bg-red-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+                            <AlertCircle className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-mono font-bold text-red-700 text-sm bg-white px-2 py-0.5 rounded border border-red-200">
+                                {part.id}
+                              </span>
+                              <span className="font-semibold text-zinc-900">{part.name}</span>
+                              <span className="text-[11px] px-2 py-0.5 rounded bg-red-500 text-white font-bold">
+                                PRIMARY SOURCE
+                              </span>
+                            </div>
+                            <div className="mt-1.5 flex items-center gap-3 flex-wrap text-xs font-mono">
+                              <span className={part.spec ? 'text-zinc-600' : 'text-red-700 font-bold bg-red-100 px-1.5 py-0.5 rounded border border-red-300'}>
+                                规格：{part.spec || '⚠️ 空字段（脏数据）'}
+                              </span>
+                              <span className={part.batch ? 'text-zinc-600' : 'text-red-700 font-bold bg-red-100 px-1.5 py-0.5 rounded border border-red-300'}>
+                                批次：{part.batch || '⚠️ 空'}
+                              </span>
+                              <span className="text-zinc-500">数量：{part.quantity}</span>
+                            </div>
+                            <div className="mt-2 text-xs text-red-900 bg-white/70 border border-red-200 rounded px-2.5 py-1.5 leading-relaxed">
+                              📌 <b>为什么是它：</b>
+                              {ref.roleLabel || '影响复核结论的原始备件，溯源必须回到此处，修正后对象不可替代'}
+                            </div>
+                          </div>
+                          <span className="text-[11px] text-red-600 inline-flex items-center gap-1 font-bold mt-1">
+                            查看源 →
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {partsByRole.corrected.length > 0 && (
+                  <div className="rounded border-2 border-zinc-300 bg-white overflow-hidden">
+                    <div className="px-4 py-2.5 bg-zinc-200 text-zinc-800 flex items-center gap-2">
+                      <Search className="w-3.5 h-3.5" />
+                      <span className="text-xs font-bold tracking-wide uppercase">
+                        ⚪ 修正后对照（仅作对比参考，不可替代原始来源）
+                      </span>
+                    </div>
+                    <ul className="divide-y divide-zinc-100">
+                      {partsByRole.corrected.map(({ ref, part }) => (
+                        <li
+                          key={part.id}
+                          onClick={() => jumpToSource(part.id)}
+                          className="px-4 py-3 flex items-start gap-3 text-sm hover:bg-zinc-50/70 cursor-pointer transition-colors"
+                        >
+                          <div className="w-9 h-9 rounded bg-zinc-300 text-zinc-700 flex items-center justify-center shrink-0">
+                            <ArrowRight className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-mono font-bold text-zinc-600">{part.id}</span>
+                              <span className="font-medium text-zinc-800">{part.name}</span>
+                              <span className="text-[10px] px-2 py-0.5 rounded bg-zinc-400 text-white font-bold">
+                                CORRECTED
+                              </span>
+                            </div>
+                            <div className="mt-1 flex items-center gap-3 text-xs font-mono text-zinc-600">
+                              <span>规格：{part.spec || '—'}</span>
+                              <span>批次：{part.batch || '—'}</span>
+                              <span>数量：{part.quantity}</span>
+                            </div>
+                            <div className="mt-1.5 text-[11px] text-zinc-500">
+                              {ref.roleLabel || '修正后的备件记录，仅作对照'}
+                            </div>
+                          </div>
+                          <span className="text-[11px] text-zinc-500 inline-flex items-center gap-1 font-medium mt-1">
+                            查看对照 →
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {partsByRole.normal.length > 0 && (
+                  <div className="rounded border border-zinc-200 bg-white overflow-hidden">
+                    <div className="px-4 py-2.5 bg-zinc-100 text-zinc-700 flex items-center justify-between">
+                      <div className="text-xs font-bold flex items-center gap-1.5">
+                        <Hash className="w-3.5 h-3.5" />
+                        其他普通关联备件
+                      </div>
+                      {!primarySourceId && (
+                        <button
+                          onClick={() => setShowSource(true)}
+                          className="text-[11px] inline-flex items-center gap-1 px-2.5 py-1 rounded border border-blue-500 text-blue-700 bg-white hover:bg-blue-50 font-semibold"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          打开备件清单溯源
+                        </button>
+                      )}
+                    </div>
+                    {partsByRole.normal.length === 0 ? (
+                      <div className="p-4 text-sm text-zinc-500 text-center">该记录未关联普通备件</div>
+                    ) : (
+                      <ul className="divide-y divide-zinc-100">
+                        {partsByRole.normal.map(({ part }) => (
+                          <li
+                            key={part.id}
+                            onClick={() => jumpToSource(part.id)}
+                            className="px-4 py-2.5 flex items-center gap-3 text-sm hover:bg-blue-50/30 cursor-pointer"
+                          >
+                            <span className="font-mono font-semibold text-blue-700 w-14">{part.id}</span>
+                            <span className="font-medium text-zinc-800">{part.name}</span>
+                            <span className="font-mono text-xs text-zinc-500">{part.spec || '—'}</span>
+                            <span className="ml-auto text-[11px] text-blue-600 inline-flex items-center gap-1 font-medium">
+                              查看 →
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
+
+                {!hasTraceableParts && (
+                  <div className="rounded border border-dashed border-zinc-300 bg-white p-6 text-center text-sm text-zinc-500">
+                    该记录未关联备件（阈值调整类不涉及备件溯源）
+                  </div>
                 )}
               </div>
 
@@ -355,7 +486,15 @@ export function DetailDrawer() {
 
       {showSource && (
         <SparePartSourceModal
+          primaryAnomalyId={primarySourceId}
+          correctedIds={partsByRole.corrected.map((x) => x.part.id)}
+          normalIds={partsByRole.normal.map((x) => x.part.id)}
           highlightIds={record.sparePartIds}
+          roleLabels={Object.fromEntries(
+            [...partsByRole.anomaly, ...partsByRole.corrected, ...partsByRole.normal]
+              .filter((x) => x.ref.roleLabel)
+              .map((x) => [x.part.id, x.ref.roleLabel!])
+          )}
           onClose={() => {
             setShowSource(false);
             useReviewStore.getState().setHighlightSparePartId(null);
