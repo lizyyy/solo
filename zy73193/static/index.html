@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>数列递推图表解释 · 建模教学助教</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1419; --panel: #1a2028; --panel2: #232b36;
+    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    --warn: #f0883e; --danger: #f85149; --ok: #3fb950;
+    --border: #30363d;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+         background: var(--bg); color: var(--text); font-size: 13px; }
+  header { padding: 14px 22px; background: var(--panel); border-bottom: 1px solid var(--border);
+           display: flex; align-items: center; justify-content: space-between; }
+  header h1 { margin:0; font-size: 16px; }
+  header .btns button { margin-left: 8px; }
+  button { background: var(--panel2); color: var(--text); border: 1px solid var(--border);
+           border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 12px; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #0a1220; font-weight: 600; }
+  button.danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+  button:hover { filter: brightness(1.15); }
+  main { display: grid; grid-template-columns: 320px 1fr 360px; gap: 10px; padding: 10px; }
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 12px;
+           max-height: calc(100vh - 80px); overflow-y: auto; }
+  .panel h2 { margin: 0 0 10px 0; font-size: 13px; color: var(--muted);
+              border-bottom: 1px solid var(--border); padding-bottom: 6px;
+              display: flex; justify-content: space-between; align-items: center; }
+  .group-card { padding: 10px; margin-bottom: 8px; background: var(--panel2);
+                border-radius: 6px; border-left: 3px solid var(--accent); cursor: pointer; }
+  .group-card.multi { border-left-color: var(--ok); }
+  .group-card.problem { border-left-color: var(--danger); }
+  .group-card.active { outline: 2px solid var(--accent); }
+  .tag { display: inline-block; padding: 1px 6px; border-radius: 10px; font-size: 11px;
+         background: var(--panel); border: 1px solid var(--border); margin-right: 4px; }
+  .tag.ok { color: var(--ok); border-color: var(--ok); }
+  .tag.warn { color: var(--warn); border-color: var(--warn); }
+  .tag.danger { color: var(--danger); border-color: var(--danger); }
+  .muted { color: var(--muted); font-size: 11px; }
+  #chartWrap { position: relative; height: 380px; }
+  .detail-box { background: var(--panel2); border-radius: 6px; padding: 10px; margin-top: 10px;
+                border: 1px solid var(--border); }
+  .detail-box h3 { margin: 0 0 6px 0; font-size: 12px; color: var(--accent); }
+  .trace-step { padding: 5px 8px; margin: 4px 0; background: #0d1117; border-radius: 4px;
+                border-left: 2px solid var(--accent); font-family: "SF Mono", Menlo, monospace; font-size: 11px; }
+  .trace-step.warn { border-left-color: var(--warn); }
+  .trace-step.danger { border-left-color: var(--danger); background: #1c0c0c; }
+  .param-row { display: grid; grid-template-columns: 90px 1fr 90px 1fr; gap: 6px;
+               align-items: center; margin: 4px 0; }
+  .param-row label { color: var(--muted); font-size: 11px; }
+  input, select, textarea { background: #0d1117; color: var(--text); border: 1px solid var(--border);
+                            border-radius: 4px; padding: 4px 6px; font-size: 12px; font-family: inherit; }
+  textarea { width: 100%; resize: vertical; min-height: 40px; }
+  .bridge-line { padding: 6px 8px; background: var(--panel2); border-radius: 4px; margin: 4px 0;
+                 border-left: 2px solid var(--ok); font-size: 12px; }
+  .bridge-line .src { color: var(--muted); }
+  .bridge-line .arrow { color: var(--accent); margin: 0 6px; }
+  .note-card { padding: 8px; margin: 6px 0; background: var(--panel2); border-radius: 4px;
+               border-left: 3px solid var(--warn); font-size: 12px; }
+  .note-card.verbal { border-left-color: var(--accent); }
+  .note-card .meta { color: var(--muted); font-size: 10px; margin-top: 3px; }
+  .diff-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .diff-table th, .diff-table td { padding: 4px 6px; border: 1px solid var(--border); text-align: right; }
+  .diff-table th { background: var(--panel2); color: var(--muted); font-weight: normal; text-align: center; }
+  .diff-table td.anom { background: #2a0f0f; color: var(--danger); }
+  .diff-table td.diff-hi { background: #2a1a08; color: var(--warn); }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px;
+          background: var(--panel2); margin-right: 4px; }
+  .section-title { font-size: 11px; color: var(--muted); margin: 10px 0 4px 0;
+                   text-transform: uppercase; letter-spacing: 0.5px; }
+  .empty { color: var(--muted); padding: 20px; text-align: center; font-size: 12px; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .legend-item { display: inline-flex; align-items: center; margin-right: 12px; font-size: 11px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>📊 数列递推图表解释 · 建模教学助教工作台</h1>
+  <div class="btns">
+    <button onclick="loadSample()">🔄 载入样例（小岑题目清单）</button>
+    <button class="primary" onclick="refreshAll()">刷新全部分析</button>
+  </div>
+</header>
+
+<main>
+  <!-- LEFT: 题目清单（多版本） -->
+  <section class="panel">
+    <h2>📋 题目清单（按版本分组）
+      <span class="muted" id="groupCount"></span>
+    </h2>
+    <div id="questionGroups"></div>
+    <div class="section-title">⚠️ 影响结论的因素</div>
+    <div id="influencers"></div>
+  </section>
+
+  <!-- MIDDLE: 图表 & 对照 -->
+  <section class="panel">
+    <h2>📈 数列递推图（点击数据点追明细）
+      <span id="selectedGroupTitle" class="muted"></span>
+    </h2>
+
+    <div class="two-col">
+      <div>
+        <div class="section-title">参数组 A</div>
+        <div id="paramSetA">
+          <select id="psAselect" onchange="recomputeChart()"></select>
+          <div id="paramsAform" class="param-form"></div>
+        </div>
+      </div>
+      <div>
+        <div class="section-title">参数组 B</div>
+        <div id="paramSetB">
+          <select id="psBselect" onchange="recomputeChart()"></select>
+          <div id="paramsBform" class="param-form"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="chartWrap"><canvas id="seqChart"></canvas></div>
+    <div style="margin-top:6px;">
+      <span class="legend-item"><span class="legend-dot" style="background:#58a6ff"></span>参数组A</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#3fb950"></span>参数组B</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#f85149"></span>异常点（可点击）</span>
+    </div>
+
+    <div class="section-title">📊 两组参数逐点对照</div>
+    <div id="compareTable"></div>
+  </section>
+
+  <!-- RIGHT: 明细溯源 -->
+  <section class="panel">
+    <h2>🔍 点明细 / 溯源 <span class="muted" id="pointIdxLabel"></span></h2>
+    <div id="pointDetail" class="empty">点击图表上的数据点查看中间计算过程与单位换算</div>
+
+    <div class="section-title">🔗 原始说法 → 处理结果（小岑对接）</div>
+    <div id="bridgeView"></div>
+
+    <div class="section-title">📝 备注（持久化，重跑不丢失）</div>
+    <div style="margin-bottom:6px;">
+      <select id="noteTargetType">
+        <option value="question">关联题目</option>
+        <option value="answer">关联答案</option>
+        <option value="point">关联数据点</option>
+        <option value="material">关联材料</option>
+      </select>
+      <input id="noteTargetId" placeholder="目标ID" style="width:90px;"/>
+      <input id="noteContent" placeholder="备注/口头说明" style="width:140px;"/>
+      <button onclick="addNote()">添加</button>
+    </div>
+    <div id="notesList"></div>
+  </section>
+</main>
+
+<script>
+let state = {
+  groups: {}, coverage: {}, influencers: {}, bridges: [],
+  paramSets: [], questions: [], answers: [], materials: [], notes: [],
+  selectedGroup: null, selectedPoint: null,
+  seqResultA: null, seqResultB: null, chart: null,
+  compareResult: null
+};
+
+const API = "/api";
+async function getJSON(u){ return (await fetch(u)).json(); }
+async function postJSON(u, b){ return (await fetch(u,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)})).json(); }
+
+async function loadSample() {
+  await postJSON(API + "/sample/load", {});
+  await refreshAll();
+}
+
+async function refreshAll() {
+  [state.groups, state.coverage, state.influencers, state.bridges,
+   state.paramSets, state.questions, state.answers, state.materials, state.notes] = await Promise.all([
+    getJSON(API + "/analysis/groups"),
+    getJSON(API + "/analysis/coverage"),
+    getJSON(API + "/analysis/influencers"),
+    getJSON(API + "/analysis/bridge"),
+    getJSON(API + "/param_sets"),
+    getJSON(API + "/questions"),
+    getJSON(API + "/answers"),
+    getJSON(API + "/materials"),
+    getJSON(API + "/notes"),
+  ]);
+  renderGroups();
+  renderInfluencers();
+  renderParamSelectors();
+  renderNotes();
+  await recomputeChart();
+}
+
+function renderGroups() {
+  const box = document.getElementById("questionGroups");
+  const keys = Object.keys(state.groups);
+  document.getElementById("groupCount").textContent = `共 ${keys.length} 组`;
+  box.innerHTML = keys.map(k => {
+    const g = state.groups[k];
+    const cov = state.coverage[k] || {};
+    const isMulti = g.coverage.includes("版本");
+    const hasProblem = (cov.missing_versions||[]).length > 0 ||
+                        Object.keys(cov.renamed_materials_affecting||{}).length > 0;
+    const cls = "group-card " + (hasProblem ? "problem " : "") + (isMulti ? "multi" : "");
+    const activeCls = state.selectedGroup === k ? " active" : "";
+    return `<div class="${cls}${activeCls}" onclick="selectGroup('${k}')">
+      <div style="font-weight:600;">${g.title || '（无题）'}</div>
+      <div class="muted" style="margin:3px 0;">指纹: ${k.slice(0,24)}…</div>
+      <div>
+        ${(g.version_labels||[]).map(v=>`<span class="tag ${isMulti?'ok':''}">${v}</span>`).join("")}
+        ${(cov.missing_versions||[]).map(v=>`<span class="tag danger">缺${v}</span>`).join("")}
+      </div>
+      ${Object.keys(cov.renamed_materials_affecting||{}).length ?
+        `<div class="muted" style="margin-top:4px;">⚠️ ${Object.keys(cov.renamed_materials_affecting).length} 份改名材料影响结论</div>`:""}
+    </div>`;
+  }).join("") || `<div class="empty">暂无题目清单，点「载入样例」</div>`;
+}
+
+function renderInfluencers() {
+  const box = document.getElementById("influencers");
+  const parts = [];
+  if ((state.influencers.questions_old||[]).length) {
+    parts.push(`<div class="note-card"><b>📜 旧版题目清单混入</b><br/>` +
+      state.influencers.questions_old.map(q =>
+        `<div>· ${q.title}<br/>` +
+        `<span class="muted">当前版 ${q.current_version}，旧版：` +
+        q.old_versions.map(o=>`${o.version}(${o.diff})`).join(", ") + `</span></div>`
+      ).join("") + `</div>`);
+  }
+  if ((state.influencers.materials||[]).length) {
+    parts.push(`<div class="note-card"><b>🔄 临时/历史改名材料</b><br/>` +
+      state.influencers.materials.map(m =>
+        `<div>· <b>${m.current_name}</b>` +
+        (m.is_temporary_rename?` <span class="tag warn">临时改名</span>`:"") +
+        `<br/><span class="muted">曾用: ${(m.previous_names||[]).join(" → ") || "无"} · ${m.rename_time||''} ${m.renamed_by||''}</span></div>`
+      ).join("") + `</div>`);
+  }
+  if ((state.influencers.notes||[]).length) {
+    parts.push(`<div class="note-card"><b>💬 口头备注</b><br/>` +
+      state.influencers.notes.map(n=>
+        `<div>· ${n.content}<br/><span class="muted">${n.author||''} · ${n.timestamp||''}</span></div>`
+      ).join("") + `</div>`);
+  }
+  box.innerHTML = parts.join("") || `<div class="muted">未检测到明显干扰因素</div>`;
+}
+
+function renderParamSelectors() {
+  const mkOpts = () => state.paramSets.map(p =>
+    `<option value="${p.pid}">${p.name}</option>`).join("");
+  document.getElementById("psAselect").innerHTML = mkOpts();
+  document.getElementById("psBselect").innerHTML = mkOpts();
+  if (state.paramSets[0]) document.getElementById("psAselect").value = state.paramSets[0].pid;
+  if (state.paramSets[1]) document.getElementById("psBselect").value = state.paramSets[1].pid;
+  renderParamForm("A"); renderParamForm("B");
+}
+
+function renderParamForm(which) {
+  const box = document.getElementById("params" + which + "form");
+  const sel = document.getElementById("ps" + which + "select");
+  const ps = state.paramSets.find(p => p.pid === sel.value);
+  if (!ps) { box.innerHTML = ""; return; }
+  const p = ps.params || {};
+  const uc = ps.unit_config || {};
+  box.innerHTML = `
+    <div class="param-row"><label>递推步长</label><input id="p${which}_length" type="number" value="${p.length||20}"/>
+                        <label>a系数</label><input id="p${which}_a" type="number" step="any" value="${p.a||1}"/></div>
+    <div class="param-row"><label>b常数</label><input id="p${which}_b" type="number" step="any" value="${p.b||0}"/>
+                        <label>c除数</label><input id="p${which}_c" type="number" step="any" value="${p.c_divisor||1}"/></div>
+    <div class="param-row"><label>初值x₀</label><input id="p${which}_x0" type="number" step="any" value="${p.x0||1}"/>
+                        <label>输入单位</label><input id="p${which}_uin" value="${uc.input||''}"/></div>
+    <div class="param-row"><label>输出单位</label><input id="p${which}_uout" value="${uc.output||''}"/>
+                        <label>输入换算</label><input id="p${which}_sin" type="number" step="any" value="${uc.scale_input||1}"/></div>
+    <div class="param-row"><label>输出换算</label><input id="p${which}_sout" type="number" step="any" value="${uc.scale_output||1}"/>
+                        <label></label><button onclick="recomputeChart()">重新计算</button></div>
+  `;
+  ["A","B"].forEach(w => {
+    document.getElementById("ps"+w+"select").onchange = () => { renderParamForm(w); recomputeChart(); };
+  });
+}
+
+function collectParam(which) {
+  return {
+    params: {
+      length: +document.getElementById("p"+which+"_length").value,
+      a: +document.getElementById("p"+which+"_a").value,
+      b: +document.getElementById("p"+which+"_b").value,
+      c_divisor: +document.getElementById("p"+which+"_c").value,
+      x0: +document.getElementById("p"+which+"_x0").value,
+    },
+    unit_config: {
+      input: document.getElementById("p"+which+"_uin").value,
+      output: document.getElementById("p"+which+"_uout").value,
+      scale_input: +document.getElementById("p"+which+"_sin").value,
+      scale_output: +document.getElementById("p"+which+"_sout").value,
+    }
+  };
+}
+
+async function recomputeChart() {
+  renderParamForm("A"); renderParamForm("B");
+  const a = collectParam("A"); const b = collectParam("B");
+  state.seqResultA = await postJSON(API + "/analysis/compute", {...a, param_set_id: "psA"});
+  state.seqResultB = await postJSON(API + "/analysis/compute", {...b, param_set_id: "psB"});
+  state.compareResult = await postJSON(API + "/analysis/compare",
+    {param_set_ids: ["psA","psB"]});
+  drawChart();
+  renderCompare();
+  renderBridge();
+}
+
+function drawChart() {
+  const ctx = document.getElementById("seqChart").getContext("2d");
+  if (state.chart) state.chart.destroy();
+  const ptsA = state.seqResultA.points || [];
+  const ptsB = state.seqResultB.points || [];
+  const buildDs = (pts, color, label) => ({
+    label, data: pts.map(p => p.value), borderColor: color,
+    backgroundColor: pts.map(p => p.is_anomaly ? "#f85149" : color + "33"),
+    pointRadius: pts.map(p => p.is_anomaly ? 7 : 3),
+    pointHoverRadius: 8,
+    pointBackgroundColor: pts.map(p => p.is_anomaly ? "#f85149" : color),
+    pointBorderColor: pts.map(p => p.is_anomaly ? "#fff" : color),
+    borderWidth: 2, tension: 0.15, fill: false
+  });
+  state.chart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: ptsA.map((_,i)=>i),
+      datasets: [
+        buildDs(ptsA, "#58a6ff", "参数组A"),
+        buildDs(ptsB, "#3fb950", "参数组B")
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      onClick: (evt, elems) => {
+        if (!elems.length) return;
+        const el = elems[0];
+        const dsIdx = el.datasetIndex;
+        const idx = el.index;
+        selectPoint(dsIdx, idx);
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const ds = ctx.datasetIndex === 0 ? state.seqResultA : state.seqResultB;
+              const p = ds.points[ctx.dataIndex];
+              let s = `${ctx.dataset.label}: x[${ctx.dataIndex}] = ${ctx.formattedValue}${p.unit?" "+p.unit:""}`;
+              if (p.is_anomaly) s += ` ⚠️${p.anomaly_type}: ${p.anomaly_detail}`;
+              return s;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: "#30363d" }, ticks: { color: "#8b949e" } },
+        y: { grid: { color: "#30363d" }, ticks: { color: "#8b949e" } }
+      }
+    }
+  });
+}
+
+function selectPoint(dsIdx, idx) {
+  state.selectedPoint = { dsIdx, idx };
+  const ds = dsIdx === 0 ? state.seqResultA : state.seqResultB;
+  const p = ds.points[idx];
+  document.getElementById("pointIdxLabel").textContent =
+    `(${dsIdx===0?"A":"B"}) 第 ${idx} 项`;
+  const traces = ds.calc_traces[idx] || {steps: []};
+  const dirty = ds.dirty_points.find(d=>d.index===idx);
+  document.getElementById("pointDetail").innerHTML = `
+    <div class="detail-box">
+      <h3>📦 数据点</h3>
+      <div><b>值:</b> ${p.value} ${p.unit?"("+p.unit+")":""}</div>
+      <div><b>原始值:</b> ${p.raw_value}</div>
+      <div><b>来源题目:</b> ${p.source_qid||'—'} · 答案 ${p.source_aid||'—'}</div>
+      ${p.is_anomaly ? `<div class="tag danger">${p.anomaly_type}</div><div class="muted">${p.anomaly_detail}</div>`:""}
+    </div>
+    ${dirty ? `<div class="detail-box">
+      <h3 style="color:var(--danger)">⚠️ 脏数据检测</h3>
+      ${dirty.issues.map(it=>`<div class="trace-step danger">
+        <b>[${it.severity}]</b> ${it.type} — ${it.detail}
+      </div>`).join("")}
+    </div>`:""}
+    <div class="detail-box">
+      <h3>🧮 中间计算过程 · 单位换算</h3>
+      ${traces.unit_conversion ? `<div class="trace-step warn">
+        <b>单位换算:</b> ${traces.unit_conversion.detail}
+      </div>`:""}
+      ${(traces.steps||[]).map(s=>`<div class="trace-step ${s.warning?'danger':''}">
+        <b>步${s.step}·${s.description||''}</b><br/>
+        <span style="color:var(--accent)">${s.formula_display||s.formula||''}</span>
+        ${s.warning?`<br/><span style="color:var(--danger)">${s.warning}</span>`:""}
+        ${s.intermediate && Object.keys(s.intermediate).length?
+          `<br/><span class="muted">中间量: ${JSON.stringify(s.intermediate)}</span>`:""}
+      </div>`).join("")}
+    </div>
+    <div class="detail-box">
+      <h3>🔙 溯源材料</h3>
+      ${renderTraceBack(p)}
+    </div>
+  `;
+  document.getElementById("noteTargetType").value = "point";
+  document.getElementById("noteTargetId").value = `${dsIdx===0?"A":"B"}_${idx}`;
+}
+
+function renderTraceBack(p) {
+  const q = state.questions.find(q=>q.qid===p.source_qid);
+  const a = state.answers.find(a=>a.aid===p.source_aid);
+  const m = a ? state.materials.find(m=>m.mid===a.material_mid) : null;
+  const relNotes = state.notes.filter(n =>
+    (n.target_type==="question" && n.target_id===p.source_qid) ||
+    (n.target_type==="answer" && n.target_id===p.source_aid) ||
+    (n.target_type==="material" && n.target_id=== (m&&m.mid))
+  );
+  return `
+    ${q ? `<div><b>题目 ${q.qid}</b> (${q.version||""})<br/>
+      <span class="muted">${q.original_text||''}</span></div>`:""}
+    ${a ? `<div style="margin-top:6px;"><b>答案 ${a.aid}</b> (${a.version||""})<br/>
+      <span class="muted">处理结果: ${a.processed_result||''}</span><br/>
+      <span class="muted">单位换算: ${a.unit_conversion||''}</span></div>`:""}
+    ${m ? `<div style="margin-top:6px;"><b>材料 ${m.mid}</b>: ${m.current_name}
+      ${m.is_temporary_rename?' <span class="tag warn">临时改名</span>':''}
+      ${(m.previous_names||[]).length?`<br/><span class="muted">曾用: ${m.previous_names.join(" → ")}</span>`:""}</div>`:""}
+    ${relNotes.length ? `<div style="margin-top:6px;"><b>相关备注</b><br/>
+      ${relNotes.map(n=>`<span class="pill">${n.note_type||''}</span>${n.content} <span class="muted">(${n.timestamp||''})</span><br/>`).join("")}</div>`:""}
+  `;
+}
+
+function renderCompare() {
+  const r = state.compareResult || {};
+  const box = document.getElementById("compareTable");
+  if (!r.diff_rows) { box.innerHTML = ""; return; }
+  box.innerHTML = `
+    <div class="muted" style="margin-bottom:4px;">
+      共 ${r.summary.total_points} 点；差异点 ${r.summary.points_with_difference}；
+      A组异常 ${r.summary.anomalies_set1}，B组异常 ${r.summary.anomalies_set2}
+    </div>
+    <div style="max-height:220px; overflow:auto;">
+    <table class="diff-table">
+      <tr><th>i</th><th>${r.set1_name}</th><th>${r.set2_name}</th><th>|Δ|</th><th>相对差</th></tr>
+      ${r.diff_rows.slice(0,50).map(row => `
+        <tr>
+          <td>${row.index}</td>
+          <td class="${row.anomaly_1?'anom':''}">${row.v1==null?'—':row.v1.toFixed(5)}</td>
+          <td class="${row.anomaly_2?'anom':''}">${row.v2==null?'—':row.v2.toFixed(5)}</td>
+          <td>${row.abs_diff==null?'—':row.abs_diff.toExponential(2)}</td>
+          <td class="${row.rel_diff!=null && row.rel_diff>1e-3?'diff-hi':''}">${row.rel_diff==null?'—':(row.rel_diff*100).toFixed(3)+'%'}</td>
+        </tr>`).join("")}
+    </table></div>
+    <div class="section-title">参数差异</div>
+    <div>${Object.entries(r.params_diff||{}).map(([k,v])=>
+      `<span class="pill ${v.different?'tag warn':''}">${k}: ${v.set1} ${v.different?'≠':'='} ${v.set2}</span>`
+    ).join("")}</div>
+  `;
+}
+
+function selectGroup(k) {
+  state.selectedGroup = k;
+  const g = state.groups[k];
+  document.getElementById("selectedGroupTitle").textContent = "· " + (g.title||k);
+  renderGroups();
+  renderBridge();
+}
+
+function renderBridge() {
+  const box = document.getElementById("bridgeView");
+  const list = state.selectedGroup
+    ? state.bridges.filter(b => state.groups[state.selectedGroup].qids.includes(b.qid))
+    : state.bridges;
+  if (!list.length) { box.innerHTML = `<div class="empty">选择左侧题目组查看对接</div>`; return; }
+  box.innerHTML = list.slice(0,3).map(b => `
+    <div class="detail-box">
+      <h3>${b.question_title} <span class="tag">题${b.question_version}</span>
+        <span class="tag ok">答${b.answer_version}</span></h3>
+      <div class="muted" style="margin-bottom:6px;">题目原文:</div>
+      <div style="font-size:12px;">${b.original_text}</div>
+      <div class="section-title">原始说法 → 处理结果（${b.bridge.match_count} 处对应）</div>
+      ${b.bridge.mappings.map(m=>`
+        <div class="bridge-line">
+          <span class="src">题: ${m.from_original}</span>
+          <span class="arrow">➜</span>
+          <span><b>${m.extracted_param}</b>=${m.param_value}</span>
+        </div>`).join("")}
+      ${b.bridge.conversion_note ? `<div class="muted">单位换算: ${b.bridge.conversion_note}</div>`:""}
+      <div class="section-title">答案原文</div>
+      <div style="font-size:12px;">${b.answer_text}</div>
+      <div class="section-title">截图说明中的处理结果</div>
+      <div style="font-size:12px;color:var(--ok);">${b.processed_result}</div>
+      ${(b.question_notes||[]).concat(b.answer_notes||[]).map(n =>
+        `<div class="note-card ${n.note_type==='verbal'?'verbal':''}">${n.content}
+         <div class="meta">${n.note_type||''} · ${n.author||''} · ${n.timestamp||''}</div></div>`).join("")}
+    </div>
+  `).join("");
+}
+
+function renderNotes() {
+  document.getElementById("notesList").innerHTML =
+    (state.notes||[]).slice().reverse().map(n => `
+      <div class="note-card ${n.note_type==='verbal'?'verbal':''}">
+        <div><span class="pill">${n.target_type||''}:${n.target_id||''}</span>
+             <span class="tag ${n.note_type==='verbal'?'':'ok'}">${n.note_type||''}</span></div>
+        <div style="margin-top:3px;">${n.content}</div>
+        <div class="meta">${n.author||''} · ${n.timestamp||''}</div>
+      </div>`).join("") || `<div class="muted">暂无备注，重跑不会丢失</div>`;
+}
+
+async function addNote() {
+  const n = {
+    target_type: document.getElementById("noteTargetType").value,
+    target_id: document.getElementById("noteTargetId").value,
+    content: document.getElementById("noteContent").value,
+    note_type: "verbal", author: "小岑"
+  };
+  if (!n.content) return;
+  await postJSON(API + "/notes/add", n);
+  state.notes = await getJSON(API + "/notes");
+  document.getElementById("noteContent").value = "";
+  renderNotes();
+  renderInfluencers();
+  if (state.selectedPoint) selectPoint(state.selectedPoint.dsIdx, state.selectedPoint.idx);
+  renderBridge();
+}
+
+refreshAll();
+</script>
+</body>
+</html>

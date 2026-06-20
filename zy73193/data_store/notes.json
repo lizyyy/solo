@@ -1,0 +1,46 @@
+[
+  {
+    "nid": "note_001",
+    "target_type": "question",
+    "target_id": "Q001_v2024",
+    "content": "现场老师口头说：这次Q001的单位一定注意要从m换算到cm，旧版题目没提这个。",
+    "note_type": "verbal",
+    "author": "小岑",
+    "timestamp": "2026-06-19 09:15:22",
+    "attachments": []
+  },
+  {
+    "nid": "note_002",
+    "target_type": "material",
+    "target_id": "M001",
+    "content": "截图说明：答案集v3把c_divisor从2改成了1，是老师上周临时改的，口头通知未更新文档标题。",
+    "note_type": "screenshot",
+    "author": "小岑",
+    "timestamp": "2026-06-19 10:02:11",
+    "attachments": [
+      {
+        "type": "screenshot",
+        "name": "v3改动截图.png"
+      }
+    ]
+  },
+  {
+    "nid": "note_003",
+    "target_type": "answer",
+    "target_id": "A001",
+    "content": "小岑备注：除零检查要留意，c_divisor+x_n不能为0，在x_n=-1附近会出问题。",
+    "note_type": "internal",
+    "author": "小岑",
+    "timestamp": "2026-06-19 11:30:05",
+    "attachments": []
+  },
+  {
+    "target_type": "question",
+    "target_id": "Q001_v2024",
+    "content": "现场老师补充：除零情况一定要高亮展示给学生，不能跳过。",
+    "note_type": "verbal",
+    "author": "小岑",
+    "timestamp": "2026-06-20T13:01:01",
+    "nid": "note_18688"
+  }
+]

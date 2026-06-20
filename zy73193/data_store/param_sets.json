@@ -1,0 +1,62 @@
+[
+  {
+    "pid": "ps_A001_2024",
+    "name": "2024版Q001 (m→cm)",
+    "qid": "Q001_v2024",
+    "aid": "A001",
+    "params": {
+      "length": 20,
+      "a": 2.0,
+      "b": 1.0,
+      "c_divisor": 1.0,
+      "x0": 3.0
+    },
+    "unit_config": {
+      "input": "m",
+      "output": "cm",
+      "scale_input": 1.0,
+      "scale_output": 100.0
+    },
+    "sequence": []
+  },
+  {
+    "pid": "ps_A002_2023",
+    "name": "2023旧版Q001 (m)",
+    "qid": "Q001_v2023",
+    "aid": "A002",
+    "params": {
+      "length": 15,
+      "a": 2.0,
+      "b": 1.0,
+      "c_divisor": 1.0,
+      "x0": 3.0
+    },
+    "unit_config": {
+      "input": "m",
+      "output": "m",
+      "scale_input": 1.0,
+      "scale_output": 1.0
+    },
+    "sequence": []
+  },
+  {
+    "pid": "ps_div0_demo",
+    "name": "除零演示 (x_n→-1)",
+    "qid": "Q001_v2024",
+    "aid": "A001",
+    "params": {
+      "length": 10,
+      "a": 1.0,
+      "b": 0.0,
+      "c_divisor": 1.0,
+      "x0": -1.0
+    },
+    "unit_config": {
+      "input": "",
+      "output": "",
+      "scale_input": 1.0,
+      "scale_output": 1.0
+    },
+    "sequence": []
+  }
+]

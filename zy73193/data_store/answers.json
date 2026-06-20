@@ -1,0 +1,50 @@
+[
+  {
+    "aid": "A001",
+    "qid": "Q001_v2024",
+    "material_mid": "M001",
+    "version": "v3",
+    "answer_text": "递推式 x_{n+1} = (2·x_n + 1) / (1 + x_n)，x_0 = 3m。按1m=100cm换算。",
+    "processed_result": "x_n 收敛到 1.618...（黄金比，单位 cm：161.8 cm）。前20项已在截图中列出。",
+    "unit_conversion": "输入单位 m → 计算单位 m → 输出 ×100 → cm；1m = 100cm",
+    "params": {
+      "length": 20,
+      "a": 2.0,
+      "b": 1.0,
+      "c_divisor": 1.0,
+      "x0": 3.0
+    }
+  },
+  {
+    "aid": "A002",
+    "qid": "Q001_v2023",
+    "material_mid": "M002",
+    "version": "2023std",
+    "answer_text": "递推式 x_{n+1} = (2·x_n + 1) / (1 + x_n)，x_0 = 3，单位为米。",
+    "processed_result": "x_n 收敛到约 1.618（单位 m）。给出前15项。",
+    "unit_conversion": "无换算，单位始终为 m",
+    "params": {
+      "length": 15,
+      "a": 2.0,
+      "b": 1.0,
+      "c_divisor": 1.0,
+      "x0": 3.0
+    }
+  },
+  {
+    "aid": "A003",
+    "qid": "Q002",
+    "material_mid": "M003",
+    "version": "v1",
+    "answer_text": "x_{n+1} = 0.5 x_n + 2，x_0 = 10",
+    "processed_result": "收敛到 4。",
+    "unit_conversion": "",
+    "params": {
+      "length": 10,
+      "a": 0.5,
+      "b": 2.0,
+      "c_divisor": 0.0,
+      "x0": 10.0
+    }
+  }
+]
