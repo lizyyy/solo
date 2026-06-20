@@ -1,13 +1,45 @@
-import { useState } from 'react';
-import { Download, FileJson, FileSpreadsheet, Eye, Check } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Download, FileJson, FileSpreadsheet, Eye, Check, Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { useRecordStore } from '../store/useRecordStore';
 import { exportToCsv, exportToJson, defaultExportFields, getExportPreview } from '../utils/exportUtil';
 import { StatusBadge } from '../components/common/StatusBadge';
+import { fetchRecords, syncToServer } from '../utils/apiClient';
 
 export default function Export() {
   const { records } = useRecordStore();
   const [format, setFormat] = useState<'csv' | 'json'>('csv');
   const [showPreview, setShowPreview] = useState(false);
+  const [apiStatus, setApiStatus] = useState<'unknown' | 'connected' | 'disconnected'>('unknown');
+  const [apiData, setApiData] = useState<any>(null);
+  const [apiLoading, setApiLoading] = useState(false);
+
+  const checkApiAndFetch = async () => {
+    setApiLoading(true);
+    try {
+      const result = await fetchRecords();
+      setApiStatus('connected');
+      setApiData(result);
+    } catch {
+      setApiStatus('disconnected');
+      setApiData(null);
+    }
+    setApiLoading(false);
+  };
+
+  const handleSyncToServer = async () => {
+    setApiLoading(true);
+    try {
+      await syncToServer(records, '阿宁', true);
+      await checkApiAndFetch();
+    } catch {
+      setApiStatus('disconnected');
+    }
+    setApiLoading(false);
+  };
+
+  useEffect(() => {
+    checkApiAndFetch();
+  }, []);
 
   const preview = getExportPreview(records);
 
@@ -176,6 +208,36 @@ export default function Export() {
               <strong>数据源一致性说明：</strong>
               本系统所有展示页面、导出功能、接口返回均读取同一份 Zustand Store 数据，确保引用链接404仍被判通过等异常记录在各处显示完全一致，不会出现一个地方显示异常、另一个地方消失的情况。
             </p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-semibold text-slate-900">API 接口状态</h4>
+              <div className="flex items-center gap-2">
+                {apiStatus === 'connected' ? (
+                  <span className="flex items-center gap-1 text-xs text-emerald-600"><Wifi className="w-3.5 h-3.5" /> 已连接</span>
+                ) : apiStatus === 'disconnected' ? (
+                  <span className="flex items-center gap-1 text-xs text-rose-600"><WifiOff className="w-3.5 h-3.5" /> 未连接</span>
+                ) : (
+                  <span className="text-xs text-slate-400">检测中...</span>
+                )}
+                <button onClick={checkApiAndFetch} disabled={apiLoading}
+                  className="p-1 rounded hover:bg-slate-100 text-slate-500 disabled:opacity-50">
+                  <RefreshCw className={`w-3.5 h-3.5 ${apiLoading ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
+            </div>
+            <button onClick={handleSyncToServer} disabled={apiLoading}
+              className="w-full py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 disabled:opacity-50 mb-3">
+              同步当前数据到 API 服务
+            </button>
+            {apiData && apiData.success && (
+              <div className="p-3 bg-slate-50 rounded-lg">
+                <p className="text-xs text-slate-500 mb-1">API 返回记录数：<span className="font-bold text-slate-900">{apiData.total}</span></p>
+                <p className="text-xs text-slate-500 mb-1">前端 Store 记录数：<span className="font-bold text-slate-900">{records.length}</span></p>
+                <p className="text-xs text-slate-500">数据一致性：<span className={`font-bold ${apiData.total === records.length ? 'text-emerald-600' : 'text-rose-600'}`}>{apiData.total === records.length ? '一致' : '不一致'}</span></p>
+              </div>
+            )}
           </div>
         </div>
       </div>

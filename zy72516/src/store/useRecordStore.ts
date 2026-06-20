@@ -432,3 +432,15 @@ export const useRecordStore = create<RecordState>()(
     }
   )
 );
+
+let syncTimer: ReturnType<typeof setTimeout> | null = null;
+
+useRecordStore.subscribe((state) => {
+  if (syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(async () => {
+    try {
+      const { syncToServer } = await import('../utils/apiClient');
+      await syncToServer(state.records, state.currentOperator, state.initialized);
+    } catch {}
+  }, 1000);
+});

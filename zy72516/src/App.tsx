@@ -18,6 +18,7 @@ export default function App() {
           <Route path="/workbench" element={<Workbench />} />
           <Route path="/conflicts" element={<Conflicts />} />
           <Route path="/export" element={<Export />} />
+          <Route path="/report" element={<Report />} />
           <Route path="/rules" element={<Rules />} />
         </Route>
       </Routes>

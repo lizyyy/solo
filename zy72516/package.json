@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:api": "npx tsx server/index.ts",
+    "dev:all": "npx tsx server/index.ts & vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -13,6 +15,8 @@
   "dependencies": {
     "@types/papaparse": "^5.5.2",
     "clsx": "^2.1.1",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "lucide-react": "^0.511.0",
     "papaparse": "^5.5.3",
     "react": "^18.3.1",
@@ -23,6 +27,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
     "@types/node": "^22.15.30",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
@@ -35,6 +41,7 @@
     "globals": "^16.0.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.22.4",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.30.1",
     "vite": "^6.3.5",

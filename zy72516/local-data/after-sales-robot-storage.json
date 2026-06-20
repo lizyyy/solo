@@ -1,0 +1,438 @@
+{
+  "records": [
+    {
+      "id": "70sv3samet",
+      "originalLineNumber": 1,
+      "annotatorMessage": "用户反馈退款未到账，需要重新核实",
+      "referenceUrl": "https://example.com/order/123",
+      "urlStatus": true,
+      "robotJudgment": "通过：用户诉求合理，同意退款",
+      "currentStatus": "pending",
+      "abnormalType": "none",
+      "modelOutputMissing": false,
+      "judgmentLogs": [
+        {
+          "id": "59ko3wi5k2n",
+          "recordId": "70sv3samet",
+          "operator": "阿宁",
+          "action": "model_output_fill",
+          "remark": "补录模型输出：GPT-4",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "fromSnapshot": {
+            "annotatorMessage": "用户反馈退款未到账，需要重新核实",
+            "referenceUrl": "https://example.com/order/123",
+            "urlStatus": true,
+            "robotJudgment": "通过：用户诉求合理，同意退款",
+            "status": "pending",
+            "abnormalType": "none"
+          },
+          "toSnapshot": {
+            "annotatorMessage": "用户反馈退款未到账，需要重新核实",
+            "referenceUrl": "https://example.com/order/123",
+            "urlStatus": true,
+            "robotJudgment": "通过：用户诉求合理，同意退款",
+            "modelOutputSnippet": "根据用户留言分析，该问题属于退款未到账范畴。建议核实用户订单支付状态和退款流水，确认退款是否已发起。如未发起，需重新提交退款申请。",
+            "modelOutputName": "GPT-4",
+            "modelOutputConfidence": 0.8,
+            "status": "pending",
+            "abnormalType": "none"
+          },
+          "diffSummary": [
+            "模型输出从暂无更新为\"根据用户留言分析，该问题属于退款未到账范...\"",
+            "模型名称从未设置更新为GPT-4",
+            "置信度从无更新为80.0%"
+          ],
+          "operatedAt": "2026-06-20T16:40:48.447Z"
+        }
+      ],
+      "rawData": {
+        "lineNumber": 1,
+        "message": "用户反馈退款未到账，需要重新核实",
+        "url": "https://example.com/order/123",
+        "robotJudgment": "通过：用户诉求合理，同意退款"
+      },
+      "originalSnapshot": {
+        "annotatorMessage": "用户反馈退款未到账，需要重新核实",
+        "referenceUrl": "https://example.com/order/123",
+        "urlStatus": true,
+        "robotJudgment": "通过：用户诉求合理，同意退款",
+        "status": "pending",
+        "abnormalType": "none"
+      },
+      "createdAt": "2026-06-20T16:40:09.790Z",
+      "updatedAt": "2026-06-20T16:40:48.447Z",
+      "modelOutput": {
+        "id": "dg55a8v0lzd",
+        "recordId": "70sv3samet",
+        "modelName": "GPT-4",
+        "outputSnippet": "根据用户留言分析，该问题属于退款未到账范畴。建议核实用户订单支付状态和退款流水，确认退款是否已发起。如未发起，需重新提交退款申请。",
+        "confidence": 0.8,
+        "reasoningDetails": {},
+        "filledBy": "阿宁",
+        "filledAt": "2026-06-20T16:40:48.447Z",
+        "isBackfill": true
+      },
+      "lastOperator": "阿宁"
+    },
+    {
+      "id": "lk7cslf1czd",
+      "originalLineNumber": 2,
+      "annotatorMessage": "错口径：用户询问会员权益，回复内容不符合最新标准",
+      "referenceUrl": "https://example.com/refund/456",
+      "urlStatus": true,
+      "robotJudgment": "通过：问题已解决",
+      "currentStatus": "pending",
+      "abnormalType": "none",
+      "modelOutput": {
+        "id": "mfysouw7ig",
+        "recordId": "lk7cslf1czd",
+        "modelName": "Claude-3.5",
+        "outputSnippet": "根据用户留言分析，该问题属于售后问题范畴。建议按照7天无理由退换货政策处理，同时核实用户订单信息。",
+        "confidence": 0.9977458179509999,
+        "reasoningDetails": {
+          "category": "after_sales",
+          "urgency": "medium"
+        },
+        "filledAt": "2026-06-20T16:40:09.790Z"
+      },
+      "modelOutputMissing": false,
+      "judgmentLogs": [],
+      "rawData": {
+        "lineNumber": 2,
+        "message": "错口径：用户询问会员权益，回复内容不符合最新标准",
+        "url": "https://example.com/refund/456",
+        "robotJudgment": "通过：问题已解决"
+      },
+      "originalSnapshot": {
+        "annotatorMessage": "错口径：用户询问会员权益，回复内容不符合最新标准",
+        "referenceUrl": "https://example.com/refund/456",
+        "urlStatus": true,
+        "robotJudgment": "通过：问题已解决",
+        "modelOutputSnippet": "根据用户留言分析，该问题属于售后问题范畴。建议按照7天无理由退换货政策处理，同时核实用户订单信息。",
+        "modelOutputName": "Claude-3.5",
+        "modelOutputConfidence": 0.9977458179509999,
+        "status": "pending",
+        "abnormalType": "none"
+      },
+      "createdAt": "2026-06-20T16:40:09.790Z",
+      "updatedAt": "2026-06-20T16:40:09.790Z"
+    },
+    {
+      "id": "kl2msfrjd3e",
+      "originalLineNumber": 3,
+      "annotatorMessage": "需要补录：缺少订单编号信息",
+      "referenceUrl": "https://example.com/product/789",
+      "urlStatus": true,
+      "robotJudgment": "通过：符合退换货条件",
+      "currentStatus": "pending",
+      "abnormalType": "none",
+      "modelOutput": {
+        "id": "q39l3lguryi",
+        "recordId": "kl2msfrjd3e",
+        "modelName": "Qwen-2.5",
+        "outputSnippet": "根据用户留言分析，该问题属于售后问题范畴。建议按照7天无理由退换货政策处理，同时核实用户订单信息。",
+        "confidence": 0.8849169828471897,
+        "reasoningDetails": {
+          "category": "after_sales",
+          "urgency": "medium"
+        },
+        "filledAt": "2026-06-20T16:40:09.790Z"
+      },
+      "modelOutputMissing": false,
+      "judgmentLogs": [],
+      "rawData": {
+        "lineNumber": 3,
+        "message": "需要补录：缺少订单编号信息",
+        "url": "https://example.com/product/789",
+        "robotJudgment": "通过：符合退换货条件"
+      },
+      "originalSnapshot": {
+        "annotatorMessage": "需要补录：缺少订单编号信息",
+        "referenceUrl": "https://example.com/product/789",
+        "urlStatus": true,
+        "robotJudgment": "通过：符合退换货条件",
+        "modelOutputSnippet": "根据用户留言分析，该问题属于售后问题范畴。建议按照7天无理由退换货政策处理，同时核实用户订单信息。",
+        "modelOutputName": "Qwen-2.5",
+        "modelOutputConfidence": 0.8849169828471897,
+        "status": "pending",
+        "abnormalType": "none"
+      },
+      "createdAt": "2026-06-20T16:40:09.790Z",
+      "updatedAt": "2026-06-20T16:40:09.790Z"
+    },
+    {
+      "id": "3u3xat8lf2n",
+      "originalLineNumber": 4,
+      "annotatorMessage": "用户投诉物流太慢，建议加强管理",
+      "referenceUrl": "https://example.com/help/policy",
+      "urlStatus": false,
+      "robotJudgment": "通过：已安抚用户",
+      "currentStatus": "pending",
+      "abnormalType": "none",
+      "modelOutput": {
+        "id": "gwkc2n5v5j8",
+        "recordId": "3u3xat8lf2n",
+        "modelName": "DeepSeek-V2",
+        "outputSnippet": "根据用户留言分析，该问题属于售后问题范畴。建议按照7天无理由退换货政策处理，同时核实用户订单信息。",
+        "confidence": 0.8497738478905648,
+        "reasoningDetails": {
+          "category": "after_sales",
+          "urgency": "medium"
+        },
+        "filledAt": "2026-06-20T16:40:09.790Z"
+      },
+      "modelOutputMissing": false,
+      "judgmentLogs": [],
+      "rawData": {
+        "lineNumber": 4,
+        "message": "用户投诉物流太慢，建议加强管理",
+        "url": "https://example.com/help/policy",
+        "robotJudgment": "通过：已安抚用户"
+      },
+      "originalSnapshot": {
+        "annotatorMessage": "用户投诉物流太慢，建议加强管理",
+        "referenceUrl": "https://example.com/help/policy",
+        "urlStatus": false,
+        "robotJudgment": "通过：已安抚用户",
+        "modelOutputSnippet": "根据用户留言分析，该问题属于售后问题范畴。建议按照7天无理由退换货政策处理，同时核实用户订单信息。",
+        "modelOutputName": "DeepSeek-V2",
+        "modelOutputConfidence": 0.8497738478905648,
+        "status": "pending",
+        "abnormalType": "none"
+      },
+      "createdAt": "2026-06-20T16:40:09.790Z",
+      "updatedAt": "2026-06-20T16:40:09.790Z"
+    },
+    {
+      "id": "um5wqf3lnw",
+      "originalLineNumber": 5,
+      "annotatorMessage": "返工：标注不完整，需要重新处理",
+      "referenceUrl": "https://example.com/user/feedback",
+      "urlStatus": true,
+      "robotJudgment": "驳回：不在服务范围内",
+      "currentStatus": "pending",
+      "abnormalType": "none",
+      "modelOutputMissing": true,
+      "judgmentLogs": [],
+      "rawData": {
+        "lineNumber": 5,
+        "message": "返工：标注不完整，需要重新处理",
+        "url": "https://example.com/user/feedback",
+        "robotJudgment": "驳回：不在服务范围内"
+      },
+      "originalSnapshot": {
+        "annotatorMessage": "返工：标注不完整，需要重新处理",
+        "referenceUrl": "https://example.com/user/feedback",
+        "urlStatus": true,
+        "robotJudgment": "驳回：不在服务范围内",
+        "status": "pending",
+        "abnormalType": "none"
+      },
+      "createdAt": "2026-06-20T16:40:09.790Z",
+      "updatedAt": "2026-06-20T16:40:09.790Z"
+    },
+    {
+      "id": "mx8b2gl0t3g",
+      "originalLineNumber": 6,
+      "annotatorMessage": "用户咨询售后政策，已按标准回复",
+      "referenceUrl": "https://example.com/order/123",
+      "urlStatus": true,
+      "robotJudgment": "驳回：需要用户提供更多信息",
+      "currentStatus": "pending",
+      "abnormalType": "none",
+      "modelOutput": {
+        "id": "4hh2btdsxlo",
+        "recordId": "mx8b2gl0t3g",
+        "modelName": "Claude-3.5",
+        "outputSnippet": "根据用户留言分析，该问题属于售后问题范畴。建议按照7天无理由退换货政策处理，同时核实用户订单信息。",
+        "confidence": 0.9184661021739035,
+        "reasoningDetails": {
+          "category": "after_sales",
+          "urgency": "medium"
+        },
+        "filledAt": "2026-06-20T16:40:09.790Z"
+      },
+      "modelOutputMissing": false,
+      "judgmentLogs": [],
+      "rawData": {
+        "lineNumber": 6,
+        "message": "用户咨询售后政策，已按标准回复",
+        "url": "https://example.com/order/123",
+        "robotJudgment": "驳回：需要用户提供更多信息"
+      },
+      "originalSnapshot": {
+        "annotatorMessage": "用户咨询售后政策，已按标准回复",
+        "referenceUrl": "https://example.com/order/123",
+        "urlStatus": true,
+        "robotJudgment": "驳回：需要用户提供更多信息",
+        "modelOutputSnippet": "根据用户留言分析，该问题属于售后问题范畴。建议按照7天无理由退换货政策处理，同时核实用户订单信息。",
+        "modelOutputName": "Claude-3.5",
+        "modelOutputConfidence": 0.9184661021739035,
+        "status": "pending",
+        "abnormalType": "none"
+      },
+      "createdAt": "2026-06-20T16:40:09.790Z",
+      "updatedAt": "2026-06-20T16:40:09.790Z"
+    },
+    {
+      "id": "0wjfd0z4sxp",
+      "originalLineNumber": 7,
+      "annotatorMessage": "不符合标准回复：7天无理由退换货政策解释错误",
+      "referenceUrl": "https://example.com/refund/456",
+      "urlStatus": true,
+      "robotJudgment": "通过：用户诉求合理，同意退款",
+      "currentStatus": "pending",
+      "abnormalType": "none",
+      "modelOutput": {
+        "id": "1ncqmm724zm",
+        "recordId": "0wjfd0z4sxp",
+        "modelName": "Qwen-2.5",
+        "outputSnippet": "根据用户留言分析，该问题属于售后问题范畴。建议按照7天无理由退换货政策处理，同时核实用户订单信息。",
+        "confidence": 0.9823765026498865,
+        "reasoningDetails": {
+          "category": "after_sales",
+          "urgency": "medium"
+        },
+        "filledAt": "2026-06-20T16:40:09.790Z"
+      },
+      "modelOutputMissing": false,
+      "judgmentLogs": [],
+      "rawData": {
+        "lineNumber": 7,
+        "message": "不符合标准回复：7天无理由退换货政策解释错误",
+        "url": "https://example.com/refund/456",
+        "robotJudgment": "通过：用户诉求合理，同意退款"
+      },
+      "originalSnapshot": {
+        "annotatorMessage": "不符合标准回复：7天无理由退换货政策解释错误",
+        "referenceUrl": "https://example.com/refund/456",
+        "urlStatus": true,
+        "robotJudgment": "通过：用户诉求合理，同意退款",
+        "modelOutputSnippet": "根据用户留言分析，该问题属于售后问题范畴。建议按照7天无理由退换货政策处理，同时核实用户订单信息。",
+        "modelOutputName": "Qwen-2.5",
+        "modelOutputConfidence": 0.9823765026498865,
+        "status": "pending",
+        "abnormalType": "none"
+      },
+      "createdAt": "2026-06-20T16:40:09.790Z",
+      "updatedAt": "2026-06-20T16:40:09.790Z"
+    },
+    {
+      "id": "z3ieu2h35zg",
+      "originalLineNumber": 8,
+      "annotatorMessage": "正常处理，用户表示满意",
+      "referenceUrl": "https://example.com/product/789",
+      "urlStatus": true,
+      "robotJudgment": "通过：问题已解决",
+      "currentStatus": "pending",
+      "abnormalType": "none",
+      "modelOutput": {
+        "id": "10dsuvuoicyl",
+        "recordId": "z3ieu2h35zg",
+        "modelName": "DeepSeek-V2",
+        "outputSnippet": "根据用户留言分析，该问题属于售后问题范畴。建议按照7天无理由退换货政策处理，同时核实用户订单信息。",
+        "confidence": 0.8138309988608898,
+        "reasoningDetails": {
+          "category": "after_sales",
+          "urgency": "medium"
+        },
+        "filledAt": "2026-06-20T16:40:09.790Z"
+      },
+      "modelOutputMissing": false,
+      "judgmentLogs": [],
+      "rawData": {
+        "lineNumber": 8,
+        "message": "正常处理，用户表示满意",
+        "url": "https://example.com/product/789",
+        "robotJudgment": "通过：问题已解决"
+      },
+      "originalSnapshot": {
+        "annotatorMessage": "正常处理，用户表示满意",
+        "referenceUrl": "https://example.com/product/789",
+        "urlStatus": true,
+        "robotJudgment": "通过：问题已解决",
+        "modelOutputSnippet": "根据用户留言分析，该问题属于售后问题范畴。建议按照7天无理由退换货政策处理，同时核实用户订单信息。",
+        "modelOutputName": "DeepSeek-V2",
+        "modelOutputConfidence": 0.8138309988608898,
+        "status": "pending",
+        "abnormalType": "none"
+      },
+      "createdAt": "2026-06-20T16:40:09.790Z",
+      "updatedAt": "2026-06-20T16:40:09.790Z"
+    },
+    {
+      "id": "cpwnzq5lgdb",
+      "originalLineNumber": 9,
+      "annotatorMessage": "重新标注：分类错误，应归为质量问题",
+      "referenceUrl": "https://example.com/help/policy",
+      "urlStatus": false,
+      "robotJudgment": "通过：符合退换货条件",
+      "currentStatus": "pending",
+      "abnormalType": "none",
+      "modelOutputMissing": true,
+      "judgmentLogs": [],
+      "rawData": {
+        "lineNumber": 9,
+        "message": "重新标注：分类错误，应归为质量问题",
+        "url": "https://example.com/help/policy",
+        "robotJudgment": "通过：符合退换货条件"
+      },
+      "originalSnapshot": {
+        "annotatorMessage": "重新标注：分类错误，应归为质量问题",
+        "referenceUrl": "https://example.com/help/policy",
+        "urlStatus": false,
+        "robotJudgment": "通过：符合退换货条件",
+        "status": "pending",
+        "abnormalType": "none"
+      },
+      "createdAt": "2026-06-20T16:40:09.790Z",
+      "updatedAt": "2026-06-20T16:40:09.790Z"
+    },
+    {
+      "id": "yrm4xg1w35",
+      "originalLineNumber": 10,
+      "annotatorMessage": "用户反映商品有瑕疵，已建议换货",
+      "referenceUrl": "https://example.com/user/feedback",
+      "urlStatus": true,
+      "robotJudgment": "通过：已安抚用户",
+      "currentStatus": "pending",
+      "abnormalType": "none",
+      "modelOutput": {
+        "id": "4246po8wip7",
+        "recordId": "yrm4xg1w35",
+        "modelName": "Claude-3.5",
+        "outputSnippet": "根据用户留言分析，该问题属于售后问题范畴。建议按照7天无理由退换货政策处理，同时核实用户订单信息。",
+        "confidence": 0.9646796836975834,
+        "reasoningDetails": {
+          "category": "after_sales",
+          "urgency": "medium"
+        },
+        "filledAt": "2026-06-20T16:40:09.790Z"
+      },
+      "modelOutputMissing": false,
+      "judgmentLogs": [],
+      "rawData": {
+        "lineNumber": 10,
+        "message": "用户反映商品有瑕疵，已建议换货",
+        "url": "https://example.com/user/feedback",
+        "robotJudgment": "通过：已安抚用户"
+      },
+      "originalSnapshot": {
+        "annotatorMessage": "用户反映商品有瑕疵，已建议换货",
+        "referenceUrl": "https://example.com/user/feedback",
+        "urlStatus": true,
+        "robotJudgment": "通过：已安抚用户",
+        "modelOutputSnippet": "根据用户留言分析，该问题属于售后问题范畴。建议按照7天无理由退换货政策处理，同时核实用户订单信息。",
+        "modelOutputName": "Claude-3.5",
+        "modelOutputConfidence": 0.9646796836975834,
+        "status": "pending",
+        "abnormalType": "none"
+      },
+      "createdAt": "2026-06-20T16:40:09.790Z",
+      "updatedAt": "2026-06-20T16:40:09.790Z"
+    }
+  ],
+  "currentOperator": "阿宁",
+  "initialized": true
+}

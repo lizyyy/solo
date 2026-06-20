@@ -17,7 +17,7 @@ import {
   ChevronUp
 } from 'lucide-react';
 import { useRecordStore } from '../store/useRecordStore';
-import { AnnotationRecord, RecordStatus, LogAction, LogActionLabelMap, StatusLabelMap, ContentSnapshot } from '../types';
+import { AnnotationRecord, RecordStatus, LogActionLabelMap, StatusLabelMap } from '../types';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { AbnormalTypeBadge } from '../components/common/AbnormalTypeBadge';
 
@@ -58,6 +58,26 @@ export default function Workbench() {
 
   const handleNext = () => {
     setCurrentIndex(prev => Math.min(pendingRecords.length - 1, prev + 1));
+  };
+
+  const handleFillModelOutput = () => {
+    if (!currentRecord || !fillModelName || !fillOutputSnippet) return;
+    fillModelOutput(currentRecord.id, {
+      modelName: fillModelName,
+      outputSnippet: fillOutputSnippet,
+      confidence: fillConfidence
+    });
+    setShowFillModal(false);
+    setFillModelName('');
+    setFillOutputSnippet('');
+    setFillConfidence(0.8);
+  };
+
+  const toggleSnapshot = (logId: string, direction: 'from' | 'to') => {
+    setExpandedSnapshot(prev => ({
+      ...prev,
+      [logId]: prev[logId] === direction ? null : direction
+    }));
   };
 
   if (pendingRecords.length === 0) {
@@ -153,15 +173,43 @@ export default function Workbench() {
                     <Bot className="w-4 h-4 text-slate-400" />
                     <span className="text-sm font-medium text-slate-300">模型输出片段</span>
                   </div>
-                  {currentRecord.modelOutput && (
-                    <span className="text-xs text-slate-500">
-                      {currentRecord.modelOutput.modelName} · 置信度 {(currentRecord.modelOutput.confidence * 100).toFixed(0)}%
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {currentRecord.modelOutput && (
+                      <span className="text-xs text-slate-500">
+                        {currentRecord.modelOutput.modelName} · 置信度 {(currentRecord.modelOutput.confidence * 100).toFixed(0)}%
+                      </span>
+                    )}
+                    {currentRecord.modelOutputMissing && !currentRecord.modelOutput && (
+                      <button
+                        onClick={() => setShowFillModal(true)}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-amber-500 hover:bg-amber-600 text-white text-xs font-medium transition-colors"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        补录
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <pre className="text-sm text-slate-200 whitespace-pre-wrap font-mono">
-                  {currentRecord.modelOutput?.outputSnippet || '暂无模型输出数据'}
+                  {currentRecord.modelOutput?.outputSnippet || (
+                    currentRecord.modelOutputMissing
+                      ? ''
+                      : '暂无模型输出数据'
+                  )}
                 </pre>
+                {currentRecord.modelOutputMissing && !currentRecord.modelOutput && (
+                  <p className="text-sm text-amber-400 font-medium mt-1">
+                    暂无模型输出数据 - 待补录
+                  </p>
+                )}
+                {currentRecord.modelOutput?.isBackfill && (
+                  <div className="mt-3 pt-3 border-t border-slate-700 flex items-center gap-2 text-xs text-slate-400">
+                    <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-medium">已补录</span>
+                    <span>补录人：{currentRecord.modelOutput.filledBy || '未知'}</span>
+                    <span>·</span>
+                    <span>{currentRecord.modelOutput.filledAt ? new Date(currentRecord.modelOutput.filledAt).toLocaleString('zh-CN') : ''}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -203,6 +251,16 @@ export default function Workbench() {
                   <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
                   <p className="text-xs text-amber-700">
                     <strong>边界规则触发：</strong>引用链接404但机器人仍判通过，需产品经理复核，不得直接归为正常
+                  </p>
+                </div>
+              </div>
+            )}
+            {currentRecord.abnormalType === 'url_404_passed' && currentRecord.modelOutputMissing && (
+              <div className="mt-3 p-3 bg-rose-50 border border-rose-200 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-rose-700">
+                    <strong>双重异常警告：</strong>引用链接404且模型输出缺失，无法通过模型片段辅助判断，请务必谨慎处理！
                   </p>
                 </div>
               </div>
@@ -277,21 +335,72 @@ export default function Workbench() {
           {showHistory && currentRecord.judgmentLogs.length > 0 && (
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3">
               <h4 className="text-sm font-medium text-slate-700">操作历史</h4>
-              {currentRecord.judgmentLogs.map((log) => (
-                <div key={log.id} className="p-3 bg-slate-50 rounded-lg">
+              {currentRecord.judgmentLogs.map((log, logIndex) => (
+                <div key={log.id} className="p-3 bg-slate-50 rounded-lg space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-slate-700">{log.operator}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-slate-700">{log.operator}</span>
+                      <span className="px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 font-medium">
+                        {LogActionLabelMap[log.action] || log.action}
+                      </span>
+                    </div>
                     <span className="text-slate-400">
                       {new Date(log.operatedAt).toLocaleString('zh-CN')}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-600 mt-1">
-                    {StatusBadge.toString.call ? '' : ''}
-                    从 <span className="text-slate-700">{log.fromStatus}</span> 变为
-                    <span className="text-slate-700 ml-1">{log.toStatus}</span>
+                  <p className="text-xs text-slate-600">
+                    从 <span className="text-slate-700">{StatusLabelMap[log.fromStatus] || log.fromStatus}</span> 变为
+                    <span className="text-slate-700 ml-1">{StatusLabelMap[log.toStatus] || log.toStatus}</span>
                   </p>
                   {log.remark && (
-                    <p className="text-xs text-slate-500 mt-1">备注：{log.remark}</p>
+                    <p className="text-xs text-slate-500">备注：{log.remark}</p>
+                  )}
+                  {log.diffSummary && log.diffSummary.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {log.diffSummary.map((diff, i) => (
+                        <span key={i} className="px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 text-[10px] font-medium">
+                          {diff}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2 pt-1">
+                    {log.fromSnapshot && (
+                      <button
+                        onClick={() => toggleSnapshot(log.id, 'from')}
+                        className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium text-slate-500 hover:bg-slate-200 transition-colors"
+                      >
+                        <Eye className="w-3 h-3" />
+                        改前快照
+                        {expandedSnapshot[log.id] === 'from' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                      </button>
+                    )}
+                    {log.toSnapshot && (
+                      <button
+                        onClick={() => toggleSnapshot(log.id, 'to')}
+                        className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium text-slate-500 hover:bg-slate-200 transition-colors"
+                      >
+                        <Eye className="w-3 h-3" />
+                        改后快照
+                        {expandedSnapshot[log.id] === 'to' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                      </button>
+                    )}
+                    <button
+                      onClick={() => rollbackToLog(currentRecord.id, logIndex)}
+                      className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium text-rose-500 hover:bg-rose-50 transition-colors ml-auto"
+                    >
+                      <RotateCcw className="w-3 h-3" />
+                      回滚
+                    </button>
+                  </div>
+                  {expandedSnapshot[log.id] && (
+                    <div className="mt-1 p-2 rounded bg-white border border-slate-200 text-[10px] font-mono text-slate-600 whitespace-pre-wrap break-all">
+                      {JSON.stringify(
+                        expandedSnapshot[log.id] === 'from' ? log.fromSnapshot : log.toSnapshot,
+                        null,
+                        2
+                      )}
+                    </div>
                   )}
                 </div>
               ))}
@@ -299,6 +408,44 @@ export default function Workbench() {
           )}
         </div>
       </div>
+
+      {showFillModal && currentRecord && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-[560px] max-h-[80vh] overflow-y-auto">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">补录模型输出</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-slate-700 mb-1 block">模型名称 *</label>
+                <input value={fillModelName} onChange={e => setFillModelName(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm" placeholder="如：GPT-4" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700 mb-1 block">输出片段 *</label>
+                <textarea value={fillOutputSnippet} onChange={e => setFillOutputSnippet(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm resize-none" rows={5}
+                  placeholder="粘贴模型输出片段..." />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700 mb-1 block">置信度</label>
+                <input type="number" min="0" max="1" step="0.01" value={fillConfidence}
+                  onChange={e => setFillConfidence(parseFloat(e.target.value) || 0)}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm" />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => setShowFillModal(false)}
+                className="flex-1 py-2.5 rounded-lg border border-slate-200 text-slate-700 text-sm font-medium">
+                取消
+              </button>
+              <button onClick={handleFillModelOutput}
+                disabled={!fillModelName || !fillOutputSnippet}
+                className="flex-1 py-2.5 rounded-lg bg-slate-900 text-white text-sm font-medium disabled:opacity-50">
+                保存补录
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
