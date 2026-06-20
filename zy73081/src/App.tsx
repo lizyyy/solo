@@ -2,14 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import CollisionListPage from '@/pages/CollisionListPage';
 import CollisionDetailPage from '@/pages/CollisionDetailPage';
 import { Toast } from '@/components/Toast';
-import { initializeStorage } from '@/services/storage';
-import { useEffect } from 'react';
 
 export default function App() {
-  useEffect(() => {
-    initializeStorage();
-  }, []);
-
   return (
     <BrowserRouter>
       <Routes>

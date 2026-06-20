@@ -20,8 +20,20 @@ export function FilterBar() {
   const [floors, setFloors] = useState<string[]>([]);
 
   useEffect(() => {
-    setProjects(CollisionService.projects());
-    setFloors(CollisionService.floors());
+    let cancelled = false;
+    (async () => {
+      const [p, f] = await Promise.all([
+        CollisionService.projects(),
+        CollisionService.floors(),
+      ]);
+      if (!cancelled) {
+        setProjects(p);
+        setFloors(f);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const reset = () => {

@@ -1,12 +1,28 @@
 import { Activity, CheckCircle2, AlertTriangle, Edit3, MapPinOff } from 'lucide-react';
 import type { SummaryData } from '@/types';
+import type { LucideIcon } from 'lucide-react';
 
 interface Props {
   data: SummaryData;
   onJump: (key: 'offset' | 'passed' | 'pending' | 'manual') => void;
 }
 
-const CARD_CONFIG = [
+type CardKey = 'total' | 'passed' | 'pending' | 'manual' | 'offset';
+type SummaryField = keyof SummaryData;
+
+interface CardConfigItem {
+  key: CardKey;
+  label: string;
+  field: SummaryField;
+  icon: LucideIcon;
+  accent: string;
+  textC: string;
+  border: string;
+  clickable?: boolean;
+  pulse?: boolean;
+}
+
+const CARD_CONFIG: CardConfigItem[] = [
   {
     key: 'total', label: '总碰撞数', field: 'total' as const,
     icon: Activity, accent: 'from-brand-500 to-brand-700', textC: 'text-brand-600',
@@ -44,7 +60,7 @@ export function SummaryCards({ data, onJump }: Props) {
         return (
           <button
             key={c.key}
-            onClick={isClickable ? () => onJump(c.key as any) : undefined}
+            onClick={isClickable ? () => onJump(c.key as Parameters<typeof onJump>[0]) : undefined}
             className={`group relative overflow-hidden bg-white rounded-lg border ${c.border} p-5 text-left transition-all
               ${isClickable ? 'hover:-translate-y-0.5 hover:shadow-lg cursor-pointer' : 'cursor-default'}`}
           >

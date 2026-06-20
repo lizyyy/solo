@@ -15,7 +15,7 @@ export function HistoryDrawer({ open, record, onClose }: Props) {
 
   useEffect(() => {
     if (open && record) actions.loadHistory(record.id);
-  }, [open, record?.id]);
+  }, [open, record, actions]);
 
   const items = useMemo(() => history, [history]);
 

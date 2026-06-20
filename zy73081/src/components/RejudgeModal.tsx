@@ -31,7 +31,7 @@ export function RejudgeModal({ open, record, onClose, onSuccess }: Props) {
       });
       setErrors({});
     }
-  }, [open, record?.id]);
+  }, [open, record]);
 
   if (!open || !record) return null;
 

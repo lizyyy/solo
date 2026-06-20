@@ -21,7 +21,7 @@ export default function CollisionDetailPage() {
   useEffect(() => {
     actions.loadDetail(id);
     actions.loadHistory(id);
-  }, [id]);
+  }, [id, actions]);
 
   if (loading && !detail) {
     return (

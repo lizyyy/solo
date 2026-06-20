@@ -1,13 +1,17 @@
 import { create } from 'zustand';
 import type {
   CollisionRecord,
-  CollisionStatus,
   ListFilterParams,
   RejudgePayload,
   SummaryData,
   HistoryRecord,
 } from '@/types';
 import { CollisionService } from '@/services/collisionService';
+
+interface ToastMessage {
+  message: string;
+  type: 'success' | 'error' | 'info';
+}
 
 interface CollisionState {
   loading: boolean;
@@ -16,7 +20,7 @@ interface CollisionState {
   detail: CollisionRecord | null;
   history: HistoryRecord[];
   filters: ListFilterParams;
-  toast: { message: string; type: 'success' | 'error' | 'info' } | null;
+  toast: ToastMessage | null;
   actions: {
     setFilters: (f: Partial<ListFilterParams>) => void;
     loadList: () => Promise<void>;
@@ -25,64 +29,18 @@ interface CollisionState {
     rejudge: (id: string, payload: RejudgePayload) => Promise<void>;
     toggleSample: (id: string, isSample: boolean) => Promise<void>;
     exportCSV: (filters?: ListFilterParams) => Promise<void>;
-    showToast: (t: CollisionState['toast']) => void;
+    showToast: (t: ToastMessage) => void;
     dismissToast: () => void;
   };
 }
 
-function statusCSVLabel(s: CollisionStatus, rejudgeCount: number): string {
-  if (rejudgeCount > 0) return '人工改过';
-  switch (s) {
-    case 'PASSED': return '已放行';
-    case 'PENDING_EVIDENCE': return '待补证据';
-    case 'REJECTED': return '驳回';
-    case 'MANUAL_REJUDGED': return '人工改过';
-  }
-}
-
-function buildCSV(rows: CollisionRecord[]): Blob {
-  const header = [
-    '碰撞编号', '是否样例', '项目名称', '楼层', '节点编号', '碰撞类型',
-    '构件A', '构件B', '状态分类', '改判次数', '是否坐标偏移异常', '异常说明',
-    '负责人', '初判结论摘要', '创建时间', '最后修改', '历史操作摘要'
-  ];
-  const lines = [header.join(',')];
-  for (const r of rows) {
-    const esc = (v: string) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-    const histSummary = r.history.map((h) => `${h.timestamp.slice(0,10)} ${h.operator}:${h.previousStatus}→${h.newStatus}`).join(' / ');
-    lines.push([
-      r.id,
-      r.isSample ? '★样例' : '',
-      esc(r.projectName),
-      r.floor,
-      r.nodeCode,
-      esc(r.collisionType),
-      esc(r.elementA),
-      esc(r.elementB),
-      statusCSVLabel(r.status, r.rejudgeCount),
-      r.rejudgeCount,
-      r.isCoordinateOffset ? '⚠️是' : '否',
-      esc(r.coordinateOffsetNote || ''),
-      r.responsiblePerson,
-      esc(r.initialConclusion),
-      r.createdAt.replace('T', ' ').slice(0, 19),
-      r.updatedAt.replace('T', ' ').slice(0, 19),
-      esc(histSummary),
-    ].join(','));
-  }
-  const BOM = '\uFEFF';
-  return new Blob([BOM + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
-}
-
-function downloadBlob(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
+function downloadFromUrl(url: string, filename: string): void {
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 export const useCollisionStore = create<CollisionState>((set, get) => ({
@@ -102,9 +60,10 @@ export const useCollisionStore = create<CollisionState>((set, get) => ({
       try {
         const { data, summary } = await CollisionService.list(get().filters);
         set({ list: data, summary, loading: false });
-      } catch (e: any) {
+      } catch (e) {
+        const err = e as Error;
         set({ loading: false });
-        get().actions.showToast({ message: e.message || '加载失败', type: 'error' });
+        get().actions.showToast({ message: err.message || '加载失败', type: 'error' });
       }
     },
 
@@ -113,9 +72,10 @@ export const useCollisionStore = create<CollisionState>((set, get) => ({
       try {
         const d = await CollisionService.get(id);
         set({ detail: d, loading: false });
-      } catch (e: any) {
+      } catch (e) {
+        const err = e as Error;
         set({ loading: false });
-        get().actions.showToast({ message: e.message || '加载详情失败', type: 'error' });
+        get().actions.showToast({ message: err.message || '加载详情失败', type: 'error' });
       }
     },
 
@@ -123,7 +83,9 @@ export const useCollisionStore = create<CollisionState>((set, get) => ({
       try {
         const h = await CollisionService.getHistory(id);
         set({ history: h });
-      } catch {}
+      } catch {
+        set({ history: [] });
+      }
     },
 
     rejudge: async (id: string, payload: RejudgePayload) => {
@@ -137,9 +99,10 @@ export const useCollisionStore = create<CollisionState>((set, get) => ({
         }));
         await get().actions.loadList();
         get().actions.showToast({ message: '改判已写入，并记录历史', type: 'success' });
-      } catch (e: any) {
+      } catch (e) {
+        const err = e as Error;
         set({ loading: false });
-        get().actions.showToast({ message: e.message || '改判失败', type: 'error' });
+        get().actions.showToast({ message: err.message || '改判失败', type: 'error' });
       }
     },
 
@@ -154,23 +117,24 @@ export const useCollisionStore = create<CollisionState>((set, get) => ({
           message: isSample ? '已标记为样例' : '已取消样例标记',
           type: 'success',
         });
-      } catch (e: any) {
-        get().actions.showToast({ message: e.message || '操作失败', type: 'error' });
+      } catch (e) {
+        const err = e as Error;
+        get().actions.showToast({ message: err.message || '操作失败', type: 'error' });
       }
     },
 
     exportCSV: async (filters) => {
       set({ loading: true });
       try {
-        const { data } = await CollisionService.list(filters || get().filters);
-        const blob = buildCSV(data);
+        const url = CollisionService.getExportUrl(filters || get().filters);
         const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
-        downloadBlob(blob, `幕墙节点碰撞预审明细_${stamp}.csv`);
+        downloadFromUrl(url, `幕墙节点碰撞预审明细_${stamp}.csv`);
         set({ loading: false });
-        get().actions.showToast({ message: `已导出 ${data.length} 条记录`, type: 'success' });
-      } catch (e: any) {
+        get().actions.showToast({ message: 'CSV 明细已开始下载', type: 'success' });
+      } catch (e) {
+        const err = e as Error;
         set({ loading: false });
-        get().actions.showToast({ message: e.message || '导出失败', type: 'error' });
+        get().actions.showToast({ message: err.message || '导出失败', type: 'error' });
       }
     },
 

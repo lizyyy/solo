@@ -15,7 +15,7 @@ export default function CollisionListPage() {
 
   useEffect(() => {
     actions.loadList();
-  }, []);
+  }, [actions]);
 
   useEffect(() => {
     const t = setTimeout(() => actions.loadList(), 50);
@@ -26,6 +26,7 @@ export default function CollisionListPage() {
     filters.keyword,
     filters.project,
     filters.floor,
+    actions,
   ]);
 
   const jumpTo = (key: 'offset' | 'passed' | 'pending' | 'manual') => {
