@@ -1,4 +1,6 @@
-"""
+import os
+
+content = '''"""
 数据库操作层
 统一数据访问入口，确保导出/页面/接口读同一份结果
 """
@@ -54,11 +56,11 @@ class Database:
         """保存YAML版本及其行记录，返回版本ID"""
         with self.get_conn() as conn:
             cursor = conn.cursor()
-            cursor.execute('''
+            cursor.execute(\'\'\'
                 INSERT INTO yaml_versions
                 (version_name, import_time, imported_by, file_name, raw_content, line_count, is_active)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', (
+            \'\'\', (
                 version.version_name,
                 version.import_time.isoformat(),
                 version.imported_by,
@@ -71,12 +73,12 @@ class Database:
 
             for line in lines:
                 line.yaml_version_id = version_id
-                cursor.execute('''
+                cursor.execute(\'\'\'
                     INSERT INTO yaml_line_records
                     (yaml_version_id, line_number, original_content, current_content,
                      is_modified, modified_by, modified_at, remark)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (
+                \'\'\', (
                     version_id,
                     line.line_number,
                     line.original_content,
@@ -93,52 +95,52 @@ class Database:
     def get_yaml_version(self, version_id: int) -> Optional[YAMLVersion]:
         with self.get_conn() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT * FROM yaml_versions WHERE id = ?', (version_id,))
+            cursor.execute(\'SELECT * FROM yaml_versions WHERE id = ?\', (version_id,))
             row = cursor.fetchone()
             if not row:
                 return None
             return YAMLVersion(
-                id=row['id'],
-                version_name=row['version_name'],
-                import_time=datetime.fromisoformat(row['import_time']),
-                imported_by=row['imported_by'],
-                file_name=row['file_name'],
-                raw_content=row['raw_content'],
-                line_count=row['line_count'],
-                is_active=row['is_active'] == 1
+                id=row[\'id\'],
+                version_name=row[\'version_name\'],
+                import_time=datetime.fromisoformat(row[\'import_time\']),
+                imported_by=row[\'imported_by\'],
+                file_name=row[\'file_name\'],
+                raw_content=row[\'raw_content\'],
+                line_count=row[\'line_count\'],
+                is_active=row[\'is_active\'] == 1
             )
 
     def get_yaml_lines(self, version_id: int) -> List[YAMLLineRecord]:
         with self.get_conn() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT * FROM yaml_line_records WHERE yaml_version_id = ? ORDER BY line_number', (version_id,))
+            cursor.execute(\'SELECT * FROM yaml_line_records WHERE yaml_version_id = ? ORDER BY line_number\', (version_id,))
             rows = cursor.fetchall()
             return [YAMLLineRecord(
-                id=r['id'],
-                yaml_version_id=r['yaml_version_id'],
-                line_number=r['line_number'],
-                original_content=r['original_content'],
-                current_content=r['current_content'],
-                is_modified=r['is_modified'] == 1,
-                modified_by=r['modified_by'],
-                modified_at=datetime.fromisoformat(r['modified_at']) if r['modified_at'] else None,
-                remark=r['remark']
+                id=r[\'id\'],
+                yaml_version_id=r[\'yaml_version_id\'],
+                line_number=r[\'line_number\'],
+                original_content=r[\'original_content\'],
+                current_content=r[\'current_content\'],
+                is_modified=r[\'is_modified\'] == 1,
+                modified_by=r[\'modified_by\'],
+                modified_at=datetime.fromisoformat(r[\'modified_at\']) if r[\'modified_at\'] else None,
+                remark=r[\'remark\']
             ) for r in rows]
 
     def update_yaml_line(self, line_id: int, new_content: str, modified_by: str, remark: str = ""):
         """更新YAML某一行内容，记录改动"""
         with self.get_conn() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT * FROM yaml_line_records WHERE id = ?', (line_id,))
+            cursor.execute(\'SELECT * FROM yaml_line_records WHERE id = ?\', (line_id,))
             row = cursor.fetchone()
             if not row:
                 return
 
-            cursor.execute('''
+            cursor.execute(\'\'\'
                 UPDATE yaml_line_records
                 SET current_content = ?, is_modified = 1, modified_by = ?, modified_at = ?, remark = ?
                 WHERE id = ?
-            ''', (new_content, modified_by, datetime.now().isoformat(), remark, line_id))
+            \'\'\', (new_content, modified_by, datetime.now().isoformat(), remark, line_id))
             conn.commit()
 
     # ==================== 边界样本相关 ====================
@@ -149,13 +151,13 @@ class Database:
             cursor = conn.cursor()
 
             if sample.id is None:
-                cursor.execute('''
+                cursor.execute(\'\'\'
                     INSERT INTO boundary_samples
                     (sample_key, batch_id, text_content, predicted_category, actual_category,
                      status, anomaly_types, yaml_version_id, yaml_line_number,
                      created_at, updated_at, last_updated_by)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (
+                \'\'\', (
                     sample.sample_key,
                     sample.batch_id,
                     sample.text_content,
@@ -172,13 +174,13 @@ class Database:
                 sample_id = cursor.lastrowid
             else:
                 sample.updated_at = datetime.now()
-                cursor.execute('''
+                cursor.execute(\'\'\'
                     UPDATE boundary_samples
                     SET sample_key = ?, batch_id = ?, text_content = ?, predicted_category = ?,
                         actual_category = ?, status = ?, anomaly_types = ?, yaml_version_id = ?,
                         yaml_line_number = ?, updated_at = ?, last_updated_by = ?
                     WHERE id = ?
-                ''', (
+                \'\'\', (
                     sample.sample_key,
                     sample.batch_id,
                     sample.text_content,
@@ -203,7 +205,7 @@ class Database:
         """
         with self.get_conn() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT * FROM boundary_samples WHERE id = ?', (sample_id,))
+            cursor.execute(\'SELECT * FROM boundary_samples WHERE id = ?\', (sample_id,))
             row = cursor.fetchone()
             if not row:
                 return None
@@ -220,7 +222,7 @@ class Database:
     def get_sample_by_key(self, sample_key: str) -> Optional[BoundarySample]:
         with self.get_conn() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT * FROM boundary_samples WHERE sample_key = ?', (sample_key,))
+            cursor.execute(\'SELECT * FROM boundary_samples WHERE sample_key = ?\', (sample_key,))
             row = cursor.fetchone()
             if not row:
                 return None
@@ -259,16 +261,16 @@ class Database:
         with self.get_conn() as conn:
             cursor = conn.cursor()
 
-            cursor.execute(f'''
+            cursor.execute(f\'\'\'
                 SELECT COUNT(*) as total FROM boundary_samples {where_clause}
-            ''', params)
-            total = cursor.fetchone()['total']
+            \'\'\', params)
+            total = cursor.fetchone()[\'total\']
 
-            cursor.execute(f'''
+            cursor.execute(f\'\'\'
                 SELECT * FROM boundary_samples {where_clause}
                 ORDER BY updated_at DESC
                 LIMIT ? OFFSET ?
-            ''', params + [page_size, offset])
+            \'\'\', params + [page_size, offset])
 
             rows = cursor.fetchall()
             samples = [self._row_to_sample(r) for r in rows]
@@ -279,37 +281,37 @@ class Database:
         """检查sample_key是否已存在（重复导入检测用）"""
         with self.get_conn() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT COUNT(*) as cnt FROM boundary_samples WHERE sample_key = ?', (sample_key,))
-            return cursor.fetchone()['cnt'] > 0
+            cursor.execute(\'SELECT COUNT(*) as cnt FROM boundary_samples WHERE sample_key = ?\', (sample_key,))
+            return cursor.fetchone()[\'cnt\'] > 0
 
     def count_samples_in_batch(self, batch_id: str) -> int:
         """统计某个批次的样本数"""
         with self.get_conn() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT COUNT(*) as cnt FROM boundary_samples WHERE batch_id = ?', (batch_id,))
-            return cursor.fetchone()['cnt']
+            cursor.execute(\'SELECT COUNT(*) as cnt FROM boundary_samples WHERE batch_id = ?\', (batch_id,))
+            return cursor.fetchone()[\'cnt\']
 
     def add_anomaly_to_sample(self, sample_id: int, anomaly_type: AnomalyType, operator: str) -> bool:
         """给样本添加异常类型"""
         with self.get_conn() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT anomaly_types, status FROM boundary_samples WHERE id = ?', (sample_id,))
+            cursor.execute(\'SELECT anomaly_types, status FROM boundary_samples WHERE id = ?\', (sample_id,))
             row = cursor.fetchone()
             if not row:
                 return False
 
-            types = json.loads(row['anomaly_types'])
+            types = json.loads(row[\'anomaly_types\'])
             if anomaly_type.value in types:
                 return False
 
-            old_status = row['status']
+            old_status = row[\'status\']
             types.append(anomaly_type.value)
 
-            cursor.execute('''
+            cursor.execute(\'\'\'
                 UPDATE boundary_samples
                 SET anomaly_types = ?, status = ?, updated_at = ?, last_updated_by = ?
                 WHERE id = ?
-            ''', (json.dumps(types), SampleStatus.PENDING_REVIEW.value, datetime.now().isoformat(), operator, sample_id))
+            \'\'\', (json.dumps(types), SampleStatus.PENDING_REVIEW.value, datetime.now().isoformat(), operator, sample_id))
 
             self._add_audit_log(conn, sample_id, "add_anomaly", old_status, SampleStatus.PENDING_REVIEW.value,
                               operator, f"添加异常: {anomaly_type.value}")
@@ -320,18 +322,18 @@ class Database:
         """更新样本状态"""
         with self.get_conn() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT status FROM boundary_samples WHERE id = ?', (sample_id,))
+            cursor.execute(\'SELECT status FROM boundary_samples WHERE id = ?\', (sample_id,))
             row = cursor.fetchone()
             if not row:
                 return
 
-            old_status = row['status']
+            old_status = row[\'status\']
 
-            cursor.execute('''
+            cursor.execute(\'\'\'
                 UPDATE boundary_samples
                 SET status = ?, updated_at = ?, last_updated_by = ?
                 WHERE id = ?
-            ''', (new_status.value, datetime.now().isoformat(), operator, sample_id))
+            \'\'\', (new_status.value, datetime.now().isoformat(), operator, sample_id))
 
             self._add_audit_log(conn, sample_id, "status_change", old_status, new_status.value,
                               operator, remark)
@@ -343,10 +345,10 @@ class Database:
         with self.get_conn() as conn:
             cursor = conn.cursor()
             if slice_obj.id is None:
-                cursor.execute('''
+                cursor.execute(\'\'\'
                     INSERT INTO evaluation_slices (sample_id, slice_data, viewed_by, viewed_at, viewer_remark)
                     VALUES (?, ?, ?, ?, ?)
-                ''', (
+                \'\'\', (
                     slice_obj.sample_id,
                     slice_obj.slice_data,
                     slice_obj.viewed_by,
@@ -355,11 +357,11 @@ class Database:
                 ))
                 slice_id = cursor.lastrowid
             else:
-                cursor.execute('''
+                cursor.execute(\'\'\'
                     UPDATE evaluation_slices
                     SET sample_id = ?, slice_data = ?, viewed_by = ?, viewed_at = ?, viewer_remark = ?
                     WHERE id = ?
-                ''', (
+                \'\'\', (
                     slice_obj.sample_id,
                     slice_obj.slice_data,
                     slice_obj.viewed_by,
@@ -374,26 +376,26 @@ class Database:
     def get_slices_by_sample(self, sample_id: int) -> List[EvaluationSlice]:
         with self.get_conn() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT * FROM evaluation_slices WHERE sample_id = ?', (sample_id,))
+            cursor.execute(\'SELECT * FROM evaluation_slices WHERE sample_id = ?\', (sample_id,))
             rows = cursor.fetchall()
             return [EvaluationSlice(
-                id=r['id'],
-                sample_id=r['sample_id'],
-                slice_data=r['slice_data'],
-                viewed_by=r['viewed_by'],
-                viewed_at=datetime.fromisoformat(r['viewed_at']) if r['viewed_at'] else None,
-                viewer_remark=r['viewer_remark']
+                id=r[\'id\'],
+                sample_id=r[\'sample_id\'],
+                slice_data=r[\'slice_data\'],
+                viewed_by=r[\'viewed_by\'],
+                viewed_at=datetime.fromisoformat(r[\'viewed_at\']) if r[\'viewed_at\'] else None,
+                viewer_remark=r[\'viewer_remark\']
             ) for r in rows]
 
     def mark_slice_viewed(self, slice_id: int, viewed_by: str, remark: str = ""):
         """老唐标记已查看评测切片"""
         with self.get_conn() as conn:
             cursor = conn.cursor()
-            cursor.execute('''
+            cursor.execute(\'\'\'
                 UPDATE evaluation_slices
                 SET viewed_by = ?, viewed_at = ?, viewer_remark = ?
                 WHERE id = ?
-            ''', (viewed_by, datetime.now().isoformat(), remark, slice_id))
+            \'\'\', (viewed_by, datetime.now().isoformat(), remark, slice_id))
             conn.commit()
 
     # ==================== 特征版本相关 ====================
@@ -402,10 +404,10 @@ class Database:
         with self.get_conn() as conn:
             cursor = conn.cursor()
             if fv.id is None:
-                cursor.execute('''
+                cursor.execute(\'\'\'
                     INSERT INTO feature_versions (sample_id, feature_version, updated_by, updated_at, update_remark)
                     VALUES (?, ?, ?, ?, ?)
-                ''', (
+                \'\'\', (
                     fv.sample_id,
                     fv.feature_version,
                     fv.updated_by,
@@ -414,11 +416,11 @@ class Database:
                 ))
                 fv_id = cursor.lastrowid
             else:
-                cursor.execute('''
+                cursor.execute(\'\'\'
                     UPDATE feature_versions
                     SET sample_id = ?, feature_version = ?, updated_by = ?, updated_at = ?, update_remark = ?
                     WHERE id = ?
-                ''', (
+                \'\'\', (
                     fv.sample_id,
                     fv.feature_version,
                     fv.updated_by,
@@ -433,15 +435,15 @@ class Database:
     def get_feature_versions_by_sample(self, sample_id: int) -> List[FeatureVersion]:
         with self.get_conn() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT * FROM feature_versions WHERE sample_id = ?', (sample_id,))
+            cursor.execute(\'SELECT * FROM feature_versions WHERE sample_id = ?\', (sample_id,))
             rows = cursor.fetchall()
             return [FeatureVersion(
-                id=r['id'],
-                sample_id=r['sample_id'],
-                feature_version=r['feature_version'],
-                updated_by=r['updated_by'],
-                updated_at=datetime.fromisoformat(r['updated_at']),
-                update_remark=r['update_remark']
+                id=r[\'id\'],
+                sample_id=r[\'sample_id\'],
+                feature_version=r[\'feature_version\'],
+                updated_by=r[\'updated_by\'],
+                updated_at=datetime.fromisoformat(r[\'updated_at\']),
+                update_remark=r[\'update_remark\']
             ) for r in rows]
 
     def get_all_batch_feature_versions(self) -> Dict[str, set]:
@@ -459,26 +461,32 @@ class Database:
             rows = cursor.fetchall()
             result: Dict[str, set] = {}
             for r in rows:
-                bid = r['batch_id']
+                bid = r[\'batch_id\']
                 if bid not in result:
                     result[bid] = set()
-                result[bid].add(r['feature_version'])
+                result[bid].add(r[\'feature_version\'])
             return result
 
     # ==================== 审计日志相关 ====================
 
     def _add_audit_log(self, conn, sample_id, action, old_status, new_status, operator, remark="", detail=""):
         cursor = conn.cursor()
-        cursor.execute('''
+        cursor.execute(\'\'\'
             INSERT INTO audit_logs (sample_id, action, old_status, new_status, operator, operate_time, remark, detail)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (sample_id, action, old_status, new_status, operator, datetime.now().isoformat(), remark, detail))
+        \'\'\', (sample_id, action, old_status, new_status, operator, datetime.now().isoformat(), remark, detail))
 
     def get_audit_logs(self, sample_id: int) -> List[dict]:
         with self.get_conn() as conn:
             cursor = conn.cursor()
-            cursor.execute('''
+            cursor.execute(\'\'\'
                 SELECT * FROM audit_logs WHERE sample_id = ? ORDER BY operate_time DESC
-            ''', (sample_id,))
+            \'\'\', (sample_id,))
             rows = cursor.fetchall()
             return [dict(r) for r in rows]
+'''
+
+with open('/Users/lzy/pro/solo/workspaces/zy72567/database.py', 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print('File written successfully')

@@ -149,8 +149,11 @@ class WorkflowManager:
             
             if len(all_versions) > 1:
                 # 同一批数据重复训练了 → 标记异常，进pending_review
+                newly_marked = 0
                 for bs in batch_samples:
-                    self.db.add_anomaly_to_sample(bs.id, AnomalyType.DUPLICATE_TRAIN, updated_by)
+                    added = self.db.add_anomaly_to_sample(bs.id, AnomalyType.DUPLICATE_TRAIN, updated_by)
+                    if added:
+                        newly_marked += 1
                 
                 return {
                     "step": "第三步：特征版本更新（注意：发现重复训练）",
@@ -159,7 +162,8 @@ class WorkflowManager:
                     "warning": "同一批数据关联了多个特征版本，已自动标记为待策略产品复核",
                     "batch_id": sample.batch_id,
                     "feature_versions_found": list(all_versions),
-                    "status": SampleStatus.PENDING_REVIEW.value
+                    "status": SampleStatus.PENDING_REVIEW.value,
+                    "newly_marked_count": newly_marked
                 }
         
         # 正常情况：更新状态

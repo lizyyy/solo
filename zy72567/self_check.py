@@ -21,10 +21,10 @@ class SelfCheckResult:
 
 class SelfChecker:
     """边界样本自检器"""
-    
+
     def __init__(self, db: Database):
         self.db = db
-    
+
     def run_all_checks(self) -> List[SelfCheckResult]:
         """运行所有自检项"""
         results = []
@@ -33,7 +33,7 @@ class SelfChecker:
         results.append(self.check_supplement_recalc())
         results.append(self.check_export_consistency())
         return results
-    
+
     def check_duplicate_import(self) -> SelfCheckResult:
         """
         检查1：重复导入
@@ -41,18 +41,15 @@ class SelfChecker:
         正常情况下sample_key是唯一的，重复导入说明流程有问题
         """
         problem_samples = []
-        
-        # 获取所有样本，检查是否有重复的sample_key（理论上数据库唯一约束会阻止，但检查流程异常）
+
         samples, _ = self.db.list_samples(page_size=10000)
-        
-        # 按sample_key分组，虽然数据库唯一，但检查导入日志中的重复尝试
-        # 这里我们实际检查的是：同一个批次内，内容完全相同的样本
+
         batch_groups: Dict[str, List[BoundarySample]] = {}
         for s in samples:
             if s.batch_id not in batch_groups:
                 batch_groups[s.batch_id] = []
             batch_groups[s.batch_id].append(s)
-        
+
         for batch_id, batch_samples in batch_groups.items():
             text_map: Dict[str, List[BoundarySample]] = {}
             for s in batch_samples:
@@ -60,7 +57,7 @@ class SelfChecker:
                 if key not in text_map:
                     text_map[key] = []
                 text_map[key].append(s)
-            
+
             for text, dup_samples in text_map.items():
                 if len(dup_samples) > 1:
                     problem_samples.append({
@@ -70,18 +67,18 @@ class SelfChecker:
                         "sample_keys": [s.sample_key for s in dup_samples],
                         "text_preview": text[:100]
                     })
-        
+
         passed = len(problem_samples) == 0
         summary = f"重复导入检查：{'通过' if passed else '发现问题'}，"
         summary += f"共发现 {len(problem_samples)} 组重复内容样本"
-        
+
         return SelfCheckResult(
             check_name="重复导入检查",
             passed=passed,
             problem_samples=problem_samples,
             summary=summary
         )
-    
+
     def check_duplicate_train(self) -> SelfCheckResult:
         """
         检查2：同一批数据重复训练两次
@@ -89,70 +86,61 @@ class SelfChecker:
         这种情况不能急着归正常，要留给策略产品复核
         """
         problem_samples = []
-        
-        samples, _ = self.db.list_samples(page_size=10000)
-        
-        # 按批次分组，检查每个批次关联的特征版本数量
-        batch_feature_counts: Dict[str, set] = {}
-        for s in samples:
-            if s.batch_id not in batch_feature_counts:
-                batch_feature_counts[s.batch_id] = set()
-            for fv in s.feature_versions:
-                batch_feature_counts[s.batch_id].add(fv.feature_version)
-        
-        for batch_id, versions in batch_feature_counts.items():
+
+        batch_fv_map = self.db.get_all_batch_feature_versions()
+
+        for batch_id, versions in batch_fv_map.items():
             if len(versions) > 1:
-                # 获取该批次所有样本
-                batch_samples = [s for s in samples if s.batch_id == batch_id]
-                # 找出其中状态不是pending_review的样本，需要标记
-                need_mark = [s for s in batch_samples if AnomalyType.DUPLICATE_TRAIN not in s.anomaly_types]
-                
-                if need_mark:
-                    problem_samples.append({
-                        "batch_id": batch_id,
-                        "feature_versions": list(versions),
-                        "version_count": len(versions),
-                        "sample_count": len(batch_samples),
-                        "need_mark_count": len(need_mark),
-                        "sample_ids_to_mark": [s.id for s in need_mark]
-                    })
-                    
-                    # 自动标记异常（但状态设为pending_review，不自动归正常）
-                    for s in need_mark:
-                        self.db.add_anomaly_to_sample(s.id, AnomalyType.DUPLICATE_TRAIN, "self_check")
-        
+                batch_samples, _ = self.db.list_samples(batch_id=batch_id, page_size=1000)
+                need_mark = []
+                for s in batch_samples:
+                    added = self.db.add_anomaly_to_sample(s.id, AnomalyType.DUPLICATE_TRAIN, "self_check")
+                    if added:
+                        need_mark.append(s)
+
+                problem_samples.append({
+                    "batch_id": batch_id,
+                    "feature_versions": list(versions),
+                    "version_count": len(versions),
+                    "sample_count": len(batch_samples),
+                    "need_mark_count": len(need_mark),
+                    "sample_ids_to_mark": [s.id for s in need_mark]
+                })
+
         passed = len(problem_samples) == 0
         summary = f"重复训练检查：{'通过' if passed else '发现问题'}，"
         summary += f"共发现 {len(problem_samples)} 个批次存在重复训练，已自动标记为待复核"
-        
+
         return SelfCheckResult(
             check_name="同一批数据重复训练检查",
             passed=passed,
             problem_samples=problem_samples,
             summary=summary
         )
-    
+
     def check_supplement_recalc(self) -> SelfCheckResult:
         """
         检查3：补录后重算
         场景：样本被补录（修改了actual_category等字段）后，评测切片和特征版本是否同步更新
         """
         problem_samples = []
-        
+
         samples, _ = self.db.list_samples(page_size=10000)
-        
+
         for s in samples:
-            # 检查：有YAML行被修改过，但评测切片或特征版本没有对应更新
-            modified_lines = [l for l in s.yaml_lines if l.is_modified]
+            full = self.db.get_sample(s.id, include_related=True)
+            if not full:
+                continue
+
+            modified_lines = [l for l in full.yaml_lines if l.is_modified]
             if modified_lines:
                 last_modified = max((l.modified_at for l in modified_lines if l.modified_at), default=None)
-                last_slice_view = max((sl.viewed_at for sl in s.slices if sl.viewed_at), default=None)
-                last_feature_update = max((fv.updated_at for fv in s.feature_versions), default=None)
-                
-                # 如果YAML修改了，但评测切片没重新查看，或者特征版本没更新
+                last_slice_view = max((sl.viewed_at for sl in full.slices if sl.viewed_at), default=None)
+                last_feature_update = max((fv.updated_at for fv in full.feature_versions), default=None)
+
                 need_recalc = False
                 reasons = []
-                
+
                 if last_modified:
                     if last_slice_view and last_slice_view < last_modified:
                         need_recalc = True
@@ -160,38 +148,36 @@ class SelfChecker:
                     if last_feature_update and last_feature_update < last_modified:
                         need_recalc = True
                         reasons.append("YAML修改后特征版本未更新")
-                    if not s.slices:
+                    if not full.slices:
                         need_recalc = True
                         reasons.append("缺少评测切片")
-                    if not s.feature_versions:
+                    if not full.feature_versions:
                         need_recalc = True
                         reasons.append("缺少特征版本记录")
-                
+
                 if need_recalc:
                     problem_samples.append({
-                        "sample_id": s.id,
-                        "sample_key": s.sample_key,
+                        "sample_id": full.id,
+                        "sample_key": full.sample_key,
                         "reasons": reasons,
                         "last_yaml_modified": str(last_modified) if last_modified else None,
                         "last_slice_view": str(last_slice_view) if last_slice_view else None,
                         "last_feature_update": str(last_feature_update) if last_feature_update else None
                     })
-                    
-                    # 标记补录重算异常
-                    if AnomalyType.SUPPLEMENT_RECALC not in s.anomaly_types:
-                        self.db.add_anomaly_to_sample(s.id, AnomalyType.SUPPLEMENT_RECALC, "self_check")
-        
+
+                    self.db.add_anomaly_to_sample(full.id, AnomalyType.SUPPLEMENT_RECALC, "self_check")
+
         passed = len(problem_samples) == 0
         summary = f"补录重算检查：{'通过' if passed else '发现问题'}，"
         summary += f"共发现 {len(problem_samples)} 个样本补录后需要重算"
-        
+
         return SelfCheckResult(
             check_name="补录后重算检查",
             passed=passed,
             problem_samples=problem_samples,
             summary=summary
         )
-    
+
     def check_export_consistency(self) -> SelfCheckResult:
         """
         检查4：导出一致性
@@ -199,13 +185,12 @@ class SelfChecker:
         （实际上我们的架构已经保证了页面/接口/导出都走同一查询入口，这里做完整性校验）
         """
         problem_samples = []
-        
+
         samples, _ = self.db.list_samples(page_size=10000)
-        
+
         for s in samples:
-            # 检查：关键数据是否完整，避免导出时缺失
             issues = []
-            
+
             if not s.text_content:
                 issues.append("文本内容为空")
             if not s.predicted_category:
@@ -216,20 +201,28 @@ class SelfChecker:
                 issues.append("批次ID为空")
             if s.yaml_line_number <= 0:
                 issues.append("YAML行号无效")
-            
+
             if issues:
                 problem_samples.append({
                     "sample_id": s.id,
                     "sample_key": s.sample_key,
                     "issues": issues
                 })
-        
+
         passed = len(problem_samples) == 0
         summary = f"导出一致性检查：{'通过' if passed else '发现问题'}，"
         summary += f"共发现 {len(problem_samples)} 个样本存在数据完整性问题"
-        
+
         return SelfCheckResult(
             check_name="导出一致性检查",
+            passed=passed,
+            problem_samples=problem_samples,
+            summary=summary
+        )
+            passed=passed,
+            problem_samples=problem_samples,
+            summary=summary
+        )
             passed=passed,
             problem_samples=problem_samples,
             summary=summary

@@ -200,7 +200,7 @@ def init_problem_sample():
     print("   - 导出CSV/JSON验证数据一致性")
     
     print("\n🚀 启动服务：python3 app.py")
-    print("🌐 访问地址：http://localhost:5001")
+    print("🌐 访问地址：http://localhost:5060")
     print("=" * 60)
 
 
