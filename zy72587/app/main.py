@@ -168,14 +168,14 @@ async def export_records(session_id: str):
     conflicts = store.get_conflicts_for_export()
     summary = store.get_summary_data()
 
-    from .self_check import check_export_consistency
+    from .self_check import check_page_api_export_consistency
     page_data = store.get_all_records_for_page()
     api_data = store.get_all_records_for_api()
-    consistency_result = check_export_consistency(page_data, api_data, records)
+    consistency_result = check_page_api_export_consistency(page_data, api_data, records)
 
     df_records = pd.DataFrame(records)
     df_conflicts = pd.DataFrame(conflicts) if conflicts else pd.DataFrame(
-        columns=["样本ID", "冲突描述", "说明", "无冲突"]
+        columns=["样本ID", "特征ID", "特征名称", "冲突类型", "记录唯一标识", "线上实验桶取值", "负样本列表取值", "冲突描述", "处理状态", "处理人(评测运营)", "处理时间", "参数版本", "冲突处理历史"]
     )
 
     params_df = pd.DataFrame([
@@ -289,11 +289,11 @@ async def check_consistency(session_id: str):
         raise HTTPException(status_code=404, detail="会话不存在")
     store = workflow_manager.get_result_store(session_id)
 
-    from .self_check import check_export_consistency
+    from .self_check import check_page_api_export_consistency
 
     page_data = store.get_all_records_for_page()
     api_data = store.get_all_records_for_api()
     detail_data = store.get_all_records_for_export()
 
-    result = check_export_consistency(page_data, api_data, detail_data)
+    result = check_page_api_export_consistency(page_data, api_data, detail_data)
     return {"result": result.dict()}

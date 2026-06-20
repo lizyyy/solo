@@ -593,8 +593,13 @@
             showElement('conflictsPanel');
             document.getElementById('conflictsList').innerHTML = data.conflicts.map(c => `
                 <div class="conflict-card">
-                    <h4>🔴 样本 ${c['样本ID']}</h4>
+                    <h4>🔴 样本 ${c['样本ID']} · 特征 ${c['特征名称']}(${c['特征ID']})</h4>
                     <p style="margin-bottom:8px;"><strong>冲突描述：</strong>${c['冲突描述']}</p>
+                    <p style="margin-bottom:8px;">
+                        <span class="param-tag" style="background:#e6d3f4;color:#553c9a;">特征名称：${c['特征名称']}</span>
+                        <span class="param-tag" style="background:#fce7f3;color:#97266d;">冲突类型：${c['冲突类型']}</span>
+                        <span class="param-tag" style="background:#bee3f8;color:#2c5282;">记录标识：${c['记录唯一标识']}</span>
+                    </p>
                     <p style="font-size:13px; background:#fafafa; padding:8px; border-radius:4px;">
                         <strong>📊 线上实验桶取值：</strong>${c['线上实验桶取值']} &nbsp;&nbsp;|&nbsp;&nbsp;
                         <strong>📊 负样本列表取值：</strong>${c['负样本列表取值']}
@@ -614,10 +619,10 @@
                     </div>` : ''}
                     ${c['处理状态'].includes('待人工') ? `
                     <div class="conflict-actions">
-                        <button class="btn btn-success" onclick="resolveConflict('${c['样本ID']}', 'confirm')">
+                        <button class="btn btn-success" onclick="resolveConflict('${c['记录唯一标识']}', 'confirm')">
                             ✅ 确认冲突（以线上实验桶为准）
                         </button>
-                        <button class="btn btn-danger" onclick="resolveConflict('${c['样本ID']}', 'reject')">
+                        <button class="btn btn-danger" onclick="resolveConflict('${c['记录唯一标识']}', 'reject')">
                             ❌ 驳回（判定数据异常）
                         </button>
                     </div>` : ''}

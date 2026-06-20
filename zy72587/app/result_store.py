@@ -98,8 +98,19 @@ class UnifiedResultStore:
             )
         history_text = history_text.rstrip(" | ")
 
+        conflict_type_map = {
+            "bucket_missing": "线上实验桶缺失",
+            "negative_missing": "负样本列表缺失",
+            "value_mismatch": "特征值不一致",
+            "default_usage_mismatch": "默认值使用不一致",
+        }
+
         return {
-            "样本ID": conflict.record_id,
+            "样本ID": conflict.sample_id,
+            "特征ID": conflict.feature_id,
+            "特征名称": conflict.feature_name,
+            "冲突类型": conflict_type_map.get(conflict.conflict_type, conflict.conflict_type),
+            "记录唯一标识": conflict.record_id,
             "线上实验桶取值": conflict.bucket_value if conflict.bucket_value is not None else "缺失",
             "负样本列表取值": conflict.negative_value if conflict.negative_value is not None else "缺失",
             "冲突描述": conflict.description,

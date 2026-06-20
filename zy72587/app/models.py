@@ -57,6 +57,10 @@ class FeatureRecord(BaseModel):
 
 class ConflictEvidence(BaseModel):
     record_id: str
+    sample_id: str
+    feature_id: str
+    feature_name: str = ""
+    conflict_type: str = "value_mismatch"
     bucket_value: Any
     negative_value: Any
     description: str

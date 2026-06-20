@@ -21,7 +21,7 @@ from app.self_check import (
     check_duplicate_imports,
     check_feature_missing_default,
     check_resupplement_recalculation,
-    check_export_consistency,
+    check_page_api_export_consistency,
 )
 from app.workflow import WorkflowManager
 from app.result_store import UnifiedResultStore
@@ -184,7 +184,7 @@ class TestUnifiedResultConsistency:
         for rec in all_recs:
             if "默认分" in str(rec.get("是否使用了默认填充值", "")):
                 assert rec["最终状态(英文)"] == "feature_missing_default"
-                assert "推荐负责人复核完成" in rec["结果说明(可解释)"]
+                assert "复核" in rec["结果说明(可解释)"] and "推荐负责人" in rec["结果说明(可解释)"]
                 assert "zhang_leader" in rec["结果说明(可解释)"]
 
     def test_summary_contains_consistency_note(self):

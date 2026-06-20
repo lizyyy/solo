@@ -17,7 +17,7 @@ from app.self_check import (
     check_duplicate_imports,
     check_feature_missing_default,
     check_resupplement_recalculation,
-    check_export_consistency,
+    check_page_api_export_consistency,
 )
 from app.workflow import WorkflowManager
 from app.result_store import UnifiedResultStore
@@ -168,14 +168,14 @@ class TestSelfCheck:
 
     def test_export_consistency_matching(self):
         data = [{"sample_id": "s001", "value": 100}]
-        result = check_export_consistency(data, data, data)
+        result = check_page_api_export_consistency(data, data, data)
         assert result.passed is True
 
     def test_export_consistency_mismatched_length(self):
         page = [{"a": 1}, {"b": 2}]
         api = [{"a": 1}]
         detail = [{"a": 1}]
-        result = check_export_consistency(page, api, detail)
+        result = check_page_api_export_consistency(page, api, detail)
         assert result.passed is False
         assert "条数不一致" in result.details
 

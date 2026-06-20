@@ -1,4 +1,9 @@
-import uuid
+import os
+import sys
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+WORKFLOW_CONTENT = '''import uuid
 import copy
 from datetime import datetime
 from typing import List, Optional
@@ -249,7 +254,6 @@ class WorkflowManager:
         if session is None:
             raise ValueError(f"会话{session_id}不存在")
 
-
         parts = record_id.split(":")
         if len(parts) >= 2:
             target_sample_id = parts[0]
@@ -273,7 +277,7 @@ class WorkflowManager:
                         to_status=resolution.value,
                         triggered_by=resolved_by,
                         trigger_step="conflict_resolution",
-                        reason=f"{'评测运营选择以线上实验桶为准（确认冲突）' if resolution == ConflictResolution.CONFIRM else '评测运营判定数据异常（驳回冲突）'}：{conflict.description}",
+                        reason=f"评测运营选择以线上实验桶为准（确认冲突）：{conflict.description}" if resolution == ConflictResolution.CONFIRM else f"评测运营判定数据异常（驳回冲突）：{conflict.description}",
                         parameter_version=session.parameters.parameter_version,
                     )
                 )
@@ -377,12 +381,11 @@ class WorkflowManager:
                                 rec.result_explanation += f"【冲突解决-驳回】{resolution.value} by {resolved_by}。"
                 break
 
-
         conflict_desc = matched_conflict.description if matched_conflict else "未知冲突"
         self._log_operation(
             session,
             to_status=f"conflict_{record_id}_{resolution.value}",
-            reason=f"样本{target_sample_id}的特征{target_feature_id}冲突由{resolved_by}选择「{'确认' if resolution == ConflictResolution.CONFIRM else '驳回'}」：{conflict_desc}",
+            reason=f"样本{target_sample_id}的特征{target_feature_id}冲突由{resolved_by}选择确认：{conflict_desc}" if resolution == ConflictResolution.CONFIRM else f"样本{target_sample_id}的特征{target_feature_id}冲突由{resolved_by}选择驳回：{conflict_desc}",
             triggered_by=resolved_by,
             parameter_version=session.parameters.parameter_version,
         )
@@ -526,3 +529,21 @@ class WorkflowManager:
 
 
 workflow_manager = WorkflowManager()
+'''
+
+target_path = os.path.join(BASE_DIR, 'app', 'workflow.py')
+with open(target_path, 'w', encoding='utf-8') as f:
+    f.write(WORKFLOW_CONTENT)
+
+print(f"workflow.py 写入成功，路径: {target_path}")
+print(f"文件大小: {os.path.getsize(target_path)} 字节")
+print(f"包含 session=session: {'session=session' in WORKFLOW_CONTENT}")
+print(f"包含 pre_bucket_snapshot: {'pre_bucket_snapshot' in WORKFLOW_CONTENT}")
+
+import ast
+try:
+    ast.parse(WORKFLOW_CONTENT)
+    print("语法检查: 通过")
+except SyntaxError as e:
+    print(f"语法错误: {e}")
+    sys.exit(1)

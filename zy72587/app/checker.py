@@ -65,22 +65,35 @@ def detect_conflicts(
 ) -> List[ConflictEvidence]:
     conflicts = []
 
-    bucket_map = {r.sample_id: r for r in bucket_records}
-    negative_map = {r.sample_id: r for r in negative_records}
+    bucket_map: Dict[Tuple[str, str], FeatureRecord] = {}
+    for r in bucket_records:
+        key = (r.sample_id, r.feature_id)
+        bucket_map[key] = r
 
-    all_sample_ids = set(bucket_map.keys()) | set(negative_map.keys())
+    negative_map: Dict[Tuple[str, str], FeatureRecord] = {}
+    for r in negative_records:
+        key = (r.sample_id, r.feature_id)
+        negative_map[key] = r
 
-    for sample_id in all_sample_ids:
-        bucket_rec = bucket_map.get(sample_id)
-        negative_rec = negative_map.get(sample_id)
+    all_keys = set(bucket_map.keys()) | set(negative_map.keys())
+
+    for (sample_id, feature_id) in all_keys:
+        bucket_rec = bucket_map.get((sample_id, feature_id))
+        negative_rec = negative_map.get((sample_id, feature_id))
+        feature_name = bucket_rec.feature_name if bucket_rec else (negative_rec.feature_name if negative_rec else "")
+        record_id = f"{sample_id}:{feature_id}"
 
         if bucket_rec is None:
             conflicts.append(
                 ConflictEvidence(
-                    record_id=sample_id,
+                    record_id=record_id,
+                    sample_id=sample_id,
+                    feature_id=feature_id,
+                    feature_name=feature_name,
+                    conflict_type="bucket_missing",
                     bucket_value=None,
                     negative_value=negative_rec.feature_value if negative_rec else None,
-                    description=f"样本{sample_id}存在于负样本列表但线上实验桶缺失",
+                    description=f"样本{sample_id}的特征{feature_name}({feature_id})存在于负样本列表但线上实验桶缺失",
                 )
             )
             continue
@@ -88,10 +101,14 @@ def detect_conflicts(
         if negative_rec is None:
             conflicts.append(
                 ConflictEvidence(
-                    record_id=sample_id,
+                    record_id=record_id,
+                    sample_id=sample_id,
+                    feature_id=feature_id,
+                    feature_name=feature_name,
+                    conflict_type="negative_missing",
                     bucket_value=bucket_rec.feature_value,
                     negative_value=None,
-                    description=f"样本{sample_id}存在于线上实验桶但负样本列表缺失",
+                    description=f"样本{sample_id}的特征{feature_name}({feature_id})存在于线上实验桶但负样本列表缺失",
                 )
             )
             continue
@@ -99,11 +116,15 @@ def detect_conflicts(
         if bucket_rec.feature_value != negative_rec.feature_value:
             conflicts.append(
                 ConflictEvidence(
-                    record_id=sample_id,
+                    record_id=record_id,
+                    sample_id=sample_id,
+                    feature_id=feature_id,
+                    feature_name=feature_name,
+                    conflict_type="value_mismatch",
                     bucket_value=bucket_rec.feature_value,
                     negative_value=negative_rec.feature_value,
                     description=(
-                        f"样本{sample_id}特征值不一致："
+                        f"样本{sample_id}的特征{feature_name}({feature_id})特征值不一致："
                         f"线上桶={bucket_rec.feature_value}, "
                         f"负样本={negative_rec.feature_value}"
                     ),
@@ -113,11 +134,15 @@ def detect_conflicts(
         if bucket_rec.default_value_used != negative_rec.default_value_used:
             conflicts.append(
                 ConflictEvidence(
-                    record_id=sample_id,
+                    record_id=record_id,
+                    sample_id=sample_id,
+                    feature_id=feature_id,
+                    feature_name=feature_name,
+                    conflict_type="default_usage_mismatch",
                     bucket_value=bucket_rec.default_value_used,
                     negative_value=negative_rec.default_value_used,
                     description=(
-                        f"样本{sample_id}默认值使用不一致："
+                        f"样本{sample_id}的特征{feature_name}({feature_id})默认值使用不一致："
                         f"线上桶={'是' if bucket_rec.default_value_used else '否'}, "
                         f"负样本={'是' if negative_rec.default_value_used else '否'}"
                     ),
@@ -228,7 +253,7 @@ def process_all_records(
 
     for conflict in conflicts:
         for rec in processed_bucket:
-            if rec.sample_id == conflict.record_id:
+            if rec.sample_id == conflict.sample_id and rec.feature_id == conflict.feature_id:
                 old = rec.status
                 _append_status_history(
                     rec, old, RecordStatus.CONFLICT,
@@ -244,7 +269,7 @@ def process_all_records(
                     f"需要人工确认或驳回，系统不自动拍板。"
                 ).strip("。")
         for rec in processed_negative:
-            if rec.sample_id == conflict.record_id:
+            if rec.sample_id == conflict.sample_id and rec.feature_id == conflict.feature_id:
                 old = rec.status
                 _append_status_history(
                     rec, old, RecordStatus.CONFLICT,
