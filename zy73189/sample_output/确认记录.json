@@ -1,0 +1,271 @@
+{
+  "说明": "人工确认记录。请排班同事逐条核对：status 填 confirmed(无误)/adjusted(已改)；如改了值，填 confirmed_value/confirmed_uncertainty 与确认说明。留 pending 表示未确认。",
+  "确认人": "排班-王芳",
+  "确认时间": "2026-06-20",
+  "条目": [
+    {
+      "question_id": "Q-001",
+      "version": "v1.0",
+      "title": "电阻测量",
+      "status": "confirmed",
+      "computed_value": 5.0,
+      "computed_uncertainty": 0.13462912017836262,
+      "confirmed_value": 5.0,
+      "confirmed_uncertainty": 0.13462912017836262,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-001",
+      "version": "v1.1",
+      "title": "电阻测量",
+      "status": "adjusted",
+      "computed_value": 5.0,
+      "computed_uncertainty": 0.07071067811865477,
+      "confirmed_value": 5.0,
+      "confirmed_uncertainty": 0.071,
+      "确认说明": "人工修约：不确定度保留两位有效数字"
+    },
+    {
+      "question_id": "Q-001",
+      "version": "v1.2",
+      "title": "电阻测量",
+      "status": "confirmed",
+      "computed_value": 5.0,
+      "computed_uncertainty": 0.13462912017836262,
+      "confirmed_value": 5.0,
+      "confirmed_uncertainty": 0.13462912017836262,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-002",
+      "version": "v1.0",
+      "title": "圆柱体体积",
+      "status": "adjusted",
+      "computed_value": 0.001570796326794897,
+      "computed_uncertainty": 6.476559171707598e-05,
+      "confirmed_value": 0.00157,
+      "confirmed_uncertainty": 6.48e-05,
+      "确认说明": "人工修约：体积按四位有效数字"
+    },
+    {
+      "question_id": "Q-002",
+      "version": "v1.1",
+      "title": "圆柱体体积",
+      "status": "confirmed",
+      "computed_value": 0.001570796326794897,
+      "computed_uncertainty": 6.476559171707598e-05,
+      "confirmed_value": 0.001570796326794897,
+      "confirmed_uncertainty": 6.476559171707598e-05,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-002",
+      "version": "v1.2",
+      "title": "圆柱体体积",
+      "status": "confirmed",
+      "computed_value": 0.001570796326794897,
+      "computed_uncertainty": 6.476559171707598e-05,
+      "confirmed_value": 0.001570796326794897,
+      "confirmed_uncertainty": 6.476559171707598e-05,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-099",
+      "version": "v1.0",
+      "title": "除零边界-电流为零",
+      "status": "confirmed",
+      "computed_value": null,
+      "computed_uncertainty": null,
+      "confirmed_value": null,
+      "confirmed_uncertainty": null,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-099",
+      "version": "v1.1",
+      "title": "除零边界-电流为零",
+      "status": "confirmed",
+      "computed_value": null,
+      "computed_uncertainty": null,
+      "confirmed_value": null,
+      "confirmed_uncertainty": null,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-099",
+      "version": "v1.2",
+      "title": "除零边界-电流为零",
+      "status": "confirmed",
+      "computed_value": null,
+      "computed_uncertainty": null,
+      "confirmed_value": null,
+      "confirmed_uncertainty": null,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-003",
+      "version": "v1.0",
+      "title": "匀速运动速度",
+      "status": "confirmed",
+      "computed_value": 10.0,
+      "computed_uncertainty": 0.1118033988749895,
+      "confirmed_value": 10.0,
+      "confirmed_uncertainty": 0.1118033988749895,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-003",
+      "version": "v1.1",
+      "title": "匀速运动速度",
+      "status": "confirmed",
+      "computed_value": 10.0,
+      "computed_uncertainty": 0.1118033988749895,
+      "confirmed_value": 10.0,
+      "confirmed_uncertainty": 0.1118033988749895,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-003",
+      "version": "v1.2",
+      "title": "匀速运动速度",
+      "status": "confirmed",
+      "computed_value": 10.0,
+      "computed_uncertainty": 0.1118033988749895,
+      "confirmed_value": 10.0,
+      "confirmed_uncertainty": 0.1118033988749895,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-098",
+      "version": "v1.0",
+      "title": "单位不一致边界-毫伏与安培混用",
+      "status": "confirmed",
+      "computed_value": 0.5,
+      "computed_uncertainty": 0.013462912017836262,
+      "confirmed_value": 0.5,
+      "confirmed_uncertainty": 0.013462912017836262,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-098",
+      "version": "v1.1",
+      "title": "单位不一致边界-毫伏与安培混用",
+      "status": "confirmed",
+      "computed_value": 0.5,
+      "computed_uncertainty": 0.013462912017836262,
+      "confirmed_value": 0.5,
+      "confirmed_uncertainty": 0.013462912017836262,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-098",
+      "version": "v1.2",
+      "title": "单位不一致边界-毫伏与安培混用",
+      "status": "adjusted",
+      "computed_value": 0.5,
+      "computed_uncertainty": 0.013124404748406688,
+      "confirmed_value": 0.5,
+      "confirmed_uncertainty": 0.0131,
+      "确认说明": "排班核对：数值与量纲复核后修约"
+    },
+    {
+      "question_id": "Q-004",
+      "version": "v1.0",
+      "title": "电功率",
+      "status": "confirmed",
+      "computed_value": 6.0,
+      "computed_uncertainty": 0.13,
+      "confirmed_value": 6.0,
+      "confirmed_uncertainty": 0.13,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-004",
+      "version": "v1.1",
+      "title": "电功率",
+      "status": "confirmed",
+      "computed_value": 6.0,
+      "computed_uncertainty": 0.13,
+      "confirmed_value": 6.0,
+      "confirmed_uncertainty": 0.13,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-004",
+      "version": "v1.2",
+      "title": "电功率",
+      "status": "confirmed",
+      "computed_value": 6.0,
+      "computed_uncertainty": 0.13,
+      "confirmed_value": 6.0,
+      "confirmed_uncertainty": 0.13,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-097",
+      "version": "v1.0",
+      "title": "零不确定度边界",
+      "status": "confirmed",
+      "computed_value": 10.0,
+      "computed_uncertainty": 0.05,
+      "confirmed_value": 10.0,
+      "confirmed_uncertainty": 0.05,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-097",
+      "version": "v1.1",
+      "title": "零不确定度边界",
+      "status": "confirmed",
+      "computed_value": 10.0,
+      "computed_uncertainty": 0.05,
+      "confirmed_value": 10.0,
+      "confirmed_uncertainty": 0.05,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-097",
+      "version": "v1.2",
+      "title": "零不确定度边界",
+      "status": "confirmed",
+      "computed_value": 10.0,
+      "computed_uncertainty": 0.05,
+      "confirmed_value": 10.0,
+      "confirmed_uncertainty": 0.05,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-096",
+      "version": "v1.0",
+      "title": "负值开方边界",
+      "status": "confirmed",
+      "computed_value": null,
+      "computed_uncertainty": null,
+      "confirmed_value": null,
+      "confirmed_uncertainty": null,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-096",
+      "version": "v1.1",
+      "title": "负值开方边界",
+      "status": "confirmed",
+      "computed_value": null,
+      "computed_uncertainty": null,
+      "confirmed_value": null,
+      "confirmed_uncertainty": null,
+      "确认说明": "经核对无误"
+    },
+    {
+      "question_id": "Q-096",
+      "version": "v1.2",
+      "title": "负值开方边界",
+      "status": "confirmed",
+      "computed_value": null,
+      "computed_uncertainty": null,
+      "confirmed_value": null,
+      "confirmed_uncertainty": null,
+      "确认说明": "经核对无误"
+    }
+  ]
+}

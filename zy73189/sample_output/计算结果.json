@@ -1,0 +1,1394 @@
+[
+  {
+    "question_id": "Q-001",
+    "version": "v1.0",
+    "version_desc": "初版参数：采用仪表标称不确定度",
+    "title": "电阻测量",
+    "category": "standard",
+    "boundary_kind": null,
+    "original_statement": "测得电压 V=10.0±0.1 V，电流 I=2.0±0.05 A，求电阻 R 及其不确定度。",
+    "formula": "V / I",
+    "result_unit": "Ω",
+    "inputs": [
+      {
+        "name": "V",
+        "value": 10.0,
+        "uncertainty": 0.1,
+        "unit": "V",
+        "value_si": 10.0,
+        "uncertainty_si": 0.1,
+        "dim_name": "电压 (V)"
+      },
+      {
+        "name": "I",
+        "value": 2.0,
+        "uncertainty": 0.05,
+        "unit": "A",
+        "value_si": 2.0,
+        "uncertainty_si": 0.05,
+        "dim_name": "电流 (A)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "V",
+        "symbolic": "1/I",
+        "value_si": 0.5,
+        "value_class": "finite"
+      },
+      {
+        "var": "I",
+        "symbolic": "-V/I**2",
+        "value_si": -2.5,
+        "value_class": "finite"
+      }
+    ],
+    "exceptions": [],
+    "notes": [],
+    "result_value_si": 5.0,
+    "result_uncertainty_si": 0.13462912017836262,
+    "result_value": 5.0,
+    "result_uncertainty": 0.13462912017836262,
+    "result_dim_name": "电阻 (Ω)",
+    "result_unit_dim_name": "电阻 (Ω)",
+    "dim_match": true,
+    "status": "ok",
+    "explanation": "【截图说明】题目 Q-001《电阻测量》\n公式：V / I\n输入（→SI）：V=10±0.1 V→SI 10±0.1；I=2±0.05 A→SI 2±0.05\n偏导数：∂f/∂V=1/I，∂f/∂I=-V/I**2\n结果：5 ± 0.1346 Ω（SI：5 ± 0.1346）\n原始说法：测得电压 V=10.0±0.1 V，电流 I=2.0±0.05 A，求电阻 R 及其不确定度。"
+  },
+  {
+    "question_id": "Q-001",
+    "version": "v1.1",
+    "version_desc": "复核后修正：Q-001 电流改用更高精度表，不确定度由 0.05 A 调为 0.02 A",
+    "title": "电阻测量",
+    "category": "standard",
+    "boundary_kind": null,
+    "original_statement": "测得电压 V=10.0±0.1 V，电流 I=2.0±0.05 A，求电阻 R 及其不确定度。",
+    "formula": "V / I",
+    "result_unit": "Ω",
+    "inputs": [
+      {
+        "name": "V",
+        "value": 10.0,
+        "uncertainty": 0.1,
+        "unit": "V",
+        "value_si": 10.0,
+        "uncertainty_si": 0.1,
+        "dim_name": "电压 (V)"
+      },
+      {
+        "name": "I",
+        "value": 2.0,
+        "uncertainty": 0.02,
+        "unit": "A",
+        "value_si": 2.0,
+        "uncertainty_si": 0.02,
+        "dim_name": "电流 (A)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "V",
+        "symbolic": "1/I",
+        "value_si": 0.5,
+        "value_class": "finite"
+      },
+      {
+        "var": "I",
+        "symbolic": "-V/I**2",
+        "value_si": -2.5,
+        "value_class": "finite"
+      }
+    ],
+    "exceptions": [],
+    "notes": [],
+    "result_value_si": 5.0,
+    "result_uncertainty_si": 0.07071067811865477,
+    "result_value": 5.0,
+    "result_uncertainty": 0.07071067811865477,
+    "result_dim_name": "电阻 (Ω)",
+    "result_unit_dim_name": "电阻 (Ω)",
+    "dim_match": true,
+    "status": "ok",
+    "explanation": "【截图说明】题目 Q-001《电阻测量》\n公式：V / I\n输入（→SI）：V=10±0.1 V→SI 10±0.1；I=2±0.02 A→SI 2±0.02\n偏导数：∂f/∂V=1/I，∂f/∂I=-V/I**2\n结果：5 ± 0.07071 Ω（SI：5 ± 0.07071）\n原始说法：测得电压 V=10.0±0.1 V，电流 I=2.0±0.05 A，求电阻 R 及其不确定度。"
+  },
+  {
+    "question_id": "Q-001",
+    "version": "v1.2",
+    "version_desc": "单位核对：Q-098 电压不确定度由 10 mV 校正为 8 mV（毫伏档重新标定）",
+    "title": "电阻测量",
+    "category": "standard",
+    "boundary_kind": null,
+    "original_statement": "测得电压 V=10.0±0.1 V，电流 I=2.0±0.05 A，求电阻 R 及其不确定度。",
+    "formula": "V / I",
+    "result_unit": "Ω",
+    "inputs": [
+      {
+        "name": "V",
+        "value": 10.0,
+        "uncertainty": 0.1,
+        "unit": "V",
+        "value_si": 10.0,
+        "uncertainty_si": 0.1,
+        "dim_name": "电压 (V)"
+      },
+      {
+        "name": "I",
+        "value": 2.0,
+        "uncertainty": 0.05,
+        "unit": "A",
+        "value_si": 2.0,
+        "uncertainty_si": 0.05,
+        "dim_name": "电流 (A)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "V",
+        "symbolic": "1/I",
+        "value_si": 0.5,
+        "value_class": "finite"
+      },
+      {
+        "var": "I",
+        "symbolic": "-V/I**2",
+        "value_si": -2.5,
+        "value_class": "finite"
+      }
+    ],
+    "exceptions": [],
+    "notes": [],
+    "result_value_si": 5.0,
+    "result_uncertainty_si": 0.13462912017836262,
+    "result_value": 5.0,
+    "result_uncertainty": 0.13462912017836262,
+    "result_dim_name": "电阻 (Ω)",
+    "result_unit_dim_name": "电阻 (Ω)",
+    "dim_match": true,
+    "status": "ok",
+    "explanation": "【截图说明】题目 Q-001《电阻测量》\n公式：V / I\n输入（→SI）：V=10±0.1 V→SI 10±0.1；I=2±0.05 A→SI 2±0.05\n偏导数：∂f/∂V=1/I，∂f/∂I=-V/I**2\n结果：5 ± 0.1346 Ω（SI：5 ± 0.1346）\n原始说法：测得电压 V=10.0±0.1 V，电流 I=2.0±0.05 A，求电阻 R 及其不确定度。"
+  },
+  {
+    "question_id": "Q-002",
+    "version": "v1.0",
+    "version_desc": "初版参数：采用仪表标称不确定度",
+    "title": "圆柱体体积",
+    "category": "standard",
+    "boundary_kind": null,
+    "original_statement": "圆柱半径 r=0.05±0.001 m，高 h=0.20±0.002 m，求体积 V 及其不确定度。",
+    "formula": "pi * r**2 * h",
+    "result_unit": "m^3",
+    "inputs": [
+      {
+        "name": "r",
+        "value": 0.05,
+        "uncertainty": 0.001,
+        "unit": "m",
+        "value_si": 0.05,
+        "uncertainty_si": 0.001,
+        "dim_name": "长度 (m)"
+      },
+      {
+        "name": "h",
+        "value": 0.2,
+        "uncertainty": 0.002,
+        "unit": "m",
+        "value_si": 0.2,
+        "uncertainty_si": 0.002,
+        "dim_name": "长度 (m)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "r",
+        "symbolic": "2*pi*h*r",
+        "value_si": 0.06283185307179588,
+        "value_class": "finite"
+      },
+      {
+        "var": "h",
+        "symbolic": "pi*r**2",
+        "value_si": 0.007853981633974485,
+        "value_class": "finite"
+      }
+    ],
+    "exceptions": [],
+    "notes": [],
+    "result_value_si": 0.001570796326794897,
+    "result_uncertainty_si": 6.476559171707598e-05,
+    "result_value": 0.001570796326794897,
+    "result_uncertainty": 6.476559171707598e-05,
+    "result_dim_name": "体积 (m^3)",
+    "result_unit_dim_name": "体积 (m^3)",
+    "dim_match": true,
+    "status": "ok",
+    "explanation": "【截图说明】题目 Q-002《圆柱体体积》\n公式：pi * r**2 * h\n输入（→SI）：r=0.05±1.0000e-03 m→SI 0.05±1.0000e-03；h=0.2±2.0000e-03 m→SI 0.2±2.0000e-03\n偏导数：∂f/∂r=2*pi*h*r，∂f/∂h=pi*r**2\n结果：1.5708e-03 ± 6.4766e-05 m^3（SI：1.5708e-03 ± 6.4766e-05）\n原始说法：圆柱半径 r=0.05±0.001 m，高 h=0.20±0.002 m，求体积 V 及其不确定度。"
+  },
+  {
+    "question_id": "Q-002",
+    "version": "v1.1",
+    "version_desc": "复核后修正：Q-001 电流改用更高精度表，不确定度由 0.05 A 调为 0.02 A",
+    "title": "圆柱体体积",
+    "category": "standard",
+    "boundary_kind": null,
+    "original_statement": "圆柱半径 r=0.05±0.001 m，高 h=0.20±0.002 m，求体积 V 及其不确定度。",
+    "formula": "pi * r**2 * h",
+    "result_unit": "m^3",
+    "inputs": [
+      {
+        "name": "r",
+        "value": 0.05,
+        "uncertainty": 0.001,
+        "unit": "m",
+        "value_si": 0.05,
+        "uncertainty_si": 0.001,
+        "dim_name": "长度 (m)"
+      },
+      {
+        "name": "h",
+        "value": 0.2,
+        "uncertainty": 0.002,
+        "unit": "m",
+        "value_si": 0.2,
+        "uncertainty_si": 0.002,
+        "dim_name": "长度 (m)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "r",
+        "symbolic": "2*pi*h*r",
+        "value_si": 0.06283185307179588,
+        "value_class": "finite"
+      },
+      {
+        "var": "h",
+        "symbolic": "pi*r**2",
+        "value_si": 0.007853981633974485,
+        "value_class": "finite"
+      }
+    ],
+    "exceptions": [],
+    "notes": [],
+    "result_value_si": 0.001570796326794897,
+    "result_uncertainty_si": 6.476559171707598e-05,
+    "result_value": 0.001570796326794897,
+    "result_uncertainty": 6.476559171707598e-05,
+    "result_dim_name": "体积 (m^3)",
+    "result_unit_dim_name": "体积 (m^3)",
+    "dim_match": true,
+    "status": "ok",
+    "explanation": "【截图说明】题目 Q-002《圆柱体体积》\n公式：pi * r**2 * h\n输入（→SI）：r=0.05±1.0000e-03 m→SI 0.05±1.0000e-03；h=0.2±2.0000e-03 m→SI 0.2±2.0000e-03\n偏导数：∂f/∂r=2*pi*h*r，∂f/∂h=pi*r**2\n结果：1.5708e-03 ± 6.4766e-05 m^3（SI：1.5708e-03 ± 6.4766e-05）\n原始说法：圆柱半径 r=0.05±0.001 m，高 h=0.20±0.002 m，求体积 V 及其不确定度。"
+  },
+  {
+    "question_id": "Q-002",
+    "version": "v1.2",
+    "version_desc": "单位核对：Q-098 电压不确定度由 10 mV 校正为 8 mV（毫伏档重新标定）",
+    "title": "圆柱体体积",
+    "category": "standard",
+    "boundary_kind": null,
+    "original_statement": "圆柱半径 r=0.05±0.001 m，高 h=0.20±0.002 m，求体积 V 及其不确定度。",
+    "formula": "pi * r**2 * h",
+    "result_unit": "m^3",
+    "inputs": [
+      {
+        "name": "r",
+        "value": 0.05,
+        "uncertainty": 0.001,
+        "unit": "m",
+        "value_si": 0.05,
+        "uncertainty_si": 0.001,
+        "dim_name": "长度 (m)"
+      },
+      {
+        "name": "h",
+        "value": 0.2,
+        "uncertainty": 0.002,
+        "unit": "m",
+        "value_si": 0.2,
+        "uncertainty_si": 0.002,
+        "dim_name": "长度 (m)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "r",
+        "symbolic": "2*pi*h*r",
+        "value_si": 0.06283185307179588,
+        "value_class": "finite"
+      },
+      {
+        "var": "h",
+        "symbolic": "pi*r**2",
+        "value_si": 0.007853981633974485,
+        "value_class": "finite"
+      }
+    ],
+    "exceptions": [],
+    "notes": [],
+    "result_value_si": 0.001570796326794897,
+    "result_uncertainty_si": 6.476559171707598e-05,
+    "result_value": 0.001570796326794897,
+    "result_uncertainty": 6.476559171707598e-05,
+    "result_dim_name": "体积 (m^3)",
+    "result_unit_dim_name": "体积 (m^3)",
+    "dim_match": true,
+    "status": "ok",
+    "explanation": "【截图说明】题目 Q-002《圆柱体体积》\n公式：pi * r**2 * h\n输入（→SI）：r=0.05±1.0000e-03 m→SI 0.05±1.0000e-03；h=0.2±2.0000e-03 m→SI 0.2±2.0000e-03\n偏导数：∂f/∂r=2*pi*h*r，∂f/∂h=pi*r**2\n结果：1.5708e-03 ± 6.4766e-05 m^3（SI：1.5708e-03 ± 6.4766e-05）\n原始说法：圆柱半径 r=0.05±0.001 m，高 h=0.20±0.002 m，求体积 V 及其不确定度。"
+  },
+  {
+    "question_id": "Q-099",
+    "version": "v1.0",
+    "version_desc": "初版参数：采用仪表标称不确定度",
+    "title": "除零边界-电流为零",
+    "category": "boundary",
+    "boundary_kind": "divide_by_zero",
+    "original_statement": "原始清单要求：当电流 I=0 时，电阻 R=V/I 无法计算，必须记录为除零异常（追溯到本条），不得给出任何含糊的有限值或一句笼统警告。",
+    "formula": "V / I",
+    "result_unit": "Ω",
+    "inputs": [
+      {
+        "name": "V",
+        "value": 10.0,
+        "uncertainty": 0.1,
+        "unit": "V",
+        "value_si": 10.0,
+        "uncertainty_si": 0.1,
+        "dim_name": "电压 (V)"
+      },
+      {
+        "name": "I",
+        "value": 0.0,
+        "uncertainty": 0.05,
+        "unit": "A",
+        "value_si": 0.0,
+        "uncertainty_si": 0.05,
+        "dim_name": "电流 (A)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "V",
+        "symbolic": "1/I",
+        "value_si": null,
+        "value_class": "zoo"
+      },
+      {
+        "var": "I",
+        "symbolic": "-V/I**2",
+        "value_si": null,
+        "value_class": "zoo"
+      }
+    ],
+    "exceptions": [
+      {
+        "type": "divide_by_zero",
+        "message": "输入变量 I 取值为 0，使公式 V / I 出现除零；结果无法给出有限值。",
+        "original_statement": "原始清单要求：当电流 I=0 时，电阻 R=V/I 无法计算，必须记录为除零异常（追溯到本条），不得给出任何含糊的有限值或一句笼统警告。",
+        "trace": "Q-099 → 公式 V / I → 除零异常 → 原始说法：原始清单要求：当电流 I=0 时，电阻 R=V/I 无法计算，必须记录为除零异常（追溯到本条），不得给出任何含糊的有限值或一句笼统警告。"
+      }
+    ],
+    "notes": [],
+    "result_value_si": null,
+    "result_uncertainty_si": null,
+    "result_value": null,
+    "result_uncertainty": null,
+    "result_dim_name": "电阻 (Ω)",
+    "result_unit_dim_name": "电阻 (Ω)",
+    "dim_match": true,
+    "status": "exception",
+    "explanation": "【截图说明】题目 Q-099《除零边界-电流为零》\n公式：V / I\n输入（→SI）：V=10±0.1 V→SI 10±0.1；I=0±0.05 A→SI 0±0.05\n偏导数：∂f/∂V=1/I，∂f/∂I=-V/I**2\n异常[除零异常]：输入变量 I 取值为 0，使公式 V / I 出现除零；结果无法给出有限值。\n追溯：Q-099 → 公式 V / I → 除零异常 → 原始说法：原始清单要求：当电流 I=0 时，电阻 R=V/I 无法计算，必须记录为除零异常（追溯到本条），不得给出任何含糊的有限值或一句笼统警告。\n原始说法：原始清单要求：当电流 I=0 时，电阻 R=V/I 无法计算，必须记录为除零异常（追溯到本条），不得给出任何含糊的有限值或一句笼统警告。"
+  },
+  {
+    "question_id": "Q-099",
+    "version": "v1.1",
+    "version_desc": "复核后修正：Q-001 电流改用更高精度表，不确定度由 0.05 A 调为 0.02 A",
+    "title": "除零边界-电流为零",
+    "category": "boundary",
+    "boundary_kind": "divide_by_zero",
+    "original_statement": "原始清单要求：当电流 I=0 时，电阻 R=V/I 无法计算，必须记录为除零异常（追溯到本条），不得给出任何含糊的有限值或一句笼统警告。",
+    "formula": "V / I",
+    "result_unit": "Ω",
+    "inputs": [
+      {
+        "name": "V",
+        "value": 10.0,
+        "uncertainty": 0.1,
+        "unit": "V",
+        "value_si": 10.0,
+        "uncertainty_si": 0.1,
+        "dim_name": "电压 (V)"
+      },
+      {
+        "name": "I",
+        "value": 0.0,
+        "uncertainty": 0.05,
+        "unit": "A",
+        "value_si": 0.0,
+        "uncertainty_si": 0.05,
+        "dim_name": "电流 (A)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "V",
+        "symbolic": "1/I",
+        "value_si": null,
+        "value_class": "zoo"
+      },
+      {
+        "var": "I",
+        "symbolic": "-V/I**2",
+        "value_si": null,
+        "value_class": "zoo"
+      }
+    ],
+    "exceptions": [
+      {
+        "type": "divide_by_zero",
+        "message": "输入变量 I 取值为 0，使公式 V / I 出现除零；结果无法给出有限值。",
+        "original_statement": "原始清单要求：当电流 I=0 时，电阻 R=V/I 无法计算，必须记录为除零异常（追溯到本条），不得给出任何含糊的有限值或一句笼统警告。",
+        "trace": "Q-099 → 公式 V / I → 除零异常 → 原始说法：原始清单要求：当电流 I=0 时，电阻 R=V/I 无法计算，必须记录为除零异常（追溯到本条），不得给出任何含糊的有限值或一句笼统警告。"
+      }
+    ],
+    "notes": [],
+    "result_value_si": null,
+    "result_uncertainty_si": null,
+    "result_value": null,
+    "result_uncertainty": null,
+    "result_dim_name": "电阻 (Ω)",
+    "result_unit_dim_name": "电阻 (Ω)",
+    "dim_match": true,
+    "status": "exception",
+    "explanation": "【截图说明】题目 Q-099《除零边界-电流为零》\n公式：V / I\n输入（→SI）：V=10±0.1 V→SI 10±0.1；I=0±0.05 A→SI 0±0.05\n偏导数：∂f/∂V=1/I，∂f/∂I=-V/I**2\n异常[除零异常]：输入变量 I 取值为 0，使公式 V / I 出现除零；结果无法给出有限值。\n追溯：Q-099 → 公式 V / I → 除零异常 → 原始说法：原始清单要求：当电流 I=0 时，电阻 R=V/I 无法计算，必须记录为除零异常（追溯到本条），不得给出任何含糊的有限值或一句笼统警告。\n原始说法：原始清单要求：当电流 I=0 时，电阻 R=V/I 无法计算，必须记录为除零异常（追溯到本条），不得给出任何含糊的有限值或一句笼统警告。"
+  },
+  {
+    "question_id": "Q-099",
+    "version": "v1.2",
+    "version_desc": "单位核对：Q-098 电压不确定度由 10 mV 校正为 8 mV（毫伏档重新标定）",
+    "title": "除零边界-电流为零",
+    "category": "boundary",
+    "boundary_kind": "divide_by_zero",
+    "original_statement": "原始清单要求：当电流 I=0 时，电阻 R=V/I 无法计算，必须记录为除零异常（追溯到本条），不得给出任何含糊的有限值或一句笼统警告。",
+    "formula": "V / I",
+    "result_unit": "Ω",
+    "inputs": [
+      {
+        "name": "V",
+        "value": 10.0,
+        "uncertainty": 0.1,
+        "unit": "V",
+        "value_si": 10.0,
+        "uncertainty_si": 0.1,
+        "dim_name": "电压 (V)"
+      },
+      {
+        "name": "I",
+        "value": 0.0,
+        "uncertainty": 0.05,
+        "unit": "A",
+        "value_si": 0.0,
+        "uncertainty_si": 0.05,
+        "dim_name": "电流 (A)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "V",
+        "symbolic": "1/I",
+        "value_si": null,
+        "value_class": "zoo"
+      },
+      {
+        "var": "I",
+        "symbolic": "-V/I**2",
+        "value_si": null,
+        "value_class": "zoo"
+      }
+    ],
+    "exceptions": [
+      {
+        "type": "divide_by_zero",
+        "message": "输入变量 I 取值为 0，使公式 V / I 出现除零；结果无法给出有限值。",
+        "original_statement": "原始清单要求：当电流 I=0 时，电阻 R=V/I 无法计算，必须记录为除零异常（追溯到本条），不得给出任何含糊的有限值或一句笼统警告。",
+        "trace": "Q-099 → 公式 V / I → 除零异常 → 原始说法：原始清单要求：当电流 I=0 时，电阻 R=V/I 无法计算，必须记录为除零异常（追溯到本条），不得给出任何含糊的有限值或一句笼统警告。"
+      }
+    ],
+    "notes": [],
+    "result_value_si": null,
+    "result_uncertainty_si": null,
+    "result_value": null,
+    "result_uncertainty": null,
+    "result_dim_name": "电阻 (Ω)",
+    "result_unit_dim_name": "电阻 (Ω)",
+    "dim_match": true,
+    "status": "exception",
+    "explanation": "【截图说明】题目 Q-099《除零边界-电流为零》\n公式：V / I\n输入（→SI）：V=10±0.1 V→SI 10±0.1；I=0±0.05 A→SI 0±0.05\n偏导数：∂f/∂V=1/I，∂f/∂I=-V/I**2\n异常[除零异常]：输入变量 I 取值为 0，使公式 V / I 出现除零；结果无法给出有限值。\n追溯：Q-099 → 公式 V / I → 除零异常 → 原始说法：原始清单要求：当电流 I=0 时，电阻 R=V/I 无法计算，必须记录为除零异常（追溯到本条），不得给出任何含糊的有限值或一句笼统警告。\n原始说法：原始清单要求：当电流 I=0 时，电阻 R=V/I 无法计算，必须记录为除零异常（追溯到本条），不得给出任何含糊的有限值或一句笼统警告。"
+  },
+  {
+    "question_id": "Q-003",
+    "version": "v1.0",
+    "version_desc": "初版参数：采用仪表标称不确定度",
+    "title": "匀速运动速度",
+    "category": "standard",
+    "boundary_kind": null,
+    "original_statement": "位移 s=100±0.5 m，时间 t=10±0.1 s，求速度 v 及其不确定度。",
+    "formula": "s / t",
+    "result_unit": "m/s",
+    "inputs": [
+      {
+        "name": "s",
+        "value": 100.0,
+        "uncertainty": 0.5,
+        "unit": "m",
+        "value_si": 100.0,
+        "uncertainty_si": 0.5,
+        "dim_name": "长度 (m)"
+      },
+      {
+        "name": "t",
+        "value": 10.0,
+        "uncertainty": 0.1,
+        "unit": "s",
+        "value_si": 10.0,
+        "uncertainty_si": 0.1,
+        "dim_name": "时间 (s)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "s",
+        "symbolic": "1/t",
+        "value_si": 0.1,
+        "value_class": "finite"
+      },
+      {
+        "var": "t",
+        "symbolic": "-s/t**2",
+        "value_si": -1.0,
+        "value_class": "finite"
+      }
+    ],
+    "exceptions": [],
+    "notes": [],
+    "result_value_si": 10.0,
+    "result_uncertainty_si": 0.1118033988749895,
+    "result_value": 10.0,
+    "result_uncertainty": 0.1118033988749895,
+    "result_dim_name": "速度 (m/s)",
+    "result_unit_dim_name": "速度 (m/s)",
+    "dim_match": true,
+    "status": "ok",
+    "explanation": "【截图说明】题目 Q-003《匀速运动速度》\n公式：s / t\n输入（→SI）：s=100±0.5 m→SI 100±0.5；t=10±0.1 s→SI 10±0.1\n偏导数：∂f/∂s=1/t，∂f/∂t=-s/t**2\n结果：10 ± 0.1118 m/s（SI：10 ± 0.1118）\n原始说法：位移 s=100±0.5 m，时间 t=10±0.1 s，求速度 v 及其不确定度。"
+  },
+  {
+    "question_id": "Q-003",
+    "version": "v1.1",
+    "version_desc": "复核后修正：Q-001 电流改用更高精度表，不确定度由 0.05 A 调为 0.02 A",
+    "title": "匀速运动速度",
+    "category": "standard",
+    "boundary_kind": null,
+    "original_statement": "位移 s=100±0.5 m，时间 t=10±0.1 s，求速度 v 及其不确定度。",
+    "formula": "s / t",
+    "result_unit": "m/s",
+    "inputs": [
+      {
+        "name": "s",
+        "value": 100.0,
+        "uncertainty": 0.5,
+        "unit": "m",
+        "value_si": 100.0,
+        "uncertainty_si": 0.5,
+        "dim_name": "长度 (m)"
+      },
+      {
+        "name": "t",
+        "value": 10.0,
+        "uncertainty": 0.1,
+        "unit": "s",
+        "value_si": 10.0,
+        "uncertainty_si": 0.1,
+        "dim_name": "时间 (s)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "s",
+        "symbolic": "1/t",
+        "value_si": 0.1,
+        "value_class": "finite"
+      },
+      {
+        "var": "t",
+        "symbolic": "-s/t**2",
+        "value_si": -1.0,
+        "value_class": "finite"
+      }
+    ],
+    "exceptions": [],
+    "notes": [],
+    "result_value_si": 10.0,
+    "result_uncertainty_si": 0.1118033988749895,
+    "result_value": 10.0,
+    "result_uncertainty": 0.1118033988749895,
+    "result_dim_name": "速度 (m/s)",
+    "result_unit_dim_name": "速度 (m/s)",
+    "dim_match": true,
+    "status": "ok",
+    "explanation": "【截图说明】题目 Q-003《匀速运动速度》\n公式：s / t\n输入（→SI）：s=100±0.5 m→SI 100±0.5；t=10±0.1 s→SI 10±0.1\n偏导数：∂f/∂s=1/t，∂f/∂t=-s/t**2\n结果：10 ± 0.1118 m/s（SI：10 ± 0.1118）\n原始说法：位移 s=100±0.5 m，时间 t=10±0.1 s，求速度 v 及其不确定度。"
+  },
+  {
+    "question_id": "Q-003",
+    "version": "v1.2",
+    "version_desc": "单位核对：Q-098 电压不确定度由 10 mV 校正为 8 mV（毫伏档重新标定）",
+    "title": "匀速运动速度",
+    "category": "standard",
+    "boundary_kind": null,
+    "original_statement": "位移 s=100±0.5 m，时间 t=10±0.1 s，求速度 v 及其不确定度。",
+    "formula": "s / t",
+    "result_unit": "m/s",
+    "inputs": [
+      {
+        "name": "s",
+        "value": 100.0,
+        "uncertainty": 0.5,
+        "unit": "m",
+        "value_si": 100.0,
+        "uncertainty_si": 0.5,
+        "dim_name": "长度 (m)"
+      },
+      {
+        "name": "t",
+        "value": 10.0,
+        "uncertainty": 0.1,
+        "unit": "s",
+        "value_si": 10.0,
+        "uncertainty_si": 0.1,
+        "dim_name": "时间 (s)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "s",
+        "symbolic": "1/t",
+        "value_si": 0.1,
+        "value_class": "finite"
+      },
+      {
+        "var": "t",
+        "symbolic": "-s/t**2",
+        "value_si": -1.0,
+        "value_class": "finite"
+      }
+    ],
+    "exceptions": [],
+    "notes": [],
+    "result_value_si": 10.0,
+    "result_uncertainty_si": 0.1118033988749895,
+    "result_value": 10.0,
+    "result_uncertainty": 0.1118033988749895,
+    "result_dim_name": "速度 (m/s)",
+    "result_unit_dim_name": "速度 (m/s)",
+    "dim_match": true,
+    "status": "ok",
+    "explanation": "【截图说明】题目 Q-003《匀速运动速度》\n公式：s / t\n输入（→SI）：s=100±0.5 m→SI 100±0.5；t=10±0.1 s→SI 10±0.1\n偏导数：∂f/∂s=1/t，∂f/∂t=-s/t**2\n结果：10 ± 0.1118 m/s（SI：10 ± 0.1118）\n原始说法：位移 s=100±0.5 m，时间 t=10±0.1 s，求速度 v 及其不确定度。"
+  },
+  {
+    "question_id": "Q-098",
+    "version": "v1.0",
+    "version_desc": "初版参数：采用仪表标称不确定度",
+    "title": "单位不一致边界-毫伏与安培混用",
+    "category": "boundary",
+    "boundary_kind": "unit_mismatch",
+    "original_statement": "原始清单要求：电压以 mV 给出、电流以 A 给出，结果要求 Ω；必须先统一到 SI 基本单位再计算，避免公式写对却因单位换算导致结果偏移。",
+    "formula": "V / I",
+    "result_unit": "Ω",
+    "inputs": [
+      {
+        "name": "V",
+        "value": 1000.0,
+        "uncertainty": 10.0,
+        "unit": "mV",
+        "value_si": 1.0,
+        "uncertainty_si": 0.01,
+        "dim_name": "电压 (V)"
+      },
+      {
+        "name": "I",
+        "value": 2.0,
+        "uncertainty": 0.05,
+        "unit": "A",
+        "value_si": 2.0,
+        "uncertainty_si": 0.05,
+        "dim_name": "电流 (A)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "V",
+        "symbolic": "1/I",
+        "value_si": 0.5,
+        "value_class": "finite"
+      },
+      {
+        "var": "I",
+        "symbolic": "-V/I**2",
+        "value_si": -0.25,
+        "value_class": "finite"
+      }
+    ],
+    "exceptions": [],
+    "notes": [],
+    "result_value_si": 0.5,
+    "result_uncertainty_si": 0.013462912017836262,
+    "result_value": 0.5,
+    "result_uncertainty": 0.013462912017836262,
+    "result_dim_name": "电阻 (Ω)",
+    "result_unit_dim_name": "电阻 (Ω)",
+    "dim_match": true,
+    "status": "ok",
+    "explanation": "【截图说明】题目 Q-098《单位不一致边界-毫伏与安培混用》\n公式：V / I\n输入（→SI）：V=1.0000e+03±10 mV→SI 1±0.01；I=2±0.05 A→SI 2±0.05\n偏导数：∂f/∂V=1/I，∂f/∂I=-V/I**2\n结果：0.5 ± 0.01346 Ω（SI：0.5 ± 0.01346）\n原始说法：原始清单要求：电压以 mV 给出、电流以 A 给出，结果要求 Ω；必须先统一到 SI 基本单位再计算，避免公式写对却因单位换算导致结果偏移。"
+  },
+  {
+    "question_id": "Q-098",
+    "version": "v1.1",
+    "version_desc": "复核后修正：Q-001 电流改用更高精度表，不确定度由 0.05 A 调为 0.02 A",
+    "title": "单位不一致边界-毫伏与安培混用",
+    "category": "boundary",
+    "boundary_kind": "unit_mismatch",
+    "original_statement": "原始清单要求：电压以 mV 给出、电流以 A 给出，结果要求 Ω；必须先统一到 SI 基本单位再计算，避免公式写对却因单位换算导致结果偏移。",
+    "formula": "V / I",
+    "result_unit": "Ω",
+    "inputs": [
+      {
+        "name": "V",
+        "value": 1000.0,
+        "uncertainty": 10.0,
+        "unit": "mV",
+        "value_si": 1.0,
+        "uncertainty_si": 0.01,
+        "dim_name": "电压 (V)"
+      },
+      {
+        "name": "I",
+        "value": 2.0,
+        "uncertainty": 0.05,
+        "unit": "A",
+        "value_si": 2.0,
+        "uncertainty_si": 0.05,
+        "dim_name": "电流 (A)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "V",
+        "symbolic": "1/I",
+        "value_si": 0.5,
+        "value_class": "finite"
+      },
+      {
+        "var": "I",
+        "symbolic": "-V/I**2",
+        "value_si": -0.25,
+        "value_class": "finite"
+      }
+    ],
+    "exceptions": [],
+    "notes": [],
+    "result_value_si": 0.5,
+    "result_uncertainty_si": 0.013462912017836262,
+    "result_value": 0.5,
+    "result_uncertainty": 0.013462912017836262,
+    "result_dim_name": "电阻 (Ω)",
+    "result_unit_dim_name": "电阻 (Ω)",
+    "dim_match": true,
+    "status": "ok",
+    "explanation": "【截图说明】题目 Q-098《单位不一致边界-毫伏与安培混用》\n公式：V / I\n输入（→SI）：V=1.0000e+03±10 mV→SI 1±0.01；I=2±0.05 A→SI 2±0.05\n偏导数：∂f/∂V=1/I，∂f/∂I=-V/I**2\n结果：0.5 ± 0.01346 Ω（SI：0.5 ± 0.01346）\n原始说法：原始清单要求：电压以 mV 给出、电流以 A 给出，结果要求 Ω；必须先统一到 SI 基本单位再计算，避免公式写对却因单位换算导致结果偏移。"
+  },
+  {
+    "question_id": "Q-098",
+    "version": "v1.2",
+    "version_desc": "单位核对：Q-098 电压不确定度由 10 mV 校正为 8 mV（毫伏档重新标定）",
+    "title": "单位不一致边界-毫伏与安培混用",
+    "category": "boundary",
+    "boundary_kind": "unit_mismatch",
+    "original_statement": "原始清单要求：电压以 mV 给出、电流以 A 给出，结果要求 Ω；必须先统一到 SI 基本单位再计算，避免公式写对却因单位换算导致结果偏移。",
+    "formula": "V / I",
+    "result_unit": "Ω",
+    "inputs": [
+      {
+        "name": "V",
+        "value": 1000.0,
+        "uncertainty": 8.0,
+        "unit": "mV",
+        "value_si": 1.0,
+        "uncertainty_si": 0.008,
+        "dim_name": "电压 (V)"
+      },
+      {
+        "name": "I",
+        "value": 2.0,
+        "uncertainty": 0.05,
+        "unit": "A",
+        "value_si": 2.0,
+        "uncertainty_si": 0.05,
+        "dim_name": "电流 (A)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "V",
+        "symbolic": "1/I",
+        "value_si": 0.5,
+        "value_class": "finite"
+      },
+      {
+        "var": "I",
+        "symbolic": "-V/I**2",
+        "value_si": -0.25,
+        "value_class": "finite"
+      }
+    ],
+    "exceptions": [],
+    "notes": [],
+    "result_value_si": 0.5,
+    "result_uncertainty_si": 0.013124404748406688,
+    "result_value": 0.5,
+    "result_uncertainty": 0.013124404748406688,
+    "result_dim_name": "电阻 (Ω)",
+    "result_unit_dim_name": "电阻 (Ω)",
+    "dim_match": true,
+    "status": "ok",
+    "explanation": "【截图说明】题目 Q-098《单位不一致边界-毫伏与安培混用》\n公式：V / I\n输入（→SI）：V=1.0000e+03±8 mV→SI 1±8.0000e-03；I=2±0.05 A→SI 2±0.05\n偏导数：∂f/∂V=1/I，∂f/∂I=-V/I**2\n结果：0.5 ± 0.01312 Ω（SI：0.5 ± 0.01312）\n原始说法：原始清单要求：电压以 mV 给出、电流以 A 给出，结果要求 Ω；必须先统一到 SI 基本单位再计算，避免公式写对却因单位换算导致结果偏移。"
+  },
+  {
+    "question_id": "Q-004",
+    "version": "v1.0",
+    "version_desc": "初版参数：采用仪表标称不确定度",
+    "title": "电功率",
+    "category": "standard",
+    "boundary_kind": null,
+    "original_statement": "电压 V=12±0.1 V，电流 I=0.5±0.01 A，求功率 P 及其不确定度。",
+    "formula": "V * I",
+    "result_unit": "W",
+    "inputs": [
+      {
+        "name": "V",
+        "value": 12.0,
+        "uncertainty": 0.1,
+        "unit": "V",
+        "value_si": 12.0,
+        "uncertainty_si": 0.1,
+        "dim_name": "电压 (V)"
+      },
+      {
+        "name": "I",
+        "value": 0.5,
+        "uncertainty": 0.01,
+        "unit": "A",
+        "value_si": 0.5,
+        "uncertainty_si": 0.01,
+        "dim_name": "电流 (A)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "V",
+        "symbolic": "I",
+        "value_si": 0.5,
+        "value_class": "finite"
+      },
+      {
+        "var": "I",
+        "symbolic": "V",
+        "value_si": 12.0,
+        "value_class": "finite"
+      }
+    ],
+    "exceptions": [],
+    "notes": [],
+    "result_value_si": 6.0,
+    "result_uncertainty_si": 0.13,
+    "result_value": 6.0,
+    "result_uncertainty": 0.13,
+    "result_dim_name": "功率 (W)",
+    "result_unit_dim_name": "功率 (W)",
+    "dim_match": true,
+    "status": "ok",
+    "explanation": "【截图说明】题目 Q-004《电功率》\n公式：V * I\n输入（→SI）：V=12±0.1 V→SI 12±0.1；I=0.5±0.01 A→SI 0.5±0.01\n偏导数：∂f/∂V=I，∂f/∂I=V\n结果：6 ± 0.13 W（SI：6 ± 0.13）\n原始说法：电压 V=12±0.1 V，电流 I=0.5±0.01 A，求功率 P 及其不确定度。"
+  },
+  {
+    "question_id": "Q-004",
+    "version": "v1.1",
+    "version_desc": "复核后修正：Q-001 电流改用更高精度表，不确定度由 0.05 A 调为 0.02 A",
+    "title": "电功率",
+    "category": "standard",
+    "boundary_kind": null,
+    "original_statement": "电压 V=12±0.1 V，电流 I=0.5±0.01 A，求功率 P 及其不确定度。",
+    "formula": "V * I",
+    "result_unit": "W",
+    "inputs": [
+      {
+        "name": "V",
+        "value": 12.0,
+        "uncertainty": 0.1,
+        "unit": "V",
+        "value_si": 12.0,
+        "uncertainty_si": 0.1,
+        "dim_name": "电压 (V)"
+      },
+      {
+        "name": "I",
+        "value": 0.5,
+        "uncertainty": 0.01,
+        "unit": "A",
+        "value_si": 0.5,
+        "uncertainty_si": 0.01,
+        "dim_name": "电流 (A)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "V",
+        "symbolic": "I",
+        "value_si": 0.5,
+        "value_class": "finite"
+      },
+      {
+        "var": "I",
+        "symbolic": "V",
+        "value_si": 12.0,
+        "value_class": "finite"
+      }
+    ],
+    "exceptions": [],
+    "notes": [],
+    "result_value_si": 6.0,
+    "result_uncertainty_si": 0.13,
+    "result_value": 6.0,
+    "result_uncertainty": 0.13,
+    "result_dim_name": "功率 (W)",
+    "result_unit_dim_name": "功率 (W)",
+    "dim_match": true,
+    "status": "ok",
+    "explanation": "【截图说明】题目 Q-004《电功率》\n公式：V * I\n输入（→SI）：V=12±0.1 V→SI 12±0.1；I=0.5±0.01 A→SI 0.5±0.01\n偏导数：∂f/∂V=I，∂f/∂I=V\n结果：6 ± 0.13 W（SI：6 ± 0.13）\n原始说法：电压 V=12±0.1 V，电流 I=0.5±0.01 A，求功率 P 及其不确定度。"
+  },
+  {
+    "question_id": "Q-004",
+    "version": "v1.2",
+    "version_desc": "单位核对：Q-098 电压不确定度由 10 mV 校正为 8 mV（毫伏档重新标定）",
+    "title": "电功率",
+    "category": "standard",
+    "boundary_kind": null,
+    "original_statement": "电压 V=12±0.1 V，电流 I=0.5±0.01 A，求功率 P 及其不确定度。",
+    "formula": "V * I",
+    "result_unit": "W",
+    "inputs": [
+      {
+        "name": "V",
+        "value": 12.0,
+        "uncertainty": 0.1,
+        "unit": "V",
+        "value_si": 12.0,
+        "uncertainty_si": 0.1,
+        "dim_name": "电压 (V)"
+      },
+      {
+        "name": "I",
+        "value": 0.5,
+        "uncertainty": 0.01,
+        "unit": "A",
+        "value_si": 0.5,
+        "uncertainty_si": 0.01,
+        "dim_name": "电流 (A)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "V",
+        "symbolic": "I",
+        "value_si": 0.5,
+        "value_class": "finite"
+      },
+      {
+        "var": "I",
+        "symbolic": "V",
+        "value_si": 12.0,
+        "value_class": "finite"
+      }
+    ],
+    "exceptions": [],
+    "notes": [],
+    "result_value_si": 6.0,
+    "result_uncertainty_si": 0.13,
+    "result_value": 6.0,
+    "result_uncertainty": 0.13,
+    "result_dim_name": "功率 (W)",
+    "result_unit_dim_name": "功率 (W)",
+    "dim_match": true,
+    "status": "ok",
+    "explanation": "【截图说明】题目 Q-004《电功率》\n公式：V * I\n输入（→SI）：V=12±0.1 V→SI 12±0.1；I=0.5±0.01 A→SI 0.5±0.01\n偏导数：∂f/∂V=I，∂f/∂I=V\n结果：6 ± 0.13 W（SI：6 ± 0.13）\n原始说法：电压 V=12±0.1 V，电流 I=0.5±0.01 A，求功率 P 及其不确定度。"
+  },
+  {
+    "question_id": "Q-097",
+    "version": "v1.0",
+    "version_desc": "初版参数：采用仪表标称不确定度",
+    "title": "零不确定度边界",
+    "category": "boundary",
+    "boundary_kind": "zero_uncertainty",
+    "original_statement": "原始清单要求：当某变量不确定度为 0 时，该项对误差无贡献，应正常计算并标注零贡献，不应报错。",
+    "formula": "V * I",
+    "result_unit": "W",
+    "inputs": [
+      {
+        "name": "V",
+        "value": 5.0,
+        "uncertainty": 0.0,
+        "unit": "V",
+        "value_si": 5.0,
+        "uncertainty_si": 0.0,
+        "dim_name": "电压 (V)"
+      },
+      {
+        "name": "I",
+        "value": 2.0,
+        "uncertainty": 0.01,
+        "unit": "A",
+        "value_si": 2.0,
+        "uncertainty_si": 0.01,
+        "dim_name": "电流 (A)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "V",
+        "symbolic": "I",
+        "value_si": 2.0,
+        "value_class": "finite"
+      },
+      {
+        "var": "I",
+        "symbolic": "V",
+        "value_si": 5.0,
+        "value_class": "finite"
+      }
+    ],
+    "exceptions": [],
+    "notes": [
+      "变量 V 不确定度为 0，对误差零贡献。"
+    ],
+    "result_value_si": 10.0,
+    "result_uncertainty_si": 0.05,
+    "result_value": 10.0,
+    "result_uncertainty": 0.05,
+    "result_dim_name": "功率 (W)",
+    "result_unit_dim_name": "功率 (W)",
+    "dim_match": true,
+    "status": "warning",
+    "explanation": "【截图说明】题目 Q-097《零不确定度边界》\n公式：V * I\n输入（→SI）：V=5±0 V→SI 5±0；I=2±0.01 A→SI 2±0.01\n偏导数：∂f/∂V=I，∂f/∂I=V\n结果：10 ± 0.05 W（SI：10 ± 0.05）\n提示：变量 V 不确定度为 0，对误差零贡献。\n原始说法：原始清单要求：当某变量不确定度为 0 时，该项对误差无贡献，应正常计算并标注零贡献，不应报错。"
+  },
+  {
+    "question_id": "Q-097",
+    "version": "v1.1",
+    "version_desc": "复核后修正：Q-001 电流改用更高精度表，不确定度由 0.05 A 调为 0.02 A",
+    "title": "零不确定度边界",
+    "category": "boundary",
+    "boundary_kind": "zero_uncertainty",
+    "original_statement": "原始清单要求：当某变量不确定度为 0 时，该项对误差无贡献，应正常计算并标注零贡献，不应报错。",
+    "formula": "V * I",
+    "result_unit": "W",
+    "inputs": [
+      {
+        "name": "V",
+        "value": 5.0,
+        "uncertainty": 0.0,
+        "unit": "V",
+        "value_si": 5.0,
+        "uncertainty_si": 0.0,
+        "dim_name": "电压 (V)"
+      },
+      {
+        "name": "I",
+        "value": 2.0,
+        "uncertainty": 0.01,
+        "unit": "A",
+        "value_si": 2.0,
+        "uncertainty_si": 0.01,
+        "dim_name": "电流 (A)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "V",
+        "symbolic": "I",
+        "value_si": 2.0,
+        "value_class": "finite"
+      },
+      {
+        "var": "I",
+        "symbolic": "V",
+        "value_si": 5.0,
+        "value_class": "finite"
+      }
+    ],
+    "exceptions": [],
+    "notes": [
+      "变量 V 不确定度为 0，对误差零贡献。"
+    ],
+    "result_value_si": 10.0,
+    "result_uncertainty_si": 0.05,
+    "result_value": 10.0,
+    "result_uncertainty": 0.05,
+    "result_dim_name": "功率 (W)",
+    "result_unit_dim_name": "功率 (W)",
+    "dim_match": true,
+    "status": "warning",
+    "explanation": "【截图说明】题目 Q-097《零不确定度边界》\n公式：V * I\n输入（→SI）：V=5±0 V→SI 5±0；I=2±0.01 A→SI 2±0.01\n偏导数：∂f/∂V=I，∂f/∂I=V\n结果：10 ± 0.05 W（SI：10 ± 0.05）\n提示：变量 V 不确定度为 0，对误差零贡献。\n原始说法：原始清单要求：当某变量不确定度为 0 时，该项对误差无贡献，应正常计算并标注零贡献，不应报错。"
+  },
+  {
+    "question_id": "Q-097",
+    "version": "v1.2",
+    "version_desc": "单位核对：Q-098 电压不确定度由 10 mV 校正为 8 mV（毫伏档重新标定）",
+    "title": "零不确定度边界",
+    "category": "boundary",
+    "boundary_kind": "zero_uncertainty",
+    "original_statement": "原始清单要求：当某变量不确定度为 0 时，该项对误差无贡献，应正常计算并标注零贡献，不应报错。",
+    "formula": "V * I",
+    "result_unit": "W",
+    "inputs": [
+      {
+        "name": "V",
+        "value": 5.0,
+        "uncertainty": 0.0,
+        "unit": "V",
+        "value_si": 5.0,
+        "uncertainty_si": 0.0,
+        "dim_name": "电压 (V)"
+      },
+      {
+        "name": "I",
+        "value": 2.0,
+        "uncertainty": 0.01,
+        "unit": "A",
+        "value_si": 2.0,
+        "uncertainty_si": 0.01,
+        "dim_name": "电流 (A)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "V",
+        "symbolic": "I",
+        "value_si": 2.0,
+        "value_class": "finite"
+      },
+      {
+        "var": "I",
+        "symbolic": "V",
+        "value_si": 5.0,
+        "value_class": "finite"
+      }
+    ],
+    "exceptions": [],
+    "notes": [
+      "变量 V 不确定度为 0，对误差零贡献。"
+    ],
+    "result_value_si": 10.0,
+    "result_uncertainty_si": 0.05,
+    "result_value": 10.0,
+    "result_uncertainty": 0.05,
+    "result_dim_name": "功率 (W)",
+    "result_unit_dim_name": "功率 (W)",
+    "dim_match": true,
+    "status": "warning",
+    "explanation": "【截图说明】题目 Q-097《零不确定度边界》\n公式：V * I\n输入（→SI）：V=5±0 V→SI 5±0；I=2±0.01 A→SI 2±0.01\n偏导数：∂f/∂V=I，∂f/∂I=V\n结果：10 ± 0.05 W（SI：10 ± 0.05）\n提示：变量 V 不确定度为 0，对误差零贡献。\n原始说法：原始清单要求：当某变量不确定度为 0 时，该项对误差无贡献，应正常计算并标注零贡献，不应报错。"
+  },
+  {
+    "question_id": "Q-096",
+    "version": "v1.0",
+    "version_desc": "初版参数：采用仪表标称不确定度",
+    "title": "负值开方边界",
+    "category": "boundary",
+    "boundary_kind": "negative_sqrt",
+    "original_statement": "原始清单要求：当 L 取负值时 sqrt(g*L) 无实数解，应记录为复数域异常并追溯到本条原始说法，不得静默返回实数。",
+    "formula": "sqrt(g * L)",
+    "result_unit": "m/s",
+    "inputs": [
+      {
+        "name": "g",
+        "value": 9.8,
+        "uncertainty": 0.1,
+        "unit": "m/s^2",
+        "value_si": 9.8,
+        "uncertainty_si": 0.1,
+        "dim_name": "加速度 (m/s^2)"
+      },
+      {
+        "name": "L",
+        "value": -0.1,
+        "uncertainty": 0.01,
+        "unit": "m",
+        "value_si": -0.1,
+        "uncertainty_si": 0.01,
+        "dim_name": "长度 (m)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "g",
+        "symbolic": "sqrt(L*g)/(2*g)",
+        "value_si": null,
+        "value_class": "complex"
+      },
+      {
+        "var": "L",
+        "symbolic": "sqrt(L*g)/(2*L)",
+        "value_si": null,
+        "value_class": "complex"
+      }
+    ],
+    "exceptions": [
+      {
+        "type": "complex_result",
+        "message": "公式 sqrt(g * L) 代入后得到复数结果（约 0 +0.9899i），无实数解。",
+        "original_statement": "原始清单要求：当 L 取负值时 sqrt(g*L) 无实数解，应记录为复数域异常并追溯到本条原始说法，不得静默返回实数。",
+        "trace": "Q-096 → 公式 sqrt(g * L) → 复数结果异常 → 原始说法：原始清单要求：当 L 取负值时 sqrt(g*L) 无实数解，应记录为复数域异常并追溯到本条原始说法，不得静默返回实数。"
+      }
+    ],
+    "notes": [],
+    "result_value_si": null,
+    "result_uncertainty_si": null,
+    "result_value": null,
+    "result_uncertainty": null,
+    "result_dim_name": "速度 (m/s)",
+    "result_unit_dim_name": "速度 (m/s)",
+    "dim_match": true,
+    "status": "exception",
+    "explanation": "【截图说明】题目 Q-096《负值开方边界》\n公式：sqrt(g * L)\n输入（→SI）：g=9.8±0.1 m/s^2→SI 9.8±0.1；L=-0.1±0.01 m→SI -0.1±0.01\n偏导数：∂f/∂g=sqrt(L*g)/(2*g)，∂f/∂L=sqrt(L*g)/(2*L)\n异常[复数结果异常]：公式 sqrt(g * L) 代入后得到复数结果（约 0 +0.9899i），无实数解。\n追溯：Q-096 → 公式 sqrt(g * L) → 复数结果异常 → 原始说法：原始清单要求：当 L 取负值时 sqrt(g*L) 无实数解，应记录为复数域异常并追溯到本条原始说法，不得静默返回实数。\n原始说法：原始清单要求：当 L 取负值时 sqrt(g*L) 无实数解，应记录为复数域异常并追溯到本条原始说法，不得静默返回实数。"
+  },
+  {
+    "question_id": "Q-096",
+    "version": "v1.1",
+    "version_desc": "复核后修正：Q-001 电流改用更高精度表，不确定度由 0.05 A 调为 0.02 A",
+    "title": "负值开方边界",
+    "category": "boundary",
+    "boundary_kind": "negative_sqrt",
+    "original_statement": "原始清单要求：当 L 取负值时 sqrt(g*L) 无实数解，应记录为复数域异常并追溯到本条原始说法，不得静默返回实数。",
+    "formula": "sqrt(g * L)",
+    "result_unit": "m/s",
+    "inputs": [
+      {
+        "name": "g",
+        "value": 9.8,
+        "uncertainty": 0.1,
+        "unit": "m/s^2",
+        "value_si": 9.8,
+        "uncertainty_si": 0.1,
+        "dim_name": "加速度 (m/s^2)"
+      },
+      {
+        "name": "L",
+        "value": -0.1,
+        "uncertainty": 0.01,
+        "unit": "m",
+        "value_si": -0.1,
+        "uncertainty_si": 0.01,
+        "dim_name": "长度 (m)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "g",
+        "symbolic": "sqrt(L*g)/(2*g)",
+        "value_si": null,
+        "value_class": "complex"
+      },
+      {
+        "var": "L",
+        "symbolic": "sqrt(L*g)/(2*L)",
+        "value_si": null,
+        "value_class": "complex"
+      }
+    ],
+    "exceptions": [
+      {
+        "type": "complex_result",
+        "message": "公式 sqrt(g * L) 代入后得到复数结果（约 0 +0.9899i），无实数解。",
+        "original_statement": "原始清单要求：当 L 取负值时 sqrt(g*L) 无实数解，应记录为复数域异常并追溯到本条原始说法，不得静默返回实数。",
+        "trace": "Q-096 → 公式 sqrt(g * L) → 复数结果异常 → 原始说法：原始清单要求：当 L 取负值时 sqrt(g*L) 无实数解，应记录为复数域异常并追溯到本条原始说法，不得静默返回实数。"
+      }
+    ],
+    "notes": [],
+    "result_value_si": null,
+    "result_uncertainty_si": null,
+    "result_value": null,
+    "result_uncertainty": null,
+    "result_dim_name": "速度 (m/s)",
+    "result_unit_dim_name": "速度 (m/s)",
+    "dim_match": true,
+    "status": "exception",
+    "explanation": "【截图说明】题目 Q-096《负值开方边界》\n公式：sqrt(g * L)\n输入（→SI）：g=9.8±0.1 m/s^2→SI 9.8±0.1；L=-0.1±0.01 m→SI -0.1±0.01\n偏导数：∂f/∂g=sqrt(L*g)/(2*g)，∂f/∂L=sqrt(L*g)/(2*L)\n异常[复数结果异常]：公式 sqrt(g * L) 代入后得到复数结果（约 0 +0.9899i），无实数解。\n追溯：Q-096 → 公式 sqrt(g * L) → 复数结果异常 → 原始说法：原始清单要求：当 L 取负值时 sqrt(g*L) 无实数解，应记录为复数域异常并追溯到本条原始说法，不得静默返回实数。\n原始说法：原始清单要求：当 L 取负值时 sqrt(g*L) 无实数解，应记录为复数域异常并追溯到本条原始说法，不得静默返回实数。"
+  },
+  {
+    "question_id": "Q-096",
+    "version": "v1.2",
+    "version_desc": "单位核对：Q-098 电压不确定度由 10 mV 校正为 8 mV（毫伏档重新标定）",
+    "title": "负值开方边界",
+    "category": "boundary",
+    "boundary_kind": "negative_sqrt",
+    "original_statement": "原始清单要求：当 L 取负值时 sqrt(g*L) 无实数解，应记录为复数域异常并追溯到本条原始说法，不得静默返回实数。",
+    "formula": "sqrt(g * L)",
+    "result_unit": "m/s",
+    "inputs": [
+      {
+        "name": "g",
+        "value": 9.8,
+        "uncertainty": 0.1,
+        "unit": "m/s^2",
+        "value_si": 9.8,
+        "uncertainty_si": 0.1,
+        "dim_name": "加速度 (m/s^2)"
+      },
+      {
+        "name": "L",
+        "value": -0.1,
+        "uncertainty": 0.01,
+        "unit": "m",
+        "value_si": -0.1,
+        "uncertainty_si": 0.01,
+        "dim_name": "长度 (m)"
+      }
+    ],
+    "partials": [
+      {
+        "var": "g",
+        "symbolic": "sqrt(L*g)/(2*g)",
+        "value_si": null,
+        "value_class": "complex"
+      },
+      {
+        "var": "L",
+        "symbolic": "sqrt(L*g)/(2*L)",
+        "value_si": null,
+        "value_class": "complex"
+      }
+    ],
+    "exceptions": [
+      {
+        "type": "complex_result",
+        "message": "公式 sqrt(g * L) 代入后得到复数结果（约 0 +0.9899i），无实数解。",
+        "original_statement": "原始清单要求：当 L 取负值时 sqrt(g*L) 无实数解，应记录为复数域异常并追溯到本条原始说法，不得静默返回实数。",
+        "trace": "Q-096 → 公式 sqrt(g * L) → 复数结果异常 → 原始说法：原始清单要求：当 L 取负值时 sqrt(g*L) 无实数解，应记录为复数域异常并追溯到本条原始说法，不得静默返回实数。"
+      }
+    ],
+    "notes": [],
+    "result_value_si": null,
+    "result_uncertainty_si": null,
+    "result_value": null,
+    "result_uncertainty": null,
+    "result_dim_name": "速度 (m/s)",
+    "result_unit_dim_name": "速度 (m/s)",
+    "dim_match": true,
+    "status": "exception",
+    "explanation": "【截图说明】题目 Q-096《负值开方边界》\n公式：sqrt(g * L)\n输入（→SI）：g=9.8±0.1 m/s^2→SI 9.8±0.1；L=-0.1±0.01 m→SI -0.1±0.01\n偏导数：∂f/∂g=sqrt(L*g)/(2*g)，∂f/∂L=sqrt(L*g)/(2*L)\n异常[复数结果异常]：公式 sqrt(g * L) 代入后得到复数结果（约 0 +0.9899i），无实数解。\n追溯：Q-096 → 公式 sqrt(g * L) → 复数结果异常 → 原始说法：原始清单要求：当 L 取负值时 sqrt(g*L) 无实数解，应记录为复数域异常并追溯到本条原始说法，不得静默返回实数。\n原始说法：原始清单要求：当 L 取负值时 sqrt(g*L) 无实数解，应记录为复数域异常并追溯到本条原始说法，不得静默返回实数。"
+  }
+]

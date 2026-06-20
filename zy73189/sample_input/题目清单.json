@@ -1,0 +1,107 @@
+{
+  "清单名称": "误差传播参数回放-题目清单",
+  "版本": "2026-06",
+  "说明": "用于误差传播计算与参数回放。标准行用于常规校核；边界行（Q-096~Q-099）夹在题目之间，用于检验异常处理。每条题目的 original_statement 字段为题目清单的原始说法，异常时须追溯到该字段，不得给出含糊警告。",
+  "题目": [
+    {
+      "id": "Q-001",
+      "title": "电阻测量",
+      "formula": "V / I",
+      "variables": {
+        "V": {"value": 10.0, "uncertainty": 0.1, "unit": "V"},
+        "I": {"value": 2.0, "uncertainty": 0.05, "unit": "A"}
+      },
+      "result_unit": "Ω",
+      "category": "standard",
+      "original_statement": "测得电压 V=10.0±0.1 V，电流 I=2.0±0.05 A，求电阻 R 及其不确定度。"
+    },
+    {
+      "id": "Q-002",
+      "title": "圆柱体体积",
+      "formula": "pi * r**2 * h",
+      "variables": {
+        "r": {"value": 0.05, "uncertainty": 0.001, "unit": "m"},
+        "h": {"value": 0.20, "uncertainty": 0.002, "unit": "m"}
+      },
+      "result_unit": "m^3",
+      "category": "standard",
+      "original_statement": "圆柱半径 r=0.05±0.001 m，高 h=0.20±0.002 m，求体积 V 及其不确定度。"
+    },
+    {
+      "id": "Q-099",
+      "title": "除零边界-电流为零",
+      "formula": "V / I",
+      "variables": {
+        "V": {"value": 10.0, "uncertainty": 0.1, "unit": "V"},
+        "I": {"value": 0.0, "uncertainty": 0.05, "unit": "A"}
+      },
+      "result_unit": "Ω",
+      "category": "boundary",
+      "boundary_kind": "divide_by_zero",
+      "original_statement": "原始清单要求：当电流 I=0 时，电阻 R=V/I 无法计算，必须记录为除零异常（追溯到本条），不得给出任何含糊的有限值或一句笼统警告。"
+    },
+    {
+      "id": "Q-003",
+      "title": "匀速运动速度",
+      "formula": "s / t",
+      "variables": {
+        "s": {"value": 100.0, "uncertainty": 0.5, "unit": "m"},
+        "t": {"value": 10.0, "uncertainty": 0.1, "unit": "s"}
+      },
+      "result_unit": "m/s",
+      "category": "standard",
+      "original_statement": "位移 s=100±0.5 m，时间 t=10±0.1 s，求速度 v 及其不确定度。"
+    },
+    {
+      "id": "Q-098",
+      "title": "单位不一致边界-毫伏与安培混用",
+      "formula": "V / I",
+      "variables": {
+        "V": {"value": 1000.0, "uncertainty": 10.0, "unit": "mV"},
+        "I": {"value": 2.0, "uncertainty": 0.05, "unit": "A"}
+      },
+      "result_unit": "Ω",
+      "category": "boundary",
+      "boundary_kind": "unit_mismatch",
+      "original_statement": "原始清单要求：电压以 mV 给出、电流以 A 给出，结果要求 Ω；必须先统一到 SI 基本单位再计算，避免公式写对却因单位换算导致结果偏移。"
+    },
+    {
+      "id": "Q-004",
+      "title": "电功率",
+      "formula": "V * I",
+      "variables": {
+        "V": {"value": 12.0, "uncertainty": 0.1, "unit": "V"},
+        "I": {"value": 0.5, "uncertainty": 0.01, "unit": "A"}
+      },
+      "result_unit": "W",
+      "category": "standard",
+      "original_statement": "电压 V=12±0.1 V，电流 I=0.5±0.01 A，求功率 P 及其不确定度。"
+    },
+    {
+      "id": "Q-097",
+      "title": "零不确定度边界",
+      "formula": "V * I",
+      "variables": {
+        "V": {"value": 5.0, "uncertainty": 0.0, "unit": "V"},
+        "I": {"value": 2.0, "uncertainty": 0.01, "unit": "A"}
+      },
+      "result_unit": "W",
+      "category": "boundary",
+      "boundary_kind": "zero_uncertainty",
+      "original_statement": "原始清单要求：当某变量不确定度为 0 时，该项对误差无贡献，应正常计算并标注零贡献，不应报错。"
+    },
+    {
+      "id": "Q-096",
+      "title": "负值开方边界",
+      "formula": "sqrt(g * L)",
+      "variables": {
+        "g": {"value": 9.8, "uncertainty": 0.1, "unit": "m/s^2"},
+        "L": {"value": -0.10, "uncertainty": 0.01, "unit": "m"}
+      },
+      "result_unit": "m/s",
+      "category": "boundary",
+      "boundary_kind": "negative_sqrt",
+      "original_statement": "原始清单要求：当 L 取负值时 sqrt(g*L) 无实数解，应记录为复数域异常并追溯到本条原始说法，不得静默返回实数。"
+    }
+  ]
+}
