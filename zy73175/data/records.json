@@ -1,0 +1,61 @@
+[
+  {
+    "id": "CASE001",
+    "student_name": "张小明",
+    "formula_desc": "概率P(A)=频率/总数，单位从百分比%换算到小数概率",
+    "source_trace": "来自课本P35 例2-3，学生草稿拍照screenshot_20260618_001.png",
+    "input_value": 75.5,
+    "input_unit": "%",
+    "target_unit": "概率",
+    "expected_result": 0.755,
+    "tolerance": 0.02,
+    "attachments": [
+      {"kind": "草稿备注", "content": "学生写的是 75.5% ≈ 0.76，后来用笔改成 0.755"},
+      {"kind": "截图引用", "content": "旧版本截图: img/draft_v1.png，新版本: img/draft_v2.png"}
+    ]
+  },
+  {
+    "id": "CASE002",
+    "student_name": "李小红",
+    "formula_desc": "期望温度换算：华氏度转摄氏度",
+    "source_trace": "习题集第4章第7题，课堂白板笔记",
+    "input_value": 98.6,
+    "input_unit": "华氏度",
+    "target_unit": "摄氏度",
+    "expected_result": 37.0,
+    "tolerance": 0.02,
+    "attachments": [
+      {"kind": "草稿备注", "content": "学生先写了32°C，后来叉掉改写成37°C，旁边标注'公式记错了已修正'"}
+    ]
+  },
+  {
+    "id": "CASE003",
+    "student_name": "王小刚",
+    "formula_desc": "高温外推：实验数据150°C外推概率计算",
+    "source_trace": "实验报告第3组，温度传感器读数，助教小岑标注异常",
+    "input_value": 302.0,
+    "input_unit": "华氏度",
+    "target_unit": "摄氏度",
+    "expected_result": 150.0,
+    "tolerance": 0.02,
+    "attachments": [
+      {"kind": "草稿备注", "content": "学生算出来150°C，但实验设备量程上限是60°C，明显超出合理区间，疑似单位漏换算"},
+      {"kind": "截图引用", "content": "实验照片: img/exp_setup.jpg, 草稿演算: img/CASE003_calc.jpg"}
+    ]
+  },
+  {
+    "id": "CASE004",
+    "student_name": "赵小琳",
+    "formula_desc": "补录：距离单位千米转米（上周漏录数据本周补）",
+    "source_trace": "补录记录，原作业编号HW-0612，学生补交",
+    "input_value": 2.5,
+    "input_unit": "千米",
+    "target_unit": "米",
+    "expected_result": 2500.0,
+    "tolerance": 0.02,
+    "attachments": [
+      {"kind": "补录说明", "content": "6月12日作业因请假延迟提交，6月18日补交，值班老师签字确认"},
+      {"kind": "截图引用", "content": "补交邮件截图: img/HW-0612_makeup.png"}
+    ]
+  }
+]
