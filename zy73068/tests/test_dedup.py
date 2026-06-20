@@ -108,13 +108,24 @@ class TestDeduplicatorMaterialNameMismatch:
         assert result.is_duplicate is True
         assert result.name_mismatch is False
 
-    def test_different_content_not_duplicate(self):
+    def test_different_name_different_content_not_duplicate(self):
         mat_a = _make_material(name="材料X", content="口径A")
         mat_a.compute_hash()
-        mat_b = _make_material(name="材料X", content="口径B")
+        mat_b = _make_material(name="材料Y", content="口径B")
         mat_b.compute_hash()
         result = self.dedup.check_material_name_mismatch(mat_b, [mat_a])
         assert result.is_duplicate is False
+
+    def test_same_name_content_v1_to_v2_is_stance_change(self):
+        mat_a = _make_material(name="叶片超声检测报告", content="结论：正常v1")
+        mat_a.compute_hash()
+        mat_b = _make_material(name="叶片超声检测报告", content="结论：异常v2")
+        mat_b.compute_hash()
+        result = self.dedup.check_material_name_mismatch(mat_b, [mat_a])
+        assert result.is_duplicate is True
+        assert result.stance_changed is True
+        assert result.name_mismatch is False
+        assert result.reason == "stance_changed_same_name"
 
 
 class TestDeduplicatorMerge:

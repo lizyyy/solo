@@ -89,6 +89,16 @@ class ReportImporter:
             )
             if dedup_result.is_duplicate:
                 result.records_skipped += 1
+                for ex_rec in existing.records:
+                    if ex_rec.record_id == dedup_result.matched_report_id:
+                        if rec.manual_note and not ex_rec.manual_note:
+                            ex_rec.manual_note = rec.manual_note
+                            result.notes_preserved += 1
+                        elif rec.manual_note and ex_rec.manual_note:
+                            if rec.manual_note not in ex_rec.manual_note:
+                                ex_rec.manual_note += " | " + rec.manual_note
+                                result.notes_preserved += 1
+                        break
             else:
                 existing.records.append(rec)
                 self.dedup._content_hashes[rec.content_hash] = rec.record_id
@@ -101,6 +111,9 @@ class ReportImporter:
             )
             if mat_result.is_duplicate and mat_result.name_mismatch:
                 self._merge_material_with_version(mat, existing, operator)
+                result.materials_updated += 1
+            elif mat_result.is_duplicate and mat_result.stance_changed:
+                self._merge_material_stance_change(mat, existing, operator)
                 result.materials_updated += 1
             elif mat_result.is_duplicate:
                 result.materials_skipped += 1
@@ -140,6 +153,34 @@ class ReportImporter:
                     operator=operator,
                 )
                 for change in changes:
+                    self.audit.log_change(
+                        report_id=existing_report.report_id,
+                        material_id=ex_mat.material_id,
+                        change=change,
+                    )
+                existing_report.materials[idx] = ex_mat
+                break
+
+    def _merge_material_stance_change(
+        self,
+        incoming: SupplementaryMaterial,
+        existing_report: BladeReport,
+        operator: str,
+    ) -> None:
+        for idx, ex_mat in enumerate(existing_report.materials):
+            if ex_mat.material_id == incoming.material_id or self.dedup._names_similar(
+                ex_mat.current_name, incoming.current_name
+            ):
+                old_content = ex_mat.content
+                changes = self.tracker.apply_update(
+                    ex_mat,
+                    new_content=incoming.content,
+                    operator=operator,
+                )
+                ex_mat.stance_changed = True
+                ex_mat.previous_stance = old_content
+                for change in changes:
+                    change.reason = "stance_changed_same_name"
                     self.audit.log_change(
                         report_id=existing_report.report_id,
                         material_id=ex_mat.material_id,

@@ -13,16 +13,18 @@ class DeduplicationResult:
         is_duplicate: bool,
         matched_report_id: Optional[str] = None,
         name_mismatch: bool = False,
+        stance_changed: bool = False,
         reason: str = "",
     ):
         self.is_duplicate = is_duplicate
         self.matched_report_id = matched_report_id
         self.name_mismatch = name_mismatch
+        self.stance_changed = stance_changed
         self.reason = reason
 
 
 class Deduplicator:
-    NAME_SIMILARITY_THRESHOLD = 0.6
+    NAME_SIMILARITY_THRESHOLD = 0.75
 
     def __init__(self) -> None:
         self._request_hashes: dict[str, str] = {}
@@ -77,22 +79,33 @@ class Deduplicator:
     ) -> DeduplicationResult:
         content_hash = material.compute_hash()
         for existing in existing_materials:
-            if existing.content_hash == content_hash:
-                name_similar = self._names_similar(
-                    material.current_name, existing.current_name
-                )
-                if not name_similar:
-                    return DeduplicationResult(
-                        is_duplicate=True,
-                        matched_report_id=existing.material_id,
-                        name_mismatch=True,
-                        reason="name_changed_same_content",
-                    )
+            names_similar = self._names_similar(
+                material.current_name, existing.current_name
+            )
+            same_content = existing.content_hash == content_hash
+            if same_content and names_similar:
                 return DeduplicationResult(
                     is_duplicate=True,
                     matched_report_id=existing.material_id,
                     name_mismatch=False,
+                    stance_changed=False,
                     reason="exact_duplicate",
+                )
+            if same_content and not names_similar:
+                return DeduplicationResult(
+                    is_duplicate=True,
+                    matched_report_id=existing.material_id,
+                    name_mismatch=True,
+                    stance_changed=False,
+                    reason="name_changed_same_content",
+                )
+            if not same_content and names_similar:
+                return DeduplicationResult(
+                    is_duplicate=True,
+                    matched_report_id=existing.material_id,
+                    name_mismatch=False,
+                    stance_changed=True,
+                    reason="stance_changed_same_name",
                 )
         return DeduplicationResult(is_duplicate=False, reason="no_match")
 
@@ -100,6 +113,10 @@ class Deduplicator:
     def _names_similar(name_a: str, name_b: str) -> bool:
         if not name_a or not name_b:
             return False
+        if name_a == name_b:
+            return True
+        if name_a.startswith(name_b) or name_b.startswith(name_a):
+            return True
         similarity = SequenceMatcher(None, name_a, name_b).ratio()
         return similarity >= Deduplicator.NAME_SIMILARITY_THRESHOLD
 
@@ -129,6 +146,15 @@ class Deduplicator:
                         )
                         existing.materials[idx].previous_stance = ex_mat.content
                         existing.materials[idx].content = mat.content
+                        existing.materials[idx].version += 1
+                        break
+            elif mat_result.stance_changed:
+                for idx, ex_mat in enumerate(existing.materials):
+                    if ex_mat.material_id == mat_result.matched_report_id:
+                        existing.materials[idx].stance_changed = True
+                        existing.materials[idx].previous_stance = ex_mat.content
+                        existing.materials[idx].content = mat.content
+                        existing.materials[idx].content_hash = mat.content_hash
                         existing.materials[idx].version += 1
                         break
         return existing

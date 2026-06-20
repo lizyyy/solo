@@ -105,6 +105,7 @@ class VersionTracker:
             material.stance_changed = True
         if changes:
             material.version += 1
+            material.compute_hash()
         self.capture(material)
         return changes
 
