@@ -231,10 +231,10 @@ tr:hover td { background:#fafcff; }
     <div class="doc-section">
       <h3>🔄 算法重跑入口</h3>
       <ul>
-        <li><strong>命令行：</strong><code>cd backend && npm run rerun-algorithm</code>（会清空旧同版本异常并重跑）</li>
+        <li><strong>命令行：</strong><code>cd backend && npm run rerun-algorithm</code>（会清空旧异常并按当前算法重跑）</li>
         <li><strong>页面按钮：</strong>异常列表页右上角「🔄 算法重跑」</li>
         <li><strong>API：</strong><code>POST /api/algorithm/rerun</code>，无参数</li>
-        <li>算法版本 <code>v1.0</code>，口径版本 <code>2026-06-v1</code></li>
+        <li>算法版本 <code>v1.1</code>，口径版本 <code>2026-06-v1</code></li>
       </ul>
     </div>
 
@@ -261,7 +261,7 @@ tr:hover td { background:#fafcff; }
     <div class="doc-section">
       <h3>📐 口径说明（和接口 _context 一致）</h3>
       <ul>
-        <li><strong>体重单位混写判定：</strong>同一记录中 kg/g/lb 混用，或数值与单位量级明显不匹配</li>
+        <li><strong>体重单位混写判定：</strong>体重字段和与体重相关的手写备注中 kg/g/lb/斤 混用，或数值与单位量级明显不匹配</li>
         <li><strong>回访结论异常：</strong>空值（无人能接查）或含歧义措辞（待查/？等）</li>
         <li><strong>关联断裂：</strong>训练课未关联有效病历，无法回溯原始材料</li>
         <li><strong>复核口径：</strong>已确认=异常属实处理；待补件=需补充材料；退回=误报</li>

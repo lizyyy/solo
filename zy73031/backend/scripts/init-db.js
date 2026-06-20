@@ -54,9 +54,9 @@ async function initDatabase() {
       description TEXT NOT NULL,
       judgment_change TEXT,
       detected_at TEXT DEFAULT (datetime('now', 'localtime')),
-      algorithm_version TEXT DEFAULT 'v1.0',
+      algorithm_version TEXT DEFAULT 'v1.1',
       口径版本 TEXT DEFAULT '2026-06-v1',
-      口径说明 TEXT DEFAULT '体重单位混写判定：同一记录中kg/g/lb混用，或数值与单位量级明显不匹配；回访结论空值或歧义；病历单号与训练课关联断裂'
+      口径说明 TEXT DEFAULT '体重单位混写判定：体重字段和与体重相关的手写备注中kg/g/lb/斤混用，或数值与单位量级明显不匹配；回访结论空值或歧义；病历单号与训练课关联断裂'
     );
 
     CREATE TABLE IF NOT EXISTS review_records (
