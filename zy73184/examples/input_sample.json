@@ -1,0 +1,85 @@
+[
+  {
+    "id": "A001",
+    "from_history_latest": true,
+    "value": 50000,
+    "unit": "元",
+    "description": "产品A收入"
+  },
+  {
+    "id": "A002",
+    "from_history_old": true,
+    "value": 3,
+    "unit": "万元",
+    "description": "产品B收入（旧版答案，单位是万元）"
+  },
+  {
+    "id": "A006",
+    "from_attachment_late": true,
+    "value": 120000,
+    "unit": "元",
+    "description": "晚到附件中的数据，插到前面了"
+  },
+  {
+    "id": "A003",
+    "formula_name": "revenue_calc",
+    "price": 100,
+    "quantity": 200,
+    "unit": "元",
+    "description": "产品C收入（公式计算）"
+  },
+  {
+    "id": "A004",
+    "from_history_latest": true,
+    "formula_name": "profit_margin",
+    "revenue": 50000,
+    "cost": 35000,
+    "description": "产品A利润率"
+  },
+  {
+    "id": "A005",
+    "from_history_latest": true,
+    "from_verbal_note": true,
+    "value": 8000,
+    "unit": "元",
+    "description": "产品D收入（口头备注确认过）"
+  },
+  {
+    "id": "BAD_001",
+    "description": "这是一个坏行，值为None？"
+  },
+  {
+    "id": "",
+    "value": 100,
+    "description": "坏行 - 空ID"
+  },
+  {
+    "id": "SKIP_001",
+    "skip": true,
+    "skip_reason": "待确认，先跳过",
+    "value": 999,
+    "description": "跳过行 - 待确认"
+  },
+  {
+    "id": "SKIP_002",
+    "status": "draft",
+    "value": 123,
+    "description": "跳过行 - 草稿状态"
+  },
+  {
+    "id": "B001",
+    "from_attachment_late": true,
+    "from_history_old": true,
+    "value": 120000,
+    "unit": "元",
+    "description": "同时来自晚到附件和旧版答案"
+  },
+  {
+    "id": "UNIT_001",
+    "formula_name": "revenue_calc",
+    "price": 50,
+    "quantity": 100,
+    "unit": "元",
+    "description": "单位换算测试"
+  }
+]

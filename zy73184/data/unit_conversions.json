@@ -1,0 +1,20 @@
+[
+  {
+    "from_unit": "元",
+    "to_unit": "万元",
+    "factor": 0.0001,
+    "description": "元转万元"
+  },
+  {
+    "from_unit": "万元",
+    "to_unit": "元",
+    "factor": 10000,
+    "description": "万元转元"
+  },
+  {
+    "from_unit": "个",
+    "to_unit": "千个",
+    "factor": 0.001,
+    "description": "个转千个"
+  }
+]

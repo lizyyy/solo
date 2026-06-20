@@ -1,0 +1,18 @@
+[
+  {
+    "name": "revenue_calc",
+    "expression": "price * quantity",
+    "unit": "元",
+    "params": ["price", "quantity"],
+    "description": "收入计算公式：单价 × 数量",
+    "version": "v1"
+  },
+  {
+    "name": "profit_margin",
+    "expression": "(revenue - cost) / revenue * 100",
+    "unit": "%",
+    "params": ["revenue", "cost"],
+    "description": "利润率计算公式",
+    "version": "v1"
+  }
+]
