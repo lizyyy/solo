@@ -1,4 +1,4 @@
-import { workflowDao } from '../dao/workflowDao';
+content = r"""import { workflowDao } from '../dao/workflowDao';
 import { redLineDao } from '../dao/redLineDao';
 import { inspectorDao } from '../dao/inspectorDao';
 import { shelterDao } from '../dao/shelterDao';
@@ -54,6 +54,7 @@ export const workflowService = {
     if (existing && existing.stepStatus !== 'completed') {
       return existing;
     }
+
     return workflowDao.create({
       shelterId,
       currentStep: 'redline_import',
@@ -75,16 +76,19 @@ export const workflowService = {
     areaRange: string,
     effectiveDate: string,
     importOperator: string,
-    options?: { isReimport?: boolean; reimportNote?: string; importBatchNo?: string; prevVersionId?: string }
+    options?: { isReimport?: boolean; reimportNote?: string; importBatchNo?: string }
   ): { workflow: WorkflowRecord; redLine: RedLineMap } => {
     const shelter = shelterDao.findById(shelterId);
     if (!shelter) {
       throw new Error('Shelter not found');
     }
+
     const existingLatest = redLineDao.findLatestByShelterId(shelterId);
     const isReimport = options?.isReimport || (existingLatest !== null);
     const importBatchNo = options?.importBatchNo || generateBatchNo();
+
     redLineDao.setOldToNotLatest(shelterId);
+
     const redLine = redLineDao.create({
       version,
       importBatchNo,
@@ -96,12 +100,9 @@ export const workflowService = {
       isLatest: true,
       isReimport,
       reimportNote: options?.reimportNote || null,
-      reviewStatus: 'pending',
-      reviewNote: null,
-      reviewedBy: null,
-      reviewedAt: null,
-      prevVersionId: options?.prevVersionId || existingLatest?.id || null
+      prevVersionId: existingLatest?.id || null
     });
+
     recordChange(
       'redline',
       redLine.id,
@@ -114,30 +115,35 @@ export const workflowService = {
       importOperator,
       isReimport ? '重新导入红线图' : '首次导入红线图'
     );
+
     const workflow = workflowDao.findById(workflowId);
     if (workflow) {
       workflowDao.updateStep(workflowId, {
-        currentStep: 'inspector_review',
-        stepStatus: 'pending',
-        previousStep: 'redline_import',
-        nextStep: 'point_update',
+        currentStep: 'redline_import',
+        stepStatus: 'completed',
+        previousStep: null,
+        nextStep: 'inspector_review',
         redLineMapId: redLine.id,
         operator: importOperator,
-        remark: '红线图导入完成，待网格员巡查表复核'
+        remark: '红线图导入完成'
       });
     }
+
     const updatedWorkflow = workflowDao.findById(workflowId) || workflow;
     return { workflow: updatedWorkflow!, redLine };
   },
 
-  reviewRedLine: (redLineId: string, reviewStatus: RedLineMap['reviewStatus'], reviewNote: string, reviewedBy: string): RedLineMap | null => {
+  reviewRedLine: (redLineId: string, reviewStatus: RedLineMap['reviewStatus'], reviewNote: string, reviewedBy: string): void => {
     const redLine = redLineDao.findById(redLineId);
     if (!redLine) {
       throw new Error('RedLine not found');
     }
+
     const shelter = shelterDao.findById(redLine.shelterId);
     const oldStatus = redLine.reviewStatus;
+
     redLineDao.updateReview(redLineId, reviewStatus, reviewNote, reviewedBy);
+
     if (shelter) {
       recordChange(
         'redline',
@@ -152,17 +158,19 @@ export const workflowService = {
         reviewNote
       );
     }
-    return redLineDao.findById(redLineId);
   },
 
-  updateRedLineRemarks: (redLineId: string, remarks: string, operator: string): RedLineMap | null => {
+  updateRedLineRemarks: (redLineId: string, remarks: string, operator: string): void => {
     const redLine = redLineDao.findById(redLineId);
     if (!redLine) {
       throw new Error('RedLine not found');
     }
+
     const shelter = shelterDao.findById(redLine.shelterId);
     const oldRemarks = redLine.remarks;
+
     redLineDao.updateRemarks(redLineId, remarks, operator);
+
     if (shelter) {
       recordChange(
         'redline',
@@ -177,7 +185,6 @@ export const workflowService = {
         '更新红线图备注'
       );
     }
-    return redLineDao.findById(redLineId);
   },
 
   step2_reviewInspectorReport: (
@@ -196,6 +203,7 @@ export const workflowService = {
     if (!shelter) {
       throw new Error('Shelter not found');
     }
+
     const reportNo = generateReportNo();
     const report = inspectorDao.create({
       reportNo,
@@ -208,6 +216,7 @@ export const workflowService = {
       detourDescription,
       roadCondition
     });
+
     recordChange(
       'inspector_report',
       report.id,
@@ -220,22 +229,10 @@ export const workflowService = {
       operator,
       '提交网格员巡查表'
     );
+
     const workflow = workflowDao.findById(workflowId);
     if (workflow) {
-      if (isTemporaryDetour) {
-        shelterDao.updateStatus(shelterId, 'pending_review');
-        recordChange(
-          'shelter',
-          shelterId,
-          shelterId,
-          shelter.name,
-          'update',
-          '状态',
-          shelter.status,
-          'pending_review',
-          operator,
-          '巡查发现临时改道，待居民代表复核'
-        );
+      if (isTemporaryDetour && shelter.status === 'pending_review') {
         workflowDao.updateStep(workflowId, {
           currentStep: 'inspector_review',
           stepStatus: 'suspended',
@@ -247,16 +244,17 @@ export const workflowService = {
         });
       } else {
         workflowDao.updateStep(workflowId, {
-          currentStep: 'point_update',
-          stepStatus: 'pending',
-          previousStep: 'inspector_review',
-          nextStep: null,
+          currentStep: 'inspector_review',
+          stepStatus: 'completed',
+          previousStep: 'redline_import',
+          nextStep: 'point_update',
           inspectorReportId: report.id,
           operator,
-          remark: '巡查表复核完成，待点位清单更新'
+          remark: '巡查表复核完成'
         });
       }
     }
+
     const updatedWorkflow = workflowDao.findById(workflowId) || workflow;
     return { workflow: updatedWorkflow!, report };
   },
@@ -266,37 +264,39 @@ export const workflowService = {
     if (!workflow) {
       throw new Error('Workflow not found');
     }
+
+    workflowDao.updateStep(workflowId, {
+      currentStep: 'inspector_review',
+      stepStatus: 'completed',
+      previousStep: 'redline_import',
+      nextStep: 'point_update',
+      operator,
+      remark: '居民审核通过，继续流程'
+    });
+
     const shelter = shelterDao.findById(shelterId);
     if (shelter) {
-      const oldStatus = shelter.status;
-      shelterDao.updateStatus(shelterId, 'normal');
       recordChange(
         'shelter',
         shelterId,
         shelterId,
         shelter.name,
         'update',
-        '状态',
-        oldStatus,
-        'normal',
+        '流程状态',
+        'suspended',
+        'completed',
         operator,
-        '居民审核通过，恢复正常状态'
+        '居民审核通过，恢复流程'
       );
     }
-    workflowDao.updateStep(workflowId, {
-      currentStep: 'point_update',
-      stepStatus: 'pending',
-      previousStep: 'inspector_review',
-      nextStep: null,
-      operator,
-      remark: '居民审核通过，待点位清单更新'
-    });
+
     const updated = workflowDao.findById(workflowId);
     return updated!;
   },
 
   step3_updatePointList: (workflowId: string, shelterId: string, operator: string): { workflow: WorkflowRecord; checkResult: CapacityCheckResult | null } => {
     const checkResult = capacityCheckService.recalculateAfterSupplement(shelterId, operator);
+
     const workflow = workflowDao.findById(workflowId);
     if (workflow) {
       workflowDao.updateStep(workflowId, {
@@ -308,6 +308,7 @@ export const workflowService = {
         remark: '点位清单更新完成，容量已重新核算'
       });
     }
+
     const shelter = shelterDao.findById(shelterId);
     if (shelter && checkResult) {
       recordChange(
@@ -324,6 +325,7 @@ export const workflowService = {
         [checkResult.id]
       );
     }
+
     const updatedWorkflow = workflowDao.findById(workflowId) || workflow;
     return { workflow: updatedWorkflow!, checkResult };
   },
@@ -352,3 +354,9 @@ export const workflowService = {
     return { ...STEP_NAMES };
   }
 };
+"""
+
+with open('/Users/lzy/pro/solo/workspaces/zy72477/src/services/workflowService.ts', 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print('Done')

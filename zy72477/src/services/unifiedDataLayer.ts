@@ -110,25 +110,45 @@ export const unifiedDataLayer = {
 
   generateExportData: (type: 'detail' | 'summary' | 'self_check', options?: { batchNo?: string; includeDetourOnly?: boolean }): UnifiedDataResponse<any> => {
     let data: any;
-    const batchNo = options?.batchNo || generateBatchNo();
+    const exportBatchNo = options?.batchNo || generateBatchNo();
 
     switch (type) {
       case 'detail': {
         let detailData = capacityCheckDao.findLatestAll();
+        let redLineBatchInfo: { batchNo: string; shelterIds: string[]; isReimport: boolean } | null = null;
+
+        if (options?.batchNo) {
+          const redLinesInBatch = redLineDao.findByBatchNo(options.batchNo);
+          if (redLinesInBatch.length > 0) {
+            const shelterIds = Array.from(new Set(redLinesInBatch.map(r => r.shelterId)));
+            redLineBatchInfo = {
+              batchNo: options.batchNo,
+              shelterIds,
+              isReimport: redLinesInBatch[0].isReimport
+            };
+            detailData = detailData.filter(r => shelterIds.includes(r.shelterId));
+          } else {
+            detailData = [];
+            redLineBatchInfo = {
+              batchNo: options.batchNo,
+              shelterIds: [],
+              isReimport: false
+            };
+          }
+        }
 
         if (options?.includeDetourOnly) {
           detailData = detailData.filter(r => r.isDetourAffected);
         }
 
-        data = {
-          exportBatchNo: batchNo,
-          exportType: 'detail',
-          exportTime: getCurrentTime(),
-          dataVersion: DATA_VERSION,
-          totalCount: detailData.length,
-          detourAffectedCount: detailData.filter(r => r.isDetourAffected).length,
-          needsReviewCount: detailData.filter(r => r.needsResidentReview).length,
-          records: detailData.map(r => ({
+        const recordsWithEnrichment = detailData.map(r => {
+          const latestRedLine = redLineDao.findLatestByShelterId(r.shelterId);
+          const allRedLines = redLineDao.findByShelterId(r.shelterId);
+          const historyForShelter = changeHistoryDao.findByShelterId(r.shelterId);
+          const remarkChanges = historyForShelter.filter(h => h.fieldName === '备注内容' || h.fieldName === '红线图备注');
+          const affectedResults = historyForShelter.filter(h => h.affectedResultIds && h.affectedResultIds.includes(r.id));
+
+          return {
             shelterId: r.shelterId,
             shelterName: r.shelterName,
             designedCapacity: r.designedCapacity,
@@ -142,15 +162,69 @@ export const unifiedDataLayer = {
             dataSources: r.dataSources,
             calculationParams: r.calculationParams,
             checkTime: r.checkTime,
-            checkedBy: r.checkedBy
-          }))
+            checkedBy: r.checkedBy,
+            redLineBatchNo: latestRedLine?.importBatchNo || null,
+            redLineVersion: latestRedLine?.version || null,
+            redLineIsReimport: latestRedLine?.isReimport || false,
+            redLineReimportNote: latestRedLine?.reimportNote || null,
+            redLineRemarks: latestRedLine?.remarks || null,
+            redLineAreaRange: latestRedLine?.areaRange || null,
+            redLineEffectiveDate: latestRedLine?.effectiveDate || null,
+            redLineImportOperator: latestRedLine?.importOperator || null,
+            redLineReviewStatus: latestRedLine?.reviewStatus || null,
+            redLineReviewNote: latestRedLine?.reviewNote || null,
+            redLineReviewedBy: latestRedLine?.reviewedBy || null,
+            redLineReviewedAt: latestRedLine?.reviewedAt || null,
+            redLineImportBatchList: allRedLines.map(rl => ({
+              batchNo: rl.importBatchNo,
+              version: rl.version,
+              isReimport: rl.isReimport,
+              importTime: rl.importTime,
+              reviewStatus: rl.reviewStatus,
+              remarks: rl.remarks
+            })),
+            remarkChangeHistory: remarkChanges.map(h => ({
+              changeTime: h.changeTime,
+              operator: h.operator,
+              changeType: h.changeType,
+              oldValue: h.oldValue,
+              newValue: h.newValue,
+              remark: h.remark
+            })),
+            changeAffectingThisResult: affectedResults.map(h => ({
+              changeTime: h.changeTime,
+              operator: h.operator,
+              changeType: h.changeType,
+              fieldName: h.fieldName,
+              oldValue: h.oldValue,
+              newValue: h.newValue,
+              remark: h.remark
+            }))
+          };
+        });
+
+        data = {
+          exportBatchNo,
+          exportType: 'detail',
+          exportTime: getCurrentTime(),
+          dataVersion: DATA_VERSION,
+          sourceRedLineBatch: redLineBatchInfo,
+          filterOptions: {
+            byBatchNo: !!options?.batchNo,
+            batchNo: options?.batchNo || null,
+            includeDetourOnly: options?.includeDetourOnly || false
+          },
+          totalCount: recordsWithEnrichment.length,
+          detourAffectedCount: recordsWithEnrichment.filter(r => r.isDetourAffected).length,
+          needsReviewCount: recordsWithEnrichment.filter(r => r.needsResidentReview).length,
+          records: recordsWithEnrichment
         };
         break;
       }
       case 'summary': {
         const all = capacityCheckDao.findLatestAll();
         data = {
-          exportBatchNo: batchNo,
+          exportBatchNo,
           exportType: 'summary',
           exportTime: getCurrentTime(),
           dataVersion: DATA_VERSION,
@@ -167,7 +241,7 @@ export const unifiedDataLayer = {
       }
       case 'self_check': {
         data = {
-          exportBatchNo: batchNo,
+          exportBatchNo,
           exportType: 'self_check',
           exportTime: getCurrentTime(),
           dataVersion: DATA_VERSION,

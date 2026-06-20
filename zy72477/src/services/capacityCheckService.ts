@@ -73,7 +73,9 @@ export const capacityCheckService = {
       if (latestReport.isTemporaryDetour) {
         isDetourAffected = true;
         detourInfo = latestReport.detourDescription;
-        needsResidentReview = true;
+        if (shelter.status === 'pending_review') {
+          needsResidentReview = true;
+        }
         const detourCoeff = activeParams.find(p => p.paramName === '改道影响系数');
         if (detourCoeff) {
           const coeff = parseFloat(detourCoeff.paramValue);

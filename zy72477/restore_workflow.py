@@ -1,4 +1,8 @@
-import { workflowDao } from '../dao/workflowDao';
+
+import base64
+import zlib
+
+content = b'''import { workflowDao } from '../dao/workflowDao';
 import { redLineDao } from '../dao/redLineDao';
 import { inspectorDao } from '../dao/inspectorDao';
 import { shelterDao } from '../dao/shelterDao';
@@ -117,13 +121,13 @@ export const workflowService = {
     const workflow = workflowDao.findById(workflowId);
     if (workflow) {
       workflowDao.updateStep(workflowId, {
-        currentStep: 'inspector_review',
-        stepStatus: 'pending',
-        previousStep: 'redline_import',
-        nextStep: 'point_update',
+        currentStep: 'redline_import',
+        stepStatus: 'completed',
+        previousStep: null,
+        nextStep: 'inspector_review',
         redLineMapId: redLine.id,
         operator: importOperator,
-        remark: '红线图导入完成，待网格员巡查表复核'
+        remark: '红线图导入完成'
       });
     }
     const updatedWorkflow = workflowDao.findById(workflowId) || workflow;
@@ -222,20 +226,7 @@ export const workflowService = {
     );
     const workflow = workflowDao.findById(workflowId);
     if (workflow) {
-      if (isTemporaryDetour) {
-        shelterDao.updateStatus(shelterId, 'pending_review');
-        recordChange(
-          'shelter',
-          shelterId,
-          shelterId,
-          shelter.name,
-          'update',
-          '状态',
-          shelter.status,
-          'pending_review',
-          operator,
-          '巡查发现临时改道，待居民代表复核'
-        );
+      if (isTemporaryDetour && shelter.status === 'pending_review') {
         workflowDao.updateStep(workflowId, {
           currentStep: 'inspector_review',
           stepStatus: 'suspended',
@@ -247,13 +238,13 @@ export const workflowService = {
         });
       } else {
         workflowDao.updateStep(workflowId, {
-          currentStep: 'point_update',
-          stepStatus: 'pending',
-          previousStep: 'inspector_review',
-          nextStep: null,
+          currentStep: 'inspector_review',
+          stepStatus: 'completed',
+          previousStep: 'redline_import',
+          nextStep: 'point_update',
           inspectorReportId: report.id,
           operator,
-          remark: '巡查表复核完成，待点位清单更新'
+          remark: '巡查表复核完成'
         });
       }
     }
@@ -266,31 +257,29 @@ export const workflowService = {
     if (!workflow) {
       throw new Error('Workflow not found');
     }
+    workflowDao.updateStep(workflowId, {
+      currentStep: 'inspector_review',
+      stepStatus: 'completed',
+      previousStep: 'redline_import',
+      nextStep: 'point_update',
+      operator,
+      remark: '居民审核通过，继续流程'
+    });
     const shelter = shelterDao.findById(shelterId);
     if (shelter) {
-      const oldStatus = shelter.status;
-      shelterDao.updateStatus(shelterId, 'normal');
       recordChange(
         'shelter',
         shelterId,
         shelterId,
         shelter.name,
         'update',
-        '状态',
-        oldStatus,
-        'normal',
+        '流程状态',
+        'suspended',
+        'completed',
         operator,
-        '居民审核通过，恢复正常状态'
+        '居民审核通过，恢复流程'
       );
     }
-    workflowDao.updateStep(workflowId, {
-      currentStep: 'point_update',
-      stepStatus: 'pending',
-      previousStep: 'inspector_review',
-      nextStep: null,
-      operator,
-      remark: '居民审核通过，待点位清单更新'
-    });
     const updated = workflowDao.findById(workflowId);
     return updated!;
   },
@@ -352,3 +341,9 @@ export const workflowService = {
     return { ...STEP_NAMES };
   }
 };
+'''
+
+with open('src/services/workflowService.ts', 'wb') as f:
+    f.write(content)
+
+print('File written successfully, size:', len(content))

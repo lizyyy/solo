@@ -99,6 +99,7 @@ export const initDemoData = () => {
     );
     if (result1.redLine) {
       workflowService.reviewRedLine(result1.redLine.id, 'reviewed', '已审核，容量数据合理', '老马');
+      workflowService.updateRedLineRemarks(result1.redLine.id, '该避难点为学校操场，可用面积约1200平方米，容量：600人。东侧入口道路施工已完成，可正常通行', '规划科-小李');
     }
     console.log(`  已为 ${step1Shelter.name} 导入红线图并完成复核`);
   }
@@ -169,6 +170,74 @@ export const initDemoData = () => {
       );
       console.log(`  已为 ${detourShelter.name} 录入含临时改道的巡查表，工作流已挂起待居民代表复核`);
     }
+  }
+
+  capacityCheckService.calculateAll('system_init');
+  console.log('  已完成所有避难点容量校核计算');
+  console.log('  test');
+
+  conflictDetectionService.detectAllConflicts();
+  console.log('  已完成冲突检测');
+
+  selfCheckService.runAllChecks();
+  console.log('  已完成系统自检');
+
+  const redLineCount = redLineDao.findAll().length;
+  const historyCount = changeHistoryDao.findAll().length;
+  console.log(`  红线图记录: ${redLineCount} 条`);
+  console.log(`  变更历史: ${historyCount} 条`);
+
+  console.log('✅ 演示数据初始化完成！');
+};
+
+if (require.main === module) {
+  initDemoData();
+}
+  const wf5 = workflowService.getWorkflowForShelter(extraShelter2.id);
+  if (wf5) {
+    workflowService.step1_importRedLine(
+      wf5.id,
+      extraShelter2.id,
+      'v1.0',
+      '市民广场地下空间，设计容量3000人',
+      '世纪大道1000号市民广场全域',
+      '2026-01-03',
+      '规划科-小王'
+    );
+    console.log(`  已为 ${extraShelter2.name} 导入红线图`);
+  }
+
+  capacityCheckService.calculateAll('system_init');
+  console.log('  已完成所有避难点容量校核计算');
+
+  conflictDetectionService.detectAllConflicts();
+  console.log('  已完成冲突检测');
+
+  selfCheckService.runAllChecks();
+  console.log('  已完成系统自检');
+
+  const redLineCount = redLineDao.findAll().length;
+  const historyCount = changeHistoryDao.findAll().length;
+  console.log(`  红线图记录: ${redLineCount} 条`);
+  console.log(`  变更历史: ${historyCount} 条`);
+
+  console.log('✅ 演示数据初始化完成！');
+};
+
+if (require.main === module) {
+  initDemoData();
+}
+  if (wf5) {
+    workflowService.step1_importRedLine(
+      wf5.id,
+      extraShelter2.id,
+      'v1.0',
+      '市民广场地下空间，设计容量3000人',
+      '世纪大道1000号市民广场全域',
+      '2026-01-03',
+      '规划科-小王'
+    );
+    console.log(`  已为 ${extraShelter2.name} 导入红线图`);
   }
 
   capacityCheckService.calculateAll('system_init');
