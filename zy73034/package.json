@@ -5,6 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "api": "node server/index.js",
+    "api:test": "node --test server/api.test.js",
+    "api:seed": "node -e \"import('./server/db.js').then(({createStore})=>{const s=createStore(); console.log(s.seed()); s.close();})\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -12,6 +15,7 @@
   },
   "dependencies": {
     "clsx": "^2.1.1",
+    "express": "^4.21.2",
     "lucide-react": "^0.511.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -25,7 +29,7 @@
     "@types/node": "^22.15.30",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.4.1",
+    "@vitejs/plugin-react": "^6.0.2",
     "autoprefixer": "^10.4.21",
     "babel-plugin-react-dev-locator": "^1.0.0",
     "eslint": "^9.25.0",
@@ -36,12 +40,11 @@
     "tailwindcss": "^3.4.17",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.30.1",
-    "vite": "^5.4.10",
-    "vite-plugin-trae-solo-badge": "^1.0.0",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite": "^8.0.16",
+    "vite-plugin-trae-solo-badge": "^1.0.0"
   },
   "optionalDependencies": {
-    "@rollup/rollup-darwin-arm64": "4.24.0",
-    "rollup": "4.24.0"
+    "@rollup/rollup-darwin-arm64": "^4.62.0",
+    "rollup": "^4.62.0"
   }
 }

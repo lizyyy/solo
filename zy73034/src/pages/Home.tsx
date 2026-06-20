@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Camera,
@@ -13,6 +13,7 @@ import {
   Sparkles,
   Clock,
   PawPrint,
+  Loader2,
 } from 'lucide-react';
 import { usePetStore } from '@/store/petStore';
 import { FilterPanel, applyFilter, type FilterState } from '@/components/FilterPanel';
@@ -32,7 +33,10 @@ const DEFAULT_FILTER: FilterState = {
 export default function Home() {
   const {
     pets,
-    initIfEmpty,
+    loading,
+    loadPets,
+    resetToDemo,
+    clearAll,
     confirmPet,
     revokePet,
     addNote,
@@ -40,14 +44,27 @@ export default function Home() {
     importPet,
   } = usePetStore();
 
-  useState(() => initIfEmpty());
-
   const [filter, setFilter] = useState<FilterState>(DEFAULT_FILTER);
   const [addendumFor, setAddendumFor] = useState<DerivedPet | null>(null);
   const [rejudgeFor, setRejudgeFor] = useState<DerivedPet | null>(null);
   const [revokeFor, setRevokeFor] = useState<DerivedPet | null>(null);
   const [showImport, setShowImport] = useState(false);
   const [lastDiffToast, setLastDiffToast] = useState<{ count: number; petName: string } | null>(null);
+
+  useEffect(() => {
+    loadPets();
+  }, [loadPets]);
+
+  const apiFilter = useMemo(() => {
+    if (filter.anomalyTypes.length === 1) {
+      return { anomaly: filter.anomalyTypes[0], q: filter.keyword || undefined };
+    }
+    return filter.keyword ? { q: filter.keyword } : undefined;
+  }, [filter]);
+
+  useEffect(() => {
+    loadPets(apiFilter);
+  }, [apiFilter, loadPets]);
 
   const filtered = useMemo(() => applyFilter(pets, filter), [pets, filter]);
 
@@ -79,11 +96,22 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setShowImport(true)}
+              onClick={() => {
+                setShowImport(true);
+              }}
               className="inline-flex items-center gap-1.5 rounded-lg border border-sage-300 bg-white px-3.5 py-2 text-sm font-medium text-sage-700 shadow-sm transition hover:bg-sage-50"
             >
               <Upload className="h-4 w-4" />
               导入记录
+            </button>
+            <button
+              onClick={async () => {
+                await resetToDemo();
+              }}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-parchment-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-600 shadow-sm transition hover:bg-parchment-50"
+            >
+              <RotateCcw className="h-4 w-4" />
+              重置演示
             </button>
             <Link
               to="/export"
@@ -113,6 +141,15 @@ export default function Home() {
           ))}
         </div>
       </header>
+
+      {loading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+          <div className="flex items-center gap-3 rounded-xl border border-parchment-200 bg-white px-6 py-4 shadow-card">
+            <Loader2 className="h-5 w-5 animate-spin text-sage-600" />
+            <span className="text-sm text-slate-600">正在从后端加载数据…</span>
+          </div>
+        </div>
+      )}
 
       {lastDiffToast && (
         <div className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2 rounded-xl border border-sage-300 bg-white/95 px-5 py-3 shadow-card backdrop-blur">
@@ -187,7 +224,9 @@ export default function Home() {
                   onAddNote={() => setAddendumFor(pet)}
                   onRejudge={() => setRejudgeFor(pet)}
                   onRevoke={() => setRevokeFor(pet)}
-                  onConfirm={() => confirmPet(pet.petId, '手动确认归档')}
+                  onConfirm={async () => {
+                    await confirmPet(pet.petId, '手动确认归档');
+                  }}
                   totalAnomalies={anomalyTotal}
                 />
               ))}
@@ -200,7 +239,7 @@ export default function Home() {
           </div>
 
           <footer className="pb-10 pt-2 text-center text-[11px] text-slate-400">
-            所有操作均以事件形式追加写入 LocalStorage（键：<code>pet-training-tracking-v1</code>），可随时重置为演示数据查看完整效果。
+            所有操作均以事件形式追加写入后端 SQLite 数据库，可随时点击「重置演示」恢复演示数据查看完整效果。
           </footer>
         </section>
       </main>
@@ -210,10 +249,15 @@ export default function Home() {
           open
           onClose={() => setAddendumFor(null)}
           petName={addendumFor.name}
-          onSubmit={(note, updates) => {
-            const diffs = addNote(addendumFor.petId, note, updates);
-            setLastDiffToast({ count: diffs.length, petName: addendumFor.name });
-            setTimeout(() => setLastDiffToast(null), 6000);
+          onSubmit={async (note, updates) => {
+            const result = await addNote(addendumFor.petId, note, updates);
+            if (result?.exportImpact?.changedFields) {
+              setLastDiffToast({
+                count: result.exportImpact.changedFields.length,
+                petName: addendumFor.name,
+              });
+              setTimeout(() => setLastDiffToast(null), 6000);
+            }
           }}
         />
       )}
@@ -223,7 +267,9 @@ export default function Home() {
           onClose={() => setRejudgeFor(null)}
           petName={rejudgeFor.name}
           currentJudge={rejudgeFor.trainingJudge}
-          onSubmit={(oldJ, newJ, reason) => rejudgePet(rejudgeFor.petId, oldJ, newJ, reason)}
+          onSubmit={async (oldJ, newJ, reason) => {
+            await rejudgePet(rejudgeFor.petId, oldJ, newJ, reason);
+          }}
         />
       )}
       {revokeFor && (
@@ -231,14 +277,16 @@ export default function Home() {
           open
           onClose={() => setRevokeFor(null)}
           petName={revokeFor.name}
-          onSubmit={(reason) => revokePet(revokeFor.petId, reason)}
+          onSubmit={async (reason) => {
+            await revokePet(revokeFor.petId, reason);
+          }}
         />
       )}
       <ImportModal
         open={showImport}
         onClose={() => setShowImport(false)}
-        onSubmit={(profile, photos, note) => {
-          importPet(profile, 'vaccine_photo', photos, note);
+        onSubmit={async (profile, photos, note) => {
+          await importPet(profile, 'vaccine_photo', photos, note);
         }}
       />
     </div>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -13,39 +13,65 @@ import {
   AlertTriangle,
   Info,
   CalendarDays,
+  Loader2,
 } from 'lucide-react';
 import { usePetStore } from '@/store/petStore';
 import { formatDate, EVENT_TYPE_LABEL, EXPORT_FIELDS, profileToRowValue } from '@/utils/tracking';
 import { AnomalyBadge, JudgeLabel, ProgressLabel } from '@/components/Badges';
+import type { ExportDiff } from '@/types';
 
 export default function ExportCenter() {
   const {
     pets,
     events,
+    loading,
+    loadPets,
     lastExport,
-    buildExportSummary,
-    computeExportDiffSinceLast,
-    markExported,
-    exportCSVBlob,
-    exportJSONBlob,
   } = usePetStore();
 
   const [lastAction, setLastAction] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState<'csv' | 'json' | null>(null);
+  const [previewContent, setPreviewContent] = useState<string>('加载中…');
+  const [exportData, setExportData] = useState<{ csv: string; json: string; diffs: ExportDiff[] } | null>(null);
+  const [exportLoading, setExportLoading] = useState(false);
 
-  const summary = useMemo(() => buildExportSummary(), [buildExportSummary]);
-  const diffs = useMemo(() => computeExportDiffSinceLast(), [computeExportDiffSinceLast]);
+  useEffect(() => {
+    loadPets();
+  }, [loadPets]);
+
+  const anomalyRows = pets.filter((p) => p.anomalies.length > 0);
 
   const diffByPet = useMemo(() => {
-    const m = new Map<string, typeof diffs>();
-    for (const d of diffs) {
+    if (!exportData?.diffs) return new Map<string, ExportDiff[]>();
+    const m = new Map<string, ExportDiff[]>();
+    for (const d of exportData.diffs) {
       if (!m.has(d.petId)) m.set(d.petId, []);
       m.get(d.petId)!.push(d);
     }
     return m;
-  }, [diffs]);
+  }, [exportData?.diffs]);
 
-  const download = (blob: Blob, filename: string) => {
+  const fetchExport = async (): Promise<{ csv: string; json: string; diffs: ExportDiff[] }> => {
+    if (exportData) return exportData;
+    setExportLoading(true);
+    try {
+      const [csvRes, jsonRes] = await Promise.all([
+        fetch('/api/export?format=csv'),
+        fetch('/api/export?format=json'),
+      ]);
+      const csv = await csvRes.text();
+      const json = await jsonRes.text();
+      const jsonData = JSON.parse(json);
+      const data = { csv, json, diffs: jsonData.exportImpact?.diffs || [] };
+      setExportData(data);
+      return data;
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  const download = (content: string, filename: string, mime: string) => {
+    const blob = new Blob([content], { type: mime });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -56,10 +82,43 @@ export default function ExportCenter() {
     URL.revokeObjectURL(url);
   };
 
-  const anomalyRows = pets.filter((p) => p.anomalies.length > 0);
+  const handlePreview = async (kind: 'csv' | 'json') => {
+    setShowPreview(kind);
+    setPreviewContent('加载中…');
+    const data = await fetchExport();
+    setPreviewContent(kind === 'csv' ? data.csv : data.json);
+  };
+
+  const handleDownload = async (kind: 'csv' | 'json') => {
+    const data = await fetchExport();
+    const name = `宠物训练课回访追踪-${new Date().toISOString().slice(0, 10)}.${kind}`;
+    download(
+      kind === 'csv' ? data.csv : data.json,
+      name,
+      kind === 'csv' ? 'text/csv;charset=utf-8' : 'application/json;charset=utf-8',
+    );
+    setLastAction(`已导出 ${kind.toUpperCase()}：${name}`);
+    setTimeout(() => setLastAction(null), 5000);
+  };
+
+  const summary = useMemo(() => ({
+    totalRows: pets.length,
+    anomalyRows: anomalyRows.length,
+    diffs: exportData?.diffs || [],
+    eventsCount: events.length,
+  }), [pets, anomalyRows, exportData?.diffs, events.length]);
 
   return (
     <div className="min-h-screen bg-paper pb-16">
+      {loading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+          <div className="flex items-center gap-3 rounded-xl border border-parchment-200 bg-white px-6 py-4 shadow-card">
+            <Loader2 className="h-5 w-5 animate-spin text-sage-600" />
+            <span className="text-sm text-slate-600">正在从后端加载数据…</span>
+          </div>
+        </div>
+      )}
+
       <header className="sticky top-0 z-30 border-b border-parchment-200 bg-parchment-100/80 backdrop-blur">
         <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-6 py-4">
           <div className="flex items-center gap-4">
@@ -81,36 +140,29 @@ export default function ExportCenter() {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setShowPreview('csv')}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-sage-200 bg-white px-3.5 py-2 text-sm font-medium text-sage-700 shadow-sm hover:bg-sage-50"
+              onClick={() => handlePreview('csv')}
+              disabled={exportLoading}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-sage-200 bg-white px-3.5 py-2 text-sm font-medium text-sage-700 shadow-sm hover:bg-sage-50 disabled:opacity-50"
             >
               <Table2 className="h-4 w-4" />
               CSV 预览
             </button>
             <button
-              onClick={() => {
-                const blob = exportCSVBlob();
-                const name = `宠物训练课回访追踪-${new Date().toISOString().slice(0, 10)}.csv`;
-                download(blob, name);
-                markExported();
-                setLastAction(`已导出 CSV：${name}`);
-                setTimeout(() => setLastAction(null), 5000);
-              }}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-sage-600 px-3.5 py-2 text-sm font-medium text-white shadow-sm hover:bg-sage-700"
+              onClick={() => handleDownload('csv')}
+              disabled={exportLoading}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-sage-600 px-3.5 py-2 text-sm font-medium text-white shadow-sm hover:bg-sage-700 disabled:opacity-50"
             >
-              <FileSpreadsheet className="h-4 w-4" />
+              {exportLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <FileSpreadsheet className="h-4 w-4" />
+              )}
               下载 CSV
             </button>
             <button
-              onClick={() => {
-                const blob = exportJSONBlob();
-                const name = `宠物训练课回访追踪-${new Date().toISOString().slice(0, 10)}.json`;
-                download(blob, name);
-                markExported();
-                setLastAction(`已导出 JSON：${name}`);
-                setTimeout(() => setLastAction(null), 5000);
-              }}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+              onClick={() => handleDownload('json')}
+              disabled={exportLoading}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-50"
             >
               <FileJson className="h-4 w-4" />
               下载 JSON
@@ -151,12 +203,12 @@ export default function ExportCenter() {
               icon: Sparkles,
               color: lastExport ? 'bg-sky-50 text-sky-700' : 'bg-slate-100 text-slate-500',
               hint: lastExport
-                ? `上次导出：${formatDate(lastExport.exportedAt)}`
+                ? `上次导出：${formatDate(lastExport.generatedAt)}`
                 : '首次导出，全部为新增',
             },
             {
               label: '事件日志条数',
-              val: events.length,
+              val: summary.eventsCount,
               icon: History,
               color: 'bg-amber-50 text-amber-700',
               hint: 'JSON 包含完整事件日志',
@@ -185,16 +237,16 @@ export default function ExportCenter() {
               <Sparkles className="h-5 w-5 text-sage-600" />
               <h2 className="font-song text-lg font-bold text-sage-800">与上次导出的差异摘要</h2>
               <span className="rounded-full bg-sage-50 px-2 py-0.5 text-xs font-mono text-sage-700">
-                {diffs.length} 处
+                {summary.diffs.length} 处
               </span>
             </div>
-            {diffs.length > 0 && (
+            {summary.diffs.length > 0 && (
               <span className="text-[11px] text-slate-400">
                 ⚠ 这些差异在 CSV 文件末尾也会以注释形式追加
               </span>
             )}
           </div>
-          {diffs.length === 0 ? (
+          {summary.diffs.length === 0 ? (
             <div className="p-10 text-center">
               <Info className="mx-auto mb-2 h-10 w-10 text-sage-300" />
               <div className="font-song text-lg text-slate-600">暂无差异</div>
@@ -392,8 +444,7 @@ export default function ExportCenter() {
         <PreviewDialog
           kind={showPreview}
           onClose={() => setShowPreview(null)}
-          csvBlob={exportCSVBlob()}
-          jsonBlob={exportJSONBlob()}
+          content={previewContent}
         />
       )}
     </div>
@@ -403,19 +454,12 @@ export default function ExportCenter() {
 function PreviewDialog({
   kind,
   onClose,
-  csvBlob,
-  jsonBlob,
+  content,
 }: {
   kind: 'csv' | 'json';
   onClose: () => void;
-  csvBlob: Blob;
-  jsonBlob: Blob;
+  content: string;
 }) {
-  const [text, setText] = useState<string>('加载中…');
-  useMemo(async () => {
-    const blob = kind === 'csv' ? csvBlob : jsonBlob;
-    setText(await blob.text());
-  }, [kind, csvBlob, jsonBlob]);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6" onClick={onClose}>
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
@@ -441,7 +485,7 @@ function PreviewDialog({
           </div>
           <div className="flex items-center gap-2">
             <a
-              href={URL.createObjectURL(kind === 'csv' ? csvBlob : jsonBlob)}
+              href={URL.createObjectURL(new Blob([content], { type: kind === 'csv' ? 'text/csv;charset=utf-8' : 'application/json;charset=utf-8' }))}
               download={`preview.${kind}`}
               className="inline-flex items-center gap-1.5 rounded-lg bg-sage-600 px-3 py-1.5 text-xs text-white hover:bg-sage-700"
             >
@@ -457,7 +501,7 @@ function PreviewDialog({
           </div>
         </div>
         <pre className="m-3 flex-1 overflow-auto rounded-lg border border-parchment-200 bg-parchment-50 p-4 text-xs leading-relaxed text-slate-700">
-{text}
+{content}
         </pre>
       </div>
     </div>
