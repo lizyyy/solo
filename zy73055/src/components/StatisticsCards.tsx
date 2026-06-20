@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FileCheck, CheckCircle2, XCircle, Clock, Timer, BookX, CopyX } from 'lucide-react';
-import { useWorkOrderStore } from '../store/workOrderStore';
+import { useStatistics } from '../store/workOrderStore';
 
 function AnimatedNumber({ value, duration = 600 }: { value: number; duration?: number }) {
   const [display, setDisplay] = useState(0);
@@ -55,7 +55,7 @@ function StatCard({ label, value, total, icon, gradient, accent, delta }: StatCa
 }
 
 export function StatisticsCards() {
-  const { statistics } = useWorkOrderStore();
+  const statistics = useStatistics();
   const { total, normal, abnormal, pending, lateArrivalCount, oldTerminologyHits, duplicateWarnings } = statistics;
 
   return (

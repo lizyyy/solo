@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { create } from 'zustand';
 import type {
   WorkOrder,
@@ -24,7 +25,8 @@ const STORAGE_KEY = 'elevator-workorder-store-v1';
 
 const DEFAULT_FILTERS: FilterState = {
   dateRange: null,
-  deviceNo: null,
+  searchKeyword: null,
+  exactDeviceNo: null,
   status: null,
   judgment: null,
   shift: null,
@@ -43,17 +45,13 @@ interface WorkOrderStore {
   duplicateWarningsFromImport: DuplicateWarning[];
   lastImportResult: DuplicateResolutionResult | null;
 
-  get filteredWorkOrders(): WorkOrder[];
-  get statistics(): Statistics;
-  get abnormalQueue(): WorkOrder[];
-  get sampleOrder(): WorkOrder | undefined;
-
   setFilters: (partial: Partial<FilterState>) => void;
   resetFilters: () => void;
   selectOrder: (id: string | null) => void;
   updateJudgment: (orderId: string, judgment: Judgment, reason?: string) => void;
   updateManualRemark: (orderId: string, remark: string) => void;
   importWorkOrders: (newOrders: WorkOrder[], actionMap?: Record<string, 'skip' | 'merge' | 'overwrite'>) => DuplicateResolutionResult;
+  previewImportDuplicates: (newOrders: WorkOrder[]) => DuplicateWarning[];
   setRole: (role: 'reviewer' | 'supervisor') => void;
   toggleHandoverGuide: (show?: boolean) => void;
   locateSampleOrder: () => void;
@@ -72,19 +70,6 @@ export const useWorkOrderStore = create<WorkOrderStore>((set, get) => ({
   showHandoverGuide: true,
   duplicateWarningsFromImport: [],
   lastImportResult: null,
-
-  get filteredWorkOrders() {
-    return applyFilters(get().workOrders, get().filters);
-  },
-  get statistics() {
-    return calculateStatistics(get().filteredWorkOrders);
-  },
-  get abnormalQueue() {
-    return get().filteredWorkOrders.filter(o => o.judgment === 'abnormal' || o.judgment === 'pending_review');
-  },
-  get sampleOrder() {
-    return get().workOrders.find(o => o.photos.some(p => p.hitsOldTerminology));
-  },
 
   setFilters: (partial) =>
     set((s) => ({ filters: { ...s.filters, ...partial } })),
@@ -137,13 +122,12 @@ export const useWorkOrderStore = create<WorkOrderStore>((set, get) => ({
   importWorkOrders: (newOrders, actionMap = {}) => {
     const existing = get().workOrders;
     const warnings = detectDuplicates(existing, newOrders);
+    const resolvedMap: Record<string, 'skip' | 'merge' | 'overwrite'> = {};
     for (const w of warnings) {
       const key = `${w.deviceNo}::${w.newOrderId}`;
-      if (!(key in actionMap)) {
-        actionMap[key] = w.suggestion;
-      }
+      resolvedMap[key] = actionMap[key] ?? w.suggestion;
     }
-    const { orders, result } = applyDuplicateAction(existing, newOrders, actionMap);
+    const { orders, result } = applyDuplicateAction(existing, newOrders, resolvedMap);
     set({
       workOrders: orders, duplicateWarningsFromImport: warnings, lastImportResult: result,
     });
@@ -151,19 +135,23 @@ export const useWorkOrderStore = create<WorkOrderStore>((set, get) => ({
     return result;
   },
 
+  previewImportDuplicates: (newOrders) => {
+    return detectDuplicates(get().workOrders, newOrders);
+  },
+
   setRole: (role) => set({ currentRole: role, currentUser: role === 'supervisor' ? '维保主管-阿敏' : '审核员-王审核' }),
 
   toggleHandoverGuide: (show) => set({ showHandoverGuide: typeof show === 'boolean' ? show : !get().showHandoverGuide }),
 
   locateSampleOrder: () => {
-    const sample = get().sampleOrder;
+    const sample = get().workOrders.find(o => o.photos.some(p => p.hitsOldTerminology));
     if (sample) {
       set({ selectedOrderId: sample.id, filters: { ...DEFAULT_FILTERS } });
     }
   },
 
   exportFilteredCSV: () => {
-    const orders = get().filteredWorkOrders;
+    const orders = applyFilters(get().workOrders, get().filters);
     const header = ['工单编号', '设备编号', '设备名称', '故障类型', '上报时间', '上报人', '优先级', '工单状态', '审核判断', '班次', '人工备注', '晚到附件数', '旧说法命中', '判断人', '判断时间'];
     const rows = orders.map(o => [
       o.orderNo, o.deviceNo, o.deviceName, o.faultType, o.reportTime, o.reporter,
@@ -203,3 +191,30 @@ export const useWorkOrderStore = create<WorkOrderStore>((set, get) => ({
     set({ workOrders: mockWorkOrders, filters: { ...DEFAULT_FILTERS }, selectedOrderId: null, duplicateWarningsFromImport: [], lastImportResult: null });
   },
 }));
+
+export function useFilteredWorkOrders(): WorkOrder[] {
+  const workOrders = useWorkOrderStore((s) => s.workOrders);
+  const filters = useWorkOrderStore((s) => s.filters);
+  return useMemo(() => applyFilters(workOrders, filters), [workOrders, filters]);
+}
+
+export function useStatistics(): Statistics {
+  const filtered = useFilteredWorkOrders();
+  return useMemo(() => calculateStatistics(filtered), [filtered]);
+}
+
+export function useAbnormalQueue(): WorkOrder[] {
+  const filtered = useFilteredWorkOrders();
+  return useMemo(
+    () => filtered.filter((o) => o.judgment === 'abnormal' || o.judgment === 'pending_review'),
+    [filtered]
+  );
+}
+
+export function useSampleOrder(): WorkOrder | undefined {
+  const workOrders = useWorkOrderStore((s) => s.workOrders);
+  return useMemo(
+    () => workOrders.find((o) => o.photos.some((p) => p.hitsOldTerminology)),
+    [workOrders]
+  );
+}

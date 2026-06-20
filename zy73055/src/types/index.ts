@@ -63,7 +63,8 @@ export interface WorkOrder {
 
 export interface FilterState {
   dateRange: [string, string] | null;
-  deviceNo: string | null;
+  searchKeyword: string | null;
+  exactDeviceNo: string | null;
   status: OrderStatus | null;
   judgment: Judgment | null;
   shift: Shift | null;

@@ -4,26 +4,25 @@ import { useWorkOrderStore } from '../store/workOrderStore';
 import { DuplicateResolution } from '../components/DuplicateResolution';
 import { mockWorkOrders } from '../utils/mockData';
 import type { WorkOrder, DuplicateResolutionResult } from '../types';
-import { detectDuplicates } from '../utils/duplicateDetector';
 
 export default function ImportPanel() {
-  const { importWorkOrders, lastImportResult, duplicateWarningsFromImport, resetAll, workOrders } = useWorkOrderStore();
+  const { importWorkOrders, lastImportResult, duplicateWarningsFromImport, resetAll, workOrders, previewImportDuplicates } = useWorkOrderStore();
   const [dragging, setDragging] = useState(false);
   const [actionMap, setActionMap] = useState<Record<string, 'skip' | 'merge' | 'overwrite'>>({});
   const [result, setResult] = useState<DuplicateResolutionResult | null>(null);
   const [simulated, setSimulated] = useState(false);
 
   const simulateBatch = useMemo(() => {
+    const rand = Math.floor(100000 + Math.random() * 900000);
     return [
       { ...mockWorkOrders[3], id: `sim-${Date.now()}-1`, orderNo: 'SIM-' + mockWorkOrders[3].orderNo },
       { ...mockWorkOrders[14], id: `sim-${Date.now()}-2`, orderNo: 'SIM-' + mockWorkOrders[14].orderNo },
       {
         ...mockWorkOrders[0],
         id: `sim-${Date.now()}-3`,
-        orderNo: 'GD2026-NEW-099',
-        deviceNo: 'DT-NEW-9999',
-        deviceName: '深圳湾1号T7-1号梯（全新）',
-        orderNoNew: undefined as any,
+        orderNo: `GD2026-SIM-${rand}`,
+        deviceNo: `DT-SIM-${rand}`,
+        deviceName: '深圳湾1号T7-1号梯（全新导入）',
       } as WorkOrder,
     ];
   }, [workOrders.length]);
@@ -35,9 +34,12 @@ export default function ImportPanel() {
   };
 
   const runImport = (batch: WorkOrder[]) => {
-    const warnings = detectDuplicates(workOrders, batch);
+    const warnings = previewImportDuplicates(batch);
     const map: Record<string, 'skip' | 'merge' | 'overwrite'> = {};
-    for (const w of warnings) map[`${w.deviceNo}::${w.newOrderId}`] = actionMap[`${w.deviceNo}::${w.newOrderId}`] ?? w.suggestion;
+    for (const w of warnings) {
+      const key = `${w.deviceNo}::${w.newOrderId}`;
+      if (actionMap[key]) map[key] = actionMap[key];
+    }
     const r = importWorkOrders(batch, map);
     setResult(r);
     setSimulated(true);
@@ -46,7 +48,7 @@ export default function ImportPanel() {
   const changeAction = (key: string, action: 'skip' | 'merge' | 'overwrite') =>
     setActionMap(prev => ({ ...prev, [key]: action }));
 
-  const showWarnings = (simulated ? duplicateWarningsFromImport : detectDuplicates(workOrders, simulateBatch));
+  const showWarnings = (simulated ? duplicateWarningsFromImport : previewImportDuplicates(simulateBatch));
 
   return (
     <div className="min-h-screen bg-slate-100 py-6 px-4 md:px-6">
@@ -55,7 +57,7 @@ export default function ImportPanel() {
           <h1 className="text-xl font-bold text-slate-900 mb-1">数据导入面板</h1>
           <p className="text-sm text-slate-500 mb-4">
             支持拖拽上传工单批次。检测到设备编号重复时<b className="text-blue-600">不报错阻断</b>，而是显示"下一步处理"卡片。
-            <br /><b className="text-emerald-600">正常记录默认不翻倍，人工备注永不被覆盖。</b>
+            <br /><b className="text-emerald-600">全新记录正常导入，重复记录不翻倍，人工备注永不被覆盖。</b>
           </p>
 
           <div
@@ -127,7 +129,7 @@ export default function ImportPanel() {
             <div className="px-6 py-4 flex items-center gap-2 text-xs text-emerald-800 bg-emerald-50/70 border-t border-emerald-200">
               <Check className="w-4 h-4" />
               <b>安全结果：</b>
-              人工备注全部保留未被覆盖 · 重复设备编号未产生翻倍记录 · 原始 Mock 数据可随时重置恢复
+              全新工单已进入工单库 · 人工备注全部保留未被覆盖 · 重复设备编号未产生翻倍记录
             </div>
           </div>
         )}

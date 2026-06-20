@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, FileUp, History, Hand, Shield, User, ChevronDown, Download, Zap } from 'lucide-react';
-import { useWorkOrderStore } from '../store/workOrderStore';
+import { useWorkOrderStore, useStatistics } from '../store/workOrderStore';
 import { useState } from 'react';
 
 const SHIFT_NAME = { morning: '早班', afternoon: '中班', night: '夜班' };
@@ -13,7 +13,8 @@ function getShift() {
 }
 
 export function TopNav() {
-  const { currentUser, currentRole, setRole, toggleHandoverGuide, exportFilteredCSV, statistics } = useWorkOrderStore();
+  const statistics = useStatistics();
+  const { currentUser, currentRole, setRole, toggleHandoverGuide, exportFilteredCSV } = useWorkOrderStore();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navItemCls = ({ isActive }: { isActive: boolean }) =>

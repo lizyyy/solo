@@ -34,8 +34,8 @@ export function FilterBar() {
           <input
             type="text"
             placeholder="搜索 设备/工单编号"
-            value={filters.deviceNo ?? ''}
-            onChange={(e) => setFilters({ deviceNo: e.target.value || null })}
+            value={filters.searchKeyword ?? ''}
+            onChange={(e) => setFilters({ searchKeyword: e.target.value || null })}
             className="w-full text-xs rounded border border-slate-300 bg-white pl-7 pr-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-slate-600/30 focus:border-slate-600"
           />
         </div>
@@ -130,8 +130,8 @@ export function FilterBar() {
 
         <div className="col-span-2 lg:col-span-2 flex items-center gap-2">
           <select
-            value={filters.deviceNo && deviceOptions.includes(filters.deviceNo) ? filters.deviceNo : ''}
-            onChange={(e) => setFilters({ deviceNo: e.target.value || null })}
+            value={filters.exactDeviceNo && deviceOptions.includes(filters.exactDeviceNo) ? filters.exactDeviceNo : ''}
+            onChange={(e) => setFilters({ exactDeviceNo: e.target.value || null })}
             className={`${selectCls} flex-1 min-w-0`}
           >
             <option value="">快速选择设备...</option>

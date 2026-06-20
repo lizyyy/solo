@@ -35,6 +35,12 @@ export function applyDuplicateAction(
 ): { orders: WorkOrder[]; result: DuplicateResolutionResult } {
   const result: DuplicateResolutionResult = { imported: 0, skipped: 0, merged: 0, overwritten: 0, warnings: [] };
   const existingById = new Map<string, WorkOrder>();
+  const duplicateWarnings = detectDuplicates(existingOrders, newOrders);
+  const warningByNewOrderId = new Map<string, DuplicateWarning>();
+  for (const warning of duplicateWarnings) {
+    warningByNewOrderId.set(warning.newOrderId, warning);
+  }
+
   for (const o of existingOrders) {
     existingById.set(o.id, {
       ...o,
@@ -44,77 +50,73 @@ export function applyDuplicateAction(
     });
   }
   const finalOrders: WorkOrder[] = [];
-  const usedExisting = new Set<string>();
 
   for (const n of newOrders) {
     const dupKey = `${n.deviceNo}::${n.id}`;
-    const action = actionMap[dupKey] ?? 'skip';
+    const dupWarning = warningByNewOrderId.get(n.id);
+    if (!dupWarning) {
+      finalOrders.push(n);
+      result.imported++;
+      continue;
+    }
+
+    const action = actionMap[dupKey] ?? dupWarning.suggestion;
     if (action === 'skip') {
       result.skipped++;
       continue;
     }
     if (action === 'merge') {
-      const dupWarning = detectDuplicates(Array.from(existingById.values()), [n])[0];
-      if (dupWarning) {
-        const existing = existingById.get(dupWarning.existingOrderId);
-        if (existing) {
-          const mergedPhotos = [
-            ...existing.photos,
-            ...n.photos.filter((np) => !existing.photos.some((ep) => ep.id === np.id)),
-          ];
-          const mergedAttachments = [
-            ...existing.attachments,
-            ...n.attachments.filter((na) => !existing.attachments.some((ea) => ea.id === na.id)),
-          ];
-          let { judgment, judgmentAt, judgmentBy } = existing;
-          if (new Date(n.reportTime).getTime() > new Date(existing.reportTime).getTime()) {
-            judgment = n.judgment;
-            judgmentAt = n.judgmentAt;
-            judgmentBy = n.judgmentBy;
-          }
-          existingById.set(existing.id, {
-            ...existing,
-            photos: mergedPhotos,
-            attachments: mergedAttachments,
-            judgment,
-            judgmentAt,
-            judgmentBy,
-            isDuplicateWarning: true,
-            duplicateAction: 'merge',
-          });
-          usedExisting.add(existing.id);
-          result.merged++;
-          continue;
+      const existing = existingById.get(dupWarning.existingOrderId);
+      if (existing) {
+        const mergedPhotos = [
+          ...existing.photos,
+          ...n.photos.filter((np) => !existing.photos.some((ep) => ep.id === np.id)),
+        ];
+        const mergedAttachments = [
+          ...existing.attachments,
+          ...n.attachments.filter((na) => !existing.attachments.some((ea) => ea.id === na.id)),
+        ];
+        let { judgment, judgmentAt, judgmentBy } = existing;
+        if (new Date(n.reportTime).getTime() > new Date(existing.reportTime).getTime()) {
+          judgment = n.judgment;
+          judgmentAt = n.judgmentAt;
+          judgmentBy = n.judgmentBy;
         }
+        existingById.set(existing.id, {
+          ...existing,
+          photos: mergedPhotos,
+          attachments: mergedAttachments,
+          judgment,
+          judgmentAt,
+          judgmentBy,
+          isDuplicateWarning: true,
+          duplicateAction: 'merge',
+        });
+        result.merged++;
+        continue;
       }
     }
     if (action === 'overwrite') {
-      const dupWarning = detectDuplicates(Array.from(existingById.values()), [n])[0];
-      if (dupWarning) {
-        const existing = existingById.get(dupWarning.existingOrderId);
-        if (existing) {
-          const preservedRemark = existing.manualRemark;
-          existingById.set(existing.id, {
-            ...n,
-            manualRemark: preservedRemark,
-            isDuplicateWarning: true,
-            duplicateAction: 'overwrite',
-          });
-          usedExisting.add(existing.id);
-          result.overwritten++;
-          continue;
-        }
+      const existing = existingById.get(dupWarning.existingOrderId);
+      if (existing) {
+        const preservedRemark = existing.manualRemark;
+        existingById.set(existing.id, {
+          ...n,
+          manualRemark: preservedRemark,
+          isDuplicateWarning: true,
+          duplicateAction: 'overwrite',
+        });
+        result.overwritten++;
+        continue;
       }
     }
-    finalOrders.push(n);
-    result.imported++;
   }
 
   for (const e of existingById.values()) {
     finalOrders.push(e);
   }
 
-  result.warnings = detectDuplicates(existingOrders, newOrders);
+  result.warnings = duplicateWarnings;
   return { orders: finalOrders, result };
 }
 

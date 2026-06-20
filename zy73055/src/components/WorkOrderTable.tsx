@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ChevronUp, ChevronDown, Eye, AlertTriangle, Clock, FileWarning } from 'lucide-react';
-import { useWorkOrderStore } from '../store/workOrderStore';
+import { useWorkOrderStore, useFilteredWorkOrders, useStatistics } from '../store/workOrderStore';
 import { LateBadge } from './LateBadge';
 import {
   STATUS_LABELS, JUDGMENT_LABELS, PRIORITY_LABELS, SHIFT_LABELS,
@@ -30,7 +30,9 @@ const PRIORITY_CLASS: Record<string, string> = {
 };
 
 export function WorkOrderTable() {
-  const { filteredWorkOrders, selectOrder, selectedOrderId, statistics } = useWorkOrderStore();
+  const filteredWorkOrders = useFilteredWorkOrders();
+  const statistics = useStatistics();
+  const { selectOrder, selectedOrderId } = useWorkOrderStore();
   const [sortKey, setSortKey] = useState<SortKey>('reportTime');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [highlightId, setHighlightId] = useState<string | null>(null);

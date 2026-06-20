@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { FileSearch, AlertOctagon, Download, ArrowRight, X } from 'lucide-react';
-import { useWorkOrderStore } from '../store/workOrderStore';
+import { useWorkOrderStore, useStatistics, useAbnormalQueue } from '../store/workOrderStore';
 
 interface HandoverCardsProps {
   asOverlay?: boolean;
@@ -9,7 +9,9 @@ interface HandoverCardsProps {
 
 export function HandoverCards({ asOverlay = false, onClose }: HandoverCardsProps) {
   const navigate = useNavigate();
-  const { locateSampleOrder, abnormalQueue, statistics, exportFilteredCSV, resetFilters, toggleHandoverGuide } = useWorkOrderStore();
+  const statistics = useStatistics();
+  const abnormalQueue = useAbnormalQueue();
+  const { locateSampleOrder, exportFilteredCSV, resetFilters, toggleHandoverGuide } = useWorkOrderStore();
 
   const handleExport = () => {
     resetFilters();

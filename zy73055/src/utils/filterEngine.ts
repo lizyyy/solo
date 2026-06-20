@@ -7,8 +7,14 @@ export function applyFilters(workOrders: WorkOrder[], filters: FilterState): Wor
       const t = new Date(order.reportTime).getTime();
       if (t < new Date(start).getTime() || t > new Date(end + ' 23:59:59').getTime()) return false;
     }
-    if (filters.deviceNo && !order.deviceNo.toLowerCase().includes(filters.deviceNo.toLowerCase()) &&
-        !order.orderNo.toLowerCase().includes(filters.deviceNo.toLowerCase())) {
+    if (filters.searchKeyword) {
+      const kw = filters.searchKeyword.toLowerCase();
+      if (!order.deviceNo.toLowerCase().includes(kw) &&
+          !order.orderNo.toLowerCase().includes(kw)) {
+        return false;
+      }
+    }
+    if (filters.exactDeviceNo && order.deviceNo !== filters.exactDeviceNo) {
       return false;
     }
     if (filters.status && order.status !== filters.status) return false;

@@ -1,5 +1,5 @@
 import { AlertTriangle, AlertOctagon, ChevronRight, Clock, BookOpen } from 'lucide-react';
-import { useWorkOrderStore } from '../store/workOrderStore';
+import { useWorkOrderStore, useAbnormalQueue } from '../store/workOrderStore';
 import { JUDGMENT_LABELS, PRIORITY_LABELS, SHIFT_LABELS } from '../types';
 import { LateBadge } from './LateBadge';
 
@@ -11,7 +11,8 @@ const PRIORITY_DOT: Record<string, string> = {
 };
 
 export function AbnormalQueue() {
-  const { abnormalQueue, selectOrder, selectedOrderId } = useWorkOrderStore();
+  const abnormalQueue = useAbnormalQueue();
+  const { selectOrder, selectedOrderId } = useWorkOrderStore();
 
   const hasLate = (o: typeof abnormalQueue[number]) =>
     o.photos.some(p => p.isLateArrival) || o.attachments.some(a => a.isLateArrival);
