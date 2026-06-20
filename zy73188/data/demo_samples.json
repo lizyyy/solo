@@ -1,0 +1,260 @@
+{
+  "description": "误差传播演示数据集 - 日常测量场景",
+  "scenario": "通过日常物品测量演示误差传播原理",
+  "samples": [
+    {
+      "name": "书的长度",
+      "symbol": "a",
+      "value": 21.0,
+      "uncertainty": 0.05,
+      "unit": "cm",
+      "variable_type": "direct_measurement",
+      "evidence_status": "confirmed",
+      "evidence_source": "游标卡尺校准证书 #CAL-2024-001",
+      "evidence_notes": "校准有效期至 2025-12-31",
+      "description": "用游标卡尺测量书的长度",
+      "sample_id": "df53977f",
+      "is_boundary": false,
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "relative_uncertainty": 0.002380952380952381,
+      "metadata": {
+        "measurement_method": "游标卡尺",
+        "instrument_precision": "0.01 mm"
+      }
+    },
+    {
+      "name": "书的宽度",
+      "symbol": "b",
+      "value": 14.8,
+      "uncertainty": 0.05,
+      "unit": "cm",
+      "variable_type": "direct_measurement",
+      "evidence_status": "confirmed",
+      "evidence_source": "游标卡尺校准证书 #CAL-2024-001",
+      "evidence_notes": "校准有效期至 2025-12-31",
+      "description": "用游标卡尺测量书的宽度",
+      "sample_id": "8584b1ef",
+      "is_boundary": false,
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "relative_uncertainty": 0.0033783783783783786,
+      "metadata": {
+        "measurement_method": "游标卡尺",
+        "instrument_precision": "0.01 mm"
+      }
+    },
+    {
+      "name": "书的厚度",
+      "symbol": "h",
+      "value": 2.5,
+      "uncertainty": 0.05,
+      "unit": "cm",
+      "variable_type": "direct_measurement",
+      "evidence_status": "confirmed",
+      "evidence_source": "游标卡尺校准证书 #CAL-2024-001",
+      "evidence_notes": null,
+      "description": "用游标卡尺测量书的厚度（不含封面）",
+      "sample_id": "0bd72a3e",
+      "is_boundary": false,
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "relative_uncertainty": 0.02,
+      "metadata": {
+        "measurement_method": "游标卡尺",
+        "pages": 320
+      }
+    },
+    {
+      "name": "书的质量",
+      "symbol": "m",
+      "value": 385.0,
+      "uncertainty": 0.5,
+      "unit": "g",
+      "variable_type": "direct_measurement",
+      "evidence_status": "confirmed",
+      "evidence_source": "电子天平校准证书 #CAL-2024-045",
+      "evidence_notes": "天平型号: FA2004",
+      "description": "用电子天平测量书的质量",
+      "sample_id": "5504029a",
+      "is_boundary": false,
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "relative_uncertainty": 0.0012987012987012987,
+      "metadata": {
+        "measurement_method": "电子天平",
+        "instrument_precision": "0.1 mg"
+      }
+    },
+    {
+      "name": "底面半径",
+      "symbol": "r",
+      "value": 3.0,
+      "uncertainty": 2.0,
+      "unit": "cm",
+      "variable_type": "direct_measurement",
+      "evidence_status": "pending",
+      "evidence_source": "普通直尺（无校准证书）",
+      "evidence_notes": "直尺精度约 1 mm，但测量时未对准圆心",
+      "description": "用普通直尺粗略测量水杯底面半径",
+      "sample_id": "987d1a65",
+      "is_boundary": true,
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "relative_uncertainty": 0.6666666666666666,
+      "metadata": {
+        "measurement_method": "普通直尺",
+        "notes": "边界样本：相对不确定度 = 2.0/3.0 = 66.7% > 50% 阈值"
+      }
+    },
+    {
+      "name": "水杯高度",
+      "symbol": "h",
+      "value": 15.0,
+      "uncertainty": 0.1,
+      "unit": "cm",
+      "variable_type": "direct_measurement",
+      "evidence_status": "pending",
+      "evidence_source": "游标卡尺校准证书 #CAL-2024-001",
+      "evidence_notes": null,
+      "description": "用游标卡尺测量水杯高度",
+      "sample_id": "258dc974",
+      "is_boundary": false,
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "relative_uncertainty": 0.006666666666666667,
+      "metadata": {
+        "measurement_method": "游标卡尺",
+        "notes": "待确认水杯是否为标准圆柱体"
+      }
+    },
+    {
+      "name": "书的质量",
+      "symbol": "m",
+      "value": 385.0,
+      "uncertainty": 0.5,
+      "unit": "g",
+      "variable_type": "direct_measurement",
+      "evidence_status": "confirmed",
+      "evidence_source": "电子天平校准证书 #CAL-2024-045",
+      "evidence_notes": null,
+      "description": "用电子天平测量书的质量（重复录入）",
+      "sample_id": "15aad829",
+      "is_boundary": false,
+      "is_duplicate": true,
+      "duplicate_of": null,
+      "relative_uncertainty": 0.0012987012987012987,
+      "metadata": {
+        "measurement_method": "电子天平",
+        "notes": "重复样本：与样本ID {} 的数据完全相同"
+      }
+    },
+    {
+      "name": "初速度",
+      "symbol": "v0",
+      "value": 0.0,
+      "uncertainty": 0.01,
+      "unit": "m/s",
+      "variable_type": "constant",
+      "evidence_status": "confirmed",
+      "evidence_source": null,
+      "evidence_notes": null,
+      "description": "自由落体初速度",
+      "sample_id": "026dd93a",
+      "is_boundary": false,
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "relative_uncertainty": Infinity,
+      "metadata": {
+        "notes": "自由落体，初速度为0"
+      }
+    },
+    {
+      "name": "重力加速度",
+      "symbol": "g",
+      "value": 9.8,
+      "uncertainty": 0.05,
+      "unit": "m/s²",
+      "variable_type": "constant",
+      "evidence_status": "confirmed",
+      "evidence_source": "国家标准 GB/T 10184-2015",
+      "evidence_notes": null,
+      "description": "本地重力加速度",
+      "sample_id": "df6c756e",
+      "is_boundary": false,
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "relative_uncertainty": 0.00510204081632653,
+      "metadata": {
+        "location": "北京",
+        "altitude": "43.5 m"
+      }
+    },
+    {
+      "name": "下落时间",
+      "symbol": "t",
+      "value": 2.0,
+      "uncertainty": 0.02,
+      "unit": "s",
+      "variable_type": "direct_measurement",
+      "evidence_status": "missing",
+      "evidence_source": "人工测量，已重复3次取平均",
+      "evidence_notes": "测量人员反应时间约 0.1 s",
+      "description": "用秒表测量小球下落时间",
+      "sample_id": "9a87d9b7",
+      "is_boundary": false,
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "relative_uncertainty": 0.01,
+      "metadata": {
+        "measurement_method": "秒表",
+        "notes": "缺少秒表校准证书",
+        "missing_evidence": "秒表校准证书"
+      }
+    }
+  ],
+  "formula_assignments": [
+    {
+      "formula": "矩形面积",
+      "variables": [
+        "a",
+        "b"
+      ],
+      "scenario": "计算书的封面面积"
+    },
+    {
+      "formula": "密度计算",
+      "variables": [
+        "m",
+        "V"
+      ],
+      "scenario": "计算书的纸张密度",
+      "notes": "V = a × b × h 需要先计算"
+    },
+    {
+      "formula": "圆柱体体积",
+      "variables": [
+        "r",
+        "h"
+      ],
+      "scenario": "计算水杯容积",
+      "notes": "包含边界样本 r，相对不确定度66.7%"
+    },
+    {
+      "formula": "匀加速位移",
+      "variables": [
+        "v0",
+        "a",
+        "t"
+      ],
+      "scenario": "计算自由落体下落距离",
+      "notes": "a = g = 9.8 m/s²"
+    }
+  ],
+  "data_quality_notes": [
+    "⚠️ 包含边界样本：水杯底面半径 r 的相对不确定度为 66.7%",
+    "⚠️ 包含重复样本：书的质量 m 被录入两次",
+    "⚠️ 包含证据缺失：下落时间 t 缺少秒表校准证书",
+    "💡 建议：先处理重复和边界样本，再进行完整计算"
+  ]
+}

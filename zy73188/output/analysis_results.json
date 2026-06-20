@@ -1,0 +1,243 @@
+{
+  "summary": {
+    "total_samples": 10,
+    "valid_samples": 10,
+    "boundary_samples": 1,
+    "duplicate_samples": 1,
+    "suspended_samples": 0,
+    "formulas_analyzed": [
+      "矩形面积"
+    ],
+    "key_findings": [
+      "矩形面积: 结果 = 310.8000 ± 1.2846 cm·cm, 相对不确定度 0.41%, 主要来源: b",
+      "⚠️ 检测到 1 个边界样本，相对不确定度过高",
+      "⚠️ 检测到 1 个重复样本"
+    ]
+  },
+  "reviewer_report": {
+    "confirmed_evidence": [
+      {
+        "sample_id": "ea4e798a",
+        "name": "书的长度",
+        "symbol": "a",
+        "value": 21.0,
+        "uncertainty": 0.05,
+        "unit": "cm",
+        "evidence_source": "游标卡尺校准证书 #CAL-2024-001",
+        "evidence_notes": "校准有效期至 2025-12-31",
+        "is_boundary": false,
+        "is_duplicate": false
+      },
+      {
+        "sample_id": "e159c402",
+        "name": "书的宽度",
+        "symbol": "b",
+        "value": 14.8,
+        "uncertainty": 0.05,
+        "unit": "cm",
+        "evidence_source": "游标卡尺校准证书 #CAL-2024-001",
+        "evidence_notes": "校准有效期至 2025-12-31",
+        "is_boundary": false,
+        "is_duplicate": false
+      },
+      {
+        "sample_id": "bf958dc0",
+        "name": "书的厚度",
+        "symbol": "h",
+        "value": 2.5,
+        "uncertainty": 0.05,
+        "unit": "cm",
+        "evidence_source": "游标卡尺校准证书 #CAL-2024-001",
+        "evidence_notes": null,
+        "is_boundary": false,
+        "is_duplicate": false
+      },
+      {
+        "sample_id": "8c7ac307",
+        "name": "书的质量",
+        "symbol": "m",
+        "value": 385.0,
+        "uncertainty": 0.5,
+        "unit": "g",
+        "evidence_source": "电子天平校准证书 #CAL-2024-045",
+        "evidence_notes": "天平型号: FA2004",
+        "is_boundary": false,
+        "is_duplicate": false
+      },
+      {
+        "sample_id": "bf0f1524",
+        "name": "书的质量",
+        "symbol": "m",
+        "value": 385.0,
+        "uncertainty": 0.5,
+        "unit": "g",
+        "evidence_source": "电子天平校准证书 #CAL-2024-045",
+        "evidence_notes": null,
+        "is_boundary": false,
+        "is_duplicate": true
+      },
+      {
+        "sample_id": "1c6bda48",
+        "name": "初速度",
+        "symbol": "v0",
+        "value": 0.0,
+        "uncertainty": 0.01,
+        "unit": "m/s",
+        "evidence_source": null,
+        "evidence_notes": null,
+        "is_boundary": false,
+        "is_duplicate": false
+      },
+      {
+        "sample_id": "282f71bd",
+        "name": "重力加速度",
+        "symbol": "g",
+        "value": 9.8,
+        "uncertainty": 0.05,
+        "unit": "m/s²",
+        "evidence_source": "国家标准 GB/T 10184-2015",
+        "evidence_notes": null,
+        "is_boundary": false,
+        "is_duplicate": false
+      }
+    ],
+    "pending_evidence": [
+      {
+        "sample_id": "59de5b39",
+        "name": "底面半径",
+        "symbol": "r",
+        "value": 3.0,
+        "uncertainty": 2.0,
+        "unit": "cm",
+        "evidence_source": "普通直尺（无校准证书）",
+        "evidence_notes": "直尺精度约 1 mm，但测量时未对准圆心",
+        "is_boundary": true,
+        "is_duplicate": false
+      },
+      {
+        "sample_id": "88ca8630",
+        "name": "水杯高度",
+        "symbol": "h",
+        "value": 15.0,
+        "uncertainty": 0.1,
+        "unit": "cm",
+        "evidence_source": "游标卡尺校准证书 #CAL-2024-001",
+        "evidence_notes": null,
+        "is_boundary": false,
+        "is_duplicate": false
+      }
+    ],
+    "missing_evidence": [
+      {
+        "sample_id": "ab9ec7c8",
+        "name": "下落时间",
+        "symbol": "t",
+        "value": 2.0,
+        "uncertainty": 0.02,
+        "unit": "s",
+        "evidence_source": "人工测量，已重复3次取平均",
+        "evidence_notes": "测量人员反应时间约 0.1 s",
+        "is_boundary": false,
+        "is_duplicate": false
+      }
+    ],
+    "recommendations": [
+      "有 1 个样本缺少证据，需尽快补充测量记录或校准证书",
+      "有 2 个样本证据待确认，请相关责任人核实",
+      "部分样本相对不确定度过高，建议重新测量或核查测量方法",
+      "存在重复样本，请确认是否为误录入，避免影响样本统计"
+    ]
+  },
+  "results": [
+    {
+      "formula": {
+        "name": "矩形面积",
+        "expression": "S = a * b",
+        "description": "计算矩形面积，a为长，b为宽",
+        "variables": [
+          "a",
+          "b"
+        ]
+      },
+      "variables": [
+        {
+          "name": "书的长度",
+          "symbol": "a",
+          "value": 21.0,
+          "uncertainty": 0.05,
+          "unit": "cm",
+          "variable_type": "direct_measurement",
+          "evidence_status": "confirmed",
+          "evidence_source": "游标卡尺校准证书 #CAL-2024-001",
+          "evidence_notes": "校准有效期至 2025-12-31",
+          "description": "用游标卡尺测量书的长度",
+          "sample_id": "ea4e798a",
+          "is_boundary": false,
+          "is_duplicate": false,
+          "duplicate_of": null,
+          "relative_uncertainty": 0.002380952380952381,
+          "metadata": {
+            "measurement_method": "游标卡尺",
+            "instrument_precision": "0.01 mm"
+          }
+        },
+        {
+          "name": "书的宽度",
+          "symbol": "b",
+          "value": 14.8,
+          "uncertainty": 0.05,
+          "unit": "cm",
+          "variable_type": "direct_measurement",
+          "evidence_status": "confirmed",
+          "evidence_source": "游标卡尺校准证书 #CAL-2024-001",
+          "evidence_notes": "校准有效期至 2025-12-31",
+          "description": "用游标卡尺测量书的宽度",
+          "sample_id": "e159c402",
+          "is_boundary": false,
+          "is_duplicate": false,
+          "duplicate_of": null,
+          "relative_uncertainty": 0.0033783783783783786,
+          "metadata": {
+            "measurement_method": "游标卡尺",
+            "instrument_precision": "0.01 mm"
+          }
+        }
+      ],
+      "result_value": 310.8,
+      "result_uncertainty": 1.284562182223967,
+      "result_unit": "cm·cm",
+      "partial_derivatives": {
+        "a": 14.8,
+        "b": 21.0
+      },
+      "uncertainty_contributions": {
+        "a": 33.18586752318042,
+        "b": 66.8141324768196
+      },
+      "relative_uncertainty": 0.004133082954388568,
+      "dominant_contribution": "b",
+      "suspended": false,
+      "suspension_reason": null,
+      "calculation_trace": [
+        "=== 矩形面积 误差传播计算 ===",
+        "公式: S = a * b",
+        "  书的长度 (a) = 21.0 ± 0.05 cm (来源: 游标卡尺校准证书 #CAL-2024-001)",
+        "  书的宽度 (b) = 14.8 ± 0.05 cm (来源: 游标卡尺校准证书 #CAL-2024-001)",
+        "--- 计算最佳估计值 ---",
+        "  S = a × b = 21.0 × 14.8 = 310.8",
+        "--- 计算合成不确定度 ---",
+        "  方差合成公式: u_c² = Σ(∂f/∂x_i)² × u²(x_i)",
+        "    (a): (14.8000)² × (0.05)² = 0.547600",
+        "    (b): (21.0000)² × (0.05)² = 1.102500",
+        "  u_c = √1.650100 = 1.284562",
+        "--- 不确定度贡献分析 ---",
+        "    a: 33.19%",
+        "    b: 66.81%",
+        "→ 最终结果: 310.8 ± 1.284562182223967 cm·cm",
+        "  相对不确定度: 0.41%",
+        "  主要不确定度来源: b (贡献: 66.81%)"
+      ]
+    }
+  ],
+  "anomalies": []
+}
