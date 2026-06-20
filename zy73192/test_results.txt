@@ -1,0 +1,233 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.9.6, pytest-8.3.3, pluggy-1.6.0 -- /Users/maca/pro/solo/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/maca/pro/solo/workspaces/zy73192
+configfile: pyproject.toml
+plugins: anyio-4.12.1
+collecting ... collected 92 items
+
+tests/test_attribution.py::TestSequenceAttribution::test_is_zero_with_tolerance PASSED [  1%]
+tests/test_attribution.py::TestSequenceAttribution::test_evaluate_formula_simple_linear PASSED [  2%]
+tests/test_attribution.py::TestSequenceAttribution::test_evaluate_formula_division_by_zero PASSED [  3%]
+tests/test_attribution.py::TestSequenceAttribution::test_evaluate_formula_division_by_zero_with_parentheses PASSED [  4%]
+tests/test_attribution.py::TestSequenceAttribution::test_evaluate_formula_fractional PASSED [  5%]
+tests/test_attribution.py::TestSequenceAttribution::test_evaluate_formula_different_notation PASSED [  6%]
+tests/test_attribution.py::TestSequenceAttribution::test_evaluate_formula_empty PASSED [  7%]
+tests/test_attribution.py::TestSequenceAttribution::test_calculate_sequence_linear PASSED [  8%]
+tests/test_attribution.py::TestSequenceAttribution::test_calculate_sequence_division_by_zero PASSED [  9%]
+tests/test_attribution.py::TestSequenceAttribution::test_calculate_sequence_empty_terms PASSED [ 10%]
+tests/test_attribution.py::TestSequenceAttribution::test_parse_numeric_answer PASSED [ 11%]
+tests/test_attribution.py::TestSequenceAttribution::test_parse_numeric_answer_with_spaces PASSED [ 13%]
+tests/test_attribution.py::TestSequenceAttribution::test_parse_numeric_answer_with_text PASSED [ 14%]
+tests/test_attribution.py::TestSequenceAttribution::test_parse_numeric_answer_empty PASSED [ 15%]
+tests/test_attribution.py::TestSequenceAttribution::test_check_calculation_error PASSED [ 16%]
+tests/test_attribution.py::TestSequenceAttribution::test_check_calculation_error_no_error PASSED [ 17%]
+tests/test_attribution.py::TestSequenceAttribution::test_check_index_error PASSED [ 18%]
+tests/test_attribution.py::TestSequenceAttribution::test_check_initial_term_error PASSED [ 19%]
+tests/test_attribution.py::TestSequenceAttribution::test_check_formula_misapplication PASSED [ 20%]
+tests/test_attribution.py::TestSequenceAttribution::test_analyze_small_sample PASSED [ 21%]
+tests/test_attribution.py::TestSequenceAttribution::test_analyze_division_by_zero FAILED [ 22%]
+tests/test_attribution.py::TestSequenceAttribution::test_analyze_negative_term PASSED [ 23%]
+tests/test_attribution.py::TestSequenceAttribution::test_analyze_correct_answer FAILED [ 25%]
+tests/test_attribution.py::TestSequenceAttribution::test_analyze_calculation_error FAILED [ 26%]
+tests/test_attribution.py::TestSequenceAttribution::test_analyze_already_marked_for_review PASSED [ 27%]
+tests/test_attribution.py::TestSequenceAttribution::test_analyze_no_numeric_answer PASSED [ 28%]
+tests/test_attribution.py::TestSequenceAttribution::test_error_categories_defined PASSED [ 29%]
+tests/test_attribution.py::TestSequenceAttribution::test_analyze_batch PASSED [ 30%]
+tests/test_config.py::TestStableMessages::test_error_messages_stability PASSED [ 31%]
+tests/test_config.py::TestStableMessages::test_status_messages_stability PASSED [ 32%]
+tests/test_config.py::TestStableMessages::test_jump_reasons_stability PASSED [ 33%]
+tests/test_config.py::TestStableMessages::test_review_reasons_stability PASSED [ 34%]
+tests/test_config.py::TestFieldMapping::test_default_field_mapping PASSED [ 35%]
+tests/test_config.py::TestFieldMapping::test_field_mapping_case_insensitive PASSED [ 36%]
+tests/test_config.py::TestAttributionConfig::test_default_config_values PASSED [ 38%]
+tests/test_config.py::TestAttributionConfig::test_config_validation PASSED [ 39%]
+tests/test_config.py::TestAttributionConfig::test_output_columns_stability PASSED [ 40%]
+tests/test_config.py::TestAttributionConfig::test_default_config_singleton PASSED [ 41%]
+tests/test_data_loader.py::TestDataLoader::test_load_file_not_found PASSED [ 42%]
+tests/test_data_loader.py::TestDataLoader::test_load_invalid_format PASSED [ 43%]
+tests/test_data_loader.py::TestDataLoader::test_load_csv_success FAILED  [ 44%]
+tests/test_data_loader.py::TestDataLoader::test_load_csv_alt_fields FAILED [ 45%]
+tests/test_data_loader.py::TestDataLoader::test_parse_terms_simple FAILED [ 46%]
+tests/test_data_loader.py::TestDataLoader::test_parse_terms_single FAILED [ 47%]
+tests/test_data_loader.py::TestDataLoader::test_parse_terms_negative FAILED [ 48%]
+tests/test_data_loader.py::TestDataLoader::test_parse_terms_decimal FAILED [ 50%]
+tests/test_data_loader.py::TestDataLoader::test_parse_terms_empty PASSED [ 51%]
+tests/test_data_loader.py::TestDataLoader::test_parse_formula_with_denominator PASSED [ 52%]
+tests/test_data_loader.py::TestDataLoader::test_parse_formula_with_parentheses PASSED [ 53%]
+tests/test_data_loader.py::TestDataLoader::test_parse_formula_simple PASSED [ 54%]
+tests/test_data_loader.py::TestDataLoader::test_parse_formula_empty PASSED [ 55%]
+tests/test_data_loader.py::TestDataLoader::test_validate_records FAILED  [ 56%]
+tests/test_data_loader.py::TestDataLoader::test_validate_records_missing_id PASSED [ 57%]
+tests/test_data_loader.py::TestDataLoader::test_validate_records_missing_data PASSED [ 58%]
+tests/test_data_loader.py::TestDataLoader::test_find_column_exact_match PASSED [ 59%]
+tests/test_data_loader.py::TestDataLoader::test_find_column_case_insensitive PASSED [ 60%]
+tests/test_data_loader.py::TestDataLoader::test_find_column_alternative_name PASSED [ 61%]
+tests/test_data_loader.py::TestDataLoader::test_find_column_not_found PASSED [ 63%]
+tests/test_data_loader.py::TestDataLoader::test_source_tracking FAILED   [ 64%]
+tests/test_jump_detector.py::TestJumpDetector::test_get_magnitude_positive PASSED [ 65%]
+tests/test_jump_detector.py::TestJumpDetector::test_get_magnitude_negative PASSED [ 66%]
+tests/test_jump_detector.py::TestJumpDetector::test_get_magnitude_special PASSED [ 67%]
+tests/test_jump_detector.py::TestJumpDetector::test_calculate_statistics PASSED [ 68%]
+tests/test_jump_detector.py::TestJumpDetector::test_calculate_statistics_with_nan PASSED [ 69%]
+tests/test_jump_detector.py::TestJumpDetector::test_calculate_statistics_empty PASSED [ 70%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_threshold_jump PASSED [ 71%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_threshold_jump_no_jump PASSED [ 72%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_unit_jump PASSED [ 73%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_unit_jump_no_jump PASSED [ 75%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_normal_jump_by_category PASSED [ 76%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_normal_jump_by_sequence FAILED [ 77%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_normal_jump_no_jump PASSED [ 78%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_jump_threshold PASSED [ 79%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_jump_unit FAILED [ 80%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_jump_normal FAILED [ 81%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_jump_no_terms PASSED [ 82%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_batch FAILED  [ 83%]
+tests/test_jump_detector.py::TestJumpDetector::test_jump_reasons_stability PASSED [ 84%]
+tests/test_models.py::TestQuestionRecord::test_default_values PASSED     [ 85%]
+tests/test_models.py::TestQuestionRecord::test_source_location_with_file_and_row PASSED [ 86%]
+tests/test_models.py::TestQuestionRecord::test_source_location_with_row_only PASSED [ 88%]
+tests/test_models.py::TestQuestionRecord::test_source_location_with_file_only PASSED [ 89%]
+tests/test_models.py::TestQuestionRecord::test_source_location_unknown PASSED [ 90%]
+tests/test_models.py::TestQuestionRecord::test_add_log PASSED            [ 91%]
+tests/test_models.py::TestQuestionRecord::test_mark_for_review PASSED    [ 92%]
+tests/test_models.py::TestQuestionRecord::test_mark_success PASSED       [ 93%]
+tests/test_models.py::TestQuestionRecord::test_mark_failed PASSED        [ 94%]
+tests/test_models.py::TestQuestionRecord::test_to_output_dict PASSED     [ 95%]
+tests/test_models.py::TestQuestionRecord::test_to_output_dict_empty_lists PASSED [ 96%]
+tests/test_models.py::TestAttributionResult::test_default_values PASSED  [ 97%]
+tests/test_models.py::TestAttributionResult::test_generate_summary_with_records PASSED [ 98%]
+tests/test_models.py::TestAttributionResult::test_generate_summary_empty PASSED [100%]
+
+=================================== FAILURES ===================================
+____________ TestSequenceAttribution.test_analyze_division_by_zero _____________
+tests/test_attribution.py:181: in test_analyze_division_by_zero
+    assert result.needs_review is True
+E   AssertionError: assert False is True
+E    +  where False = QuestionRecord(question_id='Q001', question_source='', question_content='', sequence_type='', given_terms='', recurrence_formula='a_n / (a_n - 1)', student_answer='1, 无穷大', correct_answer='', error_type='', source_row=-1, source_file='', processing_status='处理完成', attribution_result='错误类型无法自动判定，需人工检查', error_category='unknown', needs_review=False, review_reason='', jump_detected=False, jump_reason='', original_terms=[1.0, 2.0, 3.0], calculated_terms=[1.0, 2.0, 3.0, 1.5, 3.0, 1.5], processing_log=['[2026-06-20 12:14:20] 开始归因分析', '[2026-06-20 12:14:20] 按公式计算得到数列项: [1.0, 2.0, 3.0, 1.5, 3.0, 1.5]', '[2026-06-20 12:14:20] 解析学生答案数值: [1.0]', '[2026-06-20 12:14:20] 处理完成: 错误类型无法自动判定，需人工检查']).needs_review
+_____________ TestSequenceAttribution.test_analyze_correct_answer ______________
+tests/test_attribution.py:207: in test_analyze_correct_answer
+    assert "答案正确" in result.attribution_result
+E   AssertionError: assert '答案正确' in '项数索引错误: 学生答案偏移了3项'
+E    +  where '项数索引错误: 学生答案偏移了3项' = QuestionRecord(question_id='Q001', question_source='', question_content='', sequence_type='', given_terms='', recurrence_formula='2*a_n + 1', student_answer='2, 5, 11, 23', correct_answer='2, 5, 11, 23', error_type='', source_row=-1, source_file='', processing_status='处理完成', attribution_result='项数索引错误: 学生答案偏移了3项', error_category='项数索引错误', needs_review=False, review_reason='', jump_detected=False, jump_reason='', original_terms=[2.0, 5.0, 11.0], calculated_terms=[2.0, 5.0, 11.0, 23.0, 47.0, 95.0], processing_log=['[2026-06-20 12:14:20] 开始归因分析', '[2026-06-20 12:14:20] 按公式计算得到数列项: [2.0, 5.0, 11.0, 23.0, 47.0, 95.0]', '[2026-06-20 12:14:20] 解析学生答案数值: [2.0, 5.0, 11.0, 23.0]', '[2026-06-20 12:14:20] 解析正确答案数值: [2.0, 5.0, 11.0, 23.0]', '[2026-06-20 12:14:20] 处理完成: 项数索引错误: 学生答案偏移了3项', '[2026-06-20 12:14:20] 检测到1类错误: 项数索引错误: 学生答案偏移了3项']).attribution_result
+____________ TestSequenceAttribution.test_analyze_calculation_error ____________
+tests/test_attribution.py:220: in test_analyze_calculation_error
+    assert "计算错误" in result.error_category
+E   AssertionError: assert '计算错误' in '项数索引错误'
+E    +  where '项数索引错误' = QuestionRecord(question_id='Q001', question_source='', question_content='', sequence_type='', given_terms='', recurrence_formula='2*a_n + 1', student_answer='2, 5, 12, 23', correct_answer='2, 5, 11, 23', error_type='', source_row=-1, source_file='', processing_status='处理完成', attribution_result='项数索引错误: 学生答案偏移了3项; 计算错误: 第[3]项计算有误', error_category='项数索引错误', needs_review=False, review_reason='', jump_detected=False, jump_reason='', original_terms=[2.0, 5.0, 11.0], calculated_terms=[2.0, 5.0, 11.0, 23.0, 47.0, 95.0], processing_log=['[2026-06-20 12:14:20] 开始归因分析', '[2026-06-20 12:14:20] 按公式计算得到数列项: [2.0, 5.0, 11.0, 23.0, 47.0, 95.0]', '[2026-06-20 12:14:20] 解析学生答案数值: [2.0, 5.0, 12.0, 23.0]', '[2026-06-20 12:14:20] 解析正确答案数值: [2.0, 5.0, 11.0, 23.0]', '[2026-06-20 12:14:20] 处理完成: 项数索引错误: 学生答案偏移了3项; 计算错误: 第[3]项计算有误', '[2026-06-20 12:14:20] 检测到2类错误: 项数索引错误: 学生答案偏移了3项; 计算错误: 第[3]项计算有误']).error_category
+_____________________ TestDataLoader.test_load_csv_success _____________________
+tests/test_data_loader.py:59: in test_load_csv_success
+    records = loader.load_file(temp_csv_file)
+src/sequence_error_attribution/data_loader.py:103: in load_file
+    source_row=idx + 2,
+E   TypeError: can only concatenate tuple (not "int") to tuple
+___________________ TestDataLoader.test_load_csv_alt_fields ____________________
+tests/test_data_loader.py:72: in test_load_csv_alt_fields
+    records = loader.load_file(temp_csv_alt_fields)
+src/sequence_error_attribution/data_loader.py:103: in load_file
+    source_row=idx + 2,
+E   TypeError: can only concatenate tuple (not "int") to tuple
+____________________ TestDataLoader.test_parse_terms_simple ____________________
+tests/test_data_loader.py:84: in test_parse_terms_simple
+    assert terms == [2.0, 5.0, 11.0]
+E   AssertionError: assert [1.0, 2.0, 2.....0, 3.0, 11.0] == [2.0, 5.0, 11.0]
+E     
+E     At index 0 diff: 1.0 != 2.0
+E     Left contains 3 more items, first extra item: 5.0
+E     
+E     Full diff:
+E       [
+E     +     1.0,...
+E     
+E     ...Full output truncated (6 lines hidden), use '-vv' to show
+____________________ TestDataLoader.test_parse_terms_single ____________________
+tests/test_data_loader.py:90: in test_parse_terms_single
+    assert terms == [3.0]
+E   assert [1.0, 3.0] == [3.0]
+E     
+E     At index 0 diff: 1.0 != 3.0
+E     Left contains one more item: 3.0
+E     
+E     Full diff:
+E       [
+E     +     1.0,
+E           3.0,
+E       ]
+___________________ TestDataLoader.test_parse_terms_negative ___________________
+tests/test_data_loader.py:96: in test_parse_terms_negative
+    assert terms == [-2.0, -1.0]
+E   AssertionError: assert [1.0, -2.0, 2.0, -1.0] == [-2.0, -1.0]
+E     
+E     At index 0 diff: 1.0 != -2.0
+E     Left contains 2 more items, first extra item: 2.0
+E     
+E     Full diff:
+E       [
+E     +     1.0,...
+E     
+E     ...Full output truncated (4 lines hidden), use '-vv' to show
+___________________ TestDataLoader.test_parse_terms_decimal ____________________
+tests/test_data_loader.py:102: in test_parse_terms_decimal
+    assert terms == [0.5, 0.25]
+E   AssertionError: assert [1.0, 0.5, 2.0, 0.25] == [0.5, 0.25]
+E     
+E     At index 0 diff: 1.0 != 0.5
+E     Left contains 2 more items, first extra item: 2.0
+E     
+E     Full diff:
+E       [
+E     +     1.0,...
+E     
+E     ...Full output truncated (4 lines hidden), use '-vv' to show
+_____________________ TestDataLoader.test_validate_records _____________________
+tests/test_data_loader.py:144: in test_validate_records
+    records = loader.load_file(temp_csv_file)
+src/sequence_error_attribution/data_loader.py:103: in load_file
+    source_row=idx + 2,
+E   TypeError: can only concatenate tuple (not "int") to tuple
+_____________________ TestDataLoader.test_source_tracking ______________________
+tests/test_data_loader.py:207: in test_source_tracking
+    records = loader.load_file(temp_csv_file)
+src/sequence_error_attribution/data_loader.py:103: in load_file
+    source_row=idx + 2,
+E   TypeError: can only concatenate tuple (not "int") to tuple
+_____________ TestJumpDetector.test_detect_normal_jump_by_sequence _____________
+tests/test_jump_detector.py:142: in test_detect_normal_jump_by_sequence
+    assert has_jump is True
+E   assert False is True
+____________________ TestJumpDetector.test_detect_jump_unit ____________________
+tests/test_jump_detector.py:201: in test_detect_jump_unit
+    assert reason == STABLE_MESSAGES.JUMP_REASON_UNIT
+E   AssertionError: assert '阈值触发: 结果超出预设阈值范围' == '单位异常: 数值单位或数量级突变'
+E     
+E     - 单位异常: 数值单位或数量级突变
+E     + 阈值触发: 结果超出预设阈值范围
+___________________ TestJumpDetector.test_detect_jump_normal ___________________
+tests/test_jump_detector.py:226: in test_detect_jump_normal
+    assert reason == STABLE_MESSAGES.JUMP_REASON_NORMAL
+E   AssertionError: assert '阈值触发: 结果超出预设阈值范围' == '正常记录: 数据本身特征导致的合理波动'
+E     
+E     - 正常记录: 数据本身特征导致的合理波动
+E     + 阈值触发: 结果超出预设阈值范围
+______________________ TestJumpDetector.test_detect_batch ______________________
+tests/test_jump_detector.py:259: in test_detect_batch
+    assert results[0].jump_detected is False
+E   AssertionError: assert True is False
+E    +  where True = QuestionRecord(question_id='N00', question_source='', question_content='', sequence_type='', given_terms='', recurrence_formula='', student_answer='', correct_answer='', error_type='', source_row=-1, source_file='', processing_status='处理完成', attribution_result='', error_category='', needs_review=False, review_reason='', jump_detected=True, jump_reason='阈值触发: 结果超出预设阈值范围', original_terms=[1.0, 2.0, 3.0], calculated_terms=[], processing_log=['[2026-06-20 12:14:20] 检测到结果跳变: 阈值触发: 结果超出预设阈值范围 (幅度: 2.31)']).jump_detected
+=========================== short test summary info ============================
+FAILED tests/test_attribution.py::TestSequenceAttribution::test_analyze_division_by_zero
+FAILED tests/test_attribution.py::TestSequenceAttribution::test_analyze_correct_answer
+FAILED tests/test_attribution.py::TestSequenceAttribution::test_analyze_calculation_error
+FAILED tests/test_data_loader.py::TestDataLoader::test_load_csv_success - Typ...
+FAILED tests/test_data_loader.py::TestDataLoader::test_load_csv_alt_fields - ...
+FAILED tests/test_data_loader.py::TestDataLoader::test_parse_terms_simple - A...
+FAILED tests/test_data_loader.py::TestDataLoader::test_parse_terms_single - a...
+FAILED tests/test_data_loader.py::TestDataLoader::test_parse_terms_negative
+FAILED tests/test_data_loader.py::TestDataLoader::test_parse_terms_decimal - ...
+FAILED tests/test_data_loader.py::TestDataLoader::test_validate_records - Typ...
+FAILED tests/test_data_loader.py::TestDataLoader::test_source_tracking - Type...
+FAILED tests/test_jump_detector.py::TestJumpDetector::test_detect_normal_jump_by_sequence
+FAILED tests/test_jump_detector.py::TestJumpDetector::test_detect_jump_unit
+FAILED tests/test_jump_detector.py::TestJumpDetector::test_detect_jump_normal
+FAILED tests/test_jump_detector.py::TestJumpDetector::test_detect_batch - Ass...
+======================== 15 failed, 77 passed in 0.49s =========================

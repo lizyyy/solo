@@ -1,0 +1,120 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.9.6, pytest-8.3.3, pluggy-1.6.0 -- /Users/maca/pro/solo/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/maca/pro/solo/workspaces/zy73192
+configfile: pyproject.toml
+plugins: anyio-4.12.1
+collecting ... collected 92 items
+
+tests/test_attribution.py::TestSequenceAttribution::test_is_zero_with_tolerance PASSED [  1%]
+tests/test_attribution.py::TestSequenceAttribution::test_evaluate_formula_simple_linear PASSED [  2%]
+tests/test_attribution.py::TestSequenceAttribution::test_evaluate_formula_division_by_zero PASSED [  3%]
+tests/test_attribution.py::TestSequenceAttribution::test_evaluate_formula_division_by_zero_with_parentheses PASSED [  4%]
+tests/test_attribution.py::TestSequenceAttribution::test_evaluate_formula_fractional PASSED [  5%]
+tests/test_attribution.py::TestSequenceAttribution::test_evaluate_formula_different_notation PASSED [  6%]
+tests/test_attribution.py::TestSequenceAttribution::test_evaluate_formula_empty PASSED [  7%]
+tests/test_attribution.py::TestSequenceAttribution::test_calculate_sequence_linear PASSED [  8%]
+tests/test_attribution.py::TestSequenceAttribution::test_calculate_sequence_division_by_zero PASSED [  9%]
+tests/test_attribution.py::TestSequenceAttribution::test_calculate_sequence_empty_terms PASSED [ 10%]
+tests/test_attribution.py::TestSequenceAttribution::test_parse_numeric_answer PASSED [ 11%]
+tests/test_attribution.py::TestSequenceAttribution::test_parse_numeric_answer_with_spaces PASSED [ 13%]
+tests/test_attribution.py::TestSequenceAttribution::test_parse_numeric_answer_with_text PASSED [ 14%]
+tests/test_attribution.py::TestSequenceAttribution::test_parse_numeric_answer_empty PASSED [ 15%]
+tests/test_attribution.py::TestSequenceAttribution::test_check_calculation_error PASSED [ 16%]
+tests/test_attribution.py::TestSequenceAttribution::test_check_calculation_error_no_error PASSED [ 17%]
+tests/test_attribution.py::TestSequenceAttribution::test_check_index_error PASSED [ 18%]
+tests/test_attribution.py::TestSequenceAttribution::test_check_initial_term_error PASSED [ 19%]
+tests/test_attribution.py::TestSequenceAttribution::test_check_formula_misapplication PASSED [ 20%]
+tests/test_attribution.py::TestSequenceAttribution::test_analyze_small_sample PASSED [ 21%]
+tests/test_attribution.py::TestSequenceAttribution::test_analyze_division_by_zero PASSED [ 22%]
+tests/test_attribution.py::TestSequenceAttribution::test_analyze_negative_term PASSED [ 23%]
+tests/test_attribution.py::TestSequenceAttribution::test_analyze_correct_answer PASSED [ 25%]
+tests/test_attribution.py::TestSequenceAttribution::test_analyze_calculation_error PASSED [ 26%]
+tests/test_attribution.py::TestSequenceAttribution::test_analyze_already_marked_for_review PASSED [ 27%]
+tests/test_attribution.py::TestSequenceAttribution::test_analyze_no_numeric_answer PASSED [ 28%]
+tests/test_attribution.py::TestSequenceAttribution::test_error_categories_defined PASSED [ 29%]
+tests/test_attribution.py::TestSequenceAttribution::test_analyze_batch PASSED [ 30%]
+tests/test_config.py::TestStableMessages::test_error_messages_stability PASSED [ 31%]
+tests/test_config.py::TestStableMessages::test_status_messages_stability PASSED [ 32%]
+tests/test_config.py::TestStableMessages::test_jump_reasons_stability PASSED [ 33%]
+tests/test_config.py::TestStableMessages::test_review_reasons_stability PASSED [ 34%]
+tests/test_config.py::TestFieldMapping::test_default_field_mapping PASSED [ 35%]
+tests/test_config.py::TestFieldMapping::test_field_mapping_case_insensitive PASSED [ 36%]
+tests/test_config.py::TestAttributionConfig::test_default_config_values PASSED [ 38%]
+tests/test_config.py::TestAttributionConfig::test_config_validation PASSED [ 39%]
+tests/test_config.py::TestAttributionConfig::test_output_columns_stability PASSED [ 40%]
+tests/test_config.py::TestAttributionConfig::test_default_config_singleton PASSED [ 41%]
+tests/test_data_loader.py::TestDataLoader::test_load_file_not_found PASSED [ 42%]
+tests/test_data_loader.py::TestDataLoader::test_load_invalid_format PASSED [ 43%]
+tests/test_data_loader.py::TestDataLoader::test_load_csv_success FAILED  [ 44%]
+tests/test_data_loader.py::TestDataLoader::test_load_csv_alt_fields FAILED [ 45%]
+tests/test_data_loader.py::TestDataLoader::test_parse_terms_simple PASSED [ 46%]
+tests/test_data_loader.py::TestDataLoader::test_parse_terms_single PASSED [ 47%]
+tests/test_data_loader.py::TestDataLoader::test_parse_terms_negative PASSED [ 48%]
+tests/test_data_loader.py::TestDataLoader::test_parse_terms_decimal PASSED [ 50%]
+tests/test_data_loader.py::TestDataLoader::test_parse_terms_empty PASSED [ 51%]
+tests/test_data_loader.py::TestDataLoader::test_parse_formula_with_denominator PASSED [ 52%]
+tests/test_data_loader.py::TestDataLoader::test_parse_formula_with_parentheses PASSED [ 53%]
+tests/test_data_loader.py::TestDataLoader::test_parse_formula_simple PASSED [ 54%]
+tests/test_data_loader.py::TestDataLoader::test_parse_formula_empty PASSED [ 55%]
+tests/test_data_loader.py::TestDataLoader::test_validate_records PASSED  [ 56%]
+tests/test_data_loader.py::TestDataLoader::test_validate_records_missing_id PASSED [ 57%]
+tests/test_data_loader.py::TestDataLoader::test_validate_records_missing_data PASSED [ 58%]
+tests/test_data_loader.py::TestDataLoader::test_find_column_exact_match PASSED [ 59%]
+tests/test_data_loader.py::TestDataLoader::test_find_column_case_insensitive PASSED [ 60%]
+tests/test_data_loader.py::TestDataLoader::test_find_column_alternative_name PASSED [ 61%]
+tests/test_data_loader.py::TestDataLoader::test_find_column_not_found PASSED [ 63%]
+tests/test_data_loader.py::TestDataLoader::test_source_tracking PASSED   [ 64%]
+tests/test_jump_detector.py::TestJumpDetector::test_get_magnitude_positive PASSED [ 65%]
+tests/test_jump_detector.py::TestJumpDetector::test_get_magnitude_negative PASSED [ 66%]
+tests/test_jump_detector.py::TestJumpDetector::test_get_magnitude_special PASSED [ 67%]
+tests/test_jump_detector.py::TestJumpDetector::test_calculate_statistics PASSED [ 68%]
+tests/test_jump_detector.py::TestJumpDetector::test_calculate_statistics_with_nan PASSED [ 69%]
+tests/test_jump_detector.py::TestJumpDetector::test_calculate_statistics_empty PASSED [ 70%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_threshold_jump PASSED [ 71%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_threshold_jump_no_jump PASSED [ 72%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_unit_jump PASSED [ 73%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_unit_jump_no_jump PASSED [ 75%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_normal_jump_by_category PASSED [ 76%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_normal_jump_by_sequence PASSED [ 77%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_normal_jump_no_jump PASSED [ 78%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_jump_threshold PASSED [ 79%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_jump_unit PASSED [ 80%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_jump_normal PASSED [ 81%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_jump_no_terms PASSED [ 82%]
+tests/test_jump_detector.py::TestJumpDetector::test_detect_batch PASSED  [ 83%]
+tests/test_jump_detector.py::TestJumpDetector::test_jump_reasons_stability PASSED [ 84%]
+tests/test_models.py::TestQuestionRecord::test_default_values PASSED     [ 85%]
+tests/test_models.py::TestQuestionRecord::test_source_location_with_file_and_row PASSED [ 86%]
+tests/test_models.py::TestQuestionRecord::test_source_location_with_row_only PASSED [ 88%]
+tests/test_models.py::TestQuestionRecord::test_source_location_with_file_only PASSED [ 89%]
+tests/test_models.py::TestQuestionRecord::test_source_location_unknown PASSED [ 90%]
+tests/test_models.py::TestQuestionRecord::test_add_log PASSED            [ 91%]
+tests/test_models.py::TestQuestionRecord::test_mark_for_review PASSED    [ 92%]
+tests/test_models.py::TestQuestionRecord::test_mark_success PASSED       [ 93%]
+tests/test_models.py::TestQuestionRecord::test_mark_failed PASSED        [ 94%]
+tests/test_models.py::TestQuestionRecord::test_to_output_dict PASSED     [ 95%]
+tests/test_models.py::TestQuestionRecord::test_to_output_dict_empty_lists PASSED [ 96%]
+tests/test_models.py::TestAttributionResult::test_default_values PASSED  [ 97%]
+tests/test_models.py::TestAttributionResult::test_generate_summary_with_records PASSED [ 98%]
+tests/test_models.py::TestAttributionResult::test_generate_summary_empty PASSED [100%]
+
+=================================== FAILURES ===================================
+_____________________ TestDataLoader.test_load_csv_success _____________________
+tests/test_data_loader.py:62: in test_load_csv_success
+    assert records[0].question_id == "Q001"
+E   AssertionError: assert 'a1=2' == 'Q001'
+E     
+E     - Q001
+E     + a1=2
+___________________ TestDataLoader.test_load_csv_alt_fields ____________________
+tests/test_data_loader.py:75: in test_load_csv_alt_fields
+    assert records[0].question_id == "ALT001"
+E   AssertionError: assert 'a1=2' == 'ALT001'
+E     
+E     - ALT001
+E     + a1=2
+=========================== short test summary info ============================
+FAILED tests/test_data_loader.py::TestDataLoader::test_load_csv_success - Ass...
+FAILED tests/test_data_loader.py::TestDataLoader::test_load_csv_alt_fields - ...
+========================= 2 failed, 90 passed in 0.49s =========================
