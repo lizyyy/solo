@@ -1,5 +1,6 @@
 import React from 'react';
-import { AppProvider, useApp } from './context/AppContext';
+import { AppProvider } from './context/AppContext';
+import { useApp } from './hooks/useApp';
 import { getRoleName } from './utils/storage';
 import type { Role } from './types';
 import ImportPage from './components/ImportPage';

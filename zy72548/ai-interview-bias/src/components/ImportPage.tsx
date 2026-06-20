@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { useApp } from '../context/AppContext';
-import { parseCorrectionCSV, parseInterviewCSV, createReviewRecord } from '../utils/business';
+import { useApp } from '../hooks/useApp';
+import { parseCorrectionCSV, parseInterviewCSV, createReviewRecord, findCorrectionForSample, getCorrectionKey } from '../utils/business';
 import type { InterviewSample, ManualCorrection } from '../types';
 
 const ImportPage: React.FC = () => {
@@ -61,10 +61,9 @@ const ImportPage: React.FC = () => {
     }
 
     const { samples, corrections } = previewData;
-    const correctionMap = new Map(corrections.map(c => [c.sampleId, c]));
 
     const records = samples.map(sample => {
-      const correction = correctionMap.get(sample.sampleId);
+      const correction = findCorrectionForSample(corrections, sample.sampleId, sample.modelVersion);
       return createReviewRecord(sample, correction, state.currentUser, state.currentRole);
     });
 
@@ -85,14 +84,16 @@ S005,v1.1,90,钱七,2024-01-17,测试工程师
 S001,v1.2,68,张三,2024-02-10,算法工程师
 S003,v1.0,78,王五,2024-01-14,前端开发`;
 
-    const demoCorrection = `样本编号,人工评分,人工结论,改判理由,改判人,改判时间
-S001,70,通过,按v2.0提示词标准评分,运营A,2024-01-20
-S002,65,通过,表现尚可,运营A,2024-01-20
-S003,75,通过,需复核模型版本,运营B,2024-01-21`;
+    const demoCorrection = `样本编号,模型版本,人工评分,人工结论,改判理由,改判人,改判时间
+S001,v1.0,70,通过,按v2.0提示词标准评分,运营A,2024-01-20
+S001,v1.2,65,通过,v1.2模型输出较保守,运营A,2024-02-15
+S002,v1.0,65,通过,表现尚可,运营A,2024-01-20
+S003,v1.1,75,通过,需复核模型版本,运营B,2024-01-21
+S003,v1.0,72,通过,老模型评分稳定,运营B,2024-01-15`;
 
     setInterviewText(demoInterview);
     setCorrectionText(demoCorrection);
-    setMessage({ type: 'info', text: '已加载演示数据（含同样本编号不同模型版本场景），点击预览查看' });
+    setMessage({ type: 'info', text: '已加载演示数据（含同样本编号不同模型版本场景，各版本有独立改判），点击预览查看' });
   };
 
   return (
@@ -194,13 +195,16 @@ S003,75,通过,需复核模型版本,运营B,2024-01-21`;
                   <th className="px-2 py-1 text-right">AI评分</th>
                   <th className="px-2 py-1 text-right">人工评分</th>
                   <th className="px-2 py-1 text-left">人工结论</th>
+                  <th className="px-2 py-1 text-left">改判理由</th>
+                  <th className="px-2 py-1 text-left font-mono text-xs">改判匹配键</th>
                 </tr>
               </thead>
               <tbody>
                 {previewData.samples.slice(0, 10).map(sample => {
-                  const correction = previewData.corrections.find(c => c.sampleId === sample.sampleId);
+                  const correction = findCorrectionForSample(previewData.corrections, sample.sampleId, sample.modelVersion);
+                  const matchKey = getCorrectionKey(sample.sampleId, sample.modelVersion);
                   return (
-                    <tr key={sample.sampleId} className="border-b">
+                    <tr key={matchKey} className="border-b">
                       <td className="px-2 py-1">{sample.sampleId}</td>
                       <td className="px-2 py-1">{sample.candidateName}</td>
                       <td className="px-2 py-1">
@@ -219,6 +223,12 @@ S003,75,通过,需复核模型版本,运营B,2024-01-21`;
                           </span>
                         ) : '-'}
                       </td>
+                      <td className="px-2 py-1 text-xs text-gray-600">
+                        {correction ? correction.reason : '-'}
+                      </td>
+                      <td className="px-2 py-1 font-mono text-xs text-gray-500">
+                        {matchKey}
+                      </td>
                     </tr>
                   );
                 })}
@@ -234,8 +244,9 @@ S003,75,通过,需复核模型版本,运营B,2024-01-21`;
       <div className="mt-6 p-4 bg-gray-50 rounded-lg">
         <h4 className="font-semibold mb-2 text-sm">导入自检说明</h4>
         <ul className="text-xs text-gray-600 space-y-1">
-          <li>• 自动检测重复导入（同批次+同样本编号）</li>
-          <li>• 自动检测模型版本与样本编号不一致</li>
+          <li>• 人工改判按「样本编号@模型版本」匹配，同样本不同版本为独立记录</li>
+          <li>• 自动检测重复导入（同批次+同样本编号+同模型版本）</li>
+          <li>• 改判表无模型版本列时，自动回退到按样本编号匹配</li>
           <li>• 导入后不自动覆盖结论，需人工确认流程</li>
           <li>• 所有操作记入历史，可追溯审计</li>
         </ul>

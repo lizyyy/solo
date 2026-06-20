@@ -143,6 +143,9 @@ export const createReviewRecord = (
 ): ReviewRecord => {
   const now = new Date().toISOString();
   const recordId = generateId('rec');
+  const matchInfo = correction
+    ? `首次导入人工改判表，模型版本 ${interview.modelVersion}${correction.modelVersion ? `，改判匹配键 ${getCorrectionKey(correction.sampleId, correction.modelVersion)}` : `，改判匹配键 ${getCorrectionKey(correction.sampleId)}`}`
+    : undefined;
   return {
     recordId,
     sampleId: interview.sampleId,
@@ -159,7 +162,7 @@ export const createReviewRecord = (
         role,
         undefined,
         { interview, correction },
-        correction ? '首次导入人工改判表' : undefined
+        matchInfo
       ),
     ],
     createdAt: now,
@@ -178,9 +181,12 @@ export const runSelfCheck = (records: ReviewRecord[]): SelfCheckResult[] => {
     keyMap.set(key, [...existing, r]);
   });
   
-  const duplicateSamples = Array.from(keyMap.entries())
-    .filter(([_, recs]) => recs.length > 1)
-    .map(([key, recs]) => `${key} (${recs.length}条记录)`);
+  const duplicateSamples: string[] = [];
+  keyMap.forEach((recs, key) => {
+    if (recs.length > 1) {
+      duplicateSamples.push(`${key} (${recs.length}条记录)`);
+    }
+  });
   
   results.push({
     checkId: generateId('check'),
@@ -271,6 +277,7 @@ export const parseCorrectionCSV = (content: string): ManualCorrection[] => {
   const headers = lines[0].split(',').map(h => h.trim());
   const corrections: ManualCorrection[] = [];
   const batchId = generateId('batch');
+  const hasModelVersion = headers.includes('模型版本') || headers.includes('modelVersion');
   
   for (let i = 1; i < lines.length; i++) {
     const values = lines[i].split(',').map(v => v.trim());
@@ -279,7 +286,7 @@ export const parseCorrectionCSV = (content: string): ManualCorrection[] => {
       row[h] = values[idx] || '';
     });
     
-    corrections.push({
+    const correction: ManualCorrection = {
       correctionId: generateId('correction'),
       sampleId: row['样本编号'] || row['sampleId'] || '',
       humanScore: parseFloat(row['人工评分'] || row['humanScore'] || '0'),
@@ -288,10 +295,36 @@ export const parseCorrectionCSV = (content: string): ManualCorrection[] => {
       correctedBy: row['改判人'] || row['correctedBy'] || '未知',
       correctedAt: row['改判时间'] || row['correctedAt'] || new Date().toISOString(),
       batchId,
-    });
+    };
+    
+    if (hasModelVersion) {
+      correction.modelVersion = row['模型版本'] || row['modelVersion'] || undefined;
+    }
+    
+    corrections.push(correction);
   }
   
   return corrections;
+};
+
+export const getCorrectionKey = (sampleId: string, modelVersion?: string): string => {
+  return modelVersion ? `${sampleId}@${modelVersion}` : sampleId;
+};
+
+export const findCorrectionForSample = (
+  corrections: ManualCorrection[],
+  sampleId: string,
+  modelVersion: string
+): ManualCorrection | undefined => {
+  const exactMatch = corrections.find(
+    c => c.sampleId === sampleId && c.modelVersion === modelVersion
+  );
+  if (exactMatch) return exactMatch;
+  
+  const fallbackMatch = corrections.find(
+    c => c.sampleId === sampleId && c.modelVersion === undefined
+  );
+  return fallbackMatch;
 };
 
 export const parseInterviewCSV = (content: string): InterviewSample[] => {

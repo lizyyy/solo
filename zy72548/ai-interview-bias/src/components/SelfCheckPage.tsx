@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../hooks/useApp';
 import { runSelfCheck } from '../utils/business';
 import type { SelfCheckResult } from '../types';
 

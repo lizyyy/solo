@@ -28,6 +28,7 @@ export interface InterviewSample {
 export interface ManualCorrection {
   correctionId: string;
   sampleId: string;
+  modelVersion?: string;
   humanScore: number;
   conclusion: string;
   reason: string;

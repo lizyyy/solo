@@ -1,29 +1,10 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { useReducer, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import type { AppState, ReviewRecord, Role, PromptVersion } from '../types';
+import type { AppState } from '../types';
+import type { Action } from '../types/context';
 import { loadState, saveState } from '../utils/storage';
 import { detectConflicts, createHistoryRecord, getRelatedRecords } from '../utils/business';
-
-type Action =
-  | { type: 'SET_ROLE'; payload: { role: Role; user: string } }
-  | { type: 'SET_ACTIVE_TAB'; payload: AppState['activeTab'] }
-  | { type: 'SELECT_RECORD'; payload: string | undefined }
-  | { type: 'ADD_REVIEW_RECORDS'; payload: ReviewRecord[] }
-  | { type: 'UPDATE_REVIEW_RECORD'; payload: ReviewRecord }
-  | { type: 'ADD_PROMPT_VERSION'; payload: PromptVersion }
-  | { type: 'APPLY_PROMPT_VERSION'; payload: { recordId: string; promptVersion: PromptVersion } }
-  | { type: 'RESOLVE_CONFLICT'; payload: { recordId: string; conflictId: string; resolution: 'confirm' | 'reject' | 'operation_review'; operator: string } }
-  | { type: 'PM_CONFIRM'; payload: { recordId: string; operator: string } }
-  | { type: 'PM_REJECT'; payload: { recordId: string; operator: string; reason: string } }
-  | { type: 'OPERATION_APPROVE'; payload: { recordId: string; operator: string } }
-  | { type: 'OPERATION_REJECT'; payload: { recordId: string; operator: string; reason: string } }
-  | { type: 'FINALIZE_RECORD'; payload: { recordId: string; operator: string } }
-  | { type: 'RESET_STATE' };
-
-const AppContext = createContext<{
-  state: AppState;
-  dispatch: React.Dispatch<Action>;
-} | null>(null);
+import { AppContext } from './context';
 
 const appReducer = (state: AppState, action: Action): AppState => {
   let newState: AppState;
@@ -397,12 +378,4 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       {children}
     </AppContext.Provider>
   );
-};
-
-export const useApp = () => {
-  const context = useContext(AppContext);
-  if (!context) {
-    throw new Error('useApp must be used within AppProvider');
-  }
-  return context;
 };
