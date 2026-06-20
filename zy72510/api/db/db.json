@@ -15,7 +15,7 @@
         "test-suppl-001"
       ],
       "duplicateSkipped": 0,
-      "recalcVersion": 2
+      "recalcVersion": 3
     },
     {
       "id": "gray-wrong-20260613",
@@ -123,8 +123,23 @@
             "grayLabel": "reject",
             "isLowConfidence": true
           }
+        },
+        {
+          "id": "7171bfa3-8e49-479e-a557-ccf253ebe1ac",
+          "sampleId": "normal-002",
+          "action": "review",
+          "operator": "测试审核员",
+          "at": 1781972768235,
+          "note": "复核通过：该文案使用了绝对化用语'最丰富'，违反广告法，应拒绝",
+          "snapshot": {
+            "finalLabel": "reject",
+            "isLowConfidence": true
+          }
         }
-      ]
+      ],
+      "finalLabel": "reject",
+      "reviewedBy": "测试审核员",
+      "reviewedAt": 1781972768235
     },
     {
       "id": "normal-003",

@@ -39,10 +39,13 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
     const overview = await getBatchOverview(id)
     const samples = await getBatchSamples(id)
     res.json({
+      batch,
       overview,
-      lowConfidence: samples.lowConfidence,
-      normal: samples.normal,
-      all: samples.all,
+      samples: {
+        lowConfidence: samples.lowConfidence,
+        normal: samples.normal,
+        all: samples.all,
+      },
     })
   } catch (error) {
     res.status(500).json({ error: (error as Error).message })

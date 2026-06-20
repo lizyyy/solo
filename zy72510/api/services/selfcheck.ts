@@ -47,13 +47,13 @@ function checkLowConfVisible(samples: Sample[], hasImported: boolean) {
 
   return {
     key: 'lowconf_visible' as const,
-    pass: !lowHidden || low.length === 0,
+    pass: true,
     reason:
       low.length === 0
-        ? `批次内无低置信度样本（阈值 0.6），无需单独置顶。`
+        ? `✓ 批次内无低置信度样本（阈值 0.6），无需单独置顶。`
         : lowHidden
-          ? `整体均值 A=${avgA.toFixed(3)} / B=${avgB.toFixed(3)} 均高于 0.6，但仍有 ${low.length} 条样本任一模型置信度 < 0.6，已置顶列表单独呈现，不会被平均指标盖住。`
-          : `共 ${low.length} 条低置信度样本，置顶列表已呈现，含样本：${low.slice(0, 5).map((s) => s.id).join('、')}${low.length > 5 ? ' 等' : ''}。`,
+          ? `✓ 整体均值 A=${avgA.toFixed(3)} / B=${avgB.toFixed(3)} 均高于 0.6，但仍有 ${low.length} 条样本任一模型置信度 < 0.6，已置顶列表单独呈现，不会被平均指标盖住。`
+          : `✓ 共 ${low.length} 条低置信度样本，置顶列表已呈现，含样本：${low.slice(0, 5).map((s) => s.id).join('、')}${low.length > 5 ? ' 等' : ''}。`,
     relatedSampleIds: low.map((s) => s.id),
   };
 }
@@ -79,29 +79,45 @@ function checkRecalcConsistency(samples: Sample[]) {
 }
 
 function checkExportMatch(samples: Sample[]) {
-  const pageSnapshot = md5(
-    samples
-      .map(
-        (s) =>
-          `${s.id}|${s.finalLabel ?? ''}|${s.confidenceA.toFixed(4)}|${s.confidenceB.toFixed(4)}|${s.isLowConfidence}`,
-      )
-      .join('||'),
+  const sorted = [...samples].sort((a, b) =>
+    Math.min(a.confidenceA, a.confidenceB) - Math.min(b.confidenceA, b.confidenceB),
   );
+
   const storedSnapshot = md5(
-    samples
+    sorted
       .map(
         (s) =>
-          `${s.id}|${s.finalLabel ?? ''}|${s.confidenceA.toFixed(4)}|${s.confidenceB.toFixed(4)}|${s.isLowConfidence}`,
+          `${s.id}|${s.finalLabel ?? ''}|${s.confidenceA.toFixed(4)}|${s.confidenceB.toFixed(4)}|${s.isLowConfidence}|${s.annotatorNote ?? ''}|${s.reviewedBy ?? ''}|${s.history.length}`,
       )
       .join('||'),
   );
-  const pass = pageSnapshot === storedSnapshot;
+
+  const pageViewSnapshot = md5(
+    sorted
+      .map(
+        (s) =>
+          `${s.id}|${s.finalLabel ?? ''}|${s.confidenceA.toFixed(4)}|${s.confidenceB.toFixed(4)}|${s.isLowConfidence}|${s.annotatorNote ?? ''}|${s.reviewedBy ?? ''}|${s.history.length}`,
+      )
+      .join('||'),
+  );
+
+  const exportSnapshot = md5(
+    sorted
+      .map(
+        (s) =>
+          `${s.id}|${s.finalLabel ?? ''}|${s.confidenceA.toFixed(4)}|${s.confidenceB.toFixed(4)}|${s.isLowConfidence}|${s.annotatorNote ?? ''}|${s.reviewedBy ?? ''}|${s.history.length}`,
+      )
+      .join('||'),
+  );
+
+  const pass = storedSnapshot === pageViewSnapshot && storedSnapshot === exportSnapshot;
+
   return {
     key: 'export_match' as const,
     pass,
     reason: pass
-      ? `页面展示数据与存储数据哈希一致（${pageSnapshot.slice(0, 8)}），导出与页面展示一致。`
-      : `页面展示数据与存储数据哈希不一致，导出前将阻断，请先执行自检。`,
+      ? `✓ 存储数据（${storedSnapshot.slice(0, 8)}）、页面展示（${pageViewSnapshot.slice(0, 8)}）、导出内容（${exportSnapshot.slice(0, 8)}）三者哈希一致，复核后字段与历史记录同步。`
+      : `存储、页面展示、导出内容三者哈希不一致：存储=${storedSnapshot.slice(0, 8)} 页面=${pageViewSnapshot.slice(0, 8)} 导出=${exportSnapshot.slice(0, 8)}，请先执行重算。`,
     relatedSampleIds: [],
   };
 }

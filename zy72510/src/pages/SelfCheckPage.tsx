@@ -3,7 +3,7 @@ import { Download, Play } from 'lucide-react';
 import { api } from '@/api/client';
 import { useAppStore } from '@/store/app';
 import SelfCheckCard from '@/components/SelfCheckCard';
-import type { GrayBatch } from '../../../shared/types';
+import type { GrayBatch } from '../../shared/types';
 
 export default function SelfCheckPage() {
   const { currentBatchId, setCurrentBatchId, selfCheckReport, setSelfCheckReport } = useAppStore();
