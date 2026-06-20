@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+  color: #e5e7eb;
+  background-color: #0a0f10;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 800px at 10% -10%, rgba(14,79,85,0.18), transparent 60%),
+    radial-gradient(900px 600px at 100% 0%, rgba(139,92,246,0.10), transparent 60%),
+    linear-gradient(180deg, #0a0f10 0%, #071012 100%);
+  background-attachment: fixed;
+}
+
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(14,79,85,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14,79,85,0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.duplicate-stripe {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(245,158,11,0.08) 0px,
+    rgba(245,158,11,0.08) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+}
+
+.card {
+  @apply bg-slate-900/60 border border-slate-700/70 backdrop-blur-sm rounded-md;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 font-medium text-sm transition-all duration-150 rounded-sm border outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-shield-400 disabled:opacity-40 disabled:cursor-not-allowed;
+}
+
+.btn-primary {
+  @apply btn bg-shield-500 text-white border-shield-400 hover:bg-shield-600 hover:shadow-glow-shield active:translate-y-px;
+}
+
+.btn-ghost {
+  @apply btn bg-transparent text-slate-300 border-slate-600 hover:bg-slate-800 hover:text-white;
+}
+
+.btn-danger {
+  @apply btn bg-rose-600/90 text-white border-rose-500 hover:bg-rose-600;
+}
+
+.badge {
+  @apply inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-sm border;
+}
+
+.table-cell {
+  @apply px-3 py-2 text-sm align-middle;
+}
+
+.scrollbar-thin::-webkit-scrollbar { height: 6px; width: 6px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.35); border-radius: 3px; }
