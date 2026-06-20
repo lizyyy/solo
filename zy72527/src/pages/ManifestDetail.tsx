@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback, useSyncExternalStore } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -15,45 +15,58 @@ import {
   History,
   ExternalLink,
   Tag,
+  Server,
+  FileJson,
 } from 'lucide-react';
 import {
   useManifestStore,
   conflictStatusLabels,
-  isUnresolved,
 } from '../store/manifestStore';
 import { StatusBadge, SourceBadge } from '../components/StatusBadge';
 import { ConflictModal } from '../components/ConflictModal';
 import { OverrideTimeline } from '../components/OverrideTimeline';
 import { cn } from '../lib/utils';
 
+type TabKey = 'fields' | 'sources' | 'conflicts' | 'history' | 'api';
+
+interface ApiResponse {
+  dataSourceNote: string;
+  responseTimestamp: string;
+  data: unknown;
+}
+
 export function ManifestDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const manifest = useManifestStore((s) => s.getManifestById(id || ''));
-  const knowledgeRefs = useManifestStore((s) =>
-    s.getKnowledgeByManifestId(id || '')
-  );
-  const tickets = useManifestStore((s) => s.getTicketsByManifestId(id || ''));
-  const unresolvedConflicts = useManifestStore((s) =>
-    s.getUnresolvedConflictsByManifestId(id || '')
-  );
-  const resolvedConflicts = useManifestStore((s) =>
-    s.getResolvedConflictsByManifestId(id || '')
-  );
-  const overrideHistory = useManifestStore((s) =>
-    s.getOverrideHistoryByManifestId(id || '')
-  );
-  const overriddenFields = useManifestStore((s) =>
-    s.getOverriddenFieldsByManifestId(id || '')
-  );
-  const importKnowledgeBase = useManifestStore(
-    (s) => s.importKnowledgeBase
-  );
-  const manualOverrideField = useManifestStore(
-    (s) => s.manualOverrideField
-  );
+  // 选择 Store 底层数组引用作为重渲染触发源
+  // 这些引用在 Zustand 内部 immutable 更新，只有真正变更时才会触发重渲染
+  const _manifests = useManifestStore((s) => s.manifests);
+  const _conflicts = useManifestStore((s) => s.conflicts);
+  const _overrideHistory = useManifestStore((s) => s.overrideHistory);
+  const _knowledgeReferences = useManifestStore((s) => s.knowledgeReferences);
+  const _feedbackTickets = useManifestStore((s) => s.feedbackTickets);
+
+  const getManifestById = useManifestStore((s) => s.getManifestById);
+  const getKnowledgeByManifestId = useManifestStore((s) => s.getKnowledgeByManifestId);
+  const getTicketsByManifestId = useManifestStore((s) => s.getTicketsByManifestId);
+  const getUnresolvedConflictsByManifestId = useManifestStore((s) => s.getUnresolvedConflictsByManifestId);
+  const getResolvedConflictsByManifestId = useManifestStore((s) => s.getResolvedConflictsByManifestId);
+  const getOverrideHistoryByManifestId = useManifestStore((s) => s.getOverrideHistoryByManifestId);
+  const getOverriddenFieldsByManifestId = useManifestStore((s) => s.getOverriddenFieldsByManifestId);
+  const getAllConflictsByManifestId = useManifestStore((s) => s.getAllConflictsByManifestId);
+  const importKnowledgeBase = useManifestStore((s) => s.importKnowledgeBase);
+  const manualOverrideField = useManifestStore((s) => s.manualOverrideField);
   const verifyOverride = useManifestStore((s) => s.verifyOverride);
+  const getExportData = useManifestStore((s) => s.getExportData);
+
+  const manifest = getManifestById(id || '');
+  const knowledgeRefs = getKnowledgeByManifestId(id || '');
+  const tickets = getTicketsByManifestId(id || '');
+  const unresolvedConflicts = getUnresolvedConflictsByManifestId(id || '');
+  const resolvedConflicts = getResolvedConflictsByManifestId(id || '');
+  const overrideHistory = getOverrideHistoryByManifestId(id || '');
+  const overriddenFields = getOverriddenFieldsByManifestId(id || '');
 
   const [activeConflictId, setActiveConflictId] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<string | null>(null);
@@ -61,14 +74,49 @@ export function ManifestDetail() {
   const [showImport, setShowImport] = useState(false);
   const [importUrl, setImportUrl] = useState('');
   const [importTitle, setImportTitle] = useState('');
-  const [activeTab, setActiveTab] = useState<
-    'fields' | 'sources' | 'conflicts' | 'history'
-  >('fields');
+  const [activeTab, setActiveTab] = useState<TabKey>('fields');
+  const [apiResponse, setApiResponse] = useState<ApiResponse | null>(null);
+  const [apiLoading, setApiLoading] = useState(false);
+
+  const pendingCount = unresolvedConflicts.filter(
+    (c) => c.status === 'pending'
+  ).length;
+  const deferredCount = unresolvedConflicts.filter(
+    (c) => c.status === 'deferred'
+  ).length;
+
+  const fetchApiResponse = useCallback(async () => {
+    if (!id) return;
+    setApiLoading(true);
+    try {
+      const res = await fetch(`/api/manifests/${id}`);
+      const json: ApiResponse = await res.json();
+      setApiResponse(json);
+    } catch {
+      setApiResponse(null);
+    } finally {
+      setApiLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (activeTab === 'api') {
+      fetchApiResponse();
+    }
+  }, [activeTab, fetchApiResponse, manifest?.updatedAt]);
 
   if (!manifest) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#1a1d23] text-white">
-        <p className="text-zinc-400">舱单不存在</p>
+        <div className="text-center">
+          <p className="text-zinc-400">舱单不存在</p>
+          <button
+            onClick={() => navigate('/')}
+            className="mt-4 rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-700"
+          >
+            返回列表
+          </button>
+        </div>
       </div>
     );
   }
@@ -119,14 +167,110 @@ export function ManifestDetail() {
     verifyOverride(manifest.id, fieldKey, '安全审核');
   };
 
+  const handleExportJson = () => {
+    const data = getExportData();
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `manifest-${manifest.manifestNo}-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const stepLabels = ['知识库导入', '补看工单', '更新评测'];
 
-  const pendingCount = unresolvedConflicts.filter(
-    (c) => c.status === 'pending'
-  ).length;
-  const deferredCount = unresolvedConflicts.filter(
-    (c) => c.status === 'deferred'
-  ).length;
+  const tabs: { key: TabKey; label: string; count?: number; badge?: number }[] = [
+    { key: 'fields', label: '字段对比', count: displayFields.length },
+    { key: 'sources', label: '证据来源' },
+    {
+      key: 'conflicts',
+      label: '冲突裁决',
+      badge: unresolvedConflicts.length > 0 ? unresolvedConflicts.length : undefined,
+    },
+    {
+      key: 'history',
+      label: '改判历史',
+      count: overrideHistory.length,
+    },
+    { key: 'api', label: '接口返回' },
+  ];
+
+  const apiData = apiResponse?.data as Record<string, unknown> | undefined;
+  const exportData = getExportData() as Record<string, unknown>;
+  const apiManifest = apiData as Record<string, unknown> | undefined;
+
+  const consistencyChecks = useMemo(() => {
+    if (!apiManifest) return [];
+    const checks: { field: string; api: unknown; page: unknown; export: unknown; pass: boolean }[] = [];
+    const exportManifests = (exportData.manifests as Array<Record<string, unknown>>);
+    const exportEntry = exportManifests?.find(
+      (e: Record<string, unknown>) => e.id === manifest.id
+    );
+
+    const apiStatus = apiManifest.status;
+    const pageStatus = manifest.status;
+    checks.push({
+      field: 'status',
+      api: apiStatus,
+      page: pageStatus,
+      export: exportEntry?.status,
+      pass: apiStatus === pageStatus && apiStatus === exportEntry?.status,
+    });
+
+    const apiUnresolved = apiManifest.unresolvedConflictCount;
+    const pageUnresolved = unresolvedConflicts.length;
+    checks.push({
+      field: 'unresolvedConflictCount',
+      api: apiUnresolved,
+      page: pageUnresolved,
+      export: exportEntry?.unresolvedConflictCount,
+      pass:
+        apiUnresolved === pageUnresolved &&
+        apiUnresolved === exportEntry?.unresolvedConflictCount,
+    });
+
+    const apiOverridden = apiManifest.overriddenFieldCount;
+    const pageOverridden = overriddenFields.length;
+    checks.push({
+      field: 'overriddenFieldCount',
+      api: apiOverridden,
+      page: pageOverridden,
+      export: exportEntry?.overriddenFieldCount,
+      pass:
+        apiOverridden === pageOverridden &&
+        apiOverridden === exportEntry?.overriddenFieldCount,
+    });
+
+    const apiHasConflict = apiManifest.hasConflict;
+    const pageHasConflict = manifest.hasConflict;
+    checks.push({
+      field: 'hasConflict',
+      api: String(apiHasConflict),
+      page: String(pageHasConflict),
+      export: String(exportEntry?.hasConflict),
+      pass:
+        String(apiHasConflict) === String(pageHasConflict) &&
+        String(apiHasConflict) === String(exportEntry?.hasConflict),
+    });
+
+    const apiConflicts = apiManifest.conflicts as Array<Record<string, unknown>> | undefined;
+    const apiDeferred = apiConflicts?.filter(
+      (c) => c.status === 'deferred'
+    ).length ?? 0;
+    const pageDeferred = deferredCount;
+    checks.push({
+      field: 'deferredCount(暂不裁决)',
+      api: apiDeferred,
+      page: pageDeferred,
+      export: '-',
+      pass: apiDeferred === pageDeferred,
+    });
+
+    return checks;
+  }, [apiManifest, manifest, unresolvedConflicts.length, overriddenFields.length, deferredCount, exportData]);
 
   return (
     <div className="min-h-screen bg-[#1a1d23] text-white">
@@ -166,8 +310,8 @@ export function ManifestDetail() {
               </div>
               <p className="mt-1 text-sm text-zinc-400">
                 更新于 {new Date(manifest.updatedAt).toLocaleString('zh-CN')}
-                {'  ·  '}
-                单一数据源：页面/接口/导出读取同一份Store状态
+                {' · '}
+                <span className="text-emerald-400/70">页面/接口/导出 同源</span>
               </p>
             </div>
             <div className="hidden items-center gap-6 lg:flex">
@@ -234,24 +378,7 @@ export function ManifestDetail() {
 
       <main className="mx-auto max-w-7xl px-6 py-6">
         <div className="mb-6 flex items-center gap-2 border-b border-zinc-800 flex-wrap">
-          {(
-            [
-              { key: 'fields' as const, label: '字段对比', count: displayFields.length, badge: undefined as number | undefined },
-              { key: 'sources' as const, label: '证据来源', count: undefined as number | undefined, badge: undefined as number | undefined },
-              {
-                key: 'conflicts' as const,
-                label: '冲突裁决',
-                count: undefined as number | undefined,
-                badge: unresolvedConflicts.length > 0 ? unresolvedConflicts.length : undefined,
-              },
-              {
-                key: 'history' as const,
-                label: '改判历史',
-                count: overrideHistory.length,
-                badge: undefined as number | undefined,
-              },
-            ]
-          ).map((tab) => (
+          {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
@@ -262,6 +389,7 @@ export function ManifestDetail() {
                   : 'border-transparent text-zinc-400 hover:text-white'
               )}
             >
+              {tab.key === 'api' && <Server className="h-3.5 w-3.5" />}
               {tab.label}
               {tab.badge !== undefined && (
                 <span
@@ -284,6 +412,13 @@ export function ManifestDetail() {
           ))}
           <div className="ml-auto flex items-center gap-2 pb-3">
             <button
+              onClick={handleExportJson}
+              className="flex items-center gap-2 rounded-lg border border-emerald-600/50 bg-emerald-600/20 px-4 py-2 text-sm font-medium text-emerald-300 transition-colors hover:bg-emerald-600/30"
+            >
+              <FileJson className="h-4 w-4" />
+              导出JSON
+            </button>
+            <button
               onClick={() => setShowImport(true)}
               className="flex items-center gap-2 rounded-lg border border-indigo-600/50 bg-indigo-600/20 px-4 py-2 text-sm font-medium text-indigo-300 transition-colors hover:bg-indigo-600/30"
             >
@@ -298,37 +433,19 @@ export function ManifestDetail() {
             <table className="w-full">
               <thead className="bg-zinc-800/50">
                 <tr>
-                  <th className="w-40 px-4 py-3 text-left text-xs font-medium text-zinc-400">
-                    字段
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-zinc-400">
-                    OCR 原值
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-zinc-400">
-                    当前值 / 取舍说明
-                  </th>
-                  <th className="w-24 px-4 py-3 text-left text-xs font-medium text-zinc-400">
-                    来源
-                  </th>
-                  <th className="w-24 px-4 py-3 text-center text-xs font-medium text-zinc-400">
-                    标记
-                  </th>
-                  <th className="w-28 px-4 py-3 text-center text-xs font-medium text-zinc-400">
-                    操作
-                  </th>
+                  <th className="w-40 px-4 py-3 text-left text-xs font-medium text-zinc-400">字段</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-zinc-400">OCR 原值</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-zinc-400">当前值 / 取舍说明</th>
+                  <th className="w-24 px-4 py-3 text-left text-xs font-medium text-zinc-400">来源</th>
+                  <th className="w-24 px-4 py-3 text-center text-xs font-medium text-zinc-400">标记</th>
+                  <th className="w-28 px-4 py-3 text-center text-xs font-medium text-zinc-400">操作</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800">
                 {displayFields.map((field) => {
-                  const ocrField = manifest.ocrFields.find(
-                    (f) => f.key === field.key
-                  );
-                  const hasUnresolvedConflict = unresolvedConflictKeys.has(
-                    field.key
-                  );
-                  const hasResolvedConflict = resolvedConflictKeys.has(
-                    field.key
-                  );
+                  const ocrField = manifest.ocrFields.find((f) => f.key === field.key);
+                  const hasUnresolvedConflict = unresolvedConflictKeys.has(field.key);
+                  const hasResolvedConflict = resolvedConflictKeys.has(field.key);
                   const wasOverridden = overriddenFieldKeys.has(field.key);
                   const isEditing = editingField === field.key;
 
@@ -342,50 +459,31 @@ export function ManifestDetail() {
                     >
                       <td className="px-4 py-3">
                         <div className="flex flex-col gap-1">
-                          <span className="text-sm font-medium text-white">
-                            {field.label}
-                          </span>
+                          <span className="text-sm font-medium text-white">{field.label}</span>
                           <div className="flex items-center gap-1.5 flex-wrap">
                             {hasUnresolvedConflict && (
-                              <span
-                                className="inline-flex items-center gap-1 rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] text-amber-300"
-                                title="存在未决冲突"
-                              >
-                                <AlertTriangle className="h-3 w-3" />
-                                冲突
+                              <span className="inline-flex items-center gap-1 rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] text-amber-300" title="存在未决冲突">
+                                <AlertTriangle className="h-3 w-3" />冲突
                               </span>
                             )}
                             {hasResolvedConflict && !hasUnresolvedConflict && (
-                              <span
-                                className="inline-flex items-center gap-1 rounded bg-emerald-500/15 px-1.5 py-0.5 text-[10px] text-emerald-400"
-                                title="已裁决"
-                              >
-                                <Check className="h-3 w-3" />
-                                已裁决
+                              <span className="inline-flex items-center gap-1 rounded bg-emerald-500/15 px-1.5 py-0.5 text-[10px] text-emerald-400" title="已裁决">
+                                <Check className="h-3 w-3" />已裁决
                               </span>
                             )}
                             {wasOverridden && (
-                              <span
-                                className="inline-flex items-center gap-1 rounded bg-rose-500/20 px-1.5 py-0.5 text-[10px] text-rose-300 animate-pulse"
-                                title="改判被覆盖"
-                              >
-                                <ShieldAlert className="h-3 w-3" />
-                                覆盖
+                              <span className="inline-flex items-center gap-1 rounded bg-rose-500/20 px-1.5 py-0.5 text-[10px] text-rose-300 animate-pulse" title="改判被覆盖">
+                                <ShieldAlert className="h-3 w-3" />覆盖
                               </span>
                             )}
-                            {field.confidence >= 0.9 ? (
-                              <span className="inline-flex rounded bg-emerald-500/15 px-1.5 py-0.5 text-[10px] text-emerald-400">
-                                {(field.confidence * 100).toFixed(0)}%
-                              </span>
-                            ) : field.confidence >= 0.8 ? (
-                              <span className="inline-flex rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] text-amber-400">
-                                {(field.confidence * 100).toFixed(0)}%
-                              </span>
-                            ) : (
-                              <span className="inline-flex rounded bg-rose-500/15 px-1.5 py-0.5 text-[10px] text-rose-400">
-                                {(field.confidence * 100).toFixed(0)}%
-                              </span>
-                            )}
+                            <span className={cn(
+                              'inline-flex rounded px-1.5 py-0.5 text-[10px]',
+                              field.confidence >= 0.9 ? 'bg-emerald-500/15 text-emerald-400' :
+                              field.confidence >= 0.8 ? 'bg-amber-500/15 text-amber-400' :
+                              'bg-rose-500/15 text-rose-400'
+                            )}>
+                              {(field.confidence * 100).toFixed(0)}%
+                            </span>
                           </div>
                         </div>
                       </td>
@@ -396,92 +494,49 @@ export function ManifestDetail() {
                       </td>
                       <td className="px-4 py-3">
                         {isEditing ? (
-                          <input
-                            type="text"
-                            value={editValue}
-                            onChange={(e) => setEditValue(e.target.value)}
-                            className="w-full rounded border border-zinc-600 bg-zinc-900 px-2 py-1 font-mono text-sm text-white focus:border-zinc-400 focus:outline-none"
-                            autoFocus
-                          />
+                          <input type="text" value={editValue} onChange={(e) => setEditValue(e.target.value)}
+                            className="w-full rounded border border-zinc-600 bg-zinc-900 px-2 py-1 font-mono text-sm text-white focus:border-zinc-400 focus:outline-none" autoFocus />
                         ) : (
                           <div>
-                            <code className="font-mono text-sm text-white">
-                              {field.value}
-                            </code>
+                            <code className="font-mono text-sm text-white">{field.value}</code>
                             {field.tradeOffReason && (
-                              <p className="mt-1 text-xs text-zinc-500">
-                                📝 {field.tradeOffReason}
-                              </p>
+                              <p className="mt-1 text-xs text-zinc-500">📝 {field.tradeOffReason}</p>
                             )}
                             {field.paramVersion && (
                               <p className="mt-0.5 flex items-center gap-1 text-xs text-indigo-400">
-                                <Tag className="h-3 w-3" />
-                                参数版本: {field.paramVersion}
+                                <Tag className="h-3 w-3" />参数版本: {field.paramVersion}
                               </p>
                             )}
                             {field.operator && (
                               <p className="mt-0.5 text-xs text-zinc-500">
-                                操作人: {field.operator} ·{' '}
-                                {new Date(field.updatedAt).toLocaleString(
-                                  'zh-CN'
-                                )}
+                                操作人: {field.operator} · {new Date(field.updatedAt).toLocaleString('zh-CN')}
                               </p>
                             )}
                           </div>
                         )}
                       </td>
-                      <td className="px-4 py-3">
-                        <SourceBadge source={field.source} />
-                      </td>
+                      <td className="px-4 py-3"><SourceBadge source={field.source} /></td>
                       <td className="px-4 py-3 text-center">
-                        <div className="flex flex-col items-center gap-1">
-                          {field.operator && (
-                            <span className="text-[10px] text-zinc-500">
-                              {field.operator}
-                            </span>
-                          )}
-                        </div>
+                        {field.operator && (
+                          <span className="text-[10px] text-zinc-500">{field.operator}</span>
+                        )}
                       </td>
                       <td className="px-4 py-3">
                         {isEditing ? (
                           <div className="flex items-center justify-center gap-1">
-                            <button
-                              onClick={handleSaveEdit}
-                              className="rounded p-1 text-emerald-400 transition-colors hover:bg-emerald-500/20"
-                              title="保存"
-                            >
-                              <Check className="h-4 w-4" />
-                            </button>
-                            <button
-                              onClick={() => {
-                                setEditingField(null);
-                                setEditValue('');
-                              }}
-                              className="rounded p-1 text-rose-400 transition-colors hover:bg-rose-500/20"
-                              title="取消"
-                            >
-                              <X className="h-4 w-4" />
-                            </button>
+                            <button onClick={handleSaveEdit} className="rounded p-1 text-emerald-400 hover:bg-emerald-500/20" title="保存"><Check className="h-4 w-4" /></button>
+                            <button onClick={() => { setEditingField(null); setEditValue(''); }} className="rounded p-1 text-rose-400 hover:bg-rose-500/20" title="取消"><X className="h-4 w-4" /></button>
                           </div>
                         ) : wasOverridden ? (
-                          <button
-                            onClick={() => handleVerifyOverride(field.key)}
-                            className="flex items-center justify-center gap-1 w-full rounded border border-emerald-700 bg-emerald-900/30 px-2 py-1 text-xs font-medium text-emerald-300 transition-colors hover:bg-emerald-800/40"
-                            title="安全审核复核此覆盖"
-                          >
-                            <ShieldCheck className="h-3 w-3" />
-                            安全复核
+                          <button onClick={() => handleVerifyOverride(field.key)}
+                            className="flex items-center justify-center gap-1 w-full rounded border border-emerald-700 bg-emerald-900/30 px-2 py-1 text-xs font-medium text-emerald-300 hover:bg-emerald-800/40"
+                            title="安全审核复核此覆盖">
+                            <ShieldCheck className="h-3 w-3" />安全复核
                           </button>
                         ) : (
-                          <button
-                            onClick={() => {
-                              setEditingField(field.key);
-                              setEditValue(field.value);
-                            }}
-                            className="flex items-center justify-center gap-1 w-full rounded border border-zinc-700 bg-zinc-800 px-2 py-1 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-700"
-                          >
-                            <Edit3 className="h-3 w-3" />
-                            人工改判
+                          <button onClick={() => { setEditingField(field.key); setEditValue(field.value); }}
+                            className="flex items-center justify-center gap-1 w-full rounded border border-zinc-700 bg-zinc-800 px-2 py-1 text-xs font-medium text-zinc-300 hover:bg-zinc-700">
+                            <Edit3 className="h-3 w-3" />人工改判
                           </button>
                         )}
                       </td>
@@ -497,73 +552,38 @@ export function ManifestDetail() {
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <div className="rounded-xl border border-zinc-800 bg-zinc-800/20 p-5">
               <div className="mb-4 flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/20">
-                  <BookOpen className="h-4 w-4 text-indigo-400" />
-                </div>
-                <h3 className="text-base font-semibold text-white">
-                  知识库引用
-                </h3>
-                <span className="ml-auto rounded bg-zinc-700 px-2 py-0.5 text-xs text-zinc-300">
-                  {knowledgeRefs.length} 条
-                </span>
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/20"><BookOpen className="h-4 w-4 text-indigo-400" /></div>
+                <h3 className="text-base font-semibold text-white">知识库引用</h3>
+                <span className="ml-auto rounded bg-zinc-700 px-2 py-0.5 text-xs text-zinc-300">{knowledgeRefs.length} 条</span>
               </div>
               {knowledgeRefs.length === 0 ? (
-                <p className="py-8 text-center text-sm text-zinc-500">
-                  暂无知识库引用
-                </p>
+                <p className="py-8 text-center text-sm text-zinc-500">暂无知识库引用</p>
               ) : (
                 <div className="space-y-3">
                   {knowledgeRefs.map((k) => (
-                    <div
-                      key={k.id}
-                      className="rounded-lg border border-zinc-700 bg-zinc-900/40 p-3"
-                    >
+                    <div key={k.id} className="rounded-lg border border-zinc-700 bg-zinc-900/40 p-3">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-white flex items-center gap-1.5">
                             {k.title}
-                            <a
-                              href={k.url}
-                              target="_blank"
-                              rel="noreferrer"
-                              onClick={(e) => e.preventDefault()}
-                              className="text-indigo-400 hover:text-indigo-300"
-                            >
-                              <ExternalLink className="h-3 w-3" />
-                            </a>
+                            <a href={k.url} target="_blank" rel="noreferrer" onClick={(e) => e.preventDefault()} className="text-indigo-400 hover:text-indigo-300"><ExternalLink className="h-3 w-3" /></a>
                           </p>
-                          <p className="mt-1 truncate text-xs text-indigo-400 break-all">
-                            {k.url}
-                          </p>
+                          <p className="mt-1 truncate text-xs text-indigo-400 break-all">{k.url}</p>
                         </div>
-                        <span className="shrink-0 text-xs text-zinc-500">
-                          {(k.confidence * 100).toFixed(0)}%
-                        </span>
+                        <span className="shrink-0 text-xs text-zinc-500">{(k.confidence * 100).toFixed(0)}%</span>
                       </div>
                       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-500">
-                        <span>
-                          <Tag className="inline h-3 w-3 mr-1" />
-                          模型: {k.modelVersion}
-                        </span>
+                        <span><Tag className="inline h-3 w-3 mr-1" />模型: {k.modelVersion}</span>
                         <span>导入人: {k.importedBy}</span>
-                        <span>
-                          {new Date(k.importedAt).toLocaleString('zh-CN')}
-                        </span>
+                        <span>{new Date(k.importedAt).toLocaleString('zh-CN')}</span>
                       </div>
                       <div className="mt-2 rounded bg-indigo-500/5 p-2 border border-indigo-500/20">
-                        <p className="text-[10px] text-indigo-300/80 uppercase tracking-wide mb-1">
-                          解析字段
-                        </p>
+                        <p className="text-[10px] text-indigo-300/80 uppercase tracking-wide mb-1">解析字段</p>
                         <div className="space-y-0.5">
-                          {Object.entries(k.extractedFields).map(([k, v]) => (
-                            <p
-                              key={k}
-                              className="text-xs flex justify-between font-mono"
-                            >
-                              <span className="text-zinc-500">{k}:</span>
-                              <span className="text-zinc-300 ml-2 truncate">
-                                {v}
-                              </span>
+                          {Object.entries(k.extractedFields).map(([fk, v]) => (
+                            <p key={fk} className="text-xs flex justify-between font-mono">
+                              <span className="text-zinc-500">{fk}:</span>
+                              <span className="text-zinc-300 ml-2 truncate">{v}</span>
                             </p>
                           ))}
                         </div>
@@ -573,68 +593,38 @@ export function ManifestDetail() {
                 </div>
               )}
             </div>
-
             <div className="rounded-xl border border-zinc-800 bg-zinc-800/20 p-5">
               <div className="mb-4 flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-500/20">
-                  <MessageSquare className="h-4 w-4 text-pink-400" />
-                </div>
-                <h3 className="text-base font-semibold text-white">
-                  线上反馈工单
-                </h3>
-                <span className="ml-auto rounded bg-zinc-700 px-2 py-0.5 text-xs text-zinc-300">
-                  {tickets.length} 条
-                </span>
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-500/20"><MessageSquare className="h-4 w-4 text-pink-400" /></div>
+                <h3 className="text-base font-semibold text-white">线上反馈工单</h3>
+                <span className="ml-auto rounded bg-zinc-700 px-2 py-0.5 text-xs text-zinc-300">{tickets.length} 条</span>
               </div>
               {tickets.length === 0 ? (
-                <p className="py-8 text-center text-sm text-zinc-500">
-                  暂无线上工单反馈
-                </p>
+                <p className="py-8 text-center text-sm text-zinc-500">暂无线上工单反馈</p>
               ) : (
                 <div className="space-y-3">
                   {tickets.map((t) => (
-                    <div
-                      key={t.id}
-                      className="rounded-lg border border-zinc-700 bg-zinc-900/40 p-3"
-                    >
+                    <div key={t.id} className="rounded-lg border border-zinc-700 bg-zinc-900/40 p-3">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-white">
-                            {t.title}
-                          </p>
-                          <p className="mt-0.5 text-xs text-pink-400">
-                            工单号: {t.ticketNo}
-                          </p>
+                          <p className="text-sm font-medium text-white">{t.title}</p>
+                          <p className="mt-0.5 text-xs text-pink-400">工单号: {t.ticketNo}</p>
                         </div>
-                        <span className="shrink-0 text-xs text-zinc-500">
-                          {t.source}
-                        </span>
+                        <span className="shrink-0 text-xs text-zinc-500">{t.source}</span>
                       </div>
-                      <p className="mt-2 text-xs text-zinc-400 border-l-2 border-pink-500/40 pl-3">
-                        {t.content}
-                      </p>
+                      <p className="mt-2 text-xs text-zinc-400 border-l-2 border-pink-500/40 pl-3">{t.content}</p>
                       <div className="mt-2 rounded bg-pink-500/5 p-2 border border-pink-500/20">
-                        <p className="text-[10px] text-pink-300/80 uppercase tracking-wide mb-1">
-                          反馈字段
-                        </p>
+                        <p className="text-[10px] text-pink-300/80 uppercase tracking-wide mb-1">反馈字段</p>
                         <div className="space-y-0.5">
-                          {Object.entries(t.feedbackFields).map(([k, v]) => (
-                            <p
-                              key={k}
-                              className="text-xs flex justify-between font-mono"
-                            >
-                              <span className="text-zinc-500">{k}:</span>
-                              <span className="text-zinc-300 ml-2 truncate">
-                                {v}
-                              </span>
+                          {Object.entries(t.feedbackFields).map(([fk, v]) => (
+                            <p key={fk} className="text-xs flex justify-between font-mono">
+                              <span className="text-zinc-500">{fk}:</span>
+                              <span className="text-zinc-300 ml-2 truncate">{v}</span>
                             </p>
                           ))}
                         </div>
                       </div>
-                      <p className="mt-2 text-right text-[10px] text-zinc-600">
-                        创建于{' '}
-                        {new Date(t.createdAt).toLocaleString('zh-CN')}
-                      </p>
+                      <p className="mt-2 text-right text-[10px] text-zinc-600">创建于 {new Date(t.createdAt).toLocaleString('zh-CN')}</p>
                     </div>
                   ))}
                 </div>
@@ -645,145 +635,57 @@ export function ManifestDetail() {
 
         {activeTab === 'conflicts' && (
           <div className="space-y-6">
-            <div
-              className={cn(
-                'rounded-xl border p-5',
-                unresolvedConflicts.length > 0
-                  ? 'border-amber-700/50 bg-amber-900/10'
-                  : 'border-zinc-800 bg-zinc-800/20'
-              )}
-            >
+            <div className={cn('rounded-xl border p-5', unresolvedConflicts.length > 0 ? 'border-amber-700/50 bg-amber-900/10' : 'border-zinc-800 bg-zinc-800/20')}>
               <div className="mb-4 flex items-center gap-2 flex-wrap">
-                <div
-                  className={cn(
-                    'flex h-8 w-8 items-center justify-center rounded-lg',
-                    unresolvedConflicts.length > 0
-                      ? 'bg-amber-500/20'
-                      : 'bg-zinc-700'
-                  )}
-                >
-                  {unresolvedConflicts.length > 0 ? (
-                    <AlertTriangle className="h-4 w-4 text-amber-400" />
-                  ) : (
-                    <Check className="h-4 w-4 text-zinc-400" />
-                  )}
+                <div className={cn('flex h-8 w-8 items-center justify-center rounded-lg', unresolvedConflicts.length > 0 ? 'bg-amber-500/20' : 'bg-zinc-700')}>
+                  {unresolvedConflicts.length > 0 ? <AlertTriangle className="h-4 w-4 text-amber-400" /> : <Check className="h-4 w-4 text-zinc-400" />}
                 </div>
-                <h3 className="text-base font-semibold text-white">
-                  未决冲突（仍需人工复核，不自动拍板）
-                </h3>
-                <span
-                  className={cn(
-                    'rounded px-2 py-0.5 text-xs',
-                    unresolvedConflicts.length > 0
-                      ? 'bg-amber-500/20 text-amber-300'
-                      : 'bg-zinc-700 text-zinc-400'
-                  )}
-                >
-                  {pendingCount} 待裁决 · {deferredCount} 暂不裁决 · 共{' '}
-                  {unresolvedConflicts.length}
+                <h3 className="text-base font-semibold text-white">未决冲突（仍需人工复核，不自动拍板）</h3>
+                <span className={cn('rounded px-2 py-0.5 text-xs', unresolvedConflicts.length > 0 ? 'bg-amber-500/20 text-amber-300' : 'bg-zinc-700 text-zinc-400')}>
+                  {pendingCount} 待裁决 · {deferredCount} 暂不裁决 · 共 {unresolvedConflicts.length}
                 </span>
               </div>
               {unresolvedConflicts.length === 0 ? (
-                <div className="py-8 text-center">
-                  <p className="text-sm text-zinc-500">
-                    🎉 没有未决冲突，所有冲突均已人工裁决完毕
-                  </p>
-                </div>
+                <div className="py-8 text-center"><p className="text-sm text-zinc-500">🎉 没有未决冲突，所有冲突均已人工裁决完毕</p></div>
               ) : (
                 <div className="space-y-3">
                   {unresolvedConflicts.map((c) => (
-                    <div
-                      key={c.id}
-                      className={cn(
-                        'rounded-lg border p-4',
-                        c.status === 'pending'
-                          ? 'border-amber-700/40 bg-amber-950/20'
-                          : 'border-zinc-700 bg-zinc-900/40'
-                      )}
-                    >
+                    <div key={c.id} className={cn('rounded-lg border p-4', c.status === 'pending' ? 'border-amber-700/40 bg-amber-950/20' : 'border-zinc-700 bg-zinc-900/40')}>
                       <div className="flex flex-wrap items-start justify-between gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <p className="text-sm font-semibold text-white">
-                              字段: {c.fieldLabel}
-                            </p>
-                            <span
-                              className={cn(
-                                'rounded px-1.5 py-0.5 text-xs',
-                                c.status === 'pending'
-                                  ? 'bg-amber-500/20 text-amber-300'
-                                  : 'bg-zinc-600/40 text-zinc-300'
-                              )}
-                            >
-                              {c.status === 'pending' ? (
-                                <span className="flex items-center gap-1">
-                                  <AlertTriangle className="h-3 w-3" />
-                                  待裁决
-                                </span>
-                              ) : (
-                                <span className="flex items-center gap-1">
-                                  <Clock className="h-3 w-3" />
-                                  暂不裁决
-                                </span>
-                              )}
+                            <p className="text-sm font-semibold text-white">字段: {c.fieldLabel}</p>
+                            <span className={cn('rounded px-1.5 py-0.5 text-xs', c.status === 'pending' ? 'bg-amber-500/20 text-amber-300' : 'bg-zinc-600/40 text-zinc-300')}>
+                              {c.status === 'pending' ? <span className="flex items-center gap-1"><AlertTriangle className="h-3 w-3" />待裁决</span> : <span className="flex items-center gap-1"><Clock className="h-3 w-3" />暂不裁决</span>}
                             </span>
                           </div>
                           <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-[1fr,auto,1fr]">
                             <div className="rounded-lg border border-indigo-700/40 bg-indigo-950/20 p-3">
-                              <p className="text-[10px] uppercase tracking-wide text-indigo-400 mb-1">
-                                知识库值
-                              </p>
-                              <code className="font-mono text-sm text-white">
-                                {c.knowledgeValue}
-                              </code>
-                              <p className="mt-1 text-[10px] text-zinc-500 truncate">
-                                来源: {c.knowledgeSource}
-                              </p>
+                              <p className="text-[10px] uppercase tracking-wide text-indigo-400 mb-1">知识库值</p>
+                              <code className="font-mono text-sm text-white">{c.knowledgeValue}</code>
+                              <p className="mt-1 text-[10px] text-zinc-500 truncate">来源: {c.knowledgeSource}</p>
                             </div>
-                            <div className="flex md:items-center justify-center md:justify-center py-1">
-                              <span className="rounded-full bg-zinc-800 px-3 py-1 text-xs font-bold text-zinc-400">
-                                VS
-                              </span>
+                            <div className="flex md:items-center justify-center py-1">
+                              <span className="rounded-full bg-zinc-800 px-3 py-1 text-xs font-bold text-zinc-400">VS</span>
                             </div>
                             <div className="rounded-lg border border-pink-700/40 bg-pink-950/20 p-3">
-                              <p className="text-[10px] uppercase tracking-wide text-pink-400 mb-1">
-                                工单值
-                              </p>
-                              <code className="font-mono text-sm text-white">
-                                {c.ticketValue}
-                              </code>
-                              <p className="mt-1 text-[10px] text-zinc-500">
-                                来源: {c.ticketSource}
-                              </p>
+                              <p className="text-[10px] uppercase tracking-wide text-pink-400 mb-1">工单值</p>
+                              <code className="font-mono text-sm text-white">{c.ticketValue}</code>
+                              <p className="mt-1 text-[10px] text-zinc-500">来源: {c.ticketSource}</p>
                             </div>
                           </div>
                           {c.status === 'deferred' && c.decisionReason && (
                             <div className="mt-3 rounded bg-zinc-800/60 p-2 border border-zinc-700">
                               <p className="text-[10px] uppercase tracking-wide text-zinc-400 mb-1 flex items-center gap-1">
-                                <History className="h-3 w-3" />
-                                上次暂不裁决理由 · {c.decidedBy} ·{' '}
-                                {c.decidedAt
-                                  ? new Date(c.decidedAt).toLocaleString(
-                                      'zh-CN'
-                                    )
-                                  : ''}
+                                <History className="h-3 w-3" />上次暂不裁决理由 · {c.decidedBy} · {c.decidedAt ? new Date(c.decidedAt).toLocaleString('zh-CN') : ''}
                               </p>
-                              <p className="text-xs text-zinc-300">
-                                {c.decisionReason}
-                              </p>
+                              <p className="text-xs text-zinc-300">{c.decisionReason}</p>
                             </div>
                           )}
                         </div>
                         <div className="shrink-0">
-                          <button
-                            onClick={() => setActiveConflictId(c.id)}
-                            className={cn(
-                              'rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors',
-                              c.status === 'pending'
-                                ? 'bg-amber-500 hover:bg-amber-400'
-                                : 'bg-zinc-700 hover:bg-zinc-600'
-                            )}
-                          >
+                          <button onClick={() => setActiveConflictId(c.id)}
+                            className={cn('rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors', c.status === 'pending' ? 'bg-amber-500 hover:bg-amber-400' : 'bg-zinc-700 hover:bg-zinc-600')}>
                             人工裁决
                           </button>
                         </div>
@@ -793,80 +695,41 @@ export function ManifestDetail() {
                 </div>
               )}
             </div>
-
             {resolvedConflicts.length > 0 && (
               <div className="rounded-xl border border-zinc-800 bg-zinc-800/20 p-5">
                 <div className="mb-4 flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/20">
-                    <History className="h-4 w-4 text-emerald-400" />
-                  </div>
-                  <h3 className="text-base font-semibold text-white">
-                    裁决历史留痕（已完成人工拍板）
-                  </h3>
-                  <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-xs text-emerald-300">
-                    {resolvedConflicts.length} 条
-                  </span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/20"><History className="h-4 w-4 text-emerald-400" /></div>
+                  <h3 className="text-base font-semibold text-white">裁决历史留痕（已完成人工拍板）</h3>
+                  <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-xs text-emerald-300">{resolvedConflicts.length} 条</span>
                 </div>
                 <div className="space-y-2">
                   {resolvedConflicts.map((c) => (
-                    <div
-                      key={c.id}
-                      className="rounded-lg border border-zinc-700/50 bg-zinc-900/40 p-3"
-                    >
+                    <div key={c.id} className="rounded-lg border border-zinc-700/50 bg-zinc-900/40 p-3">
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
-                            <p className="text-sm font-medium text-white">
-                              字段: {c.fieldLabel}
-                            </p>
-                            <span
-                              className={cn(
-                                'rounded px-1.5 py-0.5 text-xs',
-                                c.status === 'confirmed_knowledge'
-                                  ? 'bg-indigo-500/20 text-indigo-300'
-                                  : 'bg-pink-500/20 text-pink-300'
-                              )}
-                            >
+                            <p className="text-sm font-medium text-white">字段: {c.fieldLabel}</p>
+                            <span className={cn('rounded px-1.5 py-0.5 text-xs', c.status === 'confirmed_knowledge' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-pink-500/20 text-pink-300')}>
                               {conflictStatusLabels[c.status]}
                             </span>
                           </div>
                           <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-400">
-                            <code className="bg-zinc-800 px-1.5 py-0.5 rounded text-indigo-300">
-                              KB: {c.knowledgeValue}
-                            </code>
+                            <code className="bg-zinc-800 px-1.5 py-0.5 rounded text-indigo-300">KB: {c.knowledgeValue}</code>
                             <span className="text-zinc-600">→</span>
-                            <code className="bg-zinc-800 px-1.5 py-0.5 rounded text-pink-300">
-                              TK: {c.ticketValue}
-                            </code>
+                            <code className="bg-zinc-800 px-1.5 py-0.5 rounded text-pink-300">TK: {c.ticketValue}</code>
                             <span className="text-zinc-600">→</span>
-                            <code
-                              className={cn(
-                                'px-1.5 py-0.5 rounded font-semibold',
-                                c.status === 'confirmed_knowledge'
-                                  ? 'bg-indigo-500/30 text-indigo-200'
-                                  : 'bg-pink-500/30 text-pink-200'
-                              )}
-                            >
-                              ✅{' '}
-                              {c.status === 'confirmed_knowledge'
-                                ? c.knowledgeValue
-                                : c.ticketValue}
+                            <code className={cn('px-1.5 py-0.5 rounded font-semibold', c.status === 'confirmed_knowledge' ? 'bg-indigo-500/30 text-indigo-200' : 'bg-pink-500/30 text-pink-200')}>
+                              ✅ {c.status === 'confirmed_knowledge' ? c.knowledgeValue : c.ticketValue}
                             </code>
                           </div>
                         </div>
                         <div className="text-right text-xs text-zinc-500">
                           <p>{c.decidedBy}</p>
-                          <p>
-                            {c.decidedAt
-                              ? new Date(c.decidedAt).toLocaleString('zh-CN')
-                              : ''}
-                          </p>
+                          <p>{c.decidedAt ? new Date(c.decidedAt).toLocaleString('zh-CN') : ''}</p>
                         </div>
                       </div>
                       {c.decisionReason && (
-                        <p className="mt-2 rounded bg-zinc-800/60 px-3 py-2 text-xs text-zinc-400 border-l-2 border-emerald-500/40">
-                          💬 {c.decisionReason}
-                        </p>
+                        <p className="mt-2 rounded bg-zinc-800/60 px-3 py-2 text-xs text-zinc-400 border-l-2 border-emerald-500/40">💬 {c.decisionReason}</p>
                       )}
                     </div>
                   ))}
@@ -877,22 +740,103 @@ export function ManifestDetail() {
         )}
 
         {activeTab === 'history' && (
+          <div className="rounded-xl border border-zinc-800 bg-zinc-800/20 p-5">
+            <h3 className="mb-4 text-base font-semibold text-white">改判历史记录（时间线）</h3>
+            <OverrideTimeline history={overrideHistory} />
+          </div>
+        )}
+
+        {activeTab === 'api' && (
           <div className="space-y-6">
             <div className="rounded-xl border border-zinc-800 bg-zinc-800/20 p-5">
-              <h3 className="mb-4 text-base font-semibold text-white">
-                改判历史记录（时间线）
-              </h3>
-              <OverrideTimeline history={overrideHistory} />
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/20"><Server className="h-4 w-4 text-emerald-400" /></div>
+                  <h3 className="text-base font-semibold text-white">接口返回 vs 页面 vs 导出 三路一致性校验</h3>
+                </div>
+                <button onClick={fetchApiResponse} disabled={apiLoading}
+                  className="rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-xs font-medium text-zinc-300 hover:bg-zinc-700 disabled:opacity-50">
+                  {apiLoading ? '请求中...' : '重新请求 /api/manifests/:id'}
+                </button>
+              </div>
+
+              {apiResponse && (
+                <>
+                  <div className="mb-4 rounded bg-zinc-900/60 p-3 border border-zinc-700">
+                    <p className="text-xs text-zinc-400 mb-1">
+                      <Server className="inline h-3 w-3 mr-1" />
+                      GET /api/manifests/{id}
+                    </p>
+                    <p className="text-[10px] text-zinc-500">
+                      dataSourceNote: {apiResponse.dataSourceNote}
+                    </p>
+                    <p className="text-[10px] text-zinc-500">
+                      responseTimestamp: {apiResponse.responseTimestamp}
+                    </p>
+                  </div>
+
+                  <div className="overflow-hidden rounded-lg border border-zinc-700">
+                    <table className="w-full">
+                      <thead className="bg-zinc-800/60">
+                        <tr>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-zinc-400">字段</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-zinc-400">接口返回</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-zinc-400">页面Store</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-zinc-400">导出JSON</th>
+                          <th className="px-4 py-2 text-center text-xs font-medium text-zinc-400">一致</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-zinc-800">
+                        {consistencyChecks.map((check) => (
+                          <tr key={check.field}>
+                            <td className="px-4 py-2 text-xs font-mono text-white">{check.field}</td>
+                            <td className="px-4 py-2 text-xs font-mono text-emerald-300">{String(check.api)}</td>
+                            <td className="px-4 py-2 text-xs font-mono text-amber-300">{String(check.page)}</td>
+                            <td className="px-4 py-2 text-xs font-mono text-indigo-300">{String(check.export)}</td>
+                            <td className="px-4 py-2 text-center">
+                              {check.pass ? (
+                                <span className="inline-flex items-center gap-1 rounded bg-emerald-500/20 px-2 py-0.5 text-xs text-emerald-400"><Check className="h-3 w-3" />通过</span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 rounded bg-rose-500/20 px-2 py-0.5 text-xs text-rose-400"><X className="h-3 w-3" />不一致</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {consistencyChecks.every((c) => c.pass) && (
+                    <div className="mt-4 rounded-lg border border-emerald-700/40 bg-emerald-950/20 p-4">
+                      <p className="text-sm text-emerald-300 font-medium">
+                        ✅ 三路一致性校验通过：暂不裁决(deferred)不会被页面、接口或导出任一入口改写成已裁决
+                      </p>
+                    </div>
+                  )}
+
+                  <details className="mt-4">
+                    <summary className="cursor-pointer text-xs text-zinc-400 hover:text-zinc-300">
+                      展开：接口完整响应体 (JSON)
+                    </summary>
+                    <pre className="mt-2 max-h-96 overflow-auto rounded-lg bg-zinc-900 p-4 text-[11px] text-zinc-300 font-mono leading-relaxed">
+                      {JSON.stringify(apiResponse, null, 2)}
+                    </pre>
+                  </details>
+                </>
+              )}
+
+              {!apiResponse && !apiLoading && (
+                <div className="py-8 text-center">
+                  <p className="text-sm text-zinc-500">点击上方按钮请求接口数据</p>
+                </div>
+              )}
             </div>
           </div>
         )}
       </main>
 
       {activeConflictId && (
-        <ConflictModal
-          conflictId={activeConflictId}
-          onClose={() => setActiveConflictId(null)}
-        />
+        <ConflictModal conflictId={activeConflictId} onClose={() => setActiveConflictId(null)} />
       )}
 
       {showImport && (
@@ -900,58 +844,29 @@ export function ManifestDetail() {
           <div className="w-full max-w-lg rounded-xl border border-zinc-700 bg-[#1a1d23] shadow-2xl">
             <div className="flex items-center justify-between border-b border-zinc-700 px-6 py-4">
               <div>
-                <h3 className="text-lg font-semibold text-white">
-                  第一步：导入知识库引用
-                </h3>
-                <p className="mt-1 text-xs text-zinc-400">
-                  导入后自动对比线上工单，发现冲突将保留待人工裁决，不自动拍板
-                </p>
+                <h3 className="text-lg font-semibold text-white">第一步：导入知识库引用</h3>
+                <p className="mt-1 text-xs text-zinc-400">导入后自动对比线上工单，发现冲突将保留待人工裁决，不自动拍板</p>
               </div>
-              <button
-                onClick={() => setShowImport(false)}
-                className="rounded-lg p-2 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white"
-              >
-                <X className="h-5 w-5" />
-              </button>
+              <button onClick={() => setShowImport(false)} className="rounded-lg p-2 text-zinc-400 hover:bg-zinc-800 hover:text-white"><X className="h-5 w-5" /></button>
             </div>
             <div className="space-y-4 px-6 py-5">
               <div>
-                <label className="mb-2 block text-sm font-medium text-zinc-300">
-                  知识库链接
-                </label>
-                <input
-                  type="text"
-                  value={importUrl}
-                  onChange={(e) => setImportUrl(e.target.value)}
+                <label className="mb-2 block text-sm font-medium text-zinc-300">知识库链接</label>
+                <input type="text" value={importUrl} onChange={(e) => setImportUrl(e.target.value)}
                   placeholder="https://kb.internal.example.com/articles/..."
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-900/50 px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:border-zinc-500 focus:outline-none"
-                />
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-900/50 px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:border-zinc-500 focus:outline-none" />
               </div>
               <div>
-                <label className="mb-2 block text-sm font-medium text-zinc-300">
-                  标题（选填）
-                </label>
-                <input
-                  type="text"
-                  value={importTitle}
-                  onChange={(e) => setImportTitle(e.target.value)}
+                <label className="mb-2 block text-sm font-medium text-zinc-300">标题（选填）</label>
+                <input type="text" value={importTitle} onChange={(e) => setImportTitle(e.target.value)}
                   placeholder="知识库条目名称"
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-900/50 px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:border-zinc-500 focus:outline-none"
-                />
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-900/50 px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:border-zinc-500 focus:outline-none" />
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 border-t border-zinc-700 px-6 py-4">
-              <button
-                onClick={() => setShowImport(false)}
-                className="rounded-lg border border-zinc-700 bg-zinc-800 px-5 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-700"
-              >
-                取消
-              </button>
-              <button
-                onClick={handleImport}
-                disabled={!importUrl.trim()}
-                className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-40"
-              >
+              <button onClick={() => setShowImport(false)} className="rounded-lg border border-zinc-700 bg-zinc-800 px-5 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-700">取消</button>
+              <button onClick={handleImport} disabled={!importUrl.trim()}
+                className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-40">
                 确认导入（走第一步）
               </button>
             </div>

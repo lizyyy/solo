@@ -78,6 +78,8 @@ interface ManifestState {
 
   exportData: () => string;
   getExportData: () => object;
+
+  resetToInitialState: () => void;
 }
 
 const generateId = () => Math.random().toString(36).substring(2, 11);
@@ -592,7 +594,7 @@ export const useManifestStore = create<ManifestState>((set, get) => ({
         break;
       }
       case 'export_consistency': {
-        result.totalCount = state.manifests.length;
+        result.totalCount = state.manifests.length * 3;
         const exportData = state.getExportData() as {
           manifests: Array<{
             id: string;
@@ -601,6 +603,7 @@ export const useManifestStore = create<ManifestState>((set, get) => ({
             overriddenFieldCount: number;
             hasConflict: boolean;
             hasOverride: boolean;
+            status: string;
           }>;
         };
         state.manifests.forEach((m, i) => {
@@ -612,6 +615,9 @@ export const useManifestStore = create<ManifestState>((set, get) => ({
           const pageOverridden = state
             .getOverriddenFieldsByManifestId(m.id)
             .length;
+          const pageDeferred = state
+            .getUnresolvedConflictsByManifestId(m.id)
+            .filter((c) => c.status === 'deferred').length;
           if (e.unresolvedConflictCount !== pageUnresolved) {
             result.failedItems.push({
               manifestId: m.id,
@@ -630,14 +636,28 @@ export const useManifestStore = create<ManifestState>((set, get) => ({
             result.failedItems.push({
               manifestId: m.id,
               manifestNo: m.manifestNo,
-              reason: `hasConflict标记不一致`,
+              reason: `hasConflict标记不一致(页面:${pageUnresolved > 0} vs 导出:${e.hasConflict})`,
             });
           }
           if (e.hasOverride !== (pageOverridden > 0)) {
             result.failedItems.push({
               manifestId: m.id,
               manifestNo: m.manifestNo,
-              reason: `hasOverride标记不一致`,
+              reason: `hasOverride标记不一致(页面:${pageOverridden > 0} vs 导出:${e.hasOverride})`,
+            });
+          }
+          if (e.status !== m.status) {
+            result.failedItems.push({
+              manifestId: m.id,
+              manifestNo: m.manifestNo,
+              reason: `status不一致(页面:${m.status} vs 导出:${e.status})`,
+            });
+          }
+          if (pageDeferred > 0 && m.status === 'completed') {
+            result.failedItems.push({
+              manifestId: m.id,
+              manifestNo: m.manifestNo,
+              reason: `暂不裁决(deferred)存在但舱单status=completed，违背"冲突证据不自动拍板"原则`,
             });
           }
         });
@@ -711,6 +731,19 @@ export const useManifestStore = create<ManifestState>((set, get) => ({
   exportData: () => {
     const data = get().getExportData();
     return JSON.stringify(data, null, 2);
+  },
+
+  resetToInitialState: () => {
+    set({
+      manifests: JSON.parse(JSON.stringify(mockManifests)),
+      knowledgeReferences: JSON.parse(JSON.stringify(mockKnowledgeReferences)),
+      feedbackTickets: JSON.parse(JSON.stringify(mockFeedbackTickets)),
+      conflicts: JSON.parse(JSON.stringify(mockConflicts)),
+      overrideHistory: JSON.parse(JSON.stringify(mockOverrideHistory)),
+      selfCheckResults: [],
+      selectedManifestId: null,
+      activeConflictId: null,
+    });
   },
 }));
 

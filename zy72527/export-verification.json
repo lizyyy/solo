@@ -1,0 +1,598 @@
+{
+  "exportedAt": "2026-06-20T17:18:08.538Z",
+  "dataSourceNote": "页面展示、接口返回、导出明细 均读取同一份Store状态",
+  "manifests": [
+    {
+      "id": "m1",
+      "manifestNo": "CD202406070001",
+      "status": "conflict",
+      "stepProgress": 1,
+      "hasConflict": true,
+      "hasOverride": false,
+      "unresolvedConflictCount": 1,
+      "overriddenFieldCount": 0,
+      "resolvedConflictCount": 0,
+      "fieldCount": 8,
+      "fields": [
+        {
+          "key": "shipper",
+          "label": "发货人",
+          "value": "SHANGHAI TRADING CO., LTD",
+          "confidence": 0.96,
+          "source": "knowledge_base",
+          "paramVersion": "kb-v2.3.1",
+          "tradeOffReason": "优先使用知识库已核验条目",
+          "updatedAt": "2026-06-19T17:18:08.525Z",
+          "operator": "阿宁"
+        },
+        {
+          "key": "consignee",
+          "label": "收货人",
+          "value": "知识库公司名称有限公司",
+          "confidence": 0.94,
+          "source": "knowledge_base",
+          "paramVersion": "kb-v2.3.1",
+          "tradeOffReason": "知识库补录",
+          "updatedAt": "2026-06-20T17:18:08.537Z",
+          "operator": "阿宁"
+        },
+        {
+          "key": "notify_party",
+          "label": "通知方",
+          "value": "SAME AS CONSIGNEE",
+          "confidence": 0.76,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "port_of_loading",
+          "label": "装货港",
+          "value": "SHANGHAI, CHINA",
+          "confidence": 0.95,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "port_of_discharge",
+          "label": "卸货港",
+          "value": "LOS ANGELES, CA",
+          "confidence": 0.91,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "container_no",
+          "label": "集装箱号",
+          "value": "MSKU1234567",
+          "confidence": 0.89,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "seal_no",
+          "label": "封号",
+          "value": "SEAL8821",
+          "confidence": 0.83,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "gross_weight",
+          "label": "毛重",
+          "value": "12500 KGS",
+          "confidence": 0.87,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        }
+      ],
+      "overriddenFields": []
+    },
+    {
+      "id": "m2",
+      "manifestNo": "CD202406070002",
+      "status": "overridden",
+      "stepProgress": 2,
+      "hasConflict": false,
+      "hasOverride": true,
+      "unresolvedConflictCount": 0,
+      "overriddenFieldCount": 1,
+      "resolvedConflictCount": 0,
+      "fieldCount": 8,
+      "fields": [
+        {
+          "key": "shipper",
+          "label": "发货人",
+          "value": "NINGBO ELECTRONICS CO., LTD",
+          "confidence": 0.93,
+          "source": "manual",
+          "updatedAt": "2026-06-19T17:18:08.525Z",
+          "operator": "阿宁"
+        },
+        {
+          "key": "consignee",
+          "label": "收货人",
+          "value": "NEW YORK DISTRIBUTORS LLC",
+          "confidence": 0.85,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "notify_party",
+          "label": "通知方",
+          "value": "NY LOGISTICS GROUP",
+          "confidence": 0.82,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "port_of_loading",
+          "label": "装货港",
+          "value": "NINGBO, CHINA",
+          "confidence": 0.94,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "port_of_discharge",
+          "label": "卸货港",
+          "value": "NEW YORK, NY",
+          "confidence": 0.9,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "container_no",
+          "label": "集装箱号",
+          "value": "CMAU9876543",
+          "confidence": 0.88,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "seal_no",
+          "label": "封号",
+          "value": "SEAL5532",
+          "confidence": 0.81,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "gross_weight",
+          "label": "毛重",
+          "value": "8750 KGS",
+          "confidence": 0.86,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        }
+      ],
+      "overriddenFields": [
+        {
+          "fieldKey": "shipper",
+          "fieldLabel": "发货人",
+          "batchId": "BATCH-20240607-003",
+          "operator": "阿宁",
+          "createdAt": "2026-06-19T17:18:08.525Z"
+        }
+      ]
+    },
+    {
+      "id": "m3",
+      "manifestNo": "CD202406070003",
+      "status": "completed",
+      "stepProgress": 3,
+      "hasConflict": false,
+      "hasOverride": false,
+      "unresolvedConflictCount": 0,
+      "overriddenFieldCount": 0,
+      "resolvedConflictCount": 0,
+      "fieldCount": 8,
+      "fields": [
+        {
+          "key": "shipper",
+          "label": "发货人",
+          "value": "GUANGZHOU TEXTILE MILLS CO., LTD",
+          "confidence": 0.95,
+          "source": "knowledge_base",
+          "paramVersion": "kb-v2.3.1",
+          "updatedAt": "2026-06-19T17:18:08.525Z",
+          "operator": "阿宁"
+        },
+        {
+          "key": "consignee",
+          "label": "收货人",
+          "value": "CHICAGO FASHION IMPORTS INC",
+          "confidence": 0.92,
+          "source": "ticket",
+          "updatedAt": "2026-06-19T17:18:08.525Z",
+          "operator": "阿宁"
+        },
+        {
+          "key": "notify_party",
+          "label": "通知方",
+          "value": "CHICAGO WAREHOUSE CO",
+          "confidence": 0.8,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "port_of_loading",
+          "label": "装货港",
+          "value": "GUANGZHOU, CHINA",
+          "confidence": 0.93,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "port_of_discharge",
+          "label": "卸货港",
+          "value": "CHICAGO, IL",
+          "confidence": 0.89,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "container_no",
+          "label": "集装箱号",
+          "value": "EMCU4567890",
+          "confidence": 0.87,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "seal_no",
+          "label": "封号",
+          "value": "SEAL3344",
+          "confidence": 0.82,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "gross_weight",
+          "label": "毛重",
+          "value": "6200 KGS",
+          "confidence": 0.85,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        }
+      ],
+      "overriddenFields": []
+    },
+    {
+      "id": "m4",
+      "manifestNo": "CD202406070004",
+      "status": "pending",
+      "stepProgress": 0,
+      "hasConflict": false,
+      "hasOverride": false,
+      "unresolvedConflictCount": 0,
+      "overriddenFieldCount": 0,
+      "resolvedConflictCount": 0,
+      "fieldCount": 8,
+      "fields": [
+        {
+          "key": "shipper",
+          "label": "发货人",
+          "value": "SHENZHEN TECH PARK",
+          "confidence": 0.89,
+          "source": "ocr",
+          "updatedAt": "2026-06-19T17:18:08.525Z"
+        },
+        {
+          "key": "consignee",
+          "label": "收货人",
+          "value": "SAN FRANCISCO TECH LLC",
+          "confidence": 0.84,
+          "source": "ocr",
+          "updatedAt": "2026-06-19T17:18:08.525Z"
+        },
+        {
+          "key": "notify_party",
+          "label": "通知方",
+          "value": "SF FORWARDING INC",
+          "confidence": 0.78,
+          "source": "ocr",
+          "updatedAt": "2026-06-19T17:18:08.525Z"
+        },
+        {
+          "key": "port_of_loading",
+          "label": "装货港",
+          "value": "SHENZHEN, CHINA",
+          "confidence": 0.92,
+          "source": "ocr",
+          "updatedAt": "2026-06-19T17:18:08.525Z"
+        },
+        {
+          "key": "port_of_discharge",
+          "label": "卸货港",
+          "value": "SAN FRANCISCO, CA",
+          "confidence": 0.88,
+          "source": "ocr",
+          "updatedAt": "2026-06-19T17:18:08.525Z"
+        },
+        {
+          "key": "container_no",
+          "label": "集装箱号",
+          "value": "OOLU1122334",
+          "confidence": 0.86,
+          "source": "ocr",
+          "updatedAt": "2026-06-19T17:18:08.525Z"
+        },
+        {
+          "key": "seal_no",
+          "label": "封号",
+          "value": "SEAL9988",
+          "confidence": 0.8,
+          "source": "ocr",
+          "updatedAt": "2026-06-19T17:18:08.525Z"
+        },
+        {
+          "key": "gross_weight",
+          "label": "毛重",
+          "value": "4500 KGS",
+          "confidence": 0.83,
+          "source": "ocr",
+          "updatedAt": "2026-06-19T17:18:08.525Z"
+        }
+      ],
+      "overriddenFields": []
+    },
+    {
+      "id": "m5",
+      "manifestNo": "CD202406070005",
+      "status": "verified",
+      "stepProgress": 3,
+      "hasConflict": false,
+      "hasOverride": false,
+      "unresolvedConflictCount": 0,
+      "overriddenFieldCount": 0,
+      "resolvedConflictCount": 0,
+      "fieldCount": 8,
+      "fields": [
+        {
+          "key": "shipper",
+          "label": "发货人",
+          "value": "QINGDAO SEAFOOD CO., LTD",
+          "confidence": 0.96,
+          "source": "knowledge_base",
+          "paramVersion": "kb-v2.3.1",
+          "updatedAt": "2026-06-19T17:18:08.525Z",
+          "operator": "阿宁"
+        },
+        {
+          "key": "consignee",
+          "label": "收货人",
+          "value": "SEATTLE FRESH MARKET INC",
+          "confidence": 0.94,
+          "source": "ticket",
+          "updatedAt": "2026-06-19T17:18:08.525Z",
+          "operator": "阿宁"
+        },
+        {
+          "key": "notify_party",
+          "label": "通知方",
+          "value": "SEATTLE COLD STORAGE LLC",
+          "confidence": 0.88,
+          "source": "manual",
+          "updatedAt": "2026-06-20T17:18:08.524Z",
+          "operator": "安全审核"
+        },
+        {
+          "key": "port_of_loading",
+          "label": "装货港",
+          "value": "QINGDAO, CHINA",
+          "confidence": 0.95,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "port_of_discharge",
+          "label": "卸货港",
+          "value": "SEATTLE, WA",
+          "confidence": 0.91,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "container_no",
+          "label": "集装箱号",
+          "value": "HLCU5566778",
+          "confidence": 0.9,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "seal_no",
+          "label": "封号",
+          "value": "SEAL7766",
+          "confidence": 0.84,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        },
+        {
+          "key": "gross_weight",
+          "label": "毛重",
+          "value": "9800 KGS",
+          "confidence": 0.88,
+          "source": "ocr",
+          "updatedAt": "2026-06-18T17:18:08.525Z"
+        }
+      ],
+      "overriddenFields": []
+    }
+  ],
+  "conflicts": [
+    {
+      "id": "c1",
+      "manifestId": "m1",
+      "fieldKey": "consignee",
+      "fieldLabel": "收货人",
+      "knowledgeValue": "LOS ANGELES IMPORT SERVICES INC",
+      "ticketValue": "LOS ANGELES IMPORTS INC",
+      "knowledgeSource": "https://kb.internal.example.com/articles/2024/06/shipper-verification-001",
+      "ticketSource": "TK-20240607-0089",
+      "status": "deferred",
+      "decidedBy": "阿宁",
+      "decidedAt": "2026-06-20T17:18:08.538Z",
+      "decisionReason": "需要安全审核同事进一步核实收货人信息，暂不裁决，不自动拍板",
+      "conflictStatusLabel": "暂不裁决",
+      "isUnresolved": true
+    }
+  ],
+  "overrideHistory": [
+    {
+      "id": "o1",
+      "manifestId": "m2",
+      "fieldKey": "shipper",
+      "fieldLabel": "发货人",
+      "oldValue": "NINGBO ELECTRONICS FACTORY",
+      "newValue": "NINGBO ELECTRONICS CO., LTD",
+      "oldSource": "ocr",
+      "newSource": "manual",
+      "operationType": "manual_override",
+      "operator": "阿宁",
+      "isProtected": true,
+      "wasOverridden": true,
+      "overriddenByBatch": "BATCH-20240607-003",
+      "createdAt": "2026-06-19T17:18:08.525Z",
+      "overrideStatusLabel": "已被批跑覆盖"
+    },
+    {
+      "id": "o2",
+      "manifestId": "m3",
+      "fieldKey": "consignee",
+      "fieldLabel": "收货人",
+      "oldValue": "CHICAGO FASHION IMPORTS",
+      "newValue": "CHICAGO FASHION IMPORTS INC",
+      "oldSource": "ocr",
+      "newSource": "ticket",
+      "operationType": "manual_override",
+      "operator": "阿宁",
+      "isProtected": false,
+      "wasOverridden": false,
+      "createdAt": "2026-06-19T17:18:08.525Z",
+      "overrideStatusLabel": "普通改判"
+    },
+    {
+      "id": "o3",
+      "manifestId": "m5",
+      "fieldKey": "notify_party",
+      "fieldLabel": "通知方",
+      "oldValue": "SEATTLE COLD STORAGE",
+      "newValue": "SEATTLE COLD STORAGE LLC",
+      "oldSource": "ocr",
+      "newSource": "manual",
+      "operationType": "manual_override",
+      "operator": "安全审核",
+      "isProtected": false,
+      "wasOverridden": false,
+      "createdAt": "2026-06-20T17:18:08.524Z",
+      "overrideStatusLabel": "普通改判"
+    }
+  ],
+  "knowledgeReferences": [
+    {
+      "id": "k1",
+      "manifestId": "m1",
+      "url": "https://kb.internal.example.com/articles/2024/06/shipper-verification-001",
+      "title": "发货人名称核验规则 v2.3 - 上海地区",
+      "extractedFields": {
+        "shipper": "SHANGHAI TRADING CO., LTD",
+        "consignee": "LOS ANGELES IMPORT SERVICES INC"
+      },
+      "confidence": 0.94,
+      "modelVersion": "kb-matcher-v2.3.1",
+      "importedAt": "2026-06-19T17:18:08.525Z",
+      "importedBy": "阿宁"
+    },
+    {
+      "id": "k2",
+      "manifestId": "m3",
+      "url": "https://kb.internal.example.com/articles/2024/06/shipper-verification-002",
+      "title": "发货人名称核验规则 v2.3 - 广州地区",
+      "extractedFields": {
+        "shipper": "GUANGZHOU TEXTILE MILLS CO., LTD"
+      },
+      "confidence": 0.92,
+      "modelVersion": "kb-matcher-v2.3.1",
+      "importedAt": "2026-06-19T17:18:08.525Z",
+      "importedBy": "阿宁"
+    },
+    {
+      "id": "k3",
+      "manifestId": "m5",
+      "url": "https://kb.internal.example.com/articles/2024/06/shipper-verification-003",
+      "title": "发货人名称核验规则 v2.3 - 青岛地区",
+      "extractedFields": {
+        "shipper": "QINGDAO SEAFOOD CO., LTD"
+      },
+      "confidence": 0.95,
+      "modelVersion": "kb-matcher-v2.3.1",
+      "importedAt": "2026-06-19T17:18:08.525Z",
+      "importedBy": "阿宁"
+    },
+    {
+      "id": "k4",
+      "manifestId": "m1",
+      "url": "https://kb.internal.example.com/articles/2024/06/shipper-verification-001",
+      "title": "发货人名称核验规则 v2.3 - 上海地区（重复导入）",
+      "extractedFields": {
+        "shipper": "SHANGHAI TRADING CO., LTD"
+      },
+      "confidence": 0.94,
+      "modelVersion": "kb-matcher-v2.3.1",
+      "importedAt": "2026-06-19T17:18:08.525Z",
+      "importedBy": "阿宁"
+    },
+    {
+      "id": "uuuinuef1",
+      "manifestId": "m1",
+      "url": "https://kb.internal.example.com/articles/consignee-override-v3",
+      "title": "收货人知识库条目v3",
+      "extractedFields": {
+        "consignee": "知识库公司名称有限公司"
+      },
+      "confidence": 0.93,
+      "modelVersion": "kb-matcher-v2.3.1",
+      "importedAt": "2026-06-20T17:18:08.537Z",
+      "importedBy": "阿宁"
+    }
+  ],
+  "feedbackTickets": [
+    {
+      "id": "t1",
+      "manifestId": "m1",
+      "ticketNo": "TK-20240607-0089",
+      "title": "收货人名称更正申请 - 洛杉矶进口商",
+      "content": "业务同事反馈实际收货人为 LOS ANGELES IMPORTS INC，知识库匹配的 SERVICES 为历史名称，请核实。",
+      "feedbackFields": {
+        "consignee": "LOS ANGELES IMPORTS INC"
+      },
+      "source": "客服工单系统",
+      "createdAt": "2026-06-19T17:18:08.525Z"
+    },
+    {
+      "id": "t2",
+      "manifestId": "m3",
+      "ticketNo": "TK-20240607-0090",
+      "title": "收货人信息补充 - 芝加哥时尚进口商",
+      "content": "线上反馈收货人完整名称应包含 INC 后缀，OCR识别遗漏。",
+      "feedbackFields": {
+        "consignee": "CHICAGO FASHION IMPORTS INC"
+      },
+      "source": "线上反馈通道",
+      "createdAt": "2026-06-19T17:18:08.525Z"
+    },
+    {
+      "id": "t3",
+      "manifestId": "m5",
+      "ticketNo": "TK-20240607-0091",
+      "title": "收货人名称补充 - 西雅图生鲜市场",
+      "content": "用户反馈收货人完整名称为 SEATTLE FRESH MARKET INC，请更新。",
+      "feedbackFields": {
+        "consignee": "SEATTLE FRESH MARKET INC"
+      },
+      "source": "线上反馈通道",
+      "createdAt": "2026-06-19T17:18:08.525Z"
+    }
+  ]
+}
