@@ -1,0 +1,68 @@
+import type { Note } from '@/types';
+
+export const notes: Note[] = [
+  {
+    id: 'n-001',
+    sampleId: 's-002',
+    type: 'score',
+    content: '学生递推公式记错，将a(n-2)的系数当成+0.6而不是-0.6，导致结果偏差较大。已在批注中标出错误步骤。',
+    operator: '小岑',
+    createdAt: '2026-06-19 10:20:00',
+  },
+  {
+    id: 'n-002',
+    sampleId: 's-002',
+    type: 'supplement',
+    content: '复核时仔细比对了学生的草稿纸，确认是符号错误，不是计算错误。学生在其他类似题目中也犯了同样的错误，建议重点复习递推公式的符号规则。',
+    operator: '小岑',
+    createdAt: '2026-06-19 15:45:00',
+  },
+  {
+    id: 'n-003',
+    sampleId: 's-003',
+    type: 'score',
+    content: '答题内容与S-001高度相似，递推序列完全相同，疑似雷同卷。需进一步核实。',
+    operator: '小岑',
+    createdAt: '2026-06-19 10:25:00',
+  },
+  {
+    id: 'n-004',
+    sampleId: 's-003',
+    type: 'supplement',
+    content: '与S-001对比，不仅递推序列完全一致，连答题笔迹和错误模式都相同，已标记为重复样本，待班主任确认。',
+    operator: '小岑',
+    createdAt: '2026-06-19 11:30:00',
+  },
+  {
+    id: 'n-005',
+    sampleId: 's-004',
+    type: 'score',
+    content: '学生答题过程有涂改痕迹，第3项和第4项的推导过程看不太清楚。计算结果偏差4.26%，介于两个版本阈值之间。',
+    operator: '小岑',
+    createdAt: '2026-06-19 10:30:00',
+  },
+  {
+    id: 'n-006',
+    sampleId: 's-004',
+    type: 'supplement',
+    content: '用v1.0版本阈值5%计算为正常，用v1.1版本阈值3%计算为异常。需要确认使用哪个版本的口径。已标记为待确认。',
+    operator: '小岑',
+    createdAt: '2026-06-19 16:00:00',
+  },
+  {
+    id: 'n-007',
+    sampleId: 's-004',
+    type: 'supplement',
+    content: '交班给复核同事注意：此样本偏差4.26%，在v1.0中正常但在v1.1中异常，请确认使用哪个版本后再给出最终结论。',
+    operator: '小岑',
+    createdAt: '2026-06-19 16:20:00',
+  },
+  {
+    id: 'n-008',
+    sampleId: 's-001',
+    type: 'score',
+    content: '学生答题步骤完整，递推逻辑清晰，前五项均正确。第6项计算为18.7，与标准答案18.5接近。',
+    operator: '小岑',
+    createdAt: '2026-06-19 10:15:00',
+  },
+];
