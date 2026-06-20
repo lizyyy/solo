@@ -23,3 +23,12 @@ resampler = "imbalance_resampler.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+imbalance_resampler = [
+    "templates/*.html",
+    "static/*",
+]
+
+[tool.setuptools]
+include-package-data = true

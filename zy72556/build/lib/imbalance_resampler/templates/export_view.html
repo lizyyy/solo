@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% block title %}导出明细 - {{ session_id }}{% endblock %}
+{% block content %}
+
+<div class="mb-6">
+  <div class="flex items-center gap-3 mb-2 text-sm">
+    <a href="{{ url_for('index') }}" class="text-slate-500 hover:text-slate-700">会话列表</a>
+    <span class="text-slate-300">/</span>
+    <a href="{{ url_for('session_detail', session_id=session_id) }}" class="text-slate-500 hover:text-slate-700 mono">{{ session_id }}</a>
+    <span class="text-slate-300">/</span>
+    <span class="text-slate-700 font-medium">导出明细</span>
+  </div>
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800">导出明细查看</h1>
+      <p class="text-sm text-slate-500 mt-1">
+        页面展示 / API 返回 / CSV 导出 = 完全同一份会话数据
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="{{ url_for('api_export_csv', session_id=session_id) }}"
+         class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg flex items-center gap-2 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        下载 CSV
+      </a>
+      <a href="{{ url_for('session_detail', session_id=session_id) }}"
+         class="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-sm transition">
+        ← 会话详情
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- 数据一致性说明 -->
+<div class="bg-gradient-to-r from-green-50 via-emerald-50 to-green-50 rounded-xl border-2 border-green-300 p-5 mb-6">
+  <div class="flex items-start gap-4">
+    <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center text-white shrink-0">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04M19.698 12.944a9.963 9.963 0 01-2.92 3.094 9.95 9.95 0 01-4.617 2.542 9.963 9.963 0 01-2.92-3.094"/></svg>
+    </div>
+    <div class="flex-1">
+      <h3 class="font-bold text-green-800 mb-1">数据一致性承诺</h3>
+      <ul class="text-sm text-green-800 space-y-1">
+        <li>• <span class="font-medium">页面展示</span>：当前页面展示的所有字段
+        <li>• <span class="font-medium">REST API</span>：<code class="mono bg-green-100 px-1 rounded text-xs">/api/sessions/{{ session_id }}/export.csv</code>
+        <li>• <span class="font-medium">CSV 导出</span>：点击「下载 CSV」按钮
+      </ul>
+      <div class="mt-2 text-xs text-green-700 bg-white/60 rounded-lg p-3 border border-green-200">
+        三处读取的是 <span class="mono font-semibold">同一份会话JSON文件</span>。如果页面显示异常，其他两处也同样异常；不会出现一处消失、另一处还在的情况。
+      </div>
+    </div>
+    <div class="text-right shrink-0">
+      <div class="text-xs text-green-600">总记录数</div>
+      <div class="text-2xl font-bold text-green-800 mono">{{ total_rows }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- 可疑记录单独列出 -->
+<div class="bg-white rounded-xl border-2 border-red-200 p-5 mb-6">
+  <div class="flex items-center justify-between mb-4">
+    <div>
+      <h3 class="font-bold text-red-700 flex items-center gap-2">
+      <span class="w-6 h-6 bg-red-100 rounded flex items-center justify-center text-sm">⚠</span>
+      线上特征缺失却给了默认分 · 共 {{ suspicious|length }} 条
+      </h3>
+      <p class="text-xs text-slate-500 mt-1">这些记录在导出明细中会保留，不会静默消失</p>
+    </div>
+  </div>
+
+  {% if suspicious %}
+  <div class="overflow-x-auto rounded-lg border border-slate-200">
+    <table class="w-full text-sm">
+      <thead class="bg-red-50 text-xs uppercase tracking-wider text-red-700">
+        <tr>
+          <th class="px-4 py-3 text-left">记录ID</th>
+          <th class="px-4 py-3 text-left">处理状态</th>
+          <th class="px-4 py-3 text-right">原始行号</th>
+          <th class="px-4 py-3 text-right">模型分</th>
+          <th class="px-4 py-3 text-center">缺失特征</th>
+          <th class="px-4 py-3 text-left">阿越审查意见</th>
+          <th class="px-4 py-3 text-left">结果说明</th>
+          <th class="px-4 py-3 text-right">权重</th>
+          <th class="px-4 py-3 text-center">操作</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-red-100 bg-white">
+        {% for r in suspicious %}
+        <tr>
+          <td class="px-4 py-3">
+            <a href="{{ url_for('record_detail', session_id=session_id, record_id=r.record_id) }}"
+               class="mono text-xs text-blue-700 font-medium hover:underline">{{ r.record_id }}</a>
+          </td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-0.5 {{ r.status_badge }} text-white text-xs rounded whitespace-nowrap">
+              {{ r.status_label }}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-right mono text-xs text-slate-700">#{{ r.original_line_number }}</td>
+          <td class="px-4 py-3 text-right mono text-xs font-bold text-red-600 bg-red-50">{{ r.model_score }}</td>
+          <td class="px-4 py-3 text-center">
+            {% for mf in r.missing_features %}
+            <span class="inline-block px-1.5 py-0.5 bg-red-50 border border-red-200 rounded mono text-xs mb-1">{{ mf }}</span>
+            {% endfor %}
+          </td>
+          <td class="px-4 py-3 text-xs text-blue-800 max-w-xs">
+            <div class="bg-blue-50 border-l-2 border-blue-400 p-2 rounded max-h-20 overflow-y-auto">
+              {{ r.ayue_review_note or '<span class="text-slate-400 italic">未填写</span>' | safe }}
+            </div>
+          </td>
+          <td class="px-4 py-3 text-xs text-slate-600 max-w-xs truncate" title="{{ r.explanation_summary or '' }}">
+            {{ r.explanation_summary or '-' }}
+          </td>
+          <td class="px-4 py-3 text-right mono text-xs font-semibold text-slate-700">{{ r.final_weight }}</td>
+          <td class="px-4 py-3 text-center">
+            <a href="{{ url_for('record_detail', session_id=session_id, record_id=r.record_id) }}"
+               class="text-xs text-blue-600 hover:text-blue-800">查看证据 →</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-xs text-slate-500 italic py-6 text-center bg-slate-50 rounded-lg border border-dashed border-slate-300">
+    本会话没有特征缺失+默认分的记录
+  </div>
+  {% endif %}
+</div>
+
+<!-- 状态变化汇总 -->
+<div class="bg-white rounded-xl border border-slate-200 p-5 mb-6">
+  <h3 class="font-semibold text-slate-700 mb-4">状态变化汇总 · 历史留痕</h3>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    {% for s in status_summary_rows %}
+    <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+      <div class="text-3xl font-bold text-slate-800 mono mb-1">{{ s.count }}</div>
+      <div class="px-2 py-0.5 inline-block text-white text-xs rounded mb-1 {{ s.badge }}">{{ s.label }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- CSV 字段说明 + 预览 -->
+<div class="bg-white rounded-xl border border-slate-200 p-5">
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="font-semibold text-slate-700">CSV 明细预览（前 {{ preview_rows|length }} 行 · 共 {{ total_rows }} 行</h3>
+    <div class="text-xs text-slate-500">字段说明：模型分、缺失特征、状态、阿越意见、摘要 等字段全部包含在导出中</div>
+  </div>
+
+  <div class="overflow-x-auto rounded-lg border border-slate-200">
+    <table class="text-xs">
+      <thead class="bg-slate-50 text-slate-600 uppercase tracking-wider">
+        <tr>
+          {% for col in preview_columns %}
+          <th class="px-3 py-2 text-left whitespace-nowrap mono
+            {% if 'suspicious' in col or 'default' in col or 'missing' in col %}bg-yellow-50 text-yellow-800{% endif %}">
+            {{ col }}
+          </th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for row in preview_rows %}
+        <tr class="hover:bg-slate-50">
+          {% for col in preview_columns %}
+            {% set val = row.get(col, '') %}
+            <td class="px-3 py-2 whitespace-nowrap mono
+              {% if col == 'current_status' %}
+                font-semibold
+              {% elif col == 'used_default_score' and val == True %}bg-red-50 text-red-600
+              {% elif col == 'has_missing_features' and val == True %}bg-orange-50 text-orange-600
+              {% endif %}">
+              {{ val }}
+            </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if total_rows > preview_rows|length %}
+  <div class="mt-3 text-xs text-slate-500 text-center py-3 bg-slate-50 rounded-lg border border-dashed border-slate-300">
+    ... 还有 {{ total_rows - preview_rows|length }} 行未展示，点击下载 CSV 查看全部
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

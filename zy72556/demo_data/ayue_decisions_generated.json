@@ -1,0 +1,37 @@
+{
+  "rec_91f230fd96": {
+    "curve_ok": true,
+    "keep_suspicious": true,
+    "note": "训练曲线auc稳定，双特征流量切割问题，待复核"
+  },
+  "rec_bcb3cd5ba4": {
+    "curve_ok": true,
+    "keep_suspicious": true,
+    "note": "训练正常，缺失原因未明，不急于归正常"
+  },
+  "rec_d1ff32bb38": {
+    "curve_ok": false,
+    "exclude": true,
+    "note": "训练过拟合，样本质量差，排除"
+  },
+  "rec_4e5a6faced": {
+    "curve_ok": true,
+    "keep_suspicious": true,
+    "note": "双特征缺失，训练正常，待确认分布"
+  },
+  "rec_f61a8b5432": {
+    "curve_ok": true,
+    "keep_suspicious": true,
+    "note": "已知线上bug样本，bug已修复，待决定"
+  },
+  "rec_4882c41d89": {
+    "curve_ok": true,
+    "keep_suspicious": true,
+    "note": "三特征缺失给默认分，缺失过多，待评估"
+  },
+  "rec_a815fd69e1": {
+    "curve_ok": true,
+    "confirm_normal": true,
+    "note": "缺失在此类目常见，分布正常，可确认正常"
+  }
+}

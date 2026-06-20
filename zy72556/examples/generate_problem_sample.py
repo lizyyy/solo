@@ -1,8 +1,17 @@
 #!/usr/bin/env python3
-"""生成"出问题样例"特征快照，包含典型的线上特征缺失+默认分场景"""
+"""生成"出问题样例"特征快照，包含典型的线上特征缺失+默认分场景
+
+输出：在当前脚本所在目录生成 problem_sample_features.csv
+"""
+
+import os
+import sys
+from pathlib import Path
 
 import pandas as pd
 import numpy as np
+
+script_dir = Path(__file__).resolve().parent
 
 np.random.seed(20260615)
 N = 200
@@ -64,7 +73,7 @@ for row_idx, info in problem_rows.items():
     if not info.get("no_default"):
         df.at[row_idx, "model_score"] = 0.5
 
-csv_path = "/Users/lzy/pro/solo/workspaces/zy72556/examples/problem_sample_features.csv"
+csv_path = script_dir / "problem_sample_features.csv"
 df.to_csv(csv_path, index=False)
 
 print(f"✅ 出问题样例已生成: {csv_path}")

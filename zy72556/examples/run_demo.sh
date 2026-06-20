@@ -1,54 +1,60 @@
 #!/bin/bash
 set -e
 
-echo "========================================="
-echo "  类别不平衡重采样 - 完整流程演示"
-echo "========================================="
-
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 SESSION_ID="demo_$(date +%Y%m%d_%H%M%S)"
-echo "会话ID: $SESSION_ID"
+DATA_DIR="$PROJECT_ROOT/demo_data"
+SAMPLE_CSV="$SCRIPT_DIR/problem_sample_features.csv"
+DECISIONS_FILE="$DATA_DIR/ayue_decisions_generated.json"
+mkdir -p "$DATA_DIR"
+echo "Demo: $SESSION_ID"
 echo ""
-
+echo "步骤0: 准备问题样例"
+if [ ! -f "$SAMPLE_CSV" ]; then
+    python3 "$SCRIPT_DIR/generate_problem_sample.py"
+fi
+echo "样例: $SAMPLE_CSV"
+echo ""
 echo "步骤1: 导入特征快照"
+cd "$PROJECT_ROOT"
+python3 -m imbalance_resampler.cli --data-dir "$DATA_DIR" import-snapshot "$SAMPLE_CSV" --score-col model_score --label-col label --created-by ayue --session-id "$SESSION_ID"
+echo ""
+echo "步骤2: 阿越审查训练日志曲线"
 echo "-------------------------"
-resampler --data-dir ./work_data import-snapshot sample_features.csv \
-    --score-col model_score \
-    --label-col label \
-    --created-by ayue \
-    --session-id $SESSION_ID
+echo "生成阿越决策文件..."
+export DATA_DIR SESSION_ID DECISIONS_FILE
+python3 "$SCRIPT_DIR/gen_ayue_decisions.py"
 echo ""
-
-echo "查看会话概览"
-resampler --data-dir ./work_data show $SESSION_ID
+echo "执行阿越审查..."
+python3 -m imbalance_resampler.cli --data-dir "$DATA_DIR" review-logs "$SESSION_ID" --decisions-file "$DECISIONS_FILE" --reviewer ayue
 echo ""
-
-echo "步骤2: (模拟)阿越审查训练日志"
-echo "-------------------------"
-echo "注意: 实际使用时需要先查看可疑记录，人工决策后生成 ayue_decisions.json"
-echo ""
-
 echo "步骤3: 自动生成可解释摘要"
 echo "-------------------------"
-resampler --data-dir ./work_data update-summary $SESSION_ID --auto-generate
+python3 -m imbalance_resampler.cli --data-dir "$DATA_DIR" update-summary "$SESSION_ID" --auto-generate
 echo ""
-
-echo "应用重采样权重"
+echo "步骤4: 应用重采样权重"
 echo "-------------------------"
-resampler --data-dir ./work_data apply-weights $SESSION_ID --label-col label
+python3 -m imbalance_resampler.cli --data-dir "$DATA_DIR" apply-weights "$SESSION_ID" --label-col label
 echo ""
-
-echo "导出结果"
+echo "步骤5: 导出结果"
 echo "-------------------------"
-resampler --data-dir ./work_data export $SESSION_ID --output resample_result.csv
+EXPORT_FILE="$DATA_DIR/exports/resample_result_${SESSION_ID}.csv"
+python3 -m imbalance_resampler.cli --data-dir "$DATA_DIR" export "$SESSION_ID" --output "$EXPORT_FILE"
 echo ""
-
-echo "查看可疑记录详情"
+echo "步骤6: 查看会话概览"
 echo "-------------------------"
-resampler --data-dir ./work_data show $SESSION_ID --suspicious-only
+python3 -m imbalance_resampler.cli --data-dir "$DATA_DIR" show "$SESSION_ID"
 echo ""
-
 echo "========================================="
 echo "  演示完成！"
-echo "  数据目录: ./work_data"
-echo "  导出文件: resample_result.csv"
+echo "========================================="
+echo "  会话ID: $SESSION_ID"
+echo "  数据目录: $DATA_DIR"
+echo "  样例CSV: $SAMPLE_CSV"
+echo "  决策文件: $DECISIONS_FILE"
+echo "  导出文件: $EXPORT_FILE"
+echo ""
+echo "  启动Web服务查看页面:"
+echo "    python3 -m imbalance_resampler.cli --data-dir $DATA_DIR serve --port 5001"
 echo "========================================="
