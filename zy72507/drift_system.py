@@ -929,6 +929,135 @@ class ReportService:
         }
 
     @staticmethod
+    def get_import_breakdown(batch_id: Optional[int] = None) -> Dict:
+        conn = get_db()
+        if batch_id:
+            batches = conn.execute(
+                "SELECT * FROM import_batches WHERE id = ? ORDER BY import_time DESC",
+                (batch_id,)
+            ).fetchall()
+        else:
+            batches = conn.execute(
+                "SELECT * FROM import_batches ORDER BY import_time DESC LIMIT 10"
+            ).fetchall()
+
+        total_new = 0
+        total_history_dup = 0
+        total_current_dup = 0
+        total_file_dup = 0
+        batch_details = []
+
+        for b in batches:
+            b_dict = dict(b)
+            bid = b_dict["id"]
+            btype = b_dict.get("batch_type", "")
+
+            new_count = 0
+            history_dup_count = 0
+            current_dup_count = 0
+            file_dup_count = 0
+
+            if btype == "annotator":
+                file_hash = b_dict.get("import_hash")
+                if file_hash:
+                    hash_count = conn.execute(
+                        "SELECT COUNT(*) as cnt FROM import_batches WHERE import_hash = ? AND id < ?",
+                        (file_hash, bid)
+                    ).fetchone()["cnt"]
+                    if hash_count > 0:
+                        file_dup_count = b_dict.get("record_count", 0)
+
+                annotator_records = conn.execute(
+                    "SELECT comment_id, original_line_no FROM annotator_comments WHERE batch_id = ?",
+                    (bid,)
+                ).fetchall()
+
+                seen_keys = set()
+                for ar in annotator_records:
+                    key = "{}#{}".format(ar["comment_id"], ar["original_line_no"])
+                    if key in seen_keys:
+                        current_dup_count += 1
+                    seen_keys.add(key)
+
+                    history_exists = conn.execute(
+                        "SELECT COUNT(*) as cnt FROM annotator_comments ac "
+                        "WHERE ac.comment_id = ? AND ac.original_line_no = ? AND ac.batch_id < ?",
+                        (ar["comment_id"], ar["original_line_no"], bid)
+                    ).fetchone()["cnt"]
+
+                    if history_exists > 0:
+                        history_dup_count += 1
+                    else:
+                        drift_exists = conn.execute(
+                            "SELECT COUNT(*) as cnt FROM sentiment_drift_records sdr "
+                            "WHERE sdr.comment_id = ? AND "
+                            "(SELECT MIN(batch_id) FROM annotator_comments WHERE comment_id = sdr.comment_id) = ?",
+                            (ar["comment_id"], bid)
+                        ).fetchone()["cnt"]
+                        if drift_exists > 0:
+                            new_count += 1
+
+            batch_details.append({
+                **b_dict,
+                "new_count": new_count,
+                "history_dup_count": history_dup_count,
+                "current_dup_count": current_dup_count,
+                "file_dup_count": file_dup_count,
+                "batch_type_label": "标注员留言" if btype == "annotator" else "模型输出" if btype == "model" else btype,
+            })
+
+            total_new += new_count
+            total_history_dup += history_dup_count
+            total_current_dup += current_dup_count
+            total_file_dup += file_dup_count
+
+        conn.close()
+
+        return {
+            "total_new": total_new,
+            "total_history_dup": total_history_dup,
+            "total_current_dup": total_current_dup,
+            "total_file_dup": total_file_dup,
+            "batch_details": batch_details,
+            "generated_at": datetime.now().isoformat(),
+        }
+
+    @staticmethod
+    def get_report_summary_text(report: Dict) -> str:
+        s = report["summary"]
+        lines = [
+            "=== 门店评论情绪漂移 - 评测报告 ===",
+            "生成时间：{}".format(report["generated_at_label"]),
+            "",
+            "【核心指标】",
+            "  - 总评论数：{}".format(s["total_records"]),
+            "  - 情绪漂移数：{} ({}%)".format(s["drift_count"], s["drift_rate"]),
+            "  - 已人工改判：{}".format(s["manual_adjusted_count"]),
+            "  - 待安全审核(被批跑覆盖)：{}".format(s["overridden_pending_count"]),
+            "  - 已安全复核：{}".format(s["reviewed_count"]),
+            "",
+            "【状态分布】",
+        ]
+        for code, info in report["status_distribution"].items():
+            lines.append("  - {}：{}".format(info["label"], info["count"]))
+        return "\n".join(lines)
+
+
+if __name__ == "__main__":
+    init_db()
+    print("数据库初始化完成")
+            total_file_dup += 1 if d.get("same_file_duplicate") else 0
+
+        return {
+            "by_batch": by_batch,
+            "total_new": total_new,
+            "total_history_dup": total_history_dup,
+            "total_current_dup": total_current_dup,
+            "total_file_dup": total_file_dup,
+            "generated_at": datetime.now().isoformat(),
+        }
+
+    @staticmethod
     def get_report_summary_text(report: Dict) -> str:
         s = report["summary"]
         lines = [
