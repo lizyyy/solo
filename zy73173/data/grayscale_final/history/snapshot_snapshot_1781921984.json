@@ -1,0 +1,175 @@
+{
+  "snapshot_name": "snapshot_1781921984",
+  "created_at": "2026-06-20T10:19:44.962816",
+  "timeline": {
+    "events": [
+      {
+        "event_id": "evt_1_1781921984",
+        "event_type": "data_import",
+        "description": "导入数据文件: old_material.json",
+        "timestamp": "2026-06-20T10:19:44.893417",
+        "details": {
+          "file": "data/old_material.json",
+          "record_count": 10
+        },
+        "related_note_ids": [],
+        "operator": "user"
+      },
+      {
+        "event_id": "evt_2_1781921984",
+        "event_type": "note_add",
+        "description": "导入 1 条口头备注",
+        "timestamp": "2026-06-20T10:19:44.893479",
+        "details": {
+          "count": 1,
+          "notes": [
+            "[老叶] 初版数据，仅供参考"
+          ]
+        },
+        "related_note_ids": [
+          "old_note_001"
+        ],
+        "operator": "user"
+      },
+      {
+        "event_id": "evt_3_1781921984",
+        "event_type": "param_version_change",
+        "description": "导入 1 个参数表版本",
+        "timestamp": "2026-06-20T10:19:44.893486",
+        "details": {
+          "count": 1
+        },
+        "related_note_ids": [],
+        "operator": "user"
+      },
+      {
+        "event_id": "evt_4_1781921984",
+        "event_type": "calculation_run",
+        "description": "计算最短路径: A -> D",
+        "timestamp": "2026-06-20T10:19:44.893564",
+        "details": {
+          "source": "A",
+          "target": "D",
+          "result_summary": "路径: A -> C -> D, 距离: 8.0 千米",
+          "result": {
+            "source": "A",
+            "target": "D",
+            "path": [
+              "A",
+              "C",
+              "D"
+            ],
+            "distance": 8.0,
+            "unit": "千米",
+            "node_count": 4,
+            "edge_count": 4,
+            "is_valid": true,
+            "has_missing_unit": false,
+            "missing_unit_edges": [],
+            "intermediate_nodes": [
+              "C"
+            ]
+          },
+          "parse_stats": {
+            "total_rows": 10,
+            "processed": 8,
+            "bad_rows": 0,
+            "skipped": 0,
+            "missing_unit": 0,
+            "recalled": 0
+          }
+        },
+        "related_note_ids": [],
+        "operator": "user"
+      },
+      {
+        "event_id": "evt_5_1781921984",
+        "event_type": "service_restart",
+        "description": "服务重启，已恢复历史状态",
+        "timestamp": "2026-06-20T10:19:44.928306",
+        "details": {
+          "recovered_from": "latest_state"
+        },
+        "related_note_ids": [],
+        "operator": "system"
+      },
+      {
+        "event_id": "evt_6_1781921984",
+        "event_type": "recall_add",
+        "description": "添加撤回记录: recall_1781921984",
+        "timestamp": "2026-06-20T10:19:44.928364",
+        "details": {
+          "original_row_id": "old_edge_003",
+          "reason": "A-C直连段施工关闭"
+        },
+        "related_note_ids": [],
+        "operator": "老叶"
+      },
+      {
+        "event_id": "evt_7_1781921984",
+        "event_type": "service_restart",
+        "description": "服务重启，已恢复历史状态",
+        "timestamp": "2026-06-20T10:19:44.962120",
+        "details": {
+          "recovered_from": "latest_state"
+        },
+        "related_note_ids": [],
+        "operator": "system"
+      },
+      {
+        "event_id": "evt_8_1781921984",
+        "event_type": "data_import",
+        "description": "导入数据文件: old_material.json",
+        "timestamp": "2026-06-20T10:19:44.962170",
+        "details": {
+          "file": "data/old_material.json",
+          "record_count": 10
+        },
+        "related_note_ids": [],
+        "operator": "user"
+      },
+      {
+        "event_id": "evt_9_1781921984",
+        "event_type": "calculation_run",
+        "description": "计算最短路径: A -> D",
+        "timestamp": "2026-06-20T10:19:44.962269",
+        "details": {
+          "source": "A",
+          "target": "D",
+          "result_summary": "路径: A -> B -> C -> D, 距离: 9.0 千米",
+          "result": {
+            "source": "A",
+            "target": "D",
+            "path": [
+              "A",
+              "B",
+              "C",
+              "D"
+            ],
+            "distance": 9.0,
+            "unit": "千米",
+            "node_count": 4,
+            "edge_count": 4,
+            "is_valid": true,
+            "has_missing_unit": false,
+            "missing_unit_edges": [],
+            "intermediate_nodes": [
+              "B",
+              "C"
+            ]
+          },
+          "parse_stats": {
+            "total_rows": 10,
+            "processed": 8,
+            "bad_rows": 0,
+            "skipped": 0,
+            "missing_unit": 0,
+            "recalled": 0
+          }
+        },
+        "related_note_ids": [],
+        "operator": "user"
+      }
+    ]
+  }
+}

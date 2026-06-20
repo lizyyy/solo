@@ -1,0 +1,444 @@
+{
+  "result": {
+    "source": "A",
+    "target": "E",
+    "path": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "distance": 10.0,
+    "unit": "千米",
+    "node_count": 5,
+    "edge_count": 5,
+    "is_valid": true,
+    "has_missing_unit": false,
+    "missing_unit_edges": [],
+    "intermediate_nodes": [
+      "B",
+      "C",
+      "D"
+    ]
+  },
+  "parse_result": {
+    "total_rows": 21,
+    "processed_count": 12,
+    "bad_row_count": 2,
+    "skipped_count": 1,
+    "missing_unit_count": 2,
+    "recalled_count": 1,
+    "old_param_count": 1,
+    "verbal_note_count": 2,
+    "graph_data": {
+      "nodes": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "edges": [
+        {
+          "source": "A",
+          "target": "B",
+          "weight": 4.0,
+          "unit": "千米",
+          "row_id": "edge_001"
+        },
+        {
+          "source": "B",
+          "target": "C",
+          "weight": 2.0,
+          "unit": "千米",
+          "row_id": "edge_002"
+        },
+        {
+          "source": "A",
+          "target": "C",
+          "weight": 5.0,
+          "unit": "千米",
+          "row_id": "edge_003"
+        },
+        {
+          "source": "C",
+          "target": "D",
+          "weight": 3.0,
+          "unit": "千米",
+          "row_id": "edge_004"
+        },
+        {
+          "source": "B",
+          "target": "D",
+          "weight": 6.0,
+          "unit": "千米",
+          "row_id": "edge_005"
+        },
+        {
+          "source": "D",
+          "target": "E",
+          "weight": 1.0,
+          "unit": "千米",
+          "row_id": "edge_006"
+        }
+      ]
+    },
+    "recall_records": [
+      {
+        "id": "recall_001",
+        "type": "recall",
+        "original_id": "edge_003",
+        "reason": "该路段施工，临时关闭",
+        "author": "老叶",
+        "note": "需要在复算时排除A-C直连"
+      }
+    ],
+    "verbal_notes": [
+      {
+        "id": "note_001",
+        "type": "note",
+        "content": "老叶说：这批数据是上周采的，注意A-C段可能不准",
+        "author": "老叶",
+        "related_record_id": "edge_003"
+      },
+      {
+        "id": "note_002",
+        "type": "note",
+        "content": "灰度发布前再确认一下单位问题",
+        "author": "接手同事"
+      }
+    ],
+    "param_versions": [
+      {
+        "type": "param_version",
+        "version": "v1.0",
+        "description": "初始参数表",
+        "params": {
+          "alpha": 0.5,
+          "beta": 1.2
+        },
+        "is_active": false
+      },
+      {
+        "type": "param_version",
+        "version": "v1.1",
+        "description": "灰度发布参数",
+        "params": {
+          "alpha": 0.6,
+          "beta": 1.5
+        },
+        "is_active": true
+      }
+    ],
+    "rows": [
+      {
+        "row_index": 0,
+        "row_id": "row_0",
+        "status": "old_param_version",
+        "data": {
+          "type": "param_version",
+          "version": "v1.0",
+          "description": "初始参数表",
+          "params": {
+            "alpha": 0.5,
+            "beta": 1.2
+          },
+          "is_active": false
+        },
+        "reason": "旧版参数表，不影响当前计算",
+        "source_type": "param"
+      },
+      {
+        "row_index": 1,
+        "row_id": "row_1",
+        "status": "processed",
+        "data": {
+          "type": "param_version",
+          "version": "v1.1",
+          "description": "灰度发布参数",
+          "params": {
+            "alpha": 0.6,
+            "beta": 1.5
+          },
+          "is_active": true
+        },
+        "reason": "当前激活参数版本",
+        "source_type": "param"
+      },
+      {
+        "row_index": 2,
+        "row_id": "node_A",
+        "status": "processed",
+        "data": {
+          "id": "node_A",
+          "type": "node",
+          "name": "A"
+        },
+        "reason": null,
+        "source_type": "node"
+      },
+      {
+        "row_index": 3,
+        "row_id": "node_B",
+        "status": "processed",
+        "data": {
+          "id": "node_B",
+          "type": "node",
+          "name": "B"
+        },
+        "reason": null,
+        "source_type": "node"
+      },
+      {
+        "row_index": 4,
+        "row_id": "node_C",
+        "status": "processed",
+        "data": {
+          "id": "node_C",
+          "type": "node",
+          "name": "C"
+        },
+        "reason": null,
+        "source_type": "node"
+      },
+      {
+        "row_index": 5,
+        "row_id": "node_D",
+        "status": "processed",
+        "data": {
+          "id": "node_D",
+          "type": "node",
+          "name": "D"
+        },
+        "reason": null,
+        "source_type": "node"
+      },
+      {
+        "row_index": 6,
+        "row_id": "node_E",
+        "status": "processed",
+        "data": {
+          "id": "node_E",
+          "type": "node",
+          "name": "E"
+        },
+        "reason": null,
+        "source_type": "node"
+      },
+      {
+        "row_index": 7,
+        "row_id": "edge_001",
+        "status": "processed",
+        "data": {
+          "id": "edge_001",
+          "type": "edge",
+          "source": "A",
+          "target": "B",
+          "weight": 4,
+          "unit": "千米"
+        },
+        "reason": null,
+        "source_type": "edge"
+      },
+      {
+        "row_index": 8,
+        "row_id": "edge_002",
+        "status": "processed",
+        "data": {
+          "id": "edge_002",
+          "type": "edge",
+          "source": "B",
+          "target": "C",
+          "weight": 2,
+          "unit": "千米"
+        },
+        "reason": null,
+        "source_type": "edge"
+      },
+      {
+        "row_index": 9,
+        "row_id": "edge_003",
+        "status": "processed",
+        "data": {
+          "id": "edge_003",
+          "type": "edge",
+          "source": "A",
+          "target": "C",
+          "weight": 5,
+          "unit": "千米"
+        },
+        "reason": null,
+        "source_type": "edge"
+      },
+      {
+        "row_index": 10,
+        "row_id": "edge_004",
+        "status": "processed",
+        "data": {
+          "id": "edge_004",
+          "type": "edge",
+          "source": "C",
+          "target": "D",
+          "weight": 3,
+          "unit": "千米"
+        },
+        "reason": null,
+        "source_type": "edge"
+      },
+      {
+        "row_index": 11,
+        "row_id": "edge_005",
+        "status": "processed",
+        "data": {
+          "id": "edge_005",
+          "type": "edge",
+          "source": "B",
+          "target": "D",
+          "weight": 6,
+          "unit": "千米"
+        },
+        "reason": null,
+        "source_type": "edge"
+      },
+      {
+        "row_index": 12,
+        "row_id": "edge_006",
+        "status": "processed",
+        "data": {
+          "id": "edge_006",
+          "type": "edge",
+          "source": "D",
+          "target": "E",
+          "weight": 1,
+          "unit": "千米"
+        },
+        "reason": null,
+        "source_type": "edge"
+      },
+      {
+        "row_index": 13,
+        "row_id": "edge_007",
+        "status": "missing_unit",
+        "data": {
+          "id": "edge_007",
+          "type": "edge",
+          "source": "A",
+          "target": "E",
+          "weight": 10
+        },
+        "reason": "单位缺失，单独拎出不参与正常统计",
+        "source_type": "edge"
+      },
+      {
+        "row_index": 14,
+        "row_id": "edge_008",
+        "status": "missing_unit",
+        "data": {
+          "id": "edge_008",
+          "type": "edge",
+          "source": "B",
+          "target": "E",
+          "weight": 7
+        },
+        "reason": "单位缺失，单独拎出不参与正常统计",
+        "source_type": "edge"
+      },
+      {
+        "row_index": 15,
+        "row_id": "edge_bad_001",
+        "status": "bad_row",
+        "data": {
+          "id": "edge_bad_001",
+          "type": "edge",
+          "source": "",
+          "target": "F",
+          "weight": 5,
+          "unit": "千米"
+        },
+        "reason": "行格式不正确，缺少必要字段",
+        "source_type": "edge"
+      },
+      {
+        "row_index": 16,
+        "row_id": "edge_bad_002",
+        "status": "bad_row",
+        "data": {
+          "id": "edge_bad_002",
+          "type": "edge",
+          "weight": 3,
+          "unit": "千米"
+        },
+        "reason": "行格式不正确，缺少必要字段",
+        "source_type": "edge"
+      },
+      {
+        "row_index": 17,
+        "row_id": "recall_001",
+        "status": "recalled",
+        "data": {
+          "id": "recall_001",
+          "type": "recall",
+          "original_id": "edge_003",
+          "reason": "该路段施工，临时关闭",
+          "author": "老叶",
+          "note": "需要在复算时排除A-C直连"
+        },
+        "reason": "撤回记录：该路段施工，临时关闭",
+        "source_type": "recall"
+      },
+      {
+        "row_index": 18,
+        "row_id": "note_001",
+        "status": "verbal_note",
+        "data": {
+          "id": "note_001",
+          "type": "note",
+          "content": "老叶说：这批数据是上周采的，注意A-C段可能不准",
+          "author": "老叶",
+          "related_record_id": "edge_003"
+        },
+        "reason": "口头备注，不参与计算",
+        "source_type": "note"
+      },
+      {
+        "row_index": 19,
+        "row_id": "note_002",
+        "status": "verbal_note",
+        "data": {
+          "id": "note_002",
+          "type": "note",
+          "content": "灰度发布前再确认一下单位问题",
+          "author": "接手同事"
+        },
+        "reason": "口头备注，不参与计算",
+        "source_type": "note"
+      },
+      {
+        "row_index": 20,
+        "row_id": "unknown_001",
+        "status": "skipped",
+        "data": {
+          "id": "unknown_001",
+          "type": "weird_type",
+          "foo": "bar"
+        },
+        "reason": "未知记录类型: weird_type",
+        "source_type": "weird_type"
+      }
+    ]
+  },
+  "validation": {
+    "is_valid": true,
+    "issues": [],
+    "warnings": [
+      "recall_applied"
+    ],
+    "details": {
+      "warning_details": {
+        "recall_applied": "已应用 1 条撤回记录，对应边已排除"
+      },
+      "recall_applied_count": 1
+    }
+  }
+}

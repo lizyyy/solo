@@ -1,0 +1,15 @@
+[
+  {"type": "param_version", "version": "v0.9", "description": "旧版参数（已废弃）", "params": {"alpha": 0.3, "beta": 1.0}, "is_active": false},
+
+  {"id": "old_node_A", "type": "node", "name": "A"},
+  {"id": "old_node_B", "type": "node", "name": "B"},
+  {"id": "old_node_C", "type": "node", "name": "C"},
+  {"id": "old_node_D", "type": "node", "name": "D"},
+
+  {"id": "old_edge_001", "type": "edge", "source": "A", "target": "B", "weight": 4, "unit": "千米"},
+  {"id": "old_edge_002", "type": "edge", "source": "B", "target": "C", "weight": 2, "unit": "千米"},
+  {"id": "old_edge_003", "type": "edge", "source": "A", "target": "C", "weight": 5, "unit": "千米"},
+  {"id": "old_edge_004", "type": "edge", "source": "C", "target": "D", "weight": 3, "unit": "千米"},
+
+  {"id": "old_note_001", "type": "note", "content": "初版数据，仅供参考", "author": "老叶"}
+]

@@ -1,0 +1,30 @@
+[
+  {"type": "param_version", "version": "v1.0", "description": "初始参数表", "params": {"alpha": 0.5, "beta": 1.2}, "is_active": false},
+  {"type": "param_version", "version": "v1.1", "description": "灰度发布参数", "params": {"alpha": 0.6, "beta": 1.5}, "is_active": true},
+
+  {"id": "node_A", "type": "node", "name": "A"},
+  {"id": "node_B", "type": "node", "name": "B"},
+  {"id": "node_C", "type": "node", "name": "C"},
+  {"id": "node_D", "type": "node", "name": "D"},
+  {"id": "node_E", "type": "node", "name": "E"},
+
+  {"id": "edge_001", "type": "edge", "source": "A", "target": "B", "weight": 4, "unit": "千米"},
+  {"id": "edge_002", "type": "edge", "source": "B", "target": "C", "weight": 2, "unit": "千米"},
+  {"id": "edge_003", "type": "edge", "source": "A", "target": "C", "weight": 5, "unit": "千米"},
+  {"id": "edge_004", "type": "edge", "source": "C", "target": "D", "weight": 3, "unit": "千米"},
+  {"id": "edge_005", "type": "edge", "source": "B", "target": "D", "weight": 6, "unit": "千米"},
+  {"id": "edge_006", "type": "edge", "source": "D", "target": "E", "weight": 1, "unit": "千米"},
+
+  {"id": "edge_007", "type": "edge", "source": "A", "target": "E", "weight": 10},
+  {"id": "edge_008", "type": "edge", "source": "B", "target": "E", "weight": 7},
+
+  {"id": "edge_bad_001", "type": "edge", "source": "", "target": "F", "weight": 5, "unit": "千米"},
+  {"id": "edge_bad_002", "type": "edge", "weight": 3, "unit": "千米"},
+
+  {"id": "recall_001", "type": "recall", "original_id": "edge_003", "reason": "该路段施工，临时关闭", "author": "老叶", "note": "需要在复算时排除A-C直连"},
+
+  {"id": "note_001", "type": "note", "content": "老叶说：这批数据是上周采的，注意A-C段可能不准", "author": "老叶", "related_record_id": "edge_003"},
+  {"id": "note_002", "type": "note", "content": "灰度发布前再确认一下单位问题", "author": "接手同事"},
+
+  {"id": "unknown_001", "type": "weird_type", "foo": "bar"}
+]

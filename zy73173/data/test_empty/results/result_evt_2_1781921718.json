@@ -1,0 +1,46 @@
+{
+  "result": {
+    "source": "A",
+    "target": "B",
+    "path": [],
+    "distance": 0,
+    "unit": "",
+    "node_count": 0,
+    "edge_count": 0,
+    "is_valid": false,
+    "has_missing_unit": false,
+    "missing_unit_edges": [],
+    "intermediate_nodes": []
+  },
+  "parse_result": {
+    "total_rows": 0,
+    "processed_count": 0,
+    "bad_row_count": 0,
+    "skipped_count": 0,
+    "missing_unit_count": 0,
+    "recalled_count": 0,
+    "old_param_count": 0,
+    "verbal_note_count": 0,
+    "graph_data": {
+      "nodes": [],
+      "edges": []
+    },
+    "recall_records": [],
+    "verbal_notes": [],
+    "param_versions": [],
+    "rows": []
+  },
+  "validation": {
+    "is_valid": false,
+    "issues": [
+      "empty_collection",
+      "empty_collection"
+    ],
+    "warnings": [],
+    "details": {
+      "issue_details": {
+        "empty_collection": "边集合为空，图中没有连接关系"
+      }
+    }
+  }
+}

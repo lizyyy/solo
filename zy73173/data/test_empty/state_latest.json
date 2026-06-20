@@ -1,0 +1,58 @@
+{
+  "saved_at": "2026-06-20T10:15:18.697178",
+  "timeline": {
+    "events": [
+      {
+        "event_id": "evt_1_1781921718",
+        "event_type": "data_import",
+        "description": "导入数据文件: empty_data.json",
+        "timestamp": "2026-06-20T10:15:18.696955",
+        "details": {
+          "file": "data/empty_data.json",
+          "record_count": 0
+        },
+        "related_note_ids": [],
+        "operator": "user"
+      },
+      {
+        "event_id": "evt_2_1781921718",
+        "event_type": "calculation_run",
+        "description": "计算最短路径: A -> B",
+        "timestamp": "2026-06-20T10:15:18.697024",
+        "details": {
+          "source": "A",
+          "target": "B",
+          "result_summary": "路径: 无路径, 距离: 0 ",
+          "result": {
+            "source": "A",
+            "target": "B",
+            "path": [],
+            "distance": 0,
+            "unit": "",
+            "node_count": 0,
+            "edge_count": 0,
+            "is_valid": false,
+            "has_missing_unit": false,
+            "missing_unit_edges": [],
+            "intermediate_nodes": []
+          },
+          "parse_stats": {
+            "total_rows": 0,
+            "processed": 0,
+            "bad_rows": 0,
+            "skipped": 0,
+            "missing_unit": 0,
+            "recalled": 0
+          }
+        },
+        "related_note_ids": [],
+        "operator": "user"
+      }
+    ]
+  },
+  "param_table": {
+    "versions": []
+  },
+  "recall_records": [],
+  "verbal_notes": []
+}

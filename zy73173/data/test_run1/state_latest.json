@@ -1,0 +1,152 @@
+{
+  "saved_at": "2026-06-20T10:16:16.155301",
+  "timeline": {
+    "events": [
+      {
+        "event_id": "evt_1_1781921776",
+        "event_type": "data_import",
+        "description": "导入数据文件: sample_data.json",
+        "timestamp": "2026-06-20T10:16:16.154761",
+        "details": {
+          "file": "data/sample_data.json",
+          "record_count": 21
+        },
+        "related_note_ids": [],
+        "operator": "user"
+      },
+      {
+        "event_id": "evt_2_1781921776",
+        "event_type": "recall_add",
+        "description": "导入 1 条撤回记录",
+        "timestamp": "2026-06-20T10:16:16.154838",
+        "details": {
+          "count": 1
+        },
+        "related_note_ids": [],
+        "operator": "user"
+      },
+      {
+        "event_id": "evt_3_1781921776",
+        "event_type": "note_add",
+        "description": "导入 2 条口头备注",
+        "timestamp": "2026-06-20T10:16:16.154847",
+        "details": {
+          "count": 2,
+          "notes": [
+            "[老叶] 老叶说：这批数据是上周采的，注意A-C段可能不准",
+            "[接手同事] 灰度发布前再确认一下单位问题"
+          ]
+        },
+        "related_note_ids": [
+          "note_001",
+          "note_002"
+        ],
+        "operator": "user"
+      },
+      {
+        "event_id": "evt_4_1781921776",
+        "event_type": "param_version_change",
+        "description": "导入 2 个参数表版本",
+        "timestamp": "2026-06-20T10:16:16.154854",
+        "details": {
+          "count": 2
+        },
+        "related_note_ids": [],
+        "operator": "user"
+      },
+      {
+        "event_id": "evt_5_1781921776",
+        "event_type": "calculation_run",
+        "description": "计算最短路径: A -> D",
+        "timestamp": "2026-06-20T10:16:16.154945",
+        "details": {
+          "source": "A",
+          "target": "D",
+          "result_summary": "路径: A -> C -> D, 距离: 8.0 千米",
+          "result": {
+            "source": "A",
+            "target": "D",
+            "path": [
+              "A",
+              "C",
+              "D"
+            ],
+            "distance": 8.0,
+            "unit": "千米",
+            "node_count": 5,
+            "edge_count": 5,
+            "is_valid": true,
+            "has_missing_unit": false,
+            "missing_unit_edges": [],
+            "intermediate_nodes": [
+              "C"
+            ]
+          },
+          "parse_stats": {
+            "total_rows": 21,
+            "processed": 12,
+            "bad_rows": 2,
+            "skipped": 1,
+            "missing_unit": 2,
+            "recalled": 1
+          }
+        },
+        "related_note_ids": [],
+        "operator": "user"
+      }
+    ]
+  },
+  "param_table": {
+    "versions": [
+      {
+        "version": "v1.1",
+        "description": "灰度发布参数",
+        "params": {
+          "alpha": 0.6,
+          "beta": 1.5
+        },
+        "created_at": "2026-06-20T10:16:16.154851",
+        "is_active": true
+      },
+      {
+        "version": "v1.0",
+        "description": "初始参数表",
+        "params": {
+          "alpha": 0.5,
+          "beta": 1.2
+        },
+        "created_at": "2026-06-20T10:16:16.154849",
+        "is_active": false
+      }
+    ]
+  },
+  "recall_records": [
+    {
+      "record_id": "recall_001",
+      "original_row_id": "edge_003",
+      "reason": "该路段施工，临时关闭",
+      "recalled_by": "老叶",
+      "recalled_at": "2026-06-20T10:16:16.154834",
+      "is_effective": true,
+      "note": "需要在复算时排除A-C直连"
+    }
+  ],
+  "verbal_notes": [
+    {
+      "note_id": "note_001",
+      "content": "老叶说：这批数据是上周采的，注意A-C段可能不准",
+      "author": "老叶",
+      "created_at": "2026-06-20T10:16:16.154842",
+      "related_record_id": "edge_003",
+      "related_event": null
+    },
+    {
+      "note_id": "note_002",
+      "content": "灰度发布前再确认一下单位问题",
+      "author": "接手同事",
+      "created_at": "2026-06-20T10:16:16.154844",
+      "related_record_id": null,
+      "related_event": null
+    }
+  ]
+}
