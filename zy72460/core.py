@@ -9,12 +9,16 @@ from models import (
     ConflictItem,
     ImportDetail,
     AuditEntry,
+    ImportBatch,
+    CrackRecord,
     RecordSource,
     ConflictResolution,
     GeoPoint,
     ImportStatus,
     AuditActionType,
 )
+from persistence import save_session
+from database import save_session_to_db, SessionLocal
 
 
 def _add_audit(
@@ -51,6 +55,18 @@ def create_session(session_id: Optional[str] = None) -> ReviewSession:
     )
 
 
+def _sync_to_storage(session):
+    try:
+        save_session(session)
+        db = SessionLocal()
+        try:
+            save_session_to_db(db, session)
+        finally:
+            db.close()
+    except Exception:
+        pass
+
+
 def import_inspection_points(
     session: ReviewSession,
     points_data: List[Dict],
@@ -84,11 +100,13 @@ def import_records(
     source: RecordSource,
     is_supplementary: bool = False,
     actor: str = "系统",
-) -> Tuple[ReviewSession, int, List[str], List[ImportDetail]]:
+) -> Tuple[ReviewSession, int, List[str], List[ImportDetail], ImportBatch]:
     imported = 0
     skipped_duplicates = []
     import_details = []
     new_record_ids = []
+
+    batch_id = f"BATCH-{str(uuid.uuid4())[:6]}"
 
     for rd in records_data:
         record_id = rd.get("record_id", str(uuid.uuid4())[:8])
@@ -126,6 +144,7 @@ def import_records(
             ramp_note=rd.get("ramp_note"),
             remarks=rd.get("remarks"),
             is_supplementary=is_supplementary,
+            import_batch_id=batch_id,
         )
         session.records.append(record)
         imported += 1
@@ -139,26 +158,138 @@ def import_records(
             )
         )
 
-    if imported > 0:
-        action = AuditActionType.SUPPLEMENTARY_REVIEW if is_supplementary else AuditActionType.IMPORT
-        desc = f"导入{source.value}记录 {imported} 条"
-        if skipped_duplicates:
-            desc += f"，复用已有 {len(skipped_duplicates)} 条"
-        _add_audit(
-            session,
-            action,
-            actor,
-            desc,
-            after_state={
-                "source": source.value,
-                "new_count": imported,
-                "reused_count": len(skipped_duplicates),
-                "new_record_ids": new_record_ids,
-            },
-            related_record_ids=new_record_ids,
+    batch = ImportBatch(
+        batch_id=batch_id,
+        session_id=session.session_id,
+        source=source,
+        imported_by=actor,
+        import_time=datetime.now(),
+        is_supplementary=is_supplementary,
+        details=import_details,
+        new_count=imported,
+        reused_count=len(skipped_duplicates),
+    )
+    session.import_batches.append(batch)
+
+    action = AuditActionType.SUPPLEMENTARY_REVIEW if is_supplementary else AuditActionType.IMPORT
+    desc = f"导入{source.value}记录 {imported} 条"
+    if skipped_duplicates:
+        desc += f"，复用已有 {len(skipped_duplicates)} 条"
+
+    _add_audit(
+        session,
+        action,
+        actor,
+        desc,
+        after_state={
+            "source": source.value,
+            "batch_id": batch_id,
+            "new_count": imported,
+            "reused_count": len(skipped_duplicates),
+            "new_record_ids": new_record_ids,
+            "reused_point_ids": skipped_duplicates,
+            "details": [d.to_dict() for d in import_details],
+        },
+        related_record_ids=new_record_ids,
+    )
+
+    _sync_to_storage(session)
+    return session, imported, skipped_duplicates, import_details, batch
+
+
+def import_crack_records(
+    session: ReviewSession,
+    records_data: List[Dict],
+    actor: str = "系统",
+) -> Tuple[ReviewSession, int, ImportBatch]:
+    imported = 0
+    batch_id = f"BATCH-CRACK-{str(uuid.uuid4())[:6]}"
+    details = []
+    crack_ids = []
+
+    for rd in records_data:
+        crack_id = rd.get("crack_id", str(uuid.uuid4())[:8])
+        point_id = rd["point_id"]
+
+        existing = [
+            c
+            for c in session.crack_records
+            if c.point_id == point_id
+            and c.inspect_time == datetime.fromisoformat(rd["inspect_time"])
+        ]
+        if existing:
+            details.append(
+                ImportDetail(
+                    record_id=crack_id,
+                    point_id=point_id,
+                    status=ImportStatus.REUSED,
+                    existing_record_id=existing[0].crack_id,
+                    source_value_preview=f"裂缝={existing[0].has_crack}",
+                )
+            )
+            continue
+
+        crack = CrackRecord(
+            crack_id=crack_id,
+            point_id=point_id,
+            inspector=rd["inspector"],
+            inspect_time=datetime.fromisoformat(rd["inspect_time"]),
+            has_crack=rd["has_crack"],
+            crack_description=rd.get("crack_description"),
+            crack_width_mm=rd.get("crack_width_mm"),
+            missing_3d_coords=rd.get("missing_3d_coords", False),
+            x_coord=rd.get("x_coord"),
+            y_coord=rd.get("y_coord"),
+            z_coord=rd.get("z_coord"),
+            remarks=rd.get("remarks"),
+            import_batch_id=batch_id,
+        )
+        session.crack_records.append(crack)
+        imported += 1
+        crack_ids.append(crack_id)
+        details.append(
+            ImportDetail(
+                record_id=crack_id,
+                point_id=point_id,
+                status=ImportStatus.NEW,
+                source_value_preview=f"裂缝={crack.has_crack}, 缺三维={crack.missing_3d_coords}",
+            )
         )
 
-    return session, imported, skipped_duplicates, import_details
+    batch = ImportBatch(
+        batch_id=batch_id,
+        session_id=session.session_id,
+        source=RecordSource.CRACK_SUPPLEMENTARY,
+        imported_by=actor,
+        import_time=datetime.now(),
+        is_supplementary=True,
+        details=details,
+        new_count=imported,
+        reused_count=len(records_data) - imported,
+    )
+    session.import_batches.append(batch)
+
+    desc = f"导入裂缝补录记录 {imported} 条"
+    if len(records_data) - imported > 0:
+        desc += f"，复用已有 {len(records_data) - imported} 条"
+
+    _add_audit(
+        session,
+        AuditActionType.CRACK_RECORD,
+        actor,
+        desc,
+        after_state={
+            "batch_id": batch_id,
+            "new_count": imported,
+            "reused_count": len(records_data) - imported,
+            "new_crack_ids": crack_ids,
+            "details": [d.to_dict() for d in details],
+        },
+        related_record_ids=crack_ids,
+    )
+
+    _sync_to_storage(session)
+    return session, imported, batch
 
 
 def detect_conflicts(
@@ -228,6 +359,7 @@ def detect_conflicts(
             related_conflict_ids=conflict_ids,
         )
 
+    _sync_to_storage(session)
     return session, new_conflicts
 
 
@@ -281,6 +413,7 @@ def resolve_conflict(
                 related_conflict_ids=[conflict_id],
             )
 
+            _sync_to_storage(session)
             return session, conflict
     return session, None
 

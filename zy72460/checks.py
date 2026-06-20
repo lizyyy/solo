@@ -13,6 +13,7 @@ from models import (
     AuditActionType,
 )
 from persistence import write_map_export_file, save_session
+from database import save_session_to_db, SessionLocal
 
 
 def run_all_checks(session: ReviewSession) -> Tuple[ReviewSession, List[SelfCheckResult]]:
@@ -273,5 +274,11 @@ def generate_map_export(
     )
 
     save_session(session)
+
+    db = SessionLocal()
+    try:
+        save_session_to_db(db, session)
+    finally:
+        db.close()
 
     return session, export

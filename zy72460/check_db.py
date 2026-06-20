@@ -1,0 +1,10 @@
+import sqlite3
+c = sqlite3.connect('data/rain_garden.db')
+cu = c.cursor()
+cu.execute('SELECT batch_id, new_count, reused_count FROM import_batches ORDER BY id')
+for r in cu.fetchall(): print('  %s: 新增=%d, 复用=%d' % (r[0], r[1], r[2]))
+print('裂缝记录:', cu.execute('SELECT COUNT(*) FROM crack_records').fetchone()[0])
+print('导出记录:', cu.execute('SELECT COUNT(*) FROM map_exports').fetchone()[0])
+cu.execute('SELECT export_id, file_path FROM map_exports')
+for r in cu.fetchall(): print('  %s: %s' % (r[0], r[1][:70]))
+c.close()

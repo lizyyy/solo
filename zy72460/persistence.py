@@ -64,6 +64,12 @@ def write_map_export_file(
     os.makedirs(session_export_dir, exist_ok=True)
 
     json_path = os.path.join(session_export_dir, f"map_export_{export_id}.json")
+
+    export_data["file_path"] = json_path
+    export_data["file_path_txt"] = json_path.replace(".json", ".txt")
+    export_data["file_url"] = f"/api/exports/{session.session_id}/map_export_{export_id}.json"
+    export_data["file_url_txt"] = f"/api/exports/{session.session_id}/map_export_{export_id}.txt"
+
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(export_data, f, ensure_ascii=False, indent=2)
 
@@ -82,6 +88,10 @@ def _generate_text_map(session: ReviewSession, export_data: Dict[str, Any]) -> s
     lines.append(f"  导出时间: {export_data['export_time']}")
     lines.append(f"  导出人: {export_data['exported_by']}")
     lines.append(f"  文件哈希: {export_data['file_hash']}")
+    lines.append(f"  保存位置(JSON): {export_data.get('file_path', '')}")
+    lines.append(f"  保存位置(TXT): {export_data.get('file_path_txt', '')}")
+    lines.append(f"  下载链接(JSON): {export_data.get('file_url', '')}")
+    lines.append(f"  下载链接(TXT): {export_data.get('file_url_txt', '')}")
     lines.append(f"{'=' * 60}")
     lines.append("")
 
@@ -181,10 +191,42 @@ def _format_handover_text(report: Dict[str, Any]) -> str:
     lines.append("--- 摘要 ---")
     lines.append(f"  总点位: {s.get('total_points', 0)}")
     lines.append(f"  总记录: {s.get('total_records', 0)}")
+    lines.append(f"  裂缝补录记录: {s.get('total_crack_records', 0)}")
+    lines.append(f"  导入批次: {s.get('total_import_batches', 0)}")
     lines.append(f"  待处理冲突: {s.get('pending_conflicts', 0)}")
     lines.append(f"  边界点位: {s.get('boundary_points', 0)}")
     lines.append(f"  导出次数: {s.get('export_count', 0)}")
     lines.append("")
+
+    lines.append("--- 导入批次明细 ---")
+    for batch in report.get("import_batches", []):
+        lines.append(
+            f"  [{batch['import_time']}] {batch['batch_id']} | "
+            f"{batch['source']} | {batch['imported_by']} | "
+            f"新增={batch['new_count']} 复用={batch['reused_count']}"
+        )
+        for detail in batch.get("details", []):
+            status = "新增" if detail["status"] == "真新增" else "复用"
+            extra = f" (已有 {detail['existing_record_id']})" if detail.get("existing_record_id") else ""
+            lines.append(
+                f"    [{status}] {detail['record_id']} / {detail['point_id']} | "
+                f"{detail['source_value_preview']}{extra}"
+            )
+    lines.append("")
+
+    if report.get("crack_details"):
+        lines.append("--- 裂缝补录记录 ---")
+        for cr in report.get("crack_details", []):
+            tag = " [缺三维坐标]" if cr.get("missing_3d_coords") else ""
+            lines.append(
+                f"  {cr['crack_id']} | {cr['point_id']} | {cr['inspector']} | "
+                f"有裂缝={cr['has_crack']} | 宽度={cr.get('crack_width_mm')}mm{tag}"
+            )
+            if cr.get("crack_description"):
+                lines.append(f"    描述: {cr['crack_description']}")
+            if cr.get("remarks"):
+                lines.append(f"    备注: {cr['remarks']}")
+        lines.append("")
 
     ai = report.get("action_items", {})
     lines.append("--- 待处理事项 ---")

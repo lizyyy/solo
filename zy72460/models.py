@@ -17,6 +17,7 @@ class RecordSource(str, Enum):
     RAMP_SURVEY = "无障碍坡道普查"
     NIGHT_SAMPLING = "夜间采样补录"
     MANUAL_REVIEW = "人工复核"
+    CRACK_SUPPLEMENTARY = "裂缝补录"
 
 
 class ConflictResolution(str, Enum):
@@ -33,6 +34,7 @@ class AuditActionType(str, Enum):
     SUPPLEMENTARY_REVIEW = "补录回看"
     MAP_EXPORT = "地图导出"
     SELF_CHECK = "自检"
+    CRACK_RECORD = "裂缝补录"
 
 
 class ImportStatus(str, Enum):
@@ -88,6 +90,7 @@ class InspectionRecord:
     remarks: Optional[str] = None
     import_time: datetime = field(default_factory=datetime.now)
     is_supplementary: bool = False
+    import_batch_id: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -103,6 +106,43 @@ class InspectionRecord:
             "remarks": self.remarks,
             "import_time": self.import_time.isoformat(),
             "is_supplementary": self.is_supplementary,
+            "import_batch_id": self.import_batch_id,
+        }
+
+
+@dataclass
+class CrackRecord:
+    crack_id: str
+    point_id: str
+    inspector: str
+    inspect_time: datetime
+    has_crack: bool
+    crack_description: Optional[str] = None
+    crack_width_mm: Optional[float] = None
+    missing_3d_coords: bool = False
+    x_coord: Optional[float] = None
+    y_coord: Optional[float] = None
+    z_coord: Optional[float] = None
+    remarks: Optional[str] = None
+    import_time: datetime = field(default_factory=datetime.now)
+    import_batch_id: Optional[str] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "crack_id": self.crack_id,
+            "point_id": self.point_id,
+            "inspector": self.inspector,
+            "inspect_time": self.inspect_time.isoformat(),
+            "has_crack": self.has_crack,
+            "crack_description": self.crack_description,
+            "crack_width_mm": self.crack_width_mm,
+            "missing_3d_coords": self.missing_3d_coords,
+            "x_coord": self.x_coord,
+            "y_coord": self.y_coord,
+            "z_coord": self.z_coord,
+            "remarks": self.remarks,
+            "import_time": self.import_time.isoformat(),
+            "import_batch_id": self.import_batch_id,
         }
 
 
@@ -199,6 +239,32 @@ class ImportDetail:
 
 
 @dataclass
+class ImportBatch:
+    batch_id: str
+    session_id: str
+    source: RecordSource
+    imported_by: str
+    import_time: datetime
+    is_supplementary: bool = False
+    details: List[ImportDetail] = field(default_factory=list)
+    new_count: int = 0
+    reused_count: int = 0
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "batch_id": self.batch_id,
+            "session_id": self.session_id,
+            "source": self.source.value,
+            "imported_by": self.imported_by,
+            "import_time": self.import_time.isoformat(),
+            "is_supplementary": self.is_supplementary,
+            "details": [d.to_dict() for d in self.details],
+            "new_count": self.new_count,
+            "reused_count": self.reused_count,
+        }
+
+
+@dataclass
 class AuditEntry:
     audit_id: str
     action_type: AuditActionType
@@ -233,10 +299,12 @@ class ReviewSession:
     created_at: datetime = field(default_factory=datetime.now)
     inspection_points: Dict[str, InspectionPoint] = field(default_factory=dict)
     records: List[InspectionRecord] = field(default_factory=list)
+    crack_records: List[CrackRecord] = field(default_factory=list)
     conflicts: List[ConflictItem] = field(default_factory=list)
     self_check_results: List[SelfCheckResult] = field(default_factory=list)
     export_history: List[MapExport] = field(default_factory=list)
     audit_log: List[AuditEntry] = field(default_factory=list)
+    import_batches: List[ImportBatch] = field(default_factory=list)
     current_step: int = 1
 
     def to_dict(self) -> Dict[str, Any]:
@@ -246,10 +314,12 @@ class ReviewSession:
             "created_at": self.created_at.isoformat(),
             "inspection_points": {k: v.to_dict() for k, v in self.inspection_points.items()},
             "records": [r.to_dict() for r in self.records],
+            "crack_records": [c.to_dict() for c in self.crack_records],
             "conflicts": [c.to_dict() for c in self.conflicts],
             "self_check_results": [s.to_dict() for s in self.self_check_results],
             "export_history": [e.to_dict() for e in self.export_history],
             "audit_log": [a.to_dict() for a in self.audit_log],
+            "import_batches": [b.to_dict() for b in self.import_batches],
             "current_step": self.current_step,
         }
 

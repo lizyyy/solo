@@ -89,12 +89,20 @@ def generate_handover_report(session: ReviewSession) -> Dict[str, Any]:
 
     import_audit = [
         a.to_dict() for a in session.audit_log
-        if a.action_type.value in ("导入", "补录回看")
+        if a.action_type.value in ("导入", "补录回看", "裂缝补录")
     ]
 
     resolution_audit = [
         a.to_dict() for a in session.audit_log
         if a.action_type.value == "冲突处理"
+    ]
+
+    import_batches = [
+        b.to_dict() for b in session.import_batches
+    ]
+
+    crack_records = [
+        c.to_dict() for c in session.crack_records
     ]
 
     return {
@@ -104,6 +112,8 @@ def generate_handover_report(session: ReviewSession) -> Dict[str, Any]:
         "summary": {
             "total_points": len(session.inspection_points),
             "total_records": len(session.records),
+            "total_crack_records": len(session.crack_records),
+            "total_import_batches": len(session.import_batches),
             "pending_conflicts": len(pending_conflicts),
             "resolved_conflicts": len(resolved_conflicts),
             "boundary_points": len(boundary_points),
@@ -118,9 +128,15 @@ def generate_handover_report(session: ReviewSession) -> Dict[str, Any]:
             "manager_actions": [
                 f"请复核边界点位 {p.point_id}（{p.name}，位于 {p.location.street} 与 {', '.join(p.location.adjacent_streets)} 交界）"
                 for p in boundary_points
+            ]
+            + [
+                f"请补全裂缝 {cr.crack_id} 三维坐标（点位 {cr.point_id}，{cr.crack_description}）"
+                for cr in session.crack_records if cr.missing_3d_coords
             ],
         },
+        "import_batches": import_batches,
         "conflict_details": conflict_reports,
+        "crack_details": crack_records,
         "boundary_details": [
             {
                 "point_id": p.point_id,
@@ -139,6 +155,8 @@ def generate_handover_report(session: ReviewSession) -> Dict[str, Any]:
                 "export_time": e.export_time.isoformat(),
                 "file_hash": e.file_hash,
                 "file_path": e.file_path,
+                "file_path_txt": e.file_path.replace(".json", ".txt") if e.file_path else None,
+                "file_url": f"/api/exports/{session.session_id}/map_export_{e.export_id}.json" if e.file_path else None,
                 "point_count": e.point_count,
                 "boundary_points": e.boundary_points,
                 "conflict_points": e.conflict_points,

@@ -157,14 +157,14 @@ def demo_supplementary_with_duplicate():
         },
     ]
     print(f"\n  第一次导入坡道记录：")
-    session, imported, skipped, details = import_records(
+    session, imported, skipped, details, batch1 = import_records(
         session, ramp_records_batch1, RecordSource.RAMP_SURVEY, actor="小付"
     )
     print(f"  导入 {imported} 条，跳过 {len(skipped)} 条")
     print_import_details(details)
 
     print(f"\n  第二次导入同一批坡道记录（测试重复导入区分）：")
-    session, imported2, skipped2, details2 = import_records(
+    session, imported2, skipped2, details2, batch2 = import_records(
         session, ramp_records_batch1, RecordSource.RAMP_SURVEY, actor="小付"
     )
     print(f"  导入 {imported2} 条，跳过（复用）{len(skipped2)} 条")
@@ -201,7 +201,7 @@ def demo_supplementary_with_duplicate():
             "remarks": "补录：夜间短时降雨，有积水但坡道仍可用",
         },
     ]
-    session, imported_s, skipped_s, details_s = import_records(
+    session, imported_s, skipped_s, details_s, batch_s = import_records(
         session,
         supplementary_night_records,
         RecordSource.NIGHT_SAMPLING,
@@ -329,7 +329,7 @@ def demo_wrong_caliber_interactive():
             "ramp_note": "无积水",
         },
     ]
-    session, imported, skipped, details = import_records(
+    session, imported, skipped, details, batch1 = import_records(
         session, ramp_records, RecordSource.RAMP_SURVEY, actor="王工"
     )
     print(f"  导入无障碍坡道记录 {imported} 条")
@@ -366,7 +366,7 @@ def demo_wrong_caliber_interactive():
             "remarks": "暴雨后积水，坡道入口被淹",
         },
     ]
-    session, imported, skipped, details = import_records(
+    session, imported, skipped, details, batch2 = import_records(
         session, night_records, RecordSource.NIGHT_SAMPLING, actor="赵工"
     )
     print(f"  导入夜间采样记录 {imported} 条")
@@ -530,11 +530,11 @@ if __name__ == "__main__":
             {"record_id": "R005", "point_id": "P005", "inspector": "孙工", "inspect_time": "2026-06-04T10:00:00", "has_waterlogging": False, "ramp_accessible": True, "ramp_note": "正常"},
             {"record_id": "R006", "point_id": "P006", "inspector": "孙工", "inspect_time": "2026-06-04T11:00:00", "has_waterlogging": False, "ramp_accessible": True, "ramp_note": "正常"},
         ]
-        session, imp1, skip1, det1 = import_records(session, ramp_batch, RecordSource.RAMP_SURVEY, actor="小付")
+        session, imp1, skip1, det1, batch1 = import_records(session, ramp_batch, RecordSource.RAMP_SURVEY, actor="小付")
         print(f"  第一次导入坡道记录: 新增 {imp1} 条，复用 {len(skip1)} 条")
         print_import_details(det1)
 
-        session, imp2, skip2, det2 = import_records(session, ramp_batch, RecordSource.RAMP_SURVEY, actor="小付")
+        session, imp2, skip2, det2, batch2 = import_records(session, ramp_batch, RecordSource.RAMP_SURVEY, actor="小付")
         print(f"  第二次导入同一批: 新增 {imp2} 条，复用 {len(skip2)} 条")
         print_import_details(det2)
 
@@ -546,8 +546,25 @@ if __name__ == "__main__":
         night_records = [
             {"record_id": "N005", "point_id": "P005", "inspector": "周工", "inspect_time": "2026-06-05T01:30:00", "has_waterlogging": True, "water_depth_cm": 6.0, "ramp_accessible": True, "remarks": "补录：夜间短时降雨，有积水但坡道仍可用"},
         ]
-        session, imp_s, skip_s, det_s = import_records(session, night_records, RecordSource.NIGHT_SAMPLING, is_supplementary=True, actor="周工")
+        session, imp_s, skip_s, det_s, batch_s = import_records(session, night_records, RecordSource.NIGHT_SAMPLING, is_supplementary=True, actor="周工")
         print(f"  补录夜间采样: {imp_s} 条")
+
+        from core import import_crack_records
+        crack_records = [
+            {
+                "crack_id": "C001",
+                "point_id": "P006",
+                "inspector": "小付",
+                "inspect_time": "2026-06-06T15:00:00",
+                "has_crack": True,
+                "crack_description": "无障碍坡道边缘有一条横向裂缝",
+                "crack_width_mm": 3.0,
+                "missing_3d_coords": True,
+                "remarks": "负责人补看时发现缺三维坐标，先记录待补",
+            },
+        ]
+        session, imp_crack, batch_c = import_crack_records(session, crack_records, actor="小付")
+        print(f"  补录裂缝记录: {imp_crack} 条 (缺三维坐标)")
 
         session, conflicts = detect_conflicts(session, actor="系统")
         print(f"  检测到冲突 {len(conflicts)} 个")

@@ -1,0 +1,319 @@
+{
+  "export_id": "21d936ec",
+  "export_time": "2026-06-20T08:28:57.676228",
+  "exported_by": "小付",
+  "point_count": 2,
+  "boundary_points": [
+    "P006"
+  ],
+  "conflict_points": [],
+  "file_hash": "af7ed585401f2fae0d20a817fe79b720",
+  "records_snapshot": [
+    {
+      "record_id": "R005",
+      "point_id": "P005",
+      "source": "无障碍坡道普查",
+      "inspector": "孙工",
+      "inspect_time": "2026-06-04T10:00:00",
+      "has_waterlogging": false,
+      "water_depth_cm": null,
+      "ramp_accessible": true,
+      "ramp_note": "正常",
+      "remarks": null,
+      "import_time": "2026-06-20T08:28:57.602991",
+      "is_supplementary": false,
+      "import_batch_id": "BATCH-89a615"
+    },
+    {
+      "record_id": "R006",
+      "point_id": "P006",
+      "source": "无障碍坡道普查",
+      "inspector": "孙工",
+      "inspect_time": "2026-06-04T11:00:00",
+      "has_waterlogging": false,
+      "water_depth_cm": null,
+      "ramp_accessible": true,
+      "ramp_note": "正常",
+      "remarks": null,
+      "import_time": "2026-06-20T08:28:57.603005",
+      "is_supplementary": false,
+      "import_batch_id": "BATCH-89a615"
+    },
+    {
+      "record_id": "N005",
+      "point_id": "P005",
+      "source": "夜间采样补录",
+      "inspector": "周工",
+      "inspect_time": "2026-06-05T01:30:00",
+      "has_waterlogging": true,
+      "water_depth_cm": 6.0,
+      "ramp_accessible": true,
+      "ramp_note": null,
+      "remarks": "补录",
+      "import_time": "2026-06-20T08:28:57.621179",
+      "is_supplementary": true,
+      "import_batch_id": "BATCH-7291bf"
+    }
+  ],
+  "conflicts_snapshot": [
+    {
+      "conflict_id": "211f01c4",
+      "point_id": "P005",
+      "field_name": "has_waterlogging",
+      "ramp_record_value": false,
+      "night_sampling_value": true,
+      "ramp_record_id": "R005",
+      "night_sampling_id": "N005",
+      "resolution": "巡检员确认",
+      "resolved_by": "小付",
+      "resolved_time": "2026-06-20T08:28:57.651658"
+    }
+  ],
+  "audit_snapshot": [
+    {
+      "audit_id": "3d4f147c",
+      "action_type": "导入",
+      "actor": "小付",
+      "timestamp": "2026-06-20T08:28:57.603020",
+      "description": "导入无障碍坡道普查记录 2 条",
+      "before_state": null,
+      "after_state": {
+        "source": "无障碍坡道普查",
+        "batch_id": "BATCH-89a615",
+        "new_count": 2,
+        "reused_count": 0,
+        "new_record_ids": [
+          "R005",
+          "R006"
+        ],
+        "reused_point_ids": [],
+        "details": [
+          {
+            "record_id": "R005",
+            "point_id": "P005",
+            "status": "真新增",
+            "existing_record_id": null,
+            "source_value_preview": "积水=False, 坡道可用=True"
+          },
+          {
+            "record_id": "R006",
+            "point_id": "P006",
+            "status": "真新增",
+            "existing_record_id": null,
+            "source_value_preview": "积水=False, 坡道可用=True"
+          }
+        ]
+      },
+      "related_record_ids": [
+        "R005",
+        "R006"
+      ],
+      "related_conflict_ids": [],
+      "related_export_id": "7b3032fb"
+    },
+    {
+      "audit_id": "2d858d67",
+      "action_type": "导入",
+      "actor": "小付",
+      "timestamp": "2026-06-20T08:28:57.612085",
+      "description": "导入无障碍坡道普查记录 0 条，复用已有 2 条",
+      "before_state": null,
+      "after_state": {
+        "source": "无障碍坡道普查",
+        "batch_id": "BATCH-955c39",
+        "new_count": 0,
+        "reused_count": 2,
+        "new_record_ids": [],
+        "reused_point_ids": [
+          "P005",
+          "P006"
+        ],
+        "details": [
+          {
+            "record_id": "R005",
+            "point_id": "P005",
+            "status": "复用已有",
+            "existing_record_id": "R005",
+            "source_value_preview": "积水=False, 坡道可用=True"
+          },
+          {
+            "record_id": "R006",
+            "point_id": "P006",
+            "status": "复用已有",
+            "existing_record_id": "R006",
+            "source_value_preview": "积水=False, 坡道可用=True"
+          }
+        ]
+      },
+      "related_record_ids": [],
+      "related_conflict_ids": [],
+      "related_export_id": "7b3032fb"
+    },
+    {
+      "audit_id": "6362f817",
+      "action_type": "补录回看",
+      "actor": "小付",
+      "timestamp": "2026-06-20T08:28:57.621200",
+      "description": "导入夜间采样补录记录 1 条",
+      "before_state": null,
+      "after_state": {
+        "source": "夜间采样补录",
+        "batch_id": "BATCH-7291bf",
+        "new_count": 1,
+        "reused_count": 0,
+        "new_record_ids": [
+          "N005"
+        ],
+        "reused_point_ids": [],
+        "details": [
+          {
+            "record_id": "N005",
+            "point_id": "P005",
+            "status": "真新增",
+            "existing_record_id": null,
+            "source_value_preview": "积水=True, 坡道可用=True"
+          }
+        ]
+      },
+      "related_record_ids": [
+        "N005"
+      ],
+      "related_conflict_ids": [],
+      "related_export_id": "7b3032fb"
+    },
+    {
+      "audit_id": "822e9e7b",
+      "action_type": "裂缝补录",
+      "actor": "负责人",
+      "timestamp": "2026-06-20T08:28:57.629329",
+      "description": "导入裂缝补录记录 1 条",
+      "before_state": null,
+      "after_state": {
+        "batch_id": "BATCH-CRACK-8c8dd9",
+        "new_count": 1,
+        "reused_count": 0,
+        "new_crack_ids": [
+          "C001"
+        ],
+        "details": [
+          {
+            "record_id": "C001",
+            "point_id": "P006",
+            "status": "真新增",
+            "existing_record_id": null,
+            "source_value_preview": "裂缝=True, 缺三维=True"
+          }
+        ]
+      },
+      "related_record_ids": [
+        "C001"
+      ],
+      "related_conflict_ids": [],
+      "related_export_id": "7b3032fb"
+    },
+    {
+      "audit_id": "a4bacb34",
+      "action_type": "冲突发现",
+      "actor": "小付",
+      "timestamp": "2026-06-20T08:28:57.640342",
+      "description": "发现 1 个冲突，涉及点位: P005",
+      "before_state": {
+        "ramp_records_involved": [
+          "R005"
+        ],
+        "night_records_involved": [
+          "N005"
+        ]
+      },
+      "after_state": {
+        "conflict_ids": [
+          "211f01c4"
+        ],
+        "fields": [
+          "has_waterlogging"
+        ]
+      },
+      "related_record_ids": [
+        "R005",
+        "N005"
+      ],
+      "related_conflict_ids": [
+        "211f01c4"
+      ],
+      "related_export_id": "7b3032fb"
+    },
+    {
+      "audit_id": "d372b653",
+      "action_type": "冲突处理",
+      "actor": "小付",
+      "timestamp": "2026-06-20T08:28:57.651741",
+      "description": "冲突 211f01c4 由 小付 处理为「巡检员确认」，原因: 以夜间采样为准",
+      "before_state": {
+        "conflict_id": "211f01c4",
+        "point_id": "P005",
+        "field_name": "has_waterlogging",
+        "resolution_before": "待确认",
+        "ramp_record_value": false,
+        "night_sampling_value": true
+      },
+      "after_state": {
+        "conflict_id": "211f01c4",
+        "resolution_after": "巡检员确认",
+        "resolved_by": "小付",
+        "resolved_time": "2026-06-20T08:28:57.651658",
+        "reason": "以夜间采样为准"
+      },
+      "related_record_ids": [
+        "R005",
+        "N005"
+      ],
+      "related_conflict_ids": [
+        "211f01c4"
+      ],
+      "related_export_id": "7b3032fb"
+    },
+    {
+      "audit_id": "43e1d9c5",
+      "action_type": "地图导出",
+      "actor": "小付",
+      "timestamp": "2026-06-20T08:28:57.663938",
+      "description": "地图导出 7b3032fb，含 3 条记录、1 个冲突",
+      "before_state": null,
+      "after_state": {
+        "export_id": "7b3032fb",
+        "file_hash": "af7ed585401f2fae0d20a817fe79b720",
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy72460/data/exports/AUTO-VERIFY-001/map_export_7b3032fb.json",
+        "point_count": 2,
+        "boundary_count": 1,
+        "conflict_count": 0
+      },
+      "related_record_ids": [],
+      "related_conflict_ids": [],
+      "related_export_id": "7b3032fb"
+    }
+  ],
+  "file_path": "/Users/lzy/pro/solo/workspaces/zy72460/data/exports/AUTO-VERIFY-001/map_export_21d936ec.json",
+  "points_detail": {
+    "P005": {
+      "name": "徐家汇公园雨水花园",
+      "lat": 31.1987,
+      "lng": 121.4382,
+      "street": "徐家汇街道",
+      "is_boundary": false,
+      "adjacent_streets": []
+    },
+    "P006": {
+      "name": "衡山路雨水花园",
+      "lat": 31.2078,
+      "lng": 121.4375,
+      "street": "天平路街道",
+      "is_boundary": true,
+      "adjacent_streets": [
+        "湖南路街道"
+      ]
+    }
+  },
+  "file_path_txt": "/Users/lzy/pro/solo/workspaces/zy72460/data/exports/AUTO-VERIFY-001/map_export_21d936ec.txt",
+  "file_url": "/api/exports/AUTO-VERIFY-001/map_export_21d936ec.json",
+  "file_url_txt": "/api/exports/AUTO-VERIFY-001/map_export_21d936ec.txt"
+}
