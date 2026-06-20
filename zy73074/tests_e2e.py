@@ -16,10 +16,11 @@ import sys
 import shutil
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from src.normalizer import load_csv
+from src.normalizer import load_csv, _row_hash
 from src.dedup_import import (
     dedup_import_normalized_photos,
     merge_manual_notes,
+    dedup_import_attribution,
     _load_state, _save_state
 )
 
@@ -71,14 +72,12 @@ def run_all():
     
     # T5: 重复导入不翻倍
     before = len(load_csv("output/normalized_photos.csv"))
-    # 重置 import_state.json 中的 imported_photo_hashes 但不重置目标CSV
-    # 直接再导一次同样的临时文件
-    added, skipped = dedup_import_normalized_photos(
+    added, skipped, updated = dedup_import_normalized_photos(
         "output/_tmp_normalized.csv", "output/normalized_photos.csv"
     )
     after = len(load_csv("output/normalized_photos.csv"))
-    ok = (after == before) and (skipped == 35) and (added == 0)
-    all_ok &= t(f"T5 重复导入不翻倍：前{before}条 → 后{after}条 跳过{skipped} 新增{added}",
+    ok = (after == before) and (skipped + updated == 35) and (added == 0)
+    all_ok &= t(f"T5 重复导入不翻倍：前{before}条 → 后{after}条 跳过{skipped} 更新{updated} 新增{added}",
                 ok)
     
     # T6: 人工备注不被覆盖
@@ -145,6 +144,41 @@ def run_all():
     all_ok &= t(f"T8 归因关联的照片ID都能追到normalized_photos明细(维修照片→CSV)",
                 broken == 0,
                 f"断链ID数={broken}")
+    
+    # T9: SHA256哈希跨进程稳定
+    test_row = {"photo_id": "T-001", "cabinet_id": "C1", "shoot_time": "2026-06-01 12:00:00",
+                "part_name": "母线排", "temperature": "75.0", "operator": "张三",
+                "suggestion": "待备件", "source": "app"}
+    h1 = _row_hash(test_row)
+    h2 = _row_hash(test_row)
+    import hashlib
+    is_sha256 = len(h1) == 64 and all(c in "0123456789abcdef" for c in h1)
+    all_ok &= t("T9 去重键用SHA256(跨进程稳定)：同输入同输出 + 长度64位hex",
+                h1 == h2 and is_sha256,
+                f"h1={h1[:16]}... len={len(h1)} sha256格式={is_sha256}")
+    
+    # T10: 篡改hash后仍能靠photo_id去重（双保险）
+    import csv as _c
+    rows = load_csv("output/_tmp_normalized.csv")
+    tampered = []
+    for r in rows:
+        tr = dict(r)
+        tr["row_hash"] = "FAKE_" + r.get("photo_id", "")
+        tampered.append(tr)
+    tmp_tampered = "output/_tmp_tampered_test.csv"
+    with open(tmp_tampered, "w", newline="", encoding="utf-8-sig") as f:
+        w = _c.DictWriter(f, fieldnames=list(tampered[0].keys()))
+        w.writeheader()
+        w.writerows(tampered)
+    
+    before10 = len(load_csv("output/normalized_photos.csv"))
+    added10, skipped10, updated10 = dedup_import_normalized_photos(
+        tmp_tampered, "output/normalized_photos.csv"
+    )
+    after10 = len(load_csv("output/normalized_photos.csv"))
+    all_ok &= t(f"T10 hash全变但靠photo_id仍识别为重复(不翻倍)：前{before10}后{after10} 新增{added10} 更新{updated10}",
+                added10 == 0 and before10 == after10,
+                f"photo_id作为业务主键兜底，即使hash算法变化也不会重复导入")
     
     print("\n" + "#"*60)
     final = "全部通过 🎉" if all_ok else "存在失败 ⚠️"

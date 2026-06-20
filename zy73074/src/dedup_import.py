@@ -18,12 +18,19 @@ PROTECTED_FIELDS = NOTE_FIELDS + ["manual_review_flag", "manual_adjusted_confide
 
 def _load_state():
     if not os.path.exists(STATE_PATH):
-        return {"imported_photo_hashes": {}, "imported_attr_ids": {}, "manual_notes": {}}
+        return {"imported_photo_ids": [], "imported_photo_hashes": {},
+                "imported_attr_ids": {}, "manual_notes": {}}
     try:
         with open(STATE_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
+            state = json.load(f)
+            state.setdefault("imported_photo_ids", [])
+            state.setdefault("imported_photo_hashes", {})
+            state.setdefault("imported_attr_ids", {})
+            state.setdefault("manual_notes", {})
+            return state
     except Exception:
-        return {"imported_photo_hashes": {}, "imported_attr_ids": {}, "manual_notes": {}}
+        return {"imported_photo_ids": [], "imported_photo_hashes": {},
+                "imported_attr_ids": {}, "manual_notes": {}}
 
 def _save_state(state):
     os.makedirs(os.path.dirname(STATE_PATH), exist_ok=True)
@@ -47,38 +54,98 @@ def write_csv(pth, rows, fieldnames=None):
 
 def dedup_import_normalized_photos(new_csv_path, target_csv_path):
     """
-    导入标准化维修照片：
-    - 按 row_hash 去重，已存在的行跳过（不翻倍）
-    - 返回 (新增条数, 跳过重条数)
+    导入标准化维修照片（幂等去重）：
+    - 主去重键：photo_id（业务主键，每张照片唯一）
+    - 辅助键：row_hash（SHA256内容指纹，photo_id缺失时兜底，也用于检测内容变更）
+    - 已存在的记录：更新内容但保留 process_status、人工备注等状态字段
+    - 返回 (新增条数, 跳过重条数, 更新条数)
     """
     state = _load_state()
     new_rows = load_csv(new_csv_path)
     existing_rows = load_csv(target_csv_path)
     
-    existing_by_hash = {r.get("row_hash", ""): r for r in existing_rows if r.get("row_hash")}
+    existing_by_pid = {}
+    existing_by_hash = {}
+    for r in existing_rows:
+        pid = r.get("photo_id", "").strip()
+        h = r.get("row_hash", "")
+        if pid:
+            existing_by_pid[pid] = r
+        if h:
+            existing_by_hash[h] = r
+    
+    state_pids = set(state.get("imported_photo_ids", []))
+    state_hashes = set(state.get("imported_photo_hashes", {}).keys())
+    
+    preserved_fields = ["process_status", "manual_note", "manual_review_flag",
+                       "manual_note_content", "manual_note_author", "manual_note_time"]
+    
     added = 0
     skipped = 0
+    updated = 0
     
     for r in new_rows:
+        pid = r.get("photo_id", "").strip()
         h = r.get("row_hash", "")
-        if not h:
+        
+        is_duplicate = False
+        matched_old = None
+        match_by = ""
+        
+        if pid and pid in existing_by_pid:
+            is_duplicate = True
+            matched_old = existing_by_pid[pid]
+            match_by = "photo_id"
+        elif pid and pid in state_pids:
+            is_duplicate = True
+            match_by = "photo_id(state)"
+        elif h and h in existing_by_hash:
+            is_duplicate = True
+            matched_old = existing_by_hash[h]
+            match_by = "row_hash"
+        elif h and h in state_hashes:
+            is_duplicate = True
+            match_by = "row_hash(state)"
+        
+        if is_duplicate:
+            if matched_old:
+                merged = dict(r)
+                for pf in preserved_fields:
+                    old_val = matched_old.get(pf, "") or ""
+                    if old_val.strip():
+                        merged[pf] = old_val
+                if pid:
+                    existing_by_pid[pid] = merged
+                if h:
+                    existing_by_hash[h] = merged
+                if merged != matched_old:
+                    updated += 1
+                else:
+                    skipped += 1
+            else:
+                skipped += 1
             continue
-        if h in existing_by_hash or h in state["imported_photo_hashes"]:
-            skipped += 1
-            continue
-        existing_by_hash[h] = r
-        state["imported_photo_hashes"][h] = {
-            "photo_id": r.get("photo_id", ""),
-            "imported_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
+        
+        if pid:
+            existing_by_pid[pid] = r
+            state.setdefault("imported_photo_ids", [])
+            if pid not in state["imported_photo_ids"]:
+                state["imported_photo_ids"].append(pid)
+        if h:
+            existing_by_hash[h] = r
+            if h not in state["imported_photo_hashes"]:
+                state["imported_photo_hashes"][h] = {
+                    "photo_id": pid,
+                    "imported_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                }
         added += 1
     
-    merged = list(existing_by_hash.values())
+    merged = list(existing_by_pid.values()) if existing_by_pid else list(existing_by_hash.values())
     if merged:
         write_csv(target_csv_path, merged, list(merged[0].keys()))
     
     _save_state(state)
-    return added, skipped
+    return added, skipped, updated
 
 def merge_manual_notes(notes_csv_path, attribution_csv_path, output_path):
     """

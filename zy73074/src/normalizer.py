@@ -4,6 +4,7 @@
 """
 import csv
 import os
+import hashlib
 from datetime import datetime
 
 FIELD_MAPPING = {
@@ -43,10 +44,27 @@ def _normalize_temp(val):
     except ValueError:
         return str(val)
 
+HASH_KEY_FIELDS = ["photo_id", "cabinet_id", "shoot_time", "part_name",
+                   "temperature", "operator", "suggestion", "source"]
+
+def _normalize_value(v):
+    """统一值格式：去首尾空格、None转空串、数字统一精度"""
+    if v is None:
+        return ""
+    s = str(v).strip()
+    return s
+
 def _row_hash(row):
-    """用照片编号+时间+设备生成哈希，供去重键使用"""
-    raw = f"{row.get('photo_id','')}|{row.get('cabinet_id','')}|{row.get('shoot_time','')}"
-    return str(hash(raw))
+    """
+    跨进程稳定的内容哈希：用 hashlib.sha256
+    输入是排序后的关键字段规范化值，避免字段顺序/空白/轻微格式差异导致误判
+    """
+    parts = []
+    for f in HASH_KEY_FIELDS:
+        val = _normalize_value(row.get(f, ""))
+        parts.append(f"{f}={val}")
+    raw = "|".join(parts)
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 def load_csv(path):
     with open(path, "r", encoding="utf-8-sig", newline="") as f:

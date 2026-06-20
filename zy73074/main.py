@@ -48,8 +48,8 @@ def pipeline():
     print(f"  批次1={len(n1)} 批次2={len(n2)}")
     
     target_photos = "output/normalized_photos.csv"
-    added, skipped = dedup_import_normalized_photos(tmp_n, target_photos)
-    print(f"  去重导入 → 新增={added} 跳过重复={skipped}")
+    added, skipped, updated = dedup_import_normalized_photos(tmp_n, target_photos)
+    print(f"  去重导入 → 新增={added} 跳过重复={skipped} 内容更新={updated}")
     
     step("运行温升异常归因（采样断档→标为异常处理，晚到备件→写入late_part_impact）")
     attrs, late_parts, analyzed = run_attribution(
