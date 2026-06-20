@@ -1,0 +1,59 @@
+{
+    "data": {
+        "id": 1,
+        "slice_id": "EVAL-TEST-001",
+        "slice_name": "cold-start-no-snapshot",
+        "feature_snapshot_id": null,
+        "status": "imported",
+        "total_users": 500,
+        "time_window_start": "2026-05-10T00:00:00",
+        "time_window_end": "2026-06-10T23:59:59",
+        "import_time": "2026-06-21T02:13:16.846254",
+        "imported_by": "xiaomeng",
+        "results_count": 0,
+        "abnormal_count": 0,
+        "need_review_count": 0,
+        "has_pending_conflicts": true
+    },
+    "pending_conflicts": [
+        {
+            "id": 1,
+            "conflict_type": "EMPTY_SNAPSHOT_ID",
+            "description": "\u8bc4\u6d4b\u5207\u7247\u672a\u5173\u8054\u7279\u5f81\u5feb\u7167\u7f16\u53f7",
+            "evidence": {
+                "slice_id": "EVAL-TEST-001",
+                "slice_name": "cold-start-no-snapshot"
+            },
+            "created_at": "2026-06-21T02:13:16.850772"
+        }
+    ],
+    "all_conflicts": [
+        {
+            "id": 1,
+            "conflict_type": "EMPTY_SNAPSHOT_ID",
+            "description": "\u8bc4\u6d4b\u5207\u7247\u672a\u5173\u8054\u7279\u5f81\u5feb\u7167\u7f16\u53f7",
+            "evidence": {
+                "slice_id": "EVAL-TEST-001",
+                "slice_name": "cold-start-no-snapshot"
+            },
+            "status": "pending",
+            "resolution": null,
+            "resolved_by": null,
+            "resolved_at": null,
+            "created_at": "2026-06-21T02:13:16.850772"
+        }
+    ],
+    "self_checks": [],
+    "operation_logs": [
+        {
+            "id": 1,
+            "operator": "xiaomeng",
+            "operation": "\u5bfc\u5165\u8bc4\u6d4b\u5207\u7247",
+            "details": {
+                "slice_name": "cold-start-no-snapshot",
+                "total_users": 500
+            },
+            "created_at": "2026-06-21T02:13:16.848266"
+        }
+    ]
+}

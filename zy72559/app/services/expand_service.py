@@ -286,6 +286,7 @@ def _log_operation(db: Session, operator: str, operation: str, target_type: str,
         details=details
     )
     db.add(log)
+    db.commit()
 
 
 def _eval_slice_to_dict(slice_obj: EvalSlice) -> Dict[str, Any]:

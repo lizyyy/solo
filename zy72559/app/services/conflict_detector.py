@@ -23,60 +23,58 @@ def detect_conflicts(db: Session, eval_slice: EvalSlice) -> List[ConflictRecord]
             "评测切片未关联特征快照编号",
             {"slice_id": eval_slice.slice_id, "slice_name": eval_slice.slice_name}
         ))
-        return conflicts
     
-    snapshot = db.query(FeatureSnapshot).filter(
-        FeatureSnapshot.snapshot_id == eval_slice.feature_snapshot_id
-    ).first()
-    
-    if not snapshot:
-        conflicts.append(_create_conflict(
-            eval_slice.id,
-            "INVALID_SNAPSHOT_ID",
-            f"特征快照编号 {eval_slice.feature_snapshot_id} 不存在",
-            {
-                "slice_id": eval_slice.slice_id,
-                "snapshot_id_provided": eval_slice.feature_snapshot_id,
-                "available_snapshots": [s.snapshot_id for s in db.query(FeatureSnapshot).all()]
-            }
-        ))
-        return conflicts
-    
-    if eval_slice.time_window_start and eval_slice.time_window_end:
-        slice_window_duration = (eval_slice.time_window_end - eval_slice.time_window_start).days
-        snapshot_to_window_gap = abs((snapshot.snapshot_time - eval_slice.time_window_end).days)
+    if eval_slice.feature_snapshot_id:
+        snapshot = db.query(FeatureSnapshot).filter(
+            FeatureSnapshot.snapshot_id == eval_slice.feature_snapshot_id
+        ).first()
         
-        if snapshot_to_window_gap > 7:
+        if not snapshot:
             conflicts.append(_create_conflict(
                 eval_slice.id,
-                "TIME_WINDOW_MISMATCH",
-                f"特征快照时间与评测切片时间窗相差 {snapshot_to_window_gap} 天，超过阈值7天",
+                "INVALID_SNAPSHOT_ID",
+                f"特征快照编号 {eval_slice.feature_snapshot_id} 不存在",
                 {
                     "slice_id": eval_slice.slice_id,
-                    "snapshot_id": snapshot.snapshot_id,
-                    "snapshot_time": snapshot.snapshot_time.isoformat(),
-                    "time_window_start": eval_slice.time_window_start.isoformat(),
-                    "time_window_end": eval_slice.time_window_end.isoformat(),
-                    "gap_days": snapshot_to_window_gap,
-                    "threshold_days": 7
+                    "snapshot_id_provided": eval_slice.feature_snapshot_id,
+                    "available_snapshots": [s.snapshot_id for s in db.query(FeatureSnapshot).all()]
                 }
             ))
-    
-    if eval_slice.total_users > 0 and snapshot.total_users > 0:
-        diff_ratio = abs(eval_slice.total_users - snapshot.total_users) / snapshot.total_users
-        if diff_ratio > 0.1:
-            conflicts.append(_create_conflict(
-                eval_slice.id,
-                "USER_COUNT_MISMATCH",
-                f"评测切片用户数({eval_slice.total_users})与特征快照用户数({snapshot.total_users})差异超过10%",
-                {
-                    "slice_id": eval_slice.slice_id,
-                    "snapshot_id": snapshot.snapshot_id,
-                    "slice_user_count": eval_slice.total_users,
-                    "snapshot_user_count": snapshot.total_users,
-                    "diff_ratio": round(diff_ratio * 100, 2)
-                }
-            ))
+        else:
+            if eval_slice.time_window_start and eval_slice.time_window_end:
+                snapshot_to_window_gap = abs((snapshot.snapshot_time - eval_slice.time_window_end).days)
+                
+                if snapshot_to_window_gap > 7:
+                    conflicts.append(_create_conflict(
+                        eval_slice.id,
+                        "TIME_WINDOW_MISMATCH",
+                        f"特征快照时间与评测切片时间窗相差 {snapshot_to_window_gap} 天，超过阈值7天",
+                        {
+                            "slice_id": eval_slice.slice_id,
+                            "snapshot_id": snapshot.snapshot_id,
+                            "snapshot_time": snapshot.snapshot_time.isoformat(),
+                            "time_window_start": eval_slice.time_window_start.isoformat(),
+                            "time_window_end": eval_slice.time_window_end.isoformat(),
+                            "gap_days": snapshot_to_window_gap,
+                            "threshold_days": 7
+                        }
+                    ))
+            
+            if eval_slice.total_users > 0 and snapshot.total_users > 0:
+                diff_ratio = abs(eval_slice.total_users - snapshot.total_users) / snapshot.total_users
+                if diff_ratio > 0.1:
+                    conflicts.append(_create_conflict(
+                        eval_slice.id,
+                        "USER_COUNT_MISMATCH",
+                        f"评测切片用户数({eval_slice.total_users})与特征快照用户数({snapshot.total_users})差异超过10%",
+                        {
+                            "slice_id": eval_slice.slice_id,
+                            "snapshot_id": snapshot.snapshot_id,
+                            "slice_user_count": eval_slice.total_users,
+                            "snapshot_user_count": snapshot.total_users,
+                            "diff_ratio": round(diff_ratio * 100, 2)
+                        }
+                    ))
     
     for conflict in conflicts:
         db.add(conflict)
@@ -150,4 +148,5 @@ def get_pending_conflicts(db: Session, eval_slice_id: Optional[int] = None) -> L
 def get_all_conflicts(db: Session, eval_slice_id: int) -> List[ConflictRecord]:
     return db.query(ConflictRecord).filter(
         ConflictRecord.eval_slice_id == eval_slice_id
+    ).order_by(ConflictRecord.created_at.desc()).all()
     ).order_by(ConflictRecord.created_at.desc()).all()

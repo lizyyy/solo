@@ -1,0 +1,98 @@
+{
+    "data": {
+        "id": 1,
+        "slice_id": "EVAL-TEST-001",
+        "slice_name": "cold-start-test-no-snapshot",
+        "feature_snapshot_id": "SNAP_20260601_V3",
+        "status": "snapshot_supplemented",
+        "total_users": 500,
+        "time_window_start": "2026-05-10T00:00:00",
+        "time_window_end": "2026-06-10T23:59:59",
+        "import_time": "2026-06-21T02:05:35.769469",
+        "imported_by": "xiaomeng",
+        "results_count": 0,
+        "abnormal_count": 0,
+        "need_review_count": 0,
+        "has_pending_conflicts": true
+    },
+    "pending_conflicts": [
+        {
+            "id": 2,
+            "conflict_type": "USER_COUNT_MISMATCH",
+            "description": "\u8bc4\u6d4b\u5207\u7247\u7528\u6237\u6570(500)\u4e0e\u7279\u5f81\u5feb\u7167\u7528\u6237\u6570(550000)\u5dee\u5f02\u8d85\u8fc710%",
+            "evidence": {
+                "slice_id": "EVAL-TEST-001",
+                "snapshot_id": "SNAP_20260601_V3",
+                "slice_user_count": 500,
+                "snapshot_user_count": 550000,
+                "diff_ratio": 99.91
+            },
+            "created_at": "2026-06-21T02:08:52.528220"
+        },
+        {
+            "id": 1,
+            "conflict_type": "EMPTY_SNAPSHOT_ID",
+            "description": "\u8bc4\u6d4b\u5207\u7247\u672a\u5173\u8054\u7279\u5f81\u5feb\u7167\u7f16\u53f7",
+            "evidence": {
+                "slice_id": "EVAL-TEST-001",
+                "slice_name": "cold-start-test-no-snapshot"
+            },
+            "created_at": "2026-06-21T02:05:35.776130"
+        }
+    ],
+    "all_conflicts": [
+        {
+            "id": 2,
+            "conflict_type": "USER_COUNT_MISMATCH",
+            "description": "\u8bc4\u6d4b\u5207\u7247\u7528\u6237\u6570(500)\u4e0e\u7279\u5f81\u5feb\u7167\u7528\u6237\u6570(550000)\u5dee\u5f02\u8d85\u8fc710%",
+            "evidence": {
+                "slice_id": "EVAL-TEST-001",
+                "snapshot_id": "SNAP_20260601_V3",
+                "slice_user_count": 500,
+                "snapshot_user_count": 550000,
+                "diff_ratio": 99.91
+            },
+            "status": "pending",
+            "resolution": null,
+            "resolved_by": null,
+            "resolved_at": null,
+            "created_at": "2026-06-21T02:08:52.528220"
+        },
+        {
+            "id": 1,
+            "conflict_type": "EMPTY_SNAPSHOT_ID",
+            "description": "\u8bc4\u6d4b\u5207\u7247\u672a\u5173\u8054\u7279\u5f81\u5feb\u7167\u7f16\u53f7",
+            "evidence": {
+                "slice_id": "EVAL-TEST-001",
+                "slice_name": "cold-start-test-no-snapshot"
+            },
+            "status": "pending",
+            "resolution": null,
+            "resolved_by": null,
+            "resolved_at": null,
+            "created_at": "2026-06-21T02:05:35.776130"
+        }
+    ],
+    "self_checks": [],
+    "operation_logs": [
+        {
+            "id": 2,
+            "operator": "xiaomeng",
+            "operation": "\u8865\u5f55\u7279\u5f81\u5feb\u7167\u7f16\u53f7",
+            "details": {
+                "feature_snapshot_id": "SNAP_20260601_V3"
+            },
+            "created_at": "2026-06-21T02:08:52.522892"
+        },
+        {
+            "id": 1,
+            "operator": "xiaomeng",
+            "operation": "\u5bfc\u5165\u8bc4\u6d4b\u5207\u7247",
+            "details": {
+                "slice_name": "cold-start-test-no-snapshot",
+                "total_users": 500
+            },
+            "created_at": "2026-06-21T02:05:35.771769"
+        }
+    ]
+}

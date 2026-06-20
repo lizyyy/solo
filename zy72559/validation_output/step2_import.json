@@ -1,0 +1,20 @@
+{
+    "success": true,
+    "data": {
+        "id": 1,
+        "slice_id": "EVAL-TEST-001"
+    },
+    "conflicts": [
+        {
+            "id": 1,
+            "conflict_type": "EMPTY_SNAPSHOT_ID",
+            "description": "\u8bc4\u6d4b\u5207\u7247\u672a\u5173\u8054\u7279\u5f81\u5feb\u7167\u7f16\u53f7",
+            "evidence": {
+                "slice_id": "EVAL-TEST-001",
+                "slice_name": "cold-start-no-snapshot"
+            },
+            "status": "pending",
+            "created_at": "2026-06-21T02:13:16.850772"
+        }
+    ]
+}

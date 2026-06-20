@@ -3,6 +3,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from typing import Optional, List
 from datetime import datetime
+from urllib.parse import quote
 from app.database import get_db
 from app.models import EvalSlice, FeatureSnapshot, ConflictRecord, ExpandResult, SelfCheckRecord, OperationLog
 from app.services.expand_service import (

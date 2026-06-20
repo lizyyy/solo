@@ -1,0 +1,389 @@
+{
+    "success": true,
+    "data": {
+        "eval_slice": {
+            "id": 1,
+            "slice_id": "EVAL-TEST-001",
+            "slice_name": "cold-start-no-snapshot",
+            "feature_snapshot_id": "SNAP_20260601_V3",
+            "status": "expand_completed",
+            "total_users": 500,
+            "time_window_start": "2026-05-10T00:00:00",
+            "time_window_end": "2026-06-10T23:59:59",
+            "imported_by": "xiaomeng",
+            "import_time": "2026-06-21T02:13:16.846254"
+        },
+        "total_results": 1000,
+        "abnormal_count": 49,
+        "need_review_count": 49,
+        "self_checks": [
+            {
+                "id": 1,
+                "check_type": "DUPLICATE_IMPORT",
+                "check_name": "\u91cd\u590d\u5bfc\u5165\u68c0\u67e5",
+                "passed": true,
+                "error_count": 0,
+                "details": {
+                    "checked": true,
+                    "duplicates": []
+                },
+                "checked_at": "2026-06-21T02:14:11.492589"
+            },
+            {
+                "id": 2,
+                "check_type": "TIME_WINDOW_LEAKAGE",
+                "check_name": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\u68c0\u67e5",
+                "passed": false,
+                "error_count": 49,
+                "details": {
+                    "checked": true,
+                    "leakage_samples": [
+                        {
+                            "user_id": "expand_000053",
+                            "similarity_score": 0.9661,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-12T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a2\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000103",
+                            "similarity_score": 0.821,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-28T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a18\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000109",
+                            "similarity_score": 0.773,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-20T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a10\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000144",
+                            "similarity_score": 0.762,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-16T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a6\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000157",
+                            "similarity_score": 0.5186,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-03T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a23\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000164",
+                            "similarity_score": 0.5451,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-07T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a27\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000191",
+                            "similarity_score": 0.9306,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-01T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a21\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000211",
+                            "similarity_score": 0.8054,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-17T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a7\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000216",
+                            "similarity_score": 0.929,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-07T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a27\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000225",
+                            "similarity_score": 0.5602,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-20T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a10\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000240",
+                            "similarity_score": 0.5371,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-16T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a6\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000245",
+                            "similarity_score": 0.6065,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-25T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a15\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000256",
+                            "similarity_score": 0.7163,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-17T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a7\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000301",
+                            "similarity_score": 0.6106,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-25T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a15\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000311",
+                            "similarity_score": 0.6956,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-16T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a6\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000336",
+                            "similarity_score": 0.6971,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-05T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a25\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000345",
+                            "similarity_score": 0.5804,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-02T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a22\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000351",
+                            "similarity_score": 0.7019,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-13T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a3\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000369",
+                            "similarity_score": 0.6914,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-22T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a12\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000370",
+                            "similarity_score": 0.5478,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-12T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a2\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000379",
+                            "similarity_score": 0.7784,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-26T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a16\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000416",
+                            "similarity_score": 0.9745,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-17T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a7\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000462",
+                            "similarity_score": 0.8628,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-12T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a2\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000465",
+                            "similarity_score": 0.6132,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-11T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a1\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000476",
+                            "similarity_score": 0.8082,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-16T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a6\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000508",
+                            "similarity_score": 0.8273,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-01T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a21\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000528",
+                            "similarity_score": 0.9753,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-16T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a6\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000575",
+                            "similarity_score": 0.6727,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-03T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a23\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000578",
+                            "similarity_score": 0.9863,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-24T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a14\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000599",
+                            "similarity_score": 0.6054,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-11T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a1\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000616",
+                            "similarity_score": 0.848,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-07T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a27\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000627",
+                            "similarity_score": 0.5255,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-05T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a25\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000685",
+                            "similarity_score": 0.8531,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-15T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a5\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000707",
+                            "similarity_score": 0.6984,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-05T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a25\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000713",
+                            "similarity_score": 0.5732,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-05T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a25\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000726",
+                            "similarity_score": 0.5686,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-30T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a20\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000758",
+                            "similarity_score": 0.6782,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-07T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a27\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000779",
+                            "similarity_score": 0.8484,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-05T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a25\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000793",
+                            "similarity_score": 0.747,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-28T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a18\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000807",
+                            "similarity_score": 0.8087,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-29T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a19\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000841",
+                            "similarity_score": 0.9654,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-01T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a21\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000845",
+                            "similarity_score": 0.6239,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-10T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a30\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000873",
+                            "similarity_score": 0.5144,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-06T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a26\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000900",
+                            "similarity_score": 0.5313,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-01T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a21\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000929",
+                            "similarity_score": 0.6539,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-23T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a13\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000939",
+                            "similarity_score": 0.6268,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-24T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a14\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000947",
+                            "similarity_score": 0.5365,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-06-30T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a20\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000959",
+                            "similarity_score": 0.712,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-07T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a27\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        },
+                        {
+                            "user_id": "expand_000960",
+                            "similarity_score": 0.9702,
+                            "abnormal_reason": "\u65f6\u95f4\u7a97\u7a7f\u8d8a\uff1a\u7279\u5f81\u65f6\u95f4(2026-07-09T23:59:59)\u665a\u4e8e\u65f6\u95f4\u7a97\u622a\u6b62(2026-06-10T23:59:59)\uff0c\u7a7f\u8d8a29\u5929\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8",
+                            "need_review": true
+                        }
+                    ],
+                    "total_leakage_count": 49,
+                    "warning": "\u53d1\u73b0 49 \u6761\u65f6\u95f4\u7a97\u7a7f\u8d8a\u6837\u672c\uff0c\u6548\u679c\u53ef\u80fd\u865a\u9ad8\uff0c\u9700\u5b9e\u9a8c\u5e73\u53f0\u8d1f\u8d23\u4eba\u590d\u6838"
+                },
+                "checked_at": "2026-06-21T02:14:11.492598"
+            },
+            {
+                "id": 3,
+                "check_type": "RECALCULATION_AFTER_SUPPLEMENT",
+                "check_name": "\u8865\u5f55\u540e\u91cd\u7b97\u68c0\u67e5",
+                "passed": false,
+                "error_count": 1,
+                "details": {
+                    "checked": true,
+                    "supplement_history": [],
+                    "error": "\u5df2\u8865\u5f551\u6b21\uff0c\u4f46\u672a\u6267\u884c\u91cd\u7b97"
+                },
+                "checked_at": "2026-06-21T02:14:11.492599"
+            },
+            {
+                "id": 4,
+                "check_type": "EXPORT_CONSISTENCY",
+                "check_name": "\u5bfc\u51fa\u4e00\u81f4\u6027\u68c0\u67e5",
+                "passed": true,
+                "error_count": 0,
+                "details": {
+                    "checked": true,
+                    "consistency_checks": [
+                        {
+                            "item": "\u7ed3\u679c\u603b\u884c\u6570",
+                            "count": 1000,
+                            "consistent": true
+                        },
+                        {
+                            "item": "\u5f02\u5e38\u6837\u672c\u6570",
+                            "count": 49,
+                            "consistent": true
+                        },
+                        {
+                            "item": "\u5f85\u590d\u6838\u6837\u672c\u6570",
+                            "count": 49,
+                            "consistent": true
+                        }
+                    ],
+                    "summary": {
+                        "total": 1000,
+                        "abnormal": 49,
+                        "need_review": 49
+                    }
+                },
+                "checked_at": "2026-06-21T02:14:11.492600"
+            }
+        ]
+    }
+}

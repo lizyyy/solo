@@ -1,0 +1,23 @@
+{
+    "success": true,
+    "data": {
+        "id": 1,
+        "feature_snapshot_id": "SNAP_20260601_V3"
+    },
+    "conflicts": [
+        {
+            "id": 2,
+            "conflict_type": "USER_COUNT_MISMATCH",
+            "description": "\u8bc4\u6d4b\u5207\u7247\u7528\u6237\u6570(500)\u4e0e\u7279\u5f81\u5feb\u7167\u7528\u6237\u6570(550000)\u5dee\u5f02\u8d85\u8fc710%",
+            "evidence": {
+                "slice_id": "EVAL-TEST-001",
+                "snapshot_id": "SNAP_20260601_V3",
+                "slice_user_count": 500,
+                "snapshot_user_count": 550000,
+                "diff_ratio": 99.91
+            },
+            "status": "pending",
+            "created_at": "2026-06-21T02:13:53.446956"
+        }
+    ]
+}
