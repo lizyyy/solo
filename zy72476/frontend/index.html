@@ -546,12 +546,61 @@
         async function runSelfCheck() {
             const results = await api('/self-check');
             const div = document.getElementById('checkResults');
-            div.innerHTML = results.map(r => `
+            div.innerHTML = results.map(r => {
+                let details = '';
+                if (r.check_type === '补录后重算检查') {
+                    details = `<div style="margin-top:8px;font-size:13px">
+                        <p>施工告示总数：${r.total_notices} | 待重算记录：<strong style="color:${r.passed ? '#2e7d32' : '#c62828'}">${r.need_recalc_count}</strong> | 已重算记录：${r.ok_count}</p>`;
+                    if (r.pending_details && r.pending_details.length > 0) {
+                        details += `<table style="font-size:12px;margin-top:8px;width:100%">
+                            <thead><tr style="background:#fce4ec"><th>原始行</th><th>小区</th><th>别名组</th><th>告示</th><th>影响出行</th><th>影响得分</th><th>当前状态</th></tr></thead>
+                            <tbody>${r.pending_details.map(p => `
+                                <tr style="background:#fff8f8">
+                                    <td>${p.original_row}</td>
+                                    <td>${p.community_name}</td>
+                                    <td class="highlight">${(p.canonical_group_names || []).join(' / ')}</td>
+                                    <td>${p.notice_title}</td>
+                                    <td style="color:${p.impact_trip_count >= 0 ? '#2e7d32' : '#c62828'}">${p.impact_trip_count >= 0 ? '+' : ''}${p.impact_trip_count}</td>
+                                    <td style="color:${p.impact_low_carbon_score >= 0 ? '#2e7d32' : '#c62828'}">${p.impact_low_carbon_score >= 0 ? '+' : ''}${p.impact_low_carbon_score}</td>
+                                    <td><span class="tag tag-needs_recalc">${p.current_status === 'needs_recalc' ? '需重算' : p.current_status}</span></td>
+                                </tr>`).join('')}
+                            </tbody></table>`;
+                    }
+                    if (r.hint) details += `<p style="margin-top:8px;color:#666">💡 ${r.hint}</p>`;
+                    details += `</div>`;
+                } else if (r.check_type === '同一小区新旧名识别') {
+                    details = `<div style="margin-top:8px;font-size:13px">
+                        <p>已关联别名对：${r.total_alias_pairs} | 候选推荐：<strong>${r.total_candidates}</strong> | 命名冲突：${r.total_conflicts}</p>`;
+                    if (r.candidates && r.candidates.length > 0) {
+                        details += `<table style="font-size:12px;margin-top:8px;width:100%">
+                            <thead><tr style="background:#fff3e0"><th>小区A</th><th>小区B</th><th>匹配类型</th><th>A记录数</th><th>B记录数</th><th>操作</th></tr></thead>
+                            <tbody>${r.candidates.map(p => `
+                                <tr style="background:#fffbf5">
+                                    <td>${p.name_a}</td>
+                                    <td>${p.name_b}</td>
+                                    <td style="color:#e65100">${p.match_type}</td>
+                                    <td>${p.record_count_a}</td>
+                                    <td>${p.record_count_b}</td>
+                                    <td><button class="btn btn-warning" style="padding:2px 8px;font-size:12px">去复核</button></td>
+                                </tr>`).join('')}
+                            </tbody></table>`;
+                    }
+                    if (r.hint) details += `<p style="margin-top:8px;color:#666">💡 ${r.hint}</p>`;
+                    details += `</div>`;
+                } else if (r.check_type === '重复导入检测') {
+                    details = `<div style="margin-top:8px;font-size:13px"><p>重复记录数：<strong style="color:${r.passed ? '#2e7d32' : '#c62828'}">${r.total}</strong></p></div>`;
+                } else if (r.check_type === '导出一致性校验') {
+                    details = `<div style="margin-top:8px;font-size:13px">
+                        <p>导出 ${r.export_count} 条 | API ${r.api_count} 条 | 页面 ${r.page_count} 条 | <strong style="color:${r.consistent ? '#2e7d32' : '#c62828'}">${r.consistent ? '一致' : '不一致'}</strong></p></div>`;
+                } else {
+                    details = `<br><small>${JSON.stringify(r)}</small>`;
+                }
+                return `
                 <div class="check-result ${r.passed ? 'check-pass' : 'check-fail'}">
                     <strong>${r.check_type}</strong>：${r.passed ? '✅ 通过' : '❌ 发现问题'}
-                    <br><small>${JSON.stringify(r)}</small>
-                </div>
-            `).join('');
+                    ${details}
+                </div>`;
+            }).join('');
         }
 
         async function loadLogs() {

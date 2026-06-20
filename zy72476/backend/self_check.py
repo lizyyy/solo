@@ -132,32 +132,112 @@ def check_dual_community_names():
             'hint': '候选仅为推荐，请人工确认。滨河新村一期/二期等可能不是同一小区，可忽略。'
         }
 
+def _get_alias_groups():
+    with get_db() as conn:
+        c = conn.cursor()
+        c.execute('SELECT id, name, alias_id FROM communities')
+        all_comms = {row['id']: {'name': row['name'], 'alias_id': row['alias_id']} for row in c.fetchall()}
+    
+    visited = set()
+    groups = {}
+    
+    def bfs_group(start_id):
+        group_ids = set()
+        queue = [start_id]
+        while queue:
+            current = queue.pop()
+            if current in group_ids or current not in all_comms:
+                continue
+            group_ids.add(current)
+            alias_id = all_comms[current]['alias_id']
+            if alias_id and alias_id not in group_ids:
+                queue.append(alias_id)
+            for cid, info in all_comms.items():
+                if info['alias_id'] == current and cid not in group_ids:
+                    queue.append(cid)
+        return group_ids
+    
+    for cid in all_comms:
+        if cid in visited:
+            continue
+        group = bfs_group(cid)
+        visited.update(group)
+        for gid in group:
+            groups[gid] = {
+                'ids': list(group),
+                'names': [all_comms[x]['name'] for x in group]
+            }
+    return groups, all_comms
+
 def check_recalc_after_supplement():
     with get_db() as conn:
         c = conn.cursor()
-        c.execute('''
-            SELECT pr.id, pr.community_name, pr.low_carbon_score,
-                   cn.impact_low_carbon_score, pr.trip_count, cn.impact_trip_count
-            FROM patrol_records pr
-            LEFT JOIN construction_notices cn ON pr.community_id = cn.community_id
-            WHERE cn.id IS NOT NULL
-        ''')
-        records = c.fetchall()
+        
+        alias_groups, all_comms = _get_alias_groups()
+        
+        c.execute('SELECT * FROM construction_notices ORDER BY created_at')
+        notices = [dict(row) for row in c.fetchall()]
+        
         need_recalc = []
-        for r in records:
-            if r['impact_low_carbon_score'] and r['impact_low_carbon_score'] > 0:
-                need_recalc.append({
-                    'record_id': r['id'],
-                    'community_name': r['community_name'],
-                    'original_score': r['low_carbon_score'],
-                    'impact_score': r['impact_low_carbon_score'],
-                    'needs_recalc': True
-                })
+        ok_records = []
+        
+        for notice in notices:
+            notice_cid = notice['community_id']
+            group = alias_groups.get(notice_cid, {'ids': [notice_cid], 'names': [notice['community_name']]})
+            group_ids = group['ids']
+            group_names = group['names']
+            
+            has_impact = (notice['impact_trip_count'] and notice['impact_trip_count'] != 0) or \
+                         (notice['impact_low_carbon_score'] and notice['impact_low_carbon_score'] != 0)
+            
+            if not has_impact:
+                continue
+            
+            placeholders = ','.join('?' * len(group_ids))
+            c.execute(f'''
+                SELECT pr.id, pr.community_name, pr.community_id, pr.trip_count, 
+                       pr.low_carbon_score, pr.processing_status, pr.notes,
+                       pr.original_row, pr.import_batch
+                FROM patrol_records pr
+                WHERE pr.community_id IN ({placeholders})
+            ''', group_ids)
+            
+            group_records = [dict(row) for row in c.fetchall()]
+            
+            for rec in group_records:
+                if rec['processing_status'] in ('needs_recalc', 'imported'):
+                    need_recalc.append({
+                        'record_id': rec['id'],
+                        'original_row': rec['original_row'],
+                        'community_name': rec['community_name'],
+                        'canonical_group_names': group_names,
+                        'notice_title': notice['notice_title'],
+                        'impact_trip_count': notice['impact_trip_count'],
+                        'impact_low_carbon_score': notice['impact_low_carbon_score'],
+                        'current_status': rec['processing_status'],
+                        'current_trip_count': rec['trip_count'],
+                        'current_score': rec['low_carbon_score'],
+                        'processing_status': rec['processing_status'],
+                        'import_batch': rec['import_batch'],
+                        'notes': rec['notes']
+                    })
+                elif rec['processing_status'] == 'recalculated':
+                    ok_records.append({
+                        'record_id': rec['id'],
+                        'community_name': rec['community_name'],
+                        'notice_title': notice['notice_title'],
+                        'status': '已重算'
+                    })
+        
         return {
             'check_type': '补录后重算检查',
             'passed': len(need_recalc) == 0,
             'need_recalc_count': len(need_recalc),
-            'details': need_recalc
+            'ok_count': len(ok_records),
+            'total_notices': len(notices),
+            'pending_details': need_recalc,
+            'completed_details': ok_records,
+            'hint': '请执行重算操作应用施工告示影响。别名组内的所有小区会一起检查。'
         }
 
 def check_export_consistency():
@@ -185,8 +265,7 @@ def get_export_data():
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         
-        c.execute('SELECT id, name, alias_id FROM communities')
-        all_communities = {row['id']: dict(row) for row in c.fetchall()}
+        alias_groups, all_communities = _get_alias_groups()
         
         def get_canonical_name(cid):
             if not cid or cid not in all_communities:
@@ -205,27 +284,80 @@ def get_export_data():
                 'recalculated': '已重算'
             }.get(s, s)
         
+        c.execute('SELECT community_id, notice_title, notice_content, notice_date, impact_trip_count, impact_low_carbon_score, added_by, created_at FROM construction_notices')
+        notice_map = {}
+        for n in c.fetchall():
+            nd = dict(n)
+            cid = nd['community_id']
+            group = alias_groups.get(cid, {'ids': [cid]})
+            for gid in group['ids']:
+                if gid not in notice_map:
+                    notice_map[gid] = []
+                notice_map[gid].append(nd)
+        
         c.execute('''
             SELECT pr.id, pr.original_row, pr.community_name, pr.community_id,
                    pr.travel_mode, pr.trip_count, pr.low_carbon_score,
                    pr.patrol_date, pr.grid_member, pr.import_batch,
                    pr.manual_edited, pr.processing_status, pr.notes,
-                   ib.file_name as source_file,
-                   cn.notice_title as construction_notice
+                   ib.file_name as source_file
             FROM patrol_records pr
             LEFT JOIN import_batches ib ON pr.import_batch = ib.batch_id
-            LEFT JOIN construction_notices cn ON pr.community_id = cn.community_id
             ORDER BY pr.id
         ''')
+        records_rows = [dict(row) for row in c.fetchall()]
+        
+        c.execute('SELECT operation_type, record_id, old_value, new_value, operator, created_at FROM operation_logs ORDER BY created_at')
+        log_map = {}
+        for l in c.fetchall():
+            ld = dict(l)
+            rid = ld['record_id']
+            if rid:
+                if rid not in log_map:
+                    log_map[rid] = []
+                log_map[rid].append(ld)
         
         result = []
-        for row in c.fetchall():
-            d = dict(row)
-            d['canonical_community_name'] = get_canonical_name(d['community_id'])
+        for d in records_rows:
+            cid = d['community_id']
+            group = alias_groups.get(cid, {'ids': [cid], 'names': [d['community_name']]})
+            
+            d['canonical_community_name'] = get_canonical_name(cid)
             d['processing_status_text'] = get_status_text(d['processing_status'])
             d['data_source'] = f'导入批次:{d["import_batch"]}, 文件:{d["source_file"] or "未知"}, 原始行号:{d["original_row"]}'
             d['conclusion'] = d['notes'] or '无特殊处理'
             d['is_alias_merged'] = d['canonical_community_name'] != d['community_name'] if d['canonical_community_name'] else False
+            d['alias_group_names'] = ' / '.join(group['names'])
+            d['alias_group_ids'] = ','.join(str(x) for x in group['ids'])
+            
+            related_notices = notice_map.get(cid, [])
+            if related_notices:
+                d['has_construction_notice'] = True
+                d['notice_titles'] = '; '.join(n['notice_title'] for n in related_notices)
+                d['notice_impact_trip'] = sum(n['impact_trip_count'] or 0 for n in related_notices)
+                d['notice_impact_score'] = sum(n['impact_low_carbon_score'] or 0 for n in related_notices)
+            else:
+                d['has_construction_notice'] = False
+                d['notice_titles'] = ''
+                d['notice_impact_trip'] = 0
+                d['notice_impact_score'] = 0.0
+            
+            related_logs = log_map.get(d['id'], [])
+            d['operation_count'] = len(related_logs)
+            d['operation_history'] = '; '.join(f"[{l['created_at']}]{l['operator']}:{l['operation_type']}" for l in related_logs)
+            
+            d['self_check_conclusion'] = ''
+            if d['processing_status'] == 'needs_recalc' and d['has_construction_notice']:
+                d['self_check_conclusion'] = f'待处理：已补录施工告示({d["notice_titles"]})，影响出行{d["notice_impact_trip"]:+d}、得分{d["notice_impact_score"]:+.1f}，尚未重算'
+            elif d['processing_status'] == 'recalculated' and d['has_construction_notice']:
+                d['self_check_conclusion'] = f'已完成：已重算，已应用施工告示({d["notice_titles"]})影响'
+            elif d['processing_status'] == 'imported' and d['has_construction_notice']:
+                d['self_check_conclusion'] = f'待处理：已补录施工告示({d["notice_titles"]})，记录尚未标记重算'
+            elif d['is_alias_merged']:
+                d['self_check_conclusion'] = f'已复核：{d["community_name"]} 已关联到 {d["canonical_community_name"]}'
+            else:
+                d['self_check_conclusion'] = '正常'
+            
             result.append(d)
         return result
 

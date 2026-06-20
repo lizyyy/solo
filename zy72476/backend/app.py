@@ -482,24 +482,75 @@ def get_summary():
 def export_data():
     data = get_export_data()
     
+    col_map = {
+        'id': '记录ID',
+        'original_row': '原始行号',
+        'community_name': '小区名称',
+        'canonical_community_name': '规范小区名',
+        'alias_group_names': '别名组',
+        'alias_group_ids': '别名组ID',
+        'is_alias_merged': '是否已合并',
+        'community_id': '小区ID',
+        'travel_mode': '出行方式',
+        'trip_count': '出行次数',
+        'low_carbon_score': '低碳得分',
+        'patrol_date': '巡查日期',
+        'grid_member': '网格员',
+        'import_batch': '导入批次',
+        'source_file': '来源文件',
+        'data_source': '数据来源',
+        'manual_edited': '是否人工改动',
+        'processing_status': '处理状态码',
+        'processing_status_text': '处理状态',
+        'notes': '备注/结论',
+        'conclusion': '报告说明',
+        'has_construction_notice': '有无施工告示',
+        'notice_titles': '施工告示标题',
+        'notice_impact_trip': '告示影响出行',
+        'notice_impact_score': '告示影响得分',
+        'operation_count': '操作次数',
+        'operation_history': '操作历史',
+        'self_check_conclusion': '自检结论',
+    }
+    
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        pd.DataFrame(data).to_excel(writer, sheet_name='出行账本明细', index=False)
+        df = pd.DataFrame(data)
+        df = df.rename(columns={k: v for k, v in col_map.items() if k in df.columns})
+        df.to_excel(writer, sheet_name='明细', index=False)
         
         with get_db() as conn:
             conn.row_factory = sqlite3.Row
             c = conn.cursor()
             c.execute('SELECT * FROM communities ORDER BY name')
             communities = [dict(row) for row in c.fetchall()]
-            pd.DataFrame(communities).to_excel(writer, sheet_name='小区名录', index=False)
+            df_comm = pd.DataFrame(communities)
+            df_comm = df_comm.rename(columns={
+                'id': '小区ID', 'name': '小区名称', 'alias_id': '关联小区ID',
+                'status': '复核状态', 'notes': '备注', 'created_at': '创建时间'
+            })
+            df_comm.to_excel(writer, sheet_name='小区名录', index=False)
             
             c.execute('SELECT * FROM construction_notices ORDER BY created_at')
             notices = [dict(row) for row in c.fetchall()]
-            pd.DataFrame(notices).to_excel(writer, sheet_name='施工告示', index=False)
+            df_notice = pd.DataFrame(notices)
+            df_notice = df_notice.rename(columns={
+                'id': '告示ID', 'community_id': '小区ID', 'community_name': '小区',
+                'notice_title': '标题', 'notice_content': '内容', 'notice_date': '告示日期',
+                'impact_trip_count': '影响出行次数', 'impact_low_carbon_score': '影响低碳得分',
+                'added_by': '录入人', 'created_at': '创建时间'
+            })
+            df_notice.to_excel(writer, sheet_name='施工告示', index=False)
             
             c.execute('SELECT * FROM operation_logs ORDER BY created_at DESC LIMIT 500')
             logs = [dict(row) for row in c.fetchall()]
-            pd.DataFrame(logs).to_excel(writer, sheet_name='操作日志', index=False)
+            df_logs = pd.DataFrame(logs)
+            df_logs = df_logs.rename(columns={
+                'id': '日志ID', 'operation_type': '操作类型', 'record_id': '记录ID',
+                'old_value': '旧值', 'new_value': '新值', 'operator': '操作人',
+                'created_at': '时间'
+            })
+            df_logs.to_excel(writer, sheet_name='操作日志', index=False)
     
     output.seek(0)
     
