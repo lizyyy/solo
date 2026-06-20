@@ -1,8 +1,8 @@
 {
-  "export_id": "EXPORT-20260613-3CCF0812",
+  "export_id": "EXPORT-20260621-68D04DB2",
   "ticket_id": "TICKET-20260601-001",
-  "generated_at": "2026-06-13T07:48:26.581484",
-  "generated_by": "system",
+  "generated_at": "2026-06-21T00:20:25.508171",
+  "generated_by": "verify",
   "fields": [
     {
       "field_name": "invoice_number",
@@ -82,9 +82,9 @@
     "ticket_status": "reviewed_by_operation"
   },
   "output_paths": {
-    "json": "output/EXPORT-20260613-3CCF0812_data.json",
-    "report": "output/EXPORT-20260613-3CCF0812_report.txt",
-    "summary": "output/EXPORT-20260613-3CCF0812_summary.txt"
+    "json": "output/EXPORT-20260621-68D04DB2_data.json",
+    "report": "output/EXPORT-20260621-68D04DB2_report.txt",
+    "summary": "output/EXPORT-20260621-68D04DB2_summary.txt"
   },
   "mask_version": "1.0",
   "metadata": {}

@@ -36,9 +36,9 @@
       "mask_pattern": "138*********5678",
       "ocr_confidence": 0.82,
       "leak_detected": true,
-      "leak_note": "检测到phone泄露: 应使用规则 中国大陆手机号脱敏 进行脱敏 | 运营备注: 已补充脱敏规则，该字段按手机号规则配置完成",
+      "leak_note": "检测到phone泄露: 应使用规则 中国大陆手机号脱敏 进行脱敏 | 运营备注: 已补充脱敏规则",
       "last_reviewed_by": "老唐",
-      "last_reviewed_at": "2026-06-13T07:48:26.503082",
+      "last_reviewed_at": "2026-06-21T00:20:25.507450",
       "missing_materials": []
     },
     {
@@ -72,9 +72,9 @@
       "mask_pattern": "联系电话********4321",
       "ocr_confidence": 0.71,
       "leak_detected": true,
-      "leak_note": "检测到phone泄露: 应使用规则 中国大陆手机号脱敏 进行脱敏 | 运营备注: 已补充脱敏规则，文本中的手机号也纳入遮蔽范围",
+      "leak_note": "检测到phone泄露: 应使用规则 中国大陆手机号脱敏 进行脱敏 | 运营备注: 已补充脱敏规则",
       "last_reviewed_by": "老唐",
-      "last_reviewed_at": "2026-06-13T07:48:26.503137",
+      "last_reviewed_at": "2026-06-21T00:20:25.507471",
       "missing_materials": []
     }
   ],
@@ -82,66 +82,77 @@
   "assignee": "operation",
   "rule_notes": [
     {
-      "note": "已补充脱敏规则，该字段按手机号规则配置完成",
+      "note": "已补充脱敏规则",
       "author": "老唐",
       "field_name": "buyer_phone",
-      "timestamp": "2026-06-13T07:48:26.503072"
+      "timestamp": "2026-06-21T00:20:25.507447"
     },
     {
-      "note": "已补充脱敏规则，文本中的手机号也纳入遮蔽范围",
+      "note": "已补充脱敏规则",
       "author": "老唐",
       "field_name": "seller_phone",
-      "timestamp": "2026-06-13T07:48:26.503136"
+      "timestamp": "2026-06-21T00:20:25.507470"
     }
   ],
   "algorithm_notes": [],
   "export_history": [
-    "EXPORT-20260613-3CCF0812"
+    "EXPORT-20260621-68D04DB2"
   ],
   "ocr_confidence_score": 0.87,
-  "updated_at": "2026-06-13T07:48:26.503157",
+  "updated_at": "2026-06-21T00:20:25.507491",
   "change_logs": [
     {
-      "change_id": "CHG-54C42B42",
+      "change_id": "CHG-F34E7D33",
       "change_type": "status_changed",
       "author": "system",
       "field_name": null,
       "old_value_summary": "imported",
       "new_value_summary": "detected_leak",
-      "timestamp": "2026-06-13T07:46:40.433751",
+      "timestamp": "2026-06-21T00:20:25.495935",
       "affected_exports": [],
       "note": "assignee=operation"
     },
     {
-      "change_id": "CHG-CAF3EA08",
+      "change_id": "CHG-65B45D52",
+      "change_type": "status_changed",
+      "author": "system",
+      "field_name": null,
+      "old_value_summary": "detected_leak",
+      "new_value_summary": "detected_leak",
+      "timestamp": "2026-06-21T00:20:25.499489",
+      "affected_exports": [],
+      "note": "assignee=operation"
+    },
+    {
+      "change_id": "CHG-25FEA73F",
       "change_type": "rule_note_added",
       "author": "老唐",
       "field_name": "buyer_phone",
       "old_value_summary": "masked=True",
       "new_value_summary": "masked=True",
-      "timestamp": "2026-06-13T07:48:26.503129",
+      "timestamp": "2026-06-21T00:20:25.507463",
       "affected_exports": [],
-      "note": "已补充脱敏规则，该字段按手机号规则配置完成"
+      "note": "已补充脱敏规则"
     },
     {
-      "change_id": "CHG-B28CDC19",
+      "change_id": "CHG-F8575702",
       "change_type": "rule_note_added",
       "author": "老唐",
       "field_name": "seller_phone",
       "old_value_summary": "masked=True",
       "new_value_summary": "masked=True",
-      "timestamp": "2026-06-13T07:48:26.503144",
+      "timestamp": "2026-06-21T00:20:25.507478",
       "affected_exports": [],
-      "note": "已补充脱敏规则，文本中的手机号也纳入遮蔽范围"
+      "note": "已补充脱敏规则"
     },
     {
-      "change_id": "CHG-71EB6AAE",
+      "change_id": "CHG-8547D146",
       "change_type": "status_changed",
       "author": "system",
       "field_name": null,
       "old_value_summary": "detected_leak",
       "new_value_summary": "reviewed_by_operation",
-      "timestamp": "2026-06-13T07:48:26.503155",
+      "timestamp": "2026-06-21T00:20:25.507489",
       "affected_exports": [],
       "note": null
     }

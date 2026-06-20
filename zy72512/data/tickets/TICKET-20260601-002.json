@@ -23,10 +23,10 @@
       "is_masked": true,
       "mask_pattern": "6222********0123",
       "ocr_confidence": 0.65,
-      "leak_detected": false,
-      "leak_note": null,
-      "last_reviewed_by": null,
-      "last_reviewed_at": null,
+      "leak_detected": true,
+      "leak_note": "检测到bank_card泄露: 应使用规则 银行卡号脱敏 进行脱敏 | OCR置信度0.65<0.7，需算法同事复核 [需算法复核]",
+      "last_reviewed_by": "老唐",
+      "last_reviewed_at": "2026-06-21T00:20:25.506954",
       "missing_materials": []
     },
     {
@@ -47,22 +47,72 @@
       "is_masked": true,
       "mask_pattern": "cont********.com",
       "ocr_confidence": 0.88,
-      "leak_detected": false,
-      "leak_note": null,
+      "leak_detected": true,
+      "leak_note": "检测到email泄露: 应使用规则 邮箱地址脱敏 进行脱敏",
       "last_reviewed_by": null,
       "last_reviewed_at": null,
       "missing_materials": []
     }
   ],
-  "status": "imported",
-  "assignee": null,
-  "rule_notes": [],
-  "algorithm_notes": [],
-  "export_history": [
-    "EXPORT-20260613-E98E2B52"
+  "status": "reviewed_by_operation",
+  "assignee": "algorithm",
+  "rule_notes": [
+    {
+      "note": "运营已查看",
+      "author": "老唐",
+      "field_name": "seller_bank_account",
+      "timestamp": "2026-06-21T00:20:25.506951"
+    }
   ],
+  "algorithm_notes": [],
+  "export_history": [],
   "ocr_confidence_score": 0.85,
-  "updated_at": "2026-06-13T07:46:40.434360",
-  "change_logs": [],
+  "updated_at": "2026-06-21T00:20:25.506984",
+  "change_logs": [
+    {
+      "change_id": "CHG-ABBA4092",
+      "change_type": "status_changed",
+      "author": "system",
+      "field_name": null,
+      "old_value_summary": "imported",
+      "new_value_summary": "detected_leak",
+      "timestamp": "2026-06-21T00:20:25.496653",
+      "affected_exports": [],
+      "note": "assignee=algorithm"
+    },
+    {
+      "change_id": "CHG-E5B09E61",
+      "change_type": "status_changed",
+      "author": "system",
+      "field_name": null,
+      "old_value_summary": "detected_leak",
+      "new_value_summary": "detected_leak",
+      "timestamp": "2026-06-21T00:20:25.499109",
+      "affected_exports": [],
+      "note": "assignee=algorithm"
+    },
+    {
+      "change_id": "CHG-43E75F56",
+      "change_type": "rule_note_added",
+      "author": "老唐",
+      "field_name": "seller_bank_account",
+      "old_value_summary": "masked=True",
+      "new_value_summary": "masked=True",
+      "timestamp": "2026-06-21T00:20:25.506972",
+      "affected_exports": [],
+      "note": "运营已查看"
+    },
+    {
+      "change_id": "CHG-109C8FCA",
+      "change_type": "status_changed",
+      "author": "system",
+      "field_name": null,
+      "old_value_summary": "detected_leak",
+      "new_value_summary": "reviewed_by_operation",
+      "timestamp": "2026-06-21T00:20:25.506982",
+      "affected_exports": [],
+      "note": "assignee=algorithm"
+    }
+  ],
   "metadata": {}
 }

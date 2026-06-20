@@ -1,8 +1,8 @@
 {
-  "export_id": "EXPORT-20260613-180E0F1E",
+  "export_id": "EXPORT-20260621-E4DEE711",
   "ticket_id": "TICKET-20260601-003",
-  "generated_at": "2026-06-13T07:46:40.436942",
-  "generated_by": "demo",
+  "generated_at": "2026-06-21T00:20:25.502238",
+  "generated_by": "verify",
   "fields": [
     {
       "field_name": "invoice_number",
@@ -19,50 +19,50 @@
       "field_name": "buyer_id_card",
       "original_value": "1101********1234",
       "masked_value": "1101********1234",
-      "is_masked": false,
+      "is_masked": true,
       "mask_rule_applied": "身份证号脱敏",
       "leak_risk": "none",
-      "explanation": "该字段未检测到敏感数据，无需脱敏",
-      "next_step": "可直接导出",
+      "explanation": "该字段OCR置信度较低(0.58)，已由算法同事复核确认，运营也已补充脱敏规则，脱敏已生效",
+      "next_step": "已完成算法+运营双重复核，可确认导出",
       "responsible_role": ""
     },
     {
       "field_name": "buyer_phone",
       "original_value": "135****2222",
       "masked_value": "135****2222",
-      "is_masked": false,
+      "is_masked": true,
       "mask_rule_applied": "中国大陆手机号脱敏",
       "leak_risk": "none",
-      "explanation": "该字段未检测到敏感数据，无需脱敏",
-      "next_step": "可直接导出",
+      "explanation": "该字段按脱敏规则配置已自动遮蔽",
+      "next_step": "无需额外操作",
       "responsible_role": ""
     },
     {
       "field_name": "remarks",
       "original_value": "客户备注********11确认",
       "masked_value": "客户备注********11确认",
-      "is_masked": false,
+      "is_masked": true,
       "mask_rule_applied": null,
-      "leak_risk": "high",
-      "explanation": "该字段检测到敏感数据但未完成复核。检测到phone泄露: 字段 'remarks' 不在现有手机号脱敏规则的适用范围内，需要补充规则",
-      "next_step": "请运营老唐补充脱敏规则备注，确认后再导出",
-      "responsible_role": "operation"
+      "leak_risk": "none",
+      "explanation": "该字段检测到敏感数据泄露风险，已由人工复核并标记处理，脱敏已生效",
+      "next_step": "已完成复核处理，可确认导出",
+      "responsible_role": ""
     }
   ],
   "status": "generated",
   "audit_notes": [],
   "summary": {
     "total_fields": 4,
-    "masked_fields": 0,
-    "leak_fields": 1,
+    "masked_fields": 3,
+    "leak_fields": 0,
     "needs_algorithm": 0,
-    "needs_operation": 1,
-    "ticket_status": "reviewed_by_operation"
+    "needs_operation": 0,
+    "ticket_status": "reviewed_by_algorithm"
   },
   "output_paths": {
-    "json": "output/EXPORT-20260613-180E0F1E_data.json",
-    "report": "output/EXPORT-20260613-180E0F1E_report.txt",
-    "summary": "output/EXPORT-20260613-180E0F1E_summary.txt"
+    "json": "output/EXPORT-20260621-E4DEE711_data.json",
+    "report": "output/EXPORT-20260621-E4DEE711_report.txt",
+    "summary": "output/EXPORT-20260621-E4DEE711_summary.txt"
   },
   "mask_version": "1.0",
   "metadata": {}

@@ -162,7 +162,13 @@ def cmd_algorithm(args):
         else:
             print(f"📋 待算法同事处理的工单 ({len(tickets)}):")
             for t in tickets:
-                print(f"   [{t['ticket_id']}] {t['title']} - 泄露字段: {t['leak_count']}")
+                low_conf = ""
+                if t.get("low_confidence_fields"):
+                    low_conf = f" - 低置信度字段: {', '.join(t['low_confidence_fields'])}"
+                missing_info = ""
+                if t.get("missing_materials"):
+                    missing_info = f" - 还缺: {', '.join(t['missing_materials'])}"
+                print(f"   [{t['ticket_id']}] {t['title']} - 泄露字段: {t['leak_count']}{low_conf}{missing_info}")
         return
 
     if not args.ticket_id:
@@ -176,10 +182,17 @@ def cmd_algorithm(args):
         notes = [{"field_name": None, "note": args.note or "算法已复核OCR结果"}]
 
     result = workflow.algorithm_review(args.ticket_id, notes, reviewer=reviewer)
+
+    ticket = store.load_ticket(args.ticket_id)
     print(f"\n🔬 算法复核结果:")
     print(f"   工单: {result.ticket_id}")
     print(f"   状态: {result.previous_status.value} → {result.new_status.value}")
     print(f"   消息: {result.message}")
+    if ticket and ticket.change_logs:
+        latest = ticket.change_logs[-1]
+        print(f"   变更ID: {latest.change_id} ({latest.change_type})")
+        if latest.affected_exports:
+            print(f"   影响导出: {', '.join(latest.affected_exports)}")
 
 
 def cmd_export(args):
@@ -251,53 +264,109 @@ def cmd_demo(args):
     print("\n📍 步骤1: 初始化系统")
     cmd_init(args)
 
-    # 步骤2: 导入工单
-    print("\n📍 步骤2: 导入线上反馈工单")
+    # 步骤2: 导入工单（导入时自动检测泄露）
+    print("\n📍 步骤2: 导入线上反馈工单（导入时自动检测手机号漏遮）")
     cmd_import(args)
 
-    # 步骤3: 检测漏遮
-    print("\n📍 步骤3: 检测手机号在导出里漏遮")
+    # 步骤3: 人工触发检测（验证已标记的泄露不会消失）
+    print("\n📍 步骤3: 重新检测（验证手机号漏遮不会被掩盖）")
     cmd_detect(args)
 
-    # 步骤4: 运营老唐复核
-    print("\n📍 步骤4: 算法运营老唐补看脱敏规则备注")
-    tickets = store.list_tickets()
-    if tickets:
-        tid = tickets[0].ticket_id
-        notes = [
+    # 步骤4: 运营老唐复核 TICKET-001
+    print("\n📍 步骤4: 算法运营老唐补看脱敏规则备注 (TICKET-001)")
+    workflow = ReviewWorkflow(store)
+    result_001 = workflow.operation_review(
+        "TICKET-20260601-001",
+        [
             {"field_name": "buyer_phone", "note": "已补充脱敏规则，该字段需按手机号规则遮蔽"},
             {"field_name": "seller_phone", "note": "已补充脱敏规则，文本中的手机号也需要处理"},
-        ]
-        workflow = ReviewWorkflow(store)
-        result = workflow.operation_review(tid, notes, reviewer="老唐")
-        print(f"   ✅ 工单 {tid} 运营复核完成")
-        print(f"      状态: {result.previous_status.value} → {result.new_status.value}")
-        print(f"      消息: {result.message}")
+        ],
+        reviewer="老唐",
+    )
+    print(f"   ✅ TICKET-001 运营复核完成")
+    print(f"      状态: {result_001.previous_status.value} → {result_001.new_status.value}")
+    print(f"      消息: {result_001.message}")
 
-    # 步骤5: 生成脱敏导出
-    print("\n📍 步骤5: 生成脱敏导出（含原因说明）")
-    if tickets:
-        exporter = ExportManager(store, output_dir=args.output_dir)
-        output = exporter.generate_export(tid, generated_by="demo")
-        print(f"   ✅ 导出ID: {output.export_id}")
-        print(f"      摘要: {output.summary_path}")
+    # 步骤5: 运营老唐复核 TICKET-003（含低置信度身份证 → 自动升级算法）
+    print("\n📍 步骤5: 运营老唐复核 TICKET-003（含OCR=0.58身份证）")
+    result_003 = workflow.operation_review(
+        "TICKET-20260601-003",
+        [
+            {"field_name": "remarks", "note": "已补充脱敏规则，文本中手机号纳入遮蔽"},
+        ],
+        reviewer="老唐",
+    )
+    print(f"   ✅ TICKET-003 运营复核完成")
+    print(f"      状态: {result_003.previous_status.value} → {result_003.new_status.value}")
+    print(f"      消息: {result_003.message}")
+    print(f"      自动升级算法: {'是' if result_003.escalated_to_algorithm else '否'}")
 
-    # 步骤6: 生成报告
-    print("\n📍 步骤6: 生成综合报告看板")
+    # 步骤5b: 验证算法待处理列表
+    print("\n📍 步骤5b: 查看算法同事待处理列表")
+    algo_tickets = workflow.list_tickets_for_role("algorithm")
+    for t in algo_tickets:
+        print(f"   [{t['ticket_id']}] 低置信度字段: {t.get('low_confidence_fields', [])} - 还缺: {', '.join(t.get('missing_materials', []))}")
+
+    # 步骤6: 导出 TICKET-001（运营已完全复核 → 无风险）
+    print("\n📍 步骤6: 脱敏导出 TICKET-001（运营复核完成 → 无风险）")
+    exporter = ExportManager(store, output_dir=args.output_dir)
+    output_001 = exporter.generate_export("TICKET-20260601-001", generated_by="demo")
+    print(f"   ✅ 导出ID: {output_001.export_id}")
+    print(f"      泄露风险: {'🔴 有' if output_001.has_leaks else '🟢 无'} ({output_001.leak_count} 字段)")
+
+    # 步骤7: 导出 TICKET-003（运营已复核但算法未复核 → buyer_id_card 仍高风险）
+    print("\n📍 步骤7: 脱敏导出 TICKET-003（运营已复核，但低置信度身份证仍🔴高风险）")
+    output_003 = exporter.generate_export("TICKET-20260601-003", generated_by="demo")
+    print(f"   ✅ 导出ID: {output_003.export_id}")
+    print(f"      泄露风险: {'🔴 有' if output_003.has_leaks else '🟢 无'} ({output_003.leak_count} 字段)")
+
+    # 步骤8: 算法同事复核 TICKET-003 低置信度字段
+    print("\n📍 步骤8: 算法同事复核 TICKET-003 低置信度身份证字段")
+    result_algo = workflow.algorithm_review(
+        "TICKET-20260601-003",
+        [
+            {"field_name": "buyer_id_card", "note": "算法已确认识别结果正确，已调整OCR模型参数，确认识别无误"},
+        ],
+        reviewer="算法同事",
+    )
+    print(f"   ✅ TICKET-003 算法复核完成")
+    print(f"      状态: {result_algo.previous_status.value} → {result_algo.new_status.value}")
+    print(f"      消息: {result_algo.message}")
+
+    # 步骤9: 重新导出 TICKET-003（算法+运营双重复核 → 无风险）
+    print("\n📍 步骤9: 重新导出 TICKET-003（算法+运营双重复核 → 🟢无风险）")
+    output_003_v2 = exporter.generate_export("TICKET-20260601-003", generated_by="demo")
+    print(f"   ✅ 导出ID: {output_003_v2.export_id}")
+    print(f"      泄露风险: {'🔴 有' if output_003_v2.has_leaks else '🟢 无'} ({output_003_v2.leak_count} 字段)")
+
+    # 步骤10: 生成看板
+    print("\n📍 步骤10: 生成综合报告看板")
     generator = ReportGenerator(store, output_dir=args.output_dir)
     path = generator.generate_html_report()
     print(f"   ✅ HTML看板: {path}")
 
-    # 步骤7: 脱敏复查
-    print("\n📍 步骤7: 脱敏复查（确保无原始号码）")
+    # 步骤11: 脱敏复查
+    print("\n📍 步骤11: 脱敏复查（确保无原始号码）")
     checker = AuditChecker()
     results = checker.audit_directory(args.output_dir)
     report = checker.generate_audit_report(results)
     for line in report.split("\n")[:8]:
         print(f"   {line}")
 
+    # 步骤12: 脱敏复查 data 目录
+    print("\n📍 步骤12: 脱敏复查 data 目录")
+    data_results = checker.audit_directory(args.data_dir)
+    data_report = checker.generate_audit_report(data_results)
+    for line in data_report.split("\n")[:8]:
+        print(f"   {line}")
+
     print("\n" + "=" * 60)
-    print("✅ 演示完成！请查看 output/ 目录下的导出文件")
+    print("✅ 演示完成！核心验证点:")
+    print("   1. 导入后detect能识别手机号漏遮（不会报0泄露）")
+    print("   2. 低置信度身份证(OCR<0.7)自动留给算法同事复核")
+    print("   3. 运营补备注后低置信度字段仍🔴高风险")
+    print("   4. 算法复核后低置信度字段风险清除")
+    print("   5. 所有输出物无原始敏感号码")
     print("=" * 60)
 
 

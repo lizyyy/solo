@@ -1,8 +1,8 @@
 {
-  "export_id": "EXPORT-20260613-56F81BE2",
+  "export_id": "EXPORT-20260621-16F9C2EF",
   "ticket_id": "TICKET-20260601-003",
-  "generated_at": "2026-06-13T07:47:51.182869",
-  "generated_by": "system",
+  "generated_at": "2026-06-21T00:20:25.500645",
+  "generated_by": "verify",
   "fields": [
     {
       "field_name": "invoice_number",
@@ -21,10 +21,10 @@
       "masked_value": "1101********1234",
       "is_masked": true,
       "mask_rule_applied": "身份证号脱敏",
-      "leak_risk": "none",
-      "explanation": "该字段按脱敏规则配置已自动遮蔽",
-      "next_step": "无需额外操作",
-      "responsible_role": ""
+      "leak_risk": "high",
+      "explanation": "该字段检测到敏感数据且OCR置信度较低(0.58)，识别结果可能存在偏差。检测到id_card_in_text泄露: 应使用规则 身份证号脱敏 进行脱敏 | OCR置信度0.58<0.7，需算法同事复核 [需算法复核] 还缺: 算法同事OCR识别结果二次校验, OCR模型参数调整建议或确认, 运营/算法补充的复核备注",
+      "next_step": "留给算法同事复核OCR识别准确性，确认后再进行脱敏处理",
+      "responsible_role": "algorithm"
     },
     {
       "field_name": "buyer_phone",
@@ -54,15 +54,15 @@
   "summary": {
     "total_fields": 4,
     "masked_fields": 3,
-    "leak_fields": 0,
-    "needs_algorithm": 0,
+    "leak_fields": 1,
+    "needs_algorithm": 1,
     "needs_operation": 0,
     "ticket_status": "reviewed_by_operation"
   },
   "output_paths": {
-    "json": "output/EXPORT-20260613-56F81BE2_data.json",
-    "report": "output/EXPORT-20260613-56F81BE2_report.txt",
-    "summary": "output/EXPORT-20260613-56F81BE2_summary.txt"
+    "json": "output/EXPORT-20260621-16F9C2EF_data.json",
+    "report": "output/EXPORT-20260621-16F9C2EF_report.txt",
+    "summary": "output/EXPORT-20260621-16F9C2EF_summary.txt"
   },
   "mask_version": "1.0",
   "metadata": {}

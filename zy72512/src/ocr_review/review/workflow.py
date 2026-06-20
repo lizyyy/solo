@@ -6,7 +6,9 @@ from enum import Enum
 from ..models.ticket import Ticket, TicketStatus, TicketField
 from ..models.rule import MaskRule, RuleStatus
 from ..storage.store import DataStore
-from ..utils.mask import mask_phone
+from ..utils.mask import mask_text
+
+OCR_LOW_CONFIDENCE_THRESHOLD = 0.7
 
 
 class ReviewAction(str, Enum):
@@ -28,11 +30,23 @@ class ReviewResult:
     previous_status: TicketStatus
     new_status: TicketStatus
     timestamp: str
+    escalated_to_algorithm: bool = False
 
 
 class ReviewWorkflow:
     def __init__(self, store: DataStore):
         self.store = store
+
+    def _has_low_confidence_unreviewed(self, ticket: Ticket) -> bool:
+        for f in ticket.fields:
+            if f.leak_detected and f.ocr_confidence is not None and f.ocr_confidence < OCR_LOW_CONFIDENCE_THRESHOLD:
+                algo_reviewed = any(
+                    n.get("field_name") == f.field_name
+                    for n in ticket.algorithm_notes
+                )
+                if not algo_reviewed:
+                    return True
+        return False
 
     def operation_review(self, ticket_id: str, rule_notes: List[Dict[str, str]], reviewer: str = "老唐") -> ReviewResult:
         ticket = self.store.load_ticket(ticket_id)
@@ -59,23 +73,37 @@ class ReviewWorkflow:
                 if field and field.leak_detected:
                     if "已补充脱敏规则" in note or "已配置" in note:
                         field.is_masked = True
-                        field.mask_pattern = mask_phone(field.field_value)
-                        field.leak_note = field.leak_note + f" | 运营备注: {note}"
+                        field.mask_pattern = mask_text(field.field_value)
+                        field.leak_note = (field.leak_note or "") + f" | 运营备注: {note}"
 
-        if ticket.has_leaks():
+        needs_algorithm = self._has_low_confidence_unreviewed(ticket)
+
+        if needs_algorithm:
+            ticket.set_status(TicketStatus.REVIEWED_BY_OPERATION, assignee="algorithm")
+            new_status = TicketStatus.REVIEWED_BY_OPERATION
+            low_conf_fields = [
+                f.field_name for f in ticket.fields
+                if f.leak_detected and f.ocr_confidence is not None and f.ocr_confidence < OCR_LOW_CONFIDENCE_THRESHOLD
+            ]
+            message = f"运营已补充备注，但 OCR低置信度字段 {', '.join(low_conf_fields)} 需算法同事复核，已自动升级"
+            escalated = True
+        elif ticket.has_leaks():
             unmasked_leaks = [f for f in ticket.get_leaking_fields() if not f.is_masked]
             if unmasked_leaks:
                 ticket.set_status(TicketStatus.REVIEW_PENDING, assignee="algorithm")
                 new_status = TicketStatus.REVIEW_PENDING
                 message = f"运营已补充备注，仍有 {len(unmasked_leaks)} 个字段需算法同事复核"
+                escalated = True
             else:
                 ticket.set_status(TicketStatus.REVIEWED_BY_OPERATION, assignee=None)
                 new_status = TicketStatus.REVIEWED_BY_OPERATION
                 message = "运营已完成复核，所有泄露字段已标记脱敏"
+                escalated = False
         else:
             ticket.set_status(TicketStatus.REVIEWED_BY_OPERATION, assignee=None)
             new_status = TicketStatus.REVIEWED_BY_OPERATION
             message = "运营已复核，无敏感数据泄露"
+            escalated = False
 
         self.store.save_ticket(ticket)
 
@@ -87,6 +115,7 @@ class ReviewWorkflow:
             previous_status=prev_status,
             new_status=new_status,
             timestamp=datetime.now().isoformat(),
+            escalated_to_algorithm=escalated,
         )
 
     def algorithm_review(self, ticket_id: str, algorithm_notes: List[Dict[str, str]], reviewer: str) -> ReviewResult:
@@ -112,12 +141,23 @@ class ReviewWorkflow:
             if field_name:
                 field = next((f for f in ticket.fields if f.field_name == field_name), None)
                 if field and field.leak_detected:
-                    if "算法已修复" in note or "已调整OCR" in note:
+                    if "算法已修复" in note or "已调整OCR" in note or "确认识别" in note:
                         field.is_masked = True
-                        field.mask_pattern = mask_phone(field.field_value)
-                        field.leak_note = field.leak_note + f" | 算法备注: {note}"
+                        field.mask_pattern = mask_text(field.field_value)
+                        field.leak_note = (field.leak_note or "") + f" | 算法备注: {note}"
 
-        if ticket.has_leaks():
+        still_needs_algorithm = self._has_low_confidence_unreviewed(ticket)
+
+        if still_needs_algorithm:
+            ticket.set_status(TicketStatus.REVIEWED_BY_ALGORITHM, assignee="algorithm")
+            new_status = TicketStatus.REVIEWED_BY_ALGORITHM
+            low_conf_fields = [
+                f.field_name for f in ticket.fields
+                if f.leak_detected and f.ocr_confidence is not None and f.ocr_confidence < OCR_LOW_CONFIDENCE_THRESHOLD
+                and not any(n.get("field_name") == f.field_name for n in ticket.algorithm_notes)
+            ]
+            message = f"算法已备注部分字段，但 {', '.join(low_conf_fields)} 仍需算法复核"
+        elif ticket.has_leaks():
             unmasked_leaks = [f for f in ticket.get_leaking_fields() if not f.is_masked]
             if unmasked_leaks:
                 ticket.set_status(TicketStatus.REVIEW_PENDING, assignee="algorithm")
@@ -200,6 +240,22 @@ class ReviewWorkflow:
                     timestamp=datetime.now().isoformat(),
                 )
 
+            low_conf_unreviewed = [
+                f for f in ticket.get_leaking_fields()
+                if f.ocr_confidence is not None and f.ocr_confidence < OCR_LOW_CONFIDENCE_THRESHOLD
+                and not any(n.get("field_name") == f.field_name for n in ticket.algorithm_notes)
+            ]
+            if low_conf_unreviewed:
+                return ReviewResult(
+                    success=False,
+                    action=ReviewAction.RESOLVE,
+                    ticket_id=ticket_id,
+                    message=f"OCR低置信度字段 {', '.join(f.field_name for f in low_conf_unreviewed)} 未经算法复核，无法结单",
+                    previous_status=prev_status,
+                    new_status=prev_status,
+                    timestamp=datetime.now().isoformat(),
+                )
+
         ticket.set_status(TicketStatus.RESOLVED, assignee=None)
         self.store.save_ticket(ticket)
 
@@ -231,6 +287,11 @@ class ReviewWorkflow:
                     "is_masked": f.is_masked,
                     "mask_pattern": f.mask_pattern,
                     "ocr_confidence": f.ocr_confidence,
+                    "needs_algorithm": (
+                        f.ocr_confidence is not None
+                        and f.ocr_confidence < OCR_LOW_CONFIDENCE_THRESHOLD
+                        and not any(n.get("field_name") == f.field_name for n in ticket.algorithm_notes)
+                    ),
                 }
                 for f in ticket.get_leaking_fields()
             ],
@@ -240,7 +301,7 @@ class ReviewWorkflow:
         if role == "operation":
             statuses = [TicketStatus.DETECTED_LEAK]
         elif role == "algorithm":
-            statuses = [TicketStatus.REVIEW_PENDING]
+            statuses = [TicketStatus.REVIEW_PENDING, TicketStatus.REVIEWED_BY_OPERATION]
         else:
             statuses = list(TicketStatus)
 
@@ -248,15 +309,30 @@ class ReviewWorkflow:
         for status in statuses:
             tickets.extend(self.store.list_tickets(status=status))
 
+        if role == "algorithm":
+            all_tickets = self.store.list_tickets()
+            ticket_ids = {t.ticket_id for t in tickets}
+            for t in all_tickets:
+                if t.ticket_id not in ticket_ids and t.assignee == "algorithm":
+                    tickets.append(t)
+
         result = []
         for t in tickets:
             missing = []
+            low_conf_fields = []
             for f in t.fields:
-                if f.leak_detected and not f.last_reviewed_by:
-                    if f.ocr_confidence and f.ocr_confidence < 0.7:
-                        missing.append(f"{f.field_name}需OCR二次校验")
-                    if not f.mask_pattern:
-                        missing.append(f"{f.field_name}需脱敏规则配置")
+                if f.leak_detected:
+                    if f.ocr_confidence and f.ocr_confidence < OCR_LOW_CONFIDENCE_THRESHOLD:
+                        low_conf_fields.append(f.field_name)
+                        algo_reviewed = any(
+                            n.get("field_name") == f.field_name
+                            for n in t.algorithm_notes
+                        )
+                        if not algo_reviewed:
+                            missing.append(f"{f.field_name}需算法同事OCR复核(置信度{f.ocr_confidence:.2f})")
+                    if not f.last_reviewed_by and f.ocr_confidence and f.ocr_confidence >= OCR_LOW_CONFIDENCE_THRESHOLD:
+                        if not f.mask_pattern:
+                            missing.append(f"{f.field_name}需脱敏规则配置")
             result.append({
                 "ticket_id": t.ticket_id,
                 "title": t.title,
@@ -267,5 +343,6 @@ class ReviewWorkflow:
                 "created_at": t.created_at.isoformat(),
                 "ocr_confidence": t.ocr_confidence_score,
                 "missing_materials": missing,
+                "low_confidence_fields": low_conf_fields,
             })
         return result

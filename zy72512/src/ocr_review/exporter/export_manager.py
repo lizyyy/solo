@@ -95,16 +95,23 @@ class ExportManager:
             is_masked = field.is_masked or value_changed
 
             has_human_note = self._has_human_review_note(field.field_name, ticket)
+            has_algo_note = self._has_algorithm_review_note(field.field_name, ticket)
+            is_low_confidence = (
+                field.ocr_confidence is not None and field.ocr_confidence < 0.7
+            )
 
             explanation, next_step, responsible = self._build_field_explanation(
-                field, is_masked, masked_value, has_human_note
+                field, is_masked, masked_value, has_human_note, has_algo_note, is_low_confidence
             )
 
             leak_risk = "none"
-            if field.leak_detected and not has_human_note:
-                leak_risk = "high"
-            elif field.leak_detected and has_human_note:
-                leak_risk = "none"
+            if field.leak_detected:
+                if is_low_confidence and not has_algo_note:
+                    leak_risk = "high"
+                elif not has_human_note:
+                    leak_risk = "high"
+                else:
+                    leak_risk = "none"
             elif not is_masked and field.field_value and self._has_sensitive(field.field_value):
                 leak_risk = "medium"
 
@@ -127,6 +134,12 @@ class ExportManager:
         for note in ticket.rule_notes:
             if note.get("field_name") == field_name:
                 return True
+        for note in ticket.algorithm_notes:
+            if note.get("field_name") == field_name:
+                return True
+        return False
+
+    def _has_algorithm_review_note(self, field_name: str, ticket: Ticket) -> bool:
         for note in ticket.algorithm_notes:
             if note.get("field_name") == field_name:
                 return True
@@ -160,16 +173,20 @@ class ExportManager:
                 return rule.rule_name
         return None
 
-    def _determine_missing_materials(self, field: TicketField, has_human_note: bool) -> List[str]:
-        if not field.leak_detected or has_human_note:
+    def _determine_missing_materials(self, field: TicketField, has_human_note: bool, has_algo_note: bool, is_low_confidence: bool) -> List[str]:
+        if not field.leak_detected:
+            return []
+        if is_low_confidence and has_algo_note and has_human_note:
+            return []
+        if not is_low_confidence and has_human_note:
             return []
         missing = []
-        if field.ocr_confidence and field.ocr_confidence < 0.7:
-            missing.append("OCR识别结果人工二次校验")
-            missing.append("OCR模型参数调整建议")
-        if not field.mask_pattern:
-            missing.append("脱敏规则配置（字段级pattern）")
-        if not field.leak_note:
+        if is_low_confidence and not has_algo_note:
+            missing.append("算法同事OCR识别结果二次校验")
+            missing.append("OCR模型参数调整建议或确认")
+        if not has_human_note:
+            if not field.mask_pattern:
+                missing.append("脱敏规则配置（字段级pattern）")
             missing.append("运营/算法补充的复核备注")
         if field.missing_materials:
             for m in field.missing_materials:
@@ -177,26 +194,43 @@ class ExportManager:
                     missing.append(m)
         return missing
 
-    def _build_field_explanation(self, field: TicketField, is_masked: bool, masked_value: str, has_human_note: bool):
-        missing = self._determine_missing_materials(field, has_human_note)
+    def _build_field_explanation(self, field: TicketField, is_masked: bool, masked_value: str, has_human_note: bool, has_algo_note: bool, is_low_confidence: bool):
+        missing = self._determine_missing_materials(field, has_human_note, has_algo_note, is_low_confidence)
 
         if field.leak_detected:
-            if has_human_note:
-                explanation = "该字段检测到敏感数据泄露风险，已由人工复核并标记处理"
-                if is_masked:
-                    explanation += "，脱敏已生效"
-                next_step = "已完成复核处理，可确认导出"
-                responsible = ""
-            else:
-                if field.ocr_confidence and field.ocr_confidence < 0.7:
+            if is_low_confidence:
+                if has_algo_note and has_human_note:
                     explanation = (
-                        f"该字段检测到敏感数据但未完成复核。OCR置信度较低({field.ocr_confidence:.2f})，"
-                        f"可能存在识别偏差。{field.leak_note or '需确认是否为真实手机号。'}"
+                        f"该字段OCR置信度较低({field.ocr_confidence:.2f})，"
+                        f"已由算法同事复核确认，运营也已补充脱敏规则，脱敏已生效"
+                    )
+                    next_step = "已完成算法+运营双重复核，可确认导出"
+                    responsible = ""
+                elif has_algo_note and not has_human_note:
+                    explanation = (
+                        f"该字段OCR置信度较低({field.ocr_confidence:.2f})，算法同事已复核，"
+                        f"但运营尚未补充脱敏规则备注"
+                    )
+                    if missing:
+                        explanation += f" 还缺: {', '.join(missing)}"
+                    next_step = "请运营老唐补充脱敏规则备注，确认后再导出"
+                    responsible = "operation"
+                else:
+                    explanation = (
+                        f"该字段检测到敏感数据且OCR置信度较低({field.ocr_confidence:.2f})，"
+                        f"识别结果可能存在偏差。{field.leak_note or '需确认识别准确性。'}"
                     )
                     if missing:
                         explanation += f" 还缺: {', '.join(missing)}"
                     next_step = "留给算法同事复核OCR识别准确性，确认后再进行脱敏处理"
                     responsible = "algorithm"
+            else:
+                if has_human_note:
+                    explanation = "该字段检测到敏感数据泄露风险，已由人工复核并标记处理"
+                    if is_masked:
+                        explanation += "，脱敏已生效"
+                    next_step = "已完成复核处理，可确认导出"
+                    responsible = ""
                 else:
                     explanation = (
                         f"该字段检测到敏感数据但未完成复核。{field.leak_note or '检测到手机号等敏感信息。'}"
