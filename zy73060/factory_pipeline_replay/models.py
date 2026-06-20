@@ -58,8 +58,18 @@ class ReplayLine:
     current_conclusion: str             # 当前结论
     status: str                         # LineStatus
     status_reason: str = ""             # 状态原因（跳过/坏行说明）
-    has_gap: bool = False               # 是否采样断档
-    gap_detail: str = ""                # 断档说明
+    # --- 采样断档字段（原始信息永不改变） ---
+    has_gap: bool = False               # 当前是否断档未补（待补材料筛选用）
+    gap_detail: str = ""                # 当前断档说明（补录后可说明"已补"）
+    original_has_gap: bool = False      # 原始回放时是否断档（永不改变，用于溯源）
+    original_gap_detail: str = ""       # 原始断档说明（永不改变）
+    # --- 补录状态字段（表达后续处理，不动原始信息） ---
+    is_material_filled: bool = False    # 是否已执行补录
+    filled_material: Optional[str] = None  # 补录值
+    filled_by: str = ""                 # 补录操作人
+    filled_at: str = ""                 # 补录时间
+    filled_reason: str = ""             # 补录原因（与改判原因同步）
+    # --- 改判 & 留痕 ---
     is_manual_judged: bool = False      # 是否人工改判
     manual_judge_reason: str = ""       # 改判原因
     remarks: List[Dict[str, Any]] = field(default_factory=list)  # 嵌入的备注
@@ -111,8 +121,9 @@ class ReplaySession:
     rejudge_histories: List[RejudgeHistory] = field(default_factory=list)
 
     def counters(self) -> Dict[str, int]:
-        """分类统计：坏行/跳过行/已处理行/待补材料/人工改判"""
-        c = {"已处理": 0, "跳过行": 0, "坏行": 0, "待补材料": 0, "人工改判": 0}
+        """分类统计：坏行/跳过行/已处理行/待补材料/人工改判 + 断档追踪"""
+        c = {"已处理": 0, "跳过行": 0, "坏行": 0, "待补材料": 0, "人工改判": 0,
+             "原始断档_未补": 0, "原始断档_已补": 0}
         for ln in self.lines:
             if ln.status == LineStatus.PROCESSED.value:
                 c["已处理"] += 1
@@ -124,6 +135,11 @@ class ReplaySession:
                 c["待补材料"] += 1
             if ln.is_manual_judged:
                 c["人工改判"] += 1
+            if getattr(ln, "original_has_gap", False):
+                if ln.is_material_filled:
+                    c["原始断档_已补"] += 1
+                else:
+                    c["原始断档_未补"] += 1
         return c
 
 

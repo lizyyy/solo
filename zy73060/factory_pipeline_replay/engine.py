@@ -105,6 +105,7 @@ def build_replay_lines(rows: List[Dict[str, str]], start_line_no: int = 1) -> Li
             has_gap = False
 
         original_concl = _judge_conclusion(material_value)
+        gap_msg = "采样值缺失" if has_gap else ""
 
         lines.append(ReplayLine(
             line_no=line_no,
@@ -118,7 +119,9 @@ def build_replay_lines(rows: List[Dict[str, str]], start_line_no: int = 1) -> Li
             status=status,
             status_reason=reason,
             has_gap=has_gap,
-            gap_detail="采样值缺失" if has_gap else "",
+            gap_detail=gap_msg,
+            original_has_gap=has_gap,
+            original_gap_detail=gap_msg,
         ))
     return lines
 
@@ -180,13 +183,26 @@ def run_replay(
 # ---------- 筛选与详情 ----------
 
 def filter_lines(session: Dict[str, Any], **kwargs) -> List[Dict[str, Any]]:
-    """通用筛选：按状态/是否断档/是否改判/工单号/行号等。"""
+    """通用筛选。
+
+    支持的筛选项：
+      status / has_gap（当前是否仍待补）/ original_has_gap（原始是否断档，溯源用）/
+      is_material_filled（是否已补录）/ is_manual_judged / work_order_id / line_no。
+    组合示例：
+      original_has_gap=True                         → 所有曾经断档过的行（含未补+已补，复核人最常用）
+      original_has_gap=True + has_gap=True          → 仍然待补的断档行
+      original_has_gap=True + is_material_filled=True → 已补录完毕的断档行
+    """
     lines = session.get("lines", [])
     result = []
     for ln in lines:
         if "status" in kwargs and ln.get("status") != kwargs["status"]:
             continue
         if "has_gap" in kwargs and bool(ln.get("has_gap")) != bool(kwargs["has_gap"]):
+            continue
+        if "original_has_gap" in kwargs and bool(ln.get("original_has_gap")) != bool(kwargs["original_has_gap"]):
+            continue
+        if "is_material_filled" in kwargs and bool(ln.get("is_material_filled")) != bool(kwargs["is_material_filled"]):
             continue
         if "is_manual_judged" in kwargs and bool(ln.get("is_manual_judged")) != bool(kwargs["is_manual_judged"]):
             continue
@@ -242,15 +258,29 @@ def fill_material_and_rejudge(
 
     target["material_value"] = new_material
     target["current_conclusion"] = new_concl
+    # --- 断档信息保留：永不改变 original_has_gap / original_gap_detail ---
+    # has_gap 改为 False 表示"当前已补齐，不再属于待补"
+    # 但通过 original_has_gap=True + filter --had-gap 仍可追溯
     target["has_gap"] = False
-    target["gap_detail"] = ""
+    # gap_detail 改写为原始说明 + 已补录信息
+    old_gap_detail = target.get("original_gap_detail") or target.get("gap_detail") or ""
+    target["gap_detail"] = f"原始断档：{old_gap_detail}；已补录（{operator}）：{reason}"
+    # --- 新增补录状态字段 ---
+    filled_at = datetime.now().isoformat(timespec="seconds")
+    target["is_material_filled"] = True
+    target["filled_material"] = new_material
+    target["filled_by"] = operator
+    target["filled_at"] = filled_at
+    target["filled_reason"] = reason
+    target["manual_judge_reason"] = reason if changed else target.get("manual_judge_reason", "")
     target["is_manual_judged"] = changed
     target["status"] = LineStatus.MANUAL_JUDGED.value if changed else LineStatus.PROCESSED.value
-    target["status_reason"] = f"补录材料并改判，原因：{reason}" if changed else (target.get("status_reason") or "补录材料")
+    base_reason = f"采样断档已补录，补录值={new_material}，操作人={operator}。原因：{reason}"
+    target["status_reason"] = (base_reason + f"；结论由{old_concl}改判为{new_concl}") if changed else base_reason
 
     # 写快照到 history_snapshots
     snapshot = {
-        "rejudge_time": datetime.now().isoformat(timespec="seconds"),
+        "rejudge_time": filled_at,
         "operator": operator,
         "old_material": old_material,
         "new_material": new_material,
@@ -266,7 +296,7 @@ def fill_material_and_rejudge(
             remark_id="RMK-" + uuid.uuid4().hex[:8],
             author=operator,
             shift=sess_dict.get("shift", ""),
-            created_at=datetime.now().isoformat(timespec="seconds"),
+            created_at=filled_at,
             content=remark_content,
             attached_to_line_no=line_no,
             remark_type="改判备注",
@@ -315,11 +345,17 @@ def _rewrite_session(session_id: str, sess_dict: Dict[str, Any]) -> None:
 # ---------- 导出 ----------
 
 def export_to_csv(session: Dict[str, Any], include_gap: bool = True, include_history: bool = True) -> str:
-    """导出 CSV，包含断档追踪列与改判历史。"""
+    """导出 CSV，包含断档追踪列（原始+当前+补录）与改判历史。"""
     headers = [
         "行号", "工单号", "管线号", "采样点", "采样时间",
         "材料值", "原始结论", "当前结论", "处理状态", "状态说明",
-        "是否断档", "断档说明", "是否人工改判", "改判原因",
+        # --- 断档追踪：原始 / 当前 / 补录 三段都留 ---
+        "原始是否断档", "原始断档说明",
+        "当前是否待补(断档未补)", "当前断档说明",
+        "是否已补录", "补录值", "补录人", "补录时间", "补录原因",
+        # --- 改判 ---
+        "是否人工改判", "改判原因",
+        # --- 其他 ---
         "后补备注", "改判历史", "关联交接",
     ]
     buf = io.StringIO()
@@ -350,10 +386,20 @@ def export_to_csv(session: Dict[str, Any], include_gap: bool = True, include_his
             ln.get("current_conclusion"),
             ln.get("status"),
             ln.get("status_reason"),
+            # 断档追踪
+            "是" if ln.get("original_has_gap") else "否",
+            ln.get("original_gap_detail") or "",
             "是" if ln.get("has_gap") else "否",
-            ln.get("gap_detail"),
+            ln.get("gap_detail") or "",
+            "是" if ln.get("is_material_filled") else "否",
+            ln.get("filled_material") or "",
+            ln.get("filled_by") or "",
+            ln.get("filled_at") or "",
+            ln.get("filled_reason") or "",
+            # 改判
             "是" if ln.get("is_manual_judged") else "否",
-            ln.get("manual_judge_reason"),
+            ln.get("manual_judge_reason") or "",
+            # 其他
             remarks_text,
             hist_text,
             ho_text,

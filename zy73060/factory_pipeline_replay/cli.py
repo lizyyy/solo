@@ -153,18 +153,24 @@ def cmd_replay(args: argparse.Namespace) -> int:
     print(f"    {_c('待补材料  :', _status_color('待补材料'))} {counters['待补材料']:>4}  行   (提示：采样断档需补录)")
     print(f"    {_c('人工改判  :', _status_color('人工改判'))} {counters['人工改判']:>4}  行")
     print()
+    print(_c("  ◆ 采样断档追踪（原始断档信息永不抹掉）", C.BOLD))
+    print(f"    原始断档 未补录: {counters['原始断档_未补']:>4}  行   （--gap-pending 筛）")
+    print(f"    原始断档 已补录: {counters['原始断档_已补']:>4}  行   （--gap-filled  筛）")
+    print(f"    原始断档 合计  : {counters['原始断档_未补'] + counters['原始断档_已补']:>4}  行   （--had-gap     筛）")
+    print()
 
     # 明细
-    print(_c("  ◆ 回放明细（后补备注直接跟在结果旁边）", C.BOLD))
-    print("  ┌─────┬──────────────┬──────────┬──────────┬────────────┬──────────┬──────────────────────────────────────┐")
-    print("  │行号 │ 工单号       │ 管线号   │ 采样点   │ 材料值     │ 当前结论 │ 处理状态 + 说明 + 后补备注            │")
-    print("  ├─────┼──────────────┼──────────┼──────────┼────────────┼──────────┼──────────────────────────────────────┤")
+    print(_c("  ◆ 回放明细（后补备注跟在结果旁；⚑ 表示该行曾经断档过，可溯源）", C.BOLD))
+    print("  ┌─┬─────┬──────────────┬──────────┬──────────┬────────────┬──────────┬──────────────────────────────────────┐")
+    print("  │溯│行号 │ 工单号       │ 管线号   │ 采样点   │ 材料值     │ 当前结论 │ 处理状态 + 说明 + 后补备注            │")
+    print("  ├─┼─────┼──────────────┼──────────┼──────────┼────────────┼──────────┼──────────────────────────────────────┤")
     for ln in session.lines:
         mv = ln.material_value or _c("(断档)", C.MAGENTA)
         concl_color = C.GREEN if ln.current_conclusion == WorkOrderConclusion.PASS.value else (
             C.YELLOW if ln.current_conclusion == WorkOrderConclusion.PENDING.value else C.RED
         )
         status_cell = _c(ln.status, _status_color(ln.status))
+        trace_tag = _c("⚑", C.MAGENTA + C.BOLD) if getattr(ln, "original_has_gap", False) else " "
         reason_and_remark = ln.status_reason or ""
         # 嵌入后补备注
         for rmk in ln.remarks:
@@ -173,19 +179,21 @@ def cmd_replay(args: argparse.Namespace) -> int:
         first_line_reason = reason_and_remark_wrapped.split("\n")[0] if reason_and_remark_wrapped else ""
         other_lines = reason_and_remark_wrapped.split("\n")[1:] if reason_and_remark_wrapped else []
 
-        print(f"  │ {ln.line_no:>3} │ {ln.work_order_id:<12} │ {ln.pipeline_id:<8} │ {ln.sample_point:<8} │ {str(mv):>10} │ {_c(ln.current_conclusion, concl_color):<8} │ {status_cell} {first_line_reason:<32} │")
+        print(f"  │{trace_tag}│ {ln.line_no:>3} │ {ln.work_order_id:<12} │ {ln.pipeline_id:<8} │ {ln.sample_point:<8} │ {str(mv):>10} │ {_c(ln.current_conclusion, concl_color):<8} │ {status_cell} {first_line_reason:<32} │")
         for extra in other_lines:
-            print(f"  │     │              │          │          │            │          │     {extra:<36} │")
-    print("  └─────┴──────────────┴──────────┴──────────┴────────────┴──────────┴──────────────────────────────────────┘")
+            print(f"  │ │     │              │          │          │            │          │     {extra:<36} │")
+    print("  └─┴─────┴──────────────┴──────────┴──────────┴────────────┴──────────┴──────────────────────────────────────┘")
 
     print()
     print(_c(f"  ◆ 会话 ID 保存：{session.session_id}", C.BLUE))
-    print(_c(f"    下一手操作：", C.BOLD))
-    print(_c(f"      筛选断档行  →  python -m factory_pipeline_replay.cli filter --session {session.session_id} --has-gap", C.CYAN))
-    print(_c(f"      看某行详情  →  python -m factory_pipeline_replay.cli detail --session {session.session_id} --line <行号>", C.CYAN))
-    print(_c(f"      补录并改判  →  python -m factory_pipeline_replay.cli fill --session {session.session_id} --line <行号> --material <值> ...", C.CYAN))
-    print(_c(f"      导出复核表  →  python -m factory_pipeline_replay.cli export --session {session.session_id} --out <路径>", C.CYAN))
-    print(_c(f"      经理汇总图  →  python -m factory_pipeline_replay.cli report --session {session.session_id}", C.CYAN))
+    print(_c(f"    下一手操作（从筛选 → 详情 → 导出 全链路可追）：", C.BOLD))
+    print(_c(f"      所有曾断档（最常用）→  python -m factory_pipeline_replay.cli filter --session {session.session_id} --had-gap", C.CYAN))
+    print(_c(f"      仅未补的断档       →  python -m factory_pipeline_replay.cli filter --session {session.session_id} --gap-pending", C.CYAN))
+    print(_c(f"      已补完的断档       →  python -m factory_pipeline_replay.cli filter --session {session.session_id} --gap-filled", C.CYAN))
+    print(_c(f"      看某行详情         →  python -m factory_pipeline_replay.cli detail --session {session.session_id} --line <行号>", C.CYAN))
+    print(_c(f"      补录并改判         →  python -m factory_pipeline_replay.cli fill --session {session.session_id} --line <行号> --material <值> ...", C.CYAN))
+    print(_c(f"      导出复核表         →  python -m factory_pipeline_replay.cli export --session {session.session_id} --out <路径>", C.CYAN))
+    print(_c(f"      经理汇总图         →  python -m factory_pipeline_replay.cli report --session {session.session_id}", C.CYAN))
     print()
     return 0
 
@@ -222,7 +230,21 @@ def cmd_filter(args: argparse.Namespace) -> int:
     kwargs: Dict[str, Any] = {}
     if args.status:
         kwargs["status"] = args.status
-    if args.has_gap:
+    # 三种断档筛选（互斥优先级：had-gap > gap-pending > gap-filled > has-gap）
+    if args.had_gap:
+        # 所有曾经断档过的行：未补 + 已补 均命中（复核人最常用）
+        kwargs["original_has_gap"] = True
+    elif args.gap_pending:
+        # 只看仍未补的断档行：原始断档 + 当前仍断档
+        kwargs["original_has_gap"] = True
+        kwargs["has_gap"] = True
+    elif args.gap_filled:
+        # 已补录完成的断档行：原始断档 + 已补录
+        kwargs["original_has_gap"] = True
+        kwargs["is_material_filled"] = True
+    elif args.has_gap:
+        # 兼容旧参数：等价于 gap-pending
+        kwargs["original_has_gap"] = True
         kwargs["has_gap"] = True
     if args.manual:
         kwargs["is_manual_judged"] = True
@@ -231,24 +253,37 @@ def cmd_filter(args: argparse.Namespace) -> int:
     if args.line:
         kwargs["line_no"] = args.line
     results = engine.filter_lines(sess, **kwargs)
-    print(_c(f"  筛选条件命中 {len(results)} 行（从筛选 → 详情 → 导出 都能追到每条）", C.BOLD))
+    filter_note = ""
+    if args.had_gap: filter_note = "（所有曾有采样断档的行：未补 + 已补）"
+    elif args.gap_pending or args.has_gap: filter_note = "（仍待补的断档行）"
+    elif args.gap_filled: filter_note = "（已补录的断档行）"
+    print(_c(f"  筛选条件命中 {len(results)} 行{filter_note}（从筛选 → 详情 → 导出 都能追到每条）", C.BOLD))
     for ln in results:
         mv = ln.get("material_value") or _c("(断档)", C.MAGENTA)
         status = _c(ln.get("status"), _status_color(ln.get("status")))
         tags = []
-        if ln.get("has_gap"): tags.append("⚠断档")
+        if ln.get("original_has_gap"): tags.append("⚑断档溯源")
+        if ln.get("has_gap"): tags.append("⚠待补")
+        if ln.get("is_material_filled"): tags.append("✔已补")
         if ln.get("is_manual_judged"): tags.append("✎改判")
         tag_str = " ".join(_c(t, C.YELLOW) for t in tags)
         reason = _wrap(ln.get("status_reason", ""), 60)
         print(f"    行{ln.get('line_no'):>3} │ {ln.get('work_order_id'):<12} │ {ln.get('pipeline_id'):<8} │ 材料={mv:<8} │ 结论={ln.get('current_conclusion'):<4} │ {status} {tag_str}")
+        # 原始断档信息：只要原始有断档，就单独展示一行，不被补录抹掉
+        if ln.get("original_has_gap"):
+            print(f"           🔍 原始断档：{ln.get('original_gap_detail') or '采样值缺失'}")
+            if ln.get("is_material_filled"):
+                print(f"           🔍 补录信息：值={ln.get('filled_material')} 人={ln.get('filled_by')} 时间={ln.get('filled_at')}")
+                if ln.get("filled_reason"):
+                    print(f"           🔍 补录原因：{ln.get('filled_reason')}")
         if reason:
             print(f"           原因：{reason}")
         if ln.get("remarks"):
             for r in ln["remarks"]:
                 print(f"           💬 [{r.get('remark_type')}] {r.get('author')}: {r.get('content')}")
     print()
-    if args.has_gap:
-        print(_c(f"  断档行追出提示：挑上面一个行号，用 detail --session {args.session} --line <行号> 查看完整链路。", C.CYAN))
+    if args.had_gap or args.gap_pending or args.gap_filled or args.has_gap:
+        print(_c(f"  断档追踪提示：挑一个行号，用 detail --session {args.session} --line <行号> 可看原始断档+补录+改判完整链路。", C.CYAN))
     return 0
 
 
@@ -266,20 +301,46 @@ def cmd_detail(args: argparse.Namespace) -> int:
     print(_c(f"{'='*70}", C.BLUE))
     print(_c(f"  回放行详情  行号 {args.line}   会话 {args.session}", C.BOLD + C.CYAN))
     print(_c(f"{'='*70}", C.BLUE))
-    for k in ["work_order_id","pipeline_id","sample_point","sample_time","material_value",
-              "original_conclusion","current_conclusion","status","status_reason",
-              "has_gap","gap_detail","is_manual_judged","manual_judge_reason"]:
-        v = detail.get(k)
-        if isinstance(v, bool): v = "是" if v else "否"
-        label = {
-            "work_order_id":"工单号","pipeline_id":"管线号","sample_point":"采样点",
-            "sample_time":"采样时间","material_value":"材料值",
-            "original_conclusion":"原始结论","current_conclusion":"当前结论",
-            "status":"处理状态","status_reason":"状态说明",
-            "has_gap":"是否采样断档","gap_detail":"断档说明",
-            "is_manual_judged":"是否人工改判","manual_judge_reason":"改判原因",
-        }.get(k, k)
-        print(f"  {label:<14}: {v}")
+    base_fields = [
+        "work_order_id","pipeline_id","sample_point","sample_time","material_value",
+        "original_conclusion","current_conclusion","status","status_reason",
+    ]
+    gap_fields = [
+        "original_has_gap","original_gap_detail",
+        "has_gap","gap_detail",
+    ]
+    fill_fields = [
+        "is_material_filled","filled_material","filled_by","filled_at","filled_reason",
+    ]
+    judge_fields = ["is_manual_judged","manual_judge_reason"]
+
+    label_map = {
+        "work_order_id":"工单号","pipeline_id":"管线号","sample_point":"采样点",
+        "sample_time":"采样时间","material_value":"材料值",
+        "original_conclusion":"原始结论","current_conclusion":"当前结论",
+        "status":"处理状态","status_reason":"状态说明",
+        "original_has_gap":"原始是否断档（永不改变）",
+        "original_gap_detail":"原始断档说明（永不改变）",
+        "has_gap":"当前是否仍待补（断档未补）",
+        "gap_detail":"当前断档说明",
+        "is_material_filled":"是否已补录材料",
+        "filled_material":"补录材料值",
+        "filled_by":"补录操作人",
+        "filled_at":"补录时间",
+        "filled_reason":"补录原因",
+        "is_manual_judged":"是否人工改判",
+        "manual_judge_reason":"改判原因",
+    }
+    for sec_name, fields in [("基础信息", base_fields),
+                               ("采样断档追踪（原始信息永不抹掉）", gap_fields),
+                               ("补录信息（后续处理）", fill_fields),
+                               ("改判信息", judge_fields)]:
+        print(_c(f"  ─ {sec_name}", C.DIM))
+        for k in fields:
+            v = detail.get(k)
+            if isinstance(v, bool): v = "是" if v else "否"
+            if v is None or v == "": v = _c("（空）", C.DIM)
+            print(f"  {label_map.get(k, k):<22}: {v}")
 
     # 关联交接
     if detail.get("handover"):
@@ -360,7 +421,7 @@ def cmd_export(args: argparse.Namespace) -> int:
     return 0
 
 
-# ---------- 命令：report（项目经理三栏视图） ----------
+# ---------- 命令：report（项目经理视图：已处理 / 断档未补 / 断档已补 / 人工改判 四栏） ----------
 def cmd_report(args: argparse.Namespace) -> int:
     sess = storage.load_session(args.session)
     if not sess:
@@ -369,18 +430,23 @@ def cmd_report(args: argparse.Namespace) -> int:
 
     lines = sess.get("lines", [])
     processed = [l for l in lines if l.get("status") == LineStatus.PROCESSED.value]
-    pending = [l for l in lines if l.get("status") == LineStatus.PENDING_MATERIAL.value]
+    gap_pending = [l for l in lines
+                   if l.get("original_has_gap") and (not l.get("is_material_filled"))]  # 未补
+    gap_filled = [l for l in lines
+                  if l.get("original_has_gap") and l.get("is_material_filled")]    # 已补
     judged = [l for l in lines if l.get("is_manual_judged")]
 
     def _short(ln: Dict[str, Any]) -> str:
         tags = []
-        if ln.get("has_gap"): tags.append("断档")
+        if ln.get("original_has_gap"): tags.append("断档")
+        if ln.get("original_has_gap") and (not ln.get("is_material_filled")): tags.append("未补")
+        if ln.get("is_material_filled"): tags.append("已补")
         if ln.get("is_manual_judged"): tags.append("改判")
         mv = ln.get("material_value") or "(空)"
         tag = f" [{','.join(tags)}]" if tags else ""
         return f"行{ln['line_no']:<3} {ln['work_order_id']} {ln['pipeline_id']} 材={mv:<6} 结论={ln['current_conclusion']}{tag}"
 
-    W = 50
+    W = 42
     def _box(title: str, items: List[str], color: str) -> List[str]:
         rows = []
         rows.append(_c("┌" + "─"*(W-2) + "┐", color))
@@ -395,26 +461,33 @@ def cmd_report(args: argparse.Namespace) -> int:
         rows.append(_c("└" + "─"*(W-2) + "┘", color))
         return rows
 
-    col1 = _box("已处理记录", [_short(l) for l in processed], C.GREEN)
-    col2 = _box("待补材料（采样断档）", [_short(l) for l in pending], C.MAGENTA)
-    col3 = _box("人工改判", [_short(l) for l in judged], C.CYAN)
+    col1 = _box("① 已处理记录", [_short(l) for l in processed], C.GREEN)
+    col2 = _box("② 采样断档·未补", [_short(l) for l in gap_pending], C.MAGENTA)
+    col3 = _box("③ 采样断档·已补（含改判）", [_short(l) for l in gap_filled], C.YELLOW)
+    col4 = _box("④ 人工改判", [_short(l) for l in judged], C.CYAN)
 
-    max_rows = max(len(col1), len(col2), len(col3))
+    max_rows = max(len(col1), len(col2), len(col3), len(col4))
     def pad(col, n):
         return col + [" "*(W)]*(n-len(col))
-    col1, col2, col3 = pad(col1, max_rows), pad(col2, max_rows), pad(col3, max_rows)
+    col1, col2, col3, col4 = pad(col1, max_rows), pad(col2, max_rows), pad(col3, max_rows), pad(col4, max_rows)
 
+    total_gap = len(gap_pending) + len(gap_filled)
     print()
-    print(_c(f"{'='*(W*3+4)}", C.BLUE))
-    title = f"  工厂管线工单回放 · 项目经理三栏汇总视图   会话 {args.session}"
-    print(_c(title.ljust(W*3+2), C.BOLD + C.CYAN))
+    print(_c(f"{'='*(W*4+6)}", C.BLUE))
+    title = f"  工厂管线工单回放 · 项目经理汇总视图（四栏）  会话 {args.session}"
+    print(_c(title.ljust(W*4+4), C.BOLD + C.CYAN))
     print(_c(f"  操作人：{sess.get('operator','-')}   班组：{sess.get('shift','-')}   材料：{os.path.basename(sess.get('source_file','-'))}   时间：{sess.get('started_at','-')}", C.DIM))
-    print(_c(f"{'='*(W*3+4)}", C.BLUE))
-    for a, b, c_ in zip(col1, col2, col3):
-        print(f"  {a}  {b}  {c_}")
+    print(_c(f"  采样断档追踪合计：{total_gap} 条 —— 未补 {len(gap_pending)} 条 / 已补 {len(gap_filled)} 条（改判 {len(judged)} 条）", C.MAGENTA + C.BOLD))
+    print(_c(f"{'='*(W*4+6)}", C.BLUE))
+    for a, b, c_, d in zip(col1, col2, col3, col4):
+        print(f"  {a}  {b}  {c_}  {d}")
     print()
-    print(_c("  * 本图可直接截图给项目经理：三栏分别说明【已处理、待补、人工改判】各多少、哪几条。", C.DIM))
-    print(_c("  * 待补材料列里的行号，配合 detail --line 即可看到断档的完整追踪链路。", C.DIM))
+    print(_c("  【底部总说明 · 截图交付用】", C.BOLD))
+    print(_c("  ① 已处理记录：原始数据正常、无需补录、结论由阈值自动判定的行。", C.DIM))
+    print(_c("  ② 采样断档·未补：原始回放时材料值缺失（采样断档）、截止目前仍未补录的行，下一班组需优先处理。", C.DIM))
+    print(_c("  ③ 采样断档·已补（含改判）：原始断档但已执行 fill 补录的行，保留原始断档信息+补录值+补录人+补录时间+补录原因。", C.DIM))
+    print(_c("  ④ 人工改判：补录后结论与原始结论不一致的行，旧材料/新材料/旧结论/新结论/改判原因全量留痕，detail 可展开历史。", C.DIM))
+    print(_c("  * 任意断档行的完整追踪链路：filter --had-gap 筛 → detail --line N 查（原始断档+补录+改判+备注+交接） → export 导出 CSV 给复核人。", C.DIM))
     print()
     return 0
 
@@ -489,7 +562,14 @@ def build_parser() -> argparse.ArgumentParser:
     pf = sub.add_parser("filter", help="按条件筛选回放行（从筛选 → 详情 → 导出）")
     pf.add_argument("--session", required=True, help="会话 ID（从 list 里看）")
     pf.add_argument("--status", choices=[v.value for v in LineStatus], help="按处理状态筛")
-    pf.add_argument("--has-gap", action="store_true", help="只看采样断档的行")
+    pf.add_argument("--has-gap", action="store_true",
+                    help="(兼容旧参数) 只看仍待补的采样断档行，等价于 --gap-pending")
+    pf.add_argument("--had-gap", action="store_true",
+                    help="看所有【曾经断档】过的行（未补 + 已补都能追到，复核人最常用）")
+    pf.add_argument("--gap-pending", action="store_true",
+                    help="只看仍待补材料、尚未补录的断档行")
+    pf.add_argument("--gap-filled", action="store_true",
+                    help="只看原始断档但已补录材料、已处理完毕的行")
     pf.add_argument("--manual", action="store_true", help="只看人工改判过的行")
     pf.add_argument("--work-order", help="按工单号筛")
     pf.add_argument("--line", type=int, help="按具体行号筛")

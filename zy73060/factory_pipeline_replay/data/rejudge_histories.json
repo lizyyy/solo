@@ -1,28 +1,28 @@
 [
   {
-    "history_id": "RJH-c36cafa8",
+    "history_id": "RJH-38037449",
     "work_order_id": "WO-2026-00013",
     "line_no": 6,
-    "rejudge_time": "2026-06-09T18:51:28",
+    "rejudge_time": "2026-06-21T00:48:23",
     "operator": "小王",
     "old_material": null,
     "new_material": "1.28",
     "old_conclusion": "待判定",
     "new_conclusion": "合格",
-    "reason": "巡检发现 09:30 SP-06 采样仪器接触不良，09:50 现场重测补录，压力正常",
-    "new_remark": "现场重测：温度 24.1℃，压力 1.22MPa，同批样 1.26 / 1.30 / 1.28，取平均"
+    "reason": "SP-06 仪器接触不良，09:50 重测，现场补录",
+    "new_remark": "同批样 1.26/1.30/1.28，取平均；温度 24.1℃；压力 1.22MPa"
   },
   {
-    "history_id": "RJH-65cb4368",
+    "history_id": "RJH-8fd1a896",
     "work_order_id": "WO-2026-00014",
     "line_no": 8,
-    "rejudge_time": "2026-06-09T18:51:28",
+    "rejudge_time": "2026-06-21T00:48:23",
     "operator": "小王",
     "old_material": null,
     "new_material": "3.05",
     "old_conclusion": "待判定",
     "new_conclusion": "不合格",
-    "reason": "同批次采样值异常偏高，疑似管线泄漏，按不合格判定",
-    "new_remark": "已通知巡检班现场排查 PL-D-008，待反馈"
+    "reason": "同批次值偏高，疑似 PL-D-008 微漏，判不合格",
+    "new_remark": "已通知巡检班排查，待后续复测。"
   }
 ]
