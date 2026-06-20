@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import {
   FileSpreadsheet,
@@ -16,6 +16,9 @@ import {
   Clock,
   User,
   Hash,
+  ChevronDown,
+  RefreshCw,
+  Server,
 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import {
@@ -27,6 +30,7 @@ import {
 } from '@/types';
 import type { ExportLog } from '@/types';
 import { StatusTag, NameConflictTag } from '@/components/StatusTag';
+import { approvalApi, type ApiExportDetail } from '@/services/approvalApi';
 
 export function ExportLogsList() {
   const navigate = useNavigate();
@@ -302,8 +306,49 @@ export function ExportLogDetail() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { getExportLogById, getRecordById } = useAppStore();
+  const [apiResponse, setApiResponse] = useState<ApiExportDetail | null>(null);
+  const [apiLoading, setApiLoading] = useState(false);
+  const [apiMismatches, setApiMismatches] = useState<Record<string, Array<{ field: string; snap: string | number; api: string | number }>>>({});
+  const [apiTotalMismatches, setApiTotalMismatches] = useState(0);
+  const [allFieldsExpanded, setAllFieldsExpanded] = useState(false);
 
   const log = getExportLogById(id || '');
+
+  const refreshApi = async () => {
+    if (!id) return;
+    setApiLoading(true);
+    try {
+      const resp = await approvalApi.getExportLogDetail(id);
+      if (resp.code === 0 && resp.data) {
+        setApiResponse(resp.data);
+        const mismatches: Record<string, Array<{ field: string; snap: string | number; api: string | number }>> = {};
+        let total = 0;
+        resp.data.rows.forEach((row) => {
+          const snap = log?.dataSnapshot.find((s) => s.id === row.recordId);
+          if (!snap) return;
+          const diffs: Array<{ field: string; snap: string | number; api: string | number }> = [];
+          row.fields.forEach((f) => {
+            const snapValue = formatValueByCode(snap, f.fieldCode);
+            const apiValue = f.value;
+            if (String(snapValue) !== String(apiValue)) {
+              diffs.push({ field: f.fieldLabel, snap: snapValue, api: apiValue });
+              total++;
+            }
+          });
+          if (diffs.length > 0) mismatches[row.recordId] = diffs;
+        });
+        setApiMismatches(mismatches);
+        setApiTotalMismatches(total);
+      }
+    } finally {
+      setApiLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (log && id) refreshApi();
+  }, [log, id]);
+
   if (!log) {
     return (
       <div className="space-y-6">
@@ -318,6 +363,8 @@ export function ExportLogDetail() {
       </div>
     );
   }
+
+  const displayFields = allFieldsExpanded ? EXPORT_FIELD_MAPPINGS : EXPORT_FIELD_MAPPINGS.slice(0, 9);
 
   return (
     <div className="space-y-6 max-w-6xl">
@@ -338,7 +385,7 @@ export function ExportLogDetail() {
         >
           导出追溯详情：{log.filename}
         </h1>
-        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+        <div className="mt-4 grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
           <div className="bg-gray-50 p-3 rounded-lg">
             <p className="text-xs text-gray-500">导出日志 ID</p>
             <p className="font-mono font-medium text-gray-800 mt-0.5">{log.id}</p>
@@ -357,26 +404,57 @@ export function ExportLogDetail() {
               {log.dataSnapshotHash}
             </p>
           </div>
+          <div className="bg-indigo-50 p-3 rounded-lg border border-indigo-100">
+            <p className="text-xs text-indigo-600 flex items-center gap-1">
+              <Server className="w-3 h-3" />
+              接口读取核对
+            </p>
+            <button
+              onClick={refreshApi}
+              disabled={apiLoading}
+              className="mt-1 text-xs w-full text-left font-medium text-indigo-700 flex items-center gap-1"
+            >
+              <RefreshCw className={`w-3 h-3 ${apiLoading ? 'animate-spin' : ''}`} />
+              {apiLoading
+                ? '接口读取中…'
+                : apiResponse
+                  ? apiTotalMismatches === 0
+                    ? `✅ 接口返回与快照完全一致 (${log.dataSnapshot.length}条)`
+                    : `⚠️ 发现 ${apiTotalMismatches} 处差异`
+                  : '点我重新核对接口'}
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100 bg-gray-50/50">
-          <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-            <Hash className="w-4 h-4 text-blue-600" />
-            从该导出一路追溯到每条记录的原始材料
-          </h2>
-          <p className="mt-1 text-xs text-gray-500">
-            同一业务字段映射（{EXPORT_FIELD_MAPPINGS.length} 个）：页面展示、导出明细、接口读取，三处用同一套字段编码
-          </p>
+        <div className="px-5 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between gap-3">
+          <div>
+            <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+              <Hash className="w-4 h-4 text-blue-600" />
+              从该导出一路追溯到每条记录的原始材料（页面快照 vs 接口返回）
+            </h2>
+            <p className="mt-1 text-xs text-gray-500">
+              同一业务字段映射（{EXPORT_FIELD_MAPPINGS.length} 个）：页面展示、导出明细、接口读取，三处用同一套字段编码
+            </p>
+          </div>
+          <button
+            onClick={() => setAllFieldsExpanded(!allFieldsExpanded)}
+            className="text-xs text-blue-700 hover:text-blue-800 bg-blue-50 px-3 py-1.5 rounded-md flex items-center gap-1"
+          >
+            <ChevronDown className={`w-3.5 h-3.5 ${allFieldsExpanded ? 'rotate-180' : ''}`} />
+            {allFieldsExpanded ? '收起字段' : `展开全部${EXPORT_FIELD_MAPPINGS.length}个字段`}
+          </button>
         </div>
 
         <div className="divide-y divide-gray-100">
           {log.dataSnapshot.map((snapshotRecord) => {
             const currentRecord = getRecordById(snapshotRecord.id);
+            const apiRow = apiResponse?.rows.find((r) => r.recordId === snapshotRecord.id);
+            const mismatches = apiMismatches[snapshotRecord.id] || [];
             return (
               <div key={snapshotRecord.id} className="p-5">
-                <div className="flex items-start justify-between gap-4 mb-4">
+                <div className="flex items-start justify-between gap-4 mb-4 flex-wrap">
                   <div>
                     <div className="flex items-center gap-3 flex-wrap">
                       <h3 className="font-semibold text-gray-900">
@@ -384,6 +462,16 @@ export function ExportLogDetail() {
                       </h3>
                       <StatusTag status={snapshotRecord.status} />
                       <NameConflictTag hasConflict={snapshotRecord.hasNameConflict} />
+                      {mismatches.length > 0 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-red-50 text-red-700 border border-red-200">
+                          接口差异 {mismatches.length}
+                        </span>
+                      )}
+                      {apiResponse && mismatches.length === 0 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-green-50 text-green-700 border border-green-200">
+                          接口完全一致
+                        </span>
+                      )}
                     </div>
                     <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
                       <span>
@@ -409,42 +497,75 @@ export function ExportLogDetail() {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                   <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                    <p className="text-xs font-medium text-gray-600 mb-2">导出时的快照值（无障碍坡道记录 + 其他字段）</p>
+                    <p className="text-xs font-medium text-gray-600 mb-2">
+                      📸 导出快照值（导出时记录）
+                    </p>
                     <div className="space-y-1.5 text-xs">
-                      {EXPORT_FIELD_MAPPINGS.slice(0, 9).map((mapping) => (
+                      {displayFields.map((mapping) => (
                         <div key={mapping.code} className="flex gap-2">
                           <span className="text-gray-400 shrink-0 w-28 truncate" title={mapping.label}>
                             {mapping.label}:
                           </span>
-                          <span className="text-gray-700 flex-1 break-all">
+                          <span className="text-gray-700 flex-1 break-all font-mono">
                             {formatValueByCode(snapshotRecord, mapping.code) || '(空)'}
                           </span>
                         </div>
                       ))}
                     </div>
                   </div>
+
+                  <div className="bg-teal-50 rounded-lg p-4 border border-teal-200">
+                    <p className="text-xs font-medium text-teal-700 mb-2 flex items-center gap-1">
+                      <Server className="w-3.5 h-3.5" />
+                      🛰️ 接口返回值（approvalApi.getExportLogDetail）
+                    </p>
+                    {apiRow ? (
+                      <div className="space-y-1.5 text-xs">
+                        {displayFields.map((mapping) => {
+                          const snap = formatValueByCode(snapshotRecord, mapping.code);
+                          const apiField = apiRow.fields.find((f) => f.fieldCode === mapping.code);
+                          const apiValue = apiField?.value ?? '';
+                          const diff = String(snap) !== String(apiValue);
+                          return (
+                            <div key={mapping.code} className={`flex gap-2 ${diff ? 'bg-red-50 rounded px-1 -mx-1' : ''}`}>
+                              <span className="text-teal-500 shrink-0 w-28 truncate" title={mapping.label}>
+                                {mapping.label}:
+                              </span>
+                              <span className={`flex-1 break-all font-mono ${diff ? 'text-red-700' : 'text-teal-800'}`}>
+                                {apiValue || '(空)'}
+                                {diff && <span className="ml-1 text-[10px] font-semibold">⚠️ 不一致</span>}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-gray-400 italic">
+                        {apiLoading ? '接口读取中…' : '接口数据未加载，点上方蓝色区域重新核对'}
+                      </p>
+                    )}
+                  </div>
+
                   <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                     <p className="text-xs font-medium text-blue-700 mb-2">
-                      当前系统中的实际值（对比是否被改动过）
+                      📍 当前系统中的实际值
                     </p>
                     {currentRecord ? (
                       <div className="space-y-1.5 text-xs">
-                        {EXPORT_FIELD_MAPPINGS.slice(0, 9).map((mapping) => {
+                        {displayFields.map((mapping) => {
                           const snap = formatValueByCode(snapshotRecord, mapping.code);
                           const curr = formatValueByCode(currentRecord, mapping.code);
                           const changed = snap !== curr;
                           return (
-                            <div key={mapping.code} className="flex gap-2">
-                              <span className="text-gray-400 shrink-0 w-28 truncate" title={mapping.label}>
+                            <div key={mapping.code} className={`flex gap-2 ${changed ? 'bg-red-50 rounded px-1 -mx-1' : ''}`}>
+                              <span className="text-blue-400 shrink-0 w-28 truncate" title={mapping.label}>
                                 {mapping.label}:
                               </span>
-                              <span className={`flex-1 break-all ${
-                                changed ? 'text-red-600 bg-red-50 px-1 rounded' : 'text-gray-700'
-                              }`}>
+                              <span className={`flex-1 break-all font-mono ${changed ? 'text-red-600' : 'text-gray-700'}`}>
                                 {curr || '(空)'}
-                                {changed && <span className="ml-1 text-[10px] text-red-500">（已变动）</span>}
+                                {changed && <span className="ml-1 text-[10px]">（已变动）</span>}
                               </span>
                             </div>
                           );

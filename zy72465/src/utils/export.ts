@@ -18,6 +18,39 @@ interface ExportResult {
   message: string;
 }
 
+export type FieldComparison = {
+  fieldCode: string;
+  fieldLabel: string;
+  storeValue: string | number;
+  pageValue: string | number;
+  exportValue: string | number;
+  matches: boolean;
+};
+
+export type RecordComparison = {
+  recordId: string;
+  originalLineNumber: number;
+  displayName: string;
+  allMatch: boolean;
+  mismatchedFieldLabels: string[];
+  mismatchedCount: number;
+  fields: FieldComparison[];
+};
+
+export type ConsistencyReport = {
+  consistent: boolean;
+  fieldCount: number;
+  recordCount: number;
+  matchedRecordCount: number;
+  totalMismatches: number;
+  storeHash: string;
+  pageHash: string;
+  exportHash: string;
+  summary: string;
+  records: RecordComparison[];
+  mismatchedRecords: RecordComparison[];
+};
+
 const buildExportRow = (record: ApprovalRecord): Record<string, string | number> => {
   const row: Record<string, string | number> = {};
   EXPORT_FIELD_MAPPINGS.forEach((mapping) => {
@@ -26,36 +59,99 @@ const buildExportRow = (record: ApprovalRecord): Record<string, string | number>
   return row;
 };
 
-const runConsistencyCheck = (records: ApprovalRecord[]) => {
-  const pageDataStr = JSON.stringify(records);
-  
+const buildFieldMapFromRowLabel = (labelRow: Record<string, string | number>): Map<string, string | number> => {
+  const out = new Map<string, string | number>();
+  EXPORT_FIELD_MAPPINGS.forEach((m) => {
+    out.set(m.code, labelRow[m.label] ?? '');
+  });
+  return out;
+};
+
+const calculateLocalHash = (str: string): string => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return hash.toString(36);
+};
+
+export const runConsistencyCheck = (records: ApprovalRecord[]): ConsistencyReport => {
   const exportRows = records.map(r => buildExportRow(r));
-  const exportDataStr = JSON.stringify(exportRows);
-  
-  const calculateHash = (str: string): string => {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash;
-    }
-    return hash.toString(36);
-  };
 
-  const storeHash = useAppStore.getState().calculateRecordsHash(records);
-  const pageHash = calculateHash(pageDataStr);
-  const exportHash = calculateHash(exportDataStr + pageDataStr);
+  const storeRecords = useAppStore.getState().records;
+  const storeMap = new Map(storeRecords.map(r => [r.id, r] as const));
 
-  const consistent = pageHash.length > 0 && exportHash.length > 0 && storeHash.length > 0;
+  const recordsComparison: RecordComparison[] = records.map((pageRecord) => {
+    const storeRecord = storeMap.get(pageRecord.id);
+    const idx = records.findIndex(r => r.id === pageRecord.id);
+    const exportRow = exportRows[idx] || {};
+    const exportFieldMap = buildFieldMapFromRowLabel(exportRow);
+
+    const fields: FieldComparison[] = EXPORT_FIELD_MAPPINGS.map((mapping) => {
+      const storeValue = storeRecord ? formatValueByCode(storeRecord, mapping.code) : '';
+      const pageValue = formatValueByCode(pageRecord, mapping.code);
+      const exportValue = exportFieldMap.get(mapping.code) ?? '';
+
+      const a = String(storeValue);
+      const b = String(pageValue);
+      const c = String(exportValue);
+      const matches = a === b && b === c;
+
+      return {
+        fieldCode: mapping.code,
+        fieldLabel: mapping.label,
+        storeValue,
+        pageValue,
+        exportValue,
+        matches,
+      };
+    });
+
+    const mismatched = fields.filter(f => !f.matches);
+
+    return {
+      recordId: pageRecord.id,
+      originalLineNumber: pageRecord.originalLineNumber,
+      displayName: getDisplayCommunityName(pageRecord),
+      allMatch: mismatched.length === 0,
+      mismatchedFieldLabels: mismatched.map(f => f.fieldLabel),
+      mismatchedCount: mismatched.length,
+      fields,
+    };
+  });
+
+  const mismatchedRecords = recordsComparison.filter(r => !r.allMatch);
+  const totalMismatches = mismatchedRecords.reduce((sum, r) => sum + r.mismatchedCount, 0);
+
+  const storeHash = useAppStore.getState().calculateRecordsHash(storeRecords);
+  const pageHash = calculateLocalHash(JSON.stringify(records));
+  const exportHash = calculateLocalHash(JSON.stringify(exportRows));
+
+  const consistent = mismatchedRecords.length === 0 && records.length > 0;
+
+  let summary = '';
+  if (records.length === 0) {
+    summary = '暂无可校验数据，请先导入或导出至少一条记录';
+  } else if (consistent) {
+    summary = `✅ 三处一致：存储(${records.length}条)、页面展示、导出明细的 ${EXPORT_FIELD_MAPPINGS.length} 个业务字段全部逐字段匹配，无差异`;
+  } else {
+    summary = `⚠️ 发现差异：${mismatchedRecords.length}/${records.length} 条记录共有 ${totalMismatches} 个字段不一致，请展开下方明细查看具体差异`;
+  }
 
   return {
     consistent,
+    fieldCount: EXPORT_FIELD_MAPPINGS.length,
+    recordCount: records.length,
+    matchedRecordCount: recordsComparison.filter(r => r.allMatch).length,
+    totalMismatches,
     storeHash,
     pageHash,
     exportHash,
-    message: consistent
-      ? '一致性校验通过：页面展示 / 导出明细 / 数据存储三处哈希完全一致'
-      : '一致性校验失败：存在数据不一致，已记录哈希值供排查',
+    summary,
+    records: recordsComparison,
+    mismatchedRecords,
   };
 };
 
@@ -70,15 +166,36 @@ export const exportToExcel = (records: ApprovalRecord[]): ExportResult => {
   const colWidths = EXPORT_FIELD_MAPPINGS.map(() => ({ wch: 18 }));
   worksheet['!cols'] = colWidths;
 
-  const metadataSheet = XLSX.utils.json_to_sheet([
+  const metadataRows: Record<string, string | number>[] = [
+    { '校验项': '三处一致结论', '校验值': consistency.summary },
+    { '校验项': '一致性校验结果', '校验值': consistency.consistent ? '✅ 通过（逐字段匹配）' : '❌ 失败（下方有差异明细）' },
+    { '校验项': '参与校验记录数', '校验值': `${consistency.matchedRecordCount}/${consistency.recordCount} 条一致` },
+    { '校验项': '业务字段数', '校验值': `${consistency.fieldCount} 个` },
+    { '校验项': '不匹配字段数', '校验值': consistency.totalMismatches },
     { '校验项': '数据存储哈希(store)', '校验值': consistency.storeHash },
     { '校验项': '页面渲染哈希(page)', '校验值': consistency.pageHash },
     { '校验项': '导出内容哈希(export)', '校验值': consistency.exportHash },
-    { '校验项': '一致性校验结果', '校验值': consistency.consistent ? '通过' : '失败' },
-    { '校验项': '导出记录数', '校验值': records.length },
     { '校验项': '导出时间', '校验值': new Date().toLocaleString('zh-CN') },
-    { '校验项': '字段映射版本', '校验值': EXPORT_FIELD_MAPPINGS.length + '个字段统一映射' },
-  ]);
+  ];
+
+  consistency.mismatchedRecords.forEach((rec) => {
+    metadataRows.push({
+      '校验项': `【不匹配】${rec.displayName}(行#${rec.originalLineNumber})`,
+      '校验值': `不匹配字段：${rec.mismatchedFieldLabels.join('、')}（共${rec.mismatchedCount}个）`,
+    });
+    rec.mismatchedFieldLabels.forEach((label) => {
+      const field = rec.fields.find((f) => f.fieldLabel === label);
+      if (field) {
+        metadataRows.push({
+          '校验项': `  ↳ ${label}`,
+          '校验值': `store=[${field.storeValue}] | page=[${field.pageValue}] | export=[${field.exportValue}]`,
+        });
+      }
+    });
+  });
+
+  const metadataSheet = XLSX.utils.json_to_sheet(metadataRows);
+  metadataSheet['!cols'] = [{ wch: 50 }, { wch: 80 }];
   XLSX.utils.book_append_sheet(workbook, metadataSheet, '一致性校验');
 
   const timestamp = new Date().toLocaleDateString('zh-CN').replace(/\//g, '-');
@@ -98,7 +215,7 @@ export const exportToExcel = (records: ApprovalRecord[]): ExportResult => {
     filename: `${filename}.xlsx`,
     recordCount: records.length,
     consistencyVerified: consistency.consistent,
-    message: consistency.message,
+    message: consistency.summary,
   };
 };
 
@@ -130,7 +247,7 @@ export const exportToCSV = (records: ApprovalRecord[]): ExportResult => {
     filename: `${filename}.csv`,
     recordCount: records.length,
     consistencyVerified: consistency.consistent,
-    message: consistency.message,
+    message: consistency.summary,
   };
 };
 
@@ -195,7 +312,7 @@ export const exportStreetSummary = (records: ApprovalRecord[]): ExportResult => 
     filename: `${filename}.txt`,
     recordCount: completedRecords.length,
     consistencyVerified: consistency.consistent,
-    message: consistency.message,
+    message: consistency.summary,
   };
 };
 

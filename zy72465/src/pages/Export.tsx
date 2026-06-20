@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Download,
@@ -12,12 +12,14 @@ import {
   ChevronDown,
   PlayCircle,
   XCircle,
+  Terminal,
 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { exportToExcel, exportToCSV, exportStreetSummary, verifyConsistency } from '@/utils/export';
 import { StatusTag, NameConflictTag } from '@/components/StatusTag';
 import { getDisplayCommunityName, ROLE_LABELS, STATUS_LABELS, EXPORT_FIELD_MAPPINGS } from '@/types';
 import type { SamplingPoint, Summary, UserRole } from '@/types';
+import { runFullE2ETest, type E2EResult } from '@/utils/runE2ETest';
 
 export default function ExportPage() {
   const navigate = useNavigate();
@@ -37,6 +39,29 @@ export default function ExportPage() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [demoRunning, setDemoRunning] = useState(false);
   const [demoStep, setDemoStep] = useState('');
+  const [e2eRunning, setE2eRunning] = useState(false);
+  const [e2eResult, setE2eResult] = useState<E2EResult | null>(null);
+
+  useEffect(() => {
+    (window as unknown as { RunE2E?: typeof runFullE2ETest }).RunE2E = runFullE2ETest;
+    return () => {
+      const w = window as unknown as { RunE2E?: typeof runFullE2ETest };
+      delete w.RunE2E;
+    };
+  }, []);
+
+  const runE2E = async () => {
+    setE2eRunning(true);
+    setE2eResult(null);
+    setDemoStep('【E2E验证】开始跑导入→补看→摘要→导出→刷新→接口 全流程，约需 5-10 秒…');
+    const r = await runFullE2ETest();
+    setE2eResult(r);
+    setDemoStep(r.pass
+      ? '✅【E2E验证】全部通过！详情见下方「可复现验证结果」卡片，也可在 Console 看 step-by-step 日志'
+      : '❌【E2E验证】有失败项，请展开下方卡片或 Console 排查具体是哪一步'
+    );
+    setE2eRunning(false);
+  };
 
   const completedRecords = records.filter((r) => r.summary);
   const pendingRecords = records.filter((r) => !r.summary);
@@ -207,7 +232,7 @@ export default function ExportPage() {
 
           <button
             onClick={runDemoFullFlow}
-            disabled={demoRunning}
+            disabled={demoRunning || e2eRunning}
             className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition ${
               demoRunning
                 ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
@@ -216,6 +241,19 @@ export default function ExportPage() {
           >
             <PlayCircle className="w-4 h-4" />
             {demoRunning ? '演示中…' : '一键跑：导入→补看→摘要→复核'}
+          </button>
+          <button
+            onClick={runE2E}
+            disabled={demoRunning || e2eRunning}
+            className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition ${
+              e2eRunning
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : 'bg-amber-600 text-white hover:bg-amber-700 shadow-sm'
+            }`}
+            title="可复现：重置→导入4条→补看→确认名称→更摘要→导出→刷新校验→接口核对"
+          >
+            <Terminal className="w-4 h-4" />
+            {e2eRunning ? '验证中…' : '运行 E2E 验证(10步)'}
           </button>
         </div>
       </div>
@@ -267,41 +305,140 @@ export default function ExportPage() {
 
         {consistencyResult && (
           <div
-            className={`mt-4 p-4 rounded-lg border ${
+            className={`mt-4 rounded-lg border ${
               consistencyResult.consistent
                 ? 'bg-green-50 border-green-200'
                 : 'bg-red-50 border-red-200'
             }`}
           >
-            <div className="flex items-start gap-3">
-              {consistencyResult.consistent ? (
-                <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
-              ) : (
-                <XCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-              )}
-              <div className="flex-1">
-                <p
-                  className={`font-medium ${
-                    consistencyResult.consistent ? 'text-green-800' : 'text-red-800'
-                  }`}
-                >
-                  {consistencyResult.message}
-                </p>
-                <div className="mt-2 grid grid-cols-3 gap-4 text-xs">
-                  <div className="bg-white p-2 rounded border border-gray-100">
-                    <p className="text-gray-400">存储哈希(store)</p>
-                    <p className="font-mono text-gray-700 mt-0.5">{consistencyResult.storeHash}</p>
+            <div className={`p-4`}>
+              <div className="flex items-start gap-3">
+                {consistencyResult.consistent ? (
+                  <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+                ) : (
+                  <XCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                )}
+                <div className="flex-1">
+                  <p
+                    className={`font-medium ${
+                      consistencyResult.consistent ? 'text-green-800' : 'text-red-800'
+                    }`}
+                  >
+                    {consistencyResult.summary}
+                  </p>
+                  <div className="mt-2 grid grid-cols-4 gap-3 text-xs">
+                    <div className="bg-white p-2 rounded border border-gray-100">
+                      <p className="text-gray-400">一致记录</p>
+                      <p className="font-semibold text-gray-700 mt-0.5">
+                        {consistencyResult.matchedRecordCount}/{consistencyResult.recordCount}
+                      </p>
+                    </div>
+                    <div className="bg-white p-2 rounded border border-gray-100">
+                      <p className="text-gray-400">字段数</p>
+                      <p className="font-semibold text-gray-700 mt-0.5">{consistencyResult.fieldCount}</p>
+                    </div>
+                    <div className="bg-white p-2 rounded border border-gray-100">
+                      <p className="text-gray-400">不匹配字段</p>
+                      <p className={`font-semibold mt-0.5 ${consistencyResult.totalMismatches === 0 ? 'text-green-600' : 'text-red-600'}`}
+                      >
+                        {consistencyResult.totalMismatches}
+                      </p>
+                    </div>
+                    <div className="bg-white p-2 rounded border border-gray-100">
+                      <p className="text-gray-400">存储哈希</p>
+                      <p className="font-mono text-gray-700 mt-0.5 truncate">{consistencyResult.storeHash}</p>
+                    </div>
                   </div>
-                  <div className="bg-white p-2 rounded border border-gray-100">
-                    <p className="text-gray-400">页面哈希(page)</p>
-                    <p className="font-mono text-gray-700 mt-0.5">{consistencyResult.pageHash}</p>
-                  </div>
-                  <div className="bg-white p-2 rounded border border-gray-100">
-                    <p className="text-gray-400">导出哈希(export)</p>
-                    <p className="font-mono text-gray-700 mt-0.5">{consistencyResult.exportHash}</p>
-                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    页面哈希：<span className="font-mono">{consistencyResult.pageHash}</span>
+                    <span className="mx-2">|</span>
+                    导出哈希：<span className="font-mono">{consistencyResult.exportHash}</span>
+                  </p>
                 </div>
               </div>
+            </div>
+
+            <div className="border-t border-dashed border-gray-200">
+              <details className="group">
+                <summary className="px-4 py-2.5 text-xs text-gray-600 hover:bg-white/60 cursor-pointer select-none list-none flex items-center gap-2 justify-between">
+                  <span className="font-medium">展开逐字段一致性对比（共 {consistencyResult.records.length} 条）</span>
+                  <ChevronDown className="w-4 h-4 transition-transform group-open:rotate-180" />
+                </summary>
+                <div className="p-4 bg-white/70">
+                  <div className="space-y-3">
+                    {consistencyResult.records.map((rec) => (
+                      <div
+                        key={rec.recordId}
+                        className={`rounded-lg border overflow-hidden ${rec.allMatch ? 'border-green-200' : 'border-red-300'}`}
+                      >
+                        <div className={`px-3 py-2 flex items-center justify-between gap-3 ${rec.allMatch ? 'bg-green-100/70' : 'bg-red-100/70'}`}
+                        >
+                          <span className={`text-sm font-medium">
+                            {rec.displayName}{' '}
+                            <span className="font-mono text-xs text-gray-500">
+                              (行#{rec.originalLineNumber} / {rec.recordId}
+                            </span>
+                          </span>
+                          {rec.allMatch ? (
+                            <span className="text-xs text-green-700 font-medium">
+                              17 个字段全部一致
+                            </span>
+                          ) : (
+                            <span className="text-xs text-red-700 font-medium">
+                              不匹配：{rec.mismatchedFieldLabels.join('、')}
+                            </span>
+                          )}
+                        </div>
+                        <div className="max-h-56 overflow-auto">
+                          <table className="w-full text-xs border-collapse">
+                            <thead className="bg-gray-50 sticky top-0">
+                              <tr>
+                                <th className="px-3 py-2 text-left font-medium text-gray-500 w-32">字段</th>
+                                <th className="px-3 py-2 text-left font-medium text-gray-500">
+                                  存储(store)
+                                </th>
+                                <th className="px-3 py-2 text-left font-medium text-gray-500">
+                                  页面展示(page)
+                                </th>
+                                <th className="px-3 py-2 text-left font-medium text-gray-500">
+                                  导出明细(export)
+                                </th>
+                                <th className="px-3 py-2 text-left font-medium text-gray-500 w-16">
+                                  结果
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                              {rec.fields.map((f) => (
+                                <tr
+                                  key={f.fieldCode}
+                                  className={!f.matches ? 'bg-red-50' : ''}
+                                >
+                                  <td className="px-3 py-1.5 font-medium text-gray-700">
+                                    {f.fieldLabel}
+                                  </td>
+                                  <td className="px-3 py-1.5 font-mono text-gray-800">
+                                    {f.storeValue}
+                                  </td>
+                                  <td className="px-3 py-1.5 font-mono text-gray-800">
+                                    {f.pageValue}
+                                  </td>
+                                  <td className="px-3 py-1.5 font-mono text-gray-800">
+                                    {f.exportValue}
+                                  </td>
+                                  <td className={`px-3 py-1.5 ${f.matches ? 'text-green-600' : 'text-red-600 font-semibold'}`}>
+                                    {f.matches ? '✓' : '✗'}
+                                  </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    ))}
+                  </div>
+                </div>
+              </details>
             </div>
           </div>
         )}
@@ -456,6 +593,89 @@ export default function ExportPage() {
           )}
         </div>
       </div>
+
+      {e2eResult && (
+        <div className={`rounded-xl border overflow-hidden ${e2eResult.pass ? 'border-green-200' : 'border-red-200'}`}>
+          <div className={`px-5 py-4 ${e2eResult.pass ? 'bg-green-50' : 'bg-red-50'}`}>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <Terminal className={`w-5 h-5 mt-0.5 shrink-0 ${e2eResult.pass ? 'text-green-600' : 'text-red-600'}`} />
+                <div>
+                  <h2 className={`font-semibold ${e2eResult.pass ? 'text-green-800' : 'text-red-800'}`}>
+                    {e2eResult.pass ? '✅ 可复现的 E2E 验证全部通过（10步）' : '❌ E2E 验证有失败项'}
+                  </h2>
+                  <p className={`mt-1 text-xs ${e2eResult.pass ? 'text-green-700' : 'text-red-700'}`}>
+                    覆盖：导入→补看→保存→刷新模拟→重算一致性→导出→接口读取→街道摘要，总共 {e2eResult.logs.length} 步
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3 text-right text-xs">
+                <div className="bg-white p-2 rounded border border-gray-100">
+                  <p className="text-gray-400">刷新不丢</p>
+                  <p className={`font-medium mt-0.5 ${e2eResult.apiCheck.persistencePassed ? 'text-green-600' : 'text-red-600'}`}>
+                    {e2eResult.apiCheck.persistencePassed ? '通过' : '失败'}
+                  </p>
+                </div>
+                <div className="bg-white p-2 rounded border border-gray-100">
+                  <p className="text-gray-400">接口一致</p>
+                  <p className={`font-medium mt-0.5 ${e2eResult.apiCheck.apiDetailMismatches === 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {e2eResult.apiCheck.apiDetailMismatches === 0 ? '一致' : `${e2eResult.apiCheck.apiDetailMismatches}处差异`}
+                  </p>
+                </div>
+                <div className="bg-white p-2 rounded border border-gray-100">
+                  <p className="text-gray-400">字段一致</p>
+                  <p className={`font-medium mt-0.5 ${e2eResult.consistency?.consistent ? 'text-green-600' : 'text-red-600'}`}>
+                    {e2eResult.consistency ? `${e2eResult.consistency.matchedRecordCount}/${e2eResult.consistency.recordCount}` : '未执行'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <details className="group">
+            <summary className="px-5 py-2.5 text-xs bg-gray-50 border-y border-gray-100 text-gray-600 cursor-pointer select-none flex items-center justify-between gap-2 hover:bg-gray-100/60">
+              <span className="font-medium">
+                展开 E2E 验证步骤（{e2eResult.logs.filter(l => !l.ok).length} 失败）
+              </span>
+              <ChevronDown className="w-4 h-4 transition-transform group-open:rotate-180" />
+            </summary>
+            <div className="p-5 max-h-96 overflow-auto bg-white">
+              <table className="w-full text-xs border-collapse">
+                <thead className="bg-gray-50 sticky top-0">
+                  <tr>
+                    <th className="px-3 py-2 text-left font-medium text-gray-500 w-32">步骤</th>
+                    <th className="px-3 py-2 text-left font-medium text-gray-500">描述</th>
+                    <th className="px-3 py-2 text-left font-medium text-gray-500 w-16">结果</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {e2eResult.logs.map((log, idx) => (
+                    <tr key={idx} className={!log.ok ? 'bg-red-50' : ''}>
+                      <td className="px-3 py-1.5 font-medium text-gray-700 whitespace-nowrap">{log.step}</td>
+                      <td className="px-3 py-1.5 text-gray-700 break-all">
+                        {log.description}
+                        {log.details && <span className="text-[10px] text-gray-400 block mt-0.5">{JSON.stringify(log.details)}</span>}
+                      </td>
+                      <td className={`px-3 py-1.5 font-semibold ${log.ok ? 'text-green-600' : 'text-red-600'}`}>
+                        {log.ok ? '✓' : '✗'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </details>
+
+          <div className="px-5 py-3 bg-gray-50 border-t border-gray-100 text-xs text-gray-500 flex items-start gap-2 flex-wrap">
+            <span className="font-medium text-gray-700">💡 复现方式：</span>
+            <ol className="list-decimal list-inside space-y-0.5 break-all flex-1">
+              <li>在浏览器 F12 控制台输入 <code className="bg-white px-1.5 py-0.5 rounded border border-gray-200 font-mono">await window.RunE2E()</code> 获得同一份结果</li>
+              <li>或点页面上 <code className="bg-white px-1.5 py-0.5 rounded border border-gray-200 font-mono">运行 E2E 验证(10步)</code> 按钮</li>
+              <li>导出日志 ID: <span className="font-mono text-gray-800">{e2eResult.exportedLogId || '无'}</span>，可到「导出结果追溯」页进一步核对</li>
+            </ol>
+          </div>
+        </div>
+      )}
 
       {pendingRecords.length > 0 && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">

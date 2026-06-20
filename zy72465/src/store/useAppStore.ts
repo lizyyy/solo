@@ -12,6 +12,11 @@ import type {
 } from '@/types';
 import { STATUS_LABELS } from '@/types';
 import { mockRecords, mockHistory } from '@/data/mockRecords';
+import {
+  persistToLocalStorage,
+  restoreFromLocalStorage,
+  clearPersistedState,
+} from '@/utils/persistStore';
 
 const generateId = () => Math.random().toString(36).substring(2, 9);
 const generateBatchId = () => `BATCH-${Date.now().toString(36).toUpperCase()}`;
@@ -82,13 +87,31 @@ interface AppState {
   calculateConsistencyHash: () => string;
 
   resetAllRecords: () => void;
+  clearPersistenceAndUseDefault: () => void;
 }
 
+const buildInitialState = () => {
+  const restored = restoreFromLocalStorage();
+  if (restored && (restored.records as unknown[]).length > 0) {
+    return {
+      records: restored.records as ApprovalRecord[],
+      history: restored.history as Record<string, HistoryEntry[]>,
+      exportLogs: restored.exportLogs as ExportLog[],
+      currentUser: restored.currentUser as { name: string; role: UserRole },
+    };
+  }
+  return {
+    records: deepClone(mockRecords),
+    history: deepClone(mockHistory),
+    exportLogs: [],
+    currentUser: { name: '阿宁', role: 'aning' as UserRole },
+  };
+};
+
+const initialState = buildInitialState();
+
 export const useAppStore = create<AppState>((set, get) => ({
-  records: deepClone(mockRecords),
-  history: deepClone(mockHistory),
-  exportLogs: [],
-  currentUser: { name: '阿宁', role: 'aning' },
+  ...initialState,
 
   getRecordById: (id) => get().records.find(r => r.id === id),
   getHistoryByRecordId: (id) => get().history[id] || [],
@@ -553,4 +576,23 @@ export const useAppStore = create<AppState>((set, get) => ({
       exportLogs: [],
     });
   },
+
+  clearPersistenceAndUseDefault: () => {
+    clearPersistedState();
+    set({
+      records: deepClone(mockRecords),
+      history: deepClone(mockHistory),
+      exportLogs: [],
+      currentUser: { name: '阿宁', role: 'aning' },
+    });
+  },
 }));
+
+useAppStore.subscribe((state) => {
+  persistToLocalStorage({
+    records: state.records,
+    history: state.history,
+    exportLogs: state.exportLogs,
+    currentUser: state.currentUser,
+  });
+});
