@@ -2,7 +2,7 @@
   "meta": {
     "project_name": "序列推荐负采样检查",
     "version": "1.0.0",
-    "generated_at": "2026-06-15 13:14:11",
+    "generated_at": "2026-06-21 02:46:39",
     "current_threshold": 0.5,
     "export_dir": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports",
     "total_steps": 4,
@@ -19,12 +19,12 @@
         "step_id": "step1_import",
         "step_name": "负样本列表导入",
         "status": "completed",
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "data_version": "initial",
         "export_path": "",
         "checks": [
           {
-            "check_id": "chk_4ca49281",
+            "check_id": "chk_9132185f",
             "name": "重复导入检查",
             "passed": true,
             "severity": "info",
@@ -39,7 +39,7 @@
               },
               "severity": "info",
               "suggestion": "",
-              "check_id": "chk_4ca49281",
+              "check_id": "chk_9132185f",
               "batch_id": ""
             },
             "details": {
@@ -48,7 +48,7 @@
             }
           },
           {
-            "check_id": "chk_b0f88889",
+            "check_id": "chk_7741c7d8",
             "name": "少数类样本被总指标盖住检查",
             "passed": false,
             "severity": "warning",
@@ -100,7 +100,7 @@
               },
               "severity": "warning",
               "suggestion": "少数类样本指标与总指标差异较大，请勿直接归为正常，留给算法工程师复核",
-              "check_id": "chk_b0f88889",
+              "check_id": "chk_7741c7d8",
               "batch_id": ""
             },
             "details": {
@@ -152,12 +152,12 @@
         "step_id": "step2_compare",
         "step_name": "召回候选表对比",
         "status": "completed",
-        "batch_id": "batch_20260615131411_906e09",
+        "batch_id": "batch_20260621024639_b2668c",
         "data_version": "initial",
         "export_path": "",
         "checks": [
           {
-            "check_id": "chk_87d9e4a5",
+            "check_id": "chk_3450e32a",
             "name": "负样本与召回候选表一致性检查",
             "passed": false,
             "severity": "warning",
@@ -168,51 +168,51 @@
               "passed": false,
               "details": {
                 "conflict_count": 5,
-                "recall_batch_id": "batch_20260615131411_906e09",
+                "recall_batch_id": "batch_20260621024639_b2668c",
                 "conflicts_detail": [
                   {
                     "conflict_id": "conflict_1",
                     "description": "标签冲突：{'user_id': 1001, 'item_id': 2003}",
-                    "record_trace_id": "rec_30958bb4f3f21b80",
+                    "record_trace_id": "rec_9ba50c1caa195c29",
                     "neg_label": 1,
                     "recall_label": 0,
-                    "neg_trace_id": "rec_30958bb4f3f21b80",
+                    "neg_trace_id": "rec_9ba50c1caa195c29",
                     "resolution": "pending"
                   },
                   {
                     "conflict_id": "conflict_2",
                     "description": "标签冲突：{'user_id': 1002, 'item_id': 2005}",
-                    "record_trace_id": "rec_c3d7af61620517c4",
+                    "record_trace_id": "rec_92781134d32cf717",
                     "neg_label": 1,
                     "recall_label": 0,
-                    "neg_trace_id": "rec_c3d7af61620517c4",
+                    "neg_trace_id": "rec_92781134d32cf717",
                     "resolution": "pending"
                   },
                   {
                     "conflict_id": "conflict_3",
                     "description": "标签冲突：{'user_id': 1005, 'item_id': 2004}",
-                    "record_trace_id": "rec_ec7e3b08cbb887e4",
+                    "record_trace_id": "rec_54419aa39f485da2",
                     "neg_label": 1,
                     "recall_label": 0,
-                    "neg_trace_id": "rec_ec7e3b08cbb887e4",
+                    "neg_trace_id": "rec_54419aa39f485da2",
                     "resolution": "pending"
                   },
                   {
                     "conflict_id": "conflict_4",
                     "description": "标签冲突：{'user_id': 1007, 'item_id': 2014}",
-                    "record_trace_id": "rec_7a53c343133b5a91",
+                    "record_trace_id": "rec_6caf3e66583e9b75",
                     "neg_label": 1,
                     "recall_label": 0,
-                    "neg_trace_id": "rec_7a53c343133b5a91",
+                    "neg_trace_id": "rec_6caf3e66583e9b75",
                     "resolution": "pending"
                   },
                   {
                     "conflict_id": "conflict_5",
                     "description": "标签冲突：{'user_id': 5001, 'item_id': 9001}",
-                    "record_trace_id": "rec_307c8d8953fd929e",
+                    "record_trace_id": "rec_34e186eafc65ce34",
                     "neg_label": 2,
                     "recall_label": 1,
-                    "neg_trace_id": "rec_307c8d8953fd929e",
+                    "neg_trace_id": "rec_34e186eafc65ce34",
                     "resolution": "pending"
                   }
                 ],
@@ -220,56 +220,56 @@
               },
               "severity": "warning",
               "suggestion": "检测到标签冲突，请数据科学家林姐确认或驳回，不要自动拍板。请在确认/驳回时填写理由。",
-              "check_id": "chk_87d9e4a5",
+              "check_id": "chk_3450e32a",
               "batch_id": ""
             },
             "details": {
               "conflict_count": 5,
-              "recall_batch_id": "batch_20260615131411_906e09",
+              "recall_batch_id": "batch_20260621024639_b2668c",
               "conflicts_detail": [
                 {
                   "conflict_id": "conflict_1",
                   "description": "标签冲突：{'user_id': 1001, 'item_id': 2003}",
-                  "record_trace_id": "rec_30958bb4f3f21b80",
+                  "record_trace_id": "rec_9ba50c1caa195c29",
                   "neg_label": 1,
                   "recall_label": 0,
-                  "neg_trace_id": "rec_30958bb4f3f21b80",
+                  "neg_trace_id": "rec_9ba50c1caa195c29",
                   "resolution": "pending"
                 },
                 {
                   "conflict_id": "conflict_2",
                   "description": "标签冲突：{'user_id': 1002, 'item_id': 2005}",
-                  "record_trace_id": "rec_c3d7af61620517c4",
+                  "record_trace_id": "rec_92781134d32cf717",
                   "neg_label": 1,
                   "recall_label": 0,
-                  "neg_trace_id": "rec_c3d7af61620517c4",
+                  "neg_trace_id": "rec_92781134d32cf717",
                   "resolution": "pending"
                 },
                 {
                   "conflict_id": "conflict_3",
                   "description": "标签冲突：{'user_id': 1005, 'item_id': 2004}",
-                  "record_trace_id": "rec_ec7e3b08cbb887e4",
+                  "record_trace_id": "rec_54419aa39f485da2",
                   "neg_label": 1,
                   "recall_label": 0,
-                  "neg_trace_id": "rec_ec7e3b08cbb887e4",
+                  "neg_trace_id": "rec_54419aa39f485da2",
                   "resolution": "pending"
                 },
                 {
                   "conflict_id": "conflict_4",
                   "description": "标签冲突：{'user_id': 1007, 'item_id': 2014}",
-                  "record_trace_id": "rec_7a53c343133b5a91",
+                  "record_trace_id": "rec_6caf3e66583e9b75",
                   "neg_label": 1,
                   "recall_label": 0,
-                  "neg_trace_id": "rec_7a53c343133b5a91",
+                  "neg_trace_id": "rec_6caf3e66583e9b75",
                   "resolution": "pending"
                 },
                 {
                   "conflict_id": "conflict_5",
                   "description": "标签冲突：{'user_id': 5001, 'item_id': 9001}",
-                  "record_trace_id": "rec_307c8d8953fd929e",
+                  "record_trace_id": "rec_34e186eafc65ce34",
                   "neg_label": 2,
                   "recall_label": 1,
-                  "neg_trace_id": "rec_307c8d8953fd929e",
+                  "neg_trace_id": "rec_34e186eafc65ce34",
                   "resolution": "pending"
                 }
               ],
@@ -285,8 +285,8 @@
               "user_id": 1001,
               "item_id": 2003,
               "label": 1,
-              "_trace_id": "rec_30958bb4f3f21b80",
-              "_batch_id": "batch_20260615131411_d98488"
+              "_trace_id": "rec_9ba50c1caa195c29",
+              "_batch_id": "batch_20260621024639_df4d05"
             },
             "recall_candidate_data": {
               "user_id": 1001,
@@ -294,10 +294,10 @@
               "label": 0
             },
             "field": "label",
-            "record_trace_id": "rec_30958bb4f3f21b80",
+            "record_trace_id": "rec_9ba50c1caa195c29",
             "resolution": "confirmed",
             "resolved_by": "批量模式演示",
-            "resolved_at": "2026-06-15 13:14:11",
+            "resolved_at": "2026-06-21 02:46:39",
             "resolution_reason": "[演示] 按1号规则：wrong_caliber场景下，user_id=1001 对应的负样本标签正确，依据是口径v2第1条补充说明"
           },
           {
@@ -307,8 +307,8 @@
               "user_id": 1002,
               "item_id": 2005,
               "label": 1,
-              "_trace_id": "rec_c3d7af61620517c4",
-              "_batch_id": "batch_20260615131411_d98488"
+              "_trace_id": "rec_92781134d32cf717",
+              "_batch_id": "batch_20260621024639_df4d05"
             },
             "recall_candidate_data": {
               "user_id": 1002,
@@ -316,10 +316,10 @@
               "label": 0
             },
             "field": "label",
-            "record_trace_id": "rec_c3d7af61620517c4",
+            "record_trace_id": "rec_92781134d32cf717",
             "resolution": "rejected",
             "resolved_by": "批量模式演示",
-            "resolved_at": "2026-06-15 13:14:11",
+            "resolved_at": "2026-06-21 02:46:39",
             "resolution_reason": "[演示] 按2号规则：wrong_caliber场景下，user_id=1002 对应的负样本标签错误，依据是口径v2第2条补充说明"
           },
           {
@@ -329,8 +329,8 @@
               "user_id": 1005,
               "item_id": 2004,
               "label": 1,
-              "_trace_id": "rec_ec7e3b08cbb887e4",
-              "_batch_id": "batch_20260615131411_d98488"
+              "_trace_id": "rec_54419aa39f485da2",
+              "_batch_id": "batch_20260621024639_df4d05"
             },
             "recall_candidate_data": {
               "user_id": 1005,
@@ -338,7 +338,7 @@
               "label": 0
             },
             "field": "label",
-            "record_trace_id": "rec_ec7e3b08cbb887e4",
+            "record_trace_id": "rec_54419aa39f485da2",
             "resolution": "pending",
             "resolved_by": "",
             "resolved_at": "",
@@ -351,8 +351,8 @@
               "user_id": 1007,
               "item_id": 2014,
               "label": 1,
-              "_trace_id": "rec_7a53c343133b5a91",
-              "_batch_id": "batch_20260615131411_d98488"
+              "_trace_id": "rec_6caf3e66583e9b75",
+              "_batch_id": "batch_20260621024639_df4d05"
             },
             "recall_candidate_data": {
               "user_id": 1007,
@@ -360,7 +360,7 @@
               "label": 0
             },
             "field": "label",
-            "record_trace_id": "rec_7a53c343133b5a91",
+            "record_trace_id": "rec_6caf3e66583e9b75",
             "resolution": "pending",
             "resolved_by": "",
             "resolved_at": "",
@@ -373,8 +373,8 @@
               "user_id": 5001,
               "item_id": 9001,
               "label": 2,
-              "_trace_id": "rec_307c8d8953fd929e",
-              "_batch_id": "batch_20260615131411_d98488"
+              "_trace_id": "rec_34e186eafc65ce34",
+              "_batch_id": "batch_20260621024639_df4d05"
             },
             "recall_candidate_data": {
               "user_id": 5001,
@@ -382,7 +382,7 @@
               "label": 1
             },
             "field": "label",
-            "record_trace_id": "rec_307c8d8953fd929e",
+            "record_trace_id": "rec_34e186eafc65ce34",
             "resolution": "pending",
             "resolved_by": "",
             "resolved_at": "",
@@ -399,7 +399,7 @@
         "export_path": "",
         "checks": [
           {
-            "check_id": "chk_e40461a9",
+            "check_id": "chk_3e493768",
             "name": "阈值回放检查",
             "passed": true,
             "severity": "info",
@@ -421,8 +421,8 @@
                 "history_count": 2,
                 "history_metrics": [
                   {
-                    "run_id": "run_1_5bdec7",
-                    "timestamp": "2026-06-15 13:14:11",
+                    "run_id": "run_1_25a9c2",
+                    "timestamp": "2026-06-21 02:46:39",
                     "threshold": 0.5,
                     "metrics": {
                       "threshold": 0.5,
@@ -431,11 +431,11 @@
                       "positive_count": 14,
                       "negative_count": 19
                     },
-                    "note": "导入批次 batch_20260615131411_d98488"
+                    "note": "导入批次 batch_20260621024639_df4d05"
                   },
                   {
-                    "run_id": "run_2_e5aaa6",
-                    "timestamp": "2026-06-15 13:14:11",
+                    "run_id": "run_2_012065",
+                    "timestamp": "2026-06-21 02:46:39",
                     "threshold": 0.5,
                     "metrics": {
                       "threshold": 0.5,
@@ -444,14 +444,14 @@
                       "positive_count": 14,
                       "negative_count": 19
                     },
-                    "note": "召回对比批次 batch_20260615131411_906e09"
+                    "note": "召回对比批次 batch_20260621024639_b2668c"
                   }
                 ],
                 "minority_sample_count": 1,
                 "minority_samples_traceable": [
                   {
-                    "trace_id": "rec_307c8d8953fd929e",
-                    "batch_id": "batch_20260615131411_d98488",
+                    "trace_id": "rec_34e186eafc65ce34",
+                    "batch_id": "batch_20260621024639_df4d05",
                     "user_id": 5001,
                     "item_id": 9001,
                     "label": 2,
@@ -463,7 +463,7 @@
               },
               "severity": "info",
               "suggestion": "",
-              "check_id": "chk_e40461a9",
+              "check_id": "chk_3e493768",
               "batch_id": ""
             },
             "details": {
@@ -479,8 +479,8 @@
               "history_count": 2,
               "history_metrics": [
                 {
-                  "run_id": "run_1_5bdec7",
-                  "timestamp": "2026-06-15 13:14:11",
+                  "run_id": "run_1_25a9c2",
+                  "timestamp": "2026-06-21 02:46:39",
                   "threshold": 0.5,
                   "metrics": {
                     "threshold": 0.5,
@@ -489,11 +489,11 @@
                     "positive_count": 14,
                     "negative_count": 19
                   },
-                  "note": "导入批次 batch_20260615131411_d98488"
+                  "note": "导入批次 batch_20260621024639_df4d05"
                 },
                 {
-                  "run_id": "run_2_e5aaa6",
-                  "timestamp": "2026-06-15 13:14:11",
+                  "run_id": "run_2_012065",
+                  "timestamp": "2026-06-21 02:46:39",
                   "threshold": 0.5,
                   "metrics": {
                     "threshold": 0.5,
@@ -502,14 +502,14 @@
                     "positive_count": 14,
                     "negative_count": 19
                   },
-                  "note": "召回对比批次 batch_20260615131411_906e09"
+                  "note": "召回对比批次 batch_20260621024639_b2668c"
                 }
               ],
               "minority_sample_count": 1,
               "minority_samples_traceable": [
                 {
-                  "trace_id": "rec_307c8d8953fd929e",
-                  "batch_id": "batch_20260615131411_d98488",
+                  "trace_id": "rec_34e186eafc65ce34",
+                  "batch_id": "batch_20260621024639_df4d05",
                   "user_id": 5001,
                   "item_id": 9001,
                   "label": 2,
@@ -521,7 +521,7 @@
             }
           },
           {
-            "check_id": "chk_e3de1bed",
+            "check_id": "chk_79c8a6c5",
             "name": "少数类样本复核提醒",
             "passed": false,
             "severity": "warning",
@@ -534,8 +534,8 @@
                 "count": 1,
                 "samples_traceable": [
                   {
-                    "trace_id": "rec_307c8d8953fd929e",
-                    "batch_id": "batch_20260615131411_d98488",
+                    "trace_id": "rec_34e186eafc65ce34",
+                    "batch_id": "batch_20260621024639_df4d05",
                     "user_id": 5001,
                     "item_id": 9001,
                     "label": 2,
@@ -547,15 +547,15 @@
               },
               "severity": "warning",
               "suggestion": "少数类样本请勿直接归为正常，留给算法工程师复核。点击trace_id可反查同一条样例。",
-              "check_id": "chk_e3de1bed",
+              "check_id": "chk_79c8a6c5",
               "batch_id": ""
             },
             "details": {
               "count": 1,
               "samples_traceable": [
                 {
-                  "trace_id": "rec_307c8d8953fd929e",
-                  "batch_id": "batch_20260615131411_d98488",
+                  "trace_id": "rec_34e186eafc65ce34",
+                  "batch_id": "batch_20260621024639_df4d05",
                   "user_id": 5001,
                   "item_id": 9001,
                   "label": 2,
@@ -567,7 +567,7 @@
             }
           },
           {
-            "check_id": "chk_77677d9a",
+            "check_id": "chk_0b132655",
             "name": "阈值回放检查",
             "passed": true,
             "severity": "info",
@@ -589,8 +589,8 @@
                 "history_count": 4,
                 "history_metrics": [
                   {
-                    "run_id": "run_1_5bdec7",
-                    "timestamp": "2026-06-15 13:14:11",
+                    "run_id": "run_1_25a9c2",
+                    "timestamp": "2026-06-21 02:46:39",
                     "threshold": 0.5,
                     "metrics": {
                       "threshold": 0.5,
@@ -599,11 +599,11 @@
                       "positive_count": 14,
                       "negative_count": 19
                     },
-                    "note": "导入批次 batch_20260615131411_d98488"
+                    "note": "导入批次 batch_20260621024639_df4d05"
                   },
                   {
-                    "run_id": "run_2_e5aaa6",
-                    "timestamp": "2026-06-15 13:14:11",
+                    "run_id": "run_2_012065",
+                    "timestamp": "2026-06-21 02:46:39",
                     "threshold": 0.5,
                     "metrics": {
                       "threshold": 0.5,
@@ -612,11 +612,11 @@
                       "positive_count": 14,
                       "negative_count": 19
                     },
-                    "note": "召回对比批次 batch_20260615131411_906e09"
+                    "note": "召回对比批次 batch_20260621024639_b2668c"
                   },
                   {
-                    "run_id": "run_3_d4975b",
-                    "timestamp": "2026-06-15 13:14:11",
+                    "run_id": "run_3_389f4e",
+                    "timestamp": "2026-06-21 02:46:39",
                     "threshold": 0.5,
                     "metrics": {
                       "threshold": 0.5,
@@ -628,8 +628,8 @@
                     "note": "阈值回放 0.5→0.5"
                   },
                   {
-                    "run_id": "run_4_2d3dea",
-                    "timestamp": "2026-06-15 13:14:11",
+                    "run_id": "run_4_dc9887",
+                    "timestamp": "2026-06-21 02:46:39",
                     "threshold": 0.5,
                     "metrics": {
                       "threshold": 0.5,
@@ -644,8 +644,8 @@
                 "minority_sample_count": 1,
                 "minority_samples_traceable": [
                   {
-                    "trace_id": "rec_307c8d8953fd929e",
-                    "batch_id": "batch_20260615131411_d98488",
+                    "trace_id": "rec_34e186eafc65ce34",
+                    "batch_id": "batch_20260621024639_df4d05",
                     "user_id": 5001,
                     "item_id": 9001,
                     "label": 2,
@@ -657,7 +657,7 @@
               },
               "severity": "info",
               "suggestion": "",
-              "check_id": "chk_77677d9a",
+              "check_id": "chk_0b132655",
               "batch_id": ""
             },
             "details": {
@@ -673,8 +673,8 @@
               "history_count": 4,
               "history_metrics": [
                 {
-                  "run_id": "run_1_5bdec7",
-                  "timestamp": "2026-06-15 13:14:11",
+                  "run_id": "run_1_25a9c2",
+                  "timestamp": "2026-06-21 02:46:39",
                   "threshold": 0.5,
                   "metrics": {
                     "threshold": 0.5,
@@ -683,11 +683,11 @@
                     "positive_count": 14,
                     "negative_count": 19
                   },
-                  "note": "导入批次 batch_20260615131411_d98488"
+                  "note": "导入批次 batch_20260621024639_df4d05"
                 },
                 {
-                  "run_id": "run_2_e5aaa6",
-                  "timestamp": "2026-06-15 13:14:11",
+                  "run_id": "run_2_012065",
+                  "timestamp": "2026-06-21 02:46:39",
                   "threshold": 0.5,
                   "metrics": {
                     "threshold": 0.5,
@@ -696,11 +696,11 @@
                     "positive_count": 14,
                     "negative_count": 19
                   },
-                  "note": "召回对比批次 batch_20260615131411_906e09"
+                  "note": "召回对比批次 batch_20260621024639_b2668c"
                 },
                 {
-                  "run_id": "run_3_d4975b",
-                  "timestamp": "2026-06-15 13:14:11",
+                  "run_id": "run_3_389f4e",
+                  "timestamp": "2026-06-21 02:46:39",
                   "threshold": 0.5,
                   "metrics": {
                     "threshold": 0.5,
@@ -712,8 +712,8 @@
                   "note": "阈值回放 0.5→0.5"
                 },
                 {
-                  "run_id": "run_4_2d3dea",
-                  "timestamp": "2026-06-15 13:14:11",
+                  "run_id": "run_4_dc9887",
+                  "timestamp": "2026-06-21 02:46:39",
                   "threshold": 0.5,
                   "metrics": {
                     "threshold": 0.5,
@@ -728,8 +728,8 @@
               "minority_sample_count": 1,
               "minority_samples_traceable": [
                 {
-                  "trace_id": "rec_307c8d8953fd929e",
-                  "batch_id": "batch_20260615131411_d98488",
+                  "trace_id": "rec_34e186eafc65ce34",
+                  "batch_id": "batch_20260621024639_df4d05",
                   "user_id": 5001,
                   "item_id": 9001,
                   "label": 2,
@@ -741,7 +741,7 @@
             }
           },
           {
-            "check_id": "chk_cba97a41",
+            "check_id": "chk_f3d0c8c6",
             "name": "少数类样本复核提醒",
             "passed": false,
             "severity": "warning",
@@ -754,8 +754,8 @@
                 "count": 1,
                 "samples_traceable": [
                   {
-                    "trace_id": "rec_307c8d8953fd929e",
-                    "batch_id": "batch_20260615131411_d98488",
+                    "trace_id": "rec_34e186eafc65ce34",
+                    "batch_id": "batch_20260621024639_df4d05",
                     "user_id": 5001,
                     "item_id": 9001,
                     "label": 2,
@@ -767,15 +767,15 @@
               },
               "severity": "warning",
               "suggestion": "少数类样本请勿直接归为正常，留给算法工程师复核。点击trace_id可反查同一条样例。",
-              "check_id": "chk_cba97a41",
+              "check_id": "chk_f3d0c8c6",
               "batch_id": ""
             },
             "details": {
               "count": 1,
               "samples_traceable": [
                 {
-                  "trace_id": "rec_307c8d8953fd929e",
-                  "batch_id": "batch_20260615131411_d98488",
+                  "trace_id": "rec_34e186eafc65ce34",
+                  "batch_id": "batch_20260621024639_df4d05",
                   "user_id": 5001,
                   "item_id": 9001,
                   "label": 2,
@@ -798,7 +798,7 @@
         "export_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports/export_wrong_caliber.csv",
         "checks": [
           {
-            "check_id": "chk_85305acb",
+            "check_id": "chk_56adcabb",
             "name": "导出一致性检查",
             "passed": true,
             "severity": "info",
@@ -828,13 +828,13 @@
                 ],
                 "included_trace_columns": true,
                 "source_batch_ids": [
-                  "batch_20260615131411_d98488"
+                  "batch_20260621024639_df4d05"
                 ],
                 "reverse_lookup_guide": "通过 _trace_id 可在报告、历史、内存数据中反查到同一条原始记录；通过 _batch_id 可反查导入批次"
               },
               "severity": "info",
               "suggestion": "",
-              "check_id": "chk_85305acb",
+              "check_id": "chk_56adcabb",
               "batch_id": ""
             },
             "details": {
@@ -858,13 +858,13 @@
               ],
               "included_trace_columns": true,
               "source_batch_ids": [
-                "batch_20260615131411_d98488"
+                "batch_20260621024639_df4d05"
               ],
               "reverse_lookup_guide": "通过 _trace_id 可在报告、历史、内存数据中反查到同一条原始记录；通过 _batch_id 可反查导入批次"
             }
           },
           {
-            "check_id": "chk_0c80d9bb",
+            "check_id": "chk_d225b514",
             "name": "导出校验和生成",
             "passed": true,
             "severity": "info",
@@ -874,20 +874,20 @@
               "check_name": "导出校验和生成",
               "passed": true,
               "details": {
-                "export_id": "exp_8bf11f7524d0",
-                "checksum": "d0137000a3eac8def3830621915775a3",
-                "export_time": "2026-06-15 13:14:11",
+                "export_id": "exp_3c6c9c5948ff",
+                "checksum": "2cf1aa0c624c9e8e28e500991258b5de",
+                "export_time": "2026-06-21 02:46:39",
                 "next_export_will_compare": "下次导出会对比历史校验和，防止数据漂移"
               },
               "severity": "info",
               "suggestion": "",
-              "check_id": "chk_0c80d9bb",
+              "check_id": "chk_d225b514",
               "batch_id": ""
             },
             "details": {
-              "export_id": "exp_8bf11f7524d0",
-              "checksum": "d0137000a3eac8def3830621915775a3",
-              "export_time": "2026-06-15 13:14:11",
+              "export_id": "exp_3c6c9c5948ff",
+              "checksum": "2cf1aa0c624c9e8e28e500991258b5de",
+              "export_time": "2026-06-21 02:46:39",
               "next_export_will_compare": "下次导出会对比历史校验和，防止数据漂移"
             }
           }
@@ -899,10 +899,10 @@
     "export_consistent_text": "一致",
     "batches": [
       {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "record_count": 33,
         "record_start_idx": 0,
         "record_end_idx": 33,
@@ -912,145 +912,145 @@
     ],
     "export_history": [
       {
-        "export_id": "exp_8bf11f7524d0",
-        "export_time": "2026-06-15 13:14:11",
+        "export_id": "exp_3c6c9c5948ff",
+        "export_time": "2026-06-21 02:46:39",
         "export_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports/export_wrong_caliber.csv",
         "source_batch_ids": [
-          "batch_20260615131411_d98488"
+          "batch_20260621024639_df4d05"
         ],
         "record_count": 33,
-        "checksum": "d0137000a3eac8def3830621915775a3",
+        "checksum": "2cf1aa0c624c9e8e28e500991258b5de",
         "exported_by": "system"
       }
     ],
     "history": [
       {
-        "run_id": "run_1_5bdec7",
-        "timestamp": "2026-06-15 13:14:11",
+        "run_id": "run_1_25a9c2",
+        "timestamp": "2026-06-21 02:46:39",
         "data_source": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
         "threshold": 0.5,
         "precision": 1.0,
         "recall": 1.0,
         "row_count": 33,
         "batch_ids": [
-          "batch_20260615131411_d98488"
+          "batch_20260621024639_df4d05"
         ],
         "export_paths": [],
-        "note": "导入批次 batch_20260615131411_d98488",
+        "note": "导入批次 batch_20260621024639_df4d05",
         "minority_sample_ids": [
-          "rec_307c8d8953fd929e"
+          "rec_34e186eafc65ce34"
         ]
       },
       {
-        "run_id": "run_2_e5aaa6",
-        "timestamp": "2026-06-15 13:14:11",
+        "run_id": "run_2_012065",
+        "timestamp": "2026-06-21 02:46:39",
         "data_source": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/recall_candidates.csv",
         "threshold": 0.5,
         "precision": 1.0,
         "recall": 1.0,
         "row_count": 33,
         "batch_ids": [
-          "batch_20260615131411_d98488"
+          "batch_20260621024639_df4d05"
         ],
         "export_paths": [],
-        "note": "召回对比批次 batch_20260615131411_906e09",
+        "note": "召回对比批次 batch_20260621024639_b2668c",
         "minority_sample_ids": [
-          "rec_307c8d8953fd929e"
+          "rec_34e186eafc65ce34"
         ]
       },
       {
-        "run_id": "run_3_d4975b",
-        "timestamp": "2026-06-15 13:14:11",
+        "run_id": "run_3_389f4e",
+        "timestamp": "2026-06-21 02:46:39",
         "data_source": "threshold_0.5",
         "threshold": 0.5,
         "precision": 1.0,
         "recall": 1.0,
         "row_count": 33,
         "batch_ids": [
-          "batch_20260615131411_d98488"
+          "batch_20260621024639_df4d05"
         ],
         "export_paths": [],
         "note": "阈值回放 0.5→0.5",
         "minority_sample_ids": [
-          "rec_307c8d8953fd929e"
+          "rec_34e186eafc65ce34"
         ]
       },
       {
-        "run_id": "run_4_2d3dea",
-        "timestamp": "2026-06-15 13:14:11",
+        "run_id": "run_4_dc9887",
+        "timestamp": "2026-06-21 02:46:39",
         "data_source": "snapshot",
         "threshold": 0.5,
         "precision": 1.0,
         "recall": 1.0,
         "row_count": 33,
         "batch_ids": [
-          "batch_20260615131411_d98488"
+          "batch_20260621024639_df4d05"
         ],
         "export_paths": [],
         "note": "batch.wrong_caliber.完成补录后",
         "minority_sample_ids": [
-          "rec_307c8d8953fd929e"
+          "rec_34e186eafc65ce34"
         ]
       },
       {
-        "run_id": "run_5_773e95",
-        "timestamp": "2026-06-15 13:14:11",
+        "run_id": "run_5_0fd4a6",
+        "timestamp": "2026-06-21 02:46:39",
         "data_source": "threshold_0.5",
         "threshold": 0.5,
         "precision": 1.0,
         "recall": 1.0,
         "row_count": 33,
         "batch_ids": [
-          "batch_20260615131411_d98488"
+          "batch_20260621024639_df4d05"
         ],
         "export_paths": [],
         "note": "阈值回放 0.5→0.5",
         "minority_sample_ids": [
-          "rec_307c8d8953fd929e"
+          "rec_34e186eafc65ce34"
         ]
       },
       {
-        "run_id": "run_6_75fd4a",
-        "timestamp": "2026-06-15 13:14:11",
+        "run_id": "run_6_1d6ac2",
+        "timestamp": "2026-06-21 02:46:39",
         "data_source": "refresh_results",
         "threshold": 0.5,
         "precision": 1.0,
         "recall": 1.0,
         "row_count": 33,
         "batch_ids": [
-          "batch_20260615131411_d98488"
+          "batch_20260621024639_df4d05"
         ],
         "export_paths": [],
         "note": "刷新结果",
         "minority_sample_ids": [
-          "rec_307c8d8953fd929e"
+          "rec_34e186eafc65ce34"
         ]
       },
       {
-        "run_id": "run_7_fc2edb",
-        "timestamp": "2026-06-15 13:14:11",
+        "run_id": "run_7_4c314e",
+        "timestamp": "2026-06-21 02:46:39",
         "data_source": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports/export_wrong_caliber.csv",
         "threshold": 0.5,
         "precision": 1.0,
         "recall": 1.0,
         "row_count": 33,
         "batch_ids": [
-          "batch_20260615131411_d98488"
+          "batch_20260621024639_df4d05"
         ],
         "export_paths": [
           "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports/export_wrong_caliber.csv"
         ],
-        "note": "导出 exp_8bf11f7524d0",
+        "note": "导出 exp_3c6c9c5948ff",
         "minority_sample_ids": [
-          "rec_307c8d8953fd929e"
+          "rec_34e186eafc65ce34"
         ]
       }
     ],
     "history_count": 7,
     "minority_trace_list": [
       {
-        "trace_id": "rec_307c8d8953fd929e",
-        "batch_id": "batch_20260615131411_d98488",
+        "trace_id": "rec_34e186eafc65ce34",
+        "batch_id": "batch_20260621024639_df4d05",
         "user_id": 5001,
         "item_id": 9001,
         "label": 2,
@@ -1064,7 +1064,7 @@
     "step1_import": {
       "results": [
         {
-          "check_id": "chk_4ca49281",
+          "check_id": "chk_9132185f",
           "check_name": "重复导入检查",
           "passed": true,
           "severity": "info",
@@ -1075,7 +1075,7 @@
           }
         },
         {
-          "check_id": "chk_b0f88889",
+          "check_id": "chk_7741c7d8",
           "check_name": "少数类样本被总指标盖住检查",
           "passed": false,
           "severity": "warning",
@@ -1125,65 +1125,65 @@
       ],
       "conflicts": [],
       "status": "completed",
-      "batch_id": "batch_20260615131411_d98488",
+      "batch_id": "batch_20260621024639_df4d05",
       "data_version": "initial",
       "export_path": ""
     },
     "step2_compare": {
       "results": [
         {
-          "check_id": "chk_87d9e4a5",
+          "check_id": "chk_3450e32a",
           "check_name": "负样本与召回候选表一致性检查",
           "passed": false,
           "severity": "warning",
           "suggestion": "检测到标签冲突，请数据科学家林姐确认或驳回，不要自动拍板。请在确认/驳回时填写理由。",
           "details": {
             "conflict_count": 5,
-            "recall_batch_id": "batch_20260615131411_906e09",
+            "recall_batch_id": "batch_20260621024639_b2668c",
             "conflicts_detail": [
               {
                 "conflict_id": "conflict_1",
                 "description": "标签冲突：{'user_id': 1001, 'item_id': 2003}",
-                "record_trace_id": "rec_30958bb4f3f21b80",
+                "record_trace_id": "rec_9ba50c1caa195c29",
                 "neg_label": 1,
                 "recall_label": 0,
-                "neg_trace_id": "rec_30958bb4f3f21b80",
+                "neg_trace_id": "rec_9ba50c1caa195c29",
                 "resolution": "pending"
               },
               {
                 "conflict_id": "conflict_2",
                 "description": "标签冲突：{'user_id': 1002, 'item_id': 2005}",
-                "record_trace_id": "rec_c3d7af61620517c4",
+                "record_trace_id": "rec_92781134d32cf717",
                 "neg_label": 1,
                 "recall_label": 0,
-                "neg_trace_id": "rec_c3d7af61620517c4",
+                "neg_trace_id": "rec_92781134d32cf717",
                 "resolution": "pending"
               },
               {
                 "conflict_id": "conflict_3",
                 "description": "标签冲突：{'user_id': 1005, 'item_id': 2004}",
-                "record_trace_id": "rec_ec7e3b08cbb887e4",
+                "record_trace_id": "rec_54419aa39f485da2",
                 "neg_label": 1,
                 "recall_label": 0,
-                "neg_trace_id": "rec_ec7e3b08cbb887e4",
+                "neg_trace_id": "rec_54419aa39f485da2",
                 "resolution": "pending"
               },
               {
                 "conflict_id": "conflict_4",
                 "description": "标签冲突：{'user_id': 1007, 'item_id': 2014}",
-                "record_trace_id": "rec_7a53c343133b5a91",
+                "record_trace_id": "rec_6caf3e66583e9b75",
                 "neg_label": 1,
                 "recall_label": 0,
-                "neg_trace_id": "rec_7a53c343133b5a91",
+                "neg_trace_id": "rec_6caf3e66583e9b75",
                 "resolution": "pending"
               },
               {
                 "conflict_id": "conflict_5",
                 "description": "标签冲突：{'user_id': 5001, 'item_id': 9001}",
-                "record_trace_id": "rec_307c8d8953fd929e",
+                "record_trace_id": "rec_34e186eafc65ce34",
                 "neg_label": 2,
                 "recall_label": 1,
-                "neg_trace_id": "rec_307c8d8953fd929e",
+                "neg_trace_id": "rec_34e186eafc65ce34",
                 "resolution": "pending"
               }
             ],
@@ -1199,19 +1199,19 @@
             "user_id": 1001,
             "item_id": 2003,
             "label": 1,
-            "_trace_id": "rec_30958bb4f3f21b80",
-            "_batch_id": "batch_20260615131411_d98488"
+            "_trace_id": "rec_9ba50c1caa195c29",
+            "_batch_id": "batch_20260621024639_df4d05"
           },
           "recall_candidate_data": {
             "user_id": 1001,
             "item_id": 2003,
             "label": 0
           },
-          "record_trace_id": "rec_30958bb4f3f21b80",
+          "record_trace_id": "rec_9ba50c1caa195c29",
           "resolution": "confirmed",
           "resolved_by": "批量模式演示",
           "resolution_reason": "[演示] 按1号规则：wrong_caliber场景下，user_id=1001 对应的负样本标签正确，依据是口径v2第1条补充说明",
-          "resolved_at": "2026-06-15 13:14:11"
+          "resolved_at": "2026-06-21 02:46:39"
         },
         {
           "conflict_id": "conflict_2",
@@ -1220,19 +1220,19 @@
             "user_id": 1002,
             "item_id": 2005,
             "label": 1,
-            "_trace_id": "rec_c3d7af61620517c4",
-            "_batch_id": "batch_20260615131411_d98488"
+            "_trace_id": "rec_92781134d32cf717",
+            "_batch_id": "batch_20260621024639_df4d05"
           },
           "recall_candidate_data": {
             "user_id": 1002,
             "item_id": 2005,
             "label": 0
           },
-          "record_trace_id": "rec_c3d7af61620517c4",
+          "record_trace_id": "rec_92781134d32cf717",
           "resolution": "rejected",
           "resolved_by": "批量模式演示",
           "resolution_reason": "[演示] 按2号规则：wrong_caliber场景下，user_id=1002 对应的负样本标签错误，依据是口径v2第2条补充说明",
-          "resolved_at": "2026-06-15 13:14:11"
+          "resolved_at": "2026-06-21 02:46:39"
         },
         {
           "conflict_id": "conflict_3",
@@ -1241,15 +1241,15 @@
             "user_id": 1005,
             "item_id": 2004,
             "label": 1,
-            "_trace_id": "rec_ec7e3b08cbb887e4",
-            "_batch_id": "batch_20260615131411_d98488"
+            "_trace_id": "rec_54419aa39f485da2",
+            "_batch_id": "batch_20260621024639_df4d05"
           },
           "recall_candidate_data": {
             "user_id": 1005,
             "item_id": 2004,
             "label": 0
           },
-          "record_trace_id": "rec_ec7e3b08cbb887e4",
+          "record_trace_id": "rec_54419aa39f485da2",
           "resolution": "pending",
           "resolved_by": "",
           "resolution_reason": "",
@@ -1262,15 +1262,15 @@
             "user_id": 1007,
             "item_id": 2014,
             "label": 1,
-            "_trace_id": "rec_7a53c343133b5a91",
-            "_batch_id": "batch_20260615131411_d98488"
+            "_trace_id": "rec_6caf3e66583e9b75",
+            "_batch_id": "batch_20260621024639_df4d05"
           },
           "recall_candidate_data": {
             "user_id": 1007,
             "item_id": 2014,
             "label": 0
           },
-          "record_trace_id": "rec_7a53c343133b5a91",
+          "record_trace_id": "rec_6caf3e66583e9b75",
           "resolution": "pending",
           "resolved_by": "",
           "resolution_reason": "",
@@ -1283,15 +1283,15 @@
             "user_id": 5001,
             "item_id": 9001,
             "label": 2,
-            "_trace_id": "rec_307c8d8953fd929e",
-            "_batch_id": "batch_20260615131411_d98488"
+            "_trace_id": "rec_34e186eafc65ce34",
+            "_batch_id": "batch_20260621024639_df4d05"
           },
           "recall_candidate_data": {
             "user_id": 5001,
             "item_id": 9001,
             "label": 1
           },
-          "record_trace_id": "rec_307c8d8953fd929e",
+          "record_trace_id": "rec_34e186eafc65ce34",
           "resolution": "pending",
           "resolved_by": "",
           "resolution_reason": "",
@@ -1299,14 +1299,14 @@
         }
       ],
       "status": "completed",
-      "batch_id": "batch_20260615131411_906e09",
+      "batch_id": "batch_20260621024639_b2668c",
       "data_version": "initial",
       "export_path": ""
     },
     "step3_playback": {
       "results": [
         {
-          "check_id": "chk_e40461a9",
+          "check_id": "chk_3e493768",
           "check_name": "阈值回放检查",
           "passed": true,
           "severity": "info",
@@ -1324,8 +1324,8 @@
             "history_count": 2,
             "history_metrics": [
               {
-                "run_id": "run_1_5bdec7",
-                "timestamp": "2026-06-15 13:14:11",
+                "run_id": "run_1_25a9c2",
+                "timestamp": "2026-06-21 02:46:39",
                 "threshold": 0.5,
                 "metrics": {
                   "threshold": 0.5,
@@ -1334,11 +1334,11 @@
                   "positive_count": 14,
                   "negative_count": 19
                 },
-                "note": "导入批次 batch_20260615131411_d98488"
+                "note": "导入批次 batch_20260621024639_df4d05"
               },
               {
-                "run_id": "run_2_e5aaa6",
-                "timestamp": "2026-06-15 13:14:11",
+                "run_id": "run_2_012065",
+                "timestamp": "2026-06-21 02:46:39",
                 "threshold": 0.5,
                 "metrics": {
                   "threshold": 0.5,
@@ -1347,14 +1347,14 @@
                   "positive_count": 14,
                   "negative_count": 19
                 },
-                "note": "召回对比批次 batch_20260615131411_906e09"
+                "note": "召回对比批次 batch_20260621024639_b2668c"
               }
             ],
             "minority_sample_count": 1,
             "minority_samples_traceable": [
               {
-                "trace_id": "rec_307c8d8953fd929e",
-                "batch_id": "batch_20260615131411_d98488",
+                "trace_id": "rec_34e186eafc65ce34",
+                "batch_id": "batch_20260621024639_df4d05",
                 "user_id": 5001,
                 "item_id": 9001,
                 "label": 2,
@@ -1366,7 +1366,7 @@
           }
         },
         {
-          "check_id": "chk_e3de1bed",
+          "check_id": "chk_79c8a6c5",
           "check_name": "少数类样本复核提醒",
           "passed": false,
           "severity": "warning",
@@ -1375,8 +1375,8 @@
             "count": 1,
             "samples_traceable": [
               {
-                "trace_id": "rec_307c8d8953fd929e",
-                "batch_id": "batch_20260615131411_d98488",
+                "trace_id": "rec_34e186eafc65ce34",
+                "batch_id": "batch_20260621024639_df4d05",
                 "user_id": 5001,
                 "item_id": 9001,
                 "label": 2,
@@ -1388,7 +1388,7 @@
           }
         },
         {
-          "check_id": "chk_77677d9a",
+          "check_id": "chk_0b132655",
           "check_name": "阈值回放检查",
           "passed": true,
           "severity": "info",
@@ -1406,8 +1406,8 @@
             "history_count": 4,
             "history_metrics": [
               {
-                "run_id": "run_1_5bdec7",
-                "timestamp": "2026-06-15 13:14:11",
+                "run_id": "run_1_25a9c2",
+                "timestamp": "2026-06-21 02:46:39",
                 "threshold": 0.5,
                 "metrics": {
                   "threshold": 0.5,
@@ -1416,11 +1416,11 @@
                   "positive_count": 14,
                   "negative_count": 19
                 },
-                "note": "导入批次 batch_20260615131411_d98488"
+                "note": "导入批次 batch_20260621024639_df4d05"
               },
               {
-                "run_id": "run_2_e5aaa6",
-                "timestamp": "2026-06-15 13:14:11",
+                "run_id": "run_2_012065",
+                "timestamp": "2026-06-21 02:46:39",
                 "threshold": 0.5,
                 "metrics": {
                   "threshold": 0.5,
@@ -1429,11 +1429,11 @@
                   "positive_count": 14,
                   "negative_count": 19
                 },
-                "note": "召回对比批次 batch_20260615131411_906e09"
+                "note": "召回对比批次 batch_20260621024639_b2668c"
               },
               {
-                "run_id": "run_3_d4975b",
-                "timestamp": "2026-06-15 13:14:11",
+                "run_id": "run_3_389f4e",
+                "timestamp": "2026-06-21 02:46:39",
                 "threshold": 0.5,
                 "metrics": {
                   "threshold": 0.5,
@@ -1445,8 +1445,8 @@
                 "note": "阈值回放 0.5→0.5"
               },
               {
-                "run_id": "run_4_2d3dea",
-                "timestamp": "2026-06-15 13:14:11",
+                "run_id": "run_4_dc9887",
+                "timestamp": "2026-06-21 02:46:39",
                 "threshold": 0.5,
                 "metrics": {
                   "threshold": 0.5,
@@ -1461,8 +1461,8 @@
             "minority_sample_count": 1,
             "minority_samples_traceable": [
               {
-                "trace_id": "rec_307c8d8953fd929e",
-                "batch_id": "batch_20260615131411_d98488",
+                "trace_id": "rec_34e186eafc65ce34",
+                "batch_id": "batch_20260621024639_df4d05",
                 "user_id": 5001,
                 "item_id": 9001,
                 "label": 2,
@@ -1474,7 +1474,7 @@
           }
         },
         {
-          "check_id": "chk_cba97a41",
+          "check_id": "chk_f3d0c8c6",
           "check_name": "少数类样本复核提醒",
           "passed": false,
           "severity": "warning",
@@ -1483,8 +1483,8 @@
             "count": 1,
             "samples_traceable": [
               {
-                "trace_id": "rec_307c8d8953fd929e",
-                "batch_id": "batch_20260615131411_d98488",
+                "trace_id": "rec_34e186eafc65ce34",
+                "batch_id": "batch_20260621024639_df4d05",
                 "user_id": 5001,
                 "item_id": 9001,
                 "label": 2,
@@ -1505,7 +1505,7 @@
     "step4_export": {
       "results": [
         {
-          "check_id": "chk_85305acb",
+          "check_id": "chk_56adcabb",
           "check_name": "导出一致性检查",
           "passed": true,
           "severity": "info",
@@ -1531,21 +1531,21 @@
             ],
             "included_trace_columns": true,
             "source_batch_ids": [
-              "batch_20260615131411_d98488"
+              "batch_20260621024639_df4d05"
             ],
             "reverse_lookup_guide": "通过 _trace_id 可在报告、历史、内存数据中反查到同一条原始记录；通过 _batch_id 可反查导入批次"
           }
         },
         {
-          "check_id": "chk_0c80d9bb",
+          "check_id": "chk_d225b514",
           "check_name": "导出校验和生成",
           "passed": true,
           "severity": "info",
           "suggestion": "",
           "details": {
-            "export_id": "exp_8bf11f7524d0",
-            "checksum": "d0137000a3eac8def3830621915775a3",
-            "export_time": "2026-06-15 13:14:11",
+            "export_id": "exp_3c6c9c5948ff",
+            "checksum": "2cf1aa0c624c9e8e28e500991258b5de",
+            "export_time": "2026-06-21 02:46:39",
             "next_export_will_compare": "下次导出会对比历史校验和，防止数据漂移"
           }
         }
@@ -1559,10 +1559,10 @@
   },
   "batches": [
     {
-      "batch_id": "batch_20260615131411_d98488",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_type": "initial_import",
       "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-      "created_at": "2026-06-15 13:14:11",
+      "created_at": "2026-06-21 02:46:39",
       "record_count": 33,
       "record_start_idx": 0,
       "record_end_idx": 33,
@@ -1572,142 +1572,142 @@
   ],
   "export_history": [
     {
-      "export_id": "exp_8bf11f7524d0",
-      "export_time": "2026-06-15 13:14:11",
+      "export_id": "exp_3c6c9c5948ff",
+      "export_time": "2026-06-21 02:46:39",
       "export_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports/export_wrong_caliber.csv",
       "source_batch_ids": [
-        "batch_20260615131411_d98488"
+        "batch_20260621024639_df4d05"
       ],
       "record_count": 33,
-      "checksum": "d0137000a3eac8def3830621915775a3",
+      "checksum": "2cf1aa0c624c9e8e28e500991258b5de",
       "exported_by": "system"
     }
   ],
   "run_history": [
     {
-      "run_id": "run_1_5bdec7",
-      "timestamp": "2026-06-15 13:14:11",
+      "run_id": "run_1_25a9c2",
+      "timestamp": "2026-06-21 02:46:39",
       "data_source": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
       "threshold": 0.5,
       "precision": 1.0,
       "recall": 1.0,
       "row_count": 33,
       "batch_ids": [
-        "batch_20260615131411_d98488"
+        "batch_20260621024639_df4d05"
       ],
       "export_paths": [],
-      "note": "导入批次 batch_20260615131411_d98488",
+      "note": "导入批次 batch_20260621024639_df4d05",
       "minority_sample_ids": [
-        "rec_307c8d8953fd929e"
+        "rec_34e186eafc65ce34"
       ]
     },
     {
-      "run_id": "run_2_e5aaa6",
-      "timestamp": "2026-06-15 13:14:11",
+      "run_id": "run_2_012065",
+      "timestamp": "2026-06-21 02:46:39",
       "data_source": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/recall_candidates.csv",
       "threshold": 0.5,
       "precision": 1.0,
       "recall": 1.0,
       "row_count": 33,
       "batch_ids": [
-        "batch_20260615131411_d98488"
+        "batch_20260621024639_df4d05"
       ],
       "export_paths": [],
-      "note": "召回对比批次 batch_20260615131411_906e09",
+      "note": "召回对比批次 batch_20260621024639_b2668c",
       "minority_sample_ids": [
-        "rec_307c8d8953fd929e"
+        "rec_34e186eafc65ce34"
       ]
     },
     {
-      "run_id": "run_3_d4975b",
-      "timestamp": "2026-06-15 13:14:11",
+      "run_id": "run_3_389f4e",
+      "timestamp": "2026-06-21 02:46:39",
       "data_source": "threshold_0.5",
       "threshold": 0.5,
       "precision": 1.0,
       "recall": 1.0,
       "row_count": 33,
       "batch_ids": [
-        "batch_20260615131411_d98488"
+        "batch_20260621024639_df4d05"
       ],
       "export_paths": [],
       "note": "阈值回放 0.5→0.5",
       "minority_sample_ids": [
-        "rec_307c8d8953fd929e"
+        "rec_34e186eafc65ce34"
       ]
     },
     {
-      "run_id": "run_4_2d3dea",
-      "timestamp": "2026-06-15 13:14:11",
+      "run_id": "run_4_dc9887",
+      "timestamp": "2026-06-21 02:46:39",
       "data_source": "snapshot",
       "threshold": 0.5,
       "precision": 1.0,
       "recall": 1.0,
       "row_count": 33,
       "batch_ids": [
-        "batch_20260615131411_d98488"
+        "batch_20260621024639_df4d05"
       ],
       "export_paths": [],
       "note": "batch.wrong_caliber.完成补录后",
       "minority_sample_ids": [
-        "rec_307c8d8953fd929e"
+        "rec_34e186eafc65ce34"
       ]
     },
     {
-      "run_id": "run_5_773e95",
-      "timestamp": "2026-06-15 13:14:11",
+      "run_id": "run_5_0fd4a6",
+      "timestamp": "2026-06-21 02:46:39",
       "data_source": "threshold_0.5",
       "threshold": 0.5,
       "precision": 1.0,
       "recall": 1.0,
       "row_count": 33,
       "batch_ids": [
-        "batch_20260615131411_d98488"
+        "batch_20260621024639_df4d05"
       ],
       "export_paths": [],
       "note": "阈值回放 0.5→0.5",
       "minority_sample_ids": [
-        "rec_307c8d8953fd929e"
+        "rec_34e186eafc65ce34"
       ]
     },
     {
-      "run_id": "run_6_75fd4a",
-      "timestamp": "2026-06-15 13:14:11",
+      "run_id": "run_6_1d6ac2",
+      "timestamp": "2026-06-21 02:46:39",
       "data_source": "refresh_results",
       "threshold": 0.5,
       "precision": 1.0,
       "recall": 1.0,
       "row_count": 33,
       "batch_ids": [
-        "batch_20260615131411_d98488"
+        "batch_20260621024639_df4d05"
       ],
       "export_paths": [],
       "note": "刷新结果",
       "minority_sample_ids": [
-        "rec_307c8d8953fd929e"
+        "rec_34e186eafc65ce34"
       ]
     },
     {
-      "run_id": "run_7_fc2edb",
-      "timestamp": "2026-06-15 13:14:11",
+      "run_id": "run_7_4c314e",
+      "timestamp": "2026-06-21 02:46:39",
       "data_source": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports/export_wrong_caliber.csv",
       "threshold": 0.5,
       "precision": 1.0,
       "recall": 1.0,
       "row_count": 33,
       "batch_ids": [
-        "batch_20260615131411_d98488"
+        "batch_20260621024639_df4d05"
       ],
       "export_paths": [
         "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports/export_wrong_caliber.csv"
       ],
-      "note": "导出 exp_8bf11f7524d0",
+      "note": "导出 exp_3c6c9c5948ff",
       "minority_sample_ids": [
-        "rec_307c8d8953fd929e"
+        "rec_34e186eafc65ce34"
       ]
     }
   ],
   "trace_index": {
-    "rec_34407574a21e9d79": {
+    "rec_4e383553d69e56ca": {
       "record": {
         "user_id": 1001,
         "item_id": 2001,
@@ -1717,18 +1717,22 @@
         "click_rate": 0.12,
         "conversion_rate": 0.02
       },
-      "trace_id": "rec_34407574a21e9d79",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_4e383553d69e56ca",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 0
     },
-    "rec_824fee8c8b2ff6d1": {
+    "rec_6fbfaa56c72c4d23": {
       "record": {
         "user_id": 1001,
         "item_id": 2002,
@@ -1738,18 +1742,22 @@
         "click_rate": 0.1,
         "conversion_rate": 0.01
       },
-      "trace_id": "rec_824fee8c8b2ff6d1",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_6fbfaa56c72c4d23",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 1
     },
-    "rec_30958bb4f3f21b80": {
+    "rec_9ba50c1caa195c29": {
       "record": {
         "user_id": 1001,
         "item_id": 2003,
@@ -1759,18 +1767,22 @@
         "click_rate": 0.45,
         "conversion_rate": 0.18
       },
-      "trace_id": "rec_30958bb4f3f21b80",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_9ba50c1caa195c29",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 2
     },
-    "rec_13f8f6012b0cd8f4": {
+    "rec_095b20284692073e": {
       "record": {
         "user_id": 1002,
         "item_id": 2001,
@@ -1780,18 +1792,22 @@
         "click_rate": 0.11,
         "conversion_rate": 0.03
       },
-      "trace_id": "rec_13f8f6012b0cd8f4",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_095b20284692073e",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 3
     },
-    "rec_df891773e4e5779f": {
+    "rec_974069eeb76755bd": {
       "record": {
         "user_id": 1002,
         "item_id": 2004,
@@ -1801,18 +1817,22 @@
         "click_rate": 0.15,
         "conversion_rate": 0.04
       },
-      "trace_id": "rec_df891773e4e5779f",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_974069eeb76755bd",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 4
     },
-    "rec_c3d7af61620517c4": {
+    "rec_92781134d32cf717": {
       "record": {
         "user_id": 1002,
         "item_id": 2005,
@@ -1822,18 +1842,22 @@
         "click_rate": 0.52,
         "conversion_rate": 0.22
       },
-      "trace_id": "rec_c3d7af61620517c4",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_92781134d32cf717",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 5
     },
-    "rec_98fb3c7dccaa8ba6": {
+    "rec_d044fbe5d476f48e": {
       "record": {
         "user_id": 1003,
         "item_id": 2002,
@@ -1843,18 +1867,22 @@
         "click_rate": 0.08,
         "conversion_rate": 0.01
       },
-      "trace_id": "rec_98fb3c7dccaa8ba6",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_d044fbe5d476f48e",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 6
     },
-    "rec_e087c340822dd682": {
+    "rec_4b853d86385f3b4a": {
       "record": {
         "user_id": 1003,
         "item_id": 2006,
@@ -1864,18 +1892,22 @@
         "click_rate": 0.38,
         "conversion_rate": 0.15
       },
-      "trace_id": "rec_e087c340822dd682",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_4b853d86385f3b4a",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 7
     },
-    "rec_3d64502d91c30eb8": {
+    "rec_9bda0d8611713538": {
       "record": {
         "user_id": 1003,
         "item_id": 2007,
@@ -1885,18 +1917,22 @@
         "click_rate": 0.09,
         "conversion_rate": 0.02
       },
-      "trace_id": "rec_3d64502d91c30eb8",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_9bda0d8611713538",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 8
     },
-    "rec_218945fc0a5e26da": {
+    "rec_c51a66a0398ba4f4": {
       "record": {
         "user_id": 1004,
         "item_id": 2003,
@@ -1906,18 +1942,22 @@
         "click_rate": 0.13,
         "conversion_rate": 0.03
       },
-      "trace_id": "rec_218945fc0a5e26da",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_c51a66a0398ba4f4",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 9
     },
-    "rec_0b0fe6cf44f66d92": {
+    "rec_8444ecec0c43718f": {
       "record": {
         "user_id": 1004,
         "item_id": 2008,
@@ -1927,18 +1967,22 @@
         "click_rate": 0.41,
         "conversion_rate": 0.17
       },
-      "trace_id": "rec_0b0fe6cf44f66d92",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_8444ecec0c43718f",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 10
     },
-    "rec_b910602715929f53": {
+    "rec_3463d8d561ceac9a": {
       "record": {
         "user_id": 1004,
         "item_id": 2009,
@@ -1948,18 +1992,22 @@
         "click_rate": 0.07,
         "conversion_rate": 0.01
       },
-      "trace_id": "rec_b910602715929f53",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_3463d8d561ceac9a",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 11
     },
-    "rec_ec7e3b08cbb887e4": {
+    "rec_54419aa39f485da2": {
       "record": {
         "user_id": 1005,
         "item_id": 2004,
@@ -1969,18 +2017,22 @@
         "click_rate": 0.58,
         "conversion_rate": 0.25
       },
-      "trace_id": "rec_ec7e3b08cbb887e4",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_54419aa39f485da2",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 12
     },
-    "rec_8e69d2ad02653a8d": {
+    "rec_4c6322c045c91029": {
       "record": {
         "user_id": 1005,
         "item_id": 2010,
@@ -1990,18 +2042,22 @@
         "click_rate": 0.11,
         "conversion_rate": 0.02
       },
-      "trace_id": "rec_8e69d2ad02653a8d",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_4c6322c045c91029",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 13
     },
-    "rec_f164dbf12c461996": {
+    "rec_03064b8200ea2b0d": {
       "record": {
         "user_id": 1005,
         "item_id": 2011,
@@ -2011,18 +2067,22 @@
         "click_rate": 0.09,
         "conversion_rate": 0.02
       },
-      "trace_id": "rec_f164dbf12c461996",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_03064b8200ea2b0d",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 14
     },
-    "rec_4b5e1727a1f83e56": {
+    "rec_87d759963cd03d3e": {
       "record": {
         "user_id": 1006,
         "item_id": 2005,
@@ -2032,18 +2092,22 @@
         "click_rate": 0.12,
         "conversion_rate": 0.03
       },
-      "trace_id": "rec_4b5e1727a1f83e56",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_87d759963cd03d3e",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 15
     },
-    "rec_22e20125c222843b": {
+    "rec_44d9df4634745cef": {
       "record": {
         "user_id": 1006,
         "item_id": 2012,
@@ -2053,18 +2117,22 @@
         "click_rate": 0.44,
         "conversion_rate": 0.19
       },
-      "trace_id": "rec_22e20125c222843b",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_44d9df4634745cef",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 16
     },
-    "rec_fa84f7aa80c37111": {
+    "rec_c4ebe6d8dc3cc6ed": {
       "record": {
         "user_id": 1006,
         "item_id": 2013,
@@ -2074,18 +2142,22 @@
         "click_rate": 0.08,
         "conversion_rate": 0.01
       },
-      "trace_id": "rec_fa84f7aa80c37111",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_c4ebe6d8dc3cc6ed",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 17
     },
-    "rec_188e4ed27570a8c3": {
+    "rec_5b28e5607832fcc4": {
       "record": {
         "user_id": 1007,
         "item_id": 2006,
@@ -2095,18 +2167,22 @@
         "click_rate": 0.1,
         "conversion_rate": 0.02
       },
-      "trace_id": "rec_188e4ed27570a8c3",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_5b28e5607832fcc4",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 18
     },
-    "rec_7a53c343133b5a91": {
+    "rec_6caf3e66583e9b75": {
       "record": {
         "user_id": 1007,
         "item_id": 2014,
@@ -2116,18 +2192,22 @@
         "click_rate": 0.42,
         "conversion_rate": 0.16
       },
-      "trace_id": "rec_7a53c343133b5a91",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_6caf3e66583e9b75",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 19
     },
-    "rec_9c97e4a4d585c25a": {
+    "rec_fd5aeb86659d5bf4": {
       "record": {
         "user_id": 1008,
         "item_id": 2007,
@@ -2137,18 +2217,22 @@
         "click_rate": 0.11,
         "conversion_rate": 0.02
       },
-      "trace_id": "rec_9c97e4a4d585c25a",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_fd5aeb86659d5bf4",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 20
     },
-    "rec_70ea7f25c79445cf": {
+    "rec_f42ef4a31276aa91": {
       "record": {
         "user_id": 1008,
         "item_id": 2015,
@@ -2158,18 +2242,22 @@
         "click_rate": 0.46,
         "conversion_rate": 0.2
       },
-      "trace_id": "rec_70ea7f25c79445cf",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_f42ef4a31276aa91",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 21
     },
-    "rec_5ea8fff5bacbfc24": {
+    "rec_c349c5720d94601e": {
       "record": {
         "user_id": 1009,
         "item_id": 2008,
@@ -2179,18 +2267,22 @@
         "click_rate": 0.1,
         "conversion_rate": 0.02
       },
-      "trace_id": "rec_5ea8fff5bacbfc24",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_c349c5720d94601e",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 22
     },
-    "rec_4c0ad54d1fbed5e1": {
+    "rec_8e45cfcb821091b9": {
       "record": {
         "user_id": 1009,
         "item_id": 2016,
@@ -2200,18 +2292,22 @@
         "click_rate": 0.43,
         "conversion_rate": 0.18
       },
-      "trace_id": "rec_4c0ad54d1fbed5e1",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_8e45cfcb821091b9",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 23
     },
-    "rec_fe4efab57c849e9a": {
+    "rec_56fd4dd2812a4673": {
       "record": {
         "user_id": 1010,
         "item_id": 2009,
@@ -2221,18 +2317,22 @@
         "click_rate": 0.12,
         "conversion_rate": 0.03
       },
-      "trace_id": "rec_fe4efab57c849e9a",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_56fd4dd2812a4673",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 24
     },
-    "rec_10f43c6065992547": {
+    "rec_26cb93edf205ebd5": {
       "record": {
         "user_id": 1010,
         "item_id": 2017,
@@ -2242,18 +2342,22 @@
         "click_rate": 0.5,
         "conversion_rate": 0.21
       },
-      "trace_id": "rec_10f43c6065992547",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_26cb93edf205ebd5",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 25
     },
-    "rec_e1b51f84e4227ea3": {
+    "rec_54a4f3001f8adbe7": {
       "record": {
         "user_id": 1011,
         "item_id": 2010,
@@ -2263,18 +2367,22 @@
         "click_rate": 0.09,
         "conversion_rate": 0.01
       },
-      "trace_id": "rec_e1b51f84e4227ea3",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_54a4f3001f8adbe7",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 26
     },
-    "rec_f00e7ae39e1edf70": {
+    "rec_03f6de3084f7a56f": {
       "record": {
         "user_id": 1011,
         "item_id": 2018,
@@ -2284,18 +2392,22 @@
         "click_rate": 0.39,
         "conversion_rate": 0.16
       },
-      "trace_id": "rec_f00e7ae39e1edf70",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_03f6de3084f7a56f",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 27
     },
-    "rec_44153dbbf4f0945b": {
+    "rec_b93c12385bf6522f": {
       "record": {
         "user_id": 1012,
         "item_id": 2011,
@@ -2305,18 +2417,22 @@
         "click_rate": 0.11,
         "conversion_rate": 0.02
       },
-      "trace_id": "rec_44153dbbf4f0945b",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_b93c12385bf6522f",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 28
     },
-    "rec_62239063639c484d": {
+    "rec_fb102f3460790911": {
       "record": {
         "user_id": 1012,
         "item_id": 2019,
@@ -2326,18 +2442,22 @@
         "click_rate": 0.45,
         "conversion_rate": 0.19
       },
-      "trace_id": "rec_62239063639c484d",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_fb102f3460790911",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 29
     },
-    "rec_1f9d450132ee8c0e": {
+    "rec_657c3350d0685cfd": {
       "record": {
         "user_id": 1013,
         "item_id": 2012,
@@ -2347,18 +2467,22 @@
         "click_rate": 0.1,
         "conversion_rate": 0.02
       },
-      "trace_id": "rec_1f9d450132ee8c0e",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_657c3350d0685cfd",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 30
     },
-    "rec_709918945af88987": {
+    "rec_61261eec868df9b3": {
       "record": {
         "user_id": 1013,
         "item_id": 2020,
@@ -2368,18 +2492,22 @@
         "click_rate": 0.53,
         "conversion_rate": 0.23
       },
-      "trace_id": "rec_709918945af88987",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_61261eec868df9b3",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 31
     },
-    "rec_307c8d8953fd929e": {
+    "rec_34e186eafc65ce34": {
       "record": {
         "user_id": 5001,
         "item_id": 9001,
@@ -2389,14 +2517,18 @@
         "click_rate": 0.02,
         "conversion_rate": 0.001
       },
-      "trace_id": "rec_307c8d8953fd929e",
-      "batch_id": "batch_20260615131411_d98488",
+      "trace_id": "rec_34e186eafc65ce34",
+      "batch_id": "batch_20260621024639_df4d05",
       "batch_info": {
-        "batch_id": "batch_20260615131411_d98488",
+        "batch_id": "batch_20260621024639_df4d05",
         "batch_type": "initial_import",
-        "created_at": "2026-06-15 13:14:11",
+        "created_at": "2026-06-21 02:46:39",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/wrong_caliber/neg_samples.csv",
-        "note": "batch.wrong_caliber.初始导入"
+        "note": "batch.wrong_caliber.初始导入",
+        "parent_batch_id": "",
+        "record_count": 33,
+        "record_start_idx": 0,
+        "record_end_idx": 33
       },
       "row_idx": 32
     }

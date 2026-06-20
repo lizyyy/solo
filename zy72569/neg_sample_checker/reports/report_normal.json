@@ -2,7 +2,7 @@
   "meta": {
     "project_name": "序列推荐负采样检查",
     "version": "1.0.0",
-    "generated_at": "2026-06-15 13:11:50",
+    "generated_at": "2026-06-21 02:46:36",
     "current_threshold": 0.5,
     "export_dir": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports",
     "total_steps": 4,
@@ -19,12 +19,12 @@
         "step_id": "step1_import",
         "step_name": "负样本列表导入",
         "status": "completed",
-        "batch_id": "batch_20260615131150_07650d",
+        "batch_id": "batch_20260621024636_25be32",
         "data_version": "initial",
         "export_path": "",
         "checks": [
           {
-            "check_id": "chk_78929ede",
+            "check_id": "chk_426b3a2c",
             "name": "重复导入检查",
             "passed": true,
             "severity": "info",
@@ -39,7 +39,7 @@
               },
               "severity": "info",
               "suggestion": "",
-              "check_id": "chk_78929ede",
+              "check_id": "chk_426b3a2c",
               "batch_id": ""
             },
             "details": {
@@ -48,7 +48,7 @@
             }
           },
           {
-            "check_id": "chk_a790f038",
+            "check_id": "chk_88e1ca1c",
             "name": "少数类样本被总指标盖住检查",
             "passed": true,
             "severity": "info",
@@ -70,7 +70,7 @@
               },
               "severity": "info",
               "suggestion": "",
-              "check_id": "chk_a790f038",
+              "check_id": "chk_88e1ca1c",
               "batch_id": ""
             },
             "details": {
@@ -92,12 +92,12 @@
         "step_id": "step2_compare",
         "step_name": "召回候选表对比",
         "status": "completed",
-        "batch_id": "batch_20260615131150_463c85",
+        "batch_id": "batch_20260621024636_3c5083",
         "data_version": "initial",
         "export_path": "",
         "checks": [
           {
-            "check_id": "chk_1ed639c4",
+            "check_id": "chk_ebaa699c",
             "name": "负样本与召回候选表一致性检查",
             "passed": true,
             "severity": "info",
@@ -108,16 +108,16 @@
               "passed": true,
               "details": {
                 "message": "未检测到标签冲突",
-                "recall_batch_id": "batch_20260615131150_463c85"
+                "recall_batch_id": "batch_20260621024636_3c5083"
               },
               "severity": "info",
               "suggestion": "",
-              "check_id": "chk_1ed639c4",
+              "check_id": "chk_ebaa699c",
               "batch_id": ""
             },
             "details": {
               "message": "未检测到标签冲突",
-              "recall_batch_id": "batch_20260615131150_463c85"
+              "recall_batch_id": "batch_20260621024636_3c5083"
             }
           }
         ],
@@ -132,7 +132,7 @@
         "export_path": "",
         "checks": [
           {
-            "check_id": "chk_f874d0fa",
+            "check_id": "chk_e329db83",
             "name": "阈值回放检查",
             "passed": true,
             "severity": "info",
@@ -154,8 +154,8 @@
                 "history_count": 2,
                 "history_metrics": [
                   {
-                    "run_id": "run_1_4e2a02",
-                    "timestamp": "2026-06-15 13:11:50",
+                    "run_id": "run_1_e6019c",
+                    "timestamp": "2026-06-21 02:46:36",
                     "threshold": 0.5,
                     "metrics": {
                       "threshold": 0.5,
@@ -164,11 +164,11 @@
                       "positive_count": 7,
                       "negative_count": 13
                     },
-                    "note": "导入批次 batch_20260615131150_07650d"
+                    "note": "导入批次 batch_20260621024636_25be32"
                   },
                   {
-                    "run_id": "run_2_a5a4b4",
-                    "timestamp": "2026-06-15 13:11:50",
+                    "run_id": "run_2_a565d9",
+                    "timestamp": "2026-06-21 02:46:36",
                     "threshold": 0.5,
                     "metrics": {
                       "threshold": 0.5,
@@ -177,7 +177,7 @@
                       "positive_count": 7,
                       "negative_count": 13
                     },
-                    "note": "召回对比批次 batch_20260615131150_463c85"
+                    "note": "召回对比批次 batch_20260621024636_3c5083"
                   }
                 ],
                 "minority_sample_count": 0,
@@ -186,7 +186,7 @@
               },
               "severity": "info",
               "suggestion": "",
-              "check_id": "chk_f874d0fa",
+              "check_id": "chk_e329db83",
               "batch_id": ""
             },
             "details": {
@@ -202,8 +202,8 @@
               "history_count": 2,
               "history_metrics": [
                 {
-                  "run_id": "run_1_4e2a02",
-                  "timestamp": "2026-06-15 13:11:50",
+                  "run_id": "run_1_e6019c",
+                  "timestamp": "2026-06-21 02:46:36",
                   "threshold": 0.5,
                   "metrics": {
                     "threshold": 0.5,
@@ -212,11 +212,11 @@
                     "positive_count": 7,
                     "negative_count": 13
                   },
-                  "note": "导入批次 batch_20260615131150_07650d"
+                  "note": "导入批次 batch_20260621024636_25be32"
                 },
                 {
-                  "run_id": "run_2_a5a4b4",
-                  "timestamp": "2026-06-15 13:11:50",
+                  "run_id": "run_2_a565d9",
+                  "timestamp": "2026-06-21 02:46:36",
                   "threshold": 0.5,
                   "metrics": {
                     "threshold": 0.5,
@@ -225,7 +225,7 @@
                     "positive_count": 7,
                     "negative_count": 13
                   },
-                  "note": "召回对比批次 batch_20260615131150_463c85"
+                  "note": "召回对比批次 batch_20260621024636_3c5083"
                 }
               ],
               "minority_sample_count": 0,
@@ -234,7 +234,7 @@
             }
           },
           {
-            "check_id": "chk_9a379671",
+            "check_id": "chk_5846737b",
             "name": "阈值回放检查",
             "passed": true,
             "severity": "info",
@@ -256,8 +256,8 @@
                 "history_count": 4,
                 "history_metrics": [
                   {
-                    "run_id": "run_1_4e2a02",
-                    "timestamp": "2026-06-15 13:11:50",
+                    "run_id": "run_1_e6019c",
+                    "timestamp": "2026-06-21 02:46:36",
                     "threshold": 0.5,
                     "metrics": {
                       "threshold": 0.5,
@@ -266,11 +266,11 @@
                       "positive_count": 7,
                       "negative_count": 13
                     },
-                    "note": "导入批次 batch_20260615131150_07650d"
+                    "note": "导入批次 batch_20260621024636_25be32"
                   },
                   {
-                    "run_id": "run_2_a5a4b4",
-                    "timestamp": "2026-06-15 13:11:50",
+                    "run_id": "run_2_a565d9",
+                    "timestamp": "2026-06-21 02:46:36",
                     "threshold": 0.5,
                     "metrics": {
                       "threshold": 0.5,
@@ -279,11 +279,11 @@
                       "positive_count": 7,
                       "negative_count": 13
                     },
-                    "note": "召回对比批次 batch_20260615131150_463c85"
+                    "note": "召回对比批次 batch_20260621024636_3c5083"
                   },
                   {
-                    "run_id": "run_3_d77a21",
-                    "timestamp": "2026-06-15 13:11:50",
+                    "run_id": "run_3_9bf253",
+                    "timestamp": "2026-06-21 02:46:36",
                     "threshold": 0.5,
                     "metrics": {
                       "threshold": 0.5,
@@ -295,8 +295,8 @@
                     "note": "阈值回放 0.5→0.5"
                   },
                   {
-                    "run_id": "run_4_2b32ae",
-                    "timestamp": "2026-06-15 13:11:50",
+                    "run_id": "run_4_7f271a",
+                    "timestamp": "2026-06-21 02:46:36",
                     "threshold": 0.5,
                     "metrics": {
                       "threshold": 0.5,
@@ -314,7 +314,7 @@
               },
               "severity": "info",
               "suggestion": "",
-              "check_id": "chk_9a379671",
+              "check_id": "chk_5846737b",
               "batch_id": ""
             },
             "details": {
@@ -330,8 +330,8 @@
               "history_count": 4,
               "history_metrics": [
                 {
-                  "run_id": "run_1_4e2a02",
-                  "timestamp": "2026-06-15 13:11:50",
+                  "run_id": "run_1_e6019c",
+                  "timestamp": "2026-06-21 02:46:36",
                   "threshold": 0.5,
                   "metrics": {
                     "threshold": 0.5,
@@ -340,11 +340,11 @@
                     "positive_count": 7,
                     "negative_count": 13
                   },
-                  "note": "导入批次 batch_20260615131150_07650d"
+                  "note": "导入批次 batch_20260621024636_25be32"
                 },
                 {
-                  "run_id": "run_2_a5a4b4",
-                  "timestamp": "2026-06-15 13:11:50",
+                  "run_id": "run_2_a565d9",
+                  "timestamp": "2026-06-21 02:46:36",
                   "threshold": 0.5,
                   "metrics": {
                     "threshold": 0.5,
@@ -353,11 +353,11 @@
                     "positive_count": 7,
                     "negative_count": 13
                   },
-                  "note": "召回对比批次 batch_20260615131150_463c85"
+                  "note": "召回对比批次 batch_20260621024636_3c5083"
                 },
                 {
-                  "run_id": "run_3_d77a21",
-                  "timestamp": "2026-06-15 13:11:50",
+                  "run_id": "run_3_9bf253",
+                  "timestamp": "2026-06-21 02:46:36",
                   "threshold": 0.5,
                   "metrics": {
                     "threshold": 0.5,
@@ -369,8 +369,8 @@
                   "note": "阈值回放 0.5→0.5"
                 },
                 {
-                  "run_id": "run_4_2b32ae",
-                  "timestamp": "2026-06-15 13:11:50",
+                  "run_id": "run_4_7f271a",
+                  "timestamp": "2026-06-21 02:46:36",
                   "threshold": 0.5,
                   "metrics": {
                     "threshold": 0.5,
@@ -399,7 +399,7 @@
         "export_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports/export_normal.csv",
         "checks": [
           {
-            "check_id": "chk_59104477",
+            "check_id": "chk_910f9eae",
             "name": "导出一致性检查",
             "passed": true,
             "severity": "info",
@@ -429,13 +429,13 @@
                 ],
                 "included_trace_columns": true,
                 "source_batch_ids": [
-                  "batch_20260615131150_07650d"
+                  "batch_20260621024636_25be32"
                 ],
                 "reverse_lookup_guide": "通过 _trace_id 可在报告、历史、内存数据中反查到同一条原始记录；通过 _batch_id 可反查导入批次"
               },
               "severity": "info",
               "suggestion": "",
-              "check_id": "chk_59104477",
+              "check_id": "chk_910f9eae",
               "batch_id": ""
             },
             "details": {
@@ -459,13 +459,13 @@
               ],
               "included_trace_columns": true,
               "source_batch_ids": [
-                "batch_20260615131150_07650d"
+                "batch_20260621024636_25be32"
               ],
               "reverse_lookup_guide": "通过 _trace_id 可在报告、历史、内存数据中反查到同一条原始记录；通过 _batch_id 可反查导入批次"
             }
           },
           {
-            "check_id": "chk_770f49e7",
+            "check_id": "chk_28bb2db5",
             "name": "导出校验和生成",
             "passed": true,
             "severity": "info",
@@ -475,20 +475,20 @@
               "check_name": "导出校验和生成",
               "passed": true,
               "details": {
-                "export_id": "exp_26ed65a16018",
-                "checksum": "2e9f02b043f14d0f7739d79190cf5aa1",
-                "export_time": "2026-06-15 13:11:50",
+                "export_id": "exp_4416b31edf08",
+                "checksum": "9a3a18e70046795efa394760dfab2fa0",
+                "export_time": "2026-06-21 02:46:36",
                 "next_export_will_compare": "下次导出会对比历史校验和，防止数据漂移"
               },
               "severity": "info",
               "suggestion": "",
-              "check_id": "chk_770f49e7",
+              "check_id": "chk_28bb2db5",
               "batch_id": ""
             },
             "details": {
-              "export_id": "exp_26ed65a16018",
-              "checksum": "2e9f02b043f14d0f7739d79190cf5aa1",
-              "export_time": "2026-06-15 13:11:50",
+              "export_id": "exp_4416b31edf08",
+              "checksum": "9a3a18e70046795efa394760dfab2fa0",
+              "export_time": "2026-06-21 02:46:36",
               "next_export_will_compare": "下次导出会对比历史校验和，防止数据漂移"
             }
           }
@@ -500,10 +500,10 @@
     "export_consistent_text": "一致",
     "batches": [
       {
-        "batch_id": "batch_20260615131150_07650d",
+        "batch_id": "batch_20260621024636_25be32",
         "batch_type": "initial_import",
         "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
-        "created_at": "2026-06-15 13:11:50",
+        "created_at": "2026-06-21 02:46:36",
         "record_count": 20,
         "record_start_idx": 0,
         "record_end_idx": 20,
@@ -513,123 +513,123 @@
     ],
     "export_history": [
       {
-        "export_id": "exp_26ed65a16018",
-        "export_time": "2026-06-15 13:11:50",
+        "export_id": "exp_4416b31edf08",
+        "export_time": "2026-06-21 02:46:36",
         "export_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports/export_normal.csv",
         "source_batch_ids": [
-          "batch_20260615131150_07650d"
+          "batch_20260621024636_25be32"
         ],
         "record_count": 20,
-        "checksum": "2e9f02b043f14d0f7739d79190cf5aa1",
+        "checksum": "9a3a18e70046795efa394760dfab2fa0",
         "exported_by": "system"
       }
     ],
     "history": [
       {
-        "run_id": "run_1_4e2a02",
-        "timestamp": "2026-06-15 13:11:50",
+        "run_id": "run_1_e6019c",
+        "timestamp": "2026-06-21 02:46:36",
         "data_source": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
         "threshold": 0.5,
         "precision": 1.0,
         "recall": 1.0,
         "row_count": 20,
         "batch_ids": [
-          "batch_20260615131150_07650d"
+          "batch_20260621024636_25be32"
         ],
         "export_paths": [],
-        "note": "导入批次 batch_20260615131150_07650d",
+        "note": "导入批次 batch_20260621024636_25be32",
         "minority_sample_ids": []
       },
       {
-        "run_id": "run_2_a5a4b4",
-        "timestamp": "2026-06-15 13:11:50",
+        "run_id": "run_2_a565d9",
+        "timestamp": "2026-06-21 02:46:36",
         "data_source": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/recall_candidates.csv",
         "threshold": 0.5,
         "precision": 1.0,
         "recall": 1.0,
         "row_count": 20,
         "batch_ids": [
-          "batch_20260615131150_07650d"
+          "batch_20260621024636_25be32"
         ],
         "export_paths": [],
-        "note": "召回对比批次 batch_20260615131150_463c85",
+        "note": "召回对比批次 batch_20260621024636_3c5083",
         "minority_sample_ids": []
       },
       {
-        "run_id": "run_3_d77a21",
-        "timestamp": "2026-06-15 13:11:50",
+        "run_id": "run_3_9bf253",
+        "timestamp": "2026-06-21 02:46:36",
         "data_source": "threshold_0.5",
         "threshold": 0.5,
         "precision": 1.0,
         "recall": 1.0,
         "row_count": 20,
         "batch_ids": [
-          "batch_20260615131150_07650d"
+          "batch_20260621024636_25be32"
         ],
         "export_paths": [],
         "note": "阈值回放 0.5→0.5",
         "minority_sample_ids": []
       },
       {
-        "run_id": "run_4_2b32ae",
-        "timestamp": "2026-06-15 13:11:50",
+        "run_id": "run_4_7f271a",
+        "timestamp": "2026-06-21 02:46:36",
         "data_source": "snapshot",
         "threshold": 0.5,
         "precision": 1.0,
         "recall": 1.0,
         "row_count": 20,
         "batch_ids": [
-          "batch_20260615131150_07650d"
+          "batch_20260621024636_25be32"
         ],
         "export_paths": [],
         "note": "batch.normal.完成补录后",
         "minority_sample_ids": []
       },
       {
-        "run_id": "run_5_974faa",
-        "timestamp": "2026-06-15 13:11:50",
+        "run_id": "run_5_4dea91",
+        "timestamp": "2026-06-21 02:46:36",
         "data_source": "threshold_0.5",
         "threshold": 0.5,
         "precision": 1.0,
         "recall": 1.0,
         "row_count": 20,
         "batch_ids": [
-          "batch_20260615131150_07650d"
+          "batch_20260621024636_25be32"
         ],
         "export_paths": [],
         "note": "阈值回放 0.5→0.5",
         "minority_sample_ids": []
       },
       {
-        "run_id": "run_6_423249",
-        "timestamp": "2026-06-15 13:11:50",
+        "run_id": "run_6_fd1b48",
+        "timestamp": "2026-06-21 02:46:36",
         "data_source": "refresh_results",
         "threshold": 0.5,
         "precision": 1.0,
         "recall": 1.0,
         "row_count": 20,
         "batch_ids": [
-          "batch_20260615131150_07650d"
+          "batch_20260621024636_25be32"
         ],
         "export_paths": [],
         "note": "刷新结果",
         "minority_sample_ids": []
       },
       {
-        "run_id": "run_7_60b03a",
-        "timestamp": "2026-06-15 13:11:50",
+        "run_id": "run_7_f6850f",
+        "timestamp": "2026-06-21 02:46:36",
         "data_source": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports/export_normal.csv",
         "threshold": 0.5,
         "precision": 1.0,
         "recall": 1.0,
         "row_count": 20,
         "batch_ids": [
-          "batch_20260615131150_07650d"
+          "batch_20260621024636_25be32"
         ],
         "export_paths": [
           "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports/export_normal.csv"
         ],
-        "note": "导出 exp_26ed65a16018",
+        "note": "导出 exp_4416b31edf08",
         "minority_sample_ids": []
       }
     ],
@@ -640,7 +640,7 @@
     "step1_import": {
       "results": [
         {
-          "check_id": "chk_78929ede",
+          "check_id": "chk_426b3a2c",
           "check_name": "重复导入检查",
           "passed": true,
           "severity": "info",
@@ -651,7 +651,7 @@
           }
         },
         {
-          "check_id": "chk_a790f038",
+          "check_id": "chk_88e1ca1c",
           "check_name": "少数类样本被总指标盖住检查",
           "passed": true,
           "severity": "info",
@@ -671,34 +671,34 @@
       ],
       "conflicts": [],
       "status": "completed",
-      "batch_id": "batch_20260615131150_07650d",
+      "batch_id": "batch_20260621024636_25be32",
       "data_version": "initial",
       "export_path": ""
     },
     "step2_compare": {
       "results": [
         {
-          "check_id": "chk_1ed639c4",
+          "check_id": "chk_ebaa699c",
           "check_name": "负样本与召回候选表一致性检查",
           "passed": true,
           "severity": "info",
           "suggestion": "",
           "details": {
             "message": "未检测到标签冲突",
-            "recall_batch_id": "batch_20260615131150_463c85"
+            "recall_batch_id": "batch_20260621024636_3c5083"
           }
         }
       ],
       "conflicts": [],
       "status": "completed",
-      "batch_id": "batch_20260615131150_463c85",
+      "batch_id": "batch_20260621024636_3c5083",
       "data_version": "initial",
       "export_path": ""
     },
     "step3_playback": {
       "results": [
         {
-          "check_id": "chk_f874d0fa",
+          "check_id": "chk_e329db83",
           "check_name": "阈值回放检查",
           "passed": true,
           "severity": "info",
@@ -716,8 +716,8 @@
             "history_count": 2,
             "history_metrics": [
               {
-                "run_id": "run_1_4e2a02",
-                "timestamp": "2026-06-15 13:11:50",
+                "run_id": "run_1_e6019c",
+                "timestamp": "2026-06-21 02:46:36",
                 "threshold": 0.5,
                 "metrics": {
                   "threshold": 0.5,
@@ -726,11 +726,11 @@
                   "positive_count": 7,
                   "negative_count": 13
                 },
-                "note": "导入批次 batch_20260615131150_07650d"
+                "note": "导入批次 batch_20260621024636_25be32"
               },
               {
-                "run_id": "run_2_a5a4b4",
-                "timestamp": "2026-06-15 13:11:50",
+                "run_id": "run_2_a565d9",
+                "timestamp": "2026-06-21 02:46:36",
                 "threshold": 0.5,
                 "metrics": {
                   "threshold": 0.5,
@@ -739,7 +739,7 @@
                   "positive_count": 7,
                   "negative_count": 13
                 },
-                "note": "召回对比批次 batch_20260615131150_463c85"
+                "note": "召回对比批次 batch_20260621024636_3c5083"
               }
             ],
             "minority_sample_count": 0,
@@ -748,7 +748,7 @@
           }
         },
         {
-          "check_id": "chk_9a379671",
+          "check_id": "chk_5846737b",
           "check_name": "阈值回放检查",
           "passed": true,
           "severity": "info",
@@ -766,8 +766,8 @@
             "history_count": 4,
             "history_metrics": [
               {
-                "run_id": "run_1_4e2a02",
-                "timestamp": "2026-06-15 13:11:50",
+                "run_id": "run_1_e6019c",
+                "timestamp": "2026-06-21 02:46:36",
                 "threshold": 0.5,
                 "metrics": {
                   "threshold": 0.5,
@@ -776,11 +776,11 @@
                   "positive_count": 7,
                   "negative_count": 13
                 },
-                "note": "导入批次 batch_20260615131150_07650d"
+                "note": "导入批次 batch_20260621024636_25be32"
               },
               {
-                "run_id": "run_2_a5a4b4",
-                "timestamp": "2026-06-15 13:11:50",
+                "run_id": "run_2_a565d9",
+                "timestamp": "2026-06-21 02:46:36",
                 "threshold": 0.5,
                 "metrics": {
                   "threshold": 0.5,
@@ -789,11 +789,11 @@
                   "positive_count": 7,
                   "negative_count": 13
                 },
-                "note": "召回对比批次 batch_20260615131150_463c85"
+                "note": "召回对比批次 batch_20260621024636_3c5083"
               },
               {
-                "run_id": "run_3_d77a21",
-                "timestamp": "2026-06-15 13:11:50",
+                "run_id": "run_3_9bf253",
+                "timestamp": "2026-06-21 02:46:36",
                 "threshold": 0.5,
                 "metrics": {
                   "threshold": 0.5,
@@ -805,8 +805,8 @@
                 "note": "阈值回放 0.5→0.5"
               },
               {
-                "run_id": "run_4_2b32ae",
-                "timestamp": "2026-06-15 13:11:50",
+                "run_id": "run_4_7f271a",
+                "timestamp": "2026-06-21 02:46:36",
                 "threshold": 0.5,
                 "metrics": {
                   "threshold": 0.5,
@@ -833,7 +833,7 @@
     "step4_export": {
       "results": [
         {
-          "check_id": "chk_59104477",
+          "check_id": "chk_910f9eae",
           "check_name": "导出一致性检查",
           "passed": true,
           "severity": "info",
@@ -859,21 +859,21 @@
             ],
             "included_trace_columns": true,
             "source_batch_ids": [
-              "batch_20260615131150_07650d"
+              "batch_20260621024636_25be32"
             ],
             "reverse_lookup_guide": "通过 _trace_id 可在报告、历史、内存数据中反查到同一条原始记录；通过 _batch_id 可反查导入批次"
           }
         },
         {
-          "check_id": "chk_770f49e7",
+          "check_id": "chk_28bb2db5",
           "check_name": "导出校验和生成",
           "passed": true,
           "severity": "info",
           "suggestion": "",
           "details": {
-            "export_id": "exp_26ed65a16018",
-            "checksum": "2e9f02b043f14d0f7739d79190cf5aa1",
-            "export_time": "2026-06-15 13:11:50",
+            "export_id": "exp_4416b31edf08",
+            "checksum": "9a3a18e70046795efa394760dfab2fa0",
+            "export_time": "2026-06-21 02:46:36",
             "next_export_will_compare": "下次导出会对比历史校验和，防止数据漂移"
           }
         }
@@ -887,10 +887,10 @@
   },
   "batches": [
     {
-      "batch_id": "batch_20260615131150_07650d",
+      "batch_id": "batch_20260621024636_25be32",
       "batch_type": "initial_import",
       "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
-      "created_at": "2026-06-15 13:11:50",
+      "created_at": "2026-06-21 02:46:36",
       "record_count": 20,
       "record_start_idx": 0,
       "record_end_idx": 20,
@@ -900,146 +900,626 @@
   ],
   "export_history": [
     {
-      "export_id": "exp_26ed65a16018",
-      "export_time": "2026-06-15 13:11:50",
+      "export_id": "exp_4416b31edf08",
+      "export_time": "2026-06-21 02:46:36",
       "export_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports/export_normal.csv",
       "source_batch_ids": [
-        "batch_20260615131150_07650d"
+        "batch_20260621024636_25be32"
       ],
       "record_count": 20,
-      "checksum": "2e9f02b043f14d0f7739d79190cf5aa1",
+      "checksum": "9a3a18e70046795efa394760dfab2fa0",
       "exported_by": "system"
     }
   ],
   "run_history": [
     {
-      "run_id": "run_1_4e2a02",
-      "timestamp": "2026-06-15 13:11:50",
+      "run_id": "run_1_e6019c",
+      "timestamp": "2026-06-21 02:46:36",
       "data_source": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
       "threshold": 0.5,
       "precision": 1.0,
       "recall": 1.0,
       "row_count": 20,
       "batch_ids": [
-        "batch_20260615131150_07650d"
+        "batch_20260621024636_25be32"
       ],
       "export_paths": [],
-      "note": "导入批次 batch_20260615131150_07650d",
+      "note": "导入批次 batch_20260621024636_25be32",
       "minority_sample_ids": []
     },
     {
-      "run_id": "run_2_a5a4b4",
-      "timestamp": "2026-06-15 13:11:50",
+      "run_id": "run_2_a565d9",
+      "timestamp": "2026-06-21 02:46:36",
       "data_source": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/recall_candidates.csv",
       "threshold": 0.5,
       "precision": 1.0,
       "recall": 1.0,
       "row_count": 20,
       "batch_ids": [
-        "batch_20260615131150_07650d"
+        "batch_20260621024636_25be32"
       ],
       "export_paths": [],
-      "note": "召回对比批次 batch_20260615131150_463c85",
+      "note": "召回对比批次 batch_20260621024636_3c5083",
       "minority_sample_ids": []
     },
     {
-      "run_id": "run_3_d77a21",
-      "timestamp": "2026-06-15 13:11:50",
+      "run_id": "run_3_9bf253",
+      "timestamp": "2026-06-21 02:46:36",
       "data_source": "threshold_0.5",
       "threshold": 0.5,
       "precision": 1.0,
       "recall": 1.0,
       "row_count": 20,
       "batch_ids": [
-        "batch_20260615131150_07650d"
+        "batch_20260621024636_25be32"
       ],
       "export_paths": [],
       "note": "阈值回放 0.5→0.5",
       "minority_sample_ids": []
     },
     {
-      "run_id": "run_4_2b32ae",
-      "timestamp": "2026-06-15 13:11:50",
+      "run_id": "run_4_7f271a",
+      "timestamp": "2026-06-21 02:46:36",
       "data_source": "snapshot",
       "threshold": 0.5,
       "precision": 1.0,
       "recall": 1.0,
       "row_count": 20,
       "batch_ids": [
-        "batch_20260615131150_07650d"
+        "batch_20260621024636_25be32"
       ],
       "export_paths": [],
       "note": "batch.normal.完成补录后",
       "minority_sample_ids": []
     },
     {
-      "run_id": "run_5_974faa",
-      "timestamp": "2026-06-15 13:11:50",
+      "run_id": "run_5_4dea91",
+      "timestamp": "2026-06-21 02:46:36",
       "data_source": "threshold_0.5",
       "threshold": 0.5,
       "precision": 1.0,
       "recall": 1.0,
       "row_count": 20,
       "batch_ids": [
-        "batch_20260615131150_07650d"
+        "batch_20260621024636_25be32"
       ],
       "export_paths": [],
       "note": "阈值回放 0.5→0.5",
       "minority_sample_ids": []
     },
     {
-      "run_id": "run_6_423249",
-      "timestamp": "2026-06-15 13:11:50",
+      "run_id": "run_6_fd1b48",
+      "timestamp": "2026-06-21 02:46:36",
       "data_source": "refresh_results",
       "threshold": 0.5,
       "precision": 1.0,
       "recall": 1.0,
       "row_count": 20,
       "batch_ids": [
-        "batch_20260615131150_07650d"
+        "batch_20260621024636_25be32"
       ],
       "export_paths": [],
       "note": "刷新结果",
       "minority_sample_ids": []
     },
     {
-      "run_id": "run_7_60b03a",
-      "timestamp": "2026-06-15 13:11:50",
+      "run_id": "run_7_f6850f",
+      "timestamp": "2026-06-21 02:46:36",
       "data_source": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports/export_normal.csv",
       "threshold": 0.5,
       "precision": 1.0,
       "recall": 1.0,
       "row_count": 20,
       "batch_ids": [
-        "batch_20260615131150_07650d"
+        "batch_20260621024636_25be32"
       ],
       "export_paths": [
         "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/exports/export_normal.csv"
       ],
-      "note": "导出 exp_26ed65a16018",
+      "note": "导出 exp_4416b31edf08",
       "minority_sample_ids": []
     }
   ],
-  "trace_index": [
-    "rec_c03a62c4cbef06c0",
-    "rec_a67779a2329b9880",
-    "rec_8b4e5aa53c9add52",
-    "rec_25963e346e4ecd16",
-    "rec_6c0b60dc0f360429",
-    "rec_5eee336c8a6365de",
-    "rec_807fd7d14eeef32b",
-    "rec_e4b285fa94709072",
-    "rec_c32450e0d8adcb5b",
-    "rec_4a899c483264e405",
-    "rec_60df2dbf7e2d6768",
-    "rec_92edc6f3f3a63678",
-    "rec_054f26635b3fc7bf",
-    "rec_46555a1a7efc99d3",
-    "rec_f4c8c7be152d068b",
-    "rec_09caf5bc9ed7a53c",
-    "rec_9b9b8e77b50bff83",
-    "rec_c5df7d141e7eeec7",
-    "rec_6c6c6939460a69d4",
-    "rec_3fe7df912794aab2"
-  ]
+  "trace_index": {
+    "rec_ac4064416814260e": {
+      "record": {
+        "user_id": 1001,
+        "item_id": 2001,
+        "timestamp": 1717209600,
+        "label": 0,
+        "score": 0.32,
+        "click_rate": 0.12,
+        "conversion_rate": 0.02
+      },
+      "trace_id": "rec_ac4064416814260e",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 0
+    },
+    "rec_9807dd8e03416842": {
+      "record": {
+        "user_id": 1001,
+        "item_id": 2002,
+        "timestamp": 1717209700,
+        "label": 0,
+        "score": 0.28,
+        "click_rate": 0.1,
+        "conversion_rate": 0.01
+      },
+      "trace_id": "rec_9807dd8e03416842",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 1
+    },
+    "rec_0e4678957d54c12b": {
+      "record": {
+        "user_id": 1001,
+        "item_id": 2003,
+        "timestamp": 1717209800,
+        "label": 1,
+        "score": 0.76,
+        "click_rate": 0.45,
+        "conversion_rate": 0.18
+      },
+      "trace_id": "rec_0e4678957d54c12b",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 2
+    },
+    "rec_3e1bad2a4722e3c3": {
+      "record": {
+        "user_id": 1002,
+        "item_id": 2001,
+        "timestamp": 1717210000,
+        "label": 0,
+        "score": 0.35,
+        "click_rate": 0.11,
+        "conversion_rate": 0.03
+      },
+      "trace_id": "rec_3e1bad2a4722e3c3",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 3
+    },
+    "rec_e0fc5b95e817439e": {
+      "record": {
+        "user_id": 1002,
+        "item_id": 2004,
+        "timestamp": 1717210100,
+        "label": 0,
+        "score": 0.41,
+        "click_rate": 0.15,
+        "conversion_rate": 0.04
+      },
+      "trace_id": "rec_e0fc5b95e817439e",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 4
+    },
+    "rec_4ff07cc73a8e2ee9": {
+      "record": {
+        "user_id": 1002,
+        "item_id": 2005,
+        "timestamp": 1717210200,
+        "label": 1,
+        "score": 0.82,
+        "click_rate": 0.52,
+        "conversion_rate": 0.22
+      },
+      "trace_id": "rec_4ff07cc73a8e2ee9",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 5
+    },
+    "rec_670ea2f829e71a3b": {
+      "record": {
+        "user_id": 1003,
+        "item_id": 2002,
+        "timestamp": 1717210500,
+        "label": 0,
+        "score": 0.22,
+        "click_rate": 0.08,
+        "conversion_rate": 0.01
+      },
+      "trace_id": "rec_670ea2f829e71a3b",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 6
+    },
+    "rec_6fd280ca67d6dc75": {
+      "record": {
+        "user_id": 1003,
+        "item_id": 2006,
+        "timestamp": 1717210600,
+        "label": 1,
+        "score": 0.69,
+        "click_rate": 0.38,
+        "conversion_rate": 0.15
+      },
+      "trace_id": "rec_6fd280ca67d6dc75",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 7
+    },
+    "rec_94d7cc7a4c7b1864": {
+      "record": {
+        "user_id": 1003,
+        "item_id": 2007,
+        "timestamp": 1717210700,
+        "label": 0,
+        "score": 0.3,
+        "click_rate": 0.09,
+        "conversion_rate": 0.02
+      },
+      "trace_id": "rec_94d7cc7a4c7b1864",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 8
+    },
+    "rec_64b48384e6fead2b": {
+      "record": {
+        "user_id": 1004,
+        "item_id": 2003,
+        "timestamp": 1717211000,
+        "label": 0,
+        "score": 0.38,
+        "click_rate": 0.13,
+        "conversion_rate": 0.03
+      },
+      "trace_id": "rec_64b48384e6fead2b",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 9
+    },
+    "rec_76bdc5c4d9d4f80f": {
+      "record": {
+        "user_id": 1004,
+        "item_id": 2008,
+        "timestamp": 1717211100,
+        "label": 1,
+        "score": 0.71,
+        "click_rate": 0.41,
+        "conversion_rate": 0.17
+      },
+      "trace_id": "rec_76bdc5c4d9d4f80f",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 10
+    },
+    "rec_ef3563b8b87be041": {
+      "record": {
+        "user_id": 1004,
+        "item_id": 2009,
+        "timestamp": 1717211200,
+        "label": 0,
+        "score": 0.25,
+        "click_rate": 0.07,
+        "conversion_rate": 0.01
+      },
+      "trace_id": "rec_ef3563b8b87be041",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 11
+    },
+    "rec_791953a5cf47d9ad": {
+      "record": {
+        "user_id": 1005,
+        "item_id": 2004,
+        "timestamp": 1717211500,
+        "label": 1,
+        "score": 0.85,
+        "click_rate": 0.58,
+        "conversion_rate": 0.25
+      },
+      "trace_id": "rec_791953a5cf47d9ad",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 12
+    },
+    "rec_2045c25a990ab5fd": {
+      "record": {
+        "user_id": 1005,
+        "item_id": 2010,
+        "timestamp": 1717211600,
+        "label": 0,
+        "score": 0.33,
+        "click_rate": 0.11,
+        "conversion_rate": 0.02
+      },
+      "trace_id": "rec_2045c25a990ab5fd",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 13
+    },
+    "rec_79e4aeb48af2df02": {
+      "record": {
+        "user_id": 1005,
+        "item_id": 2011,
+        "timestamp": 1717211700,
+        "label": 0,
+        "score": 0.29,
+        "click_rate": 0.09,
+        "conversion_rate": 0.02
+      },
+      "trace_id": "rec_79e4aeb48af2df02",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 14
+    },
+    "rec_c9bb19a1fe85286f": {
+      "record": {
+        "user_id": 1006,
+        "item_id": 2005,
+        "timestamp": 1717212000,
+        "label": 0,
+        "score": 0.36,
+        "click_rate": 0.12,
+        "conversion_rate": 0.03
+      },
+      "trace_id": "rec_c9bb19a1fe85286f",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 15
+    },
+    "rec_461f61d656d65534": {
+      "record": {
+        "user_id": 1006,
+        "item_id": 2012,
+        "timestamp": 1717212100,
+        "label": 1,
+        "score": 0.78,
+        "click_rate": 0.44,
+        "conversion_rate": 0.19
+      },
+      "trace_id": "rec_461f61d656d65534",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 16
+    },
+    "rec_d835d45a61ea5ebb": {
+      "record": {
+        "user_id": 1006,
+        "item_id": 2013,
+        "timestamp": 1717212200,
+        "label": 0,
+        "score": 0.27,
+        "click_rate": 0.08,
+        "conversion_rate": 0.01
+      },
+      "trace_id": "rec_d835d45a61ea5ebb",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 17
+    },
+    "rec_d7b52efce00fa82f": {
+      "record": {
+        "user_id": 1007,
+        "item_id": 2006,
+        "timestamp": 1717212500,
+        "label": 0,
+        "score": 0.31,
+        "click_rate": 0.1,
+        "conversion_rate": 0.02
+      },
+      "trace_id": "rec_d7b52efce00fa82f",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 18
+    },
+    "rec_c2de597a9ae9b4b4": {
+      "record": {
+        "user_id": 1007,
+        "item_id": 2014,
+        "timestamp": 1717212600,
+        "label": 1,
+        "score": 0.73,
+        "click_rate": 0.42,
+        "conversion_rate": 0.16
+      },
+      "trace_id": "rec_c2de597a9ae9b4b4",
+      "batch_id": "batch_20260621024636_25be32",
+      "batch_info": {
+        "batch_id": "batch_20260621024636_25be32",
+        "batch_type": "initial_import",
+        "created_at": "2026-06-21 02:46:36",
+        "source_path": "/Users/lzy/pro/solo/workspaces/zy72569/neg_sample_checker/data/normal/neg_samples.csv",
+        "note": "batch.normal.初始导入",
+        "parent_batch_id": "",
+        "record_count": 20,
+        "record_start_idx": 0,
+        "record_end_idx": 20
+      },
+      "row_idx": 19
+    }
+  }
 }

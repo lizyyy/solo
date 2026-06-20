@@ -1,6 +1,7 @@
 import json
 import os
 import numpy as np
+import pandas as pd
 import dataclasses
 from datetime import datetime, date
 from typing import Dict, List, Any
@@ -540,12 +541,16 @@ class Reporter:
                             'batch_id': b.batch_id, 'batch_type': b.batch_type,
                             'created_at': b.created_at.strftime('%Y-%m-%d %H:%M:%S'),
                             'source_path': b.source_path, 'note': b.note,
+                            'parent_batch_id': b.parent_batch_id,
+                            'record_count': b.record_count,
+                            'record_start_idx': b.record_start_idx,
+                            'record_end_idx': b.record_end_idx,
                         }
                         break
                 all_trace_records[tid] = {
                     'record': {k: v for k, v in rd.items() if not k.startswith('_')},
                     'trace_id': tid, 'batch_id': bid, 'batch_info': binfo,
-                    'row_idx': rd.get('_row_idx', -1),
+                    'row_idx': int(rd.get('_row_idx', -1)) if pd.notna(rd.get('_row_idx')) else -1,
                 }
 
         history_flat = engine.get_run_history_table()

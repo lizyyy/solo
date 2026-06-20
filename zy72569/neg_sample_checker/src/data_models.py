@@ -112,7 +112,13 @@ class NegSampleDataset:
         if "_batch_id" not in self.df.columns:
             self.df["_batch_id"] = ""
         if "_row_idx" not in self.df.columns:
-            self.df["_row_idx"] = range(len(self.df))
+            self.df["_row_idx"] = list(range(len(self.df)))
+        else:
+            na_mask = self.df["_row_idx"].isna()
+            if na_mask.any():
+                valid = self.df["_row_idx"].dropna()
+                max_existing = int(valid.max()) if len(valid) > 0 else -1
+                self.df.loc[na_mask, "_row_idx"] = list(range(max_existing + 1, max_existing + 1 + int(na_mask.sum())))
 
     def _assign_trace_ids(self, batch_id: str, start_idx: int, end_idx: int):
         for i in range(start_idx, end_idx):
@@ -125,6 +131,7 @@ class NegSampleDataset:
             )
             self.df.at[i, "_trace_id"] = tid
             self.df.at[i, "_batch_id"] = batch_id
+            self.df.at[i, "_row_idx"] = i - start_idx
 
     def load_from_csv(self, file_path: str, batch_id: str = "") -> BatchInfo:
         new_df = pd.read_csv(file_path)
@@ -219,5 +226,7 @@ class NegSampleDataset:
         export_df = self.df.copy()
         if not include_trace_cols:
             export_df = export_df[[c for c in export_df.columns if not c.startswith("_")]]
+        if "_row_idx" in export_df.columns:
+            export_df["_row_idx"] = export_df["_row_idx"].astype(int)
         export_df.to_csv(export_path, index=False)
         return export_path

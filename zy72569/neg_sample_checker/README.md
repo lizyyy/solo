@@ -180,7 +180,7 @@ ls -lt reports/
 ls -lt exports/
 
 # 看导出CSV里的追溯字段
-head -3 exports/export_wrong_caliber_*.csv
+head -3 exports/export_wrong_caliber.csv
 ```
 
 ---
