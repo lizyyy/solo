@@ -1,4 +1,6 @@
-import { useState } from 'react';
+const fs = require('fs');
+
+const CONTENT = String.raw`import { useState } from 'react';
 import { CanopyRecord, RecordStatus, OperatorRole, HistoryRecord, STATUS_LABELS } from '@/types';
 import { StatusBadge } from './StatusBadge';
 import { useRecordsStore } from '@/store/useRecordsStore';
@@ -81,7 +83,7 @@ export function RecordDetailPanel({ record }: RecordDetailPanelProps) {
   const handleRollback = (historyEntry: HistoryRecord) => {
     if (
       confirm(
-        `确定回滚「${FIELD_CN_LABELS[historyEntry.fieldName] || historyEntry.fieldName}」吗？\n将从「${historyEntry.newValue}」还原为「${historyEntry.oldValue}」`
+        \`确定回滚「\${FIELD_CN_LABELS[historyEntry.fieldName] || historyEntry.fieldName}」吗？\n将从「\${historyEntry.newValue}」还原为「\${historyEntry.oldValue}」\`
       )
     ) {
       rollbackToHistory(historyEntry.id);
@@ -126,11 +128,11 @@ export function RecordDetailPanel({ record }: RecordDetailPanelProps) {
               return (
                 <div
                   key={h.id}
-                  className={`p-2 rounded border ${
+                  className={\`p-2 rounded border \${
                     isCurrentEffective
                       ? 'bg-green-50 border-green-200'
                       : 'bg-slate-50 border-slate-200'
-                  }`}
+                  }\`}
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs text-slate-500">
@@ -357,11 +359,11 @@ export function RecordDetailPanel({ record }: RecordDetailPanelProps) {
                 key={status}
                 onClick={() => handleStatusChange(status)}
                 disabled={record.status === status}
-                className={`px-3 py-1.5 text-xs rounded-md border transition-all ${
+                className={\`px-3 py-1.5 text-xs rounded-md border transition-all \${
                   record.status === status
                     ? 'opacity-50 cursor-not-allowed'
                     : 'hover:bg-slate-50'
-                }`}
+                }\`}
               >
                 <StatusBadge status={status} size="sm" />
               </button>
@@ -373,7 +375,7 @@ export function RecordDetailPanel({ record }: RecordDetailPanelProps) {
 
       <div className="p-4 border-t border-slate-200 space-y-2">
         <Link
-          to={`/history/${record.id}`}
+          to={\`/history/\${record.id}\`}
           className="flex items-center justify-center gap-2 w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-sm font-medium transition-colors"
         >
           <History className="w-4 h-4" />
@@ -386,4 +388,9 @@ export function RecordDetailPanel({ record }: RecordDetailPanelProps) {
     </div>
   );
 }
-}
+`;
+
+fs.writeFileSync('src/components/RecordDetailPanel.tsx', CONTENT);
+console.log('RecordDetailPanel.tsx 写入完成');
+console.log('字节数:', CONTENT.length);
+console.log('行数:', CONTENT.split('\n').length);

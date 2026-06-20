@@ -277,7 +277,7 @@ export default function HistoryPage() {
                         </div>
                       )}
 
-                      {!isLatest && (
+                      {currentValue === h.newValue && h.oldValue !== h.newValue && (
                         <div className="mt-3 pt-3 border-t border-dashed border-slate-200 flex justify-end">
                           <button
                             onClick={() => handleRollback(h)}
@@ -355,4 +355,5 @@ export default function HistoryPage() {
       </div>
     </div>
   );
+}
 }
