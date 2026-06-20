@@ -1,0 +1,101 @@
+{
+  "report_id": "08e2276c-2bd5-443f-b8cc-8741653d0f39",
+  "issue_type": "除零错误",
+  "severity": "high",
+  "param_name": "分母",
+  "current_value": 0,
+  "description": "分母值为 0，接近或等于零，可能导致计算结果异常。",
+  "lineage": [
+    {
+      "node_id": "c0c48864-2c1e-4274-a44f-b865fd168d26",
+      "node_type": "parameter",
+      "name": "分母",
+      "value": 100,
+      "version_id": "a4836ba1-b31b-44a5-82b4-73051c393d3a",
+      "version_name": "v1",
+      "source_type": "excel",
+      "source_id": "data_20240601.xlsx",
+      "source_name": "6月1日数据表格",
+      "raw_data": {
+        "分子": 25,
+        "分母": 100,
+        "备注": "原始录入数据，来自Excel表格"
+      },
+      "created_at": "2026-06-20T13:17:55.550208",
+      "created_by": "阿宁",
+      "parent_node_ids": [],
+      "transformation": "首次导入"
+    },
+    {
+      "node_id": "0561683a-dc0f-43d6-bce3-2d2b97c6b210",
+      "node_type": "parameter",
+      "name": "分母",
+      "value": 100,
+      "version_id": "dfb3c07b-747d-4e91-b753-c6a0b6568233",
+      "version_name": "v2",
+      "source_type": "excel",
+      "source_id": "data_20240601.xlsx",
+      "source_name": "6月1日数据表格",
+      "raw_data": {
+        "分子": 30,
+        "分母": 100,
+        "备注": "修正后的数据"
+      },
+      "created_at": "2026-06-20T13:17:55.550215",
+      "created_by": "阿宁",
+      "parent_node_ids": [
+        "c0c48864-2c1e-4274-a44f-b865fd168d26"
+      ],
+      "transformation": "从版本 v1 变更而来"
+    },
+    {
+      "node_id": "41657ddb-8920-4945-90fc-1302ed49865c",
+      "node_type": "parameter",
+      "name": "分母",
+      "value": 0,
+      "version_id": "85d4b9cd-19e3-48cd-bbaa-7ab29e86fd49",
+      "version_name": "v3",
+      "source_type": "manual",
+      "source_id": "manual_input_001",
+      "source_name": "手动录入",
+      "raw_data": {
+        "分子": 30,
+        "分母": 0,
+        "备注": "分母错误地设为0"
+      },
+      "created_at": "2026-06-20T13:17:55.550221",
+      "created_by": "排班同事",
+      "parent_node_ids": [
+        "0561683a-dc0f-43d6-bce3-2d2b97c6b210"
+      ],
+      "transformation": "从版本 v2 变更而来"
+    }
+  ],
+  "first_occurrence": {
+    "node_id": "c0c48864-2c1e-4274-a44f-b865fd168d26",
+    "node_type": "parameter",
+    "name": "分母",
+    "value": 100,
+    "version_id": "a4836ba1-b31b-44a5-82b4-73051c393d3a",
+    "version_name": "v1",
+    "source_type": "excel",
+    "source_id": "data_20240601.xlsx",
+    "source_name": "6月1日数据表格",
+    "raw_data": {
+      "分子": 25,
+      "分母": 100,
+      "备注": "原始录入数据，来自Excel表格"
+    },
+    "created_at": "2026-06-20T13:17:55.550208",
+    "created_by": "阿宁",
+    "parent_node_ids": [],
+    "transformation": "首次导入"
+  },
+  "suggestions": [
+    "处理建议：\n1. 检查参数 '分母' 的来源数据是否正确\n2. 确认该值为零是否合理，若合理可使用一个极小值（如 1e-10）替代\n3. 若该值不应为零，请追溯参数来源：85d4b9cd-19e3-48cd-bbaa-7ab29e86fd49\n4. 可设置合理的默认值或跳过该指标计算",
+    "查看 6月1日数据表格 (ID: data_20240601.xlsx) 中的原始数据",
+    "联系首次录入人 阿宁 确认数据准确性",
+    "检查版本时间线中第 3 次变更是否引入问题"
+  ],
+  "generated_at": "2026-06-20T13:18:30.249546"
+}

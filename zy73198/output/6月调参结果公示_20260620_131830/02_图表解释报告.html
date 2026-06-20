@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>6月调参结果公示 - 图表解释</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        h1 { color: #333; }
+        .section { background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .section h2 { margin-top: 0; color: #333; }
+        .summary { background: #E3F2FD; border-left: 4px solid #2196F3; padding: 15px; }
+        .finding { background: #E8F5E9; border-left: 4px solid #4CAF50; padding: 10px 15px; margin: 10px 0; border-radius: 4px; }
+        .issue-high { background: #FFEBEE; border-left: 4px solid #F44336; padding: 15px; margin: 10px 0; border-radius: 4px; }
+        .issue-medium { background: #FFF3CD; border-left: 4px solid #FFC107; padding: 15px; margin: 10px 0; border-radius: 4px; }
+        .step { background: white; padding: 15px; margin: 10px 0; border-radius: 4px; border: 1px solid #ddd; }
+        .formula { font-family: monospace; background: #f0f0f0; padding: 5px 10px; border-radius: 4px; display: inline-block; }
+        .source-card { background: white; padding: 10px; margin: 5px 0; border-radius: 4px; border: 1px solid #ddd; }
+        .change-item { padding: 8px 0; border-bottom: 1px solid #eee; }
+        .param-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        .param-table td { padding: 8px; border-bottom: 1px solid #ddd; }
+        .param-name { font-weight: bold; width: 150px; }
+        code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>📊 6月调参结果公示 - 图表解释</h1>
+    <p>版本：<strong>v3</strong> | 生成时间：2026年06月20日 13:18:30</p>
+    
+    <div class="section">
+        <h2>📝 通俗易懂的解释</h2>
+        <div class="summary">
+            本次计算使用的是版本 'v3'，由 排班同事 在 2026年06月20日 13:17 创建。<br>本次调参原因：测试除零边界处理<br>调整内容：添加A值和B值，分母意外设为0<br>本次相比上一版本共有 3 处参数变更：<br>  - 新增参数 'A值'，值为 85<br>  - 新增参数 'B值'，值为 70<br>  - 参数 '分母' 从 100 改为 0<br>计算过程如下：<br>  - 计算分子除以分母的比例值：比例 = 分子 / 分母<br>    输入：{'分子': 30, '分母': 0}，结果：nan<br>  - 计算总数除以样本量的平均值：均值 = 总数 / 样本量<br>    输入：{'总数': 550, '样本量': 50}，结果：11.0<br>  - 计算A值与B值的差值：差值 = A值 - B值<br>    输入：{'A值': 85, 'B值': 70}，结果：15<br>  - 计算相对B值的增长率百分比：增长率 = (A值 - B值) / B值 × 100%<br>    输入：{'A值': 85, 'B值': 70}，结果：21.43%<br>⚠️  发现 1 个严重问题需要注意：<br>  - 分母值为 0，接近或等于零，可能导致计算结果异常。<br>    处理建议：<br>1. 检查参数 '分母' 的来源数据是否正确<br>2. 确认该值为零是否合理，若合理可使用一个极小值（如 1e-10）替代<br>3. 若该值不应为零，请追溯参数来源：85d4b9cd-19e3-48cd-bbaa-7ab29e86fd49<br>4. 可设置合理的默认值或跳过该指标计算<br>⚡ 发现 1 个潜在风险：<br>  - 参数 '分母' 值为 0，可能在后续除法计算中导致问题。
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>🎯 关键结论</h2>
+        
+        <div class="finding">计算得出的均值为 11.0000</div>
+        
+        <div class="finding">两者差值为 15</div>
+        
+        <div class="finding">增长率为 21.43%</div>
+        
+        <div class="finding">本次计算发现 2 个边界问题，详见问题列表</div>
+        
+    </div>
+    
+    
+    <div class="section">
+        <h2>⚠️ 边界问题处理建议</h2>
+        
+            
+            <div class="issue-medium">
+                <strong>零值风险</strong> - 参数 '分母'
+                <p>参数 '分母' 值为 0，可能在后续除法计算中导致问题。</p>
+                <p><strong>处理建议：</strong></p>
+                <p>处理建议：<br>1. 确认该参数为0是否合理<br>2. 若合理，考虑在计算时添加极小值偏移<br>3. 追溯该参数的来源：分母</p>
+            </div>
+            
+        
+            
+            <div class="issue-high">
+                <strong>除零错误</strong> - 参数 '分母' 用于除法计算时
+                <p>分母值为 0，接近或等于零，可能导致计算结果异常。</p>
+                <p><strong>处理建议：</strong></p>
+                <p>处理建议：<br>1. 检查参数 '分母' 的来源数据是否正确<br>2. 确认该值为零是否合理，若合理可使用一个极小值（如 1e-10）替代<br>3. 若该值不应为零，请追溯参数来源：85d4b9cd-19e3-48cd-bbaa-7ab29e86fd49<br>4. 可设置合理的默认值或跳过该指标计算</p>
+            </div>
+            
+        
+    </div>
+    
+    
+    <div class="section">
+        <h2>🔢 计算过程</h2>
+        
+        <div class="step">
+            <h3>计算比例</h3>
+            <p>计算分子除以分母的比例值</p>
+            <p><strong>公式：</strong><span class="formula">比例 = 分子 / 分母</span></p>
+            <p><strong>输入：</strong></p>
+            <table class="param-table">
+                
+                <tr><td class="param-name">分子</td><td>30</td></tr>
+                
+                <tr><td class="param-name">分母</td><td>0</td></tr>
+                
+            </table>
+            <p><strong>结果：</strong><code>nan</code></p>
+        </div>
+        
+        <div class="step">
+            <h3>计算均值</h3>
+            <p>计算总数除以样本量的平均值</p>
+            <p><strong>公式：</strong><span class="formula">均值 = 总数 / 样本量</span></p>
+            <p><strong>输入：</strong></p>
+            <table class="param-table">
+                
+                <tr><td class="param-name">总数</td><td>550</td></tr>
+                
+                <tr><td class="param-name">样本量</td><td>50</td></tr>
+                
+            </table>
+            <p><strong>结果：</strong><code>11.0</code></p>
+        </div>
+        
+        <div class="step">
+            <h3>计算差值</h3>
+            <p>计算A值与B值的差值</p>
+            <p><strong>公式：</strong><span class="formula">差值 = A值 - B值</span></p>
+            <p><strong>输入：</strong></p>
+            <table class="param-table">
+                
+                <tr><td class="param-name">A值</td><td>85</td></tr>
+                
+                <tr><td class="param-name">B值</td><td>70</td></tr>
+                
+            </table>
+            <p><strong>结果：</strong><code>15</code></p>
+        </div>
+        
+        <div class="step">
+            <h3>计算增长率</h3>
+            <p>计算相对B值的增长率百分比</p>
+            <p><strong>公式：</strong><span class="formula">增长率 = (A值 - B值) / B值 × 100%</span></p>
+            <p><strong>输入：</strong></p>
+            <table class="param-table">
+                
+                <tr><td class="param-name">A值</td><td>85</td></tr>
+                
+                <tr><td class="param-name">B值</td><td>70</td></tr>
+                
+            </table>
+            <p><strong>结果：</strong><code>21.43%</code></p>
+        </div>
+        
+    </div>
+    
+    
+    <div class="section">
+        <h2>🔄 相比上一版本的参数变更</h2>
+        
+        <div class="change-item">新增参数 'A值'，值为 85</div>
+        
+        <div class="change-item">新增参数 'B值'，值为 70</div>
+        
+        <div class="change-item">参数 '分母' 从 100 改为 0</div>
+        
+    </div>
+    
+    
+    <div class="section">
+        <h2>📦 数据来源</h2>
+        
+        <div class="source-card">
+            <strong>6月1日数据表格</strong> (excel)
+            <p>ID: data_20240601.xlsx</p>
+            <p>首次录入：2026-06-20T13:17:55.550208</p>
+            <p>录入人：阿宁</p>
+        </div>
+        
+        <div class="source-card">
+            <strong>手动录入</strong> (manual)
+            <p>ID: manual_input_001</p>
+            <p>首次录入：2026-06-20T13:17:55.550221</p>
+            <p>录入人：排班同事</p>
+        </div>
+        
+    </div>
+</body>
+</html>

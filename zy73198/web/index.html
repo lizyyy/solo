@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>优化调参图表解释系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            padding: 40px 0;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .quick-start {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .quick-start h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .step-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .step-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .step-card p {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .step-card code {
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-card:nth-child(1) .feature-icon {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .feature-card:nth-child(2) .feature-icon {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .feature-card:nth-child(3) .feature-icon {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .feature-card:nth-child(4) .feature-icon {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .feature-card:nth-child(5) .feature-icon {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .feature-card:nth-child(6) .feature-icon {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .feature-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .commands {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .commands h2 {
+            color: #667eea;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .command-item {
+            background: #1e1e2e;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            color: #a6e3a1;
+            overflow-x: auto;
+        }
+
+        .command-item .cmd {
+            color: #89b4fa;
+            margin-bottom: 8px;
+        }
+
+        .command-item .desc {
+            color: #cdd6f4;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .demo-section {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .demo-section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .demo-section p {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            padding: 40px 0;
+            opacity: 0.9;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .steps, .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 优化调参图表解释系统</h1>
+            <p>让每一个数字都有迹可循，让每一次调参都清晰透明</p>
+        </header>
+
+        <div class="quick-start">
+            <h2>🚀 快速开始</h2>
+            <div class="steps">
+                <div class="step-card">
+                    <span class="step-number">1</span>
+                    <h3>生成演示数据</h3>
+                    <p>先运行演示命令，体验系统的完整功能</p>
+                    <code>python -m src.cli demo</code>
+                </div>
+                <div class="step-card">
+                    <span class="step-number">2</span>
+                    <h3>查看版本时间线</h3>
+                    <p>了解每一步参数变更，看看哪一步让结果变化</p>
+                    <code>python -m src.cli timeline</code>
+                </div>
+                <div class="step-card">
+                    <span class="step-number">3</span>
+                    <h3>查看图表解释</h3>
+                    <p>用通俗易懂的语言解释计算过程和结果</p>
+                    <code>python -m src.cli explain --version v3</code>
+                </div>
+                <div class="step-card">
+                    <span class="step-number">4</span>
+                    <h3>追溯坏数据</h3>
+                    <p>顺着提示回到参数表的原始对象，找到问题根源</p>
+                    <code>python -m src.cli trace --param 分母</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">📝</div>
+                <h3>版本历史追踪</h3>
+                <p>记录每一次参数变更，避免同一题被两个版本答案覆盖。排班同事能清晰看出哪一步让结果变化。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3>原始数据保留</h3>
+                <p>参数表拿到手多半不齐整，系统保留原始来源，避免把脏数据修得看不出痕迹。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚠️</div>
+                <h3>边界问题处理</h3>
+                <p>拿除零边界压系统时，不光冒一个警告，还能告诉接手的人该怎么处理，给出具体建议。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🗣️</div>
+                <h3>通俗易懂解释</h3>
+                <p>社区公示前能把解释讲给不看代码的人听，数字从哪来要有线索，让每一步都清晰透明。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔗</div>
+                <h3>数据溯源能力</h3>
+                <p>如果坏数据影响解释，接手的人能顺着提示回到参数表的原始对象，快速定位问题。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📦</div>
+                <h3>现场材料打包</h3>
+                <p>带一包像现场会收到的材料就行，教研编辑阿宁看README能知道先跑哪条命令。</p>
+            </div>
+        </div>
+
+        <div class="commands">
+            <h2>💻 常用命令</h2>
+            <div class="command-item">
+                <div class="cmd"># 生成演示数据（首次使用）</div>
+                <div class="desc">创建3个版本的示例参数，包含除零等边界情况</div>
+            </div>
+            <div class="command-item">
+                <div class="cmd">python -m src.cli timeline</div>
+                <div class="desc">查看版本时间线，了解哪一步让结果变化</div>
+            </div>
+            <div class="command-item">
+                <div class="cmd">python -m src.cli explain --version v3</div>
+                <div class="desc">生成图表解释，用通俗易懂的语言解释计算过程</div>
+            </div>
+            <div class="command-item">
+                <div class="cmd">python -m src.cli compare --version1 v1 --version2 v2</div>
+                <div class="desc">比较两个版本，看出哪一步让结果变化</div>
+            </div>
+            <div class="command-item">
+                <div class="cmd">python -m src.cli trace --param 分母</div>
+                <div class="desc">追溯坏数据来源，回到参数表的原始对象</div>
+            </div>
+            <div class="command-item">
+                <div class="cmd">python -m src.cli package --name "6月调参结果" --output ./output</div>
+                <div class="desc">打包现场材料包，生成像现场会收到的材料</div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎬 立即体验</h2>
+            <p>只需一步，即可生成演示数据并体验完整功能</p>
+            <button class="btn" onclick="runDemo()">生成演示数据 →</button>
+        </div>
+
+        <footer>
+            <p>优化调参图表解释系统 | 让每一个数字都有迹可循</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">
+                查看 <a href="README.md">README</a> 了解更多
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        function runDemo() {
+            alert('请在终端运行以下命令：\n\npython -m src.cli demo\n\n然后根据提示继续体验其他功能。');
+        }
+    </script>
+</body>
+</html>
