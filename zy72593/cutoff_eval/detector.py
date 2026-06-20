@@ -106,8 +106,8 @@ class DuplicateDetector:
             candidate_keys[key].append(c)
 
         cross_duplicates = []
-        all_keys = set(sample_keys.keys()) | set(candidate_keys.keys())
-        for key in all_keys:
+        intersect_keys = set(sample_keys.keys()) & set(candidate_keys.keys())
+        for key in intersect_keys:
             batch_id, item_id = key
             matched_samples = sample_keys.get(key, [])
             matched_candidates = candidate_keys.get(key, [])
@@ -115,45 +115,44 @@ class DuplicateDetector:
             candidate_count = len(matched_candidates)
             total = sample_count + candidate_count
 
-            if total > 1:
-                dup_source_parts = []
-                if sample_count > 0:
-                    dup_source_parts.append(f"负样本{sample_count}次")
-                if candidate_count > 0:
-                    dup_source_parts.append(f"召回候选{candidate_count}次")
-                dup_source_desc = "、".join(dup_source_parts)
-                default_remark = (
-                    f"检测到同一批数据重复训练（交叉）：批次{batch_id}，商品{item_id}，"
-                    f"共出现{total}次（{dup_source_desc}）。待策略产品复核"
-                )
+            dup_source_parts = []
+            if sample_count > 0:
+                dup_source_parts.append(f"负样本{sample_count}次")
+            if candidate_count > 0:
+                dup_source_parts.append(f"召回候选{candidate_count}次")
+            dup_source_desc = "、".join(dup_source_parts)
+            default_remark = (
+                f"检测到同一批数据重复训练（跨表交叉）：批次{batch_id}，商品{item_id}，"
+                f"共出现{total}次（{dup_source_desc}）。待策略产品复核"
+            )
 
-                for s in matched_samples:
-                    if s.status not in (DataStatus.STRATEGY_REVIEW, DataStatus.DUPLICATE):
-                        s.status = DataStatus.DUPLICATE
-                    if not s.remarks or s.remarks == "nan":
-                        s.remarks = default_remark
+            for s in matched_samples:
+                if s.status not in (DataStatus.STRATEGY_REVIEW, DataStatus.DUPLICATE):
+                    s.status = DataStatus.DUPLICATE
+                if not s.remarks or s.remarks == "nan":
+                    s.remarks = default_remark
 
-                for c in matched_candidates:
-                    if c.status not in (DataStatus.STRATEGY_REVIEW, DataStatus.DUPLICATE):
-                        c.status = DataStatus.DUPLICATE
-                    if not c.remarks or c.remarks == "nan":
-                        c.remarks = default_remark
+            for c in matched_candidates:
+                if c.status not in (DataStatus.STRATEGY_REVIEW, DataStatus.DUPLICATE):
+                    c.status = DataStatus.DUPLICATE
+                if not c.remarks or c.remarks == "nan":
+                    c.remarks = default_remark
 
-                group_key = f"batch_{batch_id}_item_{item_id}"
-                group_info = {
-                    "group_key": group_key,
-                    "batch_id": batch_id,
-                    "item_id": item_id,
-                    "count": total,
-                    "negative_sample_count": sample_count,
-                    "recall_candidate_count": candidate_count,
-                    "sample_ids": [s.sample_id for s in matched_samples],
-                    "candidate_ids": [c.candidate_id for c in matched_candidates],
-                    "is_cross": True,
-                }
-                self.duplicate_groups[group_key] = group_info
+            group_key = f"batch_{batch_id}_item_{item_id}"
+            group_info = {
+                "group_key": group_key,
+                "batch_id": batch_id,
+                "item_id": item_id,
+                "count": total,
+                "negative_sample_count": sample_count,
+                "recall_candidate_count": candidate_count,
+                "sample_ids": [s.sample_id for s in matched_samples],
+                "candidate_ids": [c.candidate_id for c in matched_candidates],
+                "is_cross": True,
+            }
+            self.duplicate_groups[group_key] = group_info
 
-                cross_duplicates.append(group_info)
+            cross_duplicates.append(group_info)
 
         _, _ = self.mark_for_strategy_review(samples, candidates)
 

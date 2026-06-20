@@ -339,7 +339,7 @@ class ReportGenerator:
             if cross_dups:
                 for g in cross_dups:
                     dup_rows_html += f"""
-                    <tr class="dup-row cross">
+                    <tr class="dup-row cross" id="dup_{g['batch_id']}_{g['item_id']}">
                         <td><span class="badge badge-cross">交叉重复</span></td>
                         <td>{g['batch_id']}</td>
                         <td>{g['item_id']}</td>

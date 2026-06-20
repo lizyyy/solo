@@ -9,9 +9,48 @@ from .models import DataStatus
 
 
 class Visualizer:
+    CLICK_JS = """<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        var plots = document.querySelectorAll('.js-plotly-plot');
+        plots.forEach(function(plot) {
+            plot.on('plotly_click', function(data) {
+                if (data.points && data.points.length > 0) {
+                    var point = data.points[0];
+                    if (point.customdata && point.customdata.length >= 2) {
+                        var batchId = point.customdata[0];
+                        var itemId = point.customdata[1];
+                        window.location.href = 'index.html#dup_' + batchId + '_' + itemId;
+                    }
+                }
+            });
+        });
+    }, 500);
+});
+</script>"""
+
     def __init__(self, output_dir: str = "./output"):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
+
+    def _inject_js(self, html_path: str) -> None:
+        path = Path(html_path)
+        if not path.exists():
+            return
+
+        content = path.read_text(encoding="utf-8")
+
+        if self.CLICK_JS in content:
+            return
+
+        if "</body>" in content:
+            content = content.replace("</body>", self.CLICK_JS + "</body>")
+        elif "</html>" in content:
+            content = content.replace("</html>", self.CLICK_JS + "</html>")
+        else:
+            content = content + self.CLICK_JS
+
+        path.write_text(content, encoding="utf-8")
 
     def create_status_distribution_chart(
         self,
@@ -51,6 +90,7 @@ class Visualizer:
 
         output_path = self.output_dir / filename
         fig.write_html(str(output_path), include_plotlyjs="cdn")
+        self._inject_js(str(output_path))
         return str(output_path)
 
     def create_duplicate_bar_chart(
@@ -64,23 +104,33 @@ class Visualizer:
 
         data = []
         for g in duplicate_groups:
+            dup_type = "跨表交叉" if g.get("is_cross", False) else "表内重复"
             data.append(
                 {
                     "批次-商品": f"{g['batch_id']}-{g['item_id']}",
                     "重复次数": g["count"],
-                    "批次ID": g["batch_id"],
+                    "batch_id": g["batch_id"],
+                    "item_id": g["item_id"],
+                    "类型": dup_type,
                 }
             )
 
         df = pd.DataFrame(data)
 
+        color_map = {
+            "跨表交叉": "#EF553B",
+            "表内重复": "#FFA500",
+        }
+
         fig = px.bar(
             df,
             x="批次-商品",
             y="重复次数",
-            color="批次ID",
+            color="类型",
+            color_discrete_map=color_map,
             title=title,
             text="重复次数",
+            custom_data=["batch_id", "item_id", "类型"],
         )
 
         fig.update_layout(
@@ -89,11 +139,12 @@ class Visualizer:
         )
 
         fig.update_traces(
-            hovertemplate="<b>%{x}</b><br>重复次数: %{y}<extra></extra>",
+            hovertemplate="<b>%{x}</b><br>批次: %{customdata[0]}<br>商品: %{customdata[1]}<br>类型: %{customdata[2]}<br>重复次数: %{y}<br>(点击跳转到明细)<extra></extra>",
         )
 
         output_path = self.output_dir / filename
         fig.write_html(str(output_path), include_plotlyjs="cdn")
+        self._inject_js(str(output_path))
         return str(output_path)
 
     def create_3d_scatter_chart(
@@ -124,24 +175,52 @@ class Visualizer:
             "已确认": "#19D3F3",
         }
 
-        fig = go.Figure(
-            data=[
-                go.Scatter3d(
-                    x=df_sample[df_sample[color_col] == status][x_col],
-                    y=df_sample[df_sample[color_col] == status][y_col],
-                    z=df_sample[df_sample[color_col] == status][z_col],
-                    mode="markers",
-                    marker=dict(size=5, opacity=0.8),
-                    name=status,
-                    text=df[df[color_col] == status].apply(
-                        lambda row: f"批次: {row.get(x_col, '')}<br>商品: {row.get(y_col, '')}<br>分数: {row.get(z_col, '')}",
-                        axis=1,
-                    ),
-                    hoverinfo="text",
+        traces = []
+        for status in df[color_col].unique():
+            status_df = df[df[color_col] == status]
+            status_df_sample = df_sample[df_sample[color_col] == status]
+
+            customdata = []
+            hover_texts = []
+            for _, row in status_df.iterrows():
+                batch_id = str(row.get(x_col, ""))
+                item_id = str(row.get(y_col, ""))
+                score = row.get(z_col, "")
+
+                if "sample_id" in status_df.columns and pd.notna(row.get("sample_id", None)):
+                    record_id = str(row["sample_id"])
+                    src_type = "负样本"
+                elif "candidate_id" in status_df.columns and pd.notna(row.get("candidate_id", None)):
+                    record_id = str(row["candidate_id"])
+                    src_type = "召回候选"
+                else:
+                    record_id = ""
+                    src_type = "未知"
+
+                customdata.append([batch_id, item_id, record_id, src_type])
+                hover_texts.append(
+                    f"批次: {batch_id}<br>商品: {item_id}<br>分数: {score}<br>ID: {record_id}<br>(点击跳转到明细)"
                 )
-                for status in df[color_col].unique()
-            ]
-        )
+
+            traces.append(
+                go.Scatter3d(
+                    x=status_df_sample[x_col],
+                    y=status_df_sample[y_col],
+                    z=status_df_sample[z_col],
+                    mode="markers",
+                    marker=dict(
+                        size=5,
+                        opacity=0.8,
+                        color=color_map.get(status, "#636EFA"),
+                    ),
+                    name=status,
+                    text=hover_texts,
+                    hoverinfo="text",
+                    customdata=customdata,
+                )
+            )
+
+        fig = go.Figure(data=traces)
 
         fig.update_layout(
             title=title,
@@ -157,6 +236,7 @@ class Visualizer:
 
         output_path = self.output_dir / filename
         fig.write_html(str(output_path), include_plotlyjs="cdn")
+        self._inject_js(str(output_path))
         return str(output_path)
 
     def create_workflow_timeline(
@@ -223,6 +303,7 @@ class Visualizer:
 
         output_path = self.output_dir / filename
         fig.write_html(str(output_path), include_plotlyjs="cdn")
+        self._inject_js(str(output_path))
         return str(output_path)
 
     def create_batch_comparison_chart(
@@ -239,11 +320,21 @@ class Visualizer:
             id_vars=["batch_id"], var_name="状态", value_name="数量"
         )
 
+        color_map = {
+            "待复核": "#FFA500",
+            "正常": "#00CC96",
+            "重复训练": "#EF553B",
+            "材料不足": "#AB63FA",
+            "待策略产品复核": "#FF6B6B",
+            "已确认": "#19D3F3",
+        }
+
         fig = px.bar(
             batch_status_melt,
             x="batch_id",
             y="数量",
             color="状态",
+            color_discrete_map=color_map,
             title=title,
             barmode="stack",
         )
@@ -256,6 +347,7 @@ class Visualizer:
 
         output_path = self.output_dir / filename
         fig.write_html(str(output_path), include_plotlyjs="cdn")
+        self._inject_js(str(output_path))
         return str(output_path)
 
     def generate_all_charts(
