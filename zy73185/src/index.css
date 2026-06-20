@@ -1,0 +1,78 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink-500: #1f3a5f;
+  --ochre-400: #c4652b;
+  --moss-400: #4a7c59;
+  --fog-200: #e8e4de;
+  font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #0f1e31;
+  background: var(--fog-200);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(31, 58, 95, 0.08), transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, rgba(196, 101, 43, 0.07), transparent 55%),
+    linear-gradient(180deg, #faf9f7 0%, #e8e4de 100%);
+  background-attachment: fixed;
+}
+
+@layer components {
+  .card {
+    @apply bg-fog-50 border border-fog-200 rounded-xl shadow-card shadow-inset;
+  }
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md font-medium text-sm transition-all duration-150 select-none;
+  }
+  .btn-primary {
+    @apply btn bg-ink-500 text-fog-50 hover:bg-ink-600 active:translate-y-px shadow-card;
+  }
+  .btn-secondary {
+    @apply btn bg-fog-100 text-ink-700 border border-fog-300 hover:bg-white;
+  }
+  .btn-ochre {
+    @apply btn bg-ochre-400 text-white hover:bg-ochre-500 shadow-card;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+  .divider {
+    @apply h-px bg-fog-200 my-4;
+  }
+  .section-title {
+    @apply font-serif text-lg font-semibold text-ink-600 tracking-wide;
+  }
+  .label {
+    @apply text-xs font-medium text-ink-400 uppercase tracking-wider;
+  }
+  .scroll-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scroll-thin::-webkit-scrollbar-thumb {
+    background: rgba(31, 58, 95, 0.2);
+    border-radius: 3px;
+  }
+}
