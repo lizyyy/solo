@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>样本详情 - {{ sample_id }}</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; margin: 0; padding: 24px; background: #f7f8fa; color: #1f2329; }
+        .container { max-width: 960px; margin: 0 auto; }
+        h1 { margin: 0 0 16px; font-size: 22px; }
+        .back { margin-bottom: 16px; display: inline-block; color: #3370ff; text-decoration: none; font-size: 13px; }
+        .back:hover { text-decoration: underline; }
+        .card { background: #fff; border-radius: 8px; padding: 20px 24px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .warn-card { background: #ffece8; border: 2px solid #f53f3f; border-radius: 8px; padding: 16px 20px; margin-bottom: 16px; color: #ae2c2c; }
+        .warn-card strong { color: #f53f3f; font-size: 15px; }
+        .supp-card { background: #e8f3ff; border: 1px solid #3370ff; border-radius: 8px; padding: 16px 20px; margin-bottom: 16px; }
+        .supp-card h3 { margin: 0 0 8px; font-size: 14px; color: #1d4ed8; }
+        .diff-card { background: #fff7e8; border: 1px solid #ff9500; border-radius: 8px; padding: 16px 20px; margin-bottom: 16px; }
+        .diff-card h3 { margin: 0 0 8px; font-size: 14px; color: #8a3d00; }
+        .diff-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .diff-col { padding: 10px 12px; background: #fff; border-radius: 4px; font-size: 13px; }
+        .diff-col.before { border-left: 3px solid #86909c; }
+        .diff-col.after { border-left: 3px solid #00b42a; }
+        .diff-label { font-size: 11px; color: #86909c; margin-bottom: 4px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; }
+        .field { font-size: 13px; }
+        .field .label { color: #646a73; font-size: 12px; }
+        .field .value { margin-top: 2px; color: #1f2329; }
+        .tag { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 12px; }
+        .tag-dup { background: #ffece8; color: #f53f3f; border: 1px solid #f53f3f; }
+        .tag-supp { background: #e8f3ff; color: #3370ff; border: 1px solid #3370ff; }
+        .tag-confirmed { background: #e8ffea; color: #00b42a; border: 1px solid #00b42a; }
+        .tag-unconfirmed { background: #f2f3f5; color: #86909c; border: 1px solid #c9cdd4; }
+        h2 { font-size: 16px; margin: 0 0 12px; }
+        pre { background: #f7f8fa; padding: 10px 12px; border-radius: 4px; font-size: 12px; margin: 6px 0 0; white-space: pre-wrap; word-break: break-all; }
+        .text-warn { color: #f53f3f; font-weight: 600; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a class="back" href="/?{% for k,v in req_args.items() %}{{ k }}={{ v }}&{% endfor %}">← 返回列表（保留当前筛选口径）</a>
+
+    <h1>📄 样本详情：{{ sample_id }}
+        {% if detail.manual_confirmed %}
+            <span class="tag tag-confirmed">已人工确认</span>
+        {% else %}
+            <span class="tag tag-unconfirmed">待人工确认</span>
+        {% endif %}
+        {% if detail.is_duplicate %}
+            <span class="tag tag-dup">⚠ 重复样本 - 非普通记录</span>
+        {% endif %}
+        {% if detail.supplementary_remark or detail.supplementary_explanation %}
+            <span class="tag tag-supp">含后补信息</span>
+        {% endif %}
+    </h1>
+
+    {% if detail.warnings %}
+    <div class="warn-card">
+        <strong>⚠ 特别提醒：该样本不是普通记录</strong>
+        <ul style="margin:8px 0 0 20px; padding:0; font-size:13px;">
+            {% for w in detail.warnings %}
+            <li>{{ w }}</li>
+            {% endfor %}
+        </ul>
+        <p style="margin-top:8px;font-size:12px;color:#ae2c2c;">
+            导出CSV时该条记录 <code>is_duplicate_warning</code> 列也会携带同样的提醒文字。
+        </p>
+    </div>
+    {% endif %}
+
+    {% if detail.confirm_before_note or detail.confirm_after_note %}
+    <div class="diff-card">
+        <h3>🔄 人工确认前后差异（可用于第二天复盘）</h3>
+        <div class="diff-row">
+            <div class="diff-col before">
+                <div class="diff-label">确认前备注</div>
+                <div>{{ detail.confirm_before_note or '（无）' }}</div>
+            </div>
+            <div class="diff-col after">
+                <div class="diff-label">确认后备注</div>
+                <div>{{ detail.confirm_after_note or '（无）' }}</div>
+            </div>
+        </div>
+        {% if detail.confirmed_at %}
+        <p style="margin:8px 0 0;font-size:12px;color:#8a3d00;">确认时间：{{ detail.confirmed_at }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if detail.supplementary_remark or detail.supplementary_explanation %}
+    <div class="supp-card">
+        <h3>📝 后补信息（日常工作中后续添加的备注和说明）</h3>
+        {% if detail.supplementary_remark %}
+        <div style="font-size:13px;">
+            <strong>后补备注：</strong>{{ detail.supplementary_remark }}
+        </div>
+        {% endif %}
+        {% if detail.supplementary_explanation %}
+        <div style="font-size:13px;margin-top:8px;">
+            <strong>后补说明：</strong>
+            <div style="margin-top:4px;line-height:1.6;">{{ detail.supplementary_explanation }}</div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h2>基本信息</h2>
+        <div class="grid">
+            <div class="field"><div class="label">样本ID</div><div class="value">{{ detail.sample_id }}</div></div>
+            <div class="field"><div class="label">学生ID</div><div class="value">{{ detail.student_id }}</div></div>
+            <div class="field"><div class="label">题目ID</div><div class="value">{{ detail.question_id }}</div></div>
+            <div class="field"><div class="label">学科</div><div class="value">{{ detail.subject }}</div></div>
+            <div class="field"><div class="label">误差类型</div><div class="value">{{ detail.error_type }}</div></div>
+            <div class="field"><div class="label">误差来源</div><div class="value">{{ detail.error_source }}</div></div>
+            <div class="field"><div class="label">复盘轮次</div><div class="value">第 {{ detail.review_round }} 轮</div></div>
+            <div class="field"><div class="label">创建时间</div><div class="value">{{ detail.created_at }}</div></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>误差数值</h2>
+        <div class="grid">
+            <div class="field"><div class="label">期望值</div><div class="value">{{ detail.expected_value }}</div></div>
+            <div class="field"><div class="label">实际值</div><div class="value">{{ detail.actual_value }}</div></div>
+            <div class="field"><div class="label">传播误差 Δ</div><div class="value text-warn">{{ detail.propagated_error }}</div></div>
+            <div class="field"><div class="label">误差幅度 Δ²</div><div class="value">{{ detail.error_magnitude }}</div></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>答案记录</h2>
+        <div class="grid">
+            <div class="field" style="grid-column:1/3;">
+                <div class="label">原始答案</div>
+                <pre>{{ detail.original_answer }}</pre>
+            </div>
+            <div class="field" style="grid-column:1/3;">
+                <div class="label">修正后答案</div>
+                <pre>{{ detail.corrected_answer }}</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>重复关系</h2>
+        <div class="grid">
+            <div class="field">
+                <div class="label">是否标记为重复</div>
+                <div class="value">{{ '是' if detail.is_duplicate else '否' }}</div>
+            </div>
+            <div class="field">
+                <div class="label">对应主记录 duplicate_of</div>
+                <div class="value">{{ detail.duplicate_of or '（无）' }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

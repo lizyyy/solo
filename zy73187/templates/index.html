@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>误差传播错题归因</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; margin: 0; padding: 24px; background: #f7f8fa; color: #1f2329; }
+        h1 { margin: 0 0 16px; font-size: 22px; }
+        h2 { font-size: 16px; margin: 24px 0 12px; color: #1f2329; }
+        .container { max-width: 1280px; margin: 0 auto; }
+        .card { background: #fff; border-radius: 8px; padding: 16px 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .filter-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+        .filter-item { display: flex; flex-direction: column; gap: 4px; }
+        .filter-item label { font-size: 12px; color: #646a73; }
+        .filter-item select, .filter-item input { padding: 6px 10px; border: 1px solid #d0d3d9; border-radius: 4px; font-size: 13px; min-width: 140px; }
+        .btn { padding: 6px 16px; border: 1px solid #d0d3d9; border-radius: 4px; background: #fff; cursor: pointer; font-size: 13px; text-decoration: none; display: inline-block; color: #1f2329; }
+        .btn-primary { background: #3370ff; border-color: #3370ff; color: #fff; }
+        .btn-success { background: #00b42a; border-color: #00b42a; color: #fff; }
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+        .stat-item { padding: 12px 16px; background: #f2f3f5; border-radius: 6px; }
+        .stat-item .label { font-size: 12px; color: #646a73; }
+        .stat-item .value { font-size: 22px; font-weight: 600; margin-top: 4px; color: #1f2329; }
+        .stat-item.special { background: #fff7e8; border: 1px solid #ff9500; }
+        .stat-item.dup { background: #ffece8; border: 1px solid #f53f3f; }
+        .chart-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+        .chart-box { background: #fafbfc; border-radius: 6px; padding: 12px; }
+        .bar-chart { display: flex; flex-direction: column; gap: 6px; }
+        .bar-row { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .bar-label { width: 110px; color: #4e5969; flex-shrink: 0; }
+        .bar-track { flex: 1; background: #e5e6eb; height: 18px; border-radius: 3px; overflow: hidden; position: relative; }
+        .bar-fill { height: 100%; background: linear-gradient(90deg, #3370ff, #4080ff); border-radius: 3px; }
+        .bar-count { width: 40px; text-align: right; color: #4e5969; font-variant-numeric: tabular-nums; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #e5e6eb; }
+        th { background: #f7f8fa; font-weight: 600; color: #4e5969; position: sticky; top: 0; }
+        tr.dup-row { background: #fff7e8 !important; }
+        tr.dup-row td { color: #8a3d00; }
+        .tag { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 11px; line-height: 18px; }
+        .tag-dup { background: #ffece8; color: #f53f3f; border: 1px solid #f53f3f; }
+        .tag-supp { background: #e8f3ff; color: #3370ff; border: 1px solid #3370ff; }
+        .tag-confirmed { background: #e8ffea; color: #00b42a; border: 1px solid #00b42a; }
+        .tag-unconfirmed { background: #f2f3f5; color: #86909c; border: 1px solid #c9cdd4; }
+        .warning-inline { color: #f53f3f; font-weight: 600; font-size: 12px; }
+        .filters-used { font-size: 12px; color: #646a73; margin-top: 8px; }
+        .filters-used code { background: #f2f3f5; padding: 1px 6px; border-radius: 3px; font-size: 11px; }
+        .supp-note { font-size: 12px; color: #3370ff; background: #e8f3ff; padding: 4px 8px; border-radius: 4px; margin-top: 4px; display: block; }
+        .section-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .table-wrap { max-height: 520px; overflow: auto; border: 1px solid #e5e6eb; border-radius: 6px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📊 误差传播错题归因分析</h1>
+
+    <div class="card">
+        <h2 style="margin-top:0;">🔍 筛选条件 & 复算参数</h2>
+        <form method="get" action="/" class="filter-bar">
+            <div class="filter-item">
+                <label>学科</label>
+                <select name="subject">
+                    <option value="">全部</option>
+                    {% for v in result.filter_options.subject %}
+                    <option value="{{ v }}" {% if req_args.get('subject') == v %}selected{% endif %}>{{ v }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>误差类型</label>
+                <select name="error_type">
+                    <option value="">全部</option>
+                    {% for v in result.filter_options.error_type %}
+                    <option value="{{ v }}" {% if req_args.get('error_type') == v %}selected{% endif %}>{{ v }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>误差来源</label>
+                <select name="error_source">
+                    <option value="">全部</option>
+                    {% for v in result.filter_options.error_source %}
+                    <option value="{{ v }}" {% if req_args.get('error_source') == v %}selected{% endif %}>{{ v }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>复盘轮次</label>
+                <select name="review_round">
+                    <option value="">全部</option>
+                    {% for v in result.filter_options.review_round %}
+                    <option value="{{ v }}" {% if req_args.get('review_round') == v|string %}selected{% endif %}>第 {{ v }} 轮</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>人工确认</label>
+                <select name="manual_confirmed">
+                    <option value="">全部</option>
+                    <option value="true" {% if req_args.get('manual_confirmed') == 'true' %}selected{% endif %}>已确认</option>
+                    <option value="false" {% if req_args.get('manual_confirmed') == 'false' %}selected{% endif %}>未确认</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>仅重复样本</label>
+                <select name="has_duplicates">
+                    <option value="">全部</option>
+                    <option value="true" {% if req_args.get('has_duplicates') == 'true' %}selected{% endif %}>仅重复</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>含后补信息</label>
+                <select name="has_supplementary">
+                    <option value="">全部</option>
+                    <option value="true" {% if req_args.get('has_supplementary') == 'true' %}selected{% endif %}>仅含后补</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>误差幅度下限</label>
+                <input type="number" step="0.0001" name="min_error_magnitude" value="{{ req_args.get('min_error_magnitude', '') }}">
+            </div>
+            <div class="filter-item">
+                <label>复算公式</label>
+                <select name="formula">
+                    <option value="rss" {% if req_args.get('formula','rss') == 'rss' %}selected{% endif %}>方和根 RSS</option>
+                    <option value="abs" {% if req_args.get('formula') == 'abs' %}selected{% endif %}>绝对和</option>
+                    <option value="max" {% if req_args.get('formula') == 'max' %}selected{% endif %}>最大分量</option>
+                </select>
+            </div>
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary">应用筛选 & 复算</button>
+                <a href="/" class="btn">重置</a>
+                <a href="/export.csv?{{ request.query_string.decode() }}" class="btn btn-success">⬇ 导出CSV</a>
+            </div>
+        </form>
+        <div class="filters-used">
+            当前口径：
+            {% if result.filters %}
+                {% for k, v in result.filters.items() %}<code>{{ k }}={{ v }}</code>{% endfor %}
+            {% else %}
+                <code>无筛选（全部数据）</code>
+            {% endif %}
+            · 复算公式：<code>{{ result.recalc_params.formula }}</code>
+            · 所有统计、图表、明细表、CSV导出均使用此同一数据源
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📈 统计数字（同口径）</h2>
+        <div class="stat-grid">
+            <div class="stat-item"><div class="label">总样本数</div><div class="value">{{ result.statistics.total_samples }}</div></div>
+            <div class="stat-item"><div class="label">已人工确认</div><div class="value" style="color:#00b42a">{{ result.statistics.confirmed_count }}</div></div>
+            <div class="stat-item"><div class="label">待人工确认</div><div class="value" style="color:#f7ba1e">{{ result.statistics.unconfirmed_count }}</div></div>
+            <div class="stat-item dup"><div class="label">⚠ 重复样本</div><div class="value">{{ result.statistics.duplicate_count }}</div></div>
+            <div class="stat-item special"><div class="label">📝 含后补信息</div><div class="value">{{ result.statistics.supplementary_count }}</div></div>
+            <div class="stat-item special"><div class="label">🔄 含确认前后差异</div><div class="value">{{ result.statistics.confirm_diff_count }}</div></div>
+            <div class="stat-item"><div class="label">平均传播误差</div><div class="value">{{ result.statistics.avg_propagated_error }}</div></div>
+            <div class="stat-item"><div class="label">合成传播误差 ({{ result.statistics.recalc_formula }})</div><div class="value">{{ result.statistics.grouped_propagated_error }}</div></div>
+            <div class="stat-item"><div class="label">误差幅度平方和</div><div class="value">{{ result.statistics.sum_error_magnitude }}</div></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📊 分布图表（与明细表同口径）</h2>
+        <div class="chart-row">
+            <div class="chart-box">
+                <strong style="font-size:13px;">按学科</strong>
+                <div class="bar-chart" style="margin-top:10px;">
+                    {% set max_c = result.statistics.by_subject.values()|max if result.statistics.by_subject else 1 %}
+                    {% for k, v in result.statistics.by_subject.items() %}
+                    <div class="bar-row">
+                        <span class="bar-label">{{ k }}</span>
+                        <span class="bar-track"><span class="bar-fill" style="width:{{ (v / max_c * 100)|int }}%"></span></span>
+                        <span class="bar-count">{{ v }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="chart-box">
+                <strong style="font-size:13px;">按误差类型</strong>
+                <div class="bar-chart" style="margin-top:10px;">
+                    {% set max_c = result.statistics.by_error_type.values()|max if result.statistics.by_error_type else 1 %}
+                    {% for k, v in result.statistics.by_error_type.items() %}
+                    <div class="bar-row">
+                        <span class="bar-label">{{ k }}</span>
+                        <span class="bar-track"><span class="bar-fill" style="width:{{ (v / max_c * 100)|int }}%"></span></span>
+                        <span class="bar-count">{{ v }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="chart-box">
+                <strong style="font-size:13px;">按误差来源</strong>
+                <div class="bar-chart" style="margin-top:10px;">
+                    {% set max_c = result.statistics.by_error_source.values()|max if result.statistics.by_error_source else 1 %}
+                    {% for k, v in result.statistics.by_error_source.items() %}
+                    <div class="bar-row">
+                        <span class="bar-label">{{ k }}</span>
+                        <span class="bar-track"><span class="bar-fill" style="width:{{ (v / max_c * 100)|int }}%"></span></span>
+                        <span class="bar-count">{{ v }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if result.duplicates %}
+    <div class="card" style="border: 2px solid #f53f3f;">
+        <h2 style="color:#f53f3f;">⚠ 重复样本提醒（不是普通记录）</h2>
+        <p style="font-size:13px;color:#86909c;margin-top:-8px;">以下样本涉及重复标记，请逐条核对后再纳入统计或导出。详情页与导出CSV均会标注。</p>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>样本ID</th><th>是否重复</th><th>对应主记录</th><th>学生</th><th>题目</th><th>学科</th><th>后补备注</th></tr></thead>
+                <tbody>
+                {% for d in result.duplicates %}
+                <tr class="dup-row">
+                    <td><a href="/detail/{{ d.sample_id }}?{{ request.query_string.decode() }}">{{ d.sample_id }}</a></td>
+                    <td>{% if d.is_duplicate %}<span class="tag tag-dup">重复</span>{% else %}<span class="tag tag-confirmed">重复源</span>{% endif %}</td>
+                    <td>{{ d.duplicate_of or '-' }}</td>
+                    <td>{{ d.student_id }}</td>
+                    <td>{{ d.question_id }}</td>
+                    <td>{{ d.subject }}</td>
+                    <td style="max-width:280px;">{{ d.supplementary_remark or d.confirm_after_note or '-' }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if result.confirm_diffs %}
+    <div class="card" style="border: 2px solid #ff9500;">
+        <h2 style="color:#8a3d00;">🔄 人工确认前后差异（用于第二天复盘）</h2>
+        <p style="font-size:13px;color:#86909c;margin-top:-8px;">这些记录在人工确认前和确认后有备注变化，可在第二天复盘前快速过一遍。</p>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>样本ID</th><th>确认状态</th><th>确认前备注</th><th>确认后备注</th><th>确认时间</th></tr></thead>
+                <tbody>
+                {% for d in result.confirm_diffs %}
+                <tr>
+                    <td><a href="/detail/{{ d.sample_id }}?{{ request.query_string.decode() }}">{{ d.sample_id }}</a></td>
+                    <td>{% if d.manual_confirmed %}<span class="tag tag-confirmed">已确认</span>{% else %}<span class="tag tag-unconfirmed">未确认</span>{% endif %}</td>
+                    <td style="max-width:260px;">{{ d.confirm_before_note or '-' }}</td>
+                    <td style="max-width:260px;color:#00b42a;">{{ d.confirm_after_note or '-' }}</td>
+                    <td>{{ d.confirmed_at or '-' }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <div class="section-title-row">
+            <h2 style="margin:0;">📋 明细表（同口径，{{ result.statistics.total_samples }} 条）</h2>
+            <div class="btn-group">
+                <a href="/export.csv?{{ request.query_string.decode() }}" class="btn btn-success">⬇ 导出同口径CSV</a>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>样本ID</th><th>学生</th><th>题目</th><th>学科</th><th>误差类型</th><th>误差来源</th>
+                        <th>传播误差</th><th>误差幅度</th><th>状态</th><th>标记</th><th>创建时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for r in result.detail_table %}
+                <tr class="{% if r.is_duplicate %}dup-row{% endif %}">
+                    <td>
+                        <a href="/detail/{{ r.sample_id }}?{{ request.query_string.decode() }}">{{ r.sample_id }}</a>
+                        {% if r.is_duplicate %}<br><span class="warning-inline">⚠ 非普通记录</span>{% endif %}
+                    </td>
+                    <td>{{ r.student_id }}</td>
+                    <td>{{ r.question_id }}</td>
+                    <td>{{ r.subject }}</td>
+                    <td>{{ r.error_type }}</td>
+                    <td>{{ r.error_source }}</td>
+                    <td>{{ r.propagated_error }}</td>
+                    <td>{{ r.error_magnitude }}</td>
+                    <td>
+                        {% if r.manual_confirmed %}<span class="tag tag-confirmed">已确认</span>
+                        {% else %}<span class="tag tag-unconfirmed">未确认</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if r.is_duplicate %}<span class="tag tag-dup">重复({{ r.duplicate_of }})</span>{% endif %}
+                        {% if r.supplementary_remark or r.supplementary_explanation %}<span class="tag tag-supp">含后补</span>{% endif %}
+                    </td>
+                    <td>{{ r.created_at }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
