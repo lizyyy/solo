@@ -1,7 +1,7 @@
 [
   {
-    "id": "mqeb2y5m59dbrwt3gw3",
-    "batchId": "mqeb2y5m1zphpgyberc",
+    "id": "mqml47p5vqn96f6bg1",
+    "batchId": "mqml47p500d2ih4vpkiyv",
     "originalLineNumber": 2,
     "importLineNumber": 2,
     "questionText": "产品退款流程是什么",
@@ -15,7 +15,7 @@
       "feedback_time": "2024-12-01 10:23:45"
     },
     "status": "pending",
-    "statusUpdatedAt": "2026-06-14T21:38:10.666Z",
+    "statusUpdatedAt": "2026-06-20T16:41:15.257Z",
     "statusUpdatedBy": "system_import",
     "manualChanges": [],
     "mergedIntoId": null,
@@ -26,8 +26,8 @@
     "importSource": "initial"
   },
   {
-    "id": "mqeb2y5myccnduatui",
-    "batchId": "mqeb2y5m1zphpgyberc",
+    "id": "mqml47p5wqcuufnupeo",
+    "batchId": "mqml47p500d2ih4vpkiyv",
     "originalLineNumber": 3,
     "importLineNumber": 3,
     "questionText": "产品退款流程是什么",
@@ -41,14 +41,14 @@
       "feedback_time": "2024-12-01 10:25:12"
     },
     "status": "needs_review",
-    "statusUpdatedAt": "2026-06-14T21:38:10.685Z",
+    "statusUpdatedAt": "2026-06-20T16:41:15.264Z",
     "statusUpdatedBy": "老唐",
     "manualChanges": [
       {
         "field": "status",
         "oldValue": "pending",
         "newValue": "duplicate_user",
-        "changedAt": "2026-06-14T21:38:10.666Z",
+        "changedAt": "2026-06-20T16:41:15.257Z",
         "changedBy": "system_auto_check",
         "reason": "自动检测：同一用户相同问题重复反馈"
       },
@@ -56,29 +56,29 @@
         "field": "status",
         "oldValue": "duplicate_user",
         "newValue": "needs_review",
-        "changedAt": "2026-06-14T21:38:10.684Z",
+        "changedAt": "2026-06-20T16:41:15.264Z",
         "changedBy": "老唐",
         "reason": "手动更新状态"
       },
       {
         "field": "annotatorComment",
         "oldValue": "",
-        "newValue": "标注员补录：该用户上午和下午各反馈了一次，问题相同",
-        "changedAt": "2026-06-14T21:38:10.684Z",
+        "newValue": "标注员补录：该用户当天上午和下午各反馈一次，问题相同",
+        "changedAt": "2026-06-20T16:41:15.264Z",
         "changedBy": "老唐",
         "reason": "手动更新标注员留言"
       }
     ],
     "mergedIntoId": null,
     "mergedFromIds": [],
-    "annotatorComment": "标注员补录：该用户上午和下午各反馈了一次，问题相同",
+    "annotatorComment": "标注员补录：该用户当天上午和下午各反馈一次，问题相同",
     "reviewComment": "",
     "importFingerprint": "user001__产品退款流程是什么__2024-12-01 10:25:12",
     "importSource": "initial"
   },
   {
-    "id": "mqeb2y5m823r8gnconf",
-    "batchId": "mqeb2y5m1zphpgyberc",
+    "id": "mqml47p5dyauiegfkfb",
+    "batchId": "mqml47p500d2ih4vpkiyv",
     "originalLineNumber": 4,
     "importLineNumber": 4,
     "questionText": "怎么联系客服",
@@ -92,7 +92,7 @@
       "feedback_time": "2024-12-01 11:00:00"
     },
     "status": "pending",
-    "statusUpdatedAt": "2026-06-14T21:38:10.666Z",
+    "statusUpdatedAt": "2026-06-20T16:41:15.257Z",
     "statusUpdatedBy": "system_import",
     "manualChanges": [],
     "mergedIntoId": null,
@@ -103,8 +103,8 @@
     "importSource": "initial"
   },
   {
-    "id": "mqeb2y5mepfq80gx2qd",
-    "batchId": "mqeb2y5m1zphpgyberc",
+    "id": "mqml47p5vyyqvosi89",
+    "batchId": "mqml47p500d2ih4vpkiyv",
     "originalLineNumber": 5,
     "importLineNumber": 5,
     "questionText": "订单什么时候发货",
@@ -118,7 +118,7 @@
       "feedback_time": "2024-12-01 11:30:00"
     },
     "status": "pending",
-    "statusUpdatedAt": "2026-06-14T21:38:10.666Z",
+    "statusUpdatedAt": "2026-06-20T16:41:15.257Z",
     "statusUpdatedBy": "system_import",
     "manualChanges": [],
     "mergedIntoId": null,
@@ -129,8 +129,8 @@
     "importSource": "initial"
   },
   {
-    "id": "mqeb2y5mmbykqeqsb0n",
-    "batchId": "mqeb2y5m1zphpgyberc",
+    "id": "mqml47p53xy6tb3cb25",
+    "batchId": "mqml47p500d2ih4vpkiyv",
     "originalLineNumber": 6,
     "importLineNumber": 6,
     "questionText": "怎么修改收货地址",
@@ -144,7 +144,7 @@
       "feedback_time": "2024-12-01 12:00:00"
     },
     "status": "pending",
-    "statusUpdatedAt": "2026-06-14T21:38:10.666Z",
+    "statusUpdatedAt": "2026-06-20T16:41:15.257Z",
     "statusUpdatedBy": "system_import",
     "manualChanges": [],
     "mergedIntoId": null,
@@ -155,8 +155,8 @@
     "importSource": "initial"
   },
   {
-    "id": "mqeb2y5mqhgurp3u8jh",
-    "batchId": "mqeb2y5m1zphpgyberc",
+    "id": "mqml47p5rzebscc886",
+    "batchId": "mqml47p500d2ih4vpkiyv",
     "originalLineNumber": 7,
     "importLineNumber": 7,
     "questionText": "订单什么时候发货",
@@ -169,29 +169,45 @@
       "user_name": "王五",
       "feedback_time": "2024-12-01 12:15:00"
     },
-    "status": "duplicate_user",
-    "statusUpdatedAt": "2026-06-14T21:38:10.666Z",
-    "statusUpdatedBy": "system_auto_check",
+    "status": "merged",
+    "statusUpdatedAt": "2026-06-20T16:41:15.275Z",
+    "statusUpdatedBy": "标注负责人",
     "manualChanges": [
       {
         "field": "status",
         "oldValue": "pending",
         "newValue": "duplicate_user",
-        "changedAt": "2026-06-14T21:38:10.666Z",
+        "changedAt": "2026-06-20T16:41:15.257Z",
         "changedBy": "system_auto_check",
         "reason": "自动检测：同一用户相同问题重复反馈"
+      },
+      {
+        "field": "status",
+        "oldValue": "duplicate_user",
+        "newValue": "merged",
+        "changedAt": "2026-06-20T16:41:15.275Z",
+        "changedBy": "标注负责人",
+        "reason": "手动更新状态"
+      },
+      {
+        "field": "reviewComment",
+        "oldValue": "",
+        "newValue": "标注负责人复核确认：归并到主记录",
+        "changedAt": "2026-06-20T16:41:15.275Z",
+        "changedBy": "标注负责人",
+        "reason": "手动更新复核意见"
       }
     ],
     "mergedIntoId": null,
     "mergedFromIds": [],
     "annotatorComment": "",
-    "reviewComment": "",
+    "reviewComment": "标注负责人复核确认：归并到主记录",
     "importFingerprint": "user003__订单什么时候发货__2024-12-01 12:15:00",
     "importSource": "initial"
   },
   {
-    "id": "mqeb2y5m974khufngs4",
-    "batchId": "mqeb2y5m1zphpgyberc",
+    "id": "mqml47p5d06a1rgndec",
+    "batchId": "mqml47p500d2ih4vpkiyv",
     "originalLineNumber": 8,
     "importLineNumber": 8,
     "questionText": "优惠券怎么使用",
@@ -205,7 +221,7 @@
       "feedback_time": "2024-12-01 13:00:00"
     },
     "status": "pending",
-    "statusUpdatedAt": "2026-06-14T21:38:10.666Z",
+    "statusUpdatedAt": "2026-06-20T16:41:15.257Z",
     "statusUpdatedBy": "system_import",
     "manualChanges": [],
     "mergedIntoId": null,
@@ -216,8 +232,8 @@
     "importSource": "initial"
   },
   {
-    "id": "mqeb2y5mpln5g80p9e",
-    "batchId": "mqeb2y5m1zphpgyberc",
+    "id": "mqml47p5w7lo4f298rq",
+    "batchId": "mqml47p500d2ih4vpkiyv",
     "originalLineNumber": 9,
     "importLineNumber": 9,
     "questionText": "产品质量有问题怎么办",
@@ -231,7 +247,7 @@
       "feedback_time": "2024-12-01 14:00:00"
     },
     "status": "pending",
-    "statusUpdatedAt": "2026-06-14T21:38:10.666Z",
+    "statusUpdatedAt": "2026-06-20T16:41:15.257Z",
     "statusUpdatedBy": "system_import",
     "manualChanges": [],
     "mergedIntoId": null,
@@ -242,8 +258,8 @@
     "importSource": "initial"
   },
   {
-    "id": "mqeb2y5mbnsm5lex9cn",
-    "batchId": "mqeb2y5m1zphpgyberc",
+    "id": "mqml47p5xefjp0x6or",
+    "batchId": "mqml47p500d2ih4vpkiyv",
     "originalLineNumber": 10,
     "importLineNumber": 10,
     "questionText": "怎么申请售后",
@@ -257,7 +273,7 @@
       "feedback_time": "2024-12-01 15:00:00"
     },
     "status": "pending",
-    "statusUpdatedAt": "2026-06-14T21:38:10.666Z",
+    "statusUpdatedAt": "2026-06-20T16:41:15.257Z",
     "statusUpdatedBy": "system_import",
     "manualChanges": [],
     "mergedIntoId": null,
@@ -268,8 +284,8 @@
     "importSource": "initial"
   },
   {
-    "id": "mqeb2y5m6n1r6lyfrrg",
-    "batchId": "mqeb2y5m1zphpgyberc",
+    "id": "mqml47p5t7d1yn0302n",
+    "batchId": "mqml47p500d2ih4vpkiyv",
     "originalLineNumber": 11,
     "importLineNumber": 11,
     "questionText": "怎么联系客服",
@@ -283,14 +299,14 @@
       "feedback_time": "2024-12-01 15:30:00"
     },
     "status": "duplicate_user",
-    "statusUpdatedAt": "2026-06-14T21:38:10.666Z",
+    "statusUpdatedAt": "2026-06-20T16:41:15.257Z",
     "statusUpdatedBy": "system_auto_check",
     "manualChanges": [
       {
         "field": "status",
         "oldValue": "pending",
         "newValue": "duplicate_user",
-        "changedAt": "2026-06-14T21:38:10.666Z",
+        "changedAt": "2026-06-20T16:41:15.257Z",
         "changedBy": "system_auto_check",
         "reason": "自动检测：同一用户相同问题重复反馈"
       }
@@ -303,55 +319,55 @@
     "importSource": "initial"
   },
   {
-    "id": "mqeb2y5pi3t1k8kjt",
-    "batchId": "mqeb2y5m1zphpgyberc",
+    "id": "mqml47p77xa989oz0lk",
+    "batchId": "mqml47p500d2ih4vpkiyv",
     "originalLineNumber": 12,
     "importLineNumber": 2,
-    "questionText": "全新的问题X",
-    "userId": "user100",
-    "userName": "新用户",
-    "feedbackTime": "2024-12-02 09:00:00",
+    "questionText": "全新未出现过的问题A",
+    "userId": "user998",
+    "userName": "新用户甲",
+    "feedbackTime": "2024-12-10 09:00:00",
     "originalData": {
-      "question": "全新的问题X",
-      "user_id": "user100",
-      "user_name": "新用户",
-      "feedback_time": "2024-12-02 09:00:00"
+      "question": "全新未出现过的问题A",
+      "user_id": "user998",
+      "user_name": "新用户甲",
+      "feedback_time": "2024-12-10 09:00:00"
     },
     "status": "pending",
-    "statusUpdatedAt": "2026-06-14T21:38:10.669Z",
+    "statusUpdatedAt": "2026-06-20T16:41:15.259Z",
     "statusUpdatedBy": "system_import",
     "manualChanges": [],
     "mergedIntoId": null,
     "mergedFromIds": [],
     "annotatorComment": "",
     "reviewComment": "",
-    "importFingerprint": "user100__全新的问题x__2024-12-02 09:00:00",
+    "importFingerprint": "user998__全新未出现过的问题a__2024-12-10 09:00:00",
     "importSource": "incremental"
   },
   {
-    "id": "mqeb2y5pa7nklbib7uh",
-    "batchId": "mqeb2y5m1zphpgyberc",
+    "id": "mqml47p7v3tawavooh",
+    "batchId": "mqml47p500d2ih4vpkiyv",
     "originalLineNumber": 13,
     "importLineNumber": 3,
-    "questionText": "另一个新问题Y",
-    "userId": "user101",
-    "userName": "另一个",
-    "feedbackTime": "2024-12-02 10:00:00",
+    "questionText": "另一个全新问题B",
+    "userId": "user999",
+    "userName": "新用户乙",
+    "feedbackTime": "2024-12-10 10:00:00",
     "originalData": {
-      "question": "另一个新问题Y",
-      "user_id": "user101",
-      "user_name": "另一个",
-      "feedback_time": "2024-12-02 10:00:00"
+      "question": "另一个全新问题B",
+      "user_id": "user999",
+      "user_name": "新用户乙",
+      "feedback_time": "2024-12-10 10:00:00"
     },
     "status": "pending",
-    "statusUpdatedAt": "2026-06-14T21:38:10.669Z",
+    "statusUpdatedAt": "2026-06-20T16:41:15.259Z",
     "statusUpdatedBy": "system_import",
     "manualChanges": [],
     "mergedIntoId": null,
     "mergedFromIds": [],
     "annotatorComment": "",
     "reviewComment": "",
-    "importFingerprint": "user101__另一个新问题y__2024-12-02 10:00:00",
+    "importFingerprint": "user999__另一个全新问题b__2024-12-10 10:00:00",
     "importSource": "incremental"
   }
 ]

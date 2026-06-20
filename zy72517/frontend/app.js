@@ -25,26 +25,83 @@ var state = {
   mergeTargetId: null
 };
 
+function formatDate(dateStr) {
+  if (!dateStr) return "-";
+  var d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  var y = d.getFullYear();
+  var m = String(d.getMonth() + 1).padStart(2, "0");
+  var day = String(d.getDate()).padStart(2, "0");
+  var hh = String(d.getHours()).padStart(2, "0");
+  var mm = String(d.getMinutes()).padStart(2, "0");
+  return y + "-" + m + "-" + day + " " + hh + ":" + mm;
+}
+
+function showToast(message, type) {
+  var toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.className = "toast " + (type || "success");
+  toast.style.display = "block";
+  setTimeout(function() {
+    toast.style.display = "none";
+  }, 3000);
+}
+
+function openModal(modalId) {
+  document.getElementById(modalId).style.display = "block";
+}
+
+function closeModal(modalId) {
+  document.getElementById(modalId).style.display = "none";
+}
+
+async function loadBatches() {
+  try {
+    var res = await fetch(API_BASE + "/batches");
+    state.batches = await res.json();
+    renderBatchList();
+  } catch (e) { console.error(e); showToast("加载批次列表失败", "error"); }
+}
+
+function renderBatchList() {
+  var container = document.getElementById("batchList");
+  if (state.batches.length === 0) {
+    container.innerHTML = "<div style=\"color:#999;padding:20px;text-align:center;\">暂无批次</div>";
+    return;
+  }
+  var html = "";
+  state.batches.forEach(function(batch) {
+    var active = batch.id === state.currentBatchId ? " active" : "";
+    var issueBadge = batch.issueCount > 0 ? "<span class=\"issue-badge\">" + batch.issueCount + "</span>" : "";
+    html += "<div class=\"batch-item" + active + "\" onclick=\"selectBatch('" + batch.id + "')\">";
+    html += "<div class=\"batch-item-name\">" + batch.name + issueBadge + "</div>";
+    html += "<div class=\"batch-item-meta\">" + batch.recordCount + "条 · " + formatDate(batch.createdAt) + "</div>";
+    html += "</div>";
+  });
+  container.innerHTML = html;
+}
+
 async function selectBatch(batchId) {
   state.currentBatchId = batchId;
   try {
     var res = await fetch(API_BASE + "/batches/" + batchId);
-    state.currentBatch = await res.json();
-    state.records = state.currentBatch.records || [];
+    var data = await res.json();
+    state.currentBatch = data.batch;
+    state.records = data.records || [];
+    var checkResult = data.checkResult;
     renderBatchList();
-    renderBatchDetail();
+    renderBatchDetail(state.currentBatch, state.records, checkResult);
   } catch (e) { console.error(e); showToast("加载失败", "error"); }
 }
 
-function renderBatchDetail() {
+function renderBatchDetail(batch, records, checkResult) {
   document.getElementById("emptyState").style.display = "none";
   document.getElementById("batchDetail").style.display = "block";
-  var batch = state.currentBatch;
   document.getElementById("batchName").textContent = batch.name;
   document.getElementById("batchFile").textContent = batch.fileName || "-";
   document.getElementById("batchTime").textContent = formatDate(batch.createdAt);
   document.getElementById("batchNotes").value = batch.importNotes || "";
-  if (batch.checkResult) { renderCheckResult(batch.checkResult); }
+  if (checkResult) { renderCheckResult(checkResult); }
   renderRecordsTable();
 }
 
@@ -189,7 +246,8 @@ async function createBatch() {
   if (!name) { showToast("请输入批次名称", "error"); return; }
   if (!fileInput.files || !fileInput.files[0]) { showToast("请选择CSV文件", "error"); return; }
   var formData = new FormData();
-  formData.append("name", name);
+  formData.append("batchName", name);
+  formData.append("operator", "老唐");
   formData.append("file", fileInput.files[0]);
   try {
     var res = await fetch(API_BASE + "/batches", { method: "POST", body: formData });
@@ -207,6 +265,74 @@ async function createBatch() {
   } catch (e) { showToast("导入失败", "error"); }
 }
 
+async function runRecheck() {
+  if (!state.currentBatchId) return;
+  try {
+    var res = await fetch(API_BASE + "/batches/" + state.currentBatchId + "/recheck", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ operator: "老唐" })
+    });
+    var result = await res.json();
+    if (result.success) { showToast(result.message || "重算完成"); await selectBatch(state.currentBatchId); }
+    else { showToast(result.error || "重算失败", "error"); }
+  } catch (e) { showToast("重算失败", "error"); }
+}
+
+function openMergeTargetModal() {
+  if (state.selectedRecordIds.length < 2) { showToast("请至少选择2条记录进行归并", "error"); return; }
+  var listHtml = "";
+  state.selectedRecordIds.forEach(function(id) {
+    var record = state.records.find(function(r) { return r.id === id; });
+    if (!record) return;
+    listHtml += "<div class=\"merge-target-item\" onclick=\"selectMergeTarget('" + id + "')\">";
+    listHtml += "<input type=\"radio\" name=\"mergeTarget\" value=\"" + id + "\" id=\"target_" + id + "\">";
+    listHtml += "<label for=\"target_" + id + "\">";
+    listHtml += "<div><b>行号 " + (record.originalLineNumber || "-") + "</b> · 用户ID: " + (record.userId || "-") + "</div>";
+    listHtml += "<div class=\"merge-target-text\">" + (record.questionText || "").substring(0, 100) + "</div>";
+    listHtml += "</label>";
+    listHtml += "</div>";
+  });
+  document.getElementById("mergeTargetList").innerHTML = listHtml;
+  state.mergeTargetId = null;
+  openModal("mergeTargetModal");
+}
+
+function selectMergeTarget(id) {
+  state.mergeTargetId = id;
+  document.querySelectorAll("input[name='mergeTarget']").forEach(function(rb) {
+    rb.checked = rb.value === id;
+  });
+}
+
+async function confirmMerge() {
+  if (!state.mergeTargetId) { showToast("请选择主记录", "error"); return; }
+  var sourceIds = state.selectedRecordIds.filter(function(id) { return id !== state.mergeTargetId; });
+  if (sourceIds.length === 0) { showToast("请选择要归并的记录", "error"); return; }
+  try {
+    var res = await fetch(API_BASE + "/batches/" + state.currentBatchId + "/merge", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sourceRecordIds: sourceIds,
+        targetRecordId: state.mergeTargetId,
+        operator: "老唐"
+      })
+    });
+    var result = await res.json();
+    if (result.success) {
+      showToast("归并成功");
+      closeModal("mergeTargetModal");
+      state.selectedRecordIds = [];
+      state.mergeTargetId = null;
+      document.getElementById("selectAll").checked = false;
+      await selectBatch(state.currentBatchId);
+    } else {
+      showToast(result.error || "归并失败", "error");
+    }
+  } catch (e) { showToast("归并失败", "error"); }
+}
+
 document.addEventListener("DOMContentLoaded", function() {
   loadBatches();
   document.getElementById("createBatchBtn").addEventListener("click", function() { openModal("createBatchModal"); });
@@ -214,8 +340,11 @@ document.addEventListener("DOMContentLoaded", function() {
   document.getElementById("renameBatchBtn").addEventListener("click", openRenameModal);
   document.getElementById("confirmRenameBtn").addEventListener("click", confirmRename);
   document.getElementById("checkBtn").addEventListener("click", runCheck);
+  document.getElementById("recheckBtn").addEventListener("click", runRecheck);
   document.getElementById("saveNotesBtn").addEventListener("click", saveNotes);
   document.getElementById("exportBtn").addEventListener("click", exportBatch);
+  document.getElementById("mergeBtn").addEventListener("click", openMergeTargetModal);
+  document.getElementById("confirmMerge").addEventListener("click", confirmMerge);
   document.getElementById("statusFilter").addEventListener("change", renderRecordsTable);
   document.getElementById("userIdFilter").addEventListener("input", renderRecordsTable);
   document.getElementById("selectAll").addEventListener("change", function(e) {

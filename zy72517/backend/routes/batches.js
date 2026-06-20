@@ -46,7 +46,7 @@ router.get("/", function(req, res) {
 router.post("/", upload.single("file"), function(req, res) {
   var promise = new Promise(function(resolve, reject) {
     try {
-      var batchName = req.body.batchName;
+      var batchName = req.body.batchName || req.body.name;
       var operator = req.body.operator;
 
       if (!batchName) {
