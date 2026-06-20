@@ -172,3 +172,21 @@ class ImportBatch(Base):
     updated_records = Column(Integer, nullable=False, default=0)
     duplicate_skipped = Column(Integer, nullable=False, default=0)
     remark = Column(Text, nullable=True)
+
+
+class ReviewBatch(Base):
+    """人工改判批次记录
+    
+    记录每次人工改判的元数据，支持复盘时生成可重跑命令
+    """
+    __tablename__ = "review_batches"
+    
+    id = Column(Integer, primary_key=True)
+    review_batch_id = Column(String(64), nullable=False, unique=True, index=True)
+    reviewer = Column(String(64), nullable=False)
+    reviewed_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    source_file = Column(String(256), nullable=True)
+    total_items = Column(Integer, nullable=False, default=0)
+    success_count = Column(Integer, nullable=False, default=0)
+    skip_count = Column(Integer, nullable=False, default=0)
+    remark = Column(Text, nullable=True)

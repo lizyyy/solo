@@ -48,7 +48,7 @@ from typing import List, Dict, Optional, Tuple
 from sqlalchemy.orm import Session
 from .models import (
     ModelOutputFragment, ManualReview, RiskChangeLog,
-    RiskSummary, ImportBatch, RiskStatus, ChangeType
+    RiskSummary, ImportBatch, ReviewBatch, RiskStatus, ChangeType
 )
 
 
@@ -338,6 +338,17 @@ def import_model_outputs(session: Session, records: List[Dict],
     }
 
 
+def find_fragment_by_key(session: Session, sample_id: str,
+                         model_version: str,
+                         original_line_number: int) -> Optional[ModelOutputFragment]:
+    """通过三元组定位片段（不依赖自增ID，保证可复现）"""
+    return session.query(ModelOutputFragment).filter(
+        ModelOutputFragment.sample_id == sample_id,
+        ModelOutputFragment.model_version == model_version,
+        ModelOutputFragment.original_line_number == original_line_number
+    ).first()
+
+
 def apply_manual_review(session: Session, fragment_id: int,
                         reviewer: str, reviewed_is_risk: Optional[bool] = None,
                         reviewed_status: Optional[str] = None,
@@ -426,6 +437,101 @@ def apply_manual_review(session: Session, fragment_id: int,
         "reviewed_remark": fragment.current_remark,
         "reviewer": reviewer,
         "review_time": datetime.utcnow().isoformat()
+    }
+
+
+def apply_manual_review_batch(session: Session, review_items: List[Dict],
+                              reviewer: str,
+                              source_file: Optional[str] = None,
+                              review_batch_id: Optional[str] = None) -> Dict:
+    """批量人工改判 - 支持三元组定位，完整改判+只改备注混合
+    
+    review_items 每条格式（二选一，推荐三元组方式可复现）：
+    方式A：三元组定位（推荐）
+    {
+        "sample_id": "S001",
+        "model_version": "v1.0",
+        "original_line_number": 15,
+        "reviewed_is_risk": false,
+        "remark": "...",
+        "only_edit_remark": true/false
+    }
+    
+    方式B：fragment_id定位
+    {
+        "fragment_id": 1,
+        "reviewed_is_risk": false,
+        "remark": "...",
+        "only_edit_remark": true/false
+    }
+    """
+    if review_batch_id is None:
+        review_batch_id = "review_" + generate_batch_id(reviewer)[:12]
+    
+    results = []
+    success_count = 0
+    skip_count = 0
+    
+    for item in review_items:
+        if "fragment_id" in item:
+            fragment_id = item["fragment_id"]
+        else:
+            fragment = find_fragment_by_key(
+                session,
+                item["sample_id"],
+                item["model_version"],
+                item["original_line_number"]
+            )
+            if fragment is None:
+                skip_count += 1
+                results.append({
+                    "status": "skipped",
+                    "reason": "fragment_not_found",
+                    "sample_id": item.get("sample_id"),
+                    "model_version": item.get("model_version"),
+                    "original_line_number": item.get("original_line_number")
+                })
+                continue
+            fragment_id = fragment.id
+        
+        result = apply_manual_review(
+            session,
+            fragment_id=fragment_id,
+            reviewer=reviewer,
+            reviewed_is_risk=item.get("reviewed_is_risk"),
+            reviewed_status=item.get("reviewed_status"),
+            remark=item.get("remark"),
+            only_edit_remark=item.get("only_edit_remark", False),
+            review_batch_id=review_batch_id
+        )
+        result["status"] = "success"
+        results.append(result)
+        success_count += 1
+    
+    batch_record = ReviewBatch(
+        review_batch_id=review_batch_id,
+        reviewer=reviewer,
+        source_file=source_file,
+        total_items=len(review_items),
+        success_count=success_count,
+        skip_count=skip_count,
+    )
+    session.add(batch_record)
+    session.commit()
+    
+    return {
+        "review_batch_id": review_batch_id,
+        "reviewer": reviewer,
+        "total_items": len(review_items),
+        "success_count": success_count,
+        "skip_count": skip_count,
+        "results": results,
+        "replay_command": (
+            f"python -m email_auto_reply_risk.cli review "
+            f"--file {source_file} --by {reviewer} "
+            f"--batch-id {review_batch_id}"
+            if source_file else ""
+        )
     }
 
 
@@ -565,30 +671,57 @@ def get_sample_risk_timeline(session: Session, sample_id: str) -> Dict:
         else:
             risk_breakdown[v]["normal"] += 1
     
-    import_batches = list(set(f.import_batch_id for f in fragments))
+    import_batch_ids = list(set(f.import_batch_id for f in fragments))
+    
+    import_batches = session.query(ImportBatch).filter(
+        ImportBatch.batch_id.in_(import_batch_ids)
+    ).order_by(ImportBatch.imported_at.asc()).all()
+    
+    fragment_ids = [f.id for f in fragments]
+    review_batch_ids = list(set(
+        log.batch_id for log in session.query(RiskChangeLog).filter(
+            RiskChangeLog.fragment_id.in_(fragment_ids),
+            RiskChangeLog.change_type.in_(["manual_edit", "remark_edit"])
+        ).all()
+        if log.batch_id
+    ))
+    
+    review_batches = session.query(ReviewBatch).filter(
+        ReviewBatch.review_batch_id.in_(review_batch_ids)
+    ).order_by(ReviewBatch.reviewed_at.asc()).all()
     
     replay_commands = []
-    if import_batches:
-        first_batch = import_batches[0]
-        batch_record = session.query(ImportBatch).filter(
-            ImportBatch.batch_id == first_batch
-        ).first()
-        if batch_record and batch_record.source_file:
+    
+    for idx, batch in enumerate(import_batches):
+        if batch.source_file:
             replay_commands.append({
-                "step": "step1_import",
-                "description": "步骤1：导入模型输出",
+                "step": f"step1_import_v{idx+1}",
+                "description": f"步骤1-{idx+1}：导入模型输出（{batch.model_version}）",
                 "command": (
                     f"python -m email_auto_reply_risk.cli import "
-                    f"--file {batch_record.source_file} "
-                    f"--model-version {batch_record.model_version} "
-                    f"--by {batch_record.imported_by} "
-                    f"--batch-id {first_batch}"
+                    f"--file {batch.source_file} "
+                    f"--model-version {batch.model_version} "
+                    f"--by {batch.imported_by} "
+                    f"--batch-id {batch.batch_id}"
+                )
+            })
+    
+    for idx, rbatch in enumerate(review_batches):
+        if rbatch.source_file:
+            replay_commands.append({
+                "step": f"step2_review_{idx+1}",
+                "description": f"步骤2-{idx+1}：人工改判（{rbatch.reviewer}）",
+                "command": (
+                    f"python -m email_auto_reply_risk.cli review "
+                    f"--file {rbatch.source_file} "
+                    f"--by {rbatch.reviewer} "
+                    f"--batch-id {rbatch.review_batch_id}"
                 )
             })
     
     replay_commands.append({
         "step": "step_check_status",
-        "description": "查看当前处理状态",
+        "description": "查看当前处理状态和历史留痕",
         "command": (
             f"python -m email_auto_reply_risk.cli sample-timeline "
             f"--sample-id {sample_id}"
@@ -596,8 +729,8 @@ def get_sample_risk_timeline(session: Session, sample_id: str) -> Dict:
     })
     
     replay_commands.append({
-        "step": "step3_review",
-        "description": "步骤3：生成产品复盘报告",
+        "step": "step3_product_review",
+        "description": "步骤3：生成产品复盘报告并导出",
         "command": (
             f"python -m email_auto_reply_risk.cli product-review "
             f"--sample-id {sample_id} "

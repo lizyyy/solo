@@ -1,0 +1,16 @@
+[
+  {
+    "sample_id": "S001",
+    "model_version": "v1.0",
+    "original_line_number": 15,
+    "reviewed_is_risk": false,
+    "remark": "周姐人工确认：这不是自动回复，是客户真实回复，语气和之前有差异"
+  },
+  {
+    "sample_id": "S001",
+    "model_version": "v2.0",
+    "original_line_number": 15,
+    "only_edit_remark": true,
+    "remark": "周姐备注：这条v2.0判断存疑，待运营复核确认，暂不改判"
+  }
+]

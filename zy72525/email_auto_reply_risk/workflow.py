@@ -30,7 +30,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 from .core import (
-    import_model_outputs, apply_manual_review,
+    import_model_outputs, apply_manual_review, apply_manual_review_batch,
     get_sample_risk_timeline, get_fragment_history,
     get_fragment_current_state
 )
@@ -169,60 +169,52 @@ def _step1_explanation(import_result: Dict, status_breakdown: Dict,
 
 
 def step2_manual_review(session: Session, review_records: List[Dict],
-                        reviewer: str, review_batch_id: Optional[str] = None) -> Dict:
+                        reviewer: str, review_batch_id: Optional[str] = None,
+                        source_file: Optional[str] = None) -> Dict:
     """步骤2：标注负责人周姐补看人工改判表
     
-    支持两种改判记录：
+    支持两种改判记录（fragment_id 或 三元组定位）：
     - 完整改判：{"fragment_id": 1, "reviewed_is_risk": false, "remark": "..."}
-    - 只改备注：{"fragment_id": 1, "only_edit_remark": true, "remark": "..."}
+    - 只改备注：{"sample_id": "S001", "model_version": "v2.0", "original_line_number": 15, 
+                  "only_edit_remark": true, "remark": "..."}
     
     返回：
     - 每条改判的改前改后
     - 更新后的当前状态
-    - 可重跑命令
+    - 可重跑命令（带source_file，可完全复现）
     """
-    results = []
-    for record in review_records:
-        only_remark = record.get("only_edit_remark", False)
-        
-        result = apply_manual_review(
-            session,
-            fragment_id=record["fragment_id"],
-            reviewer=reviewer,
-            reviewed_is_risk=record.get("reviewed_is_risk"),
-            remark=record.get("remark"),
-            only_edit_remark=only_remark,
-            review_batch_id=review_batch_id
-        )
-        results.append(result)
+    batch_result = apply_manual_review_batch(
+        session, review_records, reviewer,
+        source_file=source_file, review_batch_id=review_batch_id
+    )
     
-    fragment_ids = [r["fragment_id"] for r in results]
+    review_batch_id_actual = batch_result["review_batch_id"]
+    results = batch_result["results"]
+    
+    success_results = [r for r in results if r.get("status") == "success"]
+    fragment_ids = [r["fragment_id"] for r in success_results]
     current_states = []
     for fid in fragment_ids:
         current_states.append(get_fragment_current_state(session, fid))
     
-    replay_cmd = (
-        f"python -m email_auto_reply_risk.cli review "
-        f"--reviewer {reviewer}" +
-        (f" --batch-id {review_batch_id}" if review_batch_id else "")
-    )
-    
-    manual_count = sum(1 for r in results if r["change_type"] == "manual_edit")
-    remark_count = sum(1 for r in results if r["change_type"] == "remark_edit")
+    manual_count = sum(1 for r in success_results if r["change_type"] == "manual_edit")
+    remark_count = sum(1 for r in success_results if r["change_type"] == "remark_edit")
     
     return {
         "step": "step2_manual_review",
         "step_name": "步骤2：标注负责人人工改判",
         "timestamp": datetime.utcnow().isoformat(),
         "reviewer": reviewer,
-        "review_batch_id": review_batch_id,
-        "total_reviewed": len(results),
+        "review_batch_id": review_batch_id_actual,
+        "source_file": source_file,
+        "total_reviewed": len(success_results),
         "manual_edit_count": manual_count,
         "remark_edit_count": remark_count,
+        "skip_count": batch_result["skip_count"],
         "results": results,
         "fragments_current_state_after": current_states,
-        "replay_command": replay_cmd,
-        "result_explanation": _step2_explanation(results, manual_count, remark_count)
+        "replay_command": batch_result["replay_command"],
+        "result_explanation": _step2_explanation(success_results, manual_count, remark_count)
     }
 
 

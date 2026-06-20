@@ -104,7 +104,10 @@ def review(file_path, reviewer, review_batch_id, db_path):
         review_records = json.load(f)
     
     session = get_session(db_path)
-    result = step2_manual_review(session, review_records, reviewer, review_batch_id)
+    result = step2_manual_review(
+        session, review_records, reviewer, review_batch_id,
+        source_file=file_path
+    )
     
     click.echo("=" * 70)
     click.echo(result["step_name"])
