@@ -98,6 +98,7 @@ class ForbiddenRecord:
     confirm_reason: Optional[str] = None
     rerun_count: int = 0
     last_rerun_at: Optional[datetime] = None
+    original_keyword: Optional[str] = None
     resolved_keyword: Optional[str] = None
     history: List[Dict] = field(default_factory=list)
 

@@ -120,8 +120,11 @@ def cmd_detail(args):
     r = detail["record"]
     print(f"\n=== 记录详情 ===")
     print(f"  记录ID: {r['id']}")
-    print(f"  关键词: {r['keyword']}")
-    if r.get('resolved_keyword'):
+    print(f"  当前关键词: {r['keyword']}")
+    if r.get('original_keyword') and r['original_keyword'] != r['keyword']:
+        print(f"  原始关键词: {r['original_keyword']}")
+        print(f"  ⚠️  口径已变更: {r['original_keyword']} → {r['keyword']}")
+    if r.get('resolved_keyword') and r['resolved_keyword'] != r['keyword']:
         print(f"  修正后口径: {r['resolved_keyword']}")
     print(f"  状态: {r['status']}")
     print(f"  来源: {r['source']}")

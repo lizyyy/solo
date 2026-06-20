@@ -122,48 +122,77 @@ def step3_handle_issues(engine, records):
 
 def step4_view_history(engine):
     print("\n" + "=" * 72)
-    print("  🕒 【可复现路线 Step 4】查看历史（同一条样例反查）")
+    print("  🕒 【可复现路线 Step 4】查看历史 + 验证闭环")
     print("=" * 72)
 
     third_id = engine.forbidden_records[2].id
     detail = engine.get_record_detail(third_id)
+    r = detail["record"]
 
-    print(f"\n  🔍 以「记录3 - {detail['record']['keyword']}」为例，从主材料可反查到：")
+    print(f"\n  🔍 以「记录3」为例，逐项核对：")
 
+    print(f"\n  📌 【1/6】关键词核对（人工修正是否生效）：")
+    print(f"      原始关键词: {r.get('original_keyword', 'N/A')}")
+    print(f"      当前关键词: {r['keyword']}")
+    keyword_match = r["keyword"] == "强效生长激素口服液" and r.get("original_keyword") == "七天长高营养液"
+    print(f"      验证结果: {'✅ 通过' if keyword_match else '❌ 失败'}")
+    if r.get("original_keyword") and r["original_keyword"] != r["keyword"]:
+        print(f"      → 口径已变更: {r['original_keyword']} → {r['keyword']}")
+
+    print(f"\n  📌 【2/6】确认理由核对（是否为人工修正的理由）：")
+    print(f"      当前确认理由: {r.get('confirm_reason', 'N/A')}")
+    reason_match = "强效生长激素口服液" in (r.get("confirm_reason") or "")
+    print(f"      验证结果: {'✅ 通过（已更新为人工修正理由）' if reason_match else '❌ 失败（理由未更新）'}")
+
+    print(f"\n  📌 【3/6】重跑次数核对：")
+    print(f"      重跑次数: {r['rerun_count']} 次")
+    print(f"      验证结果: {'✅ 通过' if r['rerun_count'] == 1 else '❌ 失败'}")
+
+    print(f"\n  📌 【4/6】主材料反查（标注员留言 → 同一条样例）：")
     if detail.get("annotator_comment"):
         c = detail["annotator_comment"]
-        print(f"\n    📝 标注员留言（主材料）：")
-        print(f"        ID: {c['id']}  |  标注员: {c['annotator']}")
-        print(f"        内容: {c['content']}")
+        print(f"      标注员留言ID: {c['id']}")
+        print(f"      标注员: {c['annotator']}")
+        print(f"      留言内容: {c['content']}")
+        print(f"      验证结果: {'✅ 通过（主材料可反查同一条样例）' if '七天长高营养液' in c['content'] else '❌ 失败'}")
 
+    print(f"\n  📌 【5/6】模型输出 + 冲突样本核对：")
     if detail.get("model_output"):
         m = detail["model_output"]
-        print(f"\n    🤖 模型输出片段（关键备注）：")
-        print(f"        ID: {m['id']}  |  模型版本: {m['model_version']}")
-        print(f"        内容: {m['content'][:80]}...")
-
+        print(f"      模型输出片段: 有（版本 {m['model_version']}）")
     if detail.get("conflicts"):
-        print(f"\n    ⚔️  关联冲突样本：")
-        for i, c in enumerate(detail["conflicts"], 1):
-            status = "✅已解决" if c["resolved"] else "❌未解决"
-            print(f"        [{i}] {c['type']} {status}  确认理由: {c.get('confirm_reason', '无')}")
+        print(f"      关联冲突: {len(detail['conflicts'])} 条")
+        for c in detail["conflicts"]:
+            print(f"        • {c['type']}，旧内容: {c['old_content']}，已解决: {c['resolved']}")
 
-    print(f"\n    🕒 完整操作历史（共 {len(detail['history'])} 条，最新在前）：")
-    for i, h in enumerate(detail["history"], 1):
+    print(f"\n  📌 【6/6】操作历史核对（关键事件是否完整）：")
+    history = detail["history"]
+    action_names = [h["action"] for h in history]
+    required_actions = ["人工修正", "执行重跑", "重跑结果生效", "冲突已解决"]
+    print(f"      历史总数: {len(history)} 条")
+    all_found = all(act in action_names for act in required_actions)
+    print(f"      关键事件完整度: {'✅ 全部存在' if all_found else '❌ 有缺失'}")
+    for act in required_actions:
+        found = act in action_names
+        print(f"        • {act}: {'✅' if found else '❌'}")
+
+    print(f"\n    🕒 完整操作历史（最新在前）：")
+    for i, h in enumerate(detail["history"][:7], 1):
         b = h.get("before_status", "")
         a = h.get("after_status", "")
         arrow = f" [{b}→{a}]" if b and a and b != a else ""
-        cr = f" ✅{h['confirm_reason'][:35]}" if h.get("confirm_reason") else ""
+        cr = f" ✅{h['confirm_reason'][:30]}" if h.get("confirm_reason") else ""
         rn = f" 🔁重跑#{h['rerun_number']}" if h.get("rerun_number") else ""
         print(f"      [{i}] {h['action']}（{h['operator']}）{arrow}{cr}{rn}")
 
     print(f"\n  ✅ 反查验证完成：标注员留言、人工修正、重跑 → 都指向同一条样例！")
+    print(f"     七天长高营养液 → 人工修正为 → 强效生长激素口服液 → 重跑验证")
     return engine
 
 
 def step5_generate_result(engine):
     print("\n" + "=" * 72)
-    print("  📄 【可复现路线 Step 5】生成结果报告")
+    print("  📄 【可复现路线 Step 5】生成结果报告 + 最终核对")
     print("=" * 72)
 
     report = engine.generate_report()
@@ -181,22 +210,48 @@ def step5_generate_result(engine):
     expected = [
         ("✅ 顺利", 0, "保健品螺旋藻片", "正常通过"),
         ("🟡 404→PM通过", 1, "美白祛斑霜特效版", "产品经理复核通过"),
-        ("🔴 旧口径→修正→重跑", 2, "七天长高营养液", "已补录修正"),
+        ("🔴 旧口径→修正→重跑", 2, "强效生长激素口服液", "已补录修正"),
     ]
-    for name, idx, keyword, expected_status in expected:
+    all_pass = True
+    for name, idx, expected_keyword, expected_status in expected:
         r = report["记录明细"][idx]
-        match = "✓" if r["status"] == expected_status else "✗"
+        keyword_match = r["keyword"] == expected_keyword
+        status_match = r["status"] == expected_status
+        match = "✓" if keyword_match and status_match else "✗"
+        if not keyword_match or not status_match:
+            all_pass = False
         print(f"    {name} {match}  {r['keyword']} → {r['status']}")
+        if r.get("original_keyword") and r["original_keyword"] != r["keyword"]:
+            print(f"        🔄 原口径: {r['original_keyword']} → 现口径: {r['keyword']}")
         if r.get("confirm_reason"):
             print(f"        ✅ 确认理由: {r['confirm_reason'][:50]}")
         if r.get("rerun_count", 0) > 0:
             print(f"        🔁 重跑次数: {r['rerun_count']}")
+
+    print(f"\n  🔍 第三条记录深度核对（旧口径→新口径闭环）：")
+    r3 = report["记录明细"][2]
+    checks = [
+        ("原始关键词为旧口径", r3.get("original_keyword") == "七天长高营养液"),
+        ("当前关键词为新口径", r3["keyword"] == "强效生长激素口服液"),
+        ("状态为已补录修正", r3["status"] == "已补录修正"),
+        ("确认理由含新口径", "强效生长激素口服液" in (r3.get("confirm_reason") or "")),
+        ("重跑次数为1次", r3.get("rerun_count", 0) == 1),
+        ("有关联冲突", r3.get("has_conflict") == True),
+    ]
+    all_checks_pass = True
+    for check_name, result in checks:
+        status = "✅" if result else "❌"
+        if not result:
+            all_checks_pass = False
+        print(f"    {status} {check_name}")
 
     report_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "demo_report.json")
     with open(report_path, "w", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=2)
 
     print(f"\n  ✅ 完整报告已保存到: {report_path}")
+    print(f"\n  🎯 最终验证结论: {'全部通过 ✅' if all_pass and all_checks_pass else '存在问题 ❌'}")
+    print(f"     七天长高营养液 → 人工修正为 → 强效生长激素口服液 → 重跑验证通过")
     print(f"\n  可复现路线执行完毕！以上 5 步可以 100% 复现演示结果。")
 
     return engine

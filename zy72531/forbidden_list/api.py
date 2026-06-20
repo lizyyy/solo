@@ -14,6 +14,7 @@ def record_to_dict(record):
     return {
         "id": record.id,
         "keyword": record.keyword,
+        "original_keyword": record.original_keyword,
         "resolved_keyword": record.resolved_keyword,
         "status": record.status.value,
         "source": record.source.value,
@@ -259,7 +260,9 @@ def dashboard():
                 <tr>
                     <td>
                         <strong>{{ r.keyword }}</strong>
-                        {% if r.resolved_keyword and r.resolved_keyword != r.keyword %}
+                        {% if r.original_keyword and r.original_keyword != r.keyword %}
+                        <div class="mini-note" style="color:#e6a23c">原始: {{ r.original_keyword }} → 已修正</div>
+                        {% elif r.resolved_keyword and r.resolved_keyword != r.keyword %}
                         <div class="mini-note">→ 修正: {{ r.resolved_keyword }}</div>
                         {% endif %}
                     </td>
@@ -427,7 +430,10 @@ def dashboard():
             let html = `<h3>📋 记录详情</h3>
                 <div class="detail-block">
                     <div><span class="detail-label">记录ID：</span>${r.id}</div>
-                    <div><span class="detail-label">关键词：</span><strong>${r.keyword}</strong></div>
+                    <div><span class="detail-label">当前关键词：</span><strong style="color:#67c23a">${r.keyword}</strong></div>
+                    ${r.original_keyword && r.original_keyword != r.keyword ?
+                        `<div><span class="detail-label">原始关键词：</span><span style="color:#909399;text-decoration:line-through">${r.original_keyword}</span>
+                         <div style="margin-left:80px;color:#e6a23c;font-size:13px">⚠️ 口径已变更：${r.original_keyword} → ${r.keyword}</div></div>` : ''}
                     ${r.resolved_keyword && r.resolved_keyword != r.keyword ?
                         `<div><span class="detail-label">修正后口径：</span><strong style="color:#409eff">${r.resolved_keyword}</strong></div>` : ''}
                     <div><span class="detail-label">状态：</span>${r.status}</div>

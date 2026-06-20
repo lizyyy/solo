@@ -1,5 +1,5 @@
 {
-  "生成时间": "2026-06-15T09:03:09.259128",
+  "生成时间": "2026-06-21T01:24:02.503735",
   "统计概览": {
     "总记录数": 3,
     "标注员留言数": 3,
@@ -19,8 +19,10 @@
   },
   "记录明细": [
     {
-      "id": "7579364b",
+      "id": "a4f8e4ef",
       "keyword": "保健品螺旋藻片",
+      "original_keyword": "保健品螺旋藻片",
+      "resolved_keyword": null,
       "status": "正常通过",
       "source": "标注员留言",
       "link_404": false,
@@ -32,8 +34,10 @@
       "reject_reason": null
     },
     {
-      "id": "c39b3fc8",
+      "id": "34fa5973",
       "keyword": "美白祛斑霜特效版",
+      "original_keyword": "美白祛斑霜特效版",
+      "resolved_keyword": null,
       "status": "产品经理复核通过",
       "source": "标注员留言",
       "link_404": true,
@@ -45,8 +49,10 @@
       "reject_reason": null
     },
     {
-      "id": "71a0491f",
-      "keyword": "七天长高营养液",
+      "id": "4d91d3c1",
+      "keyword": "强效生长激素口服液",
+      "original_keyword": "七天长高营养液",
+      "resolved_keyword": "强效生长激素口服液",
       "status": "已补录修正",
       "source": "标注员留言",
       "link_404": false,
@@ -54,14 +60,14 @@
       "annotator": "小王",
       "rerun_count": 1,
       "has_conflict": true,
-      "confirm_reason": "标注群讨论过增高产品确实需要禁推，先过但稍后补看模型片段确认口径",
+      "confirm_reason": "模型输出显示'七天长高营养液'已在Q2更新中废弃，最新口径为'强效生长激素口服液'",
       "reject_reason": null
     }
   ],
   "冲突样本表": [
     {
-      "id": "a3a8be4c",
-      "forbidden_record_id": "71a0491f",
+      "id": "9f3cb758",
+      "forbidden_record_id": "4d91d3c1",
       "type": "发现旧口径",
       "old_content": "七天长高营养液",
       "new_content": "模型输出片段：经检索历史标注记录，\"七天长高营养液\"属于旧口径，最新口径应为\"强效生长激素口服液\"，注意旧口径已在Q2更新中废弃",

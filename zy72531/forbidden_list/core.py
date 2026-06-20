@@ -30,14 +30,18 @@ class ForbiddenListEngine:
 
     def _extract_keyword(self, text: str) -> str:
         patterns = [
+            r"最新口径应为[：:]?\s*[\"\']?([^\"\',，。]+)",
+            r"最新口径[为是][：:]?\s*[\"\']?([^\"\',，。]+)",
+            r"应为[：:]?\s*[\"\']?([^\"\',，。]+)",
+            r"新口径[为是][：:]?\s*[\"\']?([^\"\',，。]+)",
+            r"改用[：:]?\s*[\"\']?([^\"\',，。]+)",
+            r"替换为[：:]?\s*[\"\']?([^\"\',，。]+)",
+            r"禁[推售][：:]\s*[\"\']?([^\"\',，。]+)",
+            r"不[能得可]推荐\s*[\"\']?([^\"\',，。]+)",
             r'"([^"]+)"',
             r"'([^']+)'",
             r"【([^】]+)】",
             r"\[([^\]]+)\]",
-            r"禁[推售][：:]\s*(\S+)",
-            r"不[能得可]推荐\s*(\S+)",
-            r"最新口径应为[：:]\s*[\"\']?([^\"\',，]+)",
-            r"应为[：:]\s*[\"\']?([^\"\',，]+)",
         ]
         for pattern in patterns:
             match = re.search(pattern, text)
@@ -122,6 +126,7 @@ class ForbiddenListEngine:
             annotator_comment_id=comment.id,
             reference_url=reference_url,
             confirm_reason=comment.reason,
+            original_keyword=keyword,
         )
         record.add_history(
             action="从标注员留言创建",
@@ -288,6 +293,8 @@ class ForbiddenListEngine:
             record.resolved_keyword = new_keyword
         if new_reference_url:
             record.reference_url = new_reference_url
+        if confirm_reason:
+            record.confirm_reason = confirm_reason
         record.status = ForbiddenStatus.SUPPLEMENTED
         record.add_history(
             action="人工修正",
@@ -327,6 +334,10 @@ class ForbiddenListEngine:
                 new_keyword = self._extract_keyword(conflict.new_content)
                 record.resolved_keyword = new_keyword
                 record.keyword = new_keyword
+            if confirm_reason:
+                record.confirm_reason = confirm_reason
+            if reject_reason:
+                record.reject_reason = reject_reason
             record.status = ForbiddenStatus.SUPPLEMENTED
             record.add_history(
                 action="冲突已解决",
@@ -460,6 +471,7 @@ class ForbiddenListEngine:
             "record": {
                 "id": record.id,
                 "keyword": record.keyword,
+                "original_keyword": record.original_keyword,
                 "resolved_keyword": record.resolved_keyword,
                 "status": record.status.value,
                 "source": record.source.value,
@@ -540,6 +552,8 @@ class ForbiddenListEngine:
             record_summaries.append({
                 "id": r.id,
                 "keyword": r.keyword,
+                "original_keyword": r.original_keyword,
+                "resolved_keyword": r.resolved_keyword,
                 "status": r.status.value,
                 "source": r.source.value,
                 "link_404": r.link_404,
