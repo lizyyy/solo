@@ -27,7 +27,6 @@ def step1_import_desensitization_rules(
     imported_by: str,
     source_file: str = "manual_input"
 ) -> Tuple[List[DesensitizationRule], ImportBatch]:
-
     batch_id = "rule_import_" + datetime.utcnow().strftime('%Y%m%d_%H%M%S') + "_" + uuid.uuid4().hex[:8]
 
     import_batch = ImportBatch(
@@ -91,22 +90,24 @@ def step2_xiaomeng_review_gray_batch(
     reconcile_result = reconcile_stale_conflicts(db, batch_id)
     conflicts = detect_desensitization_conflicts(db, batch_id)
     conflict_summary = get_conflict_summary_for_batch(db, batch_id)
-    todos = db.query(TodoExtract).filter(TodoExtract.gray_batch_id == batch_id).all()
-    current_todo_ids = set(t.id for t in todos)
-    pending_for_current = [c for c in conflicts if c.status == "pending" and c.todo_id in current_todo_ids]
-    utp_fixed = len(set(c.todo_id for c in pending_for_current))
-    conflict_summary["unique_todos_with_pending"] = utp_fixed
-    conflict_summary["pending_conflicts"] = len(pending_for_current)
 
     batch.status = "reviewed"
     batch.reviewed_by = reviewed_by
     batch.reviewed_at = datetime.utcnow()
 
     if not review_note:
+        raw_pc = conflict_summary["raw_pending_conflicts"]
+        in_scope_pc = conflict_summary["pending_conflicts"]
         utp = conflict_summary["unique_todos_with_pending"]
-        pc = conflict_summary["pending_conflicts"]
+        excluded_pc = conflict_summary["excluded_pending_conflicts"]
         ar = reconcile_result["auto_resolved"]
-        review_note = f"模型评测同事{reviewed_by}完成灰度批次审阅，发现{utp}条待办有{pc}个冲突待确认，已自动对齐{ar}条过期冲突"
+        review_note = (
+            "模型评测同事" + reviewed_by + "完成灰度批次审阅，"
+            "共" + str(raw_pc) + "条pending冲突，"
+            "其中" + str(in_scope_pc) + "条属于当前批次待办（涉及" + str(utp) + "条待办），"
+            + str(excluded_pc) + "条属于已迁移待办（不计入当前口径），"
+            "已自动对齐" + str(ar) + "条过期冲突"
+        )
     batch.review_note = review_note
 
     db.commit()
@@ -150,11 +151,7 @@ def step3_update_evaluation_report(
     ).count()
 
     total_todos = len(todos)
-    current_todo_ids = set(t.id for t in todos)
-    pending_for_current = [c for c in conflicts if c.status == "pending" and c.todo_id in current_todo_ids]
-    conflict_summary["pending_conflicts"] = len(pending_for_current)
-    unique_todos_with_pending = len(set(c.todo_id for c in pending_for_current))
-    conflict_summary["unique_todos_with_pending"] = unique_todos_with_pending
+    unique_todos_with_pending = conflict_summary["unique_todos_with_pending"]
 
     if total_todos > 0:
         accuracy_rate = (total_todos - unique_todos_with_pending) / total_todos
@@ -168,6 +165,8 @@ def step3_update_evaluation_report(
     accuracy_explanation = _build_accuracy_explanation(
         total_todos, unique_todos_with_pending, conflict_summary, reconcile_result, accuracy_rate
     )
+
+    excluded_conflict_explanation = _build_excluded_conflict_explanation(conflict_summary)
 
     todo_status_list = _build_todo_status_list(db, batch_id, todos, conflicts)
 
@@ -185,15 +184,19 @@ def step3_update_evaluation_report(
         "statistics": {
             "total_todos": total_todos,
             "total_conflicts": len(conflicts),
+            "raw_pending_conflicts": conflict_summary["raw_pending_conflicts"],
+            "raw_resolved_conflicts": conflict_summary["raw_resolved_conflicts"],
+            "pending_conflicts_in_scope": conflict_summary["pending_conflicts"],
+            "resolved_conflicts_in_scope": conflict_summary["resolved_conflicts"],
+            "excluded_pending_conflicts": conflict_summary["excluded_pending_conflicts"],
             "unique_todos_with_pending": unique_todos_with_pending,
-            "resolved_conflicts": conflict_summary["resolved_conflicts"],
-            "pending_conflicts": conflict_summary["pending_conflicts"],
             "reconciled_conflicts": reconcile_result["auto_resolved"],
             "manual_judgments_count": manual_judgments_count,
             "overridden_judgments_count": sum(1 for t in todos if t.is_overridden_by_batch),
             "needs_security_review_count": sum(1 for t in todos if t.needs_security_review)
         },
         "accuracy_explanation": accuracy_explanation,
+        "excluded_conflict_explanation": excluded_conflict_explanation,
         "conflict_summary": conflict_summary,
         "reconcile_result": reconcile_result,
         "todo_status_list": todo_status_list,
@@ -206,7 +209,8 @@ def step3_update_evaluation_report(
                 "batch_value": c.batch_value,
                 "status": c.status,
                 "resolution": c.resolution,
-                "resolved_by": c.resolved_by
+                "resolved_by": c.resolved_by,
+                "todo_in_current_batch": c.todo_id in set(t.id for t in todos)
             }
             for c in conflicts
         ],
@@ -304,7 +308,13 @@ def _build_accuracy_explanation(
     accuracy_rate
 ):
     parts = []
-    parts.append("批次共 " + str(total_todos) + " 条待办，其中 " + str(unique_todos_with_pending) + " 条有待处理的冲突。"
+    raw_pc = conflict_summary["raw_pending_conflicts"]
+    in_scope_pc = conflict_summary["pending_conflicts"]
+    excluded_pc = conflict_summary["excluded_pending_conflicts"]
+
+    parts.append(
+        "批次共 " + str(total_todos) + " 条待办，其中 "
+        + str(unique_todos_with_pending) + " 条有待处理的冲突。"
     )
     pct = "{:.2%}".format(accuracy_rate)
     parts.append(
@@ -312,23 +322,57 @@ def _build_accuracy_explanation(
         + str(total_todos) + " - " + str(unique_todos_with_pending)
         + ") / " + str(total_todos) + " = " + pct
     )
-    pc = conflict_summary["pending_conflicts"]
-    if pc != unique_todos_with_pending:
+
+    if excluded_pc > 0:
         parts.append(
-            "注：当前有 " + str(pc) + " 条原始冲突记录，但涉及 "
-            + str(unique_todos_with_pending)
-            + " 条唯一待办（一条待办可能匹配多条规则产生多条冲突）。准确率按唯一待办数计算，避免冲突条数多于待办数导致负值。"
+            "原始冲突记录共 " + str(raw_pc) + " 条pending，"
+            "其中 " + str(in_scope_pc) + " 条属于当前批次待办（计入准确率口径），"
+            + str(excluded_pc) + " 条属于已迁移至其他批次的待办（不计入当前口径）。"
+            "已迁移待办的冲突仍保持pending状态，"
+            "应由迁移目标批次的负责人确认后迁移或关闭。"
         )
+    elif raw_pc != unique_todos_with_pending:
+        parts.append(
+            "注：当前有 " + str(raw_pc) + " 条原始冲突记录，但涉及 "
+            + str(unique_todos_with_pending)
+            + " 条唯一待办（一条待办可能匹配多条规则产生多条冲突）。"
+            "准确率按唯一待办数计算，避免冲突条数多于待办数导致负值。"
+        )
+
     ar = reconcile_result["auto_resolved"]
     if ar > 0:
         parts.append(
             "本次报告生成前已自动对齐 " + str(ar)
             + " 条过期冲突（待办脱敏级别已变更，原冲突不再适用）。"
         )
+
     return " ".join(parts)
 
 
+def _build_excluded_conflict_explanation(conflict_summary):
+    excluded = conflict_summary.get("excluded_moved_todos", [])
+    if not excluded:
+        return None
+
+    parts = []
+    for item in excluded:
+        parts.append(
+            "待办" + str(item["todo_id"]) + "已迁移至批次" + str(item["current_batch_id"]) + "，"
+            "其" + str(item["pending_conflicts_count"]) + "条pending冲突（冲突ID: "
+            + ", ".join(str(cid) for cid in item["conflict_ids"])
+            + "）仍挂在当前批次。原因：冲突记录在待办迁移时未同步迁移。"
+            + item["action_required"] + "。"
+        )
+
+    summary = (
+        "当前批次共有" + str(conflict_summary["excluded_pending_conflicts"])
+        + "条pending冲突属于已迁移待办，不进入当前批次准确率计算口径。"
+    )
+    return summary + " ".join(parts)
+
+
 def _build_todo_status_list(db, batch_id, todos, conflicts):
+    current_todo_ids = set(t.id for t in todos)
     todo_conflicts = {}
     for c in conflicts:
         if c.todo_id not in todo_conflicts:
@@ -375,5 +419,33 @@ def _build_todo_status_list(db, batch_id, todos, conflicts):
             ]
         }
         result.append(item)
+
+    orphan_conflicts = [c for c in conflicts if c.todo_id not in current_todo_ids and c.status == "pending"]
+    if orphan_conflicts:
+        from models import TodoExtract as TE
+        orphan_by_todo = {}
+        for c in orphan_conflicts:
+            if c.todo_id not in orphan_by_todo:
+                todo = db.query(TE).filter(TE.id == c.todo_id).first()
+                orphan_by_todo[c.todo_id] = {
+                    "todo_id": c.todo_id,
+                    "current_batch_id": todo.gray_batch_id if todo else None,
+                    "conflicts": [],
+                    "note": "待办已迁移至批次" + str(todo.gray_batch_id) + "，冲突仍挂在当前批次" if todo else "待办已删除"
+                }
+            orphan_by_todo[c.todo_id]["conflicts"].append({
+                "conflict_id": c.id,
+                "conflict_type": c.conflict_type,
+                "status": c.status,
+                "rule_value": c.rule_value,
+                "batch_value": c.batch_value
+            })
+        result.append({
+            "todo_id": None,
+            "status": "orphan_conflicts",
+            "status_desc": "已迁移待办的遗留冲突",
+            "orphan_details": list(orphan_by_todo.values()),
+            "note": "这些冲突属于已迁移到其他批次的待办，不计入当前批次准确率，应由目标批次负责人确认后迁移或关闭"
+        })
 
     return result

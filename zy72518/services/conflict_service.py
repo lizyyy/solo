@@ -237,9 +237,65 @@ def get_conflicts_by_todo(db: Session, todo_id: int) -> List[ConflictRecord]:
 
 def get_conflict_summary_for_batch(db: Session, batch_id: int) -> Dict[str, Any]:
     from models import TodoExtract
-    conflicts = db.query(ConflictRecord).filter(ConflictRecord.batch_id == batch_id).all()
-    current_todo_ids = set(t.id for t in db.query(TodoExtract).filter(TodoExtract.gray_batch_id == batch_id).all())
-    pending = [c for c in conflicts if c.status == "pending" and c.todo_id in current_todo_ids]
-    resolved = [c for c in conflicts if c.status == "resolved" and c.todo_id in current_todo_ids]
-    todos_with_pending = set(c.todo_id for c in pending)
-    return {"batch_id": batch_id, "total_conflicts": len(conflicts), "pending_conflicts": len(pending), "resolved_conflicts": len(resolved), "unique_todos_with_pending": len(todos_with_pending), "unique_todos_affected": len(set(c.todo_id for c in conflicts if c.todo_id in current_todo_ids)), "pending_by_todo": {str(tid): len([c for c in pending if c.todo_id == tid]) for tid in todos_with_pending}}
+
+    all_conflicts = db.query(ConflictRecord).filter(
+        ConflictRecord.batch_id == batch_id
+    ).all()
+
+    current_todo_ids = set(
+        t.id for t in db.query(TodoExtract).filter(
+            TodoExtract.gray_batch_id == batch_id
+        ).all()
+    )
+
+    all_pending = [c for c in all_conflicts if c.status == "pending"]
+    all_resolved = [c for c in all_conflicts if c.status == "resolved"]
+
+    in_scope_pending = [c for c in all_pending if c.todo_id in current_todo_ids]
+    in_scope_resolved = [c for c in all_resolved if c.todo_id in current_todo_ids]
+
+    excluded_pending = [c for c in all_pending if c.todo_id not in current_todo_ids]
+    excluded_resolved = [c for c in all_resolved if c.todo_id not in current_todo_ids]
+
+    in_scope_todos_with_pending = set(c.todo_id for c in in_scope_pending)
+    all_todos_with_pending = set(c.todo_id for c in all_pending)
+
+    moved_todo_details = []
+    for tid in set(c.todo_id for c in excluded_pending + excluded_resolved):
+        todo = db.query(TodoExtract).filter(TodoExtract.id == tid).first()
+        moved_todo_details.append({
+            "todo_id": tid,
+            "current_batch_id": todo.gray_batch_id if todo else None,
+            "pending_conflicts_count": len([c for c in excluded_pending if c.todo_id == tid]),
+            "resolved_conflicts_count": len([c for c in excluded_resolved if c.todo_id == tid]),
+            "conflict_ids": [c.id for c in excluded_pending + excluded_resolved if c.todo_id == tid],
+            "reason": "待办已迁移至批次" + str(todo.gray_batch_id) if todo else "待办已删除",
+            "action_required": "应由批次" + str(todo.gray_batch_id) + "的负责人确认后迁移或关闭" if todo else "需人工确认关闭"
+        })
+
+    return {
+        "batch_id": batch_id,
+        "raw_total_conflicts": len(all_conflicts),
+        "raw_pending_conflicts": len(all_pending),
+        "raw_resolved_conflicts": len(all_resolved),
+        "pending_conflicts": len(in_scope_pending),
+        "resolved_conflicts": len(in_scope_resolved),
+        "unique_todos_with_pending": len(in_scope_todos_with_pending),
+        "unique_todos_affected": len(set(c.todo_id for c in all_conflicts if c.todo_id in current_todo_ids)),
+        "excluded_pending_conflicts": len(excluded_pending),
+        "excluded_moved_todos": moved_todo_details,
+        "pending_by_todo": {
+            str(tid): len([c for c in in_scope_pending if c.todo_id == tid])
+            for tid in in_scope_todos_with_pending
+        },
+        "explanation": (
+            "批次" + str(batch_id) + "共有" + str(len(all_pending)) + "条pending冲突记录，"
+            "其中" + str(len(in_scope_pending)) + "条属于当前批次待办，"
+            + str(len(excluded_pending)) + "条属于已迁移待办（不计入当前批次准确率）。"
+            "已迁移待办的冲突仍保持pending状态，"
+            "应由迁移目标批次的负责人确认后迁移或关闭。"
+        ) if excluded_pending else (
+            "批次" + str(batch_id) + "共有" + str(len(all_pending)) + "条pending冲突记录，"
+            "均属于当前批次待办。"
+        )
+    }

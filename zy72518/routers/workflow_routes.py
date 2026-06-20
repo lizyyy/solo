@@ -136,12 +136,12 @@ def resolve_conflict_api(
         )
         return {
             "code": 0,
-            "message": f"冲突已{request.resolution == 'confirm' and '确认' or '驳回'}",
+            "message": "冲突已" + ("确认" if request.resolution == "confirm" else "驳回"),
             "data": {
                 "conflict_id": conflict.id,
                 "resolution": conflict.resolution,
                 "resolved_by": conflict.resolved_by,
-                "note": request.resolution == "confirm" and "已按脱敏规则备注执行，需安全审核" or "已按灰度批次期望执行",
+                "note": "已按脱敏规则备注执行，需安全审核" if request.resolution == "confirm" else "已按灰度批次期望执行",
                 "auto_resolved_sibling_count": len(sibling_resolved),
             }
         }

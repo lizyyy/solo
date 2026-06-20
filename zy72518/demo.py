@@ -158,11 +158,9 @@ def demo():
         print(f"✓ 审阅人: {batch.reviewed_by}")
         print(f"✓ 审阅时间: {batch.reviewed_at}")
         print(f"✓ 发现冲突: {len(conflicts)} 个")
-        utp = conflict_summary['unique_todos_with_pending']
-        print("✓ 待办冲突汇总: " + str(utp) + " 条待办有未处理冲突")
-        ar = reconcile_result['auto_resolved']
-        if ar > 0:
-            print("✓ 自动对齐过期冲突: " + str(ar) + " 条")
+        print(f"✓ 待办冲突汇总: {conflict_summary['unique_todos_with_pending']} 条待办有未处理冲突")
+        if reconcile_result["auto_resolved"] > 0:
+            print(f"✓ 自动对齐过期冲突: {reconcile_result['auto_resolved']} 条")
         for i, conflict in enumerate(conflicts, 1):
             print(f"\n  冲突 #{i}:")
             print(f"    类型: {conflict.conflict_type}")
@@ -187,22 +185,26 @@ def demo():
             )
             print(f"✓ 冲突 #{conflicts[0].id} 已确认")
             print(f"  处理方式: {resolved.resolution}")
+            print(f"  处理人: {resolved.resolved_by}")
+            if resolved.resolution_note:
+                note_preview = resolved.resolution_note[:80]
+            else:
+                note_preview = ""
+            print(f"  备注: {note_preview}")
             if sibling_resolved:
                 print(f"  自动关闭同待办其他冲突: {len(sibling_resolved)} 条")
-            print(f"  处理人: {resolved.resolved_by}")
-            print(f"  备注: {resolved.resolution_note}")
+                for sc in sibling_resolved:
+                    print(f"    - 冲突#{sc.id}: {sc.resolution}，处理人={sc.resolved_by}")
 
             if len(conflicts) > 1:
                 print("\n处理第二个冲突：驳回，按灰度批次期望执行")
-                resolved2, sibling_resolved2 = resolve_conflict(
+                resolved2, sibling2 = resolve_conflict(
                     db, conflicts[1].id, "reject",
                     "按灰度批次降低脱敏级别，此条无需例外",
                     "模型评测-小孟"
                 )
                 print(f"✓ 冲突 #{conflicts[1].id} 已驳回")
                 print(f"  处理方式: {resolved2.resolution}")
-                if sibling_resolved2:
-                    print(f"  自动关闭同待办其他冲突: {len(sibling_resolved2)} 条")
                 print(f"  处理人: {resolved2.resolved_by}")
 
         print_separator("人工改判场景演示")
@@ -328,13 +330,22 @@ def demo():
 
         print_separator("第三步：更新评测报告")
         report = step3_update_evaluation_report(db, gray_batch.id, "模型评测-小孟")
+        stats = report.report_content.get("statistics", {})
         print(f"✓ 评测报告生成完成 (ID: {report.id})")
         print(f"  准确率: {report.accuracy_rate:.2%}")
         print(f"  召回率: {report.recall_rate:.2%}")
         print(f"  F1分数: {report.f1_score:.4f}")
-        print(f"  冲突数: {report.conflict_count}")
+        print(f"  原始pending冲突: {stats.get('raw_pending_conflicts', 'N/A')}")
+        print(f"  当前口径pending冲突: {stats.get('pending_conflicts_in_scope', 'N/A')}")
+        print(f"  被排除pending冲突(已迁移待办): {stats.get('excluded_pending_conflicts', 'N/A')}")
         print(f"  人工改判数: {report.manual_judgment_count}")
         print(f"  待安全审核数: {len(report.report_content.get('pending_review_items', []))}")
+        exp = report.report_content.get("accuracy_explanation", "")
+        if exp:
+            print(f"  准确率说明: {exp}")
+        ece = report.report_content.get("excluded_conflict_explanation")
+        if ece:
+            print(f"  被排除冲突说明: {ece}")
 
         print_separator("查看完整工作流状态")
         status = get_workflow_status(db, gray_batch.id)
