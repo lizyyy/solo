@@ -492,18 +492,18 @@
               <th>#</th>
               <th>设备编号</th>
               <th>维保日期</th>
-              <th>停机窗口 W_stop(天)</th>
-              <th>到货延迟 T_delay(天)</th>
+              <th>停机窗口 W_stop<br><span style="color:var(--warn);font-weight:400;font-size:10px;">(脏数据→脏口径值)</span></th>
+              <th>到货延迟 T_delay</th>
               <th>F_sp(%)</th>
-              <th>标准工时 T_std(h)</th>
-              <th>实际工时 T_act(h)</th>
+              <th>标准工时 T_std<br><span style="color:var(--warn);font-weight:400;font-size:10px;">(脏数据→脏口径值)</span></th>
+              <th>实际工时 T_act</th>
               <th>F_te(%)</th>
-              <th>交接完整率 R_hs</th>
+              <th>完整率 R_hs</th>
               <th>F_hs(%)</th>
               <th>边界突破 N_bd</th>
               <th>F_bd(%)</th>
-              <th>综合得分 S</th>
-              <th>判定</th>
+              <th>综合得分 S<br><span style="color:var(--purple);font-weight:400;font-size:10px;">(脏行另标干净口径)</span></th>
+              <th>判定<br><span style="color:var(--danger);font-weight:400;font-size:10px;">(脏行另标应判定)</span></th>
               <th>主因</th>
               <th>备注/交接</th>
               <th>数据标记</th>
@@ -585,22 +585,22 @@ const STANDARD_THRESHOLD = {
 let RECORDS = [
   { id:"TC-001", name:"1#塔吊·北标段", date:"2026-06-01",
     W_stop:3, T_delay:2, T_std:8, T_act:10, R_hs:0.80, N_bd:1, N_total:12,
-    note:"例行月度维保", threshold_override:null, tag:"normal" },
+    note:"例行月度维保 · 主钢丝绳磨损检查", threshold_override:null, tag:"normal" },
   { id:"TC-002", name:"2#塔吊·南标段", date:"2026-06-02",
     W_stop:2, T_delay:0, T_std:6, T_act:6, R_hs:1.00, N_bd:0, N_total:12,
-    note:"季度大保 · 备件提前3天到齐", threshold_override:null, tag:"normal" },
+    note:"季度大保 · 备件提前3天到齐 · 交接完整100%", threshold_override:null, tag:"normal" },
   { id:"TC-003", name:"3#塔吊·东标段", date:"2026-06-03",
-    W_stop:3, T_delay:1.7, T_std:8, T_act:8.5, R_hs:0.92, N_bd:0, N_total:12,
-    note:"【边界样本】各项指标接近60分阈值", threshold_override:null, tag:"boundary" },
+    W_stop:3, T_delay:3, T_std:8, T_act:14.1, R_hs:0.92, N_bd:0, N_total:12,
+    note:"【边界样本·公式可复算】F_sp=100(延迟3/窗口3)×0.40=40 + F_te=76.25×0.25=19.06 + F_hs=8×0.20=1.6 → S=60.66；仅超异常线0.66分；完整率92%提至95%即可降为正常", threshold_override:null, tag:"boundary" },
   { id:"TC-004", name:"4#塔吊·西标段", date:"2026-06-04",
     W_stop:4, T_delay:5, T_std:10, T_act:16, R_hs:0.55, N_bd:3, N_total:12,
-    note:"【脏数据·阈值调高】阈值临时偏移+28%", threshold_override:{offset_pct:28, fields:["W_stop","T_std"]}, tag:"dirty" },
+    note:"【脏数据·口径异常】有人临时把停机窗口W_stop和标准工时T_std同时调高+28%，干净口径S=67.75(异常)被压低到58.06(正常)，异常被掩盖", threshold_override:{offset_pct:28, fields:["W_stop","T_std"]}, tag:"dirty" },
   { id:"TC-005", name:"5#塔吊·中央", date:"2026-06-05",
     W_stop:2, T_delay:3, T_std:6, T_act:9, R_hs:0.70, N_bd:2, N_total:12,
-    note:"顶升作业后维保 · 交接缺力矩校验记录", threshold_override:null, tag:"normal" },
+    note:"顶升作业后维保 · 交接缺力矩校验记录 · 备件滞后3天超窗口", threshold_override:null, tag:"normal" },
   { id:"TC-001", name:"1#塔吊·北标段", date:"2026-06-08",
     W_stop:3, T_delay:4, T_std:8, T_act:12, R_hs:0.65, N_bd:2, N_total:12,
-    note:"二次维保 · 钢丝绳更换滞后", threshold_override:null, tag:"normal" }
+    note:"二次维保 · 钢丝绳更换滞后4天 · 工时超标50%", threshold_override:null, tag:"normal" }
 ];
 
 let HANDOVER_HISTORY = [];
@@ -712,22 +712,44 @@ function renderDirtyAlert(results) {
   const html = [];
   if (dirty.length > 0) {
     html.push(`<div class="dirty-alert">
-      <div class="title">⚠ 检测到 ${dirty.length} 条脏数据（阈值临时被调高）</div>
-      ${dirty.map(r=>`<div class="dirty-item">
-        <span class="key">[${r.id} ${r.date}]</span>
-        <span class="val">${r.dirtyFlag}</span>
-        　→ 导致 F_sp 降低 ${(r.F_sp - calcWithoutDirty(r).F_sp).toFixed(1)}pp，得分被虚低 ${(r.S - calcWithoutDirty(r).S).toFixed(2)} 分
-      </div>`).join("")}
+      <div class="title">⚠ 检测到 ${dirty.length} 条脏数据（阈值临时被调高 · 口径异常 · 异常被压低）</div>
+      ${dirty.map(r=>{
+        const clean = calcWithoutDirty(r);
+        const fspDrop = Math.max(0, clean.F_sp - r.F_sp);
+        const fteDrop = Math.max(0, clean.F_te - r.F_te);
+        const scoreDrop = Math.max(0, clean.S - r.S);
+        const levelFlip = clean.level !== r.level;
+        const levelNote = levelFlip
+          ? `<b style="color:var(--danger);">判定翻转：干净口径「${clean.level}」被压成「${r.level}」，异常被掩盖！</b>`
+          : `判定保持「${r.level}」`;
+        const factorLines = [];
+        if (fspDrop > 0.1) factorLines.push(`F_sp：干净口径 ${clean.F_sp}% → 当前 ${r.F_sp}%（被压低 ${fspDrop.toFixed(1)}pp，失分 ${(0.40*fspDrop).toFixed(2)}）`);
+        if (fteDrop > 0.1) factorLines.push(`F_te：干净口径 ${clean.F_te}% → 当前 ${r.F_te}%（被压低 ${fteDrop.toFixed(1)}pp，失分 ${(0.25*fteDrop).toFixed(2)}）`);
+        return `<div class="dirty-item">
+          <span class="key">[${r.id} ${r.date}]</span>
+          <span class="val">${r.dirtyFlag}</span>
+          <br>　→ 得分：干净口径 S=<b>${clean.S}</b> → 当前 S=<b>${r.S}</b>，共被压低 <b style="color:var(--danger);">${scoreDrop.toFixed(2)} 分</b>
+          <br>　→ 因子影响：${factorLines.join("；")}
+          <br>　→ ${levelNote}
+        </div>`;
+      }).join("")}
     </div>`);
   }
   if (boundary.length > 0) {
     html.push(`<div class="dirty-alert" style="border-color:var(--purple); background:rgba(168,85,247,0.08);">
-      <div class="title" style="color:var(--purple);">◈ 检测到 ${boundary.length} 条边界样本（S≈60分临界区）</div>
-      ${boundary.map(r=>`<div class="dirty-item">
-        <span class="key">[${r.id} ${r.date}]</span>
-        <span class="val">S=${r.S} 分</span>
-        　距异常线(60)仅 ${(r.S-60).toFixed(2)} 分，完整率提升3pp即可降为正常
-      </div>`).join("")}
+      <div class="title" style="color:var(--purple);">◈ 检测到 ${boundary.length} 条边界样本（S紧贴60分异常阈值）</div>
+      ${boundary.map(r=>{
+        const delta = r.S - 60;
+        const r_hs_need = Math.max(0, 0.95 - r.R_hs);
+        const score_after_hs = r_hs_need > 0 ? (r.S - 0.20 * (1 - r.R_hs) * 100) : r.S;
+        return `<div class="dirty-item">
+          <span class="key">[${r.id} ${r.date}]</span>
+          <span class="val">S=${r.S} 分</span>
+          　${delta>=0?"高于":"低于"}异常线(60) <b>${Math.abs(delta).toFixed(2)}</b> 分
+          　｜公式复算：F_sp=${(r.T_delay/r.W_stop*100).toFixed(1)}%×0.40 + F_te=${((r.T_act-r.T_std)/r.T_std*100).toFixed(1)}%×0.25 + F_hs=${r.F_hs}%×0.20 + F_bd=${r.F_bd}%×0.15 = ${r.S}
+          ${r_hs_need>0?`<br>　→ 若交接完整率从 ${(r.R_hs*100).toFixed(0)}% 补到 95%（提升 ${(r_hs_need*100).toFixed(0)}pp），F_hs 归零，S 将降到 <b>${score_after_hs.toFixed(2)}</b> → <span class="badge success">正常</span>`:''}
+        </div>`;
+      }).join("")}
     </div>`);
   }
   document.getElementById("dirtyAlertWrap").innerHTML = html.join("");
@@ -782,22 +804,28 @@ function renderProgress(results) {
   const teamIssue = abnormal.filter(r=>r.mainCause.includes("班组"));
   const handoverIssue = abnormal.filter(r=>r.mainCause.includes("交接"));
   const gapDays = results.reduce((s,r)=>s+Math.max(0,r.T_delay),0).toFixed(1);
+  const delayedDevices = [...new Set(results.filter(r=>r.T_delay>0).map(r=>r.id))].sort();
+  const overTimeHours = results.reduce((s,r)=>s+Math.max(0,r.T_act-r.T_std_adj),0).toFixed(1);
+  const lowCompleteness = results.filter(r=>r.R_hs<0.95);
+  const boundaryBreak = results.filter(r=>r.N_bd>0);
 
   const items = [
     { cls:"done", title:`已完成维保记录归档：${total}/${total}`,
-      detail:"全部6条维保记录已录入系统，数据齐全", gap:null },
-    { cls:"block", title:`备件到货滞后：${partsDelay.length} 条未闭环`,
-      detail:`累计缺口 ${gapDays} 天 · TC-001/004/005 存在备件晚于停机窗口`,
-      gap:`缺口：需供应链提前 ≥ ${Math.ceil(gapDays/partsDelay.length)} 天发货` },
-    { cls:"hold", title:`班组交接补全：${handoverIssue.length} 条待完善`,
-      detail:`完整率低于95%的共 ${results.filter(r=>r.R_hs<0.95).length} 条`,
-      gap:`缺口：补全交接班电子签字 + 关键参数记录` },
-    { cls:"hold", title:`工时超标整改：${teamIssue.length} 条待复盘`,
-      detail:`超标准工时累计 ${results.reduce((s,r)=>s+Math.max(0,r.T_act-r.T_std_adj),0).toFixed(1)} 小时`,
-      gap:`缺口：需编制《超工时案例复盘报告》` },
-    { cls:"block", title:`边界项突破整改：${results.filter(r=>r.N_bd>0).length} 台设备`,
-      detail:`共 ${results.reduce((s,r)=>s+r.N_bd,0)} 项边界检查未通过`,
-      gap:`缺口：力矩限制器/钢丝绳磨损项需在下次维保前完成` }
+      detail:`全部${total}条维保记录已录入系统，覆盖5台塔吊`, gap:null },
+    { cls:"block", title:`备件到货滞后：${partsDelay.length} 条异常未闭环（异常记录主因=备件）`,
+      detail:`累计缺口 ${gapDays} 天，${delayedDevices.length} 台设备备件晚于停机窗口：${delayedDevices.join("、")}`,
+      gap: partsDelay.length>0
+        ? `缺口：需供应链提前 ≥ ${Math.ceil(gapDays/Math.max(1,partsDelay.length))} 天发货，或调整停机窗口匹配到货节奏`
+        : null },
+    { cls:"hold", title:`班组交接补全：共 ${lowCompleteness.length} 条完整率不足95%`,
+      detail:`涉及设备：${[...new Set(lowCompleteness.map(r=>r.id))].sort().join("、")}，平均完整率 ${(lowCompleteness.reduce((s,r)=>s+r.R_hs,0)/Math.max(1,lowCompleteness.length)*100).toFixed(0)}%`,
+      gap:`缺口：补全交接班电子签字 + 关键参数（力矩校验/钢丝绳磨损）记录` },
+    { cls:"hold", title:`工时超标整改：超标准工时累计 ${overTimeHours} 小时`,
+      detail:`${results.filter(r=>r.T_act>r.T_std_adj).length} 条记录超时，${teamIssue.length} 条异常记录主因=班组执行`,
+      gap: teamIssue.length>0?`缺口：需编制《超工时案例复盘报告》并同步班组培训`:null },
+    { cls:"block", title:`边界项突破整改：${boundaryBreak.length} 台设备`,
+      detail:`共 ${results.reduce((s,r)=>s+r.N_bd,0)} 项边界检查未通过，涉及：${[...new Set(boundaryBreak.map(r=>r.id))].sort().join("、")}`,
+      gap:`缺口：力矩限制器/钢丝绳磨损等突破项需在下次维保前闭环` }
   ];
   document.getElementById("progressList").innerHTML = items.map(it=>`
     <li class="${it.cls}">
@@ -812,28 +840,37 @@ function renderCSV(results) {
   const body = document.getElementById("csvBody");
   body.innerHTML = results.map((r,i)=>{
     const rowCls = r.tag==="dirty"?"dirty":(r.tag==="boundary"?"boundary":"normal");
-    const tagBadge = r.tag==="dirty"?'<span class="badge warn">脏数据</span>':
-                    r.tag==="boundary"?'<span class="badge purple">边界</span>':
-                    '<span class="badge success">正常</span>';
-    const flag = r.dirtyFlag ? `<span title="${r.dirtyFlag}" style="color:var(--warn); cursor:help;">⚠阈值+${r.threshold_override.offset_pct}%</span>` : "—";
+    const tagBadge = r.tag==="dirty"?'<span class="badge warn">脏数据·口径异常</span>':
+                    r.tag==="boundary"?'<span class="badge purple">边界·S≈60</span>':
+                    '<span class="badge success">正常样本</span>';
+    let flag = "—";
+    let extraScore = "";
+    if (r.dirtyFlag) {
+      const clean = calcWithoutDirty(r);
+      flag = `<span title="${r.dirtyFlag}" style="color:var(--warn); cursor:help;">⚠阈值临时+${r.threshold_override.offset_pct}%</span>`;
+      extraScore = `<br><span style="color:var(--danger); font-size:11px;">干净口径:S=${clean.S}「${clean.level}」</span>`;
+    } else if (r.tag === "boundary") {
+      const delta = r.S - 60;
+      extraScore = `<br><span style="color:var(--purple); font-size:11px;">${delta>=0?"超":"低于"}阈值${Math.abs(delta).toFixed(2)}分</span>`;
+    }
     return `<tr class="${rowCls}">
       <td>${i+1}</td>
       <td><b>${r.id}</b><br><span style="color:var(--text-dim); font-size:10.5px;">${r.name}</span></td>
       <td>${r.date}</td>
-      <td>${r.W_stop}${r.W_stop_adj!==r.W_stop?`<br><span style="color:var(--warn);">→${r.W_stop_adj}</span>`:""}</td>
+      <td>${r.W_stop}${r.W_stop_adj!==r.W_stop?`<br><span style="color:var(--warn);">→脏口径${r.W_stop_adj}</span>`:""}</td>
       <td>${r.T_delay}</td>
       <td>${r.F_sp}</td>
-      <td>${r.T_std}${r.T_std_adj!==r.T_std?`<br><span style="color:var(--warn);">→${r.T_std_adj}</span>`:""}</td>
+      <td>${r.T_std}${r.T_std_adj!==r.T_std?`<br><span style="color:var(--warn);">→脏口径${r.T_std_adj}</span>`:""}</td>
       <td>${r.T_act}</td>
       <td>${r.F_te}</td>
       <td>${(r.R_hs*100).toFixed(0)}%</td>
       <td>${r.F_hs}</td>
       <td>${r.N_bd}/${r.N_total}</td>
       <td>${r.F_bd}</td>
-      <td><b style="font-size:13px;">${r.S}</b></td>
-      <td><span class="badge ${r.levelCls}">${r.level}</span></td>
+      <td><b style="font-size:13px;">${r.S}</b>${extraScore}</td>
+      <td><span class="badge ${r.levelCls}">${r.level}</span>${r.dirtyFlag?`<br><span class="badge danger" style="margin-top:3px;">应判:${calcWithoutDirty(r).level}</span>`:""}</td>
       <td><span class="badge ${r.mainCauseColor}">${r.mainCause}</span></td>
-      <td style="max-width:180px; font-size:11px; line-height:1.4;">${r.note}</td>
+      <td style="max-width:200px; font-size:11px; line-height:1.4;">${r.note}</td>
       <td>${tagBadge}<br>${flag}</td>
     </tr>`;
   }).join("");
@@ -907,10 +944,14 @@ function submitHandover() {
 
 function showImpact(before, after, dev, text) {
   const html = [];
+  const scoreDelta = (before.S - after.S).toFixed(2);
+  const beforeDist = before.S - 60;
+  const afterDist = after.S - 60;
+  const flipped = before.level !== after.level;
   html.push(`<div class="impact-block">
-    <h4>📝 ${dev} 备注补录对归因的影响分析</h4>
+    <h4>📝 ${dev} 备注补录对归因的影响分析（仅作用于 F_hs 因子，权重20%）</h4>
     <div class="impact-item">
-      <b>原始备注：</b>${text.substring(0,80)}${text.length>80?"…":""}
+      <b>补录备注：</b>${text.substring(0,90)}${text.length>90?"…":""}
     </div>
     <div class="impact-item">
       <b>交接完整率 R_hs：</b>
@@ -924,24 +965,29 @@ function showImpact(before, after, dev, text) {
       <span class="before">${before.F_hs.toFixed(1)}%</span>
       <span class="arrow">→</span>
       <span class="after">${after.F_hs.toFixed(1)}%</span>
-      （降低 ${(before.F_hs-after.F_hs).toFixed(1)} pp）
+      （降低 ${(before.F_hs-after.F_hs).toFixed(1)} pp，对应权重得分下降 ${(0.20*(before.F_hs-after.F_hs)).toFixed(2)} 分）
     </div>
     <div class="impact-item">
-      <b>综合得分 S：</b>
+      <b>综合得分 S（公式可复算）：</b>
       <span class="before">${before.S.toFixed(2)}</span>
       <span class="arrow">→</span>
       <span class="after">${after.S.toFixed(2)}</span>
-      （下降 ${(before.S-after.S).toFixed(2)} 分）
+      （共下降 ${scoreDelta} 分）
+      <br><span style="color:var(--text-dim); font-size:11.5px;">
+        距60分阈值：补录前 <b>${beforeDist>=0?"超":""}${beforeDist<0?"低":""} ${Math.abs(beforeDist).toFixed(2)} 分</b>
+        → 补录后 <b>${afterDist>=0?"超":""}${afterDist<0?"低":""} ${Math.abs(afterDist).toFixed(2)} 分</b>
+      </span>
     </div>
     <div class="impact-item">
       <b>异常判定：</b>
-      ${before.level===after.level
-        ? `<span class="diff-same">保持「${before.level}」（备注对最终判定无决定性影响）</span>`
-        : `<span class="before">${before.level}</span><span class="arrow">→</span><span class="after">${after.level}</span>
-           <span class="badge success">判定已改善！</span>`}
+      ${flipped
+        ? `<span class="before">${before.level}</span><span class="arrow">→</span><span class="after">${after.level}</span>
+           <span class="badge success">★ 判定翻转：补备注恰好跨过60分阈值！</span>`
+        : `<span class="diff-same">保持「${before.level}」</span>
+           <span style="color:var(--text-dim); font-size:11.5px;">（备注影响仅${scoreDelta}分，不足以跨过60分阈值，仍需配合备件/工时整改）</span>`}
     </div>
     <div class="impact-item" style="color:var(--text-dim); font-size:12px;">
-      💡 说明：交接完整率仅影响 F_hs 因子（权重20%）。若备件滞后是主因，仅补备注无法改变整体判定，需配合备件到货提前。
+      💡 说明：交接完整率只影响 F_hs（权重20%）。F_sp(40%)、F_te(25%)、F_bd(15%) 由备件到货/班组执行/边界检查决定，补备注不影响这些因子。
     </div>
   </div>`);
   document.getElementById("impactBlock").innerHTML = html.join("");
@@ -965,28 +1011,43 @@ function rerun() {
 }
 
 function simulateDirty() {
-  const idx = Math.floor(Math.random()*RECORDS.length);
-  const r = RECORDS[idx];
-  if (r.threshold_override) { alert("该记录已是脏数据，换一条试试"); return; }
+  const candidates = RECORDS.filter(r=>!r.threshold_override && r.id !== "TC-002");
+  if (candidates.length === 0) { alert("无可用记录可注入脏数据"); return; }
+  const idx = Math.floor(Math.random()*candidates.length);
+  const r = candidates[idx];
+  const pre = calcRecord(r);
   const offset = 15 + Math.floor(Math.random()*25);
   r.threshold_override = { offset_pct: offset, fields: ["W_stop","T_std"] };
   r.tag = "dirty";
-  r.note += `　｜【脏数据注入】阈值临时调高+${offset}%`;
+  const post = calcRecord(r);
+  r.note += `　｜【口径异常·脏数据注入】阈值临时调高+${offset}%（W_stop/T_std），干净口径S=${pre.S}「${pre.level}」→脏口径S=${post.S}「${post.level}」，异常被压低掩盖`;
   runAttribution();
 }
 
 function exportCSV() {
   const results = RECORDS.map(calcRecord);
-  const header = ["序号","设备编号","设备名称","维保日期","停机窗口(天)","调整后窗口",
-    "到货延迟(天)","F_sp(%)","标准工时(h)","调整后工时(h)","实际工时(h)","F_te(%)",
-    "完整率R_hs","F_hs(%)","边界突破","F_bd(%)","综合得分S","判定","主因","备注","数据标记"];
-  const rows = results.map((r,i)=>[
-    i+1, r.id, r.name, r.date, r.W_stop, r.W_stop_adj, r.T_delay, r.F_sp,
-    r.T_std, r.T_std_adj, r.T_act, r.F_te,
-    (r.R_hs*100).toFixed(0)+"%", r.F_hs,
-    `${r.N_bd}/${r.N_total}`, r.F_bd, r.S, r.level, r.mainCause,
-    r.note.replace(/｜/g," | "), r.tag+(r.dirtyFlag?"(阈值+"+r.threshold_override.offset_pct+"%)":"")
-  ]);
+  const header = ["序号","设备编号","设备名称","维保日期",
+    "原始停机窗口(天)","脏口径窗口(若阈值调高)","到货延迟(天)","F_sp(%)",
+    "原始标准工时(h)","脏口径工时(若阈值调高)","实际工时(h)","F_te(%)",
+    "完整率R_hs","F_hs(%)","边界突破项","F_bd(%)",
+    "综合得分S","距60阈值差值","判定","干净口径得分(若有脏数据)","干净口径判定(若有脏数据)",
+    "主根因","数据类别(正常/边界/脏)","口径异常说明","备注"];
+  const rows = results.map((r,i)=>{
+    const clean = r.dirtyFlag ? calcWithoutDirty(r) : null;
+    return [
+      i+1, r.id, r.name, r.date,
+      r.W_stop, r.W_stop_adj === r.W_stop ? "" : r.W_stop_adj, r.T_delay, r.F_sp,
+      r.T_std, r.T_std_adj === r.T_std ? "" : r.T_std_adj, r.T_act, r.F_te,
+      (r.R_hs*100).toFixed(0)+"%", r.F_hs,
+      `${r.N_bd}/${r.N_total}`, r.F_bd,
+      r.S, (r.S - 60).toFixed(2), r.level,
+      clean ? clean.S : "", clean ? clean.level : "",
+      r.mainCause,
+      r.tag === "dirty" ? "脏数据·口径异常" : (r.tag === "boundary" ? "边界样本·S≈60" : "正常样本"),
+      r.dirtyFlag ? r.dirtyFlag + `；S被压低${(clean.S-r.S).toFixed(2)}分；${clean.level}→${r.level}` : "",
+      r.note.replace(/｜/g," | ")
+    ];
+  });
   const csv = "\uFEFF"+[header, ...rows].map(r=>r.map(c=>`"${c}"`).join(",")).join("\n");
   const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
   const a = document.createElement("a");
