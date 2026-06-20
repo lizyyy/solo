@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0a0c0b;
+  --grid: rgba(255, 176, 0, 0.045);
+  --grid-strong: rgba(255, 176, 0, 0.09);
+  --bone: #e7e9e3;
+  --ash: #8b9087;
+  --amber: #ffb000;
+  --line: rgba(231, 233, 227, 0.08);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    radial-gradient(1100px 560px at 82% -12%, rgba(255, 176, 0, 0.07), transparent 60%),
+    radial-gradient(800px 500px at 0% 110%, rgba(0, 217, 126, 0.04), transparent 60%);
+  background-size: 34px 34px, 34px 34px, 100% 100%, 100% 100%;
+  background-attachment: fixed;
+  color: var(--bone);
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #252c25;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a4538;
+}
+
+::selection {
+  background: rgba(255, 176, 0, 0.26);
+  color: #fff;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+.divide-amber-line > * + * {
+  border-top: 1px solid var(--line);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes pulseDot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+.animate-pulse-dot {
+  animation: pulseDot 1.6s ease-in-out infinite;
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+.scanline::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 176, 0, 0.12), transparent);
+  animation: scanline 2.4s ease-in-out infinite;
+}
