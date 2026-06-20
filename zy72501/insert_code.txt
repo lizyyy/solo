@@ -1,0 +1,27 @@
+  const allPhoneMaskIssues = getPhoneMaskIssues();
+  const pendingCount = allPhoneMaskIssues.filter(p => p.status === 'pending_review').length;
+  const confirmedCount = allPhoneMaskIssues.filter(p => p.status === 'confirmed').length;
+  
+  const ragMissing = allCitationGaps.filter(g => g.type === 'no_rag_evidence' || g.type === 'batch_no_rag_evidence').length;
+  const ragFound = allCitationGaps.filter(g => g.type === 'rag_reference_found' || g.type === 'batch_rag_reference_found').length;
+  const other = allCitationGaps.filter(g => !g.type.includes('rag')).length;
+  
+  const gapsSummary = {
+    ragMissing,
+    ragFound,
+    other,
+    total: allCitationGaps.length
+  };
+  
+  const phoneIssuesSummary = {
+    pending: pendingCount,
+    confirmed: confirmedCount,
+    items: allPhoneMaskIssues.map(p => ({
+      traceId: p.traceId,
+      phoneNumber: p.phoneNumber,
+      fieldName: p.fieldName,
+      status: p.status,
+      sourceName: p.so  const allPhoneMaskIssues = getPhoneMaskIssues();
+  const pendingCount = a.f  const pendingCount = al
+  };
+

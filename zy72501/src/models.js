@@ -443,6 +443,28 @@ function updatePhoneMaskIssue(issueId, updates, operator) {
   if (idx === -1) return null;
   const old = { ...store.phoneMaskIssues[idx] };
   store.phoneMaskIssues[idx] = { ...store.phoneMaskIssues[idx], ...updates };
+
+  // 更新最新的 exportResult 中的 phoneIssuesSummary
+  if (store.exportResults.length > 0) {
+    const latestExport = store.exportResults[store.exportResults.length - 1];
+    const allIssues = store.phoneMaskIssues;
+    const pending = allIssues.filter(i => i.status === 'pending_review').length;
+    const confirmed = allIssues.filter(i => i.status === 'confirmed').length;
+    const items = allIssues.map(p => ({
+      phone: p.phoneNumber,
+      fieldName: p.rawMaterialSnapshot ? p.rawMaterialSnapshot.fieldName : null,
+      source: p.sourceType,
+      sourceId: p.sourceId,
+      sourceName: p.sourceName,
+      status: p.status,
+      context: p.rawMaterialSnapshot ? p.rawMaterialSnapshot.context : null,
+      traceId: p.traceId,
+      reviewedBy: p.reviewedBy,
+      reviewNote: p.reviewNote
+    }));
+    latestExport.phoneIssuesSummary = { pending, confirmed, items };
+  }
+
   saveStore(store);
   addAuditLog('update_phone_issue', operator, { issueId, oldStatus: old.status, newStatus: updates.status, ...updates });
   return store.phoneMaskIssues[idx];

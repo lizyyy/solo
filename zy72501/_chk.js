@@ -1,0 +1,14 @@
+const fs = require("fs");
+const c = fs.readFileSync("src/inspectionEngine.js", "utf8");
+console.log("phone:", c.includes("phone: phone"));
+console.log("fieldName:", c.includes("fieldName: extraMeta.fieldName"));
+console.log("gapsSum:", c.includes("gapsSummary: gapsSummary"));
+console.log("phoneSum:", c.includes("phoneIssuesSummary: phoneIssuesSummary"));
+console.log("rule.rmk:", c.includes("checkPhoneMasking(rule.remark"));
+console.log("rule.mp:", c.includes("checkPhoneMasking(rule.mainProcess"));
+console.log("rule.ct:", c.includes("checkPhoneMasking(rule.content"));
+console.log("batch.ss:", c.includes("checkPhoneMasking(batch.sceneStatement"));
+console.log("batch.ct:", c.includes("checkPhoneMasking(batch.content"));
+console.log("neg:", c.includes("否定表达"));
+const d = c.match(/(const|let) allPhoneIssues/);
+console.log("decl:", d ? d[0] : "NF");

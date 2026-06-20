@@ -5,8 +5,7 @@ const {
   savePhoneMaskIssue,
   addAuditLog,
   getDesensitizationRules,
-  getGrayBatches,
-  getPhoneMaskIssues
+  getGrayBatches
 } = require('./models');
 
 const PHONE_REGEX = /1[3-9]\d{9}/g;
@@ -35,78 +34,6 @@ function detectPhoneNumbers(text) {
 
 function isPhoneMasked(phone) {
   return phone.includes('*') || phone.includes('x') || phone.includes('X');
-}
-
-function findValidRagMatches(text) {
-  const NEG_PREFIX = ["不是","并非","非","缺少","缺失","未标注","未添加","未填写","无","没有","待补充","尚未","暂未","待补","需补充","未找到","未附上","未提供","缺乏","未包含","未说明"];
-  const NEG_SUFFIX = [/缺失/,/待补充/,/未标注/,/未提供/,/待补/];
-  const SENTENCE_BOUNDARY = /[。！？!?；;\n\r]/;
-  const RAG_PATTERNS = [
-    /RAG[ _-]*(引用|证据|来源|出处|reference|cite)/i,
-    /(引用|证据|来源|出处)[ _-]*RAG/i,
-    /知识库第[^\s]+节/,
-    /引用来源[：:]/,
-    /RAG[ _-]*reference/i,
-    /\*RAG\*/,
-    /【RAG[ _-]*(引用|证据|来源|出处)】/,
-    /「RAG[ _-]*(引用|证据|来源|出处)」/,
-    /RAG[ _-]*引用[ _-]*来源/i,
-    /(引用|证据|来源|出处)[ _-]*\[RAG\]/i
-  ];
-  const valid = [];
-  const neg = [];
-  if (!text) return { validMatches: valid, negatedMatches: neg };
-  for (let pi = 0; pi < RAG_PATTERNS.length; pi++) {
-    const pat = RAG_PATTERNS[pi];
-    const rx = new RegExp(pat.source, pat.flags.indexOf("g") >= 0 ? pat.flags : pat.flags + "g");
-    let m;
-    while ((m = rx.exec(text)) !== null) {
-      const base = {
-        patternIndex: pi,
-        matchedText: m[0],
-        matchIndex: m.index,
-        context: getMatchContext(text, m.index, m[0].length)
-      };
-      let negated = false;
-      let negationReason = "";
-      const fullPfx = text.substring(Math.max(0, m.index - 24), m.index);
-      let pfx = fullPfx;
-      const lastBoundary = fullPfx.search(SENTENCE_BOUNDARY);
-      if (lastBoundary >= 0) {
-        pfx = fullPfx.substring(lastBoundary + 1);
-      }
-      for (let i = 0; i < NEG_PREFIX.length; i++) {
-        if (pfx.indexOf(NEG_PREFIX[i]) >= 0) {
-          negated = true;
-          negationReason = "前缀含" + NEG_PREFIX[i];
-          break;
-        }
-      }
-      if (!negated) {
-        const fullSfx = text.substring(m[0].length + m.index, Math.min(text.length, m.index + m[0].length + 24));
-        let sfx = fullSfx;
-        const firstBoundary = fullSfx.search(SENTENCE_BOUNDARY);
-        if (firstBoundary >= 0) {
-          sfx = fullSfx.substring(0, firstBoundary);
-        }
-        for (let j = 0; j < NEG_SUFFIX.length; j++) {
-          if (NEG_SUFFIX[j].test(sfx)) {
-            negated = true;
-            negationReason = "后缀匹配";
-            break;
-          }
-        }
-      }
-      if (negated) {
-        base.negationReason = negationReason;
-        neg.push(base);
-      } else {
-        valid.push(base);
-      }
-      if (m.index === rx.lastIndex) rx.lastIndex++;
-    }
-  }
-  return { validMatches: valid, negatedMatches: neg };
 }
 
 function analyzeCitationGaps(rule, batches) {
@@ -151,9 +78,23 @@ function analyzeCitationGaps(rule, batches) {
   ];
   
   const ruleText = `${rule.remark || ''}\n${rule.mainProcess || ''}\n${rule.content || ''}`;
-  const ruleRag = findValidRagMatches(ruleText);
-  const hasRagReference = ruleRag.validMatches.length > 0;
+  const hasRagReference = ragPatterns.some(pattern => pattern.test(ruleText));
   
+  let ragMatchDetails = null;
+  if (hasRagReference) {
+    ragMatchDetails = [];
+    ragPatterns.forEach((pattern, idx) => {
+      const match = ruleText.match(pattern);
+      if (match) {
+        ragMatchDetails.push({
+          patternIndex: idx,
+          matchedText: match[0],
+          context: getMatchContext(ruleText, match.index, match[0].length)
+        });
+      }
+    });
+  }
+
   if (!hasRagReference) {
     gaps.push({
       type: 'no_rag_evidence',
@@ -172,34 +113,44 @@ function analyzeCitationGaps(rule, batches) {
           '引用来源', '知识库第X节',
           'RAG reference', 'RAG cite',
           '【RAG引用】', '「RAG 引用」'
-        ],
-        negatedMatches: ruleRag.negatedMatches
+        ]
       },
-      negatedMatches: ruleRag.negatedMatches,
       traceId: generateId('trace')
     });
-  } else {
+  } else if (ragMatchDetails) {
     gaps.push({
       type: 'rag_reference_found',
       severity: 'info',
       description: '脱敏规则中已检测到 RAG 引用标注',
       owner: '系统',
-      ragMatchDetails: ruleRag.validMatches,
+      ragMatchDetails,
       rawMaterialSnapshot: {
         remark: rule.remark || '',
         mainProcess: rule.mainProcess || '',
-        content: rule.content || '',
-        negatedMatches: ruleRag.negatedMatches
+        content: rule.content || ''
       },
-      negatedMatches: ruleRag.negatedMatches,
       traceId: generateId('trace')
     });
   }
 
   relatedBatches.forEach(batch => {
     const batchText = `${batch.sceneStatement || ''}\n${batch.content || ''}`;
-    const batchRag = findValidRagMatches(batchText);
-    const batchHasRag = batchRag.validMatches.length > 0;
+    const batchHasRag = ragPatterns.some(pattern => pattern.test(batchText));
+    
+    let batchRagMatchDetails = null;
+    if (batchHasRag) {
+      batchRagMatchDetails = [];
+      ragPatterns.forEach((pattern, idx) => {
+        const match = batchText.match(pattern);
+        if (match) {
+          batchRagMatchDetails.push({
+            patternIndex: idx,
+            matchedText: match[0],
+            context: getMatchContext(batchText, match.index, match[0].length)
+          });
+        }
+      });
+    }
     
     if (!batchHasRag) {
       gaps.push({
@@ -214,10 +165,8 @@ function analyzeCitationGaps(rule, batches) {
         rawMaterialSnapshot: {
           sceneStatement: batch.sceneStatement || '',
           content: batch.content || '',
-          checkedFields: ['sceneStatement', 'content'],
-          negatedMatches: batchRag.negatedMatches
+          checkedFields: ['sceneStatement', 'content']
         },
-        negatedMatches: batchRag.negatedMatches,
         traceId: generateId('trace')
       });
     } else {
@@ -228,13 +177,11 @@ function analyzeCitationGaps(rule, batches) {
         batchId: batch.id,
         description: `灰度批次 ${batch.batchNo} 中已检测到 RAG 引用标注`,
         owner: '系统',
-        ragMatchDetails: batchRag.validMatches,
+        ragMatchDetails: batchRagMatchDetails,
         rawMaterialSnapshot: {
           sceneStatement: batch.sceneStatement || '',
-          content: batch.content || '',
-          negatedMatches: batchRag.negatedMatches
+          content: batch.content || ''
         },
-        negatedMatches: batchRag.negatedMatches,
         traceId: generateId('trace')
       });
     }
@@ -243,42 +190,29 @@ function analyzeCitationGaps(rule, batches) {
   return gaps;
 }
 
-function checkPhoneMasking(text, sourceType, sourceId, sourceName, extraMeta) {
-  extraMeta = extraMeta || {};
+function checkPhoneMasking(text, sourceType, sourceId, sourceName) {
   const issues = [];
   const phones = detectPhoneNumbers(text);
-  const uniquePhones = [...new Set(phones)];
   
-  uniquePhones.forEach(phone => {
+  phones.forEach(phone => {
     if (!isPhoneMasked(phone)) {
-      let searchIdx = 0;
-      while (true) {
-        const phoneIdx = text.indexOf(phone, searchIdx);
-        if (phoneIdx === -1) break;
-        const context = getMatchContext(text, phoneIdx, phone.length, 40);
-        issues.push({
-          id: generateId("phone"),
-          phoneNumber: phone,
-          phone: phone,
-          sourceType,
-          sourceId,
-          sourceName,
-          fieldName: extraMeta.fieldName || "unknown" ,
-          status: "pending_review" ,
-          detectedAt: new Date().toISOString(),
-          note: "手机号在导出中漏遮，留待算法同事复核，暂不归为正常" ,
-          rawMaterialSnapshot: {
-            fullText: text,
-            phoneContext: context,
-            position: phoneIdx,
-            fieldName: extraMeta.fieldName || "unknown"
-          },
-          context: context ? context.fullContext : "" ,
-          traceId: generateId("trace"),
-          ...extraMeta
-        });
-        searchIdx = phoneIdx + 1;
-      }
+      const phoneIdx = text.indexOf(phone);
+      issues.push({
+        id: generateId('phone'),
+        phoneNumber: phone,
+        sourceType,
+        sourceId,
+        sourceName,
+        status: 'pending_review',
+        detectedAt: new Date().toISOString(),
+        note: '手机号在导出中漏遮，留待算法同事复核，暂不归为正常',
+        rawMaterialSnapshot: {
+          fullText: text,
+          phoneContext: getMatchContext(text, phoneIdx, phone.length, 40),
+          position: phoneIdx
+        },
+        traceId: generateId('trace')
+      });
     }
   });
   
@@ -287,7 +221,7 @@ function checkPhoneMasking(text, sourceType, sourceId, sourceName, extraMeta) {
 
 function generateFriendlyReport(inspection) {
   const lines = [];
-  lines.push(`📋 RAG 引用缺失巡检报告（含否定表达检测）`);
+  lines.push(`📋 RAG 引用缺失巡检报告`);
   lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
   lines.push(`巡检编号: ${inspection.id}`);
   lines.push(`巡检时间: ${inspection.createdAt}`);
@@ -339,12 +273,6 @@ function generateFriendlyReport(inspection) {
         if (gap.rawMaterialSnapshot.sceneStatement !== undefined) {
           const shortScene = (gap.rawMaterialSnapshot.sceneStatement || '').substring(0, 100) + ((gap.rawMaterialSnapshot.sceneStatement || '').length > 100 ? '...' : '');
           lines.push(`        现场说法原文: "${shortScene}"`);
-        }
-        if (gap.rawMaterialSnapshot && gap.rawMaterialSnapshot.negatedMatches && gap.rawMaterialSnapshot.negatedMatches.length > 0) {
-          lines.push(`     ⚠️ 否定表达(被排除关键词):${gap.rawMaterialSnapshot.negatedMatches.length}处,需人工复核`);
-        }
-        if (gap.negatedMatches && gap.negatedMatches.length > 0) {
-          lines.push(`     ⚠️ 否定表达(被排除关键词):${gap.negatedMatches.length}处,需人工复核`);
         }
       }
       lines.push('');
@@ -422,7 +350,7 @@ function runInspection(operator, options = {}) {
   const batches = getGrayBatches();
   
   const allGaps = [];
-  let allPhoneIssues = [];
+  const allPhoneIssues = [];
   const evidenceMap = {};
 
   rules.forEach(rule => {
@@ -446,24 +374,23 @@ function runInspection(operator, options = {}) {
 
     allGaps.push(...gaps.map(g => ({ ...g, ruleId: rule.id, ruleName: rule.name })));
 
-    if (rule.remark) {
-      allPhoneIssues = allPhoneIssues.concat(checkPhoneMasking(rule.remark, "rule", rule.id, rule.name, {fieldName: "remark"}));
-    }
-    if (rule.mainProcess) {
-      allPhoneIssues = allPhoneIssues.concat(checkPhoneMasking(rule.mainProcess, "rule", rule.id, rule.name, {fieldName: "mainProcess"}));
-    }
-    if (rule.content) {
-      allPhoneIssues = allPhoneIssues.concat(checkPhoneMasking(rule.content, "rule", rule.id, rule.name, {fieldName: "content"}));
-    }
+    const rulePhoneIssues = checkPhoneMasking(
+      rule.content || '',
+      'desensitization_rule',
+      rule.id,
+      rule.name
+    );
+    allPhoneIssues.push(...rulePhoneIssues);
   });
 
   batches.forEach(batch => {
-    if (batch.sceneStatement) {
-      allPhoneIssues = allPhoneIssues.concat(checkPhoneMasking(batch.sceneStatement, "batch", batch.id, batch.name, {fieldName: "sceneStatement", batchNo: batch.batchNo}));
-    }
-    if (batch.content) {
-      allPhoneIssues = allPhoneIssues.concat(checkPhoneMasking(batch.content, "batch", batch.id, batch.name, {fieldName: "content", batchNo: batch.batchNo}));
-    }
+    const batchPhoneIssues = checkPhoneMasking(
+      batch.content || batch.sceneStatement || '',
+      'gray_batch',
+      batch.id,
+      `灰度批次 ${batch.batchNo}`
+    );
+    allPhoneIssues.push(...batchPhoneIssues);
   });
 
   allPhoneIssues.forEach(issue => savePhoneMaskIssue(issue));
@@ -480,40 +407,6 @@ function runInspection(operator, options = {}) {
     options
   };
 
-  const allCitationGaps = allGaps;
-
-  // gapsSummary 计算
-  const ragGaps = allCitationGaps.filter(g => g.type === 'no_rag_evidence' || g.type === 'batch_no_rag_evidence');
-  const ragFoundGaps = allCitationGaps.filter(g => g.type === 'rag_reference_found' || g.type === 'batch_rag_reference_found');
-  const otherGaps = allCitationGaps.filter(g => !g.type.includes('rag'));
-  const gapsSummary = {
-    ragMissing: ragGaps.length,
-    ragFound: ragFoundGaps.length,
-    other: otherGaps.length,
-    total: allCitationGaps.length
-  };
-
-  // phoneIssuesSummary 计算 - 从 store 读取最新状态（包括之前已确认的）
-  const allPhoneMaskIssues = getPhoneMaskIssues();
-  const pendingCount = allPhoneMaskIssues.filter(i => i.status === 'pending_review').length;
-  const confirmedCount = allPhoneMaskIssues.filter(i => i.status === 'confirmed').length;
-  const phoneItems = allPhoneMaskIssues.map(issue => ({
-    phone: issue.phone || issue.phoneNumber,
-    phoneNumber: issue.phoneNumber,
-    sourceType: issue.sourceType,
-    sourceId: issue.sourceId,
-    sourceName: issue.sourceName,
-    fieldName: issue.fieldName || (issue.rawMaterialSnapshot && issue.rawMaterialSnapshot.fieldName) || 'unknown',
-    status: issue.status,
-    traceId: issue.traceId,
-    context: issue.context || (issue.rawMaterialSnapshot && issue.rawMaterialSnapshot.phoneContext && issue.rawMaterialSnapshot.phoneContext.fullContext) || ''
-  }));
-  const phoneIssuesSummary = {
-    pending: pendingCount,
-    confirmed: confirmedCount,
-    items: phoneItems
-  };
-
   saveInspectionRecord(inspection);
   addAuditLog('run_inspection', operator, { inspectionId: inspection.id, gapCount: allGaps.length, phoneIssueCount: allPhoneIssues.length });
 
@@ -523,9 +416,7 @@ function runInspection(operator, options = {}) {
     type: 'inspection_export',
     content: generateFriendlyReport(inspection),
     createdAt: new Date().toISOString(),
-    status: 'generated',
-    gapsSummary: gapsSummary,
-    phoneIssuesSummary: phoneIssuesSummary
+    status: 'generated'
   };
   saveExportResult(exportResult);
 
