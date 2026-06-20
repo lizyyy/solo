@@ -1,0 +1,41 @@
+{
+  "question_id": "GRAPH-001",
+  "title": "最短路径入门题",
+  "path_params": {
+    "start": 1,
+    "end": 100,
+    "weight": 2.5,
+    "depth": 5
+  },
+  "remark": {
+    "history": [
+      {
+        "value": "2025-03初始版本，路径方向需核对",
+        "timestamp": "2026-06-20T10:27:06",
+        "author": "xiaomeng",
+        "note": "初版录入"
+      }
+    ]
+  },
+  "screenshots": {
+    "history": [
+      {
+        "value": "s3://graph-snap/v1/GRAPH-001-v1.png",
+        "timestamp": "2026-06-20T10:27:06",
+        "author": "qa-team",
+        "note": "旧版本截图 #1"
+      },
+      {
+        "value": "s3://graph-snap/v1/GRAPH-001-v1-case2.png",
+        "timestamp": "2026-06-20T10:27:06",
+        "author": "qa-team",
+        "note": "旧版本截图 #2"
+      }
+    ]
+  },
+  "tags": [
+    "easy",
+    "basic"
+  ],
+  "sort_key": "1"
+}

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>图论路径参数回放 - 复核报告</title>
+<style>
+* { box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+       margin: 0; padding: 24px; background: #f8fafc; color: #0f172a; line-height: 1.6; }
+h1 { margin: 0 0 8px; font-size: 24px; }
+h2 { margin: 0 0 12px; font-size: 18px; }
+.subtitle { color: #64748b; font-size: 14px; margin-bottom: 20px; }
+.panel { background: #fff; border-radius: 8px; padding: 18px 20px; margin-bottom: 18px;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.stat-card { background: #f8fafc; padding: 12px 14px; border-radius: 6px; }
+.stat-label { font-size: 12px; color: #64748b; }
+.stat-value { font-size: 22px; font-weight: 700; margin-top: 4px; }
+.tag { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.tag.ok { background: #dcfce7; color: #166534; }
+.tag.warn { background: #fef9c3; color: #854d0e; }
+.anomaly-card { background: #fff; border-radius: 6px; padding: 14px 16px; margin-bottom: 12px; }
+.anomaly-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.anomaly-id { font-weight: 700; color: #475569; }
+.anomaly-title { flex: 1; font-weight: 600; }
+.anomaly-title small { color: #94a3b8; font-weight: 400; }
+.anomaly-badge { padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+.anomaly-type { font-size: 13px; color: #475569; }
+.anomaly-desc { margin: 4px 0; font-size: 14px; }
+.anomaly-params { font-size: 13px; margin: 4px 0; }
+.anomaly-params code { background: #f1f5f9; padding: 2px 6px; border-radius: 3px; }
+.anomaly-meta { font-size: 12px; color: #94a3b8; }
+.action-box { background: #0f172a; color: #e2e8f0; padding: 12px 14px; border-radius: 6px;
+               font-size: 13px; white-space: pre-wrap; overflow-x: auto; }
+.ops-log { list-style: none; padding: 8px 12px; background: #f8fafc; border-radius: 4px; margin: 8px 0 0; }
+.ops-log li { padding: 3px 0; font-size: 13px; border-bottom: 1px dashed #e2e8f0; }
+.ops-log li:last-child { border-bottom: none; }
+.op-time { color: #64748b; margin-right: 8px; font-size: 12px; }
+.op-type { color: #2563eb; font-weight: 600; }
+.history-box { margin-top: 10px; }
+.history-box summary { cursor: pointer; font-size: 13px; color: #2563eb; padding: 4px 0; }
+.hist-section { margin: 8px 0 4px; font-size: 13px; }
+.hist-section b { display: block; margin-bottom: 4px; color: #334155; }
+.hist-item { padding: 3px 0; border-bottom: 1px dashed #e2e8f0; }
+.hist-item:last-child { border-bottom: none; }
+.hist-ver { display: inline-block; background: #3b82f6; color: #fff; padding: 0 6px;
+             border-radius: 3px; font-size: 11px; margin-right: 6px; }
+.hist-time { color: #64748b; font-size: 12px; margin-right: 6px; }
+.diff-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 8px 0; }
+.diff-table th, .diff-table td { padding: 6px 10px; border: 1px solid #e2e8f0; text-align: left; }
+.diff-table th { background: #f1f5f9; }
+.footer { text-align: center; color: #94a3b8; font-size: 12px; margin-top: 24px; }
+</style>
+</head>
+<body>
+<h1>📊 图论路径参数回放 · 复核报告</h1>
+<div class="subtitle">
+  参数版本 <b>demo-v1.0-dirty</b> ·
+  开始 2026-06-20T10:27:06 → 完成 2026-06-20T10:27:06
+</div>
+
+<section class="panel">
+  <h2>📈 一页总览：参数版本 + 关键数据</h2>
+  <div class="stats-grid"><div class='stat-card' style='border-top:3px solid #1e3a8a'><div class='stat-label'>参数版本</div><div class='stat-value'>demo-v1.0-dirty</div></div><div class='stat-card' style='border-top:3px solid #15803d'><div class='stat-label'>已处理行</div><div class='stat-value'>13 行</div></div><div class='stat-card' style='border-top:3px solid #a16207'><div class='stat-label'>跳过行</div><div class='stat-value'>3 行</div></div><div class='stat-card' style='border-top:3px solid #b91c1c'><div class='stat-label'>坏行</div><div class='stat-value'>2 行</div></div><div class='stat-card' style='border-top:3px solid #b45309'><div class='stat-label'>异常项</div><div class='stat-value'>8 条</div></div><div class='stat-card' style='border-top:3px solid #475569'><div class='stat-label'>总行数</div><div class='stat-value'>18 行</div></div></div>
+</section>
+
+
+            <section class="panel sort-panel">
+                <h2>🔀 排序稳定性检测 <span class="tag warn">unstable</span></h2>
+                <details open>
+                    <summary>差异位置列表（前10条）</summary>
+                    <table class="diff-table">
+                        <tr><th>位置</th><th>基准顺序</th><th>冲突顺序</th></tr>
+                        <tr><td>7</td><td>GRAPH-004</td><td>GRAPH-006</td></tr><tr><td>8</td><td>GRAPH-005</td><td>GRAPH-004</td></tr><tr><td>9</td><td>GRAPH-006</td><td>GRAPH-005</td></tr>
+                    </table>
+                </details>
+                <pre class="action-box">[排序不稳定] 在 10 次随机洗牌重试中发现 3 处顺序差异。
+  影响：
+    同一排序键下至少 3 个位置结果不唯一，回放批次间顺序可能不同。
+  问题位置（前5条展示）：
+    位置 7: [GRAPH-004|排序不稳定-A题|sort_key=5] ↔ [GRAPH-006|排序不稳定-C题|sort_key=5]
+    位置 8: [GRAPH-005|排序不稳定-B题|sort_key=5] ↔ [GRAPH-004|排序不稳定-A题|sort_key=5]
+    位置 9: [GRAPH-006|排序不稳定-C题|sort_key=5] ↔ [GRAPH-005|排序不稳定-B题|sort_key=5]
+
+  建议人工处理动作（按优先级）：
+    1. 【首选】补充排序键：在题目清单里给这些重复 sort_key 的行增加二级排序字段，
+       例如 difficulty_priority、update_time 等，确保排序键唯一。
+    2. 【快速】在 sort_key 列后追加 question_id 作为 tie-breaker，
+       保证顺序稳定（脚本可自动处理，见 --auto-tiebreak 选项）。
+    3. 【合规】如果顺序本身不影响业务，可在复核页面勾选“忽略排序差异”，
+       但需在备注中记录以留痕。
+    4. 【兜底】导出不稳定位置列表，由数据小孟人工逐条确认最终顺序，
+       并将结果回写到清单后再运行回放。
+
+  下一步工具：
+    $ graph-path-replay inspect --show-ties   # 列出所有重复 sort_key 的题目组
+    $ graph-path-replay fix-sort --tiebreak id  # 自动用 id 作为二级排序</pre>
+            </section>
+            
+
+<section class="panel">
+  <h2>⚠️ 异常队列：同一页可见异常点、参数快照、解释与历史</h2>
+  
+            <div class="anomaly-card" style="border-left: 4px solid #fee2e2;">
+                <div class="anomaly-head">
+                    <span class="anomaly-id">#A001</span>
+                    <span class="anomaly-title">Dijkstra 进阶应用 <small>(GRAPH-002)</small></span>
+                    <span class="anomaly-badge" style="background:#fee2e2">🔴 待处理</span>
+                </div>
+                <div class="anomaly-type">类型: 路径参数越界</div>
+                <div class="anomaly-desc">说明: 参数 limit=-1 超出合理范围 [0, 10000]</div>
+                <div class="anomaly-params">参数快照: <code>{&quot;limit&quot;: -1}</code></div>
+                <div class="anomaly-meta">创建: 2026-06-20T10:27:06</div>
+                <details class='history-box'><summary>📜 题目历史（备注+截图，而非仅最终值）</summary><div class='hist-section'><b>备注历史:</b><div class='hist-item'><span class='hist-ver'>V1</span> <span class='hist-time'>2026-06-20T10:27:06</span> @xiaomeng: 数据小孟补的边界说明，k=10时需要特殊处理</div></div><div class='hist-section'><b>截图历史:</b><div class='hist-item'><span class='hist-ver'>📷#1</span> <span class='hist-time'>2026-06-20T10:27:06</span> @qa-team: s3://graph-snap/v2/GRAPH-002-after-fix.png</div></div></details>
+                
+            </div>
+            
+            <div class="anomaly-card" style="border-left: 4px solid #dbeafe;">
+                <div class="anomaly-head">
+                    <span class="anomaly-id">#A002</span>
+                    <span class="anomaly-title">边界样本：参数越界 <small>(GRAPH-003)</small></span>
+                    <span class="anomaly-badge" style="background:#dbeafe">🔵 已改判</span>
+                </div>
+                <div class="anomaly-type">类型: 路径参数越界</div>
+                <div class="anomaly-desc">说明: 参数 end=99999 超出合理范围 [0, 10000]</div>
+                <div class="anomaly-params">参数快照: <code>{&quot;end&quot;: 99999}</code></div>
+                <div class="anomaly-meta">创建: 2026-06-20T10:27:06</div>
+                <details class='history-box'><summary>📜 题目历史（备注+截图，而非仅最终值）</summary><div class='hist-section'><b>备注历史:</b><div class='hist-item'><span class='hist-ver'>V1</span> <span class='hist-time'>2026-06-20T10:27:06</span> @duty: 故意留的越界参数用于测试异常检测</div></div><div class='hist-section'><b>截图历史:</b><em>(无)</em></div></details>
+                <ul class='ops-log'><li><span class='op-time'>2026-06-20T10:27:06</span> <span class='op-type'>[改判]</span> @lead — 原判定越界，实为题设条件，改判通过</li></ul>
+            </div>
+            
+            <div class="anomaly-card" style="border-left: 4px solid #fef9c3;">
+                <div class="anomaly-head">
+                    <span class="anomaly-id">#A003</span>
+                    <span class="anomaly-title">边界样本：参数越界 <small>(GRAPH-003)</small></span>
+                    <span class="anomaly-badge" style="background:#fef9c3">🟡 已补充</span>
+                </div>
+                <div class="anomaly-type">类型: 路径参数越界</div>
+                <div class="anomaly-desc">说明: 参数 weight=999999 超出合理范围 [0, 10000]</div>
+                <div class="anomaly-params">参数快照: <code>{&quot;weight&quot;: 999999}</code></div>
+                <div class="anomaly-meta">创建: 2026-06-20T10:27:06</div>
+                <details class='history-box'><summary>📜 题目历史（备注+截图，而非仅最终值）</summary><div class='hist-section'><b>备注历史:</b><div class='hist-item'><span class='hist-ver'>V1</span> <span class='hist-time'>2026-06-20T10:27:06</span> @duty: 故意留的越界参数用于测试异常检测</div></div><div class='hist-section'><b>截图历史:</b><em>(无)</em></div></details>
+                <ul class='ops-log'><li><span class='op-time'>2026-06-20T10:27:06</span> <span class='op-type'>[补充信息]</span> @duty-meng — 补充了边界约束文档，depth=-5为合法场景</li></ul>
+            </div>
+            
+            <div class="anomaly-card" style="border-left: 4px solid #fee2e2;">
+                <div class="anomaly-head">
+                    <span class="anomaly-id">#A004</span>
+                    <span class="anomaly-title">边界样本：参数越界 <small>(GRAPH-003)</small></span>
+                    <span class="anomaly-badge" style="background:#fee2e2">🔴 待处理</span>
+                </div>
+                <div class="anomaly-type">类型: 路径参数越界</div>
+                <div class="anomaly-desc">说明: 参数 depth=-5 超出合理范围 [0, 10000]</div>
+                <div class="anomaly-params">参数快照: <code>{&quot;depth&quot;: -5}</code></div>
+                <div class="anomaly-meta">创建: 2026-06-20T10:27:06</div>
+                <details class='history-box'><summary>📜 题目历史（备注+截图，而非仅最终值）</summary><div class='hist-section'><b>备注历史:</b><div class='hist-item'><span class='hist-ver'>V1</span> <span class='hist-time'>2026-06-20T10:27:06</span> @duty: 故意留的越界参数用于测试异常检测</div></div><div class='hist-section'><b>截图历史:</b><em>(无)</em></div></details>
+                
+            </div>
+            
+            <div class="anomaly-card" style="border-left: 4px solid #dcfce7;">
+                <div class="anomaly-head">
+                    <span class="anomaly-id">#A005</span>
+                    <span class="anomaly-title">难题参数不足样例 <small>(GRAPH-007)</small></span>
+                    <span class="anomaly-badge" style="background:#dcfce7">🟢 已解决</span>
+                </div>
+                <div class="anomaly-type">类型: 难题参数不足</div>
+                <div class="anomaly-desc">说明: 标记为 hard 但路径参数少于 3 个，建议核对</div>
+                <div class="anomaly-params">参数快照: <code>{&quot;start&quot;: 1, &quot;end&quot;: 10}</code></div>
+                <div class="anomaly-meta">创建: 2026-06-20T10:27:06</div>
+                <details class='history-box'><summary>📜 题目历史（备注+截图，而非仅最终值）</summary><div class='hist-section'><b>备注历史:</b><div class='hist-item'><span class='hist-ver'>V1</span> <span class='hist-time'>2026-06-20T10:27:06</span> @duty: hard标签但参数只有2个，触发异常</div></div><div class='hist-section'><b>截图历史:</b><em>(无)</em></div></details>
+                <ul class='ops-log'><li><span class='op-time'>2026-06-20T10:27:06</span> <span class='op-type'>[解决]</span> @duty-meng — 超长参数已在后端增加截断处理</li></ul>
+            </div>
+            
+            <div class="anomaly-card" style="border-left: 4px solid #fee2e2;">
+                <div class="anomaly-head">
+                    <span class="anomaly-id">#A006</span>
+                    <span class="anomaly-title">空路径参数样例 <small>(GRAPH-008)</small></span>
+                    <span class="anomaly-badge" style="background:#fee2e2">🔴 待处理</span>
+                </div>
+                <div class="anomaly-type">类型: 空路径参数</div>
+                <div class="anomaly-desc">说明: 该题未解析出任何路径参数，可能格式异常或需要人工补充</div>
+                <div class="anomaly-params">参数快照: <code>{}</code></div>
+                <div class="anomaly-meta">创建: 2026-06-20T10:27:06</div>
+                <details class='history-box'><summary>📜 题目历史（备注+截图，而非仅最终值）</summary><div class='hist-section'><b>备注历史:</b><em>(无)</em></div><div class='hist-section'><b>截图历史:</b><em>(无)</em></div></details>
+                
+            </div>
+            
+            <div class="anomaly-card" style="border-left: 4px solid #fee2e2;">
+                <div class="anomaly-head">
+                    <span class="anomaly-id">#A007</span>
+                    <span class="anomaly-title">超长参数样例 <small>(GRAPH-009)</small></span>
+                    <span class="anomaly-badge" style="background:#fee2e2">🔴 待处理</span>
+                </div>
+                <div class="anomaly-type">类型: 路径参数过长</div>
+                <div class="anomaly-desc">说明: 参数 note 长度异常 (250字符)</div>
+                <div class="anomaly-params">参数快照: <code>{&quot;note&quot;: &quot;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA...&quot;}</code></div>
+                <div class="anomaly-meta">创建: 2026-06-20T10:27:06</div>
+                <details class='history-box'><summary>📜 题目历史（备注+截图，而非仅最终值）</summary><div class='hist-section'><b>备注历史:</b><em>(无)</em></div><div class='hist-section'><b>截图历史:</b><em>(无)</em></div></details>
+                
+            </div>
+            
+            <div class="anomaly-card" style="border-left: 4px solid #fee2e2;">
+                <div class="anomaly-head">
+                    <span class="anomaly-id">#A008</span>
+                    <span class="anomaly-title">参数格式错误缺等号 <small>(GRAPH-BAD3)</small></span>
+                    <span class="anomaly-badge" style="background:#fee2e2">🔴 待处理</span>
+                </div>
+                <div class="anomaly-type">类型: 空路径参数</div>
+                <div class="anomaly-desc">说明: 该题未解析出任何路径参数，可能格式异常或需要人工补充</div>
+                <div class="anomaly-params">参数快照: <code>{}</code></div>
+                <div class="anomaly-meta">创建: 2026-06-20T10:27:06</div>
+                <details class='history-box'><summary>📜 题目历史（备注+截图，而非仅最终值）</summary><div class='hist-section'><b>备注历史:</b><em>(无)</em></div><div class='hist-section'><b>截图历史:</b><em>(无)</em></div></details>
+                
+            </div>
+            
+</section>
+
+<div class="footer">报告生成时间 · 图论路径参数回放 v1.0</div>
+</body>
+</html>

@@ -1,0 +1,124 @@
+[
+  {
+    "anomaly_id": "A001",
+    "question_id": "GRAPH-002",
+    "title": "Dijkstra 进阶应用",
+    "anomaly_type": "路径参数越界",
+    "description": "参数 limit=-1 超出合理范围 [0, 10000]",
+    "status": "open",
+    "params_snapshot": {
+      "limit": -1
+    },
+    "operation_log": [],
+    "created_at": "2026-06-20T10:27:06"
+  },
+  {
+    "anomaly_id": "A002",
+    "question_id": "GRAPH-003",
+    "title": "边界样本：参数越界",
+    "anomaly_type": "路径参数越界",
+    "description": "参数 end=99999 超出合理范围 [0, 10000]",
+    "status": "rejudged",
+    "params_snapshot": {
+      "end": 99999
+    },
+    "operation_log": [
+      {
+        "op_type": "改判",
+        "detail": "原判定越界，实为题设条件，改判通过",
+        "operator": "lead",
+        "timestamp": "2026-06-20T10:27:06"
+      }
+    ],
+    "created_at": "2026-06-20T10:27:06"
+  },
+  {
+    "anomaly_id": "A003",
+    "question_id": "GRAPH-003",
+    "title": "边界样本：参数越界",
+    "anomaly_type": "路径参数越界",
+    "description": "参数 weight=999999 超出合理范围 [0, 10000]",
+    "status": "supplemented",
+    "params_snapshot": {
+      "weight": 999999
+    },
+    "operation_log": [
+      {
+        "op_type": "补充信息",
+        "detail": "补充了边界约束文档，depth=-5为合法场景",
+        "operator": "duty-meng",
+        "timestamp": "2026-06-20T10:27:06"
+      }
+    ],
+    "created_at": "2026-06-20T10:27:06"
+  },
+  {
+    "anomaly_id": "A004",
+    "question_id": "GRAPH-003",
+    "title": "边界样本：参数越界",
+    "anomaly_type": "路径参数越界",
+    "description": "参数 depth=-5 超出合理范围 [0, 10000]",
+    "status": "open",
+    "params_snapshot": {
+      "depth": -5
+    },
+    "operation_log": [],
+    "created_at": "2026-06-20T10:27:06"
+  },
+  {
+    "anomaly_id": "A005",
+    "question_id": "GRAPH-007",
+    "title": "难题参数不足样例",
+    "anomaly_type": "难题参数不足",
+    "description": "标记为 hard 但路径参数少于 3 个，建议核对",
+    "status": "resolved",
+    "params_snapshot": {
+      "start": 1,
+      "end": 10
+    },
+    "operation_log": [
+      {
+        "op_type": "解决",
+        "detail": "超长参数已在后端增加截断处理",
+        "operator": "duty-meng",
+        "timestamp": "2026-06-20T10:27:06"
+      }
+    ],
+    "created_at": "2026-06-20T10:27:06"
+  },
+  {
+    "anomaly_id": "A006",
+    "question_id": "GRAPH-008",
+    "title": "空路径参数样例",
+    "anomaly_type": "空路径参数",
+    "description": "该题未解析出任何路径参数，可能格式异常或需要人工补充",
+    "status": "open",
+    "params_snapshot": {},
+    "operation_log": [],
+    "created_at": "2026-06-20T10:27:06"
+  },
+  {
+    "anomaly_id": "A007",
+    "question_id": "GRAPH-009",
+    "title": "超长参数样例",
+    "anomaly_type": "路径参数过长",
+    "description": "参数 note 长度异常 (250字符)",
+    "status": "open",
+    "params_snapshot": {
+      "note": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA..."
+    },
+    "operation_log": [],
+    "created_at": "2026-06-20T10:27:06"
+  },
+  {
+    "anomaly_id": "A008",
+    "question_id": "GRAPH-BAD3",
+    "title": "参数格式错误缺等号",
+    "anomaly_type": "空路径参数",
+    "description": "该题未解析出任何路径参数，可能格式异常或需要人工补充",
+    "status": "open",
+    "params_snapshot": {},
+    "operation_log": [],
+    "created_at": "2026-06-20T10:27:06"
+  }
+]

@@ -1,0 +1,28 @@
+{
+  "question_id": "GRAPH-003",
+  "title": "边界样本：参数越界",
+  "path_params": {
+    "start": 0,
+    "end": 99999,
+    "weight": 999999,
+    "depth": -5
+  },
+  "remark": {
+    "history": [
+      {
+        "value": "故意留的越界参数用于测试异常检测",
+        "timestamp": "2026-06-20T10:27:06",
+        "author": "duty",
+        "note": "演示数据-边界样例"
+      }
+    ]
+  },
+  "screenshots": {
+    "history": []
+  },
+  "tags": [
+    "hard",
+    "boundary"
+  ],
+  "sort_key": "3"
+}

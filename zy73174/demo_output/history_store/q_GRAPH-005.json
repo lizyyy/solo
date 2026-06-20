@@ -1,0 +1,33 @@
+{
+  "question_id": "GRAPH-005",
+  "title": "排序不稳定-B题",
+  "path_params": {
+    "nodes": 25,
+    "edges": 55,
+    "seed": 42
+  },
+  "remark": {
+    "history": [
+      {
+        "value": "与 GRAPH-004/006 使用相同 sort_key=5，测试不稳定排序",
+        "timestamp": "2026-06-20T10:27:06",
+        "author": "qa",
+        "note": "同组排序键-2"
+      }
+    ]
+  },
+  "screenshots": {
+    "history": [
+      {
+        "value": "s3://graph-snap/v1/GRAPH-005.png",
+        "timestamp": "2026-06-20T10:27:06",
+        "author": "qa",
+        "note": "旧版本截图 #1"
+      }
+    ]
+  },
+  "tags": [
+    "medium"
+  ],
+  "sort_key": "5"
+}

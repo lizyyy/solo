@@ -1,0 +1,46 @@
+{
+  "question_id": "GRAPH-014",
+  "title": "带多轮备注的老题目",
+  "path_params": {
+    "start": 1,
+    "end": 50,
+    "algo": "floyd"
+  },
+  "remark": {
+    "history": [
+      {
+        "value": "第3轮复核：2025-05-10 小孟补充了Floyd特殊情况的说明",
+        "timestamp": "2026-06-20T10:27:06",
+        "author": "xiaomeng",
+        "note": "2025-05最新备注"
+      }
+    ]
+  },
+  "screenshots": {
+    "history": [
+      {
+        "value": "s3://graph-snap/v1/GRAPH-014.png",
+        "timestamp": "2026-06-20T10:27:06",
+        "author": "qa-team",
+        "note": "旧版本截图 #1"
+      },
+      {
+        "value": "s3://graph-snap/v2/GRAPH-014-revised.png",
+        "timestamp": "2026-06-20T10:27:06",
+        "author": "qa-team",
+        "note": "旧版本截图 #2"
+      },
+      {
+        "value": "s3://graph-snap/v3/GRAPH-014-final-approved.png",
+        "timestamp": "2026-06-20T10:27:06",
+        "author": "qa-team",
+        "note": "旧版本截图 #3"
+      }
+    ]
+  },
+  "tags": [
+    "classic",
+    "reviewed"
+  ],
+  "sort_key": "13"
+}

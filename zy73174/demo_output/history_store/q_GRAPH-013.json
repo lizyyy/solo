@@ -1,0 +1,34 @@
+{
+  "question_id": "GRAPH-013",
+  "title": "JSON格式路径参数",
+  "path_params": {
+    "start": 10,
+    "end": 20,
+    "algo": "astar",
+    "h_boost": 1.5
+  },
+  "remark": {
+    "history": [
+      {
+        "value": "支持JSON格式的路径参数",
+        "timestamp": "2026-06-20T10:27:06",
+        "author": "xiaomeng",
+        "note": "新格式支持测试"
+      }
+    ]
+  },
+  "screenshots": {
+    "history": [
+      {
+        "value": "s3://graph-snap/v3/GRAPH-013-json-params.png",
+        "timestamp": "2026-06-20T10:27:06",
+        "author": "qa-team",
+        "note": "旧版本截图 #1"
+      }
+    ]
+  },
+  "tags": [
+    "advanced"
+  ],
+  "sort_key": "12"
+}

@@ -1,0 +1,36 @@
+{
+  "question_id": "GRAPH-002",
+  "title": "Dijkstra 进阶应用",
+  "path_params": {
+    "start": 5,
+    "end": 50,
+    "weight": 3.1,
+    "k": 10,
+    "limit": -1
+  },
+  "remark": {
+    "history": [
+      {
+        "value": "数据小孟补的边界说明，k=10时需要特殊处理",
+        "timestamp": "2026-06-20T10:27:06",
+        "author": "xiaomeng",
+        "note": "复核时追加备注"
+      }
+    ]
+  },
+  "screenshots": {
+    "history": [
+      {
+        "value": "s3://graph-snap/v2/GRAPH-002-after-fix.png",
+        "timestamp": "2026-06-20T10:27:06",
+        "author": "qa-team",
+        "note": "旧版本截图 #1"
+      }
+    ]
+  },
+  "tags": [
+    "medium",
+    "dijkstra"
+  ],
+  "sort_key": "2"
+}

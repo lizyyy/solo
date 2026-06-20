@@ -1,0 +1,26 @@
+{
+  "question_id": "GRAPH-006",
+  "title": "排序不稳定-C题",
+  "path_params": {
+    "nodes": 30,
+    "edges": 60,
+    "seed": 42
+  },
+  "remark": {
+    "history": [
+      {
+        "value": "与 GRAPH-004/005 使用相同 sort_key=5，测试不稳定排序",
+        "timestamp": "2026-06-20T10:27:06",
+        "author": "qa",
+        "note": "同组排序键-3"
+      }
+    ]
+  },
+  "screenshots": {
+    "history": []
+  },
+  "tags": [
+    "medium"
+  ],
+  "sort_key": "5"
+}

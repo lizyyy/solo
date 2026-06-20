@@ -1,0 +1,25 @@
+{
+  "question_id": "GRAPH-007",
+  "title": "难题参数不足样例",
+  "path_params": {
+    "start": 1,
+    "end": 10
+  },
+  "remark": {
+    "history": [
+      {
+        "value": "hard标签但参数只有2个，触发异常",
+        "timestamp": "2026-06-20T10:27:06",
+        "author": "duty",
+        "note": "演示hard参数不足"
+      }
+    ]
+  },
+  "screenshots": {
+    "history": []
+  },
+  "tags": [
+    "hard"
+  ],
+  "sort_key": "6"
+}
