@@ -1,6 +1,6 @@
 [
   {
-    "record_id": "817ddf40-edb6-4d79-b6eb-bba5a6aa0a52",
+    "record_id": "7d29424f-e984-40ec-8635-9222ff979077",
     "complaint_id": "COMP-2024-001",
     "complaint": {
       "complaint_id": "COMP-2024-001",
@@ -14,7 +14,7 @@
       },
       "location": "幸福路与文明街交叉口东北角",
       "complaint_content": "消防通道被杂物堆放，通行受阻",
-      "imported_at": "2026-06-20T08:46:16.786287",
+      "imported_at": "2026-06-20T08:45:21.820327",
       "imported_by": "数据录入员",
       "manual_changes": []
     },
@@ -26,7 +26,7 @@
         "location": "幸福路与文明街交叉口东北角",
         "scene_description": "现场可见旧家具堆放在通道口，有明显堵塞情况",
         "reviewed_by": "阿宁",
-        "reviewed_at": "2026-06-20T08:46:16.786686",
+        "reviewed_at": "2026-06-20T08:45:21.820867",
         "raw_data": {
           "photo_id": "PHOTO-001",
           "photo_url": "/photos/comp-001-1.jpg",
@@ -39,17 +39,17 @@
     "abnormal_type": "other",
     "abnormal_note": "确认杂物堆积，需立即清理",
     "confirmed_by": "居民代表陈阿姨",
-    "confirmed_at": "2026-06-20T08:46:16.787073",
+    "confirmed_at": "2026-06-20T08:45:21.822054",
     "audit_logs": [
       {
-        "log_id": "3899a9b7-1bd7-4f96-80b1-9123afabd565",
+        "log_id": "07d575d5-efcd-4f94-830e-efd2f4272df6",
         "complaint_id": "COMP-2024-001",
         "source": "resident_complaint",
         "action": "status_change:imported->imported",
         "previous_status": "imported",
         "new_status": "imported",
         "operator": "数据录入员",
-        "timestamp": "2026-06-20T08:46:16.786351",
+        "timestamp": "2026-06-20T08:45:21.820385",
         "details": {
           "step": 1,
           "action": "import",
@@ -73,14 +73,14 @@
         }
       },
       {
-        "log_id": "cd666139-967d-42e2-833f-e23be30306b4",
+        "log_id": "1f9fdc3d-3ff5-434c-8fc8-11b289f28769",
         "complaint_id": "COMP-2024-001",
         "source": "intersection_photo",
         "action": "status_change:imported->photo_reviewed",
         "previous_status": "imported",
         "new_status": "photo_reviewed",
         "operator": "阿宁",
-        "timestamp": "2026-06-20T08:46:16.786706",
+        "timestamp": "2026-06-20T08:45:21.820890",
         "details": {
           "step": 2,
           "action": "photo_review_ok",
@@ -104,14 +104,14 @@
         }
       },
       {
-        "log_id": "ccfea640-6870-4995-acde-d1a74626383f",
+        "log_id": "bc10d672-2a58-40ef-8403-b64e6246b02f",
         "complaint_id": "COMP-2024-001",
         "source": "manual_confirmation",
         "action": "status_change:photo_reviewed->confirmed_abnormal",
         "previous_status": "photo_reviewed",
         "new_status": "confirmed_abnormal",
         "operator": "居民代表陈阿姨",
-        "timestamp": "2026-06-20T08:46:16.787083",
+        "timestamp": "2026-06-20T08:45:21.822064",
         "details": {
           "step": 3,
           "action": "confirm_abnormal",
@@ -131,19 +131,19 @@
           "abnormal_type": "other",
           "abnormal_note": "确认杂物堆积，需立即清理",
           "confirmed_by": "居民代表陈阿姨",
-          "confirmed_at": "2026-06-20T08:46:16.787073"
+          "confirmed_at": "2026-06-20T08:45:21.822054"
         }
       }
     ],
-    "created_at": "2026-06-20T08:46:16.786339",
-    "updated_at": "2026-06-20T08:46:16.787084"
+    "created_at": "2026-06-20T08:45:21.820373",
+    "updated_at": "2026-06-20T08:45:21.822066"
   },
   {
-    "record_id": "30b3859e-c065-41af-9192-a419e7427fbe",
+    "record_id": "1e2c4dea-b978-42cb-b321-398233f85b93",
     "complaint_id": "COMP-2024-002",
     "complaint": {
       "complaint_id": "COMP-2024-002",
-      "original_row_number": 1,
+      "original_row_number": 2,
       "raw_data": {
         "complaint_id": "COMP-2024-002",
         "location": "人民路88号门口",
@@ -153,7 +153,7 @@
       },
       "location": "人民路88号门口",
       "complaint_content": "施工临时改道，地图未同步更新，找不到消防通道入口，居民代表需现场核实后再确认",
-      "imported_at": "2026-06-20T08:46:16.787527",
+      "imported_at": "2026-06-20T08:45:21.820389",
       "imported_by": "数据录入员",
       "manual_changes": [
         {
@@ -161,7 +161,7 @@
           "old_value": "施工临时改道，地图未同步更新，找不到消防通道入口",
           "new_value": "施工临时改道，地图未同步更新，找不到消防通道入口，居民代表需现场核实后再确认",
           "operator": "居民代表陈阿姨",
-          "timestamp": "2026-06-20T08:46:16.788822"
+          "timestamp": "2026-06-20T08:45:21.822791"
         }
       ]
     },
@@ -173,7 +173,7 @@
         "location": "人民路88号门口",
         "scene_description": "现场确实有施工围挡，道路临时改道绕行，地图上未标注新路线",
         "reviewed_by": "阿宁",
-        "reviewed_at": "2026-06-20T08:46:16.788107",
+        "reviewed_at": "2026-06-20T08:45:21.821418",
         "raw_data": {
           "photo_id": "PHOTO-002",
           "photo_url": "/photos/comp-002-1.jpg",
@@ -189,18 +189,18 @@
     "confirmed_at": null,
     "audit_logs": [
       {
-        "log_id": "f0c30296-eefe-46bf-ad1e-f4e6c7b40ea3",
+        "log_id": "8adbc56f-71b7-44ed-a94f-738803206fbd",
         "complaint_id": "COMP-2024-002",
         "source": "resident_complaint",
         "action": "status_change:imported->imported",
         "previous_status": "imported",
         "new_status": "imported",
         "operator": "数据录入员",
-        "timestamp": "2026-06-20T08:46:16.787543",
+        "timestamp": "2026-06-20T08:45:21.820402",
         "details": {
           "step": 1,
           "action": "import",
-          "original_row": 1
+          "original_row": 2
         },
         "snapshot_before": {
           "complaint_content": "施工临时改道，地图未同步更新，找不到消防通道入口",
@@ -220,14 +220,14 @@
         }
       },
       {
-        "log_id": "9b3df24b-1bb2-4012-af1e-0e81fc45259a",
+        "log_id": "c039917c-3d1f-4627-a748-e3f3db32760d",
         "complaint_id": "COMP-2024-002",
         "source": "intersection_photo",
         "action": "status_change:imported->pending_review",
         "previous_status": "imported",
         "new_status": "pending_review",
         "operator": "阿宁",
-        "timestamp": "2026-06-20T08:46:16.788123",
+        "timestamp": "2026-06-20T08:45:21.821435",
         "details": {
           "step": 2,
           "action": "photo_review_hold",
@@ -252,14 +252,14 @@
         }
       },
       {
-        "log_id": "edbbb270-4bd8-41a2-baed-ab9ea4a0c660",
+        "log_id": "fdff2375-499e-46cf-9174-807b619fd0d8",
         "complaint_id": "COMP-2024-002",
         "source": "manual_confirmation",
         "action": "status_change:pending_review->pending_review",
         "previous_status": "pending_review",
         "new_status": "pending_review",
         "operator": "居民代表陈阿姨",
-        "timestamp": "2026-06-20T08:46:16.788832",
+        "timestamp": "2026-06-20T08:45:21.822804",
         "details": {
           "action": "manual_edit",
           "change": {
@@ -267,7 +267,7 @@
             "old_value": "施工临时改道，地图未同步更新，找不到消防通道入口",
             "new_value": "施工临时改道，地图未同步更新，找不到消防通道入口，居民代表需现场核实后再确认",
             "operator": "居民代表陈阿姨",
-            "timestamp": "2026-06-20T08:46:16.788822"
+            "timestamp": "2026-06-20T08:45:21.822791"
           }
         },
         "snapshot_before": {
@@ -288,7 +288,7 @@
         }
       }
     ],
-    "created_at": "2026-06-20T08:46:16.787536",
-    "updated_at": "2026-06-20T08:46:16.788834"
+    "created_at": "2026-06-20T08:45:21.820395",
+    "updated_at": "2026-06-20T08:45:21.822807"
   }
 ]

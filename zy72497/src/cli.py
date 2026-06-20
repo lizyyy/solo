@@ -265,18 +265,7 @@ def cmd_replayable(args):
                         "reason": log.details.get("reason", ""),
                     },
                 })
-            elif "confirm_normal" in log.action or (log_action == "confirm_normal"):
-                steps.append({
-                    "name": f"确认正常 {r.complaint_id}",
-                    "action": "confirm",
-                    "params": {
-                        "complaint_id": r.complaint_id,
-                        "operator": log.operator,
-                        "is_normal": True,
-                        "note": log.details.get("note", ""),
-                    },
-                })
-            elif "confirm_abnormal" in log.action or (log_action == "confirm_abnormal"):
+            elif log.new_status == ProcessingStatus.CONFIRMED_ABNORMAL:
                 steps.append({
                     "name": f"确认异常 {r.complaint_id}",
                     "action": "confirm",
@@ -284,6 +273,17 @@ def cmd_replayable(args):
                         "complaint_id": r.complaint_id,
                         "operator": log.operator,
                         "is_normal": False,
+                        "note": log.details.get("note", ""),
+                    },
+                })
+            elif log.new_status == ProcessingStatus.CONFIRMED_NORMAL:
+                steps.append({
+                    "name": f"确认正常 {r.complaint_id}",
+                    "action": "confirm",
+                    "params": {
+                        "complaint_id": r.complaint_id,
+                        "operator": log.operator,
+                        "is_normal": True,
                         "note": log.details.get("note", ""),
                     },
                 })
