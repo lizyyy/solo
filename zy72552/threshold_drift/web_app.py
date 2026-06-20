@@ -612,10 +612,12 @@ def create_app():
                     <h1>🧊 3D可视化看板</h1>
                     <div class="hint">
                         💡 <strong>提示：</strong>点击图表中的<strong>数据点</strong>会直接跳转到该记录的完整详情页（含负样本列表、召回候选表、为什么留给评测运营复核）。差1桶的橙色点需要重点复核。
+                        <br>当前实验ID: <code>{{ experiment_id }}</code>
                     </div>
 
                     <div class="card">
                         <h2>📊 分桶差异分布统计</h2>
+                        <p class="muted">这是聚合统计图，点击不跳转。请查看下方散点图或3D图点击跳转单条记录详情。</p>
                         {{ fig3.to_html(full_html=False, include_plotlyjs=False)|safe }}
                     </div>
 
@@ -633,12 +635,30 @@ def create_app():
 
                     <script>
                         document.addEventListener('DOMContentLoaded', function() {
+                            const EXPERIMENT_ID = '{{ experiment_id }}';
+                            console.log('Web看板已加载，实验ID =', EXPERIMENT_ID);
+                            if (!EXPERIMENT_ID) {
+                                console.error('错误：experiment_id 为空，跳转将失败！');
+                            }
                             const plotlyElements = document.querySelectorAll('.js-plotly-plot');
                             plotlyElements.forEach(function(plot) {
                                 plot.on('plotly_click', function(data) {
                                     const point = data.points[0];
                                     const recordId = point.customdata;
-                                    window.location.href = '/record/' + '{{ experiment_id }}' + '/' + recordId;
+                                    if (!recordId || recordId === 'undefined' || recordId === null) {
+                                        console.log('该图表为聚合统计图，没有单条记录ID，不跳转');
+                                        return;
+                                    }
+                                    const targetUrl = '/record/' + EXPERIMENT_ID + '/' + recordId;
+                                    console.log('点击数据点，记录ID =', recordId, '，跳转到 =', targetUrl);
+                                    // 校验构造的URL格式是否正确（应形如 /record/abc-def/ghi-jkl）
+                                    const urlPattern = /^\/record\/[^\/]+\/[^\/]+$/;
+                                    if (!urlPattern.test(targetUrl)) {
+                                        console.error('跳转URL格式错误，已拦截：', targetUrl);
+                                        alert('跳转地址格式错误，请刷新页面重试');
+                                        return;
+                                    }
+                                    window.location.href = targetUrl;
                                 });
                             });
                         });
@@ -650,6 +670,7 @@ def create_app():
             fig1=fig1,
             fig2=fig2,
             fig3=fig3,
+            experiment_id=experiment_id,
         )
 
     return app
