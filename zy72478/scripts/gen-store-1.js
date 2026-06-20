@@ -1,5 +1,8 @@
 
-import { create } from 'zustand';
+const fs = require('fs');
+const path = require('path');
+
+const part1 = `import { create } from 'zustand';
 import * as XLSX from 'xlsx';
 import type {
   Project,
@@ -69,3 +72,8 @@ interface AppState {
   exportHistory: () => ExportResult;
   verifyEvidenceChain: (busSwipeId: string) => any;
 }
+`;
+
+const target = path.resolve(__dirname, '../src/store/appStore.ts');
+fs.writeFileSync(target, part1);
+console.log('Part 1 written, lines:', part1.split('\n').length);

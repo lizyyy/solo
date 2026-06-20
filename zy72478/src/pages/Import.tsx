@@ -15,6 +15,7 @@ import {
   Flame,
   AlertTriangle,
   Info,
+  FileSpreadsheet as FileSpreadsheetIcon,
 } from 'lucide-react';
 import { useAppStore } from '../store/appStore';
 import type { DataSource, BusSwipeRecord, RedlineNote, ImportResult } from '../../shared/types';

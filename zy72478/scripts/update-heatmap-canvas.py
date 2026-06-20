@@ -1,4 +1,4 @@
-
+content = '''
 import { useEffect, useRef } from 'react';
 import type { HeatmapPoint } from '../../shared/types';
 
@@ -168,3 +168,9 @@ export function HeatmapCanvas({
     />
   );
 }
+'''
+
+with open('/Users/lzy/pro/solo/workspaces/zy72478/src/components/HeatmapCanvas.tsx', 'w') as f:
+    f.write(content)
+
+print('HeatmapCanvas.tsx updated successfully')

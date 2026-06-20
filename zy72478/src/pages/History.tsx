@@ -94,10 +94,12 @@ function ChangeDiffView({ change }: { change: DataChangeRecord }) {
 }
 
 export default function HistoryPage() {
-  const { operationLogs, currentProject, heatmapData, addOperationLog, dataChangeHistory } =
+  const { operationLogs, currentProject, heatmapData, addOperationLog, dataChangeHistory, exportHistory } =
     useAppStore();
   const [activeTab, setActiveTab] = useState<'logs' | 'changes'>('logs');
   const [expandedChange, setExpandedChange] = useState<string | null>(null);
+  const [exportPreview, setExportPreview] = useState<string | null>(null);
+  const [showExportPreview, setShowExportPreview] = useState(false);
 
   const projectLogs = operationLogs.filter((l) => l.projectId === currentProject?.id);
   const projectHeatmaps = heatmapData.filter((h) => h.projectId === currentProject?.id);
@@ -105,7 +107,19 @@ export default function HistoryPage() {
 
   const handleExport = () => {
     addOperationLog('导出操作日志', '导出完整操作日志记录');
-    alert('操作日志已导出（演示）');
+    const result = exportHistory();
+    if (result.success) {
+      setExportPreview(result.contentPreview);
+      setShowExportPreview(true);
+      if (result.downloadUrl) {
+        const link = document.createElement('a');
+        link.href = result.downloadUrl;
+        link.download = result.fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    }
   };
 
   const actionLabel = (action: string) => {
@@ -346,6 +360,33 @@ export default function HistoryPage() {
           </ul>
         </div>
       </div>
+
+      {showExportPreview && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white max-w-4xl w-full rounded-2xl shadow-2xl flex flex-col max-h-[80vh]">
+            <div className="p-6 border-b border-gray-100">
+              <h2 className="text-xl font-bold text-gray-800">导出文件预览</h2>
+              <p className="text-sm text-gray-500 mt-1">CSV格式已开始下载</p>
+            </div>
+            <div className="flex-1 overflow-auto p-6">
+              <pre className="text-xs bg-gray-50 p-4 rounded-lg whitespace-pre-wrap break-all overflow-auto">
+                {exportPreview}
+              </pre>
+            </div>
+            <div className="p-6 border-t border-gray-100 flex justify-end">
+              <button
+                onClick={() => setShowExportPreview(false)}
+                className="px-6 py-2 text-white rounded-lg transition-colors"
+                style={{ backgroundColor: '#f59e0b' }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#d97706')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f59e0b')}
+              >
+                确定
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
