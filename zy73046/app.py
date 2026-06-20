@@ -75,7 +75,13 @@ def batch_detail(batch_id):
     conn.close()
     if not batch:
         abort(404)
-    return render_template("batch_detail.html", batch=batch, parts=parts)
+    details = {}
+    if batch["details_json"]:
+        try:
+            details = json.loads(batch["details_json"])
+        except Exception:
+            details = {}
+    return render_template("batch_detail.html", batch=batch, parts=parts, details=details)
 
 
 @app.route("/run", methods=["GET", "POST"])

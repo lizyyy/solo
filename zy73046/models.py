@@ -110,7 +110,8 @@ def init_db():
         duplicate_count INTEGER DEFAULT 0,
         incomplete_count INTEGER DEFAULT 0,
         imported_at TEXT NOT NULL,
-        imported_by TEXT
+        imported_by TEXT,
+        details_json TEXT
     )
     """)
 
@@ -153,21 +154,23 @@ def init_db():
             "系统初始化默认配置，使用中位数+IQR避免异常被均值掩盖"
         ))
 
-    loose_params = dict(default_params)
-    loose_params["deviation_upper_pct"] = 35.0
-    loose_params["deviation_lower_pct"] = 35.0
-    loose_params["zscore_threshold"] = 3.5
-    c.execute("""
-    INSERT INTO threshold_config (config_name, params_json, created_at, created_by, is_active, remark)
-    VALUES (?, ?, ?, ?, ?, ?)
-    """, (
-        "临时调高阈值-样例包",
-        json.dumps(loose_params, ensure_ascii=False),
-        datetime.now().isoformat(),
-        "system",
-        0,
-        "样例包使用：阈值临时调高，用于验证异常提示清晰度"
-    ))
+    c.execute("SELECT COUNT(*) as cnt FROM threshold_config WHERE config_name=?", ("临时调高阈值-样例包",))
+    if c.fetchone()["cnt"] == 0:
+        loose_params = dict(default_params)
+        loose_params["deviation_upper_pct"] = 35.0
+        loose_params["deviation_lower_pct"] = 35.0
+        loose_params["zscore_threshold"] = 3.5
+        c.execute("""
+        INSERT INTO threshold_config (config_name, params_json, created_at, created_by, is_active, remark)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            "临时调高阈值-样例包",
+            json.dumps(loose_params, ensure_ascii=False),
+            datetime.now().isoformat(),
+            "system",
+            0,
+            "样例包使用：阈值临时调高，用于验证异常提示清晰度"
+        ))
 
     conn.commit()
     conn.close()

@@ -4,22 +4,143 @@
 
 <div class="card">
   <h2>📦 导入批次详情</h2>
+  {% if details.summary_text %}
+  <div class="alert alert-info" style="font-size:15px; font-weight:500">
+    📊 {{ details.summary_text }}
+  </div>
+  {% endif %}
   <div class="stat-grid">
     <div class="stat-box"><div class="label">批次ID</div><div class="value" style="font-size:13px"><code>{{ batch.batch_id }}</code></div></div>
     <div class="stat-box"><div class="label">文件</div><div class="value" style="font-size:14px">{{ batch.file_name }}</div></div>
-    <div class="stat-box"><div class="label">总数</div><div class="value">{{ batch.total_count }}</div></div>
-    <div class="stat-box"><div class="label">成功导入</div><div class="value" style="color:#16a34a">{{ batch.success_count }}</div></div>
-    <div class="stat-box"><div class="label">重复跳过</div><div class="value" style="color:#f59e0b">{{ batch.duplicate_count }}</div></div>
-    <div class="stat-box"><div class="label">不齐整</div><div class="value" style="color:#dc2626">{{ batch.incomplete_count }}</div></div>
+    <div class="stat-box"><div class="label">总条数</div><div class="value">{{ batch.total_count }}</div></div>
+    <div class="stat-box"><div class="label">✅ 新增入库</div><div class="value" style="color:#16a34a">{{ batch.success_count }}</div></div>
+    <div class="stat-box"><div class="label">✖️ 跳过(重复)</div><div class="value" style="color:#f59e0b">{{ batch.duplicate_count }}</div></div>
+    <div class="stat-box"><div class="label">⚠️ 不齐整(缺信息)</div><div class="value" style="color:#dc2626">{{ batch.incomplete_count }}</div></div>
   </div>
   <a class="btn btn-warn" href="{{ url_for('run_warning') }}?batch_id={{ batch.batch_id }}">⚡ 以此批次运行阈值预警</a>
 </div>
 
+{% if details.incomplete_detail %}
+<div class="card" style="border-left:4px solid #f59e0b">
+  <h2 style="color:#92400e">📋 缺信息需要补的材料（维保主管阿敏优先处理）</h2>
+  <table style="font-size:13px">
+    <thead><tr>
+      <th>#</th><th>批次号</th><th>材料名称</th><th>规格型号</th><th>缺失字段</th><th>原始备注</th><th>补齐状态</th>
+    </tr></thead>
+    <tbody>
+      {% for item in details.incomplete_detail %}
+      <tr style="background:#fffbeb">
+        <td>{{ loop.index }}</td>
+        <td>{{ item.batch_no }}</td>
+        <td><strong>{{ item.material_name }}</strong></td>
+        <td>{{ item.spec_model or '-' }}</td>
+        <td>
+          {% for f in item.missing_fields %}
+          <span class="badge b-err">{{ f }}</span>
+          {% endfor %}
+        </td>
+        <td style="max-width:250px;white-space:pre-wrap">{{ item.remark or '-' }}</td>
+        <td>
+          {% if item.spare_part_id %}
+          <form class="inline-form" method="post" action="{{ url_for('set_remark', spare_id=item.spare_part_id) }}">
+            <input type="text" name="manual_remark" placeholder="已后补/说明…" style="width:120px">
+            <button class="btn small-btn btn-ghost" type="submit">保存备注</button>
+          </form>
+          {% else %}
+          <span class="muted">（本条为重复跳过，无入库ID）</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% if details.pending_warnings %}
+<div class="card" style="border-left:4px solid #dc2626">
+  <h2 style="color:#991b1b">⚠️ 待处理的异常（这些材料已有预警记录）</h2>
+  <div class="alert alert-warn">
+    本次导入涉及 <strong>{{ details.pending_warnings|length }}</strong> 条材料已有未闭环的预警记录，请先处理再考虑放行。
+  </div>
+  <table style="font-size:13px">
+    <thead><tr>
+      <th>#</th><th>优先级</th><th>异常级别</th><th>异常类型</th><th>材料</th><th>规格</th><th>预警状态</th><th>队列状态</th><th>结论</th><th>操作</th>
+    </tr></thead>
+    <tbody>
+      {% for w in details.pending_warnings %}
+      <tr style="{% if w.level == '严重' %}background:#fef2f2{% elif w.level == '警告' %}background:#fffbeb{% endif %}">
+        <td>{{ loop.index }}</td>
+        <td>
+          {% if w.level == '严重' %}<span class="badge b-high">高</span>
+          {% elif w.level == '警告' %}<span class="badge b-mid">中</span>
+          {% else %}<span class="badge b-low">低</span>{% endif %}
+        </td>
+        <td>
+          {% if w.level == '严重' %}<span class="badge b-severe">{{ w.level }}</span>
+          {% elif w.level == '警告' %}<span class="badge b-warn">{{ w.level }}</span>
+          {% else %}<span class="badge b-normal">{{ w.level }}</span>{% endif %}
+        </td>
+        <td>{{ w.anomaly_type }}</td>
+        <td><strong>{{ w.material_name }}</strong><br><span class="muted">{{ w.batch_no }}</span></td>
+        <td>{{ w.spec_model or '-' }}</td>
+        <td>
+          {% if w.status == '待处理' %}<span class="badge b-pending">待处理</span>
+          {% elif w.status == '处理中' %}<span class="badge b-mid">处理中</span>
+          {% else %}{{ w.status }}{% endif %}
+        </td>
+        <td>
+          {% if w.queue_status == '待分派' %}<span class="badge b-pending">待分派</span>
+          {% elif w.queue_status == '处理中' %}<span class="badge b-mid">处理中</span>
+          {% else %}{{ w.queue_status }}{% endif %}
+        </td>
+        <td>{{ w.conclusion or w.file_conclusion or '-' }}</td>
+        <td><a class="btn small-btn" href="{{ url_for('run_detail', run_id=1) }}#r{{ w.id }}">去处理</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% if details.duplicate_detail %}
+<div class="card" style="border-left:4px solid #6b7280">
+  <h2 style="color:#374151">✖️ 重复导入被跳过的记录（未新增，未污染数据）</h2>
+  <div class="alert alert-ok">
+    共跳过 <strong>{{ details.duplicate_detail|length }}</strong> 条重复记录，数据库中备件总数未增加。
+    {% if details.skipped_due_remark_detail %}
+    其中 <strong style="color:#dc2626">{{ details.skipped_due_remark_detail|length }}</strong> 条带有人工备注，已完整保留未覆盖。
+    {% endif %}
+  </div>
+  <table style="font-size:13px">
+    <thead><tr>
+      <th>#</th><th>批次号</th><th>材料编码</th><th>材料名称</th><th>规格型号</th><th>测量值</th><th>跳过原因</th><th>已有备注</th>
+    </tr></thead>
+    <tbody>
+      {% for d in details.duplicate_detail %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ d.batch_no }}</td>
+        <td>{{ d.material_code or '-' }}</td>
+        <td><strong>{{ d.material_name }}</strong></td>
+        <td>{{ d.spec_model or '-' }}</td>
+        <td>{{ d.measured_value if d.measured_value is not none else '-' }}</td>
+        <td><span class="badge {% if '已有人工备注' in d.reason %}b-err{% else %}b-normal{% endif %}">{{ d.reason }}</span></td>
+        <td style="max-width:220px">
+          {% set remark_item = details.skipped_due_remark_detail | selectattr('spare_part_id', 'equalto', d.existing_id) | first %}
+          {% if remark_item %}
+          <span style="color:#1d4ed8;font-weight:500">👤 {{ remark_item.existing_manual_remark }}</span>
+          {% else %}-{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
 <div class="card">
-  <h2>📋 备件明细（共 {{ parts|length }} 条）</h2>
-  {% if batch.incomplete_count %}
-  <div class="alert alert-warn">⚠️ 本批次有 <strong>{{ batch.incomplete_count }}</strong> 条不齐整材料，已在备注中标注缺失字段，可在下方「人工备注」列补充后补说明。</div>
-  {% endif %}
+  <h2>📋 本批次入库的备件明细（共 {{ parts|length }} 条）</h2>
   <table style="font-size:12px">
     <thead><tr>
       <th>#</th><th>材料批次</th><th>编码</th><th>名称</th><th>规格型号</th>

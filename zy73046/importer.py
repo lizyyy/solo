@@ -199,46 +199,112 @@ def import_spare_parts(file_path: str, file_name: Optional[str] = None,
         skipped_due_remark = 0
 
         seen_hashes_in_this_batch = set()
+        duplicate_detail = []
+        skipped_due_remark_detail = []
+        incomplete_detail = []
+        reused_ids = []
 
         for rec in records:
             rh = _row_hash(rec)
+
             if rh in seen_hashes_in_this_batch:
                 duplicates += 1
+                duplicate_detail.append({
+                    "batch_no": rec["batch_no"],
+                    "material_code": rec.get("material_code"),
+                    "material_name": rec["material_name"],
+                    "spec_model": rec.get("spec_model"),
+                    "measured_value": rec.get("measured_value"),
+                    "reason": "本批次内重复"
+                })
                 continue
             seen_hashes_in_this_batch.add(rh)
 
-            bk = _business_key(rec)
-            bk_like = bk.replace("|", "||", 1) + "||%" if bk else None
-
-            existing_with_remark = conn.execute("""
-                SELECT id, manual_remark, row_hash FROM spare_parts
-                WHERE manual_remark IS NOT NULL
-                  AND manual_remark != ''
-                  AND batch_no = COALESCE(?, batch_no)
-                  AND COALESCE(material_code, '') = COALESCE(?, COALESCE(material_code, ''))
-                  AND material_name = ?
-                  AND COALESCE(spec_model, '') = COALESCE(?, COALESCE(spec_model, ''))
+            existing = conn.execute("""
+                SELECT id, manual_remark, import_batch_id, row_hash
+                FROM spare_parts
+                WHERE row_hash = ?
                 LIMIT 1
-            """, (
-                rec["batch_no"] or None,
-                rec["material_code"] or "",
-                rec["material_name"],
-                rec["spec_model"] or ""
-            )).fetchone()
+            """, (rh,)).fetchone()
 
-            if existing_with_remark:
-                skipped_due_remark += 1
+            if not existing:
+                bk = _business_key(rec)
+                existing = conn.execute("""
+                    SELECT id, manual_remark, import_batch_id, row_hash
+                    FROM spare_parts
+                    WHERE batch_no = COALESCE(?, batch_no)
+                      AND COALESCE(material_code, '') = COALESCE(?, COALESCE(material_code, ''))
+                      AND material_name = ?
+                      AND COALESCE(spec_model, '') = COALESCE(?, COALESCE(spec_model, ''))
+                      AND ABS(COALESCE(measured_value, -999999) - COALESCE(?, -999999)) < 0.001
+                    LIMIT 1
+                """, (
+                    rec["batch_no"] or None,
+                    rec.get("material_code") or "",
+                    rec["material_name"],
+                    rec.get("spec_model") or "",
+                    rec.get("measured_value") if rec.get("measured_value") is not None else -999999
+                )).fetchone()
+
+            if existing:
+                duplicates += 1
+                reused_ids.append(existing["id"])
+
+                if existing["manual_remark"]:
+                    skipped_due_remark += 1
+                    skipped_due_remark_detail.append({
+                        "spare_part_id": existing["id"],
+                        "batch_no": rec["batch_no"],
+                        "material_name": rec["material_name"],
+                        "spec_model": rec.get("spec_model"),
+                        "measured_value": rec.get("measured_value"),
+                        "existing_manual_remark": existing["manual_remark"],
+                        "original_import_batch": existing["import_batch_id"]
+                    })
+                    duplicate_detail.append({
+                        "batch_no": rec["batch_no"],
+                        "material_code": rec.get("material_code"),
+                        "material_name": rec["material_name"],
+                        "spec_model": rec.get("spec_model"),
+                        "measured_value": rec.get("measured_value"),
+                        "reason": "跨批次重复（已有人工备注，已保留）",
+                        "existing_id": existing["id"]
+                    })
+                else:
+                    duplicate_detail.append({
+                        "batch_no": rec["batch_no"],
+                        "material_code": rec.get("material_code"),
+                        "material_name": rec["material_name"],
+                        "spec_model": rec.get("spec_model"),
+                        "measured_value": rec.get("measured_value"),
+                        "reason": "跨批次重复（普通记录，已跳过）",
+                        "existing_id": existing["id"]
+                    })
                 continue
 
-            existing_same_row = conn.execute("""
-                SELECT id, manual_remark FROM spare_parts
-                WHERE row_hash = ? AND import_batch_id != ?
-                LIMIT 1
-            """, (rh, batch_id)).fetchone()
+            if not rec["is_complete"]:
+                field_map = {
+                    "材料编码": "material_code",
+                    "规格型号": "spec_model",
+                    "测量值": "measured_value",
+                    "单位": "unit",
+                    "供应商": "supplier"
+                }
+                missing_fields = []
+                for label, key in field_map.items():
+                    val = rec.get(key)
+                    if val is None or (isinstance(val, str) and val == ""):
+                        missing_fields.append(label)
+                incomplete_detail.append({
+                    "spare_part_id": None,
+                    "batch_no": rec["batch_no"],
+                    "material_name": rec["material_name"],
+                    "spec_model": rec.get("spec_model"),
+                    "remark": rec["raw_remark"],
+                    "missing_fields": missing_fields
+                })
 
             try:
-                manual_remark = (existing_same_row["manual_remark"] if existing_same_row else None) or \
-                                (existing_with_remark["manual_remark"] if existing_with_remark else None)
                 c.execute("""
                     INSERT INTO spare_parts (
                         batch_no, material_code, material_name, spec_model, measured_value,
@@ -246,20 +312,32 @@ def import_spare_parts(file_path: str, file_name: Optional[str] = None,
                         is_complete, created_at, row_hash
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
-                    rec["batch_no"], rec["material_code"], rec["material_name"],
-                    rec["spec_model"], rec["measured_value"], rec["unit"], rec["supplier"],
-                    batch_id, rec["raw_remark"],
-                    manual_remark,
+                    rec["batch_no"], rec.get("material_code"), rec["material_name"],
+                    rec.get("spec_model"), rec.get("measured_value"), rec.get("unit"), rec.get("supplier"),
+                    batch_id, rec.get("raw_remark"),
+                    None,
                     rec["is_complete"],
                     datetime.now().isoformat(),
                     rh
                 ))
+                new_id = c.lastrowid
+                reused_ids.append(new_id)
                 success += 1
                 if not rec["is_complete"]:
                     incomplete += 1
+                    if incomplete_detail and incomplete_detail[-1]["spare_part_id"] is None:
+                        incomplete_detail[-1]["spare_part_id"] = new_id
             except Exception as e:
                 if "UNIQUE" in str(e):
                     duplicates += 1
+                    duplicate_detail.append({
+                        "batch_no": rec["batch_no"],
+                        "material_code": rec.get("material_code"),
+                        "material_name": rec["material_name"],
+                        "spec_model": rec.get("spec_model"),
+                        "measured_value": rec.get("measured_value"),
+                        "reason": "数据库唯一约束冲突"
+                    })
                 else:
                     raise
 
@@ -268,6 +346,33 @@ def import_spare_parts(file_path: str, file_name: Optional[str] = None,
             SET success_count=?, duplicate_count=?, incomplete_count=?
             WHERE batch_id=?
         """, (success, duplicates, incomplete, batch_id))
+
+        pending_warnings = []
+        if reused_ids:
+            placeholders = ",".join("?" * len(reused_ids))
+            warnings = conn.execute(f"""
+                SELECT wr.id, wr.level, wr.anomaly_type, wr.status, wr.conclusion,
+                       sp.material_name, sp.spec_model, sp.batch_no,
+                       aq.queue_status, aq.file_conclusion
+                FROM warning_record wr
+                JOIN spare_parts sp ON wr.spare_part_id = sp.id
+                JOIN anomaly_queue aq ON aq.warning_record_id = wr.id
+                WHERE wr.spare_part_id IN ({placeholders})
+                  AND wr.status NOT IN ('已放行', '需补货')
+                ORDER BY CASE wr.level WHEN '严重' THEN 1 WHEN '警告' THEN 2 ELSE 3 END
+            """, reused_ids).fetchall()
+            pending_warnings = [dict(w) for w in warnings]
+
+        details = {
+            "duplicate_detail": duplicate_detail,
+            "skipped_due_remark_detail": skipped_due_remark_detail,
+            "incomplete_detail": incomplete_detail,
+            "pending_warnings": pending_warnings,
+            "summary_text": f"共{len(records)}条 → 新增{success}条，跳过重复{duplicates}条（其中{skipped_due_remark}条带人工备注已保留），不齐整{incomplete}条"
+        }
+        c.execute("UPDATE import_batch SET details_json=? WHERE batch_id=?",
+                  (json.dumps(details, ensure_ascii=False), batch_id))
+
         conn.commit()
 
         return {
@@ -279,14 +384,12 @@ def import_spare_parts(file_path: str, file_name: Optional[str] = None,
             "duplicates": duplicates,
             "incomplete": incomplete,
             "skipped_due_manual_remark": skipped_due_remark,
-            "incomplete_detail": [
-                {
-                    "batch_no": r["batch_no"],
-                    "material_name": r["material_name"],
-                    "remark": r["raw_remark"]
-                }
-                for r in records if not r["is_complete"]
-            ]
+            "reused_spare_part_ids": reused_ids,
+            "duplicate_detail": duplicate_detail,
+            "skipped_due_remark_detail": skipped_due_remark_detail,
+            "incomplete_detail": incomplete_detail,
+            "pending_warnings": pending_warnings,
+            "summary_text": details["summary_text"]
         }
     except Exception as e:
         conn.rollback()

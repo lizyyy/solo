@@ -3,6 +3,7 @@ import sys
 import json
 import shutil
 from datetime import datetime
+import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -120,16 +121,41 @@ def main():
     results.append(check("重复导入未报错", r2["success"]))
     results.append(check("重复导入时跳过带manual_remark的记录（人工备注不被覆盖）",
         r2["skipped_due_manual_remark"] >= 1, f"skipped_due_manual_remark={r2['skipped_due_manual_remark']}"))
+    results.append(check("同一Excel重复导入时不再新增正常记录",
+        r2["imported"] == 0, f"二次导入成功={r2['imported']}, 重复={r2['duplicates']}"))
 
     conn = get_conn()
     total_parts = conn.execute("SELECT COUNT(*) as cnt FROM spare_parts").fetchone()["cnt"]
     still_remark = conn.execute("SELECT manual_remark FROM spare_parts WHERE id=?", (a_part["id"],)).fetchone()["manual_remark"]
     conn.close()
-    results.append(check("备件总数不翻倍（同一批次UNIQUE + 跳过带备注的）",
-        total_parts == r["imported"] + r2["imported"],
+    results.append(check("备件总数不翻倍（重复导入后总数仍等于首次导入数）",
+        total_parts == r["imported"],
         f"首次导入={r['imported']}, 二次导入成功={r2['imported']}, 总数={total_parts}"))
     results.append(check("人工备注未被覆盖（仍然是原内容）",
         still_remark == REMARK_CONTENT, f"原备注={REMARK_CONTENT[:30]}, 当前={still_remark[:30] if still_remark else '空'}"))
+
+    supplement_path = "samples/test_sample_1_supplement.xlsx"
+    pd.DataFrame([{
+        "批次号": "B2026-06001",
+        "材料编码": "ZZ-003",
+        "材料名称": "球型支座",
+        "规格型号": "QZ1000GD",
+        "测量值": 1000.0,
+        "单位": "mm",
+        "供应商": "宝力集团",
+        "备注": "测量值已补录"
+    }]).to_excel(supplement_path, index=False, sheet_name="备件清单")
+    r3 = import_spare_parts(supplement_path, os.path.basename(supplement_path), "补录-测试")
+    conn = get_conn()
+    total_after_supplement = conn.execute("SELECT COUNT(*) as cnt FROM spare_parts").fetchone()["cnt"]
+    still_remark_after_supplement = conn.execute("SELECT manual_remark FROM spare_parts WHERE id=?", (a_part["id"],)).fetchone()["manual_remark"]
+    conn.close()
+    results.append(check("同业务键的真实补录可导入（不因旧人工备注被误跳过）",
+        r3["success"] and r3["imported"] == 1 and total_after_supplement == r["imported"] + 1,
+        f"补录导入={r3.get('imported')}, 总数={total_after_supplement}"))
+    results.append(check("补录后原人工备注仍未被覆盖",
+        still_remark_after_supplement == REMARK_CONTENT,
+        f"当前={still_remark_after_supplement[:30] if still_remark_after_supplement else '空'}"))
 
     # ========== 场景5：处理流程 - 状态/备注/结论联动 ==========
     section("场景5：处理流程状态联动 - 状态↔队列↔结论三对应")
