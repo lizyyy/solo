@@ -1,30 +1,30 @@
 {
-  "SAMPLE-COVERED": {
-    "sample_id": "SAMPLE-COVERED",
+  "SAMPLE-E2E": {
+    "sample_id": "SAMPLE-E2E",
     "status": "review_approved",
     "model_output": {
-      "sample_id": "SAMPLE-COVERED",
+      "sample_id": "SAMPLE-E2E",
       "original_line_number": 88,
       "batch_id": "BATCH-002",
-      "model_version": "v2.4.0",
-      "content": "文本包含暴力隐喻表达",
+      "model_version": "v2.4",
+      "content": "一段文本内容",
       "predicted_label": "normal",
       "confidence": 0.95,
       "risk_tags": [],
       "evidence_snippets": [
-        "新版模型优化后未检测到敏感词"
+        "B2证据: 新版模型优化后未检测到敏感词"
       ],
-      "import_time": "2026-06-21 01:20:03.489894",
+      "import_time": "2026-06-21 01:19:51.527606",
       "raw_data": {}
     },
     "manual_judgments": [
       {
-        "sample_id": "SAMPLE-COVERED",
-        "judgment_id": "JUDGE-COVERED-001",
+        "sample_id": "SAMPLE-E2E",
+        "judgment_id": "JUDGE-E2E-001",
         "judge_person": "周姐",
-        "judgment_time": "2026-06-21 01:20:03.489600",
+        "judgment_time": "2026-06-21 01:19:51.527408",
         "final_label": "violent",
-        "on_site_statement": "周姐现场确认：文本确实包含暴力隐喻，模型判断正确，需回流训练集",
+        "on_site_statement": "周姐现场确认: 文本确实包含暴力隐喻，模型判断正确",
         "change_type": "label_change",
         "changed_fields": [
           "predicted_label"
@@ -35,19 +35,19 @@
         "new_values": {
           "predicted_label": "violent"
         },
-        "remarks": "周姐现场确认，该样本需回流到训练集",
+        "remarks": "周姐确认需回流训练集",
         "is_overridden": false,
         "override_batch_id": null,
         "override_time": null
       }
     ],
     "active_manual_judgment": {
-      "sample_id": "SAMPLE-COVERED",
-      "judgment_id": "JUDGE-COVERED-001",
+      "sample_id": "SAMPLE-E2E",
+      "judgment_id": "JUDGE-E2E-001",
       "judge_person": "周姐",
-      "judgment_time": "2026-06-21 01:20:03.489600",
+      "judgment_time": "2026-06-21 01:19:51.527408",
       "final_label": "violent",
-      "on_site_statement": "周姐现场确认：文本确实包含暴力隐喻，模型判断正确，需回流训练集",
+      "on_site_statement": "周姐现场确认: 文本确实包含暴力隐喻，模型判断正确",
       "change_type": "label_change",
       "changed_fields": [
         "predicted_label"
@@ -58,7 +58,7 @@
       "new_values": {
         "predicted_label": "violent"
       },
-      "remarks": "周姐现场确认，该样本需回流到训练集",
+      "remarks": "周姐确认需回流训练集",
       "is_overridden": false,
       "override_batch_id": null,
       "override_time": null
@@ -67,12 +67,12 @@
     "covered_by_batch_id": null,
     "current_label": "violent",
     "final_evidence": [
-      "新版模型优化后未检测到敏感词",
-      "周姐现场确认：文本确实包含暴力隐喻，模型判断正确，需回流训练集"
+      "B2证据: 新版模型优化后未检测到敏感词",
+      "周姐现场确认: 文本确实包含暴力隐喻，模型判断正确"
     ],
     "change_history": [
       {
-        "timestamp": "2026-06-21 01:20:03.489276",
+        "timestamp": "2026-06-21 01:19:51.527000",
         "operator": "工程师A",
         "action": "model_import",
         "field_name": "model_output",
@@ -81,16 +81,16 @@
         "reason": "首次导入模型输出片段"
       },
       {
-        "timestamp": "2026-06-21 01:20:03.489622",
+        "timestamp": "2026-06-21 01:19:51.527436",
         "operator": "周姐",
         "action": "manual_judgment_update",
         "field_name": "active_manual_judgment",
         "old_value": null,
-        "new_value": "JUDGE-COVERED-001",
+        "new_value": "JUDGE-E2E-001",
         "reason": "标注负责人补看人工改判表"
       },
       {
-        "timestamp": "2026-06-21 01:20:03.489897",
+        "timestamp": "2026-06-21 01:19:51.527610",
         "operator": "工程师B",
         "action": "batch_override_detected",
         "field_name": "model_output.batch_id",
@@ -99,26 +99,26 @@
         "reason": "新批跑覆盖旧批跑，旧批=BATCH-001, 新批=BATCH-002"
       },
       {
-        "timestamp": "2026-06-21 01:20:03.489912",
+        "timestamp": "2026-06-21 01:19:51.527625",
         "operator": "工程师B",
         "action": "manual_judgment_overridden",
         "field_name": "active_manual_judgment",
-        "old_value": "JUDGE-COVERED-001",
+        "old_value": "JUDGE-E2E-001",
         "new_value": null,
         "reason": "人工改判被新批跑覆盖，等待安全审核同事复核"
       },
       {
-        "timestamp": "2026-06-21 01:20:03.490368",
+        "timestamp": "2026-06-21 01:19:51.527828",
         "operator": "安全审核同事",
         "action": "covered_review_approve",
         "field_name": "active_manual_judgment",
         "old_value": null,
-        "new_value": "JUDGE-COVERED-001",
-        "reason": "人工改判有效，模型新版本漏检"
+        "new_value": "JUDGE-E2E-001",
+        "reason": "人工改判有效，模型新版本漏检暴力内容"
       }
     ],
-    "last_updated": "2026-06-21 01:20:03.490369",
+    "last_updated": "2026-06-21 01:19:51.527830",
     "review_person": "安全审核同事",
-    "review_time": "2026-06-21 01:20:03.490365"
+    "review_time": "2026-06-21 01:19:51.527823"
   }
 }

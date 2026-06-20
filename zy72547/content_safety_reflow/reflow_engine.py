@@ -138,6 +138,9 @@ class ReflowEngine:
         )
 
         if has_manual:
+            result.model_output = new_output
+            result.current_label = new_output.predicted_label
+            result.final_evidence = list(new_output.evidence_snippets)
             result.is_covered = True
             result.covered_by_batch_id = new_output.batch_id
             result.status = ReflowStatus.COVERED_PENDING_REVIEW
@@ -248,12 +251,23 @@ class ReflowEngine:
             raise ValueError(f"样本 {sample_id} 不处于待复核状态")
 
         if approve:
-            if result.active_manual_judgment:
-                result.current_label = result.active_manual_judgment.final_label
+            restored_judgment = None
+            for mj in reversed(result.manual_judgments):
+                if mj.is_overridden:
+                    mj.is_overridden = False
+                    mj.override_batch_id = None
+                    mj.override_time = None
+                    restored_judgment = mj
+                    break
+
+            if restored_judgment:
+                result.active_manual_judgment = restored_judgment
+                result.current_label = restored_judgment.final_label
+
                 merged_evidence = []
                 if result.model_output:
                     merged_evidence.extend(result.model_output.evidence_snippets)
-                merged_evidence.append(result.active_manual_judgment.on_site_statement)
+                merged_evidence.append(restored_judgment.on_site_statement)
                 result.final_evidence = merged_evidence
             elif result.model_output:
                 result.current_label = result.model_output.predicted_label
@@ -269,6 +283,9 @@ class ReflowEngine:
                 ChangeLogEntry(
                     operator=reviewer,
                     action="covered_review_approve",
+                    field_name="active_manual_judgment",
+                    old_value=None,
+                    new_value=restored_judgment.judgment_id if restored_judgment else None,
                     reason=reason or "安全审核同事复核通过，恢复人工改判效力",
                 )
             )
@@ -277,6 +294,7 @@ class ReflowEngine:
                 result.current_label = result.model_output.predicted_label
                 result.final_evidence = list(result.model_output.evidence_snippets)
 
+            result.active_manual_judgment = None
             result.is_covered = False
             result.covered_by_batch_id = None
             result.status = ReflowStatus.REVIEW_APPROVED
@@ -287,6 +305,9 @@ class ReflowEngine:
                 ChangeLogEntry(
                     operator=reviewer,
                     action="covered_review_reject",
+                    field_name="active_manual_judgment",
+                    old_value=None,
+                    new_value=None,
                     reason=reason or "安全审核同事复核不通过，以新批跑模型输出为准",
                 )
             )

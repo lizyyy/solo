@@ -1,0 +1,49 @@
+{
+  "version_id": "snap_0001_20260621011958",
+  "timestamp": "2026-06-21T01:19:58.510759",
+  "operator": "周姐",
+  "description": "导入模型后正确状态",
+  "results_snapshot": {
+    "SAMPLE-004": {
+      "sample_id": "SAMPLE-004",
+      "status": "model_imported",
+      "model_output": {
+        "sample_id": "SAMPLE-004",
+        "original_line_number": 1,
+        "batch_id": "BATCH-001",
+        "model_version": "v1.0",
+        "content": "测试",
+        "predicted_label": "normal",
+        "confidence": 0.9,
+        "risk_tags": [],
+        "evidence_snippets": [
+          "初始证据"
+        ],
+        "import_time": "2026-06-21 01:19:58.510741",
+        "raw_data": {}
+      },
+      "manual_judgments": [],
+      "active_manual_judgment": null,
+      "is_covered": false,
+      "covered_by_batch_id": null,
+      "current_label": "normal",
+      "final_evidence": [
+        "初始证据"
+      ],
+      "change_history": [
+        {
+          "timestamp": "2026-06-21 01:19:58.510743",
+          "operator": "工程师A",
+          "action": "model_import",
+          "field_name": "model_output",
+          "old_value": null,
+          "new_value": "batch=BATCH-001, line=1",
+          "reason": "首次导入模型输出片段"
+        }
+      ],
+      "last_updated": "2026-06-21 01:19:58.510746",
+      "review_person": null,
+      "review_time": null
+    }
+  }
+}
