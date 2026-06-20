@@ -1,0 +1,56 @@
+[
+  {
+    "question_id": "Q-2026-003",
+    "content": "学生答对概率约 6 成，通常需要补充分类讨论的完整步骤",
+    "unit": "步",
+    "version": "v1.0",
+    "source_raw": "2025 年秋教研会 A 组第 3 条，原备注写在教案侧栏",
+    "note": "旧说法，负责人标记过后续需更新",
+    "is_normal_record": false
+  },
+  {
+    "question_id": "Q-2026-003",
+    "content": "学生答对概率约 65%，分类讨论的完整步骤以 3 步为满分量纲",
+    "unit": "步",
+    "version": "v1.2",
+    "source_raw": "2026-03 教研修订记录，替换 v1.0",
+    "note": "最新版本，覆盖 v1.0 旧说法",
+    "is_normal_record": false
+  },
+  {
+    "question_id": "Q-2026-007",
+    "content": "大部分学生能完成前两小问，第三问得分率偏低，需要强调样本空间",
+    "unit": null,
+    "version": "v0.9",
+    "source_raw": "现场收集的评分备注，阿宁手写拍照转写，原句没写单位",
+    "note": "单位缺失，故意保留现场原样，不清洗",
+    "is_normal_record": false
+  },
+  {
+    "question_id": "Q-2026-011",
+    "content": "本题按参考答案作答即可，无特殊扣分点",
+    "unit": "分",
+    "version": "v2.0",
+    "source_raw": "常规题评分备注，来自题库模板",
+    "note": "正常记录，不涉及旧说法冲突",
+    "is_normal_record": true
+  },
+  {
+    "question_id": "Q-2026-015",
+    "content": "树状图画对第一层可得一半分数，第二层再给另一半",
+    "unit": "层",
+    "version": null,
+    "source_raw": "阿宁 2026-05 备注稿，未标注版本号",
+    "note": "无 version 的老备注，按旧说法处理",
+    "is_normal_record": false
+  },
+  {
+    "question_id": "Q-2026-015",
+    "content": "第一层和第二层各占一半，第三层若出现加 1 分附加分",
+    "unit": "层",
+    "version": null,
+    "source_raw": "正常记录补录",
+    "note": "同一题的正常记录，应被上一条（非 normal 的旧说法）覆盖",
+    "is_normal_record": true
+  }
+]
