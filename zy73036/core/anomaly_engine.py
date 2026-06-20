@@ -4,7 +4,8 @@ from datetime import datetime
 import json
 import os
 from .models import (WeightRecord, AnomalyRecord, AnomalyType,
-                     ProcessingStatus, HistoryChange, WeightCurveSnapshot)
+                     ProcessingStatus, HistoryChange, WeightCurveSnapshot,
+                     stable_anomaly_id)
 from .weight_curve import WeightCurveManager
 
 
@@ -28,6 +29,7 @@ class AnomalyEngine:
 
     def _make_anomaly(self, **kwargs) -> AnomalyRecord:
         a = AnomalyRecord(**kwargs)
+        a.ensure_stable_id()
         self.anomalies.append(a)
         if a.pet_id:
             self.anomalies_by_pet[a.pet_id].append(a)
@@ -173,6 +175,7 @@ class AnomalyEngine:
         anomaly = self._find_anomaly(anomaly_id)
         if not anomaly:
             return None
+        anomaly_id = anomaly.anomaly_id
         rec_ids = anomaly.involved_record_ids
         old_vals = {}
         new_vals = {}
@@ -202,7 +205,7 @@ class AnomalyEngine:
                 "weight_unit": rec.weight_unit,
                 "unit_normalized": rec.unit_normalized,
             }
-        self.history.append(HistoryChange(
+        change = HistoryChange(
             anomaly_id=anomaly_id,
             changed_by=operator,
             action="确认单位",
@@ -213,7 +216,9 @@ class AnomalyEngine:
             new_conclusion="已确认单位，重新计算体重曲线",
             old_remark=anomaly.block_reason,
             new_remark=remark or anomaly.block_reason,
-        ))
+        )
+        change.ensure_stable_id()
+        self.history.append(change)
         anomaly.status = ProcessingStatus.RESOLVED
         anomaly.resolved_at = datetime.now()
         anomaly.resolved_by = operator
@@ -226,6 +231,7 @@ class AnomalyEngine:
         anomaly = self._find_anomaly(anomaly_id)
         if not anomaly:
             return None
+        anomaly_id = anomaly.anomaly_id
         old_vals = {}
         new_vals = {}
         if override_values:
@@ -251,7 +257,7 @@ class AnomalyEngine:
                     "remark": rec.remark,
                 }
         prev_conc = anomaly.status.value
-        self.history.append(HistoryChange(
+        change = HistoryChange(
             anomaly_id=anomaly_id,
             changed_by=operator,
             action="改判结论",
@@ -263,7 +269,9 @@ class AnomalyEngine:
             old_remark=anomaly.block_reason,
             new_remark=new_remark or anomaly.block_reason,
             source_materials_ref=anomaly.involved_record_ids,
-        ))
+        )
+        change.ensure_stable_id()
+        self.history.append(change)
         anomaly.status = ProcessingStatus.REVISED
         anomaly.block_reason = f"[原]{anomaly.block_reason} [改判原因]{revision_reason}"
         anomaly.updated_at = datetime.now()
@@ -272,15 +280,23 @@ class AnomalyEngine:
         return anomaly
 
     def get_history_for_anomaly(self, anomaly_id: str) -> List[HistoryChange]:
-        return [h for h in self.history if h.anomaly_id == anomaly_id]
+        return [
+            h for h in self.history
+            if h.anomaly_id == anomaly_id
+            or anomaly_id.startswith(h.anomaly_id)
+            or h.anomaly_id.startswith(anomaly_id)
+        ]
 
     def get_history_for_pet(self, pet_id: str) -> List[HistoryChange]:
         target_anom_ids = {a.anomaly_id for a in self.anomalies_by_pet.get(pet_id, [])}
         return [h for h in self.history if h.anomaly_id in target_anom_ids]
 
     def _find_anomaly(self, aid: str) -> AnomalyRecord:
+        exact = [a for a in self.anomalies if a.anomaly_id == aid]
+        if exact:
+            return exact[0]
         for a in self.anomalies:
-            if a.anomaly_id == aid:
+            if a.anomaly_id.startswith(aid):
                 return a
         return None
 
@@ -324,8 +340,110 @@ class AnomalyEngine:
             json.dump(data, f, ensure_ascii=False, indent=2)
         return out_path
 
+    def save_anomaly_objects(self, out_path: str):
+        data = [a.to_dict() for a in self.anomalies]
+        with open(out_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        return out_path
+
+    def load_anomaly_objects(self, path: str) -> Dict[str, AnomalyRecord]:
+        if not os.path.exists(path):
+            return {}
+        with open(path, "r", encoding="utf-8") as f:
+            raw = json.load(f)
+        saved = {}
+        for item in raw:
+            try:
+                a = AnomalyRecord.from_dict(item)
+                a.ensure_stable_id()
+                saved[a.anomaly_id] = a
+            except Exception:
+                continue
+        self._merge_saved_anomaly_status(saved)
+        return saved
+
+    def _merge_saved_anomaly_status(self, saved: Dict[str, AnomalyRecord]):
+        for live in self.anomalies:
+            s = saved.get(live.anomaly_id)
+            if not s:
+                continue
+            if s.status.value != live.status.value:
+                live.status = s.status
+            if s.block_reason and s.block_reason != live.block_reason:
+                live.block_reason = s.block_reason
+            if s.resolved_at:
+                live.resolved_at = s.resolved_at
+            if s.resolved_by:
+                live.resolved_by = s.resolved_by
+            if s.updated_at:
+                live.updated_at = s.updated_at
+            if s.extra:
+                for k, v in s.extra.items():
+                    live.extra.setdefault(k, v)
+
     def save_history(self, out_path: str):
         data = [h.to_dict() for h in self.history]
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         return out_path
+
+    def load_history(self, history_path: str):
+        if not os.path.exists(history_path):
+            self.history = []
+            return []
+        with open(history_path, "r", encoding="utf-8") as f:
+            raw_items = json.load(f)
+        self.history = []
+        for item in raw_items:
+            try:
+                h = HistoryChange.from_dict(item)
+                h.ensure_stable_id()
+                self.history.append(h)
+            except Exception:
+                continue
+        self.apply_history()
+        return self.history
+
+    def apply_history(self):
+        dedup = {}
+        unique = []
+        for change in self.history:
+            if change.change_id not in dedup:
+                dedup[change.change_id] = True
+                unique.append(change)
+        self.history = unique
+        for change in self.history:
+            anomaly = self._find_anomaly(change.anomaly_id)
+            for record_id, values in change.new_values.items():
+                rec = self._find_record(record_id)
+                if rec:
+                    self._apply_record_values(rec, values)
+            if not anomaly:
+                continue
+            if change.action == "确认单位":
+                anomaly.status = ProcessingStatus.RESOLVED
+            elif change.action == "改判结论":
+                anomaly.status = ProcessingStatus.REVISED
+                if change.revision_reason and "[改判原因]" not in anomaly.block_reason:
+                    anomaly.block_reason = f"[原]{anomaly.block_reason} [改判原因]{change.revision_reason}"
+            if change.changed_at:
+                anomaly.resolved_at = change.changed_at
+                anomaly.updated_at = change.changed_at
+            if change.changed_by:
+                anomaly.resolved_by = change.changed_by
+
+    @staticmethod
+    def _apply_record_values(rec: WeightRecord, values: Dict[str, Any]):
+        if "weight_kg" in values:
+            rec.weight_kg = values["weight_kg"]
+        if "weight_unit" in values:
+            rec.weight_unit = values["weight_unit"]
+        if "unit_normalized" in values:
+            rec.unit_normalized = bool(values["unit_normalized"])
+        if "processing_status" in values:
+            try:
+                rec.processing_status = ProcessingStatus(values["processing_status"])
+            except ValueError:
+                pass
+        if "remark" in values:
+            rec.remark = values["remark"]

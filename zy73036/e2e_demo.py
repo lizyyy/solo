@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 端到端演示脚本：在同一个进程里走完所有步骤，
-确保 confirm-unit / revise 的历史留存在同一份状态里。
-（CLI 单次调用无法保存内存状态，这个脚本演示完整流程）
+演示 confirm-unit / revise 的历史留存和筛选导出流程。
+CLI 也会通过 output/变更历史.json 在多次调用之间回放状态。
 """
 import json
 import os

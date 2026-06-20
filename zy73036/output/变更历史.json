@@ -1,13 +1,13 @@
 [
   {
-    "change_id": "262a48f4-7097-47aa-a33b-b3cf71ee41db",
-    "anomaly_id": "aad0d1be-0cec-4398-b5f6-ae7ad4c3da99",
+    "change_id": "chg_6b85e65497cffcb1",
+    "anomaly_id": "anom_629ec4d0550d1209",
     "record_id": "",
     "changed_by": "阿岑",
-    "changed_at": "2026-06-09T08:45:54.777560",
+    "changed_at": "2026-06-17T13:24:57.091497",
     "action": "确认单位",
     "old_values": {
-      "3bd9dd50-b6ab-428e-ac54-10b1c9b90744": {
+      "rec_d213f4451eebe0b4": {
         "processing_status": "需确认单位",
         "weight_kg": null,
         "weight_unit": "",
@@ -15,7 +15,7 @@
       }
     },
     "new_values": {
-      "3bd9dd50-b6ab-428e-ac54-10b1c9b90744": {
+      "rec_d213f4451eebe0b4": {
         "processing_status": "已确认",
         "weight_kg": 4.5,
         "weight_unit": "kg",
@@ -24,50 +24,80 @@
     },
     "revision_reason": "人工确认单位为: kg",
     "old_remark": "未识别单位，缺失单位标注",
-    "new_remark": "已和运营主管核对：主人回忆时口头说的是 kg，实际和现场对得上",
+    "new_remark": "已和运营主管核对原始单据，确认单位是kg",
     "previous_conclusion": "需确认单位",
     "new_conclusion": "已确认单位，重新计算体重曲线",
     "source_materials_ref": []
   },
   {
-    "change_id": "ef6eed62-537b-4cd1-bf13-3a69d8665075",
-    "anomaly_id": "62fed507-e7b9-49f4-89a6-eccba63ce105",
+    "change_id": "chg_7ebdacc672fe5a60",
+    "anomaly_id": "anom_8b0b46bc3a462411",
     "record_id": "",
     "changed_by": "阿岑",
-    "changed_at": "2026-06-09T08:45:54.777635",
+    "changed_at": "2026-06-20T15:41:47.861783",
+    "action": "确认单位",
+    "old_values": {
+      "rec_8c33b58d77d3d1fb": {
+        "processing_status": "需确认单位",
+        "weight_kg": null,
+        "weight_unit": "",
+        "unit_normalized": false
+      }
+    },
+    "new_values": {
+      "rec_8c33b58d77d3d1fb": {
+        "processing_status": "已确认",
+        "weight_kg": 4.5,
+        "weight_unit": "kg",
+        "unit_normalized": true
+      }
+    },
+    "revision_reason": "人工确认单位为: kg",
+    "old_remark": "未识别单位，缺失单位标注",
+    "new_remark": "电话确认主人，4.5是公斤，不是斤或磅",
+    "previous_conclusion": "需确认单位",
+    "new_conclusion": "已确认单位，重新计算体重曲线",
+    "source_materials_ref": []
+  },
+  {
+    "change_id": "chg_fd794d1cf1d3381c",
+    "anomaly_id": "anom_0efff038c4f3950f",
+    "record_id": "",
+    "changed_by": "阿岑",
+    "changed_at": "2026-06-20T15:44:34.776408",
     "action": "改判结论",
     "old_values": {
-      "fc2eed81-be0f-473d-9b36-c823f5b616aa": {
+      "rec_4bd20502bda0b6c1": {
         "weight_kg": 12.8,
         "processing_status": "已确认",
         "remark": ""
       },
-      "7ef89be7-8d93-4c74-965f-0d6bb85bbaab": {
+      "rec_12b9d4659334f0fb": {
         "weight_kg": 6.0,
         "processing_status": "已确认",
         "remark": "？？？骤降异常，需复核（原12.x）"
       }
     },
     "new_values": {
-      "fc2eed81-be0f-473d-9b36-c823f5b616aa": {
+      "rec_4bd20502bda0b6c1": {
         "weight_kg": 13.0,
         "processing_status": "已改判",
-        "remark": "2026-06-09 现场复核：电子秤log显示13.0kg，6.0为笔误"
+        "remark": "已电话和运营主管复核，5月5号称重实际是13.0kg"
       },
-      "7ef89be7-8d93-4c74-965f-0d6bb85bbaab": {
+      "rec_12b9d4659334f0fb": {
         "weight_kg": 13.0,
         "processing_status": "已改判",
-        "remark": "？？？骤降异常，需复核（原12.x） | 2026-06-09 现场复核：电子秤log显示13.0kg，6.0为笔误"
+        "remark": "？？？骤降异常，需复核（原12.x） | 已电话和运营主管复核，5月5号称重实际是13.0kg"
       }
     },
-    "revision_reason": "现场复核原始电子秤记录，对照5/5当日操作日志和监控，录入员小数点少按一位",
+    "revision_reason": "对照运营历史记录5/1前后毛豆体重稳定在12.5~13.0kg，6.0kg属手误少打了个1",
     "old_remark": "两次相邻称重相差超过阈值30.0%，疑似数据冲突或主人补充信息与旧记录不一致",
-    "new_remark": "2026-06-09 现场复核：电子秤log显示13.0kg，6.0为笔误",
+    "new_remark": "已电话和运营主管复核，5月5号称重实际是13.0kg",
     "previous_conclusion": "数据冲突待核",
-    "new_conclusion": "确认录入错误，原始单据是13.0kg不是6.0kg",
+    "new_conclusion": "判定为录入错误，正确体重应为13.0kg（和后续5/15测量一致）",
     "source_materials_ref": [
-      "fc2eed81-be0f-473d-9b36-c823f5b616aa",
-      "7ef89be7-8d93-4c74-965f-0d6bb85bbaab"
+      "rec_4bd20502bda0b6c1",
+      "rec_12b9d4659334f0fb"
     ]
   }
 ]

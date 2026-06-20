@@ -41,26 +41,54 @@ def _load_context():
     return curve_mgr, loader, engine, exporter
 
 
+def _load_source(loader, args):
+    src = args.input or os.path.join(BASE, "data_incoming")
+    if os.path.isdir(src):
+        loader.load_directory(src)
+    else:
+        loader.load_file(src)
+    return src
+
+
+def _history_path(exporter):
+    return os.path.join(exporter.output_dir, "变更历史.json")
+
+
+def _anomaly_objects_path(exporter):
+    return os.path.join(exporter.output_dir, "异常队列_完整对象.json")
+
+
+def _pipeline(loader, engine, exporter, args, detect: bool = True):
+    src = _load_source(loader, args)
+    if detect:
+        engine.detect_all()
+    if os.path.exists(_anomaly_objects_path(exporter)):
+        engine.load_anomaly_objects(_anomaly_objects_path(exporter))
+    engine.load_history(_history_path(exporter))
+    return src
+
+
+def _persist_all(engine, exporter):
+    engine.save_anomaly_objects(_anomaly_objects_path(exporter))
+    engine.save_anomaly_queue(os.path.join(exporter.output_dir, "异常队列.json"))
+    engine.save_history(_history_path(exporter))
+    exporter.export_history_csv(engine.history)
+    queue = engine.anomaly_queue_to_dicts()
+    exporter.export_anomaly_queue_csv(queue, "异常队列.csv", filters_used={})
+
+
 def cmd_load(args):
     curve_mgr, loader, engine, exporter = _load_context()
-    src = args.input or os.path.join(BASE, "data_incoming")
-    print(_c(f"[加载数据] 从 {src}", "蓝", "粗"))
-    if os.path.isdir(src):
-        results = loader.load_directory(src)
-        for fn, (ok, tot) in results.items():
-            tag = _c(f"{ok}/{tot}", "绿" if ok == tot else "黄")
-            print(f"  · {fn}: 成功 {tag} 条")
-    else:
-        ok, tot = loader.load_file(src)
-        print(f"  · {os.path.basename(src)}: 成功 {_c(f'{ok}/{tot}', '绿')} 条")
+    print(_c(f"[加载数据 + 异常检测 + 合并已处理状态]", "蓝", "粗"))
+    _pipeline(loader, engine, exporter, args, detect=True)
     print(_c(f"共加载 {len(curve_mgr.records)} 条记录，涉及 {len(curve_mgr.records_by_pet)} 只宠物", "蓝"))
-    anomalies = engine.detect_all()
-    _print_anomaly_summary(anomalies)
-    engine.save_anomaly_queue(os.path.join(exporter.output_dir, "异常队列.json"))
+    _print_anomaly_summary(engine.anomalies)
+    _persist_all(engine, exporter)
     curve_mgr.save_curves_json(os.path.join(exporter.output_dir, "体重曲线.json"))
     exporter.export_records_debug(curve_mgr.records, "体重记录明细.csv")
-    exporter.export_history_csv([], "变更历史.csv")
     _print_file_locations(exporter)
+    print(_c("\n[提示] 从下一行命令复制异常ID（anom_开头），"
+            "queue/detail/confirm-unit/revise 都能用同一个ID", "青", "粗"))
     return curve_mgr, engine, exporter
 
 
@@ -90,12 +118,7 @@ def _print_file_locations(exporter):
 
 def cmd_queue(args):
     curve_mgr, loader, engine, exporter = _load_context()
-    src = args.input or os.path.join(BASE, "data_incoming")
-    if os.path.isdir(src):
-        loader.load_directory(src)
-    else:
-        loader.load_file(src)
-    engine.detect_all()
+    _pipeline(loader, engine, exporter, args, detect=True)
 
     filters = {}
     if args.status:
@@ -109,9 +132,10 @@ def cmd_queue(args):
 
     queue = engine.anomaly_queue_to_dicts(filters)
     print(_c(f"\n═══════════════ 异常队列 {'（筛选：'+str(filters)+'）' if filters else ''} ═══════════════", "青", "粗"))
+    print(_c("（复制完整 anom_xxx ID，用于 detail / confirm-unit / revise 命令）", "青"))
     for idx, a in enumerate(queue, start=1):
         print(_c(f"\n  ┌─ 异常 #{idx}", "粗", "紫"))
-        print(_c(f"  │ ID: ", "蓝") + f"{a['anomaly_id'][:8]}...")
+        print(_c(f"  │ ID: ", "蓝") + _c(a["anomaly_id"], "黄", "粗"))
         print(_c(f"  │ 类型: ", "蓝") + _c(a["anomaly_type"], "红", "粗"))
         print(_c(f"  │ 宠物: ", "蓝") + f"{a['pet_name']}({a['pet_id']})")
         print(_c(f"  │ 状态: ", "蓝") + _c(a["status"], "黄"))
@@ -143,25 +167,17 @@ def cmd_queue(args):
 
 def cmd_detail(args):
     curve_mgr, loader, engine, exporter = _load_context()
-    src = args.input or os.path.join(BASE, "data_incoming")
-    if os.path.isdir(src):
-        loader.load_directory(src)
-    else:
-        loader.load_file(src)
-    engine.detect_all()
+    _pipeline(loader, engine, exporter, args, detect=True)
 
     aid = args.anomaly_id
-    anomaly = None
-    for a in engine.anomalies:
-        if a.anomaly_id.startswith(aid) or a.anomaly_id == aid:
-            anomaly = a
-            break
+    anomaly = engine._find_anomaly(aid)
     if not anomaly:
         print(_c(f"未找到异常ID匹配: {aid}", "红"))
+        print(_c("可用命令: python3 rescue_anomaly.py queue --type \"单位混写\" 来获取异常ID", "蓝"))
         return
 
     print(_c(f"\n═══════════════ 异常详情 ═══════════════", "紫", "粗"))
-    print(_c(f"异常ID: ", "蓝") + f"{anomaly.anomaly_id}")
+    print(_c(f"异常ID: ", "蓝") + _c(anomaly.anomaly_id, "黄", "粗"))
     print(_c(f"类型: ", "蓝") + _c(anomaly.anomaly_type.value, "红", "粗"))
     print(_c(f"严重级: ", "蓝") + anomaly.severity)
     print(_c(f"宠物: ", "蓝") + f"{anomaly.pet_name} ({anomaly.pet_id})")
@@ -177,41 +193,62 @@ def cmd_detail(args):
     if anomaly.resolved_at:
         print(_c(f"解决人/时间: ", "蓝") + f"{anomaly.resolved_by} / {anomaly.resolved_at}")
 
-    print(_c(f"\n── 关联体重曲线 ──", "青", "粗"))
+    print(_c(f"\n── 原始材料来源（{len(anomaly.involved_record_ids)} 条涉及记录） ──", "紫", "粗"))
+    for i, rid in enumerate(anomaly.involved_record_ids, start=1):
+        rec = engine._find_record(rid)
+        if not rec:
+            print(_c(f"  #{i} 记录ID={rid}（已不在当前数据中）", "黄"))
+            continue
+        print(_c(f"  #{i} 记录: ", "蓝") + f"{rec.pet_name}({rec.pet_id}) @ {rec.source_file}:{rec.source_row}")
+        print(_c(f"     原始体重值: ", "蓝") + f"'{rec.raw_weight_value}'  单位字段: '{rec.raw_unit_value}'")
+        print(_c(f"     解析后: ", "蓝") + f"{rec.weight_kg} kg (std_unit={rec.weight_unit})  状态: {rec.processing_status.value}")
+        if rec.measure_date:
+            print(_c(f"     测量日期: ", "蓝") + rec.measure_date.isoformat())
+        if rec.remark:
+            print(_c(f"     备注: ", "蓝") + rec.remark)
+        if rec.data_source:
+            print(_c(f"     来源: ", "蓝") + rec.data_source)
+
+    print(_c(f"\n── 关联体重曲线（{anomaly.pet_name}） ──", "青", "粗"))
     snap = curve_mgr.build_curve(anomaly.pet_id)
     print(f"宠物: {snap.pet_name}({snap.pet_id})  趋势: {snap.trend}  基线: {snap.baseline_weight_kg}kg  最新: {snap.last_weight_kg}kg")
     print(f"计算说明: {snap.calc_note}")
     for p in snap.points:
         marker = ""
         if p["record_id"] in anomaly.involved_record_ids:
-            marker = _c(" ◄── 关联异常", "红", "粗")
-        print(_c(f"  [{p['date'][:10]}] {p['weight_kg']}kg  状态:{p['status']}  来源:{p['source_file']}:{p['source_row']}", "青") + marker)
+            marker = _c(" ◄── 关联异常（本次计算用到）", "红", "粗")
+        st_color = "绿" if p["status"] in ("已确认",) else ("黄" if p["status"] == "需确认单位" else "红")
+        print(_c(f"  [{p['date'][:10]}] {p['weight_kg']}kg  ", "白") +
+              _c(f"[{p['status']}]", st_color) +
+              _c(f"  来源:{p['source_file']}:{p['source_row']}", "蓝") + marker)
 
     hist = engine.get_history_for_anomaly(anomaly.anomaly_id)
     if hist:
-        print(_c(f"\n── 变更历史（共{len(hist)}条） ──", "黄", "粗"))
-        for h in hist:
-            print(_c(f"  [{h.changed_at}] {h.action}  by {h.changed_by}", "黄", "粗"))
-            print(_c(f"    改判原因: ", "黄") + h.revision_reason)
-            print(_c(f"    原结论: ", "红") + h.previous_conclusion + _c("  → 新结论: ", "绿") + h.new_conclusion)
+        print(_c(f"\n── 变更历史（共{len(hist)}条，改判后可在此回看旧材料、新备注和改判原因） ──", "黄", "粗"))
+        for i, h in enumerate(hist, start=1):
+            print(_c(f"  #{i} [{h.changed_at}] {h.action}  by {h.changed_by}", "黄", "粗"))
+            if h.revision_reason:
+                print(_c(f"     改判原因: ", "黄") + _c(h.revision_reason, "黄", "粗"))
+            if h.previous_conclusion or h.new_conclusion:
+                print(_c(f"     原结论: ", "红") + h.previous_conclusion +
+                      _c("  → 新结论: ", "绿") + _c(h.new_conclusion, "绿", "粗"))
             if h.old_values:
-                print(_c(f"    旧值: ", "红") + json.dumps(h.old_values, ensure_ascii=False)[:120])
-            if h.new_values:
-                print(_c(f"    新值: ", "绿") + json.dumps(h.new_values, ensure_ascii=False)[:120])
+                for k, v in h.old_values.items():
+                    nv = h.new_values.get(k)
+                    print(_c(f"     [涉及记录 {k[:8]}...] 旧值: ", "红") + json.dumps(v, ensure_ascii=False) +
+                          _c("  → 新值: ", "绿") + json.dumps(nv, ensure_ascii=False))
             if h.old_remark or h.new_remark:
-                print(_c(f"    旧备注: ", "红") + _short(h.old_remark, 50))
-                print(_c(f"    新备注: ", "绿") + _short(h.new_remark, 50))
+                print(_c(f"     旧备注: ", "红") + h.old_remark)
+                print(_c(f"     新备注: ", "绿") + h.new_remark)
+            if h.source_materials_ref:
+                print(_c(f"     源材料引用: ", "蓝") + ", ".join(h.source_materials_ref))
     else:
-        print(_c("\n（尚无变更历史）", "黄"))
+        print(_c("\n（尚无变更历史 — 做一次 confirm-unit 或 revise 后会在这里显示）", "黄"))
 
 
 def cmd_curve(args):
     curve_mgr, loader, engine, exporter = _load_context()
-    src = args.input or os.path.join(BASE, "data_incoming")
-    if os.path.isdir(src):
-        loader.load_directory(src)
-    else:
-        loader.load_file(src)
+    _pipeline(loader, engine, exporter, args, detect=True)
     curves = curve_mgr.build_all_curves()
     pet_id = args.pet_id
     if pet_id:
@@ -233,34 +270,25 @@ def cmd_curve(args):
 
 def cmd_confirm_unit(args):
     curve_mgr, loader, engine, exporter = _load_context()
-    src = args.input or os.path.join(BASE, "data_incoming")
-    if os.path.isdir(src):
-        loader.load_directory(src)
-    else:
-        loader.load_file(src)
-    engine.detect_all()
-    engine.confirm_unit(args.anomaly_id, args.unit, args.operator or "阿岑", args.remark or "")
-    engine.save_anomaly_queue(os.path.join(exporter.output_dir, "异常队列.json"))
-    engine.save_history(os.path.join(exporter.output_dir, "变更历史.json"))
-    exporter.export_history_csv(engine.history)
+    _pipeline(loader, engine, exporter, args, detect=True)
+    result = engine.confirm_unit(args.anomaly_id, args.unit, args.operator or "阿岑", args.remark or "")
+    if not result:
+        print(_c(f"未找到异常ID匹配: {args.anomaly_id}", "红"))
+        print(_c("可用命令: python3 rescue_anomaly.py queue --type \"单位混写\" 来获取异常ID", "蓝"))
+        return
+    _persist_all(engine, exporter)
     print(_c(f"已确认单位为: {args.unit}", "绿", "粗"))
-    print(_c(f"变更历史已保存", "绿"))
-    queue = engine.anomaly_queue_to_dicts()
-    exporter.export_anomaly_queue_csv(queue, "异常队列.csv", filters={})
+    print(_c(f"变更历史已保存，再跑一次 detail {args.anomaly_id} 可以看到历史记录", "绿"))
+    print(_c(f"涉及异常ID: {result.anomaly_id}", "蓝"))
 
 
 def cmd_revise(args):
     curve_mgr, loader, engine, exporter = _load_context()
-    src = args.input or os.path.join(BASE, "data_incoming")
-    if os.path.isdir(src):
-        loader.load_directory(src)
-    else:
-        loader.load_file(src)
-    engine.detect_all()
+    _pipeline(loader, engine, exporter, args, detect=True)
     override = {}
     if args.new_weight_kg:
         override["weight_kg"] = float(args.new_weight_kg)
-    engine.revise_conclusion(
+    result = engine.revise_conclusion(
         anomaly_id=args.anomaly_id,
         new_conclusion=args.new_conclusion,
         revision_reason=args.reason,
@@ -268,21 +296,19 @@ def cmd_revise(args):
         new_remark=args.remark or "",
         override_values=override or None,
     )
-    engine.save_anomaly_queue(os.path.join(exporter.output_dir, "异常队列.json"))
-    engine.save_history(os.path.join(exporter.output_dir, "变更历史.json"))
-    exporter.export_history_csv(engine.history)
+    if not result:
+        print(_c(f"未找到异常ID匹配: {args.anomaly_id}", "红"))
+        print(_c("可用命令: python3 rescue_anomaly.py queue --status \"数据冲突待核\" 来获取异常ID", "蓝"))
+        return
+    _persist_all(engine, exporter)
     print(_c(f"已改判结论为: {args.new_conclusion}", "绿", "粗"))
     print(_c(f"改判原因: {args.reason}", "蓝"))
+    print(_c(f"变更历史已保存，再跑一次 detail {args.anomaly_id} 可以看到旧材料、新备注和改判原因", "绿"))
 
 
 def cmd_export(args):
     curve_mgr, loader, engine, exporter = _load_context()
-    src = args.input or os.path.join(BASE, "data_incoming")
-    if os.path.isdir(src):
-        loader.load_directory(src)
-    else:
-        loader.load_file(src)
-    engine.detect_all()
+    _pipeline(loader, engine, exporter, args, detect=True)
 
     filters = {}
     if args.status:
@@ -321,13 +347,9 @@ def cmd_export(args):
 
 def cmd_summary(args):
     curve_mgr, loader, engine, exporter = _load_context()
-    src = args.input or os.path.join(BASE, "data_incoming")
-    if os.path.isdir(src):
-        loader.load_directory(src)
-    else:
-        loader.load_file(src)
-    anomalies = engine.detect_all()
+    _pipeline(loader, engine, exporter, args, detect=True)
     curves = curve_mgr.build_all_curves()
+    anomalies = engine.anomalies
     print(_c(f"\n═══════════════ 数据总览 ═══════════════", "紫", "粗"))
     print(_c(f"  加载记录数: ", "蓝") + f"{len(curve_mgr.records)}")
     print(_c(f"  涉及宠物数: ", "蓝") + f"{len(curves)}")

@@ -1,6 +1,7 @@
 from typing import List, Dict, Optional, Tuple
 from datetime import datetime
 from collections import defaultdict
+import hashlib
 import json
 import os
 from .models import WeightRecord, WeightCurveSnapshot, ProcessingStatus
@@ -54,6 +55,7 @@ class WeightCurveManager:
         )
         if not rec.pet_id:
             rec.pet_id = f"__unnamed_{row_num}"
+        rec.ensure_stable_id()
         norm = self.unit_normalizer.full_normalize(rec.raw_weight_value, rec.raw_unit_value)
         rec.weight_kg = norm["weight_kg"]
         rec.weight_unit = norm["std_unit"] or ""
