@@ -103,6 +103,167 @@ def _build_baseline_section(run: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _build_anomaly_changes_section(run: Dict[str, Any]) -> str:
+    summary = run.get("baseline_summary")
+    if not summary or "anomaly_changes" not in summary:
+        return ""
+
+    changes = summary["anomaly_changes"]
+    counts = summary.get("change_summary_counts", {})
+
+    lines = []
+    lines.append("## 二+、异常类型变化明细（按 rule_id 粒度）\n")
+    lines.append(
+        "> 负责人复盘口径：本章节揭示「仍然异常」掩盖下的真实变化。"
+        "同一记录从 R001 变 R003 这类情况在此显式暴露。\n"
+    )
+
+    lines.append("### 变化维度汇总\n")
+    lines.append("| 指标 | 记录数 | 说明 |")
+    lines.append("| --- | ---: | --- |")
+    lines.append(
+        f"| 🆕 有新增异常的记录 | **{counts.get('records_with_new_anomalies', 0)}** | "
+        "本轮新触发了之前没有的规则 |"
+    )
+    lines.append(
+        f"| ✅ 有已消失异常的记录 | **{counts.get('records_with_disappeared_anomalies', 0)}** | "
+        "之前触发的规则本轮已修复（注意：不代表整体通过） |"
+    )
+    lines.append(
+        f"| 🔄 同规则字段/级别变化 | **{counts.get('records_with_persisting_changes', 0)}** | "
+        "同一 rule_id 仍触发，但字段或严重级别变了 |"
+    )
+    lines.append(
+        f"| 👤 需人工确认 | **{counts.get('needs_manual_confirm', 0)}** | "
+        "有新增异常或同规则发生变化，建议人工过目 |"
+    )
+    lines.append("")
+
+    lines.append("### 逐条记录异常变化\n")
+    lines.append(
+        "> 表格列说明：变化类型用「基线异常 → 当前异常」对比；"
+        "⚠️ 标记的是**需人工确认**的记录。\n"
+    )
+
+    sorted_rids = sorted(
+        changes.keys(),
+        key=lambda rid: (
+            not changes[rid]["needs_manual_confirm"],
+            -len(changes[rid]["new_anomalies"]) - len(changes[rid]["disappeared_anomalies"]),
+            rid,
+        ),
+    )
+
+    for rid in sorted_rids:
+        c = changes[rid]
+        mark = " ⚠️" if c["needs_manual_confirm"] else ""
+        ver_note = ""
+        if c["version_jumped"]:
+            ver_note = f" (版本 v{c['baseline_version']}→v{c['current_version']})"
+
+        lines.append(
+            f"#### `{rid}` · {c['pet_name']}（{c['owner_name']}）{mark}{ver_note}\n"
+        )
+        lines.append(f"- **变化类型**：{c['change_type']}")
+        lines.append(
+            f"- **整体状态**：{_status_icon(c['baseline_status'])} {c['baseline_status']} "
+            f"→ {_status_icon(c['current_status'])} {c['current_status']}"
+        )
+        lines.append("")
+
+        if c["disappeared_anomalies"]:
+            lines.append("**✅ 已消失的异常（基线有，当前无）**\n")
+            lines.append("| rule_id | 规则名称 | 严重级别 | 字段 | 当时的异常原因 | 当时值 |")
+            lines.append("| --- | --- | --- | --- | --- | --- |")
+            for a in c["disappeared_anomalies"]:
+                val = a.get("current_value") or "-"
+                if len(val) > 30:
+                    val = val[:27] + "…"
+                lines.append(
+                    f"| `{a['rule_id']}` | {a['rule_name']} | "
+                    f"{_severity_icon(a['severity'])} {a['severity']} | "
+                    f"`{a.get('field_name') or '-'}` | {a['anomaly_reason']} | {val} |"
+                )
+            lines.append("")
+
+        if c["new_anomalies"]:
+            lines.append("**🆕 新增的异常（基线无，当前有）**\n")
+            lines.append("| rule_id | 规则名称 | 严重级别 | 字段 | 异常原因 | 当前值 |")
+            lines.append("| --- | --- | --- | --- | --- | --- |")
+            for a in c["new_anomalies"]:
+                val = a.get("current_value") or "-"
+                if len(val) > 30:
+                    val = val[:27] + "…"
+                lines.append(
+                    f"| `{a['rule_id']}` | {a['rule_name']} | "
+                    f"{_severity_icon(a['severity'])} {a['severity']} | "
+                    f"`{a.get('field_name') or '-'}` | {a['anomaly_reason']} | {val} |"
+                )
+            lines.append("")
+
+        if c["persisting_anomalies"]:
+            lines.append("**🔄 仍存在的异常（两轮都触发，显式对比变化）**\n")
+            lines.append(
+                "| rule_id | 规则 | 字段(基→现) | 严重级(基→现) | 值(基→现) | 变化标记 |"
+            )
+            lines.append("| --- | --- | --- | --- | --- | --- |")
+            for p in c["persisting_anomalies"]:
+                field_diff = (
+                    f"`{p.get('baseline_field_name') or '-'}` → `{p.get('field_name') or '-'}`"
+                )
+                sev_diff = (
+                    f"{_severity_icon(p.get('baseline_severity'))} {p.get('baseline_severity')} → "
+                    f"{_severity_icon(p.get('severity'))} {p.get('severity')}"
+                )
+                b_val = p.get("baseline_current_value") or "-"
+                c_val = p.get("current_value") or "-"
+                if len(b_val) > 18:
+                    b_val = b_val[:15] + "…"
+                if len(c_val) > 18:
+                    c_val = c_val[:15] + "…"
+                val_diff = f"{b_val} → {c_val}"
+                marks = []
+                if p["field_changed"]:
+                    marks.append("字段变")
+                if p["severity_changed"]:
+                    marks.append("级别变")
+                if p["value_changed"]:
+                    marks.append("值变")
+                if not marks:
+                    marks.append("无变化")
+                mark_str = "、".join(marks)
+                if p["any_changed"]:
+                    mark_str = f"⚠️ {mark_str}"
+                lines.append(
+                    f"| `{p['rule_id']}` | {p['rule_name']} | "
+                    f"{field_diff} | {sev_diff} | {val_diff} | {mark_str} |"
+                )
+            lines.append("")
+
+    needs_confirm = summary.get("needs_manual_confirm_records", [])
+    if needs_confirm:
+        lines.append("### 📋 需人工确认清单\n")
+        lines.append(
+            "以下记录本轮出现了**新增异常**或**同规则字段/级别变化**，"
+            "建议人工复核确认是否为预期变化：\n"
+        )
+        lines.append("| record_id | 宠物名 | 主人 | 变化类型 | 版本 |")
+        lines.append("| --- | --- | --- | --- | ---: |")
+        for rid in needs_confirm:
+            c = changes[rid]
+            ver = (
+                f"v{c['baseline_version']}→v{c['current_version']}"
+                if c["version_jumped"]
+                else f"v{c['current_version']}"
+            )
+            lines.append(
+                f"| `{rid}` | {c['pet_name']} | {c['owner_name']} | {c['change_type']} | {ver} |"
+            )
+        lines.append("")
+
+    return "\n".join(lines)
+
+
 def _build_history_snippet(record_id: str) -> str:
     history = get_record_history(record_id)
     if len(history) <= 1:
@@ -200,6 +361,9 @@ def render_markdown(run_tag: str, db_path: str = None) -> str:
     baseline_block = _build_baseline_section(run)
     if baseline_block:
         parts.append(baseline_block)
+    anomaly_changes_block = _build_anomaly_changes_section(run)
+    if anomaly_changes_block:
+        parts.append(anomaly_changes_block)
     parts.append(_build_detail_section(run))
     return "\n".join(parts)
 

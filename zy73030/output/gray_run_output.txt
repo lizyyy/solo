@@ -1,3 +1,157 @@
+灰度发布前完整验证流程 — 开始于 2026-06-20 14:35:55.951569
+数据库位置: output/pet_training.db (每轮测试自动重建)
+
+ℹ️  已清理旧数据库，确保本次验证从零开始
+
+================================================================================
+▶ 步骤0: 初始化数据库
+  命令: /Library/Developer/CommandLineTools/usr/bin/python3 -m pet_training_audit init
+================================================================================
+  退出码: 0  (期望: [0])
+  ── STDOUT ──
+{
+  "ok": true,
+  "db_path": "(默认)",
+  "message": "数据库已初始化"
+}
+  结果: ✅ 通过
+
+================================================================================
+▶ 步骤1: 导入旧材料 batch_01 (6条历史记录)
+  命令: /Library/Developer/CommandLineTools/usr/bin/python3 -m pet_training_audit import --file tests/data/batch_01_old_materials.json
+================================================================================
+  退出码: 0  (期望: [0])
+  ── STDOUT ──
+{
+  "ok": true,
+  "total": 6,
+  "inserted": 6,
+  "versioned": 0,
+  "skipped": 0,
+  "failed": 0,
+  "errors": [],
+  "imported_ids": [
+    {
+      "record_id": "PET-20250601-001",
+      "version": 1
+    },
+    {
+      "record_id": "PET-20250602-002",
+      "version": 1
+    },
+    {
+      "record_id": "PET-20250603-003",
+      "version": 1
+    },
+    {
+      "record_id": "PET-20250604-004",
+      "version": 1
+    },
+    {
+      "record_id": "PET-20250605-005",
+      "version": 1
+    },
+    {
+      "record_id": "PET-20250606-006",
+      "version": 1
+    }
+  ]
+}
+  结果: ✅ 通过
+  → 导入统计: inserted=6, versioned=0, failed=0
+
+================================================================================
+▶ 步骤2: 基线复核 (仅旧材料) → run_tag=gray_baseline_v1
+  命令: /Library/Developer/CommandLineTools/usr/bin/python3 -m pet_training_audit audit --run-tag gray_baseline_v1 --triggered-by gray-release-step1-old-materials
+================================================================================
+  退出码: 2  (期望: [0, 2])
+  ── STDOUT ──
+{
+  "ok": true,
+  "run_id": 1,
+  "run_tag": "gray_baseline_v1",
+  "total_records": 6,
+  "anomaly_records": 6,
+  "total_anomalies": 8,
+  "per_severity": {
+    "warning": 6,
+    "error": 2
+  },
+  "per_rule": {
+    "R003": 4,
+    "R001": 2,
+    "R002": 2
+  },
+  "has_anomalies": true
+}
+  结果: ✅ 通过
+  → 复核结果: total=6, 异常记录=6, 总异常数=8, 按严重级={'warning': 6, 'error': 2}
+
+================================================================================
+▶ 步骤3: 补边界样本 batch_02 (2条升级v2 + 1条新增边界样本)
+  命令: /Library/Developer/CommandLineTools/usr/bin/python3 -m pet_training_audit import --file tests/data/batch_02_boundary_samples.json
+================================================================================
+  退出码: 0  (期望: [0])
+  ── STDOUT ──
+{
+  "ok": true,
+  "total": 3,
+  "inserted": 1,
+  "versioned": 2,
+  "skipped": 0,
+  "failed": 0,
+  "errors": [],
+  "imported_ids": [
+    {
+      "record_id": "PET-20250602-002",
+      "version": 2
+    },
+    {
+      "record_id": "PET-20250603-003",
+      "version": 2
+    },
+    {
+      "record_id": "PET-20250608-007",
+      "version": 1
+    }
+  ]
+}
+  结果: ✅ 通过
+  → 导入统计: inserted=1, versioned=2, failed=0
+
+================================================================================
+▶ 步骤4: 当前复核 (基线对比 baseline=gray_baseline_v1) → run_tag=gray_current_v2
+  命令: /Library/Developer/CommandLineTools/usr/bin/python3 -m pet_training_audit audit --run-tag gray_current_v2 --triggered-by gray-release-step2-boundary --baseline gray_baseline_v1
+================================================================================
+  退出码: 2  (期望: [0, 2])
+  ── STDOUT ──
+{
+  "ok": true,
+  "run_id": 2,
+  "run_tag": "gray_current_v2",
+  "total_records": 7,
+  "anomaly_records": 7,
+  "total_anomalies": 10,
+  "per_severity": {
+    "warning": 8,
+    "error": 2
+  },
+  "per_rule": {
+    "R003": 6,
+    "R001": 2,
+    "R002": 2
+  },
+  "has_anomalies": true
+}
+  结果: ✅ 通过
+  → 复核结果: total=7, 异常记录=7, 总异常数=10, 按规则={'R003': 6, 'R001': 2, 'R002': 2}
+
+================================================================================
+▶ 步骤5: 生成Markdown报告 (run_tag=gray_current_v2, 同时打印到stdout便于检查)
+  命令: /Library/Developer/CommandLineTools/usr/bin/python3 -m pet_training_audit report --run-tag gray_current_v2 --stdout
+================================================================================
+  退出码: 0  (期望: [0])
+  ── STDOUT ──
 # 🐾 宠物训练课记录复核报告
 
 - **报告编号**: `gray_current_v2`
@@ -219,3 +373,30 @@
 | rule_id | 严重级别 | 字段 | 异常原因 | 当前值 | 期望值 |
 | --- | --- | --- | --- | --- | --- |
 | `R003` | 🟡 warning | `medication_reminder` | **用药提醒填写过短，建议至少写明「药名+频次+提醒对象」，避免歧义** | 无 | 例如: '饭后半粒速诺，每日2次，提醒主人连续7天' |
+
+{
+  "ok": true,
+  "run_tag": "gray_current_v2",
+  "report_path": "/Users/maca/pro/solo/workspaces/zy73030/output/audit_report_gray_current_v2.md"
+}
+  结果: ✅ 通过
+
+================================================================================
+✅ 灰度流程全部执行完毕
+   - 基线 run_tag: gray_baseline_v1
+   - 当前 run_tag: gray_current_v2
+   - 报告文件: /Users/maca/pro/solo/workspaces/zy73030/output/audit_report_gray_current_v2.md
+   - 完整日志: /Users/maca/pro/solo/workspaces/zy73030/output/gray_release_run.log
+   - 报告大小: 12390 字节
+   - 报告行数: 221 行
+
+================================================================================
+🔍 数据一致性检查：版本历史与附件数量
+================================================================================
+  ✅ PET-20250601-001 毛毛      声明v=1, 实际版本数=1,  附件总数=1
+  ✅ PET-20250602-002 豆豆      声明v=2, 实际版本数=2,  附件总数=4
+  ✅ PET-20250603-003 奶糖      声明v=2, 实际版本数=2,  附件总数=4
+  ✅ PET-20250604-004 球球      声明v=1, 实际版本数=1,  附件总数=0
+  ✅ PET-20250605-005 旺财      声明v=1, 实际版本数=1,  附件总数=0
+  ✅ PET-20250606-006 咪咪      声明v=1, 实际版本数=1,  附件总数=1
+  ✅ PET-20250608-007 黑豹      声明v=1, 实际版本数=1,  附件总数=1

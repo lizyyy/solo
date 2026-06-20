@@ -219,6 +219,21 @@ def summarize_diff(current: Dict[str, Any], baseline: Dict[str, Any]) -> Dict[st
     fixed_anomaly_records = []
     still_failing = []
 
+    anomaly_changes: Dict[str, Dict[str, Any]] = {}
+
+    def _anomaly_key(a: Dict[str, Any]) -> str:
+        return a["rule_id"]
+
+    def _anomaly_meta(a: Dict[str, Any]) -> Dict[str, Any]:
+        return {
+            "rule_id": a["rule_id"],
+            "rule_name": a.get("rule_name", ""),
+            "severity": a.get("severity", ""),
+            "field_name": a.get("field_name"),
+            "anomaly_reason": a.get("anomaly_reason", ""),
+            "current_value": a.get("current_value"),
+        }
+
     all_ids = set(cur_map.keys()) | set(base_map.keys())
     for rid in sorted(all_ids):
         cur = cur_map.get(rid)
@@ -232,9 +247,125 @@ def summarize_diff(current: Dict[str, Any], baseline: Dict[str, Any]) -> Dict[st
         elif cur_fail and base_fail:
             still_failing.append(rid)
 
+        cur_anoms = {
+            _anomaly_key(a): _anomaly_meta(a)
+            for a in (cur.get("anomalies", []) if cur else [])
+        }
+        base_anoms = {
+            _anomaly_key(a): _anomaly_meta(a)
+            for a in (base.get("anomalies", []) if base else [])
+        }
+
+        all_rule_ids = set(cur_anoms.keys()) | set(base_anoms.keys())
+        new_rule_ids = set(cur_anoms.keys()) - set(base_anoms.keys())
+        disappeared_rule_ids = set(base_anoms.keys()) - set(cur_anoms.keys())
+        persisting_rule_ids = set(cur_anoms.keys()) & set(base_anoms.keys())
+
+        if not all_rule_ids and not (cur_fail or base_fail):
+            continue
+
+        new_list = [cur_anoms[rid2] for rid2 in sorted(new_rule_ids)]
+        disappeared_list = [base_anoms[rid2] for rid2 in sorted(disappeared_rule_ids)]
+        persisting_list = []
+        for rid2 in sorted(persisting_rule_ids):
+            c = cur_anoms[rid2]
+            b = base_anoms[rid2]
+            field_changed = c.get("field_name") != b.get("field_name")
+            severity_changed = c.get("severity") != b.get("severity")
+            value_changed = c.get("current_value") != b.get("current_value")
+            persisting_list.append({
+                **c,
+                "baseline_field_name": b.get("field_name"),
+                "baseline_severity": b.get("severity"),
+                "baseline_current_value": b.get("current_value"),
+                "baseline_anomaly_reason": b.get("anomaly_reason"),
+                "field_changed": field_changed,
+                "severity_changed": severity_changed,
+                "value_changed": value_changed,
+                "any_changed": field_changed or severity_changed or value_changed,
+            })
+
+        change_type_parts = []
+        if not base_fail and cur_fail:
+            change_type_parts.append("新出现异常")
+        elif base_fail and not cur_fail:
+            change_type_parts.append("全部修复")
+        else:
+            if disappeared_list:
+                change_type_parts.append(
+                    f"{len(disappeared_list)}项异常已消失({','.join(a['rule_id'] for a in disappeared_list)})"
+                )
+            if new_list:
+                change_type_parts.append(
+                    f"{len(new_list)}项异常新增({','.join(a['rule_id'] for a in new_list)})"
+                )
+            if persisting_list:
+                changed_persist = [p for p in persisting_list if p["any_changed"]]
+                unchanged_persist = [p for p in persisting_list if not p["any_changed"]]
+                if changed_persist:
+                    change_type_parts.append(
+                        f"{len(changed_persist)}项异常字段/级别变化({','.join(p['rule_id'] for p in changed_persist)})"
+                    )
+                if unchanged_persist:
+                    change_type_parts.append(
+                        f"{len(unchanged_persist)}项异常仍存在({','.join(p['rule_id'] for p in unchanged_persist)})"
+                    )
+
+        needs_manual_confirm = bool(
+            new_list
+            or any(p["any_changed"] for p in persisting_list)
+        )
+
+        pet_name = cur.get("pet_name") if cur else (base.get("pet_name") if base else "")
+        owner_name = cur.get("owner_name") if cur else (base.get("owner_name") if base else "")
+        baseline_version = base.get("version") if base else None
+        current_version = cur.get("version") if cur else None
+        version_jumped = (
+            baseline_version and current_version and current_version > baseline_version
+        )
+
+        anomaly_changes[rid] = {
+            "record_id": rid,
+            "pet_name": pet_name,
+            "owner_name": owner_name,
+            "baseline_status": "fail" if base_fail else "pass",
+            "current_status": "fail" if cur_fail else "pass",
+            "baseline_version": baseline_version,
+            "current_version": current_version,
+            "version_jumped": version_jumped,
+            "new_anomalies": new_list,
+            "disappeared_anomalies": disappeared_list,
+            "persisting_anomalies": persisting_list,
+            "change_type": " → ".join(change_type_parts) or "无变化",
+            "needs_manual_confirm": needs_manual_confirm,
+        }
+
+    needs_confirm_ids = sorted(
+        rid for rid, c in anomaly_changes.items()
+        if c["needs_manual_confirm"]
+    )
+
     return {
         "baseline_run_tag": baseline["run_tag"],
         "new_anomaly_records": new_anomaly_records,
         "fixed_anomaly_records": fixed_anomaly_records,
         "still_failing_records": still_failing,
+        "anomaly_changes": anomaly_changes,
+        "needs_manual_confirm_records": needs_confirm_ids,
+        "change_summary_counts": {
+            "new_anomaly_records": len(new_anomaly_records),
+            "fixed_anomaly_records": len(fixed_anomaly_records),
+            "still_failing_records": len(still_failing),
+            "records_with_new_anomalies": len(
+                [rid for rid, c in anomaly_changes.items() if c["new_anomalies"]]
+            ),
+            "records_with_disappeared_anomalies": len(
+                [rid for rid, c in anomaly_changes.items() if c["disappeared_anomalies"]]
+            ),
+            "records_with_persisting_changes": len(
+                [rid for rid, c in anomaly_changes.items()
+                 if any(p["any_changed"] for p in c["persisting_anomalies"])]
+            ),
+            "needs_manual_confirm": len(needs_confirm_ids),
+        },
     }
