@@ -74,18 +74,47 @@ Step 3: 模型版本对比更新
 - 置信度分布图中每一个柱子，点击后必须能看到该区间内的**所有样本明细**
 - **真实下钻（修复 Bug 3）**：前端缓存完整样本列表，不是 alert 占位符
   - 点击柱子弹出 `showBinSamples` 函数渲染真实明细表格
-  - 每个样本包含：
+  - 每个样本包含完整判断明细字段：
+    - 📝 原文 (original_text)
+    - 🤖 模型预测 (model_prediction)
+    - 📊 模型置信度 (model_confidence)
+    - ✍️ 人工标注 (manual_label)
+    - 🏷️ 当前状态 (status)
+    - 📋 备注 (raw_remark)
+    - 🔍 标记（低置信度 / 被平均掩盖 / 已KB复核）
+  - 每个样本带 4 个证据追溯链接：
     - 🔗 回到人工改判表的链接：`/api/sheets/{sheet_id}`
     - 🔗 提示词版本号链接：`/api/prompts/{prompt_id}`
     - 🔗 完整变更历史：`/api/samples/{id}/history`
     - 🔗 回滚入口：`/api/samples/{id}/rollback`
   - 后端 `cachedConfidenceData` 缓存后端返回的完整数据用于下钻
-  - 代码位置：[visualization_service.py#L82-L113](file:///Users/lzy/pro/solo/workspaces/zy72524/services/visualization_service.py#L82-L113)、[index.html#L321-L378](file:///Users/lzy/pro/solo/workspaces/zy72524/templates/index.html#L321-L378)
+  - 代码位置：[visualization_service.py#L82-L125](file:///Users/lzy/pro/solo/workspaces/zy72524/services/visualization_service.py#L82-L125)、[index.html#L346-L379](file:///Users/lzy/pro/solo/workspaces/zy72524/templates/index.html#L346-L379)
 - 后端返回的每个区间包含完整样本列表，每个样本带所有证据链接
 
 **禁止**：只展示漂亮的聚合指标，无法下钻到原始证据。
 
-### 5. 历史可追溯规则
+### 5. 证据链完整性规则
+
+**同一条样本的判断明细必须在所有环节保持一致**
+- 同一样本在以下所有节点中，`id`、`original_text`、`model_prediction`、`model_confidence`、`manual_label`、`raw_remark` 等核心字段必须完全一致：
+  1. 📋 样本列表 API
+  2. 📊 置信度分布图表下钻
+  3. 🔍 样本详情 API
+  4. 📜 样本变更历史（通过 sample_id 关联）
+  5. ⚠️ 被平均掩盖样本列表
+  6. 🔄 批次更新后（同一样本 ID 保持不变，仅备注等字段更新）
+  7. 📤 导出报告
+- 验证方式：运行 `python3 run_evidence_chain_test.py`，自动验证 98 个证据链一致性检查点
+- 代码位置：[_get_sample_evidence_link](file:///Users/lzy/pro/solo/workspaces/zy72524/services/visualization_service.py#L82-L125) 是所有样本展示的统一数据出口
+
+**导出报告规则**
+- 导出格式：CSV（UTF-8 BOM，支持 Excel 直接打开）
+- 报告包含：批次信息、完整样本明细（14 列）、统计汇总
+- 样本明细字段：样本ID、唯一标识、原文、模型预测、模型置信度、人工标注、当前状态、是否低置信度、是否被平均掩盖、是否KB复核、KB复核人、原始备注、创建时间、更新时间
+- API：`GET /api/sheets/{sheet_id}/export`
+- 代码位置：[app.py#L274-L335](file:///Users/lzy/pro/solo/workspaces/zy72524/app.py#L274-L335)
+
+### 6. 历史可追溯规则
 
 **单条备注修改可对比**
 - 当周姐只改了一条备注时，`SampleChangeHistory` 会记录 `change_type = 'remark_update'`
@@ -175,6 +204,13 @@ POST /api/workflows/{sheet_id}/complete-step
 - 状态汇总：`GET /api/visualization/status-summary/{sheet_id}`
 - 被平均掩盖的样本：`GET /api/visualization/masked-samples/{sheet_id}`
 
+### 导出报告
+```
+GET /api/sheets/{sheet_id}/export
+返回: CSV 文件（UTF-8 BOM）
+包含: 批次信息 + 完整样本明细（14列） + 统计汇总
+```
+
 ---
 
 ## 数据模型
@@ -243,6 +279,43 @@ POST /api/workflows/{sheet_id}/complete-step
 - 单元测试：`python3 run_test.py` 全部 6 项通过
 - 端到端测试：`python3 e2e_test.py` 完整流程验证通过
 - 浏览器集成：服务运行在 http://localhost:5001，图表下钻、备注变更、步骤流转全部正常
+
+### v1.2 - 证据链完整性增强
+
+**问题**：低置信度柱状图点击后，弹窗里的样本行没有真正展示原文、模型预测、人工标注；原文列被备注占用，模型预测列被状态占用；样本详情也显示不全。
+
+**修复内容**：
+
+1. **统一数据出口**：`_get_sample_evidence_link` 函数补充完整字段（原文、模型预测、人工标注、置信度、状态、备注等 20+ 字段），确保所有展示接口使用同一数据源
+   - 代码：[visualization_service.py#L82-L125](file:///Users/lzy/pro/solo/workspaces/zy72524/services/visualization_service.py#L82-L125)
+
+2. **修复图表下钻列映射**：下钻弹窗表格 9 列正确对应（ID、原文、模型预测、置信度、人工标注、状态、标记、备注、证据追溯）
+   - 代码：[index.html#L346-L379](file:///Users/lzy/pro/solo/workspaces/zy72524/templates/index.html#L346-L379)
+
+3. **修复被平均掩盖样本列表**：同步补充完整判断明细字段
+   - 代码：[index.html#L416-L432](file:///Users/lzy/pro/solo/workspaces/zy72524/templates/index.html#L416-L432)
+
+4. **新增报告导出功能**：CSV 格式，包含批次信息、14 列完整样本明细、统计汇总
+   - API：`GET /api/sheets/{sheet_id}/export`
+   - 代码：[app.py#L274-L335](file:///Users/lzy/pro/solo/workspaces/zy72524/app.py#L274-L335)
+
+5. **新增证据链一致性测试**：98 个检查点，验证同一条样本在 8 个环节的字段一致性
+   - 测试脚本：`python3 run_evidence_chain_test.py`
+   - 覆盖：样本列表 → 图表下钻 → 样本详情 → 变更历史 → 批次更新 → 备注变更 → KB复核 → 导出报告
+
+**验证方式**
+```bash
+# 1. 生成测试数据
+python3 gen_test_data.py
+
+# 2. 运行证据链验证（98 个检查点）
+python3 run_evidence_chain_test.py
+
+# 3. 启动服务手动验证
+python3 app.py
+# 访问 http://localhost:5001
+# 操作：导入 → 点低置信度柱子 → 看明细 → 点样本详情 → 导出报告
+```
 
 ---
 

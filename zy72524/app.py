@@ -1,5 +1,7 @@
 import os
-from flask import Flask, request, jsonify, render_template, send_from_directory
+import csv
+import io
+from flask import Flask, request, jsonify, render_template, send_from_directory, Response
 from config import Config
 from models import db, ManualCorrectionSheet, ReviewSample, PromptVersion
 from services.import_service import ImportService
@@ -268,6 +270,69 @@ def create_app():
     @app.route('/api/visualization/workflow-overview', methods=['GET'])
     def viz_workflow_overview():
         return jsonify(VisualizationService.get_workflow_overview())
+    
+    @app.route('/api/sheets/<int:sheet_id>/export', methods=['GET'])
+    def export_sheet_report(sheet_id):
+        sheet = ManualCorrectionSheet.query.get_or_404(sheet_id)
+        samples = ReviewSample.query.filter_by(correction_sheet_id=sheet_id).all()
+        
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        writer.writerow([
+            '智能质检漏检复盘报告',
+            f'批次: {sheet.sheet_name}',
+            f'版本: v{sheet.version}',
+            f'导入人: {sheet.imported_by}',
+            f'导入时间: {sheet.imported_at.isoformat() if sheet.imported_at else ""}'
+        ])
+        writer.writerow([])
+        
+        headers = [
+            '样本ID', '唯一标识', '原文', '模型预测', '模型置信度',
+            '人工标注', '当前状态', '是否低置信度', '是否被平均掩盖',
+            '是否KB复核', 'KB复核人', '原始备注', '创建时间', '更新时间'
+        ]
+        writer.writerow(headers)
+        
+        for s in samples:
+            writer.writerow([
+                s.id,
+                s.unique_key,
+                s.original_text or '',
+                s.model_prediction or '',
+                s.model_confidence if s.model_confidence is not None else '',
+                s.manual_label or '',
+                Config.SAMPLE_STATUS.get(s.status, s.status),
+                '是' if s.is_low_confidence else '否',
+                '是' if s.masked_by_average else '否',
+                '是' if s.kb_reviewed else '否',
+                s.kb_reviewed_by or '',
+                s.raw_remark or '',
+                s.created_at.isoformat() if s.created_at else '',
+                s.updated_at.isoformat() if s.updated_at else ''
+            ])
+        
+        writer.writerow([])
+        writer.writerow(['=== 统计汇总 ==='])
+        writer.writerow(['总样本数', len(samples)])
+        low_conf_count = len([s for s in samples if s.is_low_confidence])
+        writer.writerow(['低置信度数', low_conf_count])
+        masked_count = len([s for s in samples if s.masked_by_average])
+        writer.writerow(['被平均掩盖数', masked_count])
+        kb_reviewed_count = len([s for s in samples if s.kb_reviewed])
+        writer.writerow(['已KB复核数', kb_reviewed_count])
+        
+        output.seek(0)
+        filename = f'{sheet.sheet_name}_v{sheet.version}_复盘报告.csv'
+        
+        return Response(
+            output.getvalue().encode('utf-8-sig'),
+            mimetype='text/csv; charset=utf-8',
+            headers={
+                'Content-Disposition': f'attachment; filename="{filename}"'
+            }
+        )
     
     return app
 

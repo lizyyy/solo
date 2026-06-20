@@ -88,6 +88,7 @@
                 <h2>工作流进度</h2>
                 <div class="workflow-steps" id="workflowSteps"></div>
                 <button id="completeStepBtn" class="btn btn-success" onclick="completeCurrentStep()">完成当前步骤</button>
+                <button class="btn btn-primary" onclick="exportReport()" style="margin-left: 10px;">📥 导出复盘报告</button>
                 <span id="stepUser" style="margin-left: 10px;">
                     操作人: <input type="text" id="currentUser" placeholder="姓名" style="width: 100px;">
                     角色: 
@@ -190,6 +191,11 @@
                 </div>
             `).join('');
             document.getElementById('sheetsList').innerHTML = html || '<p style="color: #999;">暂无改判表，请先导入</p>';
+        }
+
+        function exportReport() {
+            if (!currentSheetId) return;
+            window.open(`/api/sheets/${currentSheetId}/export`, '_blank');
         }
 
         async function importSheet() {
@@ -345,7 +351,7 @@
             
             let html = '<table><thead><tr>' +
                 '<th>ID</th><th>原文</th><th>模型预测</th><th>置信度</th>' +
-                '<th>状态</th><th>标记</th><th>备注</th><th>证据追溯</th>' +
+                '<th>人工标注</th><th>状态</th><th>标记</th><th>备注</th><th>证据追溯</th>' +
                 '</tr></thead><tbody>';
             
             binData.samples.forEach(s => {
@@ -354,21 +360,22 @@
                     : (s.status === 'normal' ? '<span class="badge badge-normal">正常</span>' : '<span class="badge badge-pending">' + escapeHtml(s.status_label || s.status) + '</span>');
                 
                 html += `<tr>
-                    <td><a href="#" onclick="showSample(${s.sample_id}); return false;">#${s.sample_id}</a></td>
-                    <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(s.raw_remark || '')}">${escapeHtml((s.raw_remark || '').substring(0, 40)) || '-'}</td>
-                    <td>${escapeHtml(s.status_label || s.status)}</td>
-                    <td>${s.model_confidence !== null && s.model_confidence !== undefined ? s.model_confidence.toFixed(3) : '-'}</td>
+                    <td><a href="#" onclick="showSample(${s.sample_id || s.id}); return false;">#${s.sample_id || s.id}</a></td>
+                    <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(s.original_text || '')}">${escapeHtml((s.original_text || '').substring(0, 40)) || '-'}</td>
+                    <td>${escapeHtml(s.model_prediction || '-')}</td>
+                    <td>${s.model_confidence !== null && s.model_confidence !== undefined ? Number(s.model_confidence).toFixed(3) : '-'}</td>
+                    <td>${escapeHtml(s.manual_label || '-')}</td>
                     <td>${statusBadge}</td>
                     <td>
                         ${s.masked_by_average ? '<span class="badge badge-masked">被平均掩盖</span>' : ''}
                         ${s.kb_reviewed ? '<span class="badge badge-kb">已KB复核</span>' : ''}
                     </td>
-                    <td>${s.raw_remark ? '<div class="remark-box">' + escapeHtml(s.raw_remark.substring(0, 60)) + (s.raw_remark.length > 60 ? '...' : '') + '</div>' : '-'}</td>
+                    <td style="max-width: 120px;">${s.raw_remark ? '<div class="remark-box" style="max-height: 60px; overflow: hidden;" title="' + escapeHtml(s.raw_remark) + '">' + escapeHtml(s.raw_remark.substring(0, 40)) + (s.raw_remark.length > 40 ? '...' : '') + '</div>' : '-'}</td>
                     <td class="evidence-links">
-                        ${s.links.correction_sheet ? `<a href="#" onclick="openSheet(${s.sample_id}); return false;">� 改判表v${s.sheet_version || '?'}</a>` : ''}
-                        ${s.links.prompt_version ? `<a href="#" onclick="fetchPrompt(${s.links.prompt_version.split('/').pop()}); return false;">� 提示词</a>` : ''}
-                        <a href="#" onclick="showSample(${s.sample_id}); return false;">� 变更历史</a>
-                        <a href="#" onclick="rollbackSample(${s.sample_id}); return false;">↩️ 回滚</a>
+                        ${s.links?.correction_sheet ? `<a href="#" onclick="openSheet(${s.correction_sheet_id || s.sample_id}); return false;">📄 改判表v${s.sheet_version || '?'}</a>` : ''}
+                        ${s.links?.prompt_version ? `<a href="#" onclick="fetchPrompt(${s.links.prompt_version.split('/').pop()}); return false;">💡 提示词</a>` : ''}
+                        <a href="#" onclick="showSample(${s.sample_id || s.id}); return false;">📜 历史</a>
+                        <a href="#" onclick="rollbackSample(${s.sample_id || s.id}); return false;">↩️ 回滚</a>
                     </td>
                 </tr>`;
             });
@@ -412,16 +419,20 @@
                 return;
             }
 
-            let html = '<table><thead><tr><th>样本ID</th><th>置信度</th><th>备注</th><th>证据链接</th></tr></thead><tbody>';
+            let html = '<table><thead><tr><th>ID</th><th>原文</th><th>模型预测</th><th>置信度</th><th>人工标注</th><th>状态</th><th>备注</th><th>证据链接</th></tr></thead><tbody>';
             samples.forEach(s => {
                 html += `<tr>
-                    <td><a href="#" onclick="showSample(${s.sample_id}); return false;">#${s.sample_id}</a></td>
-                    <td>${s.model_confidence}</td>
-                    <td>${s.raw_remark ? '<div class="remark-box">' + escapeHtml(s.raw_remark) + '</div>' : '-'}</td>
+                    <td><a href="#" onclick="showSample(${s.sample_id || s.id}); return false;">#${s.sample_id || s.id}</a></td>
+                    <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(s.original_text || '')}">${escapeHtml((s.original_text || '').substring(0, 40)) || '-'}</td>
+                    <td>${escapeHtml(s.model_prediction || '-')}</td>
+                    <td>${s.model_confidence !== null && s.model_confidence !== undefined ? Number(s.model_confidence).toFixed(3) : '-'}</td>
+                    <td>${escapeHtml(s.manual_label || '-')}</td>
+                    <td><span class="badge badge-low">低置信度</span></td>
+                    <td>${s.raw_remark ? '<div class="remark-box" style="max-height: 50px; overflow: hidden;">' + escapeHtml(s.raw_remark.substring(0, 30)) + '</div>' : '-'}</td>
                     <td class="evidence-links">
-                        ${s.links.correction_sheet ? `<a href="#" onclick="alert('跳转到改判表'); return false;">📄 改判表</a>` : ''}
-                        ${s.links.prompt_version ? `<a href="#" onclick="alert('跳转到提示词版本'); return false;">💡 提示词</a>` : ''}
-                        <a href="#" onclick="showSample(${s.sample_id}); return false;">📜 历史</a>
+                        ${s.links?.correction_sheet ? `<a href="#" onclick="openSheet(${s.correction_sheet_id}); return false;">📄 改判表</a>` : ''}
+                        ${s.links?.prompt_version ? `<a href="#" onclick="fetchPrompt(${s.links.prompt_version.split('/').pop()}); return false;">💡 提示词</a>` : ''}
+                        <a href="#" onclick="showSample(${s.sample_id || s.id}); return false;">📜 历史</a>
                     </td>
                 </tr>`;
             });
