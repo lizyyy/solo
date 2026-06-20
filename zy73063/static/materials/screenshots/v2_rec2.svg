@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="420" viewBox="0 0 640 420">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fafafa"/><stop offset="1" stop-color="#f1f5f9"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="420" fill="url(#bg)" stroke="#475569" stroke-width="2"/>
+  <rect x="0" y="0" width="640" height="34" fill="#1e293b"/>
+  <text x="14" y="22" font-family="Menlo,Consolas,monospace" font-size="13" fill="#f8fafc">旧版本截图 · v2 · 记录#2 · 2026-06-07 中班 PL-A01</text>
+  <text x="540" y="22" font-family="Menlo,Consolas,monospace" font-size="12" fill="#94a3b8">2026-06-07 22:15</text>
+
+  <rect x="20" y="52" width="600" height="42" rx="4" fill="#fff7ed" stroke="#fdba74"/>
+  <text x="32" y="78" font-family="-apple-system,PingFang SC,sans-serif" font-size="15" fill="#9a3412" font-weight="700">📦 状态：待补件（中班 → 夜班 交接截图凭证）</text>
+
+  <g font-family="-apple-system,PingFang SC,sans-serif" font-size="13" fill="#0f172a">
+    <rect x="20" y="108" width="600" height="260" rx="5" fill="#fff" stroke="#cbd5e1"/>
+    <text x="36" y="132" font-weight="600" fill="#1e40af">班组交接录入界面  v2（复核前留档）</text>
+    <line x1="36" y1="144" x2="604" y2="144" stroke="#e2e8f0"/>
+
+    <text x="36" y="170" fill="#334155">交接日期：</text><text x="130" y="170" font-family="Menlo,monospace">2026-06-07</text>
+    <text x="340" y="170" fill="#334155">班次：</text><text x="400" y="170" font-family="Menlo,monospace">中班（16:00-24:00）</text>
+
+    <text x="36" y="196" fill="#334155">操作员：</text><text x="130" y="196">李师傅</text>
+    <text x="340" y="196" fill="#334155">接班人：</text><text x="400" y="196">王师傅</text>
+
+    <text x="36" y="222" fill="#334155">管线编号：</text><text x="130" y="222" font-family="Menlo,monospace">PL-A01</text>
+    <text x="340" y="222" fill="#334155">管段：</text><text x="400" y="222">北区主管廊2段</text>
+
+    <line x1="36" y1="236" x2="604" y2="236" stroke="#e2e8f0"/>
+
+    <text x="36" y="260" font-weight="600" fill="#1e293b">仪表读数：</text>
+    <rect x="36" y="272" width="270" height="82" rx="3" fill="#f8fafc" stroke="#94a3b8"/>
+    <text x="52" y="296" fill="#475569">压力 PI-A01-2 ：</text><text x="220" y="296" font-family="Menlo,monospace" font-weight="700" fill="#0f172a">0.79 MPa</text>
+    <text x="52" y="320" fill="#475569">流量 FI-A01-2 ：</text><text x="220" y="320" font-family="Menlo,monospace" fill="#b91c1c" font-weight="600">— —（待确认）</text>
+    <text x="52" y="344" fill="#475569">阀门状态 3#：</text><text x="220" y="344" font-family="Menlo,monospace" fill="#b45309">填料函微渗</text>
+
+    <rect x="320" y="272" width="300" height="82" rx="3" fill="#fffbeb" stroke="#f59e0b" stroke-dasharray="4 3"/>
+    <text x="336" y="296" font-weight="600" fill="#92400e">备注（v2 留档状态）：</text>
+    <text x="336" y="318" fill="#78350f" font-size="12.5">· 3#阀门填料函微渗，待补件更换</text>
+    <text x="336" y="340" fill="#78350f" font-size="12.5">· 流量仪表 5 月校准证书未同步</text>
+  </g>
+
+  <text x="20" y="402" font-family="Menlo,monospace" font-size="10.5" fill="#94a3b8">SHA256 留痕：8A3F…E2C1 · 关联记录ID #2 · 版本 v2 · 存于 /static/materials/screenshots/v2_rec2.svg</text>
+</svg>

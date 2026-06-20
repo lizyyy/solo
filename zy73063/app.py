@@ -109,7 +109,7 @@ def seed_demo_data(conn):
     c = conn.cursor()
     shifts = [
         ("2026-06-07", "早班", "张师傅", "PL-A01", "北区主管廊1段", "confirmed", "交接后补充：焊缝位置确认无误"),
-        ("2026-06-07", "中班", "李师傅", "PL-A01", "北区主管廊2段", "pending_parts", None),
+        ("2026-06-07", "中班", "李师傅", "PL-A01", "北区主管廊2段", "pending_parts", "3#阀门填料函备件申请已提交，采购单号PO-0607-14，预计3天到货"),
         ("2026-06-07", "夜班", "王师傅", "PL-B03", "南区回流管", "returned", "压力读数异常，退回重测"),
         ("2026-06-08", "早班", "赵师傅", "PL-A01", "北区主管廊2段", "confirmed", "补录：2号仪表校准证书已归档"),
         ("2026-06-08", "中班", "钱师傅", "PL-C02", "西区进料管", "pending_parts", None),
@@ -133,7 +133,7 @@ def seed_demo_data(conn):
             v2_snap = json.dumps({"shift_date": sd, "shift_name": sn, "operator": op, "status": st, "remark_later": rm})
             c.execute(
                 "INSERT INTO record_versions(record_id,version_no,snapshot_json,screenshot_ref,change_note,changed_by,changed_at) VALUES(?,?,?,?,?,?,?)",
-                (rec_id, 2, v2_snap, f"static/materials/screenshots/v2_rec{rec_id}.png" if i % 2 else None,
+                (rec_id, 2, v2_snap, f"/static/materials/screenshots/v2_rec{rec_id}.svg" if i % 2 else None,
                  "状态更新/补录备注" if rm else "复核状态变更", "老何", (now - timedelta(days=1-i, hours=3)).isoformat(timespec="seconds"))
             )
         formulas_use = [("pressure_loss", {"f":0.035,"L":1200+i*50,"D":0.3,"rho":998,"v":2.1+i*0.05}),
@@ -209,6 +209,11 @@ def list_records():
             m["inputs"] = json.loads(m["inputs_json"])
         d["photos"] = [dict(p) for p in db.execute(
             "SELECT * FROM photo_attachments WHERE record_id=?", (r["id"],)).fetchall()]
+        vs = db.execute(
+            "SELECT COUNT(*) c, MAX(CASE WHEN screenshot_ref IS NOT NULL THEN 1 ELSE 0 END) hs FROM record_versions WHERE record_id=?",
+            (r["id"],)).fetchone()
+        d["version_count"] = vs["c"]
+        d["has_screenshot"] = bool(vs["hs"])
         result.append(d)
     return jsonify(result)
 

@@ -81,6 +81,13 @@ main{padding:20px 24px;max-width:1480px;margin:0 auto}
 .close-x{background:none;border:none;font-size:20px;cursor:pointer;color:#64748b;line-height:1}
 .badge{padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600;margin-left:5px}
 .badge-purple{background:#ede9fe;color:#6d28d9}
+.badge-shot{background:#faf5ff;border:1px solid #c4b5fd;color:#5b21b6}
+.tl-shot{margin-top:8px;padding:10px 12px;background:#fafafa;border:1px dashed #c4b5fd;border-radius:6px}
+.tl-shot-label{font-size:12.5px;color:#4c1d95;margin-bottom:7px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tl-shot-label a{color:#6d28d9;text-decoration:underline;font-weight:600}
+.tl-shot-label .shot-path{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:#6b7280;background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #e5e7eb}
+.tl-thumb{max-width:100%;max-height:240px;border:1px solid #d1d5db;border-radius:5px;background:#fff;display:block;cursor:zoom-in;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.tl-thumb:hover{box-shadow:0 4px 10px rgba(91,33,182,.15);border-color:#8b5cf6}
 </style>
 </head>
 <body>
@@ -259,7 +266,7 @@ function renderRecords(list){
     const card=document.createElement("div");
     card.className="rec-card";
     card.innerHTML=`<span class="tag" style="background:${sm.color}">${sm.text}</span>
-      <h3>🔧 ${esc(r.pipeline_id)} · ${esc(r.line_section||"—")}</h3>
+      <h3>🔧 ${esc(r.pipeline_id)} · ${esc(r.line_section||"—")} ${r.has_screenshot?'<span class="badge badge-shot">📎 含截图证据</span>':''} ${r.version_count?`<span class="badge" style="background:#eff6ff;color:#1d4ed8">v×${r.version_count}</span>`:''}</h3>
       <div class="meta">
         <span>📅 <b>${r.shift_date}</b></span>
         <span>🕗 <b>${r.shift_name}</b></span>
@@ -293,7 +300,10 @@ async function openTimeline(rid){
        · 变更人 <b>${esc(v.changed_by)}</b> · ${fmtDT(v.changed_at)}</div>
       <div class="tl-note">${esc(v.change_note)}</div>
       <div class="tl-snap">${JSON.stringify(v.snapshot,null,2)}</div>
-      ${v.screenshot_ref?`<div class="tl-shot">🖼️ 旧版本截图留存：${esc(v.screenshot_ref)}</div>`:""}
+      ${v.screenshot_ref?`<div class="tl-shot">
+        <div class="tl-shot-label">🖼️ 旧版本截图证据：<a href="${esc(v.screenshot_ref)}" target="_blank" rel="noopener" title="新标签打开原图">🔗 新标签打开</a> <span class="shot-path">${esc(v.screenshot_ref)}</span></div>
+        <a href="${esc(v.screenshot_ref)}" target="_blank" rel="noopener"><img class="tl-thumb" src="${esc(v.screenshot_ref)}" alt="记录版本${v.version_no}截图"></a>
+      </div>`:""}
     </div>`).join("")+`</div>`;
   openModal("modalTimeline");
 }

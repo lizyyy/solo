@@ -77,16 +77,20 @@ static/materials/
 ├── 班组交接记录原件_6月7-9日.txt     ← 纸质原件OCR文本，含7条交接
 ├── notes/
 │   └── 补录备注_6月上旬.txt          ← 老何和同事后来补写的备注条
-└── screenshots/                      ← 旧版本截图（4张，SVG格式占位）
-    ├── v2_rec1.png.svg
-    ├── v2_rec3.png.svg
-    ├── v2_rec5.png.svg
-    └── v2_rec7.png.svg
+└── screenshots/                      ← 旧版本截图证据（3张SVG，对应rec_id=2,4,6的v2版本）
+    ├── v2_rec2.svg                  ← rec#2 中班PL-A01待补件 · 阀门填料函微渗 + 流量待确认
+    ├── v2_rec4.svg                  ← rec#4 早班PL-A01已确认 · 2号仪表校准证书归档补录
+    └── v2_rec6.svg                  ← rec#6 夜班PL-B03解禁 · 退回重测后复核确认
 ```
 
 > 第一次启动 app.py 时，这些材料会被自动灌进 SQLite 数据库，
 > 生成 7 条示例交接记录 + 14 张照片（7张正常 + 7张时间错位）+
-> 11 个历史版本 + 14 条公式计算结果。
+> 11 个历史版本（其中 rec#2/4/6 的 v2 版挂了上面 3 张截图证据）+
+> 14 条公式计算结果。
+>
+> **截图访问约定**：每条带截图的历史版本，`screenshot_ref` 字段存完整 static URL
+> （如 `/static/materials/screenshots/v2_rec4.svg`），前端时间线里直接缩略图预览，
+> 点击开新标签放大；导出 CSV 里原样保留路径，粘到浏览器即可打开。
 
 ---
 
@@ -117,7 +121,7 @@ static/materials/
 │   └── materials/             ← 现场材料包
 │       ├── 班组交接记录原件_6月7-9日.txt
 │       ├── notes/
-│       └── screenshots/
+│       └── screenshots/       ← 3张旧版本截图证据(v2_rec2/4/6.svg)
 └── data/
     └── pipeline_review.db     ← 第一次启动自动生成（SQLite）
 ```
