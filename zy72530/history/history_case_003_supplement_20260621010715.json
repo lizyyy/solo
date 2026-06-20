@@ -1,9 +1,9 @@
 {
   "scenario": "case_003_supplement",
-  "saved_at": "2026-06-15T08:46:07.686956",
+  "saved_at": "2026-06-21T01:07:15.201599",
   "actions": [
     {
-      "timestamp": "2026-06-15T08:46:07.685470",
+      "timestamp": "2026-06-21T01:07:15.201208",
       "action": "IMPORT_MODEL_OUTPUT",
       "details": {
         "batch_id": "BATCH_003_20260605",
@@ -12,7 +12,7 @@
       }
     },
     {
-      "timestamp": "2026-06-15T08:46:07.686066",
+      "timestamp": "2026-06-21T01:07:15.201376",
       "action": "APPLY_SUPPLEMENT",
       "details": {
         "batch_id": "BATCH_003_20260605",
@@ -23,7 +23,7 @@
       }
     },
     {
-      "timestamp": "2026-06-15T08:46:07.686639",
+      "timestamp": "2026-06-21T01:07:15.201533",
       "action": "GENERATE_REPORT",
       "details": {
         "batch_id": "BATCH_003_20260605",

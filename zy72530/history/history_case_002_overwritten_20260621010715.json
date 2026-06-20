@@ -1,9 +1,9 @@
 {
   "scenario": "case_002_overwritten",
-  "saved_at": "2026-06-15T08:46:07.683572",
+  "saved_at": "2026-06-21T01:07:15.200941",
   "actions": [
     {
-      "timestamp": "2026-06-15T08:46:07.682351",
+      "timestamp": "2026-06-21T01:07:15.200318",
       "action": "IMPORT_MODEL_OUTPUT",
       "details": {
         "batch_id": "BATCH_002_20260607_V1",
@@ -12,7 +12,7 @@
       }
     },
     {
-      "timestamp": "2026-06-15T08:46:07.682548",
+      "timestamp": "2026-06-21T01:07:15.200460",
       "action": "APPLY_MANUAL_JUDGMENT",
       "details": {
         "batch_id": "BATCH_002_20260607_V1",
@@ -22,7 +22,7 @@
       }
     },
     {
-      "timestamp": "2026-06-15T08:46:07.682805",
+      "timestamp": "2026-06-21T01:07:15.200620",
       "action": "BATCH_OVERWRITE_DETECTED",
       "details": {
         "original_batch_id": "BATCH_002_20260607_V1",
@@ -55,7 +55,7 @@
       }
     },
     {
-      "timestamp": "2026-06-15T08:46:07.683168",
+      "timestamp": "2026-06-21T01:07:15.200863",
       "action": "GENERATE_REPORT",
       "details": {
         "batch_id": "BATCH_002_20260607_V2",

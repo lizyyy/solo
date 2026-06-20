@@ -1,6 +1,6 @@
 {
-  "report_id": "REPORT_BATCH_002_20260607_V2_20260615084607",
-  "generated_at": "2026-06-15T08:46:07.682823",
+  "report_id": "REPORT_BATCH_002_20260607_V2_20260621010715",
+  "generated_at": "2026-06-21T01:07:15.200644",
   "batch_id": "BATCH_002_20260607_V2",
   "model_version": "v2.2.0",
   "batch_status": "pending_safety_review",
@@ -10,7 +10,7 @@
     "confirmed_count": 0,
     "modified_count": 0,
     "total_abs_score_diff": 0,
-    "has_overwrites": false,
+    "has_overwrites": true,
     "has_supplements": false,
     "needs_safety_review": true,
     "overwrites_original_batch": "BATCH_002_20260607_V1",
@@ -43,7 +43,7 @@
   ],
   "history_snapshot": [
     {
-      "timestamp": "2026-06-15T08:46:07.682351",
+      "timestamp": "2026-06-21T01:07:15.200318",
       "action": "IMPORT_MODEL_OUTPUT",
       "details": {
         "batch_id": "BATCH_002_20260607_V1",
@@ -52,7 +52,7 @@
       }
     },
     {
-      "timestamp": "2026-06-15T08:46:07.682548",
+      "timestamp": "2026-06-21T01:07:15.200460",
       "action": "APPLY_MANUAL_JUDGMENT",
       "details": {
         "batch_id": "BATCH_002_20260607_V1",
@@ -62,7 +62,7 @@
       }
     },
     {
-      "timestamp": "2026-06-15T08:46:07.682805",
+      "timestamp": "2026-06-21T01:07:15.200620",
       "action": "BATCH_OVERWRITE_DETECTED",
       "details": {
         "original_batch_id": "BATCH_002_20260607_V1",

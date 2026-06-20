@@ -258,7 +258,7 @@ class ReviewEngine:
                 "confirmed_count": confirmed_count,
                 "modified_count": modified_count,
                 "total_abs_score_diff": total_score_diff,
-                "has_overwrites": len(state.get("overwrites", [])) > 0,
+                "has_overwrites": (len(state.get("overwrites", [])) > 0) or (state.get("overwrites_original") is not None),
                 "has_supplements": len(state.get("supplements", [])) > 0,
                 "needs_safety_review": state.get("status") == "pending_safety_review",
                 "overwrites_original_batch": state.get("overwrites_original"),
@@ -345,9 +345,10 @@ class ReviewEngine:
         needs_safety = report.get("summary", {}).get("needs_safety_review", False)
         
         if overwrite_in_history:
+            summary_has_overwrites = report.get("summary", {}).get("has_overwrites", False)
             check_name = "覆盖场景: 覆盖检测在报告与历史一致"
-            passed = overwrite_in_report_ctx and summary_overwrite
-            results["checks"].append({"name": check_name, "pass": passed, "detail": f"历史有覆盖记录:{overwrite_in_history} 报告有overwrite_context:{overwrite_in_report_ctx} summary.overwrites_original_batch:{summary_overwrite}"})
+            passed = overwrite_in_report_ctx and summary_overwrite and summary_has_overwrites
+            results["checks"].append({"name": check_name, "pass": passed, "detail": f"历史有覆盖记录:{overwrite_in_history} 报告有overwrite_context:{overwrite_in_report_ctx} summary.overwrites_original_batch:{summary_overwrite} summary.has_overwrites:{summary_has_overwrites}"})
             if not passed: results["pass"] = False
             
             check_name = "覆盖场景: 被覆盖的人工改判痕迹在报告中可见"

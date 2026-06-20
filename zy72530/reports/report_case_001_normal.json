@@ -1,6 +1,6 @@
 {
-  "report_id": "REPORT_BATCH_001_20260607_20260615084607",
-  "generated_at": "2026-06-15T08:46:07.681744",
+  "report_id": "REPORT_BATCH_001_20260607_20260621010715",
+  "generated_at": "2026-06-21T01:07:15.199903",
   "batch_id": "BATCH_001_20260607",
   "model_version": "v2.1.0",
   "batch_status": "reviewed",
@@ -36,7 +36,7 @@
   ],
   "history_snapshot": [
     {
-      "timestamp": "2026-06-15T08:46:07.681458",
+      "timestamp": "2026-06-21T01:07:15.199704",
       "action": "IMPORT_MODEL_OUTPUT",
       "details": {
         "batch_id": "BATCH_001_20260607",
@@ -45,7 +45,7 @@
       }
     },
     {
-      "timestamp": "2026-06-15T08:46:07.681724",
+      "timestamp": "2026-06-21T01:07:15.199884",
       "action": "APPLY_MANUAL_JUDGMENT",
       "details": {
         "batch_id": "BATCH_001_20260607",

@@ -1,9 +1,9 @@
 {
   "scenario": "case_001_normal",
-  "saved_at": "2026-06-15T08:46:07.682027",
+  "saved_at": "2026-06-21T01:07:15.200143",
   "actions": [
     {
-      "timestamp": "2026-06-15T08:46:07.681458",
+      "timestamp": "2026-06-21T01:07:15.199704",
       "action": "IMPORT_MODEL_OUTPUT",
       "details": {
         "batch_id": "BATCH_001_20260607",
@@ -12,7 +12,7 @@
       }
     },
     {
-      "timestamp": "2026-06-15T08:46:07.681724",
+      "timestamp": "2026-06-21T01:07:15.199884",
       "action": "APPLY_MANUAL_JUDGMENT",
       "details": {
         "batch_id": "BATCH_001_20260607",
@@ -22,7 +22,7 @@
       }
     },
     {
-      "timestamp": "2026-06-15T08:46:07.681951",
+      "timestamp": "2026-06-21T01:07:15.200079",
       "action": "GENERATE_REPORT",
       "details": {
         "batch_id": "BATCH_001_20260607",
