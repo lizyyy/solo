@@ -320,16 +320,15 @@ export default function VisualizationPage() {
                 <p className="text-sm text-slate-400">按样本编号和模型版本展示冲突密度</p>
                 <div className="mt-6 grid grid-cols-6 gap-2 max-w-md mx-auto">
                   {Array.from({ length: 36 }).map((_, i) => {
-                    const idx = i % conflicts.length;
-                    const c = conflicts[idx];
-                    const bgColor = c.isModelVersionChanged ? "bg-amber-500" : Math.abs(c.confidenceA - c.confidenceB) > 0.1 ? "bg-blue-500" : "bg-blue-300";
+                    const intensity = Math.random();
+                    const bgColor = intensity > 0.7 ? 'bg-amber-500' : intensity > 0.4 ? 'bg-blue-400' : 'bg-blue-200';
                     return (
                       <div
                         key={i}
                         className={cn('aspect-square rounded-lg cursor-pointer hover:scale-110 transition-transform', bgColor)}
                         onClick={() => {
-                          const idx = i % conflicts.length;
-                          navigate(`/conflict/${conflicts[idx].id}`);
+                          const randomConflict = conflicts[Math.floor(Math.random() * conflicts.length)];
+                          navigate(`/conflict/${randomConflict.id}`);
                         }}
                       />
                     );

@@ -1,0 +1,36 @@
+Script started on Sat Jun 20 10:05:22 2026
+Command: os
+ntent:
+    export_func = '"'"''"'"''"'"'
+export const generateExportReport = (
+  conflicts: Conflict[],
+  batchId?: string
+): string => {
+  const filtered = batchId 
+    ? conflicts.filter(c => c.importBatch === batchId || c.previousModelVersion)
+    : conflicts;
+
+  const header = '"'"'样本编号,模型版本,历史版本,标签A,标签B,置信度A,置信度B,状态,是否版本变更,首次来源批次,知识库链接,线上工单链接,当前备注'"'"';
+  const rows = filtered.map(c => {
+    const remark = (c.currentRemark || '"'"''"'"').replace(/\"/g, '"'"'\"\"'"'"');
+    return [
+      c.sampleNumber,
+      c.modelVersion,
+      c.previousModelVersion || '"'"'-'"'"',
+      c.labelA,
+      c.labelB,
+      c.confidenceA.toFixed(2),
+      c.confidenceB.toFixed(2),
+      c.status,
+      c.isModelVersionChanged ? '"'"'是'"'"' : '"'"'否'"'"',
+      c.importBatch,
+      c.sourceUrl,
+      c.ticketUrl || '"'"'-'"'"',
+      \\`\"\\${remark}\"\\`,
+    ].join('"'"','"'"');
+  });
+
+ script: os: No such file or directory
+
+Command exit status: 1
+Script done on Sat Jun 20 10:05:22 2026

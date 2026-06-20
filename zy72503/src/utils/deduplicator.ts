@@ -153,53 +153,50 @@ export const detectDuplicatesAndChanges = (
       const prevConfidence = deterministicGetConfidence(link.sampleNumber, prevVersion);
       const newConfidence = deterministicGetConfidence(link.sampleNumber, link.modelVersion);
 
-      const hasLabelConflict = prevLabel !== newLabel;
+      const hasLabelChange = prevLabel !== newLabel;
+      const confidenceDiff = Math.abs(newConfidence - prevConfidence);
 
-      if (hasLabelConflict) {
-        const newConflict: Conflict = {
-          id: `c_${simpleHash(key).toString(36)}_${simpleHash(batchId).toString(36)}`,
-          sampleNumber: link.sampleNumber,
-          modelVersion: link.modelVersion,
-          previousModelVersion: prevVersion,
-          labelA: prevLabel,
-          labelB: newLabel,
-          confidenceA: prevConfidence,
-          confidenceB: newConfidence,
-          status: 'pending',
-          sourceUrl: link.url,
-          isModelVersionChanged: true,
-          currentRemark: `模型版本从 ${prevVersion} 升级到 ${link.modelVersion}，标签从「${prevLabel}」变为「${newLabel}」，待运营复核人确认`,
-          importBatch: batchId,
-          createdAt: now,
-          updatedAt: now,
-        };
-
-        result.modelChangedCount++;
-        result.updatedConflicts.push(newConflict);
-        result.items.push({
-          sampleNumber: link.sampleNumber,
-          modelVersion: link.modelVersion,
-          url: link.url,
-          status: 'model_changed',
-          previousModelVersion: prevVersion,
-          previousLabel: prevLabel,
-          newLabel: newLabel,
-          conflictId: newConflict.id,
-          reason: `模型版本 ${prevVersion} → ${link.modelVersion}，标签「${prevLabel}」→「${newLabel}」，标记为待复核`,
-        });
+      let changeReason = '';
+      if (hasLabelChange) {
+        changeReason = `标签从「${prevLabel}」变为「${newLabel}」`;
+      } else if (confidenceDiff > 0.05) {
+        changeReason = `置信度变化 ${(confidenceDiff * 100).toFixed(1)}%`;
       } else {
-        result.noConflictCount++;
-        result.items.push({
-          sampleNumber: link.sampleNumber,
-          modelVersion: link.modelVersion,
-          url: link.url,
-          status: 'no_conflict',
-          previousModelVersion: prevVersion,
-          previousLabel: prevLabel,
-          newLabel: newLabel,
-          reason: `模型版本 ${prevVersion} → ${link.modelVersion}，标签均为「${newLabel}」，无冲突`,
-        });
+        changeReason = '模型版本升级，需复核结果一致性';
       }
+
+      const newConflict: Conflict = {
+        id: `c_${simpleHash(key).toString(36)}_${simpleHash(batchId).toString(36)}`,
+        sampleNumber: link.sampleNumber,
+        modelVersion: link.modelVersion,
+        previousModelVersion: prevVersion,
+        labelA: prevLabel,
+        labelB: newLabel,
+        confidenceA: prevConfidence,
+        confidenceB: newConfidence,
+        status: 'pending',
+        sourceUrl: link.url,
+        ticketUrl: `https://ticket.example.com/feedback/${link.sampleNumber}`,
+        isModelVersionChanged: true,
+        currentRemark: `模型版本从 ${prevVersion} 升级到 ${link.modelVersion}，${changeReason}，待运营复核人确认`,
+        importBatch: batchId,
+        createdAt: now,
+        updatedAt: now,
+      };
+
+      result.modelChangedCount++;
+      result.updatedConflicts.push(newConflict);
+      result.items.push({
+        sampleNumber: link.sampleNumber,
+        modelVersion: link.modelVersion,
+        url: link.url,
+        status: 'model_changed',
+        previousModelVersion: prevVersion,
+        previousLabel: prevLabel,
+        newLabel: newLabel,
+        conflictId: newConflict.id,
+        reason: `模型版本 ${prevVersion} → ${link.modelVersion}，${changeReason}，标记为待复核`,
+      });
     } else if (isFirstEver) {
       const labelA = deterministicGetLabel(link.sampleNumber, 'baseline');
       const labelB = deterministicGetLabel(link.sampleNumber, link.modelVersion);
@@ -379,4 +376,41 @@ export const getBatches = (links: KnowledgeLink[]): { batchId: string; count: nu
       importedAt: data.importedAt,
     }))
     .sort((a, b) => new Date(b.importedAt).getTime() - new Date(a.importedAt).getTime());
+};
+  });
+  return Array.from(batchMap.entries())
+    .map(([batchId, data]) => ({
+      batchId,
+      count: data.count,
+      importedAt: data.importedAt,
+    }))
+    .sort((a, b) => new Date(b.importedAt).getTime() - new Date(a.importedAt).getTime());
+};
+
+export const generateExportReport = (
+  conflicts: Conflict[],
+  batchId?: string
+): string => {
+  const filtered = batchId 
+    ? conflicts.filter(c => c.importBatch === batchId || c.previousModelVersion)
+    : conflicts;
+
+  const header = '样本编号,模型版本,历史版本,标签A,标签B,置信度A,置信度B,状态,是否版本变更,首次来源批次,知识库链接,线上工单链接,当前备注';
+  const rows = filtered.map(c => [
+    c.sampleNumber,
+    c.modelVersion,
+    c.previousModelVersion || '-',
+    c.labelA,
+    c.labelB,
+    c.confidenceA.toFixed(2),
+    c.confidenceB.toFixed(2),
+    c.status,
+    c.isModelVersionChanged ? '是' : '否',
+    c.importBatch,
+    c.sourceUrl,
+    c.ticketUrl || '-',
+    `"${(c.currentRemark || '').replace(/"/g, '""')}"`,
+  ].join(','));
+
+  return [header, ...rows].join('\n');
 };
