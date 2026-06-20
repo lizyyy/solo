@@ -966,7 +966,8 @@ async function executeWorkflowStep(step) {
                             rawText: notes,
                             notes
                         },
-                        supplementedBy: '阿宁'
+                        supplementedBy: '阿宁',
+                        reason: reason
                     })
                 });
                 const result = await res.json();
@@ -1084,9 +1085,13 @@ function renderWorkflowFinalReport() {
                     if (r.duplicated) {
                         photoDuplicates.push({
                             pointId: d.pointId,
-                            filename: r.photoRecord?.originalFilename || '未知文件',
+                            pointName: d.pointName || '',
+                            submittedFilename: r.submittedFilename || r.photoRecord?.originalFilename || '未知文件',
+                            existingFilename: r.existingFilename || '未知文件',
                             existingPhotoId: r.existingPhotoId,
-                            existingPointId: r.existingPointId
+                            existingPointId: r.existingPointId,
+                            existingPointName: r.existingPointName || '',
+                            existingUploadedAt: r.existingUploadedAt
                         });
                     }
                 }
@@ -1126,11 +1131,14 @@ function renderWorkflowFinalReport() {
                     <p style="font-size: 14px;"><strong>去重口径：</strong>SHA256文件哈希，同一文件重复上传自动识别</p>
                     ${photoDuplicates.length > 0 ? `
                         <div style="margin-top: 10px; padding: 10px; background: #fef3c7; border-radius: 6px;">
-                            <p style="font-size: 13px; font-weight: 600; color: #92400e;">重复导入明细：</p>
+                            <p style="font-size: 13px; font-weight: 600; color: #92400e;">重复导入明细（来源 + 处理状态 + 结论）：</p>
                             ${photoDuplicates.map(d => `
-                                <p style="font-size: 12px; color: #78350f;">
-                                    • 文件 ${escapeHtml(d.filename)} → 已存在（照片ID: ${d.existingPhotoId?.substring(0, 8)}...）
-                                </p>
+                                <div style="font-size: 12px; color: #78350f; padding: 6px 0; border-bottom: 1px solid #fde68a;">
+                                    <p><strong>本次提交文件：</strong>${escapeHtml(d.submittedFilename)}</p>
+                                    <p><strong>处理状态：</strong><span style="color: #d97706;">重复，已去重，数量不翻倍</span></p>
+                                    <p><strong>已有来源：</strong>${escapeHtml(d.existingPointName)} 点位的 ${escapeHtml(d.existingFilename)}（${formatTime(d.existingUploadedAt)}上传）</p>
+                                    <p><strong>结论：</strong>通过SHA256文件哈希比对判定为同一文件，跳过导入</p>
+                                </div>
                             `).join('')}
                         </div>
                     ` : ''}

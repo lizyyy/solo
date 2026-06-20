@@ -28,17 +28,17 @@ function advanceWorkflow(pointId, targetStage, context = {}) {
   return result;
 }
 
-function supplementBusCard(pointId, busCardData, supplementedBy) {
+function supplementBusCard(pointId, busCardData, supplementedBy, reason = null) {
   const point = store.getPoint(pointId);
   if (!point) return { error: '点位不存在' };
   
   const busCardPeriod = createBusCardPeriod(busCardData, pointId, supplementedBy);
-  const result = store.addBusCardPeriod(pointId, busCardPeriod);
+  const result = store.addBusCardPeriod(pointId, busCardPeriod, reason, supplementedBy);
   
   if (point.workflowStage === WORKFLOW_STAGE.PHOTO_IMPORTED) {
     store.updatePoint(pointId, { workflowStage: WORKFLOW_STAGE.BUS_CARD_SUPPLEMENTED }, {
       action: 'workflow_advance',
-      reason: '补充公交刷卡时段后自动推进工作流',
+      reason: `补充公交刷卡时段后自动推进工作流${reason ? ' - ' + reason : ''}`,
       modifiedBy: supplementedBy
     });
   }

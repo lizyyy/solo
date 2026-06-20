@@ -102,11 +102,12 @@ app.post('/api/points/:pointId/photos', upload.array('photos', 50), (req, res) =
 });
 
 app.post('/api/points/:pointId/bus-cards', (req, res) => {
-  const { busCardData, supplementedBy } = req.body;
+  const { busCardData, supplementedBy, reason } = req.body;
   const result = workflowService.supplementBusCard(
     req.params.pointId, 
     busCardData, 
-    supplementedBy || '阿宁'
+    supplementedBy || '阿宁',
+    reason || null
   );
   if (!result) return res.status(404).json({ error: '点位不存在' });
   res.json(result);

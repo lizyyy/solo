@@ -103,10 +103,16 @@ function addPhotoToPoint(pointId, photoRecord) {
   
   if (isPhotoDuplicated(photoRecord.fileHash)) {
     const hashInfo = readPhotoHashIndex()[photoRecord.fileHash];
+    const existingPoint = points.find(p => p.id === hashInfo.pointId);
+    const existingPhoto = existingPoint ? existingPoint.photos.find(p => p.id === hashInfo.photoId) : null;
     return { 
       duplicated: true, 
       existingPhotoId: hashInfo.photoId,
       existingPointId: hashInfo.pointId,
+      existingFilename: existingPhoto ? existingPhoto.originalFilename : '未知文件',
+      existingUploadedAt: existingPhoto ? existingPhoto.uploadedAt : null,
+      existingPointName: existingPoint ? existingPoint.name : '未知点位',
+      submittedFilename: photoRecord.originalFilename,
       point
     };
   }
@@ -131,7 +137,7 @@ function addPhotoToPoint(pointId, photoRecord) {
   return { duplicated: false, point, photoRecord, version };
 }
 
-function addBusCardPeriod(pointId, busCardPeriod) {
+function addBusCardPeriod(pointId, busCardPeriod, reason = null, modifiedBy = null) {
   const points = readPoints();
   const idx = points.findIndex(p => p.id === pointId && !p.isDeleted);
   if (idx === -1) return null;
@@ -148,8 +154,10 @@ function addBusCardPeriod(pointId, busCardPeriod) {
   });
   
   point.updatedAt = new Date().toISOString();
+  if (modifiedBy) point.updatedBy = modifiedBy;
   
-  const version = createVersion(point, previous, 'add_bus_card', `补充公交刷卡时段: ${busCardPeriod.period}`);
+  const versionReason = reason || `补充公交刷卡时段: ${busCardPeriod.period}`;
+  const version = createVersion(point, previous, 'add_bus_card', versionReason);
   point.versions.push(version);
   
   points[idx] = point;
