@@ -1,15 +1,37 @@
 {
   "session_id": "TEST-REPLAY",
-  "name": "归并会话-TEST-REPLAY",
-  "created_at": "2026-06-13T01:13:14.051331",
-  "completed_at": "2026-06-13T01:13:14.147877",
+  "name": "归并重放测试",
+  "created_at": "2026-06-20T13:13:42.952225",
+  "completed_at": null,
   "replay_commands": [
     "python3 main.py import --session TEST-REPLAY --data all",
-    "echo \"  [导入] 已载入 3 条居民投诉记录\"",
+    "echo \"  [Step1] 导入完成: 新增 3 条, 跳过重复 0 条\"",
     "python3 main.py review-photos --session TEST-REPLAY --data all --reviewer 周姐",
-    "echo \"  [审核] 周姐 已审核 3 张路口照片\"",
+    "echo \"  [Step2] 照片审核完成: 更新 3 条, 跳过 0 条\"",
     "python3 main.py update-points --session TEST-REPLAY",
-    "echo \"  [更新点位] 已归并1条，已补录1条，待复核1条，冲突0条\""
+    "echo \"  [Step3] 点位更新完成: 正常归并 1 条, 临时改道待复核 1 条, 旧口径补录 1 条, 冲突待确认 0 条\"",
+    "python3 main.py import --session TEST-REPLAY --data all",
+    "echo \"  [Step1] 导入完成: 新增 0 条, 跳过重复 3 条\"",
+    "python3 main.py review-photos --session TEST-REPLAY --data all --reviewer 周姐",
+    "echo \"  [Step2] 照片审核完成: 更新 0 条, 跳过 3 条\"",
+    "python3 main.py update-points --session TEST-REPLAY",
+    "echo \"  [Step3] 点位更新完成: 正常归并 0 条, 临时改道待复核 0 条, 旧口径补录 0 条, 冲突待确认 0 条\"",
+    "python3 main.py import --session TEST-REPLAY --data all",
+    "echo \"  [Step1] 导入完成: 新增 0 条, 跳过重复 3 条\"",
+    "python3 main.py review-photos --session TEST-REPLAY --data all --reviewer 周姐",
+    "echo \"  [Step2] 照片审核完成: 更新 0 条, 跳过 3 条\"",
+    "python3 main.py update-points --session TEST-REPLAY",
+    "echo \"  [Step3] 点位更新完成: 正常归并 0 条, 临时改道待复核 0 条, 旧口径补录 0 条, 冲突待确认 0 条\"",
+    "python3 main.py review-photos --session TEST-REPLAY --data all --reviewer 周姐",
+    "echo \"  [Step2] 照片审核完成: 更新 0 条, 跳过 3 条\"",
+    "python3 main.py update-points --session TEST-REPLAY",
+    "echo \"  [Step3] 点位更新完成: 正常归并 0 条, 临时改道待复核 0 条, 旧口径补录 0 条, 冲突待确认 0 条\"",
+    "python3 main.py import --session TEST-REPLAY --data all",
+    "echo \"  [Step1] 导入完成: 新增 0 条, 跳过重复 3 条\"",
+    "python3 main.py review-photos --session TEST-REPLAY --data all --reviewer 周姐",
+    "echo \"  [Step2] 照片审核完成: 更新 0 条, 跳过 3 条\"",
+    "python3 main.py update-points --session TEST-REPLAY",
+    "echo \"  [Step3] 点位更新完成: 正常归并 0 条, 临时改道待复核 0 条, 旧口径补录 0 条, 冲突待确认 0 条\""
   ],
   "records": [
     {
@@ -23,37 +45,29 @@
       "point_id": "P-001",
       "is_temporary_detour": false,
       "is_old_standard": false,
-      "created_at": "2026-06-13T01:13:14.051360",
-      "updated_at": "2026-06-13T01:13:14.147860",
+      "created_at": "2026-06-20T13:13:43.015820",
+      "updated_at": "2026-06-20T13:13:43.137378",
       "remark": "居民反映门牌缺失，已现场核实",
       "conflicts": [],
       "audit_logs": [
         {
-          "timestamp": "2026-06-13T01:13:14.051362",
-          "operator": "系统",
-          "action": "居民投诉编号导入: TS-2026-001",
+          "timestamp": "2026-06-20T13:13:43.015825",
+          "operator": "system",
+          "action": "导入居民投诉记录",
           "before_status": "已导入",
           "after_status": null,
           "remark": ""
         },
         {
-          "timestamp": "2026-06-13T01:13:14.099284",
-          "operator": "周姐",
-          "action": "关联路口照片: PHOTO-2026-0607-001",
-          "before_status": "已导入",
-          "after_status": null,
-          "remark": ""
-        },
-        {
-          "timestamp": "2026-06-13T01:13:14.099292",
+          "timestamp": "2026-06-20T13:13:43.077688",
           "operator": "周姐",
           "action": "状态变更: 已导入 → 待审核路口照片",
           "before_status": "待审核路口照片",
           "after_status": null,
-          "remark": "路口照片审核完成"
+          "remark": "关联路口照片 PHOTO-2026-0607-001"
         },
         {
-          "timestamp": "2026-06-13T01:13:14.147848",
+          "timestamp": "2026-06-20T13:13:43.137365",
           "operator": "系统",
           "action": "冲突检查通过",
           "before_status": "待审核路口照片",
@@ -61,7 +75,7 @@
           "remark": ""
         },
         {
-          "timestamp": "2026-06-13T01:13:14.147853",
+          "timestamp": "2026-06-20T13:13:43.137370",
           "operator": "系统",
           "action": "开始正常归并处理",
           "before_status": "待审核路口照片",
@@ -69,7 +83,7 @@
           "remark": ""
         },
         {
-          "timestamp": "2026-06-13T01:13:14.147859",
+          "timestamp": "2026-06-20T13:13:43.137377",
           "operator": "系统",
           "action": "状态变更: 待审核路口照片 → 已归并",
           "before_status": "已归并",
@@ -89,45 +103,29 @@
       "point_id": null,
       "is_temporary_detour": true,
       "is_old_standard": false,
-      "created_at": "2026-06-13T01:13:14.051370",
-      "updated_at": "2026-06-13T01:13:14.147867",
+      "created_at": "2026-06-20T13:13:43.015832",
+      "updated_at": "2026-06-20T13:13:43.137383",
       "remark": "因道路施工临时改道，地图尚未更新",
       "conflicts": [],
       "audit_logs": [
         {
-          "timestamp": "2026-06-13T01:13:14.051371",
-          "operator": "系统",
-          "action": "居民投诉编号导入: TS-2026-002",
+          "timestamp": "2026-06-20T13:13:43.015833",
+          "operator": "system",
+          "action": "导入居民投诉记录",
           "before_status": "已导入",
           "after_status": null,
           "remark": ""
         },
         {
-          "timestamp": "2026-06-13T01:13:14.099294",
-          "operator": "周姐",
-          "action": "关联路口照片: PHOTO-2026-0607-002",
-          "before_status": "已导入",
-          "after_status": null,
-          "remark": ""
-        },
-        {
-          "timestamp": "2026-06-13T01:13:14.099296",
-          "operator": "周姐",
-          "action": "标记: 施工临时改道，地图未同步",
-          "before_status": "已导入",
-          "after_status": null,
-          "remark": ""
-        },
-        {
-          "timestamp": "2026-06-13T01:13:14.099298",
+          "timestamp": "2026-06-20T13:13:43.077695",
           "operator": "周姐",
           "action": "状态变更: 已导入 → 待审核路口照片",
           "before_status": "待审核路口照片",
           "after_status": null,
-          "remark": "路口照片审核完成"
+          "remark": "关联路口照片 PHOTO-2026-0607-002"
         },
         {
-          "timestamp": "2026-06-13T01:13:14.147862",
+          "timestamp": "2026-06-20T13:13:43.137379",
           "operator": "系统",
           "action": "冲突检查通过",
           "before_status": "待审核路口照片",
@@ -135,7 +133,7 @@
           "remark": ""
         },
         {
-          "timestamp": "2026-06-13T01:13:14.147864",
+          "timestamp": "2026-06-20T13:13:43.137381",
           "operator": "系统",
           "action": "检测到施工临时改道标记",
           "before_status": "待审核路口照片",
@@ -143,7 +141,7 @@
           "remark": ""
         },
         {
-          "timestamp": "2026-06-13T01:13:14.147866",
+          "timestamp": "2026-06-20T13:13:43.137382",
           "operator": "系统",
           "action": "状态变更: 待审核路口照片 → 待居民代表复核",
           "before_status": "待居民代表复核",
@@ -163,45 +161,29 @@
       "point_id": "P-002",
       "is_temporary_detour": false,
       "is_old_standard": true,
-      "created_at": "2026-06-13T01:13:14.051374",
-      "updated_at": "2026-06-13T01:13:14.147876",
+      "created_at": "2026-06-20T13:13:43.015836",
+      "updated_at": "2026-06-20T13:13:43.137391",
       "remark": "历史遗留旧门牌，路口照片新发现",
       "conflicts": [],
       "audit_logs": [
         {
-          "timestamp": "2026-06-13T01:13:14.051375",
-          "operator": "系统",
-          "action": "居民投诉编号导入: TS-2026-003",
+          "timestamp": "2026-06-20T13:13:43.015837",
+          "operator": "system",
+          "action": "导入居民投诉记录",
           "before_status": "已导入",
           "after_status": null,
           "remark": ""
         },
         {
-          "timestamp": "2026-06-13T01:13:14.099300",
-          "operator": "周姐",
-          "action": "关联路口照片: PHOTO-2026-0607-003",
-          "before_status": "已导入",
-          "after_status": null,
-          "remark": ""
-        },
-        {
-          "timestamp": "2026-06-13T01:13:14.099301",
-          "operator": "周姐",
-          "action": "标记: 旧口径，从路口照片补录",
-          "before_status": "已导入",
-          "after_status": null,
-          "remark": ""
-        },
-        {
-          "timestamp": "2026-06-13T01:13:14.099303",
+          "timestamp": "2026-06-20T13:13:43.077698",
           "operator": "周姐",
           "action": "状态变更: 已导入 → 待审核路口照片",
           "before_status": "待审核路口照片",
           "after_status": null,
-          "remark": "路口照片审核完成"
+          "remark": "关联路口照片 PHOTO-2026-0607-003"
         },
         {
-          "timestamp": "2026-06-13T01:13:14.147868",
+          "timestamp": "2026-06-20T13:13:43.137384",
           "operator": "系统",
           "action": "冲突检查通过",
           "before_status": "待审核路口照片",
@@ -209,7 +191,7 @@
           "remark": ""
         },
         {
-          "timestamp": "2026-06-13T01:13:14.147870",
+          "timestamp": "2026-06-20T13:13:43.137386",
           "operator": "系统",
           "action": "处理路口照片补录的旧口径记录",
           "before_status": "待审核路口照片",
@@ -217,7 +199,7 @@
           "remark": ""
         },
         {
-          "timestamp": "2026-06-13T01:13:14.147875",
+          "timestamp": "2026-06-20T13:13:43.137390",
           "operator": "系统",
           "action": "状态变更: 待审核路口照片 → 已补录",
           "before_status": "已补录",
@@ -236,8 +218,8 @@
       "source_records": [
         "R-001"
       ],
-      "created_at": "2026-06-13T01:13:14.147857",
-      "updated_at": "2026-06-13T01:13:14.147857",
+      "created_at": "2026-06-20T13:13:43.137375",
+      "updated_at": "2026-06-20T13:13:43.137376",
       "remark": "正常归并"
     },
     {
@@ -248,8 +230,8 @@
       "source_records": [
         "R-003"
       ],
-      "created_at": "2026-06-13T01:13:14.147873",
-      "updated_at": "2026-06-13T01:13:14.147874",
+      "created_at": "2026-06-20T13:13:43.137389",
+      "updated_at": "2026-06-20T13:13:43.137389",
       "remark": "旧口径补录，路口照片补充"
     }
   ]

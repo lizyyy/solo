@@ -29,11 +29,20 @@ def detect_conflicts(record: MergeRecord) -> List[ConflictEvidence]:
     return conflicts
 
 
+def _next_point_id(session: MergeSession) -> str:
+    existing_ids = {p.point_id for p in session.points}
+    for i in range(1, 1000):
+        candidate = f"P-{i:03d}"
+        if candidate not in existing_ids:
+            return candidate
+    raise RuntimeError("点位ID已用尽（超过999个）")
+
+
 def process_normal_record(record: MergeRecord, session: MergeSession) -> Tuple[Point, MergeRecord]:
     record.add_audit_log("系统", "开始正常归并处理")
 
     point = Point(
-        point_id=f"P-{len(session.points) + 1:03d}",
+        point_id=_next_point_id(session),
         house_number=record.house_number,
         address=record.address,
         status=PointStatus.ACTIVE,
@@ -79,7 +88,7 @@ def process_supplementary_record(record: MergeRecord, session: MergeSession) -> 
         point = existing_point
     else:
         point = Point(
-            point_id=f"P-{len(session.points) + 1:03d}",
+            point_id=_next_point_id(session),
             house_number=record.house_number,
             address=record.address,
             status=PointStatus.OLD_STANDARD,

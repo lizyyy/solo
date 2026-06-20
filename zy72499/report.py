@@ -111,11 +111,6 @@ def generate_replay_script(session: MergeSession, output_dir: str = "output") ->
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     script_path = os.path.join(output_dir, f"重跑命令_{session.session_id}_{timestamp}.sh")
 
-    merged_target = sum(1 for r in session.records if r.status.value == "已归并")
-    supp_target = sum(1 for r in session.records if r.status.value == "已补录")
-    pending_target = sum(1 for r in session.records if r.status.value == "待居民代表复核")
-    conflict_target = sum(1 for r in session.records if r.status.value == "冲突待确认")
-    points_target = len(session.points)
 
     lines = []
     lines.append("#!/bin/bash")
@@ -150,17 +145,9 @@ def generate_replay_script(session: MergeSession, output_dir: str = "output") ->
     lines.append("")
     lines.append(f'python3 main.py generate-report --session {session.session_id}')
     lines.append("")
-    lines.append('echo "============================================================"')
-    lines.append('echo "  归并流程重跑完成！结果统计："')
-    lines.append(f'echo "    点位总数: {points_target}"')
-    lines.append(f'echo "    已归并:   {merged_target} 条"')
-    lines.append(f'echo "    已补录:   {supp_target} 条"')
-    lines.append(f'echo "    待复核:   {pending_target} 条"')
-    lines.append(f'echo "    冲突待确认: {conflict_target} 条"')
+    lines.append('echo "  归并流程重跑完成！结果统计（来自实际会话数据）："')
     lines.append('echo "------------------------------------------------------------"')
-    lines.append(f'echo "  复盘记录:   output/复盘记录_{session.session_id}_*.md"')
-    lines.append(f'echo "  会话存档:   sessions/{session.session_id}.json"')
-    lines.append('echo "============================================================"')
+    lines.append(f'python3 main.py summary --session {session.session_id}')
 
     script_content = "\n".join(lines)
     with open(script_path, "w", encoding="utf-8") as f:
@@ -214,6 +201,11 @@ def generate_console_summary(session: MergeSession) -> str:
             lines.append(f"    👥  {record.record_id}: 待居民代表复核(施工临时改道)")
     if not has_pending:
         lines.append("    无待处理事项")
+    lines.append("")
+
+    lines.append("=" * 60)
+
+    return "\n".join(lines)
     lines.append("")
 
     lines.append("=" * 60)

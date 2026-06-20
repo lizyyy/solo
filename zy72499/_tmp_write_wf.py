@@ -1,4 +1,6 @@
-from typing import List, Optional, Tuple
+import sys
+
+CONTENT = r"""from typing import List, Optional, Tuple
 from datetime import datetime
 from models import (
     MergeSession,
@@ -327,3 +329,9 @@ def resident_review_complete(
         record.update_status(RecordStatus.REJECTED, operator, "居民代表复核不通过")
 
     return session
+"""
+
+with open("workflow.py", "w", encoding="utf-8") as f:
+    f.write(CONTENT)
+
+print("workflow.py written successfully, lines:", len(CONTENT.splitlines())
