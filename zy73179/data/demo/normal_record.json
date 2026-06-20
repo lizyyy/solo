@@ -1,0 +1,25 @@
+{
+  "id": "nr-2024-06",
+  "type": "normal_record",
+  "title": "正常作答记录",
+  "author": "教务",
+  "stance": "正常采集的作答分数，未做人工调整",
+  "revisions": [
+    {
+      "at": "2024-06-15T08:30:00",
+      "by": "教务",
+      "stance": "正常采集的作答分数，未做人工调整",
+      "reason": "原始录入"
+    }
+  ],
+  "payload": {
+    "records": [
+      {"id": "S001", "name": "学生甲", "base_score": 88.0},
+      {"id": "S002", "name": "学生乙", "base_score": 60.0},
+      {"id": "S003", "name": "学生丙", "base_score": 60.0},
+      {"id": "S004", "name": "学生丁", "base_score": 60.0},
+      {"id": "S005", "name": "学生戊", "base_score": 72.0},
+      {"id": "S006", "name": "学生己", "base_score": 58.0}
+    ]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "sn-2024-06",
+  "type": "scoring_notes",
+  "title": "期末概率卷评分备注",
+  "author": "数学老师老叶",
+  "stance": "采用线性加分公式 final=base+N(0,sigma)，单位为分数（满分100），及格线 60 分",
+  "revisions": [
+    {
+      "at": "2024-06-15T08:00:00",
+      "by": "老叶",
+      "stance": "采用线性加分公式 final=base+N(0,sigma)，单位为分数（满分100），及格线 60 分",
+      "reason": "初始评分口径，依据教学大纲"
+    }
+  ],
+  "payload": {
+    "formula": "linear",
+    "unit": "point",
+    "max_score": 100,
+    "pass_threshold": 60,
+    "weights": {
+      "选择题": 0.4,
+      "解答题": 0.6
+    }
+  }
+}
