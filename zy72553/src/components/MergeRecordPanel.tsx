@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Table, Button, Space, Tag, Radio, Tooltip, Popover } from 'antd';
-import { BarChartOutlined, TableOutlined, AppstoreOutlined, HistoryOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { Table, Button, Space, Tag, Radio, Tooltip, Popover, message, Modal } from 'antd';
+import { BarChartOutlined, TableOutlined, AppstoreOutlined, HistoryOutlined, InfoCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import { useAppStore } from '../store';
 import type { ColumnsType } from 'antd/es/table';
 import type { EntityMergeRecord, ViewMode } from '../types';
@@ -19,6 +19,42 @@ export const MergeRecordPanel: React.FC = () => {
 
   const handleViewModeChange = (e: any) => {
     setViewMode(e.target.value as ViewMode);
+  };
+
+  const handleConfirm = (record: EntityMergeRecord) => {
+    const success = confirmRecord(record.id);
+    if (success) {
+      message.success('记录已确认');
+    } else {
+      Modal.warning({
+        title: '无法直接确认',
+        icon: <WarningOutlined style={{ color: '#fa8c16' }} />,
+        content: (
+          <div>
+            <p style={{ marginBottom: 8 }}>
+              <strong>该记录存在线上特征缺失，使用了默认评分</strong>
+            </p>
+            <p style={{ marginBottom: 8 }}>
+              缺失特征：{record.missingFeatures.map((f, idx) => (
+                <Tag key={idx} color="red" style={{ marginRight: 4 }}>{f}</Tag>
+              ))}
+            </p>
+            <p style={{ marginBottom: 8 }}>
+              根据流程规范，特征缺失的默认分记录需先由<strong>推荐负责人</strong>在负样本列表中复核确认：
+            </p>
+            <ul style={{ paddingLeft: 20, marginBottom: 0 }}>
+              <li>点击「详情」查看完整信息和关联负样本</li>
+              <li>在「关联负样本」tab 中点击「在负样本列表中查看并筛选」</li>
+              <li>由推荐负责人复核后更新摘要，标记为特征完整后再确认</li>
+            </ul>
+          </div>
+        ),
+        okText: '去查看详情',
+        onOk: () => {
+          handleRowClick(record);
+        },
+      });
+    }
   };
 
   const statusMap: Record<string, { color: string; text: string }> = {
@@ -157,7 +193,7 @@ export const MergeRecordPanel: React.FC = () => {
           <Button size="small" onClick={() => handleRowClick(record)}>详情</Button>
           {record.status !== 'confirmed' && record.status !== 'rejected' && (
             <>
-              <Button size="small" type="primary" onClick={() => confirmRecord(record.id)}>确认</Button>
+              <Button size="small" type="primary" onClick={() => handleConfirm(record)}>确认</Button>
               <Button size="small" danger onClick={() => rejectRecord(record.id)}>拒绝</Button>
             </>
           )}
