@@ -2,7 +2,7 @@ import { useMinutesStore } from "@/stores/useMinutesStore";
 import { useModelStore } from "@/stores/useModelStore";
 import { useMaterialsStore } from "@/stores/useMaterialsStore";
 import { useAnomaliesStore } from "@/stores/useAnomaliesStore";
-import { Snapshot, Note } from "@/types";
+import { Snapshot, Note, Anomaly, ModelAnnotation, MaterialBatch, MeetingMinutes } from "@/types";
 
 export interface ExportConfig {
   includeSnapshots: boolean;
@@ -10,6 +10,30 @@ export interface ExportConfig {
   includeRawMinutes: boolean;
   format: "json" | "markdown";
   scope: "all" | "open" | "critical";
+}
+
+interface ExportMeta {
+  generatedAt: string;
+  systemVersion: string;
+  scope: string;
+  counts: {
+    anomalies: number;
+    annotations: number;
+    materials: number;
+    minutes: number;
+    snapshots: number;
+    notes: number;
+  };
+}
+
+interface ExportData {
+  exportMeta: ExportMeta;
+  anomalies: Anomaly[];
+  annotations: ModelAnnotation[];
+  materials: MaterialBatch[];
+  minutes: MeetingMinutes[];
+  snapshots: Snapshot[];
+  notes: Note[];
 }
 
 export function generateExport(config: ExportConfig): { filename: string; content: string; type: string } {
@@ -84,7 +108,7 @@ export function generateExport(config: ExportConfig): { filename: string; conten
   };
 }
 
-function buildMarkdown(d: any): string {
+function buildMarkdown(d: ExportData): string {
   const lines: string[] = [];
   lines.push(`# 结构加固图纸复核报告`);
   lines.push("");
@@ -106,9 +130,9 @@ function buildMarkdown(d: any): string {
   lines.push(`## 异常详情`);
   lines.push("");
   for (const a of d.anomalies) {
-    const ann = d.annotations.find((x: any) => x.id === a.annotationId);
-    const mats = d.materials.filter((x: any) => x.annotationId === a.annotationId);
-    const mins = ann ? d.minutes.find((x: any) => x.id === ann.minutesId) : null;
+    const ann = d.annotations.find((x: ModelAnnotation) => x.id === a.annotationId);
+    const mats = d.materials.filter((x: MaterialBatch) => x.annotationId === a.annotationId);
+    const mins = ann ? d.minutes.find((x: MeetingMinutes) => x.id === ann.minutesId) : null;
     lines.push(`### ${a.title} · \`${a.id}\``);
     lines.push("");
     lines.push(`- **严重程度**：${a.severity}  `);
@@ -135,7 +159,7 @@ function buildMarkdown(d: any): string {
       }
     }
     if (d.snapshots?.length) {
-      const snaps = d.snapshots.filter((s: any) => s.anomalyId === a.id);
+      const snaps = d.snapshots.filter((s) => s.anomalyId === a.id);
       if (snaps.length) {
         lines.push("");
         lines.push(`**结论追溯（时间胶囊）**：`);
@@ -146,7 +170,7 @@ function buildMarkdown(d: any): string {
       }
     }
     if (d.notes?.length) {
-      const notes = d.notes.filter((n: any) => n.anomalyId === a.id);
+      const notes = d.notes.filter((n) => n.anomalyId === a.id);
       if (notes.length) {
         lines.push("");
         lines.push(`**历史备注（受保护，重跑不覆盖）**：`);

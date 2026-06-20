@@ -5,7 +5,9 @@ import { Package, Plus, AlertTriangle, CheckCircle2, Search, Filter } from "luci
 import { ImportanceBadge } from "@/components/StatusBadges";
 import DecisionBanner from "@/components/DecisionBanner";
 import { useUIGlobalStore } from "@/stores/useUIGlobalStore";
-import { StructuralImportance } from "@/types";
+import { StructuralImportance, MaterialBatch } from "@/types";
+
+type MaterialBatchInput = Omit<MaterialBatch, "id" | "createdAt">;
 
 export default function MaterialsPage() {
   const { batches, addBatch, updateBatch, removeBatch, getDecision, getBatchesForAnnotation } =
@@ -15,15 +17,13 @@ export default function MaterialsPage() {
   const [showForm, setShowForm] = useState(false);
   const [filter, setFilter] = useState<"all" | "missing" | "ok">("all");
   const [query, setQuery] = useState("");
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<MaterialBatchInput>({
     annotationId: annotations[0]?.id || "",
     materialType: "",
     batchNumber: "",
     testReport: "",
     isMissing: false,
   });
-
-  const annotationsById = Object.fromEntries(annotations.map((a) => [a.id, a]));
 
   const grouped = annotations.map((a) => {
     const b = getBatchesForAnnotation(a.id);
@@ -53,7 +53,7 @@ export default function MaterialsPage() {
       showToast("error", "请填写材料类型");
       return;
     }
-    addBatch(form as any);
+    addBatch(form);
     showToast("success", `材料批次已登记：${form.materialType}`);
     setForm({
       annotationId: annotations[0]?.id || "",

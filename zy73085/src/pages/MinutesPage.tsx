@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useMinutesStore, MeetingMinutes } from "@/stores/useMinutesStore";
+import { useMinutesStore } from "@/stores/useMinutesStore";
+import { MeetingMinutes, MinutesStatus } from "@/types";
 import { StatusBadge } from "@/components/StatusBadges";
 import { FileText, Upload, Plus, Trash2, CheckCircle2, AlertCircle, Eye, RefreshCw } from "lucide-react";
 import { useUIGlobalStore } from "@/stores/useUIGlobalStore";
-import { buildMinutesFromRaw } from "@/utils/fieldCompat";
 
-const SAMPLES: Record<string, Record<string, any>> = {
+const SAMPLES: Record<string, Record<string, string>> = {
   sample1: {
     "纪要来源": "第43次现场协调会",
     "处理状态": "待处理",
@@ -48,23 +48,24 @@ export default function MinutesPage() {
     reader.onload = () => {
       try {
         const txt = String(reader.result || "");
-        let data: any;
+        let data: Record<string, unknown> | undefined;
         if (file.name.endsWith(".json")) {
-          data = JSON.parse(txt);
+          data = JSON.parse(txt) as Record<string, unknown>;
         } else {
           const lines = txt.split(/\r?\n/).filter(Boolean);
           if (lines.length >= 2) {
             const headers = lines[0].split(/[,，]/);
             const values = lines[1].split(/[,，]/);
-            data = {};
-            headers.forEach((h, i) => (data[h.trim()] = values[i]?.trim() || ""));
+            const parsed: Record<string, unknown> = {};
+            headers.forEach((h, i) => (parsed[h.trim()] = values[i]?.trim() || ""));
+            data = parsed;
           }
         }
         if (data) {
           const m = addMinutes(data);
           showToast("success", `文件 ${file.name} 解析完成 · ID: ${m.id.slice(0, 12)}`);
         }
-      } catch (err) {
+      } catch {
         showToast("error", "解析失败：文件格式不正确");
       }
     };
@@ -210,7 +211,7 @@ export default function MinutesPage() {
                   <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                     <select
                       value={m.status}
-                      onChange={(e) => updateStatus(m.id, e.target.value as any)}
+                      onChange={(e) => updateStatus(m.id, e.target.value as MinutesStatus)}
                       className="eng-input !py-1 !px-2 text-xs w-[90px]"
                     >
                       <option value="pending">待处理</option>

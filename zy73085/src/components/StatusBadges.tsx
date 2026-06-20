@@ -1,6 +1,30 @@
-import { CheckCircle2, PauseCircle, AlertTriangle, AlertCircle, Clock, HelpCircle, XCircle } from "lucide-react";
+/* eslint-disable react-refresh/only-export-components */
+import { CheckCircle2, PauseCircle, AlertTriangle, AlertCircle, Clock, HelpCircle, XCircle, type LucideIcon } from "lucide-react";
 
-export const STATUS_STYLES: Record<string, { label: string; cls: string; icon: any }> = {
+interface StatusStyleItem {
+  label: string;
+  cls: string;
+  icon: LucideIcon;
+}
+
+interface SeverityStyleItem {
+  label: string;
+  cls: string;
+  dot: string;
+}
+
+interface ImportanceStyleItem {
+  label: string;
+  cls: string;
+}
+
+interface HoldStyleItem {
+  label: string;
+  cls: string;
+  icon: LucideIcon;
+}
+
+export const STATUS_STYLES: Record<string, StatusStyleItem> = {
   pending: { label: "待处理", cls: "bg-ink-100 text-ink-700 border border-ink-200", icon: Clock },
   processing: { label: "复核中", cls: "bg-brand-50 text-brand-700 border border-brand-200", icon: AlertCircle },
   resolved: { label: "已解决", cls: "bg-safe-50 text-safe-700 border border-safe-200", icon: CheckCircle2 },
@@ -9,19 +33,19 @@ export const STATUS_STYLES: Record<string, { label: string; cls: string; icon: a
   released: { label: "已放行", cls: "bg-safe-100 text-safe-800 border border-safe-300", icon: CheckCircle2 },
 };
 
-export const SEVERITY_STYLES: Record<string, { label: string; cls: string; dot: string }> = {
+export const SEVERITY_STYLES: Record<string, SeverityStyleItem> = {
   critical: { label: "严重", cls: "bg-danger-600 text-white", dot: "bg-danger-600" },
   warning: { label: "警告", cls: "bg-warn-600 text-white", dot: "bg-warn-600" },
   info: { label: "提示", cls: "bg-brand-600 text-white", dot: "bg-brand-600" },
 };
 
-export const IMPORTANCE_STYLES: Record<string, { label: string; cls: string }> = {
+export const IMPORTANCE_STYLES: Record<string, ImportanceStyleItem> = {
   critical: { label: "关键结构", cls: "bg-danger-50 text-danger-700 border border-danger-200" },
   normal: { label: "普通构件", cls: "bg-brand-50 text-brand-700 border border-brand-200" },
   minor: { label: "次要装饰", cls: "bg-ink-50 text-ink-600 border border-ink-200" },
 };
 
-export const HOLD_STYLES: Record<string, { label: string; cls: string; icon: any }> = {
+export const HOLD_STYLES: Record<string, HoldStyleItem> = {
   hold: { label: "必须挂起", cls: "bg-danger-600 text-white", icon: PauseCircle },
   release: { label: "可放行", cls: "bg-safe-600 text-white", icon: CheckCircle2 },
   evaluate: { label: "需评估", cls: "bg-warn-600 text-white", icon: HelpCircle },

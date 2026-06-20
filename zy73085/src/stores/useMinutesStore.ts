@@ -7,7 +7,7 @@ import { buildMinutesFromRaw } from "@/utils/fieldCompat";
 interface MinutesState {
   minutes: MeetingMinutes[];
   selectedId: string | null;
-  addMinutes: (raw: Record<string, any>) => MeetingMinutes;
+  addMinutes: (raw: Record<string, unknown>) => MeetingMinutes;
   updateStatus: (id: string, status: MeetingMinutes["status"]) => void;
   remove: (id: string) => void;
   setSelected: (id: string | null) => void;

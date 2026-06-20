@@ -16,6 +16,7 @@ import {
   FileWarning,
   Ban,
   PlayCircle,
+  type LucideIcon,
 } from "lucide-react";
 import { useUIGlobalStore } from "@/stores/useUIGlobalStore";
 import { useMemo } from "react";
@@ -287,6 +288,18 @@ export default function Dashboard() {
   );
 }
 
+interface StatCardProps {
+  icon: LucideIcon;
+  label: string;
+  value: number | string;
+  trend: string;
+  trendUp: boolean;
+  bg: string;
+  border: string;
+  text: string;
+  iconBg: string;
+}
+
 function StatCard({
   icon: Icon,
   label,
@@ -297,7 +310,7 @@ function StatCard({
   border,
   text,
   iconBg,
-}: any) {
+}: StatCardProps) {
   return (
     <div className={`eng-card p-5 bg-gradient-to-br ${bg} border ${border}`}>
       <div className="flex items-start justify-between mb-3">

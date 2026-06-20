@@ -3,8 +3,8 @@ import { Anomaly, Snapshot, Note } from "@/types";
 export function makeSnapshot(params: {
   anomalyId: string;
   fieldName: string;
-  oldValue: any;
-  newValue: any;
+  oldValue: unknown;
+  newValue: unknown;
   operator: string;
   note?: string;
 }): Snapshot {

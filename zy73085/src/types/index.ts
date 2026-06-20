@@ -17,8 +17,8 @@ export interface MeetingMinutes {
   source: string;
   status: MinutesStatus;
   rawContent: string;
-  rawData: Record<string, any>;
-  parsedData: Record<string, any>;
+  rawData: Record<string, unknown>;
+  parsedData: Record<string, unknown>;
   fieldMappings: FieldMapping[];
   title?: string;
   meetingDate?: string;

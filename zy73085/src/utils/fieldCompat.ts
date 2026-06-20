@@ -41,14 +41,14 @@ function normalizeKey(k: string): string {
 }
 
 interface ParseResult {
-  parsedData: Record<string, any>;
+  parsedData: Record<string, unknown>;
   fieldMappings: FieldMapping[];
   source: string;
   status: MinutesStatus;
 }
 
-export function parseRawMinutes(raw: Record<string, any>): ParseResult {
-  const parsedData: Record<string, any> = {};
+export function parseRawMinutes(raw: Record<string, unknown>): ParseResult {
+  const parsedData: Record<string, unknown> = {};
   const fieldMappings: FieldMapping[] = [];
   const usedOriginals = new Set<string>();
 
@@ -111,7 +111,7 @@ export function parseRawMinutes(raw: Record<string, any>): ParseResult {
     }
   }
 
-  let source: string = parsedData.source;
+  let source: string = parsedData.source as string;
   if (!source || String(source).trim().length === 0) {
     for (const origKey of originalKeys) {
       const val = raw[origKey];
@@ -131,7 +131,7 @@ export function parseRawMinutes(raw: Record<string, any>): ParseResult {
     }
   }
 
-  let status: MinutesStatus = parsedData.status;
+  let status: MinutesStatus = parsedData.status as MinutesStatus;
   let statusMatched = false;
   if (status && typeof status === "string") {
     const s = status.trim();
@@ -176,7 +176,7 @@ export function parseRawMinutes(raw: Record<string, any>): ParseResult {
   return { parsedData, fieldMappings, source, status };
 }
 
-export function buildMinutesFromRaw(raw: Record<string, any>, rawContent?: string): MeetingMinutes {
+export function buildMinutesFromRaw(raw: Record<string, unknown>, rawContent?: string): MeetingMinutes {
   const now = new Date().toISOString();
   const { parsedData, fieldMappings, source, status } = parseRawMinutes(raw);
   return {
@@ -187,9 +187,9 @@ export function buildMinutesFromRaw(raw: Record<string, any>, rawContent?: strin
     rawData: { ...raw },
     parsedData,
     fieldMappings,
-    title: parsedData.title,
-    meetingDate: parsedData.meetingDate,
-    participant: parsedData.participant,
+    title: parsedData.title as string | undefined,
+    meetingDate: parsedData.meetingDate as string | undefined,
+    participant: parsedData.participant as string | undefined,
     createdAt: now,
     updatedAt: now,
   };

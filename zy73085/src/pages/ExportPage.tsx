@@ -16,8 +16,19 @@ import {
   History,
   MessageSquare,
   Copy,
+  type LucideIcon,
 } from "lucide-react";
 import { useUIGlobalStore } from "@/stores/useUIGlobalStore";
+
+type ExportOptionKey = "includeSnapshots" | "includeNotes" | "includeRawMinutes";
+
+interface ExportOption {
+  key: ExportOptionKey;
+  icon: LucideIcon;
+  label: string;
+  desc: string;
+  recommended: boolean;
+}
 
 export default function ExportPage() {
   const { anomalies, snapshots, notes, reruns } = useAnomaliesStore();
@@ -39,6 +50,30 @@ export default function ExportPage() {
     open: anomalies.filter((a) => ["open", "processing", "suspended"].includes(a.status)).length,
     critical: anomalies.filter((a) => a.severity === "critical").length,
   };
+
+  const exportOptions: ExportOption[] = [
+    {
+      key: "includeSnapshots",
+      icon: History,
+      label: "历史快照（结论变化时间胶囊）",
+      desc: `包含 ${snapshots.length} 条结论变更记录，用于追溯为什么这次结论不一样`,
+      recommended: true,
+    },
+    {
+      key: "includeNotes",
+      icon: MessageSquare,
+      label: "历史备注（🔒 受保护备注）",
+      desc: `包含 ${notes.length} 条人工备注，重新复核不会覆盖这些内容`,
+      recommended: true,
+    },
+    {
+      key: "includeRawMinutes",
+      icon: FileIcon,
+      label: "会议纪要原始内容",
+      desc: `包含 ${minutes.length} 份纪要的原始 JSON，文件体积较大`,
+      recommended: false,
+    },
+  ];
 
   const handleExport = () => {
     const result = generateExport(config);
@@ -178,49 +213,27 @@ export default function ExportPage() {
               第三步 · 包含内容选项
             </h3>
             <div className="space-y-2">
-              {[
-                {
-                  key: "includeSnapshots",
-                  icon: History,
-                  label: "历史快照（结论变化时间胶囊）",
-                  desc: `包含 ${snapshots.length} 条结论变更记录，用于追溯为什么这次结论不一样`,
-                  recommended: true,
-                },
-                {
-                  key: "includeNotes",
-                  icon: MessageSquare,
-                  label: "历史备注（🔒 受保护备注）",
-                  desc: `包含 ${notes.length} 条人工备注，重新复核不会覆盖这些内容`,
-                  recommended: true,
-                },
-                {
-                  key: "includeRawMinutes",
-                  icon: FileIcon,
-                  label: "会议纪要原始内容",
-                  desc: `包含 ${minutes.length} 份纪要的原始 JSON，文件体积较大`,
-                  recommended: false,
-                },
-              ].map((opt) => (
+              {exportOptions.map((opt) => (
                 <label
                   key={opt.key}
                   className={`flex items-start gap-3 p-3 rounded-eng border cursor-pointer transition-all ${
-                    (config as any)[opt.key]
+                    config[opt.key]
                       ? "border-brand-300 bg-brand-50/40"
                       : "border-ink-200 hover:bg-ink-50"
                   }`}
                 >
                   <input
                     type="checkbox"
-                    checked={(config as any)[opt.key]}
+                    checked={config[opt.key]}
                     onChange={(e) =>
-                      setConfig({ ...config, [opt.key]: e.target.checked } as ExportConfig)
+                      setConfig({ ...config, [opt.key]: e.target.checked })
                     }
                     className="mt-1 w-4 h-4 accent-brand-600"
                   />
                   <opt.icon
                     size={18}
                     className={`mt-0.5 shrink-0 ${
-                      (config as any)[opt.key] ? "text-brand-600" : "text-ink-400"
+                      config[opt.key] ? "text-brand-600" : "text-ink-400"
                     }`}
                   />
                   <div className="flex-1 min-w-0">
@@ -311,14 +324,24 @@ export default function ExportPage() {
   );
 }
 
-function Stat({ icon: Icon, label, value, color }: any) {
-  const bg = {
+type StatColor = "danger" | "brand" | "warn" | "safe" | "ink";
+
+interface StatProps {
+  icon: LucideIcon;
+  label: string;
+  value: number | string;
+  color: StatColor;
+}
+
+function Stat({ icon: Icon, label, value, color }: StatProps) {
+  const bgMap: Record<StatColor, string> = {
     danger: "bg-danger-600",
     brand: "bg-brand-600",
     warn: "bg-warn-600",
     safe: "bg-safe-600",
     ink: "bg-ink-600",
-  }[color] || "bg-ink-600";
+  };
+  const bg = bgMap[color] || bgMap.ink;
   return (
     <div className="flex items-center gap-2 px-3 py-2 rounded-eng bg-white border border-ink-200 shadow-eng">
       <div className={`w-8 h-8 rounded-eng ${bg} text-white flex items-center justify-center`}>
