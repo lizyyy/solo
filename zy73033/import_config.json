@@ -1,0 +1,37 @@
+{
+  "base_token": "Fj4jbNvHaado6JsbEFgci9XMnJu",
+  "tables": {
+    "main": "tblUcXaYYXNDsKfP",
+    "exception": "tblx2Y63lE047DWV",
+    "import_log": "tblLlcdq3ozZ74Ix",
+    "field_alias": "tbl6S3Xe2UyouFAh"
+  },
+  "dedup_key_fields": ["宠物姓名", "主人姓名", "上课日期", "课程名称"],
+  "protected_fields": {
+    "main": {
+      "主人微信备注": "人工备注保护标记",
+      "处理状态": {
+        "protected_values": ["人工改判"],
+        "protect_reason_field": "主人微信备注"
+      }
+    },
+    "exception": {
+      "人工确认理由": true,
+      "影响范围": true,
+      "处理状态": {
+        "protected_values": ["已确认", "已修复", "已忽略"]
+      }
+    }
+  },
+  "auto_fill_empty_fields": [
+    "训练内容", "训练表现", "课后作业", "疫苗接种日期"
+  ],
+  "non_override_fields": [
+    "数据来源", "处理状态"
+  ],
+  "exception_types": {
+    "vaccine_missing": "疫苗日期缺失",
+    "field_alias_mismatch": "字段名不一致",
+    "note_conflict": "微信备注冲突"
+  }
+}
