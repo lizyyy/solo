@@ -249,8 +249,8 @@ class ConclusionTracker:
 class WarningAppService:
     """对外接口：导入材料、补录、查询（含负责人视图）"""
 
-    def __init__(self):
-        self.repo = WarningRepository()
+    def __init__(self, repo=None):
+        self.repo = repo if repo is not None else WarningRepository()
         self.dup_checker = DuplicateChecker(self.repo)
 
     # ---------- 接口1：导入/创建预警记录 ----------
@@ -407,9 +407,8 @@ class WarningAppService:
         return {
             "total_records": len(result_list),
             "duplicate_merged_count": sum(
-                1 for r in records if any(
-                    "重复提交合并" in h.remark for h in r.history
-                )
+                sum(1 for h in r.history if "重复提交合并" in h.remark)
+                for r in records
             ),
             "records": result_list,
         }
