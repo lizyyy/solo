@@ -73,6 +73,18 @@ export interface AlertPoint {
   inspectionId: string
 }
 
+export interface RerunDelta {
+  statusChanged: boolean
+  oldStatus: PumpStatus
+  newStatus: PumpStatus
+  addedAlerts: string[]
+  removedAlerts: string[]
+  changedMetrics: string[]
+  notesInherited: number
+  screenshotsInherited: number
+  changesInherited: number
+}
+
 export interface Inspection {
   id: string
   pumpId: string
@@ -91,6 +103,7 @@ export interface Inspection {
   calcNotes: string
   createTime: string
   updateTime: string
+  rerunDelta?: RerunDelta
 }
 
 export interface ExportHistory {

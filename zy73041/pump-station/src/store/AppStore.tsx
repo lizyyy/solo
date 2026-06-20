@@ -39,7 +39,9 @@ interface AppStoreContextValue extends AppState {
   confirmPartReplace: (inspectionId: string, partIndex: number, confirmedBy: string) => void
   rerunInspection: (parentId: string, newMetrics: MetricValue, inspector: string, source: 'supplement' | 'rerun') => Inspection
   exportSelection: (ids: string[]) => { csv: string; hash: string; formulaVersion: string }
+  exportChain: (inspectionId: string) => { csv: string; hash: string; formulaVersion: string }
   getHistoryChain: (inspectionId: string) => Inspection[]
+  getHistoryChainIds: (inspectionId: string) => string[]
   resetAll: () => void
 }
 
@@ -326,6 +328,37 @@ export const AppStoreProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const newStatus = inferStatus(newMetrics, hasUnconfirmed)
       const nowISO = new Date().toISOString()
       const newId = makeId('INS')
+
+      const oldAlertMetrics = new Set(parent.alerts.map((a) => a.metric))
+      const newAlertMetrics = new Set(newAlerts.map((a) => a.metric))
+      const addedAlerts: string[] = []
+      const removedAlerts: string[] = []
+      for (const a of newAlerts) {
+        if (!oldAlertMetrics.has(a.metric)) addedAlerts.push(`${METRIC_LABELS[a.metric]} ${a.level === 'critical' ? '超限' : '预警'}`)
+      }
+      for (const a of parent.alerts) {
+        if (!newAlertMetrics.has(a.metric)) removedAlerts.push(`${METRIC_LABELS[a.metric]} ${a.level === 'critical' ? '超限' : '预警'}`)
+      }
+      const changedMetricsKeys = (Object.keys(newMetrics) as (keyof MetricValue)[])
+        .filter((key) => Math.abs(parent.metrics[key] - newMetrics[key]) > 0.0001)
+      const changedMetrics = changedMetricsKeys.map((key) => `${METRIC_LABELS[key]} ${parent.metrics[key]}→${newMetrics[key]}`)
+
+      const parentNoteCount = state.notes.filter((n) => n.inspectionId === parentId).length
+      const parentShotCount = state.screenshots.filter((s) => s.inspectionId === parentId).length
+      const parentChangeCount = state.changes.filter((c) => c.inspectionId === parentId).length
+
+      const delta: import('../types').RerunDelta = {
+        statusChanged: parent.status !== newStatus,
+        oldStatus: parent.status,
+        newStatus,
+        addedAlerts,
+        removedAlerts,
+        changedMetrics,
+        notesInherited: parentNoteCount,
+        screenshotsInherited: parentShotCount,
+        changesInherited: parentChangeCount,
+      }
+
       const copy: Inspection = {
         ...parent,
         id: newId,
@@ -341,11 +374,30 @@ export const AppStoreProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         createTime: nowISO,
         updateTime: nowISO,
         parts: parent.parts.map((p) => ({ ...p })),
+        rerunDelta: delta,
       }
-      setState((s) => ({ ...s, inspections: [copy, ...s.inspections] }))
+
+      const summary = changedMetrics.length > 0
+        ? changedMetrics.join('；')
+        : '指标值未变化，仅按当前口径重算'
+
+      const chainChange: ChangeRecord = {
+        id: makeId('CH'),
+        inspectionId: newId,
+        field: source === 'supplement' ? 'supplement.rerunChain' : 'rerun.chain',
+        oldValue: parentId,
+        newValue: newId,
+        operator: state.currentUser.name,
+        operatorRole: state.currentUser.role,
+        changeTime: nowISO,
+        shift: parent.shift,
+        reason: `${source === 'supplement' ? '补录后重跑' : '重跑计算'}生成新记录；保留父记录备注(${parentNoteCount}条)、截图(${parentShotCount}张)和变更历史(${parentChangeCount}条)的链路引用；变更摘要：${summary}`,
+      }
+
+      setState((s) => ({ ...s, inspections: [copy, ...s.inspections], changes: [chainChange, ...s.changes] }))
       return copy
     },
-    [state.inspections]
+    [state.currentUser.name, state.currentUser.role, state.inspections, state.notes, state.screenshots, state.changes]
   )
 
   const exportSelection = useCallback(
@@ -395,6 +447,130 @@ export const AppStoreProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     [state.inspections]
   )
 
+  const getHistoryChainIds = useCallback(
+    (inspectionId: string): string[] => getHistoryChain(inspectionId).map((i) => i.id),
+    [getHistoryChain]
+  )
+
+  const exportChain = useCallback(
+    (inspectionId: string) => {
+      const chain = getHistoryChain(inspectionId)
+      const chainIds = chain.map((i) => i.id)
+      const chainNotes = state.notes.filter((n) => chainIds.includes(n.inspectionId))
+      const chainShots = state.screenshots.filter((s) => chainIds.includes(s.inspectionId))
+      const chainChanges = state.changes.filter((c) => chainIds.includes(c.inspectionId))
+
+      const statusLabel: Record<string, string> = {
+        normal: '正常',
+        warning: '预警',
+        critical: '超限',
+        pending_confirm: '待主管确认',
+        suspended: '挂起',
+      }
+
+      let csv = '\uFEFF'
+      csv += '=== 泵站巡检阈值预警 · 链路导出文件 ===\r\n'
+      csv += `导出时间,${new Date().toLocaleString('zh-CN')}\r\n`
+      csv += `链路记录数,${chain.length}\r\n`
+      csv += `口径版本,${THRESHOLD_VERSION}\r\n`
+      csv += `备注总数,${chainNotes.length}\r\n`
+      csv += `截图总数,${chainShots.length}\r\n`
+      csv += `变更记录总数,${chainChanges.length}\r\n`
+      csv += '\r\n'
+
+      csv += '--- 一、巡检记录链路（按时间从早到晚，parentId 追溯） ---\r\n'
+      csv += '序号,编号,泵站,日期,班次,巡检人,来源,状态,parentId,重跑次数,振动,温度,压力,流量,电流,口径版本,备注\r\n'
+      chain.forEach((r, idx) => {
+        csv += [
+          idx + 1,
+          r.id,
+          r.pumpName,
+          r.inspectionDate,
+          r.shift,
+          r.inspector,
+          r.source,
+          statusLabel[r.status] ?? r.status,
+          r.parentId ?? '(根节点)',
+          r.rerunCount,
+          r.metrics.vibration,
+          r.metrics.temperature,
+          r.metrics.pressure,
+          r.metrics.flowRate,
+          r.metrics.current,
+          r.calcFormulaVersion,
+          `"${r.calcNotes.replace(/"/g, '""')}"`,
+        ].join(',') + '\r\n'
+      })
+      csv += '\r\n'
+
+      csv += '--- 二、状态与异常变化对比（每次重跑/补录前后） ---\r\n'
+      csv += '记录编号,操作类型,原状态,新状态,状态变化,新增异常,消除异常,指标变化数,继承备注,继承截图,继承变更\r\n'
+      chain.forEach((r) => {
+        if (r.rerunDelta) {
+          csv += [
+            r.id,
+            r.source === 'supplement' ? '补录' : r.source === 'rerun' ? '重跑' : '常规',
+            statusLabel[r.rerunDelta.oldStatus] ?? r.rerunDelta.oldStatus,
+            statusLabel[r.rerunDelta.newStatus] ?? r.rerunDelta.newStatus,
+            r.rerunDelta.statusChanged ? '是' : '否',
+            `"${r.rerunDelta.addedAlerts.join('；').replace(/"/g, '""')}"`,
+            `"${r.rerunDelta.removedAlerts.join('；').replace(/"/g, '""')}"`,
+            r.rerunDelta.changedMetrics.length,
+            r.rerunDelta.notesInherited,
+            r.rerunDelta.screenshotsInherited,
+            r.rerunDelta.changesInherited,
+          ].join(',') + '\r\n'
+        }
+      })
+      csv += '\r\n'
+
+      csv += '--- 三、链路备注（含 affectedJudgments 判断变化） ---\r\n'
+      csv += '备注编号,所属巡检记录,作者,角色,时间,内容,改变的判断(分号分隔),关联截图数\r\n'
+      chainNotes
+        .sort((a, b) => a.createTime.localeCompare(b.createTime))
+        .forEach((n) => {
+          csv += [
+            n.id,
+            n.inspectionId,
+            n.author,
+            n.authorRole,
+            n.createTime,
+            `"${n.content.replace(/"/g, '""')}"`,
+            `"${n.affectedJudgments.join('；').replace(/"/g, '""')}"`,
+            n.screenshotRefs?.length ?? 0,
+          ].join(',') + '\r\n'
+        })
+      csv += '\r\n'
+
+      csv += '--- 四、链路变更历史（交接班可查） ---\r\n'
+      csv += '变更编号,所属巡检记录,操作人,角色,班次,时间,字段,原值,新值,原因\r\n'
+      chainChanges
+        .sort((a, b) => a.changeTime.localeCompare(b.changeTime))
+        .forEach((c) => {
+          csv += [
+            c.id,
+            c.inspectionId,
+            c.operator,
+            c.operatorRole,
+            c.shift,
+            c.changeTime,
+            c.field,
+            `"${c.oldValue.replace(/"/g, '""')}"`,
+            `"${c.newValue.replace(/"/g, '""')}"`,
+            `"${(c.reason ?? '').replace(/"/g, '""')}"`,
+          ].join(',') + '\r\n'
+        })
+      csv += '\r\n'
+
+      csv += '--- 五、计算口径说明（本次导出采用的阈值规则） ---\r\n'
+      csv += `"${CALC_FORMULA_NOTES.trim().replace(/"/g, '""')}"\r\n`
+
+      const hash = hashString(csv + THRESHOLD_VERSION)
+      return { csv, hash, formulaVersion: THRESHOLD_VERSION }
+    },
+    [getHistoryChain, state.notes, state.screenshots, state.changes]
+  )
+
   const resetAll = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY)
     setState({
@@ -423,7 +599,9 @@ export const AppStoreProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       confirmPartReplace,
       rerunInspection,
       exportSelection,
+      exportChain,
       getHistoryChain,
+      getHistoryChainIds,
       resetAll,
     }),
     [
@@ -439,7 +617,9 @@ export const AppStoreProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       confirmPartReplace,
       rerunInspection,
       exportSelection,
+      exportChain,
       getHistoryChain,
+      getHistoryChainIds,
       resetAll,
     ]
   )

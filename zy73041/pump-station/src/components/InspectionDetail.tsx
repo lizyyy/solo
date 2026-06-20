@@ -7,7 +7,7 @@ import clsx from 'clsx'
 import {
   X, Edit3, Check, XCircle, RefreshCw, FilePlus, ImagePlus, AlertTriangle,
   GitBranch, MessageSquare, Camera, ThumbsUp, ChevronDown, ChevronUp, Trash2,
-  User, Clock, Eye, ShieldAlert, Link as LinkIcon,
+  User, Clock, Eye, ShieldAlert, Link as LinkIcon, TrendingUp,
 } from 'lucide-react'
 import { RerunModal } from './RerunModal'
 
@@ -16,7 +16,7 @@ export const InspectionDetail: React.FC = () => {
     inspections, changes, notes, screenshots, selectedInspectionId, setSelectedInspectionId,
     highlightAlertMetric, setHighlightAlertMetric,
     updateMetric, updateStatus, updateCalcNotes, updatePart, confirmPartReplace,
-    addNote, addScreenshot, getHistoryChain, currentUser,
+    addNote, addScreenshot, getHistoryChain, getHistoryChainIds, currentUser,
   } = useAppStore()
 
   const inspection = inspections.find((i) => i.id === selectedInspectionId)
@@ -31,21 +31,50 @@ export const InspectionDetail: React.FC = () => {
   const [showRerunModal, setShowRerunModal] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const relatedChanges = useMemo(
-    () => changes.filter((c) => c.inspectionId === selectedInspectionId).sort((a, b) => b.changeTime.localeCompare(a.changeTime)),
-    [changes, selectedInspectionId]
-  )
-  const relatedNotes = useMemo(
-    () => notes.filter((n) => n.inspectionId === selectedInspectionId).sort((a, b) => b.createTime.localeCompare(a.createTime)),
-    [notes, selectedInspectionId]
-  )
-  const relatedShots = useMemo(
-    () => screenshots.filter((s) => s.inspectionId === selectedInspectionId),
-    [screenshots, selectedInspectionId]
-  )
   const historyChain = useMemo(
     () => (selectedInspectionId ? getHistoryChain(selectedInspectionId) : []),
     [selectedInspectionId, getHistoryChain]
+  )
+  const historyChainIds = useMemo(
+    () => (selectedInspectionId ? getHistoryChainIds(selectedInspectionId) : []),
+    [selectedInspectionId, getHistoryChainIds]
+  )
+  const relatedChanges = useMemo(
+    () => changes.filter((c) => historyChainIds.includes(c.inspectionId)).sort((a, b) => b.changeTime.localeCompare(a.changeTime)),
+    [changes, historyChainIds]
+  )
+  const relatedNotes = useMemo(
+    () => notes.filter((n) => historyChainIds.includes(n.inspectionId)).sort((a, b) => b.createTime.localeCompare(a.createTime)),
+    [notes, historyChainIds]
+  )
+  const relatedShots = useMemo(
+    () => screenshots.filter((s) => historyChainIds.includes(s.inspectionId)),
+    [screenshots, historyChainIds]
+  )
+
+  const ownNotes = useMemo(
+    () => notes.filter((n) => n.inspectionId === selectedInspectionId).sort((a, b) => b.createTime.localeCompare(a.createTime)),
+    [notes, selectedInspectionId]
+  )
+  const inheritedNotes = useMemo(
+    () => notes.filter((n) => n.inspectionId !== selectedInspectionId && historyChainIds.includes(n.inspectionId)).sort((a, b) => b.createTime.localeCompare(a.createTime)),
+    [notes, selectedInspectionId, historyChainIds]
+  )
+  const ownShots = useMemo(
+    () => screenshots.filter((s) => s.inspectionId === selectedInspectionId),
+    [screenshots, selectedInspectionId]
+  )
+  const inheritedShots = useMemo(
+    () => screenshots.filter((s) => s.inspectionId !== selectedInspectionId && historyChainIds.includes(s.inspectionId)),
+    [screenshots, selectedInspectionId, historyChainIds]
+  )
+  const ownChanges = useMemo(
+    () => changes.filter((c) => c.inspectionId === selectedInspectionId).sort((a, b) => b.changeTime.localeCompare(a.changeTime)),
+    [changes, selectedInspectionId]
+  )
+  const inheritedChanges = useMemo(
+    () => changes.filter((c) => c.inspectionId !== selectedInspectionId && historyChainIds.includes(c.inspectionId)).sort((a, b) => b.changeTime.localeCompare(a.changeTime)),
+    [changes, selectedInspectionId, historyChainIds]
   )
 
   useEffect(() => {
@@ -184,6 +213,78 @@ export const InspectionDetail: React.FC = () => {
         )}
 
         <div className="p-5 space-y-5">
+          {inspection.rerunDelta && (
+            <section className="bg-gradient-to-r from-violet-50 to-brand-50 rounded-lg border border-violet-200 overflow-hidden">
+              <div className="px-4 py-2.5 border-b border-violet-100 flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-violet-800 flex items-center gap-1.5">
+                  <TrendingUp className="w-4 h-4" />
+                  本次{inspection.source === 'supplement' ? '补录' : '重跑'}对比 · 与父记录 {inspection.parentId} 的变化
+                </h3>
+                <span className="text-[11px] text-violet-500 bg-white/60 px-2 py-0.5 rounded">
+                  口径 {inspection.calcFormulaVersion}
+                </span>
+              </div>
+              <div className="p-4 space-y-3">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="bg-white/70 rounded-lg p-3 border border-violet-100">
+                    <div className="text-[11px] text-violet-500 mb-1">状态变化</div>
+                    <div className="flex items-center gap-1.5">
+                      <StatusBadge status={inspection.rerunDelta.oldStatus} />
+                      <span className="text-slate-400">→</span>
+                      <StatusBadge status={inspection.rerunDelta.newStatus} />
+                    </div>
+                    <div className="text-[10px] mt-1 text-slate-500">
+                      {inspection.rerunDelta.statusChanged ? '状态已变更' : '状态未变'}
+                    </div>
+                  </div>
+                  <div className="bg-white/70 rounded-lg p-3 border border-violet-100">
+                    <div className="text-[11px] text-violet-500 mb-1">新增异常</div>
+                    <div className="text-lg font-bold text-amber-600">
+                      {inspection.rerunDelta.addedAlerts.length}
+                    </div>
+                    <div className="text-[10px] text-slate-500 mt-0.5 line-clamp-1">
+                      {inspection.rerunDelta.addedAlerts.length > 0
+                        ? inspection.rerunDelta.addedAlerts.join('、')
+                        : '无新增'}
+                    </div>
+                  </div>
+                  <div className="bg-white/70 rounded-lg p-3 border border-violet-100">
+                    <div className="text-[11px] text-violet-500 mb-1">消除异常</div>
+                    <div className="text-lg font-bold text-emerald-600">
+                      {inspection.rerunDelta.removedAlerts.length}
+                    </div>
+                    <div className="text-[10px] text-slate-500 mt-0.5 line-clamp-1">
+                      {inspection.rerunDelta.removedAlerts.length > 0
+                        ? inspection.rerunDelta.removedAlerts.join('、')
+                        : '无消除'}
+                    </div>
+                  </div>
+                  <div className="bg-white/70 rounded-lg p-3 border border-violet-100">
+                    <div className="text-[11px] text-violet-500 mb-1">继承链路内容</div>
+                    <div className="text-xs text-slate-700 space-y-0.5">
+                      <div>备注 {inspection.rerunDelta.notesInherited} 条</div>
+                      <div>截图 {inspection.rerunDelta.screenshotsInherited} 张</div>
+                      <div>变更 {inspection.rerunDelta.changesInherited} 条</div>
+                    </div>
+                  </div>
+                </div>
+
+                {inspection.rerunDelta.changedMetrics.length > 0 && (
+                  <div className="bg-white/70 rounded-lg p-3 border border-violet-100">
+                    <div className="text-[11px] text-violet-500 mb-2">指标变化明细</div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {inspection.rerunDelta.changedMetrics.map((m, idx) => (
+                        <span key={idx} className="text-[11px] bg-white text-slate-700 px-2 py-0.5 rounded border border-slate-200">
+                          {m}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
+
           <section className="bg-white rounded-lg border border-slate-200 overflow-hidden">
             <div className="px-4 py-2.5 border-b border-slate-100 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
@@ -322,10 +423,11 @@ export const InspectionDetail: React.FC = () => {
                   <MessageSquare className="w-4 h-4 text-brand-600" />
                   巡检表备注（必须说明改变了哪些判断）
                 </h3>
-                <span className="text-[11px] text-slate-400">{relatedNotes.length} 条</span>
+                <span className="text-[11px] text-slate-400">本次 {ownNotes.length} 条 · 继承 {inheritedNotes.length} 条</span>
               </div>
-              <div className="p-4 space-y-3">
+              <div className="p-4 space-y-4">
                 <div className="bg-slate-50 rounded-lg p-3 border border-slate-200">
+                  <div className="text-xs text-slate-500 mb-2 font-medium">📝 添加本次备注</div>
                   <textarea
                     value={noteDraft}
                     onChange={(e) => setNoteDraft(e.target.value)}
@@ -351,37 +453,81 @@ export const InspectionDetail: React.FC = () => {
                     </button>
                   </div>
                 </div>
-                <div className="space-y-2.5">
-                  {relatedNotes.length === 0 && <div className="text-xs text-slate-400 py-3 text-center">暂无备注</div>}
-                  {relatedNotes.map((n) => (
-                    <div key={n.id} className="border border-slate-100 rounded-lg p-3">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                          <User className="w-3 h-3" /><span className="font-medium text-slate-700">{n.author}</span>
-                          <span className="text-slate-400">·</span><span>{n.authorRole}</span>
-                          <span className="text-slate-400">·</span>
-                          <Clock className="w-3 h-3" /><span>{formatDateTime(n.createTime)}</span>
+
+                <div>
+                  <div className="text-xs text-slate-500 mb-2 font-medium flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-brand-400" />
+                    本次记录备注（{ownNotes.length} 条）
+                  </div>
+                  <div className="space-y-2">
+                    {ownNotes.length === 0 && <div className="text-xs text-slate-400 py-2 text-center border border-dashed border-slate-200 rounded">暂无本次备注</div>}
+                    {ownNotes.map((n) => (
+                      <div key={n.id} className="border border-brand-100 rounded-lg p-3 bg-brand-50/30">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                            <User className="w-3 h-3" /><span className="font-medium text-slate-700">{n.author}</span>
+                            <span className="text-slate-400">·</span><span>{n.authorRole}</span>
+                            <span className="text-slate-400">·</span>
+                            <Clock className="w-3 h-3" /><span>{formatDateTime(n.createTime)}</span>
+                          </div>
+                          {n.screenshotRefs && n.screenshotRefs.length > 0 && (
+                            <span className="inline-flex items-center gap-0.5 text-[10px] text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded">
+                              <Camera className="w-3 h-3" />关联截图 {n.screenshotRefs.length}
+                            </span>
+                          )}
                         </div>
-                        {n.screenshotRefs && n.screenshotRefs.length > 0 && (
-                          <span className="inline-flex items-center gap-0.5 text-[10px] text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded">
-                            <Camera className="w-3 h-3" />关联截图 {n.screenshotRefs.length}
-                          </span>
+                        <p className="text-sm text-slate-800 leading-relaxed">{n.content}</p>
+                        {n.affectedJudgments.length > 0 && (
+                          <ul className="mt-2 space-y-1">
+                            {n.affectedJudgments.map((j, idx) => (
+                              <li key={idx} className="text-xs text-violet-700 bg-violet-50 rounded px-2 py-1 inline-flex items-start gap-1.5 mr-1 mb-1">
+                                <span className="text-violet-400 mt-0.5">◆</span>
+                                <span>{j}</span>
+                              </li>
+                            ))}
+                          </ul>
                         )}
                       </div>
-                      <p className="text-sm text-slate-800 leading-relaxed">{n.content}</p>
-                      {n.affectedJudgments.length > 0 && (
-                        <ul className="mt-2 space-y-1">
-                          {n.affectedJudgments.map((j, idx) => (
-                            <li key={idx} className="text-xs text-violet-700 bg-violet-50 rounded px-2 py-1 inline-flex items-start gap-1.5 mr-1 mb-1">
-                              <span className="text-violet-400 mt-0.5">◆</span>
-                              <span>{j}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
+
+                {inheritedNotes.length > 0 && (
+                  <div>
+                    <div className="text-xs text-slate-500 mb-2 font-medium flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-violet-300" />
+                      继承自链路历史备注（{inheritedNotes.length} 条 · 来自父记录及更早）
+                    </div>
+                    <div className="space-y-2">
+                      {inheritedNotes.map((n) => (
+                        <div key={n.id} className="border border-slate-200 rounded-lg p-3 bg-slate-50/50 opacity-80">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                              <User className="w-3 h-3" /><span className="font-medium text-slate-700">{n.author}</span>
+                              <span className="text-slate-400">·</span><span>{n.authorRole}</span>
+                              <span className="text-slate-400">·</span>
+                              <Clock className="w-3 h-3" /><span>{formatDateTime(n.createTime)}</span>
+                            </div>
+                            <span className="inline-flex items-center gap-0.5 text-[10px] text-violet-600 bg-violet-50 px-1.5 py-0.5 rounded">
+                              <LinkIcon className="w-3 h-3" />{n.inspectionId}
+                            </span>
+                          </div>
+                          <p className="text-sm text-slate-700 leading-relaxed">{n.content}</p>
+                          {n.affectedJudgments.length > 0 && (
+                            <ul className="mt-2 space-y-1">
+                              {n.affectedJudgments.map((j, idx) => (
+                                <li key={idx} className="text-xs text-violet-600 bg-violet-50/70 rounded px-2 py-1 inline-flex items-start gap-1.5 mr-1 mb-1">
+                                  <span className="text-violet-400 mt-0.5">◆</span>
+                                  <span>{j}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </section>
           </div>
@@ -393,6 +539,7 @@ export const InspectionDetail: React.FC = () => {
                 截图说明（与备注/状态关联，断线可追踪）
               </h3>
               <div className="flex items-center gap-2">
+                <span className="text-[11px] text-slate-400">本次 {ownShots.length} 张 · 继承 {inheritedShots.length} 张</span>
                 <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
                   onChange={(e) => handleFile(e.target.files?.[0] ?? undefined)} />
                 <button
@@ -403,23 +550,55 @@ export const InspectionDetail: React.FC = () => {
                 </button>
               </div>
             </div>
-            <div className="p-4">
-              {relatedShots.length === 0 ? (
-                <div className="text-xs text-slate-400 py-3 text-center">暂无截图，演示数据中有2张预置截图（请切换到 INS-20260608-002 或 INS-20260607-003 查看）</div>
-              ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {relatedShots.map((s) => (
-                    <figure key={s.id} className="rounded-lg border border-slate-200 overflow-hidden bg-slate-50 group">
-                      <div className="aspect-video overflow-hidden bg-white">
-                        <img src={s.dataUrl} alt={s.name} className="w-full h-full object-contain" />
-                      </div>
-                      <figcaption className="p-2 border-t border-slate-100 bg-white">
-                        <div className="text-xs font-medium text-slate-700 truncate">{s.name}</div>
-                        {s.description && <div className="text-[11px] text-slate-500 mt-0.5 line-clamp-2">{s.description}</div>}
-                        <div className="text-[10px] text-slate-400 mt-1">{formatDateTime(s.uploadTime)}</div>
-                      </figcaption>
-                    </figure>
-                  ))}
+            <div className="p-4 space-y-4">
+              <div>
+                <div className="text-xs text-slate-500 mb-2 font-medium flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-brand-400" />
+                  本次记录截图（{ownShots.length} 张）
+                </div>
+                {ownShots.length === 0 ? (
+                  <div className="text-xs text-slate-400 py-3 text-center border border-dashed border-slate-200 rounded">
+                    暂无本次截图
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {ownShots.map((s) => (
+                      <figure key={s.id} className="rounded-lg border border-brand-200 overflow-hidden bg-brand-50/30">
+                        <div className="aspect-video overflow-hidden bg-white">
+                          <img src={s.dataUrl} alt={s.name} className="w-full h-full object-contain" />
+                        </div>
+                        <figcaption className="p-2 border-t border-slate-100 bg-white">
+                          <div className="text-xs font-medium text-slate-700 truncate">{s.name}</div>
+                          {s.description && <div className="text-[11px] text-slate-500 mt-0.5 line-clamp-2">{s.description}</div>}
+                          <div className="text-[10px] text-slate-400 mt-1">{formatDateTime(s.uploadTime)}</div>
+                        </figcaption>
+                      </figure>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {inheritedShots.length > 0 && (
+                <div>
+                  <div className="text-xs text-slate-500 mb-2 font-medium flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-violet-300" />
+                    继承自链路截图（{inheritedShots.length} 张 · 来自父记录及更早）
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {inheritedShots.map((s) => (
+                      <figure key={s.id} className="rounded-lg border border-slate-200 overflow-hidden bg-slate-50 opacity-80">
+                        <div className="aspect-video overflow-hidden bg-white">
+                          <img src={s.dataUrl} alt={s.name} className="w-full h-full object-contain" />
+                        </div>
+                        <figcaption className="p-2 border-t border-slate-100 bg-white">
+                          <div className="text-xs font-medium text-slate-700 truncate">{s.name}</div>
+                          <div className="text-[10px] text-violet-600 mt-0.5">来自 {s.inspectionId}</div>
+                          {s.description && <div className="text-[11px] text-slate-500 mt-0.5 line-clamp-2">{s.description}</div>}
+                          <div className="text-[10px] text-slate-400 mt-1">{formatDateTime(s.uploadTime)}</div>
+                        </figcaption>
+                      </figure>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -515,40 +694,83 @@ export const InspectionDetail: React.FC = () => {
                 变更历史（交接班必看：上一班改了什么、为什么改）
               </h3>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] text-slate-400">{relatedChanges.length} 条</span>
+                <span className="text-[11px] text-slate-400">本次 {ownChanges.length} 条 · 继承 {inheritedChanges.length} 条</span>
                 {showHistory ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
               </div>
             </div>
             {showHistory && (
-              <div className="p-4">
-                {relatedChanges.length === 0 ? (
-                  <div className="text-xs text-slate-400 py-3 text-center">该记录暂无修改</div>
-                ) : (
-                  <ol className="relative border-l border-slate-200 ml-2 space-y-4">
-                    {relatedChanges.map((c) => (
-                      <li key={c.id} className="pl-4 relative">
-                        <div className="absolute -left-[7px] top-1 w-3 h-3 rounded-full bg-brand-500 ring-4 ring-brand-100" />
-                        <div className="flex items-center gap-2 text-xs text-slate-500 mb-0.5">
-                          <span className="font-medium text-slate-700">{c.operator}</span>
-                          <span className="text-slate-400">·</span><span>{c.operatorRole}</span>
-                          <span className="text-slate-400">·</span><ShiftBadge shift={c.shift} />
-                          <span className="text-slate-400">·</span><span>{formatDateTime(c.changeTime)}</span>
-                        </div>
-                        <div className="text-sm text-slate-800">
-                          字段 <code className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-mono text-[11px]">{c.field}</code>
-                          <span className="text-slate-400 mx-1.5">：</span>
-                          <span className="line-through text-red-500/70">{c.oldValue}</span>
-                          <span className="mx-1.5 text-slate-400">→</span>
-                          <span className="text-emerald-700 font-medium">{c.newValue}</span>
-                        </div>
-                        {c.reason && (
-                          <div className="mt-1 text-xs text-slate-600 bg-slate-50 border border-slate-100 rounded px-2 py-1 inline-block">
-                            <span className="text-slate-400 mr-1">原因：</span>{c.reason}
+              <div className="p-4 space-y-4">
+                <div>
+                  <div className="text-xs text-slate-500 mb-2 font-medium flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-brand-400" />
+                    本次记录变更（{ownChanges.length} 条）
+                  </div>
+                  {ownChanges.length === 0 ? (
+                    <div className="text-xs text-slate-400 py-2 text-center border border-dashed border-slate-200 rounded">暂无本次变更</div>
+                  ) : (
+                    <ol className="relative border-l border-brand-200 ml-2 space-y-3">
+                      {ownChanges.map((c) => (
+                        <li key={c.id} className="pl-4 relative">
+                          <div className="absolute -left-[7px] top-1 w-3 h-3 rounded-full bg-brand-500 ring-4 ring-brand-100" />
+                          <div className="flex items-center gap-2 text-xs text-slate-500 mb-0.5">
+                            <span className="font-medium text-slate-700">{c.operator}</span>
+                            <span className="text-slate-400">·</span><span>{c.operatorRole}</span>
+                            <span className="text-slate-400">·</span><ShiftBadge shift={c.shift} />
+                            <span className="text-slate-400">·</span><span>{formatDateTime(c.changeTime)}</span>
                           </div>
-                        )}
-                      </li>
-                    ))}
-                  </ol>
+                          <div className="text-sm text-slate-800">
+                            字段 <code className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-mono text-[11px]">{c.field}</code>
+                            <span className="text-slate-400 mx-1.5">：</span>
+                            <span className="line-through text-red-500/70">{c.oldValue}</span>
+                            <span className="mx-1.5 text-slate-400">→</span>
+                            <span className="text-emerald-700 font-medium">{c.newValue}</span>
+                          </div>
+                          {c.reason && (
+                            <div className="mt-1 text-xs text-slate-600 bg-slate-50 border border-slate-100 rounded px-2 py-1 inline-block">
+                              <span className="text-slate-400 mr-1">原因：</span>{c.reason}
+                            </div>
+                          )}
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </div>
+
+                {inheritedChanges.length > 0 && (
+                  <div>
+                    <div className="text-xs text-slate-500 mb-2 font-medium flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-violet-300" />
+                      继承自链路历史变更（{inheritedChanges.length} 条 · 来自父记录及更早）
+                    </div>
+                    <ol className="relative border-l border-violet-200 ml-2 space-y-3 opacity-75">
+                      {inheritedChanges.slice(0, 10).map((c) => (
+                        <li key={c.id} className="pl-4 relative">
+                          <div className="absolute -left-[7px] top-1 w-3 h-3 rounded-full bg-violet-400 ring-4 ring-violet-100" />
+                          <div className="flex items-center gap-2 text-xs text-slate-500 mb-0.5">
+                            <code className="px-1 py-0.5 rounded bg-violet-50 text-violet-600 font-mono text-[10px]">{c.inspectionId}</code>
+                            <span className="font-medium text-slate-700">{c.operator}</span>
+                            <span className="text-slate-400">·</span><span>{c.operatorRole}</span>
+                            <span className="text-slate-400">·</span><span>{formatDateTime(c.changeTime)}</span>
+                          </div>
+                          <div className="text-sm text-slate-700">
+                            字段 <code className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-mono text-[11px]">{c.field}</code>
+                            <span className="text-slate-400 mx-1.5">：</span>
+                            <span className="line-through text-red-500/50">{c.oldValue}</span>
+                            <span className="mx-1.5 text-slate-400">→</span>
+                            <span className="text-emerald-600 font-medium">{c.newValue}</span>
+                          </div>
+                          {c.reason && (
+                            <div className="mt-1 text-xs text-slate-500 bg-slate-50 border border-slate-100 rounded px-2 py-1 inline-block">
+                              <span className="text-slate-400 mr-1">原因：</span>{c.reason}
+                            </div>
+                          )}
+                        </li>
+                      ))}
+                      {inheritedChanges.length > 10 && (
+                        <li className="pl-4 text-xs text-slate-400">还有 {inheritedChanges.length - 10} 条更早的变更，可追溯历史链路查看</li>
+                      )}
+                    </ol>
+                  </div>
                 )}
               </div>
             )}

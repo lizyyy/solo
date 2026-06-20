@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react'
 import { useAppStore } from '../store/AppStore'
-import type { Inspection, MetricValue } from '../types'
-import { METRIC_LABELS, DEFAULT_THRESHOLD } from '../data/thresholds'
-import { X, Check, RefreshCw, FilePlus, AlertTriangle, GitBranch, Download } from 'lucide-react'
+import type { Inspection, MetricValue, PumpStatus } from '../types'
+import { METRIC_LABELS, DEFAULT_THRESHOLD, THRESHOLD_VERSION } from '../data/thresholds'
+import { StatusBadge } from './StatusBadge'
+import { X, Check, RefreshCw, FilePlus, AlertTriangle, GitBranch, Download, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import clsx from 'clsx'
 
 interface Props {
@@ -10,40 +11,69 @@ interface Props {
   onClose: () => void
 }
 
+function inferStatusLocal(metrics: MetricValue, hasUnconfirmedPartReplace: boolean): PumpStatus {
+  if (hasUnconfirmedPartReplace) return 'pending_confirm'
+  const metricKeys: (keyof MetricValue)[] = ['vibration', 'temperature', 'pressure', 'flowRate', 'current']
+  let hasCritical = false
+  let hasWarning = false
+  for (const k of metricKeys) {
+    const t = DEFAULT_THRESHOLD[k]
+    const v = metrics[k]
+    if (v < t.min || v > t.max) { hasCritical = true; break }
+    if (v < t.warningMin || v > t.warningMax) { hasWarning = true }
+  }
+  if (hasCritical) return 'critical'
+  if (hasWarning) return 'warning'
+  return 'normal'
+}
+
 export const RerunModal: React.FC<Props> = ({ inspection, onClose }) => {
-  const { rerunInspection, exportSelection, setSelectedInspectionId } = useAppStore()
+  const { rerunInspection, exportChain, setSelectedInspectionId, getHistoryChain } = useAppStore()
   const [mode, setMode] = useState<'supplement' | 'rerun'>('supplement')
   const [metrics, setMetrics] = useState<MetricValue>({ ...inspection.metrics })
   const [step, setStep] = useState<'edit' | 'verify'>('edit')
+  const [exporting, setExporting] = useState(false)
 
   const metricKeys: (keyof MetricValue)[] = ['vibration', 'temperature', 'pressure', 'flowRate', 'current']
 
+  const hasUnconfirmed = inspection.parts.some((p) => p.replaced && !p.confirmedBy)
+
   const diffs = useMemo(() => {
-    const list: { key: keyof MetricValue; label: string; old: number; now: number; changed: boolean; alertLevel: 'none' | 'warning' | 'critical' }[] = []
+    const list: { key: keyof MetricValue; label: string; old: number; now: number; changed: boolean; oldAlert: 'none' | 'warning' | 'critical'; newAlert: 'none' | 'warning' | 'critical'; alertChanged: boolean }[] = []
     for (const k of metricKeys) {
       const oldV = inspection.metrics[k]
       const nowV = metrics[k]
       const t = DEFAULT_THRESHOLD[k]
-      let alertLevel: 'none' | 'warning' | 'critical' = 'none'
-      if (nowV < t.min || nowV > t.max) alertLevel = 'critical'
-      else if (nowV < t.warningMin || nowV > t.warningMax) alertLevel = 'warning'
+      let oldAlert: 'none' | 'warning' | 'critical' = 'none'
+      if (oldV < t.min || oldV > t.max) oldAlert = 'critical'
+      else if (oldV < t.warningMin || oldV > t.warningMax) oldAlert = 'warning'
+      let newAlert: 'none' | 'warning' | 'critical' = 'none'
+      if (nowV < t.min || nowV > t.max) newAlert = 'critical'
+      else if (nowV < t.warningMin || nowV > t.warningMax) newAlert = 'warning'
       list.push({
         key: k,
         label: METRIC_LABELS[k],
         old: oldV,
         now: nowV,
         changed: Math.abs(oldV - nowV) > 0.0001,
-        alertLevel,
+        oldAlert,
+        newAlert,
+        alertChanged: oldAlert !== newAlert,
       })
     }
     return list
   }, [metrics, inspection.metrics])
 
-  const historyChainIds = useMemo(() => {
-    const r = useAppStore()
-    const chain = r.getHistoryChain(inspection.id).map((i) => i.id)
-    return [...chain, inspection.id]
-  }, [inspection.id])
+  const oldStatus = inspection.status
+  const newStatus = useMemo(() => inferStatusLocal(metrics, hasUnconfirmed), [metrics, hasUnconfirmed])
+  const statusChanged = oldStatus !== newStatus
+
+  const addedAlerts = diffs.filter((d) => d.oldAlert === 'none' && d.newAlert !== 'none')
+  const removedAlerts = diffs.filter((d) => d.oldAlert !== 'none' && d.newAlert === 'none')
+  const upgradedAlerts = diffs.filter((d) => d.oldAlert === 'warning' && d.newAlert === 'critical')
+  const downgradedAlerts = diffs.filter((d) => d.oldAlert === 'critical' && d.newAlert === 'warning')
+
+  const historyChain = useMemo(() => getHistoryChain(inspection.id), [getHistoryChain, inspection.id])
 
   const runAndClose = () => {
     const created = rerunInspection(inspection.id, metrics, inspection.inspector.replace(/（.+）/, '') + `（${mode === 'supplement' ? '补录' : '重跑'}）`, mode)
@@ -53,16 +83,22 @@ export const RerunModal: React.FC<Props> = ({ inspection, onClose }) => {
   }
 
   const handleExportChain = () => {
-    const chain = useAppStore().getHistoryChain(inspection.id).map((i) => i.id)
-    const ids = chain.concat([inspection.id])
-    const { csv, hash, formulaVersion } = exportSelection(ids)
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `链路导出_${formulaVersion}_${hash}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
+    if (exporting) return
+    setExporting(true)
+    try {
+      const { csv, hash, formulaVersion } = exportChain(inspection.id)
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `链路导出_${formulaVersion}_${hash}.csv`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+    } finally {
+      setExporting(false)
+    }
   }
 
   return (
@@ -131,8 +167,8 @@ export const RerunModal: React.FC<Props> = ({ inspection, onClose }) => {
               {diffs.map((d) => (
                 <div key={d.key} className={clsx('rounded-lg border p-3 transition',
                   d.changed ? 'border-brand-300 bg-brand-50/40' : 'border-slate-200 bg-white',
-                  d.alertLevel === 'critical' && 'ring-2 ring-red-200',
-                  d.alertLevel === 'warning' && 'ring-2 ring-amber-200')}>
+                  d.newAlert === 'critical' && 'ring-2 ring-red-200',
+                  d.newAlert === 'warning' && 'ring-2 ring-amber-200')}>
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <div className="text-xs text-slate-500">{d.label}</div>
@@ -140,17 +176,23 @@ export const RerunModal: React.FC<Props> = ({ inspection, onClose }) => {
                         范围 {DEFAULT_THRESHOLD[d.key].min} ~ {DEFAULT_THRESHOLD[d.key].max}
                       </div>
                     </div>
-                    {d.alertLevel !== 'none' && (
+                    {d.newAlert !== 'none' && (
                       <span className={clsx('inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium',
-                        d.alertLevel === 'critical' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700')}>
-                        <AlertTriangle className="w-3 h-3" />{d.alertLevel === 'critical' ? '超限' : '预警'}
+                        d.newAlert === 'critical' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700')}>
+                        <AlertTriangle className="w-3 h-3" />{d.newAlert === 'critical' ? '超限' : '预警'}
+                      </span>
+                    )}
+                    {d.alertChanged && d.newAlert === 'none' && (
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-100 text-emerald-700">
+                        <Check className="w-3 h-3" />恢复正常
                       </span>
                     )}
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="bg-slate-50 rounded p-2">
                       <div className="text-[10px] text-slate-400">原值</div>
-                      <div className="text-base font-mono tabular-nums text-slate-700">{d.old}</div>
+                      <div className={clsx('text-base font-mono tabular-nums',
+                        d.oldAlert === 'critical' ? 'text-red-600' : d.oldAlert === 'warning' ? 'text-amber-600' : 'text-slate-700')}>{d.old}</div>
                     </div>
                     <div>
                       <div className="text-[10px] text-slate-400">{mode === 'supplement' ? '补录值' : '重跑值'}</div>
@@ -167,6 +209,17 @@ export const RerunModal: React.FC<Props> = ({ inspection, onClose }) => {
                       变更：{d.old} → {d.now}（{((d.now - d.old) / Math.max(0.0001, d.old) * 100).toFixed(1)}%）
                     </div>
                   )}
+                  {d.alertChanged && (
+                    <div className={clsx('mt-2 text-[11px] px-2 py-1 rounded border',
+                      d.newAlert === 'none' ? 'text-emerald-700 bg-emerald-50 border-emerald-200' :
+                      d.newAlert === 'critical' ? 'text-red-700 bg-red-50 border-red-200' :
+                      'text-amber-700 bg-amber-50 border-amber-200')}>
+                      {d.oldAlert === 'none' ? '新增' : d.newAlert === 'none' ? '消除' : '等级变化'}：
+                      {d.oldAlert === 'none' ? '正常' : d.oldAlert === 'critical' ? '超限' : '预警'}
+                      {' → '}
+                      {d.newAlert === 'none' ? '正常' : d.newAlert === 'critical' ? '超限' : '预警'}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -178,54 +231,114 @@ export const RerunModal: React.FC<Props> = ({ inspection, onClose }) => {
                   校验 1 · 历史链路连续性
                 </h4>
                 <div className="flex items-center gap-2 flex-wrap">
-                  {historyChainIds.map((id, idx) => (
-                    <React.Fragment key={id}>
+                  {historyChain.map((h, idx) => (
+                    <React.Fragment key={h.id}>
                       <div className="px-2.5 py-1 rounded bg-white border border-emerald-200 text-[11px] text-emerald-700 inline-flex items-center gap-1">
-                        <Check className="w-3 h-3" />{id}
+                        <Check className="w-3 h-3" />{h.id}
                       </div>
-                      {idx < historyChainIds.length - 1 && <span className="text-slate-300">→</span>}
+                      {idx < historyChain.length - 1 && <span className="text-slate-300">→</span>}
                     </React.Fragment>
                   ))}
                 </div>
                 <p className="mt-3 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-3 py-1.5 inline-block">
-                  ✓ 链路连续：共 {historyChainIds.length} 条记录，parentId 均可追溯到根节点，未断档
+                  ✓ 链路连续：共 {historyChain.length} 条记录，parentId 均可追溯到根节点，未断档
                 </p>
               </div>
 
               <div className="bg-slate-50 rounded-lg border border-slate-200 p-4">
                 <h4 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-1.5">
+                  <TrendingUp className="w-4 h-4 text-amber-500" />
+                  校验 2 · 状态与异常等级变化
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs mb-3">
+                  <div className="bg-white border border-slate-200 rounded p-3">
+                    <div className="text-slate-400 mb-1">原状态</div>
+                    <StatusBadge status={oldStatus} />
+                  </div>
+                  <div className="bg-white border border-slate-200 rounded p-3 flex items-center justify-center">
+                    <span className={clsx('text-lg font-bold',
+                      statusChanged ? 'text-brand-600' : 'text-slate-300')}>
+                      {statusChanged ? '→ 变化' : '→ 不变'}
+                    </span>
+                  </div>
+                  <div className="bg-white border border-slate-200 rounded p-3">
+                    <div className="text-slate-400 mb-1">新状态</div>
+                    <StatusBadge status={newStatus} />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  {addedAlerts.length > 0 && (
+                    <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2">
+                      <b>新增异常 {addedAlerts.length} 项：</b>
+                      {addedAlerts.map((a) => a.label).join('、')}
+                    </div>
+                  )}
+                  {removedAlerts.length > 0 && (
+                    <div className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-3 py-2">
+                      <b>消除异常 {removedAlerts.length} 项：</b>
+                      {removedAlerts.map((a) => a.label).join('、')}
+                    </div>
+                  )}
+                  {upgradedAlerts.length > 0 && (
+                    <div className="text-xs text-red-700 bg-red-50 border border-red-200 rounded px-3 py-2">
+                      <b>等级升级（预警→超限）{upgradedAlerts.length} 项：</b>
+                      {upgradedAlerts.map((a) => a.label).join('、')}
+                    </div>
+                  )}
+                  {downgradedAlerts.length > 0 && (
+                    <div className="text-xs text-brand-700 bg-brand-50 border border-brand-200 rounded px-3 py-2">
+                      <b>等级下降（超限→预警）{downgradedAlerts.length} 项：</b>
+                      {downgradedAlerts.map((a) => a.label).join('、')}
+                    </div>
+                  )}
+                  {addedAlerts.length === 0 && removedAlerts.length === 0 && upgradedAlerts.length === 0 && downgradedAlerts.length === 0 && (
+                    <div className="text-xs text-slate-400 bg-slate-50 border border-slate-200 rounded px-3 py-2">
+                      异常项无变化
+                    </div>
+                  )}
+                </div>
+                {hasUnconfirmed && (
+                  <p className="mt-3 text-xs text-violet-700 bg-violet-50 border border-violet-200 rounded px-3 py-1.5 inline-flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3" />
+                    存在未确认备件替换，状态自动挂起待运营主管确认，不做假稳定结论
+                  </p>
+                )}
+              </div>
+
+              <div className="bg-slate-50 rounded-lg border border-slate-200 p-4">
+                <h4 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-1.5">
                   <Check className="w-4 h-4 text-brand-500" />
-                  校验 2 · 导出口径一致性
+                  校验 3 · 导出口径一致性
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                   <div className="bg-white border border-slate-200 rounded p-3">
                     <div className="text-slate-400">口径版本</div>
-                    <div className="font-mono text-slate-700 mt-0.5">v2.3.1</div>
+                    <div className="font-mono text-slate-700 mt-0.5">{THRESHOLD_VERSION}</div>
                   </div>
                   <div className="bg-white border border-slate-200 rounded p-3">
                     <div className="text-slate-400">规则条目数</div>
                     <div className="font-mono text-slate-700 mt-0.5">5 项（振/温/压/流/电）</div>
                   </div>
                   <div className="bg-white border border-slate-200 rounded p-3">
-                    <div className="text-slate-400">CSV 哈希校验</div>
-                    <div className="font-mono text-slate-700 mt-0.5">同数据→同哈希</div>
+                    <div className="text-slate-400">链路导出格式</div>
+                    <div className="font-mono text-slate-700 mt-0.5">5 段式 CSV</div>
                   </div>
                 </div>
                 <p className="mt-3 text-xs text-brand-700 bg-brand-50 border border-brand-200 rounded px-3 py-1.5 inline-block">
-                  ✓ 导出口径锁定：CSV 文件名带口径版本+哈希，审计可复算
+                  ✓ 导出口径锁定：链路CSV含原记录/新记录/parentId/判断变化/计算口径，审计可复算
                 </p>
               </div>
 
               <div className="bg-slate-50 rounded-lg border border-slate-200 p-4">
                 <h4 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-1.5">
                   <AlertTriangle className="w-4 h-4 text-amber-500" />
-                  校验 3 · 变更摘要（会同步进入变更历史）
+                  校验 4 · 指标变更摘要（会同步进入变更历史）
                 </h4>
                 <ul className="space-y-1.5 text-sm">
-                  {diffs.filter((d) => d.changed || d.alertLevel !== 'none').length === 0 && (
+                  {diffs.filter((d) => d.changed || d.alertChanged).length === 0 && (
                     <li className="text-slate-400 text-xs">无变化</li>
                   )}
-                  {diffs.filter((d) => d.changed || d.alertLevel !== 'none').map((d) => (
+                  {diffs.filter((d) => d.changed || d.alertChanged).map((d) => (
                     <li key={d.key} className="flex items-start gap-2 bg-white border border-slate-200 rounded p-2">
                       <span className="font-medium text-slate-700 text-xs w-16 shrink-0">{METRIC_LABELS[d.key].split(' ')[0]}</span>
                       <span className="text-xs text-slate-500 tabular-nums">{d.old} → <b className="text-slate-700">{d.now}</b></span>
@@ -234,10 +347,11 @@ export const RerunModal: React.FC<Props> = ({ inspection, onClose }) => {
                           Δ {((d.now - d.old) / Math.max(0.0001, d.old) * 100).toFixed(1)}%
                         </span>
                       )}
-                      {d.alertLevel !== 'none' && (
+                      {d.alertChanged && (
                         <span className={clsx('text-[10px] px-1.5 py-0.5 rounded shrink-0 ml-auto',
-                          d.alertLevel === 'critical' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600')}>
-                          {d.alertLevel === 'critical' ? '超限' : '预警'}
+                          d.newAlert === 'none' ? 'bg-emerald-50 text-emerald-600' :
+                          d.newAlert === 'critical' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600')}>
+                          {d.newAlert === 'none' ? '已恢复' : d.newAlert === 'critical' ? '超限' : '预警'}
                         </span>
                       )}
                     </li>
