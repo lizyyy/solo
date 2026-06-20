@@ -151,25 +151,77 @@ export function importCSV(content: string, operator = '阿宁'): CsvImportResult
       result.newCount++;
     } else {
       const hasManualNote = !!existing.manualNote;
+      const hasCadNote = !!existing.cadNote;
+      const hasChangeOrder = !!existing.changeOrderNo;
       const updates: Partial<Material> = { importBatchNo: batchNo };
+      const protectedReasons: string[] = [];
+
       const editableKeys: Array<keyof Material> = [
         'materialName', 'specification', 'quantity', 'unit', 'projectName',
-        'layerCode', 'position', 'status', 'collisionPoint', 'cadNote',
-        'cadJudgmentChange', 'changeOrderNo', 'changeOrderReason', 'changeOrderImpact',
+        'layerCode', 'position', 'collisionPoint',
       ];
       for (const k of editableKeys) {
         if ((parsed as any)[k] !== undefined && (parsed as any)[k] !== '') {
-          if (hasManualNote && k === 'manualNote') continue;
           (updates as any)[k] = (parsed as any)[k];
         }
       }
-      updateMaterial(existing.id, updates, operator, 'csv_update', `重复导入更新（批次${batchNo}）${hasManualNote ? '，人工备注已保留不覆盖' : ''}`);
+
+      if ((parsed as any).status !== undefined && (parsed as any).status !== '') {
+        if (existing.status === 'pending') {
+          updates.status = (parsed as any).status;
+        } else {
+          protectedReasons.push(`状态${STATUS_LABELS[existing.status]}不回退`);
+        }
+      }
+
+      if ((parsed as any).manualNote !== undefined && (parsed as any).manualNote !== '') {
+        if (!hasManualNote) {
+          updates.manualNote = (parsed as any).manualNote;
+        } else {
+          protectedReasons.push('人工备注已保留');
+        }
+      }
+
+      if ((parsed as any).cadNote !== undefined && (parsed as any).cadNote !== '') {
+        if (!hasCadNote) {
+          updates.cadNote = (parsed as any).cadNote;
+        } else {
+          protectedReasons.push('CAD备注已保留');
+        }
+      }
+      if ((parsed as any).cadJudgmentChange !== undefined && (parsed as any).cadJudgmentChange !== '') {
+        if (!existing.cadJudgmentChange) {
+          updates.cadJudgmentChange = (parsed as any).cadJudgmentChange;
+        }
+      }
+
+      if ((parsed as any).changeOrderNo !== undefined && (parsed as any).changeOrderNo !== '') {
+        if (!hasChangeOrder) {
+          updates.changeOrderNo = (parsed as any).changeOrderNo;
+        } else {
+          protectedReasons.push(`变更单${existing.changeOrderNo}已保留`);
+        }
+      }
+      if ((parsed as any).changeOrderReason !== undefined && (parsed as any).changeOrderReason !== '') {
+        if (!existing.changeOrderReason) {
+          updates.changeOrderReason = (parsed as any).changeOrderReason;
+        }
+      }
+      if ((parsed as any).changeOrderImpact !== undefined && (parsed as any).changeOrderImpact !== '') {
+        if (!existing.changeOrderImpact) {
+          updates.changeOrderImpact = (parsed as any).changeOrderImpact;
+        }
+      }
+
+      const allProtected = protectedReasons.length > 0;
+      updateMaterial(existing.id, updates, operator, 'csv_update',
+        `重复导入更新（批次${batchNo}）${allProtected ? '，' + protectedReasons.join('、') : ''}`);
       result.updatedCount++;
       result.duplicates.push({
         row: rowNum,
         materialCode: code,
-        reason: hasManualNote
-          ? '材料编号已存在，系统字段更新，人工备注保留不覆盖'
+        reason: allProtected
+          ? `材料编号已存在，基础字段已更新，${protectedReasons.join('、')}不覆盖`
           : '材料编号已存在，字段已按最新值更新',
         hasManualNote,
       });

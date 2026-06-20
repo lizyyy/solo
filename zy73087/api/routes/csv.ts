@@ -71,7 +71,7 @@ router.get('/sample', (_req, res) => {
   res.send(BOM + csv);
 });
 
-router.get('/parse-preview', express.json({ limit: '5mb' }), (req, res) => {
+router.post('/parse-preview', express.json({ limit: '5mb' }), (req, res) => {
   try {
     const { content } = req.body;
     if (!content) return res.status(400).json({ error: 'CSV内容为空' });
