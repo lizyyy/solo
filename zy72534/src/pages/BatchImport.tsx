@@ -1,10 +1,11 @@
 import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Upload, FileText, AlertTriangle, CheckCircle, Eye, ArrowRight, X } from 'lucide-react';
+import { Upload, FileText, AlertTriangle, CheckCircle, Eye, X } from 'lucide-react';
 import { StatusBadge } from '../components/StatusBadge';
 import { useAppStore } from '../store/useAppStore';
 import { formatDate, generateId } from '../utils/formatters';
 import { detectAnomalies } from '../utils/anomalyDetector';
+import { parseFile, ParsedSampleRow } from '../utils/fileParser';
 import { Sample } from '../types';
 
 const demoCsvContent = `sampleNo,currentModelVersion,category,style,scene
@@ -17,7 +18,9 @@ export default function BatchImport() {
   const { batches, selectedBatchId, setSelectedBatchId, addBatch, addSamples, getSamplesByBatch } = useAppStore();
   const [isDragging, setIsDragging] = useState(false);
   const [imported, setImported] = useState(false);
-  const [importResult, setImportResult] = useState<{ total: number; anomalies: number } | null>(null);
+  const [importResult, setImportResult] = useState<{ total: number; anomalies: number; fileName?: string } | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
   const [newBatchName, setNewBatchName] = useState('灰度批次 #20240603-C');
   const [newModelVersion, setNewModelVersion] = useState('v2.3.1');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -25,16 +28,22 @@ export default function BatchImport() {
   const currentBatch = batches.find(b => b.id === selectedBatchId);
   const currentSamples = selectedBatchId ? getSamplesByBatch(selectedBatchId) : [];
 
-  const handleDemoImport = () => {
-    const lines = demoCsvContent.trim().split('\n').slice(1);
+  const mergeRowsAndImport = async (rows: ParsedSampleRow[], sourceFileName?: string) => {
+    setImportError(null);
 
-    const csvRows = lines.map(line => {
-      const [sampleNo, currentModelVersion, category, style, scene] = line.split(',');
-      return { sampleNo, currentModelVersion, category, style, scene };
-    });
+    if (rows.length === 0) {
+      setImportError('文件中没有有效的样本数据');
+      return;
+    }
 
-    const groupedBySampleNo = new Map<string, typeof csvRows>();
-    csvRows.forEach(row => {
+    const validRows = rows.filter(r => r.sampleNo && r.currentModelVersion);
+    if (validRows.length === 0) {
+      setImportError('文件中缺少必填字段：sampleNo 或 currentModelVersion 为空');
+      return;
+    }
+
+    const groupedBySampleNo = new Map<string, ParsedSampleRow[]>();
+    validRows.forEach(row => {
       const existing = groupedBySampleNo.get(row.sampleNo) || [];
       groupedBySampleNo.set(row.sampleNo, [...existing, row]);
     });
@@ -48,15 +57,15 @@ export default function BatchImport() {
 
     const mergedSamples: Omit<Sample, 'id' | 'isAnomaly'>[] = [];
 
-    groupedBySampleNo.forEach((rows, sampleNo) => {
-      const versions = rows.map((row, idx) => ({
+    groupedBySampleNo.forEach((rowsForSample, sampleNo) => {
+      const versions = rowsForSample.map((row, idx) => ({
         id: `v-${generateId()}`,
         modelVersion: row.currentModelVersion,
         tags: { category: row.category, style: row.style, scene: row.scene },
         timestamp: new Date(Date.now() + idx * 60000).toISOString(),
       }));
 
-      const lastRow = rows[rows.length - 1];
+      const lastRow = rowsForSample[rowsForSample.length - 1];
 
       mergedSamples.push({
         sampleNo,
@@ -75,16 +84,63 @@ export default function BatchImport() {
 
     addSamples(mergedSamples);
 
-    setTimeout(() => {
-      setImportResult({ total: totalUnique, anomalies: anomalyCount });
-      setImported(true);
-    }, 500);
+    setImportResult({ total: totalUnique, anomalies: anomalyCount, fileName: sourceFileName });
+    setImported(true);
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDemoImport = () => {
+    setIsImporting(true);
+    setImportError(null);
+    try {
+      const lines = demoCsvContent.trim().split('\n').slice(1);
+      const rows: ParsedSampleRow[] = lines.map(line => {
+        const [sampleNo, currentModelVersion, category, style, scene] = line.split(',');
+        return { sampleNo, currentModelVersion, category, style, scene };
+      });
+      mergeRowsAndImport(rows, '演示数据');
+    } catch (e) {
+      setImportError(e instanceof Error ? e.message : '导入失败');
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    handleDemoImport();
+    await processFile(file);
+    e.target.value = '';
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    await processFile(file);
+  };
+
+  const processFile = async (file: File) => {
+    setIsImporting(true);
+    setImported(false);
+    setImportResult(null);
+    setImportError(null);
+
+    try {
+      const rows = await parseFile(file);
+      await mergeRowsAndImport(rows, file.name);
+    } catch (e) {
+      setImportError(e instanceof Error ? e.message : '文件解析失败');
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const resetImport = () => {
+    setImported(false);
+    setImportResult(null);
+    setImportError(null);
   };
 
   return (
@@ -125,22 +181,53 @@ export default function BatchImport() {
                 ? 'border-amber-400 bg-amber-50'
                 : imported
                 ? 'border-emerald-300 bg-emerald-50'
+                : importError
+                ? 'border-red-300 bg-red-50'
                 : 'border-stone-300 hover:border-amber-300 bg-stone-50'
             }`}
             onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
             onDragLeave={() => setIsDragging(false)}
-            onDrop={(e) => {
-              e.preventDefault();
-              setIsDragging(false);
-              handleDemoImport();
-            }}
+            onDrop={handleDrop}
           >
-            {imported && importResult ? (
+            {importError && (
+              <button
+                onClick={resetImport}
+                className="absolute top-3 right-3 text-stone-400 hover:text-stone-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+
+            {isImporting ? (
+              <div className="space-y-3">
+                <div className="w-16 h-16 mx-auto rounded-full bg-amber-100 flex items-center justify-center animate-pulse">
+                  <Upload className="w-8 h-8 text-amber-600" />
+                </div>
+                <p className="font-medium text-stone-700">正在解析文件...</p>
+              </div>
+            ) : importError ? (
+              <div className="space-y-3">
+                <div className="w-16 h-16 mx-auto rounded-full bg-red-100 flex items-center justify-center">
+                  <AlertTriangle className="w-8 h-8 text-red-600" />
+                </div>
+                <p className="font-semibold text-stone-800">导入失败</p>
+                <p className="text-sm text-red-600">{importError}</p>
+                <button
+                  onClick={resetImport}
+                  className="text-sm text-amber-600 hover:text-amber-700 font-medium"
+                >
+                  重新上传
+                </button>
+              </div>
+            ) : imported && importResult ? (
               <div className="space-y-3">
                 <div className="w-16 h-16 mx-auto rounded-full bg-emerald-100 flex items-center justify-center">
                   <CheckCircle className="w-8 h-8 text-emerald-600" />
                 </div>
                 <p className="font-semibold text-stone-800">导入成功</p>
+                {importResult.fileName && (
+                  <p className="text-xs text-stone-500">来源：{importResult.fileName}</p>
+                )}
                 <div className="flex items-center justify-center gap-6 text-sm">
                   <div>
                     <span className="text-stone-500">样本总数</span>
@@ -189,6 +276,15 @@ export default function BatchImport() {
                   系统会自动检测「模型版本换了但样本编号没变」的样本，这些样本不会自动归为正常，会留给运营复核人确认。
                 </p>
               </div>
+            </div>
+          </div>
+
+          <div className="mt-4 p-4 bg-stone-50 rounded-lg border border-stone-200">
+            <p className="text-xs font-medium text-stone-600 mb-2">📋 文件格式说明</p>
+            <div className="text-xs text-stone-500 space-y-1">
+              <p><span className="font-medium">CSV 字段：</span>sampleNo, currentModelVersion, category, style, scene</p>
+              <p><span className="font-medium">JSON 格式：</span>样本数组，每个元素含 sampleNo、currentModelVersion、标签字段</p>
+              <p><span className="font-medium text-amber-600">异常识别：</span>同一样本编号出现多行 / 多版本即判定为异常</p>
             </div>
           </div>
         </div>
