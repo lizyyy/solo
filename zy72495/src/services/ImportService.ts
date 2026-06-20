@@ -3,11 +3,19 @@ import Papa from 'papaparse';
 import type { BusTimeSlot } from '@/types';
 import { showToast, getErrorMessage } from '@/utils/errorMessageUtils';
 
+export interface DuplicateSlotInfo {
+  slot: BusTimeSlot;
+  existingSlot: BusTimeSlot;
+  changedFields: string[];
+}
+
 export interface ImportResult {
   success: boolean;
   data: BusTimeSlot[];
   duplicateCount: number;
   newCount: number;
+  updateCount: number;
+  duplicates: DuplicateSlotInfo[];
   errors: string[];
 }
 
@@ -19,11 +27,11 @@ function generateBatchId(): string {
   return 'batch-' + Date.now();
 }
 
-function isDuplicate(
+function findExisting(
   slot: Partial<BusTimeSlot>,
   existingSlots: BusTimeSlot[]
-): boolean {
-  return existingSlots.some(
+): BusTimeSlot | undefined {
+  return existingSlots.find(
     (s) =>
       s.routeName === slot.routeName &&
       s.date === slot.date &&
@@ -73,6 +81,8 @@ export async function importFromFile(
     data: [],
     duplicateCount: 0,
     newCount: 0,
+    updateCount: 0,
+    duplicates: [],
     errors: [],
   };
 
@@ -104,6 +114,7 @@ export async function importFromFile(
     const now = new Date().toISOString();
     let duplicateCount = 0;
     let newCount = 0;
+    let updateCount = 0;
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
@@ -113,7 +124,8 @@ export async function importFromFile(
         continue;
       }
 
-      const slot: Partial<BusTimeSlot> = {
+      const slot: BusTimeSlot = {
+        id: generateId(),
         routeName: String(row.routeName || ''),
         date: String(row.date || ''),
         startTime: String(row.startTime || ''),
@@ -125,26 +137,43 @@ export async function importFromFile(
         updatedAt: now,
       };
 
-      if (isDuplicate(slot, existingSlots)) {
+      const existing = findExisting(slot, existingSlots);
+      if (existing) {
         duplicateCount++;
+        const changedFields: string[] = [];
+        if (existing.passengerCount !== slot.passengerCount) {
+          changedFields.push('passengerCount');
+        }
+        result.duplicates.push({
+          slot,
+          existingSlot: existing,
+          changedFields,
+        });
+        result.data.push(slot);
+        updateCount++;
       } else {
-        slot.id = generateId();
-        result.data.push(slot as BusTimeSlot);
+        result.data.push(slot);
         newCount++;
       }
     }
 
-    result.success = result.errors.length === 0 || newCount > 0;
+    result.success = newCount > 0 || updateCount > 0;
     result.duplicateCount = duplicateCount;
     result.newCount = newCount;
+    result.updateCount = updateCount;
 
-    if (duplicateCount > 0) {
+    if (updateCount > 0 && newCount > 0) {
       showToast(
-        `导入完成：新增${newCount}条，跳过${duplicateCount}条重复数据`,
-        'warning'
+        `解析完成：新增${newCount}条，更新${updateCount}条`,
+        'info'
+      );
+    } else if (updateCount > 0) {
+      showToast(
+        `解析完成：更新${updateCount}条历史记录`,
+        'info'
       );
     } else if (newCount > 0) {
-      showToast(`成功导入${newCount}条数据`, 'success');
+      showToast(`解析完成：新增${newCount}条数据`, 'success');
     }
   } catch (error) {
     result.errors.push(getErrorMessage('import/invalid-format'));

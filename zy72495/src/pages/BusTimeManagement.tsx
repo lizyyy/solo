@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import { Upload, Trash2, Search, FileSpreadsheet, X, AlertCircle, MapPin, Download, ChevronDown, Clock } from 'lucide-react';
 import { useAppStore } from '@/store';
-import { importFromFile, type ImportResult } from '@/services/ImportService';
+import { importFromFile, type ImportResult, type DuplicateSlotInfo } from '@/services/ImportService';
 import { showToast } from '@/utils/errorMessageUtils';
 import { getFieldDisplayName } from '@/utils/diffUtils';
 
@@ -262,10 +262,10 @@ export default function BusTimeManagement() {
         </div>
         <p className="text-slate-700 font-medium">拖拽文件到此处，或点击上方导入按钮</p>
         <p className="text-slate-400 text-sm mt-2">支持 Excel (.xlsx, .xls) 和 CSV 格式</p>
-        {importResult && importResult.duplicateCount > 0 && (
+        {importResult && importResult.updateCount > 0 && (
           <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 rounded-lg text-sm">
             <AlertCircle size={16} />
-            上次导入跳过了 {importResult.duplicateCount} 条重复数据
+            上次导入更新了 {importResult.updateCount} 条历史记录的客流数
           </div>
         )}
       </div>
@@ -473,13 +473,42 @@ export default function BusTimeManagement() {
                   <p className="text-green-700 text-sm">新增数据</p>
                 </div>
                 <div className="flex-1 p-4 bg-amber-50 rounded-lg text-center">
-                  <p className="text-2xl font-bold text-amber-600">{importResult.duplicateCount}</p>
-                  <p className="text-amber-700 text-sm">跳过重复</p>
+                  <p className="text-2xl font-bold text-amber-600">{importResult.updateCount}</p>
+                  <p className="text-amber-700 text-sm">更新已有</p>
                 </div>
               </div>
+              {importResult.duplicates.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-sm font-medium text-amber-700 mb-2">更新明细（客流数变更）：</p>
+                  <div className="border border-amber-200 rounded-lg overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead className="bg-amber-50">
+                        <tr>
+                          <th className="px-3 py-2 text-left">组绍</th>
+                          <th className="px-3 py-2 text-left">日期</th>
+                          <th className="px-3 py-2 text-left">时揔</th>
+                          <th className="px-3 py-2 text-left">工坼孚</th>
+                          <th className="px-3 py-2 text-left">新坼孚</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {importResult.duplicates.map((dup: DuplicateSlotInfo, i: number) => (
+                          <tr key={i} className="border-t border-amber-100">
+                            <td className="px-3 py-2">{dup.slot.routeName}</td>
+                            <td className="px-3 py-2">{dup.slot.date}</td>
+                            <td className="px-3 py-2">{dup.slot.startTime} - {dup.slot.endTime}</td>
+                            <td className="px-3 py-2 text-red-500 line-through">{dup.existingSlot.passengerCount}</td>
+                            <td className="px-3 py-2 text-green-600 font-medium">{dup.slot.passengerCount}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
               {importResult.data.length > 0 && (
                 <div>
-                  <p className="text-sm text-slate-500 mb-2">新增数据预览：</p>
+                  <p className="text-sm text-slate-500 mb-2">数据预览：</p>
                   <div className="border border-slate-200 rounded-lg overflow-hidden">
                     <table className="w-full text-sm">
                       <thead className="bg-slate-50">
@@ -487,6 +516,7 @@ export default function BusTimeManagement() {
                           <th className="px-3 py-2 text-left">线路</th>
                           <th className="px-3 py-2 text-left">日期</th>
                           <th className="px-3 py-2 text-left">时段</th>
+                          <th className="px-3 py-2 text-left">客流数</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -497,6 +527,7 @@ export default function BusTimeManagement() {
                             <td className="px-3 py-2">
                               {slot.startTime} - {slot.endTime}
                             </td>
+                            <td className="px-3 py-2">{slot.passengerCount}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -514,7 +545,7 @@ export default function BusTimeManagement() {
               </button>
               <button
                 onClick={handleConfirmImport}
-                disabled={importResult.newCount === 0}
+                disabled={importResult.newCount === 0 && importResult.updateCount === 0}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 确认导入

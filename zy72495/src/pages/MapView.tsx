@@ -1,525 +1,592 @@
-import { useState, useRef, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
-import * as THREE from 'three';
-import ReactECharts from 'echarts-for-react';
-import {
-  Map,
-  Box,
-  PieChart,
-  Download,
-  Layers,
-  ExternalLink,
-  MapPin,
-  FileText,
-  Bus,
-  X,
-  AlertTriangle,
-} from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { MapPin, Clock, FileText, ChevronRight, AlertTriangle, CheckCircle, XCircle, ZoomIn, ZoomOut, Move } from 'lucide-react';
 import { useAppStore } from '@/store';
 import { showToast } from '@/utils/errorMessageUtils';
+import type { BoundaryStatus, Point } from '@/types';
 
-function PointMarker({
-  position,
-  isBoundary,
-  isPending,
-  onClick,
-}: {
-  position: [number, number, number];
-  isBoundary: boolean;
-  isPending: boolean;
-  onClick: () => void;
-}) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const [hovered, setHovered] = useState(false);
-
-  useFrame((state) => {
-    if (meshRef.current) {
-      meshRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 2) * 0.1;
-    }
-  });
-
-  const color = isPending ? '#F59E0B' : isBoundary ? '#EF4444' : '#10B981';
-
-  return (
-    <mesh
-      ref={meshRef}
-      position={position}
-      onClick={(e) => {
-        e.stopPropagation();
-        onClick();
-      }}
-      onPointerOver={(e) => {
-        e.stopPropagation();
-        setHovered(true);
-        document.body.style.cursor = 'pointer';
-      }}
-      onPointerOut={() => {
-        setHovered(false);
-        document.body.style.cursor = 'auto';
-      }}
-    >
-      <cylinderGeometry args={[0.15, 0.15, 0.6, 8]} />
-      <meshStandardMaterial
-        color={color}
-        emissive={color}
-        emissiveIntensity={hovered ? 0.5 : 0.2}
-      />
-      <mesh position={[0, 0.45, 0]}>
-        <sphereGeometry args={[0.2, 16, 16]} />
-        <meshStandardMaterial
-          color={color}
-          emissive={color}
-          emissiveIntensity={hovered ? 0.8 : 0.4}
-        />
-      </mesh>
-    </mesh>
-  );
+interface LocationState {
+  fromBusTime?: boolean;
+  fromRedline?: boolean;
+  highlightPointId?: string;
 }
 
-function StreetBoundary({ boundary, color }: { boundary: [number, number][]; color: string }) {
-  const points = useMemo(() => {
-    const shape = new THREE.Shape();
-    boundary.forEach((pt, i) => {
-      const x = (pt[0] - 116.35) * 100;
-      const z = (pt[1] - 39.95) * 100;
-      if (i === 0) shape.moveTo(x, z);
-      else shape.lineTo(x, z);
-    });
-    const geometry = new THREE.ShapeGeometry(shape);
-    const positions = geometry.attributes.position;
-    const newPositions = new Float32Array(positions.count * 3);
-    for (let i = 0; i < positions.count; i++) {
-      newPositions[i * 3] = positions.getX(i);
-      newPositions[i * 3 + 1] = 0;
-      newPositions[i * 3 + 2] = positions.getY(i);
-    }
-    geometry.setAttribute('position', new THREE.BufferAttribute(newPositions, 3));
-    geometry.computeVertexNormals();
-    return geometry;
-  }, [boundary]);
-
-  return (
-    <mesh geometry={points} receiveShadow>
-      <meshStandardMaterial color={color} transparent opacity={0.3} side={THREE.DoubleSide} />
-    </mesh>
-  );
+interface StatusConfig {
+  label: string;
+  dot: string;
+  ring: string;
+  text: string;
+  bg: string;
+  Icon: typeof AlertTriangle;
 }
 
-function Scene3D({
-  onPointClick,
-}: {
-  onPointClick: (pointId: string) => void;
-}) {
-  const { points, streets } = useAppStore();
+function getStatusConfig(status: BoundaryStatus | string): StatusConfig {
+  switch (status) {
+    case 'pending':
+      return {
+        label: '待复核',
+        dot: '#F59E0B',
+        ring: 'ring-amber-400/40',
+        text: 'text-amber-700',
+        bg: 'bg-amber-100',
+        Icon: AlertTriangle,
+      };
+    case 'confirmed':
+      return {
+        label: '已确认',
+        dot: '#10B981',
+        ring: 'ring-emerald-400/40',
+        text: 'text-emerald-700',
+        bg: 'bg-emerald-100',
+        Icon: CheckCircle,
+      };
+    case 'rejected':
+      return {
+        label: '已驳回',
+        dot: '#EF4444',
+        ring: 'ring-red-400/40',
+        text: 'text-red-700',
+        bg: 'bg-red-100',
+        Icon: XCircle,
+      };
+    case 'normal':
+    default:
+      return {
+        label: '正常',
+        dot: '#3B82F6',
+        ring: 'ring-blue-400/40',
+        text: 'text-blue-700',
+        bg: 'bg-blue-100',
+        Icon: CheckCircle,
+      };
+  }
+}
 
-  return (
-    <>
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[10, 20, 10]} intensity={1} castShadow />
-      <directionalLight position={[-10, 10, -10]} intensity={0.4} />
+interface StreetColor {
+  fill: string;
+  stroke: string;
+}
 
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
-        <planeGeometry args={[30, 30]} />
-        <meshStandardMaterial color="#F1F5F9" />
-      </mesh>
+function getStreetColor(streetId: string): StreetColor {
+  switch (streetId) {
+    case 'st1':
+      return { fill: 'rgba(59,130,246,0.12)', stroke: '#3B82F6' };
+    case 'st2':
+      return { fill: 'rgba(16,185,129,0.12)', stroke: '#10B981' };
+    default:
+      return { fill: 'rgba(100,116,139,0.10)', stroke: '#64748B' };
+  }
+}
 
-      <gridHelper args={[30, 30, '#CBD5E1', '#E2E8F0']} position={[0, 0, 0]} />
+function transformLngToX(lng: number): number {
+  return 100 + (lng - 116.35) * 2000;
+}
 
-      {streets.map((street, index) => (
-        <StreetBoundary
-          key={street.id}
-          boundary={street.boundary}
-          color={index === 0 ? '#DBEAFE' : '#D1FAE5'}
-        />
-      ))}
-
-      {points.map((point) => {
-        const x = (point.lng - 116.35) * 100;
-        const z = (point.lat - 39.95) * 100;
-        return (
-          <PointMarker
-            key={point.id}
-            position={[x, 0.5, z]}
-            isBoundary={point.isBoundary}
-            isPending={point.boundaryStatus === 'pending'}
-            onClick={() => onPointClick(point.id)}
-          />
-        );
-      })}
-
-      <OrbitControls
-        enablePan={true}
-        enableZoom={true}
-        enableRotate={true}
-        minDistance={5}
-        maxDistance={50}
-      />
-    </>
-  );
+function transformLatToY(lat: number): number {
+  return 100 + (39.95 - lat) * 2000;
 }
 
 export default function MapView() {
-  const { points, streets, busTimeSlots, stallRotations, getPointRemarks } = useAppStore();
-  const [viewMode, setViewMode] = useState<'2d' | '3d' | 'chart'>('3d');
-  const [selectedPointId, setSelectedPointId] = useState<string | null>(null);
-  const mapRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const locationState = location.state as LocationState | null;
 
-  const selectedPoint = points.find((p) => p.id === selectedPointId);
-  const pointRemarks = selectedPointId ? getPointRemarks(selectedPointId) : [];
-  const pointSlots = selectedPointId
-    ? busTimeSlots.filter((s) => s.relatedPointIds.includes(selectedPointId))
-    : [];
-  const pointStalls = selectedPointId
-    ? stallRotations.filter((s) => s.pointId === selectedPointId)
-    : [];
+  const { points, streets, busTimeSlots, getPointRemarks } = useAppStore();
 
-  const getStreetName = (id: string) => streets.find((s) => s.id === id)?.name || id;
+  const [selectedPointId, setSelectedPointId] = useState<string | null>(null);
+  const [viewScale, setViewScale] = useState<number>(1);
 
-  const handleExport = async () => {
-    if (!mapRef.current) return;
-    try {
-      const html2canvas = (await import('html2canvas')).default;
-      const canvas = await html2canvas(mapRef.current);
-      const link = document.createElement('a');
-      link.download = `早市点位地图_${new Date().toISOString().slice(0, 10)}.png`;
-      link.href = canvas.toDataURL();
-      link.click();
-      showToast('地图导出成功', 'success');
-    } catch (e) {
-      showToast('导出失败，请重试', 'error');
+  useEffect(() => {
+    if (locationState?.highlightPointId) {
+      setSelectedPointId(locationState.highlightPointId);
+      showToast('已返回地图，自动展开关联点位详情', 'info');
     }
+  }, [locationState?.highlightPointId]);
+
+  const selectedPoint = useMemo<Point | null>(() => {
+    return points.find((p) => p.id === selectedPointId) || null;
+  }, [points, selectedPointId]);
+
+  const pointSlots = useMemo(() => {
+    return selectedPointId ? busTimeSlots.filter((s) => s.relatedPointIds.includes(selectedPointId)) : [];
+  }, [busTimeSlots, selectedPointId]);
+
+  const pointRemarks = useMemo(() => {
+    return selectedPointId ? getPointRemarks(selectedPointId) : [];
+  }, [getPointRemarks, selectedPointId]);
+
+  const getStreetName = (id: string): string => {
+    return streets.find((s) => s.id === id)?.name || id;
   };
 
-  const chartOption = {
-    tooltip: { trigger: 'item' },
-    legend: { bottom: '5%', left: 'center' },
-    series: [
-      {
-        name: '点位分布',
-        type: 'pie',
-        radius: ['40%', '70%'],
-        avoidLabelOverlap: false,
-        itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
-        label: { show: false },
-        emphasis: {
-          label: { show: true, fontSize: 16, fontWeight: 'bold' },
-        },
-        data: [
-          { value: points.filter((p) => !p.isBoundary).length, name: '正常点位', itemStyle: { color: '#10B981' } },
-          { value: points.filter((p) => p.isBoundary && p.boundaryStatus === 'pending').length, name: '待复核边界点', itemStyle: { color: '#F59E0B' } },
-          { value: points.filter((p) => p.isBoundary && p.boundaryStatus === 'confirmed').length, name: '已确认边界点', itemStyle: { color: '#3B82F6' } },
-        ],
+  const handleViewBusTime = () => {
+    if (!selectedPoint) return;
+    navigate('/bus-time', {
+      state: {
+        fromMap: true,
+        pointId: selectedPointId,
+        pointName: selectedPoint.name,
+        highlightSlotIds: pointSlots.map((s) => s.id),
       },
-    ],
+    });
   };
 
-  const barOption = {
-    tooltip: { trigger: 'axis' },
-    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-    xAxis: {
-      type: 'category',
-      data: stallRotations.map((s) => s.stallNumber),
-    },
-    yAxis: { type: 'value', name: '关联时段数' },
-    series: [
-      {
-        data: stallRotations.map((s) => s.busTimeSlotIds.length),
-        type: 'bar',
-        itemStyle: { color: '#1E40AF', borderRadius: [4, 4, 0, 0] },
+  const handleViewRedlineRemark = () => {
+    if (!selectedPoint) return;
+    navigate('/redline-remark', {
+      state: {
+        fromMap: true,
+        pointId: selectedPointId,
+        pointName: selectedPoint.name,
+        highlightRemarkIds: pointRemarks.map((r) => r.id),
       },
-    ],
+    });
   };
 
-  const Positions2D = () => (
-    <div className="relative w-full h-full bg-slate-100 rounded-lg overflow-hidden">
-      <svg viewBox="-2 -2 4 4" className="w-full h-full">
-        {streets.map((street, index) => {
-          const points = street.boundary
-            .map(([lng, lat]) => `${(lng - 116.35) * 20},${(39.95 - lat) * 20}`)
-            .join(' ');
-          return (
-            <polygon
-              key={street.id}
-              points={points}
-              fill={index === 0 ? '#DBEAFE' : '#D1FAE5'}
-              stroke={index === 0 ? '#93C5FD' : '#6EE7B7'}
-              strokeWidth={0.05}
-            />
-          );
-        })}
-        {points.map((point) => {
-          const x = (point.lng - 116.35) * 20;
-          const y = (39.95 - point.lat) * 20;
-          const color =
-            point.boundaryStatus === 'pending'
-              ? '#F59E0B'
-              : point.isBoundary
-              ? '#EF4444'
-              : '#10B981';
-          return (
-            <g key={point.id} onClick={() => setSelectedPointId(point.id)} className="cursor-pointer">
-              <circle cx={x} cy={y} r={0.15} fill={color} stroke="white" strokeWidth={0.05} />
-              <text x={x} y={y - 0.25} textAnchor="middle" fontSize={0.2} fill="#334155">
-                {point.name.slice(0, 4)}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
-    </div>
-  );
+  const handleZoomIn = () => {
+    setViewScale((prev) => Math.min(prev + 0.25, 2));
+  };
+
+  const handleZoomOut = () => {
+    setViewScale((prev) => Math.max(prev - 0.25, 0.5));
+  };
+
+  const statusItems: Array<{ status: BoundaryStatus | string; label: string }> = [
+    { status: 'normal', label: '正常' },
+    { status: 'pending', label: '待复核' },
+    { status: 'confirmed', label: '已确认' },
+    { status: 'rejected', label: '已驳回' },
+  ];
+
+  const latestRemark = pointRemarks.length > 0
+    ? pointRemarks.slice().sort((a, b) => b.version - a.version)[0]
+    : null;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-slate-800 font-serif">地图展示</h2>
-          <p className="text-slate-500 mt-1">查看点位分布，支持2D/3D切换和图表统计</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex bg-slate-100 rounded-lg p-1">
-            <button
-              onClick={() => setViewMode('2d')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
-                viewMode === '2d' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-800'
-              }`}
-            >
-              <Map size={16} />
-              2D
-            </button>
-            <button
-              onClick={() => setViewMode('3d')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
-                viewMode === '3d' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-800'
-              }`}
-            >
-              <Box size={16} />
-              3D
-            </button>
-            <button
-              onClick={() => setViewMode('chart')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
-                viewMode === 'chart' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-800'
-              }`}
-            >
-              <PieChart size={16} />
-              图表
-            </button>
+    <div className="h-[calc(100vh-5rem)] flex bg-slate-50">
+      <div className="flex-1 relative overflow-hidden">
+        <div className="absolute top-4 right-4 z-20 flex flex-col gap-2">
+          <button
+            onClick={handleZoomIn}
+            className="w-10 h-10 bg-white rounded-lg shadow-sm border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-colors"
+            title="放大"
+          >
+            <ZoomIn className="w-5 h-5 text-slate-600" />
+          </button>
+          <button
+            onClick={handleZoomOut}
+            className="w-10 h-10 bg-white rounded-lg shadow-sm border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-colors"
+            title="缩小"
+          >
+            <ZoomOut className="w-5 h-5 text-slate-600" />
+          </button>
+          <div className="w-10 h-10 bg-white rounded-lg shadow-sm border border-slate-200 flex items-center justify-center">
+            <Move className="w-5 h-5 text-slate-400" />
           </div>
-          {viewMode !== 'chart' && (
-            <button
-              onClick={handleExport}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-            >
-              <Download size={18} />
-              导出地图
-            </button>
-          )}
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 px-2 py-1 text-center text-xs text-slate-500 font-medium">
+            {Math.round(viewScale * 100)}%
+          </div>
         </div>
+
+        <div className="absolute top-4 left-4 z-20 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-sm border border-slate-200 max-w-[200px]">
+          <div className="text-xs font-semibold text-slate-700 mb-2 tracking-wide">图例</div>
+          <div className="space-y-1.5 mb-3">
+            <div className="text-[11px] text-slate-500 font-medium mb-1.5">点位状态</div>
+            {statusItems.map((item) => {
+              const cfg = getStatusConfig(item.status);
+              return (
+                <div key={item.status} className="flex items-center gap-2">
+                  <span
+                    className="w-3 h-3 rounded-full inline-block shrink-0"
+                    style={{ backgroundColor: cfg.dot }}
+                  />
+                  <span className="text-xs text-slate-600">{item.label}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="border-t border-slate-100 pt-2">
+            <div className="text-[11px] text-slate-500 font-medium mb-1.5">街道区域</div>
+            <div className="space-y-1.5">
+              {streets.map((street) => {
+                const color = getStreetColor(street.id);
+                return (
+                  <div key={street.id} className="flex items-center gap-2">
+                    <span
+                      className="w-4 h-3 rounded-sm inline-block shrink-0 border"
+                      style={{ backgroundColor: color.fill, borderColor: color.stroke }}
+                    />
+                    <span className="text-xs text-slate-600 truncate">{street.name}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <svg
+          viewBox="0 0 800 600"
+          className="absolute inset-0 w-full h-full"
+          style={{
+            transform: `scale(${viewScale})`,
+            transformOrigin: 'center center',
+          }}
+        >
+          <defs>
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#E2E8F0" strokeWidth="0.5" />
+            </pattern>
+            <pattern id="grid-small" width="10" height="10" patternUnits="userSpaceOnUse">
+              <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#F1F5F9" strokeWidth="0.3" />
+            </pattern>
+            <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="1" stdDeviation="2" floodOpacity="0.15" />
+            </filter>
+          </defs>
+
+          <rect width="800" height="600" fill="#F8FAFC" />
+          <rect width="800" height="600" fill="url(#grid-small)" />
+          <rect width="800" height="600" fill="url(#grid)" />
+
+          {streets.map((street) => {
+            const color = getStreetColor(street.id);
+            const pointsStr = street.boundary
+              .map((pt) => `${transformLngToX(pt[0])},${transformLatToY(pt[1])}`)
+              .join(' ');
+            const centerX = street.boundary.reduce((sum, pt) => sum + transformLngToX(pt[0]), 0) / street.boundary.length;
+            const centerY = street.boundary.reduce((sum, pt) => sum + transformLatToY(pt[1]), 0) / street.boundary.length;
+            return (
+              <g key={street.id}>
+                <polygon
+                  points={pointsStr}
+                  fill={color.fill}
+                  stroke={color.stroke}
+                  strokeWidth="2"
+                  strokeDasharray="8 4"
+                  strokeLinejoin="round"
+                />
+                <text
+                  x={centerX}
+                  y={centerY}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fill={color.stroke}
+                  fontSize="13"
+                  fontWeight="600"
+                  className="select-none pointer-events-none"
+                >
+                  {street.name}
+                </text>
+              </g>
+            );
+          })}
+
+          {points.map((point) => {
+            const cfg = getStatusConfig(point.boundaryStatus);
+            const cx = transformLngToX(point.lng);
+            const cy = transformLatToY(point.lat);
+            const isSelected = selectedPointId === point.id;
+            const baseRadius = point.isBoundary ? 7 : 6;
+            const radius = isSelected ? baseRadius + 2 : baseRadius;
+
+            return (
+              <g
+                key={point.id}
+                onClick={() => setSelectedPointId(point.id)}
+                className="cursor-pointer"
+              >
+                {isSelected && (
+                  <>
+                    <circle
+                      cx={cx}
+                      cy={cy}
+                      r={radius + 10}
+                      fill={cfg.dot}
+                      fillOpacity="0.12"
+                    />
+                    <circle
+                      cx={cx}
+                      cy={cy}
+                      r={radius + 5}
+                      fill="none"
+                      stroke={cfg.dot}
+                      strokeWidth="2"
+                      strokeOpacity="0.5"
+                      strokeDasharray="4 3"
+                    >
+                      <animateTransform
+                        attributeName="transform"
+                        type="rotate"
+                        from={`0 ${cx} ${cy}`}
+                        to={`360 ${cx} ${cy}`}
+                        dur="6s"
+                        repeatCount="indefinite"
+                      />
+                    </circle>
+                  </>
+                )}
+                {point.isBoundary && (
+                  <circle
+                    cx={cx}
+                    cy={cy}
+                    r={radius + 2}
+                    fill="none"
+                    stroke="#F59E0B"
+                    strokeWidth="1.5"
+                    strokeDasharray="3 2"
+                    strokeOpacity="0.6"
+                  />
+                )}
+                <circle
+                  cx={cx}
+                  cy={cy}
+                  r={radius}
+                  fill={cfg.dot}
+                  stroke="white"
+                  strokeWidth="2.5"
+                  filter="url(#shadow)"
+                />
+                <circle
+                  cx={cx}
+                  cy={cy}
+                  r={radius / 2.5}
+                  fill="white"
+                  fillOpacity="0.7"
+                />
+                <text
+                  x={cx + radius + 6}
+                  y={cy - radius - 2}
+                  fontSize="11"
+                  fill="#334155"
+                  fontWeight={isSelected ? '600' : '500'}
+                  className="select-none pointer-events-none"
+                  style={{ paintOrder: 'stroke' }}
+                  stroke="white"
+                  strokeWidth="3"
+                  strokeLinejoin="round"
+                >
+                  {point.name}
+                </text>
+              </g>
+            );
+          })}
+
+          {points.map((point) => {
+            const cx = transformLngToX(point.lng);
+            const cy = transformLatToY(point.lat);
+            return (
+              <g key={`label-${point.id}`}>
+                <line
+                  x1={cx}
+                  y1={cy + 10}
+                  x2={cx}
+                  y2={cy + 20}
+                  stroke="#94A3B8"
+                  strokeWidth="0.8"
+                  strokeDasharray="2 2"
+                  strokeOpacity="0.4"
+                />
+              </g>
+            );
+          })}
+        </svg>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3">
-          <div
-            ref={mapRef}
-            className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden"
-            style={{ height: viewMode === 'chart' ? '500px' : '500px' }}
-          >
-            {viewMode === '2d' && <Positions2D />}
-            {viewMode === '3d' && (
-              <Canvas camera={{ position: [15, 15, 15], fov: 50 }}>
-                <Scene3D onPointClick={setSelectedPointId} />
-              </Canvas>
-            )}
-            {viewMode === 'chart' && (
-              <div className="p-6 h-full grid grid-cols-2 gap-6">
-                <div>
-                  <h4 className="text-lg font-semibold text-slate-800 mb-4">点位状态分布</h4>
-                  <ReactECharts option={chartOption} style={{ height: '380px' }} />
-                </div>
-                <div>
-                  <h4 className="text-lg font-semibold text-slate-800 mb-4">摊位关联时段数</h4>
-                  <ReactECharts option={barOption} style={{ height: '380px' }} />
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-green-500" />
-              <span className="text-slate-600">正常点位</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-amber-500" />
-              <span className="text-slate-600">边界待复核</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500" />
-              <span className="text-slate-600">边界点位</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-3 bg-blue-100 border border-blue-200" />
-              <span className="text-slate-600">幸福街道</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-3 bg-green-100 border border-green-200" />
-              <span className="text-slate-600">光明街道</span>
-            </div>
-          </div>
+      <div className="w-[22rem] bg-white border-l border-slate-200 p-4 overflow-y-auto flex flex-col gap-4">
+        <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+          <MapPin className="w-5 h-5 text-blue-500" />
+          <h2 className="text-xl font-bold font-serif text-slate-800">点位列表</h2>
+          <span className="ml-auto text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+            {points.length} 个
+          </span>
         </div>
 
-        <div className="lg:col-span-1">
-          {selectedPoint ? (
-            <div className="bg-white rounded-xl shadow-sm border border-slate-100 sticky top-6">
-              <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-                <h3 className="font-semibold text-slate-800">点位详情</h3>
-                <button
-                  onClick={() => setSelectedPointId(null)}
-                  className="p-1 hover:bg-slate-100 rounded"
-                >
-                  <X size={18} className="text-slate-400" />
-                </button>
-              </div>
-              <div className="p-4 space-y-4">
-                <div>
-                  <p className="text-sm text-slate-500">点位名称</p>
-                  <p className="font-medium text-slate-800">{selectedPoint.name}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">归属街道</p>
-                  <p className="text-slate-700">{selectedPoint.streetIds.map(getStreetName).join(' / ')}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">坐标</p>
-                  <p className="text-slate-700 font-mono text-sm">
-                    {selectedPoint.lng}, {selectedPoint.lat}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500 mb-1">状态</p>
-                  {selectedPoint.boundaryStatus === 'pending' ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-50 text-amber-700 rounded text-sm">
-                      <AlertTriangle size={14} />
-                      边界待复核
-                    </span>
-                  ) : selectedPoint.isBoundary ? (
-                    <span className="px-2 py-1 bg-red-50 text-red-700 rounded text-sm">边界点位</span>
-                  ) : (
-                    <span className="px-2 py-1 bg-green-50 text-green-700 rounded text-sm">正常</span>
-                  )}
-                </div>
+        <div className="flex flex-col gap-2">
+          {points.map((point) => {
+            const cfg = getStatusConfig(point.boundaryStatus);
+            const StatusIcon = cfg.Icon;
+            const isSelected = selectedPointId === point.id;
+            const streetNames = point.streetIds.map(getStreetName).join('、');
 
-                <div className="pt-3 border-t border-slate-100 space-y-2">
-                  <p className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                    <Bus size={14} />
-                    关联公交时段 ({pointSlots.length})
-                  </p>
-                  {pointSlots.length > 0 ? (
-                    pointSlots.slice(0, 3).map((slot) => (
-                      <div key={slot.id} className="p-2 bg-slate-50 rounded text-sm">
-                        <p className="text-slate-700">{slot.routeName} - {slot.date}</p>
-                        <p className="text-slate-500 text-xs">{slot.startTime} - {slot.endTime}</p>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-slate-400">暂无关联时段</p>
-                  )}
-                </div>
-
-                <div className="pt-3 border-t border-slate-100 space-y-2">
-                  <p className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                    <FileText size={14} />
-                    红线图备注 ({pointRemarks.length})
-                  </p>
-                  {pointRemarks.length > 0 ? (
-                    <div className="p-2 bg-slate-50 rounded text-sm">
-                      <p className="text-slate-700">{pointRemarks[0].content}</p>
-                      <p className="text-slate-400 text-xs mt-1">
-                        {pointRemarks[0].createdByName} · v{pointRemarks[0].version}
-                      </p>
+            return (
+              <button
+                key={point.id}
+                onClick={() => setSelectedPointId(point.id)}
+                className={`w-full text-left rounded-lg border p-3 transition-all duration-200 ${
+                  isSelected
+                    ? 'bg-blue-50 border-blue-300 ring-1 ring-blue-200 shadow-sm'
+                    : 'bg-white border-slate-200 hover:bg-slate-50 hover:border-slate-300'
+                }`}
+              >
+                <div className="flex items-start gap-2.5">
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
+                    style={{ backgroundColor: `${cfg.dot}1A` }}
+                  >
+                    <MapPin className="w-4 h-4" style={{ color: cfg.dot }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className={`text-sm font-semibold truncate ${isSelected ? 'text-blue-900' : 'text-slate-800'}`}>
+                        {point.name}
+                      </span>
+                      <span
+                        className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0 ${cfg.bg} ${cfg.text}`}
+                      >
+                        <StatusIcon className="w-3 h-3" />
+                        {cfg.label}
+                      </span>
                     </div>
-                  ) : (
-                    <p className="text-sm text-slate-400">暂无备注</p>
-                  )}
-                </div>
-
-                <div className="pt-3 border-t border-slate-100 space-y-2">
-                  <p className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                    <Layers size={14} />
-                    关联摊位 ({pointStalls.length})
-                  </p>
-                  {pointStalls.length > 0 ? (
-                    pointStalls.map((stall) => (
-                      <div key={stall.id} className="p-2 bg-slate-50 rounded text-sm">
-                        <p className="text-slate-700 font-medium">{stall.stallNumber}</p>
-                        <p className="text-slate-500 text-xs">{stall.vendorName}</p>
+                    <div className="mt-1 text-xs text-slate-500 flex items-center gap-1.5">
+                      <span className="w-1 h-1 rounded-full bg-slate-300" />
+                      <span className="truncate">{streetNames}</span>
+                    </div>
+                    {point.isBoundary && (
+                      <div className="mt-1 text-[11px] text-amber-600 flex items-center gap-1">
+                        <AlertTriangle className="w-3 h-3" />
+                        边界点位
                       </div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-slate-400">暂无摊位</p>
-                  )}
+                    )}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {selectedPoint && (
+          <div className="sticky bottom-0 bg-white border-t border-slate-200 -mx-4 -mb-4 px-4 py-4 mt-2">
+            {locationState?.highlightPointId === selectedPointId && (
+              <div className="mb-3 bg-amber-50 border border-amber-200 rounded-lg p-2.5 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span className="text-xs text-amber-700">
+                  从业务页溯源返回，自动展开该点位详情
+                </span>
+              </div>
+            )}
+
+            <div className="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
+              <div className="px-3.5 py-3 bg-white border-b border-slate-100">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-bold text-slate-800 truncate">
+                      {selectedPoint.name}
+                    </div>
+                    <div className="mt-1 text-xs text-slate-500 font-mono">
+                      {selectedPoint.lng.toFixed(4)}°E, {selectedPoint.lat.toFixed(4)}°N
+                    </div>
+                  </div>
+                  {(() => {
+                    const cfg = getStatusConfig(selectedPoint.boundaryStatus);
+                    const StatusIcon = cfg.Icon;
+                    return (
+                      <span
+                        className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-lg ${cfg.bg} ${cfg.text}`}
+                      >
+                        <StatusIcon className="w-3.5 h-3.5" />
+                        {cfg.label}
+                      </span>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              <div className="p-3.5 space-y-3.5">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-4 h-4 text-blue-500" />
+                      <span className="text-sm font-semibold text-slate-700">关联公交时段</span>
+                    </div>
+                    <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                      {pointSlots.length} 条
+                    </span>
+                  </div>
+                  <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100">
+                    {pointSlots.length === 0 ? (
+                      <div className="px-3 py-4 text-center text-xs text-slate-400">
+                        暂无关联公交时段
+                      </div>
+                    ) : (
+                      <>
+                        {pointSlots.slice(0, 3).map((slot) => (
+                          <div key={slot.id} className="px-3 py-2.5 flex items-center justify-between gap-2">
+                            <div className="min-w-0">
+                              <div className="text-xs font-semibold text-slate-700">
+                                {slot.routeName}
+                              </div>
+                              <div className="text-[11px] text-slate-500 mt-0.5">
+                                {slot.startTime}-{slot.endTime}
+                              </div>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <div className="text-xs font-bold text-blue-600">
+                                {slot.passengerCount}
+                              </div>
+                              <div className="text-[10px] text-slate-400">客流</div>
+                            </div>
+                          </div>
+                        ))}
+                        {pointSlots.length > 3 && (
+                          <div className="px-3 py-2 text-xs text-slate-400 text-center">
+                            还有 {pointSlots.length - 3} 条...
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                  <button
+                    onClick={handleViewBusTime}
+                    disabled={pointSlots.length === 0}
+                    className="mt-2 w-full flex items-center justify-center gap-1 bg-blue-500 hover:bg-blue-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-sm font-medium py-2.5 rounded-lg transition-colors"
+                  >
+                    <Clock className="w-4 h-4" />
+                    查看关联时段
+                    <ChevronRight className="w-4 h-4 -mr-1" />
+                  </button>
                 </div>
 
-                <div className="pt-3 space-y-2">
+                <div className="pt-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <FileText className="w-4 h-4 text-emerald-500" />
+                      <span className="text-sm font-semibold text-slate-700">红线图备注</span>
+                    </div>
+                    <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                      {pointRemarks.length} 条
+                    </span>
+                  </div>
+                  <div className="bg-white rounded-lg border border-slate-200">
+                    {!latestRemark ? (
+                      <div className="px-3 py-4 text-center text-xs text-slate-400">
+                        暂无红线图备注
+                      </div>
+                    ) : (
+                      <div className="px-3 py-3">
+                        <div className="text-xs text-slate-600 leading-relaxed line-clamp-3">
+                          {latestRemark.content}
+                        </div>
+                        <div className="mt-2 flex items-center justify-between text-[11px] text-slate-400">
+                          <span>{latestRemark.createdByName}</span>
+                          <span className="font-mono">v{latestRemark.version}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   <button
-                    onClick={() => {
-                      navigate('/bus-time', {
-                        state: {
-                          fromMap: true,
-                          pointId: selectedPointId,
-                          pointName: selectedPoint?.name,
-                          highlightSlotIds: pointSlots.map((s) => s.id),
-                        },
-                      });
-                      showToast(`已跳转至公交时段管理，关联 ${pointSlots.length} 条记录`, 'success');
-                    }}
-                    disabled={pointSlots.length === 0}
-                    className={`w-full py-2 px-3 border rounded-lg text-sm flex items-center justify-center gap-2 transition-colors ${
-                      pointSlots.length === 0
-                        ? 'border-slate-200 text-slate-400 cursor-not-allowed'
-                        : 'border-slate-200 text-slate-700 hover:bg-slate-50'
-                    }`}
-                  >
-                    <ExternalLink size={14} />
-                    查看关联时段 ({pointSlots.length})
-                  </button>
-                  <button
-                    onClick={() => {
-                      navigate('/redline-remark', {
-                        state: {
-                          fromMap: true,
-                          pointId: selectedPointId,
-                          pointName: selectedPoint?.name,
-                          highlightRemarkIds: pointRemarks.map((r) => r.id),
-                        },
-                      });
-                      showToast(`已跳转至红线备注管理，关联 ${pointRemarks.length} 条记录`, 'success');
-                    }}
+                    onClick={handleViewRedlineRemark}
                     disabled={pointRemarks.length === 0}
-                    className={`w-full py-2 px-3 border rounded-lg text-sm flex items-center justify-center gap-2 transition-colors ${
-                      pointRemarks.length === 0
-                        ? 'border-slate-200 text-slate-400 cursor-not-allowed'
-                        : 'border-slate-200 text-slate-700 hover:bg-slate-50'
-                    }`}
+                    className="mt-2 w-full flex items-center justify-center gap-1 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-sm font-medium py-2.5 rounded-lg transition-colors"
                   >
-                    <ExternalLink size={14} />
-                    查看红线备注 ({pointRemarks.length})
+                    <FileText className="w-4 h-4" />
+                    查看红线备注
+                    <ChevronRight className="w-4 h-4 -mr-1" />
                   </button>
                 </div>
               </div>
             </div>
-          ) : (
-            <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-8 text-center">
-              <MapPin size={48} className="mx-auto text-slate-300 mb-3" />
-              <p className="text-slate-500">点击地图上的点位</p>
-              <p className="text-slate-400 text-sm">查看详细信息和溯源</p>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
