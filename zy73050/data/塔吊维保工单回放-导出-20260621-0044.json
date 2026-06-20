@@ -1,0 +1,1936 @@
+{
+  "exportedAt": "2026-06-21 00:44",
+  "filter": "all",
+  "keyword": "",
+  "summary": {
+    "已确认": 3,
+    "待补件": 3,
+    "退回": 1,
+    "采样断档工单": 5,
+    "总计工单": 7,
+    "说明": "已确认/待补件/退回为主状态互斥分类；采样断档单独统计，可能与主状态重叠"
+  },
+  "workorders": [
+    {
+      "id": "WO-20260621-0DD",
+      "craneId": "TC-TEST-ABNORMAL",
+      "craneName": "测试塔机 · 异常区测试",
+      "title": "测试新增断档工单（验收用）",
+      "type": "月度维保",
+      "status": "pending",
+      "scheduler": "验收测试",
+      "maintainer": "验收班组",
+      "downtimeWindow": {
+        "start": "2026-06-21 09:00",
+        "end": "2026-06-21 12:00"
+      },
+      "createdAt": "2026-06-21 00:44",
+      "hasAbnormalSampling": true,
+      "hasLateParts": false,
+      "dedupHash": "B30F9634",
+      "parts": [
+        {
+          "id": "P-9AF70",
+          "name": "验收测试备件",
+          "spec": "验收规格",
+          "qty": 1.0,
+          "unit": "个",
+          "plannedArrival": "2026-06-20 18:00",
+          "actualArrival": "2026-06-21 08:00",
+          "isLate": false,
+          "lateDays": 0,
+          "remarkVersions": [
+            {
+              "version": 1,
+              "isLatest": true,
+              "content": "这是验收用的新工单",
+              "author": "验收测试",
+              "role": "提交人",
+              "createdAt": "2026-06-21 00:44"
+            }
+          ],
+          "screenshotVersions": [
+            {
+              "version": 1,
+              "isLatest": true,
+              "name": "验收截图",
+              "author": "验收测试",
+              "createdAt": "2026-06-21 00:44",
+              "preview": "🖼️"
+            }
+          ]
+        }
+      ],
+      "sampling": [
+        {
+          "time": "09:00",
+          "value": 60.0,
+          "pct": 60,
+          "status": "normal",
+          "reason": "正常采样"
+        },
+        {
+          "time": "09:30",
+          "value": 0.0,
+          "pct": 0,
+          "status": "abnormal",
+          "reason": "验收：采样断档测试"
+        },
+        {
+          "time": "10:00",
+          "value": 0.0,
+          "pct": 0,
+          "status": "abnormal",
+          "reason": "验收：采样断档测试2"
+        },
+        {
+          "time": "10:30",
+          "value": 62.0,
+          "pct": 62,
+          "status": "normal",
+          "reason": "恢复正常"
+        }
+      ],
+      "timeline": [
+        {
+          "id": "TL-C-WO-20260621-0DD",
+          "type": "created",
+          "title": "工单创建",
+          "desc": "验收测试提交复核材料：测试新增断档工单（验收用）",
+          "time": "2026-06-21 00:44",
+          "operator": "验收测试",
+          "operatorRole": "测试",
+          "statusFrom": null,
+          "statusTo": "待处理",
+          "statusClass": "",
+          "isOverride": false,
+          "dotClass": "",
+          "overrideReason": null
+        },
+        {
+          "id": "TL-A-WO-20260621-0DD",
+          "type": "assigned",
+          "title": "材料已登记",
+          "desc": "复核材料已入库，等待进一步处理。",
+          "time": "2026-06-21 00:44",
+          "operator": "验收测试",
+          "operatorRole": "测试",
+          "statusFrom": "待处理",
+          "statusTo": "待补件",
+          "statusClass": "st-amber",
+          "isOverride": false,
+          "dotClass": "dot-sky",
+          "overrideReason": null
+        },
+        {
+          "id": "TL-SA-cbefee",
+          "type": "sampling_abnormal",
+          "title": "采样断档·已单独拎出",
+          "desc": "检测到采样断档记录，已放入异常区，不计入正常统计。",
+          "time": "2026-06-21 00:44",
+          "operator": "系统自动",
+          "operatorRole": "数据监控",
+          "statusFrom": null,
+          "statusTo": null,
+          "statusClass": "",
+          "isOverride": false,
+          "dotClass": "dot-rose",
+          "overrideReason": null
+        }
+      ]
+    },
+    {
+      "id": "WO-2026-0601-017",
+      "craneId": "TC-ZZ-03-A",
+      "craneName": "3号塔机 · A区",
+      "title": "主卷扬齿轮箱月度维保",
+      "type": "月度维保",
+      "status": "pending",
+      "scheduler": "宋建国（小宋）",
+      "maintainer": "李师傅班组",
+      "downtimeWindow": {
+        "start": "2026-06-08 08:00",
+        "end": "2026-06-08 14:00"
+      },
+      "createdAt": "2026-06-05 09:20",
+      "hasAbnormalSampling": false,
+      "hasLateParts": true,
+      "dedupHash": "E5C84B13",
+      "parts": [
+        {
+          "id": "P-001",
+          "name": "工业齿轮油 L-CKD 320",
+          "spec": "20L/桶 · ISO VG 320",
+          "qty": 2.0,
+          "unit": "桶",
+          "plannedArrival": "2026-06-07 16:00",
+          "actualArrival": "2026-06-08 09:30",
+          "isLate": true,
+          "lateDays": 0.73,
+          "remarkVersions": [
+            {
+              "version": 3,
+              "isLatest": true,
+              "content": "供应商物流更新：6月8日早晨6点已到达中转站，预计9:30送达现场。已协调仓库提前安排卸货。现场小宋确认延迟将占用约1.5小时停机窗口。",
+              "author": "宋建国",
+              "role": "现场调度",
+              "createdAt": "2026-06-08 07:45"
+            },
+            {
+              "version": 2,
+              "isLatest": false,
+              "content": "补录：仓库提醒该批次油品6月7日下午运输车辆因暴雨延误，预计到货时间推迟到6月8日上午。",
+              "author": "王雪",
+              "role": "仓管",
+              "createdAt": "2026-06-07 20:10"
+            },
+            {
+              "version": 1,
+              "isLatest": false,
+              "content": "首次提交：常规齿轮油更换，需2桶。原计划6月7日下午到货，与停机窗口预留16小时缓冲。",
+              "author": "李师傅",
+              "role": "维保班长",
+              "createdAt": "2026-06-05 09:35"
+            }
+          ],
+          "screenshotVersions": [
+            {
+              "version": 3,
+              "isLatest": true,
+              "name": "物流实时位置截图",
+              "author": "宋建国",
+              "createdAt": "2026-06-08 07:45",
+              "preview": "🚚"
+            },
+            {
+              "version": 2,
+              "isLatest": false,
+              "name": "物流延误通知",
+              "author": "王雪",
+              "createdAt": "2026-06-07 20:10",
+              "preview": "📦"
+            },
+            {
+              "version": 1,
+              "isLatest": false,
+              "name": "采购订单截图",
+              "author": "李师傅",
+              "createdAt": "2026-06-05 09:40",
+              "preview": "📋"
+            }
+          ]
+        },
+        {
+          "id": "P-002",
+          "name": "齿轮箱密封垫组件",
+          "spec": "型号 GX-MJ-180 · NBR橡胶",
+          "qty": 1.0,
+          "unit": "套",
+          "plannedArrival": "2026-06-07 16:00",
+          "actualArrival": "2026-06-07 15:10",
+          "isLate": false,
+          "lateDays": 0,
+          "remarkVersions": [
+            {
+              "version": 2,
+              "isLatest": true,
+              "content": "6月7日下午仓库验收合格，配套螺栓已配齐，放在待发区3号货架。",
+              "author": "王雪",
+              "role": "仓管",
+              "createdAt": "2026-06-07 15:40"
+            },
+            {
+              "version": 1,
+              "isLatest": false,
+              "content": "原有机密封垫有老化迹象，更换时需同时检查箱体接触面平整度。",
+              "author": "李师傅",
+              "role": "维保班长",
+              "createdAt": "2026-06-05 09:38"
+            }
+          ],
+          "screenshotVersions": [
+            {
+              "version": 2,
+              "isLatest": true,
+              "name": "实物入库照片",
+              "author": "王雪",
+              "createdAt": "2026-06-07 15:40",
+              "preview": "📦"
+            },
+            {
+              "version": 1,
+              "isLatest": false,
+              "name": "密封垫型号对照图",
+              "author": "李师傅",
+              "createdAt": "2026-06-05 09:45",
+              "preview": "📐"
+            }
+          ]
+        },
+        {
+          "id": "P-003",
+          "name": "强磁排油堵头",
+          "spec": "M24×1.5 · 带O型圈",
+          "qty": 2.0,
+          "unit": "个",
+          "plannedArrival": "2026-06-06 18:00",
+          "actualArrival": "2026-06-06 17:20",
+          "isLate": false,
+          "lateDays": 0,
+          "remarkVersions": [
+            {
+              "version": 1,
+              "isLatest": true,
+              "content": "常备备件，库存充足，直接领用。建议下次保养时顺便更换旧堵头。",
+              "author": "王雪",
+              "role": "仓管",
+              "createdAt": "2026-06-06 17:30"
+            }
+          ],
+          "screenshotVersions": [
+            {
+              "version": 1,
+              "isLatest": true,
+              "name": "备件领取单",
+              "author": "王雪",
+              "createdAt": "2026-06-06 17:30",
+              "preview": "📄"
+            }
+          ]
+        }
+      ],
+      "sampling": [
+        {
+          "time": "08:30",
+          "value": 62.3,
+          "pct": 62,
+          "status": "normal",
+          "reason": "油温正常"
+        },
+        {
+          "time": "09:00",
+          "value": 65.1,
+          "pct": 65,
+          "status": "normal",
+          "reason": "油温正常"
+        },
+        {
+          "time": "09:30",
+          "value": 0.0,
+          "pct": 0,
+          "status": "abnormal",
+          "reason": "数据断档 · 传感器离线"
+        },
+        {
+          "time": "10:00",
+          "value": 0.0,
+          "pct": 0,
+          "status": "abnormal",
+          "reason": "数据断档 · 传感器离线"
+        },
+        {
+          "time": "10:30",
+          "value": 71.5,
+          "pct": 72,
+          "status": "normal",
+          "reason": "恢复采样 · 油温稍高"
+        },
+        {
+          "time": "11:00",
+          "value": 68.2,
+          "pct": 68,
+          "status": "normal",
+          "reason": "油温回落正常"
+        },
+        {
+          "time": "11:30",
+          "value": 64.7,
+          "pct": 65,
+          "status": "normal",
+          "reason": "油温正常"
+        },
+        {
+          "time": "12:00",
+          "value": 61.4,
+          "pct": 61,
+          "status": "normal",
+          "reason": "油温正常"
+        }
+      ],
+      "timeline": [
+        {
+          "id": "TL-1-WO-2026-0601-017",
+          "type": "created",
+          "title": "工单创建",
+          "desc": "系统根据月度维保计划自动生成工单，主卷扬齿轮箱到保养周期。",
+          "time": "2026-06-05 09:20",
+          "operator": "系统自动",
+          "operatorRole": "系统",
+          "statusFrom": null,
+          "statusTo": "待处理",
+          "statusClass": "",
+          "isOverride": false,
+          "dotClass": "",
+          "overrideReason": null
+        },
+        {
+          "id": "TL-2-WO-2026-0601-017",
+          "type": "assigned",
+          "title": "分配给李师傅班组",
+          "desc": "现场调度小宋确认维保人员，设置停机窗口为6月8日上午。",
+          "time": "2026-06-05 10:15",
+          "operator": "宋建国",
+          "operatorRole": "现场调度",
+          "statusFrom": "待处理",
+          "statusTo": "已分配",
+          "statusClass": "",
+          "isOverride": false,
+          "dotClass": "dot-sky",
+          "overrideReason": null
+        },
+        {
+          "id": "TL-3-WO-2026-0601-017",
+          "type": "parts_late",
+          "title": "备件到货延迟预警",
+          "desc": "系统检测到工业齿轮油（P-001）实际到货时间晚于停机窗口开始，触发预警。",
+          "time": "2026-06-07 20:30",
+          "operator": "系统自动",
+          "operatorRole": "预警引擎",
+          "statusFrom": "已分配",
+          "statusTo": "待补件",
+          "statusClass": "st-amber",
+          "isOverride": false,
+          "dotClass": "dot-amber",
+          "overrideReason": null
+        },
+        {
+          "id": "TL-4-WO-2026-0601-017",
+          "type": "override",
+          "title": "人工改判：不调整停机窗口",
+          "desc": "负责人批示：该备件虽延迟1.5小时，但后续工序可并行开展，不延期停机窗口，待补件后立即开工。",
+          "time": "2026-06-07 21:00",
+          "operator": "张总监",
+          "operatorRole": "运维负责人",
+          "statusFrom": null,
+          "statusTo": null,
+          "statusClass": "",
+          "isOverride": true,
+          "dotClass": "dot-violet",
+          "overrideReason": "窗口时间已协调项目组，不宜再改"
+        },
+        {
+          "id": "TL-5-WO-2026-0601-017",
+          "type": "in_progress",
+          "title": "开始维保作业",
+          "desc": "备件9:30到场，李师傅班组先开展其他不依赖齿轮油的工序，10:20正式开始换油。",
+          "time": "2026-06-08 10:20",
+          "operator": "李师傅",
+          "operatorRole": "维保班长",
+          "statusFrom": "待补件",
+          "statusTo": "处理中",
+          "statusClass": "",
+          "isOverride": false,
+          "dotClass": "dot-green",
+          "overrideReason": null
+        },
+        {
+          "id": "TL-6-WO-2026-0601-017",
+          "type": "sampling_abnormal",
+          "title": "采样断档告警",
+          "desc": "系统检测到 09:30-10:00 两次采样失败，已单独标记为异常，不纳入正常数据统计。",
+          "time": "2026-06-08 10:35",
+          "operator": "系统自动",
+          "operatorRole": "数据监控",
+          "statusFrom": null,
+          "statusTo": null,
+          "statusClass": "",
+          "isOverride": false,
+          "dotClass": "dot-rose",
+          "overrideReason": null
+        },
+        {
+          "id": "TL-DUP-ac34ff",
+          "type": "duplicate",
+          "title": "重复提交合并（哈希 E5C84B13）",
+          "desc": "与已有工单 #WO-2026-0601-017 匹配：相同塔吊+相同维保类型+相同停机窗口+相同备件清单。统计数量不翻倍，仅追加提交历史。",
+          "time": "2026-06-21 00:42",
+          "operator": "测试人",
+          "operatorRole": "测试",
+          "statusFrom": null,
+          "statusTo": null,
+          "statusClass": "",
+          "isOverride": false,
+          "dotClass": "dot-amber",
+          "overrideReason": null
+        }
+      ]
+    },
+    {
+      "id": "WO-2026-0606-041",
+      "craneId": "TC-ZZ-02-B",
+      "craneName": "2号塔机 · B区",
+      "title": "电气柜防尘滤网更换",
+      "type": "月度维保",
+      "status": "confirmed",
+      "scheduler": "宋建国（小宋）",
+      "maintainer": "赵工班组",
+      "downtimeWindow": {
+        "start": "2026-06-06 10:00",
+        "end": "2026-06-06 11:00"
+      },
+      "createdAt": "2026-06-04 14:00",
+      "hasAbnormalSampling": false,
+      "hasLateParts": false,
+      "dedupHash": "2C978A0B",
+      "parts": [
+        {
+          "id": "P-401",
+          "name": "电气柜防尘滤网",
+          "spec": "320×240×20mm · G4级初效",
+          "qty": 2.0,
+          "unit": "片",
+          "plannedArrival": "2026-06-05 18:00",
+          "actualArrival": "2026-06-05 16:30",
+          "isLate": false,
+          "lateDays": 0,
+          "remarkVersions": [
+            {
+              "version": 1,
+              "isLatest": true,
+              "content": "常备件，仓库备货充足。建议同时检查变频器散热风扇转速。",
+              "author": "赵工",
+              "role": "维保工程师",
+              "createdAt": "2026-06-04 14:10"
+            }
+          ],
+          "screenshotVersions": [
+            {
+              "version": 1,
+              "isLatest": true,
+              "name": "新旧滤网对比图",
+              "author": "赵工",
+              "createdAt": "2026-06-06 10:40",
+              "preview": "🌬️"
+            }
+          ]
+        }
+      ],
+      "sampling": [
+        {
+          "time": "10:15",
+          "value": 88.2,
+          "pct": 88,
+          "status": "normal",
+          "reason": "散热正常"
+        },
+        {
+          "time": "10:30",
+          "value": 89.5,
+          "pct": 90,
+          "status": "normal",
+          "reason": "散热良好"
+        },
+        {
+          "time": "10:45",
+          "value": 91.0,
+          "pct": 91,
+          "status": "normal",
+          "reason": "散热良好"
+        }
+      ],
+      "timeline": [
+        {
+          "id": "TL-1-WO-2026-0606-041",
+          "type": "created",
+          "title": "滤网更换工单",
+          "desc": "2号塔机电气柜滤网到更换周期。",
+          "time": "2026-06-04 14:00",
+          "operator": "系统自动",
+          "operatorRole": "系统",
+          "statusFrom": null,
+          "statusTo": "待处理",
+          "statusClass": "",
+          "isOverride": false,
+          "dotClass": "",
+          "overrideReason": null
+        },
+        {
+          "id": "TL-2-WO-2026-0606-041",
+          "type": "confirmed",
+          "title": "快速完成 · 已确认",
+          "desc": "仅1小时停机窗口，更换完成并采样全部正常，直接确认。",
+          "time": "2026-06-06 11:10",
+          "operator": "赵工",
+          "operatorRole": "维保工程师",
+          "statusFrom": "处理中",
+          "statusTo": "已确认",
+          "statusClass": "st-green",
+          "isOverride": false,
+          "dotClass": "dot-green",
+          "overrideReason": null
+        }
+      ]
+    },
+    {
+      "id": "WO-2026-0604-038",
+      "craneId": "TC-ZZ-09-C",
+      "craneName": "9号塔机 · C区",
+      "title": "力矩限制器校准",
+      "type": "季度校准",
+      "status": "pending",
+      "scheduler": "宋建国（小宋）",
+      "maintainer": "周工班组",
+      "downtimeWindow": {
+        "start": "2026-06-04 13:00",
+        "end": "2026-06-04 17:00"
+      },
+      "createdAt": "2026-06-03 09:00",
+      "hasAbnormalSampling": true,
+      "hasLateParts": false,
+      "dedupHash": "785EFA39",
+      "parts": [
+        {
+          "id": "P-501",
+          "name": "标准砝码借用",
+          "spec": "1t × 4块 · 第三方计量所",
+          "qty": 4.0,
+          "unit": "块",
+          "plannedArrival": "2026-06-04 12:00",
+          "actualArrival": "2026-06-04 11:40",
+          "isLate": false,
+          "lateDays": 0,
+          "remarkVersions": [
+            {
+              "version": 2,
+              "isLatest": true,
+              "content": "补录：6月4日下午校准过程中因突降暴雨暂停约40分钟，已与计量所确认可顺延。",
+              "author": "宋建国",
+              "role": "现场调度",
+              "createdAt": "2026-06-04 16:00"
+            },
+            {
+              "version": 1,
+              "isLatest": false,
+              "content": "季度力矩校准，需借用标准砝码。计量师已到场安排。",
+              "author": "周工",
+              "role": "维保工程师",
+              "createdAt": "2026-06-03 09:15"
+            }
+          ],
+          "screenshotVersions": [
+            {
+              "version": 2,
+              "isLatest": true,
+              "name": "暴雨现场照片",
+              "author": "宋建国",
+              "createdAt": "2026-06-04 16:00",
+              "preview": "🌧️"
+            },
+            {
+              "version": 1,
+              "isLatest": false,
+              "name": "砝码运输单",
+              "author": "周工",
+              "createdAt": "2026-06-03 09:20",
+              "preview": "⚖️"
+            }
+          ]
+        }
+      ],
+      "sampling": [
+        {
+          "time": "13:30",
+          "value": 95.0,
+          "pct": 95,
+          "status": "normal",
+          "reason": "空载校准正常"
+        },
+        {
+          "time": "14:00",
+          "value": 0.0,
+          "pct": 0,
+          "status": "abnormal",
+          "reason": "断档 · 暴雨暂停"
+        },
+        {
+          "time": "14:30",
+          "value": 0.0,
+          "pct": 0,
+          "status": "abnormal",
+          "reason": "断档 · 暴雨暂停"
+        },
+        {
+          "time": "15:00",
+          "value": 0.0,
+          "pct": 0,
+          "status": "abnormal",
+          "reason": "断档 · 暴雨暂停"
+        },
+        {
+          "time": "15:30",
+          "value": 96.2,
+          "pct": 96,
+          "status": "normal",
+          "reason": "1t载荷校准"
+        },
+        {
+          "time": "16:00",
+          "value": 97.1,
+          "pct": 97,
+          "status": "normal",
+          "reason": "2t载荷校准"
+        },
+        {
+          "time": "16:30",
+          "value": 95.8,
+          "pct": 96,
+          "status": "normal",
+          "reason": "4t载荷校准"
+        }
+      ],
+      "timeline": [
+        {
+          "id": "TL-1-WO-2026-0604-038",
+          "type": "created",
+          "title": "季度校准工单",
+          "desc": "9号塔机力矩限制器到强制校准周期（每季度）。",
+          "time": "2026-06-03 09:00",
+          "operator": "系统自动",
+          "operatorRole": "系统",
+          "statusFrom": null,
+          "statusTo": "待处理",
+          "statusClass": "",
+          "isOverride": false,
+          "dotClass": "",
+          "overrideReason": null
+        },
+        {
+          "id": "TL-2-WO-2026-0604-038",
+          "type": "in_progress",
+          "title": "开始校准",
+          "desc": "计量所到场，砝码就位，先进行空载测试。",
+          "time": "2026-06-04 13:15",
+          "operator": "周工",
+          "operatorRole": "维保工程师",
+          "statusFrom": "已分配",
+          "statusTo": "处理中",
+          "statusClass": "",
+          "isOverride": false,
+          "dotClass": "dot-green",
+          "overrideReason": null
+        },
+        {
+          "id": "TL-3-WO-2026-0604-038",
+          "type": "sampling_abnormal",
+          "title": "暴雨导致采样断档 · 已标记",
+          "desc": "14:00-15:00 因暴雨暂停作业，3次采样断档已单独拎出，不计入正常统计。",
+          "time": "2026-06-04 15:05",
+          "operator": "系统自动",
+          "operatorRole": "数据监控",
+          "statusFrom": null,
+          "statusTo": null,
+          "statusClass": "",
+          "isOverride": false,
+          "dotClass": "dot-rose",
+          "overrideReason": null
+        }
+      ]
+    },
+    {
+      "id": "WO-2026-0603-033",
+      "craneId": "TC-ZZ-05-A",
+      "craneName": "5号塔机 · A区",
+      "title": "起升制动器间隙校验",
+      "type": "月度维保",
+      "status": "confirmed",
+      "scheduler": "宋建国（小宋）",
+      "maintainer": "李师傅班组",
+      "downtimeWindow": {
+        "start": "2026-06-03 08:00",
+        "end": "2026-06-03 11:00"
+      },
+      "createdAt": "2026-06-02 10:00",
+      "hasAbnormalSampling": false,
+      "hasLateParts": false,
+      "dedupHash": "CFD377E4",
+      "parts": [
+        {
+          "id": "P-301",
+          "name": "制动摩擦片",
+          "spec": "型号 ZDP-220 · 耐磨型",
+          "qty": 4.0,
+          "unit": "片",
+          "plannedArrival": "2026-06-02 18:00",
+          "actualArrival": "2026-06-02 17:15",
+          "isLate": false,
+          "lateDays": 0,
+          "remarkVersions": [
+            {
+              "version": 2,
+              "isLatest": true,
+              "content": "补录：现场小宋确认，实际检查发现原有摩擦片厚度还有12mm（磨损极限8mm），本次仅作间隙调整未更换，备件退回库存。",
+              "author": "宋建国",
+              "role": "现场调度",
+              "createdAt": "2026-06-03 15:30"
+            },
+            {
+              "version": 1,
+              "isLatest": false,
+              "content": "按计划更换制动器摩擦片，需4片同批次。",
+              "author": "李师傅",
+              "role": "维保班长",
+              "createdAt": "2026-06-02 10:10"
+            }
+          ],
+          "screenshotVersions": [
+            {
+              "version": 2,
+              "isLatest": true,
+              "name": "间隙测量记录图",
+              "author": "宋建国",
+              "createdAt": "2026-06-03 15:30",
+              "preview": "📏"
+            },
+            {
+              "version": 1,
+              "isLatest": false,
+              "name": "摩擦片采购清单",
+              "author": "李师傅",
+              "createdAt": "2026-06-02 10:10",
+              "preview": "📋"
+            }
+          ]
+        }
+      ],
+      "sampling": [
+        {
+          "time": "08:30",
+          "value": 78.5,
+          "pct": 78,
+          "status": "normal",
+          "reason": "制动力正常"
+        },
+        {
+          "time": "09:00",
+          "value": 80.2,
+          "pct": 80,
+          "status": "normal",
+          "reason": "制动力正常"
+        },
+        {
+          "time": "09:30",
+          "value": 82.1,
+          "pct": 82,
+          "status": "normal",
+          "reason": "制动力良好"
+        },
+        {
+          "time": "10:00",
+          "value": 79.8,
+          "pct": 80,
+          "status": "normal",
+          "reason": "制动力正常"
+        },
+        {
+          "time": "10:30",
+          "value": 81.4,
+          "pct": 81,
+          "status": "normal",
+          "reason": "制动力正常"
+        }
+      ],
+      "timeline": [
+        {
+          "id": "TL-1-WO-2026-0603-033",
+          "type": "created",
+          "title": "月度校验工单",
+          "desc": "5号塔机起升制动器到月度校验周期。",
+          "time": "2026-06-02 10:00",
+          "operator": "系统自动",
+          "operatorRole": "系统",
+          "statusFrom": null,
+          "statusTo": "待处理",
+          "statusClass": "",
+          "isOverride": false,
+          "dotClass": "",
+          "overrideReason": null
+        },
+        {
+          "id": "TL-2-WO-2026-0603-033",
+          "type": "in_progress",
+          "title": "开始校验作业",
+          "desc": "班组进场，先测量制动盘摆差和摩擦片厚度。",
+          "time": "2026-06-03 08:10",
+          "operator": "李师傅",
+          "operatorRole": "维保班长",
+          "statusFrom": "已分配",
+          "statusTo": "处理中",
+          "statusClass": "",
+          "isOverride": false,
+          "dotClass": "dot-green",
+          "overrideReason": null
+        },
+        {
+          "id": "TL-3-WO-2026-0603-033",
+          "type": "override",
+          "title": "人工改判：不更换摩擦片",
+          "desc": "现场实测摩擦片厚度仍有12mm，大于磨损极限8mm。负责人同意改判：本次不更换，仅做间隙调整和清洁。",
+          "time": "2026-06-03 09:15",
+          "operator": "张总监",
+          "operatorRole": "运维负责人",
+          "statusFrom": null,
+          "statusTo": null,
+          "statusClass": "",
+          "isOverride": true,
+          "dotClass": "dot-violet",
+          "overrideReason": "磨损量未达更换阈值"
+        },
+        {
+          "id": "TL-4-WO-2026-0603-033",
+          "type": "confirmed",
+          "title": "复核通过 · 已确认",
+          "desc": "小宋月底复核：间隙测量数据完整、制动器制动力采样全部达标、摩擦片退回手续齐全，标记已确认。",
+          "time": "2026-06-05 17:00",
+          "operator": "宋建国",
+          "operatorRole": "现场调度",
+          "statusFrom": "处理中",
+          "statusTo": "已确认",
+          "statusClass": "st-green",
+          "isOverride": false,
+          "dotClass": "dot-green",
+          "overrideReason": null
+        }
+      ]
+    },
+    {
+      "id": "WO-2026-0602-024",
+      "craneId": "TC-ZZ-07-B",
+      "craneName": "7号塔机 · B区",
+      "title": "变幅钢丝绳探伤与张紧调整",
+      "type": "专项维保",
+      "status": "confirmed",
+      "scheduler": "宋建国（小宋）",
+      "maintainer": "赵工班组",
+      "downtimeWindow": {
+        "start": "2026-06-02 14:00",
+        "end": "2026-06-02 18:00"
+      },
+      "createdAt": "2026-06-01 11:00",
+      "hasAbnormalSampling": true,
+      "hasLateParts": false,
+      "dedupHash": "E6DE0AB0",
+      "parts": [
+        {
+          "id": "P-101",
+          "name": "钢丝绳专用润滑脂",
+          "spec": "5kg/罐 · 含二硫化钼",
+          "qty": 1.0,
+          "unit": "罐",
+          "plannedArrival": "2026-06-02 10:00",
+          "actualArrival": "2026-06-02 09:20",
+          "isLate": false,
+          "lateDays": 0,
+          "remarkVersions": [
+            {
+              "version": 2,
+              "isLatest": true,
+              "content": "补录：现场检查确认该润滑脂已在6月1日晚班时提前领出放在工具房，无需再走出库流程。",
+              "author": "宋建国",
+              "role": "现场调度",
+              "createdAt": "2026-06-02 11:00"
+            },
+            {
+              "version": 1,
+              "isLatest": false,
+              "content": "专项维保用钢丝绳润滑脂，需耐高温、防水型。",
+              "author": "赵工",
+              "role": "维保工程师",
+              "createdAt": "2026-06-01 11:10"
+            }
+          ],
+          "screenshotVersions": [
+            {
+              "version": 2,
+              "isLatest": true,
+              "name": "工具房实拍图",
+              "author": "宋建国",
+              "createdAt": "2026-06-02 11:00",
+              "preview": "🛠️"
+            },
+            {
+              "version": 1,
+              "isLatest": false,
+              "name": "润滑脂产品参数页",
+              "author": "赵工",
+              "createdAt": "2026-06-01 11:10",
+              "preview": "📊"
+            }
+          ]
+        },
+        {
+          "id": "P-102",
+          "name": "绳端固定压板螺栓",
+          "spec": "M20×80 · 8.8级高强螺栓",
+          "qty": 8.0,
+          "unit": "个",
+          "plannedArrival": "2026-06-02 10:00",
+          "actualArrival": "2026-06-02 09:45",
+          "isLate": false,
+          "lateDays": 0,
+          "remarkVersions": [
+            {
+              "version": 1,
+              "isLatest": true,
+              "content": "旧螺栓有明显锈蚀，本次全部更换。扭矩按标准260N·m执行。",
+              "author": "赵工",
+              "role": "维保工程师",
+              "createdAt": "2026-06-01 11:15"
+            }
+          ],
+          "screenshotVersions": [
+            {
+              "version": 1,
+              "isLatest": true,
+              "name": "螺栓锈蚀对比图",
+              "author": "赵工",
+              "createdAt": "2026-06-01 11:20",
+              "preview": "🔩"
+            }
+          ]
+        }
+      ],
+      "sampling": [
+        {
+          "time": "14:30",
+          "value": 58.2,
+          "pct": 58,
+          "status": "normal",
+          "reason": "张力正常"
+        },
+        {
+          "time": "15:00",
+          "value": 0.0,
+          "pct": 0,
+          "status": "abnormal",
+          "reason": "断档 · 探头遮挡"
+        },
+        {
+          "time": "15:30",
+          "value": 0.0,
+          "pct": 0,
+          "status": "abnormal",
+          "reason": "断档 · 探头遮挡"
+        },
+        {
+          "time": "16:00",
+          "value": 0.0,
+          "pct": 0,
+          "status": "abnormal",
+          "reason": "断档 · 信号丢失"
+        },
+        {
+          "time": "16:30",
+          "value": 60.1,
+          "pct": 60,
+          "status": "normal",
+          "reason": "张力正常"
+        },
+        {
+          "time": "17:00",
+          "value": 61.8,
+          "pct": 62,
+          "status": "normal",
+          "reason": "张力正常"
+        },
+        {
+          "time": "17:30",
+          "value": 60.5,
+          "pct": 60,
+          "status": "normal",
+          "reason": "张力正常"
+        }
+      ],
+      "timeline": [
+        {
+          "id": "TL-1-WO-2026-0602-024",
+          "type": "created",
+          "title": "专项工单创建",
+          "desc": "根据周度巡检报告，7号塔机变幅钢丝绳达到探伤周期，启动专项维保。",
+          "time": "2026-06-01 11:00",
+          "operator": "宋建国",
+          "operatorRole": "现场调度",
+          "statusFrom": null,
+          "statusTo": "待处理",
+          "statusClass": "",
+          "isOverride": false,
+          "dotClass": "",
+          "overrideReason": null
+        },
+        {
+          "id": "TL-2-WO-2026-0602-024",
+          "type": "assigned",
+          "title": "赵工班组承接",
+          "desc": "安排赵工班组执行，配备探伤仪，预计4小时完成。",
+          "time": "2026-06-01 14:30",
+          "operator": "宋建国",
+          "operatorRole": "现场调度",
+          "statusFrom": "待处理",
+          "statusTo": "已分配",
+          "statusClass": "",
+          "isOverride": false,
+          "dotClass": "dot-sky",
+          "overrideReason": null
+        },
+        {
+          "id": "TL-3-WO-2026-0602-024",
+          "type": "in_progress",
+          "title": "开始作业",
+          "desc": "14:00停机，班组进场。先进行绳端检查，再进行探伤。",
+          "time": "2026-06-02 14:10",
+          "operator": "赵工",
+          "operatorRole": "维保工程师",
+          "statusFrom": "已分配",
+          "statusTo": "处理中",
+          "statusClass": "",
+          "isOverride": false,
+          "dotClass": "dot-green",
+          "overrideReason": null
+        },
+        {
+          "id": "TL-4-WO-2026-0602-024",
+          "type": "sampling_abnormal",
+          "title": "采样断档 · 已分离处理",
+          "desc": "15:00-16:00 期间因探头被工具遮挡导致3次采样失败，系统已将此段数据独立出来，未计入正常结果。",
+          "time": "2026-06-02 16:05",
+          "operator": "系统自动",
+          "operatorRole": "数据监控",
+          "statusFrom": null,
+          "statusTo": null,
+          "statusClass": "",
+          "isOverride": false,
+          "dotClass": "dot-rose",
+          "overrideReason": null
+        },
+        {
+          "id": "TL-5-WO-2026-0602-024",
+          "type": "override",
+          "title": "人工改判：断档数据不影响结论",
+          "desc": "张总监审核：该段断档期间作业人员正在绳端进行螺栓更换，不涉及张力调整，采样数据缺失不影响维保结论。",
+          "time": "2026-06-02 18:30",
+          "operator": "张总监",
+          "operatorRole": "运维负责人",
+          "statusFrom": null,
+          "statusTo": null,
+          "statusClass": "",
+          "isOverride": true,
+          "dotClass": "dot-violet",
+          "overrideReason": "作业内容与采样维度不重合"
+        },
+        {
+          "id": "TL-6-WO-2026-0602-024",
+          "type": "confirmed",
+          "title": "复核通过 · 已确认",
+          "desc": "现场调度小宋月底复核：探伤报告完整、螺栓更换记录齐全、润滑到位，标记为已确认。",
+          "time": "2026-06-05 16:20",
+          "operator": "宋建国",
+          "operatorRole": "现场调度",
+          "statusFrom": "处理中",
+          "statusTo": "已确认",
+          "statusClass": "st-green",
+          "isOverride": false,
+          "dotClass": "dot-green",
+          "overrideReason": null
+        }
+      ]
+    },
+    {
+      "id": "WO-2026-0528-009",
+      "craneId": "TC-ZZ-12-C",
+      "craneName": "12号塔机 · C区",
+      "title": "回转支撑异响排查",
+      "type": "故障维保",
+      "status": "returned",
+      "scheduler": "宋建国（小宋）",
+      "maintainer": "周工班组",
+      "downtimeWindow": {
+        "start": "2026-05-28 09:00",
+        "end": "2026-05-28 12:00"
+      },
+      "createdAt": "2026-05-27 16:30",
+      "hasAbnormalSampling": true,
+      "hasLateParts": true,
+      "dedupHash": "69AC8E47",
+      "parts": [
+        {
+          "id": "P-201",
+          "name": "回转大齿圈润滑脂",
+          "spec": "开式齿轮润滑脂 · 黑色高粘度",
+          "qty": 3.0,
+          "unit": "kg",
+          "plannedArrival": "2026-05-27 18:00",
+          "actualArrival": "2026-05-28 13:40",
+          "isLate": true,
+          "lateDays": 0.81,
+          "remarkVersions": [
+            {
+              "version": 2,
+              "isLatest": true,
+              "content": "该物料为特殊订货，供应商5月28日中午才送到。因已过原定停机窗口，本次维保未能使用，已做退回处理。",
+              "author": "王雪",
+              "role": "仓管",
+              "createdAt": "2026-05-28 14:00"
+            },
+            {
+              "version": 1,
+              "isLatest": false,
+              "content": "首次提交：排查异响原因可能缺少润滑，需补足回转大齿圈润滑脂。",
+              "author": "周工",
+              "role": "维保工程师",
+              "createdAt": "2026-05-27 16:40"
+            }
+          ],
+          "screenshotVersions": [
+            {
+              "version": 2,
+              "isLatest": true,
+              "name": "退货入库单",
+              "author": "王雪",
+              "createdAt": "2026-05-28 14:00",
+              "preview": "📤"
+            },
+            {
+              "version": 1,
+              "isLatest": false,
+              "name": "齿圈缺油照片",
+              "author": "周工",
+              "createdAt": "2026-05-27 16:45",
+              "preview": "⚙️"
+            }
+          ]
+        }
+      ],
+      "sampling": [
+        {
+          "time": "09:00",
+          "value": 0.0,
+          "pct": 0,
+          "status": "abnormal",
+          "reason": "断档 · 未连接设备"
+        },
+        {
+          "time": "09:30",
+          "value": 0.0,
+          "pct": 0,
+          "status": "abnormal",
+          "reason": "断档 · 未连接设备"
+        },
+        {
+          "time": "10:00",
+          "value": 42.8,
+          "pct": 43,
+          "status": "normal",
+          "reason": "已连接 · 温度偏低"
+        },
+        {
+          "time": "10:30",
+          "value": 45.3,
+          "pct": 45,
+          "status": "normal",
+          "reason": "温度偏低"
+        },
+        {
+          "time": "11:00",
+          "value": 0.0,
+          "pct": 0,
+          "status": "abnormal",
+          "reason": "断档 · 作业暂停"
+        },
+        {
+          "time": "11:30",
+          "value": 0.0,
+          "pct": 0,
+          "status": "abnormal",
+          "reason": "断档 · 作业暂停"
+        }
+      ],
+      "timeline": [
+        {
+          "id": "TL-1-WO-2026-0528-009",
+          "type": "created",
+          "title": "故障工单创建",
+          "desc": "12号塔机回转支撑在重载转向时发出异响，启动故障排查。",
+          "time": "2026-05-27 16:30",
+          "operator": "塔机操作手",
+          "operatorRole": "上报人",
+          "statusFrom": null,
+          "statusTo": "待处理",
+          "statusClass": "",
+          "isOverride": false,
+          "dotClass": "",
+          "overrideReason": null
+        },
+        {
+          "id": "TL-2-WO-2026-0528-009",
+          "type": "parts_late",
+          "title": "备件到货严重延迟",
+          "desc": "系统检测：回转大齿圈润滑脂原定5月27日18点到货，实际5月28日13:40才到达，晚于停机窗口结束时间（12:00）。",
+          "time": "2026-05-28 08:15",
+          "operator": "系统自动",
+          "operatorRole": "预警引擎",
+          "statusFrom": "待处理",
+          "statusTo": "待补件",
+          "statusClass": "st-amber",
+          "isOverride": false,
+          "dotClass": "dot-amber",
+          "overrideReason": null
+        },
+        {
+          "id": "TL-3-WO-2026-0528-009",
+          "type": "sampling_abnormal",
+          "title": "多重采样断档",
+          "desc": "检测到4次采样断档，涉及09:00-09:30、11:00-11:30两个时段。已单独拎出，不参与统计。",
+          "time": "2026-05-28 12:05",
+          "operator": "系统自动",
+          "operatorRole": "数据监控",
+          "statusFrom": null,
+          "statusTo": null,
+          "statusClass": "",
+          "isOverride": false,
+          "dotClass": "dot-rose",
+          "overrideReason": null
+        },
+        {
+          "id": "TL-4-WO-2026-0528-009",
+          "type": "returned",
+          "title": "退回处理",
+          "desc": "因备件未按时到位且采样严重缺失，无法确认维保有效性。退回至下一维保窗口重新安排，备件已做退货入库。",
+          "time": "2026-05-29 10:00",
+          "operator": "宋建国",
+          "operatorRole": "现场调度",
+          "statusFrom": "待补件",
+          "statusTo": "退回",
+          "statusClass": "st-rose",
+          "isOverride": false,
+          "dotClass": "dot-rose",
+          "overrideReason": null
+        }
+      ]
+    }
+  ],
+  "abnormalRecords": [
+    {
+      "workorderId": "WO-20260621-0DD",
+      "workorderTitle": "测试新增断档工单（验收用）",
+      "craneName": "测试塔机 · 异常区测试",
+      "time": "09:30",
+      "reason": "验收：采样断档测试"
+    },
+    {
+      "workorderId": "WO-20260621-0DD",
+      "workorderTitle": "测试新增断档工单（验收用）",
+      "craneName": "测试塔机 · 异常区测试",
+      "time": "10:00",
+      "reason": "验收：采样断档测试2"
+    },
+    {
+      "workorderId": "WO-2026-0601-017",
+      "workorderTitle": "主卷扬齿轮箱月度维保",
+      "craneName": "3号塔机 · A区",
+      "time": "09:30",
+      "reason": "数据断档 · 传感器离线"
+    },
+    {
+      "workorderId": "WO-2026-0601-017",
+      "workorderTitle": "主卷扬齿轮箱月度维保",
+      "craneName": "3号塔机 · A区",
+      "time": "10:00",
+      "reason": "数据断档 · 传感器离线"
+    },
+    {
+      "workorderId": "WO-2026-0604-038",
+      "workorderTitle": "力矩限制器校准",
+      "craneName": "9号塔机 · C区",
+      "time": "14:00",
+      "reason": "断档 · 暴雨暂停"
+    },
+    {
+      "workorderId": "WO-2026-0604-038",
+      "workorderTitle": "力矩限制器校准",
+      "craneName": "9号塔机 · C区",
+      "time": "14:30",
+      "reason": "断档 · 暴雨暂停"
+    },
+    {
+      "workorderId": "WO-2026-0604-038",
+      "workorderTitle": "力矩限制器校准",
+      "craneName": "9号塔机 · C区",
+      "time": "15:00",
+      "reason": "断档 · 暴雨暂停"
+    },
+    {
+      "workorderId": "WO-2026-0602-024",
+      "workorderTitle": "变幅钢丝绳探伤与张紧调整",
+      "craneName": "7号塔机 · B区",
+      "time": "15:00",
+      "reason": "断档 · 探头遮挡"
+    },
+    {
+      "workorderId": "WO-2026-0602-024",
+      "workorderTitle": "变幅钢丝绳探伤与张紧调整",
+      "craneName": "7号塔机 · B区",
+      "time": "15:30",
+      "reason": "断档 · 探头遮挡"
+    },
+    {
+      "workorderId": "WO-2026-0602-024",
+      "workorderTitle": "变幅钢丝绳探伤与张紧调整",
+      "craneName": "7号塔机 · B区",
+      "time": "16:00",
+      "reason": "断档 · 信号丢失"
+    },
+    {
+      "workorderId": "WO-2026-0528-009",
+      "workorderTitle": "回转支撑异响排查",
+      "craneName": "12号塔机 · C区",
+      "time": "09:00",
+      "reason": "断档 · 未连接设备"
+    },
+    {
+      "workorderId": "WO-2026-0528-009",
+      "workorderTitle": "回转支撑异响排查",
+      "craneName": "12号塔机 · C区",
+      "time": "09:30",
+      "reason": "断档 · 未连接设备"
+    },
+    {
+      "workorderId": "WO-2026-0528-009",
+      "workorderTitle": "回转支撑异响排查",
+      "craneName": "12号塔机 · C区",
+      "time": "11:00",
+      "reason": "断档 · 作业暂停"
+    },
+    {
+      "workorderId": "WO-2026-0528-009",
+      "workorderTitle": "回转支撑异响排查",
+      "craneName": "12号塔机 · C区",
+      "time": "11:30",
+      "reason": "断档 · 作业暂停"
+    }
+  ],
+  "duplicatesMerged": [
+    {
+      "workorderId": "WO-2026-0601-017",
+      "dedupHash": "E5C84B13",
+      "title": "主卷扬齿轮箱月度维保",
+      "submitCount": 2,
+      "submitHistory": [
+        {
+          "submittedAt": "2026-06-05 09:20",
+          "operator": "宋建国（小宋）",
+          "note": "初始提交"
+        },
+        {
+          "submittedAt": "2026-06-21 00:42",
+          "operator": "测试人",
+          "note": "重复提交·已合并到已有工单"
+        }
+      ],
+      "note": "该工单合并了多次提交，统计时只按1份计算"
+    }
+  ],
+  "timelineFull": [
+    {
+      "id": "TL-1-WO-2026-0528-009",
+      "type": "created",
+      "title": "故障工单创建",
+      "desc": "12号塔机回转支撑在重载转向时发出异响，启动故障排查。",
+      "time": "2026-05-27 16:30",
+      "operator": "塔机操作手",
+      "operatorRole": "上报人",
+      "statusFrom": null,
+      "statusTo": "待处理",
+      "statusClass": "",
+      "isOverride": false,
+      "dotClass": "",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0528-009",
+      "workorderTitle": "回转支撑异响排查"
+    },
+    {
+      "id": "TL-2-WO-2026-0528-009",
+      "type": "parts_late",
+      "title": "备件到货严重延迟",
+      "desc": "系统检测：回转大齿圈润滑脂原定5月27日18点到货，实际5月28日13:40才到达，晚于停机窗口结束时间（12:00）。",
+      "time": "2026-05-28 08:15",
+      "operator": "系统自动",
+      "operatorRole": "预警引擎",
+      "statusFrom": "待处理",
+      "statusTo": "待补件",
+      "statusClass": "st-amber",
+      "isOverride": false,
+      "dotClass": "dot-amber",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0528-009",
+      "workorderTitle": "回转支撑异响排查"
+    },
+    {
+      "id": "TL-3-WO-2026-0528-009",
+      "type": "sampling_abnormal",
+      "title": "多重采样断档",
+      "desc": "检测到4次采样断档，涉及09:00-09:30、11:00-11:30两个时段。已单独拎出，不参与统计。",
+      "time": "2026-05-28 12:05",
+      "operator": "系统自动",
+      "operatorRole": "数据监控",
+      "statusFrom": null,
+      "statusTo": null,
+      "statusClass": "",
+      "isOverride": false,
+      "dotClass": "dot-rose",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0528-009",
+      "workorderTitle": "回转支撑异响排查"
+    },
+    {
+      "id": "TL-4-WO-2026-0528-009",
+      "type": "returned",
+      "title": "退回处理",
+      "desc": "因备件未按时到位且采样严重缺失，无法确认维保有效性。退回至下一维保窗口重新安排，备件已做退货入库。",
+      "time": "2026-05-29 10:00",
+      "operator": "宋建国",
+      "operatorRole": "现场调度",
+      "statusFrom": "待补件",
+      "statusTo": "退回",
+      "statusClass": "st-rose",
+      "isOverride": false,
+      "dotClass": "dot-rose",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0528-009",
+      "workorderTitle": "回转支撑异响排查"
+    },
+    {
+      "id": "TL-1-WO-2026-0602-024",
+      "type": "created",
+      "title": "专项工单创建",
+      "desc": "根据周度巡检报告，7号塔机变幅钢丝绳达到探伤周期，启动专项维保。",
+      "time": "2026-06-01 11:00",
+      "operator": "宋建国",
+      "operatorRole": "现场调度",
+      "statusFrom": null,
+      "statusTo": "待处理",
+      "statusClass": "",
+      "isOverride": false,
+      "dotClass": "",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0602-024",
+      "workorderTitle": "变幅钢丝绳探伤与张紧调整"
+    },
+    {
+      "id": "TL-2-WO-2026-0602-024",
+      "type": "assigned",
+      "title": "赵工班组承接",
+      "desc": "安排赵工班组执行，配备探伤仪，预计4小时完成。",
+      "time": "2026-06-01 14:30",
+      "operator": "宋建国",
+      "operatorRole": "现场调度",
+      "statusFrom": "待处理",
+      "statusTo": "已分配",
+      "statusClass": "",
+      "isOverride": false,
+      "dotClass": "dot-sky",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0602-024",
+      "workorderTitle": "变幅钢丝绳探伤与张紧调整"
+    },
+    {
+      "id": "TL-1-WO-2026-0603-033",
+      "type": "created",
+      "title": "月度校验工单",
+      "desc": "5号塔机起升制动器到月度校验周期。",
+      "time": "2026-06-02 10:00",
+      "operator": "系统自动",
+      "operatorRole": "系统",
+      "statusFrom": null,
+      "statusTo": "待处理",
+      "statusClass": "",
+      "isOverride": false,
+      "dotClass": "",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0603-033",
+      "workorderTitle": "起升制动器间隙校验"
+    },
+    {
+      "id": "TL-3-WO-2026-0602-024",
+      "type": "in_progress",
+      "title": "开始作业",
+      "desc": "14:00停机，班组进场。先进行绳端检查，再进行探伤。",
+      "time": "2026-06-02 14:10",
+      "operator": "赵工",
+      "operatorRole": "维保工程师",
+      "statusFrom": "已分配",
+      "statusTo": "处理中",
+      "statusClass": "",
+      "isOverride": false,
+      "dotClass": "dot-green",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0602-024",
+      "workorderTitle": "变幅钢丝绳探伤与张紧调整"
+    },
+    {
+      "id": "TL-4-WO-2026-0602-024",
+      "type": "sampling_abnormal",
+      "title": "采样断档 · 已分离处理",
+      "desc": "15:00-16:00 期间因探头被工具遮挡导致3次采样失败，系统已将此段数据独立出来，未计入正常结果。",
+      "time": "2026-06-02 16:05",
+      "operator": "系统自动",
+      "operatorRole": "数据监控",
+      "statusFrom": null,
+      "statusTo": null,
+      "statusClass": "",
+      "isOverride": false,
+      "dotClass": "dot-rose",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0602-024",
+      "workorderTitle": "变幅钢丝绳探伤与张紧调整"
+    },
+    {
+      "id": "TL-5-WO-2026-0602-024",
+      "type": "override",
+      "title": "人工改判：断档数据不影响结论",
+      "desc": "张总监审核：该段断档期间作业人员正在绳端进行螺栓更换，不涉及张力调整，采样数据缺失不影响维保结论。",
+      "time": "2026-06-02 18:30",
+      "operator": "张总监",
+      "operatorRole": "运维负责人",
+      "statusFrom": null,
+      "statusTo": null,
+      "statusClass": "",
+      "isOverride": true,
+      "dotClass": "dot-violet",
+      "overrideReason": "作业内容与采样维度不重合",
+      "workorderId": "WO-2026-0602-024",
+      "workorderTitle": "变幅钢丝绳探伤与张紧调整"
+    },
+    {
+      "id": "TL-2-WO-2026-0603-033",
+      "type": "in_progress",
+      "title": "开始校验作业",
+      "desc": "班组进场，先测量制动盘摆差和摩擦片厚度。",
+      "time": "2026-06-03 08:10",
+      "operator": "李师傅",
+      "operatorRole": "维保班长",
+      "statusFrom": "已分配",
+      "statusTo": "处理中",
+      "statusClass": "",
+      "isOverride": false,
+      "dotClass": "dot-green",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0603-033",
+      "workorderTitle": "起升制动器间隙校验"
+    },
+    {
+      "id": "TL-1-WO-2026-0604-038",
+      "type": "created",
+      "title": "季度校准工单",
+      "desc": "9号塔机力矩限制器到强制校准周期（每季度）。",
+      "time": "2026-06-03 09:00",
+      "operator": "系统自动",
+      "operatorRole": "系统",
+      "statusFrom": null,
+      "statusTo": "待处理",
+      "statusClass": "",
+      "isOverride": false,
+      "dotClass": "",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0604-038",
+      "workorderTitle": "力矩限制器校准"
+    },
+    {
+      "id": "TL-3-WO-2026-0603-033",
+      "type": "override",
+      "title": "人工改判：不更换摩擦片",
+      "desc": "现场实测摩擦片厚度仍有12mm，大于磨损极限8mm。负责人同意改判：本次不更换，仅做间隙调整和清洁。",
+      "time": "2026-06-03 09:15",
+      "operator": "张总监",
+      "operatorRole": "运维负责人",
+      "statusFrom": null,
+      "statusTo": null,
+      "statusClass": "",
+      "isOverride": true,
+      "dotClass": "dot-violet",
+      "overrideReason": "磨损量未达更换阈值",
+      "workorderId": "WO-2026-0603-033",
+      "workorderTitle": "起升制动器间隙校验"
+    },
+    {
+      "id": "TL-2-WO-2026-0604-038",
+      "type": "in_progress",
+      "title": "开始校准",
+      "desc": "计量所到场，砝码就位，先进行空载测试。",
+      "time": "2026-06-04 13:15",
+      "operator": "周工",
+      "operatorRole": "维保工程师",
+      "statusFrom": "已分配",
+      "statusTo": "处理中",
+      "statusClass": "",
+      "isOverride": false,
+      "dotClass": "dot-green",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0604-038",
+      "workorderTitle": "力矩限制器校准"
+    },
+    {
+      "id": "TL-1-WO-2026-0606-041",
+      "type": "created",
+      "title": "滤网更换工单",
+      "desc": "2号塔机电气柜滤网到更换周期。",
+      "time": "2026-06-04 14:00",
+      "operator": "系统自动",
+      "operatorRole": "系统",
+      "statusFrom": null,
+      "statusTo": "待处理",
+      "statusClass": "",
+      "isOverride": false,
+      "dotClass": "",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0606-041",
+      "workorderTitle": "电气柜防尘滤网更换"
+    },
+    {
+      "id": "TL-3-WO-2026-0604-038",
+      "type": "sampling_abnormal",
+      "title": "暴雨导致采样断档 · 已标记",
+      "desc": "14:00-15:00 因暴雨暂停作业，3次采样断档已单独拎出，不计入正常统计。",
+      "time": "2026-06-04 15:05",
+      "operator": "系统自动",
+      "operatorRole": "数据监控",
+      "statusFrom": null,
+      "statusTo": null,
+      "statusClass": "",
+      "isOverride": false,
+      "dotClass": "dot-rose",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0604-038",
+      "workorderTitle": "力矩限制器校准"
+    },
+    {
+      "id": "TL-1-WO-2026-0601-017",
+      "type": "created",
+      "title": "工单创建",
+      "desc": "系统根据月度维保计划自动生成工单，主卷扬齿轮箱到保养周期。",
+      "time": "2026-06-05 09:20",
+      "operator": "系统自动",
+      "operatorRole": "系统",
+      "statusFrom": null,
+      "statusTo": "待处理",
+      "statusClass": "",
+      "isOverride": false,
+      "dotClass": "",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0601-017",
+      "workorderTitle": "主卷扬齿轮箱月度维保"
+    },
+    {
+      "id": "TL-2-WO-2026-0601-017",
+      "type": "assigned",
+      "title": "分配给李师傅班组",
+      "desc": "现场调度小宋确认维保人员，设置停机窗口为6月8日上午。",
+      "time": "2026-06-05 10:15",
+      "operator": "宋建国",
+      "operatorRole": "现场调度",
+      "statusFrom": "待处理",
+      "statusTo": "已分配",
+      "statusClass": "",
+      "isOverride": false,
+      "dotClass": "dot-sky",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0601-017",
+      "workorderTitle": "主卷扬齿轮箱月度维保"
+    },
+    {
+      "id": "TL-6-WO-2026-0602-024",
+      "type": "confirmed",
+      "title": "复核通过 · 已确认",
+      "desc": "现场调度小宋月底复核：探伤报告完整、螺栓更换记录齐全、润滑到位，标记为已确认。",
+      "time": "2026-06-05 16:20",
+      "operator": "宋建国",
+      "operatorRole": "现场调度",
+      "statusFrom": "处理中",
+      "statusTo": "已确认",
+      "statusClass": "st-green",
+      "isOverride": false,
+      "dotClass": "dot-green",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0602-024",
+      "workorderTitle": "变幅钢丝绳探伤与张紧调整"
+    },
+    {
+      "id": "TL-4-WO-2026-0603-033",
+      "type": "confirmed",
+      "title": "复核通过 · 已确认",
+      "desc": "小宋月底复核：间隙测量数据完整、制动器制动力采样全部达标、摩擦片退回手续齐全，标记已确认。",
+      "time": "2026-06-05 17:00",
+      "operator": "宋建国",
+      "operatorRole": "现场调度",
+      "statusFrom": "处理中",
+      "statusTo": "已确认",
+      "statusClass": "st-green",
+      "isOverride": false,
+      "dotClass": "dot-green",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0603-033",
+      "workorderTitle": "起升制动器间隙校验"
+    },
+    {
+      "id": "TL-2-WO-2026-0606-041",
+      "type": "confirmed",
+      "title": "快速完成 · 已确认",
+      "desc": "仅1小时停机窗口，更换完成并采样全部正常，直接确认。",
+      "time": "2026-06-06 11:10",
+      "operator": "赵工",
+      "operatorRole": "维保工程师",
+      "statusFrom": "处理中",
+      "statusTo": "已确认",
+      "statusClass": "st-green",
+      "isOverride": false,
+      "dotClass": "dot-green",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0606-041",
+      "workorderTitle": "电气柜防尘滤网更换"
+    },
+    {
+      "id": "TL-3-WO-2026-0601-017",
+      "type": "parts_late",
+      "title": "备件到货延迟预警",
+      "desc": "系统检测到工业齿轮油（P-001）实际到货时间晚于停机窗口开始，触发预警。",
+      "time": "2026-06-07 20:30",
+      "operator": "系统自动",
+      "operatorRole": "预警引擎",
+      "statusFrom": "已分配",
+      "statusTo": "待补件",
+      "statusClass": "st-amber",
+      "isOverride": false,
+      "dotClass": "dot-amber",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0601-017",
+      "workorderTitle": "主卷扬齿轮箱月度维保"
+    },
+    {
+      "id": "TL-4-WO-2026-0601-017",
+      "type": "override",
+      "title": "人工改判：不调整停机窗口",
+      "desc": "负责人批示：该备件虽延迟1.5小时，但后续工序可并行开展，不延期停机窗口，待补件后立即开工。",
+      "time": "2026-06-07 21:00",
+      "operator": "张总监",
+      "operatorRole": "运维负责人",
+      "statusFrom": null,
+      "statusTo": null,
+      "statusClass": "",
+      "isOverride": true,
+      "dotClass": "dot-violet",
+      "overrideReason": "窗口时间已协调项目组，不宜再改",
+      "workorderId": "WO-2026-0601-017",
+      "workorderTitle": "主卷扬齿轮箱月度维保"
+    },
+    {
+      "id": "TL-5-WO-2026-0601-017",
+      "type": "in_progress",
+      "title": "开始维保作业",
+      "desc": "备件9:30到场，李师傅班组先开展其他不依赖齿轮油的工序，10:20正式开始换油。",
+      "time": "2026-06-08 10:20",
+      "operator": "李师傅",
+      "operatorRole": "维保班长",
+      "statusFrom": "待补件",
+      "statusTo": "处理中",
+      "statusClass": "",
+      "isOverride": false,
+      "dotClass": "dot-green",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0601-017",
+      "workorderTitle": "主卷扬齿轮箱月度维保"
+    },
+    {
+      "id": "TL-6-WO-2026-0601-017",
+      "type": "sampling_abnormal",
+      "title": "采样断档告警",
+      "desc": "系统检测到 09:30-10:00 两次采样失败，已单独标记为异常，不纳入正常数据统计。",
+      "time": "2026-06-08 10:35",
+      "operator": "系统自动",
+      "operatorRole": "数据监控",
+      "statusFrom": null,
+      "statusTo": null,
+      "statusClass": "",
+      "isOverride": false,
+      "dotClass": "dot-rose",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0601-017",
+      "workorderTitle": "主卷扬齿轮箱月度维保"
+    },
+    {
+      "id": "TL-DUP-ac34ff",
+      "type": "duplicate",
+      "title": "重复提交合并（哈希 E5C84B13）",
+      "desc": "与已有工单 #WO-2026-0601-017 匹配：相同塔吊+相同维保类型+相同停机窗口+相同备件清单。统计数量不翻倍，仅追加提交历史。",
+      "time": "2026-06-21 00:42",
+      "operator": "测试人",
+      "operatorRole": "测试",
+      "statusFrom": null,
+      "statusTo": null,
+      "statusClass": "",
+      "isOverride": false,
+      "dotClass": "dot-amber",
+      "overrideReason": null,
+      "workorderId": "WO-2026-0601-017",
+      "workorderTitle": "主卷扬齿轮箱月度维保"
+    },
+    {
+      "id": "TL-C-WO-20260621-0DD",
+      "type": "created",
+      "title": "工单创建",
+      "desc": "验收测试提交复核材料：测试新增断档工单（验收用）",
+      "time": "2026-06-21 00:44",
+      "operator": "验收测试",
+      "operatorRole": "测试",
+      "statusFrom": null,
+      "statusTo": "待处理",
+      "statusClass": "",
+      "isOverride": false,
+      "dotClass": "",
+      "overrideReason": null,
+      "workorderId": "WO-20260621-0DD",
+      "workorderTitle": "测试新增断档工单（验收用）"
+    },
+    {
+      "id": "TL-A-WO-20260621-0DD",
+      "type": "assigned",
+      "title": "材料已登记",
+      "desc": "复核材料已入库，等待进一步处理。",
+      "time": "2026-06-21 00:44",
+      "operator": "验收测试",
+      "operatorRole": "测试",
+      "statusFrom": "待处理",
+      "statusTo": "待补件",
+      "statusClass": "st-amber",
+      "isOverride": false,
+      "dotClass": "dot-sky",
+      "overrideReason": null,
+      "workorderId": "WO-20260621-0DD",
+      "workorderTitle": "测试新增断档工单（验收用）"
+    },
+    {
+      "id": "TL-SA-cbefee",
+      "type": "sampling_abnormal",
+      "title": "采样断档·已单独拎出",
+      "desc": "检测到采样断档记录，已放入异常区，不计入正常统计。",
+      "time": "2026-06-21 00:44",
+      "operator": "系统自动",
+      "operatorRole": "数据监控",
+      "statusFrom": null,
+      "statusTo": null,
+      "statusClass": "",
+      "isOverride": false,
+      "dotClass": "dot-rose",
+      "overrideReason": null,
+      "workorderId": "WO-20260621-0DD",
+      "workorderTitle": "测试新增断档工单（验收用）"
+    }
+  ]
+}

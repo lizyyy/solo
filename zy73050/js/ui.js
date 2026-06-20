@@ -454,4 +454,131 @@ const UI = {
       nextBtn.classList.toggle('btn-primary', true);
     }
   },
+
+  // ----------------------------------------------------------
+  // 提交复核材料表单
+  // ----------------------------------------------------------
+  renderSubmitForm() {
+    const partsEl = document.getElementById('partsFormList');
+    const samEl = document.getElementById('samplingFormList');
+    if (partsEl) partsEl.innerHTML = '';
+    if (samEl) samEl.innerHTML = '';
+
+    document.getElementById('f_craneId').value = '';
+    document.getElementById('f_craneName').value = '';
+    document.getElementById('f_title').value = '';
+    document.getElementById('f_type').value = '月度维保';
+    document.getElementById('f_dtStart').value = '';
+    document.getElementById('f_dtEnd').value = '';
+    document.getElementById('f_scheduler').value = '宋建国';
+    document.getElementById('f_maintainer').value = '';
+    document.getElementById('f_status').value = 'pending';
+    document.getElementById('f_operator').value = '现场调度';
+
+    this.addPartRow();
+    this.addSamplingRow();
+  },
+
+  addPartRow() {
+    const partsEl = document.getElementById('partsFormList');
+    if (!partsEl) return;
+    const row = document.createElement('div');
+    row.className = 'dyn-row';
+    row.innerHTML = `
+      <div class="form-item"><label>备件名称</label><input type="text" class="fp_name" placeholder="如 工业齿轮油 L-CKD 320"/></div>
+      <div class="form-item"><label>规格型号</label><input type="text" class="fp_spec" placeholder="如 20L/桶"/></div>
+      <div class="form-item"><label>数量</label><input type="number" class="fp_qty" value="1" step="0.1"/></div>
+      <div class="form-item"><label>单位</label><input type="text" class="fp_unit" placeholder="桶"/></div>
+      <div class="form-item"><label>计划到货</label><input type="datetime-local" class="fp_pa"/></div>
+      <div class="form-item"><label>实际到货</label><input type="datetime-local" class="fp_aa"/></div>
+      <button class="btn-remove-row" type="button" title="删除此备件">×</button>
+    `;
+    row.querySelector('.btn-remove-row').addEventListener('click', () => row.remove());
+    partsEl.appendChild(row);
+  },
+
+  addSamplingRow() {
+    const samEl = document.getElementById('samplingFormList');
+    if (!samEl) return;
+    const row = document.createElement('div');
+    row.className = 'sampling-row';
+    row.innerHTML = `
+      <div class="form-item"><label>时间</label><input type="text" class="fs_time" placeholder="09:30"/></div>
+      <div class="form-item"><label>数值</label><input type="number" class="fs_value" value="0" step="0.1"/></div>
+      <div class="form-item"><label>状态</label>
+        <select class="fs_status">
+          <option value="normal">正常</option>
+          <option value="abnormal">断档</option>
+        </select>
+      </div>
+      <div class="form-item"><label>原因说明</label><input type="text" class="fs_reason" placeholder="如 油温正常 / 断档·传感器离线"/></div>
+      <button class="btn-remove-row" type="button" title="删除此采样">×</button>
+    `;
+    row.querySelector('.btn-remove-row').addEventListener('click', () => row.remove());
+    samEl.appendChild(row);
+  },
+
+  _dtLocalToStr(v) {
+    if (!v) return '';
+    return v.replace('T', ' ');
+  },
+
+  collectFormData() {
+    const craneId = document.getElementById('f_craneId').value.trim();
+    const title = document.getElementById('f_title').value.trim();
+    const dtStart = document.getElementById('f_dtStart').value;
+    const dtEnd = document.getElementById('f_dtEnd').value;
+
+    if (!craneId || !title || !dtStart || !dtEnd) {
+      return { error: '塔吊编号、工单标题、停机窗口起止为必填项' };
+    }
+
+    const parts = [];
+    document.querySelectorAll('#partsFormList .dyn-row').forEach(row => {
+      const name = row.querySelector('.fp_name').value.trim();
+      if (!name) return;
+      const spec = row.querySelector('.fp_spec').value.trim();
+      const qty = parseFloat(row.querySelector('.fp_qty').value) || 1;
+      const unit = row.querySelector('.fp_unit').value.trim();
+      const plannedArrival = this._dtLocalToStr(row.querySelector('.fp_pa').value) || this._dtLocalToStr(dtStart);
+      const actualArrival = this._dtLocalToStr(row.querySelector('.fp_aa').value) || plannedArrival;
+      parts.push({
+        name, spec, qty, unit,
+        plannedArrival, actualArrival,
+        remark: '', screenshotName: '',
+        author: document.getElementById('f_operator').value.trim() || '提交人',
+      });
+    });
+    if (parts.length === 0) {
+      return { error: '至少需要一项备件' };
+    }
+
+    const sampling = [];
+    document.querySelectorAll('#samplingFormList .sampling-row').forEach(row => {
+      const time = row.querySelector('.fs_time').value.trim();
+      if (!time) return;
+      const value = parseFloat(row.querySelector('.fs_value').value) || 0;
+      const status = row.querySelector('.fs_status').value;
+      const reason = row.querySelector('.fs_reason').value.trim() || (status === 'abnormal' ? '采样断档' : '正常');
+      const pct = Math.max(0, Math.min(100, Math.round(value)));
+      sampling.push({ time, value, pct, status, reason });
+    });
+
+    return {
+      data: {
+        craneId,
+        craneName: document.getElementById('f_craneName').value.trim() || craneId,
+        title,
+        type: document.getElementById('f_type').value,
+        status: document.getElementById('f_status').value,
+        scheduler: document.getElementById('f_scheduler').value.trim(),
+        maintainer: document.getElementById('f_maintainer').value.trim(),
+        downtimeWindow: { start: this._dtLocalToStr(dtStart), end: this._dtLocalToStr(dtEnd) },
+        parts,
+        sampling,
+        operator: document.getElementById('f_operator').value.trim() || '现场调度',
+        operatorRole: '现场调度',
+      }
+    };
+  },
 };

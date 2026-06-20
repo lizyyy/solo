@@ -1,0 +1,18 @@
+{
+  "craneId": "TC-ZZ-03-A",
+  "craneName": "3号塔机 · A区",
+  "title": "主卷扬齿轮箱月度维保",
+  "type": "月度维保",
+  "status": "pending",
+  "scheduler": "宋建国",
+  "maintainer": "李师傅班组",
+  "downtimeWindow": {"start": "2026-06-08 08:00", "end": "2026-06-08 14:00"},
+  "operator": "测试人",
+  "operatorRole": "测试",
+  "parts": [
+    {"name": "工业齿轮油 L-CKD 320", "spec": "20L/桶", "qty": 2, "unit": "桶", "plannedArrival": "2026-06-07 16:00", "actualArrival": "2026-06-08 09:30", "remark": "", "screenshotName": "", "author": "测试"},
+    {"name": "齿轮箱密封垫组件", "spec": "GX-MJ-180", "qty": 1, "unit": "套", "plannedArrival": "2026-06-07 16:00", "actualArrival": "2026-06-07 15:10", "remark": "", "screenshotName": "", "author": "测试"},
+    {"name": "强磁排油堵头", "spec": "M24×1.5", "qty": 2, "unit": "个", "plannedArrival": "2026-06-06 18:00", "actualArrival": "2026-06-06 17:20", "remark": "", "screenshotName": "", "author": "测试"}
+  ],
+  "sampling": []
+}

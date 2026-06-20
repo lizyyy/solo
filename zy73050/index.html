@@ -25,6 +25,13 @@
     </div>
     <div class="header-right">
       <div class="status-chips" id="statusChips"></div>
+      <button class="btn btn-accent" id="btnSubmitForm" title="提交复核材料">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>提交复核材料</span>
+      </button>
       <button class="btn btn-primary" id="btnExport" title="重新导出当前视图">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -199,13 +206,95 @@
     </div>
   </div>
 
+  <!-- Submit Workorder Form Modal -->
+  <div class="modal" id="submitModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-box modal-box-xl">
+      <div class="modal-header">
+        <h3 class="modal-title">📝 提交复核材料</h3>
+        <button class="modal-close" id="btnCloseSubmit">×</button>
+      </div>
+      <div class="card-body" style="max-height:72vh;overflow-y:auto;">
+        <div class="form-grid">
+          <div class="form-item">
+            <label>塔吊编号 <span class="req">*</span></label>
+            <input type="text" id="f_craneId" placeholder="例如 TC-ZZ-03-A" />
+          </div>
+          <div class="form-item">
+            <label>塔吊名称</label>
+            <input type="text" id="f_craneName" placeholder="例如 3号塔机 · A区" />
+          </div>
+          <div class="form-item">
+            <label>工单标题 <span class="req">*</span></label>
+            <input type="text" id="f_title" placeholder="例如 主卷扬齿轮箱月度维保" />
+          </div>
+          <div class="form-item">
+            <label>维保类型</label>
+            <select id="f_type">
+              <option value="月度维保">月度维保</option>
+              <option value="专项维保">专项维保</option>
+              <option value="故障维保">故障维保</option>
+              <option value="季度校准">季度校准</option>
+            </select>
+          </div>
+          <div class="form-item">
+            <label>停机窗口开始 <span class="req">*</span></label>
+            <input type="datetime-local" id="f_dtStart" />
+          </div>
+          <div class="form-item">
+            <label>停机窗口结束 <span class="req">*</span></label>
+            <input type="datetime-local" id="f_dtEnd" />
+          </div>
+          <div class="form-item">
+            <label>现场调度</label>
+            <input type="text" id="f_scheduler" value="宋建国" />
+          </div>
+          <div class="form-item">
+            <label>维保班组</label>
+            <input type="text" id="f_maintainer" placeholder="例如 李师傅班组" />
+          </div>
+          <div class="form-item">
+            <label>初始状态</label>
+            <select id="f_status">
+              <option value="pending">待补件</option>
+              <option value="confirmed">已确认</option>
+              <option value="returned">退回</option>
+            </select>
+          </div>
+          <div class="form-item">
+            <label>提交人</label>
+            <input type="text" id="f_operator" value="现场调度" />
+          </div>
+        </div>
+
+        <h4 style="margin:18px 0 8px;">🧰 备件清单（可添加多个）</h4>
+        <div id="partsFormList"></div>
+        <button class="btn btn-sm" id="btnAddPart" type="button" style="margin-top:6px;">+ 添加备件</button>
+
+        <h4 style="margin:20px 0 8px;">📊 采样记录（可选，含断档标记）</h4>
+        <div id="samplingFormList"></div>
+        <button class="btn btn-sm" id="btnAddSampling" type="button" style="margin-top:6px;">+ 添加采样</button>
+      </div>
+      <div class="modal-actions modal-actions-between">
+        <div style="color:var(--text-tertiary);font-size:12px;">
+          💡 相同塔吊+相同维保类型+相同停机窗口+相同备件清单会被识别为同一条复核样本，不会重复计数
+        </div>
+        <div>
+          <button class="btn btn-ghost" id="btnCancelSubmit">取消</button>
+          <button class="btn btn-primary" id="btnConfirmSubmit">提交复核材料</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Container -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <script src="js/data.js?v=2"></script>
-  <script src="js/core.js?v=2"></script>
-  <script src="js/timeline.js?v=2"></script>
-  <script src="js/ui.js?v=2"></script>
-  <script src="js/app.js?v=2"></script>
+  <script src="js/data.js?v=9"></script>
+  <script src="js/core.js?v=9"></script>
+  <script src="js/timeline.js?v=9"></script>
+  <script src="js/ui.js?v=9"></script>
+  <script src="js/api.js?v=9"></script>
+  <script src="js/app.js?v=9"></script>
 </body>
 </html>
