@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Calendar, User, Volume2, RefreshCw, Play, AlertTriangle, CheckCircle, XCircle, FileWarning, Clock } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, User, Volume2, RefreshCw, Play, AlertTriangle, CheckCircle, XCircle, FileWarning, Clock, Download } from 'lucide-react';
 import { useCaseStore } from '../store/useCaseStore';
 import { StepProgress } from '../components/StepProgress';
 import { EvidencePanel } from '../components/EvidencePanel';
@@ -19,6 +19,7 @@ export function CaseDetail() {
     simulateStep1ImportRoadPhoto,
     simulateStep2ReviewBusCard,
     simulateStep3ConflictReview,
+    generateReport,
   } = useCaseStore();
 
   const caseItem = id ? getCaseById(id) : undefined;
@@ -44,19 +45,33 @@ export function CaseDetail() {
 
   const hasUnresolvedConflict = caseItem.status === 'conflict' && !caseItem.conflictResolved;
 
+  const handleExportReport = () => {
+    if (!id) return;
+    const report = generateReport(id);
+    const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${caseItem.title}-调解报告.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const renderFinalConclusion = () => {
     if (caseItem.finalConclusion) {
       return <p className="text-sm text-gray-700 leading-relaxed">{caseItem.finalConclusion}</p>;
     }
 
-    if (caseItem.status === 'conflict') {
+    if (caseItem.status === 'conflict' && !caseItem.conflictResolved) {
       return (
         <div className="space-y-3">
           <div className="flex items-start gap-2">
             <AlertTriangle className="w-5 h-5 text-danger-500 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-medium text-danger-700 mb-1">
-                ⚠️ 证据冲突，尚未完成人工复核
+                证据冲突，尚未完成人工复核
               </p>
               <p className="text-sm text-gray-700">
                 路口照片与公交刷卡时段证据存在矛盾，<strong className="text-danger-600">系统不会自动拍板</strong>。
@@ -64,12 +79,11 @@ export function CaseDetail() {
               </p>
             </div>
           </div>
-          <div className="p-3 bg-danger-50 rounded border border-danger-200">
-            <p className="text-xs font-medium text-danger-700 mb-1">冲突要点提醒：</p>
-            <ul className="text-xs text-gray-600 space-y-1 list-disc pl-4">
-              <li>不得显示「证据一致」「已形成完整证据链」「调解结论属实」等内容</li>
-              <li>必须列出冲突证据，等待人工确认或驳回</li>
-              <li>复核完成后，案件状态、结果标签、结论说明会同步更新</li>
+          <div className="p-3 bg-red-50 rounded border border-red-200">
+            <p className="text-xs font-medium text-red-700 mb-1">此案件不得显示以下内容：</p>
+            <ul className="text-xs text-gray-600 space-y-0.5 list-disc pl-4">
+              <li>「证据一致」「已形成完整证据链」「调解结论属实」</li>
+              <li>「顺利记录」标签</li>
             </ul>
           </div>
         </div>
@@ -84,7 +98,7 @@ export function CaseDetail() {
           </p>
           <p className="text-sm font-medium text-warning-700 flex items-start gap-1.5">
             <FileWarning className="w-4 h-4 mt-0.5 flex-shrink-0" />
-            ⚠️ 此案件<strong>暂不归入正常结案</strong>，需社区书记复核确认汇总意见有效性后再处理。
+            此案件暂不归入正常结案，需社区书记复核确认汇总意见有效性后再处理。
           </p>
         </div>
       );
@@ -98,7 +112,7 @@ export function CaseDetail() {
           </p>
           <p className="text-sm text-primary-700 flex items-start gap-1.5">
             <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" />
-            📝 补录说明：公交刷卡数据从历史档案中追溯补录，与主流程存在时间差，
+            补录说明：公交刷卡数据从历史档案中追溯补录，与主流程存在时间差，
             已标注补录来源，调解结论参考双方证据综合判断。
           </p>
         </div>
@@ -114,12 +128,41 @@ export function CaseDetail() {
       );
     }
 
+    if (caseItem.resultType === 'conflict_confirmed' && caseItem.conflictResolved) {
+      return (
+        <p className="text-sm text-gray-700">
+          路口照片与公交刷卡时段证据冲突已由小姜人工确认采信。两类证据描述的时段不同（21:00 vs 22:30后），均属实，
+          说明<strong>噪声问题存在时段性差异</strong>。
+          调解结论：噪声问题属实，但具有时段性，21:00前后相对正常，22:30后明显加重，需加强深夜时段管控。
+        </p>
+      );
+    }
+
+    if (caseItem.resultType === 'conflict_rejected') {
+      return (
+        <div className="space-y-2">
+          <p className="text-sm text-gray-700">
+            路口照片与公交刷卡时段证词矛盾点未消除，21:00照片与22:30后公交刷卡说法的时段差异尚无法判定是噪声时段性变化还是取证偏差，暂不形成最终结论，需补充更多时段证据。
+          </p>
+          <p className="text-sm font-medium text-orange-700">
+            此案件驳回原因是照片与公交刷卡时段冲突，与居民原文缺失无关。
+          </p>
+        </div>
+      );
+    }
+
     return <p className="text-sm text-gray-500">请完成三步流程后查看最终结论</p>;
   };
 
   const getResultBoxStyle = () => {
-    if (caseItem.status === 'conflict') {
+    if (caseItem.status === 'conflict' && !caseItem.conflictResolved) {
       return 'bg-danger-50 border-danger-200';
+    }
+    if (caseItem.resultType === 'conflict_confirmed') {
+      return 'bg-green-50 border-green-200';
+    }
+    if (caseItem.resultType === 'conflict_rejected') {
+      return 'bg-orange-50 border-orange-200';
     }
     if (caseItem.status === 'pending_review') {
       return 'bg-warning-50 border-warning-200';
@@ -151,6 +194,13 @@ export function CaseDetail() {
             </div>
             <div className="flex items-center gap-4">
               <button
+                onClick={handleExportReport}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-white/10 hover:bg-white/20 rounded-md transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                导出报告
+              </button>
+              <button
                 onClick={resetToInitialData}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-white/10 hover:bg-white/20 rounded-md transition-colors"
               >
@@ -177,15 +227,15 @@ export function CaseDetail() {
                 <StatusBadge status={caseItem.status} />
                 <ResultTypeBadge resultType={caseItem.resultType} />
                 {caseItem.conflictResolved && caseItem.conflictResolution === 'confirmed' && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-success-100 text-success-700 border border-success-200">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">
                     <CheckCircle className="w-3 h-3" />
-                    冲突已确认
+                    冲突已确认采信
                   </span>
                 )}
                 {caseItem.conflictResolved && caseItem.conflictResolution === 'rejected' && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700 border border-orange-200">
                     <XCircle className="w-3 h-3" />
-                    冲突已驳回
+                    冲突已驳回待补
                   </span>
                 )}
               </div>
@@ -251,18 +301,27 @@ export function CaseDetail() {
         </div>
 
         <div className="mt-6 bg-white rounded-lg border border-gray-200 p-5">
-          <h3 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
-            统一处理结果
-            {hasUnresolvedConflict && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-danger-100 text-danger-700">
-                <AlertTriangle className="w-3 h-3" />
-                有未决冲突
-              </span>
-            )}
-          </h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+              统一处理结果
+              {hasUnresolvedConflict && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-danger-100 text-danger-700">
+                  <AlertTriangle className="w-3 h-3" />
+                  有未决冲突
+                </span>
+              )}
+            </h3>
+            <button
+              onClick={handleExportReport}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 rounded-md transition-colors text-gray-700"
+            >
+              <Download className="w-3.5 h-3.5" />
+              导出报告
+            </button>
+          </div>
           <div className={`p-4 rounded-lg border ${getResultBoxStyle()}`}>
             <div className="flex items-start gap-3">
-              {caseItem.status === 'conflict' && !caseItem.conflictResolved ? (
+              {hasUnresolvedConflict ? (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-danger-100 text-danger-700 border border-danger-200 flex-shrink-0">
                   <AlertTriangle className="w-3 h-3" />
                   冲突待人工复核

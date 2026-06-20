@@ -170,7 +170,7 @@ export function Dashboard() {
                 </div>
                 <div className="p-2 bg-danger-50 rounded border border-danger-100">
                   <p className="font-medium text-danger-700">case-004：冲突待处理</p>
-                  <p className="text-danger-600 mt-0.5">照片与刷卡时段证据矛盾</p>
+                  <p className="text-danger-600 mt-0.5">21:00照片与22:30后公交刷卡矛盾，确认后不回写顺利</p>
                 </div>
               </div>
             </div>

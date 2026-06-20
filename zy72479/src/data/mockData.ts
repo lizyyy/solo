@@ -39,7 +39,7 @@ export const mockCases: Case[] = [
     title: '美食街商铺排烟噪声争议',
     address: '美食街56-78号',
     status: 'conflict',
-    resultType: 'smooth',
+    resultType: 'conflict_confirmed',
     currentStep: 3,
     createdAt: '2024-06-08 13:00:00',
     updatedAt: '2024-06-08 15:30:00',

@@ -1,4 +1,4 @@
-import { CaseStatus, ResultType, statusLabels, resultTypeLabels } from '../types';
+import { CaseStatus, ResultType, statusLabels, resultTypeLabels, resultTypeStyles } from '../types';
 
 interface StatusBadgeProps {
   status: CaseStatus;
@@ -26,15 +26,9 @@ interface ResultTypeBadgeProps {
 }
 
 export function ResultTypeBadge({ resultType }: ResultTypeBadgeProps) {
-  const styles: Record<ResultType, string> = {
-    smooth: 'bg-success-50 text-success-600 border-success-200',
-    summary_only: 'bg-warning-50 text-warning-600 border-warning-200',
-    old_supplemented: 'bg-primary-50 text-primary-600 border-primary-200',
-  };
-
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styles[resultType]}`}
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${resultTypeStyles[resultType]}`}
     >
       {resultTypeLabels[resultType]}
     </span>
