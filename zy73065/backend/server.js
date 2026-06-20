@@ -126,15 +126,25 @@ const DB_PATH = path.join(__dirname, '..', 'data', 'replay.db');
 
   app.post('/api/workorders/:id/status', (req, res) => {
     try {
+      const newStatus = req.body.status || req.body.to;
+      if (!newStatus) {
+        return res.status(400).json({ error: '缺少状态字段,需传 status 或 to' });
+      }
+      if (!['confirmed', 'pending_part', 'returned', 'pending'].includes(newStatus)) {
+        return res.status(400).json({
+          error: `非法状态值: ${newStatus}`,
+          allowed: ['confirmed', 'pending_part', 'returned', 'pending']
+        });
+      }
       const r = core.changeStatus({
         workorderId: req.params.id,
-        newStatus: req.body.status,
+        newStatus,
         operator: req.body.operator || '小林',
         note: req.body.note,
         confirmNote: req.body.confirm_note,
         returnReason: req.body.return_reason
       });
-      res.json(r);
+      res.json({ ...r, received_status_field: req.body.status ? 'status' : 'to' });
     } catch (e) {
       res.status(400).json({ error: e.message });
     }
