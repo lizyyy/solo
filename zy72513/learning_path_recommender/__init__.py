@@ -1,9 +1,6 @@
 from .models import Recommendation, ImportRecord, VersionHistory, MaskingRule
 from .core import Importer, VersionManager, MaskingEngine
-try:
-    from .workflow import ThreeStepWorkflow
-except Exception:
-    ThreeStepWorkflow = None
+from .workflow import ThreeStepWorkflow
 from .audit import AuditLogger
 
 __version__ = "1.0.0"

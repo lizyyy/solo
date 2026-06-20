@@ -1,6 +1,6 @@
 {
-  "id": "013dd413-4cf3-47cf-8407-2e4530986b55",
-  "recommendation_id": "d715dc4b-8e52-4b23-89c5-c8a8de8ecd1e",
+  "id": "7c3ac3e3-ec03-42b6-bbda-477d9de1b12d",
+  "recommendation_id": "67919196-6fb3-4ca5-9112-a95e2a041f13",
   "version": 2,
   "previous_version": 1,
   "field_name": "review_status",
@@ -8,8 +8,8 @@
   "new_value": "reviewed",
   "change_summary": "review_status: pending -> reviewed",
   "changed_by": "xiaomeng",
-  "changed_at": "2026-06-14T18:56:59.996863",
+  "changed_at": "2026-06-21T00:20:44.077152",
   "change_reason": "manual_review_status_update",
-  "source": "manual_review_batch:batch_001",
+  "source": "manual_review_batch:BATCH_XM_VERIFY_001",
   "metadata": {}
 }

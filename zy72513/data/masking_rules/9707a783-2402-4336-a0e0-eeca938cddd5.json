@@ -1,5 +1,5 @@
 {
-  "id": "e092cabe-558b-4644-b32e-7d216d203909",
+  "id": "9707a783-2402-4336-a0e0-eeca938cddd5",
   "name": "email_general",
   "pattern": "[\\w.-]+@[\\w.-]+\\.\\w+",
   "replacement": "***@***.com",
@@ -7,7 +7,7 @@
   "category": "pii",
   "is_enabled": true,
   "severity": "medium",
-  "created_at": "2026-06-14T18:57:21.527566",
-  "updated_at": "2026-06-14T18:57:21.527566",
+  "created_at": "2026-06-21T00:20:44.207236",
+  "updated_at": "2026-06-21T00:20:44.207236",
   "metadata": {}
 }
