@@ -4,9 +4,9 @@
     "part_id": "HD-001",
     "part_name": "滚刀17寸",
     "category": "滚刀",
-    "scheduled_date": "2026-06-11",
+    "scheduled_date": "2026-06-13",
     "quantity": 4,
-    "status": "优先排产",
+    "status": "已完成",
     "source": "运营主管-白班",
     "source_fields": {
       "备件编号": "HD-001",
@@ -83,10 +83,30 @@
         "operator": "现场调度-小宋",
         "reason": "实测磨损4mm需提前换；与白班主管电话确认加订1件；今早调度会指令优先排产",
         "timestamp": "2026-06-10 01:40:54"
+      },
+      {
+        "audit_id": "9bedd9fcb73d",
+        "record_id": "a9d6970480a0",
+        "field": "scheduled_date",
+        "old_value": "2026-06-11",
+        "new_value": "2026-06-13",
+        "operator": "前端验证测试员",
+        "reason": "前端自动化测试：仅修改排程日期，状态保持优先排产，验证不会误提交状态变更",
+        "timestamp": "2026-06-21 02:17:54"
+      },
+      {
+        "audit_id": "c3047274fb7e",
+        "record_id": "a9d6970480a0",
+        "field": "status",
+        "old_value": "优先排产",
+        "new_value": "已完成",
+        "operator": "前端验证测试员",
+        "reason": "前端自动化测试：仅修改状态从优先排产到已完成，验证状态变更被正确记录",
+        "timestamp": "2026-06-21 02:19:10"
       }
     ],
     "created_at": "2026-06-10 01:40:54",
-    "updated_at": "2026-06-10 01:40:54"
+    "updated_at": "2026-06-21 02:19:10"
   },
   {
     "record_id": "4d66373b8955",

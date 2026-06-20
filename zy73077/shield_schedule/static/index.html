@@ -343,6 +343,7 @@ function toggleOnlyAnomaly() {
 async function openRecord(rid) {
   cur.recordId = rid;
   const r = await j(`/api/versions/${cur.versionId}/records/${rid}`);
+  cur.record = r;
   $("recTitle").textContent = `${r.part_name||'-'} (${r.part_id||'-'})`;
   $("recBasic").innerHTML = [
     ["状态", statusTag(r.status)], ["分类", r.category||"-"],
@@ -399,8 +400,10 @@ function closeRecordModal() {
   $("recordModal").classList.remove("flex");
 }
 
-// ========== 人工修改（强制记原因） ==========
+// ========== 人工修改（强制记原因 + 只提交真正改动） ==========
 function openManualEdit() {
+  const r = cur.record;
+  if (!r) return;
   const fields = [
     ["status", "状态", ["正常排程","优先排产","待确认","异常-待处理","已完成"]],
     ["scheduled_date", "排程日期", null],
@@ -409,13 +412,15 @@ function openManualEdit() {
     ["part_name", "备件名称", null],
   ];
   $("editForm").innerHTML = fields.map(([k,l,opts])=>{
+    const curVal = r[k] != null ? r[k] : "";
     if (opts) return `<div><label class="text-xs text-slate-500">${l}</label>
-      <select data-k="${k}" class="edit-input w-full border rounded px-3 py-1.5 text-sm">
-        ${opts.map(o=>`<option>${o}</option>`).join("")}</select></div>`;
+      <select data-k="${k}" data-orig="${curVal}" class="edit-input w-full border rounded px-3 py-1.5 text-sm">
+        ${opts.map(o=>`<option ${o===curVal?'selected':''}>${o}</option>`).join("")}</select></div>`;
     const t = k==="scheduled_date"?"date":"text";
     return `<div><label class="text-xs text-slate-500">${l}</label>
-      <input data-k="${k}" type="${t}" class="edit-input w-full border rounded px-3 py-1.5 text-sm"/></div>`;
+      <input data-k="${k}" data-orig="${curVal}" type="${t}" value="${curVal}" class="edit-input w-full border rounded px-3 py-1.5 text-sm"/></div>`;
   }).join("");
+  $("editReason").value = "";
   $("editModal").classList.remove("hidden");
   $("editModal").classList.add("flex");
 }
@@ -426,16 +431,26 @@ function closeEditModal() {
 async function submitEdit() {
   const updates = {};
   document.querySelectorAll(".edit-input").forEach(el => {
-    const v = el.value.trim();
-    if (v !== "") {
-      const k = el.dataset.k;
-      updates[k] = k === "quantity" ? parseInt(v) : v;
+    const k = el.dataset.k;
+    const orig = el.dataset.orig;
+    const raw = el.value.trim();
+    if (raw === "") return;
+    let v, origVal;
+    if (k === "quantity") {
+      v = parseInt(raw);
+      origVal = orig !== "" ? parseInt(orig) : "";
+    } else {
+      v = raw;
+      origVal = orig;
+    }
+    if (String(v) !== String(origVal)) {
+      updates[k] = v;
     }
   });
   const reason = $("editReason").value.trim();
   const op = $("editOperator").value.trim() || "未知";
   if (!reason) { alert("必须填写变更原因（周一早会靠它，不靠人回忆）"); return; }
-  if (!Object.keys(updates).length) { alert("至少填一个要改的字段"); return; }
+  if (!Object.keys(updates).length) { alert("未检测到字段变更，无需提交"); return; }
   await j(`/api/versions/${cur.versionId}/records/${cur.recordId}`, {
     method:"PUT", headers:{"Content-Type":"application/json"},
     body: JSON.stringify({updates, operator:op, reason})
