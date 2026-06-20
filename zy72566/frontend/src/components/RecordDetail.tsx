@@ -226,7 +226,7 @@ function RecordDetail({ recordId, visible, onClose }: RecordDetailProps) {
       label: '三步操作',
       children: (
         <Space direction="vertical" style={{ width: '100%' }} size={16}>
-          <Card size="small" title="第二步: 补看特征快照编号" type={!hasFeatureSnapshot ? '' : 'inner'}>
+          <Card size="small" title="第二步: 补看特征快照编号" type={hasFeatureSnapshot ? 'inner' : undefined}>
             {canAddFeature ? (
               <>
                 {hasFeatureSnapshot && (
@@ -259,7 +259,7 @@ function RecordDetail({ recordId, visible, onClose }: RecordDetailProps) {
             )}
           </Card>
 
-          <Card size="small" title="第三步: 阈值回放更新" type={!hasThreshold ? '' : 'inner'}>
+          <Card size="small" title="第三步: 阈值回放更新" type={hasThreshold ? 'inner' : undefined}>
             {canUpdateThreshold ? (
               <>
                 {hasThreshold && (
@@ -414,6 +414,24 @@ function RecordDetail({ recordId, visible, onClose }: RecordDetailProps) {
       <Tabs activeKey={activeTab} onChange={setActiveTab} items={tabItems} />
     </Modal>
   )
+}
+
+export default RecordDetail
+}
+
+export default RecordDetail
+}
+
+export default RecordDetail
+}
+
+export default RecordDetail
+}
+
+export default RecordDetail
+}
+
+export default RecordDetail
 }
 
 export default RecordDetail

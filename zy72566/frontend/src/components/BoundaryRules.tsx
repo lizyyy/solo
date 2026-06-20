@@ -3,10 +3,10 @@ import { Card, Descriptions, Alert, Tag, Space, Divider, Typography } from 'antd
 import { SafetyCertificateOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import { boundaryRulesApi } from '../api'
 
-const { Title, Paragraph, Text } = Typography
+const { Paragraph, Text } = Typography
 
 function BoundaryRules() {
-  const [rules, setRules] = useState<any>(null)
+  const [, setRules] = useState<any>(null)
 
   useEffect(() => {
     boundaryRulesApi.getRules().then((res) => {

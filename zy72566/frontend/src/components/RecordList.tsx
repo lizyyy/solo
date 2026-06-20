@@ -14,7 +14,7 @@ import {
   EyeOutlined,
   ExclamationCircleOutlined,
 } from '@ant-design/icons'
-import { sliceApi, recordApi, ReconciliationRecord, statusLabels, statusColors } from '../api'
+import { sliceApi, ReconciliationRecord, statusLabels, statusColors } from '../api'
 import dayjs from 'dayjs'
 import RecordDetail from './RecordDetail'
 
@@ -104,7 +104,7 @@ function RecordList({ sliceId, onBack }: RecordListProps) {
       dataIndex: 'sample_type',
       key: 'sample_type',
       width: 100,
-      render: (type: string, record: ReconciliationRecord) => (
+      render: (_type: string, record: ReconciliationRecord) => (
         record.is_minority ? (
           <Tag color="orange">少数类</Tag>
         ) : (
@@ -117,7 +117,7 @@ function RecordList({ sliceId, onBack }: RecordListProps) {
       dataIndex: 'recall_rate',
       key: 'recall_rate',
       width: 100,
-      render: (val?: number) =>
+      render: (val: number | undefined) =>
         val !== undefined ? `${(val * 100).toFixed(1)}%` : '-',
     },
     {
@@ -125,7 +125,7 @@ function RecordList({ sliceId, onBack }: RecordListProps) {
       dataIndex: 'precision_rate',
       key: 'precision_rate',
       width: 100,
-      render: (val?: number) =>
+      render: (val: number | undefined) =>
         val !== undefined ? `${(val * 100).toFixed(1)}%` : '-',
     },
     {
@@ -133,7 +133,7 @@ function RecordList({ sliceId, onBack }: RecordListProps) {
       dataIndex: 'total_metric',
       key: 'total_metric',
       width: 100,
-      render: (val?: number, record: ReconciliationRecord) => (
+      render: (val: number | undefined, record: ReconciliationRecord) => (
         <span style={{ color: record.is_masked_by_total ? '#faad14' : undefined, fontWeight: record.is_masked_by_total ? 600 : undefined }}>
           {val !== undefined ? `${(val * 100).toFixed(1)}%` : '-'}
         </span>
@@ -152,7 +152,7 @@ function RecordList({ sliceId, onBack }: RecordListProps) {
       dataIndex: 'feature_snapshot_id',
       key: 'feature_snapshot_id',
       width: 140,
-      render: (val?: string) => val || '-',
+      render: (val: string | undefined) => val || '-',
     },
     {
       title: '阈值回放',
@@ -183,7 +183,7 @@ function RecordList({ sliceId, onBack }: RecordListProps) {
       dataIndex: 'updated_at',
       key: 'updated_at',
       width: 160,
-      render: (t?: string) =>
+      render: (t: string | undefined) =>
         t ? dayjs(t).format('MM-DD HH:mm') : '-',
     },
     {

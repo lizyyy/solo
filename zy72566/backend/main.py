@@ -387,10 +387,14 @@ def export_records(
         )
 
     output.seek(0)
+    import urllib.parse
+    safe_filename = urllib.parse.quote(f"对账明细_{slice_obj.slice_name}.xlsx")
     return StreamingResponse(
         output,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": f"attachment; filename=对账明细_{slice_obj.slice_name}.xlsx"},
+        headers={
+            "Content-Disposition": f"attachment; filename*=UTF-8''{safe_filename}"
+        },
     )
 
 

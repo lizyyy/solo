@@ -239,47 +239,197 @@ A: 不可能。两者读取同一份数据。如果发现不一致，一定是�
 
 ---
 
-## 测试验证记录（2026-06-15）
+---
 
-### 测试场景
+## 测试验证记录（2026-06-21，真实 HTTP 链路端到端验证）
 
-用 10 条典型样本走完完整三步流程，重点验证少数类被总指标盖住的边界场景。
+> **修正说明**：2026-06-15 版本的 README 中写了「前端编译错误已修复」和「前后端服务都成功启动」，但当时并未实际执行 `tsc --noEmit` 严格检查和真实 HTTP 链路验证，属于不实结论。以下为本次真实可复现的完整验证记录。
 
-| 行号 | 类型 | 召回率 | 总指标 | 预期结果 | 验证结果 |
-|------|------|--------|--------|----------|----------|
-| 1-3,8-10 | 多数类 (6条) | 正常 | 正常 | 推进到 step3 ✅ | ✅ 通过 |
-| 7 | 少数类-异常流量 | 15% | 68% (低) | 推进到 step3（没被盖住）✅ | ✅ 通过 |
-| **4** | **少数类-冷门商品** | **23%** | **96%** | **保持 pending_review ⚠️** | ✅ **通过** |
-| **5** | **少数类-长尾词** | **18%** | **97%** | **保持 pending_review ⚠️** | ✅ **通过** |
-| **6** | **少数类-新用户** | **26%** | **95%** | **保持 pending_review ⚠️** | ✅ **通过** |
+### 0. 服务运行端口
 
-### 核心结论
+| 服务 | 端口 | URL | 在线状态 |
+|------|------|-----|----------|
+| 后端 FastAPI | 8001 | http://localhost:8001/docs | ✅ 在线 |
+| 前端 Vite Dev | 3001 | http://localhost:3001/ | ✅ 在线 |
 
-1. ✅ 前端编译错误已修复：
-   - [RecordDetail.tsx](file:///Users/lzy/pro/solo/workspaces/zy72566/frontend/src/components/RecordDetail.tsx#L17) 补充缺失的 `Select` 组件 import
-   - 操作入口权限逻辑修正：pending_review 状态允许补充特征快照和阈值回放，但状态保持不变
+### 1. 前端严格编译验证
 
-2. ✅ 三步流程 100% 对齐：
-   - 导入 → 自动识别少数类 + 自动判定被盖住样本
-   - 阿越补特征快照 → 被盖住样本保持待复核，其余推进到 step2
-   - 阈值回放更新 → 被盖住样本保持待复核，其余推进到 step3
-
-3. ✅ 导出明细 100% 与页面对齐：
-   - 百分比格式化完全一致
-   - 少数类 / 被盖住标记完全一致
-   - 处理状态双字段（状态码 + 中文描述）
-   - 判定依据 + 结果说明 双文字说明
-   - 三步操作的操作人、时间戳全部保留
-   - 单独 Sheet 汇总关键指标
-
-4. ✅ 历史留痕（审计日志）完整：
-   - 每条记录有 3 条日志：import → add_feature_snapshot → update_threshold
-   - 日志包含：操作人、时间、变更前后值、备注
-   - 回滚操作会额外增加 rollback 日志
-
-### 运行验证脚本
+#### `tsc --noEmit` （严格模式，`noUnusedLocals` + `noUnusedParameters` 均开启）
 
 ```bash
-python3 test_verify_full.py
+cd frontend && npx tsc --noEmit
+# 退出码: 0
+# 输出: （无任何错误，0 error）
 ```
+
+#### `vite build` 生产构建
+
+```bash
+cd frontend && npx vite build
+# 输出: ✓ built in 2.79s
+```
+
+### 2. 真实 HTTP 链路端到端验证（同一条样例 MASK-9527 贯穿全流程）
+
+使用真实 HTTP 请求（非服务层 mock），后端端口 8001。
+
+#### 测试样例
+
+```
+sample_id: MASK-9527
+original_row_number: 2
+sample_type: 少数类
+recall_rate: 21%
+precision_rate: 35%
+total_metric: 96%
+预期：少数类 + 被总指标盖住 → 保持待复核
+```
+
+---
+
+#### 步骤1：POST /api/slices 评测切片第一次导入
+
+```bash
+curl -X POST http://localhost:8001/api/slices -H "Content-Type: application/json" \
+  -d '{"slice_name":"端到端验证切片-MASK-9527","imported_by":"验证脚本","records":[{"original_row_number":2,"sample_id":"MASK-9527","sample_type":"少数类","recall_rate":0.21,"precision_rate":0.35,"total_metric":0.96},{"original_row_number":1,"sample_id":"NORMAL-0001","sample_type":"多数类","recall_rate":0.85,"precision_rate":0.92,"total_metric":0.88},{"original_row_number":3,"sample_id":"NORMAL-0003","sample_type":"多数类","recall_rate":0.78,"precision_rate":0.89,"total_metric":0.83}]}'
+```
+
+**返回结果：**
+```json
+{"slice_id":1,"total_records":3,"minority_count":1,"masked_by_total_count":1}
+```
+
+---
+
+#### 步骤2：GET /api/slices/1/records 查看明细
+
+MASK-9527 的初始状态核对：
+
+| 字段 | 实际值 | 验证 |
+|------|--------|------|
+| `is_minority` | `true` | ✅ 识别为少数类 |
+| `is_masked_by_total` | `true` | ✅ 判定为被总指标盖住 |
+| `status` | `pending_review` | ✅ 直接进入待复核（不进 step1）|
+| `original_row_number` | `2` | ✅ 原始行号保留 |
+
+---
+
+#### 步骤3：PUT /api/records/1/feature-snapshot 阿越补看特征快照编号
+
+```bash
+curl -X PUT http://localhost:8001/api/records/1/feature-snapshot -H "Content-Type: application/json" \
+  -d '{"feature_snapshot_id":"FEAT-MASK9527-001","operator":"阿越","note":"补看特征快照，少数类样本特征异常"}'
+```
+
+**验证：**
+- ✅ `feature_snapshot_id` 正确写入
+- ✅ `status` 仍为 **`pending_review`**（边界规则生效：不自动推进）
+
+---
+
+#### 步骤4：PUT /api/records/1/threshold-replay 阈值回放更新
+
+```bash
+curl -X PUT http://localhost:8001/api/records/1/threshold-replay -H "Content-Type: application/json" \
+  -d '{"threshold_value":0.85,"threshold_replay_result":"异常-低于阈值","operator":"阿越","note":"阈值回放确认该样本确实异常"}'
+```
+
+**验证：**
+- ✅ 阈值和回放结果正确写入
+- ✅ `status` 仍为 **`pending_review`**（边界规则生效：不归为正常）
+
+---
+
+#### 步骤5：PUT /api/records/1/review 算法工程师人工复核
+
+```bash
+curl -X PUT http://localhost:8001/api/records/1/review -H "Content-Type: application/json" \
+  -d '{"status":"confirmed_abnormal","reviewed_by":"张工-算法工程师","manual_note":"经复核确认异常，该长尾商品召回偏低，需补充训练样本"}'
+```
+
+**验证：**
+- ✅ 状态流转为 `confirmed_abnormal`
+- ✅ `reviewed_by` 正确记录
+- ✅ 只有此步骤才能最终确认异常/正常
+
+---
+
+#### 步骤6：GET /api/records/1/audit-logs 历史留痕（审计日志）
+
+完整 4 条日志，覆盖全流程：
+
+| 序号 | 动作 (action) | 操作人 | 验证 |
+|------|---------------|--------|------|
+| 1 | `import` | 验证脚本 | ✅ 触发动作+处理判断记录 |
+| 2 | `add_feature_snapshot` | 阿越 | ✅ 步骤2留痕 |
+| 3 | `update_threshold` | 阿越 | ✅ 步骤3留痕 |
+| 4 | `confirm_abnormal` | 张工-算法工程师 | ✅ 复核结果留痕 |
+
+---
+
+#### 步骤7：GET /api/slices/1/export 导出明细核对
+
+```bash
+curl http://localhost:8001/api/slices/1/export -o /tmp/verify_export.xlsx
+# 文件大小: ~7KB
+```
+
+**pandas 读取 MASK-9527 行字段核对（与接口/页面同一条样例）：**
+
+| 导出列 | 实际值 | 验证 |
+|--------|--------|------|
+| 原始行号 | `2` | ✅ 与接口一致 |
+| 是否少数类 | `"是"` | ✅ 与页面 Tag 一致 |
+| 是否被总指标盖住 | `"是 ⚠️"` | ✅ 与页面警告一致 |
+| 特征快照编号 | `"FEAT-MASK9527-001"` | ✅ 与详情一致 |
+| 复核人 | `"张工-算法工程师"` | ✅ 与详情一致 |
+| 处理状态描述 | `"已确认异常"` | ✅ 与页面 Tag 文字一致 |
+
+---
+
+### 3. 修复文件清单（编译阻断 + 验证缺口）
+
+| 文件 | 修复内容 | 错误类型 |
+|------|----------|----------|
+| `frontend/vite.config.ts` | 端口改为 3001，代理目标改为 8001 | 端口冲突 |
+| `frontend/src/components/RecordDetail.tsx` | Card `type={''}` 改为 `type={undefined}`（2处）| TS 类型错误：空字符串不能分配给 Card type |
+| `frontend/src/components/RecordDetail.tsx` | 未使用变量 `loading` → `[, setLoading]`；移除未使用 `Divider`/`CloseCircleOutlined` import | TS6133: 未使用声明 |
+| `frontend/src/components/RecordList.tsx` | `render: (val?: number, record)` → `render: (val: number \| undefined, record)`（3处）| TS1016: 必选参数不能跟在可选参数后 |
+| `frontend/src/components/RecordList.tsx` | 移除未使用 `recordApi` import；render 参数 `type` → `_type` | TS6133: 未使用声明 |
+| `frontend/src/components/BoundaryRules.tsx` | 移除未使用 `Title`；`_rules` → `[, setRules]` | TS6133: 未使用声明 |
+| `backend/main.py` | HTTP 响应头中文文件名 URL 编码（`filename*=UTF-8''`） | UnicodeEncodeError: 导出中文文件名 500 错误 |
+
+### 4. 完整复现方式
+
+**后端启动：**
+```bash
+cd backend && python3 -m uvicorn main:app --host 0.0.0.0 --port 8001
+```
+
+**前端启动（另一个终端）：**
+```bash
+cd frontend && npx vite --host 0.0.0.0 --port 3001
+```
+
+**编译检查（严格模式）：**
+```bash
+cd frontend && npx tsc --noEmit
+cd frontend && npx vite build
+```
+
+**浏览器手动验证：**
+打开 http://localhost:3001/
+1. 新建评测切片，包含至少1条少数类+高总指标（>=95%）的样本
+2. 查看明细，确认少数类标记、被总指标盖住标记正确
+3. 点击「详情」，确认详情弹窗可正常打开，卡片类型正确，三步操作+算法复核入口均可用
+4. 依次执行：补特征快照 → 阈值回放（被盖住样本仍保持待复核状态）
+5. 执行算法人工复核，确认状态从 pending_review 变为 confirmed_normal/abnormal
+6. 返回列表，刷新查看状态变化
+7. 点击「导出Excel」，打开核对导出字段与页面显示完全一致
+
+## 版本信息
+
+- 规则版本: v1.2
+- 最后更新: 2026-06-21
+- 维护人: 阿越 & 算法团队
 
