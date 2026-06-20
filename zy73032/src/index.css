@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .card {
+    @apply bg-white rounded-2xl shadow-sm border border-warm-200 p-5;
+  }
+
+  .card-title {
+    @apply font-serif text-lg text-warm-800 font-semibold mb-3;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg font-medium transition-all duration-150 text-sm;
+  }
+
+  .btn-primary {
+    @apply btn bg-brand-600 text-white hover:bg-brand-700 active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply btn bg-warm-100 text-warm-700 hover:bg-warm-200;
+  }
+
+  .btn-danger {
+    @apply btn bg-danger-500 text-white hover:bg-danger-600;
+  }
+
+  .btn-ghost {
+    @apply btn text-warm-600 hover:bg-warm-100;
+  }
+
+  .tag {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .tag-pending {
+    @apply tag bg-brand-50 text-brand-700;
+  }
+
+  .tag-confirmed {
+    @apply tag bg-success-50 text-success-700;
+  }
+
+  .tag-withdrawn {
+    @apply tag bg-warm-100 text-warm-600;
+  }
+
+  .tag-anomaly {
+    @apply tag bg-danger-50 text-danger-700 animate-pulse-soft;
+  }
+
+  .nav-link {
+    @apply flex items-center gap-2 px-3 py-2 rounded-lg text-warm-700 hover:bg-warm-100 transition-colors text-sm;
+  }
+
+  .nav-link-active {
+    @apply bg-brand-50 text-brand-700 font-medium;
+  }
+
+  .step-num {
+    @apply w-7 h-7 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm font-bold flex-shrink-0;
+  }
+
+  .step-num-active {
+    @apply bg-brand-600 text-white;
+  }
+
+  .input {
+    @apply w-full px-3 py-2 border border-warm-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent text-sm;
+  }
+
+  .textarea {
+    @apply w-full px-3 py-2 border border-warm-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent text-sm resize-none;
+  }
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  font-family: 'PingFang SC', 'Helvetica Neue', sans-serif;
+  background-color: #fafaf9;
+  color: #292524;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d6d3d1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a29e;
+}
