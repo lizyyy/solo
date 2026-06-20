@@ -1,0 +1,16 @@
+{
+  "step": "review decide",
+  "timestamp": "2026-06-21T02:15:37.325359",
+  "submitted_by_role": "experiment_platform",
+  "decision": {
+    "sample_id": "SAMPLE-003",
+    "before_status": "YAML_SUPPLEMENT_OLD_CALIBER",
+    "after_status": "CONFIRMED",
+    "actor": "阿越",
+    "reason": "（真实提交）补看参数YAML：候选表v1是历史遗留，按YAML补录v2口径和重算分0.675执行",
+    "field_changes": {
+      "confirmed_caliber_source": "yaml_supplement",
+      "confirmed_uplift_score": 0.675
+    }
+  }
+}

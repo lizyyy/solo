@@ -1,0 +1,121 @@
+{
+  "step": "import",
+  "timestamp": "2026-06-21T02:15:37.322588",
+  "imported_count": 3,
+  "records": [
+    {
+      "sample_id": "SAMPLE-001",
+      "import_status": "IMPORTED",
+      "initial_status": "NORMAL",
+      "feature_missing": false,
+      "default_score_applied": false,
+      "uplift_score": 0.782,
+      "remark": "正常记录:线上特征齐全"
+    },
+    {
+      "sample_id": "SAMPLE-002",
+      "import_status": "IMPORTED",
+      "initial_status": "FEATURE_MISSING_DEFAULT",
+      "feature_missing": true,
+      "default_score_applied": true,
+      "uplift_score": 0.5,
+      "remark": "特征缺失:avg_purchase_30d 和 ctr_7d 线上未返回，给了默认分0.5"
+    },
+    {
+      "sample_id": "SAMPLE-003",
+      "import_status": "IMPORTED",
+      "initial_status": "NORMAL",
+      "feature_missing": false,
+      "default_score_applied": false,
+      "uplift_score": 0.641,
+      "remark": "旧口径:候选表里仍标 v1，参数YAML已升级到v2，需补录"
+    }
+  ],
+  "conflict_report": [
+    {
+      "sample_id": "SAMPLE-003",
+      "final_status": "YAML_SUPPLEMENT_OLD_CALIBER",
+      "conflict_count": 3,
+      "conflicts": [
+        {
+          "sample_id": "SAMPLE-003",
+          "field_name": "caliber_version",
+          "candidate_table_value": "v1",
+          "yaml_value": "v2",
+          "description": "召回候选表口径版本=v1，参数YAML当前口径版本=v2"
+        },
+        {
+          "sample_id": "SAMPLE-003",
+          "field_name": "caliber_version (supplemented)",
+          "candidate_table_value": "v1",
+          "yaml_value": "v2",
+          "description": "召回候选表口径=v1，YAML补录口径=v2，补录理由: 参数YAML升级到v2后补录，按新口径重算，候选表中v1为历史遗留值"
+        },
+        {
+          "sample_id": "SAMPLE-003",
+          "field_name": "uplift_score",
+          "candidate_table_value": 0.641,
+          "yaml_value": 0.675,
+          "description": "候选表线上分=0.641，YAML按补录口径重算分=0.675"
+        }
+      ],
+      "need_confirm_by": "阿越"
+    }
+  ],
+  "supplement_report": [
+    {
+      "sample_id": "SAMPLE-003",
+      "status": "YAML_SUPPLEMENT_OLD_CALIBER",
+      "supplemented_from_yaml": true,
+      "supplemented_by": "实验平台-阿越",
+      "supplemented_at": "2026-06-05T14:22:00",
+      "reason": "参数YAML升级到v2后补录，按新口径重算，候选表中v1为历史遗留值",
+      "new_uplift_score": 0.675
+    }
+  ],
+  "pending_items": {
+    "experiment_platform": [
+      {
+        "sample_id": "SAMPLE-003",
+        "current_status": "YAML_SUPPLEMENT_OLD_CALIBER",
+        "user_id": "U38472",
+        "uplift_score": 0.675,
+        "caliber_source": "yaml_supplement",
+        "conflicts": [
+          {
+            "sample_id": "SAMPLE-003",
+            "field_name": "caliber_version",
+            "candidate_table_value": "v1",
+            "yaml_value": "v2",
+            "description": "召回候选表口径版本=v1，参数YAML当前口径版本=v2"
+          },
+          {
+            "sample_id": "SAMPLE-003",
+            "field_name": "caliber_version (supplemented)",
+            "candidate_table_value": "v1",
+            "yaml_value": "v2",
+            "description": "召回候选表口径=v1，YAML补录口径=v2，补录理由: 参数YAML升级到v2后补录，按新口径重算，候选表中v1为历史遗留值"
+          },
+          {
+            "sample_id": "SAMPLE-003",
+            "field_name": "uplift_score",
+            "candidate_table_value": 0.641,
+            "yaml_value": 0.675,
+            "description": "候选表线上分=0.641，YAML按补录口径重算分=0.675"
+          }
+        ]
+      }
+    ],
+    "recommend_lead": [
+      {
+        "sample_id": "SAMPLE-002",
+        "current_status": "PENDING_REVIEW",
+        "user_id": "U20391",
+        "uplift_score": 0.5,
+        "feature_missing": true,
+        "default_score_applied": true
+      }
+    ]
+  },
+  "state_path": "/Users/lzy/pro/solo/workspaces/zy72561/causal_uplift/output/state/pipeline_state.json"
+}

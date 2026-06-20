@@ -1,0 +1,18 @@
+{
+  "step": "review decide",
+  "timestamp": "2026-06-21T02:15:12.025962",
+  "submitted_by_role": "experiment_platform",
+  "decision": {
+    "sample_id": "SAMPLE-003",
+    "before_status": "YAML_SUPPLEMENT_OLD_CALIBER",
+    "after_status": "REJECTED",
+    "actor": "阿越",
+    "reason": "S4-MAT-WRONG-001：阿越核对v1/v2/0.641/0.675证据后驳回",
+    "field_changes": {
+      "rejected": true,
+      "rollback_reason": "S4-MAT-WRONG-001：阿越核对v1/v2/0.641/0.675证据后驳回",
+      "old_uplift_score": 0.675,
+      "rollback_uplift_score": 0.641
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "step": "review decide",
+  "timestamp": "2026-06-21T02:09:18.162605",
+  "submitted_by_role": "recommend_lead",
+  "decision": {
+    "sample_id": "SAMPLE-002",
+    "before_status": "PENDING_REVIEW",
+    "after_status": "REVIEW_COMPLETED",
+    "actor": "林川",
+    "decision": "OVERRIDE",
+    "reason": "S2-林川真实覆盖：高潜用户 0.5->0.720",
+    "field_changes": {
+      "decision": "override",
+      "old_score": 0.5,
+      "new_score": 0.72
+    }
+  }
+}

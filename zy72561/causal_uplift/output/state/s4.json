@@ -14,7 +14,7 @@
       "default_score_applied": false,
       "status": "NORMAL",
       "caliber_source": "online",
-      "imported_at": "2026-06-21T02:15:37.322079",
+      "imported_at": "2026-06-21T02:14:42.034355",
       "raw_data": {
         "sample_id": "SAMPLE-001",
         "user_id": "U10086",
@@ -37,9 +37,9 @@
       },
       "feature_missing": true,
       "default_score_applied": true,
-      "status": "REVIEW_COMPLETED",
+      "status": "PENDING_REVIEW",
       "caliber_source": "online",
-      "imported_at": "2026-06-21T02:15:37.322094",
+      "imported_at": "2026-06-21T02:14:42.034371",
       "raw_data": {
         "sample_id": "SAMPLE-002",
         "user_id": "U20391",
@@ -56,7 +56,7 @@
       "sample_id": "SAMPLE-003",
       "user_id": "U38472",
       "scene": "search_result",
-      "uplift_score": 0.675,
+      "uplift_score": 0.641,
       "features": {
         "avg_purchase_30d": 89.2,
         "ctr_7d": 0.055,
@@ -64,9 +64,9 @@
       },
       "feature_missing": false,
       "default_score_applied": false,
-      "status": "CONFIRMED",
+      "status": "REJECTED",
       "caliber_source": "yaml_supplement",
-      "imported_at": "2026-06-21T02:15:37.322100",
+      "imported_at": "2026-06-21T02:14:42.034377",
       "raw_data": {
         "sample_id": "SAMPLE-003",
         "user_id": "U38472",
@@ -112,7 +112,7 @@
       "actor": "林川",
       "action": "AUTO_PENDING",
       "reason": "线上特征缺失（avg_purchase_30d/ctr_7d），已给默认分，不急着归正常，留给推荐负责人复核",
-      "timestamp": "2026-06-21T02:15:37.322111",
+      "timestamp": "2026-06-21T02:14:42.034390",
       "before_status": "FEATURE_MISSING_DEFAULT",
       "after_status": "PENDING_REVIEW",
       "field_changes": {}
@@ -121,27 +121,16 @@
       "sample_id": "SAMPLE-003",
       "role": "实验平台负责人",
       "actor": "阿越",
-      "action": "CONFIRM",
-      "reason": "（真实提交）补看参数YAML：候选表v1是历史遗留，按YAML补录v2口径和重算分0.675执行",
-      "timestamp": "2026-06-21T02:15:37.325035",
+      "action": "REJECT",
+      "reason": "S4-MAT-WRONG-001：阿越核对v1/v2/0.641/0.675证据后驳回",
+      "timestamp": "2026-06-21T02:15:12.025491",
       "before_status": "YAML_SUPPLEMENT_OLD_CALIBER",
-      "after_status": "CONFIRMED",
+      "after_status": "REJECTED",
       "field_changes": {
-        "confirmed_caliber_source": "yaml_supplement",
-        "confirmed_uplift_score": 0.675
-      }
-    },
-    {
-      "sample_id": "SAMPLE-002",
-      "role": "推荐负责人",
-      "actor": "林川",
-      "action": "REVIEW_ACCEPT_DEFAULT",
-      "reason": "（真实提交）核查SLA：该时段特征服务降级，默认分0.500可接受，暂不覆盖",
-      "timestamp": "2026-06-21T02:15:37.327078",
-      "before_status": "PENDING_REVIEW",
-      "after_status": "REVIEW_COMPLETED",
-      "field_changes": {
-        "decision": "accept_default_score"
+        "rejected": true,
+        "rollback_reason": "S4-MAT-WRONG-001：阿越核对v1/v2/0.641/0.675证据后驳回",
+        "old_uplift_score": 0.675,
+        "rollback_uplift_score": 0.641
       }
     }
   ],
@@ -173,12 +162,12 @@
         "召回候选表(online)"
       ],
       "review_history_refs": [],
-      "updated_at": "2026-06-21T02:15:37.330409"
+      "updated_at": "2026-06-21T02:15:12.095981"
     },
     "SAMPLE-002": {
       "sample_id": "SAMPLE-002",
-      "status": "REVIEW_COMPLETED",
-      "summary_text": "[推荐复核完成] sample_id=SAMPLE-002，决策=accept_default_score，由林川处理，理由: （真实提交）核查SLA：该时段特征服务降级，默认分0.500可接受，暂不覆盖。最终 uplift_score=0.5。",
+      "status": "PENDING_REVIEW",
+      "summary_text": "[待推荐负责人复核] sample_id=SAMPLE-002，线上特征缺失，已给默认分 uplift_score=0.5，需要推荐负责人确认接受或覆盖。",
       "score_breakdown": {
         "final_score": 0.5,
         "caliber_source": "online",
@@ -201,17 +190,16 @@
         "默认分兜底"
       ],
       "review_history_refs": [
-        "2026-06-21T02:15:37.322111",
-        "2026-06-21T02:15:37.327078"
+        "2026-06-21T02:14:42.034390"
       ],
-      "updated_at": "2026-06-21T02:15:37.330499"
+      "updated_at": "2026-06-21T02:15:12.096084"
     },
     "SAMPLE-003": {
       "sample_id": "SAMPLE-003",
-      "status": "CONFIRMED",
-      "summary_text": "[已确认] sample_id=SAMPLE-003，由阿越确认，理由: （真实提交）补看参数YAML：候选表v1是历史遗留，按YAML补录v2口径和重算分0.675执行。最终 uplift_score=0.675。",
+      "status": "REJECTED",
+      "summary_text": "[已驳回] sample_id=SAMPLE-003，由阿越驳回，理由: S4-MAT-WRONG-001：阿越核对v1/v2/0.641/0.675证据后驳回。最终 uplift_score=0.641。",
       "score_breakdown": {
-        "final_score": 0.675,
+        "final_score": 0.641,
         "caliber_source": "yaml_supplement",
         "feature_weights": {
           "avg_purchase_30d": 0.4,
@@ -234,10 +222,9 @@
         "参数YAML补录"
       ],
       "review_history_refs": [
-        "2026-06-21T02:15:37.325035"
+        "2026-06-21T02:15:12.025491"
       ],
-      "updated_at": "2026-06-21T02:15:37.330551"
+      "updated_at": "2026-06-21T02:15:12.096139"
     }
-  },
-  "generated_from": "真实负责人提交决策，非脚本内置文案"
+  }
 }

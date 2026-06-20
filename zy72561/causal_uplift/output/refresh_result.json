@@ -1,0 +1,103 @@
+{
+  "step": "refresh",
+  "timestamp": "2026-06-21T02:15:37.434788",
+  "summaries": [
+    {
+      "sample_id": "SAMPLE-001",
+      "status": "NORMAL",
+      "summary_text": "[正常记录] sample_id=SAMPLE-001，线上特征齐全，uplift_score=0.782，口径来源=online，无需复核。",
+      "score_breakdown": {
+        "final_score": 0.782,
+        "caliber_source": "online",
+        "feature_weights": {
+          "avg_purchase_30d": 0.4,
+          "ctr_7d": 0.3,
+          "category_pref": 0.3
+        },
+        "available_features": [
+          "avg_purchase_30d",
+          "ctr_7d",
+          "category_pref"
+        ],
+        "feature_values": {
+          "avg_purchase_30d": 156.5,
+          "ctr_7d": 0.128,
+          "category_pref": "electronics"
+        }
+      },
+      "data_sources": [
+        "召回候选表(online)"
+      ],
+      "review_history_refs": [],
+      "updated_at": "2026-06-21T02:15:37.433207"
+    },
+    {
+      "sample_id": "SAMPLE-002",
+      "status": "REVIEW_COMPLETED",
+      "summary_text": "[推荐复核完成] sample_id=SAMPLE-002，决策=accept_default_score，由林川处理，理由: （真实提交）核查SLA：该时段特征服务降级，默认分0.500可接受，暂不覆盖。最终 uplift_score=0.5。",
+      "score_breakdown": {
+        "final_score": 0.5,
+        "caliber_source": "online",
+        "feature_weights": {
+          "avg_purchase_30d": 0.4,
+          "ctr_7d": 0.3,
+          "category_pref": 0.3
+        },
+        "available_features": [
+          "category_pref"
+        ],
+        "feature_values": {
+          "category_pref": "clothing"
+        },
+        "default_score_applied": true,
+        "default_score_value": 0.5
+      },
+      "data_sources": [
+        "召回候选表(online)",
+        "默认分兜底"
+      ],
+      "review_history_refs": [
+        "2026-06-21T02:15:37.322111",
+        "2026-06-21T02:15:37.327078"
+      ],
+      "updated_at": "2026-06-21T02:15:37.433783"
+    },
+    {
+      "sample_id": "SAMPLE-003",
+      "status": "CONFIRMED",
+      "summary_text": "[已确认] sample_id=SAMPLE-003，由阿越确认，理由: （真实提交）补看参数YAML：候选表v1是历史遗留，按YAML补录v2口径和重算分0.675执行。最终 uplift_score=0.675。",
+      "score_breakdown": {
+        "final_score": 0.675,
+        "caliber_source": "yaml_supplement",
+        "feature_weights": {
+          "avg_purchase_30d": 0.4,
+          "ctr_7d": 0.3,
+          "category_pref": 0.3
+        },
+        "available_features": [
+          "avg_purchase_30d",
+          "ctr_7d",
+          "category_pref"
+        ],
+        "feature_values": {
+          "avg_purchase_30d": 89.2,
+          "ctr_7d": 0.055,
+          "category_pref": "beauty"
+        }
+      },
+      "data_sources": [
+        "召回候选表(online)",
+        "参数YAML补录"
+      ],
+      "review_history_refs": [
+        "2026-06-21T02:15:37.325035"
+      ],
+      "updated_at": "2026-06-21T02:15:37.434003"
+    }
+  ],
+  "cross_check": {
+    "has_error": false,
+    "errors": [],
+    "description": "每条摘要 sample_id 与 review_history_refs 核对结果"
+  }
+}
