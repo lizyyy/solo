@@ -157,19 +157,27 @@ def check_recalculate_consistency(db: Session, ticket_id: int) -> dict:
     for s in samples:
         latest_version = db.query(models.SampleVersion).filter(
             models.SampleVersion.sample_id == s.id
-        ).order_by(models.SampleVersion.created_at.desc()).first()
+        ).order_by(
+            models.SampleVersion.created_at.desc(),
+            models.SampleVersion.model_version_id.desc(),
+            models.SampleVersion.id.desc()
+        ).first()
 
         if latest_version and latest_version.rank != s.current_rank:
             inconsistencies.append({
                 "sample_id": s.id,
                 "sample_no": s.sample_no,
                 "current_rank": s.current_rank,
-                "latest_version_rank": latest_version.rank
+                "latest_version_rank": latest_version.rank,
+                "latest_model_version_id": latest_version.model_version_id,
+                "sample_version_id": latest_version.id
             })
 
     return {
         "passed": len(inconsistencies) == 0,
-        "inconsistencies": inconsistencies
+        "inconsistencies": inconsistencies,
+        "total_samples": len(samples),
+        "consistent_count": len(samples) - len(inconsistencies)
     }
 
 
@@ -226,15 +234,38 @@ def recalculate_ranks(db: Session, ticket_id: int, operator: str) -> dict:
 
     recalculated = 0
     hidden_count = 0
+    version_sync_count = 0
+    current_from_version = 0
 
     for s in samples:
         old_rank = s.current_rank
         old_hidden = s.is_hidden_by_avg
         old_status = s.status
 
-        if s.expected_rank is not None:
+        rank_changed = False
+        rank_source = None
+
+        latest_sv = db.query(models.SampleVersion).filter(
+            models.SampleVersion.sample_id == s.id
+        ).order_by(
+            models.SampleVersion.model_version_id.desc(),
+            models.SampleVersion.id.desc()
+        ).first()
+
+        if s.expected_rank is not None and s.current_rank != s.expected_rank:
             s.current_rank = s.expected_rank
             recalculated += 1
+            rank_changed = True
+            rank_source = "expected_rank"
+            if latest_sv and latest_sv.rank != s.current_rank:
+                latest_sv.rank = s.current_rank
+                latest_sv.is_manual_modified = True
+                version_sync_count += 1
+        elif s.expected_rank is None and latest_sv and s.current_rank != latest_sv.rank:
+            s.current_rank = latest_sv.rank
+            current_from_version += 1
+            rank_changed = True
+            rank_source = "latest_version"
 
         if s.is_low_confidence:
             avg_conf = sum(x.confidence for x in samples) / len(samples) if samples else 0
@@ -247,13 +278,25 @@ def recalculate_ranks(db: Session, ticket_id: int, operator: str) -> dict:
                 s.is_hidden_by_avg = False
 
         if old_rank != s.current_rank or old_hidden != s.is_hidden_by_avg or old_status != s.status:
+            after_val = {
+                "rank": s.current_rank,
+                "is_hidden_by_avg": s.is_hidden_by_avg,
+                "status": s.status
+            }
+            if rank_source:
+                after_val["rank_source"] = rank_source
+                after_val["version_synced"] = True
             audit = models.AuditLog(
                 ticket_id=ticket_id,
                 sample_id=s.id,
                 action="重算排名",
                 operator=operator,
-                before_value={"rank": old_rank, "is_hidden_by_avg": old_hidden, "status": old_status},
-                after_value={"rank": s.current_rank, "is_hidden_by_avg": s.is_hidden_by_avg, "status": s.status}
+                before_value={
+                    "rank": old_rank,
+                    "is_hidden_by_avg": old_hidden,
+                    "status": old_status
+                },
+                after_value=after_val
             )
             db.add(audit)
 
@@ -262,7 +305,9 @@ def recalculate_ranks(db: Session, ticket_id: int, operator: str) -> dict:
     return {
         "ticket_id": ticket_id,
         "recalculated_count": recalculated,
-        "hidden_by_avg_count": hidden_count
+        "hidden_by_avg_count": hidden_count,
+        "version_sync_count": version_sync_count,
+        "current_from_version_count": current_from_version
     }
 
 

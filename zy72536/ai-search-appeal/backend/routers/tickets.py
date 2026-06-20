@@ -139,12 +139,16 @@ def export_ticket_excel(ticket_id: int, db: Session = Depends(get_db)):
     output.seek(0)
 
     ticket = db.query(models.AppealTicket).filter(models.AppealTicket.id == ticket_id).first()
-    filename = f"申诉工单_{ticket.ticket_no}.xlsx"
+    from urllib.parse import quote
+    filename_ascii = f"appeal_{ticket.ticket_no}.xlsx"
+    filename_utf8 = f"申诉工单_{ticket.ticket_no}.xlsx"
+    filename_encoded = quote(filename_utf8)
+    content_disposition = f"attachment; filename=\"{filename_ascii}\"; filename*=UTF-8''{filename_encoded}"
 
     return StreamingResponse(
         output,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": f"attachment; filename={filename}"}
+        headers={"Content-Disposition": content_disposition}
     )
 
 
@@ -162,3 +166,66 @@ def get_audit_logs(ticket_id: int, db: Session = Depends(get_db)):
         models.AuditLog.ticket_id == ticket_id
     ).order_by(models.AuditLog.created_at.desc()).all()
     return logs
+
+
+@router.patch("/{ticket_id}/samples/{sample_id}", response_model=schemas.Sample)
+def update_sample(
+    ticket_id: int,
+    sample_id: int,
+    data: schemas.SampleUpdate,
+    operator: str = "system",
+    db: Session = Depends(get_db)
+):
+    sample = db.query(models.Sample).filter(
+        models.Sample.id == sample_id,
+        models.Sample.ticket_id == ticket_id
+    ).first()
+    if not sample:
+        raise HTTPException(status_code=404, detail="样本不存在")
+
+    before = {
+        "expected_rank": sample.expected_rank,
+        "current_rank": sample.current_rank,
+        "status": sample.status,
+        "manual_note": sample.manual_note,
+        "is_hidden_by_avg": sample.is_hidden_by_avg
+    }
+
+    changed = False
+    if data.expected_rank is not None and data.expected_rank != sample.expected_rank:
+        sample.expected_rank = data.expected_rank
+        changed = True
+    if data.current_rank is not None and data.current_rank != sample.current_rank:
+        sample.current_rank = data.current_rank
+        changed = True
+    if data.status is not None and data.status != sample.status:
+        sample.status = data.status
+        changed = True
+    if data.manual_note is not None and data.manual_note != sample.manual_note:
+        sample.manual_note = data.manual_note
+        changed = True
+    if data.is_hidden_by_avg is not None and data.is_hidden_by_avg != sample.is_hidden_by_avg:
+        sample.is_hidden_by_avg = data.is_hidden_by_avg
+        changed = True
+
+    if changed:
+        after = {
+            "expected_rank": sample.expected_rank,
+            "current_rank": sample.current_rank,
+            "status": sample.status,
+            "manual_note": sample.manual_note,
+            "is_hidden_by_avg": sample.is_hidden_by_avg
+        }
+        audit = models.AuditLog(
+            ticket_id=ticket_id,
+            sample_id=sample_id,
+            action="更新样本",
+            operator=operator,
+            before_value=before,
+            after_value=after
+        )
+        db.add(audit)
+        db.commit()
+        db.refresh(sample)
+
+    return sample
