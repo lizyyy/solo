@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, Response, make_response
 import pandas as pd
 import os
+import io
 from werkzeug.utils import secure_filename
 from models import init_db, ManualReviewRecord
 
@@ -8,6 +9,7 @@ app = Flask(__name__)
 app.secret_key = 'medical-review-secret-key'
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['PORT'] = 5001
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
@@ -18,12 +20,29 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+def clean_empty(val):
+    if val is None:
+        return ''
+    if isinstance(val, float) and pd.isna(val):
+        return ''
+    s = str(val).strip()
+    if s.lower() == 'nan':
+        return ''
+    if s.lower() == 'none':
+        return ''
+    if s.lower() == 'null':
+        return ''
+    if s.lower() == 'undefined':
+        return ''
+    return s
+
+
 @app.route('/')
 def index():
     stats = ManualReviewRecord.get_statistics()
     batches = ManualReviewRecord.get_batches()
     rules = ManualReviewRecord.get_boundary_rules()
-    return render_template('index.html', stats=stats, batches=batches, rules=rules)
+    return render_template('index.html', stats=stats, batches=batches, rules=rules, port=app.config['PORT'])
 
 
 @app.route('/records')
@@ -54,12 +73,18 @@ def record_detail(record_id):
 @app.route('/record/<int:record_id>/edit', methods=['POST'])
 def edit_record(record_id):
     updates = {}
-    operator = request.form.get('operator', 'system')
-    change_reason = request.form.get('change_reason', None)
+    operator = clean_empty(request.form.get('operator', 'system'))
+    if operator == '':
+        operator = 'system'
+    change_reason = clean_empty(request.form.get('change_reason', None))
+    if change_reason == '':
+        change_reason = None
 
     for field in ['manual_remark', 'prompt_version', 'manual_conclusion', 'reference_url_status', 'current_status']:
-        if field in request.form and request.form[field] != '':
-            updates[field] = request.form[field]
+        if field in request.form:
+            val = clean_empty(request.form[field])
+            if val != '' or field == 'manual_remark':
+                updates[field] = val
 
     if updates:
         ManualReviewRecord.update_record(record_id, updates, operator, change_reason)
@@ -81,8 +106,12 @@ def batch_detail(batch_id):
 @app.route('/batch/<batch_id>/rollback', methods=['POST'])
 def rollback_batch(batch_id):
     rollback_type = request.form.get('rollback_type')
-    reason = request.form.get('reason', '未填写原因')
-    operator = request.form.get('operator', '系统管理员')
+    reason = clean_empty(request.form.get('reason', '未填写原因'))
+    if reason == '':
+        reason = '未填写原因'
+    operator = clean_empty(request.form.get('operator', '系统管理员'))
+    if operator == '':
+        operator = '系统管理员'
 
     result = ManualReviewRecord.rollback_batch(batch_id, rollback_type, reason, operator)
     if result['success']:
@@ -91,6 +120,55 @@ def rollback_batch(batch_id):
         flash('回滚失败：' + result.get('message', '未知错误'), 'error')
 
     return redirect(url_for('batch_detail', batch_id=batch_id))
+
+
+@app.route('/batch/<batch_id>/export')
+def export_batch(batch_id):
+    export_format = request.args.get('format', 'xlsx')
+    records = ManualReviewRecord.get_records(batch_id=batch_id, limit=10000)
+
+    if not records:
+        flash('批次无数据可导出', 'error')
+        return redirect(url_for('batch_detail', batch_id=batch_id))
+
+    data = []
+    for r in records:
+        data.append({
+            '批次ID': r['batch_id'],
+            '原始行号': r['original_row_number'],
+            '问题ID': r['question_id'],
+            '问题': r['question'],
+            '原结论': r['original_conclusion'],
+            '人工改判结论': r['manual_conclusion'],
+            '备注': r['manual_remark'],
+            '提示词版本号': r['prompt_version'],
+            '引用链接': r['reference_url'],
+            '链接状态': r['reference_url_status'],
+            '当前处理状态': r['current_status'],
+            '创建时间': r['created_at'],
+            '更新时间': r['updated_at'],
+        })
+
+    df = pd.DataFrame(data)
+
+    if export_format == 'csv':
+        output = io.StringIO()
+        df.to_csv(output, index=False, encoding='utf-8-sig')
+        output.seek(0)
+        return Response(
+            output.getvalue(),
+            mimetype='text/csv; charset=utf-8',
+            headers={'Content-disposition': f'attachment; filename={batch_id}_export.csv'}
+        )
+    else:
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='人工改判记录')
+        output.seek(0)
+        response = make_response(output.getvalue())
+        response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        response.headers['Content-Disposition'] = f'attachment; filename={batch_id}_export.xlsx'
+        return response
 
 
 @app.route('/conflicts')
@@ -106,8 +184,10 @@ def conflicts():
 @app.route('/conflict/<int:conflict_id>/review', methods=['POST'])
 def review_conflict(conflict_id):
     status = request.form.get('status')
-    remark = request.form.get('remark')
-    operator = request.form.get('operator', 'product')
+    remark = clean_empty(request.form.get('remark', ''))
+    operator = clean_empty(request.form.get('operator', 'product'))
+    if operator == '':
+        operator = 'product'
 
     if status:
         ManualReviewRecord.update_product_review(conflict_id, status, remark, operator)
@@ -120,7 +200,9 @@ def review_conflict(conflict_id):
 def import_batch():
     if request.method == 'POST':
         batch_id = request.form.get('batch_id')
-        imported_by = request.form.get('imported_by', 'system')
+        imported_by = clean_empty(request.form.get('imported_by', 'system'))
+        if imported_by == '':
+            imported_by = 'system'
 
         if not batch_id:
             flash('请输入批次ID', 'error')
@@ -147,22 +229,44 @@ def import_batch():
                     df = pd.read_excel(filepath)
 
                 records = []
+                empty_prompt_count = 0
+
                 for idx, row in df.iterrows():
+                    qid = clean_empty(row.get('问题ID', row.get('question_id', '')))
+                    q = clean_empty(row.get('问题', row.get('question', '')))
+                    oc = clean_empty(row.get('原结论', row.get('original_conclusion', '')))
+                    mc = clean_empty(row.get('人工改判结论', row.get('manual_conclusion', '')))
+                    mr = clean_empty(row.get('备注', row.get('manual_remark', '')))
+                    pv = clean_empty(row.get('提示词版本号', row.get('prompt_version', '')))
+                    ru = clean_empty(row.get('引用链接', row.get('reference_url', '')))
+                    rus = clean_empty(row.get('链接状态', row.get('reference_url_status', 'unknown')))
+
+                    if pv == '':
+                        empty_prompt_count += 1
+
+                    if rus == '':
+                        rus = 'unknown'
+
                     record = {
                         'original_row_number': idx + 2,
-                        'question_id': str(row.get('问题ID', row.get('question_id', ''))),
-                        'question': str(row.get('问题', row.get('question', ''))),
-                        'original_conclusion': str(row.get('原结论', row.get('original_conclusion', ''))),
-                        'manual_conclusion': str(row.get('人工改判结论', row.get('manual_conclusion', ''))),
-                        'manual_remark': str(row.get('备注', row.get('manual_remark', ''))),
-                        'prompt_version': str(row.get('提示词版本号', row.get('prompt_version', ''))),
-                        'reference_url': str(row.get('引用链接', row.get('reference_url', ''))),
-                        'reference_url_status': str(row.get('链接状态', row.get('reference_url_status', 'unknown'))),
+                        'question_id': qid,
+                        'question': q,
+                        'original_conclusion': oc,
+                        'manual_conclusion': mc,
+                        'manual_remark': mr,
+                        'prompt_version': pv,
+                        'reference_url': ru,
+                        'reference_url_status': rus,
                     }
                     records.append(record)
 
                 result = ManualReviewRecord.import_batch(batch_id, records, filename, imported_by)
-                flash(f"导入成功！批次: {batch_id}, 新增: {result.get('inserted', 0)}, 更新: {result.get('updated', 0)}, 未变化: {result.get('unchanged', 0)}", 'success')
+
+                extra_msg = ''
+                if empty_prompt_count > 0:
+                    extra_msg = f'；其中 {empty_prompt_count} 条提示词版本号为空，已进入「小乔补看」队列'
+
+                flash(f"导入成功！批次: {batch_id}, 新增: {result.get('inserted', 0)}, 更新: {result.get('updated', 0)}, 未变化: {result.get('unchanged', 0)}{extra_msg}", 'success')
                 return redirect(url_for('records', batch_id=batch_id))
 
             except Exception as e:
@@ -190,4 +294,4 @@ def workflow():
 
 if __name__ == '__main__':
     init_db()
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    app.run(debug=True, host='0.0.0.0', port=app.config['PORT'])

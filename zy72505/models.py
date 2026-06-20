@@ -220,6 +220,25 @@ class ManualReviewRecord:
             'is_new_batch': True
         }
 
+
+def clean_empty(val):
+    import pandas as pd
+    if val is None:
+        return ''
+    if isinstance(val, float) and pd.isna(val):
+        return ''
+    s = str(val).strip()
+    if s.lower() == 'nan':
+        return ''
+    if s.lower() == 'none':
+        return ''
+    if s.lower() == 'null':
+        return ''
+    if s.lower() == 'undefined':
+        return ''
+    return s
+
+
     @staticmethod
     def _update_existing_batch(conn, batch_id: str, records: List[Dict]) -> Dict:
         c = conn.cursor()
@@ -330,7 +349,14 @@ class ManualReviewRecord:
 
     @staticmethod
     def _determine_initial_status(record: Dict) -> str:
-        if record.get('reference_url_status') == '404' and record.get('manual_conclusion') == '通过':
+        prompt_version = clean_empty(record.get('prompt_version', ''))
+        ref_status = clean_empty(record.get('reference_url_status', 'unknown'))
+        if ref_status == '':
+            ref_status = 'unknown'
+        manual_conclusion = clean_empty(record.get('manual_conclusion', ''))
+        original_conclusion = clean_empty(record.get('original_conclusion', ''))
+
+        if ref_status == '404' and manual_conclusion == '通过':
             return 'pending_product_review'
         if record.get('original_conclusion') != record.get('manual_conclusion'):
             return 'pending_conflict_review'
@@ -340,9 +366,12 @@ class ManualReviewRecord:
 
     @staticmethod
     def _is_conflict(record: Dict) -> bool:
-        if record.get('reference_url_status') == '404' and record.get('manual_conclusion') == '通过':
+        ref_status = clean_empty(record.get('reference_url_status', 'unknown'))
+        manual_conclusion = clean_empty(record.get('manual_conclusion', ''))
+        original_conclusion = clean_empty(record.get('original_conclusion', ''))
+        if ref_status == '404' and manual_conclusion == '通过':
             return True
-        if record.get('original_conclusion') != record.get('manual_conclusion'):
+        if original_conclusion != manual_conclusion and original_conclusion != '' and manual_conclusion != '':
             return True
         return False
 

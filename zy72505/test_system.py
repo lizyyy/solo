@@ -14,6 +14,116 @@ def print_header(title):
     print("=" * 70)
 
 
+
+def test_0_empty_cell_bypass_proof():
+    print_header("测试 0：核心验证 — 空单元格（nan/null/none）无法绕过 pending_prompt")
+    print("重点证明：Excel 空单元格被 pandas 读成 nan → 不会被当成已填写")
+
+    import pandas as pd
+    import numpy as np
+
+    # 构造模拟的导入数据（模拟 pandas 从 Excel 读出来的样子）
+    records_simulated = [
+        {
+            'original_row_number': 2,
+            'question_id': 'Q-EMPTY-001',
+            'question': '空字符串测试',
+            'original_conclusion': '通过',
+            'manual_conclusion': '通过',
+            'manual_remark': '',
+            'prompt_version': '',           # 空字符串
+            'reference_url_status': '200',
+        },
+        {
+            'original_row_number': 3,
+            'question_id': 'Q-EMPTY-002',
+            'question': 'np.nan 测试（Excel 空单元格）',
+            'original_conclusion': '通过',
+            'manual_conclusion': '通过',
+            'manual_remark': np.nan,        # Excel 空单元格
+            'prompt_version': np.nan,       # Excel 空单元格
+            'reference_url_status': '200',
+        },
+        {
+            'original_row_number': 4,
+            'question_id': 'Q-EMPTY-003',
+            'question': '字符串 nan 测试',
+            'original_conclusion': '通过',
+            'manual_conclusion': '通过',
+            'manual_remark': 'nan',
+            'prompt_version': 'nan',        # 有人手填了 nan
+            'reference_url_status': '200',
+        },
+        {
+            'original_row_number': 5,
+            'question_id': 'Q-EMPTY-004',
+            'question': '全空格测试',
+            'original_conclusion': '通过',
+            'manual_conclusion': '通过',
+            'manual_remark': '   ',
+            'prompt_version': '   ',        # 全空格
+            'reference_url_status': '200',
+        },
+        {
+            'original_row_number': 6,
+            'question_id': 'Q-EMPTY-005',
+            'question': '字符串 None 测试',
+            'original_conclusion': '通过',
+            'manual_conclusion': '通过',
+            'manual_remark': 'None',
+            'prompt_version': 'None',
+            'reference_url_status': '200',
+        },
+        {
+            'original_row_number': 7,
+            'question_id': 'Q-EMPTY-006',
+            'question': '正常有版本号（对照组）',
+            'original_conclusion': '通过',
+            'manual_conclusion': '通过',
+            'manual_remark': '正常',
+            'prompt_version': 'v2.5.0',
+            'reference_url_status': '200',
+        },
+    ]
+
+    # 模拟导入：先经过 clean_empty 清洗，再判断状态
+    from models import clean_empty, ManualReviewRecord
+
+    batch_id = 'BATCH-EMPTY-BYPASS-TEST'
+    cleaned_records = []
+    for r in records_simulated:
+        cleaned = {}
+        for k, v in r.items():
+            cleaned[k] = clean_empty(v)
+            if k == 'reference_url_status' and cleaned[k] == '':
+                cleaned[k] = 'unknown'
+        cleaned_records.append(cleaned)
+
+        status = ManualReviewRecord._determine_initial_status(cleaned)
+        print(f"  {r['question']}:")
+        print(f"    原始 prompt_version = {repr(r['prompt_version'])}")
+        print(f"    清洗后 prompt_version = {repr(cleaned['prompt_version'])}")
+        print(f"    最终状态 = {status}")
+
+        if r['question_id'] == 'Q-EMPTY-006':
+            assert status == 'pending_review', f"对照组应该是 pending_review，实际 {status}"
+        else:
+            assert status == 'pending_prompt', f"{r['question_id']} 应该进入 pending_prompt，实际 {status} —— ❌ 绕过了！"
+
+    # 实际导入数据库验证
+    r = ManualReviewRecord.import_batch(batch_id, cleaned_records, 'empty_test.xlsx', '测试员')
+    print(f"  导入结果：{r}")
+
+    db_records = ManualReviewRecord.get_records(batch_id=batch_id)
+    for dbr in db_records:
+        assert dbr['prompt_version'] == '' if dbr['question_id'] != 'Q-EMPTY-006' else dbr['prompt_version'] == 'v2.5.0', f"{dbr['question_id']} prompt_version 清洗后不对"
+
+    pending_count = sum(1 for d in db_records if d['current_status'] == 'pending_prompt')
+    assert pending_count == 5, f"应该有 5 条 pending_prompt，实际 {pending_count}"
+
+    print("\n✅ 测试 0 通过：所有空值类型（空串/nan/字符串nan/全空格/None）都正确进入 pending_prompt，无法绕过！")
+    print("   证明：Excel 空单元格不会再被当成已填写。")
+
 def test_step1_normal_sample_status_flow():
     print_header("测试 1：用户反馈的核心场景 — 正常样本补填版本号后状态流转")
 
@@ -495,6 +605,7 @@ def run_all_tests():
     init_db()
 
     try:
+        test_0_empty_cell_bypass_proof()
         test_step1_normal_sample_status_flow()
         test_step2_404_pass_sample_status_flow()
         test_step3_reimport_no_duplicate()

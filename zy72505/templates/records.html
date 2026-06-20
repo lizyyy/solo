@@ -5,6 +5,9 @@
     <h2>📝 人工改判记录</h2>
     <div class="filter-bar">
         <form method="get" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+            {% if selected_batch %}
+            <a href="{{ url_for('export_batch', batch_id=selected_batch, format='xlsx') }}" class="btn btn-success" style="margin-right: 1rem;">📥 导出本批</a>
+            {% endif %}
             <select name="batch_id" onchange="this.form.submit()">
                 <option value="">所有批次</option>
                 {% for batch in batches %}

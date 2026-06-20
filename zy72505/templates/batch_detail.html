@@ -30,6 +30,8 @@
     <div style="margin-top: 1rem;">
         <a href="{{ url_for('records', batch_id=batch.batch_id) }}" class="btn btn-primary">查看本批次所有记录</a>
         <a href="{{ url_for('conflicts', batch_id=batch.batch_id) }}" class="btn btn-warning">查看本批次冲突样本</a>
+        <a href="{{ url_for('export_batch', batch_id=batch.batch_id, format='xlsx') }}" class="btn btn-success">📥 导出 Excel</a>
+        <a href="{{ url_for('export_batch', batch_id=batch.batch_id, format='csv') }}" class="btn btn-success">📥 导出 CSV</a>
     </div>
 </div>
 
