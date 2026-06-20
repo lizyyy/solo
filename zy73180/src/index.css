@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+Pro:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #37404e;
+  background-color: #f6f7f9;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-ink-900 text-white hover:bg-ink-800 focus:ring-ink-500;
+  }
+
+  .btn-secondary {
+    @apply btn bg-white text-ink-700 border border-ink-200 hover:bg-ink-50 focus:ring-ink-300;
+  }
+
+  .btn-ghost {
+    @apply btn text-ink-600 hover:bg-ink-100 focus:ring-ink-300;
+  }
+
+  .card {
+    @apply bg-white rounded-lg border border-ink-200 shadow-soft;
+  }
+
+  .card-hover {
+    @apply card transition-all duration-150 hover:shadow-card hover:border-ink-300;
+  }
+
+  .input {
+    @apply w-full px-3 py-2 text-sm border border-ink-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-ink-400 focus:border-transparent placeholder:text-ink-400;
+  }
+
+  .tag {
+    @apply inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full;
+  }
+
+  .tag-unit {
+    @apply tag bg-red-50 text-anomaly-unit border border-red-200;
+  }
+
+  .tag-boundary {
+    @apply tag bg-purple-50 text-anomaly-boundary border border-purple-200;
+  }
+
+  .tag-bad {
+    @apply tag bg-gray-50 text-anomaly-bad border border-gray-200;
+  }
+
+  .tag-calc {
+    @apply tag bg-amber-50 text-anomaly-calc border border-amber-200;
+  }
+
+  .tag-normal {
+    @apply tag bg-emerald-50 text-anomaly-normal border border-emerald-200;
+  }
+
+  .tag-pending {
+    @apply tag bg-amber-50 text-amber-700 border border-amber-200;
+  }
+
+  .tag-resolved {
+    @apply tag bg-emerald-50 text-emerald-700 border border-emerald-200;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #d5dae3 transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #d5dae3;
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: #b0bac9;
+  }
+}
