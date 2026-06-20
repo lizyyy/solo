@@ -1,0 +1,338 @@
+{
+  "67593e975a63248a": [
+    {
+      "run_id": "SEED-OLD-67593e97",
+      "record_id": "BA-WT-0117-B1-20260609083000",
+      "status": "已处理(旧)",
+      "previous_run_id": null,
+      "appended_note": null,
+      "created_at": "2026-06-09 08:00:00",
+      "exported": false,
+      "material": {
+        "turbine": "WT-0117",
+        "blade": 1,
+        "timestamp": "2026-06-09 08:30:00",
+        "vibration": 3.2,
+        "temperature": 48.0,
+        "pitch": 2.1
+      },
+      "note_kind": "初次采集处理(旧)"
+    },
+    {
+      "run_id": "SEED-APPEND-67593e97",
+      "record_id": "BA-WT-0117-B1-20260609083000",
+      "status": "后补备注",
+      "previous_run_id": "SEED-OLD-67593e97",
+      "appended_note": "现场复核后补：补充振动频谱与温度趋势图，确认非偶发 [2026-06-09 16:30:00]",
+      "created_at": "2026-06-09 16:30:00",
+      "exported": false,
+      "material": {
+        "turbine": "WT-0117",
+        "blade": 1,
+        "timestamp": "2026-06-09 08:30:00",
+        "vibration": 3.2,
+        "temperature": 48.0,
+        "pitch": 2.1
+      },
+      "note_kind": "后补备注"
+    },
+    {
+      "run_id": "SEED-EXPORT-67593e97",
+      "record_id": "BA-WT-0117-B1-20260609083000",
+      "status": "已导出(最新)",
+      "previous_run_id": "SEED-APPEND-67593e97",
+      "appended_note": null,
+      "created_at": "2026-06-10 09:00:00",
+      "exported": true,
+      "material": {
+        "turbine": "WT-0117",
+        "blade": 1,
+        "timestamp": "2026-06-09 08:30:00",
+        "vibration": 3.2,
+        "temperature": 48.0,
+        "pitch": 2.1
+      },
+      "note_kind": "最新导出"
+    }
+  ],
+  "8f4880a6d004f216": [
+    {
+      "run_id": "SEED-OLD-8f4880a6",
+      "record_id": "BA-WT-0117-B2-20260609091500",
+      "status": "已处理(旧)",
+      "previous_run_id": null,
+      "appended_note": null,
+      "created_at": "2026-06-09 08:00:00",
+      "exported": false,
+      "material": {
+        "turbine": "WT-0117",
+        "blade": 2,
+        "timestamp": "2026-06-09 09:15:00",
+        "vibration": 4.55,
+        "temperature": 52.0,
+        "pitch": 2.05
+      },
+      "note_kind": "初次采集处理(旧)"
+    },
+    {
+      "run_id": "SEED-APPEND-8f4880a6",
+      "record_id": "BA-WT-0117-B2-20260609091500",
+      "status": "后补备注",
+      "previous_run_id": "SEED-OLD-8f4880a6",
+      "appended_note": "班组交接：B2叶尖出现雷击裂纹痕迹，待进一步内窥检测确认。 [2026-06-09 16:30:00]",
+      "created_at": "2026-06-09 16:30:00",
+      "exported": false,
+      "material": {
+        "turbine": "WT-0117",
+        "blade": 2,
+        "timestamp": "2026-06-09 09:15:00",
+        "vibration": 4.55,
+        "temperature": 52.0,
+        "pitch": 2.05
+      },
+      "note_kind": "后补备注"
+    },
+    {
+      "run_id": "SEED-EXPORT-8f4880a6",
+      "record_id": "BA-WT-0117-B2-20260609091500",
+      "status": "已导出(最新)",
+      "previous_run_id": "SEED-APPEND-8f4880a6",
+      "appended_note": null,
+      "created_at": "2026-06-10 09:00:00",
+      "exported": true,
+      "material": {
+        "turbine": "WT-0117",
+        "blade": 2,
+        "timestamp": "2026-06-09 09:15:00",
+        "vibration": 4.55,
+        "temperature": 52.0,
+        "pitch": 2.05
+      },
+      "note_kind": "最新导出"
+    }
+  ],
+  "688f52054886c10c": [
+    {
+      "run_id": "SEED-OLD-688f5205",
+      "record_id": "BA-WT-0203-B3-20260609094500",
+      "status": "已处理(旧)",
+      "previous_run_id": null,
+      "appended_note": null,
+      "created_at": "2026-06-09 08:00:00",
+      "exported": false,
+      "material": {
+        "turbine": "WT-0203",
+        "blade": 3,
+        "timestamp": "2026-06-09 09:45:00",
+        "vibration": 7.15,
+        "temperature": 65.0,
+        "pitch": 5.1
+      },
+      "note_kind": "初次采集处理(旧)"
+    },
+    {
+      "run_id": "SEED-APPEND-688f5205",
+      "record_id": "BA-WT-0203-B3-20260609094500",
+      "status": "后补备注",
+      "previous_run_id": "SEED-OLD-688f5205",
+      "appended_note": "现场复核后补：补充振动频谱与温度趋势图，确认非偶发 [2026-06-09 16:30:00]",
+      "created_at": "2026-06-09 16:30:00",
+      "exported": false,
+      "material": {
+        "turbine": "WT-0203",
+        "blade": 3,
+        "timestamp": "2026-06-09 09:45:00",
+        "vibration": 7.15,
+        "temperature": 65.0,
+        "pitch": 5.1
+      },
+      "note_kind": "后补备注"
+    },
+    {
+      "run_id": "SEED-EXPORT-688f5205",
+      "record_id": "BA-WT-0203-B3-20260609094500",
+      "status": "已导出(最新)",
+      "previous_run_id": "SEED-APPEND-688f5205",
+      "appended_note": null,
+      "created_at": "2026-06-10 09:00:00",
+      "exported": true,
+      "material": {
+        "turbine": "WT-0203",
+        "blade": 3,
+        "timestamp": "2026-06-09 09:45:00",
+        "vibration": 7.15,
+        "temperature": 65.0,
+        "pitch": 5.1
+      },
+      "note_kind": "最新导出"
+    }
+  ],
+  "f75638681004d1ae": [
+    {
+      "run_id": "SEED-OLD-f7563868",
+      "record_id": "BA-WT-0089-B1-20260609102000",
+      "status": "已处理(旧)",
+      "previous_run_id": null,
+      "appended_note": null,
+      "created_at": "2026-06-09 08:00:00",
+      "exported": false,
+      "material": {
+        "turbine": "WT-0089",
+        "blade": 1,
+        "timestamp": "2026-06-09 10:20:00",
+        "vibration": 4.52,
+        "temperature": 47.4,
+        "pitch": 2.02
+      },
+      "note_kind": "初次采集处理(旧)"
+    },
+    {
+      "run_id": "SEED-APPEND-f7563868",
+      "record_id": "BA-WT-0089-B1-20260609102000",
+      "status": "后补备注",
+      "previous_run_id": "SEED-OLD-f7563868",
+      "appended_note": "B1班组6月8日夜班记录：听到异响，怀疑叶根螺栓松动，已安排白班复核。 [2026-06-09 16:30:00]",
+      "created_at": "2026-06-09 16:30:00",
+      "exported": false,
+      "material": {
+        "turbine": "WT-0089",
+        "blade": 1,
+        "timestamp": "2026-06-09 10:20:00",
+        "vibration": 4.52,
+        "temperature": 47.4,
+        "pitch": 2.02
+      },
+      "note_kind": "后补备注"
+    },
+    {
+      "run_id": "SEED-EXPORT-f7563868",
+      "record_id": "BA-WT-0089-B1-20260609102000",
+      "status": "已导出(最新)",
+      "previous_run_id": "SEED-APPEND-f7563868",
+      "appended_note": null,
+      "created_at": "2026-06-10 09:00:00",
+      "exported": true,
+      "material": {
+        "turbine": "WT-0089",
+        "blade": 1,
+        "timestamp": "2026-06-09 10:20:00",
+        "vibration": 4.52,
+        "temperature": 47.4,
+        "pitch": 2.02
+      },
+      "note_kind": "最新导出"
+    }
+  ],
+  "d8552ecb57e45365": [
+    {
+      "run_id": "SEED-OLD-d8552ecb",
+      "record_id": "BA-WT-0089-B2-20260609110000",
+      "status": "已处理(旧)",
+      "previous_run_id": null,
+      "appended_note": null,
+      "created_at": "2026-06-09 08:00:00",
+      "exported": false,
+      "material": {
+        "turbine": "WT-0089",
+        "blade": 2,
+        "timestamp": "2026-06-09 11:00:00",
+        "vibration": 4.6,
+        "temperature": 50.0,
+        "pitch": 2.0
+      },
+      "note_kind": "初次采集处理(旧)"
+    },
+    {
+      "run_id": "SEED-APPEND-d8552ecb",
+      "record_id": "BA-WT-0089-B2-20260609110000",
+      "status": "后补备注",
+      "previous_run_id": "SEED-OLD-d8552ecb",
+      "appended_note": "现场复核后补：补充振动频谱与温度趋势图，确认非偶发 [2026-06-09 16:30:00]",
+      "created_at": "2026-06-09 16:30:00",
+      "exported": false,
+      "material": {
+        "turbine": "WT-0089",
+        "blade": 2,
+        "timestamp": "2026-06-09 11:00:00",
+        "vibration": 4.6,
+        "temperature": 50.0,
+        "pitch": 2.0
+      },
+      "note_kind": "后补备注"
+    },
+    {
+      "run_id": "SEED-EXPORT-d8552ecb",
+      "record_id": "BA-WT-0089-B2-20260609110000",
+      "status": "已导出(最新)",
+      "previous_run_id": "SEED-APPEND-d8552ecb",
+      "appended_note": null,
+      "created_at": "2026-06-10 09:00:00",
+      "exported": true,
+      "material": {
+        "turbine": "WT-0089",
+        "blade": 2,
+        "timestamp": "2026-06-09 11:00:00",
+        "vibration": 4.6,
+        "temperature": 50.0,
+        "pitch": 2.0
+      },
+      "note_kind": "最新导出"
+    }
+  ],
+  "cff394065eef51cf": [
+    {
+      "run_id": "SEED-OLD-cff39406",
+      "record_id": "BA-WT-0341-B2-20260609140000",
+      "status": "已处理(旧)",
+      "previous_run_id": null,
+      "appended_note": null,
+      "created_at": "2026-06-09 08:00:00",
+      "exported": false,
+      "material": {
+        "turbine": "WT-0341",
+        "blade": 2,
+        "timestamp": "2026-06-09 14:00:00",
+        "vibration": 8.0,
+        "temperature": 70.0,
+        "pitch": 6.0
+      },
+      "note_kind": "初次采集处理(旧)"
+    },
+    {
+      "run_id": "SEED-APPEND-cff39406",
+      "record_id": "BA-WT-0341-B2-20260609140000",
+      "status": "后补备注",
+      "previous_run_id": "SEED-OLD-cff39406",
+      "appended_note": "现场复核后补：补充振动频谱与温度趋势图，确认非偶发 [2026-06-09 16:30:00]",
+      "created_at": "2026-06-09 16:30:00",
+      "exported": false,
+      "material": {
+        "turbine": "WT-0341",
+        "blade": 2,
+        "timestamp": "2026-06-09 14:00:00",
+        "vibration": 8.0,
+        "temperature": 70.0,
+        "pitch": 6.0
+      },
+      "note_kind": "后补备注"
+    },
+    {
+      "run_id": "SEED-EXPORT-cff39406",
+      "record_id": "BA-WT-0341-B2-20260609140000",
+      "status": "已导出(最新)",
+      "previous_run_id": "SEED-APPEND-cff39406",
+      "appended_note": null,
+      "created_at": "2026-06-10 09:00:00",
+      "exported": true,
+      "material": {
+        "turbine": "WT-0341",
+        "blade": 2,
+        "timestamp": "2026-06-09 14:00:00",
+        "vibration": 8.0,
+        "temperature": 70.0,
+        "pitch": 6.0
+      },
+      "note_kind": "最新导出"
+    }
+  ]
+}
