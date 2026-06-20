@@ -167,7 +167,7 @@
       <p>备件到货晚于停机窗口的记录一览</p>
       <span class="lh-badge" id="abnCount">0 条</span>
     </div>
-    <div class="lh-card export" onclick="document.getElementById('fileExport').click()">
+    <div class="lh-card export" onclick="openQuickExport()">
       <h3>📤 结果导出</h3>
       <p>按当前筛选条件导出 JSON/CSV</p>
       <span class="lh-badge">一键导出</span>
@@ -836,6 +836,46 @@ function filteredRecords(){
   if(sf) list = list.filter(r=>r.status===sf);
   if(df!=='') list = list.filter(r=>recordHasDelay(r)===(df==='1'));
   return list;
+}
+
+// ================ 首屏快捷导出 ================
+function openQuickExport(){
+  const total = DB.records.length;
+  const filtered = filteredRecords().length;
+  const body = `
+    <div style="text-align:center;padding:10px 0 14px">
+      <div style="font-size:42px;margin-bottom:10px">📤</div>
+      <div style="font-size:16px;font-weight:600;color:#2d3748;margin-bottom:6px">导出复核结果</div>
+      <div style="font-size:12px;color:#718096;line-height:1.7">
+        本地共 <b style="color:#2b6cb0">${total}</b> 条巡检记录
+        ${total!==filtered?`<br>当前筛选后 <b style="color:#d69e2e">${filtered}</b> 条`:''}
+        <br>包含：巡检明细 / 备件替换原因 / 处理去向 / 补录备注 / 改判历史
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px">
+      <div style="background:#f7fafc;border:2px solid #e2e8f0;border-radius:10px;padding:18px;text-align:center;cursor:pointer;transition:all .15s"
+           onmouseover="this.style.borderColor='#2b6cb0';this.style.background='#ebf8ff'"
+           onmouseout="this.style.borderColor='#e2e8f0';this.style.background='#f7fafc'"
+           onclick="closeModal();exportJSON()">
+        <div style="font-size:30px;margin-bottom:6px">📄</div>
+        <div style="font-weight:600;color:#2c5282;font-size:14px">导出 JSON</div>
+        <div style="font-size:11px;color:#718096;margin-top:4px">完整结构 · 含历史留痕</div>
+      </div>
+      <div style="background:#f7fafc;border:2px solid #e2e8f0;border-radius:10px;padding:18px;text-align:center;cursor:pointer;transition:all .15s"
+           onmouseover="this.style.borderColor='#38a169';this.style.background='#f0fff4'"
+           onmouseout="this.style.borderColor='#e2e8f0';this.style.background='#f7fafc'"
+           onclick="closeModal();exportCSV()">
+        <div style="font-size:30px;margin-bottom:6px">📊</div>
+        <div style="font-weight:600;color:#276749;font-size:14px">导出 CSV</div>
+        <div style="font-size:11px;color:#718096;margin-top:4px">表格格式 · Excel 可直接打开</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:#a0aec0;text-align:center;margin-top:14px">
+      导出范围 = 当前筛选结果；工具栏按钮与此一致
+    </div>
+  `;
+  openModal('📤 导出复核结果', body,
+    `<button class="btn btn-ghost" onclick="closeModal()">取消</button>`);
 }
 
 // ================ 老何快捷入口 ================
