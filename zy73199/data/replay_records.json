@@ -1,0 +1,743 @@
+[
+  {
+    "record_id": "area_001_v1_12cf9f8e",
+    "problem_id": "area_001",
+    "problem_title": "教室面积计算",
+    "version": 1,
+    "status": "计算成功",
+    "parameters": [
+      {
+        "name": "长度",
+        "value": 12.0,
+        "unit": "m",
+        "source": "题目已知"
+      },
+      {
+        "name": "宽度",
+        "value": 8.0,
+        "unit": "m",
+        "source": "题目已知"
+      }
+    ],
+    "steps": [
+      {
+        "step_name": "步骤1：单位统一",
+        "formula": "将长度和宽度转换为米(m)",
+        "input_values": {
+          "长度": 12.0,
+          "宽度": 8.0,
+          "长度(转换后)": 12.0,
+          "宽度(转换后)": 8.0
+        },
+        "input_units": {
+          "长度": "m",
+          "宽度": "m",
+          "长度(转换后)": "m",
+          "宽度(转换后)": "m"
+        },
+        "result_value": 12.0,
+        "result_unit": "m",
+        "error_msg": null
+      },
+      {
+        "step_name": "步骤2：面积计算",
+        "formula": "S = a × b （面积 = 长度 × 宽度）",
+        "input_values": {
+          "a": 12.0,
+          "b": 8.0
+        },
+        "input_units": {
+          "a": "m",
+          "b": "m"
+        },
+        "result_value": 96.0,
+        "result_unit": "m²",
+        "error_msg": null
+      },
+      {
+        "step_name": "步骤3：阈值校验",
+        "formula": "检查面积是否在合理范围内",
+        "input_values": {
+          "计算面积": 96.0,
+          "阈值上限": 1000000.0
+        },
+        "input_units": {
+          "计算面积": "m²",
+          "阈值上限": "m²"
+        },
+        "result_value": 96.0,
+        "result_unit": "m²",
+        "error_msg": null
+      }
+    ],
+    "final_result": 96.0,
+    "final_unit": "m²",
+    "fail_reason": null,
+    "fail_detail": null,
+    "is_boundary": false,
+    "boundary_type": null,
+    "remark": "基础面积题",
+    "created_at": "2026-06-20T13:35:07.183499",
+    "updated_at": "2026-06-20T13:35:07.183553",
+    "created_by": "学生草稿-王五"
+  },
+  {
+    "record_id": "area_002_v1_680de8ef",
+    "problem_id": "area_002",
+    "problem_title": "操场面积（边界样本）",
+    "version": 1,
+    "status": "边界样本",
+    "parameters": [
+      {
+        "name": "长度",
+        "value": 999.5,
+        "unit": "m",
+        "source": "题目已知"
+      },
+      {
+        "name": "宽度",
+        "value": 999.0,
+        "unit": "m",
+        "source": "题目已知"
+      }
+    ],
+    "steps": [
+      {
+        "step_name": "步骤1：单位统一",
+        "formula": "将长度和宽度转换为米(m)",
+        "input_values": {
+          "长度": 999.5,
+          "宽度": 999.0,
+          "长度(转换后)": 999.5,
+          "宽度(转换后)": 999.0
+        },
+        "input_units": {
+          "长度": "m",
+          "宽度": "m",
+          "长度(转换后)": "m",
+          "宽度(转换后)": "m"
+        },
+        "result_value": 999.5,
+        "result_unit": "m",
+        "error_msg": null
+      },
+      {
+        "step_name": "步骤2：面积计算",
+        "formula": "S = a × b （面积 = 长度 × 宽度）",
+        "input_values": {
+          "a": 999.5,
+          "b": 999.0
+        },
+        "input_units": {
+          "a": "m",
+          "b": "m"
+        },
+        "result_value": 998500.5,
+        "result_unit": "m²",
+        "error_msg": null
+      },
+      {
+        "step_name": "步骤3：阈值校验",
+        "formula": "检查面积是否在合理范围内",
+        "input_values": {
+          "计算面积": 998500.5,
+          "阈值上限": 1000000.0
+        },
+        "input_units": {
+          "计算面积": "m²",
+          "阈值上限": "m²"
+        },
+        "result_value": 998500.5,
+        "result_unit": "m²",
+        "error_msg": null
+      }
+    ],
+    "final_result": 998500.5,
+    "final_unit": "m²",
+    "fail_reason": null,
+    "fail_detail": null,
+    "is_boundary": true,
+    "boundary_type": "边界输入",
+    "remark": "边界样本：面积接近阈值上限，用来验证校验逻辑",
+    "created_at": "2026-06-20T13:35:07.183504",
+    "updated_at": "2026-06-20T13:35:07.183557",
+    "created_by": "学生草稿-赵六"
+  },
+  {
+    "record_id": "density_001_v1_a6922da3",
+    "problem_id": "density_001",
+    "problem_title": "铁块密度计算",
+    "version": 1,
+    "status": "计算成功",
+    "parameters": [
+      {
+        "name": "质量",
+        "value": 7.8,
+        "unit": "kg",
+        "source": "题目已知"
+      },
+      {
+        "name": "体积",
+        "value": 0.001,
+        "unit": "m3",
+        "source": "题目已知"
+      }
+    ],
+    "steps": [
+      {
+        "step_name": "步骤1：单位统一",
+        "formula": "将质量转换为千克(kg)，体积转换为立方米(m³)",
+        "input_values": {
+          "质量": 7.8,
+          "体积": 0.001,
+          "质量(转换后)": 7.8,
+          "体积(转换后)": 0.001
+        },
+        "input_units": {
+          "质量": "kg",
+          "体积": "m3",
+          "质量(转换后)": "kg",
+          "体积(转换后)": "m3"
+        },
+        "result_value": 7.8,
+        "result_unit": "kg",
+        "error_msg": null
+      },
+      {
+        "step_name": "步骤2：密度计算",
+        "formula": "ρ = m / V （密度 = 质量 / 体积）",
+        "input_values": {
+          "m": 7.8,
+          "V": 0.001
+        },
+        "input_units": {
+          "m": "kg",
+          "V": "m³"
+        },
+        "result_value": 7800.0,
+        "result_unit": "kg/m³",
+        "error_msg": null
+      }
+    ],
+    "final_result": 7800.0,
+    "final_unit": "kg/m³",
+    "fail_reason": null,
+    "fail_detail": null,
+    "is_boundary": false,
+    "boundary_type": null,
+    "remark": "标准密度题",
+    "created_at": "2026-06-20T13:35:07.183490",
+    "updated_at": "2026-06-20T13:35:07.183545",
+    "created_by": "学生草稿-张三"
+  },
+  {
+    "record_id": "density_002_v1_ad3bcfbe",
+    "problem_id": "density_002",
+    "problem_title": "木块密度（单位混合）",
+    "version": 1,
+    "status": "计算成功",
+    "parameters": [
+      {
+        "name": "质量",
+        "value": 500.0,
+        "unit": "g",
+        "source": "题目已知"
+      },
+      {
+        "name": "体积",
+        "value": 1000.0,
+        "unit": "cm3",
+        "source": "题目已知"
+      }
+    ],
+    "steps": [
+      {
+        "step_name": "步骤1：单位统一",
+        "formula": "将质量转换为千克(kg)，体积转换为立方米(m³)",
+        "input_values": {
+          "质量": 500.0,
+          "体积": 1000.0,
+          "质量(转换后)": 0.5,
+          "体积(转换后)": 0.001
+        },
+        "input_units": {
+          "质量": "g",
+          "体积": "cm3",
+          "质量(转换后)": "kg",
+          "体积(转换后)": "m3"
+        },
+        "result_value": 0.5,
+        "result_unit": "kg",
+        "error_msg": null
+      },
+      {
+        "step_name": "步骤2：密度计算",
+        "formula": "ρ = m / V （密度 = 质量 / 体积）",
+        "input_values": {
+          "m": 0.5,
+          "V": 0.001
+        },
+        "input_units": {
+          "m": "kg",
+          "V": "m³"
+        },
+        "result_value": 500.0,
+        "result_unit": "kg/m³",
+        "error_msg": null
+      }
+    ],
+    "final_result": 500.0,
+    "final_unit": "kg/m³",
+    "fail_reason": null,
+    "fail_detail": null,
+    "is_boundary": false,
+    "boundary_type": null,
+    "remark": "注意g和cm3的单位换算",
+    "created_at": "2026-06-20T13:35:07.183495",
+    "updated_at": "2026-06-20T13:35:07.183549",
+    "created_by": "学生草稿-李四"
+  },
+  {
+    "record_id": "kinetic_001_v1_67bf496b",
+    "problem_id": "kinetic_001",
+    "problem_title": "汽车动能计算",
+    "version": 1,
+    "status": "计算成功",
+    "parameters": [
+      {
+        "name": "质量",
+        "value": 1500.0,
+        "unit": "kg",
+        "source": "题目已知"
+      },
+      {
+        "name": "速度",
+        "value": 20.0,
+        "unit": "m/s",
+        "source": "题目已知"
+      }
+    ],
+    "steps": [
+      {
+        "step_name": "步骤1：单位统一",
+        "formula": "将质量转换为千克(kg)，速度转换为米每秒(m/s)",
+        "input_values": {
+          "质量": 1500.0,
+          "速度": 20.0,
+          "质量(转换后)": 1500.0,
+          "速度(转换后)": 20.0
+        },
+        "input_units": {
+          "质量": "kg",
+          "速度": "m/s",
+          "质量(转换后)": "kg",
+          "速度(转换后)": "m/s"
+        },
+        "result_value": 1500.0,
+        "result_unit": "kg",
+        "error_msg": null
+      },
+      {
+        "step_name": "步骤2：动能计算",
+        "formula": "Ek = ½ × m × v² （动能 = 0.5 × 质量 × 速度²）",
+        "input_values": {
+          "m": 1500.0,
+          "v": 20.0
+        },
+        "input_units": {
+          "m": "kg",
+          "v": "m/s"
+        },
+        "result_value": 300000.0,
+        "result_unit": "J",
+        "error_msg": null
+      }
+    ],
+    "final_result": 300000.0,
+    "final_unit": "J",
+    "fail_reason": null,
+    "fail_detail": null,
+    "is_boundary": false,
+    "boundary_type": null,
+    "remark": "动能公式练习",
+    "created_at": "2026-06-20T13:35:07.183508",
+    "updated_at": "2026-06-20T13:35:07.183562",
+    "created_by": "学生草稿-张三"
+  },
+  {
+    "record_id": "speed_001_v1_487c4a40",
+    "problem_id": "speed_001",
+    "problem_title": "小明跑步速度计算",
+    "version": 1,
+    "status": "计算成功",
+    "parameters": [
+      {
+        "name": "距离",
+        "value": 100.0,
+        "unit": "m",
+        "source": "题目已知"
+      },
+      {
+        "name": "时间",
+        "value": 12.5,
+        "unit": "s",
+        "source": "题目已知"
+      }
+    ],
+    "steps": [
+      {
+        "step_name": "步骤1：单位统一",
+        "formula": "将距离转换为米(m)，时间转换为秒(s)",
+        "input_values": {
+          "距离": 100.0,
+          "时间": 12.5,
+          "距离(转换后)": 100.0,
+          "时间(转换后)": 12.5
+        },
+        "input_units": {
+          "距离": "m",
+          "时间": "s",
+          "距离(转换后)": "m",
+          "时间(转换后)": "s"
+        },
+        "result_value": 100.0,
+        "result_unit": "m",
+        "error_msg": null
+      },
+      {
+        "step_name": "步骤2：速度计算",
+        "formula": "v = s / t （速度 = 距离 / 时间）",
+        "input_values": {
+          "s": 100.0,
+          "t": 12.5
+        },
+        "input_units": {
+          "s": "m",
+          "t": "s"
+        },
+        "result_value": 8.0,
+        "result_unit": "m/s",
+        "error_msg": null
+      },
+      {
+        "step_name": "步骤3：阈值校验",
+        "formula": "检查速度是否在合理范围内 (0 ~ speed_max)",
+        "input_values": {
+          "计算速度": 8.0,
+          "阈值上限": 300.0
+        },
+        "input_units": {
+          "计算速度": "m/s",
+          "阈值上限": "m/s"
+        },
+        "result_value": 8.0,
+        "result_unit": "m/s",
+        "error_msg": null
+      }
+    ],
+    "final_result": 8.0,
+    "final_unit": "m/s",
+    "fail_reason": null,
+    "fail_detail": null,
+    "is_boundary": false,
+    "boundary_type": null,
+    "remark": "第一次试跑，用课堂例题数据",
+    "created_at": "2026-06-20T13:35:07.183464",
+    "updated_at": "2026-06-20T13:35:07.183520",
+    "created_by": "学生草稿-张三"
+  },
+  {
+    "record_id": "speed_001_v2_de50b4c3",
+    "problem_id": "speed_001",
+    "problem_title": "小明跑步速度计算",
+    "version": 2,
+    "status": "计算成功",
+    "parameters": [
+      {
+        "name": "距离",
+        "value": 0.1,
+        "unit": "km",
+        "source": "题目已知"
+      },
+      {
+        "name": "时间",
+        "value": 12.5,
+        "unit": "s",
+        "source": "题目已知"
+      }
+    ],
+    "steps": [
+      {
+        "step_name": "步骤1：单位统一",
+        "formula": "将距离转换为米(m)，时间转换为秒(s)",
+        "input_values": {
+          "距离": 0.1,
+          "时间": 12.5,
+          "距离(转换后)": 100.0,
+          "时间(转换后)": 12.5
+        },
+        "input_units": {
+          "距离": "km",
+          "时间": "s",
+          "距离(转换后)": "m",
+          "时间(转换后)": "s"
+        },
+        "result_value": 100.0,
+        "result_unit": "m",
+        "error_msg": null
+      },
+      {
+        "step_name": "步骤2：速度计算",
+        "formula": "v = s / t （速度 = 距离 / 时间）",
+        "input_values": {
+          "s": 100.0,
+          "t": 12.5
+        },
+        "input_units": {
+          "s": "m",
+          "t": "s"
+        },
+        "result_value": 8.0,
+        "result_unit": "m/s",
+        "error_msg": null
+      },
+      {
+        "step_name": "步骤3：阈值校验",
+        "formula": "检查速度是否在合理范围内 (0 ~ speed_max)",
+        "input_values": {
+          "计算速度": 8.0,
+          "阈值上限": 300.0
+        },
+        "input_units": {
+          "计算速度": "m/s",
+          "阈值上限": "m/s"
+        },
+        "result_value": 8.0,
+        "result_unit": "m/s",
+        "error_msg": null
+      }
+    ],
+    "final_result": 8.0,
+    "final_unit": "m/s",
+    "fail_reason": null,
+    "fail_detail": null,
+    "is_boundary": false,
+    "boundary_type": null,
+    "remark": "第二次试跑，距离换了单位",
+    "created_at": "2026-06-20T13:35:07.183475",
+    "updated_at": "2026-06-20T13:35:07.183532",
+    "created_by": "学生草稿-张三"
+  },
+  {
+    "record_id": "speed_002_v1_b6948760",
+    "problem_id": "speed_002",
+    "problem_title": "高铁运行速度",
+    "version": 1,
+    "status": "计算成功",
+    "parameters": [
+      {
+        "name": "距离",
+        "value": 300.0,
+        "unit": "km",
+        "source": "题目已知"
+      },
+      {
+        "name": "时间",
+        "value": 1.5,
+        "unit": "h",
+        "source": "题目已知"
+      }
+    ],
+    "steps": [
+      {
+        "step_name": "步骤1：单位统一",
+        "formula": "将距离转换为米(m)，时间转换为秒(s)",
+        "input_values": {
+          "距离": 300.0,
+          "时间": 1.5,
+          "距离(转换后)": 300000.0,
+          "时间(转换后)": 5400.0
+        },
+        "input_units": {
+          "距离": "km",
+          "时间": "h",
+          "距离(转换后)": "m",
+          "时间(转换后)": "s"
+        },
+        "result_value": 300000.0,
+        "result_unit": "m",
+        "error_msg": null
+      },
+      {
+        "step_name": "步骤2：速度计算",
+        "formula": "v = s / t （速度 = 距离 / 时间）",
+        "input_values": {
+          "s": 300000.0,
+          "t": 5400.0
+        },
+        "input_units": {
+          "s": "m",
+          "t": "s"
+        },
+        "result_value": 55.5556,
+        "result_unit": "m/s",
+        "error_msg": null
+      },
+      {
+        "step_name": "步骤3：阈值校验",
+        "formula": "检查速度是否在合理范围内 (0 ~ speed_max)",
+        "input_values": {
+          "计算速度": 55.55555555555556,
+          "阈值上限": 300.0
+        },
+        "input_units": {
+          "计算速度": "m/s",
+          "阈值上限": "m/s"
+        },
+        "result_value": 55.55555555555556,
+        "result_unit": "m/s",
+        "error_msg": null
+      }
+    ],
+    "final_result": 55.5556,
+    "final_unit": "m/s",
+    "fail_reason": null,
+    "fail_detail": null,
+    "is_boundary": false,
+    "boundary_type": null,
+    "remark": "单位换算题，注意km/h转m/s",
+    "created_at": "2026-06-20T13:35:07.183481",
+    "updated_at": "2026-06-20T13:35:07.183537",
+    "created_by": "学生草稿-李四"
+  },
+  {
+    "record_id": "speed_003_v1_11cf3ab7",
+    "problem_id": "speed_003",
+    "problem_title": "缺失单位的速度题",
+    "version": 1,
+    "status": "单位缺失",
+    "parameters": [
+      {
+        "name": "距离",
+        "value": 500.0,
+        "unit": "",
+        "source": "题目已知"
+      },
+      {
+        "name": "时间",
+        "value": 25.0,
+        "unit": "s",
+        "source": "题目已知"
+      }
+    ],
+    "steps": [
+      {
+        "step_name": "单位完整性检查",
+        "formula": "检查所有参数是否带有有效单位",
+        "input_values": {
+          "距离": 500.0,
+          "时间": 25.0
+        },
+        "input_units": {
+          "距离": "(缺失)",
+          "时间": "s"
+        },
+        "result_value": null,
+        "result_unit": null,
+        "error_msg": "缺失单位的参数: 距离"
+      }
+    ],
+    "final_result": null,
+    "final_unit": null,
+    "fail_reason": "单位缺失",
+    "fail_detail": "存在参数缺少单位，无法进行完整计算",
+    "is_boundary": false,
+    "boundary_type": null,
+    "remark": "漏抄了距离的单位，待补充\n2026-06-20 13:35:43: 补充：距离单位应该是米，待学生确认后再修改",
+    "created_at": "2026-06-20T13:35:07.183485",
+    "updated_at": "2026-06-20T13:35:43.882138",
+    "created_by": "学生草稿-王五"
+  },
+  {
+    "record_id": "speed_004_v1_ba35d4f8",
+    "problem_id": "speed_004",
+    "problem_title": "超高速（阈值校验）",
+    "version": 1,
+    "status": "超阈值",
+    "parameters": [
+      {
+        "name": "距离",
+        "value": 1000.0,
+        "unit": "m",
+        "source": "题目已知"
+      },
+      {
+        "name": "时间",
+        "value": 0.1,
+        "unit": "s",
+        "source": "题目已知"
+      }
+    ],
+    "steps": [
+      {
+        "step_name": "步骤1：单位统一",
+        "formula": "将距离转换为米(m)，时间转换为秒(s)",
+        "input_values": {
+          "距离": 1000.0,
+          "时间": 0.1,
+          "距离(转换后)": 1000.0,
+          "时间(转换后)": 0.1
+        },
+        "input_units": {
+          "距离": "m",
+          "时间": "s",
+          "距离(转换后)": "m",
+          "时间(转换后)": "s"
+        },
+        "result_value": 1000.0,
+        "result_unit": "m",
+        "error_msg": null
+      },
+      {
+        "step_name": "步骤2：速度计算",
+        "formula": "v = s / t （速度 = 距离 / 时间）",
+        "input_values": {
+          "s": 1000.0,
+          "t": 0.1
+        },
+        "input_units": {
+          "s": "m",
+          "t": "s"
+        },
+        "result_value": 10000.0,
+        "result_unit": "m/s",
+        "error_msg": null
+      },
+      {
+        "step_name": "步骤3：阈值校验",
+        "formula": "检查速度是否在合理范围内 (0 ~ speed_max)",
+        "input_values": {
+          "计算速度": 10000.0,
+          "阈值上限": 300.0
+        },
+        "input_units": {
+          "计算速度": "m/s",
+          "阈值上限": "m/s"
+        },
+        "result_value": 10000.0,
+        "result_unit": "m/s",
+        "error_msg": "速度 10000.00 m/s 超过阈值 300.0 m/s"
+      }
+    ],
+    "final_result": null,
+    "final_unit": null,
+    "fail_reason": "超阈值",
+    "fail_detail": "速度值 10000.00 m/s 超出最大阈值 300.0 m/s",
+    "is_boundary": false,
+    "boundary_type": null,
+    "remark": "故意设置超阈值，验证阈值检查逻辑",
+    "created_at": "2026-06-20T13:35:07.183513",
+    "updated_at": "2026-06-20T13:35:07.183566",
+    "created_by": "学生草稿-测试"
+  }
+]
