@@ -38,11 +38,13 @@ class ReviewedItem:
         if self.is_blocked:
             self.status = "卡点-暂不放行"
             self.remark = "重复样本待人工确认，结果暂不放行。"
+            self.conclusion = "暂不放行"
             if self.issues:
                 self.remark += "；".join(self.issues)
         elif self.issues:
             self.status = "待核查"
             self.remark = "；".join(self.issues)
+            self.conclusion = "待核查确认"
         else:
             self.status = "复核通过"
             self.remark = ""
@@ -58,14 +60,26 @@ class ReviewedItem:
 
     def _check_triple_consistency(self) -> bool:
         if self.status == "卡点-暂不放行":
-            return "暂不放行" in self.remark and "重复" in self.remark
-        if self.status == "复核通过":
-            return self.remark == "" and bool(self.conclusion)
-        if self.status == "待核查":
-            return bool(self.remark) and any(
-                k in self.remark for k in ["阈值", "单位", "结论", "跳变", "对不上"]
+            return (
+                "暂不放行" in self.remark
+                and self.conclusion == "暂不放行"
             )
-        return True
+        if self.status == "待核查":
+            return (
+                bool(self.remark)
+                and self.conclusion == "待核查确认"
+                and any(
+                    k in self.remark
+                    for k in ["阈值", "单位", "结论", "跳变", "对不上", "重复样本"]
+                )
+            )
+        if self.status == "复核通过":
+            return (
+                self.remark == ""
+                and self.conclusion == self.original.conclusion
+                and bool(self.conclusion)
+            )
+        return False
 
 
 def _build_reviewed_items(
