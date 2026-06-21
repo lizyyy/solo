@@ -1,0 +1,28 @@
+{
+  "name": "ocean-ranch-data-cleaning",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "海洋牧场数据清洗工具 - 实验室结果表异常队列管理",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "antd": "^5.12.0",
+    "dayjs": "^1.11.10",
+    "leaflet": "^1.9.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-leaflet": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.8",
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8"
+  }
+}
