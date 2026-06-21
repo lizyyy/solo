@@ -13,7 +13,7 @@ import taskRoutes from './routes/task.router.js'
 import layerRoutes from './routes/layer.router.js'
 import screenshotRoutes from './routes/screenshot.router.js'
 import guideRoutes from './routes/guide.router.js'
-import { initDb } from './db.js'
+import { initDb, UPLOADS_DIR } from './db.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -27,6 +27,7 @@ app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
 app.use('/api/auth', authRoutes)
+app.use('/api/uploads', express.static(UPLOADS_DIR))
 app.use('/api', taskRoutes)
 app.use('/api', layerRoutes)
 app.use('/api', screenshotRoutes)

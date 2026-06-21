@@ -119,8 +119,28 @@ export async function compareHistory(
   return request(`/tasks/${taskId}/history/compare?${params.toString()}`);
 }
 
-export function exportTask(taskId: string): void {
-  window.open(`${API_BASE}/tasks/${taskId}/export`, '_blank');
+export async function exportTask(taskId: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/tasks/${taskId}/export`, { method: 'POST' });
+  if (!res.ok) {
+    let msg = `导出失败: ${res.status} ${res.statusText}`;
+    try {
+      const err = await res.json();
+      if (err?.error) msg = err.error;
+    } catch {}
+    throw new Error(msg);
+  }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const disposition = res.headers.get('content-disposition');
+  const match = disposition?.match(/filename="?([^"]+)"?/);
+  const rawFilename = match ? match[1] : 'export.zip';
+  a.download = decodeURIComponent(rawFilename);
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 export async function fetchLayer(id: string): Promise<CadLayer> {

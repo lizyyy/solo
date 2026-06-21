@@ -29,7 +29,7 @@ export default function ScreenshotsPage() {
   const [layers, setLayers] = useState<CadLayer[]>([]);
   const [shots, setShots] = useState<Screenshot[]>([]);
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ layerId: '', caption: '', standardTags: '' });
+  const [form, setForm] = useState({ layerId: '', caption: '', standardTags: '', boundVersion: '' });
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -47,16 +47,17 @@ export default function ScreenshotsPage() {
     fd.append('file', file);
     if (form.layerId) fd.append('layerId', form.layerId);
     fd.append('caption', form.caption);
+    if (form.boundVersion) fd.append('boundVersion', form.boundVersion);
     const tagArr = form.standardTags.split(',').map((s) => s.trim()).filter(Boolean);
     if (tagArr.length === 0) tagArr.push('未分类');
     fd.append('standardTags', JSON.stringify(tagArr));
     setLoading(true);
     try {
-      await uploadScreenshot(taskId, fd);
+      const shot = await uploadScreenshot(taskId, fd);
       setShowModal(false);
-      setForm({ layerId: '', caption: '', standardTags: '' });
+      setForm({ layerId: '', caption: '', standardTags: '', boundVersion: '' });
       setFile(null);
-      setToast('截图上传成功');
+      setToast(`截图上传成功${shot.boundVersion ? `，已绑定版本 V${shot.boundVersion}` : ''}`);
       load();
     } finally { setLoading(false); }
   }
@@ -103,7 +104,7 @@ export default function ScreenshotsPage() {
               return (
                 <div key={s.id} className="card group overflow-hidden transition hover:shadow-hover">
                   <div className="relative">
-                    <img src={s.storedPath} alt={s.caption} className="h-44 w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+                    <img src={s.url ?? s.storedPath} alt={s.caption} className="h-44 w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
                     <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition group-hover:opacity-100">
                       <button onClick={() => handleDownload(s)} className="rounded-md bg-black/60 p-2 text-slate-200 hover:bg-brand-600 hover:text-white backdrop-blur" title="下载"><Download className="h-4 w-4" /></button>
                       <button onClick={() => handleReplace(s)} className="rounded-md bg-black/60 p-2 text-slate-200 hover:bg-brand-600 hover:text-white backdrop-blur" title="替换"><RefreshCw className="h-4 w-4" /></button>

@@ -1,57 +1,209 @@
-# React + TypeScript + Vite
+# 机电管综图纸复核系统
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+面向建筑师和机电工程师的 CAD 图层复核全栈 Web 应用。核心解决以下 5 个痛点：
 
-Currently, two official plugins are available:
+- ✅ **旧意见反复冒头** → 图层级版本化留痕，只追加、不覆盖
+- ✅ **图层命名混乱** → 保留 CAD 原始命名（锁定不可修改），支持完整追溯
+- ✅ **新旧记录不连贯** → 补完备注再重跑时，旧历史保留、新版本追加、口径一致
+- ✅ **截图与页面口径不一致** → 截图强制绑定当前版本和规范口径，导出文件按口径重命名
+- ✅ **上手不明确** → 内置上手文档，启动命令、重跑方式、截图规范一目了然
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 技术栈
 
-## Expanding the ESLint configuration
+- **前端**：React 18 + TypeScript + Vite 5 + Zustand + Tailwind CSS 3 + react-router-dom v7
+- **后端**：Express 4 + TypeScript
+- **数据层**：lowdb 7（JSON 文件持久化，零配置）
+- **文件处理**：multer 1.4（上传）、archiver 7（ZIP 导出）
+- **设计**：工程蓝 + 工业灰暗色主题，Space Grotesk + Noto Sans SC + JetBrains Mono
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 目录结构
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```
+├── api/                 # Express 后端
+│   ├── routes/          # 路由层
+│   ├── services/        # 业务逻辑层
+│   ├── app.ts           # 应用入口
+│   └── db.ts            # lowdb 初始化
+├── src/                 # React 前端
+│   ├── pages/           # 页面（列表、详情、历史、截图、文档）
+│   ├── components/      # 可复用组件
+│   ├── lib/             # API 层、工具函数
+│   └── store/           # Zustand 状态
+├── shared/              # 前后端共享类型
+├── data/db.json         # lowdb 持久化文件
+├── uploads/             # 上传截图存储目录
+└── package.json         # 项目配置
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 快速启动
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 1. 安装依赖
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+cd /Users/maca/pro/solo/workspaces/zy73090
+npm install
 ```
+
+> 注：已在 `.npmrc` 中设置 `ignore-scripts=false`，并在 `package.json` 中通过 `overrides` 强制使用 `@rollup/wasm-node` 绕过 macOS 原生二进制签名问题。
+
+### 2. 启动开发服务
+
+```bash
+npm run dev
+```
+
+该命令会同时启动：
+
+- **前端**：http://localhost:5173 （Vite 开发服务器，带 HMR）
+- **后端**：http://localhost:3001 （Express API 服务器）
+- Vite 已配置 `/api` 代理转发到后端，前端无需关心跨域。
+
+启动后访问 http://localhost:5173 即可看到任务列表。首次启动会自动生成示例数据（2 个任务、15 个图层、6 张占位截图）。
+
+### 3. 端口占用问题
+
+如果遇到端口被占用：
+
+```bash
+# 清理 3001 端口
+lsof -ti:3001 | xargs kill -9
+# 清理 5173 端口
+lsof -ti:5173 | xargs kill -9
+```
+
+## 核心功能说明
+
+### 🔹 页面导航
+
+- `/` — 任务列表（支持按状态筛选、搜索）
+- `/tasks/:id` — 任务详情（图层清单、改判面板、历史留痕、关联截图）
+- `/tasks/:id/history` — 版本对比页（任意两个历史版本差异）
+- `/tasks/:id/screenshots` — 截图管理页（全量截图预览、上传、下载、删除）
+- `/guide` — 上手文档页（启动命令、重跑方式、截图规范、接口速览）
+
+### 🔹 数据模型要点
+
+- **CadLayer.originalName**：CAD 原始图层名，**锁定不可修改**，界面上用等宽字体突出显示
+- **LayerHistory**：每次改判/补备注都会生成一条新历史，版本号自增，旧历史永不删除
+- **Screenshot.boundVersion**：截图绑定上传时的图层版本，重跑复核不影响旧截图
+- **Screenshot.standardTags**：规范口径标签，**强制非空**，上传时必须提供
+
+## 重跑复核流程
+
+### 场景：补完备注再重跑，旧历史不覆盖
+
+1. 在详情页选择一个图层，填写补充备注、改判意见、勾选绑定的截图、设置新的口径标签
+2. 点击「提交复核意见」，系统会：
+   - 自动对比变更字段（`changedFields`）
+   - 生成新版本历史（版本号 +1）
+   - 将截图 ID、口径标签、新备注一起写入历史
+   - 旧历史完整保留，可在「版本留痕」面板或「历史对比页」查看完整变更链
+3. 如需重新导出，点击「导出」按钮，导出包中会包含所有版本的截图，并在文件名和 manifest 中注明对应版本
+
+## 截图上传验证步骤
+
+### 1. 准备工作
+
+- 访问 http://localhost:5173
+- 从任务列表点进任意任务的详情页
+- 左侧选择一个图层（例如「W-P-1 喷淋干管」）
+
+### 2. 上传截图
+
+1. 在右侧「关联截图」区域，点击「上传截图」按钮
+2. 弹窗中会自动填充：
+   - 绑定图层 = 当前选中的图层
+   - 图片说明 = 图层显示名称
+   - 口径标签 = 当前页面上已添加的口径标签（可修改）
+   - 绑定版本 = 当前图层的最新版本号（**关键**，确保导出时版本不落到 v0）
+3. 点击选择图片文件（支持 jpg/png/gif/webp，上限 10MB）
+4. 点击「确认上传」
+
+### 3. 验证上传结果
+
+- ✅ 页面底部 Toast 提示：「截图上传成功，已绑定版本 Vx」
+- ✅ 「关联截图」网格中立刻显示新上传的截图，图片正常加载（URL 为 `/api/uploads/uuid.jpg`）
+- ✅ 截图下方显示绑定的 CAD 原始图层名和版本号（如 `W-P-1 · V2`）
+- ✅ 改判面板的「绑定截图」列表中，新截图已被自动勾选（方便直接提交）
+- ✅ 刷新页面后数据仍然存在（已写入 `data/db.json`）
+
+## 导出验证步骤
+
+### 1. 前置条件
+
+- 已完成至少一次截图上传和改判提交
+- 详情页「版本留痕」面板中至少有一条历史记录
+
+### 2. 执行导出
+
+1. 在任务详情页顶部，点击「导出」按钮
+2. Toast 提示会依次显示：
+   - 「导出中...」（请求后端）
+   - 「导出完成，文件已下载」（ZIP 已触发浏览器下载）
+
+### 3. 验证下载文件
+
+- ✅ 浏览器下载完成，文件名格式：`{项目名}_{图纸版本}_复核资料.zip`
+- ✅ 解压后包含以下内容：
+  ```
+  screenshots/
+    {CAD原始图层名}_v{绑定版本}_[{口径标签}]_{当前状态}.{扩展名}
+    例：W-P-1_v2_[GB50015-2019,喷淋避让]_需修改.jpg
+  manifest.json     # 全量元数据（任务、图层、截图、版本、判断、备注）
+  复核摘要.txt        # 人类可读的汇总
+  ```
+- ✅ 打开 `manifest.json`，检查每个截图条目包含：
+  - `boundVersion`：绑定的版本号（不是 0）
+  - `layerOriginalName`：CAD 原始图层名
+  - `layerStatus`：当前复核状态（中文）
+  - `layerOpinion`：最新改判意见
+  - `layerNote`：最新补充备注
+- ✅ 打开 `复核摘要.txt`，检查包含图层明细、截图说明，且内容与页面展示一致
+
+## 数据持久化与重置
+
+- 所有数据持久化到 `data/db.json`
+- 上传的截图文件存储在 `uploads/` 目录
+- 如需重置数据：
+  ```bash
+  rm -rf data/db.json uploads/*
+  npm run dev   # 重启后自动重新生成示例数据
+  ```
+
+## 接口速览
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/tasks` | 任务列表 |
+| GET | `/api/tasks/:id` | 任务详情 |
+| GET | `/api/tasks/:id/layers` | 任务下所有图层 |
+| GET | `/api/tasks/:id/history` | 任务下所有历史 |
+| POST | `/api/tasks/:id/export` | **导出复核资料 ZIP**（统一使用 POST） |
+| POST | `/api/layers/:id/reviews` | 提交改判（生成新版本历史） |
+| PUT | `/api/layers/:id/notes` | 追加备注（仅变更 note 字段） |
+| POST | `/api/tasks/:id/screenshots` | 上传截图（返回 `url` 可直接访问） |
+| GET | `/api/tasks/:id/screenshots` | 任务下所有截图 |
+| GET | `/api/uploads/:filename` | **静态文件路由**，直接访问上传的图片 |
+| GET | `/api/guide` | 上手文档内容 |
+
+## 类型检查
+
+```bash
+# 前后端统一类型检查，零错误通过
+npx tsc --noEmit
+```
+
+## 端到端验收清单
+
+验收时按以下顺序操作，确保全链路打通：
+
+1. ✅ 启动服务 `npm run dev`，浏览器访问 http://localhost:5173 正常加载
+2. ✅ 进入任务详情，选中图层，**上传截图**，图片稳定预览不裂图
+3. ✅ 填写改判意见、补充备注、勾选截图和口径标签，**提交复核**
+4. ✅ 「版本留痕」面板出现新历史，旧历史仍在，版本号 +1
+5. ✅ 刷新页面，所有数据（截图、历史、判断）仍然存在
+6. ✅ 点击「导出」，**浏览器下载 ZIP 文件**
+7. ✅ 解压 ZIP，文件名包含正确版本号和状态，manifest 包含图层原始名、判断、备注
+8. ✅ 再次改判补备注，重复导出，新导出的口径与页面最新展示一致
+
+所有步骤通过则验收完成。

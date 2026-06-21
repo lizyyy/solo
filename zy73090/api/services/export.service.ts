@@ -3,7 +3,13 @@ import type { Response } from 'express';
 import path from 'path';
 import fs from 'fs';
 import { getDb } from '../db.js';
-import type { ReviewTask, CadLayer, LayerHistory, Screenshot } from '../../shared/types.js';
+import type { ReviewTask, CadLayer, LayerHistory, Screenshot, LayerStatus } from '../../shared/types.js';
+
+const STATUS_CN: Record<LayerStatus, string> = {
+  approved: '通过',
+  needs_modify: '需修改',
+  rejected: '驳回',
+};
 
 function isUrl(p: string): boolean {
   return /^https?:\/\//i.test(p);
@@ -35,8 +41,25 @@ function sanitizeName(name: string): string {
 interface Manifest {
   exportedAt: string;
   task: ReviewTask;
-  layers: CadLayer[];
-  screenshots: Array<Screenshot & { zipEntry: string; layerName?: string }>;
+  layers: Array<
+    CadLayer & {
+      originalName: string;
+      latestStatus: string;
+      latestOpinion: string;
+      latestNote?: string;
+      historyCount: number;
+    }
+  >;
+  screenshots: Array<
+    Screenshot & {
+      zipEntry: string;
+      layerName?: string;
+      layerOriginalName?: string;
+      layerStatus?: string;
+      layerOpinion?: string;
+      layerNote?: string;
+    }
+  >;
   notes: {
     口径说明: string;
     规范标准: string;
@@ -62,27 +85,52 @@ export async function exportTask(taskId: string, res: Response): Promise<void> {
   const zipFileName = `${sanitizeName(task.projectName)}_${task.drawingVersion}_复核资料.zip`;
 
   res.setHeader('Content-Type', 'application/zip');
-  res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(zipFileName)}"`);
+  res.setHeader(
+    'Content-Disposition',
+    `attachment; filename="${encodeURIComponent(zipFileName)}"`,
+  );
 
   const archive = archiver('zip', { zlib: { level: 9 } });
   archive.pipe(res);
 
   const entries: Manifest['screenshots'] = [];
+  const enrichedLayers: Manifest['layers'] = layers.map((l) => {
+    const layerHistories = histories.filter((h) => h.layerId === l.id);
+    const latestNote = [...layerHistories]
+      .sort((a, b) => b.version - a.version)
+      .find((h) => h.note);
+    return {
+      ...l,
+      originalName: l.originalName,
+      latestStatus: STATUS_CN[l.currentStatus],
+      latestOpinion: l.latestOpinion,
+      latestNote: latestNote?.note,
+      historyCount: layerHistories.length,
+    };
+  });
 
   for (const shot of screenshots) {
     const layer = layerMap.get(shot.layerId || '');
-    const layerBase = layer
-      ? sanitizeName(layer.displayName || layer.originalName)
-      : sanitizeName(task.projectName.slice(0, 10));
+    const layerHistories = histories.filter((h) => h.layerId === layer?.id);
+    const latestNote = [...layerHistories]
+      .sort((a, b) => b.version - a.version)
+      .find((h) => h.note);
+
+    const layerOriginal = layer ? layer.originalName : sanitizeName(task.projectName.slice(0, 10));
     const tags = sanitizeName(shot.standardTags.join(',')) || 'notag';
-    const version = shot.boundVersion ?? 0;
+    const version = shot.boundVersion ?? (layer ? layer.version : 0);
     const ext = getExtension(shot.mimeType, shot.storedPath);
-    const zipEntry = `screenshots/${layerBase}_v${version}_[${tags}].${ext}`;
+    const statusLabel = layer ? STATUS_CN[layer.currentStatus] : '';
+    const zipEntry = `screenshots/${sanitizeName(layerOriginal)}_v${version}_[${tags}]_${statusLabel || '任务级'}.${ext}`;
 
     entries.push({
       ...shot,
       zipEntry,
       layerName: layer?.displayName || layer?.originalName,
+      layerOriginalName: layer?.originalName,
+      layerStatus: layer ? STATUS_CN[layer.currentStatus] : undefined,
+      layerOpinion: layer?.latestOpinion,
+      layerNote: latestNote?.note,
     });
 
     try {
@@ -103,12 +151,15 @@ export async function exportTask(taskId: string, res: Response): Promise<void> {
   const manifest: Manifest = {
     exportedAt: new Date().toISOString(),
     task,
-    layers,
+    layers: enrichedLayers,
     screenshots: entries,
     notes: {
-      口径说明: '本导出包包含机电管综复核任务下的所有有效截图及全量元数据。图层状态中 needs_modify 与 rejected 视为待整改问题。',
-      规范标准: '审核依据现行国家规范，包括但不限于 GB50015-2019《建筑给水排水设计标准》、GB50736-2012《民用建筑供暖通风与空气调节设计规范》、GB50052-2009《供配电系统设计规范》、GB50016-2014《建筑设计防火规范》(2018版) 等。',
-      文件命名规则: '截图文件名 = {图层原始名称或任务名}_v{绑定版本}_[{规范标签用逗号分隔}].{扩展名}。标签字段做了非法字符过滤，以 "_" 替换。',
+      口径说明:
+        '本导出包包含机电管综复核任务下的所有有效截图及全量元数据。图层状态中 needs_modify 与 rejected 视为待整改问题。每个截图绑定了上传时的图层版本和规范口径，重跑复核会保留旧版本并生成新的截图说明。',
+      规范标准:
+        '审核依据现行国家规范，包括但不限于 GB50015-2019《建筑给水排水设计标准》、GB50736-2012《民用建筑供暖通风与空气调节设计规范》、GB50052-2009《供配电系统设计规范》、GB50016-2014《建筑设计防火规范》(2018版) 等。',
+      文件命名规则:
+        '截图文件名 = {CAD原始图层名}_v{绑定的复核版本}_[{规范标签用逗号分隔}]_{当前复核状态}.{扩展名}。所有非法字符以 "_" 替换，确保在各操作系统下均可用。',
     },
   };
 
@@ -123,6 +174,18 @@ export async function exportTask(taskId: string, res: Response): Promise<void> {
     `截图数量: ${screenshots.length}`,
     `历史记录: ${histories.length} 条`,
     `待整改数: ${layers.filter((l) => l.currentStatus !== 'approved').length}`,
+    `======================================================================`,
+    `图层明细:`,
+    ...enrichedLayers.map(
+      (l) =>
+        `  ${l.category} | ${l.originalName} | ${l.displayName} | ${l.latestStatus} | V${l.version} | ${l.historyCount}条历史`,
+    ),
+    `======================================================================`,
+    `截图说明:`,
+    ...entries.map(
+      (s) =>
+        `  [V${s.boundVersion || 0}] ${s.layerOriginalName || '任务级'} | ${s.caption} | 口径: ${s.standardTags.join(',')}`,
+    ),
   ];
   archive.append(summary.join('\n'), { name: '复核摘要.txt' });
 

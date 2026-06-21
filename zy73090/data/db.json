@@ -104,11 +104,11 @@
       "category": "电气",
       "color": "#CA8A04",
       "lineType": "PHANTOM",
-      "currentStatus": "approved",
-      "latestOpinion": "管线布置合理，满足规范要求，可通过",
-      "version": 2,
+      "currentStatus": "needs_modify",
+      "latestOpinion": "管井处喷淋管道与风管交叉，净距不满足规范要求",
+      "version": 3,
       "createdAt": "2026-05-27T19:52:00.000Z",
-      "updatedAt": "2026-06-08T19:33:00.000Z"
+      "updatedAt": "2026-06-20T23:57:02.690Z"
     },
     {
       "id": "9f31bdef-2fc7-4c70-ba58-648b3bb4d64f",
@@ -1025,6 +1025,30 @@
         "status",
         "opinion"
       ]
+    },
+    {
+      "id": "ca368b7a-e6a5-42b6-a1e1-916c273a8963",
+      "layerId": "6ffef543-c306-44db-b10e-bd4891c1134a",
+      "version": 3,
+      "status": "needs_modify",
+      "opinion": "管井处喷淋管道与风管交叉，净距不满足规范要求",
+      "note": "已协调暖通专业，建议下调风管标高50mm，预计3日内完成修改",
+      "reviewer": "测试用户",
+      "reviewedAt": "2026-06-20T23:57:02.690Z",
+      "standardTags": [
+        "GB50015-2019",
+        "喷淋避让风管"
+      ],
+      "screenshotIds": [
+        "026bd51d-adf3-4bf0-baff-d16edc2f7436"
+      ],
+      "changedFields": [
+        "status",
+        "opinion",
+        "note",
+        "standardTags",
+        "screenshotIds"
+      ]
     }
   ],
   "screenshots": [
@@ -1133,6 +1157,24 @@
         "GB50052-2009",
         "GB50736-2012",
         "15K606"
+      ],
+      "boundVersion": 2,
+      "isDeleted": false
+    },
+    {
+      "id": "026bd51d-adf3-4bf0-baff-d16edc2f7436",
+      "taskId": "d21983f1-f275-4aac-90c7-2dd8bff552d0",
+      "layerId": "6ffef543-c306-44db-b10e-bd4891c1134a",
+      "fileName": "6b08d3de-f71c-49a0-954d-c4c954c7e2f8.jpg",
+      "storedPath": "/Users/maca/pro/solo/workspaces/zy73090/uploads/6b08d3de-f71c-49a0-954d-c4c954c7e2f8.jpg",
+      "fileSize": 286,
+      "mimeType": "image/jpeg",
+      "uploadedAt": "2026-06-20T23:57:02.677Z",
+      "caption": "测试上传-地下二层管井交叉",
+      "standardTags": [
+        "GB50015-2019",
+        "喷淋避让风管",
+        "2026.06 最新规范"
       ],
       "boundVersion": 2,
       "isDeleted": false

@@ -5,7 +5,7 @@ import {
   History as HistoryIcon, ChevronRight, Plus as PlusIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { fetchTask, fetchLayers, fetchTaskHistory, fetchScreenshots, submitReview, uploadScreenshot } from '@/lib/api';
+import { fetchTask, fetchLayers, fetchTaskHistory, fetchScreenshots, submitReview, uploadScreenshot, exportTask } from '@/lib/api';
 import type { ReviewTask, CadLayer, LayerHistory, Screenshot, LayerCategory, LayerStatus } from '@shared/types';
 import Empty from '@/components/Empty';
 
@@ -42,7 +42,7 @@ export default function TaskDetail() {
   const [tagInput, setTagInput] = useState('');
   const [selectedShots, setSelectedShots] = useState<string[]>([]);
   const [showUpModal, setShowUpModal] = useState(false);
-  const [upForm, setUpForm] = useState({ layerId: '', caption: '', standardTags: '' });
+  const [upForm, setUpForm] = useState({ layerId: '', caption: '', standardTags: '', boundVersion: '' });
   const [upFile, setUpFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -94,16 +94,18 @@ export default function TaskDetail() {
     fd.append('file', upFile);
     if (upForm.layerId) fd.append('layerId', upForm.layerId);
     fd.append('caption', upForm.caption);
+    if (upForm.boundVersion) fd.append('boundVersion', upForm.boundVersion);
     const tagArr = upForm.standardTags.split(',').map((s) => s.trim()).filter(Boolean);
     if (tagArr.length === 0) tagArr.push('未分类');
     fd.append('standardTags', JSON.stringify(tagArr));
     setSubmitting(true);
     try {
-      await uploadScreenshot(taskId, fd);
+      const shot = await uploadScreenshot(taskId, fd);
       setShowUpModal(false);
-      setUpForm({ layerId: '', caption: '', standardTags: '' });
+      setUpForm({ layerId: '', caption: '', standardTags: '', boundVersion: '' });
       setUpFile(null);
-      setToast('截图上传成功');
+      if (shot.id) setSelectedShots((prev) => [...prev, shot.id]);
+      setToast(`截图上传成功，已绑定版本 V${shot.boundVersion || 0}`);
       loadAll();
     } finally { setSubmitting(false); }
   }
@@ -118,7 +120,16 @@ export default function TaskDetail() {
           <ChevronRight className="h-3 w-3 text-slate-600" />
           <span className="text-slate-200 font-medium">{task.projectName}</span>
           <span className="chip bg-brand-600/20 text-brand-400 ml-2">{STATUS_LABELS[task.status as LayerStatus] || task.status}</span>
-          <button className="btn-primary ml-auto px-3 py-1.5 text-xs" onClick={() => { fetch(`/api/tasks/${taskId}/export`, { method: 'POST' }); setToast('导出已开始'); }}>
+          <button className="btn-primary ml-auto px-3 py-1.5 text-xs" onClick={async () => {
+            try {
+              setToast('导出中...');
+              await exportTask(taskId!);
+              setToast('导出完成，文件已下载');
+            } catch (e) {
+              const msg = e instanceof Error ? e.message : '导出失败';
+              setToast(msg);
+            }
+          }}>
             <FileDown className="h-3.5 w-3.5" />导出
           </button>
         </div>
@@ -223,7 +234,7 @@ export default function TaskDetail() {
                         {screenshots.map((s) => (
                           <label key={s.id} className="flex cursor-pointer items-center gap-2 rounded p-2 hover:bg-bg-elevated">
                             <input type="checkbox" checked={selectedShots.includes(s.id)} onChange={(e) => setSelectedShots(e.target.checked ? [...selectedShots, s.id] : selectedShots.filter((id) => id !== s.id))} className="rounded border-bg-border bg-bg-elevated" />
-                            <img src={s.storedPath} className="h-8 w-12 rounded object-cover" alt="" />
+                            <img src={s.url ?? s.storedPath} className="h-8 w-12 rounded object-cover" alt="" />
                             <span className="truncate text-sm text-slate-300">{s.caption}</span>
                           </label>
                         ))}
@@ -264,7 +275,17 @@ export default function TaskDetail() {
                   <div className="mb-4 flex items-center gap-2">
                     <Tag className="h-4 w-4 text-slate-400" />
                     <h3 className="font-display text-base font-semibold text-white">关联截图</h3>
-                    <button onClick={() => setShowUpModal(true)} className="btn-primary ml-auto px-3 py-1.5 text-xs">
+                    <button onClick={() => {
+                      if (currentLayer) {
+                        setUpForm({
+                          layerId: currentLayer.id,
+                          caption: currentLayer.displayName,
+                          standardTags: tags.join(','),
+                          boundVersion: String(currentLayer.version),
+                        });
+                      }
+                      setShowUpModal(true);
+                    }} className="btn-primary ml-auto px-3 py-1.5 text-xs">
                       <Upload className="h-3.5 w-3.5" />上传截图
                     </button>
                   </div>
@@ -272,7 +293,7 @@ export default function TaskDetail() {
                     <div className="stagger grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                       {layerShots.map((s) => (
                         <div key={s.id} className="group overflow-hidden rounded-md border border-bg-border bg-bg-soft">
-                          <img src={s.storedPath} className="h-32 w-full object-cover transition group-hover:scale-[1.02]" alt={s.caption} />
+                          <img src={s.url ?? s.storedPath} className="h-32 w-full object-cover transition group-hover:scale-[1.02]" alt={s.caption} />
                           <div className="p-3">
                             <p className="truncate text-sm text-slate-200">{s.caption}</p>
                             <div className="mt-2 flex flex-wrap gap-1">

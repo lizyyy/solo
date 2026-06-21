@@ -57,4 +57,10 @@ export interface Screenshot {
   standardTags: string[];
   boundVersion?: number;
   isDeleted: boolean;
+  url?: string;
+  layerOriginalName?: string;
+  layerDisplayName?: string;
+  layerStatus?: string;
+  layerOpinion?: string;
+  layerNote?: string;
 }
