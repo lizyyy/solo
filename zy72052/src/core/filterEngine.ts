@@ -47,7 +47,12 @@ export function buildFilterSummary(criteria: FilterCriteria): string {
   }
 
   if (criteria.dateRange) {
-    parts.push(`日期: ${criteria.dateRange[0]} ~ ${criteria.dateRange[1]}`);
+    const [start, end] = criteria.dateRange;
+    if (start === end) {
+      parts.push(`日期: ${start}`);
+    } else {
+      parts.push(`日期: ${start} ~ ${end}`);
+    }
   }
 
   if (criteria.onlyReflectionChambers) {

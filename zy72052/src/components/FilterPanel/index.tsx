@@ -51,6 +51,7 @@ function ToggleChip<T extends string>({
 export function FilterPanel() {
   const criteria = useAppStore(s => s.filterCriteria);
   const setFilterCriteria = useAppStore(s => s.setFilterCriteria);
+  const currentDate = useAppStore(s => s.currentDate);
   const filteredCount = useAppStore(s => s.filteredPoints.length);
   const totalCount = useAppStore(s => s.points.length);
 
@@ -80,7 +81,7 @@ export function FilterPanel() {
       types: [],
       statuses: [],
       schemeVersions: [],
-      dateRange: null,
+      dateRange: [currentDate, currentDate],
       onlyReflectionChambers: false,
       onlyAnomalies: false,
     });

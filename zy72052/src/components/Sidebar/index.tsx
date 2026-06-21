@@ -7,6 +7,7 @@ import { AlertTriangle, Camera, FileText, MapPin, Crosshair, ChevronRight } from
 export function Sidebar() {
   const selectedPointId = useAppStore(s => s.selectedPointId);
   const points = useAppStore(s => s.points);
+  const filteredPoints = useAppStore(s => s.filteredPoints);
   const photos = useAppStore(s => s.photos);
   const schemes = useAppStore(s => s.schemes);
   const conflicts = useAppStore(s => s.conflicts);
@@ -20,8 +21,12 @@ export function Sidebar() {
   const relatedSchemes = selectedPoint ? schemes.filter(s => s.pointId === selectedPoint.id) : [];
   const relatedConflict = conflicts.find(c => c.pointId === selectedPointId);
 
-  const anomalyPoints = points.filter(
+  const anomalyPoints = filteredPoints.filter(
     p => p.status !== 'normal' && p.status !== 'warning'
+  );
+
+  const relatedConflicts = conflicts.filter(c =>
+    filteredPoints.some(p => p.id === c.pointId)
   );
 
   if (!sidebarOpen) {
@@ -82,13 +87,13 @@ export function Sidebar() {
               onSelectPoint={selectPoint}
             />
 
-            {conflicts.length > 0 && (
+            {relatedConflicts.length > 0 && (
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-xs text-red-400 font-medium">
                   <AlertTriangle size={12} />
-                  数据冲突
+                  数据冲突 ({relatedConflicts.length})
                 </div>
-                {conflicts.map(c => (
+                {relatedConflicts.map(c => (
                   <button
                     key={c.pointId}
                     onClick={() => selectPoint(c.pointId)}

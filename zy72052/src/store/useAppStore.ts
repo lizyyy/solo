@@ -32,11 +32,13 @@ interface AppState {
   isPointInRayPath: (pointId: string) => boolean;
 }
 
+const defaultDate = '2024-12-01';
+
 const defaultCriteria: FilterCriteria = {
   types: [],
   statuses: [],
   schemeVersions: [],
-  dateRange: null,
+  dateRange: [defaultDate, defaultDate],
   onlyReflectionChambers: false,
   onlyAnomalies: false
 };
@@ -98,7 +100,19 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   setCurrentDate: (date: string) => {
-    set({ currentDate: date });
+    const { points, filterCriteria } = get();
+    const newCriteria: FilterCriteria = {
+      ...filterCriteria,
+      dateRange: [date, date]
+    };
+    const filteredPoints = filterPoints(points, newCriteria);
+    const filterSummary = buildFilterSummary(newCriteria);
+    set({
+      currentDate: date,
+      filterCriteria: newCriteria,
+      filteredPoints,
+      filterSummary
+    });
   },
 
   setShowRayAnimation: (show: boolean) => {

@@ -19,6 +19,9 @@ export function ExportButton() {
 
   const generateReport = useCallback(() => {
     const anomalies = filteredPoints.filter(p => p.status !== 'normal' && p.status !== 'warning');
+    const relatedConflicts = conflicts.filter(c =>
+      filteredPoints.some(p => p.id === c.pointId)
+    );
     const now = new Date().toISOString().slice(0, 10);
 
     let report = `音乐厅声线反射舱 - 巡检报告\n`;
@@ -28,7 +31,7 @@ export function ExportButton() {
     report += `点位总数: ${points.length}\n`;
     report += `筛选结果: ${filteredPoints.length}\n`;
     report += `异常点位: ${anomalies.length}\n`;
-    report += `数据冲突: ${conflicts.length}\n`;
+    report += `数据冲突: ${relatedConflicts.length}\n`;
     if (selectedPoint) {
       report += `当前选中: ${selectedPoint.name} (${getStatusLabel(selectedPoint.status)})\n`;
     }
@@ -63,10 +66,6 @@ export function ExportButton() {
     } else {
       report += `\n✅ 当前筛选条件下无异常点位\n`;
     }
-
-    const relatedConflicts = conflicts.filter(c =>
-      filteredPoints.some(p => p.id === c.pointId)
-    );
 
     if (relatedConflicts.length > 0) {
       report += `\n${'='.repeat(60)}\n`;
