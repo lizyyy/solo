@@ -81,34 +81,105 @@ export const detectBuoyLogAnomalies = (
   return results;
 };
 
+const normalizeTimeKey = (isoString: string): string => {
+  const d = new Date(isoString);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+};
+
 export const isDuplicateLog = (log: BuoyLog, existingLogs: BuoyLog[]): BuoyLog | null => {
-  const duplicate = existingLogs.find(
-    (existing) =>
-      existing.buoyId === log.buoyId &&
-      new Date(existing.recordTime).getTime() === new Date(log.recordTime).getTime()
-  );
+  const newTimeKey = normalizeTimeKey(log.recordTime);
+
+  const duplicate = existingLogs.find((existing) => {
+    if (existing.buoyId !== log.buoyId) return false;
+
+    const existingTimeKey = normalizeTimeKey(existing.recordTime);
+    if (existingTimeKey === newTimeKey) return true;
+
+    if (log.importBatch && existing.importBatch === log.importBatch) return true;
+
+    return false;
+  });
+
   return duplicate || null;
 };
 
+export interface MergeResult {
+  merged: BuoyLog;
+  preservedFields: string[];
+  filledFields: string[];
+  changedFields: string[];
+  preservedRemark: boolean;
+  preservedConfirmed: boolean;
+}
+
 export const mergeDuplicateLog = (
   existingLog: BuoyLog,
-  newLog: BuoyLog
-): { merged: BuoyLog; preservedRemark: boolean } => {
+  newLog: BuoyLog,
+  newBatchName: string
+): MergeResult => {
+  const preservedFields: string[] = [];
+  const filledFields: string[] = [];
+  const changedFields: string[] = [];
+
   const preservedRemark = existingLog.remark.trim().length > 0;
+  const preservedConfirmed = existingLog.isConfirmed;
 
-  const merged: BuoyLog = {
-    ...existingLog,
-    temperature: newLog.temperature,
-    seagrassCoverage: newLog.seagrassCoverage,
-    biomass: newLog.biomass,
-    longitude: preservedRemark ? existingLog.longitude : newLog.longitude,
-    latitude: preservedRemark ? existingLog.latitude : newLog.latitude,
-    remark: preservedRemark ? existingLog.remark : newLog.remark,
-    importBatch: existingLog.importBatch,
-    updatedAt: new Date().toISOString(),
+  const merged = { ...existingLog };
+
+  const protectedFields = ['remark', 'isConfirmed', 'confirmedAt', 'confirmer', 'id', 'createdAt'];
+  const dataFields: (keyof BuoyLog)[] = [
+    'temperature',
+    'seagrassCoverage',
+    'biomass',
+    'longitude',
+    'latitude',
+  ];
+
+  if (preservedRemark) {
+    preservedFields.push('remark');
+  }
+  if (preservedConfirmed) {
+    preservedFields.push('isConfirmed', 'confirmedAt', 'confirmer');
+  }
+
+  dataFields.forEach((field) => {
+    const existingVal = existingLog[field] as number;
+    const newVal = newLog[field] as number;
+
+    if (newVal !== undefined && newVal !== null && !Number.isNaN(newVal)) {
+      if (existingVal === undefined || existingVal === null || Number.isNaN(existingVal)) {
+        (merged as any)[field] = newVal;
+        filledFields.push(field);
+      } else if (preservedConfirmed) {
+        preservedFields.push(field);
+      } else if (Math.abs(existingVal - newVal) > 0.0001) {
+        changedFields.push(field);
+        (merged as any)[field] = newVal;
+      }
+    }
+  });
+
+  if (!merged.remark && newLog.remark) {
+    merged.remark = newLog.remark;
+    filledFields.push('remark');
+  }
+
+  const existingBatches = (merged as any)._importBatches || [existingLog.importBatch];
+  if (!existingBatches.includes(newBatchName)) {
+    existingBatches.push(newBatchName);
+  }
+  (merged as any)._importBatches = existingBatches;
+
+  merged.updatedAt = new Date().toISOString();
+
+  return {
+    merged,
+    preservedFields,
+    filledFields,
+    changedFields,
+    preservedRemark,
+    preservedConfirmed,
   };
-
-  return { merged, preservedRemark };
 };
 
 export const getAnomalyTypeLabel = (type: AnomalyType): string => {

@@ -10,7 +10,22 @@ const ImportModal = () => {
   const [sampleData, setSampleData] = useState<any[]>([]);
   const [batchName, setBatchName] = useState('');
 
-  const generateMockImportData = (hasDuplicate: boolean, hasAnomaly: boolean) => {
+  const STABLE_DATES: Record<string, string> = {
+    'FB-A04': '2026-06-12T09:30:00.000Z',
+    'FB-B02': '2026-06-17T10:15:00.000Z',
+    'FB-A01': '2026-06-15T14:00:00.000Z',
+    'FB-C02': '2026-06-16T11:45:00.000Z',
+    'FB-D01': '2026-06-14T08:20:00.000Z',
+    'FB-D02': '2026-06-13T15:10:00.000Z',
+  };
+
+  const STABLE_BATCHES: Record<string, string> = {
+    normal: 'batch-2026-0618-补录-A',
+    'with-duplicate': 'batch-2026-0615-复查',
+    'with-anomaly': 'batch-2026-0616-异常排查',
+  };
+
+  const generateMockImportData = (type: 'normal' | 'with-duplicate' | 'with-anomaly') => {
     const data: any[] = [
       {
         buoyId: 'FB-A04',
@@ -19,7 +34,7 @@ const ImportModal = () => {
         temperature: 23.5,
         seagrassCoverage: 72,
         biomass: 148,
-        recordTime: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+        recordTime: STABLE_DATES['FB-A04'],
       },
       {
         buoyId: 'FB-B02',
@@ -28,11 +43,11 @@ const ImportModal = () => {
         temperature: 22.8,
         seagrassCoverage: 58,
         biomass: 115,
-        recordTime: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+        recordTime: STABLE_DATES['FB-B02'],
       },
     ];
 
-    if (hasDuplicate) {
+    if (type === 'with-duplicate') {
       data.push({
         buoyId: 'FB-A01',
         longitude: 118.7823,
@@ -40,11 +55,11 @@ const ImportModal = () => {
         temperature: 22.5,
         seagrassCoverage: 78,
         biomass: 156,
-        recordTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        recordTime: STABLE_DATES['FB-A01'],
       });
     }
 
-    if (hasAnomaly) {
+    if (type === 'with-anomaly') {
       data.push({
         buoyId: 'FB-C02',
         longitude: 32.0923,
@@ -52,7 +67,7 @@ const ImportModal = () => {
         temperature: 21.2,
         seagrassCoverage: 35,
         biomass: 68,
-        recordTime: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+        recordTime: STABLE_DATES['FB-C02'],
       });
     }
 
@@ -60,20 +75,8 @@ const ImportModal = () => {
   };
 
   const handleSimulateImport = (type: 'normal' | 'with-duplicate' | 'with-anomaly') => {
-    let data: any[] = [];
-    const batch = `batch-test-${Date.now()}`;
-
-    switch (type) {
-      case 'normal':
-        data = generateMockImportData(false, false);
-        break;
-      case 'with-duplicate':
-        data = generateMockImportData(true, false);
-        break;
-      case 'with-anomaly':
-        data = generateMockImportData(false, true);
-        break;
-    }
+    const data = generateMockImportData(type);
+    const batch = STABLE_BATCHES[type];
 
     setSampleData(data);
     setBatchName(batch);
@@ -239,12 +242,24 @@ const ImportModal = () => {
                   </div>
                   <div className="bg-sand-50 rounded-lg p-4 text-center">
                     <p className="text-2xl font-bold text-sand-700">{importResult.duplicateCount}</p>
-                    <p className="text-xs text-sand-600 mt-1">重复记录</p>
+                    <p className="text-xs text-sand-600 mt-1">重复识别</p>
                   </div>
                   <div className="bg-coral-50 rounded-lg p-4 text-center">
                     <p className="text-2xl font-bold text-coral-700">{importResult.anomalyCount}</p>
-                    <p className="text-xs text-coral-600 mt-1">检测到异常</p>
+                    <p className="text-xs text-coral-600 mt-1">异常条目</p>
                   </div>
+                  {importResult.mergedCount > 0 && (
+                    <div className="bg-ocean-50 rounded-lg p-4 text-center">
+                      <p className="text-2xl font-bold text-ocean-700">{importResult.mergedCount}</p>
+                      <p className="text-xs text-ocean-600 mt-1">补录合并</p>
+                    </div>
+                  )}
+                  {importResult.filledFieldsCount > 0 && (
+                    <div className="bg-emerald-50 rounded-lg p-4 text-center">
+                      <p className="text-2xl font-bold text-emerald-700">{importResult.filledFieldsCount}</p>
+                      <p className="text-xs text-emerald-600 mt-1">补全字段</p>
+                    </div>
+                  )}
                 </div>
 
                 {importResult.skippedWithRemark > 0 && (
@@ -252,9 +267,23 @@ const ImportModal = () => {
                     <div className="flex items-start gap-2">
                       <AlertTriangle className="w-5 h-5 text-sand-600 flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="font-medium text-sand-800 text-sm">备注保留提示</p>
+                        <p className="font-medium text-sand-800 text-sm">人工备注已保留</p>
                         <p className="text-xs text-sand-700 mt-1">
                           {importResult.skippedWithRemark} 条重复记录保留了原有人工备注，未被新数据覆盖
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {importResult.preservedConfirmedCount > 0 && (
+                  <div className="bg-ocean-100 border border-ocean-200 rounded-lg p-4">
+                    <div className="flex items-start gap-2">
+                      <Check className="w-5 h-5 text-ocean-600 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-ocean-800 text-sm">人工确认状态保留</p>
+                        <p className="text-xs text-ocean-700 mt-1">
+                          {importResult.preservedConfirmedCount} 条已确认记录保留了确认人、确认时间和确认状态
                         </p>
                       </div>
                     </div>

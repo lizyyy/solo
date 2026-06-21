@@ -14,6 +14,8 @@ import {
   detectBuoyLogAnomalies,
   isDuplicateLog,
   mergeDuplicateLog,
+  detectLatLngSwapped,
+  type MergeResult,
 } from '../utils/anomalyUtils';
 import { mockBuoyLogs, mockSpatialMarks, mockAnomalies, mockChangeLogs } from '../data/mockData';
 
@@ -181,11 +183,16 @@ export const useAppStore = create<AppState>()(
           anomalyCount: 0,
           skippedWithRemark: 0,
           batchName,
+          filledFieldsCount: 0,
+          preservedConfirmedCount: 0,
+          mergedCount: 0,
         };
 
         const now = new Date().toISOString();
         const newLogs: BuoyLog[] = [];
-        const updatedLogs: BuoyLog[] = [];
+        const mergedUpdates: { log: BuoyLog; mergeInfo: MergeResult; originalBefore: BuoyLog }[] = [];
+
+        const currentAllLogs = get().buoyLogs;
 
         logs.forEach((logData) => {
           const fullLogData = {
@@ -193,34 +200,84 @@ export const useAppStore = create<AppState>()(
             importBatch: batchName,
             remark: '',
             isConfirmed: false,
-          };
+          } as BuoyLog;
 
-          const existingLog = isDuplicateLog(fullLogData as BuoyLog, get().buoyLogs);
+          const hasLatLngSwap = (() => {
+            const { longitude, latitude } = fullLogData;
+            const chinaLngMin = 73;
+            const chinaLngMax = 135;
+            const chinaLatMin = 18;
+            const chinaLatMax = 54;
+            const lngInRange = longitude >= chinaLngMin && longitude <= chinaLngMax;
+            const latInRange = latitude >= chinaLatMin && latitude <= chinaLatMax;
+            const swappedLngInRange = latitude >= chinaLngMin && latitude <= chinaLngMax;
+            const swappedLatInRange = longitude >= chinaLatMin && longitude <= chinaLatMax;
+            if (!lngInRange && !latInRange && swappedLngInRange && swappedLatInRange) return true;
+            if (Math.abs(longitude) < 60 && Math.abs(latitude) > 90) return true;
+            return false;
+          })();
+
+          const existingLog = isDuplicateLog(fullLogData, currentAllLogs);
 
           if (existingLog) {
             result.duplicateCount++;
-            const { merged, preservedRemark } = mergeDuplicateLog(
+            const originalBefore = { ...existingLog };
+
+            const mergeInfo = mergeDuplicateLog(
               existingLog,
-              fullLogData as BuoyLog
+              fullLogData,
+              batchName
             );
-            if (preservedRemark) {
+
+            mergeInfo.merged._lastMergedAt = now;
+            mergeInfo.merged._mergedCount = (existingLog._mergedCount || 1) + 1;
+
+            if (mergeInfo.preservedRemark) {
               result.skippedWithRemark++;
             }
-            updatedLogs.push(merged);
+            if (mergeInfo.preservedConfirmed) {
+              result.preservedConfirmedCount++;
+            }
+            result.filledFieldsCount += mergeInfo.filledFields.length;
+
+            if (
+              mergeInfo.changedFields.length > 0 ||
+              mergeInfo.filledFields.length > 0 ||
+              mergeInfo.preservedFields.length > 0
+            ) {
+              result.mergedCount++;
+            }
+
+            if (hasLatLngSwap) {
+              const existingAnomalies = get().anomalies.filter(
+                (a) => a.sourceId === existingLog.id && !a.isResolved
+              );
+              const hasExistingSwap = existingAnomalies.some((a) => a.type === 'latlng_swapped');
+              if (!hasExistingSwap) {
+                result.anomalyCount++;
+              }
+            }
+
+            mergedUpdates.push({ log: mergeInfo.merged, mergeInfo, originalBefore });
           } else {
             const newLog: BuoyLog = {
               ...fullLogData,
               id: generateId('log'),
               createdAt: now,
               updatedAt: now,
+              _importBatches: [batchName],
+              _mergedCount: 1,
             };
 
+            if (hasLatLngSwap) {
+              result.anomalyCount++;
+            }
+
             const anomalies = detectBuoyLogAnomalies(newLog, [
-              ...get().buoyLogs,
+              ...currentAllLogs,
               ...newLogs,
             ]);
             if (anomalies.length > 0) {
-              result.anomalyCount += anomalies.length;
               anomalies.forEach((a) => {
                 if (a.hasAnomaly && a.type && a.severity && a.description) {
                   get().addAnomaly({
@@ -240,24 +297,119 @@ export const useAppStore = create<AppState>()(
           }
         });
 
+        if (mergedUpdates.length > 0) {
+          mergedUpdates.forEach(({ log, mergeInfo, originalBefore }) => {
+            const hasRealChanges =
+              mergeInfo.changedFields.length > 0 || mergeInfo.filledFields.length > 0;
+
+            if (detectLatLngSwapped(log) || mergeInfo.changedFields.length > 0) {
+              const detected = detectBuoyLogAnomalies(log, currentAllLogs);
+              detected.forEach((a) => {
+                if (a.hasAnomaly && a.type && a.severity && a.description) {
+                  const existing = get().anomalies.find(
+                    (an) =>
+                      an.sourceId === log.id &&
+                      an.type === a.type &&
+                      !an.isResolved
+                  );
+                  if (!existing) {
+                    get().addAnomaly({
+                      sourceType: 'buoy_log',
+                      sourceId: log.id,
+                      type: a.type,
+                      description: a.description,
+                      severity: a.severity,
+                      isResolved: false,
+                    });
+                  }
+                }
+              });
+            }
+
+            const beforeSnapshot: Record<string, unknown> = {};
+            const afterSnapshot: Record<string, unknown> = {};
+
+            [...mergeInfo.changedFields, ...mergeInfo.filledFields, ...mergeInfo.preservedFields].forEach(
+              (field) => {
+                beforeSnapshot[field] = (originalBefore as any)[field];
+                afterSnapshot[field] = (log as any)[field];
+              }
+            );
+
+            const changeRemark = [
+              mergeInfo.changedFields.length > 0 && `更新: ${mergeInfo.changedFields.join(', ')}`,
+              mergeInfo.filledFields.length > 0 && `补齐: ${mergeInfo.filledFields.join(', ')}`,
+              mergeInfo.preservedRemark && `保留备注: "${originalBefore.remark}"`,
+              mergeInfo.preservedConfirmed && `保留确认状态(${originalBefore.confirmer || ''})`,
+            ]
+              .filter(Boolean)
+              .join(' | ');
+
+            get().addChangeLog(
+              'buoy_log',
+              log.id,
+              'update',
+              beforeSnapshot,
+              afterSnapshot,
+              '系统',
+              `补录合并 [${batchName}] ${changeRemark}`
+            );
+          });
+        }
+
         set((state) => ({
           buoyLogs: [
             ...state.buoyLogs.map((l) => {
-              const updated = updatedLogs.find((u) => u.id === l.id);
-              return updated || l;
+              const merged = mergedUpdates.find((m) => m.log.id === l.id);
+              return merged ? merged.log : l;
             }),
             ...newLogs,
           ],
         }));
+
+        newLogs.forEach((log) => {
+          get().addChangeLog(
+            'buoy_log',
+            log.id,
+            'create',
+            null,
+            {
+              buoyId: log.buoyId,
+              seagrassCoverage: log.seagrassCoverage,
+              biomass: log.biomass,
+              recordTime: log.recordTime,
+              batch: batchName,
+            },
+            '系统',
+            `导入新增 [${batchName}]`
+          );
+        });
+
+        const batchSummary = [
+          `新增 ${result.newCount}`,
+          result.duplicateCount > 0 && `重复识别 ${result.duplicateCount}`,
+          result.mergedCount > 0 && `合并补录 ${result.mergedCount}`,
+          result.skippedWithRemark > 0 && `保留备注 ${result.skippedWithRemark}`,
+          result.preservedConfirmedCount > 0 && `保留确认 ${result.preservedConfirmedCount}`,
+          result.anomalyCount > 0 && `异常 ${result.anomalyCount}`,
+        ]
+          .filter(Boolean)
+          .join(' | ');
 
         get().addChangeLog(
           'buoy_log',
           'batch-import',
           'import',
           null,
-          { count: result.newCount, batch: batchName } as Record<string, unknown>,
+          {
+            total: result.total,
+            newCount: result.newCount,
+            duplicateCount: result.duplicateCount,
+            anomalyCount: result.anomalyCount,
+            batch: batchName,
+          },
           '系统',
-          `批量导入 ${batchName}：新增 ${result.newCount} 条，重复 ${result.duplicateCount} 条`
+          `批量导入 ${batchName}：${batchSummary}`
         );
 
         return result;
