@@ -207,11 +207,11 @@ export function ExportPage() {
                           {getStatusLabel(point.status)}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-gray-600 max-w-xs">{truncate(point.description, 100)}</td>
-                      <td className="py-3 px-4 text-gray-600 max-w-xs">{truncate(s.feedbacks, 100)}</td>
-                      <td className="py-3 px-4 text-gray-600 max-w-xs">{truncate(s.photos, 80)}</td>
-                      <td className="py-3 px-4 text-gray-600 max-w-xs">{truncate(s.conflicts, 100)}</td>
-                      <td className="py-3 px-4 text-gray-600 max-w-xs">{truncate(s.history, 120)}</td>
+                      <td className="py-3 px-4 text-gray-600 max-w-xs">{truncate(point.description, 300)}</td>
+                      <td className="py-3 px-4 text-gray-600 max-w-xs">{truncate(s.feedbacks, 200)}</td>
+                      <td className="py-3 px-4 text-gray-600 max-w-xs">{truncate(s.photos, 100)}</td>
+                      <td className="py-3 px-4 text-gray-600 max-w-xs">{truncate(s.conflicts, 200)}</td>
+                      <td className="py-3 px-4 text-gray-600 max-w-xs">{truncate(s.history, 200)}</td>
                     </tr>
                   );
                 })}

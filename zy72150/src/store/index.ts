@@ -285,7 +285,8 @@ export const useAppStore = create<AppState & AppActions>()(
             } else if (resolution === 'use_import') {
               resolvedValue = conflict.importValue;
             } else if (resolution === 'custom') {
-              resolvedValue = customValue || conflict.gisValue;
+              if (!customValue || !customValue.trim()) return p;
+              resolvedValue = customValue.trim();
             }
 
             if (conflict.type === 'name') {

@@ -12,10 +12,17 @@ import {
   X,
   AlertCircle,
   Info,
+  Edit3,
 } from 'lucide-react';
 import { useAppStore } from '../store';
-import { Point, PointStatus, TabType } from '../types';
+import { Point, PointStatus, TabType, ConflictInfo } from '../types';
 import { cn, getSourceColor, getSourceLabel, getStatusColor, getStatusLabel } from '../lib/utils';
+
+interface CustomResolveModal {
+  open: boolean;
+  conflictIndex: number;
+  conflict: ConflictInfo | null;
+}
 
 export function ReviewPage() {
   const { points, selectedPointId, setSelectedPointId, updatePointStatus, addRemark, resolveConflict } = useAppStore();
@@ -23,6 +30,8 @@ export function ReviewPage() {
   const [remarkText, setRemarkText] = useState('');
   const [showRemarkInput, setShowRemarkInput] = useState(false);
   const [filterStatus, setFilterStatus] = useState<PointStatus | 'all'>('all');
+  const [customModal, setCustomModal] = useState<CustomResolveModal>({ open: false, conflictIndex: -1, conflict: null });
+  const [customValue, setCustomValue] = useState('');
 
   const filteredPoints = filterStatus === 'all' ? points : points.filter((p) => p.status === filterStatus);
   const selectedPoint = points.find((p) => p.id === selectedPointId);
@@ -40,15 +49,107 @@ export function ReviewPage() {
   };
 
   const handleResolveConflict = (conflictIndex: number, resolution: 'use_gis' | 'use_import' | 'custom') => {
-    if (selectedPointId) {
-      resolveConflict(selectedPointId, conflictIndex, resolution);
+    if (!selectedPointId) return;
+    if (resolution === 'custom') {
+      const conflict = selectedPoint?.conflicts[conflictIndex];
+      if (!conflict) return;
+      setCustomValue('');
+      setCustomModal({ open: true, conflictIndex, conflict });
+      return;
     }
+    resolveConflict(selectedPointId, conflictIndex, resolution);
+  };
+
+  const handleCustomConfirm = () => {
+    if (!selectedPointId || !customValue.trim() || !customModal.conflict) return;
+    resolveConflict(selectedPointId, customModal.conflictIndex, 'custom', customValue.trim());
+    setCustomModal({ open: false, conflictIndex: -1, conflict: null });
+    setCustomValue('');
+  };
+
+  const handleCustomCancel = () => {
+    setCustomModal({ open: false, conflictIndex: -1, conflict: null });
+    setCustomValue('');
   };
 
   const unresolvedConflicts = selectedPoint?.conflicts.filter((c) => !c.resolved) || [];
 
+  const conflictFieldLabel: Record<string, string> = { name: '点位名称', address: '地址', category: '类别' };
+
   return (
-    <div className="h-[calc(100vh-8rem)] flex gap-6">
+    <div className="h-[calc(100vh-8rem)] flex gap-6 relative">
+      {customModal.open && customModal.conflict && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-amber-600" />
+                手动处理 — {conflictFieldLabel[customModal.conflict.type]}冲突
+              </h3>
+              <button onClick={handleCustomCancel} className="p-1 hover:bg-gray-100 rounded-lg">
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-600 mb-4">
+              请输入人工判定后的{conflictFieldLabel[customModal.conflict.type]}，保存后将同步更新点位正文、冲突处理状态、历史记录和导出清单。
+            </p>
+
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-xs text-blue-600 mb-1">GIS数据</p>
+                <p className="text-sm font-medium text-gray-900">{customModal.conflict.gisValue}</p>
+              </div>
+              <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                <p className="text-xs text-purple-600 mb-1">导入数据</p>
+                <p className="text-sm font-medium text-gray-900">{customModal.conflict.importValue}</p>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <label className="text-sm font-medium text-gray-700 block mb-2">
+                人工判定的{conflictFieldLabel[customModal.conflict.type]}
+                <span className="text-red-500 ml-1">*</span>
+              </label>
+              <input
+                type="text"
+                value={customValue}
+                onChange={(e) => setCustomValue(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleCustomConfirm(); }}
+                placeholder={`请输入${conflictFieldLabel[customModal.conflict.type]}`}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                autoFocus
+              />
+              <p className="text-xs text-gray-400 mt-2">
+                可参考上方 GIS 数据或导入数据，也可输入全新的值。此项不可为空。
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={handleCustomCancel}
+                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                取消
+              </button>
+              <button
+                onClick={handleCustomConfirm}
+                disabled={!customValue.trim()}
+                className={cn(
+                  'px-4 py-2 text-sm rounded-lg font-medium transition-colors flex items-center gap-2',
+                  customValue.trim()
+                    ? 'bg-amber-600 text-white hover:bg-amber-700'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                )}
+              >
+                <CheckCircle className="w-4 h-4" />
+                保存人工判定
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="w-80 flex flex-col">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">人工复核</h1>
