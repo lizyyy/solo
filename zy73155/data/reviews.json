@@ -1,11 +1,12 @@
 [
   {
-    "review_id": "rev_40d3cbc5",
+    "review_id": "rev_430163eb",
     "record_id": "rec_008",
     "reviewer": "阿宁",
-    "review_time": "2026-06-18T16:26:41.076360",
+    "review_time": "2026-06-22T00:49:59.045162",
     "status": "manual_overridden",
     "fail_reason": "threshold",
+    "field_name": "temperature",
     "original_value": "50.0",
     "overridden_value": "35.0",
     "justification": "船上记录本第12页显示该站位温度传感器校准有偏差，实际温度约35°C",

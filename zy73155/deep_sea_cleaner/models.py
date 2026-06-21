@@ -65,6 +65,7 @@ class ManualReviewRecord:
     review_time: datetime
     status: ReviewStatus
     fail_reason: FailReason
+    field_name: Optional[str] = None
     original_value: Optional[str] = None
     overridden_value: Optional[str] = None
     justification: str = ""

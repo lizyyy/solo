@@ -94,6 +94,7 @@ def record_to_dict(rec: CleanedRecord) -> Dict[str, Any]:
             "review_time": rec.review.review_time.isoformat(),
             "status": rec.review.status.value,
             "fail_reason": rec.review.fail_reason.value,
+            "field_name": rec.review.field_name,
             "original_value": rec.review.original_value,
             "overridden_value": rec.review.overridden_value,
             "justification": rec.review.justification,

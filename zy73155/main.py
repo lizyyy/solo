@@ -35,6 +35,8 @@ def main():
     review_parser.add_argument("--reviewer", "-w", required=True, help="评审人")
     review_parser.add_argument("--reason", "-n", required=True, choices=["formula", "unit", "threshold", "format"],
                                help="失败原因：formula/unit/threshold/format")
+    review_parser.add_argument("--field", "-f", choices=["temperature", "salinity", "depth", "latitude", "longitude"],
+                               help="改判字段名")
     review_parser.add_argument("--original", "-o", help="原始值")
     review_parser.add_argument("--override", "-v", help="改判值")
     review_parser.add_argument("--justification", "-j", default="", help="改判理由")
@@ -112,6 +114,7 @@ def main():
             record_id=args.record,
             reviewer=args.reviewer,
             fail_reason=args.reason,
+            field_name=args.field,
             original_value=args.original,
             overridden_value=args.override,
             justification=args.justification,
@@ -122,6 +125,7 @@ def main():
         print(f"  记录ID: {review.record_id}")
         print(f"  评审人: {review.reviewer}")
         print(f"  失败原因: {review.fail_reason.value}")
+        print(f"  改判字段: {review.field_name}")
         print(f"  原始值: {review.original_value}")
         print(f"  改判值: {review.overridden_value}")
         print(f"  理由: {review.justification}")
@@ -139,6 +143,7 @@ def main():
                 print(f"      评审人: {r['reviewer']}")
                 print(f"      状态: {r['status']}")
                 print(f"      失败原因: {r['fail_reason']}")
+                print(f"      改判字段: {r['field_name']}")
                 print(f"      原始值: {r['original_value']}")
                 print(f"      改判值: {r['overridden_value']}")
                 print(f"      理由: {r['justification']}")

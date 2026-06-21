@@ -2,12 +2,15 @@ import json
 import os
 import uuid
 from datetime import datetime
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Tuple
 from .models import (
     ManualReviewRecord,
     ReviewStatus,
     FailReason,
     CleanedRecord,
+    RawSampleRecord,
+    CleanAnomaly,
+    AnomalyType,
 )
 
 
@@ -30,6 +33,7 @@ class ReviewTracker:
                         review_time=datetime.fromisoformat(rec_data["review_time"]),
                         status=ReviewStatus(rec_data["status"]),
                         fail_reason=FailReason(rec_data["fail_reason"]),
+                        field_name=rec_data.get("field_name"),
                         original_value=rec_data.get("original_value"),
                         overridden_value=rec_data.get("overridden_value"),
                         justification=rec_data.get("justification", ""),
@@ -53,6 +57,7 @@ class ReviewTracker:
                     "review_time": rec.review_time.isoformat(),
                     "status": rec.status.value,
                     "fail_reason": rec.fail_reason.value,
+                    "field_name": rec.field_name,
                     "original_value": rec.original_value,
                     "overridden_value": rec.overridden_value,
                     "justification": rec.justification,
@@ -66,6 +71,7 @@ class ReviewTracker:
         record_id: str,
         reviewer: str,
         fail_reason: FailReason,
+        field_name: Optional[str] = None,
         status: ReviewStatus = ReviewStatus.MANUAL_OVERRIDDEN,
         original_value: Optional[str] = None,
         overridden_value: Optional[str] = None,
@@ -79,6 +85,7 @@ class ReviewTracker:
             review_time=datetime.now(),
             status=status,
             fail_reason=fail_reason,
+            field_name=field_name,
             original_value=original_value,
             overridden_value=overridden_value,
             justification=justification,
@@ -101,12 +108,72 @@ class ReviewTracker:
         return sorted(self.reviews[record_id], key=lambda r: r.review_time)
 
     def apply_reviews_to_records(self, cleaned_records: List[CleanedRecord]) -> List[CleanedRecord]:
+        from .cleaner import convert_temperature, convert_salinity, convert_depth, parse_lat_lon
+
         for rec in cleaned_records:
             latest = self.get_latest_review(rec.record_id)
-            if latest:
-                rec.review = latest
-                if latest.status == ReviewStatus.MANUAL_OVERRIDDEN:
-                    rec.is_valid = True
+            if not latest or latest.status != ReviewStatus.MANUAL_OVERRIDDEN:
+                if latest:
+                    rec.review = latest
+                continue
+
+            rec.review = latest
+
+            if not latest.field_name or latest.overridden_value is None:
+                rec.is_valid = True
+                continue
+
+            field = latest.field_name
+            new_val_str = latest.overridden_value
+
+            new_anomaly: Optional[CleanAnomaly] = None
+
+            try:
+                if field == "temperature":
+                    val = float(new_val_str)
+                    new_val, new_anomaly = convert_temperature(val, "°C")
+                    if new_val is not None:
+                        rec.temperature_c = new_val
+                elif field == "salinity":
+                    val = float(new_val_str)
+                    new_val, new_anomaly = convert_salinity(val, "PSU")
+                    if new_val is not None:
+                        rec.salinity_psu = new_val
+                elif field == "depth":
+                    val = float(new_val_str)
+                    new_val, new_anomaly = convert_depth(val, "m")
+                    if new_val is not None:
+                        rec.depth_m = new_val
+                elif field == "latitude":
+                    new_val, new_anomaly = parse_lat_lon(new_val_str, is_lat=True)
+                    if new_val is not None:
+                        rec.latitude = new_val
+                elif field == "longitude":
+                    new_val, new_anomaly = parse_lat_lon(new_val_str, is_lat=False)
+                    if new_val is not None:
+                        rec.longitude = new_val
+            except (ValueError, TypeError):
+                pass
+
+            if field:
+                rec.anomalies = [
+                    a for a in rec.anomalies
+                    if not (a.field_name == field and a.fail_reason == latest.fail_reason)
+                ]
+
+            if new_anomaly:
+                rec.anomalies.append(new_anomaly)
+
+            has_blocking_anomaly = any(
+                a.anomaly_type in (
+                    AnomalyType.MISSING_VALUE,
+                    AnomalyType.INVALID_VALUE,
+                    AnomalyType.LAT_LON_FORMAT,
+                )
+                for a in rec.anomalies
+            )
+            rec.is_valid = not has_blocking_anomaly
+
         return cleaned_records
 
     def get_fail_reason_summary(self) -> Dict[str, int]:

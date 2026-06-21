@@ -1,0 +1,507 @@
+{
+  "batch_id": "batch_api_001",
+  "sample_file": "pack01_demo.csv",
+  "run_time": "2026-06-22T00:53:23.281945",
+  "summary": {
+    "batch_id": "batch_api_001",
+    "run_time": "2026-06-22T00:53:23.281938",
+    "total_records": 15,
+    "valid_records": 8,
+    "anomaly_records": 7,
+    "valid_rate": 53.33,
+    "anomaly_by_type": {
+      "duplicate_bottle": 4,
+      "missing_value": 3,
+      "lat_lon_format": 1,
+      "threshold_outlier": 1
+    },
+    "duplicate_bottles": [
+      {
+        "station_bottle": "ST-A1_B-101",
+        "station": "ST-A1",
+        "bottle_id": "B-101",
+        "count": 2,
+        "record_ids": [
+          "rec_001",
+          "rec_004"
+        ],
+        "sample_times": [
+          "2024-03-15 08:30:00",
+          "2024-03-15 11:00:00"
+        ]
+      },
+      {
+        "station_bottle": "ST-B2_B-401",
+        "station": "ST-B2",
+        "bottle_id": "B-401",
+        "count": 2,
+        "record_ids": [
+          "rec_012",
+          "rec_015"
+        ],
+        "sample_times": [
+          "2024-03-15 19:00:00",
+          "2024-03-15 22:00:00"
+        ]
+      }
+    ],
+    "duplicate_bottle_count": 2,
+    "fail_reason_counts": {
+      "format": 8,
+      "threshold": 1
+    },
+    "manual_review_pending": 7,
+    "manual_review_overridden": 1
+  },
+  "records": [
+    {
+      "record_id": "rec_001",
+      "station": "ST-A1",
+      "bottle_id": "B-101",
+      "depth_m": 500.0,
+      "temperature_c": 4.5,
+      "salinity_psu": 34.5,
+      "latitude": 31.256528,
+      "longitude": 124.512556,
+      "sample_time": "2024-03-15 08:30:00",
+      "is_valid": false,
+      "anomalies": [
+        {
+          "type": "duplicate_bottle",
+          "field": "bottle_id",
+          "message": "采样瓶编号重复: B-101",
+          "fail_reason": "format",
+          "detail": {
+            "bottle_id": "B-101",
+            "station": "ST-A1"
+          }
+        }
+      ],
+      "review": null
+    },
+    {
+      "record_id": "rec_002",
+      "station": "ST-A1",
+      "bottle_id": "B-102",
+      "depth_m": 1000.0,
+      "temperature_c": 3.2,
+      "salinity_psu": 34.8,
+      "latitude": 31.2565,
+      "longitude": 124.5125,
+      "sample_time": "2024-03-15 09:15:00",
+      "is_valid": true,
+      "anomalies": [],
+      "review": null
+    },
+    {
+      "record_id": "rec_003",
+      "station": "ST-A1",
+      "bottle_id": "B-103",
+      "depth_m": 2000.0,
+      "temperature_c": 2.1,
+      "salinity_psu": 34.9,
+      "latitude": 31.256528,
+      "longitude": 124.512556,
+      "sample_time": "2024-03-15 10:00:00",
+      "is_valid": true,
+      "anomalies": [],
+      "review": null
+    },
+    {
+      "record_id": "rec_004",
+      "station": "ST-A1",
+      "bottle_id": "B-101",
+      "depth_m": 500.0,
+      "temperature_c": 4.6,
+      "salinity_psu": 34.6,
+      "latitude": 31.2565,
+      "longitude": 124.5125,
+      "sample_time": "2024-03-15 11:00:00",
+      "is_valid": false,
+      "anomalies": [
+        {
+          "type": "duplicate_bottle",
+          "field": "bottle_id",
+          "message": "采样瓶编号重复: B-101",
+          "fail_reason": "format",
+          "detail": {
+            "bottle_id": "B-101",
+            "station": "ST-A1"
+          }
+        }
+      ],
+      "review": null
+    },
+    {
+      "record_id": "rec_005",
+      "station": "ST-A2",
+      "bottle_id": "B-201",
+      "depth_m": 152.4,
+      "temperature_c": 4.5,
+      "salinity_psu": 35.0,
+      "latitude": 31.2565,
+      "longitude": 124.5125,
+      "sample_time": "2024-03-15 12:00:00",
+      "is_valid": true,
+      "anomalies": [],
+      "review": null
+    },
+    {
+      "record_id": "rec_006",
+      "station": "ST-A2",
+      "bottle_id": "B-202",
+      "depth_m": 1500.0,
+      "temperature_c": 1.8,
+      "salinity_psu": 35.1,
+      "latitude": 31.2565,
+      "longitude": 124.5125,
+      "sample_time": "2024-03-15 13:00:00",
+      "is_valid": true,
+      "anomalies": [],
+      "review": null
+    },
+    {
+      "record_id": "rec_007",
+      "station": "ST-A2",
+      "bottle_id": "B-203",
+      "depth_m": 800.0,
+      "temperature_c": 5.0,
+      "salinity_psu": 34.7,
+      "latitude": -31.2565,
+      "longitude": -124.5125,
+      "sample_time": "2024-03-15 14:00:00",
+      "is_valid": true,
+      "anomalies": [],
+      "review": null
+    },
+    {
+      "record_id": "rec_008",
+      "station": "ST-A2",
+      "bottle_id": "B-204",
+      "depth_m": 3000.0,
+      "temperature_c": 35.0,
+      "salinity_psu": 20.0,
+      "latitude": 31.2565,
+      "longitude": 124.5125,
+      "sample_time": "2024-03-15 15:00:00",
+      "is_valid": true,
+      "anomalies": [],
+      "review": {
+        "review_id": "rev_430163eb",
+        "reviewer": "阿宁",
+        "review_time": "2026-06-22T00:49:59.045162",
+        "status": "manual_overridden",
+        "fail_reason": "threshold",
+        "field_name": "temperature",
+        "original_value": "50.0",
+        "overridden_value": "35.0",
+        "justification": "船上记录本第12页显示该站位温度传感器校准有偏差，实际温度约35°C",
+        "source_note": "深海调查船记录簿 Vol.7 第12页"
+      }
+    },
+    {
+      "record_id": "rec_009",
+      "station": "ST-B1",
+      "bottle_id": "B-301",
+      "depth_m": 100.0,
+      "temperature_c": 10.5,
+      "salinity_psu": 32.0,
+      "latitude": null,
+      "longitude": null,
+      "sample_time": "2024-03-15 16:00:00",
+      "is_valid": false,
+      "anomalies": [
+        {
+          "type": "missing_value",
+          "field": "latitude",
+          "message": "经纬度值缺失",
+          "fail_reason": "format",
+          "detail": {}
+        },
+        {
+          "type": "missing_value",
+          "field": "longitude",
+          "message": "经纬度值缺失",
+          "fail_reason": "format",
+          "detail": {}
+        }
+      ],
+      "review": null
+    },
+    {
+      "record_id": "rec_010",
+      "station": "ST-B1",
+      "bottle_id": "",
+      "depth_m": 200.0,
+      "temperature_c": 8.5,
+      "salinity_psu": 33.0,
+      "latitude": 31.2565,
+      "longitude": 124.5125,
+      "sample_time": "2024-03-15 17:00:00",
+      "is_valid": false,
+      "anomalies": [
+        {
+          "type": "missing_value",
+          "field": "bottle_id",
+          "message": "采样瓶编号缺失",
+          "fail_reason": "format",
+          "detail": {}
+        }
+      ],
+      "review": null
+    },
+    {
+      "record_id": "rec_011",
+      "station": "ST-B1",
+      "bottle_id": "B-303",
+      "depth_m": 5000.0,
+      "temperature_c": 2.5,
+      "salinity_psu": 34.9,
+      "latitude": null,
+      "longitude": 124.5125,
+      "sample_time": "2024-03-15 18:00:00",
+      "is_valid": false,
+      "anomalies": [
+        {
+          "type": "lat_lon_format",
+          "field": "latitude",
+          "message": "无法解析的经纬度格式: 无效格式",
+          "fail_reason": "format",
+          "detail": {
+            "raw_value": "无效格式"
+          }
+        }
+      ],
+      "review": null
+    },
+    {
+      "record_id": "rec_012",
+      "station": "ST-B2",
+      "bottle_id": "B-401",
+      "depth_m": 1200.0,
+      "temperature_c": -268.95,
+      "salinity_psu": 35.0,
+      "latitude": 31.2565,
+      "longitude": 124.5125,
+      "sample_time": "2024-03-15 19:00:00",
+      "is_valid": false,
+      "anomalies": [
+        {
+          "type": "threshold_outlier",
+          "field": "temperature",
+          "message": "温度值异常: -268.95°C (超出深海正常范围 -2~40°C)",
+          "fail_reason": "threshold",
+          "detail": {
+            "value_c": -268.95,
+            "min": -2,
+            "max": 40
+          }
+        },
+        {
+          "type": "duplicate_bottle",
+          "field": "bottle_id",
+          "message": "采样瓶编号重复: B-401",
+          "fail_reason": "format",
+          "detail": {
+            "bottle_id": "B-401",
+            "station": "ST-B2"
+          }
+        }
+      ],
+      "review": null
+    },
+    {
+      "record_id": "rec_013",
+      "station": "ST-B2",
+      "bottle_id": "B-402",
+      "depth_m": 800.0,
+      "temperature_c": 6.5,
+      "salinity_psu": 34.8,
+      "latitude": 31.2565,
+      "longitude": 124.5125,
+      "sample_time": "2024-03-15 20:00:00",
+      "is_valid": true,
+      "anomalies": [],
+      "review": null
+    },
+    {
+      "record_id": "rec_014",
+      "station": "ST-B2",
+      "bottle_id": "B-403",
+      "depth_m": 2000.0,
+      "temperature_c": 3.8,
+      "salinity_psu": 34.6,
+      "latitude": 31.2565,
+      "longitude": 124.5125,
+      "sample_time": "2024-03-15 21:00:00",
+      "is_valid": true,
+      "anomalies": [],
+      "review": null
+    },
+    {
+      "record_id": "rec_015",
+      "station": "ST-B2",
+      "bottle_id": "B-401",
+      "depth_m": 1200.0,
+      "temperature_c": 4.3,
+      "salinity_psu": 35.1,
+      "latitude": 31.2565,
+      "longitude": 124.5125,
+      "sample_time": "2024-03-15 22:00:00",
+      "is_valid": false,
+      "anomalies": [
+        {
+          "type": "duplicate_bottle",
+          "field": "bottle_id",
+          "message": "采样瓶编号重复: B-401",
+          "fail_reason": "format",
+          "detail": {
+            "bottle_id": "B-401",
+            "station": "ST-B2"
+          }
+        }
+      ],
+      "review": null
+    }
+  ],
+  "anomaly_details": [
+    {
+      "record_id": "rec_001",
+      "station": "ST-A1",
+      "bottle_id": "B-101",
+      "anomaly_type": "duplicate_bottle",
+      "field_name": "bottle_id",
+      "message": "采样瓶编号重复: B-101",
+      "fail_reason": "format",
+      "detail": {
+        "bottle_id": "B-101",
+        "station": "ST-A1"
+      }
+    },
+    {
+      "record_id": "rec_004",
+      "station": "ST-A1",
+      "bottle_id": "B-101",
+      "anomaly_type": "duplicate_bottle",
+      "field_name": "bottle_id",
+      "message": "采样瓶编号重复: B-101",
+      "fail_reason": "format",
+      "detail": {
+        "bottle_id": "B-101",
+        "station": "ST-A1"
+      }
+    },
+    {
+      "record_id": "rec_009",
+      "station": "ST-B1",
+      "bottle_id": "B-301",
+      "anomaly_type": "missing_value",
+      "field_name": "latitude",
+      "message": "经纬度值缺失",
+      "fail_reason": "format",
+      "detail": {}
+    },
+    {
+      "record_id": "rec_009",
+      "station": "ST-B1",
+      "bottle_id": "B-301",
+      "anomaly_type": "missing_value",
+      "field_name": "longitude",
+      "message": "经纬度值缺失",
+      "fail_reason": "format",
+      "detail": {}
+    },
+    {
+      "record_id": "rec_010",
+      "station": "ST-B1",
+      "bottle_id": "",
+      "anomaly_type": "missing_value",
+      "field_name": "bottle_id",
+      "message": "采样瓶编号缺失",
+      "fail_reason": "format",
+      "detail": {}
+    },
+    {
+      "record_id": "rec_011",
+      "station": "ST-B1",
+      "bottle_id": "B-303",
+      "anomaly_type": "lat_lon_format",
+      "field_name": "latitude",
+      "message": "无法解析的经纬度格式: 无效格式",
+      "fail_reason": "format",
+      "detail": {
+        "raw_value": "无效格式"
+      }
+    },
+    {
+      "record_id": "rec_012",
+      "station": "ST-B2",
+      "bottle_id": "B-401",
+      "anomaly_type": "threshold_outlier",
+      "field_name": "temperature",
+      "message": "温度值异常: -268.95°C (超出深海正常范围 -2~40°C)",
+      "fail_reason": "threshold",
+      "detail": {
+        "value_c": -268.95,
+        "min": -2,
+        "max": 40
+      }
+    },
+    {
+      "record_id": "rec_012",
+      "station": "ST-B2",
+      "bottle_id": "B-401",
+      "anomaly_type": "duplicate_bottle",
+      "field_name": "bottle_id",
+      "message": "采样瓶编号重复: B-401",
+      "fail_reason": "format",
+      "detail": {
+        "bottle_id": "B-401",
+        "station": "ST-B2"
+      }
+    },
+    {
+      "record_id": "rec_015",
+      "station": "ST-B2",
+      "bottle_id": "B-401",
+      "anomaly_type": "duplicate_bottle",
+      "field_name": "bottle_id",
+      "message": "采样瓶编号重复: B-401",
+      "fail_reason": "format",
+      "detail": {
+        "bottle_id": "B-401",
+        "station": "ST-B2"
+      }
+    }
+  ],
+  "duplicate_details": [
+    {
+      "station_bottle": "ST-A1_B-101",
+      "station": "ST-A1",
+      "bottle_id": "B-101",
+      "count": 2,
+      "record_ids": [
+        "rec_001",
+        "rec_004"
+      ],
+      "sample_times": [
+        "2024-03-15 08:30:00",
+        "2024-03-15 11:00:00"
+      ]
+    },
+    {
+      "station_bottle": "ST-B2_B-401",
+      "station": "ST-B2",
+      "bottle_id": "B-401",
+      "count": 2,
+      "record_ids": [
+        "rec_012",
+        "rec_015"
+      ],
+      "sample_times": [
+        "2024-03-15 19:00:00",
+        "2024-03-15 22:00:00"
+      ]
+    }
+  ]
+}
