@@ -202,13 +202,13 @@ def demo_minority_masked():
 
 
 def demo_supplement_material():
-    print_separator("场景四：补录材料 + 合并历史重算（重点对齐场景）")
+    print_separator("场景四：补录材料 + 完整三步工作流（重点对齐场景）")
     
     importer = MaterialImporter()
     explainer = EnsembleVoteExplainer()
     
-    # ── 第一阶段：首次导入（样例入口） ──
-    print("\n📥 【第1批】样例入口：首次导入阈值调参笔记")
+    # ── Step 1：首次导入（正常材料） ──
+    print("\n📥 【Step 1】第1批导入：阈值调参笔记（正常材料）")
     print("   材料ID：MAT-004")
     print("   材料类型：正常材料")
     print("   阈值笔记：1条（NOTE-004，阈值=0.60）")
@@ -231,12 +231,13 @@ def demo_supplement_material():
     
     result = explainer.process_material(material1)
     
-    print("\n   处理状态：第1批导入完成")
-    print(f"   计算结果：阈值 = {result.final_threshold:.4f}（只有笔记1条：0.60）")
+    print(f"\n   状态：{result.review_status.value}")
+    print(f"   工作流步骤：{result.workflow_step.value}")
+    print(f"   阈值 = {result.final_threshold:.4f}（只有笔记1条：0.60）")
     print(f"   置信度：{result.confidence:.2%}（样本量不足，扣减）")
     
-    # ── 第二阶段：补录材料 ──
-    print("\n📥 【第2批】补录材料：新增线上实验桶数据")
+    # ── Step 1 supplement：补录材料 ──
+    print("\n📥 【Step 1 补录】第2批补录：新增线上实验桶数据")
     print("   材料ID：MAT-004（同一份材料，补录）")
     print("   材料类型：补录材料")
     print("   阈值笔记：0条")
@@ -263,17 +264,50 @@ def demo_supplement_material():
     
     result = explainer.process_material(material2)
     
-    print("\n   处理状态：第2批补录完成，已合并历史重算")
-    print(f"   计算结果：阈值 = {result.final_threshold:.4f}")
+    print(f"\n   状态：{result.review_status.value}（检测到冲突）")
+    print(f"   工作流步骤：{result.workflow_step.value}")
+    print(f"   阈值 = {result.final_threshold:.4f}")
     print(f"   计算过程：(NOTE-004的0.60 + BUCKET-D的0.58) ÷ 2 = 0.59")
     print(f"   置信度：{result.confidence:.2%}（样本量充足，恢复）")
+    print(f"   冲突证据数：{len(result.conflict_evidences)}")
     
-    # ── 第三阶段：明细刷新 ──
+    # ── Step 2：老唐审核 ──
+    print("\n👴 【Step 2】老唐审核线上实验桶")
+    print("   冲突：NOTE-004(0.60) vs BUCKET-D(0.58)")
+    print("   老唐决定：驳回笔记阈值，采用实验桶值")
+    
+    result = explainer.tang_review_buckets(
+        "retention_model_v1",
+        reject_conflicts=["NOTE-004"]
+    )
+    
+    print(f"\n   状态：{result.review_status.value}")
+    print(f"   工作流步骤：{result.workflow_step.value}")
+    print(f"   最终阈值 = {result.final_threshold:.4f}（采用BUCKET-D的0.58）")
+    print(f"   剩余冲突：{len(result.conflict_evidences)}个")
+    
+    # ── Step 3：阈值回放更新 ──
+    print("\n🔄 【Step 3】阈值回放更新")
+    print("   回放阈值：0.595（最终校准值）")
+    
+    result = explainer.update_threshold_playback(
+        model_name="retention_model_v1",
+        new_threshold=0.595,
+        reason="线上效果校准，提升留存目标"
+    )
+    
+    print(f"\n   状态：{result.review_status.value}")
+    print(f"   工作流步骤：{result.workflow_step.value}")
+    print(f"   最终阈值 = {result.final_threshold:.4f}")
+    print(f"   导出追踪ID：{result.export_trace_id}")
+    print(f"   导出追踪ID非空：{'是' if result.export_trace_id else '否'}")
+    
+    # ── 明细刷新 ──
     print("\n🔍 【明细刷新】查看批次明细和阈值变更历史")
     print_result(result, show_batches=True, show_history=True)
     
-    # ── 第四阶段：报告说明 ──
-    print("\n📋 【报告说明】导出报告（可反查到同一条记录）")
+    # ── 导出报告 ──
+    print("\n📋 【导出报告】可反查到同一条记录")
     report = explainer.export_report("retention_model_v1")
     
     print(f"   模型名称：{report['模型名称']}")
@@ -281,6 +315,13 @@ def demo_supplement_material():
     print(f"   最终阈值：{report['最终阈值']:.4f}")
     print(f"   审核状态：{report['审核状态']}")
     print(f"   工作流阶段：{report['工作流阶段']}")
+    print(f"   导出追踪ID：{report['导出追踪ID']}")
+    print(f"   导出追踪ID非空：{'是' if report['导出追踪ID'] else '否'}")
+    
+    print("\n   反查键：")
+    print(f"   - 变更ID列表：{report['反查键']['变更ID列表']}")
+    print(f"   - 批次号列表：{report['反查键']['批次号列表']}")
+    print(f"   - 材料ID列表：{report['反查键']['材料ID列表']}")
     
     print("\n   历史批次明细：")
     for b in report['历史批次明细']:
