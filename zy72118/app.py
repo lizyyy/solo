@@ -325,27 +325,40 @@ elif page == "⚖️ 冲突检测":
             stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4)
             stat_col1.metric("微信记录", report.get('wechat_records_count', 0))
             stat_col2.metric("含距离记录", report.get('distance_wechat_records', 0))
-            stat_col3.metric("含方向记录", report.get('directional_wechat_records', 0))
+            stat_col3.metric("含有效方向", report.get('directional_wechat_records', 0))
             stat_col4.metric("时间匹配成功", report.get('time_matches', 0))
+
+            if report.get('missing_direction_wechat_records', 0):
+                st.info(f"ℹ️ {report['missing_direction_wechat_records']} 条微信记录未标注方向（会以'微信方向缺失'单独提示）")
             
             pending = summary.get('pending_conflicts', 0)
             total = summary.get('total_conflicts', 0)
             resolved = summary.get('resolved_conflicts', 0)
             ignored = summary.get('ignored_conflicts', 0)
+            pending_high = sum(1 for c in summary.get('pending_conflicts_list', [])
+                               if c.severity == 'high')
             
             sc1, sc2, sc3, sc4 = st.columns(4)
             sc1.metric("待处理冲突", pending, delta=None)
-            sc2.metric("已解决冲突", resolved, delta=None)
-            sc3.metric("已忽略冲突", ignored, delta=None)
+            sc2.metric("  其中 high 级", pending_high, delta=None)
+            sc3.metric("已解决 / 已忽略", f"{resolved} / {ignored}", delta=None)
             sc4.metric("冲突总数", total, delta=None)
+
+            by_type = summary.get('by_type', {})
+            if by_type:
+                type_cols = st.columns(len(by_type))
+                for i, (ctype, cnt) in enumerate(by_type.items()):
+                    type_cols[i].metric(ctype, cnt)
             
             if report.get('parse_errors'):
                 with st.expander(f"⚠️ 解析/匹配异常 {len(report['parse_errors'])} 条"):
                     for e in report['parse_errors'][:10]:
                         st.warning(e)
-            
-            if pending > 0:
-                st.error(f"⚖️ 存在 {pending} 个未处理冲突，建议先处理再继续校准")
+
+            if pending_high > 0:
+                st.error(f"⚖️ 存在 {pending_high} 个 **high 严重度**待处理冲突，必须先处理再继续校准")
+            elif pending > 0:
+                st.warning(f"⚠️ 存在 {pending} 个低/中严重度待处理冲突，建议先核对后再校准")
             elif total > 0:
                 st.success(f"✅ {total} 个冲突已全部处理（已解决 {resolved}，已忽略 {ignored}），可以继续校准")
             else:
@@ -363,39 +376,62 @@ elif page == "⚖️ 冲突检测":
                     horizontal=True,
                     key='conflict_filter'
                 )
+
+                filter_type = st.multiselect(
+                    "筛选类型（可选）",
+                    options=list(by_type.keys()),
+                    default=list(by_type.keys()),
+                    key='conflict_filter_type'
+                )
                 
                 display_conflicts = []
                 for c in summary['conflicts']:
-                    if filter_status == '待处理' and c.status == 'pending':
-                        display_conflicts.append(c)
-                    elif filter_status == '已解决' and c.status == 'resolved':
-                        display_conflicts.append(c)
-                    elif filter_status == '已忽略' and c.status == 'ignored':
-                        display_conflicts.append(c)
-                    elif filter_status == '全部':
-                        display_conflicts.append(c)
+                    if filter_status == '待处理' and c.status != 'pending':
+                        continue
+                    elif filter_status == '已解决' and c.status != 'resolved':
+                        continue
+                    elif filter_status == '已忽略' and c.status != 'ignored':
+                        continue
+                    if c.conflict_type not in filter_type:
+                        continue
+                    display_conflicts.append(c)
+
+                if not display_conflicts:
+                    st.info("该筛选条件下没有冲突")
                 
                 for idx, c in enumerate(display_conflicts):
                     status_label = {'pending': '🟡 待处理', 'resolved': '✅ 已解决', 'ignored': '⚪ 已忽略'}[c.status]
-                    severity_icon = "🔴" if c.severity == 'high' else "🟡"
+                    sev_map = {'high': '🔴', 'medium': '🟡', 'low': '🔵'}
+                    severity_icon = sev_map.get(c.severity, '⚪')
+
+                    if c.conflict_type.startswith('数值'):
+                        title_suffix = f"差异 {c.discrepancy:.2f} mm ({c.discrepancy_percent:.1f}%)"
+                    elif c.conflict_type == '方向冲突':
+                        title_suffix = f"方向不一致"
+                    elif c.conflict_type == '微信方向缺失':
+                        title_suffix = f"微信记录未说明方向"
+                    elif c.conflict_type == '数据方向缺失':
+                        title_suffix = f"实验数据方向无法识别"
+                    else:
+                        title_suffix = ""
                     
-                    with st.expander(f"{status_label} {severity_icon} {c.conflict_type} - "
-                                     f"差异: {c.discrepancy:.2f} mm ({c.discrepancy_percent:.1f}%)"
+                    with st.expander(f"{status_label} {severity_icon} [{c.severity.upper()}] "
+                                     f"{c.conflict_type} - {title_suffix}"
                                      f"{' | ' + c.resolution_note if c.resolution_note else ''}"):
                         col_a, col_b = st.columns(2)
                         with col_a:
                             st.write("**实验数据**")
                             if c.conflict_type.startswith('数值'):
                                 st.info(f"数值: {c.data_value:.2f} mm")
-                            else:
-                                st.info("(方向冲突，无数值)")
+                            elif c.conflict_type in ('方向冲突', '微信方向缺失', '数据方向缺失'):
+                                # 从 suggestion 里抓实际方向展示
+                                st.info(c.suggestion.split('，')[0].replace('方向不一致，', '').strip()
+                                        if c.conflict_type == '方向冲突' else c.suggestion.split('，')[0])
                             st.caption(f"时间: {c.timestamp}")
                         with col_b:
                             st.write("**微信群记录**")
                             if c.conflict_type.startswith('数值'):
                                 st.warning(f"数值: {c.wechat_value:.2f} mm")
-                            else:
-                                st.warning("(方向冲突，无数值)")
                             st.code(c.wechat_record, language=None)
                         
                         st.write("**建议动作**")
@@ -425,6 +461,9 @@ elif page == "⚖️ 冲突检测":
                                     st.session_state.conflict_detector._ignored_keys.discard(c.conflict_id)
                                 st.session_state.last_conflicts_summary = st.session_state.conflict_detector.get_conflict_summary()
                                 st.rerun()
+
+            # 把处理状态暴露给"继续校准"判断
+            st.session_state.pending_high_conflicts = pending_high
             
             st.divider()
             st.subheader("建议动作")
@@ -481,8 +520,14 @@ elif page == "🔧 误差校准":
         segments = 3
         if calibration_method == "分段线性校准":
             segments = st.slider("分段数量", min_value=2, max_value=5, value=3)
+
+        pending_high = st.session_state.get('pending_high_conflicts', None)
+        if pending_high and pending_high > 0:
+            st.error(f"⚠️ 检测到 {pending_high} 个 high 严重度冲突尚未处理，必须先在「微信群记录对比」页面标记处理")
+        elif pending_high == 0 and st.session_state.get('last_conflicts_summary', {}).get('total_conflicts', 0):
+            st.success("✅ 所有冲突已处理，可以继续校准")
         
-        if st.button("执行校准", type="primary"):
+        if st.button("执行校准", type="primary", disabled=(pending_high and pending_high > 0)):
             with st.spinner("正在计算校准参数..."):
                 raw_values = pd.to_numeric(df[raw_col], errors='coerce').values
                 ref_values = pd.to_numeric(df[ref_col], errors='coerce').values

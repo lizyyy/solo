@@ -313,52 +313,110 @@ class ConflictDetector:
                            data_time_col: str = None) -> List[ConflictRecord]:
         conflicts = []
         self._last_detection_report['direction_checked'] = True
-        self._last_detection_report['directional_wechat_records'] = sum(
-            1 for r in self.wechat_records if r.get('direction') is not None
-        )
-        
+
+        directional = 0
+        missing = 0
+
         positive_set = set(DIRECTION_GROUPS.get('正向', []))
         negative_set = set(DIRECTION_GROUPS.get('反向', []))
+
+        def _normalize(d: str):
+            if d is None:
+                return None
+            s = str(d).strip()
+            if not s or s.lower() in ('none', 'nan', 'null', '无', '-'):
+                return None
+            mapped = DIRECTION_ALIASES.get(s, s)
+            if mapped in positive_set or s in positive_set:
+                return '正向'
+            if mapped in negative_set or s in negative_set:
+                return '反向'
+            return None
         
         for wechat_rec in self.wechat_records:
-            if 'direction' not in wechat_rec:
-                continue
-                
-            wechat_direction = wechat_rec['direction']
-            wechat_mapped = DIRECTION_ALIASES.get(wechat_direction, wechat_direction)
-            wechat_is_positive = wechat_mapped in positive_set or wechat_direction in positive_set
-            
-            if data_time_col and data_time_col in data_df.columns and 'timestamp' in wechat_rec and wechat_rec['timestamp']:
+            wechat_direction_raw = wechat_rec.get('direction')
+            wechat_dir_norm = _normalize(wechat_direction_raw)
+
+            has_distance = wechat_rec.get('distance') is not None
+            has_content = bool(wechat_rec.get('content', '').strip())
+
+            if wechat_dir_norm is not None:
+                directional += 1
+            else:
+                if has_distance or has_content:
+                    missing += 1
+
+            if data_time_col and data_time_col in data_df.columns \
+                    and wechat_rec.get('timestamp'):
                 try:
                     data_times = pd.to_datetime(data_df[data_time_col])
                     wechat_time = pd.to_datetime(wechat_rec['timestamp'])
                     time_diff = abs((data_times - wechat_time).dt.total_seconds())
                     closest_idx = time_diff.idxmin()
-                    
-                    if time_diff[closest_idx] < 300:
-                        data_direction = str(data_df.iloc[closest_idx][data_direction_col]).strip()
-                        data_mapped = DIRECTION_ALIASES.get(data_direction, data_direction)
-                        data_is_positive = data_mapped in positive_set or data_direction in positive_set
-                        data_is_negative = data_mapped in negative_set or data_direction in negative_set
-                        
-                        if (data_is_positive or data_is_negative) and (data_is_positive != wechat_is_positive):
+
+                    if time_diff[closest_idx] >= 300:
+                        continue
+
+                    data_direction_raw = data_df.iloc[closest_idx][data_direction_col]
+                    data_dir_norm = _normalize(data_direction_raw)
+
+                    if wechat_dir_norm is not None and data_dir_norm is not None:
+                        if wechat_dir_norm != data_dir_norm:
                             conflicts.append(ConflictRecord(
                                 conflict_type='方向冲突',
                                 data_source='实验数据',
-                                wechat_record=wechat_rec['content'],
+                                wechat_record=wechat_rec.get('content', ''),
                                 data_value=0,
                                 wechat_value=0,
                                 discrepancy=0,
                                 discrepancy_percent=0,
                                 timestamp=wechat_rec.get('timestamp', ''),
-                                suggestion=f'方向不一致，实验数据: {data_direction}，微信群记录: {wechat_direction}',
+                                suggestion=(
+                                    f'方向不一致，实验数据: {data_direction_raw}（{data_dir_norm}），'
+                                    f'微信群记录: {wechat_direction_raw}（{wechat_dir_norm}）'
+                                ),
                                 severity='high'
                             ))
+                    elif wechat_dir_norm is not None and data_dir_norm is None:
+                        conflicts.append(ConflictRecord(
+                            conflict_type='数据方向缺失',
+                            data_source='实验数据',
+                            wechat_record=wechat_rec.get('content', ''),
+                            data_value=0,
+                            wechat_value=0,
+                            discrepancy=0,
+                            discrepancy_percent=0,
+                            timestamp=wechat_rec.get('timestamp', ''),
+                            suggestion=(
+                                f'实验数据方向字段无法识别（原始值: {data_direction_raw}），'
+                                f'微信群记录为 {wechat_direction_raw}，建议补录或核对'
+                            ),
+                            severity='medium'
+                        ))
+                    elif wechat_dir_norm is None and data_dir_norm is not None and (has_distance or has_content):
+                        conflicts.append(ConflictRecord(
+                            conflict_type='微信方向缺失',
+                            data_source='微信群记录',
+                            wechat_record=wechat_rec.get('content', ''),
+                            data_value=0,
+                            wechat_value=0,
+                            discrepancy=0,
+                            discrepancy_percent=0,
+                            timestamp=wechat_rec.get('timestamp', ''),
+                            suggestion=(
+                                f'微信群记录未说明方向（实验数据为 {data_direction_raw}），'
+                                f'建议补录方向信息'
+                            ),
+                            severity='low'
+                        ))
                 except Exception as e:
                     self._last_detection_report['parse_errors'].append(
                         f"方向匹配失败[{wechat_rec.get('timestamp', '')}]: {e}"
                     )
-                    
+
+        self._last_detection_report['directional_wechat_records'] = directional
+        self._last_detection_report['missing_direction_wechat_records'] = missing
+
         for c in conflicts:
             self._add_conflict_if_new(c)
         return conflicts
