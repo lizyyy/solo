@@ -3,10 +3,17 @@ import type { Scheme, Building, SolarPanel, Inverter, ConflictRecord } from "@/t
 import { sampleScheme } from "@/utils/sampleData"
 import { validateBuilding, validatePanel, validateInverter } from "@/utils/dataValidator"
 
+interface PendingImport {
+  buildings: Building[]
+  panels: SolarPanel[]
+  inverters: Inverter[]
+}
+
 interface SchemeStore {
   currentScheme: Scheme
   savedSchemes: Scheme[]
   conflicts: ConflictRecord[]
+  pendingImport: PendingImport
 
   loadSample: () => void
   updateSchemeParams: (params: Partial<Pick<Scheme, "latitude" | "longitude" | "date" | "time" | "sunAltitude" | "sunAzimuth" | "name" | "note">>) => void
@@ -23,9 +30,10 @@ interface SchemeStore {
   loadScheme: (id: string) => void
   deleteScheme: (id: string) => void
   renameScheme: (id: string, name: string) => void
-  setConflicts: (conflicts: ConflictRecord[]) => void
+  setConflictsAndPending: (conflicts: ConflictRecord[], pending: PendingImport) => void
   resolveConflict: (id: string, decision: "keep_existing" | "use_imported" | "merge") => void
   applyImportedData: () => void
+  cancelImport: () => void
   recalcShadowCoverage: () => void
   loadFromLocalStorage: () => void
 }
@@ -77,9 +85,10 @@ export const useSchemeStore = create<SchemeStore>((set, get) => ({
   currentScheme: revalidate(sampleScheme),
   savedSchemes: [],
   conflicts: [],
+  pendingImport: { buildings: [], panels: [], inverters: [] },
 
   loadSample: () => {
-    set({ currentScheme: revalidate(sampleScheme), conflicts: [] })
+    set({ currentScheme: revalidate(sampleScheme), conflicts: [], pendingImport: { buildings: [], panels: [], inverters: [] } })
   },
 
   updateSchemeParams: (params) => {
@@ -212,7 +221,7 @@ export const useSchemeStore = create<SchemeStore>((set, get) => ({
     const { savedSchemes } = get()
     const found = savedSchemes.find((s) => s.id === id)
     if (found) {
-      set({ currentScheme: revalidate(found), conflicts: [] })
+      set({ currentScheme: revalidate(found), conflicts: [], pendingImport: { buildings: [], panels: [], inverters: [] } })
     }
   },
 
@@ -236,7 +245,7 @@ export const useSchemeStore = create<SchemeStore>((set, get) => ({
     })
   },
 
-  setConflicts: (conflicts) => set({ conflicts }),
+  setConflictsAndPending: (conflicts, pending) => set({ conflicts, pendingImport: pending }),
 
   resolveConflict: (id, decision) => {
     set((state) => ({
@@ -247,20 +256,141 @@ export const useSchemeStore = create<SchemeStore>((set, get) => ({
   },
 
   applyImportedData: () => {
-    const { conflicts, currentScheme } = get()
-    const scheme = { ...currentScheme }
+    const { conflicts, pendingImport, currentScheme } = get()
+    let scheme = { ...currentScheme }
+    let buildings = [...scheme.buildings]
+    let panels = [...scheme.panels]
+    let inverters = [...scheme.inverters]
+
+    const conflictEntityIds = new Map<string, "keep_existing" | "use_imported" | "merge">()
     conflicts.forEach((c) => {
-      if (!c.resolved || c.userDecision === "keep_existing") return
-      if (c.userDecision === "use_imported") {
+      if (c.resolved && c.userDecision) {
+        conflictEntityIds.set(`${c.entityType}:${c.entityId}`, c.userDecision)
+      }
+    })
+
+    const importedBuildingsHandled = new Set<string>()
+    const importedPanelsHandled = new Set<string>()
+    const importedInvertersHandled = new Set<string>()
+
+    conflicts.forEach((c) => {
+      if (!c.resolved || !c.userDecision) return
+      if (c.userDecision === "keep_existing") {
         if (c.entityType === "building") {
-          scheme.buildings = scheme.buildings.map((b) =>
-            b.id === c.entityId ? { ...b, ...c.importedData as Partial<Building> } : b
+          const matchName = (c.existingData as Partial<Building>).name
+          const idx = pendingImport.buildings.findIndex((b) => b.name === matchName)
+          if (idx >= 0) importedBuildingsHandled.add(pendingImport.buildings[idx].id)
+        } else if (c.entityType === "panel") {
+          const matchName = (c.existingData as Partial<SolarPanel>).name
+          const idx = pendingImport.panels.findIndex((p) => p.name === matchName)
+          if (idx >= 0) importedPanelsHandled.add(pendingImport.panels[idx].id)
+        } else if (c.entityType === "inverter") {
+          const matchName = (c.existingData as Partial<Inverter>).name
+          const idx = pendingImport.inverters.findIndex((i) => i.name === matchName)
+          if (idx >= 0) importedInvertersHandled.add(pendingImport.inverters[idx].id)
+        }
+      } else if (c.userDecision === "use_imported") {
+        if (c.entityType === "building") {
+          const imported = pendingImport.buildings.find(
+            (b) => b.name === (c.existingData as Partial<Building>).name
           )
+          if (imported) {
+            importedBuildingsHandled.add(imported.id)
+            buildings = buildings.map((b) =>
+              b.id === c.entityId ? { ...b, ...imported } : b
+            )
+          }
+        } else if (c.entityType === "panel") {
+          const imported = pendingImport.panels.find(
+            (p) => p.name === (c.existingData as Partial<SolarPanel>).name
+          )
+          if (imported) {
+            importedPanelsHandled.add(imported.id)
+            panels = panels.map((p) =>
+              p.id === c.entityId ? { ...p, ...imported } : p
+            )
+          }
+        } else if (c.entityType === "inverter") {
+          const imported = pendingImport.inverters.find(
+            (i) => i.name === (c.existingData as Partial<Inverter>).name
+          )
+          if (imported) {
+            importedInvertersHandled.add(imported.id)
+            inverters = inverters.map((i) =>
+              i.id === c.entityId ? { ...i, ...imported } : i
+            )
+          }
+        }
+      } else if (c.userDecision === "merge") {
+        if (c.entityType === "building") {
+          const existing = buildings.find((b) => b.id === c.entityId)
+          const imported = pendingImport.buildings.find(
+            (b) => b.name === (c.existingData as Partial<Building>).name
+          )
+          if (existing && imported) {
+            importedBuildingsHandled.add(imported.id)
+            const mergedNote = `[合并] 原X=${existing.x},Y=${existing.y}; 导入X=${imported.x},Y=${imported.y}`
+            buildings = buildings.map((b) =>
+              b.id === c.entityId
+                ? {
+                    ...b,
+                    x: imported.x,
+                    y: imported.y,
+                    width: Math.max(b.width, imported.width),
+                    depth: Math.max(b.depth, imported.depth),
+                    height: Math.max(b.height, imported.height),
+                    anomalyNote: mergedNote,
+                    aliasName: imported.name,
+                  }
+                : b
+            )
+          }
+        } else if (c.entityType === "inverter") {
+          const existing = inverters.find((i) => i.id === c.entityId)
+          const imported = pendingImport.inverters.find(
+            (i) => i.name === (c.existingData as Partial<Inverter>).name
+              || (existing && i.aliasName === existing.name)
+          )
+          if (existing && imported) {
+            importedInvertersHandled.add(imported.id)
+            inverters = inverters.map((i) =>
+              i.id === c.entityId
+                ? { ...i, aliasName: imported.name || i.aliasName, anomalyNote: "[合并] 已合并别名记录" }
+                : i
+            )
+          }
         }
       }
     })
-    set({ currentScheme: revalidate(scheme), conflicts: [] })
+
+    const newBuildings = pendingImport.buildings.filter((b) => !importedBuildingsHandled.has(b.id))
+    const newPanels = pendingImport.panels.filter((p) => !importedPanelsHandled.has(p.id))
+    const newInverters = pendingImport.inverters.filter((i) => !importedInvertersHandled.has(i.id))
+
+    buildings = [...buildings, ...newBuildings]
+    panels = [...panels, ...newPanels]
+    inverters = [...inverters, ...newInverters]
+
+    const finalScheme = revalidate({
+      ...scheme,
+      buildings,
+      panels,
+      inverters,
+      updatedAt: new Date().toISOString(),
+    })
+    set({
+      currentScheme: finalScheme,
+      conflicts: [],
+      pendingImport: { buildings: [], panels: [], inverters: [] },
+    })
     get().recalcShadowCoverage()
+  },
+
+  cancelImport: () => {
+    set({
+      conflicts: [],
+      pendingImport: { buildings: [], panels: [], inverters: [] },
+    })
   },
 
   recalcShadowCoverage: () => {

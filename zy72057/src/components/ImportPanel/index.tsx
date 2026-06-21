@@ -6,7 +6,7 @@ import { Upload, FileUp, X, AlertTriangle } from "lucide-react"
 import type { Building, SolarPanel, Inverter } from "@/types"
 
 export default function ImportPanel() {
-  const { currentScheme, setConflicts, addBuildings, addPanels, addInverters } = useSchemeStore()
+  const { currentScheme, setConflictsAndPending, applyImportedData } = useSchemeStore()
   const { setImportModalOpen } = useUIStore()
   const [rawText, setRawText] = useState("")
   const [format, setFormat] = useState<"csv" | "json">("csv")
@@ -23,29 +23,57 @@ export default function ImportPanel() {
     const rows = parseImportData(rawText, format) as Record<string, string>[]
     if (rows.length === 0) return
 
+    const pending = { buildings: [] as Building[], panels: [] as SolarPanel[], inverters: [] as Inverter[] }
+
     if (importType === "building") {
-      const buildings = mapCSVToBuildings(rows) as Building[]
+      const buildings = mapCSVToBuildings(rows).map((b) => ({
+        ...b,
+        status: "normal" as const,
+        anomalyNote: "",
+      } as Building))
+      pending.buildings = buildings
       const conflicts = detectConflicts(currentScheme, { buildings })
       if (conflicts.length > 0) {
-        setConflicts(conflicts)
+        setConflictsAndPending(conflicts, pending)
+      } else {
+        setConflictsAndPending([], pending)
+        applyImportedData()
       }
-      addBuildings(buildings.map((b) => ({ ...b, status: "normal", anomalyNote: "" } as Building)))
     } else if (importType === "panel") {
-      const panels = mapCSVToPanels(rows) as SolarPanel[]
-      addPanels(panels.map((p) => ({ ...p, status: "normal", anomalyNote: "", shadowCoverage: 0 } as SolarPanel)))
+      const panels = mapCSVToPanels(rows).map((p) => ({
+        ...p,
+        status: "normal" as const,
+        anomalyNote: "",
+        shadowCoverage: 0,
+      } as SolarPanel))
+      pending.panels = panels
+      const conflicts = detectConflicts(currentScheme, { panels })
+      if (conflicts.length > 0) {
+        setConflictsAndPending(conflicts, pending)
+      } else {
+        setConflictsAndPending([], pending)
+        applyImportedData()
+      }
     } else {
-      const inverters = mapCSVToInverters(rows) as Inverter[]
+      const inverters = mapCSVToInverters(rows).map((i) => ({
+        ...i,
+        status: "normal" as const,
+        anomalyNote: "",
+      } as Inverter))
+      pending.inverters = inverters
       const conflicts = detectConflicts(currentScheme, { inverters })
       if (conflicts.length > 0) {
-        setConflicts(conflicts)
+        setConflictsAndPending(conflicts, pending)
+      } else {
+        setConflictsAndPending([], pending)
+        applyImportedData()
       }
-      addInverters(inverters.map((i) => ({ ...i, status: "normal", anomalyNote: "" } as Inverter)))
     }
 
     setRawText("")
     setPreview([])
     setImportModalOpen(false)
-  }, [rawText, format, importType, currentScheme, setConflicts, addBuildings, addPanels, addInverters, setImportModalOpen])
+  }, [rawText, format, importType, currentScheme, setConflictsAndPending, applyImportedData, setImportModalOpen])
 
   const handleFileDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()

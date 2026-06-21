@@ -1,9 +1,9 @@
 import { useSchemeStore } from "@/store/useSchemeStore"
-import { AlertTriangle, Check, ArrowRightLeft, GitMerge } from "lucide-react"
+import { AlertTriangle, Check, ArrowRightLeft, GitMerge, X } from "lucide-react"
 import type { ConflictRecord } from "@/types"
 
 export default function ConflictPanel() {
-  const { conflicts, resolveConflict, applyImportedData } = useSchemeStore()
+  const { conflicts, resolveConflict, applyImportedData, cancelImport } = useSchemeStore()
 
   if (conflicts.length === 0) return null
 
@@ -24,9 +24,9 @@ export default function ConflictPanel() {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center" onClick={applyImportedData}>
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center" onClick={cancelImport}>
       <div className="bg-slate-800 rounded-xl shadow-2xl w-[720px] max-h-[80vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
-        <div className="px-5 py-4 border-b border-slate-700">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-700">
           <div className="flex items-center gap-2 text-amber-400 font-semibold">
             <AlertTriangle size={18} />
             <span>数据冲突检测</span>
@@ -34,6 +34,9 @@ export default function ConflictPanel() {
               {unresolved.length} 条待处理
             </span>
           </div>
+          <button onClick={cancelImport} className="p-1 hover:bg-slate-700 rounded text-slate-400 hover:text-white">
+            <X size={16} />
+          </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
@@ -99,6 +102,12 @@ export default function ConflictPanel() {
         </div>
 
         <div className="flex justify-end gap-3 px-5 py-4 border-t border-slate-700">
+          <button
+            onClick={cancelImport}
+            className="px-4 py-1.5 text-slate-400 text-sm hover:text-white transition-colors"
+          >
+            取消全部导入
+          </button>
           <button
             onClick={applyImportedData}
             disabled={unresolved.length > 0}
