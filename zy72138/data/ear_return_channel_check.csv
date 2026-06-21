@@ -1,22 +1,12 @@
-﻿批次号,检查日期,检查人,通道编号,曲目名称,文件名,文件时长,时码入点,时码出点,版本标记,批注,导入来源,人工改名标记,_source_file,_source_row
-BATCH-001,2026-06-02,张工,CH-001,Intro 开场序曲,intro_opening_v2.wav,00:01:30,00:00:00,00:01:30,2025_master,音量正常,音频库,,,
-BATCH-001,2026-06-02,张工,CH-001,Intro 开场序曲,intro_opening_v2.wav,00:01:30,00:00:00,00:01:30,2025_master,音量正常,音频库,,ear_return_channel_check.csv,2
-BATCH-001,2026-06-02,张工,CH-002,霓虹深处,neon_deep_v2.wav,00:03:45,00:01:35,00:05:20,2024_master,旧版母带标记,手工导入,,,
-BATCH-001,2026-06-02,张工,CH-002,霓虹深处,neon_deep_v3.wav,00:03:45,00:01:30,00:05:15,2025_master,相位已校准,音频库,,ear_return_channel_check.csv,3
-BATCH-001,2026-06-02,张工,CH-002,霓虹深处,neon_deep_v2.wav,00:03:45,00:01:35,00:05:20,2024_master,旧版母带标记,手工导入,,ear_return_channel_check.csv,4
-BATCH-001,2026-06-02,张工,CH-003,城市回响,echo_city_v1.wav,00:03:45,00:05:15,00:09:00,2024_master,旧版母带,音频库,,,
-BATCH-001,2026-06-02,张工,CH-003,城市回响,echo_city_v1.wav,00:03:45,00:05:15,00:09:00,2024_master,旧版母带,音频库,,ear_return_channel_check.csv,5
-BATCH-001,2026-06-02,张工,CH-004,霓虹深处,neon_deep_v2.wav,00:03:45,00:09:00,00:12:45,2024_master,重复曲目,音频库,,,
-BATCH-001,2026-06-02,张工,CH-004,霓虹深处,neon_deep_v2.wav,00:03:45,00:09:00,00:12:45,2024_master,重复曲目,音频库,,ear_return_channel_check.csv,6
-BATCH-001,2026-06-02,张工,CH-005,空城旧梦,empty_city_dream.wav,00:03:45,00:12:45,00:16:30,2025_master,电平偏低,音频库,,,
-BATCH-001,2026-06-02,张工,CH-005,空城旧梦,empty_city_dream.wav,00:03:45,00:12:45,00:16:30,2025_master,电平偏低,音频库,,ear_return_channel_check.csv,7
-BATCH-001,2026-06-02,张工,CH-006,边界线,boundary_line_rename.wav,00:02:30,00:16:30,00:19:00,2025_master,人工改名,手工导入,是,,
-BATCH-001,2026-06-02,张工,CH-006,边界线,boundary_line_rename.wav,00:02:30,00:16:30,00:19:00,2025_master,人工改名,手工导入,是,ear_return_channel_check.csv,8
-BATCH-001,2026-06-02,张工,CH-007,未知曲目,unknown_track.wav,00:03:15,00:19:00,00:22:15,2025_master,曲目名称为空,音频库,,,
-BATCH-001,2026-06-02,张工,CH-007,未知曲目,unknown_track.wav,00:03:15,00:19:00,00:22:15,2025_master,曲目名称为空,音频库,,ear_return_channel_check.csv,9
-BATCH-001,2026-06-02,张工,CH-008,风起时,wind_rises.wav,00:03:15,00:22:15,00:25:30,2025_master,正常,音频库,,,
-BATCH-001,2026-06-02,张工,CH-008,风起时,wind_rises.wav,00:03:15,00:22:15,00:25:30,2025_master,正常,音频库,,ear_return_channel_check.csv,10
-BATCH-001,2026-06-02,张工,CH-009,潮声,tide_sound_v1.wav,00:03:45,00:25:30,00:29:15,2024_master,旧版母带,音频库,,,
-BATCH-001,2026-06-02,张工,CH-009,潮声,tide_sound_v1.wav,00:03:45,00:25:30,00:29:15,2024_master,旧版母带,音频库,,ear_return_channel_check.csv,11
-BATCH-001,2026-06-02,张工,CH-010,夜航,night_flight.wav,00:03:45,00:29:15,00:33:00,2025_master,缺授权标记,音频库,,,
-BATCH-001,2026-06-02,张工,CH-010,夜航,night_flight.wav,00:03:45,00:29:15,00:33:00,2025_master,缺授权标记,音频库,,ear_return_channel_check.csv,12
+﻿批次号,检查日期,检查人,通道编号,曲目名称,文件名,文件时长,时码入点,时码出点,版本标记,批注,导入来源,人工改名标记
+BATCH-001,2026-06-02,张工,CH-001,Intro 开场序曲,intro_opening_v2.wav,00:01:30,00:00:00,00:01:30,2025_master,音量正常,音频库,
+BATCH-001,2026-06-02,张工,CH-002,霓虹深处,neon_deep_v3.wav,00:03:45,00:01:30,00:05:15,2025_master,相位已校准,音频库,
+BATCH-001,2026-06-02,张工,CH-002,霓虹深处,neon_deep_v2.wav,00:03:45,00:01:35,00:05:20,2024_master,旧版母带标记,手工导入,
+BATCH-001,2026-06-02,张工,CH-003,城市回响,echo_city_v1.wav,00:03:45,00:05:15,00:09:00,2024_master,旧版母带,音频库,
+BATCH-001,2026-06-02,张工,CH-004,霓虹深处,neon_deep_v2.wav,00:03:45,00:09:00,00:12:45,2024_master,重复曲目,音频库,
+BATCH-001,2026-06-02,张工,CH-005,空城旧梦,empty_city_dream.wav,00:03:45,00:12:45,00:16:30,2025_master,电平偏低,音频库,
+BATCH-001,2026-06-02,张工,CH-006,边界线,boundary_line_rename.wav,00:02:30,00:16:30,00:19:00,2025_master,人工改名,手工导入,是
+BATCH-001,2026-06-02,张工,CH-007,未知曲目,unknown_track.wav,00:03:15,00:19:00,00:22:15,2025_master,曲目名称为空,音频库,
+BATCH-001,2026-06-02,张工,CH-008,风起时,wind_rises.wav,00:03:15,00:22:15,00:25:30,2025_master,正常,音频库,
+BATCH-001,2026-06-02,张工,CH-009,潮声,tide_sound_v1.wav,00:03:45,00:25:30,00:29:15,2024_master,旧版母带,音频库,
+BATCH-001,2026-06-02,张工,CH-010,夜航,night_flight.wav,00:03:45,00:29:15,00:33:00,2025_master,缺授权标记,音频库,

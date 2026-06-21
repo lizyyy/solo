@@ -393,6 +393,11 @@ def collect_all_issue_keys(channel, stage_records, check_records):
         for f in empty_fields:
             keys.append(issue_key("empty", channel, f))
 
+    if not stage:
+        keys.append(issue_key("empty", channel, "no_stage"))
+    if not checks:
+        keys.append(issue_key("empty", channel, "no_check"))
+
     return keys
 
 
@@ -438,8 +443,12 @@ class IssueManager:
     def add_category_only(self, category, item_data):
         self.category_items[category].append(item_data)
 
-    def add_issue_only(self, level, msg):
-        self.open_issues.append((level, msg, "_warning_"))
+    def add_issue_only(self, level, msg, issue_key=None):
+        key = issue_key or f"warn:{self.channel}:{hash(msg) & 0xffff}"
+        if key in self.resolved_keys:
+            self.resolved_issues.append((level, msg, key))
+        else:
+            self.open_issues.append((level, msg, key))
 
     def get_display_issues(self):
         return [(l, m) for l, m, _ in self.open_issues]
@@ -448,12 +457,15 @@ class IssueManager:
         return [(l, m) for l, m, _ in self.resolved_issues]
 
     def status_summary(self):
-        actual_total = len(self.open_issues) + len(self.resolved_keys)
-        actual_resolved = len(self.resolved_keys)
-        actual_open = len([k for _, _, k in self.open_issues if not k.startswith("_warning_")])
-        warning_count = len([k for _, _, k in self.open_issues if k.startswith("_warning_")])
-        
-        if actual_open == 0 and warning_count == 0 and actual_resolved == 0:
+        unique_open_keys = set()
+        for _, _, k in self.open_issues:
+            unique_open_keys.add(k)
+        unique_resolved_from_state = self.resolved_keys
+        actual_total = len(unique_open_keys | unique_resolved_from_state)
+        actual_resolved = len(unique_resolved_from_state)
+        actual_open = len(unique_open_keys)
+
+        if actual_open == 0 and actual_resolved == 0:
             return "✅ 正常", ""
         if actual_open == 0:
             return "✅ 已处理", f"（{actual_resolved} 项问题已解决）"
@@ -608,56 +620,74 @@ def confirm_import(import_result):
     return import_result
 
 
+def _dedup_keys(row):
+    """为一行数据生成一组去重 key，任意 key 命中即视为重复。
+    优先使用 _source_file+_source_row 的精确来源 key，
+    其次使用内容签名 key（作为导入前后跨阶段的兜底匹配）。"""
+    keys = []
+    src = row.get("_source_file", "") or row.get("source_file", "")
+    srow = row.get("_source_row", "") or row.get("source_row", "")
+    if src and srow:
+        keys.append(f"src:{src}:{srow}")
+    sig_parts = []
+    for k in ["通道编号", "文件名", "曲目名称", "文件时长", "时码入点", "时码出点"]:
+        sig_parts.append(str(row.get(k, "")))
+    content_sig = "|".join(sig_parts)
+    if content_sig and content_sig != "|||||":
+        keys.append(f"sig:{content_sig}")
+    return keys
+
+
 def write_import_to_csv(import_result, output_path):
     rows = import_result["normalized"]
     if not rows:
         return
+    data_type = import_result["data_type"]
     target_fields = import_result["target_fields"]
-    all_fields = target_fields + ["_source_file", "_source_row"]
 
-    existing = {}
+    existing_rows = []
+    seen_keys = set()
     if os.path.exists(output_path):
         with open(output_path, "r", encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 ch = row.get("通道编号", "").strip()
-                if ch:
-                    existing[ch] = row
+                if not ch:
+                    continue
+                row_keys = _dedup_keys(row)
+                if any(k in seen_keys for k in row_keys):
+                    continue
+                for k in row_keys:
+                    seen_keys.add(k)
+                existing_rows.append(row)
 
     for row in rows:
         ch = row.get("通道编号", "").strip()
         if not ch:
             continue
-        if data_type_merge_key(import_result["data_type"]) == "stage":
-            existing[ch] = {f: row.get(f, "") for f in all_fields}
-        else:
-            if ch not in existing:
-                existing[ch] = []
-            if isinstance(existing[ch], list):
-                existing[ch].append({f: row.get(f, "") for f in all_fields})
-            else:
-                existing[ch] = [existing[ch], {f: row.get(f, "") for f in all_fields}]
+        row_keys = _dedup_keys(row)
+        if any(k in seen_keys for k in row_keys):
+            continue
+        for k in row_keys:
+            seen_keys.add(k)
+        existing_rows.append(row)
 
-    if import_result["data_type"] == "stage":
+    if data_type == "stage":
+        merged = {}
+        for row in existing_rows:
+            ch = row["通道编号"].strip()
+            merged[ch] = {f: row.get(f, "") for f in target_fields}
         with open(output_path, "w", encoding="utf-8-sig", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=all_fields, extrasaction="ignore")
+            writer = csv.DictWriter(f, fieldnames=target_fields, extrasaction="ignore")
             writer.writeheader()
-            for ch in sorted(existing.keys()):
-                writer.writerow(existing[ch])
+            for ch in sorted(merged.keys()):
+                writer.writerow(merged[ch])
     else:
-        fieldnames = all_fields
-        all_rows = []
-        if isinstance(existing, dict):
-            for ch, recs in existing.items():
-                if isinstance(recs, list):
-                    all_rows.extend(recs)
-                else:
-                    all_rows.append(recs)
         with open(output_path, "w", encoding="utf-8-sig", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
+            writer = csv.DictWriter(f, fieldnames=target_fields, extrasaction="ignore")
             writer.writeheader()
-            for r in all_rows:
-                writer.writerow(r)
+            for r in existing_rows:
+                writer.writerow({f: r.get(f, "") for f in target_fields})
 
 
 def data_type_merge_key(data_type):
@@ -908,9 +938,9 @@ def analyze_data(stage_path=None, check_path=None):
         im = IssueManager(channel, resolved_keys, state_notes)
 
         if not stage_rec:
-            im.add_issue_only("警告", f"通道 {channel} 无舞台表记录")
+            im.add_issue_only("警告", f"通道 {channel} 无舞台表记录", issue_key("empty", channel, "no_stage"))
         if not check_rec_list:
-            im.add_issue_only("警告", f"通道 {channel} 无检查记录")
+            im.add_issue_only("警告", f"通道 {channel} 无检查记录", issue_key("empty", channel, "no_check"))
 
         auth_ok, auth_msg = check_authorization(stage_rec) if stage_rec else (False, "无舞台表记录")
         if not auth_ok:

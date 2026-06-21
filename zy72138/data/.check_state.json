@@ -16,12 +16,14 @@
       "auth:CH-002:missing"
     ],
     "S-011": [
-      "auth:S-011:expired"
+      "auth:S-011:expired",
+      "auth:S-011:missing",
+      "empty:S-011:no_check"
     ]
   },
   "notes": {
     "CH-002": "授权已确认，母带为最新版，时码已对齐，文件已确认",
-    "S-011": "授权已续签到2027"
+    "S-011": "授权已续签到2027，无需检查记录"
   },
   "last_updated": "2026-06-08"
 }
