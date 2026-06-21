@@ -45,6 +45,29 @@ class TidalPredictionResult:
     processing_notes: str = ""
 
 
+OLD_PORTAL_ALIASES = [
+    "old_portal",
+    "旧系统导出",
+    "旧口径",
+    "老板汇总页",
+    "汇总页",
+    "旧系统",
+    "历史数据",
+    "历史口径",
+    "legacy",
+]
+
+
+def is_old_portal_source(data_source: str) -> bool:
+    if not data_source:
+        return False
+    ds = data_source.strip().lower()
+    for alias in OLD_PORTAL_ALIASES:
+        if alias.lower() in ds:
+            return True
+    return False
+
+
 class TidalPowerCalculator:
     SEA_WATER_DENSITY = 1025
     GRAVITY = 9.81
@@ -202,7 +225,7 @@ class TidalPowerCalculator:
                 result.confidence_score = 0.6
 
             if result.predicted_power is not None:
-                if data.data_source == "old_portal":
+                if is_old_portal_source(data.data_source):
                     result.status = "needs_review"
                     result.processing_notes = "数据来自旧汇总页口径，计算结果仅供参考对比"
                     result.confidence_score *= 0.8

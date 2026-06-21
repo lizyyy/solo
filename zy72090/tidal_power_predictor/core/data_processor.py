@@ -6,6 +6,7 @@ from .calculator import (
     TidalPredictionResult,
     TidalPowerCalculator,
     ValidationIssue,
+    is_old_portal_source,
 )
 
 
@@ -107,10 +108,10 @@ class TidalDataProcessor:
             elif result.status == "failed":
                 summary.failed_count += 1
 
-            if result.input.data_source == "old_portal":
+            if is_old_portal_source(result.input.data_source):
                 summary.old_portal_count += 1
 
-            if result.predicted_power is not None:
+            if result.status == "success" and result.predicted_power is not None:
                 success_power.append(result.predicted_power)
                 confidence_scores.append(result.confidence_score)
 

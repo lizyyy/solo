@@ -44,6 +44,22 @@ TARGET_COLUMN_LABELS = {
 }
 
 
+def normalize_station_name(name: str) -> str:
+    if not name:
+        return ""
+    n = name.strip()
+    suffixes = [
+        "潮汐发电站", "潮汐电站", "发电站", "电站",
+        "潮汐电厂", "电厂", "发电厂",
+        "潮汐观测站", "观测站", "水文站",
+    ]
+    for suffix in suffixes:
+        if n.endswith(suffix):
+            n = n[:-len(suffix)]
+            break
+    return n.strip()
+
+
 def serialize_record(record: TidalPredictionInput) -> dict:
     return {
         "record_id": record.record_id,
@@ -435,12 +451,22 @@ def diff_result():
     
     diff_items = []
     
+    baseline_by_norm_name = {}
+    for bl in baseline_results:
+        norm = normalize_station_name(bl.get('station_name', ''))
+        if norm and norm not in baseline_by_norm_name:
+            baseline_by_norm_name[norm] = bl
+    
     for curr in current_results:
         baseline = None
-        for bl in baseline_results:
-            if (bl['station_name'] and bl['station_name'] == curr['station_name']) or bl['record_id'] == curr['record_id']:
-                baseline = bl
-                break
+        curr_norm = normalize_station_name(curr.get('station_name', ''))
+        if curr_norm and curr_norm in baseline_by_norm_name:
+            baseline = baseline_by_norm_name[curr_norm]
+        else:
+            for bl in baseline_results:
+                if bl['record_id'] == curr['record_id']:
+                    baseline = bl
+                    break
         
         diff_item = {
             'record_id': curr['record_id'],
@@ -471,12 +497,22 @@ def diff_result():
         
         diff_items.append(diff_item)
     
+    current_by_norm_name = {}
+    for curr in current_results:
+        norm = normalize_station_name(curr.get('station_name', ''))
+        if norm:
+            current_by_norm_name[norm] = curr
+    
     for bl in baseline_results:
         found = False
-        for curr in current_results:
-            if (curr['station_name'] and curr['station_name'] == bl['station_name']) or curr['record_id'] == bl['record_id']:
-                found = True
-                break
+        bl_norm = normalize_station_name(bl.get('station_name', ''))
+        if bl_norm and bl_norm in current_by_norm_name:
+            found = True
+        else:
+            for curr in current_results:
+                if curr['record_id'] == bl['record_id']:
+                    found = True
+                    break
         if not found:
             diff_items.append({
                 'record_id': bl['record_id'],
