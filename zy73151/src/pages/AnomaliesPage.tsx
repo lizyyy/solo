@@ -16,16 +16,21 @@ import {
   ArrowRight,
   CheckCircle,
   Clock,
+  Download,
+  FileSpreadsheet,
+  File,
 } from 'lucide-react';
 import { useState } from 'react';
 import { anomalyTypeLabels, severityLabels, sourceTypeLabels } from '@/utils/anomalyDetector';
 import type { AnomalyType, Severity, EvidenceStatus } from '@/types';
 import { useNavigate } from 'react-router-dom';
+import { exportAnomalyReport } from '@/utils/exporters';
 
 export default function AnomaliesPage() {
-  const { anomalies, filter, setFilter, setAnomalyStatus, stations, selectAnomaly } = useAppStore();
+  const { anomalies, materials, stations, filter, setFilter, setAnomalyStatus, selectAnomaly } = useAppStore();
   const navigate = useNavigate();
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   const filtered = anomalies.filter(a => {
     if (filter.type !== 'all' && a.type !== filter.type) return false;
@@ -56,6 +61,11 @@ export default function AnomaliesPage() {
     navigate('/review');
   };
 
+  const handleExport = (format: 'csv' | 'markdown' | 'all') => {
+    exportAnomalyReport(anomalies, materials, stations, format);
+    setShowExportMenu(false);
+  };
+
   return (
     <div className="space-y-6 animate-fade-in-up">
       <div className="flex items-center justify-between">
@@ -73,9 +83,41 @@ export default function AnomaliesPage() {
             版本对比
             <ArrowRight className="w-4 h-4" />
           </button>
-          <button className="btn-primary text-sm flex items-center gap-1.5">
-            导出异常报告
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => setShowExportMenu(!showExportMenu)}
+              className="btn-primary text-sm flex items-center gap-1.5"
+            >
+              <Download className="w-4 h-4" />
+              导出异常报告
+            </button>
+            {showExportMenu && (
+              <div className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-glow-orange border border-ocean-100 py-1 min-w-[180px] z-10 animate-slide-in-right">
+                <button
+                  onClick={() => handleExport('csv')}
+                  className="w-full px-4 py-2 text-left text-sm text-ocean-700 hover:bg-ocean-50 flex items-center gap-2"
+                >
+                  <FileSpreadsheet className="w-4 h-4 text-alert-orange" />
+                  导出 CSV 清单
+                </button>
+                <button
+                  onClick={() => handleExport('markdown')}
+                  className="w-full px-4 py-2 text-left text-sm text-ocean-700 hover:bg-ocean-50 flex items-center gap-2"
+                >
+                  <File className="w-4 h-4 text-purple-500" />
+                  导出详细报告 MD
+                </button>
+                <div className="border-t border-ocean-100 my-1" />
+                <button
+                  onClick={() => handleExport('all')}
+                  className="w-full px-4 py-2 text-left text-sm font-medium text-ocean-800 hover:bg-ocean-50 flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4 text-ocean-600" />
+                  全部导出
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

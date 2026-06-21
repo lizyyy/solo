@@ -168,7 +168,7 @@ export const detectTimeMismatch = (materials: Material[]): Anomaly[] => {
 
       if (resultTime < sampleTime) {
         anomalies.push({
-          id: `anomaly-time-${record.id}`,
+          id: `anomaly-time-${record.id}-${generateId()}`,
           type: 'time_mismatch',
           severity: 'high',
           stationId: record.stationId,
@@ -197,7 +197,7 @@ export const detectTimeMismatch = (materials: Material[]): Anomaly[] => {
       const diffHours = (resultTime - sampleTime) / (1000 * 60 * 60);
       if (resultTime > sampleTime && diffHours > 72) {
         anomalies.push({
-          id: `anomaly-time-gap-${record.id}`,
+          id: `anomaly-time-gap-${record.id}-${generateId()}`,
           type: 'time_mismatch',
           severity: 'low',
           stationId: record.stationId,
@@ -228,12 +228,105 @@ export const detectTimeMismatch = (materials: Material[]): Anomaly[] => {
   return anomalies;
 };
 
+export interface ThresholdConfig {
+  field: keyof LabRecord;
+  fieldName: string;
+  min: number;
+  max: number;
+  unit: string;
+}
+
+const thresholds: ThresholdConfig[] = [
+  { field: 'dissolvedOxygen', fieldName: '溶解氧', min: 6.0, max: 10.0, unit: 'mg/L' },
+  { field: 'ph', fieldName: 'pH值', min: 7.5, max: 8.8, unit: '' },
+  { field: 'temperature', fieldName: '水温', min: 10.0, max: 30.0, unit: '°C' },
+  { field: 'salinity', fieldName: '盐度', min: 25.0, max: 38.0, unit: '‰' },
+  { field: 'tideLevel', fieldName: '潮位(米)', min: 0.1, max: 5.0, unit: 'm' },
+];
+
+const normalizeTideToMeters = (value: number, unit: TideUnit): number => {
+  switch (unit) {
+    case 'cm': return value / 100;
+    case 'mm': return value / 1000;
+    default: return value;
+  }
+};
+
+export const detectValueAbnormal = (materials: Material[]): Anomaly[] => {
+  const anomalies: Anomaly[] = [];
+
+  materials.forEach(material => {
+    material.parsedData.forEach(record => {
+      thresholds.forEach(th => {
+        let value = record[th.field] as number;
+
+        if (th.field === 'tideLevel') {
+          value = normalizeTideToMeters(record.tideLevel, record.tideUnit);
+        }
+
+        if (typeof value !== 'number' || isNaN(value)) return;
+
+        const isAbnormal = value < th.min || value > th.max;
+        if (!isAbnormal) return;
+
+        const direction = value < th.min
+          ? `偏低 (${value}${th.unit} < 阈值${th.min}${th.unit})`
+          : `偏高 (${value}${th.unit} > 阈值${th.max}${th.unit})`;
+
+        const severity = th.field === 'dissolvedOxygen' && value < 6.0
+          ? 'high'
+          : (value < th.min * 0.8 || value > th.max * 1.2 ? 'high' : 'medium');
+
+        const conclusionReasons: Record<string, string> = {
+          dissolvedOxygen: value < 6.0
+            ? '溶解氧低于渔业水质标准6mg/L，可能影响海洋生物存活，需排查赤潮/污染等原因。'
+            : '溶解氧超出正常范围，需复核实验操作或重新采样检测。',
+          ph: 'pH值超出正常海水范围7.5-8.8，需确认是否存在酸碱污染或检测误差。',
+          temperature: '水温超出近海正常波动范围，需核实是否为异常气候或记录笔误。',
+          salinity: '盐度超出近海正常范围，需核对是否为淡水混入或单位换算问题。',
+          tideLevel: '潮位数值超出合理范围，请确认单位换算是否正确（m/cm/mm）。',
+        };
+
+        anomalies.push({
+          id: `anomaly-value-${record.id}-${th.field}-${generateId()}`,
+          type: 'value_abnormal',
+          severity,
+          stationId: record.stationId,
+          stationName: record.stationName,
+          description: `${th.fieldName}${direction}`,
+          impactRange: `点位「${record.stationName}」第 ${record.sourceRow} 行，${th.fieldName}字段`,
+          sourceRows: [record.sourceRow],
+          materialIds: [material.id],
+          materialNames: [material.name],
+          evidenceChain: [{
+            id: generateId(),
+            materialId: material.id,
+            materialName: material.name,
+            version: material.version,
+            timestamp: material.uploadTime,
+            content: `${th.fieldName} = ${value}${th.unit}，正常范围 ${th.min}~${th.max}${th.unit}`,
+            isVerbal: false,
+            fieldName: th.field as string,
+          }],
+          status: 'pending',
+          conclusionChange: conclusionReasons[th.field] || '数值超出正常范围，需进一步核实。',
+          detectedAt: new Date().toISOString(),
+          fieldName: th.field as string,
+        });
+      });
+    });
+  });
+
+  return anomalies;
+};
+
 export const detectAllAnomalies = (materials: Material[]): Anomaly[] => {
   const unitAnomalies = detectUnitMismatch(materials);
   const caliberAnomalies = detectCaliberChanges(materials);
   const timeAnomalies = detectTimeMismatch(materials);
+  const valueAnomalies = detectValueAbnormal(materials);
 
-  return [...unitAnomalies, ...caliberAnomalies, ...timeAnomalies];
+  return [...unitAnomalies, ...caliberAnomalies, ...timeAnomalies, ...valueAnomalies];
 };
 
 export const anomalyTypeLabels: Record<string, string> = {

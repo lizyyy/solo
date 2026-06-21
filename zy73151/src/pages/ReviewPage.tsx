@@ -20,13 +20,22 @@ import {
   Search,
   Layers,
   History,
+  Download,
+  FileSpreadsheet,
+  File,
+  AlertCircle,
+  Zap,
+  ListChecks,
+  ShieldAlert,
 } from 'lucide-react';
 import { anomalyTypeLabels, severityLabels, sourceTypeLabels } from '@/utils/anomalyDetector';
 import type { AnomalyType, Severity, EvidenceStatus, EvidenceItem } from '@/types';
+import { exportReviewReport } from '@/utils/exporters';
 
 export default function ReviewPage() {
-  const { anomalies, filter, setFilter, setAnomalyStatus, selectedAnomalyId, selectAnomaly, materials } = useAppStore();
+  const { anomalies, materials, stations, filter, setFilter, setAnomalyStatus, selectedAnomalyId, selectAnomaly } = useAppStore();
   const [activeTab, setActiveTab] = useState<'all' | 'confirmed' | 'pending'>('all');
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   const filtered = anomalies.filter(a => {
     if (activeTab === 'confirmed' && a.status !== 'confirmed') return false;
@@ -53,6 +62,11 @@ export default function ReviewPage() {
 
   const confirmationRate = stats.total > 0 ? ((stats.confirmed / stats.total) * 100).toFixed(1) : '0';
 
+  const handleExport = (format: 'markdown' | 'html' | 'all') => {
+    exportReviewReport(anomalies, materials, stations, format);
+    setShowExportMenu(false);
+  };
+
   return (
     <div className="space-y-6 animate-fade-in-up">
       <div className="flex items-center justify-between">
@@ -62,9 +76,41 @@ export default function ReviewPage() {
             分类管理异常记录，区分已确认与待补证据，追溯结论变化
           </p>
         </div>
-        <button className="btn-primary text-sm flex items-center gap-1.5">
-          导出复核报告
-        </button>
+        <div className="relative">
+          <button
+            onClick={() => setShowExportMenu(!showExportMenu)}
+            className="btn-primary text-sm flex items-center gap-1.5"
+          >
+            <Download className="w-4 h-4" />
+            导出复核报告
+          </button>
+          {showExportMenu && (
+            <div className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-glow-orange border border-ocean-100 py-1 min-w-[200px] z-10 animate-slide-in-right">
+              <button
+                onClick={() => handleExport('markdown')}
+                className="w-full px-4 py-2 text-left text-sm text-ocean-700 hover:bg-ocean-50 flex items-center gap-2"
+              >
+                <File className="w-4 h-4 text-ocean-500" />
+                导出 Markdown（适合文档存档）
+              </button>
+              <button
+                onClick={() => handleExport('html')}
+                className="w-full px-4 py-2 text-left text-sm text-ocean-700 hover:bg-ocean-50 flex items-center gap-2"
+              >
+                <FileSpreadsheet className="w-4 h-4 text-purple-500" />
+                导出 HTML（可直接浏览器打开）
+              </button>
+              <div className="border-t border-ocean-100 my-1" />
+              <button
+                onClick={() => handleExport('all')}
+                className="w-full px-4 py-2 text-left text-sm font-medium text-ocean-800 hover:bg-ocean-50 flex items-center gap-2"
+              >
+                <Download className="w-4 h-4 text-ocean-600" />
+                全部导出
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-4 gap-4">
@@ -273,28 +319,117 @@ export default function ReviewPage() {
 }
 
 function EvidenceDetailCard({ anomalyId }: { anomalyId: string }) {
-  const { anomalies, setAnomalyStatus } = useAppStore();
+  const { anomalies, setAnomalyStatus, materials } = useAppStore();
   const anomaly = anomalies.find(a => a.id === anomalyId);
 
   if (!anomaly) return null;
 
+  const verbalEvidence = anomaly.evidenceChain.filter(e => e.isVerbal);
+  const caliberEvidence = anomaly.evidenceChain.filter(e => e.changeType === 'modify' && e.previousValue && e.currentValue);
+  const confirmedEvidence = anomaly.status === 'confirmed' ? anomaly.evidenceChain : [];
+  const pendingEvidence = anomaly.status === 'pending'
+    ? anomaly.evidenceChain
+    : anomaly.evidenceChain.filter(e => {
+      const mat = materials.find(m => m.id === e.materialId);
+      return mat?.source === 'verbal_note' || false;
+    });
+
+  const hasCaliberChanges = verbalEvidence.length > 0 || caliberEvidence.length > 0;
+
   return (
-    <div className="card-base p-4 border-l-4 border-alert-orange/50 animate-slide-in-right">
-      <div className="flex items-center justify-between mb-4">
+    <div className="card-base p-4 border-l-4 border-alert-orange/50 animate-slide-in-right space-y-5">
+      <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-ocean-700">证据链详情</h3>
         <StatusBadge status={anomaly.status} />
       </div>
 
-      <div className="mb-4">
-        <p className="text-sm text-ocean-700 font-medium mb-2">结论变化说明</p>
-        <p className="text-sm text-ocean-600 leading-relaxed bg-ocean-50/50 p-3 rounded-md">
-          {anomaly.conclusionChange}
-        </p>
+      <div>
+        <div className="flex items-center gap-1.5 mb-2">
+          <AlertCircle className="w-4 h-4 text-alert-orange" />
+          <p className="text-sm font-medium text-ocean-700">异常原因</p>
+        </div>
+        <div className="p-3 bg-red-50/60 border border-red-100 rounded-md space-y-1.5">
+          <p className="text-sm text-red-700 font-medium">{anomaly.description}</p>
+          <div className="flex flex-wrap gap-1.5 text-xs pt-1">
+            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/80 rounded border border-red-200 text-red-600">
+              <MapPin className="w-3 h-3" />
+              {anomaly.stationName}
+            </span>
+            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/80 rounded border border-red-200 text-red-600">
+              <FileText className="w-3 h-3" />
+              第 {anomaly.sourceRows.join(', ')} 行
+            </span>
+          </div>
+        </div>
       </div>
 
-      <div className="mb-4">
-        <p className="text-sm font-medium text-ocean-700 mb-3">证据时间线</p>
-        <div className="space-y-3 max-h-64 overflow-y-auto scrollbar-thin">
+      <div>
+        <div className="flex items-center gap-1.5 mb-2">
+          <Zap className="w-4 h-4 text-alert-orange" />
+          <p className="text-sm font-medium text-ocean-700">影响范围 & 结论说明</p>
+        </div>
+        <div className="p-3 bg-ocean-50/60 border border-ocean-100 rounded-md space-y-2">
+          <div>
+            <span className="text-xs font-medium text-ocean-600">影响范围：</span>
+            <span className="text-xs text-ocean-700">{anomaly.impactRange}</span>
+          </div>
+          <div>
+            <span className="text-xs font-medium text-ocean-600">结论说明：</span>
+            <span className="text-xs text-ocean-700 leading-relaxed">{anomaly.conclusionChange}</span>
+          </div>
+        </div>
+      </div>
+
+      {hasCaliberChanges && (
+        <div>
+          <div className="flex items-center gap-1.5 mb-2">
+            <ShieldAlert className="w-4 h-4 text-purple-500" />
+            <p className="text-sm font-medium text-ocean-700">口径变更记录</p>
+          </div>
+          <div className="p-3 bg-purple-50/60 border border-purple-100 rounded-md space-y-2">
+            {verbalEvidence.length > 0 && (
+              <div>
+                <p className="text-xs font-medium text-purple-700 mb-1">📣 口头说明改变判断（{verbalEvidence.length}条）</p>
+                {verbalEvidence.map(item => (
+                  <div key={item.id} className="ml-2 p-2 bg-white/70 rounded text-xs space-y-1">
+                    <div className="font-medium text-purple-600 flex items-center gap-1">
+                      <MessageSquare className="w-3 h-3" />
+                      {item.materialName}
+                    </div>
+                    <p className="text-ocean-600 leading-relaxed">{item.content}</p>
+                    <p className="text-ocean-400 text-[10px]">{item.timestamp}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+            {caliberEvidence.length > 0 && (
+              <div>
+                <p className="text-xs font-medium text-amber-700 mb-1">✏️ 数值变更记录（{caliberEvidence.length}条）</p>
+                {caliberEvidence.map(item => (
+                  <div key={item.id} className="ml-2 p-2 bg-white/70 rounded text-xs">
+                    <div className="flex items-center gap-2 text-[11px] font-medium text-ocean-700">
+                      <FileText className="w-3 h-3" />
+                      {item.fieldName}：{item.materialName}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-red-500 line-through">{item.previousValue}</span>
+                      <ArrowRight className="w-3 h-3 text-ocean-400" />
+                      <span className="text-alert-green font-medium">{item.currentValue}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <div>
+        <p className="text-sm font-medium text-ocean-700 mb-3 flex items-center gap-1.5">
+          <History className="w-4 h-4" />
+          证据时间线（共 {anomaly.evidenceChain.length} 条）
+        </p>
+        <div className="space-y-3 max-h-64 overflow-y-auto scrollbar-thin pr-1">
           {anomaly.evidenceChain.map((item: EvidenceItem, i: number) => (
             <div key={item.id} className="flex items-start gap-3">
               <div className="relative flex-shrink-0">
@@ -308,40 +443,84 @@ function EvidenceDetailCard({ anomalyId }: { anomalyId: string }) {
                   )}
                 </div>
                 {i < anomaly.evidenceChain.length - 1 && (
-                  <div className="absolute top-8 left-1/2 -translate-x-1/2 w-px h-4 bg-ocean-200" />
+                  <div className="absolute top-8 left-1/2 -translate-x-1/2 w-px h-5 bg-ocean-200" />
                 )}
               </div>
-              <div className="flex-1 min-w-0 pb-3">
-                <div className="flex items-center gap-2">
+              <div className="flex-1 min-w-0 pb-4">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-sm font-medium text-ocean-800 truncate">
                     {item.materialName}
                   </span>
                   {item.changeType && (
-                    <span className={`text-xs px-1.5 py-0.5 rounded ${
+                    <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${
                       item.changeType === 'modify' ? 'bg-amber-100 text-amber-700' :
                       item.changeType === 'add' ? 'bg-green-100 text-green-700' :
                       'bg-red-100 text-red-700'
                     }`}>
-                      {item.changeType === 'modify' ? '修改' : item.changeType === 'add' ? '新增' : '删除'}
+                      {item.changeType === 'modify' ? '修改口径' : item.changeType === 'add' ? '新增' : '删除'}
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-ocean-600 mt-1">{item.content}</p>
+                <p className="text-sm text-ocean-600 mt-1 leading-relaxed">{item.content}</p>
                 {item.previousValue && item.currentValue && (
                   <div className="mt-2 flex items-center gap-2 text-xs">
-                    <span className="text-red-500 line-through">{item.previousValue}</span>
+                    <span className="px-2 py-0.5 bg-red-100 text-red-600 rounded line-through">{item.previousValue}</span>
                     <ArrowRight className="w-3 h-3 text-ocean-400" />
-                    <span className="text-alert-green font-medium">{item.currentValue}</span>
+                    <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded font-medium">{item.currentValue}</span>
                   </div>
                 )}
-                <p className="text-xs text-ocean-400 mt-1">{item.timestamp}</p>
+                <p className="text-[11px] text-ocean-400 mt-1">{item.timestamp}</p>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="pt-4 border-t border-ocean-100">
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-sm font-medium text-ocean-700 flex items-center gap-1.5">
+            <ListChecks className="w-4 h-4" />
+            当前证据状态
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div className={`p-3 rounded-md border ${
+            anomaly.status === 'confirmed'
+              ? 'bg-alert-green/5 border-alert-green/30'
+              : 'bg-ocean-50 border-ocean-100'
+          }`}>
+            <div className="flex items-center gap-1 mb-1">
+              <CheckCircle className={`w-4 h-4 ${anomaly.status === 'confirmed' ? 'text-alert-green' : 'text-ocean-300'}`} />
+              <span className={`text-xs font-medium ${anomaly.status === 'confirmed' ? 'text-alert-green' : 'text-ocean-500'}`}>
+                已确认证据
+              </span>
+            </div>
+            <p className="text-lg font-bold text-ocean-800">
+              {anomaly.status === 'confirmed' ? anomaly.evidenceChain.length : 0}
+            </p>
+          </div>
+          <div className={`p-3 rounded-md border ${
+            anomaly.status === 'pending'
+              ? 'bg-amber-50 border-amber-200'
+              : 'bg-ocean-50 border-ocean-100'
+          }`}>
+            <div className="flex items-center gap-1 mb-1">
+              <Clock className={`w-4 h-4 ${anomaly.status === 'pending' ? 'text-amber-500' : 'text-ocean-300'}`} />
+              <span className={`text-xs font-medium ${anomaly.status === 'pending' ? 'text-amber-700' : 'text-ocean-500'}`}>
+                待补证据
+              </span>
+            </div>
+            <p className="text-lg font-bold text-ocean-800">
+              {anomaly.status === 'pending' ? '需补充' : 0}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="pt-4 border-t border-ocean-100 space-y-2">
+        <div className="p-2 bg-ocean-50/50 rounded-md text-xs text-ocean-600">
+          <span className="font-medium">关联材料：</span>{anomaly.materialNames.join('、')}
+        </div>
         {anomaly.status === 'pending' ? (
           <button
             onClick={() => setAnomalyStatus(anomaly.id, 'confirmed')}
