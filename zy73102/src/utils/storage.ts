@@ -25,7 +25,7 @@ function isAvailable(): boolean {
 /**
  * 获取存储项（泛型）
  */
-export function get<T = any>(key: string, defaultValue?: T): T | undefined {
+export function get<T = unknown>(key: string, defaultValue?: T): T | undefined {
   if (!isAvailable()) return defaultValue;
   try {
     const raw = localStorage.getItem(buildKey(key));
@@ -39,7 +39,7 @@ export function get<T = any>(key: string, defaultValue?: T): T | undefined {
 /**
  * 设置存储项（泛型）
  */
-export function set<T = any>(key: string, value: T): void {
+export function set<T = unknown>(key: string, value: T): void {
   if (!isAvailable()) return;
   try {
     const raw = JSON.stringify(value);

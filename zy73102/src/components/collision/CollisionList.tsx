@@ -68,7 +68,7 @@ export default function CollisionList({
   className,
 }: CollisionListProps) {
   const [searchQuery, setSearchQuery] = useState('')
-  const { focusOnMaterial, setSelectedMaterial } = useSceneStore()
+  const { focusOnMaterial } = useSceneStore()
 
   const filteredCollisions = useMemo(() => {
     if (!searchQuery.trim()) {

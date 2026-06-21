@@ -69,7 +69,7 @@ function AnimatedNumber({ value, isVersion }: { value: number | string; isVersio
     }
 
     const target = typeof value === 'number' ? value : 0;
-    const start = typeof displayValue === 'number' ? displayValue : 0;
+    const start = 0;
     const duration = 600;
     const startTime = performance.now();
 

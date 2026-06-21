@@ -12,6 +12,7 @@ export interface BatchRun {
   abnormalCount: number;
   collisionCount: number;
   version: string;
+  remark: string;
 }
 
 export interface Batch {
@@ -90,13 +91,13 @@ const mockSampleBatches: Batch[] = [
 ];
 
 const mockSampleRuns: BatchRun[] = [
-  { id: 'run-001', batchId: 'batch-001', runAt: '2026-06-09 15:42:00', duration: 128, materialCount: 86, abnormalCount: 0, collisionCount: 0, version: 'v1.2.3' },
-  { id: 'run-002', batchId: 'batch-001', runAt: '2026-06-08 16:10:00', duration: 132, materialCount: 84, abnormalCount: 1, collisionCount: 2, version: 'v1.2.2' },
-  { id: 'run-003', batchId: 'batch-001', runAt: '2026-06-08 10:00:00', duration: 145, materialCount: 82, abnormalCount: 3, collisionCount: 4, version: 'v1.2.1' },
-  { id: 'run-004', batchId: 'batch-002', runAt: '2026-06-10 08:20:00', duration: 196, materialCount: 142, abnormalCount: 2, collisionCount: 1, version: 'v1.2.3' },
-  { id: 'run-005', batchId: 'batch-002', runAt: '2026-06-09 14:30:00', duration: 188, materialCount: 138, abnormalCount: 5, collisionCount: 3, version: 'v1.2.2' },
-  { id: 'run-006', batchId: 'batch-003', runAt: '2026-06-08 11:30:00', duration: 156, materialCount: 64, abnormalCount: 7, collisionCount: 5, version: 'v1.2.2' },
-  { id: 'run-007', batchId: 'batch-003', runAt: '2026-06-07 18:00:00', duration: 160, materialCount: 64, abnormalCount: 9, collisionCount: 6, version: 'v1.2.1' },
+  { id: 'run-001', batchId: 'batch-001', runAt: '2026-06-09 15:42:00', duration: 128, materialCount: 86, abnormalCount: 0, collisionCount: 0, version: 'v1.2.3', remark: '补备注：修正了雨水斗数量与V1.1的冲突，按设计评审会议最终意见执行' },
+  { id: 'run-002', batchId: 'batch-001', runAt: '2026-06-08 16:10:00', duration: 132, materialCount: 84, abnormalCount: 1, collisionCount: 2, version: 'v1.2.2', remark: '补备注：新增HDPE管与铸铁雨水斗的衔接处理意见' },
+  { id: 'run-003', batchId: 'batch-001', runAt: '2026-06-08 10:00:00', duration: 145, materialCount: 82, abnormalCount: 3, collisionCount: 4, version: 'v1.2.1', remark: '首次执行' },
+  { id: 'run-004', batchId: 'batch-002', runAt: '2026-06-10 08:20:00', duration: 196, materialCount: 142, abnormalCount: 2, collisionCount: 1, version: 'v1.2.3', remark: '补备注：虹吸式排水系统材料清单复核完成' },
+  { id: 'run-005', batchId: 'batch-002', runAt: '2026-06-09 14:30:00', duration: 188, materialCount: 138, abnormalCount: 5, collisionCount: 3, version: 'v1.2.2', remark: '首次执行' },
+  { id: 'run-006', batchId: 'batch-003', runAt: '2026-06-08 11:30:00', duration: 156, materialCount: 64, abnormalCount: 7, collisionCount: 5, version: 'v1.2.2', remark: '补备注：已定位3处材料规格冲突，待设计方确认' },
+  { id: 'run-007', batchId: 'batch-003', runAt: '2026-06-07 18:00:00', duration: 160, materialCount: 64, abnormalCount: 9, collisionCount: 6, version: 'v1.2.1', remark: '首次执行' },
 ];
 
 export const useAppStore = create<AppState>((set) => ({
@@ -135,6 +136,7 @@ export const useAppStore = create<AppState>((set) => ({
         abnormalCount: Math.floor(Math.random() * 5),
         collisionCount: Math.floor(Math.random() * 4),
         version: state.latestVersion,
+        remark,
       };
       const updatedBatches = state.batches.map((b) =>
         b.id === batchId

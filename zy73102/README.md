@@ -1,57 +1,127 @@
-# React + TypeScript + Vite
+# 屋面排水材料追踪系统
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+面向设计院助理与复核人员的专业工具：通过 Web3D 可视化与时间轴联动，解决会议纪要字段混乱、图纸版本确认困难、碰撞点追踪含糊等核心痛点。
 
-Currently, two official plugins are available:
+## 功能总览
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🔷 **Web3D 追踪工作台**：点选构件高亮、切时间轴看图纸版本、筛选与摘要卡片四向联动
+- 🔒 **会议纪要字段归一化**：自动识别同义字段，强制保住「来源」「处理状态」不丢失
+- 🔍 **碰撞点原始说法追溯**：FNV-1a 哈希自动去重，点击可跳转会议纪要原文高亮段
+- 🔄 **历史补注重跑**：同一批次先跑一次，补备注后再跑，历史记录与导出文件名可前后对照
+- 📤 **CSV/JSON 导出**：文件名自动携带 `{批次号}_run{轮次}_{时间戳}.ext`
+- 🧭 **新手三步指引**：首页/历史页顶部有①②③卡片说明样例包、重来、摘要位置
 
-## Expanding the ESLint configuration
+## 快速开始
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 环境要求
+- Node.js >= 18（推荐 20+）
+- 包管理器：npm
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 安装依赖
+```bash
+npm install
+```
+安装完成后会自动执行 `postinstall`，对 macOS arm64 平台下的 Rollup 原生模块做 ad-hoc 签名修复（无需任何手动操作）。
+
+### 启动开发服务器
+```bash
+# 默认方式（http://localhost:5173）
+npm run dev
+
+# 指定绑定 127.0.0.1（用户验收场景）
+npm run dev:host
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 构建并预览静态产物
+```bash
+npm run build     # 产出 dist/ 目录
+npm run preview   # 预览 dist 下的静态产物
+```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 验收核心流程
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 1. 跑样例包 & 查看字段归一化
+1. 进入「主控制台」首页
+2. 点击 **🚀 一键加载标准样例包A**（或右上角「重新加载样例」）
+3. 进入「追踪工作台」→ 右侧 **字段归一化** Tab：
+   - 确认「物料名 / 构件名 / item / 品名」都映射到 `materialName`
+   - 确认「状态 / 处理情况 / 进度 / status」都映射到 `processingStatus`
+   - 🔒 标识的 `source`（来源纪要编号）与 `processingStatus` 被强制锁定，不被后续重映射覆盖
+4. 查看 4 张摘要卡片：材料总数、碰撞数、异常数、最新版本号
+
+### 2. Web3D 点选 × 时间轴 × 筛选 × 摘要 联动
+1. 在追踪工作台中央 3D 场景：**鼠标左键**点选任意排水构件（雨水斗、管道、排水沟、管件、密封胶）
+   - 构件外发光高亮
+   - 右侧「材料列表」自动滚动定位并选中对应行
+   - 摘要卡片实时刷新
+2. **时间轴**：点击 V1.0 / V1.1 / V1.2 节点切换版本
+   - 3D 场景按版本更新颜色与状态
+   - 摘要卡片同步变更该版本统计
+3. **筛选联动器**：选择「管道 / 雨水斗」材料类型、「有冲突」处理状态、或打开「仅显示涉及碰撞的材料」
+   - 3D 场景中未命中的构件灰显（opacity 0.2）
+   - 命中构件保持高亮
+   - 材料列表与摘要卡片同步过滤
+
+### 3. 碰撞异常追到会议纪要原始说法
+1. 进入「碰撞中心」
+2. 左侧碰撞清单展示去重后的条目，顶部显示「共 X 条去重，合并 Y 条重复」（验证样例包：3条去重、合并2条）
+3. 点击任意条目的 **📍 查看原文**：
+   - 右侧抽屉滑出对应会议纪要全文
+   - 命中的段落以**黄色背景**高亮，右上角显示「📍 第 X 条」
+   - 点击「在3D中定位材料」跳回追踪工作台并聚焦涉及构件
+
+### 4. 补备注重跑 × 历史对比 × 导出结果前后对照
+1. 进入「历史与导出」
+2. 查看「执行历史对比」：BATCH001 已含 3 次执行（V1.0 → V1.1 → V1.2）
+3. 点击任意 run 的 **补备注重跑**，填写备注后确认：
+   - 自动创建新 run，Number 为该批次最大值 + 1
+   - 选择两个 run 可左右分栏**差异对比**（相同灰、差异黄、新增备注绿）
+4. 右下「导出中心」：
+   - 选择批次 + 执行轮次（下拉联动）
+   - 选择 CSV 或 JSON 格式
+   - 文件名预览形如 `BATCH001_run4_20260621-093012.csv`
+   - 点击 **📤 导出下载**，浏览器触发下载
+5. 对同一批次导出前后两次 run 的文件，文件名中 run 序号与时间戳可精确对照。
+
+### 5. 复核人接手：三步走完全局
+复核人不需要问任何人，按照左侧导航顺序即可：
+| 任务 | 在哪里做 |
+|------|---------|
+| 放材料 / 看材料 | 主控制台批次卡片 + 追踪工作台 3D 场景 |
+| 看异常 / 看碰撞 | 碰撞中心 |
+| 重跑 / 导出报告 | 历史与导出页 |
+
+## 常用命令
+
+| 命令 | 说明 |
+|------|------|
+| `npm run dev` | 启动开发服务器 |
+| `npm run dev:host` | 启动开发服务器并绑定 127.0.0.1 |
+| `npm run build` | 类型检查 + 生产构建到 dist/ |
+| `npm run preview` | 预览 dist 静态产物 |
+| `npm run lint` | ESLint 检查 |
+| `npm run check` | TypeScript 类型检查（无 emit） |
+
+## 技术栈
+- React 18 + TypeScript + Vite 5
+- Three.js + @react-three/fiber + drei + postprocessing
+- Zustand（状态管理）
+- TailwindCSS 3
+
+## 目录结构
+```
+src/
+├── components/
+│   ├── layout/          # 主布局、侧边导航
+│   ├── console/         # 主控制台：批次、样例导入、摘要卡
+│   ├── scene3d/         # 3D 场景、时间轴、筛选器
+│   ├── processing/      # 字段归一化面板、材料列表
+│   ├── collision/       # 碰撞清单、原文引用抽屉
+│   └── history/         # 历史对比、导出中心、三步指引
+├── data/mock/           # 标准样例包 A 数据
+├── engine/              # 归一化引擎、去重算法
+├── utils/               # 哈希、导出、localStorage
+├── store/               # Zustand stores
+├── pages/               # 4 个路由页面
+└── App.tsx              # 路由配置
 ```

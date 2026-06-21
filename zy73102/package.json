@@ -5,10 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:host": "vite --host 127.0.0.1",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "check": "tsc -b --noEmit"
+    "check": "tsc -b --noEmit",
+    "postinstall": "node scripts/fix-rollup.mjs"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
     "@react-three/drei": "^9.114.0",
@@ -47,8 +52,5 @@
   "allowScripts": {
     "fsevents@2.3.3": true,
     "esbuild@0.21.5": true
-  },
-  "optionalDependencies": {
-    "rollup": "^4.61.1"
   }
 }

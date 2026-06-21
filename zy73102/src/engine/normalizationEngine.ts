@@ -4,7 +4,7 @@ import { fieldMappings, lockedFieldNames } from '@/data/mappings/fieldMappings';
 
 interface NormalizeResult {
   normalized: Partial<MaterialItem>;
-  originalFields: Record<string, any>;
+  originalFields: Record<string, unknown>;
   matchedMap: Record<string, string>;
 }
 
@@ -33,9 +33,9 @@ function deepClone<T>(obj: T): T {
   if (obj instanceof Date) return new Date(obj.getTime()) as unknown as T;
   if (obj instanceof Array) return obj.map((item) => deepClone(item)) as unknown as T;
   if (obj instanceof Object) {
-    const cloned = {} as Record<string, any>;
-    for (const key of Object.keys(obj as Record<string, any>)) {
-      cloned[key] = deepClone((obj as Record<string, any>)[key]);
+    const cloned = {} as Record<string, unknown>;
+    for (const key of Object.keys(obj as Record<string, unknown>)) {
+      cloned[key] = deepClone((obj as Record<string, unknown>)[key]);
     }
     return cloned as T;
   }
@@ -48,7 +48,7 @@ function deepClone<T>(obj: T): T {
  * - source 和 processingStatus 一旦识别则加入 lockedFields 标记，不可被覆盖
  * - 所有原始字段深拷贝到 originalFields 防丢失
  */
-export function normalizeFields(original: Record<string, any>): NormalizeResult {
+export function normalizeFields(original: Record<string, unknown>): NormalizeResult {
   const normalized: Partial<MaterialItem> = {};
   const matchedMap: Record<string, string> = {};
   const lockedFields: ('source' | 'processingStatus')[] = [];
@@ -77,17 +77,17 @@ export function normalizeFields(original: Record<string, any>): NormalizeResult 
     // 匹配到标准字段
     if (matchedStandardField) {
       // 检查锁定字段：已锁定的不可覆盖
-      const isLocked = lockedFieldNames.includes(matchedStandardField as any);
-      if (isLocked && lockedFields.includes(matchedStandardField as any)) {
+      const isLocked = lockedFieldNames.includes(matchedStandardField as 'source' | 'processingStatus');
+      if (isLocked && lockedFields.includes(matchedStandardField as 'source' | 'processingStatus')) {
         continue;
       }
 
       // 如果是锁定字段，首次匹配时加入锁定列表
-      if (isLocked && !lockedFields.includes(matchedStandardField as any)) {
+      if (isLocked && !lockedFields.includes(matchedStandardField as 'source' | 'processingStatus')) {
         lockedFields.push(matchedStandardField as 'source' | 'processingStatus');
       }
 
-      (normalized as Record<string, any>)[matchedStandardField] = origValue;
+      (normalized as Record<string, unknown>)[matchedStandardField] = origValue;
       matchedMap[matchedStandardField] = origKey;
     }
   }
