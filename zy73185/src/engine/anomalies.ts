@@ -49,12 +49,15 @@ export function runCalculation(
     paramVersion.name
   );
 
+  const allDraftIds = drafts.map((d) => d.id);
+  const validDraftIds = keptDrafts.map((d) => d.id);
   const run: CalculationRun = {
     id: `run-${startedAt}`,
     paramVersionId: paramVersion.id,
     startedAt,
     finishedAt: Date.now(),
-    draftIds: keptDrafts.map((d) => d.id),
+    allDraftIds,
+    validDraftIds,
     anomalies,
     summary,
   };

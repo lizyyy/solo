@@ -1,9 +1,17 @@
+import { useEffect } from "react";
 import TopSummaryBar from "@/components/layout/TopSummaryBar";
 import LeftPanel from "@/components/layout/LeftPanel";
 import CenterPanel from "@/components/layout/CenterPanel";
 import RightPanel from "@/components/layout/RightPanel";
+import { useAppStore } from "@/store/useAppStore";
 
 export default function Home() {
+  const { refreshAll } = useAppStore();
+
+  useEffect(() => {
+    refreshAll();
+  }, [refreshAll]);
+
   return (
     <div className="min-h-screen flex flex-col">
       <TopSummaryBar />

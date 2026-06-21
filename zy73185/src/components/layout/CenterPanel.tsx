@@ -1,11 +1,16 @@
-import { Gauge, PlayCircle } from "lucide-react";
+import { Gauge, PlayCircle, Loader2 } from "lucide-react";
 import { useAppStore } from "@/store/useAppStore";
 import ParamVersionCard from "@/components/params/ParamVersionCard";
 import AnomalyTimeline from "@/components/review/AnomalyTimeline";
 
 export default function CenterPanel() {
-  const { runCalculationNow, drafts, activeParamVersionId } = useAppStore();
-  const canRun = drafts.length > 0 && !!activeParamVersionId;
+  const { submitBatch, drafts, activeParamVersionId, loading, error } = useAppStore();
+  const canRun = drafts.length > 0 && !!activeParamVersionId && !loading;
+
+  const handleSubmit = async () => {
+    if (!canRun) return;
+    await submitBatch();
+  };
 
   return (
     <section
@@ -22,16 +27,23 @@ export default function CenterPanel() {
             <p className="text-xs text-ink-400 mt-0.5">
               自动识别答案版本冲突、重复提交、重复样本与不齐整材料
             </p>
+            {error && (
+              <p className="text-xs text-ochre-600 mt-1 font-medium">{error}</p>
+            )}
           </div>
           <button
-            onClick={() => runCalculationNow()}
+            onClick={handleSubmit}
             disabled={!canRun}
             className={`btn-primary !px-6 ${
               !canRun ? "opacity-50 cursor-not-allowed" : "hover:animate-glow"
             }`}
           >
-            <PlayCircle size={16} />
-            启动验算
+            {loading ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <PlayCircle size={16} />
+            )}
+            {loading ? "验算中…" : "启动验算"}
           </button>
         </div>
         <ParamVersionCard />

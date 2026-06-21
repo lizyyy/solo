@@ -93,7 +93,7 @@ export function buildDeliveryMarkdown(opts: {
       lines.push(`### 运行 @ ${formatTime(r.startedAt)}`);
       lines.push("");
       lines.push(`- **参数版本**：${pv?.name || r.paramVersionId}`);
-      lines.push(`- **草稿条数**：${r.draftIds.length}`);
+      lines.push(`- **草稿条数**：总 ${r.allDraftIds.length} / 有效 ${r.validDraftIds.length}`);
       lines.push(`- **异常数**：${r.anomalies.length}`);
       lines.push(`- **自动摘要**：${r.summary}`);
       if (r.editorNote) {

@@ -1,17 +1,30 @@
 import { useState } from "react";
 import {
-  ChevronDown, ChevronRight, Trash2, PencilLine, Check, X,
+  ChevronDown,
+  ChevronRight,
+  Trash2,
+  PencilLine,
+  Check,
+  X,
 } from "lucide-react";
 import { useAppStore } from "@/store/useAppStore";
 import { anomalyLabel, formatTime } from "@/utils/export";
 
 export default function DraftList() {
-  const { drafts, currentAnomalies, removeDraft, updateDraftNote } =
-    useAppStore();
+  const {
+    drafts,
+    currentAnomalies,
+    removeStagedDraft,
+    updateStagedDraftNote,
+    currentRunId,
+    runs,
+  } = useAppStore();
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [noteDraft, setNoteDraft] = useState("");
 
+  const currentRun = runs.find((r) => r.id === currentRunId);
+  const validIds = new Set(currentRun?.validDraftIds ?? []);
   const anomaliesByDraft = new Map<string, string[]>();
   for (const a of currentAnomalies) {
     for (const id of a.relatedDraftIds) {
@@ -26,7 +39,7 @@ export default function DraftList() {
   };
 
   const saveNote = (draftId: string) => {
-    updateDraftNote(draftId, noteDraft);
+    updateStagedDraftNote(draftId, noteDraft);
     setEditingNote(null);
   };
 
@@ -34,7 +47,7 @@ export default function DraftList() {
     return (
       <div className="flex-1 flex items-center justify-center text-center p-6">
         <div className="text-ink-300 text-sm">
-          <p>暂无草稿</p>
+          <p>暂存区为空</p>
           <p className="text-xs text-ink-400 mt-1">
             上方粘贴或载入示例
           </p>
@@ -49,10 +62,14 @@ export default function DraftList() {
         const flags = anomaliesByDraft.get(d.id) || [];
         const isOpen = !!expanded[d.id];
         const isEditingNote = editingNote === d.id;
+        const isExcluded =
+          currentRun && !validIds.has(d.id) && !!anomaliesByDraft.get(d.id);
         return (
           <li
             key={d.id}
-            className="rounded-lg border border-fog-200 bg-fog-50 overflow-hidden"
+            className={`rounded-lg border bg-fog-50 overflow-hidden ${
+              isExcluded ? "border-ochre-300 bg-ochre-50/40" : "border-fog-200"
+            }`}
           >
             <button
               onClick={() =>
@@ -86,6 +103,11 @@ export default function DraftList() {
                   {!d.supplementaryNote && (
                     <span className="chip bg-fog-200 text-ink-500">
                       待补备注
+                    </span>
+                  )}
+                  {isExcluded && (
+                    <span className="chip bg-ochre-100 text-ochre-700 border border-ochre-300">
+                      已排除 · 不纳入汇总
                     </span>
                   )}
                 </div>
@@ -153,11 +175,11 @@ export default function DraftList() {
                     {formatTime(d.submittedAt)}
                   </span>
                   <button
-                    onClick={() => removeDraft(d.id)}
+                    onClick={() => removeStagedDraft(d.id)}
                     className="inline-flex items-center gap-1 text-ochre-500 hover:text-ochre-700"
                   >
                     <Trash2 size={12} />
-                    移除
+                    从暂存区移除
                   </button>
                 </div>
               </div>

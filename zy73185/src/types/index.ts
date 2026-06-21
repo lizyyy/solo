@@ -39,12 +39,15 @@ export interface Anomaly {
 export interface CalculationRun {
   id: string;
   paramVersionId: string;
+  paramVersion?: ParamVersion;
   startedAt: number;
   finishedAt: number;
-  draftIds: string[];
+  validDraftIds: string[];
+  allDraftIds: string[];
   anomalies: Anomaly[];
   summary: string;
   editorNote?: string;
+  batchId?: string;
 }
 
 export interface AppState {
@@ -52,6 +55,8 @@ export interface AppState {
   paramVersions: ParamVersion[];
   activeParamVersionId: string | null;
   runs: CalculationRun[];
+  currentRunId: string | null;
   currentAnomalies: Anomaly[];
   globalSummary: string;
+  loading: boolean;
 }

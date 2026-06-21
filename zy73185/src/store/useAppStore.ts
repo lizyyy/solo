@@ -1,141 +1,230 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import type {
   DraftEntry,
   ParamVersion,
   CalculationRun,
   Anomaly,
 } from "@/types";
-import { runCalculation, buildSummary } from "@/engine/anomalies";
+import { api, type FullRunResponse } from "@/utils/apiClient";
+import { parseDraftText, parsedLineToDraft } from "@/utils/parseDraft";
 
 interface AppStateShape {
   drafts: DraftEntry[];
   paramVersions: ParamVersion[];
   activeParamVersionId: string | null;
   runs: CalculationRun[];
+  currentRunId: string | null;
   currentAnomalies: Anomaly[];
   globalSummary: string;
-  addDrafts: (drafts: DraftEntry[]) => void;
-  removeDraft: (id: string) => void;
-  clearDrafts: () => void;
-  addParamVersion: (p: Omit<ParamVersion, "id" | "createdAt">) => void;
-  setActiveParamVersion: (id: string) => void;
-  runCalculationNow: () => CalculationRun | null;
-  setAnomalyResolved: (anomalyId: string, resolved: boolean, note?: string) => void;
-  updateDraftNote: (draftId: string, note: string) => void;
-  setEditorNoteForRun: (runId: string, note: string) => void;
-  recomputeGlobalSummary: () => void;
+  loading: boolean;
+  error: string | null;
+  setLoading: (v: boolean) => void;
+  setError: (e: string | null) => void;
+  refreshParamVersions: () => Promise<void>;
+  createParamVersion: (
+    p: Omit<ParamVersion, "id" | "createdAt">
+  ) => Promise<void>;
+  setActiveParamVersion: (id: string) => Promise<void>;
+  parseAndStageDrafts: (text: string) => DraftEntry[];
+  addStagedDrafts: (drafts: DraftEntry[]) => void;
+  removeStagedDraft: (id: string) => void;
+  clearStagedDrafts: () => void;
+  updateStagedDraftNote: (draftId: string, note: string) => void;
+  submitBatch: (editorNote?: string) => Promise<CalculationRun | null>;
+  refreshAll: () => Promise<void>;
+  selectRun: (runId: string) => Promise<void>;
+  rerun: (runId: string) => Promise<void>;
+  setEditorNoteForRun: (runId: string, note: string) => Promise<void>;
+  setAnomalyResolved: (
+    anomalyId: string,
+    resolved: boolean,
+    note?: string
+  ) => Promise<void>;
+  updateDraftNote: (draftId: string, note: string) => Promise<void>;
+  exportMarkdown: (runId: string) => Promise<string>;
 }
 
-export const useAppStore = create<AppStateShape>()(
-  persist(
-    (set, get) => ({
-      drafts: [],
-      paramVersions: [],
-      activeParamVersionId: null,
-      runs: [],
-      currentAnomalies: [],
-      globalSummary: "尚未运行验算。请先导入学生草稿并选择参数版本。",
+function applyFull(state: AppStateShape, payload: FullRunResponse) {
+  const runMap = new Map(state.runs.map((r) => [r.id, r]));
+  runMap.set(payload.run.id, payload.run);
+  const draftMap = new Map(state.drafts.map((d) => [d.id, d]));
+  for (const d of payload.drafts) draftMap.set(d.id, d);
+  state.drafts = [...draftMap.values()];
+  state.paramVersions = payload.paramVersions;
+  state.runs = [...runMap.values()].sort((a, b) => b.startedAt - a.startedAt);
+  state.currentRunId = payload.run.id;
+  state.currentAnomalies = payload.run.anomalies;
+  state.globalSummary = payload.globalSummary;
+  state.activeParamVersionId =
+    payload.paramVersions.find((p) => p.isActive)?.id ?? null;
+}
 
-      addDrafts: (drafts) =>
-        set((s) => ({ drafts: [...s.drafts, ...drafts] })),
+export const useAppStore = create<AppStateShape>((set, get) => ({
+  drafts: [],
+  paramVersions: [],
+  activeParamVersionId: null,
+  runs: [],
+  currentRunId: null,
+  currentAnomalies: [],
+  globalSummary:
+    "尚未运行验算。请先导入学生草稿并选择参数版本，然后点击『启动验算』。",
+  loading: false,
+  error: null,
 
-      removeDraft: (id) =>
-        set((s) => ({ drafts: s.drafts.filter((d) => d.id !== id) })),
+  setLoading: (v) => set({ loading: v }),
+  setError: (e) => set({ error: e }),
 
-      clearDrafts: () => set({ drafts: [], currentAnomalies: [] }),
+  refreshParamVersions: async () => {
+    const list = await api.listParamVersions();
+    set({
+      paramVersions: list,
+      activeParamVersionId: list.find((p) => p.isActive)?.id ?? null,
+    });
+  },
 
-      addParamVersion: (p) => {
-        const version: ParamVersion = {
-          ...p,
-          id: `pv-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-          createdAt: Date.now(),
-        };
-        set((s) => ({
-          paramVersions: [
-            ...s.paramVersions.map((pv) => ({ ...pv, isActive: false })),
-            { ...version, isActive: true },
-          ],
-          activeParamVersionId: version.id,
-        }));
-      },
-
-      setActiveParamVersion: (id) =>
-        set((s) => ({
-          paramVersions: s.paramVersions.map((pv) => ({
-            ...pv,
-            isActive: pv.id === id,
-          })),
-          activeParamVersionId: id,
-        })),
-
-      runCalculationNow: () => {
-        const state = get();
-        const pv = state.paramVersions.find(
-          (x) => x.id === state.activeParamVersionId
-        );
-        if (!pv || state.drafts.length === 0) return null;
-        const result = runCalculation(state.drafts, pv);
-        set({
-          runs: [...state.runs, result.run],
-          currentAnomalies: result.anomalies,
-          globalSummary: result.summary,
-        });
-        return result.run;
-      },
-
-      setAnomalyResolved: (anomalyId, resolved, note) =>
-        set((s) => {
-          const updater = (a: Anomaly): Anomaly =>
-            a.id === anomalyId
-              ? { ...a, resolved, resolverNote: note ?? a.resolverNote }
-              : a;
-          return {
-            currentAnomalies: s.currentAnomalies.map(updater),
-            runs: s.runs.map((r) => ({
-              ...r,
-              anomalies: r.anomalies.map(updater),
-            })),
-          };
-        }),
-
-      updateDraftNote: (draftId, note) =>
-        set((s) => ({
-          drafts: s.drafts.map((d) =>
-            d.id === draftId ? { ...d, supplementaryNote: note } : d
-          ),
-        })),
-
-      setEditorNoteForRun: (runId, note) =>
-        set((s) => ({
-          runs: s.runs.map((r) =>
-            r.id === runId ? { ...r, editorNote: note } : r
-          ),
-        })),
-
-      recomputeGlobalSummary: () =>
-        set((s) => {
-          const pv =
-            s.paramVersions.find((x) => x.id === s.activeParamVersionId)?.name ||
-            "未选择";
-          const summary = buildSummary(
-            s.currentAnomalies,
-            s.drafts.length,
-            pv
-          );
-          return { globalSummary: summary };
-        }),
-    }),
-    {
-      name: "epb-workbench",
-      partialize: (s) => ({
-        drafts: s.drafts,
-        paramVersions: s.paramVersions,
-        activeParamVersionId: s.activeParamVersionId,
-        runs: s.runs,
-        currentAnomalies: s.currentAnomalies,
-        globalSummary: s.globalSummary,
-      }),
+  createParamVersion: async (p) => {
+    set({ loading: true });
+    try {
+      const pv = await api.createParamVersion(p);
+      const list = await api.listParamVersions();
+      set({
+        paramVersions: list,
+        activeParamVersionId: pv.isActive ? pv.id : get().activeParamVersionId,
+      });
+    } finally {
+      set({ loading: false });
     }
-  )
-);
+  },
+
+  setActiveParamVersion: async (id) => {
+    await api.activateParamVersion(id);
+    set({
+      paramVersions: get().paramVersions.map((pv) => ({
+        ...pv,
+        isActive: pv.id === id,
+      })),
+      activeParamVersionId: id,
+    });
+  },
+
+  parseAndStageDrafts: (text) => {
+    const parsed = parseDraftText(text);
+    return parsed.map((p, i) => parsedLineToDraft(p, Date.now() + i));
+  },
+
+  addStagedDrafts: (drafts) =>
+    set((s) => ({ drafts: [...s.drafts, ...drafts] })),
+
+  removeStagedDraft: (id) =>
+    set((s) => ({ drafts: s.drafts.filter((d) => d.id !== id) })),
+
+  clearStagedDrafts: () => set({ drafts: [], currentAnomalies: [] }),
+
+  updateStagedDraftNote: (draftId, note) =>
+    set((s) => ({
+      drafts: s.drafts.map((d) =>
+        d.id === draftId ? { ...d, supplementaryNote: note } : d
+      ),
+    })),
+
+  submitBatch: async (editorNote) => {
+    const state = get();
+    if (state.drafts.length === 0) return null;
+    set({ loading: true, error: null });
+    try {
+      const resp = await api.submitBatch({
+        drafts: state.drafts.map((d) => ({
+          questionNo: d.questionNo,
+          answerContent: d.answerContent,
+          answerVersion: d.answerVersion,
+          supplementaryNote: d.supplementaryNote,
+          rawSource: d.rawSource,
+        })),
+        paramVersionId: state.activeParamVersionId ?? undefined,
+        editorNote,
+      });
+      applyFull(get(), resp);
+      set({ drafts: [] });
+      return resp.run;
+    } catch (e: any) {
+      set({ error: e?.message ?? "提交失败" });
+      return null;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  refreshAll: async () => {
+    set({ loading: true });
+    try {
+      const [pvs, runs] = await Promise.all([
+        api.listParamVersions(),
+        api.listRuns(),
+      ]);
+      const latest = runs[0];
+      set({
+        paramVersions: pvs,
+        activeParamVersionId: pvs.find((p) => p.isActive)?.id ?? null,
+        runs,
+        currentRunId: latest?.id ?? null,
+        currentAnomalies: latest?.anomalies ?? [],
+        globalSummary: latest?.summary ?? get().globalSummary,
+      });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  selectRun: async (runId) => {
+    const resp = await api.getRun(runId);
+    applyFull(get(), resp);
+  },
+
+  rerun: async (runId) => {
+    set({ loading: true, error: null });
+    try {
+      const resp = await api.rerun(runId);
+      applyFull(get(), resp);
+    } catch (e: any) {
+      set({ error: e?.message ?? "重跑失败" });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  setEditorNoteForRun: async (runId, note) => {
+    await api.setEditorNote(runId, note);
+    set((s) => ({
+      runs: s.runs.map((r) =>
+        r.id === runId ? { ...r, editorNote: note } : r
+      ),
+    }));
+  },
+
+  setAnomalyResolved: async (anomalyId, resolved, note) => {
+    const a = await api.resolveAnomaly(anomalyId, resolved, note);
+    set((s) => {
+      const updater = (x: Anomaly): Anomaly =>
+        x.id === anomalyId ? a : x;
+      return {
+        currentAnomalies: s.currentAnomalies.map(updater),
+        runs: s.runs.map((r) => ({
+          ...r,
+          anomalies: r.anomalies.map(updater),
+        })),
+      };
+    });
+  },
+
+  updateDraftNote: async (draftId, note) => {
+    const d = await api.updateDraftNote(draftId, note);
+    set((s) => ({
+      drafts: s.drafts.map((x) => (x.id === draftId ? d : x)),
+    }));
+  },
+
+  exportMarkdown: async (runId) => {
+    const resp = await api.exportRun(runId);
+    return resp.markdown;
+  },
+}));

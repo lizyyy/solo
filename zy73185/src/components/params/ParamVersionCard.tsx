@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Layers, Plus, X, Check } from "lucide-react";
+import { Layers, Plus, X, Check, Loader2 } from "lucide-react";
 import { useAppStore } from "@/store/useAppStore";
 import { formatTime } from "@/utils/export";
 
@@ -8,7 +8,8 @@ export default function ParamVersionCard() {
     paramVersions,
     activeParamVersionId,
     setActiveParamVersion,
-    addParamVersion,
+    createParamVersion,
+    loading,
   } = useAppStore();
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState("");
@@ -17,10 +18,12 @@ export default function ParamVersionCard() {
   const [roundingRule, setRoundingRule] = useState<
     "round" | "floor" | "ceil"
   >("round");
+  const [submitting, setSubmitting] = useState(false);
 
-  const submitNew = () => {
+  const submitNew = async () => {
     if (!name.trim()) return;
-    addParamVersion({
+    setSubmitting(true);
+    await createParamVersion({
       name: name.trim(),
       tolerance,
       roundingRule,
@@ -32,7 +35,11 @@ export default function ParamVersionCard() {
     setTolerance(0.05);
     setSigFigs(3);
     setRoundingRule("round");
+    setSubmitting(false);
   };
+
+  const ruleLabel = (r: string) =>
+    r === "round" ? "四舍五入" : r === "floor" ? "向下" : "向上";
 
   return (
     <div className="card p-4 w-[340px] shrink-0">
@@ -93,8 +100,16 @@ export default function ParamVersionCard() {
               <option value="ceil">向上取整</option>
             </select>
           </div>
-          <button onClick={submitNew} className="btn-primary w-full">
-            <Check size={14} />
+          <button
+            onClick={submitNew}
+            disabled={submitting || !name.trim()}
+            className="btn-primary w-full disabled:opacity-50"
+          >
+            {submitting ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <Check size={14} />
+            )}
             保存新版本
           </button>
         </div>
@@ -108,16 +123,11 @@ export default function ParamVersionCard() {
         <ul className="space-y-2 max-h-[200px] overflow-y-auto scroll-thin pr-1">
           {paramVersions.map((pv) => {
             const active = pv.id === activeParamVersionId;
-            const ruleLabel =
-              pv.roundingRule === "round"
-                ? "四舍五入"
-                : pv.roundingRule === "floor"
-                  ? "向下"
-                  : "向上";
             return (
               <button
                 key={pv.id}
                 onClick={() => setActiveParamVersion(pv.id)}
+                disabled={loading}
                 className={`w-full text-left p-3 rounded-lg border transition-all ${
                   active
                     ? "border-ink-300 bg-ink-50 shadow-card animate-flip-y"
@@ -141,7 +151,7 @@ export default function ParamVersionCard() {
                 <div className="mt-1 grid grid-cols-3 gap-1 text-[10px] text-ink-400 font-mono">
                   <span>容忍 {pv.tolerance}</span>
                   <span>有效 {pv.sigFigs}位</span>
-                  <span>舍入 {ruleLabel}</span>
+                  <span>舍入 {ruleLabel(pv.roundingRule)}</span>
                 </div>
                 <p className="mt-1 text-[10px] text-ink-400">
                   建档 {formatTime(pv.createdAt)}

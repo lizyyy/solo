@@ -51,7 +51,7 @@ export default function NoteTimeline() {
               {pv?.name || "（参数版本已删除）"}
             </div>
             <div className="text-xs text-ink-500 mt-0.5">
-              草稿 {run.draftIds.length} 条 · 异常 {run.anomalies.length} 项
+              总草稿 {run.allDraftIds.length} 条 · 有效 {run.validDraftIds.length} 条 · 异常 {run.anomalies.length} 项
             </div>
             <div className="text-xs text-ink-400 mt-0.5 italic">
               {run.summary}
