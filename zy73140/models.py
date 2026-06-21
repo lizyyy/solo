@@ -41,16 +41,18 @@ class CleaningResult:
     confirmed: int
     pending: int
     rejected: int
-    cloud_cover_records: List[str]
+    cloud_cover_records: List[Dict[str, Any]]
     boundary_records: List[Dict[str, Any]]
     time_mismatch_count: int
     missing_bottle_count: int
     boundary_analysis: Dict[str, Any]
+    all_records: List[SeagrassRecord]
     cleaned_data: List[SeagrassRecord]
 
 
 SCENE_LABELS = {
     "CLOUD_COVER": "遥感云遮挡记录已单独提取，不参与统计计算",
+    "CLOUD_COVER_REJECT_REASON": "遥感云遮挡率超过30%，原始采样结果不可靠，从正常统计链路剔除，不参与覆盖率均值与边界样本计算",
     "TIME_MISMATCH": "采样时间与实验时间偏差超过阈值，需人工复核",
     "BOUNDARY": "边界样本，对最终覆盖率计算影响显著",
     "MISSING_BOTTLE": "采样瓶编号缺失，需补充原始记录",

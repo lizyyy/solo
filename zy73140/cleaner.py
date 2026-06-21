@@ -1,6 +1,6 @@
 import re
 from datetime import datetime, timedelta
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 from models import (
     SeagrassRecord,
     CleaningResult,
@@ -130,16 +130,39 @@ def clean_record(record: SeagrassRecord, time_threshold: int = 2) -> SeagrassRec
     return record
 
 
-def clean_seagrass_data(records: List[SeagrassRecord],
-                        time_threshold: int = 2,
-                        include_cloud_cover: bool = False) -> CleaningResult:
-    cleaned_records = [clean_record(r, time_threshold) for r in records]
+def _format_time(dt: Optional[datetime]) -> Optional[str]:
+    return dt.strftime("%Y-%m-%d %H:%M:%S") if dt else None
 
-    cloud_cover_ids = [r.record_id for r in cleaned_records
-                       if QualityFlag.CLOUD_COVER in r.quality_flags]
+
+def clean_seagrass_data(records: List[SeagrassRecord],
+                        time_threshold: int = 2) -> CleaningResult:
+    all_tagged = [clean_record(r, time_threshold) for r in records]
+
+    cloud_cover_full = []
+    for r in all_tagged:
+        if QualityFlag.CLOUD_COVER in r.quality_flags:
+            cloud_pct = r.raw_data.get("remote_sensing", {}).get("cloud_cover", 0)
+            cloud_cover_full.append({
+                "record_id": r.record_id,
+                "bottle_id": r.bottle_id,
+                "sampling_time": _format_time(r.sampling_time),
+                "lab_time": _format_time(r.lab_time),
+                "seagrass_coverage": r.seagrass_coverage,
+                "biomass": r.biomass,
+                "species": r.species,
+                "location": r.location,
+                "cloud_cover_percent": cloud_pct,
+                "status": r.status.value,
+                "reject_reason": SCENE_LABELS["CLOUD_COVER_REJECT_REASON"],
+                "quality_flags": [f.value for f in r.quality_flags],
+                "note": SCENE_LABELS["CLOUD_COVER"]
+            })
+
+    usable_records = [r for r in all_tagged
+                      if QualityFlag.CLOUD_COVER not in r.quality_flags]
 
     boundary_records = []
-    for r in cleaned_records:
+    for r in usable_records:
         if QualityFlag.BOUNDARY in r.quality_flags:
             boundary_records.append({
                 "record_id": r.record_id,
@@ -150,33 +173,44 @@ def clean_seagrass_data(records: List[SeagrassRecord],
                 "note": SCENE_LABELS["BOUNDARY"]
             })
 
-    boundary_analysis = calculate_boundary_influence(cleaned_records, cleaned_records)
+    boundary_analysis = calculate_boundary_influence(usable_records, usable_records)
+    boundary_analysis["calculation_note"] = "已先排除遥感云遮挡记录，基于可用记录计算"
 
-    confirmed = sum(1 for r in cleaned_records if r.status == RecordStatus.CONFIRMED)
-    pending = sum(1 for r in cleaned_records if r.status == RecordStatus.PENDING)
-    rejected = sum(1 for r in cleaned_records if r.status == RecordStatus.REJECTED)
+    confirmed = sum(1 for r in all_tagged if r.status == RecordStatus.CONFIRMED)
+    pending = sum(1 for r in all_tagged if r.status == RecordStatus.PENDING)
+    rejected = sum(1 for r in all_tagged if r.status == RecordStatus.REJECTED)
 
-    time_mismatch_count = sum(1 for r in cleaned_records
+    time_mismatch_count = sum(1 for r in usable_records
                               if QualityFlag.TIME_MISMATCH in r.quality_flags)
-    missing_bottle_count = sum(1 for r in cleaned_records
+    missing_bottle_count = sum(1 for r in usable_records
                                 if QualityFlag.MISSING_BOTTLE in r.quality_flags)
-
-    if not include_cloud_cover:
-        cleaned_records = [r for r in cleaned_records
-                           if QualityFlag.CLOUD_COVER not in r.quality_flags]
 
     return CleaningResult(
         total_records=len(records),
         confirmed=confirmed,
         pending=pending,
         rejected=rejected,
-        cloud_cover_records=cloud_cover_ids,
+        cloud_cover_records=cloud_cover_full,
         boundary_records=boundary_records,
         time_mismatch_count=time_mismatch_count,
         missing_bottle_count=missing_bottle_count,
         boundary_analysis=boundary_analysis,
-        cleaned_data=cleaned_records
+        all_records=all_tagged,
+        cleaned_data=usable_records
     )
+
+
+def _build_summary(result: CleaningResult) -> Dict[str, Any]:
+    return {
+        "总记录数": result.total_records,
+        "已确认": result.confirmed,
+        "待补件": result.pending,
+        "退回": result.rejected,
+        "遥感云遮挡数": len(result.cloud_cover_records),
+        "边界样本数": len(result.boundary_records),
+        "时间不匹配数": result.time_mismatch_count,
+        "采样瓶缺失数": result.missing_bottle_count
+    }
 
 
 def build_api_response(result: CleaningResult) -> Dict[str, Any]:
@@ -186,16 +220,7 @@ def build_api_response(result: CleaningResult) -> Dict[str, Any]:
         "scene_label": "海草床调查数据清洗 - 质量控制与复核管理",
         "side_note": SIDE_NOTES["CLOUD_COVER"] + " " + SIDE_NOTES["PENDING_FLOW"],
         "data": {
-            "summary": {
-                "总记录数": result.total_records,
-                "已确认": result.confirmed,
-                "待补件": result.pending,
-                "退回": result.rejected,
-                "遥感云遮挡数": len(result.cloud_cover_records),
-                "边界样本数": len(result.boundary_records),
-                "时间不匹配数": result.time_mismatch_count,
-                "采样瓶缺失数": result.missing_bottle_count
-            },
+            "summary": _build_summary(result),
             "cloud_cover_records": result.cloud_cover_records,
             "boundary_records": result.boundary_records,
             "boundary_analysis": result.boundary_analysis,
@@ -212,3 +237,50 @@ def build_api_response(result: CleaningResult) -> Dict[str, Any]:
             ]
         }
     }
+
+
+def export_by_view(result: CleaningResult, view: str = "engineer") -> Dict[str, Any]:
+    scene_label_map = {
+        "engineer": "海草床调查数据清洗 - 工程师视角：原始质量问题排查",
+        "reviewer": "海草床调查数据清洗 - 复核视角：月底状态分类与优先级",
+        "api": "海草床调查数据清洗 - 接口视角：结构化数据返回"
+    }
+    side_note_map = {
+        "engineer": SIDE_NOTES["CLOUD_COVER"] + " " + SIDE_NOTES["BOUNDARY"] + " " + SIDE_NOTES["TIME_MISMATCH"] + " " + SIDE_NOTES["MISSING_BOTTLE"],
+        "reviewer": SIDE_NOTES["PENDING_FLOW"] + " " + SIDE_NOTES["CLOUD_COVER"],
+        "api": SIDE_NOTES["CLOUD_COVER"] + " " + SIDE_NOTES["PENDING_FLOW"]
+    }
+
+    view = view.lower()
+    if view not in scene_label_map:
+        view = "engineer"
+
+    base = {
+        "scene_label": scene_label_map[view],
+        "side_note": side_note_map[view],
+        "summary": _build_summary(result)
+    }
+
+    if view == "engineer":
+        base.update({
+            "云遮挡详细清单": result.cloud_cover_records,
+            "边界样本列表": result.boundary_records,
+            "边界影响分析": result.boundary_analysis,
+            "每条记录问题标记": [
+                {
+                    "record_id": r.record_id,
+                    "bottle_id": r.bottle_id,
+                    "quality_flags": [f.value for f in r.quality_flags],
+                    "notes": r.notes
+                }
+                for r in result.all_records
+            ]
+        })
+    elif view == "reviewer":
+        from review import ReviewManager
+        reviewer = ReviewManager(result)
+        base.update(reviewer.export_for_monthly_review())
+    else:
+        base.update(build_api_response(result)["data"])
+
+    return base

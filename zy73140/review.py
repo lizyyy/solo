@@ -9,7 +9,7 @@ class ReviewManager:
         self.pending_deadline_days = 7
 
     def get_records_by_status(self, status: RecordStatus) -> List[SeagrassRecord]:
-        return [r for r in self.result.cleaned_data if r.status == status]
+        return [r for r in self.result.all_records if r.status == status]
 
     def get_summary(self) -> Dict[str, Any]:
         confirmed = self.get_records_by_status(RecordStatus.CONFIRMED)
@@ -21,7 +21,7 @@ class ReviewManager:
                 "已确认数": len(confirmed),
                 "待补件数": len(pending),
                 "退回数": len(rejected),
-                "云遮挡退回数": len(self.result.cloud_cover_records)
+                "其中云遮挡退回数": len(self.result.cloud_cover_records)
             },
             "待补件截止日期提醒": SIDE_NOTES["PENDING_FLOW"],
             "待处理优先级": self._get_priority_list(pending)
@@ -52,7 +52,7 @@ class ReviewManager:
         return priority
 
     def confirm_record(self, record_id: str) -> Optional[SeagrassRecord]:
-        for r in self.result.cleaned_data:
+        for r in self.result.all_records:
             if r.record_id == record_id:
                 r.status = RecordStatus.CONFIRMED
                 r.notes = "人工复核通过，已确认"
@@ -60,7 +60,7 @@ class ReviewManager:
         return None
 
     def reject_record(self, record_id: str, reason: str = "") -> Optional[SeagrassRecord]:
-        for r in self.result.cleaned_data:
+        for r in self.result.all_records:
             if r.record_id == record_id:
                 r.status = RecordStatus.REJECTED
                 r.notes = f"退回 - {reason}" if reason else "退回"
@@ -68,7 +68,7 @@ class ReviewManager:
         return None
 
     def request_more_info(self, record_id: str, info_request: str) -> Optional[SeagrassRecord]:
-        for r in self.result.cleaned_data:
+        for r in self.result.all_records:
             if r.record_id == record_id:
                 r.status = RecordStatus.PENDING
                 r.notes = f"待补件 - 需补充: {info_request}"
@@ -92,8 +92,10 @@ class ReviewManager:
                 {
                     "record_id": r.record_id,
                     "bottle_id": r.bottle_id,
+                    "sampling_time": r.sampling_time.strftime("%Y-%m-%d %H:%M:%S") if r.sampling_time else None,
                     "coverage": r.seagrass_coverage,
-                    "quality_flags": [f.value for f in r.quality_flags]
+                    "quality_flags": [f.value for f in r.quality_flags],
+                    "notes": r.notes
                 }
                 for r in self.get_records_by_status(RecordStatus.CONFIRMED)
             ],
@@ -101,6 +103,8 @@ class ReviewManager:
                 {
                     "record_id": r.record_id,
                     "bottle_id": r.bottle_id,
+                    "sampling_time": r.sampling_time.strftime("%Y-%m-%d %H:%M:%S") if r.sampling_time else None,
+                    "coverage": r.seagrass_coverage,
                     "notes": r.notes,
                     "quality_flags": [f.value for f in r.quality_flags]
                 }
@@ -110,12 +114,14 @@ class ReviewManager:
                 {
                     "record_id": r.record_id,
                     "bottle_id": r.bottle_id,
+                    "sampling_time": r.sampling_time.strftime("%Y-%m-%d %H:%M:%S") if r.sampling_time else None,
+                    "coverage": r.seagrass_coverage,
                     "notes": r.notes,
                     "quality_flags": [f.value for f in r.quality_flags]
                 }
                 for r in self.get_records_by_status(RecordStatus.REJECTED)
             ],
-            "云遮挡单独记录": self.result.cloud_cover_records,
+            "云遮挡退回详情": self.result.cloud_cover_records,
             "边界样本影响分析": self.result.boundary_analysis
         }
 
