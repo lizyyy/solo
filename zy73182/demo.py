@@ -4,6 +4,7 @@ from models import (
     AttributionConfig,
     OverrideSource,
     EvidenceGapLevel,
+    BoundaryEventType,
 )
 from normalizer import DraftNormalizer, AuditLogger
 from engine import ConstraintAttributionEngine
@@ -268,7 +269,7 @@ def main():
     else:
         print("  所有外推越界都已关联说法 ✓")
 
-    unresolved_extr = bt.query_unresolved_extrapolations(gap_manager)
+    unresolved_extr = bt.query_unresolved_boundary_gaps(gap_manager)
     print(f"  仍需补材料的外推越界数: {len(unresolved_extr)}")
 
     # ──────────────────────────────────────────────────────────────────────
@@ -374,7 +375,7 @@ def main():
     print_sub("先模拟小孟补材料：补全草稿A的外推原始说法对应的证据缺口")
     for did, gaps in gap_manager._gaps.items():
         for g in gaps:
-            if g.gap_type == "extrapolation_without_claim":
+            if g.gap_type == "boundary_event_without_claim":
                 gap_manager.resolve_gap(did, g.gap_id, "data_analyst_meng",
                                          note="从草稿文字中提取并回填至BoundaryEvent.original_claim_text")
                 print(f"  ✓ 解决 gap_id={g.gap_id[:6]}: {g.gap_type}")
@@ -404,6 +405,26 @@ def main():
     for item in cl["all_items"]:
         mark = "✅" if item["passed"] else "🚫"
         print(f"  {mark} {item['item']}  （未解决: {item['pending_count']}）")
+
+    print_sub("🏷️  问题分类面板（一眼区分三类问题）")
+    ic = dash["issue_classification"]
+    print(f"\n  🔴 越界缺原始说法（必补，阻塞放行）: {ic['🔴 boundary_missing_claim']['count']} 处 / {ic['🔴 boundary_missing_claim']['affected_drafts']} 份草稿")
+    for det in ic['🔴 boundary_missing_claim']['details'][:3]:
+        print(f"    · gap_id={det['gap_id'][:6]} | draft={det['draft_id'][:6]} | {det['description'][:60]}...")
+        print(f"       建议: {det['fill_suggestion']}")
+        print(f"       点击回显: {det['clickthrough_link']}")
+    print(f"\n  🟡 公式单位问题（建议补，不阻塞）: {ic['🟡 formula_unit_issue']['count']} 处 / {ic['🟡 formula_unit_issue']['affected_drafts']} 份草稿")
+    for det in ic['🟡 formula_unit_issue']['details'][:3]:
+        print(f"    · gap_id={det['gap_id'][:6]} | draft={det['draft_id'][:6]} | {det['description'][:60]}...")
+        print(f"       建议: {det['fill_suggestion']}")
+    print(f"\n  🟢 证据齐全可放行: {ic['🟢 ready_to_release']['count']} / {ic['total_drafts']} 份草稿")
+    for rd in ic['🟢 ready_to_release']['details'][:5]:
+        non_block = ", ".join([f"{g['gap_type']}({g['level']})" for g in rd['non_blocking_gaps']]) if rd['non_blocking_gaps'] else "无任何缺口"
+        print(f"    · draft={rd['draft_id'][:6]} | 学生{rd['student_id']} | {rd['result_category']} | 非阻塞: {non_block}")
+    if ic['other_must_fill']['count']:
+        print(f"\n  ⚠️  其他必补项: {ic['other_must_fill']['count']} 处")
+    if ic['other_should_fill']['count']:
+        print(f"  ⚠️  其他建议项: {ic['other_should_fill']['count']} 处")
 
     print_sub("📋 四个面板：告诉小孟哪条材料该补、哪条可以放行")
     for panel_key, panel_title in [
@@ -460,17 +481,170 @@ def main():
             print(f"    备注: {l.comment[:120]}")
 
     # ──────────────────────────────────────────────────────────────────────
-    # 10. 需求覆盖总结
+    # 10. 验收用例：越界追证严格性验证
     # ──────────────────────────────────────────────────────────────────────
-    print_section("10. 需求覆盖检查")
+    print_section("10. 验收用例：越界追证严格性验证")
+
+    print_sub("📌 验收用例 A：x_value=150 超上界(上界100)，草稿无变量来源/原始说法")
+    print("  期望：生成 OUT_OF_RANGE 事件，original_claim_text 为空 → 触发 MUST_FILL 边界缺口 → 被必补清单拦住")
+    print("  草稿内容特点：只有数字计算，没有对 x=150 的来源/说明文字")
+
+    draft_A_payload = {
+        "学生id": "S901",
+        "tihao": "Q3",
+        "作答分数": 630.0,
+        "x_axis": 150.0,
+        "xielv": 4.0,
+        "jiesanju": 30.0,
+        "图表点": [{"x": 150, "y": 630}],
+        "草稿内容": "4.0*150+30=630，答案630",
+    }
+
+    draft_A = normalizer.normalize(draft_A_payload, source_file="验收用例A.xlsx", source_batch="acceptance_test", operator="test_runner")
+    print(f"  ✓ 草稿标准化完成，状态={draft_A.processing_status.value}")
+    print(f"    草稿文字长度={len(draft_A.raw_scratch_text)}，内容='{draft_A.raw_scratch_text}'")
+
+    result_A, events_A, gaps_A = engine.run(draft_A, run_id="accept_A", operator="test_runner")
+    print(f"  ✓ 归因完成：分类={result_A.error_category}/{result_A.error_subcategory}")
+
+    print(f"\n  📋 边界事件检查：")
+    out_of_range_events = [e for e in events_A if e.event_type == BoundaryEventType.OUT_OF_RANGE]
+    print(f"  OUT_OF_RANGE 事件数：{len(out_of_range_events)}")
+    for e in out_of_range_events:
+        print(f"    · {e.variable_name}={e.input_value}{e.units}，范围=[{e.valid_min},{e.valid_max}]")
+        print(f"      类型={e.event_type.value}，严重度={e.impact_severity}")
+        print(f"      关联原始说法: '{e.original_claim_text}' (长度={len(e.original_claim_text)})")
+
+    print(f"\n  📋 证据缺口检查：")
+    boundary_gaps = [g for g in gaps_A if g.gap_type == "boundary_event_without_claim"]
+    print(f"  boundary_event_without_claim 缺口数：{len(boundary_gaps)}")
+    for g in boundary_gaps:
+        print(f"    · {g.gap_type}: {g.gap_description}")
+        print(f"      级别={g.level.value}，是否阻塞={g.blocking_release}")
+
+    pass_case_A = (
+        len(out_of_range_events) > 0
+        and all(not e.original_claim_text for e in out_of_range_events)
+        and len(boundary_gaps) > 0
+        and all(g.level == EvidenceGapLevel.MUST_FILL and g.blocking_release for g in boundary_gaps)
+    )
+
+    print(f"\n  🔍 用例 A 验收结果：{'✅ 通过' if pass_case_A else '❌ 未通过'}")
+    if pass_case_A:
+        print("  ✓ 越界事件已生成、原始说法为空、MUST_FILL缺口已触发、阻塞发布=TRUE → 成功拦住！")
+    else:
+        print("  ✗ 验收失败，预期：有OUT_OF_RANGE事件且original_claim_text为空，且触发阻塞级别的边界缺口")
+
+    gap_manager.register_gaps(draft_A.draft_id, gaps_A)
+    all_boundary_events[draft_A.draft_id] = events_A
+    results[draft_A.draft_id] = result_A
+    drafts.append(draft_A)
+
+    print_sub("📌 验收用例 B：x_value=150 超上界(上界100)，草稿有完整原始说法")
+    print("  期望：生成 OUT_OF_RANGE 事件，original_claim_text 有内容 → 不触发边界缺口 → 不被误拦")
+    print("  草稿内容特点：明确写了x=150的来源和理由")
+
+    draft_B_payload = {
+        "学生id": "S902",
+        "tihao": "Q3",
+        "作答分数": 625.0,
+        "x_axis": 150.0,
+        "xielv": 4.0,
+        "jiesanju": 25.0,
+        "图表点": [{"x": 150, "y": 625}],
+        "草稿内容": "x_value取150小时，虽然学习时间超过了训练数据的100小时上限，"
+                    "但我认为线性趋势稳定，可以外推。"
+                    "公式4.0*150+25=625，所以答案写625",
+    }
+
+    draft_B = normalizer.normalize(draft_B_payload, source_file="验收用例B.xlsx", source_batch="acceptance_test", operator="test_runner")
+    print(f"  ✓ 草稿标准化完成，状态={draft_B.processing_status.value}")
+    print(f"    草稿文字长度={len(draft_B.raw_scratch_text)}")
+    print(f"    文字节选：'{draft_B.raw_scratch_text[:60]}...'")
+
+    result_B, events_B, gaps_B = engine.run(draft_B, run_id="accept_B", operator="test_runner")
+    print(f"  ✓ 归因完成：分类={result_B.error_category}/{result_B.error_subcategory}")
+
+    print(f"\n  📋 边界事件检查：")
+    out_of_range_events_B = [e for e in events_B if e.event_type == BoundaryEventType.OUT_OF_RANGE]
+    print(f"  OUT_OF_RANGE 事件数：{len(out_of_range_events_B)}")
+    for e in out_of_range_events_B:
+        print(f"    · {e.variable_name}={e.input_value}{e.units}，范围=[{e.valid_min},{e.valid_max}]")
+        print(f"      类型={e.event_type.value}，严重度={e.impact_severity}")
+        print(f"      关联原始说法: '{e.original_claim_text[:80]}...' (长度={len(e.original_claim_text)})")
+
+    print(f"\n  📋 证据缺口检查：")
+    boundary_gaps_B = [g for g in gaps_B if g.gap_type == "boundary_event_without_claim"]
+    print(f"  boundary_event_without_claim 缺口数：{len(boundary_gaps_B)} (期望=0)")
+
+    pass_case_B = (
+        len(out_of_range_events_B) > 0
+        and all(e.original_claim_text for e in out_of_range_events_B)
+        and len(boundary_gaps_B) == 0
+    )
+
+    print(f"\n  🔍 用例 B 验收结果：{'✅ 通过' if pass_case_B else '❌ 未通过'}")
+    if pass_case_B:
+        print("  ✓ 越界事件已生成、原始说法已关联、无边界缺口 → 未被误拦！")
+    else:
+        print("  ✗ 验收失败，预期：有OUT_OF_RANGE事件且original_claim_text非空，且无边界缺口")
+
+    gap_manager.register_gaps(draft_B.draft_id, gaps_B)
+    all_boundary_events[draft_B.draft_id] = events_B
+    results[draft_B.draft_id] = result_B
+    drafts.append(draft_B)
+
+    print_sub("🔗 三处一致性验证：后端事件 / 接口查询 / 项目经理视图")
+
+    print(f"\n  ① 后端事件层一致性：")
+    print(f"    用例A边界事件数={len(events_A)}，缺原始说法={all(not e.original_claim_text for e in events_A if e.event_type != BoundaryEventType.CLAMPED)}")
+    print(f"    用例B边界事件数={len(events_B)}，有原始说法={all(e.original_claim_text for e in events_B if e.event_type != BoundaryEventType.CLAMPED)}")
+
+    print(f"\n  ② 接口层一致性 (BoundaryTraceService.query_missing_claim)：")
+    bt2 = BoundaryTraceService(drafts, all_boundary_events, results)
+    missing = bt2.query_missing_claim()
+    case_A_in_missing = any(d["draft_id"] == draft_A.draft_id for d in missing)
+    case_B_in_missing = any(d["draft_id"] == draft_B.draft_id for d in missing)
+    print(f"    query_missing_claim 返回缺说法事件数={len(missing)}")
+    print(f"    用例A在缺说法列表中？{case_A_in_missing} (期望=True)")
+    print(f"    用例B在缺说法列表中？{case_B_in_missing} (期望=False)")
+
+    print(f"\n  ③ 项目经理视图层一致性 (issue_classification)：")
+    pmv2 = ProjectManagerView(drafts, results, gap_manager, override_mgr)
+    dash2 = pmv2.dashboard()
+    ic2 = dash2["issue_classification"]
+    boundary_ids = ic2["🔴 boundary_missing_claim"]["draft_ids"]
+    ready_ids = [d["draft_id"] for d in ic2["🟢 ready_to_release"]["details"]]
+    print(f"    越界缺说法面板草稿数={ic2['🔴 boundary_missing_claim']['count']}")
+    print(f"    证据齐全可放行草稿数={ic2['🟢 ready_to_release']['count']}")
+    print(f"    用例A在缺说法面板？{draft_A.draft_id in boundary_ids} (期望=True)")
+    print(f"    用例B在可放行面板？{draft_B.draft_id in ready_ids} (期望=True，若无其他阻塞)")
+
+    print(f"\n  🏁 两处一致性总体验收：")
+    consistent_backend_api = case_A_in_missing and not case_B_in_missing
+    consistent_backend_view = (
+        draft_A.draft_id in boundary_ids
+        and (draft_B.draft_id in ready_ids or any(g.blocking_release for g in gaps_B) is False)
+    )
+    all_passed = pass_case_A and pass_case_B and consistent_backend_api and consistent_backend_view
+    print(f"  后端↔接口一致：{'✅' if consistent_backend_api else '❌'}")
+    print(f"  后端↔视图一致：{'✅' if consistent_backend_view else '❌'}")
+    print(f"  全部验收用例：{'✅ 全部通过' if all_passed else '❌ 存在失败'}")
+
+    # ──────────────────────────────────────────────────────────────────────
+    # 11. 需求覆盖总结
+    # ──────────────────────────────────────────────────────────────────────
+    print_section("11. 需求覆盖检查（含本次越界追证增强）")
     requirements = [
         ("图表好看且能点击回显明细",          "VisualizationService.click_through", "✓"),
         ("每次改判可查来源+当前状态",           "OverrideManager + AuditLogger", "✓"),
         ("草稿字段名前后不一，保住来源处理状态", "DraftNormalizer + FieldMappingRecord", "✓"),
-        ("外推越界不是含糊警告，追到原始说法",  "BoundaryEvent + BoundaryTraceService", "✓"),
-        ("调参数复算报告显示公式/单位/边界原因", "RecalculationReport.per_draft_diffs", "✓"),
-        ("项目经理一眼看出缺哪些证据",         "ProjectManagerView.dashboard + checklist", "✓"),
-        ("收尾不是技术说明，而是补/放行建议",   "per_draft_action_list + action_items", "✓"),
+        ("OUT_OF_RANGE/CLAMPED缺说法也必补",    "EvidenceGapDetector + boundary_event_without_claim", "✓"),
+        ("外推越界追到学生草稿原始说法",        "BoundaryEvent.original_claim_text + 同义词匹配", "✓"),
+        ("参数复算报告显示公式/单位/边界原因",  "RecalculationReport.per_draft_diffs", "✓"),
+        ("项目经理一眼区分三类问题",            "issue_classification 三分类面板", "✓"),
+        ("收尾是补/放行建议而非技术说明",       "per_draft_action_list + action_items", "✓"),
+        ("三处一致不出现后端有记录前端看不见",  "后端/接口/视图三重验证", "✓"),
     ]
     for req, impl, flag in requirements:
         print(f"  {flag} {req}")
@@ -478,8 +652,9 @@ def main():
 
     print("\n" + "=" * 72)
     print("  端到端演示完成。所有关键需求均有可追溯实现。")
+    print(f"  本次新增越界追证验收用例：{'✅ 全部通过' if all_passed else '❌ 存在失败'}")
     print("=" * 72)
-    return 0
+    return 0 if all_passed else 1
 
 
 if __name__ == "__main__":

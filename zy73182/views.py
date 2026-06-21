@@ -259,6 +259,8 @@ class ProjectManagerView:
         ok_list = [g for g in unresolved if g.level == EvidenceGapLevel.OK_TO_PASS]
         nice_list = [g for g in unresolved if g.level == EvidenceGapLevel.NICE_TO_HAVE]
 
+        issue_classification = self._classify_issues(unresolved, must_list, should_list)
+
         return {
             "summary": summary,
             "progress_bar": self._build_progress_bar(summary),
@@ -266,6 +268,7 @@ class ProjectManagerView:
             "category_breakdown": category_counts,
             "override_count": override_count,
             "latest_recalculation": self._format_recalc_report(self.latest_report) if self.latest_report else None,
+            "issue_classification": issue_classification,
             "actionable_panels": {
                 "must_fill_panel": self._summarize_gaps(must_list, "必须补齐", True),
                 "should_fill_panel": self._summarize_gaps(should_list, "建议补齐", False),
@@ -273,6 +276,107 @@ class ProjectManagerView:
                 "nice_to_have_panel": self._summarize_gaps(nice_list, "锦上添花", False),
             },
             "release_checklist": self._build_release_checklist(summary, must_list),
+        }
+
+    def _classify_issues(self, all_unresolved: List[EvidenceGap],
+                          must_list: List[EvidenceGap],
+                          should_list: List[EvidenceGap]) -> Dict[str, Any]:
+        boundary_missing = [
+            g for g in all_unresolved
+            if g.gap_type == "boundary_event_without_claim" and not g.resolved
+        ]
+        formula_unit = [
+            g for g in all_unresolved
+            if g.gap_type in ("formula_unit_incomplete", "formula_missing_units") and not g.resolved
+        ]
+        other_must = [
+            g for g in must_list
+            if g.gap_type not in ("boundary_event_without_claim",) and not g.resolved
+        ]
+        other_should = [
+            g for g in should_list
+            if g.gap_type not in ("formula_unit_incomplete", "formula_missing_units") and not g.resolved
+        ]
+
+        drafts_with_boundary = list(set(g.draft_id for g in boundary_missing))
+        drafts_with_formula = list(set(g.draft_id for g in formula_unit))
+
+        ready_drafts = []
+        for draft in self.drafts:
+            gaps = self.gap_manager._gaps.get(draft.draft_id, [])
+            unresolved_for_draft = [g for g in gaps if not g.resolved]
+            blocking = [g for g in unresolved_for_draft if g.blocking_release or g.level == EvidenceGapLevel.MUST_FILL]
+            if not blocking:
+                ready_drafts.append({
+                    "draft_id": draft.draft_id,
+                    "student_id": draft.student_id,
+                    "question_id": draft.question_id,
+                    "processing_status": draft.processing_status.value,
+                    "non_blocking_gaps": [
+                        {"gap_type": g.gap_type, "level": g.level.value}
+                        for g in unresolved_for_draft
+                    ],
+                    "result_category": (
+                        self.results.get(draft.draft_id).error_category
+                        if self.results.get(draft.draft_id) else "未归因"
+                    ),
+                })
+
+        boundary_details = []
+        for g in boundary_missing:
+            boundary_details.append({
+                "gap_id": g.gap_id,
+                "draft_id": g.draft_id,
+                "gap_type": g.gap_type,
+                "description": g.gap_description,
+                "fill_suggestion": g.fill_suggestion,
+                "clickthrough_link": f"/clickthrough?draft_id={g.draft_id}",
+            })
+
+        formula_details = []
+        for g in formula_unit:
+            formula_details.append({
+                "gap_id": g.gap_id,
+                "draft_id": g.draft_id,
+                "gap_type": g.gap_type,
+                "description": g.gap_description,
+                "fill_suggestion": g.fill_suggestion,
+                "blocking": g.blocking_release,
+            })
+
+        return {
+            "total_drafts": len(self.drafts),
+            "🔴 boundary_missing_claim": {
+                "count": len(boundary_missing),
+                "affected_drafts": len(drafts_with_boundary),
+                "blocking_release": True,
+                "label": "越界缺原始说法（必补，阻塞放行）",
+                "details": boundary_details,
+                "draft_ids": drafts_with_boundary,
+            },
+            "🟡 formula_unit_issue": {
+                "count": len(formula_unit),
+                "affected_drafts": len(drafts_with_formula),
+                "blocking_release": False,
+                "label": "公式单位问题（建议补，不阻塞）",
+                "details": formula_details,
+                "draft_ids": drafts_with_formula,
+            },
+            "🟢 ready_to_release": {
+                "count": len(ready_drafts),
+                "label": "证据齐全可放行",
+                "details": ready_drafts,
+            },
+            "other_must_fill": {
+                "count": len(other_must),
+                "affected_drafts": list(set(g.draft_id for g in other_must)),
+                "label": "其他必补项",
+            },
+            "other_should_fill": {
+                "count": len(other_should),
+                "affected_drafts": list(set(g.draft_id for g in other_should)),
+                "label": "其他建议项",
+            },
         }
 
     @staticmethod
@@ -305,9 +409,9 @@ class ProjectManagerView:
                 "pending_count": sum(1 for g in must_list if g.gap_type == "low_confidence_mapping"),
             },
             {
-                "item": "外推越界都已关联学生原始说法",
-                "passed": not any(g.gap_type == "extrapolation_without_claim" for g in must_list),
-                "pending_count": sum(1 for g in must_list if g.gap_type == "extrapolation_without_claim"),
+                "item": "所有边界/越界事件(EXTRAPOLATION/OUT_OF_RANGE/CLAMPED/FORMULA_ADJUSTED)都已关联学生原始说法、变量来源或可解释依据",
+                "passed": not any(g.gap_type == "boundary_event_without_claim" for g in must_list),
+                "pending_count": sum(1 for g in must_list if g.gap_type == "boundary_event_without_claim"),
             },
         ]
         all_passed = all(c["passed"] for c in checklist)
@@ -461,28 +565,46 @@ class BoundaryTraceService:
         missing = []
         for did, events in self.boundary_events.items():
             for e in events:
-                if e.event_type == BoundaryEventType.EXTRAPOLATION and not e.original_claim_text:
+                if e.event_type in (
+                    BoundaryEventType.EXTRAPOLATION,
+                    BoundaryEventType.OUT_OF_RANGE,
+                    BoundaryEventType.CLAMPED,
+                    BoundaryEventType.FORMULA_ADJUSTED,
+                ) and not e.original_claim_text:
                     missing.append((did, e))
         return self._format_list([e for _, e in missing], None)
 
-    def query_unresolved_extrapolations(self, gap_manager: GapManager) -> List[Dict[str, Any]]:
+    def query_unresolved_boundary_gaps(self, gap_manager: GapManager) -> List[Dict[str, Any]]:
         unresolved = []
         for did, events in self.boundary_events.items():
             gaps = gap_manager._gaps.get(did, [])
-            extrap_gaps = [g for g in gaps if g.gap_type == "extrapolation_without_claim" and not g.resolved]
+            boundary_gaps = [g for g in gaps if g.gap_type == "boundary_event_without_claim" and not g.resolved]
             for e in events:
-                if e.event_type == BoundaryEventType.EXTRAPOLATION and not e.original_claim_text:
+                if e.event_type in (
+                    BoundaryEventType.EXTRAPOLATION,
+                    BoundaryEventType.OUT_OF_RANGE,
+                    BoundaryEventType.CLAMPED,
+                    BoundaryEventType.FORMULA_ADJUSTED,
+                ) and not e.original_claim_text:
                     unresolved.append({
                         "draft_id": did,
                         "event": self._format_single(e),
-                        "gap_ids": [g.gap_id for g in extrap_gaps],
+                        "gap_ids": [g.gap_id for g in boundary_gaps],
                         "student": self._draft_by_id.get(did).student_id if did in self._draft_by_id else "",
                         "question": self._draft_by_id.get(did).question_id if did in self._draft_by_id else "",
+                        "processing_status": (
+                            self._draft_by_id.get(did).processing_status.value
+                            if did in self._draft_by_id else ""
+                        ),
                         "scratch_excerpt": (
                             self._draft_by_id.get(did).raw_scratch_text[:300]
                             if did in self._draft_by_id else ""
                         ),
-                        "manual_search_hint": f"在草稿中查找包含 '{e.variable_name}' 的原始表述",
+                        "manual_search_hint": (
+                            f"在草稿中查找包含 '{e.variable_name}'、数值 {e.input_value} 或变量来源的原始表述；"
+                            f"事件类型={e.event_type.value}，范围=[{e.valid_min},{e.valid_max}]"
+                        ),
+                        "clickthrough_link": f"/clickthrough?draft_id={did}&event_id={e.event_id}",
                     })
         return unresolved
 

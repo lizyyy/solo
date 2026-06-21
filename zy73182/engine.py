@@ -138,7 +138,7 @@ class FormulaEvaluator:
 
 class BoundaryDetector:
     def __init__(self, valid_ranges: Dict[str, Dict[str, float]],
-                 scratch_text_extractor: Callable[[str, str], str]):
+                 scratch_text_extractor: Callable[[str, str, Optional[float]], str]):
         self.valid_ranges = valid_ranges
         self.extract_claim = scratch_text_extractor
 
@@ -165,7 +165,7 @@ class BoundaryDetector:
         if event_type is None:
             return None
 
-        original_claim = self.extract_claim(draft.raw_scratch_text, variable_name)
+        original_claim = self.extract_claim(draft.raw_scratch_text, variable_name, value)
 
         severity = 0.0
         if lo is not None and hi is not None and (hi - lo) > 0:
@@ -232,23 +232,28 @@ class EvidenceGapDetector:
             "suggestion": "人工确认低置信度字段的映射关系并标记为人工修正",
         },
         {
-            "gap_type": "extrapolation_without_claim",
+            "gap_type": "boundary_event_without_claim",
             "condition": lambda _, boundary_events, __: any(
-                b.event_type == BoundaryEventType.EXTRAPOLATION and not b.original_claim_text
+                b.event_type in (
+                    BoundaryEventType.EXTRAPOLATION,
+                    BoundaryEventType.OUT_OF_RANGE,
+                    BoundaryEventType.CLAMPED,
+                    BoundaryEventType.FORMULA_ADJUSTED,
+                ) and not b.original_claim_text
                 for b in boundary_events
             ),
-            "description": "存在外推越界但未关联学生原始说法",
+            "description": "存在边界/越界事件但未关联学生草稿原始说法或变量来源",
             "level": EvidenceGapLevel.MUST_FILL,
             "blocking": True,
-            "suggestion": "从草稿文字中提取学生对越界参数的原始说法并补充",
+            "suggestion": "从草稿文字中提取学生对该越界/边界参数的原始说法、变量来源或可解释依据并补充",
         },
         {
-            "gap_type": "formula_missing_units",
+            "gap_type": "formula_unit_incomplete",
             "condition": lambda _, ___, traces: any(not t.unit for t in traces),
-            "description": "部分计算变量缺少单位标注",
-            "level": EvidenceGapLevel.NICE_TO_HAVE,
+            "description": "部分计算变量缺少单位标注（公式/单位问题）",
+            "level": EvidenceGapLevel.SHOULD_FILL,
             "blocking": False,
-            "suggestion": "在配置文件中补充相关变量的单位定义",
+            "suggestion": "在配置文件中补充相关变量的单位定义（非阻塞，建议完善）",
         },
         {
             "gap_type": "boundary_sample_unlabeled",
@@ -256,7 +261,7 @@ class EvidenceGapDetector:
             "description": "边界样本未标记具体原因",
             "level": EvidenceGapLevel.SHOULD_FILL,
             "blocking": False,
-            "suggestion": "补充边界样本触发原因的详细说明",
+            "suggestion": "补充边界样本触发原因的详细说明（非阻塞，建议完善）",
         },
     ]
 
@@ -288,18 +293,102 @@ class ConstraintAttributionEngine:
         self.evaluator = FormulaEvaluator(config.formulas, config.units)
         self.boundary_detector = BoundaryDetector(config.valid_ranges, self._extract_claim_from_scratch)
         self.gap_detector = EvidenceGapDetector()
+        self._variable_synonyms = self._build_variable_synonyms(config)
 
     @staticmethod
-    def _extract_claim_from_scratch(scratch_text: str, variable_name: str) -> str:
+    def _build_variable_synonyms(config: AttributionConfig) -> Dict[str, List[str]]:
+        base_map = {
+            "x_value": ["x_value", "x轴", "自变量", "x", "xval", "independent_var", "x_axis", "x变量"],
+            "y_predicted": ["y_predicted", "预测值", "y", "y_hat", "预测分数", "predicted", "预测"],
+            "slope": ["slope", "斜率", "xielv", "gradient", "斜率系数", "系数"],
+            "intercept": ["intercept", "截距", "jiesanju", "bias", "常数项"],
+            "residual": ["residual", "残差", "偏差", "误差", "差值"],
+            "answer_value": ["answer_value", "答案", "作答值", "最终答案", "ans", "result", "作答分数"],
+        }
+        for canonical, syns in config.field_synonyms.items():
+            if canonical not in base_map:
+                base_map[canonical] = list(syns)
+            else:
+                base_map[canonical] = list(set(base_map[canonical] + list(syns)))
+        return base_map
+
+    def _extract_claim_from_scratch(self, scratch_text: str, variable_name: str, value: Optional[float] = None) -> str:
         if not scratch_text:
             return ""
         lines = scratch_text.replace("\r", "").split("\n")
-        patterns = [variable_name, variable_name.lower(), variable_name.upper()]
+        syns = self._variable_synonyms.get(variable_name, [variable_name])
+
+        var_patterns = []
+        for s in syns:
+            var_patterns.extend([s, s.lower()])
+        var_patterns.extend([variable_name, variable_name.lower(), variable_name.upper()])
+        var_patterns = [p for p in var_patterns if p and len(p) >= 1]
+
+        value_patterns = []
+        if value is not None:
+            value_patterns = [
+                f"{value:.0f}", f"{value:.1f}", f"{value:.2f}",
+                str(int(value)) if value == int(value) else str(value),
+                f"={value:.0f}", f"={value:.1f}",
+            ]
+
+        claim_indicators = [
+            "超过", "超出", "超范围", "越界", "外推", "延拓",
+            "范围", "区间", "最大", "最小", "上限", "下限", "上界", "下界",
+            "假设", "假定", "认为", "取", "设定", "给定", "来源", "来源于",
+            "题目", "题意", "题干",
+        ]
+
+        best_line = ""
+        best_score = 0
+        best_contains_var = False
+        best_contains_indicator = False
+
         for line in lines:
-            for pat in patterns:
-                if pat in line and len(line.strip()) > 3:
-                    return line.strip()[:200]
+            if not line.strip() or len(line.strip()) <= 2:
+                continue
+            line_lower = line.lower()
+
+            has_var = any(p and p in line_lower for p in var_patterns)
+            has_value = any(vp and vp in line for vp in value_patterns)
+            has_indicator = any(ci and ci.lower() in line_lower for ci in claim_indicators)
+
+            var_score = 3 if has_var else 0
+            value_score = 1 if has_value else 0
+            indicator_score = 2 if has_indicator else 0
+            total_score = var_score + value_score + indicator_score
+
+            is_arithmetic_only = self._is_pure_arithmetic(line)
+            if is_arithmetic_only:
+                total_score = min(total_score, 1)
+
+            if total_score > best_score:
+                best_score = total_score
+                best_line = line.strip()[:200]
+                best_contains_var = has_var
+                best_contains_indicator = has_indicator
+
+        if best_score >= 3 or (best_score >= 2 and (best_contains_var or best_contains_indicator)):
+            return best_line
+
+        if best_score >= 1 and not self._is_pure_arithmetic(best_line) and (best_contains_var or best_contains_indicator):
+            return best_line
+
         return ""
+
+    @staticmethod
+    def _is_pure_arithmetic(text: str) -> bool:
+        stripped = text.strip()
+        if not stripped:
+            return True
+        arithmetic_chars = set("0123456789.+-*/=()（），, ；;\n\t答案等于")
+        text_chars = set(stripped)
+        non_arithmetic = text_chars - arithmetic_chars
+        if len(non_arithmetic) == 0:
+            return True
+        if len(non_arithmetic) <= 2 and "答案" in stripped:
+            return True
+        return False
 
     def _build_clickthrough(self, draft: StudentDraft,
                              traces: List[FormulaTrace]) -> List[Dict[str, Any]]:
