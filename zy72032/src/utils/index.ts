@@ -98,7 +98,7 @@ export function extractExceptions(record: TrainingRecord): ExceptionItem[] {
     })
   }
 
-  record.pauses.forEach((pause, idx) => {
+  record.pauses.forEach((pause) => {
     exceptions.push({
       recordId: record.id,
       type: "主动暂停",

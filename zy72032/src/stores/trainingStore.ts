@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import type { StepResult, PauseRecord, Scenario, Option } from "@/types"
-import { generateId, calculateTotalScore } from "@/utils"
+import { calculateTotalScore } from "@/utils"
 import { useLevelStore } from "./levelStore"
 import { useRecordStore } from "./recordStore"
 
