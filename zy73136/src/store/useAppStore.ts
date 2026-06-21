@@ -23,6 +23,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   filterParams: {
     parameter: 'all',
     riskLevel: 'all',
+    status: 'all',
+    type: 'all',
     buoyIds: [],
   },
 
@@ -161,6 +163,10 @@ export const useAppStore = create<AppState>((set, get) => ({
       anomalies = anomalies.filter((a) => a.level === filterParams.riskLevel);
     }
 
+    if (filterParams.status !== 'all') {
+      anomalies = anomalies.filter((a) => a.status === filterParams.status);
+    }
+
     if (filterParams.buoyIds.length > 0) {
       anomalies = anomalies.filter((a) =>
         filterParams.buoyIds.includes(a.buoyId)
@@ -169,6 +175,10 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     if (filterParams.parameter !== 'all') {
       anomalies = anomalies.filter((a) => a.parameter === filterParams.parameter);
+    }
+
+    if (filterParams.type !== 'all') {
+      anomalies = anomalies.filter((a) => a.type === filterParams.type);
     }
 
     if (filterParams.timeRange) {

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   AlertTriangle,
@@ -13,10 +13,9 @@ import {
   ChevronRight,
   Layers,
   ArrowRight,
-  RefreshCw,
   Home,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import { useSyncState } from '../hooks/useSyncState';
 import {
@@ -33,51 +32,58 @@ import {
 
 export default function Queue() {
   const navigate = useNavigate();
-  const { anomalies, logs, buoys, updateAnomalyStatus, getFilteredLogs, filterParams } = useAppStore();
+  const location = useLocation();
+  const {
+    anomalies,
+    logs,
+    buoys,
+    selectedAnomalyId,
+    getFilteredAnomalies,
+    filterParams,
+    updateAnomalyStatus,
+    setSelectedAnomaly,
+    setFilter,
+  } = useAppStore();
   const { handleBuoyClick, handleAnomalyClick, handleTimeChange } = useSyncState();
 
-  const [selectedAnomalyId, setSelectedAnomalyId] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<AnomalyStatus | 'all'>('all');
-  const [levelFilter, setLevelFilter] = useState<AnomalyLevel | 'all'>('all');
-  const [typeFilter, setTypeFilter] = useState<AnomalyType | 'all'>('all');
-
   const filteredAnomalies = useMemo(() => {
-    return anomalies
-      .filter((a) => {
-        if (statusFilter !== 'all' && a.status !== statusFilter) return false;
-        if (levelFilter !== 'all' && a.level !== levelFilter) return false;
-        if (typeFilter !== 'all' && a.type !== typeFilter) return false;
-        return true;
-      })
-      .sort((a, b) => {
-        const levelOrder = { critical: 0, high: 1, medium: 2, low: 3 };
-        const levelDiff = levelOrder[a.level] - levelOrder[b.level];
-        if (levelDiff !== 0) return levelDiff;
-        return b.timestamp - a.timestamp;
-      });
-  }, [anomalies, statusFilter, levelFilter, typeFilter]);
+    return getFilteredAnomalies().sort((a, b) => {
+      const levelOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+      const levelDiff = levelOrder[a.level] - levelOrder[b.level];
+      if (levelDiff !== 0) return levelDiff;
+      return b.timestamp - a.timestamp;
+    });
+  }, [getFilteredAnomalies]);
 
   const stats = useMemo(() => {
-    const total = anomalies.length;
-    const pending = anomalies.filter((a) => a.status === 'pending').length;
-    const processing = anomalies.filter((a) => a.status === 'processing').length;
-    const resolved = anomalies.filter((a) => a.status === 'resolved').length;
-    const ignored = anomalies.filter((a) => a.status === 'ignored').length;
+    const data = filteredAnomalies;
+    const total = data.length;
+    const pending = data.filter((a) => a.status === 'pending').length;
+    const processing = data.filter((a) => a.status === 'processing').length;
+    const resolved = data.filter((a) => a.status === 'resolved').length;
+    const ignored = data.filter((a) => a.status === 'ignored').length;
 
     const byLevel: Record<AnomalyLevel, number> = {
-      low: anomalies.filter((a) => a.level === 'low').length,
-      medium: anomalies.filter((a) => a.level === 'medium').length,
-      high: anomalies.filter((a) => a.level === 'high').length,
-      critical: anomalies.filter((a) => a.level === 'critical').length,
+      low: data.filter((a) => a.level === 'low').length,
+      medium: data.filter((a) => a.level === 'medium').length,
+      high: data.filter((a) => a.level === 'high').length,
+      critical: data.filter((a) => a.level === 'critical').length,
     };
 
     return { total, pending, processing, resolved, ignored, byLevel };
-  }, [anomalies]);
+  }, [filteredAnomalies]);
 
   const selectedAnomaly = useMemo(() => {
     if (!selectedAnomalyId) return null;
     return anomalies.find((a) => a.id === selectedAnomalyId);
   }, [selectedAnomalyId, anomalies]);
+
+  useEffect(() => {
+    const state = location.state as { anomalyId?: string } | null;
+    if (state?.anomalyId && state.anomalyId !== selectedAnomalyId) {
+      handleAnomalyClick(state.anomalyId);
+    }
+  }, [location.state, selectedAnomalyId, handleAnomalyClick]);
 
   const getTraceChain = useMemo(() => {
     if (!selectedAnomaly) return null;
@@ -119,7 +125,23 @@ export default function Queue() {
   };
 
   const navigateToLog = (logId: string) => {
-    navigate('/logs', { state: { logId } });
+    navigate('/logs', { state: { logId, anomalyId: selectedAnomalyId } });
+  };
+
+  const handleStatusFilterChange = (value: AnomalyStatus | 'all') => {
+    setFilter({ status: value });
+  };
+
+  const handleLevelFilterChange = (value: AnomalyLevel | 'all') => {
+    setFilter({ riskLevel: value });
+  };
+
+  const handleTypeFilterChange = (value: AnomalyType | 'all') => {
+    setFilter({ type: value as any });
+  };
+
+  const handleAnomalySelect = (anomalyId: string) => {
+    handleAnomalyClick(anomalyId);
   };
 
   return (
@@ -239,9 +261,9 @@ export default function Queue() {
                   <div className="flex items-center gap-1">
                     <Filter size={14} className="text-cyan-dim" />
                     <select
-                      value={statusFilter}
+                      value={filterParams.status}
                       onChange={(e) =>
-                        setStatusFilter(e.target.value as AnomalyStatus | 'all')
+                        handleStatusFilterChange(e.target.value as AnomalyStatus | 'all')
                       }
                       className="px-3 py-1.5 rounded-lg bg-ocean-blue/30 border border-cyan-glow/30 text-white text-sm focus:outline-none focus:border-cyan-glow/50"
                     >
@@ -253,9 +275,9 @@ export default function Queue() {
                     </select>
                   </div>
                   <select
-                    value={levelFilter}
+                    value={filterParams.riskLevel}
                     onChange={(e) =>
-                      setLevelFilter(e.target.value as AnomalyLevel | 'all')
+                      handleLevelFilterChange(e.target.value as AnomalyLevel | 'all')
                     }
                     className="px-3 py-1.5 rounded-lg bg-ocean-blue/30 border border-cyan-glow/30 text-white text-sm focus:outline-none focus:border-cyan-glow/50"
                   >
@@ -266,9 +288,9 @@ export default function Queue() {
                     <option value="critical">严重</option>
                   </select>
                   <select
-                    value={typeFilter}
+                    value={(filterParams as any).type || 'all'}
                     onChange={(e) =>
-                      setTypeFilter(e.target.value as AnomalyType | 'all')
+                      handleTypeFilterChange(e.target.value as AnomalyType | 'all')
                     }
                     className="px-3 py-1.5 rounded-lg bg-ocean-blue/30 border border-cyan-glow/30 text-white text-sm focus:outline-none focus:border-cyan-glow/50"
                   >
@@ -304,13 +326,11 @@ export default function Queue() {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -10 }}
                           onClick={() =>
-                            setSelectedAnomalyId(
-                              isSelected ? null : anomaly.id
-                            )
+                            handleAnomalySelect(anomaly.id)
                           }
                           className={`p-4 rounded-lg cursor-pointer transition-all border ${
                             isSelected
-                              ? 'bg-ocean-blue/60 border-cyan-glow/50 shadow-glow'
+                              ? 'bg-ocean-blue/60 border-cyan-glow/50 shadow-glow ring-2 ring-cyan-glow/30'
                               : 'bg-ocean-blue/20 border-transparent hover:bg-ocean-blue/40 hover:border-cyan-glow/30'
                           }`}
                         >

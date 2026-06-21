@@ -60,6 +60,8 @@ export interface Anomaly {
 export interface FilterParams {
   parameter: keyof WaterQualityParams | 'all';
   riskLevel: AnomalyLevel | 'all';
+  status: AnomalyStatus | 'all';
+  type: AnomalyType | 'all';
   buoyIds: string[];
   timeRange?: [number, number];
 }
