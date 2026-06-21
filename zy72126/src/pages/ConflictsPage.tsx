@@ -52,9 +52,19 @@ export const ConflictsPage = () => {
   const { tracks, channelTable, conflicts, resolveConflict } = useAppStore();
   const [filter, setFilter] = useState<'all' | 'pending' | 'resolved'>('pending');
   const [editingConflictId, setEditingConflictId] = useState<string | null>(null);
-  const [manualValue, setManualValue] = useState('');
-  const [resolutionReason, setResolutionReason] = useState('');
-  const [resolvedBy, setResolvedBy] = useState('林老师');
+  const [manualValues, setManualValues] = useState<Record<string, string>>({});
+  const [resolutionReasons, setResolutionReasons] = useState<Record<string, string>>({});
+  const [resolvedBys, setResolvedBys] = useState<Record<string, string>>({});
+
+  const getReason = (id: string) => resolutionReasons[id] || '';
+  const getHandler = (id: string) => resolvedBys[id] || '林老师';
+  const getManual = (id: string) => manualValues[id] || '';
+  const setReason = (id: string, v: string) =>
+    setResolutionReasons((s) => ({ ...s, [id]: v }));
+  const setHandler = (id: string, v: string) =>
+    setResolvedBys((s) => ({ ...s, [id]: v }));
+  const setManual = (id: string, v: string) =>
+    setManualValues((s) => ({ ...s, [id]: v }));
 
   const filteredConflicts = conflicts.filter((c) => {
     if (filter === 'all') return true;
@@ -81,12 +91,12 @@ export const ConflictsPage = () => {
   ) => {
     resolveConflict(conflictId, resolution, {
       manualValue: options?.manualValue,
-      resolvedBy,
-      resolutionReason: resolutionReason.trim() || undefined,
+      resolvedBy: getHandler(conflictId),
+      resolutionReason: getReason(conflictId).trim() || undefined,
     });
     setEditingConflictId(null);
-    setManualValue('');
-    setResolutionReason('');
+    setManual(conflictId, '');
+    setReason(conflictId, '');
   };
 
   const renderResolutionLabel = (c: any): string => {
@@ -284,7 +294,7 @@ export const ConflictsPage = () => {
                   {conflict.status === 'resolved' && (
                     <div className="mb-4 p-4 bg-moss-50 rounded-xl border border-moss-200">
                       <p className="font-semibold text-moss-800 text-sm mb-2">裁决结果</p>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
                           <span className="text-moss-600">处理动作：</span>
                           <span className="font-medium text-moss-800">{renderResolutionLabel(conflict)}</span>
@@ -312,10 +322,43 @@ export const ConflictsPage = () => {
                           </span>
                         </div>
                       </div>
-                      {conflict.trackId && (
-                        <div className="mt-3 pt-3 border-t border-moss-200 text-xs text-moss-600">
+                      {conflict.conflictType === 'missing_file' && conflict.channelEntryId && (() => {
+                        const e = channelTable.find((x) => x.id === conflict.channelEntryId);
+                        if (!e) return null;
+                        const statusLabel: Record<string, { label: string; cls: string }> = {
+                          matched: { label: '已匹配文件', cls: 'bg-moss-100 text-moss-700' },
+                          confirmed_missing: { label: '已确认无文件', cls: 'bg-brick-100 text-brick-700' },
+                          pending_upload: { label: '待补传文件', cls: 'bg-amber-100 text-amber-700' },
+                          removed_from_setlist: { label: '已从曲目单移除', cls: 'bg-olive-100 text-olive-700' },
+                          pending: { label: '待处理', cls: 'bg-cream-100 text-olive-700' },
+                        };
+                        const s = statusLabel[e.fileStatus] || statusLabel.pending;
+                        return (
+                          <div className="mt-3 p-3 rounded-lg bg-white border border-moss-100 text-xs">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="font-semibold text-moss-700">通道表处理状态：</span>
+                              <span className={`px-2 py-0.5 rounded-full ${s.cls}`}>{s.label}</span>
+                            </div>
+                            <div className="text-moss-600 space-y-1">
+                              <div>关联通道条目：第{e.channelNo}通道 · {e.trackName}</div>
+                              {e.resolvedBy && <div>通道表处理人：{e.resolvedBy}</div>}
+                              {e.resolutionReason && <div>通道表处理原因：{e.resolutionReason}</div>}
+                              {e.resolutionNote && (
+                                <div className="pt-1 mt-1 border-t border-moss-100 break-all">
+                                  <span className="font-semibold">证据链：</span>
+                                  {e.resolutionNote}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })()}
+                      {(conflict.trackId || conflict.channelEntryId) && (
+                        <div className="mt-3 pt-3 border-t border-moss-200 text-xs text-moss-600 break-all">
                           证据链：数据源A({conflict.sourceA})="{conflict.originalValueA}" vs 数据源B(
                           {conflict.sourceB})="{conflict.originalValueB}" → 裁决: {renderResolutionLabel(conflict)}
+                          {conflict.resolutionReason ? ` | 处理原因: ${conflict.resolutionReason}` : ''}
+                          {conflict.resolvedBy ? ` | 处理人: ${conflict.resolvedBy}` : ''}
                         </div>
                       )}
                     </div>
@@ -333,32 +376,32 @@ export const ConflictsPage = () => {
                                   ? '人工修正曲目名，或留空启用其他动作'
                                   : '输入自定义值'
                               }
-                              value={manualValue}
-                              onChange={(e) => setManualValue(e.target.value)}
+                              value={getManual(conflict.id)}
+                              onChange={(e) => setManual(conflict.id, e.target.value)}
                               className="px-3 py-2 border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 text-sm"
                               autoFocus
                             />
                             <input
                               type="text"
                               placeholder="处理人"
-                              value={resolvedBy}
-                              onChange={(e) => setResolvedBy(e.target.value)}
+                              value={getHandler(conflict.id)}
+                              onChange={(e) => setHandler(conflict.id, e.target.value)}
                               className="px-3 py-2 border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 text-sm"
                             />
                           </div>
                           <input
                             type="text"
                             placeholder="处理原因（可选）"
-                            value={resolutionReason}
-                            onChange={(e) => setResolutionReason(e.target.value)}
+                            value={getReason(conflict.id)}
+                            onChange={(e) => setReason(conflict.id, e.target.value)}
                             className="w-full px-3 py-2 border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 text-sm"
                           />
                           <div className="flex justify-end gap-2">
                             <button
                               onClick={() => {
                                 setEditingConflictId(null);
-                                setManualValue('');
-                                setResolutionReason('');
+                                setManual(conflict.id, '');
+                                setReason(conflict.id, '');
                               }}
                               className="px-3 py-1.5 text-sm text-olive-600 hover:bg-amber-100 rounded-lg transition-colors flex items-center gap-1"
                             >
@@ -367,13 +410,13 @@ export const ConflictsPage = () => {
                             <button
                               onClick={() =>
                                 handleResolve(conflict.id, 'manual', {
-                                  manualValue: manualValue.trim() || undefined,
+                                  manualValue: getManual(conflict.id).trim() || undefined,
                                 })
                               }
-                              disabled={!manualValue.trim() && conflict.conflictType !== 'extra_file'}
+                              disabled={!getManual(conflict.id).trim() && conflict.conflictType !== 'extra_file'}
                               className={cn(
                                 'px-4 py-1.5 text-sm rounded-lg font-medium flex items-center gap-1 transition-colors',
-                                manualValue.trim() || conflict.conflictType === 'extra_file'
+                                getManual(conflict.id).trim() || conflict.conflictType === 'extra_file'
                                   ? 'bg-amber-500 text-white hover:bg-amber-600'
                                   : 'bg-amber-200 text-amber-400 cursor-not-allowed'
                               )}
@@ -388,15 +431,15 @@ export const ConflictsPage = () => {
                             <input
                               type="text"
                               placeholder="处理人"
-                              value={resolvedBy}
-                              onChange={(e) => setResolvedBy(e.target.value)}
+                              value={getHandler(conflict.id)}
+                              onChange={(e) => setHandler(conflict.id, e.target.value)}
                               className="px-2 py-1 w-24 border border-olive-200 rounded focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm"
                             />
                             <input
                               type="text"
                               placeholder="处理原因（可选）"
-                              value={resolutionReason}
-                              onChange={(e) => setResolutionReason(e.target.value)}
+                              value={getReason(conflict.id)}
+                              onChange={(e) => setReason(conflict.id, e.target.value)}
                               className="px-2 py-1 w-56 border border-olive-200 rounded focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm"
                             />
                           </div>

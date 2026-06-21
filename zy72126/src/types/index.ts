@@ -1,12 +1,19 @@
-export type TrackStatus = 'normal' | 'conflict' | 'error' | 'pending';
+export type TrackStatus = 'normal' | 'conflict' | 'error' | 'pending' | 'deleted';
 
-export type ImportStatus = 'success' | 'failed' | 'skipped' | 'processing';
+export type ImportStatus = 'success' | 'failed' | 'skipped' | 'processing' | 'deleted_manually';
 
 export type ConflictStatus = 'pending' | 'resolved';
 
 export type ConflictResolution = 'A' | 'B' | 'manual' | 'ignore' | 'delete_track' | 'add_to_channel';
 
 export type ConflictType = 'value_mismatch' | 'extra_file' | 'missing_file';
+
+export type ChannelFileStatus =
+  | 'pending'
+  | 'matched'
+  | 'confirmed_missing'
+  | 'pending_upload'
+  | 'removed_from_setlist';
 
 export interface ChannelTableEntry {
   id: string;
@@ -16,6 +23,11 @@ export interface ChannelTableEntry {
   duration?: string;
   source?: string;
   note?: string;
+  fileStatus: ChannelFileStatus;
+  resolutionNote?: string;
+  resolvedBy?: string;
+  resolutionReason?: string;
+  resolvedAt?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -78,6 +90,10 @@ export interface ImportRecord {
   errorReason?: string;
   importedAt: string;
   trackId?: string;
+  resolutionNote?: string;
+  resolvedBy?: string;
+  resolutionReason?: string;
+  resolvedAt?: string;
 }
 
 export interface ParsedFileName {

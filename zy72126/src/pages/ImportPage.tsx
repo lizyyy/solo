@@ -44,6 +44,7 @@ export const ImportPage = () => {
     addChannelEntry,
     addChannelEntries,
     deleteChannelEntry,
+    updateChannelEntry,
     addTrack,
     addImportRecord,
     addConflict,
@@ -80,6 +81,7 @@ export const ImportPage = () => {
       duration: newEntry.duration.trim() || undefined,
       source: newEntry.source.trim() || undefined,
       note: newEntry.note.trim() || undefined,
+      fileStatus: 'pending',
       createdAt: now,
       updatedAt: now,
     });
@@ -101,6 +103,7 @@ export const ImportPage = () => {
         duration: parts[3] || undefined,
         source: parts[4] || undefined,
         note: parts[5] || undefined,
+        fileStatus: 'pending',
         createdAt: now,
         updatedAt: now,
       });
@@ -150,6 +153,7 @@ export const ImportPage = () => {
       if (matched) {
         channelTableId = matched.id;
         usedChannelIds.add(matched.id);
+        updateChannelEntry(matched.id, { fileStatus: 'matched' });
 
         const detected = detectConflicts(matched, { ...parsedData, fileName: fileItem.file.name });
 
@@ -175,7 +179,7 @@ export const ImportPage = () => {
           }
         }
       } else {
-        trackStatus = 'error';
+        trackStatus = 'conflict';
         addConflict({
           id: generateId(),
           trackId,
@@ -389,20 +393,32 @@ export const ImportPage = () => {
               <table className="w-full">
                 <thead className="bg-cream-50">
                   <tr>
-                    {['通道号', '曲目名称', '艺术家', '时长', '来源', '备注', ''].map((h) => (
+                    {['通道号', '曲目名称', '艺术家', '时长', '来源', '文件状态', '备注', ''].map((h) => (
                       <th key={h} className="px-4 py-2.5 text-left text-xs font-semibold text-olive-600">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-cream-200">
-                  {channelTable.map((entry) => (
+                  {channelTable.map((entry) => {
+                    const statusLabel: Record<string, { text: string; cls: string }> = {
+                      pending: { text: '待对账', cls: 'bg-cream-100 text-olive-700' },
+                      matched: { text: '已匹配文件', cls: 'bg-moss-100 text-moss-700' },
+                      confirmed_missing: { text: '已确认无文件', cls: 'bg-brick-100 text-brick-700' },
+                      pending_upload: { text: '待补传', cls: 'bg-amber-100 text-amber-700' },
+                      removed_from_setlist: { text: '已从曲目单移除', cls: 'bg-olive-100 text-olive-700' },
+                    };
+                    const s = statusLabel[entry.fileStatus] || statusLabel.pending;
+                    return (
                     <tr key={entry.id} className="hover:bg-olive-50/30 transition-colors">
                       <td className="px-4 py-2.5 text-sm font-medium text-olive-900">{entry.channelNo || '-'}</td>
                       <td className="px-4 py-2.5 text-sm font-medium text-olive-900">{entry.trackName}</td>
                       <td className="px-4 py-2.5 text-sm text-olive-600">{entry.artist || '-'}</td>
                       <td className="px-4 py-2.5 text-sm text-olive-600">{entry.duration || '-'}</td>
                       <td className="px-4 py-2.5 text-sm text-amber-600">{entry.source || '-'}</td>
-                      <td className="px-4 py-2.5 text-sm text-olive-500">{entry.note || '-'}</td>
+                      <td className="px-4 py-2.5">
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${s.cls}`}>{s.text}</span>
+                      </td>
+                      <td className="px-4 py-2.5 text-sm text-olive-500">{entry.note || (entry.resolvedBy ? `由${entry.resolvedBy}处理` : '-')}</td>
                       <td className="px-4 py-2.5">
                         <button
                           onClick={() => deleteChannelEntry(entry.id)}
@@ -412,7 +428,8 @@ export const ImportPage = () => {
                         </button>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

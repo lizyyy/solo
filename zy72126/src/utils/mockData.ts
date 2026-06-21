@@ -18,12 +18,12 @@ export const generateMockData = (): {
   const ch6 = generateId();
 
   const channelTable: ChannelTableEntry[] = [
-    { id: ch1, channelNo: '1', trackName: '夜曲', artist: '周杰伦', duration: '3:45', source: '微信聊天记录', createdAt: now, updatedAt: now },
-    { id: ch2, channelNo: '2', trackName: '稻香', artist: '周杰伦', duration: '3:43', source: '林老师手写', createdAt: now, updatedAt: now },
-    { id: ch3, channelNo: '3', trackName: '晴天', artist: '周杰伦', duration: '4:29', createdAt: now, updatedAt: now },
-    { id: ch4, channelNo: '4', trackName: '七里香', artist: '周杰伦', duration: '4:59', createdAt: now, updatedAt: now },
-    { id: ch5, channelNo: '5', trackName: '青花瓷', artist: '周杰伦', duration: '3:52', source: '邮件附件', note: '春晚版本', createdAt: now, updatedAt: now },
-    { id: ch6, channelNo: '6', trackName: '双截棍', artist: '周杰伦', duration: '3:20', source: '短信记录', note: '待补传文件', createdAt: now, updatedAt: now },
+    { id: ch1, channelNo: '1', trackName: '夜曲', artist: '周杰伦', duration: '3:45', source: '微信聊天记录', fileStatus: 'matched', createdAt: now, updatedAt: now },
+    { id: ch2, channelNo: '2', trackName: '稻香', artist: '周杰伦', duration: '3:43', source: '林老师手写', fileStatus: 'matched', createdAt: now, updatedAt: now },
+    { id: ch3, channelNo: '3', trackName: '晴天', artist: '周杰伦', duration: '4:29', fileStatus: 'matched', createdAt: now, updatedAt: now },
+    { id: ch4, channelNo: '4', trackName: '七里香', artist: '周杰伦', duration: '4:59', fileStatus: 'matched', createdAt: now, updatedAt: now },
+    { id: ch5, channelNo: '5', trackName: '青花瓷', artist: '周杰伦', duration: '3:52', source: '邮件附件', note: '春晚版本', fileStatus: 'matched', createdAt: now, updatedAt: now },
+    { id: ch6, channelNo: '6', trackName: '双截棍', artist: '周杰伦', duration: '3:20', source: '短信记录', note: '待补传文件', fileStatus: 'pending', createdAt: now, updatedAt: now },
   ];
 
   const trackId1 = generateId();
@@ -66,7 +66,7 @@ export const generateMockData = (): {
     },
     {
       id: trackId6, channelNo: '', trackName: '告白气球', artist: '周杰伦', duration: '3:35',
-      fileName: '告白气球.mp3', fileSize: 3800000, status: 'error',
+      fileName: '告白气球.mp3', fileSize: 3800000, status: 'conflict',
       metadata: { originalName: '告白气球.mp3' },
       createdAt: now, updatedAt: now,
     },
