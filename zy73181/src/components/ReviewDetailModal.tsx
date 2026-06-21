@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, ChevronDown, ChevronUp, ArrowLeftRight, AlertTriangle, FileWarning, CheckCircle2 } from 'lucide-react';
-import type { Problem, ReviewResult, ReviewParams, CalculationStep } from '@/types';
-import { reviewBoundary, compareResults } from '@/engine/boundaryReviewEngine';
+import type { Problem, ReviewResult, ReviewParams, CalculationStep, StepDetail } from '@/types';
+import { reviewBoundary, compareResults, statusLabel } from '@/engine/boundaryReviewEngine';
 import { constraintTypeLabel, difficultyLabel, reviewResultStatusLabel, unitCheckResultLabel } from '@/services/filterService';
 import { getUnitCategory } from '@/engine/unitValidator';
 
@@ -51,6 +51,14 @@ export default function ReviewDetailModal({
   const activeParams = activeGroup === 'A' ? paramsA : paramsB;
   const comparison = resultA && resultB ? compareResults(resultA, resultB) : null;
 
+  const resolveHeadStatus = () => {
+    if (activeResult?.status === 'unit_issue') return 'unit_issue';
+    if (activeResult?.status === 'abnormal') return 'abnormal';
+    if (activeResult?.status === 'normal') return 'normal';
+    return problem.reviewStatus;
+  };
+  const headStatus = resolveHeadStatus();
+
   const toggleStep = (idx: number) => {
     setExpandedSteps((prev) => ({ ...prev, [idx]: !prev[idx] }));
   };
@@ -79,13 +87,23 @@ export default function ReviewDetailModal({
               </span>
               <span className="text-[11px] text-academic-200">行号 #{problem.originalRow}</span>
               <span className={`tag ${
-                problem.reviewStatus === 'normal' ? 'bg-status-normal/20 text-green-300 border-0' :
-                problem.reviewStatus === 'abnormal' ? 'bg-status-abnormal/20 text-red-300 border-0' :
-                problem.reviewStatus === 'unit_issue' ? 'bg-status-unit/20 text-purple-300 border-0' :
+                headStatus === 'normal' ? 'bg-status-normal/20 text-green-300 border-0' :
+                headStatus === 'abnormal' ? 'bg-status-abnormal/20 text-red-300 border-0' :
+                headStatus === 'unit_issue' ? 'bg-status-unit/20 text-purple-300 border-0' :
                 'bg-white/10 text-white border-0'
               }`}>
-                {reviewResultStatusLabel(problem.reviewStatus)}
+                {statusLabel(headStatus)}
               </span>
+              {problem.hasUnitIssue && (
+                <span className="tag bg-status-unit/20 text-purple-200 border-0">
+                  单位缺失
+                </span>
+              )}
+              {problem.isRemarkSupplementary && (
+                <span className="tag bg-amber-400/20 text-amber-200 border-0">
+                  后补备注
+                </span>
+              )}
             </div>
             <h2 className="font-display text-xl font-semibold text-white">{problem.title}</h2>
             <div className="flex items-center gap-3 mt-2 text-xs text-academic-200">
@@ -216,7 +234,7 @@ function CompareView({
 }: {
   resultA: ReviewResult | null;
   resultB: ReviewResult | null;
-  comparison: { statusChanged: boolean; deviationDiff: number; summary: string };
+  comparison: { statusChanged: boolean; deviationDiff: number; summary: string; changedInB?: string[] };
 }) {
   if (!resultA || !resultB) return null;
 
@@ -246,6 +264,8 @@ function CompareView({
         <ResultCard result={resultB} label="B组结果" />
       </div>
 
+      <StepDetailCompare resultA={resultA} resultB={resultB} />
+
       <div className="grid grid-cols-2 gap-4">
         <div className="card-academic p-4">
           <h4 className="text-sm font-semibold text-academic-800 mb-3">A组计算步骤摘要</h4>
@@ -263,6 +283,227 @@ function CompareView({
             ))}
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function fmtNum(v: number | null | undefined, digits = 4) {
+  if (v == null) return '—';
+  return Number.isFinite(v) ? v.toFixed(digits) : '—';
+}
+
+function StepDetailCompare({
+  resultA,
+  resultB,
+}: {
+  resultA: ReviewResult;
+  resultB: ReviewResult;
+}) {
+  const sdA = resultA.stepDetail;
+  const sdB = resultB.stepDetail;
+
+  if (!sdA || !sdB) {
+    const isUnitIssue =
+      resultA.status === 'unit_issue' || resultB.status === 'unit_issue';
+    return (
+      <div className="card-academic p-4 border-l-4 border-l-status-unit">
+        <p className="text-sm font-semibold text-status-unit mb-2">
+          两组参数 · 全链路计算对照
+        </p>
+        {isUnitIssue ? (
+          <div className="bg-status-unit/5 rounded p-3 text-xs text-status-unit leading-relaxed">
+            <p className="font-semibold mb-1">⚠️ 单位问题导致无法完成完整复核链路</p>
+            <p>
+              A组单位校验结果：<strong>{unitCheckResultLabel(resultA.unitCheckResult)}</strong>
+              <span className="mx-2">|</span>
+              B组单位校验结果：<strong>{unitCheckResultLabel(resultB.unitCheckResult)}</strong>
+            </p>
+            <p className="mt-1.5">
+              已独立标记，未参与正常/异常统计，请补全单位后再复核。
+            </p>
+          </div>
+        ) : (
+          <p className="text-xs text-academic-500">暂无可展示的结构化计算详情</p>
+        )}
+      </div>
+    );
+  }
+
+  const fields: Array<{
+    label: string;
+    key: keyof StepDetail;
+    suffixKey?: keyof StepDetail;
+    hint?: string;
+    tone?: 'number' | 'text';
+    digits?: number;
+  }> = [
+    { label: '原始边界值', key: 'rawBoundaryValue', suffixKey: 'rawBoundaryUnit', digits: 4 },
+    { label: '应用边界系数后', key: 'adjustedValue', suffixKey: 'adjustedUnit', digits: 4 },
+    { label: '单位换算公式', key: 'conversionFormula', tone: 'text' },
+    { label: '换算后数值', key: 'convertedValue', suffixKey: 'convertedUnit', digits: 4 },
+    { label: '容差值', key: 'toleranceValue', digits: 4 },
+    { label: '严格模式系数', key: 'strictMultiplier', digits: 2 },
+    { label: '判定阈值', key: 'threshold', digits: 4 },
+    { label: '下限', key: 'lowerBound', suffixKey: 'boundUnit', digits: 4 },
+    { label: '上限', key: 'upperBound', suffixKey: 'boundUnit', digits: 4 },
+    { label: '实际计算值', key: 'actualValue', suffixKey: 'actualUnit', digits: 4 },
+    { label: '绝对偏差', key: 'deviationAbsolute', digits: 4 },
+    { label: '相对偏差', key: 'deviationRelative', digits: 4 },
+    { label: '偏差来源', key: 'deviationSource', tone: 'text' },
+  ];
+
+  const diff = (k: keyof StepDetail) => {
+    const a = sdA[k]; const b = sdB[k];
+    if (a === b) return false;
+    if (typeof a === 'number' && typeof b === 'number') {
+      if (Number.isNaN(a) && Number.isNaN(b)) return false;
+      return Math.abs(a - b) > 1e-10;
+    }
+    return JSON.stringify(a) !== JSON.stringify(b);
+  };
+
+  const display = (sd: StepDetail, f: typeof fields[0]) => {
+    const v = sd[f.key];
+    const suffix = f.suffixKey ? sd[f.suffixKey] : null;
+    if (f.tone === 'text') {
+      return (v ?? '—') as string;
+    }
+    const d = f.digits ?? 4;
+    if (v == null) return '—';
+    if (typeof v === 'number') {
+      const label = fmtNum(v, d);
+      return suffix ? `${label} ${String(suffix)}` : label;
+    }
+    return String(v);
+  };
+
+  return (
+    <div className="card-academic p-4 border-l-4 border-l-academic-600">
+      <div className="flex items-start justify-between mb-3">
+        <div>
+          <p className="text-sm font-semibold text-academic-800">
+            两组参数 · 全链路计算对照
+          </p>
+          <p className="text-[11px] text-academic-500 mt-0.5">
+            展示 原始单位 → 系数调整 → 单位换算 → 阈值边界 → 偏差来源 → 最终判定 完整链条
+          </p>
+        </div>
+        <div className="flex gap-2 text-[11px]">
+          <span className="inline-flex items-center gap-1 px-2 py-1 bg-status-abnormal/10 text-status-abnormal rounded">
+            ■ 判定变化
+          </span>
+          <span className="inline-flex items-center gap-1 px-2 py-1 bg-academic-100 text-academic-600 rounded">
+            ■ 仅数值变化
+          </span>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="bg-academic-50 text-[11px] text-academic-600 font-semibold">
+              <th className="px-3 py-2 text-left w-36">计算节点</th>
+              <th className="px-3 py-2 text-left">A组参数</th>
+              <th className="px-3 py-2 text-left">B组参数</th>
+              <th className="px-3 py-2 text-left w-24">变化</th>
+            </tr>
+          </thead>
+          <tbody>
+            {fields.map((f) => {
+              const hasDiff = diff(f.key) || (f.suffixKey && diff(f.suffixKey));
+              return (
+                <tr
+                  key={f.key as string}
+                  className={`border-b border-academic-50 last:border-b-0 ${
+                    hasDiff ? 'bg-status-abnormal/[0.04]' : ''
+                  }`}
+                >
+                  <td className="px-3 py-2 font-medium text-academic-700 align-top whitespace-nowrap">
+                    {f.label}
+                  </td>
+                  <td className="px-3 py-2 font-mono text-academic-800 align-top">
+                    {display(sdA, f)}
+                  </td>
+                  <td className="px-3 py-2 font-mono text-academic-800 align-top">
+                    {display(sdB, f)}
+                  </td>
+                  <td className="px-3 py-2 align-top">
+                    {hasDiff ? (
+                      <span className="text-[10px] px-1.5 py-0.5 bg-status-abnormal/10 text-status-abnormal font-semibold rounded">
+                        变化
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-academic-400">—</span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+            <tr className="bg-academic-50 border-b border-academic-100">
+              <td className="px-3 py-2 font-semibold text-academic-700">最终判定</td>
+              <td className="px-3 py-2 align-top">
+                {sdA.isNormal ? (
+                  <span className="tag-normal">正常</span>
+                ) : (
+                  <span className="tag-abnormal">异常</span>
+                )}
+              </td>
+              <td className="px-3 py-2 align-top">
+                {sdB.isNormal ? (
+                  <span className="tag-normal">正常</span>
+                ) : (
+                  <span className="tag-abnormal">异常</span>
+                )}
+              </td>
+              <td className="px-3 py-2 align-top">
+                {sdA.isNormal !== sdB.isNormal ? (
+                  <span className="text-[10px] px-1.5 py-0.5 bg-status-abnormal text-white font-semibold rounded">
+                    判定变化
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-status-normal font-semibold">
+                    一致
+                  </span>
+                )}
+              </td>
+            </tr>
+            <tr>
+              <td className="px-3 py-2 font-semibold text-academic-700">最终结果标签</td>
+              <td className="px-3 py-2 align-top">
+                {resultA.status === 'normal' && <span className="tag-normal">正常</span>}
+                {resultA.status === 'abnormal' && <span className="tag-abnormal">异常</span>}
+                {resultA.status === 'unit_issue' && <span className="tag-unit">单位问题</span>}
+                {resultA.status === 'skipped' && <span className="tag-pending">已跳过</span>}
+                <span className="ml-2 font-mono text-[11px] text-academic-500">
+                  偏差 {(resultA.deviation * 100).toFixed(3)}%
+                </span>
+              </td>
+              <td className="px-3 py-2 align-top">
+                {resultB.status === 'normal' && <span className="tag-normal">正常</span>}
+                {resultB.status === 'abnormal' && <span className="tag-abnormal">异常</span>}
+                {resultB.status === 'unit_issue' && <span className="tag-unit">单位问题</span>}
+                {resultB.status === 'skipped' && <span className="tag-pending">已跳过</span>}
+                <span className="ml-2 font-mono text-[11px] text-academic-500">
+                  偏差 {(resultB.deviation * 100).toFixed(3)}%
+                </span>
+              </td>
+              <td className="px-3 py-2 align-top">
+                {resultA.status !== resultB.status ? (
+                  <span className="text-[10px] px-1.5 py-0.5 bg-status-abnormal text-white font-semibold rounded">
+                    状态变化
+                  </span>
+                ) : Math.abs(resultA.deviation - resultB.deviation) > 1e-10 ? (
+                  <span className="text-[10px] px-1.5 py-0.5 bg-academic-100 text-academic-700 font-semibold rounded">
+                    偏差变化
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-status-normal font-semibold">一致</span>
+                )}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   );

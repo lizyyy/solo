@@ -15,23 +15,29 @@ export default function BoundaryChart({ problems, reviewResults, onPointClick }:
     const unitData: [number, number, string, string][] = [];
     const pendingData: [number, number, string, string][] = [];
 
+    const resolveStatus = (p: Problem, r?: ReviewResult) => {
+      if (r?.status === 'unit_issue' || p.hasUnitIssue) return 'unit_issue';
+      if (r?.status === 'abnormal') return 'abnormal';
+      if (r?.status === 'normal') return 'normal';
+      if (r?.status === 'skipped') return 'pending';
+      return p.reviewStatus;
+    };
+
     problems.forEach((p) => {
       const result = reviewResults.find((r) => r.problemId === p.id);
-      const deviation = result ? result.deviation : 0;
       const point: [number, number, string, string] = [
         p.originalRow,
         p.boundaryValue || 0,
         p.id,
         p.title,
       ];
+      const status = resolveStatus(p, result);
 
-      if (p.reviewStatus === 'unit_issue' || p.hasUnitIssue) {
+      if (status === 'unit_issue') {
         unitData.push(point);
-      } else if (result?.status === 'abnormal') {
+      } else if (status === 'abnormal') {
         abnormalData.push(point);
-      } else if (p.reviewStatus === 'abnormal') {
-        abnormalData.push(point);
-      } else if (p.reviewStatus === 'pending') {
+      } else if (status === 'pending') {
         pendingData.push(point);
       } else {
         normalData.push(point);

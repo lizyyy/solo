@@ -167,12 +167,15 @@ export default function ReviewPage() {
                   <tbody>
                     {problems.map((p, idx) => {
                       const r = results.find((x) => x.problemId === p.id);
+                      const rowStatus = r
+                        ? (r.status === 'skipped' ? 'pending' : r.status)
+                        : p.reviewStatus;
                       return (
                         <tr
                           key={p.id}
                           className={`border-b border-academic-50 hover:bg-academic-50/50 transition-colors ${
-                            p.hasUnitIssue ? 'bg-status-unit/5' :
-                            p.reviewStatus === 'abnormal' ? 'bg-status-abnormal/5' :
+                            p.hasUnitIssue || rowStatus === 'unit_issue' ? 'bg-status-unit/5' :
+                            rowStatus === 'abnormal' ? 'bg-status-abnormal/5' :
                             p.isRemarkSupplementary ? 'bg-amber-50/60' : ''
                           }`}
                           style={{ animationDelay: `${idx * 15}ms` }}
@@ -198,14 +201,10 @@ export default function ReviewPage() {
                             </span>
                           </td>
                           <td className="px-4 py-3">
-                            {r ? (
-                              r.status === 'normal' ? <span className="tag-normal">正常</span> :
-                              r.status === 'abnormal' ? <span className="tag-abnormal">异常</span> :
-                              r.status === 'unit_issue' ? <span className="tag-unit">单位问题</span> :
-                              <span className="tag-pending">跳过</span>
-                            ) : (
-                              <span className="tag-pending">{reviewStatusLabel(p.reviewStatus)}</span>
-                            )}
+                            {rowStatus === 'normal' ? <span className="tag-normal">正常</span> :
+                             rowStatus === 'abnormal' ? <span className="tag-abnormal">异常</span> :
+                             rowStatus === 'unit_issue' ? <span className="tag-unit">单位问题</span> :
+                             <span className="tag-pending">{reviewStatusLabel(rowStatus)}</span>}
                           </td>
                           <td className="px-4 py-3 font-mono text-xs tabular-nums">
                             {r && r.status !== 'unit_issue' ? (

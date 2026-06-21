@@ -31,28 +31,36 @@ export default function ProblemTable({
     }
   }, [highlightedRowId, onHighlightRow]);
 
-  const getRowClass = (p: Problem): string => {
+  const resolveStatus = (p: Problem, r?: ReviewResult) => {
+    if (r?.status === 'unit_issue') return 'unit_issue';
+    if (r?.status === 'abnormal') return 'abnormal';
+    if (r?.status === 'normal') return 'normal';
+    if (r?.status === 'skipped') return 'pending';
+    return p.reviewStatus;
+  };
+
+  const getRowClass = (p: Problem, r?: ReviewResult): string => {
+    const status = resolveStatus(p, r);
     let cls = 'transition-colors duration-200';
-    if (p.reviewStatus === 'abnormal') cls += ' table-row-abnormal';
-    else if (p.hasUnitIssue) cls += ' table-row-unit';
+    if (status === 'abnormal') cls += ' table-row-abnormal';
+    else if (p.hasUnitIssue || status === 'unit_issue') cls += ' table-row-unit';
     else if (p.isRemarkSupplementary) cls += ' table-row-supplementary';
     if (highlightedRowId === p.id) cls += ' animate-highlight';
     return cls;
   };
 
   const getStatusTag = (p: Problem, r?: ReviewResult) => {
-    const status = r ? r.status : p.reviewStatus;
+    const status = resolveStatus(p, r);
     switch (status) {
       case 'normal':
-        return <span className="tag-normal">{reviewResultStatusLabel(status)}</span>;
+        return <span className="tag-normal">{reviewResultStatusLabel('normal')}</span>;
       case 'abnormal':
-        return <span className="tag-abnormal">{reviewResultStatusLabel(status)}</span>;
+        return <span className="tag-abnormal">{reviewResultStatusLabel('abnormal')}</span>;
       case 'unit_issue':
-        return <span className="tag-unit">{reviewResultStatusLabel(status)}</span>;
-      case 'skipped':
+        return <span className="tag-unit">{reviewResultStatusLabel('unit_issue')}</span>;
       case 'pending':
       default:
-        return <span className="tag-pending">{reviewStatusLabel(p.reviewStatus)}</span>;
+        return <span className="tag-pending">{reviewStatusLabel('pending')}</span>;
     }
   };
 
@@ -113,7 +121,7 @@ export default function ProblemTable({
                 <tr
                   key={p.id}
                   ref={(el) => { rowRefs.current[p.id] = el; }}
-                  className={getRowClass(p)}
+                  className={getRowClass(p, result)}
                   style={{ animationDelay: `${idx * 20}ms` }}
                 >
                   <td className="px-4 py-3 font-mono text-xs text-academic-400">

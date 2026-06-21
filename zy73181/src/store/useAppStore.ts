@@ -9,10 +9,23 @@ import {
   demoProblems,
   defaultReviewParamsA,
   defaultReviewParamsB,
-  demoReviewResultsA,
-  demoReviewResultsB,
 } from '@/data/demoData';
 import { reviewBoundary } from '@/engine/boundaryReviewEngine';
+
+function buildInitialResults(problems: Problem[], paramsA: ReviewParams, paramsB: ReviewParams) {
+  return {
+    reviewResultsA: problems.map((p) => reviewBoundary(p, paramsA)),
+    reviewResultsB: problems.map((p) => reviewBoundary(p, paramsB)),
+  };
+}
+
+function resolveStatus(problem: Problem, result?: ReviewResult) {
+  if (result?.status === 'unit_issue') return 'unit_issue';
+  if (result?.status === 'abnormal') return 'abnormal';
+  if (result?.status === 'normal') return 'normal';
+  if (result?.status === 'skipped') return 'pending';
+  return problem.reviewStatus;
+}
 
 interface AppState {
   problems: Problem[];
@@ -34,7 +47,9 @@ interface AppState {
   selectProblem: (id: string | null) => void;
   highlightRow: (id: string | null) => void;
   setGrayReleaseNote: (problemId: string, note: string) => void;
+  getActiveResults: () => ReviewResult[];
   getFilteredProblems: () => Problem[];
+  getFilteredResults: () => ReviewResult[];
   getReviewResult: (problemId: string, group: 'A' | 'B') => ReviewResult | undefined;
   getStatistics: () => {
     total: number;
@@ -43,15 +58,20 @@ interface AppState {
     unitIssue: number;
     pending: number;
   };
+  resolveProblemStatus: (problem: Problem) => 'pending' | 'normal' | 'abnormal' | 'unit_issue';
 }
+
+const initialParamsA = { ...defaultReviewParamsA };
+const initialParamsB = { ...defaultReviewParamsB };
+const initialResults = buildInitialResults(demoProblems, initialParamsA, initialParamsB);
 
 export const useAppStore = create<AppState>((set, get) => ({
   problems: demoProblems,
-  reviewParamsA: defaultReviewParamsA,
-  reviewParamsB: defaultReviewParamsB,
+  reviewParamsA: initialParamsA,
+  reviewParamsB: initialParamsB,
   activeParamsGroup: 'A',
-  reviewResultsA: demoReviewResultsA,
-  reviewResultsB: demoReviewResultsB,
+  reviewResultsA: initialResults.reviewResultsA,
+  reviewResultsB: initialResults.reviewResultsB,
   filterCriteria: {
     difficulties: [],
     constraintTypes: [],
@@ -62,7 +82,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   selectedProblemId: null,
   highlightedRowId: null,
   grayReleaseNotes: {
-    'P-003': '灰度发布v2.1：本次复核将边界判定从"通过"改为"异常"，原因是容差标准收紧至2%',
+    'P-003': '灰度发布v2.1：本次复核将边界判定从「通过」改为「异常」，原因是容差标准收紧至2%',
   },
 
   setFilterCriteria: (criteria) =>
@@ -72,39 +92,40 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   setActiveParamsGroup: (group) => set({ activeParamsGroup: group }),
 
-  updateReviewParams: (group, params) =>
-    set((state) => ({
-      [`reviewParams${group}`]: {
-        ...state[`reviewParams${group}`],
-        ...params,
-      },
-    })),
+  updateReviewParams: (group, partial) => {
+    const paramsKey = `reviewParams${group}` as const;
+    const resultsKey = `reviewResults${group}` as const;
+
+    const newParams = { ...get()[paramsKey], ...partial };
+    const { problems } = get();
+    const newResults = problems.map((p) => reviewBoundary(p, { ...newParams, groupId: group }));
+
+    set({
+      [paramsKey]: newParams,
+      [resultsKey]: newResults,
+    } as unknown as Partial<AppState>);
+  },
 
   runReview: (problemId, group) => {
     const problem = get().problems.find((p) => p.id === problemId);
     if (!problem) return;
-
     const params = group === 'A' ? get().reviewParamsA : get().reviewParamsB;
-    const result = reviewBoundary(problem, params);
+    const result = reviewBoundary(problem, { ...params, groupId: group });
+    const resultsKey = `reviewResults${group}` as const;
 
     set((state) => {
-      const resultsKey = `reviewResults${group}` as const;
       const results = [...state[resultsKey]];
       const idx = results.findIndex((r) => r.problemId === problemId);
-      if (idx >= 0) {
-        results[idx] = result;
-      } else {
-        results.push(result);
-      }
+      if (idx >= 0) results[idx] = result;
+      else results.push(result);
       return { [resultsKey]: results };
     });
   },
 
   runAllReviews: (group) => {
-    const { problems, reviewParamsA, reviewParamsB } = get();
-    const params = group === 'A' ? reviewParamsA : reviewParamsB;
-
-    const results = problems.map((p) => reviewBoundary(p, params));
+    const { problems } = get();
+    const params = group === 'A' ? get().reviewParamsA : get().reviewParamsB;
+    const results = problems.map((p) => reviewBoundary(p, { ...params, groupId: group }));
     const key = `reviewResults${group}` as const;
     set({ [key]: results });
   },
@@ -118,18 +139,38 @@ export const useAppStore = create<AppState>((set, get) => ({
       grayReleaseNotes: { ...state.grayReleaseNotes, [problemId]: note },
     })),
 
+  getActiveResults: () => {
+    return get().activeParamsGroup === 'A' ? get().reviewResultsA : get().reviewResultsB;
+  },
+
+  resolveProblemStatus: (problem) => {
+    const activeResults = get().getActiveResults();
+    const result = activeResults.find((r) => r.problemId === problem.id);
+    return resolveStatus(problem, result);
+  },
+
   getFilteredProblems: () => {
     const { problems, filterCriteria } = get();
     const { difficulties, constraintTypes, reviewStatuses, showUnitIssuesOnly, keyword } = filterCriteria;
 
     return problems.filter((p) => {
+      const resolvedStatus = get().resolveProblemStatus(p);
+
       if (difficulties.length > 0 && !difficulties.includes(p.difficulty)) return false;
       if (constraintTypes.length > 0 && !constraintTypes.includes(p.constraintType)) return false;
-      if (reviewStatuses.length > 0 && !reviewStatuses.includes(p.reviewStatus)) return false;
+      if (reviewStatuses.length > 0 && !reviewStatuses.includes(resolvedStatus)) return false;
       if (showUnitIssuesOnly && !p.hasUnitIssue) return false;
       if (keyword && !p.title.includes(keyword) && !p.knowledgePoint.includes(keyword)) return false;
       return true;
     });
+  },
+
+  getFilteredResults: () => {
+    const filtered = get().getFilteredProblems();
+    const activeResults = get().getActiveResults();
+    return filtered
+      .map((p) => activeResults.find((r) => r.problemId === p.id))
+      .filter((r): r is ReviewResult => !!r);
   },
 
   getReviewResult: (problemId, group) => {
@@ -139,12 +180,22 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   getStatistics: () => {
     const problems = get().getFilteredProblems();
-    return {
-      total: problems.length,
-      normal: problems.filter((p) => p.reviewStatus === 'normal').length,
-      abnormal: problems.filter((p) => p.reviewStatus === 'abnormal').length,
-      unitIssue: problems.filter((p) => p.reviewStatus === 'unit_issue' || p.hasUnitIssue).length,
-      pending: problems.filter((p) => p.reviewStatus === 'pending').length,
-    };
+
+    let normal = 0;
+    let abnormal = 0;
+    let unitIssue = 0;
+    let pending = 0;
+
+    problems.forEach((p) => {
+      const s = get().resolveProblemStatus(p);
+      switch (s) {
+        case 'normal': normal++; break;
+        case 'abnormal': abnormal++; break;
+        case 'unit_issue': unitIssue++; break;
+        case 'pending': pending++; break;
+      }
+    });
+
+    return { total: problems.length, normal, abnormal, unitIssue, pending };
   },
 }));

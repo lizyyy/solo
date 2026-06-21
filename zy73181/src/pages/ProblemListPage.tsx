@@ -28,19 +28,21 @@ export default function ProblemListPage() {
     updateReviewParams,
     runAllReviews,
     getFilteredProblems,
+    getActiveResults,
     getReviewResult,
     getStatistics,
+    problems,
   } = useAppStore();
 
   const [showExport, setShowExport] = useState(false);
 
   const filteredProblems = useMemo(() => getFilteredProblems(), [getFilteredProblems, filterCriteria]);
-  const reviewResults = activeParamsGroup === 'A' ? reviewResultsA : reviewResultsB;
+  const reviewResults = useMemo(() => getActiveResults(), [getActiveResults, activeParamsGroup]);
   const statistics = getStatistics();
 
   const selectedProblem = useMemo(
-    () => filteredProblems.find((p) => p.id === selectedProblemId) || null,
-    [filteredProblems, selectedProblemId]
+    () => problems.find((p) => p.id === selectedProblemId) || null,
+    [problems, selectedProblemId]
   );
 
   const handleChartClick = (problemId: string) => {
@@ -234,6 +236,8 @@ export default function ProblemListPage() {
         <ExportModal
           problems={filteredProblems}
           reviewResults={reviewResults}
+          reviewResultsA={reviewResultsA}
+          reviewResultsB={reviewResultsB}
           filterCriteria={filterCriteria}
           activeGroup={activeParamsGroup}
           onClose={() => setShowExport(false)}

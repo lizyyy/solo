@@ -42,6 +42,28 @@ export interface CalculationStep {
   unitConversion?: string;
 }
 
+export interface StepDetail {
+  rawBoundaryValue: number;
+  rawBoundaryUnit: string | null;
+  adjustedValue: number;
+  adjustedUnit: string;
+  convertedValue: number | null;
+  convertedUnit: string | null;
+  conversionFormula: string | null;
+  toleranceValue: number;
+  lowerBound: number;
+  upperBound: number;
+  boundUnit: string;
+  actualValue: number;
+  actualUnit: string;
+  deviationAbsolute: number;
+  deviationRelative: number;
+  deviationSource: string;
+  threshold: number;
+  isNormal: boolean;
+  strictMultiplier: number;
+}
+
 export interface ReviewResult {
   id: string;
   problemId: string;
@@ -55,6 +77,7 @@ export interface ReviewResult {
   calculationSteps: CalculationStep[];
   isDirtyDemo?: boolean;
   reviewedAt: string;
+  stepDetail?: StepDetail | null;
 }
 
 export interface FilterCriteria {
@@ -65,18 +88,43 @@ export interface FilterCriteria {
   keyword: string;
 }
 
+export interface ProblematicRowInfo {
+  id: string;
+  problemId: string;
+  originalRow: number;
+  title: string;
+  deviation: number;
+  deviationAbs: number;
+  remarkStatus: 'none' | 'normal' | 'supplementary';
+  unitStatus: 'present' | 'missing' | 'mismatch';
+  rawBoundaryValue: number | null;
+  rawBoundaryUnit: string | null;
+  convertedValue: number | null;
+  convertedUnit: string | null;
+  judgmentA: 'pending' | 'normal' | 'abnormal' | 'unit_issue';
+  judgmentB: 'pending' | 'normal' | 'abnormal' | 'unit_issue';
+  judgmentChanged: boolean;
+  changedJudgments: string[];
+}
+
 export interface ExportReport {
   exportTime: string;
+  activeGroup: 'A' | 'B';
   filterCriteria: FilterCriteria;
   filterSummary: string;
-  totalCount: number;
-  normalCount: number;
-  abnormalCount: number;
-  unitIssueCount: number;
-  pendingCount: number;
-  problematicRows: { rowNumber: number; problemId: string; title: string; deviation: number }[];
-  problems: Problem[];
-  reviewResults: ReviewResult[];
+  statistics: {
+    total: number;
+    normal: number;
+    abnormal: number;
+    unitIssue: number;
+    pending: number;
+  };
+  problematicRows: ProblematicRowInfo[];
+  unitIssueRows: ProblematicRowInfo[];
+  records: Array<{
+    problem: Problem;
+    result: ReviewResult;
+  }>;
 }
 
 export interface UnitConversion {

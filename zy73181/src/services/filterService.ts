@@ -1,4 +1,5 @@
-import type { FilterCriteria, Problem, ReviewResult } from '@/types';
+import type { FilterCriteria, Problem, ReviewResult, ProblematicRowInfo } from '@/types';
+import { statusLabel } from '@/engine/boundaryReviewEngine';
 
 export function generateFilterSummary(criteria: FilterCriteria): string {
   const parts: string[] = [];
@@ -84,21 +85,107 @@ export function unitCheckResultLabel(r: string): string {
   return map[r] || r;
 }
 
+export function remarkStatusLabel(s: ProblematicRowInfo['remarkStatus']): string {
+  const map = { none: '无备注', normal: '有备注', supplementary: '后补备注' } as const;
+  return map[s];
+}
+
+export function unitStatusLabel(s: ProblematicRowInfo['unitStatus']): string {
+  const map = { present: '完整', missing: '缺失', mismatch: '不匹配' } as const;
+  return map[s];
+}
+
+function toJudgment(r?: ReviewResult): ProblematicRowInfo['judgmentA'] {
+  if (!r) return 'pending';
+  if (r.status === 'unit_issue') return 'unit_issue';
+  if (r.status === 'abnormal') return 'abnormal';
+  if (r.status === 'normal') return 'normal';
+  return 'pending';
+}
+
+export function buildProblematicRowInfo(
+  problem: Problem,
+  resultA?: ReviewResult,
+  resultB?: ReviewResult,
+): ProblematicRowInfo {
+  const active = resultB || resultA;
+  const sd = active?.stepDetail;
+  const remarkStatus: ProblematicRowInfo['remarkStatus'] = problem.isRemarkSupplementary
+    ? 'supplementary'
+    : problem.remark
+      ? 'normal'
+      : 'none';
+  let unitStatus: ProblematicRowInfo['unitStatus'] = 'present';
+  if (problem.hasUnitIssue || problem.boundaryUnit == null) unitStatus = 'missing';
+  else if (active?.unitCheckResult === 'mismatch') unitStatus = 'mismatch';
+
+  const jA = toJudgment(resultA);
+  const jB = toJudgment(resultB);
+
+  return {
+    id: active?.id || `info-${problem.id}`,
+    problemId: problem.id,
+    originalRow: problem.originalRow,
+    title: problem.title,
+    deviation: active?.deviation ?? 0,
+    deviationAbs: Math.abs(active?.deviation ?? 0),
+    remarkStatus,
+    unitStatus,
+    rawBoundaryValue: problem.boundaryValue as number | null,
+    rawBoundaryUnit: problem.boundaryUnit,
+    convertedValue: sd?.convertedValue ?? null,
+    convertedUnit: sd?.convertedUnit ?? null,
+    judgmentA: jA,
+    judgmentB: jB,
+    judgmentChanged: resultA && resultB ? jA !== jB : false,
+    changedJudgments: active?.changedJudgments ?? [],
+  };
+}
+
 export function findProblematicRows(
   problems: Problem[],
-  results: ReviewResult[]
-): { rowNumber: number; problemId: string; title: string; deviation: number }[] {
-  return results
+  resultsA: ReviewResult[],
+  resultsB: ReviewResult[],
+  activeGroup: 'A' | 'B' = 'A',
+): ProblematicRowInfo[] {
+  const active = activeGroup === 'A' ? resultsA : resultsB;
+  return active
     .filter((r) => r.status === 'abnormal')
-    .sort((a, b) => b.deviation - a.deviation)
-    .slice(0, 5)
     .map((r) => {
-      const problem = problems.find((p) => p.id === r.problemId);
-      return {
-        rowNumber: problem?.originalRow || 0,
-        problemId: r.problemId,
-        title: problem?.title || '未知题目',
-        deviation: r.deviation,
-      };
-    });
+      const problem = problems.find((p) => p.id === r.problemId)!;
+      const rA = resultsA.find((x) => x.problemId === r.problemId);
+      const rB = resultsB.find((x) => x.problemId === r.problemId);
+      return buildProblematicRowInfo(problem, rA, rB);
+    })
+    .sort((a, b) => b.deviationAbs - a.deviationAbs)
+    .slice(0, 5);
 }
+
+export function findUnitIssueRows(
+  problems: Problem[],
+  resultsA: ReviewResult[],
+  resultsB: ReviewResult[],
+  activeGroup: 'A' | 'B' = 'A',
+): ProblematicRowInfo[] {
+  const active = activeGroup === 'A' ? resultsA : resultsB;
+  const unitIssueIds = new Set<string>();
+  active
+    .filter((r) => r.status === 'unit_issue')
+    .forEach((r) => unitIssueIds.add(r.problemId));
+  problems.forEach((p) => {
+    if (p.hasUnitIssue) unitIssueIds.add(p.id);
+  });
+  return Array.from(unitIssueIds)
+    .map((id) => {
+      const problem = problems.find((p) => p.id === id)!;
+      const rA = resultsA.find((x) => x.problemId === id);
+      const rB = resultsB.find((x) => x.problemId === id);
+      return buildProblematicRowInfo(problem, rA, rB);
+    })
+    .sort((a, b) => a.originalRow - b.originalRow);
+}
+
+export function judgmentLabel(j: ProblematicRowInfo['judgmentA']): string {
+  return statusLabel(j);
+}
+

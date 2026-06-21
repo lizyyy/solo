@@ -16,6 +16,8 @@ export default function ExportPage() {
     setActiveParamsGroup,
     filterCriteria,
     getFilteredProblems,
+    getStatistics,
+    resolveProblemStatus,
   } = useAppStore();
 
   const [showModal, setShowModal] = useState(false);
@@ -23,33 +25,26 @@ export default function ExportPage() {
   const filteredProblems = useMemo(() => getFilteredProblems(), [getFilteredProblems]);
   const results = activeParamsGroup === 'A' ? reviewResultsA : reviewResultsB;
   const filterSummary = generateFilterSummary(filterCriteria);
-  const problematicRows = findProblematicRows(filteredProblems, results);
-
-  const stats = useMemo(() => {
-    return {
-      total: filteredProblems.length,
-      normal: filteredProblems.filter((p) => p.reviewStatus === 'normal').length,
-      abnormal: filteredProblems.filter((p) => p.reviewStatus === 'abnormal').length,
-      unitIssue: filteredProblems.filter((p) => p.hasUnitIssue).length,
-      pending: filteredProblems.filter((p) => p.reviewStatus === 'pending').length,
-    };
-  }, [filteredProblems]);
+  const problematicRows = findProblematicRows(filteredProblems, reviewResultsA, reviewResultsB, activeParamsGroup);
+  const stats = getStatistics();
 
   const handleExportCSV = () => {
     exportToCSV({
       problems: filteredProblems,
-      reviewResults: results,
+      reviewResultsA,
+      reviewResultsB,
       filterCriteria,
-      groupId: activeParamsGroup,
+      activeGroup: activeParamsGroup,
     });
   };
 
   const handleExportExcel = () => {
     exportToExcel({
       problems: filteredProblems,
-      reviewResults: results,
+      reviewResultsA,
+      reviewResultsB,
       filterCriteria,
-      groupId: activeParamsGroup,
+      activeGroup: activeParamsGroup,
     });
   };
 
@@ -129,24 +124,45 @@ export default function ExportPage() {
               <div className="flex items-center gap-2 mb-3">
                 <AlertTriangle className="w-4 h-4 text-status-abnormal" />
                 <p className="text-xs font-semibold text-status-abnormal">
-                  问题行定位（按偏差降序，报告中标注哪一行拖偏了整体结果）
+                  问题行定位（按偏差降序，报告中标注哪一行拖偏了整体结果，含备注/单位/原始值/换算值/判定变化）
                 </p>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 text-xs">
+                <div className="grid grid-cols-12 gap-2 px-3 py-2 bg-academic-50 rounded text-[11px] font-semibold text-academic-600">
+                  <span className="col-span-1">行号</span>
+                  <span className="col-span-2">题目编号</span>
+                  <span className="col-span-1">备注</span>
+                  <span className="col-span-1">单位</span>
+                  <span className="col-span-2">原始/换算值</span>
+                  <span className="col-span-3">判定变化</span>
+                  <span className="col-span-2 text-right">偏差</span>
+                </div>
                 {problematicRows.map((row) => (
                   <div
                     key={row.problemId}
-                    className="flex items-center justify-between py-2.5 px-4 bg-status-abnormal/5 rounded-lg border border-status-abnormal/20"
+                    className="grid grid-cols-12 gap-2 items-center py-2.5 px-3 bg-status-abnormal/5 rounded-lg border border-status-abnormal/20"
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono text-xs font-bold text-status-abnormal bg-status-abnormal/10 px-2.5 py-1 rounded">
-                        行 #{row.rowNumber}
-                      </span>
-                      <span className="font-mono text-xs text-academic-500">{row.problemId}</span>
-                      <span className="text-sm text-academic-700">{row.title}</span>
-                    </div>
-                    <span className="font-mono text-sm text-status-abnormal font-bold">
-                      偏差 {(row.deviation * 100).toFixed(2)}%
+                    <span className="col-span-1 font-mono font-bold text-status-abnormal">{row.originalRow}</span>
+                    <span className="col-span-2 font-mono text-xs text-academic-700 font-semibold">{row.problemId}</span>
+                    <span className={`col-span-1 ${row.remarkStatus === 'supplementary' ? 'text-amber-700' : 'text-academic-500'}`}>
+                      {row.remarkStatus === 'supplementary' ? '后补备注' : row.remarkStatus === 'normal' ? '有备注' : '—'}
+                    </span>
+                    <span className={`col-span-1 ${row.unitStatus === 'present' ? 'text-status-normal' : 'text-status-unit font-semibold'}`}>
+                      {row.unitStatus === 'present' ? '完整' : row.unitStatus === 'missing' ? '缺失' : '不匹配'}
+                    </span>
+                    <span className="col-span-2 font-mono text-academic-700">
+                      {row.rawBoundaryValue ?? '-'}{row.rawBoundaryUnit ? ` ${row.rawBoundaryUnit}` : ''}
+                      {row.convertedValue != null && (
+                        <span className="text-academic-500 ml-1">→ {row.convertedValue}{row.convertedUnit ? ` ${row.convertedUnit}` : ''}</span>
+                      )}
+                    </span>
+                    <span className={`col-span-3 ${row.judgmentChanged ? 'text-status-abnormal font-semibold' : 'text-academic-500'}`}>
+                      {row.judgmentChanged
+                        ? `${reviewStatusLabel(row.judgmentA)} → ${reviewStatusLabel(row.judgmentB)}`
+                        : '无变化'}
+                    </span>
+                    <span className="col-span-2 text-right font-mono text-status-abnormal font-bold">
+                      {(row.deviation * 100).toFixed(2)}%
                     </span>
                   </div>
                 ))}
@@ -249,11 +265,11 @@ export default function ExportPage() {
                       </td>
                       <td className="px-4 py-3">
                         <span className={`tag-${
-                          p.reviewStatus === 'normal' ? 'normal' :
-                          p.reviewStatus === 'abnormal' ? 'abnormal' :
-                          p.reviewStatus === 'unit_issue' ? 'unit' : 'pending'
+                          resolveProblemStatus(p) === 'normal' ? 'normal' :
+                          resolveProblemStatus(p) === 'abnormal' ? 'abnormal' :
+                          resolveProblemStatus(p) === 'unit_issue' ? 'unit' : 'pending'
                         }`}>
-                          {reviewStatusLabel(p.reviewStatus)}
+                          {reviewStatusLabel(resolveProblemStatus(p))}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-xs tabular-nums">
@@ -289,6 +305,8 @@ export default function ExportPage() {
         <ExportModal
           problems={filteredProblems}
           reviewResults={results}
+          reviewResultsA={reviewResultsA}
+          reviewResultsB={reviewResultsB}
           filterCriteria={filterCriteria}
           activeGroup={activeParamsGroup}
           onClose={() => setShowModal(false)}
