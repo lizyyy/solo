@@ -492,7 +492,15 @@ def manual_judgment(result_id):
     result.judgment_by = data.get('by', 'manual')
     result.judgment_at = datetime.utcnow()
     db.session.commit()
-    return jsonify({'success': True})
+
+    task = CheckTask.query.get(result.task_id)
+    report_path = None
+    if task and task.status == 'completed':
+        report_path = generate_markdown_report(task)
+        task.report_path = report_path
+        db.session.commit()
+
+    return jsonify({'success': True, 'report_updated': report_path is not None, 'report_path': report_path})
 
 
 @app.route('/api/anomalies', methods=['GET'])
@@ -551,94 +559,250 @@ def save_check_state(key, value, updated_by='system'):
 @app.route('/api/reports/<int:task_id>/markdown', methods=['GET'])
 def get_report_markdown(task_id):
     task = CheckTask.query.get_or_404(task_id)
-    if task.report_path and os.path.exists(task.report_path):
+    force_refresh = request.args.get('force', '0') == '1'
+
+    if not force_refresh and task.report_path and os.path.exists(task.report_path):
         with open(task.report_path, 'r', encoding='utf-8') as f:
             content = f.read()
-        return jsonify({'content': content, 'path': task.report_path})
-    content = generate_markdown_report(task)
-    return jsonify({'content': content, 'path': None})
+        return jsonify({
+            'content': content,
+            'path': task.report_path,
+            'regenerated': False,
+            'generated_at': datetime.fromtimestamp(os.path.getmtime(task.report_path)).isoformat()
+        })
+
+    report_path = generate_markdown_report(task)
+    task.report_path = report_path
+    db.session.commit()
+
+    with open(report_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    return jsonify({
+        'content': content,
+        'path': report_path,
+        'regenerated': True,
+        'generated_at': datetime.fromtimestamp(os.path.getmtime(report_path)).isoformat()
+    })
 
 
 def generate_markdown_report(task):
     results = task.results
     total = len(results)
-    passed = len([r for r in results if r.processing_status == 'passed'])
-    failed = len([r for r in results if r.processing_status == 'failed'])
-    skipped = len([r for r in results if r.processing_status == 'skipped'])
-    error = len([r for r in results if r.processing_status == 'error'])
+    passed_auto = [r for r in results if r.processing_status == 'passed']
+    failed_auto = [r for r in results if r.processing_status == 'failed']
+    skipped_auto = [r for r in results if r.processing_status == 'skipped']
+    error_auto = [r for r in results if r.processing_status == 'error']
     anomalies = [r for r in results if r.is_anomaly]
     manual = [r for r in results if r.is_manual_judgment]
+
+    def final_status(r):
+        if r.is_manual_judgment:
+            return r.judgment_result
+        return r.processing_status
+
+    final_passed = len([r for r in results if final_status(r) == 'passed'])
+    final_failed = len([r for r in results if final_status(r) == 'failed'])
+    final_skipped = len([r for r in results if final_status(r) == 'skipped'])
+    final_error = len([r for r in results if final_status(r) == 'error'])
+
+    now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     lines = []
     lines.append(f"# 矩阵分解批量验算报告")
     lines.append("")
-    lines.append(f"**任务ID**: {task.task_id}")
+    lines.append("> **说明**: 本报告基于数据库最新结果自动生成，数据与复核页保持同步，每次人工改判后自动刷新。")
+    lines.append("")
+    lines.append(f"**任务ID**: `{task.task_id}`")
     lines.append(f"**任务名称**: {task.name}")
-    lines.append(f"**参数版本**: {task.params_version}")
-    lines.append(f"**开始时间**: {task.started_at.strftime('%Y-%m-%d %H:%M:%S')}")
-    lines.append(f"**完成时间**: {task.completed_at.strftime('%Y-%m-%d %H:%M:%S') if task.completed_at else '未完成'}")
-    lines.append(f"**状态**: {task.status}")
+    lines.append(f"**核心参数版本**: `{task.params_version}`")
+    lines.append(f"**报告生成时间**: {now_str}")
+    lines.append(f"**验算开始时间**: {task.started_at.strftime('%Y-%m-%d %H:%M:%S')}")
+    lines.append(f"**验算完成时间**: {task.completed_at.strftime('%Y-%m-%d %H:%M:%S') if task.completed_at else '未完成'}")
+    lines.append(f"**任务状态**: {task.status}")
+    lines.append(f"**改判刷新次数**: {len(manual)} 次人工改判（报告已同步）")
     lines.append("")
 
-    lines.append("## 处理状态汇总")
+    lines.append("---")
+    lines.append("")
+
+    lines.append("## 一、自动判定汇总（按算法输出）")
     lines.append("")
     lines.append("| 状态 | 数量 | 占比 |")
     lines.append("|------|------|------|")
-    lines.append(f"| 通过 | {passed} | {passed/total*100:.1f}% |" if total else "| 通过 | 0 | 0% |")
-    lines.append(f"| 失败 | {failed} | {failed/total*100:.1f}% |" if total else "| 失败 | 0 | 0% |")
-    lines.append(f"| 跳过 | {skipped} | {skipped/total*100:.1f}% |" if total else "| 跳过 | 0 | 0% |")
-    lines.append(f"| 错误 | {error} | {error/total*100:.1f}% |" if total else "| 错误 | 0 | 0% |")
+    lines.append(f"| 通过 | {len(passed_auto)} | {len(passed_auto)/total*100:.1f}% |" if total else "| 通过 | 0 | 0% |")
+    lines.append(f"| 失败 | {len(failed_auto)} | {len(failed_auto)/total*100:.1f}% |" if total else "| 失败 | 0 | 0% |")
+    lines.append(f"| 跳过 | {len(skipped_auto)} | {len(skipped_auto)/total*100:.1f}% |" if total else "| 跳过 | 0 | 0% |")
+    lines.append(f"| 错误 | {len(error_auto)} | {len(error_auto)/total*100:.1f}% |" if total else "| 错误 | 0 | 0% |")
     lines.append(f"| **总计** | **{total}** | **100%** |")
     lines.append("")
 
+    lines.append("## 二、最终处理状态汇总（含人工改判）")
+    lines.append("")
+    lines.append("| 最终状态 | 数量 | 占比 | 说明 |")
+    lines.append("|----------|------|------|------|")
+    lines.append(f"| 通过 | {final_passed} | {final_passed/total*100:.1f}% | 算法通过 + 人工改判为通过 |" if total else "| 通过 | 0 | 0% | |")
+    lines.append(f"| 失败 | {final_failed} | {final_failed/total*100:.1f}% | 算法失败 + 人工改判为失败 |" if total else "| 失败 | 0 | 0% | |")
+    lines.append(f"| 跳过 | {final_skipped} | {final_skipped/total*100:.1f}% | 重复样本等原因跳过 |" if total else "| 跳过 | 0 | 0% | |")
+    lines.append(f"| 错误 | {final_error} | {final_error/total*100:.1f}% | 计算错误 |" if total else "| 错误 | 0 | 0% | |")
+    lines.append(f"| **合计** | **{total}** | **100%** | |")
+    lines.append("")
+    lines.append(f"- 人工改判数量: {len(manual)} 道题")
+    lines.append(f"- 异常样本数量: {len(anomalies)} 道题")
+    lines.append("")
+
+    lines.append("---")
+    lines.append("")
+
     if anomalies:
-        lines.append("## 异常记录")
+        lines.append("## 三、异常与说明（保留原始原因）")
         lines.append("")
-        lines.append("| 题目ID | 标题 | 异常类型 | 说明 | 状态 |")
-        lines.append("|--------|------|----------|------|------|")
+        lines.append("| 题目ID | 标题 | 异常类型 | 异常解释 | 参数版本 | 人工处理状态 |")
+        lines.append("|--------|------|----------|----------|----------|--------------|")
         for r in anomalies:
             p = r.problem
-            status = '已人工改判' if r.is_manual_judgment else '待处理'
-            lines.append(f"| {p.problem_id} | {p.title} | {r.anomaly_type} | {r.anomaly_explanation or ''} | {status} |")
+            human = f"已改判为 **{r.judgment_result}**" if r.is_manual_judgment else "待处理"
+            explanation = (r.anomaly_explanation or '').replace('\n', ' ').replace('|', '/')
+            lines.append(f"| {p.problem_id} | {p.title} | `{r.anomaly_type}` | {explanation} | `{task.params_version}` | {human} |")
         lines.append("")
 
     if manual:
-        lines.append("## 人工改判记录")
+        lines.append("## 四、人工改判明细")
         lines.append("")
-        lines.append("| 题目ID | 标题 | 改判结果 | 改判原因 | 改判人 | 改判时间 |")
-        lines.append("|--------|------|----------|----------|--------|----------|")
-        for r in manual:
+        for idx, r in enumerate(manual, 1):
             p = r.problem
-            lines.append(f"| {p.problem_id} | {p.title} | {r.judgment_result} | {r.judgment_reason or ''} | {r.judgment_by or ''} | {r.judgment_at.strftime('%Y-%m-%d %H:%M') if r.judgment_at else ''} |")
-        lines.append("")
+            lines.append(f"### 4.{idx} {p.problem_id} - {p.title}")
+            lines.append("")
+            lines.append(f"- **自动判定状态**: `{r.processing_status}`")
+            lines.append(f"- **人工改判结果**: `{r.judgment_result}`")
+            no_desc = "(无说明)"
+            reason_text = r.judgment_reason if r.judgment_reason else no_desc
+            lines.append(f"- **改判说明**: {reason_text}")
+            lines.append(f"- **改判人**: {r.judgment_by or '未知'}")
+            lines.append(f"- **改判时间**: {r.judgment_at.strftime('%Y-%m-%d %H:%M') if r.judgment_at else '未知'}")
+            if r.anomaly_explanation:
+                lines.append(f"- **关联异常**: {r.anomaly_type} - {r.anomaly_explanation}")
+            lines.append(f"- **参数版本**: `{task.params_version}`")
+            lines.append("")
 
-    lines.append("## 详细结果表")
+    lines.append("## 五、逐题详细结果（自动判定 + 人工改判）")
     lines.append("")
-    lines.append("| 题目ID | 标题 | 处理状态 | 是否异常 | 人工改判 | 备注 |")
-    lines.append("|--------|------|----------|----------|----------|------|")
+    lines.append("| 题目ID | 标题 | 自动判定 | 最终状态 | 是否异常 | 异常类型 | 人工改判 | 改判说明 | 参数版本 | 备注 |")
+    lines.append("|--------|------|----------|----------|----------|----------|----------|----------|----------|------|")
     for r in results:
         p = r.problem
+        auto = r.processing_status
+        final = final_status(r)
         is_anomaly = '是' if r.is_anomaly else '否'
+        anomaly_t = r.anomaly_type or '-'
         is_manual = r.judgment_result if r.is_manual_judgment else '否'
-        remark = []
-        if r.is_anomaly:
-            remark.append(f"异常: {r.anomaly_type}")
-        if r.diff_detail and r.processing_status == 'failed':
-            remark.append(f"差异: {r.diff_detail[:50]}...")
+        manual_reason = (r.judgment_reason or '').replace('\n', ' ').replace('|', '/') if r.is_manual_judgment else '-'
+        remarks = []
+        if r.diff_detail and r.processing_status == 'failed' and not r.is_manual_judgment:
+            remarks.append(f"差异: {r.diff_detail[:50]}")
         if r.anomaly_explanation:
-            remark.append(f"说明: {r.anomaly_explanation[:30]}")
-        lines.append(f"| {p.problem_id} | {p.title} | {r.processing_status} | {is_anomaly} | {is_manual} | {'; '.join(remark)} |")
+            remarks.append(f"原因: {r.anomaly_explanation[:30]}")
+        remark_str = '; '.join(remarks) if remarks else '-'
+        lines.append(f"| {p.problem_id} | {p.title} | {auto} | **{final}** | {is_anomaly} | {anomaly_t} | {is_manual} | {manual_reason} | `{task.params_version}` | {remark_str} |")
     lines.append("")
 
-    lines.append("## 验算参数")
+    lines.append("---")
+    lines.append("")
+
+    lines.append("## 六、每道题完整记录")
+    lines.append("")
+    for idx, r in enumerate(results, 1):
+        p = r.problem
+        lines.append(f"### 6.{idx} {p.problem_id} - {p.title}")
+        lines.append("")
+        lines.append(f"- **题目ID**: `{p.problem_id}`")
+        desc_text = p.description if p.description else "(无)"
+        lines.append(f"- **题目描述**: {desc_text}")
+        lines.append(f"- **核心参数版本**: `{task.params_version}`")
+        lines.append(f"- **自动判定处理状态**: `{r.processing_status}`")
+        lines.append(f"- **最终处理状态**: `{final_status(r)}` {'(人工改判)' if r.is_manual_judgment else '(算法判定)'}")
+        lines.append(f"- **是否异常**: {'是' if r.is_anomaly else '否'}")
+        if r.is_anomaly:
+            lines.append(f"  - **异常类型**: `{r.anomaly_type}`")
+            lines.append(f"  - **异常解释**: {r.anomaly_explanation or '无'}")
+        if r.is_manual_judgment:
+            no_desc2 = "(无说明)"
+            reason_text2 = r.judgment_reason if r.judgment_reason else no_desc2
+            lines.append(f"- **人工改判**:")
+            lines.append(f"  - **改判结果**: `{r.judgment_result}`")
+            lines.append(f"  - **改判说明**: {reason_text2}")
+            lines.append(f"  - **改判人**: {r.judgment_by or '未知'}")
+            lines.append(f"  - **改判时间**: {r.judgment_at.strftime('%Y-%m-%d %H:%M:%S') if r.judgment_at else '未知'}")
+        if r.diff_detail:
+            lines.append(f"- **差异详情**:")
+            lines.append("")
+            lines.append("```")
+            lines.append(r.diff_detail)
+            lines.append("```")
+            lines.append("")
+        lines.append("")
+
+    lines.append("---")
+    lines.append("")
+
+    lines.append("## 七、题目历史材料（备注、截图、版本记录 - 保留不丢失）")
+    lines.append("")
+    has_history = False
+    for r in results:
+        p = r.problem
+        versions = sorted(p.versions, key=lambda v: v.version, reverse=True)
+        problem_anomalies = p.anomalies
+        if versions or problem_anomalies:
+            has_history = True
+            lines.append(f"### {p.problem_id} - {p.title}")
+            lines.append("")
+
+            if versions:
+                lines.append("**版本历史**:")
+                lines.append("")
+                lines.append("| 版本 | 备注 | 修改人 | 修改时间 | 变更记录 | 截图 |")
+                lines.append("|------|------|--------|----------|----------|------|")
+                for v in versions:
+                    screenshot_link = f"[查看截图]({v.screenshot_path})" if v.screenshot_path else '-'
+                    remark = (v.remark or '').replace('\n', ' ').replace('|', '/')
+                    change_log = (v.change_log or '').replace('\n', ' ').replace('|', '/')
+                    lines.append(f"| v{v.version} | {remark} | {v.modified_by or '-'} | {v.created_at.strftime('%Y-%m-%d %H:%M') if v.created_at else '-'} | {change_log} | {screenshot_link} |")
+                lines.append("")
+
+            if problem_anomalies:
+                lines.append("**异常历史**:")
+                lines.append("")
+                for a in problem_anomalies:
+                    status_str = f"✅ 已解决 - {a.resolution}" if a.is_resolved else "⚠️ 未解决"
+                    lines.append(f"- [{a.anomaly_type}：{a.description}（检测于{a.detected_at.strftime('%Y-%m-%d')}） - {status_str}")
+                lines.append("")
+
+    if not has_history:
+        lines.append("（无历史材料）")
+        lines.append("")
+
+    lines.append("---")
+    lines.append("")
+
+    lines.append("## 八、验算参数")
+    lines.append("")
+    lines.append(f"**参数版本号**: `{task.params_version}`")
     lines.append("")
     try:
         params = json.loads(task.parameters) if task.parameters else {}
-        for k, v in params.items():
-            lines.append(f"- {k}: {v}")
+        if params:
+            for k, v in params.items():
+                lines.append(f"- **{k}**: {v}")
+        else:
+            lines.append("- 无额外自定义参数")
     except:
         lines.append(f"- 原始参数: {task.parameters}")
     lines.append("")
+    lines.append(f"- 矩阵分解算法: numpy.linalg.eig（特征值分解 + numpy.linalg.svd（奇异值分解）")
+    lines.append(f"- 特征值容差: 1e-6")
+    lines.append("")
+    lines.append("---")
+    lines.append(f"*报告生成时间: {now_str}，基于数据库最新记录生成*")
 
     content = '\n'.join(lines)
 
