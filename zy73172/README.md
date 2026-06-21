@@ -1,57 +1,176 @@
-# React + TypeScript + Vite
+# 图论路径错题归因 · 教研编辑工作台
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> 给接手同事的使用说明。所有数据自动保存到浏览器本地存储（localStorage），刷新或重新打开浏览器不丢失。
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 快速启动
 
-## Expanding the ESLint configuration
+```bash
+# 安装依赖（首次）
+pnpm install
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+# 启动开发服务器
+pnpm run dev
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+# 访问 http://localhost:5173/
+
+# 生产构建
+pnpm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 📦 预置演示数据（4 条，覆盖全部场景）
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+重置后默认状态（点击顶栏「重置演示」可恢复）：
+
+| 记录 ID | 学生 | 题目 | 初始状态 | 说明 |
+|---------|------|------|----------|------|
+| r001 | 林小雅 (s001) | Dijkstra 算法应用 | ✅ **已处理** | 顺利归因的正常样本 |
+| r002 | 王浩然 (s002) | Prim/Kruskal 辨析 | 📝 **待补材料** | 缺材料待补录（非撤回） |
+| r003 | 陈思琪 (s003) | 带负权边的最短路径 | 📝 **待补材料** | 撤回后补录，**复算后正常归入已处理** |
+| r004 | 林小雅 (s001) | Dijkstra 算法应用 | 📝 **待补材料** | 撤回后补录，**与 r001 学生+题目重复，复算后进入人工改判** |
+
+---
+
+## 🧭 界面分区
+
+页面从上到下分为三个区域：
+
+### 1. 顶栏
+- **口径校验徽章**：绿色=图表与明细口径一致，橙色=不一致
+- **复算时间**：最近一次撤回复算的时间戳
+- **导入样本**：打开粘贴面板，支持历史答案/撤回记录/补充说明三类
+- **重置演示**：恢复到初始 4 条演示数据
+
+### 2. 知识路径图（中间）
+- 5 个知识节点：图论基础 → 最短路径 / 拓扑排序 / 最小生成树 → 网络流
+- 节点大小 = 该知识点错题数量，颜色 = 归因类型
+- **点击节点**：下方台账自动筛选该节点的记录
+- 节点上的数字 = 已处理且非重复的错题数
+
+### 3. 三栏台账（下方）
+| 栏位 | 位置 | 说明 |
+|------|------|------|
+| ✅ **已处理记录** | 左栏 | 正常归因完成的记录 |
+| 📝 **待补材料** | 中栏 | 缺材料、撤回后待复算的记录 |
+| 👤 **人工改判** | 右栏 | 重复样本、口径冲突等需人工确认的记录 |
+
+每栏卡片右上角的眼睛图标：点击展开**明细抽屉**。
+
+---
+
+## 🔄 完整复核流程（验收步骤）
+
+### 场景 1：正常撤回复算（r003 陈思琪）
+
+1. 在**待补材料**中找到「带负权边的最短路径求解」（陈思琪）
+2. 点击卡片，打开明细抽屉
+3. 确认右侧有**「撤回复算」按钮**（橙色）
+4. 点击「撤回复算」→ 记录从**待补材料**移入**已处理记录**
+5. 观察路径图：「最短路径」节点数字从 **1** 变成 **2**
+6. 顶栏显示「复算 HH:MM:SS」+「口径校验通过」
+
+### 场景 2：重复撤回复算（r004 林小雅）
+
+1. 在**待补材料**中找到「有向图中最短路径的 Dijkstra 算法应用」（林小雅）
+2. 点击卡片，打开明细抽屉
+3. 确认有**「撤回复算」按钮**
+4. 点击「撤回复算」→ **不会静默通过**！
+5. 记录自动归入**人工改判**（右栏）
+6. 卡片变为**赭石色底色** + 「重复样本」标签 **+ 脉冲动效**
+7. 卡片下方展开**异常原因**：
+   > 学生 s001（林小雅）+ 题目 q101 组合已有记录（r001），疑似样本重复，需人工确认是否纳入统计
+8. 路径图数字**不变**（因为重复样本不计入统计）
+9. 明细抽屉右侧**异常说明区块**显示完整原因
+
+### 场景 3：粘贴重复撤回样本复算（验收重点）
+
+1. 点击顶栏「导入样本」
+2. 样本类型选择「撤回记录」
+3. 点击「加载示例」或手动粘贴以下内容：
+   ```
+   学生姓名：林小雅
+   学生ID：s001
+   题目：有向图中最短路径的 Dijkstra 算法应用
+   学生答案：使用 Floyd 算法，时间复杂度 O(n³)
+   正确答案：使用 Dijkstra 算法，时间复杂度 O((n+m)logn)
+   知识点：n2
+   归因类型：concept
+   归因标签：算法选型错误
+   备注：从历史答案库撤回补录
+   状态：withdrawn
+   ```
+4. 点击「导入」→ 新记录出现在**待补材料**中
+5. 点击该记录打开明细，点击「撤回复算」
+6. 验证：**必须进入人工改判**，且异常原因中能看到具体命中的已有记录 ID
+
+---
+
+## 📋 可粘贴的样本模板
+
+### 历史答案（直接归入已处理）
 ```
+学生姓名：周子轩
+学生ID：s005
+题目：图的遍历-BFS与DFS
+学生答案：BFS用栈，DFS用队列
+正确答案：BFS用队列，DFS用栈
+知识点：n1
+归因类型：concept
+归因标签：概念误解
+```
+
+### 撤回记录（归入待补，需手动复算）
+```
+学生姓名：林小雅
+学生ID：s001
+题目：有向图中最短路径的 Dijkstra 算法应用
+学生答案：使用 Floyd 算法
+正确答案：使用 Dijkstra 算法
+知识点：n2
+归因类型：concept
+归因标签：算法选型错误
+备注：从历史答案库撤回补录
+状态：withdrawn
+```
+
+### 补充说明（归入待补）
+```
+学生姓名：吴天琪
+学生ID：s006
+题目：网络流最大流问题
+学生答案：用 Dinic 算法
+正确答案：Ford-Fulkerson / Edmonds-Karp / Dinic 均可
+知识点：n5
+归因类型：thinking
+归因标签：思路正确但细节不全
+备注：补充了 Edmonds-Karp 的时间复杂度说明
+```
+
+也支持粘贴 JSON 格式。
+
+---
+
+## 📏 口径说明（避免图表与明细不一致）
+
+**路径图节点数字 = 已处理记录中 isDuplicate = false 的数量**
+
+- 待补材料（pending）不计入
+- 人工改判（manual）不计入
+- 已处理但标记为重复的不计入
+
+这样确保：撤回复算（待补 → 已处理）后节点数字增加，重复样本（待补 → 人工改判）后节点数字不变，口径清晰。
+
+---
+
+## 📁 关键代码位置
+
+- 状态管理 + 持久化：[useAppStore.ts](src/store/useAppStore.ts)
+- 去重检测 + 节点计数：[records.ts](src/utils/records.ts)
+- 路径图组件：[PathGraph/index.tsx](src/components/PathGraph/index.tsx)
+- 三栏台账：[RecordLedger/index.tsx](src/components/RecordLedger/index.tsx)
+- 明细抽屉：[DetailDrawer/index.tsx](src/components/DetailDrawer/index.tsx)
+- 导入面板：[TopBar/index.tsx](src/components/TopBar/index.tsx)
+- 种子数据：[seedData.ts](src/data/seedData.ts)

@@ -10,12 +10,15 @@ import {
   moveRecord,
 } from '@/utils/records';
 
+type ImportType = 'answer' | 'withdrawn' | 'supplement';
+
 interface AppStore extends AppState {
   selectNode: (nodeId: string | null) => void;
   selectRecord: (recordId: string | null) => void;
   moveRecordTo: (recordId: string, target: 'processed' | 'pending' | 'manual') => void;
   recalcWithdrawn: (recordId: string) => { success: boolean; message: string };
   importWithdrawnRecord: (record: ErrorRecord) => { success: boolean; message: string };
+  importRawRecord: (record: ErrorRecord, importType: ImportType) => { success: boolean; message: string };
   resetToSeed: () => void;
   updateRecordNote: (recordId: string, note: string) => void;
 }
@@ -68,19 +71,26 @@ export const useAppStore = create<AppStore>()(
 
         const dup = checkDuplicate(record, all, recordId);
         const targetStatus = dup.isDuplicate ? 'manual' : 'processed';
+
+        let reason = dup.reason;
+        if (dup.isDuplicate && !reason) {
+          const existing = all.find(
+            (r) => r.id !== recordId && r.studentId === record.studentId && r.questionId === record.questionId
+          );
+          reason = `学生 ${record.studentId}（${record.studentName}）+ 题目 ${record.questionId} 组合已有记录${existing ? `（${existing.id}）` : ''}，疑似样本重复，需人工确认是否纳入统计`;
+        }
+
         const updatedRecord: ErrorRecord = {
           ...record,
           status: targetStatus,
           isWithdrawn: false,
           isDuplicate: dup.isDuplicate,
-          duplicateReason: dup.reason,
+          duplicateReason: reason || '',
           updatedAt: new Date().toISOString(),
         };
 
         const newRecords = moveRecord(get().records, recordId, targetStatus);
 
-        const allNew = getAllRecords(newRecords);
-        const idx = allNew.findIndex((r) => r.id === recordId);
         const targetList = newRecords[targetStatus];
         const targetIdx = targetList.findIndex((r) => r.id === recordId);
         if (targetIdx >= 0) {
@@ -100,26 +110,32 @@ export const useAppStore = create<AppStore>()(
         if (dup.isDuplicate) {
           return {
             success: true,
-            message: `复算完成：检测到重复样本，已归入「人工改判」，原因：${dup.reason}`,
+            message: `复算完成：检测到重复样本，已归入「人工改判」，原因：${reason}`,
           };
         }
         return { success: true, message: '复算完成：记录已正常归入「已处理」，图表与明细口径校验通过' };
       },
 
       importWithdrawnRecord: (record) => {
-        const all = getAllRecords(get().records);
-        const dup = checkDuplicate(record, all);
+        return get().importRawRecord(record, 'withdrawn');
+      },
+
+      importRawRecord: (record, importType) => {
+        const targetBucket = importType === 'answer' ? 'processed' : 'pending';
+        const isWithdrawn = importType === 'withdrawn';
+
         const newRecord: ErrorRecord = {
           ...record,
-          isWithdrawn: true,
-          isDuplicate: dup.isDuplicate,
-          duplicateReason: dup.reason,
+          status: targetBucket,
+          isWithdrawn,
+          isDuplicate: false,
+          duplicateReason: '',
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
 
         const records = { ...get().records };
-        records.pending = [...records.pending, newRecord];
+        records[targetBucket] = [...records[targetBucket], newRecord];
 
         const nodes = calcNodeErrorCounts(get().graph.nodes, records);
         const passed = verifyCaliber(nodes, records);
@@ -130,7 +146,11 @@ export const useAppStore = create<AppStore>()(
           caliberCheckPassed: passed,
         });
 
-        return { success: true, message: '撤回记录已导入，置于「待补材料」桶，可点击「复算」处理' };
+        const bucketName = targetBucket === 'processed' ? '已处理' : '待补材料';
+        return {
+          success: true,
+          message: `已导入${importType === 'answer' ? '历史答案' : importType === 'withdrawn' ? '撤回记录' : '补充说明'}，置于「${bucketName}」${isWithdrawn ? '，可点击「撤回复算」处理' : ''}`,
+        };
       },
 
       resetToSeed: () => {

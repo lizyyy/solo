@@ -1,5 +1,16 @@
 import type { ErrorRecord, KnowledgeNode, RecordState } from '@/types';
 
+function titleSimilar(a: string, b: string): boolean {
+  const normalize = (s: string) => s.replace(/\s+/g, '').replace(/[（）()《》【】\[\]]/g, '').toLowerCase();
+  const normA = normalize(a);
+  const normB = normalize(b);
+  if (normA === normB) return true;
+  if (normA.includes(normB) || normB.includes(normA)) return true;
+  let common = 0;
+  for (const c of normA) if (normB.includes(c)) common++;
+  return common / Math.max(normA.length, normB.length) > 0.7;
+}
+
 export function checkDuplicate(
   record: ErrorRecord,
   allRecords: ErrorRecord[],
@@ -9,13 +20,14 @@ export function checkDuplicate(
     (r) =>
       r.id !== excludeId &&
       r.studentId === record.studentId &&
-      r.questionId === record.questionId &&
-      !r.isWithdrawn
+      !r.isWithdrawn &&
+      (r.questionId === record.questionId || titleSimilar(r.questionTitle, record.questionTitle))
   );
   if (matched) {
+    const matchType = matched.questionId === record.questionId ? '学生+题目ID' : '学生+题目标题高度相似';
     return {
       isDuplicate: true,
-      reason: `学生 ${record.studentName} 的「${record.questionTitle.slice(0, 15)}...」已有记录（${matched.id}），样本重复`,
+      reason: `学生 ${record.studentId}（${record.studentName}）+ 题目${matched.questionId === record.questionId ? ` ${record.questionId}` : ''}「${record.questionTitle.slice(0, 15)}...」已有记录（${matched.id}），${matchType}匹配命中，疑似样本重复，需人工确认是否纳入统计`,
       matchedId: matched.id,
     };
   }
