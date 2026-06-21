@@ -97,49 +97,81 @@ export const useAnomalyStore = create<AnomalyStore>()(
         let boundary = 0
         const newAnomalies: AnomalyRecord[] = []
         const newRemarks: Remark[] = []
+        const existingAnomalyUpdates = new Map<string, Partial<AnomalyRecord>>()
 
         for (const rec of toAdd) {
           if (rec.isBoundarySample) boundary++
           const coordCheck = detectCoordReversal(rec.recordLat, rec.recordLng)
+          const linkedId = rec.linkedAnomalyId
+          const existing = state.anomalies.find((a) => a.id === linkedId)
+
           if (coordCheck.reversed) {
             suspended++
+
             newRemarks.push({
               id: uuid(),
-              recordId: rec.linkedAnomalyId,
+              recordId: linkedId,
               author: '系统',
               content: `系统检测：船上记录经纬度疑似反写 - ${coordCheck.reason}`,
               createdAt: new Date().toISOString(),
             })
+
+            if (existing) {
+              existingAnomalyUpdates.set(linkedId, {
+                status: 'SUSPENDED',
+                updatedAt: new Date().toISOString(),
+              })
+            } else {
+              const matchRec = toAdd.find((r) => r.linkedAnomalyId === linkedId)
+              newAnomalies.push({
+                id: linkedId,
+                buoyId: matchRec?.buoyId || 'UNKNOWN',
+                sensorTimestamp: matchRec?.recordTimestamp || new Date().toISOString(),
+                sensorLat: 0,
+                sensorLng: 0,
+                waterTemp: 0,
+                salinity: 0,
+                dissolvedOxygen: 0,
+                phValue: 0,
+                anomalyType: 'MULTI_ANOMALY',
+                status: 'SUSPENDED',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              })
+            }
+          } else {
+            if (!existing && !newAnomalies.some((a) => a.id === linkedId)) {
+              const matchRec = toAdd.find((r) => r.linkedAnomalyId === linkedId)
+              newAnomalies.push({
+                id: linkedId,
+                buoyId: matchRec?.buoyId || 'UNKNOWN',
+                sensorTimestamp: matchRec?.recordTimestamp || new Date().toISOString(),
+                sensorLat: 0,
+                sensorLng: 0,
+                waterTemp: 0,
+                salinity: 0,
+                dissolvedOxygen: 0,
+                phValue: 0,
+                anomalyType: 'MULTI_ANOMALY',
+                status: 'UNCONFIRMED',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              })
+            }
           }
         }
 
-        const anomalyIdsToAdd = toAdd.map((r) => r.linkedAnomalyId)
-        for (const aId of anomalyIdsToAdd) {
-          const existing = state.anomalies.find((a) => a.id === aId)
-          if (!existing) {
-            newAnomalies.push({
-              id: aId,
-              buoyId: toAdd.find((r) => r.linkedAnomalyId === aId)?.buoyId || 'UNKNOWN',
-              sensorTimestamp: toAdd.find((r) => r.linkedAnomalyId === aId)?.recordTimestamp || new Date().toISOString(),
-              sensorLat: 0,
-              sensorLng: 0,
-              waterTemp: 0,
-              salinity: 0,
-              dissolvedOxygen: 0,
-              phValue: 0,
-              anomalyType: 'MULTI_ANOMALY',
-              status: suspended > 0 ? 'SUSPENDED' : 'UNCONFIRMED',
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            })
+        set((s) => {
+          const updatedAnomalies = s.anomalies.map((a) => {
+            const update = existingAnomalyUpdates.get(a.id)
+            return update ? { ...a, ...update } : a
+          })
+          return {
+            shipRecords: [...s.shipRecords, ...toAdd],
+            anomalies: [...updatedAnomalies, ...newAnomalies],
+            remarks: [...s.remarks, ...newRemarks],
           }
-        }
-
-        set((s) => ({
-          shipRecords: [...s.shipRecords, ...toAdd],
-          anomalies: [...s.anomalies, ...newAnomalies],
-          remarks: [...s.remarks, ...newRemarks],
-        }))
+        })
 
         return { added: toAdd.length, skipped: skipped.length, boundary, suspended }
       },
