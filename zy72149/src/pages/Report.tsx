@@ -1,6 +1,7 @@
 import { Download, FileText, CheckCircle, Clock, AlertTriangle, Music2 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { exportToExcel, downloadReport, generateReportContent } from '../utils/export';
+import { countDuplicateGroups } from '../utils/detection';
 import TagBadge from '../components/common/TagBadge';
 
 const Report = () => {
@@ -17,9 +18,7 @@ const Report = () => {
   const timecodeMismatch = materials.filter((m) =>
     m.exceptions.some((e) => e.type === 'timecode_mismatch' && !e.resolved)
   ).length;
-  const duplicateTrack = materials.filter((m) =>
-    m.exceptions.some((e) => e.type === 'duplicate_track' && !e.resolved)
-  ).length / 2;
+  const duplicateTrack = countDuplicateGroups(materials);
 
   const emotionStats: Record<string, number> = {};
   materials.forEach((m) => {
@@ -75,7 +74,7 @@ const Report = () => {
   const exceptionStats = [
     { label: '授权过期', value: authExpired, color: 'text-red-600', bgColor: 'bg-red-100' },
     { label: '时码错位', value: timecodeMismatch, color: 'text-amber-600', bgColor: 'bg-amber-100' },
-    { label: '重复曲目', value: Math.ceil(duplicateTrack), color: 'text-violet-600', bgColor: 'bg-violet-100' },
+    { label: '重复曲目', value: duplicateTrack, color: 'text-violet-600', bgColor: 'bg-violet-100' },
   ];
 
   return (

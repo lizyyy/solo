@@ -52,7 +52,24 @@ const normalizeDateValue = (val: string): string => {
 const guessSourceByFileName = (name: string): SourceType => {
   const ext = name.split('.').pop()?.toLowerCase() || '';
   if (['wav', 'mp3', 'aiff', 'flac', 'ogg', 'aac', 'm4a', 'wma'].includes(ext)) return '音频文件';
+  if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'heic'].includes(ext)) return '合同截图';
   return '曲目表';
+};
+
+const isImageFile = (file: File): boolean => {
+  if (file.type && file.type.startsWith('image/')) return true;
+  const ext = file.name.split('.').pop()?.toLowerCase() || '';
+  return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'heic'].includes(ext);
+};
+
+const isSpreadsheetFile = (file: File): boolean => {
+  const ext = file.name.split('.').pop()?.toLowerCase() || '';
+  return ['xlsx', 'xls', 'csv'].includes(ext);
+};
+
+const isTextFile = (file: File): boolean => {
+  const ext = file.name.split('.').pop()?.toLowerCase() || '';
+  return ['txt', 'text', 'lst', 'md'].includes(ext);
 };
 
 export const parseExcelOrCsv = (file: File): Promise<ParsedRow[]> => {
@@ -167,7 +184,7 @@ export const parseFile = (file: File): Promise<ParsedRow[]> => {
   const ext = file.name.split('.').pop()?.toLowerCase() || '';
   const excelExts = ['xlsx', 'xls'];
   const csvExts = ['csv'];
-  const textExts = ['txt', 'text', 'lst'];
+  const textExts = ['txt', 'text', 'lst', 'md'];
 
   if (excelExts.includes(ext) || csvExts.includes(ext)) {
     return parseExcelOrCsv(file);
@@ -177,13 +194,69 @@ export const parseFile = (file: File): Promise<ParsedRow[]> => {
     return parseTextFileList(file);
   }
 
+  if (isImageFile(file)) {
+    return parseImageFile(file);
+  }
+
   return parseTextFileList(file);
 };
 
+export const parseImageFile = (file: File): Promise<ParsedRow[]> => {
+  return new Promise((resolve) => {
+    const trackName = file.name.replace(/\.[^.]+$/, '') || '未命名截图';
+    resolve([{
+      fileName: file.name,
+      trackName,
+      emotionTag: '',
+      source: '合同截图',
+      remark: '图片附件：请人工复核截图内容',
+      originalSource: `合同截图导入：${file.name}（截图解析仅保留附件记录，异常与标签需人工核对）`,
+    }]);
+  });
+};
+
+export interface ParsedFileResult {
+  file: File;
+  rows: ParsedRow[];
+  error?: string;
+}
+
+export const parseFiles = async (files: FileList | File[]): Promise<ParsedFileResult[]> => {
+  const fileArray = Array.from(files);
+  const results: ParsedFileResult[] = [];
+
+  for (const file of fileArray) {
+    try {
+      if (isSpreadsheetFile(file) || isTextFile(file)) {
+        const rows = await parseFile(file);
+        results.push({ file, rows });
+      } else if (isImageFile(file)) {
+        const rows = await parseImageFile(file);
+        results.push({ file, rows });
+      } else {
+        results.push({
+          file,
+          rows: [],
+          error: `不支持的文件类型 "${file.name.split('.').pop() || ''}"，当前支持 CSV/Excel/TXT/图片`,
+        });
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '未知错误';
+      results.push({ file, rows: [], error: msg });
+    }
+  }
+
+  return results;
+};
+
+export const flattenParsedResults = (results: ParsedFileResult[]): ParsedRow[] => {
+  return results.flatMap((r) => r.rows);
+};
+
 export const getAcceptedExtensions = (): string => {
-  return '.csv,.xlsx,.xls,.txt,.text,.lst';
+  return '.csv,.xlsx,.xls,.txt,.text,.lst,.md,.png,.jpg,.jpeg,.gif,.webp,.bmp,.heic';
 };
 
 export const getAcceptedMimeTypes = (): string => {
-  return '.csv,.xlsx,.xls,.txt,.text,.lst';
+  return '.csv,.xlsx,.xls,.txt,.text,.lst,.md,image/*';
 };

@@ -81,6 +81,11 @@ export const detectDuplicateTracks = (materials: AudioMaterial[]): Map<string, s
   return duplicates;
 };
 
+export const countDuplicateGroups = (materials: AudioMaterial[]): number => {
+  const duplicates = detectDuplicateTracks(materials);
+  return duplicates.size;
+};
+
 export const detectAllExceptions = (materials: AudioMaterial[]): AudioMaterial[] => {
   const duplicates = detectDuplicateTracks(materials);
   const duplicateIds = new Set<string>();

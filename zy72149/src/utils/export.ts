@@ -1,6 +1,7 @@
 import * as XLSX from 'xlsx';
 import type { AudioMaterial, ExceptionType, MaterialStatus } from '../types';
 import { EXCEPTION_TYPES, STATUS_LABELS } from '../types';
+import { countDuplicateGroups } from './detection';
 
 const getExceptionLabels = (exceptions: { type: ExceptionType }[]): string => {
   return exceptions.map((e) => {
@@ -74,9 +75,7 @@ export const generateReportContent = (materials: AudioMaterial[]): string => {
   const timecodeMismatch = materials.filter((m) =>
     m.exceptions.some((e) => e.type === 'timecode_mismatch' && !e.resolved)
   ).length;
-  const duplicateTrack = materials.filter((m) =>
-    m.exceptions.some((e) => e.type === 'duplicate_track' && !e.resolved)
-  ).length;
+  const duplicateTrack = countDuplicateGroups(materials);
 
   const emotionStats: Record<string, number> = {};
   materials.forEach((m) => {

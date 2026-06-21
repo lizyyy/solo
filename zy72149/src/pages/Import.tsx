@@ -1,20 +1,20 @@
 import { useState, useRef, useCallback } from 'react';
-import { Upload, FileText, FileAudio, Image, MessageSquare, Plus, Check, X, FileUp, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Upload, FileText, FileAudio, Image, MessageSquare, Plus, Check, X, FileUp, AlertCircle, CheckCircle2, Info } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { SOURCE_TYPES, EMOTION_TAGS } from '../types';
 import type { SourceType, EmotionTag } from '../types';
-import { parseFile, getAcceptedExtensions, type ParsedRow } from '../utils/fileParser';
+import { parseFiles, flattenParsedResults, getAcceptedExtensions, type ParsedRow, type ParsedFileResult } from '../utils/fileParser';
 
 const Import = () => {
   const { addMaterial, addMaterials, addToast } = useStore();
   const [activeTab, setActiveTab] = useState<'upload' | 'manual'>('upload');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [parseError, setParseError] = useState<string | null>(null);
+  const [parseErrors, setParseErrors] = useState<{ fileName: string; message: string }[]>([]);
   const [parsedRows, setParsedRows] = useState<ParsedRow[]>([]);
-  const [parsedFileName, setParsedFileName] = useState('');
+  const [parsedFileSummary, setParsedFileSummary] = useState<{ fileName: string; count: number; source: SourceType }[]>([]);
   const [isParsing, setIsParsing] = useState(false);
-  const [importSource, setImportSource] = useState<SourceType>('曲目表');
+  const [importSource, setImportSource] = useState<SourceType | 'auto'>('auto');
 
   const [formData, setFormData] = useState({
     fileName: '',
@@ -27,24 +27,47 @@ const Import = () => {
     timecode: '',
   });
 
-  const handleFileParse = useCallback(async (file: File) => {
+  const handleFilesParse = useCallback(async (files: FileList | File[]) => {
     setIsParsing(true);
-    setParseError(null);
+    setParseErrors([]);
     setParsedRows([]);
-    setParsedFileName(file.name);
+    setParsedFileSummary([]);
 
     try {
-      const rows = await parseFile(file);
-      if (rows.length === 0) {
-        setParseError(`文件 "${file.name}" 中没有找到可识别的数据行`);
+      const results: ParsedFileResult[] = await parseFiles(files);
+      const allRows = flattenParsedResults(results);
+
+      const errors: { fileName: string; message: string }[] = [];
+      const summary: { fileName: string; count: number; source: SourceType }[] = [];
+
+      results.forEach((r) => {
+        if (r.error) {
+          errors.push({ fileName: r.file.name, message: r.error });
+        } else if (r.rows.length === 0) {
+          errors.push({ fileName: r.file.name, message: '没有找到可识别的数据行' });
+        } else {
+          const firstSource = r.rows[0]?.source || '曲目表';
+          summary.push({ fileName: r.file.name, count: r.rows.length, source: firstSource });
+        }
+      });
+
+      setParseErrors(errors);
+      setParsedFileSummary(summary);
+      setParsedRows(allRows);
+
+      if (allRows.length === 0 && errors.length === 0) {
         addToast('warning', '文件中没有可识别的数据');
-      } else {
-        setParsedRows(rows);
-        addToast('info', `已解析 ${rows.length} 条记录，请确认后导入`);
+      } else if (allRows.length > 0) {
+        const sourceBreakdown = summary.map((s) => `${s.fileName}（${s.count}条，${s.source}）`).join('、');
+        addToast('info', `已解析 ${allRows.length} 条记录：${sourceBreakdown}，请确认后导入`);
+      }
+
+      if (errors.length > 0) {
+        addToast('warning', `${errors.length} 个文件解析失败，详见下方说明`);
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : '未知错误';
-      setParseError(msg);
+      setParseErrors([{ fileName: '批量解析', message: msg }]);
       addToast('error', `解析失败：${msg}`);
     } finally {
       setIsParsing(false);
@@ -52,18 +75,18 @@ const Import = () => {
   }, [addToast]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    handleFileParse(file);
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    handleFilesParse(files);
     e.target.value = '';
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (!file) return;
-    handleFileParse(file);
+    const files = e.dataTransfer.files;
+    if (!files || files.length === 0) return;
+    handleFilesParse(files);
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -78,13 +101,12 @@ const Import = () => {
   const handleBatchImport = () => {
     if (parsedRows.length === 0) return;
 
-    const sourceOverride = importSource;
     const materialsToImport = parsedRows.map((row) => ({
       fileName: row.fileName,
       trackName: row.trackName,
       emotionTag: row.emotionTag,
       remark: row.remark,
-      source: sourceOverride === '音频文件' && row.source === '音频文件' ? '音频文件' as SourceType : sourceOverride,
+      source: importSource === 'auto' ? row.source : importSource,
       processedBy: '小温',
       status: 'pending' as const,
       exceptions: [],
@@ -94,16 +116,21 @@ const Import = () => {
     }));
 
     addMaterials(materialsToImport);
-    addToast('success', `成功导入 ${materialsToImport.length} 条素材，异常检测已自动运行`);
+    const bySource: Record<string, number> = {};
+    materialsToImport.forEach((m) => {
+      bySource[m.source] = (bySource[m.source] || 0) + 1;
+    });
+    const sourceMsg = Object.entries(bySource).map(([k, v]) => `${k} ${v} 条`).join('，');
+    addToast('success', `成功导入 ${materialsToImport.length} 条素材（${sourceMsg}），异常检测已自动运行`);
     setParsedRows([]);
-    setParsedFileName('');
-    setParseError(null);
+    setParsedFileSummary([]);
+    setParseErrors([]);
   };
 
   const clearParsed = () => {
     setParsedRows([]);
-    setParsedFileName('');
-    setParseError(null);
+    setParsedFileSummary([]);
+    setParseErrors([]);
   };
 
   const handleManualSubmit = () => {
@@ -203,35 +230,45 @@ const Import = () => {
                 </div>
                 <h3 className="text-lg font-medium text-slate-700 mb-2">拖拽文件到这里上传</h3>
                 <p className="text-sm text-slate-500 mb-4">
-                  支持 CSV、Excel（.xlsx/.xls）格式的曲目表，或 TXT 文本文件名清单
+                  支持 CSV、Excel（.xlsx/.xls）格式的曲目表，TXT 文本文件名清单，PNG/JPG 等合同截图
                 </p>
                 <p className="text-xs text-slate-400 mb-4">
                   曲目表列名示例：文件名、曲目名称、情绪标签、授权日期、时码、备注<br/>
-                  文件名清单每行一条，格式：文件名,曲目名称（逗号或Tab分隔）
+                  文件名清单每行一条，格式：文件名,曲目名称（逗号或Tab分隔）<br/>
+                  合同截图：保留附件记录，内容需人工复核；一次可多选或拖拽多个文件
                 </p>
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isParsing}
                   className="px-6 py-2.5 text-sm text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors shadow-sm disabled:opacity-50"
                 >
-                  {isParsing ? '解析中...' : '选择文件'}
+                  {isParsing ? '解析中...' : '选择文件（可多选）'}
                 </button>
                 <input
                   ref={fileInputRef}
                   type="file"
+                  multiple
                   accept={getAcceptedExtensions()}
                   onChange={handleFileSelect}
                   className="hidden"
                 />
               </div>
 
-              {parseError && (
-                <div className="p-4 bg-red-50 rounded-lg border border-red-200 flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
-                  <div>
-                    <p className="text-sm font-medium text-red-700">解析失败</p>
-                    <p className="text-sm text-red-600">{parseError}</p>
+              {parseErrors.length > 0 && (
+                <div className="p-4 bg-red-50 rounded-lg border border-red-200 space-y-2">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium text-red-700">{parseErrors.length} 个文件解析失败</p>
+                    </div>
                   </div>
+                  <ul className="text-sm text-red-600 space-y-1 pl-8">
+                    {parseErrors.map((e, idx) => (
+                      <li key={idx}>
+                        <span className="font-medium">{e.fileName}</span>：{e.message}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
 
@@ -241,7 +278,7 @@ const Import = () => {
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-5 h-5 text-green-500" />
                       <span className="text-sm font-medium text-slate-700">
-                        解析结果：{parsedFileName}（共 {parsedRows.length} 条）
+                        解析结果：共 {parsedRows.length} 条，来自 {parsedFileSummary.length} 个文件
                       </span>
                     </div>
                     <button
@@ -253,9 +290,37 @@ const Import = () => {
                   </div>
 
                   <div className="p-4 space-y-4">
+                    <div className="flex flex-wrap gap-2 text-xs">
+                      {parsedFileSummary.map((s, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200"
+                        >
+                          {sourceIcons[s.source]}
+                          {s.fileName} × {s.count}（{s.source}）
+                        </span>
+                      ))}
+                    </div>
+
                     <div>
-                      <label className="block text-sm text-slate-700 font-medium mb-2">导入为哪种来源？</label>
-                      <div className="grid grid-cols-4 gap-2">
+                      <label className="block text-sm text-slate-700 font-medium mb-2">
+                        导入来源
+                        <span className="text-xs text-slate-400 font-normal ml-2">
+                          默认按文件类型自动判定，仅在需要整批统一标记时覆盖
+                        </span>
+                      </label>
+                      <div className="grid grid-cols-5 gap-2">
+                        <button
+                          onClick={() => setImportSource('auto')}
+                          className={`flex flex-col items-center gap-1 p-3 rounded-lg border transition-all ${
+                            importSource === 'auto'
+                              ? 'border-orange-500 bg-orange-50 text-orange-700'
+                              : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                          }`}
+                        >
+                          <Info className="w-5 h-5" />
+                          <span className="text-xs">自动判定</span>
+                        </button>
                         {SOURCE_TYPES.map((source) => (
                           <button
                             key={source}
@@ -277,6 +342,7 @@ const Import = () => {
                       <table className="w-full text-sm">
                         <thead className="bg-slate-50 sticky top-0">
                           <tr>
+                            <th className="px-3 py-2 text-left text-xs font-medium text-slate-500">来源</th>
                             <th className="px-3 py-2 text-left text-xs font-medium text-slate-500">文件名</th>
                             <th className="px-3 py-2 text-left text-xs font-medium text-slate-500">曲目名称</th>
                             <th className="px-3 py-2 text-left text-xs font-medium text-slate-500">情绪标签</th>
@@ -287,6 +353,9 @@ const Import = () => {
                         <tbody className="divide-y divide-slate-100">
                           {parsedRows.slice(0, 50).map((row, idx) => (
                             <tr key={idx} className="hover:bg-slate-50">
+                              <td className="px-3 py-2 text-xs text-slate-500">
+                                {importSource === 'auto' ? row.source : importSource}
+                              </td>
                               <td className="px-3 py-2 font-mono text-xs">{row.fileName}</td>
                               <td className="px-3 py-2">{row.trackName}</td>
                               <td className="px-3 py-2">{row.emotionTag || <span className="text-slate-400">-</span>}</td>
