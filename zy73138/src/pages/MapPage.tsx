@@ -4,10 +4,8 @@ import MapCanvas from '@/components/map/MapCanvas'
 import MapLegend from '@/components/map/MapLegend'
 import LogbookPanel from '@/components/map/LogbookPanel'
 import FilterBar from '@/components/map/FilterBar'
-import { useWaterQualityStore } from '@/store'
 
 export default function MapPage() {
-  const selectedRecordId = useWaterQualityStore((s) => s.selectedRecordId)
 
   return (
     <div className="flex h-screen flex-col bg-ocean-900">
@@ -43,7 +41,7 @@ export default function MapPage() {
 
         <MapLegend />
 
-        {selectedRecordId && <LogbookPanel />}
+        <LogbookPanel />
       </div>
     </div>
   )
