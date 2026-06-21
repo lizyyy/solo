@@ -4,12 +4,13 @@ const path = require('path');
 const dbPath = path.join(__dirname, '..', 'data', 'db.json');
 
 function loadDB() {
-  if (!fs.existsSync(dbPath)) {
-    return initEmptyDB();
-  }
+  if (!fs.existsSync(dbPath)) return initEmptyDB();
   try {
-    const data = fs.readFileSync(dbPath, 'utf-8');
-    return JSON.parse(data);
+    const raw = fs.readFileSync(dbPath, 'utf-8');
+    if (!raw.trim()) return initEmptyDB();
+    const data = JSON.parse(raw);
+    if (!data._counters) data._counters = {};
+    return data;
   } catch (e) {
     return initEmptyDB();
   }
@@ -17,9 +18,7 @@ function loadDB() {
 
 function saveDB(db) {
   const dir = path.dirname(dbPath);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
 }
 
@@ -42,181 +41,133 @@ function initEmptyDB() {
   };
 }
 
-function nextId(table) {
-  const db = loadDB();
-  db._counters[table] = (db._counters[table] || 0) + 1;
-  saveDB(db);
-  return db._counters[table];
-}
-
 function now() {
   return new Date().toISOString().replace('T', ' ').substring(0, 19);
 }
 
-function createStatement(sql) {
-  const trimmed = sql.trim().toUpperCase();
-  
-  if (trimmed.startsWith('INSERT INTO')) {
-    const tableMatch = sql.match(/INSERT INTO\s+(\w+)/i);
-    const table = tableMatch ? tableMatch[1] : null;
-    const colsMatch = sql.match(/\(([^)]+)\)/);
-    const columns = colsMatch ? colsMatch[1].split(',').map(s => s.trim()) : [];
-    
-    return {
-      run(...args) {
-        const db = loadDB();
-        const row = {};
-        const id = nextId(table);
-        row.id = id;
-        columns.forEach((col, i) => {
-          if (col !== 'id') {
-            row[col] = args[i];
-          }
-        });
-        if (!row.created_at) row.created_at = now();
-        if (!row.updated_at && db[table] && db[table][0] && 'updated_at' in db[table][0]) {
-          row.updated_at = now();
-        }
-        if (!db[table]) db[table] = [];
-        db[table].push(row);
-        saveDB(db);
-        return { lastInsertRowid: id, changes: 1 };
-      }
-    };
+function insertRow(table, fields, values) {
+  const db = loadDB();
+  if (!db[table]) db[table] = [];
+  if (!db._counters) db._counters = {};
+  if (db._counters[table] == null) db._counters[table] = 0;
+  db._counters[table] += 1;
+
+  const row = { id: db._counters[table] };
+  fields.forEach((f, i) => {
+    if (f !== 'id') row[f] = values[i];
+  });
+  if (!row.created_at) row.created_at = now();
+  if (table !== 'sample_audit_logs' && table !== 'self_check_results' && table !== 'export_records') {
+    if (!row.updated_at) row.updated_at = now();
   }
-  
-  if (trimmed.startsWith('SELECT')) {
-    const fromMatch = sql.match(/FROM\s+(\w+)/i);
-    const table = fromMatch ? fromMatch[1] : null;
-    const whereMatch = sql.match(/WHERE\s+([^;]+)/i);
-    
-    function extractWhereClause(whereStr) {
-      const conditions = [];
-      const parts = whereStr.split(/\s+AND\s+/i);
-      parts.forEach(p => {
-        const eq = p.match(/(\w+)\s*=\s*\?/i);
-        if (eq) {
-          conditions.push({ field: eq[1], op: '=' });
-        }
-      });
-      return conditions;
+  db[table].push(row);
+  saveDB(db);
+  return { lastInsertRowid: row.id, changes: 1, row };
+}
+
+function updateRow(table, setFields, setValues, whereField, whereValue) {
+  const db = loadDB();
+  if (!db[table]) return { changes: 0 };
+  let changes = 0;
+  db[table].forEach(row => {
+    if (String(row[whereField]) === String(whereValue)) {
+      setFields.forEach((f, i) => { row[f] = setValues[i]; });
+      if ('updated_at' in row && !setFields.includes('updated_at')) {
+        row.updated_at = now();
+      }
+      changes++;
     }
-    
-    return {
-      get(...args) {
-        const db = loadDB();
-        let rows = db[table] || [];
-        if (whereMatch) {
-          const conditions = extractWhereClause(whereMatch[1]);
-          rows = rows.filter(row => {
-            return conditions.every((c, i) => row[c.field] == args[i]);
-          });
-        }
-        return rows[0] || undefined;
-      },
-      all(...args) {
-        const db = loadDB();
-        let rows = [...(db[table] || [])];
-        if (whereMatch) {
-          const conditions = extractWhereClause(whereMatch[1]);
-          rows = rows.filter(row => {
-            return conditions.every((c, i) => row[c.field] == args[i]);
-          });
-        }
-        return rows;
-      }
-    };
+  });
+  saveDB(db);
+  return { changes };
+}
+
+function selectRows(table, whereField, whereValue, single = false) {
+  const db = loadDB();
+  let rows = db[table] || [];
+  if (whereField != null) {
+    rows = rows.filter(r => String(r[whereField]) === String(whereValue));
   }
-  
-  if (trimmed.startsWith('UPDATE')) {
-    const tableMatch = sql.match(/UPDATE\s+(\w+)/i);
-    const table = tableMatch ? tableMatch[1] : null;
-    const setMatch = sql.match(/SET\s+(.+?)\s+WHERE/i);
-    const whereMatch = sql.match(/WHERE\s+(.+)/i);
-    
-    return {
-      run(...args) {
-        const db = loadDB();
-        const setStr = setMatch ? setMatch[1] : '';
-        const setParts = setStr.split(',').map(s => s.trim());
-        const assignments = [];
-        let argIdx = 0;
-        
-        setParts.forEach(part => {
-          const m = part.match(/(\w+)\s*=\s*\?/i);
-          if (m) {
-            assignments.push({ field: m[1], value: args[argIdx++] });
-          } else {
-            const currM = part.match(/(\w+)\s*=\s*CURRENT_TIMESTAMP/i);
-            if (currM) {
-              assignments.push({ field: currM[1], value: now() });
-            }
-          }
-        });
-        
-        let changes = 0;
-        if (whereMatch) {
-          const whereStr = whereMatch[1];
-          const eq = whereStr.match(/(\w+)\s*=\s*\?/i);
-          if (eq) {
-            const whereField = eq[1];
-            const whereValue = args[argIdx];
-            db[table].forEach(row => {
-              if (row[whereField] == whereValue) {
-                assignments.forEach(a => {
-                  row[a.field] = a.value;
-                });
-                changes++;
-              }
-            });
-          }
-        }
-        
-        saveDB(db);
-        return { changes };
-      }
-    };
+  return single ? rows[0] : rows;
+}
+
+function deleteRows(table, whereField, whereValue) {
+  const db = loadDB();
+  if (!db[table]) return { changes: 0 };
+  const before = db[table].length;
+  if (whereField != null) {
+    db[table] = db[table].filter(r => String(r[whereField]) !== String(whereValue));
+  } else {
+    db[table] = [];
   }
-  
-  if (trimmed.startsWith('DELETE')) {
-    const fromMatch = sql.match(/FROM\s+(\w+)/i);
-    const table = fromMatch ? fromMatch[1] : null;
-    return {
-      run(...args) {
-        const db = loadDB();
-        const whereMatch = sql.match(/WHERE\s+(.+)/i);
-        let changes = 0;
-        if (whereMatch) {
-          const eq = whereMatch[1].match(/(\w+)\s*=\s*\?/i);
-          if (eq) {
-            const before = db[table].length;
-            db[table] = db[table].filter(row => row[eq[1]] != args[0]);
-            changes = before - db[table].length;
-          }
-        }
-        saveDB(db);
-        return { changes };
-      }
-    };
-  }
-  
-  return {
-    run() { return { changes: 0 }; },
-    get() { return undefined; },
-    all() { return []; }
-  };
+  saveDB(db);
+  return { changes: before - db[table].length };
 }
 
 const db = {
   prepare(sql) {
-    return createStatement(sql);
+    const trimmed = sql.trim();
+    if (trimmed.toUpperCase().startsWith('INSERT INTO')) {
+      const m = trimmed.match(/INSERT INTO\s+(\w+)\s*\(([^)]+)\)/i);
+      if (!m) return { run: () => ({ changes: 0, lastInsertRowid: 0 }) };
+      const table = m[1];
+      const fields = m[2].split(',').map(s => s.trim());
+      return {
+        run(...args) { return insertRow(table, fields, args); }
+      };
+    }
+    if (trimmed.toUpperCase().startsWith('SELECT')) {
+      const fm = trimmed.match(/FROM\s+(\w+)/i);
+      const wm = trimmed.match(/WHERE\s+(\w+)\s*=\s*\?/i);
+      const table = fm ? fm[1] : null;
+      const whereField = wm ? wm[1] : null;
+      return {
+        get(...args) { return selectRows(table, whereField, args[0], true); },
+        all(...args) { return selectRows(table, whereField, args[0], false); }
+      };
+    }
+    if (trimmed.toUpperCase().startsWith('UPDATE')) {
+      const tm = trimmed.match(/UPDATE\s+(\w+)/i);
+      const sm = trimmed.match(/SET\s+(.+?)(?:\s+WHERE|$)/i);
+      const wm = trimmed.match(/WHERE\s+(\w+)\s*=\s*\?/i);
+      const table = tm ? tm[1] : null;
+      const whereField = wm ? wm[1] : null;
+      return {
+        run(...args) {
+          const setStr = sm ? sm[1] : '';
+          const setFields = [];
+          const setValues = [];
+          let argIdx = 0;
+          setStr.split(',').map(s => s.trim()).forEach(part => {
+            const m1 = part.match(/(\w+)\s*=\s*\?/i);
+            if (m1) { setFields.push(m1[1]); setValues.push(args[argIdx++]); }
+            else {
+              const m2 = part.match(/(\w+)\s*=\s*CURRENT_TIMESTAMP/i);
+              if (m2) { setFields.push(m2[1]); setValues.push(now()); }
+            }
+          });
+          return updateRow(table, setFields, setValues, whereField, args[argIdx]);
+        }
+      };
+    }
+    if (trimmed.toUpperCase().startsWith('DELETE')) {
+      const fm = trimmed.match(/FROM\s+(\w+)/i);
+      const wm = trimmed.match(/WHERE\s+(\w+)\s*=\s*\?/i);
+      const table = fm ? fm[1] : null;
+      const whereField = wm ? wm[1] : null;
+      return {
+        run(...args) { return deleteRows(table, whereField, args[0]); }
+      };
+    }
+    return {
+      run() { return { changes: 0, lastInsertRowid: 0 }; },
+      get() { return undefined; },
+      all() { return []; }
+    };
   },
   exec(sql) {
-    const statements = sql.split(';').filter(s => s.trim());
-    statements.forEach(stmt => {
-      if (stmt.trim()) {
-        try { createStatement(stmt).run(); } catch(e) {}
-      }
+    sql.split(';').filter(s => s.trim()).forEach(stmt => {
+      try { db.prepare(stmt).run(); } catch(e) {}
     });
   },
   pragma() {}
@@ -225,5 +176,10 @@ const db = {
 module.exports = {
   ...db,
   loadDB,
-  saveDB
+  saveDB,
+  insertRow,
+  updateRow,
+  selectRows,
+  deleteRows,
+  now
 };
