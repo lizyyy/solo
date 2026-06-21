@@ -79,6 +79,27 @@ const SAMPLE_DATA = {
     ]
 };
 
+const SAMPLE_NON_CONFLICT_DATA = {
+    groupClaims: [
+        { scenario: 1, claim: "先排查再通风，别直接跑", score: 65 },
+        { scenario: 2, claim: "上报调度，别自己断电", score: 70 },
+        { scenario: 3, claim: "手电不够就撤，安全第一", score: 75 },
+        { scenario: 4, claim: "水位涨得快，先撤再说", score: 68 },
+        { scenario: 5, claim: "先戴呼吸器再救人", score: 72 }
+    ],
+    records: [
+        { id: 1, name: "学员A", score: 80, choices: [2,3,2,2,2], time: 48, isNewbie: false, pauseCount: 1, totalPauseSec: 5, pauseEvents: [
+            { index: 1, durationSec: 5, scenarioIndex: 2, scenarioTitle: "场景3：应急照明故障", scoreAtPause: 85 }
+        ]},
+        { id: 2, name: "学员B", score: 65, choices: [1,3,2,2,1], time: 55, isNewbie: true, pauseCount: 0, totalPauseSec: 0, pauseEvents: [] },
+        { id: 3, name: "学员C", score: 70, choices: [2,2,2,2,2], time: 50, isNewbie: false, pauseCount: 2, totalPauseSec: 18, pauseEvents: [
+            { index: 1, durationSec: 10, scenarioIndex: 1, scenarioTitle: "场景2：发现电缆接头过热", scoreAtPause: 90 },
+            { index: 2, durationSec: 8, scenarioIndex: 4, scenarioTitle: "场景5：人员遇险求救", scoreAtPause: 75 }
+        ]},
+        { id: 4, name: "学员D", score: 55, choices: [1,1,2,1,1], time: 58, isNewbie: true, isBoundary: false, pauseCount: 0, totalPauseSec: 0, pauseEvents: [] }
+    ]
+};
+
 let gameState = {
     score: 100,
     currentScenario: 0,
@@ -152,6 +173,7 @@ function bindEvents() {
     document.getElementById('exportBtn').addEventListener('click', exportResult);
     document.getElementById('importBtn').addEventListener('click', importData);
     document.getElementById('loadSampleBtn').addEventListener('click', loadSampleData);
+    document.getElementById('loadNonConflictBtn').addEventListener('click', loadNonConflictSample);
     document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
 }
 
@@ -615,6 +637,11 @@ function loadSampleData() {
     showToast('示例数据已加载', 'success');
 }
 
+function loadNonConflictSample() {
+    DOM.importData.value = JSON.stringify(SAMPLE_NON_CONFLICT_DATA, null, 2);
+    showToast('非冲突样例已加载', 'success');
+}
+
 function importData() {
     const raw = DOM.importData.value.trim();
     
@@ -627,10 +654,13 @@ function importData() {
         const data = JSON.parse(raw);
         const validation = validateData(data);
         
-        renderValidationReport(validation);
+        renderValidationReport(validation, data);
         
         if (validation.hasConflicts) {
+            DOM.conflictAlert.classList.remove('hidden');
             renderConflicts(validation.conflicts, data);
+        } else {
+            DOM.conflictAlert.classList.add('hidden');
         }
         
         DOM.importResult.classList.remove('hidden');
@@ -689,8 +719,8 @@ function validateData(data) {
     });
     
     if (data.groupClaims && data.records) {
-        result.hasConflicts = true;
         result.conflicts = detectConflicts(data);
+        result.hasConflicts = result.conflicts.length > 0;
     }
     
     return result;
@@ -727,10 +757,18 @@ function detectConflicts(data) {
     return conflicts;
 }
 
-function renderValidationReport(validation) {
+function renderValidationReport(validation, data) {
     let html = '';
     
     html += `<div class="validation-item success">✓ 共导入 ${validation.stats.total} 条记录</div>`;
+    
+    if (data && data.groupClaims && data.groupClaims.length > 0) {
+        if (validation.hasConflicts) {
+            html += `<div class="validation-item error">⚠️ 检测到 ${validation.conflicts.length} 处群说法与实际数据冲突</div>`;
+        } else {
+            html += `<div class="validation-item success">✓ 已核对群说法（共${data.groupClaims.length}条），未发现冲突</div>`;
+        }
+    }
     
     if (validation.stats.empty > 0) {
         html += `<div class="validation-item warning">⚠️ 发现 ${validation.stats.empty} 处空值字段</div>`;
