@@ -16,6 +16,7 @@ export interface BuoyLog {
   tideUnit: TideUnit;
   rawPayload: string;
   status: LogStatus;
+  _correctedFromCm?: boolean;
 }
 
 export interface ManualRecord {

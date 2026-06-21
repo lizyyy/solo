@@ -6,12 +6,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { TimelineChart } from "@/components/TimelineChart";
 import { TimelineController } from "@/components/TimelineController";
 import { useTimeFormatter } from "@/hooks/useTimeFormatter";
-import {
-  selectBuoyLogs,
-  selectManualRecords,
-  selectSupplementaryNotes,
-  usePlaybackStore,
-} from "@/store/usePlaybackStore";
+import { usePlaybackStore } from "@/store/usePlaybackStore";
 
 function downloadJSON(name: string, obj: unknown) {
   const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
@@ -26,25 +21,106 @@ function downloadJSON(name: string, obj: unknown) {
 }
 
 export default function PlaybackPage() {
-  const logs = selectBuoyLogs();
-  const manual = selectManualRecords();
-  const notes = selectSupplementaryNotes();
+  const { fmtFull, fmtHM } = useTimeFormatter();
+  const buoyLogs = usePlaybackStore((s) => s.buoyLogs);
+  const manualRecords = usePlaybackStore((s) => s.manualRecords);
+  const supplementaryNotes = usePlaybackStore((s) => s.supplementaryNotes);
   const anomalies = usePlaybackStore((s) => s.anomalies);
   const history = usePlaybackStore((s) => s.history);
   const activeVersionTag = usePlaybackStore((s) => s.activeVersionTag);
-  const triggerSupplementRerun = usePlaybackStore((s) => s.triggerSupplementRerun);
-  const { fmtFull } = useTimeFormatter();
+  const timeRange = usePlaybackStore((s) => s.timeRange);
 
   const handleExport = () => {
     const activeVersion = history.find((h) => h.versionTag === activeVersionTag);
+    const anomalySummaries = anomalies.map((a) => {
+      const relatedLogs = buoyLogs.filter((l) => a.relatedBuoyLogIds.includes(l.id));
+      const relatedManual = manualRecords.filter((m) => a.relatedManualIds.includes(m.id));
+      const relatedNotes = supplementaryNotes.filter(
+        (n) => a.timestamp >= n.relatedTimeRange[0] && a.timestamp <= n.relatedTimeRange[1],
+      );
+      const unitMixed = relatedLogs.some((l) => l.tideUnit === "cm") && !relatedLogs.every((l) => l._correctedFromCm);
+      const pendingReasons: string[] = [];
+      if (unitMixed) pendingReasons.push("潮位单位混写（m/cm）");
+      if (a.type === "pending_confirmation") {
+        pendingReasons.unshift(`系统自动检测：${a.reason}`);
+      }
+      return {
+        id: a.id,
+        timestamp: a.timestamp,
+        reason: a.reason,
+        detail: a.detail,
+        status: a.confirmed ? "confirmed" : a.type === "pending_confirmation" ? "pending" : "anomaly",
+        confirmedBy: a.confirmedBy ?? null,
+        evidence: {
+          buoyLogIds: a.relatedBuoyLogIds,
+          buoyLogCount: relatedLogs.length,
+          manualRecords: relatedManual.map((m) => ({ id: m.id, late: m.arrivedAt > m.recordedAt + 30 * 60000, operator: m.operator })),
+          supplementaryNotes: relatedNotes.map((n) => ({ id: n.id, author: n.author, attachedAt: n.attachedAt })),
+        },
+        sources: [
+          ...relatedLogs.map((l) => `浮标 ${l.id} @ ${fmtFull(l.timestamp)}`),
+          ...relatedManual.map((m) => `人工记录 ${m.id} @ ${fmtFull(m.recordedAt)}`),
+        ],
+        pendingReasons,
+      };
+    });
+
+    const manualEditVersions = history.filter((h) => h.hasManualEdit);
+
+    const handoverSummary = {
+      threeThingsForNextAnalyst: {
+        whereIsSampleData: {
+          buoyLogs: `${buoyLogs.length} 条（时间范围 ${fmtHM(timeRange[0])}–${fmtHM(timeRange[1])}）`,
+          manualRecords: `${manualRecords.length} 条`,
+          supplementaryNotes: `${supplementaryNotes.length} 条`,
+        },
+        whereIsAnomaly: anomalySummaries.map((a) => ({
+          id: a.id,
+          time: fmtFull(a.timestamp),
+          status: a.status,
+          reason: a.reason,
+          pendingReasons: a.pendingReasons,
+        })),
+        howToDeliver: {
+          activeVersion: activeVersionTag,
+          activeSpecVersion: activeVersion?.spec.version ?? null,
+          specFormula: activeVersion?.spec.formula ?? null,
+          unitConversions: activeVersion?.spec.unitConversions ?? null,
+          totalHistoryVersions: history.length,
+          manualEditVersions: manualEditVersions.map((h) => ({
+            versionTag: h.versionTag,
+            createdBy: h.createdBy,
+            trigger: h.trigger,
+            manualEditFields: h.manualEditFields,
+            createdAt: h.createdAt,
+          })),
+          exportedAt: new Date().toISOString(),
+          filename: `coastal-water-playback-${activeVersionTag}.json`,
+        },
+      },
+    };
+
     downloadJSON(`coastal-water-playback-${activeVersionTag}-${Date.now()}.json`, {
       exportedAt: new Date().toISOString(),
       activeVersion: activeVersionTag,
-      buoyLogs: logs,
-      manualRecords: manual,
-      supplementaryNotes: notes,
-      anomalies,
+      handoverSummary,
+      anomalyEvidenceSummary: anomalySummaries,
       calculationSpec: activeVersion?.spec,
+      continuityReport: activeVersion?.continuityReport,
+      manualEditTrail: history
+        .filter((h) => h.hasManualEdit)
+        .map((h) => ({
+          versionTag: h.versionTag,
+          createdAt: h.createdAt,
+          createdBy: h.createdBy,
+          trigger: h.trigger,
+          manualEditFields: h.manualEditFields,
+          specDelta: h.spec,
+        })),
+      buoyLogs,
+      manualRecords,
+      supplementaryNotes,
+      anomalies,
       history: history.map((h) => ({
         versionTag: h.versionTag,
         createdAt: h.createdAt,
@@ -76,16 +152,11 @@ export default function PlaybackPage() {
             <div className="glass-card p-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <h3 className="font-display text-base font-semibold text-white">
-                    事件列表
-                  </h3>
+                  <h3 className="font-display text-base font-semibold text-white">事件列表</h3>
                   <p className="text-xs text-ink-200">
-                    点击事件进入详情，可查看浮标日志、计算口径与待确认原因
+                    点击事件进入详情，可查看浮标日志、晚到附件、计算口径与待确认原因；待确认事件可在右侧「补录后重跑」提交说明触发重算
                   </p>
                 </div>
-                <button className="btn-primary" onClick={triggerSupplementRerun}>
-                  补录后重跑（模拟）
-                </button>
               </div>
               <ul className="mt-4 space-y-2">
                 {anomalies.map((a) => (
@@ -125,28 +196,21 @@ function EventCard({ id }: { id: string }) {
   return (
     <li
       className={`cursor-pointer rounded-xl border p-3 transition ${
-        active
-          ? "border-tide-500/50 bg-tide-500/10"
-          : "border-white/10 bg-white/5 hover:border-white/20"
+        active ? "border-tide-500/50 bg-tide-500/10" : "border-white/10 bg-white/5 hover:border-white/20"
       }`}
       onClick={() => selectAnomaly(a.id)}
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <StatusBadge
-            kind={
-              a.type === "anomaly"
-                ? "anomaly"
-                : a.confirmed
-                  ? "ok"
-                  : "pending"
-            }
+            kind={a.type === "anomaly" ? "anomaly" : a.confirmed ? "ok" : "pending"}
           />
           <span className="text-sm font-medium text-white">{a.reason}</span>
+          {a.confirmed && a.confirmedBy && (
+            <span className="text-[10px] text-alert-green">由 {a.confirmedBy} 确认</span>
+          )}
         </div>
-        <span className="shrink-0 font-mono text-[11px] text-ink-300">
-          {fmtFull(a.timestamp)}
-        </span>
+        <span className="shrink-0 font-mono text-[11px] text-ink-300">{fmtFull(a.timestamp)}</span>
       </div>
       <p className="mt-1 line-clamp-2 text-xs text-ink-200">{a.detail}</p>
     </li>

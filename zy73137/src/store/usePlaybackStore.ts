@@ -4,11 +4,24 @@ import {
   BUOY_LOGS,
   HISTORY_VERSIONS,
   MANUAL_RECORDS,
-  SPEC_V3,
   SUPPLEMENTARY_NOTES,
   TIME_RANGE,
 } from "@/data/mockData";
-import type { AnomalyEvent, HistoryVersion, MetricKey } from "@/types";
+import type {
+  AnomalyEvent,
+  BuoyLog,
+  CalculationSpec,
+  HistoryVersion,
+  ManualRecord,
+  MetricKey,
+  SupplementaryNote,
+} from "@/types";
+
+interface SupplementRerunInput {
+  author: string;
+  note: string;
+  targetAnomalyId?: string;
+}
 
 interface PlaybackState {
   timeRange: [number, number];
@@ -17,12 +30,16 @@ interface PlaybackState {
   speed: 1 | 2 | 4;
   selectedMetricKeys: MetricKey[];
   showManualPoints: boolean;
+  buoyLogs: BuoyLog[];
+  manualRecords: ManualRecord[];
+  supplementaryNotes: SupplementaryNote[];
   anomalies: AnomalyEvent[];
   selectedAnomalyId: string | null;
   activeVersionTag: string;
   history: HistoryVersion[];
   quickStartVisible: boolean;
   historyDrawerOpen: boolean;
+  lastRerunInfo: { versionTag: string; at: number } | null;
   jumpToNext: (kind?: "anomaly" | "pending") => void;
   jumpToPrev: (kind?: "anomaly" | "pending") => void;
   setCursor: (ts: number) => void;
@@ -33,9 +50,28 @@ interface PlaybackState {
   selectAnomaly: (id: string | null) => void;
   confirmAnomaly: (id: string) => void;
   setActiveVersion: (tag: string) => void;
-  triggerSupplementRerun: () => void;
+  addSupplementaryNote: (note: Omit<SupplementaryNote, "id" | "attachedAt">) => void;
+  triggerSupplementRerun: (input: SupplementRerunInput) => HistoryVersion;
   toggleQuickStart: (v?: boolean) => void;
   toggleHistoryDrawer: (v?: boolean) => void;
+  clearLastRerunInfo: () => void;
+}
+
+function buildNextSpec(base: CalculationSpec, version: string): CalculationSpec {
+  return {
+    ...base,
+    id: `SPEC-${version}`,
+    version,
+    timestamp: Date.now(),
+    unitConversions: {
+      ...base.unitConversions,
+      tideLevel: "m (cm 自动 ×0.01，人工补录已统一)",
+    },
+    formula:
+      base.formula +
+      "；人工补录确认 B-09/B-10 潮位为传感器误写 cm，已按 cm×0.01 修正为 m",
+    thresholds: { ...base.thresholds },
+  };
 }
 
 export const usePlaybackStore = create<PlaybackState>((set, get) => ({
@@ -45,28 +81,38 @@ export const usePlaybackStore = create<PlaybackState>((set, get) => ({
   speed: 1,
   selectedMetricKeys: ["dissolvedOxygen", "turbidity", "ph", "tideLevel"],
   showManualPoints: true,
-  anomalies: ANOMALIES,
+  buoyLogs: BUOY_LOGS.map((l) => ({ ...l })),
+  manualRecords: MANUAL_RECORDS.map((r) => ({ ...r })),
+  supplementaryNotes: SUPPLEMENTARY_NOTES.map((n) => ({ ...n })),
+  anomalies: ANOMALIES.map((a) => ({ ...a })),
   selectedAnomalyId: ANOMALIES[0].id,
   activeVersionTag: HISTORY_VERSIONS[HISTORY_VERSIONS.length - 1].versionTag,
-  history: HISTORY_VERSIONS,
+  history: HISTORY_VERSIONS.map((h) => ({ ...h })),
   quickStartVisible: true,
   historyDrawerOpen: false,
+  lastRerunInfo: null,
 
   jumpToNext(kind) {
     const { anomalies, cursor, timeRange } = get();
     const list = kind
-      ? anomalies.filter((a) => (kind === "anomaly" ? a.type === "anomaly" : a.type === "pending_confirmation"))
+      ? anomalies.filter((a) =>
+          kind === "anomaly" ? a.type === "anomaly" : a.type === "pending_confirmation",
+        )
       : anomalies;
     const next = list.find((a) => a.timestamp > cursor) ?? list[0];
-    if (next) set({ cursor: Math.min(Math.max(next.timestamp, timeRange[0]), timeRange[1]) });
+    if (next)
+      set({ cursor: Math.min(Math.max(next.timestamp, timeRange[0]), timeRange[1]) });
   },
   jumpToPrev(kind) {
     const { anomalies, cursor, timeRange } = get();
     const list = kind
-      ? anomalies.filter((a) => (kind === "anomaly" ? a.type === "anomaly" : a.type === "pending_confirmation"))
+      ? anomalies.filter((a) =>
+          kind === "anomaly" ? a.type === "anomaly" : a.type === "pending_confirmation",
+        )
       : anomalies;
     const prev = [...list].reverse().find((a) => a.timestamp < cursor) ?? list[list.length - 1];
-    if (prev) set({ cursor: Math.min(Math.max(prev.timestamp, timeRange[0]), timeRange[1]) });
+    if (prev)
+      set({ cursor: Math.min(Math.max(prev.timestamp, timeRange[0]), timeRange[1]) });
   },
   setCursor(ts) {
     const { timeRange } = get();
@@ -104,26 +150,73 @@ export const usePlaybackStore = create<PlaybackState>((set, get) => ({
   setActiveVersion(tag) {
     set({ activeVersionTag: tag });
   },
-  triggerSupplementRerun() {
-    const { history } = get();
-    const next: HistoryVersion = {
-      id: `H-V${history.length + 1}`,
-      versionTag: `v${history.length + 1}`,
+  addSupplementaryNote(note) {
+    set({
+      supplementaryNotes: [
+        ...get().supplementaryNotes,
+        { ...note, id: `N-${Date.now()}`, attachedAt: Date.now() },
+      ],
+    });
+  },
+  triggerSupplementRerun(input) {
+    const state = get();
+    const nextVersionIdx = state.history.length + 1;
+    const nextTag = `v${nextVersionIdx}`;
+    const prevVer = state.history[state.history.length - 1];
+
+    const targetId = input.targetAnomalyId ?? state.selectedAnomalyId;
+    const related = state.anomalies.find((a) => a.id === targetId);
+
+    const relatedTimeRange: [number, number] = related
+      ? [related.timestamp - 60 * 60000, related.timestamp + 60 * 60000]
+      : state.timeRange;
+
+    const newNote: SupplementaryNote = {
+      id: `N-${Date.now()}`,
+      attachedAt: Date.now(),
+      author: input.author || "阿乔",
+      content: input.note,
+      relatedTimeRange,
+    };
+
+    const fixedBuoyLogs = state.buoyLogs.map((l) => {
+      if (l.tideUnit === "cm") {
+        return { ...l, tideLevel: l.tideLevel / 100, tideUnit: "m" as const, _correctedFromCm: true };
+      }
+      return l;
+    });
+
+    const newSpec = buildNextSpec(prevVer.spec, nextTag);
+
+    const nextVersion: HistoryVersion = {
+      id: `H-V${nextVersionIdx}`,
+      versionTag: nextTag,
       createdAt: Date.now(),
-      createdBy: "阿乔",
+      createdBy: input.author || "阿乔",
       trigger: "supplement_rerun",
       hasManualEdit: true,
-      manualEditFields: ["unitConversions.tideLevel"],
-      spec: { ...SPEC_V3, id: `SPEC-V${history.length + 1}`, version: `v${history.length + 1}`, timestamp: Date.now() },
+      manualEditFields: [
+        "unitConversions.tideLevel",
+        "formula",
+        "supplementaryNotes",
+        "buoyLogs.corrected",
+      ],
+      spec: newSpec,
       continuityReport: { hasGaps: false, gaps: [] },
     };
+
     set({
-      history: [...history, next],
-      activeVersionTag: next.versionTag,
-      anomalies: get().anomalies.map((a) =>
-        a.id === "A-02" ? { ...a, confirmed: true, confirmedBy: "阿乔" } : a,
+      supplementaryNotes: [...state.supplementaryNotes, newNote],
+      buoyLogs: fixedBuoyLogs,
+      anomalies: state.anomalies.map((a) =>
+        a.id === targetId ? { ...a, confirmed: true, confirmedBy: input.author || "阿乔" } : a,
       ),
+      history: [...state.history, nextVersion],
+      activeVersionTag: nextTag,
+      lastRerunInfo: { versionTag: nextTag, at: Date.now() },
     });
+
+    return nextVersion;
   },
   toggleQuickStart(v) {
     set({ quickStartVisible: typeof v === "boolean" ? v : !get().quickStartVisible });
@@ -131,8 +224,11 @@ export const usePlaybackStore = create<PlaybackState>((set, get) => ({
   toggleHistoryDrawer(v) {
     set({ historyDrawerOpen: typeof v === "boolean" ? v : !get().historyDrawerOpen });
   },
+  clearLastRerunInfo() {
+    set({ lastRerunInfo: null });
+  },
 }));
 
-export const selectBuoyLogs = () => BUOY_LOGS;
-export const selectManualRecords = () => MANUAL_RECORDS;
-export const selectSupplementaryNotes = () => SUPPLEMENTARY_NOTES;
+export const selectBuoyLogs = () => usePlaybackStore.getState().buoyLogs;
+export const selectManualRecords = () => usePlaybackStore.getState().manualRecords;
+export const selectSupplementaryNotes = () => usePlaybackStore.getState().supplementaryNotes;

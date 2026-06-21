@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { usePlaybackStore } from "@/store/usePlaybackStore";
-import { BUOY_LOGS, MANUAL_RECORDS, METRICS } from "@/data/mockData";
+import { METRICS } from "@/data/mockData";
 import type { BuoyLog, MetricKey } from "@/types";
 import { useTimeFormatter } from "@/hooks/useTimeFormatter";
 import { StatusBadge } from "./StatusBadge";
@@ -24,6 +24,8 @@ export function TimelineChart() {
     selectedAnomalyId,
     selectAnomaly,
     toggleMetric,
+    buoyLogs,
+    manualRecords,
   } = usePlaybackStore();
   const { fmtHM } = useTimeFormatter();
   const [hover, setHover] = useState<{ x: number; log: BuoyLog } | null>(null);
@@ -38,7 +40,7 @@ export function TimelineChart() {
 
   const buildPath = (key: MetricKey) => {
     const meta = METRICS.find((m) => m.key === key)!;
-    return BUOY_LOGS.map((l, i) => {
+    return buoyLogs.map((l, i) => {
       const x = xOf(l.timestamp);
       let v = l[key];
       if (key === "tideLevel" && l.tideUnit === "cm") v = v / 100;
@@ -49,15 +51,15 @@ export function TimelineChart() {
 
   const buildArea = (key: MetricKey) => {
     const meta = METRICS.find((m) => m.key === key)!;
-    const top = BUOY_LOGS.map((l, i) => {
+    const top = buoyLogs.map((l, i) => {
       const x = xOf(l.timestamp);
       let v = l[key];
       if (key === "tideLevel" && l.tideUnit === "cm") v = v / 100;
       const y = yOf(v, meta.domain);
       return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
     }).join(" ");
-    const last = BUOY_LOGS[BUOY_LOGS.length - 1];
-    const first = BUOY_LOGS[0];
+    const last = buoyLogs[buoyLogs.length - 1];
+    const first = buoyLogs[0];
     return `${top} L${xOf(last.timestamp).toFixed(1)},${(PT + INNER_H).toFixed(1)} L${xOf(first.timestamp).toFixed(1)},${(PT + INNER_H).toFixed(1)} Z`;
   };
 
@@ -198,7 +200,7 @@ export function TimelineChart() {
           ))}
 
           {/* 数据点悬浮热区 */}
-          {BUOY_LOGS.map((l) => (
+          {buoyLogs.map((l) => (
             <rect
               key={`hot-${l.id}`}
               x={xOf(l.timestamp) - 8}
@@ -217,7 +219,7 @@ export function TimelineChart() {
 
           {/* 人工记录点 */}
           {showManualPoints &&
-            MANUAL_RECORDS.map((r) => {
+            manualRecords.map((r) => {
               const meta = METRICS.find((m) => m.key === "dissolvedOxygen")!;
               const y = r.sampleDO ? yOf(r.sampleDO, meta.domain) : PT + INNER_H / 2;
               const late = r.arrivedAt > r.recordedAt + 30 * 60000;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   CheckCircle2,
   FileText,
@@ -6,8 +6,13 @@ import {
   RefreshCw,
   Scale,
   Sparkles,
+  AlertTriangle,
+  Activity,
+  History,
+  X,
+  CheckCheck,
 } from "lucide-react";
-import { usePlaybackStore, selectBuoyLogs, selectManualRecords, selectSupplementaryNotes } from "@/store/usePlaybackStore";
+import { usePlaybackStore } from "@/store/usePlaybackStore";
 import { useTimeFormatter } from "@/hooks/useTimeFormatter";
 import { StatusBadge } from "./StatusBadge";
 
@@ -16,41 +21,95 @@ type Tab = "buoy" | "spec" | "reason";
 export function AnomalyPanel() {
   const {
     anomalies,
+    buoyLogs,
+    manualRecords,
+    supplementaryNotes,
     selectedAnomalyId,
-    selectAnomaly,
     confirmAnomaly,
     activeVersionTag,
     history,
     triggerSupplementRerun,
+    lastRerunInfo,
+    clearLastRerunInfo,
+    toggleHistoryDrawer,
   } = usePlaybackStore();
-  const buoyLogs = selectBuoyLogs();
-  const manual = selectManualRecords();
-  const notes = selectSupplementaryNotes();
-  const { fmtFull, fmtDuration } = useTimeFormatter();
+  const { fmtFull, fmtDuration, fmtHM } = useTimeFormatter();
   const [tab, setTab] = useState<Tab>("buoy");
+  const [rerunFormOpen, setRerunFormOpen] = useState(false);
+  const [author, setAuthor] = useState("阿乔");
+  const [note, setNote] = useState("");
 
-  const current = anomalies.find((a) => a.id === selectedAnomalyId) ?? anomalies[0];
+  const current = useMemo(
+    () => anomalies.find((a) => a.id === selectedAnomalyId) ?? anomalies[0],
+    [anomalies, selectedAnomalyId],
+  );
   const ver = history.find((h) => h.versionTag === activeVersionTag);
 
   if (!current) return null;
 
   const relatedLogs = buoyLogs.filter((l) => current.relatedBuoyLogIds.includes(l.id));
-  const relatedManual = manual.filter((m) => current.relatedManualIds.includes(m.id));
-  const relatedNotes = notes.filter(
+  const relatedManual = manualRecords.filter((m) => current.relatedManualIds.includes(m.id));
+  const relatedNotes = supplementaryNotes.filter(
     (n) =>
-      current.timestamp >= n.relatedTimeRange[0] &&
-      current.timestamp <= n.relatedTimeRange[1],
+      current.timestamp >= n.relatedTimeRange[0] && current.timestamp <= n.relatedTimeRange[1],
   );
+  const correctedCount = relatedLogs.filter((l) => l._correctedFromCm).length;
+
+  const lateCount = relatedManual.filter(
+    (m) => m.arrivedAt > m.recordedAt + 30 * 60000,
+  ).length;
+
+  const unitIssueLogs = relatedLogs.filter((l) => l.tideUnit === "cm");
+  const reasonSummary =
+    current.type === "pending_confirmation"
+      ? `相邻 ${unitIssueLogs.length} 条潮位单位写为 cm，其余为 m，疑似传感器误写`
+      : current.reason;
+
+  function handleRerun() {
+    if (!note.trim()) return;
+    triggerSupplementRerun({
+      author: author.trim() || "阿乔",
+      note: note.trim(),
+      targetAnomalyId: current.id,
+    });
+    setAuthor("阿乔");
+    setNote("");
+    setRerunFormOpen(false);
+  }
 
   return (
     <div className="glass-card flex h-full flex-col">
+      {lastRerunInfo && (
+        <div className="flex items-center justify-between gap-2 border-b border-alert-green/20 bg-alert-green/10 px-4 py-2.5">
+          <div className="flex items-center gap-2 text-xs text-alert-green">
+            <CheckCheck className="h-3.5 w-3.5" />
+            <span>
+              已生成新版本 <b className="font-mono">{lastRerunInfo.versionTag}</b>（人工补录重跑）
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <button
+              className="text-[11px] text-alert-green/80 underline-offset-2 hover:underline"
+              onClick={() => toggleHistoryDrawer(true)}
+            >
+              查看历史
+            </button>
+            <button
+              className="text-alert-green/80 hover:text-white"
+              onClick={clearLastRerunInfo}
+              aria-label="关闭提示"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="border-b border-white/10 px-5 py-4">
         <div className="flex items-start justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="font-display text-base font-semibold text-white">
-                事件详情
-              </h2>
+              <h2 className="font-display text-base font-semibold text-white">事件详情</h2>
               <StatusBadge
                 kind={current.type === "anomaly" ? "anomaly" : current.confirmed ? "ok" : "pending"}
                 text={
@@ -67,15 +126,19 @@ export function AnomalyPanel() {
               {fmtFull(current.timestamp)} · 严重度 {current.severity.toUpperCase()}
             </p>
           </div>
-          <div className="flex flex-col items-end gap-1">
+          <div className="flex flex-col items-end gap-1.5">
             {!current.confirmed && (
               <button className="btn-primary" onClick={() => confirmAnomaly(current.id)}>
                 <CheckCircle2 className="h-3.5 w-3.5" /> 确认处理
               </button>
             )}
-            {current.type === "pending_confirmation" && (
-              <button className="btn-ghost" onClick={triggerSupplementRerun}>
-                <RefreshCw className="h-3.5 w-3.5" /> 补录后重跑
+            {current.type === "pending_confirmation" && !current.confirmed && (
+              <button
+                className="btn-ghost"
+                onClick={() => setRerunFormOpen((x) => !x)}
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${rerunFormOpen ? "rotate-45" : ""}`} />
+                {rerunFormOpen ? "收起表单" : "补录后重跑"}
               </button>
             )}
           </div>
@@ -83,19 +146,82 @@ export function AnomalyPanel() {
         <p className="mt-3 rounded-xl border border-white/10 bg-white/5 p-3 text-sm leading-relaxed text-ink-100">
           {current.detail}
         </p>
+
+        <div className="mt-4 grid grid-cols-2 gap-2 text-[11px] md:grid-cols-4">
+          <EvidenceCard
+            title="浮标日志"
+            icon={<Activity className="h-3.5 w-3.5 text-tide-400" />}
+            main={`${relatedLogs.length} 条`}
+            sub={
+              correctedCount > 0
+                ? `${correctedCount} 条已 cm→m 修正`
+                : `${unitIssueLogs.length} 条单位异常`
+            }
+            tone={correctedCount > 0 ? "green" : unitIssueLogs.length > 0 ? "amber" : "default"}
+          />
+          <EvidenceCard
+            title="晚到附件"
+            icon={<History className="h-3.5 w-3.5 text-violet-300" />}
+            main={`${relatedManual.length} 条`}
+            sub={lateCount > 0 ? `${lateCount} 条晚到（>${fmtDuration(lateCount * 30 * 60000)}）` : "无晚到"}
+            tone={lateCount > 0 ? "violet" : "default"}
+          />
+          <EvidenceCard
+            title="计算口径"
+            icon={<Scale className="h-3.5 w-3.5 text-ocean-300" />}
+            main={ver?.spec.version ?? "—"}
+            sub={ver?.createdBy ? `由 ${ver.createdBy} 触发` : "自动生成"}
+            tone="default"
+          />
+          <EvidenceCard
+            title="待确认原因"
+            icon={<AlertTriangle className="h-3.5 w-3.5 text-alert-amber" />}
+            main={current.type === "pending_confirmation" ? "潮位单位混写" : "已无"}
+            sub={reasonSummary.slice(0, 22)}
+            tone={current.type === "pending_confirmation" && !current.confirmed ? "amber" : "green"}
+          />
+        </div>
       </div>
 
+      {rerunFormOpen && current.type === "pending_confirmation" && !current.confirmed && (
+        <div className="border-b border-white/10 bg-alert-amber/5 px-5 py-3">
+          <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-alert-amber">
+            <Sparkles className="h-3.5 w-3.5" /> 提交补充说明并触发重跑
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            <input
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+              placeholder="操作人"
+              className="col-span-1 rounded-lg border border-white/10 bg-ocean-950/60 px-2.5 py-2 text-xs text-white placeholder:text-ink-300 focus:border-tide-400 focus:outline-none"
+            />
+            <input
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="补充说明（如：现场反馈 B-09/B-10 传感器误写 cm，已按 ×0.01 换算为 m）"
+              className="col-span-3 rounded-lg border border-white/10 bg-ocean-950/60 px-2.5 py-2 text-xs text-white placeholder:text-ink-300 focus:border-tide-400 focus:outline-none"
+            />
+          </div>
+          <div className="mt-2 flex items-center justify-between">
+            <p className="text-[10px] text-ink-300">
+              重跑将：统一 cm→m，追加补充说明，生成新版本，保留历史
+            </p>
+            <button
+              className="btn-primary !py-1 !text-[11px]"
+              onClick={handleRerun}
+              disabled={!note.trim()}
+            >
+              <RefreshCw className="h-3 w-3" /> 触发补录后重跑
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="flex gap-1 border-b border-white/10 px-2 pt-2">
-        <button
-          className={`tab-btn ${tab === "buoy" ? "active" : ""}`}
-          onClick={() => setTab("buoy")}
-        >
+        <button className={`tab-btn ${tab === "buoy" ? "active" : ""}`} onClick={() => setTab("buoy")}>
           <FileText className="inline h-3.5 w-3.5" /> 浮标日志
         </button>
-        <button
-          className={`tab-btn ${tab === "spec" ? "active" : ""}`}
-          onClick={() => setTab("spec")}
-        >
+        <button className={`tab-btn ${tab === "spec" ? "active" : ""}`} onClick={() => setTab("spec")}>
           <Scale className="inline h-3.5 w-3.5" /> 计算口径
         </button>
         <button
@@ -116,7 +242,14 @@ export function AnomalyPanel() {
               {relatedLogs.map((l) => (
                 <div key={l.id} className="rounded-xl border border-white/10 bg-white/5 p-3">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs text-tide-400">{l.id}</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono text-xs text-tide-400">{l.id}</span>
+                      {l._correctedFromCm && (
+                        <span className="rounded-md bg-alert-green/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-alert-green">
+                          已由 cm→m 修正
+                        </span>
+                      )}
+                    </div>
                     <StatusBadge
                       kind={
                         l.status === "error"
@@ -127,9 +260,7 @@ export function AnomalyPanel() {
                       }
                     />
                   </div>
-                  <p className="mt-1 font-mono text-[11px] text-ink-200">
-                    {fmtFull(l.timestamp)}
-                  </p>
+                  <p className="mt-1 font-mono text-[11px] text-ink-200">{fmtFull(l.timestamp)}</p>
                   <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
                     <Row label="溶解氧" value={`${l.dissolvedOxygen.toFixed(2)} mg/L`} />
                     <Row label="浊度" value={`${l.turbidity.toFixed(1)} NTU`} />
@@ -138,7 +269,7 @@ export function AnomalyPanel() {
                     <Row
                       label="潮位"
                       value={`${l.tideLevel.toFixed(2)} ${l.tideUnit}`}
-                      highlight={l.tideUnit === "cm"}
+                      highlight={l.tideUnit === "cm" && !l._correctedFromCm}
                     />
                     <Row label="设备" value={l.deviceId} />
                   </div>
@@ -169,7 +300,9 @@ export function AnomalyPanel() {
                       >
                         <div className="flex items-center justify-between">
                           <span className="font-mono text-xs text-violet-300">{m.id}</span>
-                          {late && <StatusBadge kind="late" text={`晚到 ${fmtDuration(m.arrivedAt - m.recordedAt)}`} />}
+                          {late && (
+                            <StatusBadge kind="late" text={`晚到 ${fmtDuration(m.arrivedAt - m.recordedAt)}`} />
+                          )}
                         </div>
                         <p className="mt-1 text-xs text-ink-100">
                           <b>{m.operator}</b> @ {m.location}
@@ -179,7 +312,10 @@ export function AnomalyPanel() {
                         </p>
                         <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
                           <Row label="船采 DO" value={m.sampleDO != null ? `${m.sampleDO.toFixed(2)} mg/L` : "—"} />
-                          <Row label="船采 浊度" value={m.sampleTurbidity != null ? `${m.sampleTurbidity.toFixed(1)} NTU` : "—"} />
+                          <Row
+                            label="船采 浊度"
+                            value={m.sampleTurbidity != null ? `${m.sampleTurbidity.toFixed(1)} NTU` : "—"}
+                          />
                         </div>
                         <p className="mt-2 rounded-lg bg-ocean-950/60 p-2 text-[11px] leading-relaxed text-ink-100">
                           {m.remark}
@@ -202,10 +338,13 @@ export function AnomalyPanel() {
                     className="rounded-xl border border-alert-amber/20 bg-alert-amber/5 p-3"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-alert-amber">{n.author}</span>
-                      <span className="font-mono text-[11px] text-ink-300">
-                        {fmtFull(n.attachedAt)}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-semibold text-alert-amber">{n.author}</span>
+                        <span className="rounded bg-white/5 px-1 py-0.5 font-mono text-[9px] text-ink-300">
+                          {fmtHM(n.relatedTimeRange[0])}–{fmtHM(n.relatedTimeRange[1])}
+                        </span>
+                      </div>
+                      <span className="font-mono text-[11px] text-ink-300">{fmtFull(n.attachedAt)}</span>
                     </div>
                     <p className="mt-2 text-xs leading-relaxed text-ink-100">{n.content}</p>
                   </div>
@@ -223,7 +362,7 @@ export function AnomalyPanel() {
                 <span className="chip font-mono text-tide-400">{ver.spec.version}</span>
               </div>
               <p className="mt-2 font-mono text-[11px] text-ink-300">
-                生成时间 {fmtFull(ver.spec.timestamp)}
+                生成时间 {fmtFull(ver.spec.timestamp)} · 触发者 {ver.createdBy} · {ver.trigger}
               </p>
               <pre className="mt-3 overflow-x-auto rounded-lg bg-ocean-950/70 p-3 font-mono text-[11px] leading-relaxed text-tide-300">
 {ver.spec.formula}
@@ -275,12 +414,15 @@ export function AnomalyPanel() {
                   return (
                     <li key={id} className="flex items-center gap-2">
                       <span className="font-mono text-tide-400">{id}</span>
-                      <span className="text-ink-300">
-                        {fmtFull(log.timestamp)}
-                      </span>
+                      <span className="text-ink-300">{fmtFull(log.timestamp)}</span>
                       <span className="font-mono">
                         tide = {log.tideLevel.toFixed(2)} {log.tideUnit}
                       </span>
+                      {log._correctedFromCm && (
+                        <span className="rounded bg-alert-green/20 px-1 py-0.5 text-[9px] text-alert-green">
+                          已修正
+                        </span>
+                      )}
                     </li>
                   );
                 })}
@@ -290,7 +432,8 @@ export function AnomalyPanel() {
             <div className="rounded-xl border border-white/10 bg-white/5 p-4">
               <h4 className="text-sm font-semibold text-white">为什么进入待确认状态？</h4>
               <p className="mt-2 text-xs leading-relaxed text-ink-200">
-                潮位字段在相邻记录中出现 <code className="rounded bg-ocean-950/60 px-1 py-0.5 font-mono text-tide-300">m</code> 与{" "}
+                潮位字段在相邻记录中出现{" "}
+                <code className="rounded bg-ocean-950/60 px-1 py-0.5 font-mono text-tide-300">m</code> 与{" "}
                 <code className="rounded bg-ocean-950/60 px-1 py-0.5 font-mono text-tide-300">cm</code>{" "}
                 两种单位混用，系统无法确定是否为传感器上报错误或真实单位切换。为避免错把 2.12cm 当 2.12m 计算而放大 100 倍误差，
                 自动将该时段标记为 <b className="text-alert-amber">待确认</b>，直到人工处理并触发重跑。
@@ -326,8 +469,51 @@ export function AnomalyPanel() {
       <div className="border-t border-white/10 px-5 py-3">
         <p className="text-[11px] text-ink-300">
           事件 {current.id} · 口径版本 <span className="font-mono text-tide-400">{ver?.spec.version}</span>
+          {current.confirmed && current.confirmedBy && (
+            <>
+              {" · 已由 "}
+              <b className="text-alert-green">{current.confirmedBy}</b> 确认
+            </>
+          )}
         </p>
       </div>
+    </div>
+  );
+}
+
+function EvidenceCard({
+  title,
+  icon,
+  main,
+  sub,
+  tone,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  main: string;
+  sub: string;
+  tone: "default" | "amber" | "green" | "violet";
+}) {
+  const toneBorder: Record<string, string> = {
+    default: "border-white/10 bg-white/5",
+    amber: "border-alert-amber/30 bg-alert-amber/10",
+    green: "border-alert-green/30 bg-alert-green/10",
+    violet: "border-violet-400/30 bg-violet-400/10",
+  };
+  const toneText: Record<string, string> = {
+    default: "text-white",
+    amber: "text-alert-amber",
+    green: "text-alert-green",
+    violet: "text-violet-300",
+  };
+  return (
+    <div className={`rounded-lg border px-2.5 py-2 ${toneBorder[tone]}`}>
+      <div className="flex items-center gap-1 text-[10px] uppercase tracking-wider text-ink-300">
+        {icon}
+        {title}
+      </div>
+      <p className={`mt-0.5 font-display text-sm font-semibold ${toneText[tone]}`}>{main}</p>
+      <p className="text-[10px] text-ink-300">{sub}</p>
     </div>
   );
 }
@@ -346,7 +532,9 @@ function Row({
   return (
     <div className="flex items-center justify-between">
       <span className="text-ink-300">{label}</span>
-      <span className={`${mono ? "font-mono" : ""} ${highlight ? "text-alert-amber" : "text-white"}`}>
+      <span
+        className={`${mono ? "font-mono" : ""} ${highlight ? "text-alert-amber" : "text-white"}`}
+      >
         {value}
       </span>
     </div>
