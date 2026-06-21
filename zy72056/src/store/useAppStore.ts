@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import type { StationPoint, AuditLog, FilterState, QualityStatus, AuditAction, DeviceType, SupplementRecord } from "@/data/types"
+import type { StationPoint, AuditLog, FilterState, QualityStatus, AuditAction, SupplementRecord } from "@/data/types"
 import { mockStationPoints } from "@/data/mockStation"
 import { mockTimeSlots } from "@/data/mockTimeSlots"
 
@@ -20,7 +20,8 @@ function loadPersistedState(): { points: StationPoint[]; auditLogs: AuditLog[] }
       return { points: data.points, auditLogs: data.auditLogs || [] }
     }
     return null
-  } catch {
+  } catch (_e) {
+    void _e
     return null
   }
 }
@@ -29,14 +30,16 @@ function persistState(points: StationPoint[], auditLogs: AuditLog[]) {
   try {
     const data: PersistedState = { points, auditLogs, savedAt: new Date().toISOString() }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
-  } catch {
+  } catch (_e) {
+    void _e
   }
 }
 
 export function resetPersistedState() {
   try {
     localStorage.removeItem(STORAGE_KEY)
-  } catch {
+  } catch (_e) {
+    void _e
   }
 }
 

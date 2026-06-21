@@ -1,5 +1,5 @@
 import { useRef, useMemo, useState } from "react"
-import { Canvas, useFrame, useThree } from "@react-three/fiber"
+import { Canvas, useFrame } from "@react-three/fiber"
 import { OrbitControls, Html } from "@react-three/drei"
 import { EffectComposer, Bloom } from "@react-three/postprocessing"
 import * as THREE from "three"
@@ -51,7 +51,7 @@ function FloorPlan({ floor, bounds }: { floor: string; bounds: typeof STATION_BO
       { x: minX + w / 2, y: minY + h / 2, w: 8, h: h },
       { x: minX + w / 2, y: minY + h / 2, w: w, h: 8 },
     ]
-  }, [minX, maxX, minY, maxY, w, h])
+  }, [minX, minY, w, h])
 
   return (
     <group position={[0, height, 0]}>
@@ -244,7 +244,7 @@ function DeviceMarkers({ points, timeHour }: { points: StationPoint[]; timeHour:
 
 function SelectedRing({ position }: { position: [number, number, number] }) {
   const meshRef = useRef<THREE.Mesh>(null)
-  useFrame((state, delta) => {
+  useFrame((state) => {
     if (meshRef.current) {
       const s = 1 + Math.sin(state.clock.elapsedTime * 4) * 0.15
       meshRef.current.scale.set(s, s, s)
@@ -259,17 +259,8 @@ function SelectedRing({ position }: { position: [number, number, number] }) {
 }
 
 function CameraController() {
-  const { camera } = useThree()
-  const controlsRef = useRef<any>(null)
-
-  useFrame(() => {
-    if (camera instanceof THREE.OrthographicCamera) {
-    }
-  })
-
   return (
     <OrbitControls
-      ref={controlsRef}
       enableRotate={false}
       enablePan={true}
       enableZoom={true}
@@ -287,8 +278,6 @@ function CameraController() {
 export default function HeatmapCanvas() {
   const { filter, getFilteredPoints } = useAppStore()
   const points = getFilteredPoints()
-  const activeFloor = filter.floors[0] ?? "B1"
-  const bounds = STATION_BOUNDS[activeFloor as keyof typeof STATION_BOUNDS] ?? STATION_BOUNDS.B1
 
   return (
     <div className="flex-1 relative bg-[#0D1117]">

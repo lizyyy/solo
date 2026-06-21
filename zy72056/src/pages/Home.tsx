@@ -27,7 +27,7 @@ export default function Home() {
         addAuditLog("annotate", "数据加载完成，未检测到质量问题")
       }
     }
-  }, [])
+  }, [addAuditLog, hasPersistedData, points])
 
   return (
     <div id="app-container" className="h-screen w-screen flex flex-col bg-[#0D1117] overflow-hidden">

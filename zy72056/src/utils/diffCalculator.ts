@@ -1,4 +1,4 @@
-import type { StationPoint, SupplementRecord } from "@/data/types"
+import type { StationPoint } from "@/data/types"
 
 export interface DiffEntry {
   field: string
