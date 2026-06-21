@@ -391,6 +391,67 @@ test('filterRecords - 按离群值筛选', () => {
   assert.strictEqual(outliers[0].id, 'r2');
 });
 
+test('filterRecords - hasOutlier传字符串"true"仍能筛出离群（对应前端query string）', () => {
+  const records = [
+    { id: 'r1', stationId: 'S01', isOutlier: false },
+    { id: 'r2', stationId: 'S02', isOutlier: true },
+    { id: 'r3', stationId: 'S03', isOutlier: true }
+  ];
+
+  const byStrTrue = filterRecords(records, { hasOutlier: 'true' });
+  assert.strictEqual(byStrTrue.length, 2, '字符串"true"应等同于布尔true筛出离群');
+  assert.ok(byStrTrue.every(r => r.isOutlier === true));
+
+  const byStrFalse = filterRecords(records, { hasOutlier: 'false' });
+  assert.strictEqual(byStrFalse.length, 1, '字符串"false"应等同于布尔false筛出非离群');
+  assert.strictEqual(byStrFalse[0].id, 'r1');
+});
+
+test('filterRecords - hasOutlier大小写与前后空格不敏感', () => {
+  const records = [
+    { id: 'r1', isOutlier: true },
+    { id: 'r2', isOutlier: false }
+  ];
+  assert.strictEqual(filterRecords(records, { hasOutlier: 'TRUE' }).length, 1);
+  assert.strictEqual(filterRecords(records, { hasOutlier: '  True  ' }).length, 1);
+  assert.strictEqual(filterRecords(records, { hasOutlier: 'False' }).length, 1);
+});
+
+test('filterRecords - hasOutlier缺省或空时不过滤（返回全部）', () => {
+  const records = [
+    { id: 'r1', isOutlier: true },
+    { id: 'r2', isOutlier: false }
+  ];
+  assert.strictEqual(filterRecords(records, {}).length, 2);
+  assert.strictEqual(filterRecords(records, { hasOutlier: undefined }).length, 2);
+  assert.strictEqual(filterRecords(records, { hasOutlier: '' }).length, 2);
+});
+
+test('筛出口径一致：filterRecords与exportData使用同一hasOutlier判断', () => {
+  const { toBool } = require('./processor');
+  const records = [
+    { id: 'r1', stationId: 'S01', isOutlier: false },
+    { id: 'r2', stationId: 'S02', isOutlier: true },
+    { id: 'r3', stationId: 'S03', isOutlier: true }
+  ];
+  const filters = { hasOutlier: 'true' };
+
+  const filtered = filterRecords(records, filters);
+  const exportedStr = exportData(filtered, 'json');
+  const exported = JSON.parse(exportedStr);
+
+  assert.strictEqual(filtered.length, 2);
+  assert.strictEqual(exported.length, filtered.length, '导出记录数应等于屏幕筛选记录数');
+  assert.deepStrictEqual(
+    exported.map(r => r.id).sort(),
+    filtered.map(r => r.id).sort(),
+    '导出的记录ID集合应与屏幕筛选的一致'
+  );
+
+  assert.strictEqual(toBool('true'), true, 'toBool(true字符串)统一归一');
+  assert.strictEqual(toBool(true), true, 'toBool(布尔true)统一归一');
+});
+
 test('filterRecords - 按站点筛选', () => {
   const records = [
     { id: 'r1', stationId: 'S01', status: 'normal', isOutlier: false },
@@ -568,6 +629,66 @@ test('完整彩排：导入旧材料 → 补录边界样本 → 重跑 → 检�
   console.log(`      → 离群值: ${outlierRecords.length} 条（保留但标记）`);
   console.log(`      → 总记录: ${v4.records.length} 条`);
   console.log(`      → ✅ 没有删除离群数据`);
+
+  console.log('   第十步：模拟前端 hasOutlier="true" 筛选 → 贯通到导出');
+  const screenFiltered = filterRecords(v4.records, { hasOutlier: 'true' });
+  assert.strictEqual(
+    screenFiltered.length,
+    outlierRecords.length,
+    '前端传字符串 "true" 时，screen筛选结果应等于全量离群记录数'
+  );
+  for (const r of screenFiltered) {
+    assert.strictEqual(r.isOutlier, true, '筛出的每条记录必须确实是离群');
+  }
+
+  const nonOutlierScreen = filterRecords(v4.records, { hasOutlier: 'false' });
+  assert.strictEqual(
+    nonOutlierScreen.length,
+    v4.records.length - outlierRecords.length,
+    '前端传字符串 "false" 时，应筛出全部非离群'
+  );
+  for (const r of nonOutlierScreen) {
+    assert.strictEqual(r.isOutlier, false, '筛出的每条记录必须确实是非离群');
+  }
+
+  const noCondition = filterRecords(v4.records, {});
+  assert.strictEqual(noCondition.length, v4.records.length, '不传hasOutlier时不过滤');
+
+  const exportJSONStr = exportData(screenFiltered, 'json');
+  const exportJSON = JSON.parse(exportJSONStr);
+  assert.strictEqual(
+    exportJSON.length,
+    screenFiltered.length,
+    'JSON导出记录数 = 屏幕筛选记录数'
+  );
+  assert.deepStrictEqual(
+    exportJSON.map(r => r.id).sort(),
+    screenFiltered.map(r => r.id).sort(),
+    '导出的ID集合 = 屏幕筛选的ID集合（口径一致）'
+  );
+
+  const exportCSV = exportData(screenFiltered, 'csv');
+  const csvLines = exportCSV.split('\n').filter(l => l.trim() !== '');
+  assert.strictEqual(
+    csvLines.length,
+    screenFiltered.length + 1,
+    'CSV导出行数（含表头） = 屏幕筛选数 + 1（口径一致）'
+  );
+
+  console.log(`      → 仅离群筛选（hasOutlier="true"）: ${screenFiltered.length} 条`);
+  console.log(`      → 非离群筛选（hasOutlier="false"）: ${nonOutlierScreen.length} 条`);
+  console.log(`      → 无筛选条件: ${noCondition.length} 条`);
+  console.log(`      → JSON导出: ${exportJSON.length} 条 ↔ 屏幕: ${screenFiltered.length} 条 ✅ 一致`);
+  console.log(`      → CSV导出: ${screenFiltered.length} 条数据行 + 表头 ✅ 一致`);
+  console.log(`      → ✅ 前端筛选 / 后端查询 / 导出 共用一套判断，没有各走一套`);
+
+  console.log('   第十一步：历史没有断');
+  const history = store.getAllVersions();
+  assert.strictEqual(history.length, 4);
+  const flow = history.map(h => h.source);
+  assert.deepStrictEqual(flow, ['lab-report', 'verbal-note', 'boundary-sample', 'rerun']);
+  console.log(`      → 版本链: ${flow.join(' → ')}`);
+  console.log(`      → ✅ 历史连续、口径变更追踪完整`);
   
   console.log('   ✅ 完整彩排流程通过！');
 });

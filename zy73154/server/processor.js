@@ -259,6 +259,16 @@ function mergeData(existingData, newData, source) {
   return merged;
 }
 
+function toBool(value) {
+  if (value === true || value === false) return value;
+  if (typeof value === 'string') {
+    const v = value.trim().toLowerCase();
+    if (v === 'true' || v === '1' || v === 'yes') return true;
+    if (v === 'false' || v === '0' || v === 'no') return false;
+  }
+  return null;
+}
+
 function filterRecords(records, filters = {}) {
   let result = [...records];
 
@@ -270,8 +280,9 @@ function filterRecords(records, filters = {}) {
     result = result.filter(r => r.status === filters.status);
   }
 
-  if (filters.hasOutlier !== undefined) {
-    result = result.filter(r => r.isOutlier === filters.hasOutlier);
+  const hasOutlierBool = toBool(filters.hasOutlier);
+  if (hasOutlierBool !== null) {
+    result = result.filter(r => r.isOutlier === hasOutlierBool);
   }
 
   if (filters.startTime) {
@@ -319,5 +330,6 @@ module.exports = {
   filterRecords,
   exportData,
   normalizeUnit,
+  toBool,
   TIDE_UNITS
 };
