@@ -64,6 +64,66 @@ def _snapshot_record_state(record: SedimentRecord) -> Dict[str, Any]:
     }
 
 
+def _merge_bottle_fields(
+    existing: BottleSample, incoming: BottleSample
+) -> Tuple[BottleSample, Dict[str, Dict[str, Any]]]:
+    snapshot_before = existing.model_dump(mode="json")
+    merged = BottleSample(**existing.model_dump())
+    changes: Dict[str, Dict[str, Any]] = {"added": {}, "overwritten": {}}
+
+    def _check_and_merge(field_name: str, new_val: Any, is_bool: bool = False):
+        current_val = getattr(merged, field_name)
+        if is_bool:
+            if new_val and not current_val:
+                setattr(merged, field_name, new_val)
+                changes["added"][field_name] = {"from": current_val, "to": new_val}
+            elif new_val and current_val and new_val != current_val:
+                setattr(merged, field_name, new_val)
+                changes["overwritten"][field_name] = {"from": current_val, "to": new_val}
+            return
+        if new_val is not None and new_val != "":
+            if current_val is None or current_val == "":
+                setattr(merged, field_name, new_val)
+                changes["added"][field_name] = {"from": current_val, "to": new_val}
+            elif current_val != new_val:
+                setattr(merged, field_name, new_val)
+                changes["overwritten"][field_name] = {"from": current_val, "to": new_val}
+
+    if incoming.experiment_result is not None:
+        if existing.experiment_result is None:
+            merged.experiment_result = incoming.experiment_result
+            changes["added"]["experiment_result"] = {
+                "from": existing.experiment_result,
+                "to": incoming.experiment_result,
+            }
+        elif existing.experiment_result != incoming.experiment_result:
+            merged.experiment_result = incoming.experiment_result
+            changes["overwritten"]["experiment_result"] = {
+                "from": existing.experiment_result,
+                "to": incoming.experiment_result,
+            }
+
+    _check_and_merge("experiment_unit", incoming.experiment_unit)
+    _check_and_merge("experiment_time", incoming.experiment_time)
+    _check_and_merge("sampling_time", incoming.sampling_time)
+    _check_and_merge("station_code", incoming.station_code)
+    _check_and_merge("operator", incoming.operator)
+    _check_and_merge("batch_no", incoming.batch_no)
+    _check_and_merge("remarks", incoming.remarks)
+    _check_and_merge("has_cloud_occlusion", incoming.has_cloud_occlusion, is_bool=True)
+    _check_and_merge("cloud_occlusion_detail", incoming.cloud_occlusion_detail)
+
+    if incoming.raw_data:
+        old_raw_data = dict(merged.raw_data)
+        merged.raw_data.update(incoming.raw_data)
+        changes["added"]["raw_data"] = {
+            "from": old_raw_data,
+            "to": dict(merged.raw_data),
+        }
+
+    return merged, changes
+
+
 def add_bottles_batch(
     record: SedimentRecord,
     new_bottles: List[BottleSample],
@@ -76,9 +136,10 @@ def add_bottles_batch(
         "record_state": _snapshot_record_state(record),
     }
 
-    existing_ids = {b.bottle_id for b in record.bottles}
+    existing_by_id = {b.bottle_id: b for b in record.bottles}
     added_bottles: List[BottleSample] = []
-    duplicate_ids: List[str] = []
+    merged_bottles: List[BottleSample] = []
+    merge_details: List[Dict[str, Any]] = []
 
     for bottle in new_bottles:
         enriched = enrich_bottle_from_id(bottle.bottle_id)
@@ -104,22 +165,39 @@ def add_bottles_batch(
             enriched.cloud_occlusion_detail = bottle.cloud_occlusion_detail
         enriched.raw_data.update(bottle.raw_data)
 
-        if bottle.bottle_id in existing_ids:
-            duplicate_ids.append(bottle.bottle_id)
-            continue
-        added_bottles.append(enriched)
-        existing_ids.add(bottle.bottle_id)
+        if bottle.bottle_id in existing_by_id:
+            existing = existing_by_id[bottle.bottle_id]
+            merged, changes = _merge_bottle_fields(existing, enriched)
+            if changes["added"] or changes["overwritten"]:
+                idx = record.bottles.index(existing)
+                record.bottles[idx] = merged
+                merged_bottles.append(merged)
+                merge_details.append(
+                    {
+                        "bottle_id": bottle.bottle_id,
+                        "before": _snapshot_bottles([existing])[0],
+                        "after": _snapshot_bottles([merged])[0],
+                        "added_fields": changes["added"],
+                        "overwritten_fields": changes["overwritten"],
+                    }
+                )
+        else:
+            added_bottles.append(enriched)
+            existing_by_id[bottle.bottle_id] = enriched
 
     record.bottles.extend(added_bottles)
 
     added_ids = [b.bottle_id for b in added_bottles]
-    record.bottles_received.extend(added_ids)
+    merged_ids = [b.bottle_id for b in merged_bottles]
+    record.bottles_received.extend(added_ids + merged_ids)
 
     calc_result = calculate_sediment(record)
 
     new_material = {
-        "bottles": _snapshot_bottles(added_bottles),
-        "duplicate_skipped": duplicate_ids,
+        "new_bottles": _snapshot_bottles(added_bottles),
+        "merged_bottles": merge_details,
+        "new_bottle_ids": added_ids,
+        "merged_bottle_ids": merged_ids,
         "batch_note": batch_note,
         "calculation_result": {
             "success": calc_result.success,
@@ -129,6 +207,8 @@ def add_bottles_batch(
             "conclusion": calc_result.conclusion,
             "errors_count": len(calc_result.errors),
             "suspicions_count": len(calc_result.suspicions),
+            "valid_bottle_count": len(calc_result.valid_bottles),
+            "invalid_bottle_count": len(calc_result.invalid_bottles),
         },
     }
 
@@ -146,13 +226,29 @@ def add_bottles_batch(
     record.updated_at = datetime.now()
     record.last_modified_by = operator
 
+    final_reason = change_reason
+    if merged_bottles and not added_bottles:
+        field_changes = []
+        for detail in merge_details:
+            added = list(detail["added_fields"].keys())
+            overwritten = list(detail["overwritten_fields"].keys())
+            parts = []
+            if added:
+                parts.append(f"补录字段：{', '.join(added)}")
+            if overwritten:
+                parts.append(f"覆盖字段：{', '.join(overwritten)}")
+            field_changes.append(f"{detail['bottle_id']}({'、'.join(parts)})")
+        final_reason = "补录采样瓶材料：" + "；".join(field_changes)
+    elif added_bottles and merged_bottles:
+        final_reason = f"新增采样瓶{len(added_bottles)}个，补录{len(merged_bottles)}个已有采样瓶的晚到材料"
+
     change = ChangeHistory(
         version=record.current_version,
         operator=operator,
         old_material=old_material,
         new_material=new_material,
         new_remark=batch_note,
-        change_reason=change_reason,
+        change_reason=final_reason,
         old_conclusion=old_conclusion,
         new_conclusion=record.sediment_conclusion,
     )

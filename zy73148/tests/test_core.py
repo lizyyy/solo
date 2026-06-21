@@ -132,7 +132,7 @@ class TestSedimentCalculation:
         bottle = self._make_valid_bottle("HW-20250315-A03-072")
         bottle.experiment_result = None
         record, calc = create_record("A03", "大连港", [bottle])
-        assert record.status == RecordStatus.CALCULATION_FAILED
+        assert record.status == RecordStatus.PENDING_EVIDENCE
         assert record.final_report_ready is False
         assert any(e.category == ErrorCategory.MISSING_DATA for e in record.calculation_errors)
 
@@ -184,12 +184,153 @@ class TestSedimentCalculation:
         assert latest.old_conclusion == conclusion_after_first
         assert latest.new_material.get("batch_note") == "交接晚到附件"
 
-    def test_duplicate_bottle_not_added(self):
+    def test_duplicate_bottle_is_merged_not_skipped(self):
         bottle1 = self._make_valid_bottle("HW-20250315-A03-072", 15.0, "kg/m³")
         record, _ = create_record("A03", "大连港", [bottle1])
+        old_value = record.sediment_value
         bottle_dup = self._make_valid_bottle("HW-20250315-A03-072", 99.0, "kg/m³")
         record, _ = add_bottles_batch(record, [bottle_dup])
         assert len(record.bottles) == 1
+        assert record.bottles[0].experiment_result == 99.0
+        assert record.sediment_value != old_value
+
+    def test_missing_experiment_result_status_is_pending_evidence(self):
+        bottle = self._make_valid_bottle("HW-20250315-A03-072", 15.0, "kg/m³")
+        bottle.experiment_result = None
+        record, calc = create_record("A03", "大连港", [bottle])
+        assert record.status == RecordStatus.PENDING_EVIDENCE
+        assert record.final_report_ready is False
+        assert any(e.category == ErrorCategory.MISSING_DATA for e in record.calculation_errors)
+
+    def test_supplement_experiment_result_merges_and_recalculates(self):
+        bottle = self._make_valid_bottle("HW-20250315-A03-072", 15.0, "kg/m³")
+        bottle.experiment_result = None
+        bottle.experiment_unit = None
+        record, _ = create_record("A03", "大连港", [bottle], created_by="小宋")
+        assert record.status == RecordStatus.PENDING_EVIDENCE
+        assert record.sediment_value is None
+        assert record.sediment_conclusion is None
+        version_after_create = record.current_version
+
+        supplement = BottleSample(
+            bottle_id="HW-20250315-A03-072",
+            experiment_result=18.5,
+            experiment_unit="kg/m³",
+            experiment_time=datetime(2025, 3, 16, 10, 0),
+            remarks="实验室晚到数据，交接补充",
+            raw_data={"source": "晚到附件", "attachment_id": "ATT-2025-0317-001"},
+        )
+        record, _ = add_bottles_batch(
+            record, [supplement], operator="小王", batch_note="交接晚到附件"
+        )
+
+        assert record.status == RecordStatus.RELEASED
+        assert record.sediment_value is not None
+        assert record.sediment_value > 0
+        assert record.sediment_conclusion is not None
+        assert record.current_version == version_after_create + 1
+        assert record.bottles[0].experiment_result == 18.5
+        assert record.bottles[0].experiment_unit == "kg/m³"
+        assert "实验室晚到数据" in (record.bottles[0].remarks or "")
+        assert record.bottles[0].raw_data.get("source") == "晚到附件"
+
+        latest = record.change_history[-1]
+        assert latest.old_conclusion is None
+        assert latest.new_conclusion == record.sediment_conclusion
+        assert "补录字段" in latest.change_reason
+        assert "experiment_result" in latest.change_reason
+        assert "experiment_unit" in latest.change_reason
+
+        merged_details = latest.new_material.get("merged_bottles", [])
+        assert len(merged_details) == 1
+        assert merged_details[0]["bottle_id"] == "HW-20250315-A03-072"
+        assert "experiment_result" in merged_details[0]["added_fields"]
+        assert "experiment_unit" in merged_details[0]["added_fields"]
+        assert merged_details[0]["before"]["experiment_result"] is None
+        assert merged_details[0]["after"]["experiment_result"] == 18.5
+
+    def test_supplement_changes_conclusion_history_visible(self):
+        bottle1 = self._make_valid_bottle("HW-20250315-A03-072", 8.0, "kg/m³")
+        bottle2 = self._make_valid_bottle("HW-20250315-A03-073")
+        bottle2.experiment_result = None
+        record, _ = create_record("A03", "大连港", [bottle1, bottle2])
+        conclusion_v1 = record.sediment_conclusion
+        assert "轻度" in conclusion_v1
+
+        supplement = BottleSample(
+            bottle_id="HW-20250315-A03-073",
+            experiment_result=95.0,
+            experiment_unit="kg/m³",
+        )
+        record, _ = add_bottles_batch(
+            record, [supplement], change_reason="补充A03-073的实验结果"
+        )
+        conclusion_v2 = record.sediment_conclusion
+        assert conclusion_v2 != conclusion_v1
+        assert "重度" in conclusion_v2
+
+        latest = record.change_history[-1]
+        assert latest.old_conclusion == conclusion_v1
+        assert latest.new_conclusion == conclusion_v2
+        assert "补录字段" in latest.change_reason
+        assert "experiment_result" in latest.change_reason
+
+    def test_mixed_errors_pending_vs_calculation_failed(self):
+        bottle_missing = self._make_valid_bottle("HW-20250315-A03-072")
+        bottle_missing.experiment_result = None
+        bottle_bad_unit = self._make_valid_bottle("HW-20250315-A03-073", 15.0, "bad_unit")
+        record, _ = create_record("A03", "大连港", [bottle_missing, bottle_bad_unit])
+        assert record.status == RecordStatus.CALCULATION_FAILED
+
+    def test_only_missing_data_is_pending_evidence(self):
+        bottle1 = self._make_valid_bottle("HW-20250315-A03-072")
+        bottle1.experiment_result = None
+        bottle2 = self._make_valid_bottle("HW-20250315-A03-073")
+        bottle2.experiment_result = None
+        record, _ = create_record("A03", "大连港", [bottle1, bottle2])
+        assert record.status == RecordStatus.PENDING_EVIDENCE
+
+    def test_partial_valid_bottles_with_missing_is_pending(self):
+        bottle_valid = self._make_valid_bottle("HW-20250315-A03-072", 15.0, "kg/m³")
+        bottle_missing = self._make_valid_bottle("HW-20250315-A03-073")
+        bottle_missing.experiment_result = None
+        record, _ = create_record("A03", "大连港", [bottle_valid, bottle_missing])
+        assert record.status == RecordStatus.PENDING_EVIDENCE
+        assert record.sediment_value is not None
+        assert record.final_report_ready is False
+
+    def test_supplement_multiple_fields_including_remarks(self):
+        bottle = self._make_valid_bottle("HW-20250315-A03-072", 15.0, "kg/m³")
+        bottle.remarks = None
+        bottle.operator = None
+        bottle.cloud_occlusion_detail = None
+        record, _ = create_record("A03", "大连港", [bottle])
+
+        supplement = BottleSample(
+            bottle_id="HW-20250315-A03-072",
+            remarks="第二次复核确认数值",
+            operator="李老师",
+            has_cloud_occlusion=True,
+            cloud_occlusion_detail="影像东北区域15%云覆盖",
+            raw_data={"review_round": 2},
+        )
+        record, _ = add_bottles_batch(
+            record, [supplement], batch_note="复核补充材料"
+        )
+
+        b = record.bottles[0]
+        assert b.experiment_result == 15.0
+        assert b.remarks == "第二次复核确认数值"
+        assert b.operator == "李老师"
+        assert b.has_cloud_occlusion is True
+        assert "15%云覆盖" in b.cloud_occlusion_detail
+        assert b.raw_data.get("review_round") == 2
+
+        latest = record.change_history[-1]
+        assert "remarks" in latest.change_reason
+        assert "operator" in latest.change_reason
+        assert "has_cloud_occlusion" in latest.change_reason
+        assert "cloud_occlusion_detail" in latest.change_reason
 
     def test_manual_modify_records_history(self):
         bottle = self._make_valid_bottle("HW-20250315-A03-072", 15.0, "kg/m³")
@@ -249,8 +390,8 @@ class TestSedimentCalculation:
         bottle.experiment_result = None
         record, _ = create_record("A03", "大连港", [bottle])
         comm = format_for_communication(record)
-        assert comm.status == RecordStatus.CALCULATION_FAILED
-        assert "计算失败" in comm.summary
+        assert comm.status == RecordStatus.PENDING_EVIDENCE
+        assert "待补证据" in comm.summary
         assert len(comm.pending_actions) >= 1
 
     def test_communication_result_suspended(self):

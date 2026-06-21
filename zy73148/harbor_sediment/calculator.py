@@ -222,7 +222,20 @@ def calculate_sediment(
     cloud_suspicions = _check_cloud_occlusion(target_bottles)
     suspicions.extend(cloud_suspicions)
 
+    def _separate_errors(err_list: List[CalculationError]) -> Tuple[List[CalculationError], List[CalculationError]]:
+        missing_errs = [e for e in err_list if e.category == ErrorCategory.MISSING_DATA]
+        hard_errs = [e for e in err_list if e.category != ErrorCategory.MISSING_DATA]
+        return missing_errs, hard_errs
+
+    missing_errors, hard_errors = _separate_errors(errors)
+
     if not valid_bottles:
+        if hard_errors:
+            final_status = RecordStatus.CALCULATION_FAILED
+        elif missing_errors:
+            final_status = RecordStatus.PENDING_EVIDENCE
+        else:
+            final_status = RecordStatus.PENDING_EVIDENCE
         return CalculationResult(
             success=False,
             sediment_value=None,
@@ -232,7 +245,7 @@ def calculate_sediment(
             suspicions=suspicions,
             valid_bottles=[],
             invalid_bottles=invalid_bottles,
-            status=RecordStatus.CALCULATION_FAILED if errors else RecordStatus.PENDING_EVIDENCE,
+            status=final_status,
             final_report_ready=False,
         )
 
@@ -292,14 +305,15 @@ def calculate_sediment(
         conclusion = "重度淤积（淤积量 ≥ 50 kg/m³）"
 
     has_suspicion = len(suspicions) > 0
-    has_error = len(errors) > 0
-    final_report_ready = not has_suspicion and not has_error
+    has_hard_error = len(hard_errors) > 0
+    has_missing_error = len(missing_errors) > 0
+    final_report_ready = not has_suspicion and not has_hard_error and not has_missing_error
 
     if has_suspicion:
         status = RecordStatus.SUSPENDED
-    elif has_error:
+    elif has_hard_error:
         status = RecordStatus.CALCULATION_FAILED
-    elif len(invalid_bottles) > 0 or len(valid_bottles) < len(target_bottles):
+    elif has_missing_error or len(invalid_bottles) > 0 or len(valid_bottles) < len(target_bottles):
         status = RecordStatus.PENDING_EVIDENCE
     else:
         status = RecordStatus.RELEASED
