@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>曲线拟合错题归因系统</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", sans-serif;
+      background: #f5f7fa;
+      color: #303133;
+      padding: 20px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #409eff;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+    .card h2 {
+      font-size: 16px;
+      margin-bottom: 16px;
+      color: #303133;
+      border-bottom: 2px solid #409eff;
+      padding-bottom: 8px;
+      display: inline-block;
+    }
+    label { display: block; font-size: 13px; color: #606266; margin-bottom: 6px; margin-top: 12px; }
+    input, textarea, select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    textarea { resize: vertical; min-height: 80px; }
+    button {
+      margin-top: 12px;
+      padding: 8px 16px;
+      background: #409eff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover { background: #66b1ff; }
+    button.secondary { background: #67c23a; }
+    button.secondary:hover { background: #85ce61; }
+    button.warn { background: #e6a23c; }
+    button.warn:hover { background: #ebb563; }
+    .question-list {
+      list-style: none;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .question-item {
+      padding: 10px;
+      border-bottom: 1px solid #ebeef5;
+      cursor: pointer;
+    }
+    .question-item:hover { background: #f5f7fa; }
+    .question-item.active { background: #ecf5ff; border-left: 3px solid #409eff; }
+    .question-name { font-weight: 600; font-size: 14px; }
+    .question-meta { font-size: 12px; color: #909399; margin-top: 4px; }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 12px;
+      border-radius: 3px;
+      margin-right: 4px;
+    }
+    .tag-green { background: #f0f9eb; color: #67c23a; }
+    .tag-red { background: #fef0f0; color: #f56c6c; }
+    .tag-blue { background: #ecf5ff; color: #409eff; }
+    .tag-orange { background: #fdf6ec; color: #e6a23c; }
+    .report-section {
+      margin-top: 20px;
+      padding: 12px;
+      background: #fafafa;
+      border-radius: 4px;
+    }
+    .report-section h3 {
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: #303133;
+    }
+    .confidence-bar {
+      height: 8px;
+      background: #ebeef5;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .confidence-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #67c23a, #e6a23c);
+      transition: width 0.3s;
+    }
+    .suggestion-list {
+      list-style: none;
+      padding-left: 0;
+    }
+    .suggestion-list li {
+      padding: 6px 0;
+      padding-left: 20px;
+      position: relative;
+      font-size: 13px;
+      color: #606266;
+    }
+    .suggestion-list li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: #409eff;
+    }
+    .change-item {
+      padding: 8px;
+      background: #fff;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+    .change-item .field { font-weight: 600; color: #303133; }
+    .change-item .arrow { color: #409eff; margin: 0 8px; }
+    .hidden { display: none; }
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      background: #67c23a;
+      color: #fff;
+      border-radius: 4px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }
+    .toast.error { background: #f56c6c; }
+    code {
+      background: #f5f7fa;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+      color: #f56c6c;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📊 曲线拟合错题归因系统</h1>
+
+    <div class="grid">
+      <div>
+        <div class="card">
+          <h2>🔍 题目列表</h2>
+          <ul class="question-list" id="questionList"></ul>
+        </div>
+
+        <div class="card">
+          <h2>➕ 录入题目</h2>
+          <label>题目名称</label>
+          <input type="text" id="newQName" placeholder="例如：曲线拟合第一题">
+          <label>题目描述</label>
+          <textarea id="newQDesc" placeholder="题目描述或题干"></textarea>
+          <label>学科</label>
+          <input type="text" id="newQSubject" placeholder="例如：数学">
+          <button onclick="addQuestion()">添加 / 查找题目</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" id="detailCard">
+          <h2>📋 题目详情</h2>
+          <p style="color:#909399;font-size:13px;">请从左侧选择一个题目</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card hidden" id="reportCard">
+      <h2>📑 归因报告</h2>
+      <div id="reportContent"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentQuestionId = null;
+
+    function toast(msg, type = 'success') {
+      const el = document.createElement('div');
+      el.className = 'toast ' + (type === 'error' ? 'error' : '');
+      el.textContent = msg;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2000);
+    }
+
+    async function fetchJson(url, options = {}) {
+      const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json' },
+        ...options,
+      });
+      return res.json();
+    }
+
+    async function loadQuestions() {
+      const data = await fetchJson('/api/questions');
+      const list = document.getElementById('questionList');
+      list.innerHTML = '';
+      if (!data.questions || data.questions.length === 0) {
+        list.innerHTML = '<li style="padding:10px;color:#909399;">暂无题目，先录入一个吧</li>';
+        return;
+      }
+      data.questions.forEach(q => {
+        const li = document.createElement('li');
+        li.className = 'question-item' + (q.id === currentQuestionId ? ' active' : '');
+        li.innerHTML = `
+          <div class="question-name">${q.display_names[0] || q.canonical_name}</div>
+          <div class="question-meta">ID: ${q.id} · 别名: ${q.display_names.length} 个</div>
+        `;
+        li.onclick = () => selectQuestion(q.id);
+        list.appendChild(li);
+      });
+    }
+
+    async function addQuestion() {
+      const name = document.getElementById('newQName').value.trim();
+      const desc = document.getElementById('newQDesc').value.trim();
+      const subject = document.getElementById('newQSubject').value.trim();
+      if (!name) { toast('请输入题目名称', 'error'); return; }
+
+      const data = await fetchJson('/api/questions', {
+        method: 'POST',
+        body: JSON.stringify({ name, description: desc, subject }),
+      });
+
+      if (data.error) { toast(data.error, 'error'); return; }
+      toast(data.created ? '题目创建成功' : '匹配到已有题目');
+      loadQuestions();
+      selectQuestion(data.question.id);
+    }
+
+    async function selectQuestion(id) {
+      currentQuestionId = id;
+      loadQuestions();
+      await loadDetail();
+      await loadReport();
+    }
+
+    async function loadDetail() {
+      if (!currentQuestionId) return;
+      const card = document.getElementById('detailCard');
+      const [qData, reportData] = await Promise.all([
+        fetchJson(`/api/questions/${currentQuestionId}`),
+        fetchJson(`/api/questions/${currentQuestionId}/report`),
+      ]);
+
+      const q = qData.question;
+      const r = reportData.report;
+
+      card.innerHTML = `
+        <h2>📋 题目详情</h2>
+        <p><strong>标准名:</strong> ${q.canonical_name}</p>
+        <p><strong>别名:</strong> ${q.display_names.join(' / ')}</p>
+        ${q.description ? `<p><strong>描述:</strong> ${q.description}</p>` : ''}
+        ${q.subject ? `<p><strong>学科:</strong> ${q.subject}</p>` : ''}
+
+        <div style="margin-top:20px;">
+          <h3 style="font-size:14px;margin-bottom:10px;">➕ 添加答案版本</h3>
+          <label>版本标识</label>
+          <input type="text" id="avTag" placeholder="v1.0 / 新版 / 教师版">
+          <label>答案内容</label>
+          <textarea id="avContent" placeholder="答案或解题步骤"></textarea>
+          <label>置信度 (0-1)</label>
+          <input type="number" id="avConf" step="0.01" min="0" max="1" value="1">
+          <button class="secondary" onclick="addAnswerVersion()">添加版本</button>
+        </div>
+
+        <div style="margin-top:20px;">
+          <h3 style="font-size:14px;margin-bottom:10px;">📝 添加评分备注</h3>
+          <label>备注内容</label>
+          <textarea id="snContent" placeholder="例如：v1.0和v2.0答案覆盖，置信度80%，需人工确认外推越界"></textarea>
+          <label>评分人</label>
+          <input type="text" id="snScorer" placeholder="评分人姓名">
+          <label>分数 / 满分</label>
+          <div style="display:flex;gap:8px;">
+            <input type="number" id="snScore" placeholder="得分">
+            <input type="number" id="snMax" placeholder="满分">
+          </div>
+          <button class="secondary" onclick="addScoreNote()">添加备注</button>
+        </div>
+
+        <div style="margin-top:20px;">
+          <h3 style="font-size:14px;margin-bottom:10px;">📎 补充材料</h3>
+          <label>材料名称</label>
+          <input type="text" id="supName" placeholder="拟合曲线参数 / 阈值表">
+          <label>内容</label>
+          <input type="text" id="supContent" placeholder="数值或描述">
+          <div style="display:flex;gap:8px;">
+            <div style="flex:1;">
+              <label>单位</label>
+              <input type="text" id="supUnit" placeholder="m / s / kg">
+            </div>
+            <div style="flex:1;">
+              <label>阈值</label>
+              <input type="number" id="supThresh" step="0.01">
+            </div>
+          </div>
+          <button class="secondary" onclick="addSupplement()">添加/更新材料</button>
+        </div>
+
+        <div style="margin-top:20px;">
+          <h3 style="font-size:14px;margin-bottom:10px;">✅ 人工确认</h3>
+          <label>确认结论</label>
+          <select id="cfDecision">
+            <option value="confirmed">确认归因正确</option>
+            <option value="revised">修正归因</option>
+            <option value="rejected">驳回归因</option>
+          </select>
+          <label>原因</label>
+          <textarea id="cfReason" placeholder="确认或修正的原因"></textarea>
+          <label>操作人</label>
+          <input type="text" id="cfOperator" placeholder="负责人">
+          <button class="warn" onclick="addConfirmation()">提交确认</button>
+        </div>
+      `;
+    }
+
+    async function addAnswerVersion() {
+      const version_tag = document.getElementById('avTag').value.trim();
+      const answer_content = document.getElementById('avContent').value.trim();
+      const confidence = parseFloat(document.getElementById('avConf').value);
+      if (!version_tag || !answer_content) { toast('请填写完整', 'error'); return; }
+
+      const data = await fetchJson(`/api/questions/${currentQuestionId}/answer-versions`, {
+        method: 'POST',
+        body: JSON.stringify({ version_tag, answer_content, confidence }),
+      });
+      if (data.error) { toast(data.error, 'error'); return; }
+      toast(data.created ? '版本已添加' : '该版本已存在');
+      loadReport();
+    }
+
+    async function addScoreNote() {
+      const content = document.getElementById('snContent').value.trim();
+      const scorer = document.getElementById('snScorer').value.trim();
+      const score = document.getElementById('snScore').value;
+      const max_score = document.getElementById('snMax').value;
+      if (!content) { toast('请填写备注内容', 'error'); return; }
+
+      const data = await fetchJson(`/api/questions/${currentQuestionId}/score-notes`, {
+        method: 'POST',
+        body: JSON.stringify({
+          content,
+          scorer,
+          score: score ? parseFloat(score) : undefined,
+          max_score: max_score ? parseFloat(max_score) : undefined,
+        }),
+      });
+      if (data.error) { toast(data.error, 'error'); return; }
+      toast(data.duplicate ? '检测到重复请求，已去重' : '备注已添加');
+      loadReport();
+    }
+
+    async function addSupplement() {
+      const name = document.getElementById('supName').value.trim();
+      const content = document.getElementById('supContent').value.trim();
+      const unit = document.getElementById('supUnit').value.trim();
+      const threshold = document.getElementById('supThresh').value;
+      if (!name || !content) { toast('请填写名称和内容', 'error'); return; }
+
+      const data = await fetchJson(`/api/questions/${currentQuestionId}/supplements`, {
+        method: 'POST',
+        body: JSON.stringify({
+          name, content, unit,
+          threshold: threshold ? parseFloat(threshold) : undefined,
+        }),
+      });
+      if (data.error) { toast(data.error, 'error'); return; }
+      toast(data.updated ? '材料已更新' : '材料已添加');
+      loadReport();
+    }
+
+    async function addConfirmation() {
+      const decision = document.getElementById('cfDecision').value;
+      const reason = document.getElementById('cfReason').value.trim();
+      const operator = document.getElementById('cfOperator').value.trim();
+
+      const before = { question_id: currentQuestionId, note_count: 0 };
+      const after = { ...before, confirmed: true, decision };
+
+      const data = await fetchJson(`/api/questions/${currentQuestionId}/confirmations`, {
+        method: 'POST',
+        body: JSON.stringify({ decision, reason, operator, before_state: before, after_state: after }),
+      });
+      if (data.error) { toast(data.error, 'error'); return; }
+      toast('确认已记录');
+      loadReport();
+    }
+
+    async function loadReport() {
+      if (!currentQuestionId) return;
+      const data = await fetchJson(`/api/questions/${currentQuestionId}/report`);
+      if (data.error) { return; }
+      const r = data.report;
+      const card = document.getElementById('reportCard');
+      card.classList.remove('hidden');
+
+      const confPct = (r.summary.confidence * 100).toFixed(0);
+
+      let coverageHtml = '<p style="color:#909399;font-size:13px;">暂无多版本覆盖</p>';
+      if (r.version_coverage.hasMultipleVersions) {
+        coverageHtml = `
+          <p><span class="tag tag-orange">${r.version_coverage.versions.length} 个答案版本</span></p>
+          <ul style="margin-top:8px;font-size:13px;">
+            ${r.version_coverage.versions.map(v => `<li>• ${v.version_tag} (置信度: ${v.confidence})</li>`).join('')}
+          </ul>
+          ${r.version_coverage.coverageEvidence.length > 0 ? `
+            <p style="margin-top:8px;font-size:13px;"><strong>评分备注中识别到的覆盖关系:</strong></p>
+            <ul style="font-size:13px;">
+              ${r.version_coverage.coverageEvidence.map(e => `<li>备注 #${e.note_id}: ${e.content.substring(0, 50)}...</li>`).join('')}
+            </ul>
+          ` : '<p style="font-size:13px;color:#909399;">评分备注中暂未明确提及覆盖关系</p>'}
+        `;
+      }
+
+      let extraHtml = '<p style="color:#909399;font-size:13px;">未检测到外推越界</p>';
+      if (r.extrapolation.hasIssues) {
+        extraHtml = r.extrapolation.issues.map(issue => `
+          <div style="margin-bottom:12px;">
+            <p><span class="tag tag-red">外推越界</span> ${issue.description}</p>
+            <p style="font-size:12px;color:#909399;margin-top:4px;">${issue.detail || ''}</p>
+            <p style="font-size:13px;margin-top:6px;"><strong>下一步处理建议:</strong></p>
+            <ul class="suggestion-list">
+              ${issue.suggestions.map(s => `<li>${s}</li>`).join('')}
+            </ul>
+          </div>
+        `).join('');
+      }
+
+      let noteImpactHtml = '';
+      if (r.latest_note_impact && r.latest_note_impact.changes.length > 0) {
+        noteImpactHtml = `
+          <div class="report-section">
+            <h3>🆕 最新评分备注带来的判断变化</h3>
+            ${r.latest_note_impact.changes.map(c => `
+              <div class="change-item">
+                <span class="field">${c.field}:</span>
+                <span>${c.before}</span>
+                <span class="arrow">→</span>
+                <span style="color:#67c23a;">${c.after}</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      let changeHtml = '<p style="color:#909399;font-size:13px;">暂无跳变检测数据</p>';
+      if (r.sudden_change.possibleCauses.length > 0) {
+        changeHtml = `
+          <p>${r.sudden_change.hasSuddenChange ? '<span class="tag tag-red">检测到跳变</span>' : '<span class="tag tag-blue">状态监测中</span>'}</p>
+          <p style="font-size:13px;margin-top:6px;"><strong>可能原因分析:</strong></p>
+          <ul style="font-size:13px;">
+            ${r.sudden_change.possibleCauses.map((c, i) => `
+              <li style="margin-bottom:4px;">
+                <span class="tag tag-${c.type === 'threshold_change' ? 'orange' : c.type === 'unit_inconsistency' ? 'red' : c.type === 'supplement_rename' ? 'blue' : 'green'}">
+                  ${c.type === 'threshold_change' ? '阈值变化' :
+                    c.type === 'unit_inconsistency' ? '单位不一致' :
+                    c.type === 'supplement_rename' ? '补充材料改名' :
+                    c.type === 'multiple_versions' ? '多版本切换' : '其他原因'}
+                </span>
+                ${c.description}
+              </li>
+            `).join('')}
+          </ul>
+        `;
+      }
+
+      let confirmHtml = '<p style="color:#909399;font-size:13px;">尚无人工确认记录</p>';
+      if (r.confirmation_diff) {
+        const c = r.confirmation_diff;
+        confirmHtml = `
+          <p><span class="tag tag-green">已有人工确认</span> 决策: ${c.decision}</p>
+          <p style="font-size:13px;margin-top:6px;">操作人: ${c.operator || '未记录'}</p>
+          ${c.reason ? `<p style="font-size:13px;">原因: ${c.reason}</p>` : ''}
+          <div style="margin-top:8px;font-size:12px;">
+            <p><strong>确认前后差异复盘:</strong></p>
+            <p>前置状态: ${c.before_state ? JSON.stringify(c.before_state) : '无记录'}</p>
+            <p>后置状态: ${c.after_state ? JSON.stringify(c.after_state) : '无记录'}</p>
+          </div>
+        `;
+      }
+
+      document.getElementById('reportContent').innerHTML = `
+        <div class="report-section">
+          <h3>🎯 归因结论</h3>
+          <p><strong>原因:</strong> ${r.summary.attribution_reason}</p>
+          <p style="margin-top:6px;">
+            <strong>置信度:</strong> ${confPct}%
+            <div class="confidence-bar"><div class="confidence-fill" style="width:${confPct}%"></div></div>
+          </p>
+          <p style="margin-top:8px;">
+            ${r.summary.need_manual_confirm ? '<span class="tag tag-orange">需人工确认</span>' : '<span class="tag tag-green">无需人工确认</span>'}
+          </p>
+        </div>
+
+        <div class="report-section">
+          <h3>📚 版本覆盖关系</h3>
+          ${coverageHtml}
+        </div>
+
+        ${noteImpactHtml}
+
+        <div class="report-section">
+          <h3>⚠️ 外推越界检测</h3>
+          ${extraHtml}
+        </div>
+
+        <div class="report-section">
+          <h3>📈 结果跳变分析</h3>
+          ${changeHtml}
+        </div>
+
+        <div class="report-section">
+          <h3>✅ 人工确认复盘</h3>
+          ${confirmHtml}
+        </div>
+
+        <div class="report-section">
+          <h3>📊 数据统计</h3>
+          <p>答案版本: <code>${r.summary.answer_version_count}</code> 个</p>
+          <p>评分备注: <code>${r.summary.score_note_count}</code> 条</p>
+          <p>补充材料: <code>${r.summary.supplement_count}</code> 份</p>
+          <p>人工确认: <code>${r.summary.confirmation_count}</code> 次</p>
+        </div>
+      `;
+    }
+
+    loadQuestions();
+  </script>
+</body>
+</html>

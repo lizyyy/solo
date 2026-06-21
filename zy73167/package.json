@@ -1,0 +1,20 @@
+{
+  "name": "curve-fitting-error-analysis",
+  "version": "1.0.0",
+  "description": "曲线拟合错题归因系统 - Node.js + SQLite",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node scripts/demo.js",
+    "test": "node scripts/demo.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "better-sqlite3": "^11.3.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
