@@ -12,7 +12,7 @@ const conflictFingerprint = (c: ConflictRecord): string => {
     case 'direction_error': {
       const sensorDirMatch = c.sensorData.rawLog?.match(/DIR=(CCW|CW)/i);
       const sensorDir = sensorDirMatch ? sensorDirMatch[1].toUpperCase() : 'UNKNOWN';
-      let importDir = c.importData.direction;
+      let importDir: string | undefined = c.importData.direction;
       if (!importDir) {
         const importDirMatch = c.suggestedAction?.match(/导入数据为(CCW|CW)/i);
         if (importDirMatch) {
