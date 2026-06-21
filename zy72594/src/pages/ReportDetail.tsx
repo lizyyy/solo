@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { BarChart3, AlertTriangle, ArrowLeft, Edit3, Check } from 'lucide-react';
+import { BarChart3, AlertTriangle, ArrowLeft, Edit3, Check, Award } from 'lucide-react';
 import { useReportStore } from '../store/useReportStore';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { StepIndicator } from '../components/common/StepIndicator';
@@ -57,6 +57,10 @@ export function ReportDetail() {
     reviewTimeWindowIssue(report.id, approved);
   };
 
+  const conclusionBgColor = report.status === 'pending_review' ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-200';
+  const conclusionTextColor = report.status === 'pending_review' ? 'text-amber-800' : 'text-slate-800';
+  const conclusionIconColor = report.status === 'pending_review' ? 'text-amber-600' : 'text-slate-600';
+
   return (
     <div className="p-8">
       <div className="mb-6">
@@ -81,6 +85,18 @@ export function ReportDetail() {
           currentStep={report.workflowStep}
           steps={['导入实验桶', '补看负样本', '更新异常页']}
         />
+      </div>
+
+      <div className={`mb-6 rounded-xl p-6 border ${conclusionBgColor}`}>
+        <div className="flex items-start gap-3">
+          <Award size={20} className={`flex-shrink-0 mt-0.5 ${conclusionIconColor}`} />
+          <div className="flex-1">
+            <p className={`font-semibold mb-2 ${conclusionTextColor}`}>置信度校准结论</p>
+            <p className={`text-sm leading-relaxed ${conclusionTextColor}`}>
+              {report.conclusion}
+            </p>
+          </div>
+        </div>
       </div>
 
       {report.hasTimeWindowIssue && (

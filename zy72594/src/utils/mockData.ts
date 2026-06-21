@@ -62,6 +62,7 @@ export const mockReports: ConfidenceReport[] = [
     currentVersion: 'v1.2',
     hasTimeWindowIssue: true,
     workflowStep: 2,
+    conclusion: '基于 Wilson 置信区间（α=0.05），在 10000 样本量下点估计置信度约 92%；因样本 S20240601-0003 存在跨天时间窗穿越，整体指标存在约 8% 虚高，需实验平台负责人复核时间戳口径后方可确认最终结论。',
   },
   {
     id: 'report-002',
@@ -73,6 +74,7 @@ export const mockReports: ConfidenceReport[] = [
     currentVersion: 'v1.0',
     hasTimeWindowIssue: false,
     workflowStep: 3,
+    conclusion: '基于 Wilson 置信区间（α=0.05），在 8500 样本量下点估计置信度约 95%，未检测到时间窗穿越或异常样本，结论可作为后续策略迭代依据。',
   },
 ];
 

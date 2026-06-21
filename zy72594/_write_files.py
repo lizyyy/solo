@@ -1,4 +1,8 @@
-export interface ExperimentBucket {
+import os
+
+files = {}
+
+files['src/types/index.ts'] = """export interface ExperimentBucket {
   id: string;
   name: string;
   importTime: string;
@@ -76,3 +80,9 @@ export interface VisualizationDataPoint {
   sourceId: string;
   hasTimeWindowIssue?: boolean;
 }
+"""
+
+for path, content in files.items():
+    with open(path, 'w') as f:
+        f.write(content)
+    print(f'Written {path}: {len(content)} bytes, {content.count(chr(10))} lines')

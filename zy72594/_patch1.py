@@ -1,4 +1,4 @@
-export interface ExperimentBucket {
+TYPES = '''export interface ExperimentBucket {
   id: string;
   name: string;
   importTime: string;
@@ -76,3 +76,9 @@ export interface VisualizationDataPoint {
   sourceId: string;
   hasTimeWindowIssue?: boolean;
 }
+'''
+
+with open('/Users/lzy/pro/solo/workspaces/zy72594/src/types/index.ts', 'w') as f:
+    f.write(TYPES)
+
+print('types written:', len(TYPES), 'bytes')
