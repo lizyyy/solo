@@ -121,6 +121,26 @@ class SpatialAnnotation:
 
 
 @dataclass
+class SensorReading:
+    reading_time: datetime
+    value: float
+    unit: str
+    source: str = "现场浮标"
+    note: str = ""
+
+
+@dataclass
+class DriftEvidence:
+    threshold_pct: float
+    observed_deviation_pct: float
+    last_calibration: Optional[datetime]
+    days_since_calibration: int
+    reference_value: float
+    basis: str
+    conclusion: str
+
+
+@dataclass
 class PendingRecord:
     annotation_id: str
     sample_id: str

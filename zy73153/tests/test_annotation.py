@@ -113,16 +113,67 @@ def test_pending_records_for_scheduler_view(client: TestClient) -> None:
     assert resp.status_code == 200
     pending = resp.json()
     assert len(pending) >= 3
+
+    pending_sample_ids = {p["sample_id"] for p in pending}
+    assert "SP-20260615-001" not in pending_sample_ids, "已正常完成标注的记录不应进入待处理列表"
+
+    allowed = {
+        RecordStatus.LATE_ATTACHMENT.value,
+        RecordStatus.TIME_MISMATCH.value,
+        RecordStatus.SENSOR_DRIFT.value,
+    }
     for p in pending:
         assert p["annotation_id"]
         assert p["sample_id"]
-        assert p["status"]
+        assert p["status"] in allowed, "只有需人工确认的异常才进入待处理"
         assert p["summary"]
+        assert "卡住原因" in p["summary"], "待处理要说明为什么卡住"
         assert p["action_needed"], "排班同事要看到讲明白的待处理动作"
+        assert p["contact_person"], "联系人不能空"
+        assert p["check_first_source"], "先查来源不能空"
+
     drift_pending = [p for p in pending if p["status"] == RecordStatus.SENSOR_DRIFT.value]
     assert len(drift_pending) >= 1
-    assert drift_pending[0]["contact_person"], "漂移待办要有联系人"
-    assert drift_pending[0]["check_first_source"], "漂移待办要标明先看哪条来源"
+    assert "/api/sensors/SN-B2/history" in drift_pending[0]["check_first_source"]
+    assert "李工" in drift_pending[0]["contact_person"], "漂移待办联系人要写明李工"
+
+
+def test_drift_history_endpoint_walks_full_chain(client: TestClient) -> None:
+    client.get("/api/run-main-flow")
+    pending = client.get("/api/pending").json()
+    drift = [p for p in pending if p["status"] == RecordStatus.SENSOR_DRIFT.value][0]
+
+    source = drift["check_first_source"]
+    path = source.split("http://127.0.0.1:8000")[-1]
+    if not path.startswith("/api/sensors/"):
+        path = path  # already a path
+
+    hist_resp = client.get(path)
+    assert hist_resp.status_code == 200, f"漂移核对入口不应 404: {path}"
+    payload = hist_resp.json()
+    assert payload["sensor_id"] == "SN-B2"
+    assert payload["status"] in (
+        SensorStatus.DRIFT_SUSPECTED.value,
+        SensorStatus.DRIFT_CONFIRMED.value,
+    )
+    assert len(payload["history_readings"]) >= 2, "要给出历史读数作为证据"
+    assert any(r["source"] == "实验室复核" for r in payload["history_readings"]), "要含实验室比对值"
+
+    evidence = payload["drift_evidence"]
+    assert evidence is not None
+    assert evidence["threshold_pct"] >= 0
+    assert "偏差率" in evidence["basis"], "判断依据要写明偏差率计算"
+    assert evidence["conclusion"], "要给出结论是否漂移"
+    assert evidence["days_since_calibration"] > 30, "SN-B2 上次校准距今应较久"
+
+    contact = payload["suggested_contact"]
+    assert contact and contact["name"] == "李工", "历史接口要给出建议联系人李工"
+    assert payload["suggested_first_check_source"].endswith("/history")
+
+
+def test_sensor_history_endpoint_404_for_unknown(client: TestClient) -> None:
+    resp = client.get("/api/sensors/SN-NOT-EXIST/history")
+    assert resp.status_code == 404
 
 
 def test_sensor_status_seeded_correctly() -> None:

@@ -5,12 +5,14 @@ from typing import Optional
 
 from .models import (
     CalculationTrail,
+    DriftEvidence,
     FormulaStep,
     LabResult,
     PendingRecord,
     RecordStatus,
     SamplingRecord,
     Sensor,
+    SensorReading,
     SensorStatus,
     SpatialAnnotation,
 )
@@ -272,35 +274,158 @@ class AnnotationEngine:
                 results.append(ann)
         return results
 
+    def build_drift_evidence(self, sensor: Sensor) -> Optional[DriftEvidence]:
+        history = store.sensor_history.get(sensor.sensor_id, [])
+        if not history:
+            return None
+        field_readings = [r for r in history if r.source == "现场浮标"]
+        lab_readings = [r for r in history if r.source == "实验室复核"]
+        if lab_readings:
+            reference_value = lab_readings[-1].value
+        elif field_readings:
+            reference_value = field_readings[0].value
+        else:
+            reference_value = history[0].value
+
+        latest_field = field_readings[-1].value if field_readings else history[-1].value
+        observed_dev = (
+            round(abs(reference_value - latest_field) / reference_value * 100, 2)
+            if reference_value
+            else 0.0
+        )
+        threshold_pct = round(sensor.drift_threshold * 100, 2)
+        days_since = (
+            (datetime.now() - sensor.last_calibration).days
+            if sensor.last_calibration
+            else -1
+        )
+        exceeds = observed_dev > threshold_pct
+        if sensor.status == SensorStatus.DRIFT_CONFIRMED:
+            conclusion = "已确认漂移，建议停用该传感器读数，采用实验室值单独判定"
+        elif exceeds or sensor.status == SensorStatus.DRIFT_SUSPECTED:
+            conclusion = (
+                f"现场读数与实验室参考值偏差 {observed_dev}%，"
+                f"超过漂移阈值 {threshold_pct}%，需人工复核是否漂移"
+            )
+        else:
+            conclusion = (
+                f"偏差 {observed_dev}% 在阈值 {threshold_pct}% 以内，暂未发现漂移"
+            )
+        basis = (
+            f"依据：最近一次实验室复核值 {reference_value} {history[0].unit}，"
+            f"最新现场读数 {latest_field} {history[0].unit}，"
+            f"偏差率 = |参考值 - 现场读数| / 参考值 * 100 = {observed_dev}%；"
+            f"阈值 {threshold_pct}%。"
+            f"上次校准距今 {days_since} 天。"
+        )
+        return DriftEvidence(
+            threshold_pct=threshold_pct,
+            observed_deviation_pct=observed_dev,
+            last_calibration=sensor.last_calibration,
+            days_since_calibration=days_since,
+            reference_value=reference_value,
+            basis=basis,
+            conclusion=conclusion,
+        )
+
+    def get_sensor_history(self, sensor_id: str) -> Optional[dict]:
+        sensor = store.sensors.get(sensor_id)
+        if not sensor:
+            return None
+        history = store.sensor_history.get(sensor_id, [])
+        evidence = self.build_drift_evidence(sensor)
+        tech = store.staff.get(sensor.responsible_person_id)
+        contact = {
+            "staff_id": tech.staff_id,
+            "name": tech.name,
+            "role": tech.role.value,
+            "phone": tech.phone,
+            "contact_hint": tech.contact_hint,
+        } if tech else None
+        readings = [
+            {
+                "reading_time": r.reading_time,
+                "value": r.value,
+                "unit": r.unit,
+                "source": r.source,
+                "note": r.note,
+            }
+            for r in history
+        ]
+        return {
+            "sensor_id": sensor.sensor_id,
+            "name": sensor.name,
+            "location": sensor.location,
+            "status": sensor.status.value,
+            "drift_threshold": sensor.drift_threshold,
+            "last_calibration": sensor.last_calibration,
+            "responsible_person": contact,
+            "history_readings": readings,
+            "drift_evidence": (
+                {
+                    "threshold_pct": evidence.threshold_pct,
+                    "observed_deviation_pct": evidence.observed_deviation_pct,
+                    "last_calibration": evidence.last_calibration,
+                    "days_since_calibration": evidence.days_since_calibration,
+                    "reference_value": evidence.reference_value,
+                    "basis": evidence.basis,
+                    "conclusion": evidence.conclusion,
+                }
+                if evidence
+                else None
+            ),
+            "suggested_first_check_source": sensor.data_source_url,
+            "suggested_contact": contact,
+        }
+
+    def _contact_str(self, staff_id: str) -> str:
+        tech = store.staff.get(staff_id)
+        if not tech:
+            return ""
+        return f"{tech.name}（{tech.role.value}）{tech.phone} {tech.contact_hint}"
+
     def list_pending(self) -> list[PendingRecord]:
         pending: list[PendingRecord] = []
         for ann in store.annotations.values():
-            summary = (
-                f"{ann.zone_level}-{ann.zone_name} | "
-                f"融合值 {ann.calculation_trail.final_result} {ann.calculation_trail.final_unit}"
-            )
-            if ann.alerts:
-                summary += " | " + "；".join(ann.alerts[:2])
-            action = ann.handler_hint or "查看详情"
+            if ann.status in (RecordStatus.NORMAL, RecordStatus.DUPLICATE):
+                continue
 
-            contact = ""
-            first_source = ""
             sr = next(
                 (s for s in store.sampling_records.values() if s.sample_id == ann.sample_id),
                 None,
             )
-            if ann.status in (RecordStatus.TIME_MISMATCH, RecordStatus.LATE_ATTACHMENT):
-                lab_tech = store.staff.get("S003")
-                if lab_tech:
-                    contact = f"{lab_tech.name}（{lab_tech.role.value}）{lab_tech.phone} {lab_tech.contact_hint}"
-                first_source = "实验室原始记录"
-            elif ann.status == RecordStatus.SENSOR_DRIFT and sr:
+            contact = ""
+            first_source = ""
+
+            if ann.status == RecordStatus.SENSOR_DRIFT and sr:
                 sensor = store.sensors.get(sr.sensor_id)
                 if sensor:
-                    tech = store.staff.get(sensor.responsible_person_id)
-                    if tech:
-                        contact = f"{tech.name}（{tech.role.value}）{tech.phone} {tech.contact_hint}"
+                    contact = self._contact_str(sensor.responsible_person_id)
                     first_source = sensor.data_source_url
+                    if not first_source:
+                        first_source = f"传感器历史读数 /api/sensors/{sensor.sensor_id}/history"
+            elif ann.status in (RecordStatus.TIME_MISMATCH, RecordStatus.LATE_ATTACHMENT):
+                contact = self._contact_str("S003")
+                if ann.status == RecordStatus.LATE_ATTACHMENT:
+                    first_source = "实验室附件寄送记录与原始扫描件"
+                else:
+                    first_source = f"实验室原始采样记录（关联 {ann.sample_id} 的实验时间）"
+
+            why = (
+                f"状态：{ann.status.value}。"
+                + ("；".join(ann.alerts[:2]) if ann.alerts else "无附加告警")
+            )
+            summary = (
+                f"{ann.zone_level}-{ann.zone_name} | "
+                f"融合值 {ann.calculation_trail.final_result} {ann.calculation_trail.final_unit} | "
+                f"卡住原因：{why}"
+            )
+            action = ann.handler_hint or "需要人工确认后才能完成空间标注"
+
+            if not contact:
+                contact = self._contact_str("S001")
+            if not first_source:
+                first_source = f"标注详情 /api/annotations/{ann.annotation_id}"
 
             pending.append(
                 PendingRecord(

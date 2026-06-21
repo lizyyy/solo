@@ -30,8 +30,13 @@ pytest tests/ -v
 | ① | `curl http://localhost:8000/api/info` | 有哪些可用命令和端点 |
 | ② | `curl http://localhost:8000/api/run-main-flow` | **主流程批量标注**，看多少条正常、多少条异常；每条都带完整公式、单位、边界值 |
 | ③ | `curl http://localhost:8000/api/annotations/AN-xxx-0001` | 单条详情，重点看 `calculation_trail`（每一步怎么算出来的） |
-| ④ | `curl http://localhost:8000/api/pending` | **待处理记录面板**（排班同事也看这份） |
-| ⑤ | 重复执行一次 `POST /api/annotations/run/SP-20260615-001` | 验证不会重复导入、不会覆盖人工备注 |
+| ④ | `curl http://localhost:8000/api/pending` | **待处理记录面板**（只含需人工确认的；正常完成的不会混进来） |
+| ⑤ | 拿待处理里漂移记录的 `check_first_source`（如 `/api/sensors/SN-B2/history`）再 `curl` 一次 | **漂移核对链路**：历史读数 + 漂移判断依据 + 先查来源 + 联系人，点过去不会 404 |
+| ⑥ | 重复执行一次 `POST /api/annotations/run/SP-20260615-001` | 验证不会重复导入、不会覆盖人工备注 |
+
+> 漂移核对链路（重点）：`/api/pending` 里漂移记录的 `check_first_source` 指向 `/api/sensors/SN-B2/history`，
+> 该接口是真实可访问的，返回这台传感器的历史读数、漂移判断依据（偏差率计算 + 阈值 + 距上次校准天数）、
+> 建议先核对的来源和建议联系人（李工）。小宋顺着 `check_first_source` 点过去就能拿到证据，不会遇到 404。
 
 ---
 
@@ -116,6 +121,10 @@ pytest tests/ -v
 
 ### `GET /api/pending` — 待处理记录（排班同事视图）
 
+> **收口规则**：只有「晚到附件 / 采样时间与实验结果对不上 / 传感器漂移」这类需要人工确认的记录才进入待处理列表。
+> 已正常完成空间标注的记录（如 `SP-20260615-001`）**不会**出现在这里，重复导入自动处理的也不进入。
+> 每条都说明「为什么卡住、该找谁、先查哪条接口或原始材料」，`contact_person` 与 `check_first_source` 不会空着。
+
 ```jsonc
 [
   {
@@ -123,8 +132,8 @@ pytest tests/ -v
     "sample_id": "SP-20260615-002",
     "station_name": "胶州湾二号站",
     "status": "传感器漂移",
-    "summary": "溶解氧-适宜养殖区 | 融合值 8.35 mg/L | 传感器 B2号溶解氧传感器...",
-    "created_at": "2026-06-18T...",
+    "summary": "溶解氧-适宜养殖区 | 融合值 8.35 mg/L | 卡住原因：状态：传感器漂移。传感器 B2号溶解氧传感器...",
+    "created_at": "2026-06-22T...",
     "action_needed": "确认传感器漂移情况并决定是否使用实验室值单独判定",
     "contact_person": "李工（传感器运维）138-0000-0002 传感器运维组，先看传感器校准日志",
     "check_first_source": "/api/sensors/SN-B2/history"
@@ -133,6 +142,40 @@ pytest tests/ -v
 ```
 
 排班同事拿到这份就能直接按 `check_first_source` → `contact_person` → `action_needed` 处理。
+漂移记录的 `check_first_source` 是真实接口，访问它即可拿到漂移判断证据（见下一节）。
+
+### `GET /api/sensors/{sensor_id}/history` — 漂移核对链路（顺着 check_first_source 点过去）
+
+例如 `GET /api/sensors/SN-B2/history`：
+
+```jsonc
+{
+  "sensor_id": "SN-B2",
+  "name": "B2号溶解氧传感器",
+  "location": "2号海域浮标",
+  "status": "疑似漂移",
+  "drift_threshold": 0.1,
+  "last_calibration": "2026-03-24T...",
+  "responsible_person": { "staff_id": "S002", "name": "李工", "role": "传感器运维", "phone": "138-0000-0002", "contact_hint": "..." },
+  "history_readings": [
+    { "reading_time": "...", "value": 8.2, "unit": "mg/L", "source": "现场浮标", "note": "校准后第1天读数" },
+    { "reading_time": "...", "value": 8.9, "unit": "mg/L", "source": "实验室复核", "note": "王姐实验室当日比对值" }
+  ],
+  "drift_evidence": {
+    "threshold_pct": 10.0,
+    "observed_deviation_pct": 12.36,
+    "last_calibration": "2026-03-24T...",
+    "days_since_calibration": 90,
+    "reference_value": 8.9,
+    "basis": "依据：最近一次实验室复核值 8.9 mg/L，最新现场读数 7.8 mg/L，偏差率 = |参考值 - 现场读数| / 参考值 * 100 = 12.36%；阈值 10.0%。上次校准距今 90 天。",
+    "conclusion": "现场读数与实验室参考值偏差 12.36%，超过漂移阈值 10.0%，需人工复核是否漂移"
+  },
+  "suggested_first_check_source": "/api/sensors/SN-B2/history",
+  "suggested_contact": { "name": "李工", "role": "传感器运维", "phone": "138-0000-0002", ... }
+}
+```
+
+不存在的传感器会返回 `404`（带中文说明），不会假装成功。
 
 ---
 

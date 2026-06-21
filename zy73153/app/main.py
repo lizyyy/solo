@@ -136,6 +136,7 @@ async def api_info() -> ApiInfoOut:
             {"method": "PATCH", "path": "/api/lab-results/{lab_result_id}/remark", "desc": "更新实验室备注（不覆盖已有非空备注？不，按 editable 控制）"},
             {"method": "PATCH", "path": "/api/sampling/{sample_id}/remark", "desc": "更新采样备注"},
             {"method": "GET", "path": "/api/sensors", "desc": "传感器列表"},
+            {"method": "GET", "path": "/api/sensors/{sensor_id}/history", "desc": "传感器历史读数+漂移判断依据+先查来源+联系人（漂移核对入口，不可 404）"},
         ],
     )
 
@@ -340,6 +341,17 @@ async def list_sensors() -> list[SensorOut]:
         )
         for s in store.sensors.values()
     ]
+
+
+@app.get("/api/sensors/{sensor_id}/history")
+async def get_sensor_history(sensor_id: str) -> dict:
+    payload = engine.get_sensor_history(sensor_id)
+    if payload is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"传感器 {sensor_id} 不存在，无法提供历史读数与漂移判断依据",
+        )
+    return payload
 
 
 @app.patch("/api/lab-results/{lab_result_id}/remark")

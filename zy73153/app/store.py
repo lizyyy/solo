@@ -10,6 +10,7 @@ from .models import (
     RecordStatus,
     SamplingRecord,
     Sensor,
+    SensorReading,
     SensorStatus,
     SpatialAnnotation,
 )
@@ -19,6 +20,7 @@ class DataStore:
     def __init__(self) -> None:
         self.staff: dict[str, DutyStaff] = {}
         self.sensors: dict[str, Sensor] = {}
+        self.sensor_history: dict[str, list[SensorReading]] = {}
         self.sampling_records: dict[str, SamplingRecord] = {}
         self.lab_results: dict[str, LabResult] = {}
         self.annotations: dict[str, SpatialAnnotation] = {}
@@ -75,6 +77,21 @@ class DataStore:
             responsible_person_id="S002",
             data_source_url="/api/sensors/SN-B2/history",
         )
+
+        hist_base = datetime(2026, 6, 10, 9, 0, 0)
+        self.sensor_history["SN-A1"] = [
+            SensorReading(hist_base, 18.4, "℃", "现场浮标", "校准后第1天读数"),
+            SensorReading(hist_base + timedelta(days=2), 18.6, "℃", "现场浮标", "海况良好"),
+            SensorReading(hist_base + timedelta(days=4), 18.5, "℃", "现场浮标", "与实验室一致"),
+            SensorReading(hist_base + timedelta(days=5, hours=5), 18.5, "℃", "现场浮标", "SP-20260615-001 对应读数"),
+        ]
+        self.sensor_history["SN-B2"] = [
+            SensorReading(hist_base, 8.2, "mg/L", "现场浮标", "校准后第1天读数"),
+            SensorReading(hist_base + timedelta(days=2), 8.1, "mg/L", "现场浮标", "略低于实验室复核"),
+            SensorReading(hist_base + timedelta(days=4), 7.9, "mg/L", "现场浮标", "连续下行，疑似漂移起点"),
+            SensorReading(hist_base + timedelta(days=5, hours=6), 7.8, "mg/L", "现场浮标", "SP-20260615-002 对应读数，与实验室 8.9 差距扩大"),
+            SensorReading(hist_base + timedelta(days=5, hours=6), 8.9, "mg/L", "实验室复核", "王姐实验室当日比对值"),
+        ]
 
         base_time = datetime(2026, 6, 15, 9, 0, 0)
         self.sampling_records["SP-20260615-001"] = SamplingRecord(
