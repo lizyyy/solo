@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { useStore } from "@/store/useStore"
 import { calculateOverallBandwidth } from "@/lib/calculator"
@@ -33,7 +33,12 @@ export default function ReportPage() {
     commonCycle,
     direction,
     activeFilter,
+    recalculate,
   } = useStore()
+
+  useEffect(() => {
+    recalculate()
+  }, [recalculate])
 
   const filteredIntersections = useMemo(() => {
     if (activeFilter === "全部") return intersections
@@ -78,6 +83,7 @@ export default function ReportPage() {
   }, [filteredIntersections])
 
   const exportCSV = () => {
+    recalculate()
     const lines: string[] = []
 
     lines.push("基本信息")

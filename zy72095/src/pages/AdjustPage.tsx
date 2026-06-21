@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useStore } from "@/store/useStore"
-import { calculateSpeedBand, calculateOptimizations } from "@/lib/calculator"
 import type { ManualAdjustment, IntersectionData } from "@/lib/types"
 import { ArrowLeft, Pencil, Download, Trash2, RefreshCw, Filter, GitCompare, FileText } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -21,12 +20,11 @@ export default function AdjustPage() {
     intersections,
     setIntersections,
     speedBandResults,
-    setSpeedBandResults,
     manualAdjustments,
     addManualAdjustment,
     activeFilter,
     setActiveFilter,
-    setOptimizationSuggestions,
+    recalculate,
   } = useStore()
 
   const [editingCell, setEditingCell] = useState<{ id: string; field: EditableField } | null>(null)
@@ -91,6 +89,7 @@ export default function AdjustPage() {
       i.id === id ? { ...i, [field]: numVal } : i
     )
     setIntersections(updated)
+    recalculate()
     setEditingCell(null)
   }
 
@@ -99,11 +98,8 @@ export default function AdjustPage() {
     if (e.key === "Escape") setEditingCell(null)
   }
 
-  const recalculate = () => {
-    const results = calculateSpeedBand(intersections)
-    setSpeedBandResults(results)
-    const suggestions = calculateOptimizations(intersections, results)
-    setOptimizationSuggestions(suggestions)
+  const recalcBtn = () => {
+    recalculate()
   }
 
   const removeAdjustment = (adj: ManualAdjustment) => {
@@ -118,9 +114,11 @@ export default function AdjustPage() {
     })
     useStore.setState({ manualAdjustments: updatedAdjustments })
     setIntersections(updatedIntersections)
+    recalculate()
   }
 
   const exportCSV = () => {
+    recalculate()
     const filtered = getFilteredResults()
     const header =
       "段编号,起点,终点,距离(m),速度下限(km/h),速度上限(km/h),带宽(s),是否异常,异常原因"
@@ -223,7 +221,7 @@ export default function AdjustPage() {
             </span>
           </div>
           <button
-            onClick={recalculate}
+            onClick={recalcBtn}
             className="flex items-center gap-2 bg-[#0D7377] hover:bg-[#0D7377]/80 text-white px-4 py-2 rounded-lg transition-colors"
           >
             <RefreshCw className="w-4 h-4" />

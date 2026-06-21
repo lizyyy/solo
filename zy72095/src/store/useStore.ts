@@ -8,6 +8,7 @@ import type {
   ManualAdjustment,
   ConflictChoice,
 } from '@/lib/types'
+import { calculateSpeedBand, calculateOptimizations } from '@/lib/calculator'
 
 interface StoreState {
   rawText: string
@@ -41,6 +42,7 @@ interface StoreActions {
   setAnnotation: (id: string, annotation: string) => void
   resetCalculation: () => void
   getFilteredIntersections: () => IntersectionData[]
+  recalculate: () => void
 }
 
 export const useStore = create<StoreState & StoreActions>()(
@@ -76,7 +78,9 @@ export const useStore = create<StoreState & StoreActions>()(
           }
           return updated
         })
-        set({ intersections: merged })
+        const speedBandResults = calculateSpeedBand(merged)
+        const optimizationSuggestions = calculateOptimizations(merged, speedBandResults)
+        set({ intersections: merged, speedBandResults, optimizationSuggestions })
       },
       setValidationResults: (results) => set({ validationResults: results }),
       setSpeedBandResults: (results) => set({ speedBandResults: results }),
@@ -127,9 +131,78 @@ export const useStore = create<StoreState & StoreActions>()(
         if (activeFilter === '全部') return intersections
         return intersections.filter((i) => i.direction === activeFilter)
       },
+      recalculate: () => {
+        const { intersections } = get()
+        const speedBandResults = calculateSpeedBand(intersections)
+        const optimizationSuggestions = calculateOptimizations(intersections, speedBandResults)
+        set({ speedBandResults, optimizationSuggestions })
+      },
     }),
     {
       name: 'green-wave-store',
     }
   )
 )
+
+if (typeof window !== 'undefined') {
+  // @ts-ignore - for E2E testing only
+  window.__gwStore = useStore
+  // @ts-ignore
+  window.__gwValidate = () => {
+    const state = useStore.getState()
+    const { intersections, speedBandResults, manualAdjustments } = state
+
+    function calcExpected() {
+      const bandwidth = Math.min(...intersections.map(d => d.cycle * d.greenRatio))
+      const expected = []
+      for (let i = 0; i < intersections.length - 1; i++) {
+        const from = intersections[i];
+        const to = intersections[i + 1]
+        const distance = to.distanceFromStart - from.distanceFromStart
+        const deltaOffset = to.offset - from.offset
+        const greenTimeFrom = from.cycle * from.greenRatio
+        const greenTimeTo = to.cycle * to.greenRatio
+        const segmentBandwidth = Math.min(greenTimeFrom, greenTimeTo)
+        let isAnomalous = false
+        let reason = ''
+        if (segmentBandwidth <= 0) { isAnomalous = true; reason = '绿信比为0导致无绿波带宽' }
+        else if (deltaOffset <= 0) { isAnomalous = true; reason = '偏移差≤0，无法形成绿波' }
+        else {
+          const halfBand = bandwidth / 2
+          const denominatorMax = deltaOffset - halfBand
+          if (denominatorMax <= 0) { isAnomalous = true; reason = '偏移差不足以支撑绿波带宽' }
+        }
+        expected.push({
+          segmentIndex: i, isAnomalous, reason, bandwidth: Math.round(segmentBandwidth * 10) / 10,
+        })
+      }
+      return expected
+    }
+
+    const expected = calcExpected()
+    const results = []
+    results.push({ name: 'J03 offset 保留修正值', expect: 40, actual: intersections.find(i => i.id === 'J03')?.offset })
+    results.push({ name: 'J04 greenRatio 保留修正值', expect: 0.55, actual: intersections.find(i => i.id === 'J04')?.greenRatio })
+    results.push({ name: '人工修正记录数=2', expect: 2, actual: manualAdjustments.length })
+    results.push({ name: '速度带段数=4', expect: 4, actual: speedBandResults.length })
+    let allMatch = true
+    for (let i = 0; i < expected.length; i++) {
+      const actual = speedBandResults[i]
+      const exp = expected[i]
+      const match = actual?.isAnomalous === exp.isAnomalous && actual?.bandwidth === exp.bandwidth
+      if (!match) allMatch = false
+    }
+    results.push({ name: 'speedBandResults = 按修正值重算结果', expect: true, actual: allMatch })
+    results.push({ name: '异常段数一致', expect: expected.filter(r => r.isAnomalous).length, actual: speedBandResults.filter(r => r.isAnomalous).length })
+    results.push({ name: '有效段数一致', expect: expected.filter(r => !r.isAnomalous).length, actual: speedBandResults.filter(r => !r.isAnomalous).length })
+
+    const j03Adj = manualAdjustments.find(a => a.intersectionId === 'J03' && a.field === 'offset')
+    const j04Adj = manualAdjustments.find(a => a.intersectionId === 'J04' && a.field === 'greenRatio')
+    results.push({ name: 'J03 修正记录原始值=48', expect: 48, actual: j03Adj?.originalValue })
+    results.push({ name: 'J04 修正记录原始值=0.52', expect: 0.52, actual: j04Adj?.originalValue })
+
+    const pass = results.filter(r => r.expect === r.actual).length
+    const total = results.length
+    return { pass, total, results }
+  }
+}
