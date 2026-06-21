@@ -55,6 +55,10 @@ class AnomalyRecord:
     severity: str
     suggestion: str
     detail: str
+    raw_value: str = ""
+    detected_unit: str = ""
+    normalized_value: str = ""
+    action: str = ""
 
 
 @dataclass
@@ -142,6 +146,16 @@ TIDE_UNIT_SUGGESTIONS = {
 }
 
 
+TIDE_ACTION_MESSAGES = {
+    "cm": "已自动换算为米(m)，换算关系：1cm = 0.01m",
+    "mm": "已自动换算为米(m)，换算关系：1mm = 0.001m",
+    "no_unit_likely_m": "已按数值范围推断为米(m)，待人工复核确认",
+    "no_unit_likely_cm": "已按数值范围推断为厘米(cm)并换算为米(m)，待人工复核确认",
+    "no_unit_likely_mm": "已按数值范围推断为毫米(mm)并换算为米(m)，待人工复核确认",
+    "unknown": "无法自动处理，需人工核实原始记录",
+}
+
+
 def normalize_tide(value: str, station: str, date: str, ctx: CleanContext) -> Optional[float]:
     if value is None:
         return None
@@ -181,12 +195,19 @@ def normalize_tide(value: str, station: str, date: str, ctx: CleanContext) -> Op
                 meters = v / 1000.0
                 detected_unit = "no_unit_likely_mm"
 
+    norm_val_str = f"{round(meters, 4)}m" if meters is not None else ""
+    action = TIDE_ACTION_MESSAGES.get(detected_unit, "")
+
     if meters is None:
         ctx.anomalies.append(AnomalyRecord(
             station=station, date=date, field="潮位", value=s,
             severity="high",
             suggestion=TIDE_UNIT_SUGGESTIONS["unknown"],
             detail=f"原始值 {s} 无法解析为数值或识别单位",
+            raw_value=s,
+            detected_unit=detected_unit,
+            normalized_value="",
+            action=action,
         ))
         ctx.tide_issues.append(TideIssue(
             station=station, date=date, raw_value=s,
@@ -206,12 +227,26 @@ def normalize_tide(value: str, station: str, date: str, ctx: CleanContext) -> Op
             severity="medium",
             suggestion=TIDE_UNIT_SUGGESTIONS["no_unit"],
             detail=f"缺少单位，按数值范围推断结果为 {round(meters, 4)}m",
+            raw_value=s,
+            detected_unit=detected_unit,
+            normalized_value=norm_val_str,
+            action=action,
         ))
     elif detected_unit != "m":
         ctx.tide_issues.append(TideIssue(
             station=station, date=date, raw_value=s,
             detected_unit=detected_unit, normalized_value=round(meters, 4),
             suggestion=TIDE_UNIT_SUGGESTIONS["mixed"],
+        ))
+        ctx.anomalies.append(AnomalyRecord(
+            station=station, date=date, field="潮位", value=s,
+            severity="low",
+            suggestion=TIDE_UNIT_SUGGESTIONS["mixed"],
+            detail=f"单位为 {detected_unit}，非标准单位，已统一换算为 {norm_val_str}",
+            raw_value=s,
+            detected_unit=detected_unit,
+            normalized_value=norm_val_str,
+            action=action,
         ))
 
     return round(meters, 4)
@@ -282,6 +317,29 @@ def apply_he_changes(rows: List[Dict], he_path: str, ctx: CleanContext) -> None:
     if not os.path.exists(he_path):
         return
     changes = read_csv(he_path)
+
+    extra_fields = set()
+    for c in changes:
+        field = c["字段"]
+        has_field = False
+        for row in rows:
+            if (row["站点编号"], row["监测日期"]) == (c["站点编号"], c["监测日期"]):
+                if field in row:
+                    has_field = True
+                break
+        if not has_field:
+            extra_fields.add(field)
+
+    for row in rows:
+        for ef in extra_fields:
+            if ef not in row:
+                row[ef] = ""
+        for c in changes:
+            if (row["站点编号"], row["监测日期"]) == (c["站点编号"], c["监测日期"]):
+                fld = c["字段"]
+                if fld in extra_fields:
+                    row[fld] = c["改判前"]
+
     for row in rows:
         key = row["站点编号"] + "_" + row["监测日期"]
         ctx.he_changes_before[key] = dict(row)
@@ -291,24 +349,16 @@ def apply_he_changes(rows: List[Dict], he_path: str, ctx: CleanContext) -> None:
         field = c["字段"]
         for row in rows:
             if (row["站点编号"], row["监测日期"]) == key:
-                if field in row:
-                    old = row[field]
-                    row[field] = c["改判后"]
-                    ctx.changes.append(ChangeRecord(
-                        station=key[0], date=key[1], field=field,
-                        old_value=old, new_value=c["改判后"],
-                        source="老何改判", reason=c["改判理由"],
-                        operator=c.get("改判人", "老何"),
-                        timestamp=c.get("改判时间", ""),
-                    ))
-                elif field == "白化等级":
-                    ctx.changes.append(ChangeRecord(
-                        station=key[0], date=key[1], field=field,
-                        old_value=c["改判前"], new_value=c["改判后"],
-                        source="老何改判", reason=c["改判理由"],
-                        operator=c.get("改判人", "老何"),
-                        timestamp=c.get("改判时间", ""),
-                    ))
+                old = row.get(field, "")
+                row[field] = c["改判后"]
+                ctx.changes.append(ChangeRecord(
+                    station=key[0], date=key[1], field=field,
+                    old_value=c["改判前"] if old == "" else old,
+                    new_value=c["改判后"],
+                    source="老何改判", reason=c["改判理由"],
+                    operator=c.get("改判人", "老何"),
+                    timestamp=c.get("改判时间", ""),
+                ))
                 break
 
     for row in rows:
@@ -418,6 +468,8 @@ def build_summary(ctx: CleanContext, raw_count: int, clean_count: int) -> Dict:
     for a in ctx.anomalies:
         severity_counts[a.severity] = severity_counts.get(a.severity, 0) + 1
 
+    tide_anomaly_count = sum(1 for a in ctx.anomalies if a.field == "潮位")
+
     return {
         "生成时间": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "原始记录数": raw_count,
@@ -426,7 +478,7 @@ def build_summary(ctx: CleanContext, raw_count: int, clean_count: int) -> Dict:
         "修改来源分布": source_counts,
         "异常记录数": len(ctx.anomalies),
         "异常严重程度分布": severity_counts,
-        "潮位单位问题数": len(ctx.tide_issues),
+        "潮位单位问题数": tide_anomaly_count,
         "潮位单位分布": tide_units,
         "老何改判记录数": sum(1 for c in ctx.changes if c.source == "老何改判"),
     }
@@ -494,7 +546,7 @@ def main():
 
     anomaly_rows = []
     for a in ctx.anomalies:
-        anomaly_rows.append({
+        row = {
             "站点编号": a.station,
             "监测日期": a.date,
             "字段": a.field,
@@ -502,7 +554,13 @@ def main():
             "严重程度": a.severity,
             "处理建议": a.suggestion,
             "详细说明": a.detail,
-        })
+        }
+        if a.field == "潮位":
+            row["原始值"] = a.raw_value
+            row["识别单位"] = a.detected_unit
+            row["换算后标准值"] = a.normalized_value
+            row["处理动作"] = a.action
+        anomaly_rows.append(row)
     write_csv(anomaly_rows, args.anomalies)
 
     he_diff = {"before": ctx.he_changes_before, "after": ctx.he_changes_after}
@@ -528,7 +586,7 @@ def main():
     print(f"  字段修改:     {summary['字段修改总次数']} 次")
     for src, cnt in summary["修改来源分布"].items():
         print(f"    - {src}: {cnt} 次")
-    print(f"  异常记录:     {summary['异常记录数']} 条 (高:{summary['异常严重程度分布']['high']} 中:{summary['异常严重程度分布']['medium']})")
+    print(f"  异常记录:     {summary['异常记录数']} 条 (高:{summary['异常严重程度分布']['high']} 中:{summary['异常严重程度分布']['medium']} 低:{summary['异常严重程度分布']['low']})")
     print(f"  潮位单位问题: {summary['潮位单位问题数']} 条")
     print(f"  老何改判:     {summary['老何改判记录数']} 条")
     print("=================================")

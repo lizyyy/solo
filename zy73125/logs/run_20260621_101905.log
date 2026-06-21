@@ -1,0 +1,42 @@
+{
+  "参数": {
+    "input": "data/lab_results_old.csv",
+    "corrections": "data/correction_notes.csv",
+    "verbal": "data/verbal_notes.csv",
+    "he_changes": "data/he_decision_changes.csv",
+    "output": "output/cleaned_results.csv",
+    "summary": "output/summary.json",
+    "changes_log": "output/changes_log.csv",
+    "anomalies": "output/anomalies.csv",
+    "he_diff": "output/he_diff.json",
+    "log_dir": "logs"
+  },
+  "汇总": {
+    "生成时间": "2026-06-21 10:19:05",
+    "原始记录数": 8,
+    "清洗后记录数": 8,
+    "字段修改总次数": 26,
+    "修改来源分布": {
+      "后补备注": 3,
+      "口头备注": 4,
+      "格式标准化": 12,
+      "单位标准化": 4,
+      "老何改判": 3
+    },
+    "异常记录数": 5,
+    "异常严重程度分布": {
+      "high": 0,
+      "medium": 2,
+      "low": 3
+    },
+    "潮位单位问题数": 5,
+    "潮位单位分布": {
+      "cm": 2,
+      "no_unit_likely_m": 2,
+      "mm": 1
+    },
+    "老何改判记录数": 3
+  },
+  "修改数": 26,
+  "异常数": 5
+}
