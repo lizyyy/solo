@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 const ANOMALY_MESSAGES: Record<AnomalyType, string> = {
   coordinate_offset: '设备坐标偏移超出容差范围',
   duplicate_name: '存在重名设备',
+  same_device_different_name: '同一设备被记录为两个不同名称',
   missing_photo: '设备缺少照片',
   cross_floor: '设备坐标与所在楼层不匹配',
   empty_value: '存在空值字段',
@@ -13,6 +14,7 @@ const ANOMALY_MESSAGES: Record<AnomalyType, string> = {
 const ANOMALY_SEVERITY: Record<AnomalyType, 'low' | 'medium' | 'high'> = {
   coordinate_offset: 'medium',
   duplicate_name: 'high',
+  same_device_different_name: 'high',
   missing_photo: 'low',
   cross_floor: 'high',
   empty_value: 'high',
@@ -22,13 +24,15 @@ const ANOMALY_SEVERITY: Record<AnomalyType, 'low' | 'medium' | 'high'> = {
 export function createAnomaly(
   type: AnomalyType,
   deviceId: string,
-  extraInfo?: string
+  extraInfo?: string,
+  relatedDeviceId?: string
 ): Anomaly {
   return {
     id: uuidv4(),
     type,
     deviceId,
-    description: extraInfo 
+    relatedDeviceId,
+    description: extraInfo
       ? `${ANOMALY_MESSAGES[type]}: ${extraInfo}`
       : ANOMALY_MESSAGES[type],
     severity: ANOMALY_SEVERITY[type],
@@ -100,6 +104,64 @@ export function detectDuplicateNames(devices: DeviceData[]): Anomaly[] {
   return anomalies;
 }
 
+export function detectSameDeviceDifferentNames(
+  devices: DeviceData[],
+  config: ParameterConfig
+): Anomaly[] {
+  const anomalies: Anomaly[] = [];
+  const processedPairs = new Set<string>();
+  const positionTolerance = config.sameDevicePositionTolerance || 0.5;
+  const energyTolerance = config.sameDeviceEnergyTolerance || 0.1;
+
+  for (let i = 0; i < devices.length; i++) {
+    for (let j = i + 1; j < devices.length; j++) {
+      const d1 = devices[i];
+      const d2 = devices[j];
+
+      if (d1.floor !== d2.floor) continue;
+      if (d1.name === d2.name) continue;
+
+      const distance = Math.sqrt(
+        Math.pow(d1.position.x - d2.position.x, 2) +
+        Math.pow(d1.position.y - d2.position.y, 2) +
+        Math.pow(d1.position.z - d2.position.z, 2)
+      );
+
+      const avgEnergy = (d1.energyConsumption + d2.energyConsumption) / 2;
+      const energyDiffRatio = avgEnergy > 0
+        ? Math.abs(d1.energyConsumption - d2.energyConsumption) / avgEnergy
+        : Math.abs(d1.energyConsumption - d2.energyConsumption);
+
+      if (distance <= positionTolerance && energyDiffRatio <= energyTolerance) {
+        const pairKey1 = `${d1.id}-${d2.id}`;
+        const pairKey2 = `${d2.id}-${d1.id}`;
+        if (processedPairs.has(pairKey1) || processedPairs.has(pairKey2)) continue;
+        processedPairs.add(pairKey1);
+        processedPairs.add(pairKey2);
+
+        anomalies.push(
+          createAnomaly(
+            'same_device_different_name',
+            d1.id,
+            `设备 "${d1.name}" 与 "${d2.name}" 位置差${distance.toFixed(2)}m、能耗差${(energyDiffRatio * 100).toFixed(1)}%，疑似同一物理设备`,
+            d2.id
+          )
+        );
+        anomalies.push(
+          createAnomaly(
+            'same_device_different_name',
+            d2.id,
+            `设备 "${d2.name}" 与 "${d1.name}" 位置差${distance.toFixed(2)}m、能耗差${(energyDiffRatio * 100).toFixed(1)}%，疑似同一物理设备`,
+            d1.id
+          )
+        );
+      }
+    }
+  }
+
+  return anomalies;
+}
+
 export function detectMissingPhotos(devices: DeviceData[]): Anomaly[] {
   const anomalies: Anomaly[] = [];
 
@@ -137,7 +199,7 @@ export function detectEmptyValues(devices: DeviceData[]): Anomaly[] {
 
   devices.forEach((device) => {
     const emptyFields: string[] = [];
-    
+
     if (!device.name || device.name.trim() === '') {
       emptyFields.push('设备名称');
     }
@@ -196,6 +258,7 @@ export function detectAllAnomalies(
   const detectors = [
     () => detectCoordinateOffset(devices, config.coordinateTolerance),
     () => detectDuplicateNames(devices),
+    () => detectSameDeviceDifferentNames(devices, config),
     () => detectMissingPhotos(devices),
     () => detectCrossFloor(devices),
     () => detectEmptyValues(devices),

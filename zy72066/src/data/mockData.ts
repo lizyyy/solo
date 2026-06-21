@@ -11,6 +11,8 @@ export const defaultConfig: ParameterConfig = {
     error: 150,
   },
   coordinateTolerance: 1.5,
+  sameDevicePositionTolerance: 0.8,
+  sameDeviceEnergyTolerance: 0.15,
   createdAt: now,
   updatedAt: now,
   operator: '林老师',
@@ -166,6 +168,94 @@ export const sampleDevicesRework: DeviceData[] = [
   },
 ];
 
+export const sampleDevicesRework91: DeviceData[] = [
+  {
+    id: 'dev-91-a1-main',
+    name: '空调主机-A1',
+    floor: 1,
+    position: { x: -2.05, y: 1.02, z: -1.98 },
+    energyConsumption: 86.2,
+    status: 'normal',
+    photo: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=200&h=150&fit=crop',
+    lastUpdate: '2026-06-20T09:30:00.000Z',
+  },
+  {
+    id: 'dev-91-a1-alias',
+    name: '空调主机-1F',
+    floor: 1,
+    position: { x: -2.02, y: 1.03, z: -2.01 },
+    energyConsumption: 87.1,
+    status: 'normal',
+    photo: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=200&h=150&fit=crop',
+    lastUpdate: '2026-06-20T09:31:00.000Z',
+  },
+  {
+    id: 'dev-91-lighting',
+    name: '照明系统-1F',
+    floor: 1,
+    position: { x: 0, y: 4.6, z: -2 },
+    energyConsumption: 45.3,
+    status: 'normal',
+    lastUpdate: '2026-06-20T09:32:00.000Z',
+  },
+  {
+    id: 'dev-91-power',
+    name: '配电柜-主',
+    floor: 1,
+    position: { x: 2, y: 1, z: -2 },
+    energyConsumption: 149,
+    status: 'warning',
+    photo: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=150&fit=crop',
+    lastUpdate: '2026-06-20T09:33:00.000Z',
+  },
+  {
+    id: 'dev-91-unnamed',
+    name: '',
+    floor: 2,
+    position: { x: -2, y: 4, z: -2 },
+    energyConsumption: 95.8,
+    status: 'normal',
+    lastUpdate: '2026-06-20T09:34:00.000Z',
+  },
+  {
+    id: 'dev-91-server',
+    name: '服务器机房-2F',
+    floor: 2,
+    position: { x: 0, y: 4, z: 0 },
+    energyConsumption: 180.5,
+    status: 'error',
+    photo: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=200&h=150&fit=crop',
+    lastUpdate: '2026-06-20T09:35:00.000Z',
+  },
+  {
+    id: 'dev-91-ventilation',
+    name: '通风系统-3F',
+    floor: 3,
+    position: { x: 4.2, y: 7, z: -2 },
+    energyConsumption: 55.1,
+    status: 'normal',
+    lastUpdate: '2026-06-20T09:36:00.000Z',
+  },
+  {
+    id: 'dev-91-elevator',
+    name: '电梯机组-北',
+    floor: 3,
+    position: { x: 2, y: 7, z: 0 },
+    energyConsumption: 75.4,
+    status: 'normal',
+    lastUpdate: '2026-06-20T09:37:00.000Z',
+  },
+  {
+    id: 'dev-91-power2',
+    name: '配电柜-备用',
+    floor: 2,
+    position: { x: 2, y: 4, z: -2 },
+    energyConsumption: 99,
+    status: 'warning',
+    lastUpdate: '2026-06-20T09:38:00.000Z',
+  },
+];
+
 export const sampleDevicesBoundary: DeviceData[] = [
   {
     id: uuidv4(),
@@ -248,10 +338,14 @@ export const createSampleSolution = (
   updatedAt: now,
   operator: '林老师',
   remarks: [],
+  operationLogs: [],
+  snapshots: [],
+  mergedDevices: [],
 });
 
 export const sampleSolutions: Solution[] = [
   createSampleSolution('方案A-顺利处理样例', sampleDevicesSmooth, 'approved'),
   createSampleSolution('方案B-返工样例', sampleDevicesRework, 'rework'),
   createSampleSolution('方案C-边界测试样例', sampleDevicesBoundary, 'reviewing'),
+  createSampleSolution('返工样例91-异名同设备', sampleDevicesRework91, 'rework'),
 ];

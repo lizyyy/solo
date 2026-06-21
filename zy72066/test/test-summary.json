@@ -1,0 +1,173 @@
+{
+  "testTime": "2026-06-21T17:55:58.514Z",
+  "scenario": "返工样例91-空调主机-A1异名同设备全链路验证",
+  "totalTests": 38,
+  "passed": 38,
+  "failed": 0,
+  "details": {
+    "设备数量应为9台": {
+      "passed": 1,
+      "failed": 0
+    },
+    "空调主机-A1设备存在": {
+      "passed": 1,
+      "failed": 0
+    },
+    "空调主机-1F设备存在": {
+      "passed": 1,
+      "failed": 0
+    },
+    "两台设备在同一楼层(1F)": {
+      "passed": 1,
+      "failed": 0
+    },
+    "位置差应在容差范围内": {
+      "passed": 1,
+      "failed": 0
+    },
+    "能耗差应在容差范围内": {
+      "passed": 1,
+      "failed": 0
+    },
+    "异名同设备应检测到2条(双向)": {
+      "passed": 1,
+      "failed": 0
+    },
+    "空调主机-A1应产生异常记录": {
+      "passed": 1,
+      "failed": 0
+    },
+    "空调主机-1F应产生异常记录": {
+      "passed": 1,
+      "failed": 0
+    },
+    "异常类型应为same_device_different_name": {
+      "passed": 1,
+      "failed": 0
+    },
+    "关联设备ID应为dev-91-a1-alias": {
+      "passed": 1,
+      "failed": 0
+    },
+    "异常严重程度应为high": {
+      "passed": 1,
+      "failed": 0
+    },
+    "初始状态应为未处理": {
+      "passed": 1,
+      "failed": 0
+    },
+    "异常描述应包含两个设备名": {
+      "passed": 1,
+      "failed": 0
+    },
+    "异名同设备异常: 2条": {
+      "passed": 1,
+      "failed": 0
+    },
+    "跨楼层异常: 至少1条(照明系统-1F Y=4.6)": {
+      "passed": 1,
+      "failed": 0
+    },
+    "空值异常: 至少1条(未命名设备)": {
+      "passed": 1,
+      "failed": 0
+    },
+    "边界值异常: 至少1条(配电柜-主 149kWh)": {
+      "passed": 1,
+      "failed": 0
+    },
+    "合并后设备数应为8台": {
+      "passed": 1,
+      "failed": 0
+    },
+    "目标设备应保留别名": {
+      "passed": 1,
+      "failed": 0
+    },
+    "目标设备名称应为规范名": {
+      "passed": 1,
+      "failed": 0
+    },
+    "合并后异名同设备异常应消失": {
+      "passed": 1,
+      "failed": 0
+    },
+    "合并后异常数至少减少2条(异名同设备双向记录)": {
+      "passed": 1,
+      "failed": 0
+    },
+    "设备数应减少1台(合并掉异名设备)": {
+      "passed": 1,
+      "failed": 0
+    },
+    "异常总数应至少减少2条": {
+      "passed": 1,
+      "failed": 0
+    },
+    "已处理异常数应增加": {
+      "passed": 1,
+      "failed": 0
+    },
+    "操作记录应为5条": {
+      "passed": 1,
+      "failed": 0
+    },
+    "应包含设备合并记录": {
+      "passed": 1,
+      "failed": 0
+    },
+    "应包含异常处理记录": {
+      "passed": 1,
+      "failed": 0
+    },
+    "应包含备注添加记录": {
+      "passed": 1,
+      "failed": 0
+    },
+    "设备明细应为8行(合并后)": {
+      "passed": 1,
+      "failed": 0
+    },
+    "合并记录应为1行": {
+      "passed": 1,
+      "failed": 0
+    },
+    "备注应为2条": {
+      "passed": 1,
+      "failed": 0
+    },
+    "操作历史应为5条": {
+      "passed": 1,
+      "failed": 0
+    },
+    "差异对比至少4行基础项": {
+      "passed": 1,
+      "failed": 0
+    },
+    "被合并设备名应为空调主机-1F": {
+      "passed": 1,
+      "failed": 0
+    },
+    "保留设备名应为空调主机-A1": {
+      "passed": 1,
+      "failed": 0
+    },
+    "规范名称应为空调主机-A1": {
+      "passed": 1,
+      "failed": 0
+    }
+  },
+  "exportFiles": {
+    "structuredReport": "/Users/lzy/pro/solo/workspaces/zy72066/test/test-report.json",
+    "runLog": "/Users/lzy/pro/solo/workspaces/zy72066/test/test-run.log"
+  },
+  "keyVerification": {
+    "differentNameDetected": true,
+    "mergeReducesDeviceCount": true,
+    "mergeEliminatesAnomaly": true,
+    "diffSnapshotCaptured": true,
+    "operationLogsTraceable": true,
+    "structuredExportConsistent": true
+  }
+}

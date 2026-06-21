@@ -164,6 +164,58 @@ export default function ParameterPage() {
                   <span>5m</span>
                 </div>
               </div>
+
+              <div className="pt-4 border-t border-gray-100">
+                <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                  🔍 异名同设备识别
+                </h4>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    位置容差 (米)
+                    <span className="float-right text-purple-600 font-bold">{currentConfig.sameDevicePositionTolerance}m</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="0.1"
+                    max="3"
+                    step="0.1"
+                    value={currentConfig.sameDevicePositionTolerance}
+                    onChange={(e) => updateConfig({ sameDevicePositionTolerance: Number(e.target.value) })}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
+                  />
+                  <div className="flex justify-between text-xs text-gray-400 mt-1">
+                    <span>0.1m</span>
+                    <span>3m</span>
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    能耗容差 (百分比)
+                    <span className="float-right text-purple-600 font-bold">
+                      {(currentConfig.sameDeviceEnergyTolerance * 100).toFixed(0)}%
+                    </span>
+                  </label>
+                  <input
+                    type="range"
+                    min="0.02"
+                    max="0.5"
+                    step="0.01"
+                    value={currentConfig.sameDeviceEnergyTolerance}
+                    onChange={(e) => updateConfig({ sameDeviceEnergyTolerance: Number(e.target.value) })}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
+                  />
+                  <div className="flex justify-between text-xs text-gray-400 mt-1">
+                    <span>2%</span>
+                    <span>50%</span>
+                  </div>
+                </div>
+
+                <p className="mt-3 text-xs text-gray-500">
+                  两个设备位置差≤位置容差 且 能耗差百分比≤能耗容差时，判定为疑似同一设备
+                </p>
+              </div>
             </div>
 
             <div className="mt-8 p-4 bg-blue-50 rounded-xl">
@@ -334,6 +386,7 @@ function LinkPreviewCard({ icon: Icon, title, description, onClick, count }: any
 
 function getAnomalyTypeStats(anomalies: Anomaly[]) {
   const typeMap: Record<string, { count: number; severity: string; label: string }> = {
+    same_device_different_name: { count: 0, severity: 'high', label: '异名同设备' },
     coordinate_offset: { count: 0, severity: 'medium', label: '坐标偏移' },
     duplicate_name: { count: 0, severity: 'high', label: '重名设备' },
     missing_photo: { count: 0, severity: 'low', label: '缺少照片' },

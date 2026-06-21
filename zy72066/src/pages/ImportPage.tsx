@@ -1,14 +1,16 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
-import { Upload, FileSpreadsheet, AlertTriangle, CheckCircle, ChevronRight, Sparkles } from 'lucide-react';
+import { Upload, FileSpreadsheet, AlertTriangle, CheckCircle, ChevronRight, Sparkles, Users } from 'lucide-react';
 import { useAppStore, createNewSolution } from '../store/appStore';
-import { sampleDevicesSmooth, sampleDevicesRework, sampleDevicesBoundary } from '../data/mockData';
+import { sampleDevicesSmooth, sampleDevicesRework, sampleDevicesBoundary, sampleDevicesRework91, defaultConfig } from '../data/mockData';
 import { DeviceData } from '../types';
+import { detectSameDeviceDifferentNames } from '../utils/anomalyDetector';
 
 const sampleDatasets = [
   { name: '顺利处理样例', description: '少量异常，可快速通过', devices: sampleDevicesSmooth, color: 'green' },
   { name: '返工样例', description: '包含多种异常，需要补录修正', devices: sampleDevicesRework, color: 'orange' },
+  { name: '返工样例91', description: '空调主机-A1异名同设备（含真实业务场景）', devices: sampleDevicesRework91, color: 'purple' },
   { name: '边界测试样例', description: '空值、重复项、边界值测试', devices: sampleDevicesBoundary, color: 'red' },
 ];
 
@@ -180,8 +182,9 @@ export default function ImportPage() {
             <AlertTriangle className="w-5 h-5 text-accent-orange" />
             异常预检测结果
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
             <StatCard label="设备总数" value={(uploadedData || sampleDatasets[selectedSample!].devices).length} />
+            <StatCard label="异名同设备" value={countAnomalyType('same_device_different_name')} error icon />
             <StatCard label="坐标偏移" value={countAnomalyType('coordinate_offset')} warning />
             <StatCard label="重名设备" value={countAnomalyType('duplicate_name')} error />
             <StatCard label="缺照片" value={countAnomalyType('missing_photo')} />
@@ -211,34 +214,87 @@ export default function ImportPage() {
   function countAnomalyType(type: string): number {
     const devices = uploadedData || (selectedSample !== null ? sampleDatasets[selectedSample].devices : null);
     if (!devices) return 0;
-    
+
     if (type === 'missing_photo') {
-      return devices.filter(d => !d.photo).length;
+      return devices.filter((d) => !d.photo).length;
     }
     if (type === 'duplicate_name') {
       const names = new Set();
       const duplicates = new Set();
-      devices.forEach(d => {
+      devices.forEach((d) => {
         if (names.has(d.name)) duplicates.add(d.name);
         names.add(d.name);
       });
       return duplicates.size;
     }
     if (type === 'empty_value') {
-      return devices.filter(d => !d.name || d.name.trim() === '').length;
+      return devices.filter((d) => !d.name || d.name.trim() === '').length;
+    }
+    if (type === 'same_device_different_name') {
+      return detectSameDeviceDifferentNames(devices, defaultConfig).length / 2;
+    }
+    if (type === 'coordinate_offset') {
+      const tolerance = defaultConfig.coordinateTolerance;
+      const standardPositions: Record<number, { x: number; z: number }[]> = {
+        1: [{ x: -2, z: -2 }, { x: 0, z: -2 }, { x: 2, z: -2 }, { x: -2, z: 0 }, { x: 0, z: 0 }],
+        2: [{ x: -2, z: -2 }, { x: 0, z: -2 }, { x: 2, z: -2 }, { x: -2, z: 0 }, { x: 0, z: 0 }],
+        3: [{ x: -2, z: -2 }, { x: 0, z: -2 }, { x: 2, z: -2 }, { x: -2, z: 0 }, { x: 0, z: 0 }],
+      };
+      return devices.filter((device) => {
+        const floorPositions = standardPositions[device.floor] || [];
+        const minDistance = Math.min(
+          ...floorPositions.map(
+            (pos) => Math.sqrt(Math.pow(device.position.x - pos.x, 2) + Math.pow(device.position.z - pos.z, 2))
+          ),
+          Infinity
+        );
+        return minDistance > tolerance && floorPositions.length > 0;
+      }).length;
+    }
+    if (type === 'cross_floor') {
+      const floorHeight = 3;
+      return devices.filter((device) => {
+        const expectedY = (device.floor - 1) * floorHeight + 1;
+        return Math.abs(device.position.y - expectedY) > floorHeight / 2;
+      }).length;
+    }
+    if (type === 'boundary') {
+      const warningThreshold = defaultConfig.energyThreshold.warning;
+      const errorThreshold = defaultConfig.energyThreshold.error;
+      const boundaryRange = 0.05;
+      return devices.filter((device) => {
+        const nearWarning = Math.abs(device.energyConsumption - warningThreshold) / warningThreshold < boundaryRange;
+        const nearError = Math.abs(device.energyConsumption - errorThreshold) / errorThreshold < boundaryRange;
+        return nearWarning || nearError;
+      }).length;
     }
     return 0;
   }
 }
 
-function StatCard({ label, value, warning, error }: { label: string; value: number; warning?: boolean; error?: boolean }) {
+function StatCard({
+  label,
+  value,
+  warning,
+  error,
+  icon,
+}: {
+  label: string;
+  value: number;
+  warning?: boolean;
+  error?: boolean;
+  icon?: boolean;
+}) {
   return (
-    <div className="bg-gray-50 rounded-xl p-4 text-center">
-      <p className={`text-2xl font-bold ${
-        error ? 'text-accent-red' : warning ? 'text-accent-orange' : 'text-gray-800'
-      }`}>
-        {value}
-      </p>
+    <div className={`rounded-xl p-4 text-center ${value > 0 ? (error ? 'bg-red-50' : warning ? 'bg-orange-50' : 'bg-gray-50') : 'bg-gray-50'}`}>
+      <div className="flex items-center justify-center gap-1">
+        {icon && value > 0 && <Users className={`w-4 h-4 ${error ? 'text-accent-red' : 'text-gray-400'}`} />}
+        <p
+          className={`text-2xl font-bold ${error ? 'text-accent-red' : warning ? 'text-accent-orange' : 'text-gray-800'}`}
+        >
+          {value}
+        </p>
+      </div>
       <p className="text-sm text-gray-500 mt-1">{label}</p>
     </div>
   );
