@@ -1,4 +1,4 @@
-import type { TidalRecord, Station, SourceChainItem, Remark } from '../types';
+import type { TidalRecord, Station, SourceChainItem, Remark, ReviewLog } from '../types';
 import { getStatusLabel, getAnomalyTypeLabel, formatDateTime, getSourceTypeLabel } from './helpers';
 
 interface ReportData {
@@ -6,11 +6,12 @@ interface ReportData {
   records: TidalRecord[];
   sourceChains: Record<string, SourceChainItem[]>;
   remarks: Record<string, Remark[]>;
+  reviewLogs: Record<string, ReviewLog[]>;
   reportTime: string;
 }
 
 export function generateMarkdownReport(data: ReportData): string {
-  const { station, records, sourceChains, remarks, reportTime } = data;
+  const { station, records, sourceChains, remarks, reviewLogs, reportTime } = data;
   
   const totalRecords = records.length;
   const anomalyRecords = records.filter(r => r.isAnomaly);
@@ -90,6 +91,26 @@ export function generateMarkdownReport(data: ReportData): string {
           md += `> ${remark.content}${verbalTag}  \n`;
           md += `> —— ${remark.author} · ${formatDateTime(remark.time)}\n\n`;
         });
+      }
+      
+      const recordReviewLogs = reviewLogs[record.id];
+      if (recordReviewLogs && recordReviewLogs.length > 0) {
+        md += `**状态操作历史**\n\n`;
+        md += `| 时间 | 操作人 | 状态变更 | 操作备注 |\n`;
+        md += `|------|--------|----------|----------|\n`;
+        recordReviewLogs.forEach(log => {
+          const fromStatus = log.fromStatus ? `${getStatusLabel(log.fromStatus)} → ` : '';
+          const toStatus = `**${getStatusLabel(log.toStatus)}**`;
+          const statusChange = `${fromStatus}${toStatus}`;
+          md += `| ${formatDateTime(log.time)} | ${log.operator} | ${statusChange} | ${log.remark || '-'} |\n`;
+        });
+        md += `\n`;
+        
+        const latestLog = recordReviewLogs[recordReviewLogs.length - 1];
+        if (latestLog.conclusion) {
+          md += `**最终复核结论**（${getStatusLabel(latestLog.toStatus)}）：\n\n`;
+          md += `> ${latestLog.conclusion}\n\n`;
+        }
       }
       
       md += `---\n\n`;

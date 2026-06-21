@@ -6,7 +6,7 @@ import { generateMarkdownReport } from '../../utils/markdownGenerator';
 import { copyToClipboard, downloadFile, formatDateTime } from '../../utils/helpers';
 
 const ReportModal: React.FC = () => {
-  const { showReport, toggleReport, stations, selectedStationId, records, sourceChains, remarks } = useAppStore();
+  const { showReport, toggleReport, stations, selectedStationId, records, sourceChains, remarks, reviewLogs } = useAppStore();
   const [copied, setCopied] = useState(false);
 
   const station = stations.find(s => s.id === selectedStationId);
@@ -19,9 +19,10 @@ const ReportModal: React.FC = () => {
       records: stationRecords,
       sourceChains,
       remarks,
+      reviewLogs,
       reportTime: formatDateTime(new Date().toISOString()),
     });
-  }, [station, stationRecords, sourceChains, remarks]);
+  }, [station, stationRecords, sourceChains, remarks, reviewLogs]);
 
   if (!showReport) return null;
 

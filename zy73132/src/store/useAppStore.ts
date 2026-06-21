@@ -4,6 +4,7 @@ import { stations as mockStations } from '../data/stations';
 import { allRecords } from '../data/records';
 import { getSourceChain } from '../data/sourceChains';
 import { getRemarks } from '../data/remarks';
+import { generateConclusion } from '../utils/conclusionGenerator';
 
 const initialSourceChains: Record<string, SourceChainItem[]> = {};
 const initialRemarks: Record<string, Remark[]> = {};
@@ -60,19 +61,36 @@ const useAppStore = create<AppState & AppActions>((set, get) => ({
   })),
 
   updateRecordStatus: (recordId: string, status: ReviewStatus, remark?: string) => set(state => {
+    const record = state.records.find(r => r.id === recordId);
+    if (!record) return state;
+    
+    const operationTime = new Date().toISOString();
+    const operatorName = '小宋';
+    
+    const newConclusion = generateConclusion({
+      record,
+      newStatus: status,
+      operationRemark: remark,
+      sourceChain: state.sourceChains[recordId] || [],
+      remarks: state.remarks[recordId] || [],
+      operatorName,
+      operationTime,
+    });
+    
     const newRecords = state.records.map(r =>
-      r.id === recordId ? { ...r, status } : r
+      r.id === recordId ? { ...r, status, conclusion: newConclusion } : r
     );
     
     const newLog: ReviewLog = {
       id: `log-${Date.now()}`,
       recordId,
       action: 'status_change',
-      fromStatus: state.records.find(r => r.id === recordId)?.status,
+      fromStatus: record.status,
       toStatus: status,
-      operator: '小宋',
-      time: new Date().toISOString(),
+      operator: operatorName,
+      time: operationTime,
       remark,
+      conclusion: newConclusion,
     };
     
     const newReviewLogs = {

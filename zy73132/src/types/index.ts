@@ -59,6 +59,7 @@ export interface ReviewLog {
   operator: string;
   time: string;
   remark?: string;
+  conclusion?: string;
 }
 
 export interface AppState {
