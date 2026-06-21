@@ -25,6 +25,18 @@ const JUDGMENT_HEADERS = [
   '记录ID', '关联点位', '操作人', '判断类型', '原值', '新值', '理由', '时间'
 ]
 
+const IMPORT_ERROR_HEADERS = [
+  '错误ID', '来源文件', '行号', '字段', '原值', '错误类型', '原因说明'
+]
+
+const IMPORT_ERROR_TYPE_LABELS: Record<string, string> = {
+  missing_field: '缺失字段',
+  invalid_format: '格式错误',
+  out_of_range: '范围越界',
+  duplicate_id: '重复ID',
+  unknown_pipe: '未知管线',
+}
+
 function formatDate(iso: string): string {
   if (!iso) return ''
   const d = new Date(iso)
@@ -64,6 +76,7 @@ export default function ReportExport() {
   const filters = useStore((s) => s.filters)
   const qcRecords = useStore((s) => s.qcRecords)
   const judgments = useStore((s) => s.judgments)
+  const importErrors = useStore((s) => s.importErrors)
   const pipes = useStore((s) => s.pipes)
 
   function getPipeName(pipeId: string): string {
@@ -95,6 +108,7 @@ export default function ReportExport() {
     data.push(['异常点位', stats.anomaly])
     data.push(['例外点位', stats.exception])
     data.push(['冲突点位', stats.conflict])
+    data.push(['导入错误', importErrors.length])
     data.push(['', ''])
     data.push(['导出时间', new Date().toLocaleString('zh-CN', { hour12: false })])
     return data
@@ -159,6 +173,22 @@ export default function ReportExport() {
     return data
   }
 
+  function buildImportErrorsData(): any[][] {
+    const data: any[][] = [IMPORT_ERROR_HEADERS]
+    importErrors.forEach(e => {
+      data.push([
+        e.id,
+        e.sourceFile,
+        e.rowNumber ?? '',
+        e.field ?? '',
+        e.value ?? '',
+        IMPORT_ERROR_TYPE_LABELS[e.errorType] || e.errorType,
+        e.message
+      ])
+    })
+    return data
+  }
+
   async function handleExport() {
     setBusy(true)
     try {
@@ -189,6 +219,12 @@ export default function ReportExport() {
       autoWidth(wsJudgment, judgmentData)
       boldHeader(wsJudgment)
       XLSX.utils.book_append_sheet(wb, wsJudgment, '判断记录')
+
+      const importErrorData = buildImportErrorsData()
+      const wsImportError = XLSX.utils.aoa_to_sheet(importErrorData)
+      autoWidth(wsImportError, importErrorData)
+      boldHeader(wsImportError)
+      XLSX.utils.book_append_sheet(wb, wsImportError, '导入错误明细')
 
       const now = new Date()
       const ts = now.getFullYear().toString() +

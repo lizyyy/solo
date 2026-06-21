@@ -59,6 +59,7 @@ interface AppState {
 
   batchImportPoints: (newPoints: CorrosionPoint[], sourceFile: string) => { imported: number; errors: ImportError[] }
   addImportError: (error: Omit<ImportError, 'id'>) => void
+  addImportErrors: (errors: Omit<ImportError, 'id'>[]) => void
   clearImportErrors: () => void
   addQCRecord: (qc: Omit<QCRecord, 'id'>) => void
 }
@@ -333,6 +334,18 @@ export const useStore = create<AppState>()(
           ],
         })),
 
+      addImportErrors: (errors) =>
+        set((state) => {
+          const newErrors: ImportError[] = []
+          let currentIds = state.importErrors.map((e) => e.id)
+          errors.forEach((err) => {
+            const id = generateId('err', currentIds)
+            newErrors.push({ ...err, id })
+            currentIds.push(id)
+          })
+          return { importErrors: [...state.importErrors, ...newErrors] }
+        }),
+
       clearImportErrors: () => set({ importErrors: [] }),
 
       addQCRecord: (qc) =>
@@ -351,6 +364,7 @@ export const useStore = create<AppState>()(
         qcRecords: state.qcRecords,
         conflicts: state.conflicts,
         filterPresets: state.filterPresets,
+        importErrors: state.importErrors,
       }),
     }
   )

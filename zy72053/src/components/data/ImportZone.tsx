@@ -86,6 +86,7 @@ export default function ImportZone() {
 
   const batchImportPoints = useStore((s) => s.batchImportPoints)
   const clearImportErrors = useStore((s) => s.clearImportErrors)
+  const addImportErrors = useStore((s) => s.addImportErrors)
   const pipes = useStore((s) => s.pipes)
   const points = useStore((s) => s.points)
 
@@ -403,8 +404,14 @@ export default function ImportZone() {
       .filter((r) => r.errors.length === 0 && r.point)
       .map((r) => r.point!)
 
+    const allErrors = validatedRows.flatMap((r) => r.errors)
+
+    if (allErrors.length > 0) {
+      addImportErrors(allErrors)
+    }
+
     const result = batchImportPoints(validPoints, fileName || 'excel_import.xlsx')
-    setImportResult({ imported: result.imported, errors: result.errors.length })
+    setImportResult({ imported: result.imported, errors: allErrors.length })
   }
 
   const handleDownloadTemplate = () => {
@@ -665,15 +672,17 @@ export default function ImportZone() {
               </button>
               <button
                 onClick={handleConfirmImport}
-                disabled={hasErrors || importResult !== null}
+                disabled={validatedRows.length === 0 || importResult !== null}
                 className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-                  hasErrors || importResult !== null
+                  validatedRows.length === 0 || importResult !== null
                     ? 'cursor-not-allowed bg-gray-600/30 text-gray-500'
-                    : 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'
+                    : hasErrors
+                      ? 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30'
+                      : 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'
                 }`}
               >
                 <Database size={14} className="mr-1.5 inline" />
-                确认导入
+                {hasErrors ? `导入有效数据（${totalErrors}条错误将记录）` : '确认导入'}
               </button>
             </div>
           </div>
