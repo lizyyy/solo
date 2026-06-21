@@ -1,4 +1,115 @@
-import type { BimNote, CollisionPoint, MaterialChange, AuditLog } from '../types';
+import type { BimNote, CollisionPoint, MaterialChange, AuditLog, BimComponent, DuplicateEvidence } from '../types';
+
+export const mockBimComponents: BimComponent[] = [
+  {
+    id: 'comp-001',
+    name: '消防水管 DN150',
+    type: 'pipe',
+    position: { x: 120, y: -80, z: 35 },
+    size: { x: 0.15, y: 0.15, z: 5 },
+    material: '镀锌钢管',
+    color: '#e74c3c',
+  },
+  {
+    id: 'comp-002',
+    name: '通风风管 800x400',
+    type: 'duct',
+    position: { x: 125, y: -78, z: 34.5 },
+    size: { x: 0.8, y: 0.4, z: 6 },
+    material: '镀锌铁皮',
+    color: '#3498db',
+  },
+  {
+    id: 'comp-003',
+    name: '喷淋支管 DN25',
+    type: 'pipe',
+    position: { x: 140, y: -95, z: 32 },
+    size: { x: 0.025, y: 0.025, z: 3 },
+    material: '镀锌钢管',
+    color: '#e67e22',
+  },
+  {
+    id: 'comp-004',
+    name: '弱电桥架 200x100',
+    type: 'other',
+    position: { x: 141, y: -94, z: 32.5 },
+    size: { x: 0.2, y: 0.1, z: 4 },
+    material: '钢制桥架',
+    color: '#95a5a6',
+  },
+  {
+    id: 'comp-005',
+    name: '结构梁 600x800',
+    type: 'beam',
+    position: { x: 160, y: -110, z: 38 },
+    size: { x: 0.6, y: 0.8, z: 8 },
+    material: '钢筋混凝土',
+    color: '#7f8c8d',
+  },
+  {
+    id: 'comp-006',
+    name: '污水排水管 DN200',
+    type: 'pipe',
+    position: { x: 158, y: -108, z: 39 },
+    size: { x: 0.2, y: 0.2, z: 4 },
+    material: 'UPVC',
+    color: '#27ae60',
+  },
+  {
+    id: 'comp-007',
+    name: '石材墙面 30mm',
+    type: 'wall',
+    position: { x: 80, y: -50, z: 25 },
+    size: { x: 0.03, y: 3, z: 6 },
+    material: '奥特曼米黄大理石',
+    color: '#f5deb3',
+  },
+  {
+    id: 'comp-008',
+    name: '消防栓箱',
+    type: 'other',
+    position: { x: 79.5, y: -48, z: 26 },
+    size: { x: 0.25, y: 0.8, z: 0.65 },
+    material: '钢板',
+    color: '#c0392b',
+  },
+  {
+    id: 'comp-009',
+    name: '结构柱 500x500',
+    type: 'column',
+    position: { x: 100, y: -70, z: 20 },
+    size: { x: 0.5, y: 0.5, z: 4 },
+    material: '钢筋混凝土',
+    color: '#95a5a6',
+  },
+  {
+    id: 'comp-010',
+    name: '楼板 200mm',
+    type: 'floor',
+    position: { x: 130, y: -90, z: 30 },
+    size: { x: 20, y: 15, z: 0.2 },
+    material: '钢筋混凝土',
+    color: '#bdc3c7',
+  },
+  {
+    id: 'comp-011',
+    name: '空调供水管 DN100',
+    type: 'pipe',
+    position: { x: 135, y: -85, z: 36 },
+    size: { x: 0.1, y: 0.1, z: 5 },
+    material: '镀锌钢管',
+    color: '#1abc9c',
+  },
+  {
+    id: 'comp-012',
+    name: '电缆桥架 400x200',
+    type: 'other',
+    position: { x: 130, y: -88, z: 37 },
+    size: { x: 0.4, y: 0.2, z: 6 },
+    material: '钢制桥架',
+    color: '#34495e',
+  },
+];
 
 export const mockBimNotes: BimNote[] = [
   {
@@ -11,6 +122,8 @@ export const mockBimNotes: BimNote[] = [
     modelVersion: 'v2.3.1',
     tags: ['机电', '碰撞', 'B2层'],
     isDeleted: false,
+    componentIds: ['comp-001', 'comp-002', 'comp-003', 'comp-004', 'comp-005', 'comp-006'],
+    location: { x: 130, y: -90, z: 35 },
   },
   {
     id: 'bn-002',
@@ -22,6 +135,8 @@ export const mockBimNotes: BimNote[] = [
     modelVersion: 'v2.2.0',
     tags: ['装修', '材料变更', '1层'],
     isDeleted: false,
+    componentIds: ['comp-007', 'comp-008'],
+    location: { x: 80, y: -50, z: 25 },
   },
   {
     id: 'bn-003',
@@ -33,6 +148,7 @@ export const mockBimNotes: BimNote[] = [
     modelVersion: 'v2.1.5',
     tags: ['结构', '钢结构', '屋面'],
     isDeleted: false,
+    location: { x: 150, y: -60, z: 60 },
   },
   {
     id: 'bn-004',
@@ -44,6 +160,7 @@ export const mockBimNotes: BimNote[] = [
     modelVersion: 'v2.1.0',
     tags: ['建筑', '车库', 'B1层'],
     isDeleted: false,
+    location: { x: 50, y: -30, z: 15 },
   },
   {
     id: 'bn-005',
@@ -56,8 +173,17 @@ export const mockBimNotes: BimNote[] = [
     tags: ['外墙', '保温', '材料'],
     isDeleted: true,
     deletedReason: '数据来源不明，厚度参数缺失，需与设计方确认后重新录入',
+    location: { x: 60, y: -40, z: 30 },
   },
 ];
+
+const duplicateEvidence003: DuplicateEvidence = {
+  componentIds: ['comp-001', 'comp-002'],
+  spatialDistance: 2.5,
+  sameBimNote: true,
+  similarCameraAngle: false,
+  descriptionMatch: 0.85,
+};
 
 export const mockCollisions: CollisionPoint[] = [
   {
@@ -76,6 +202,8 @@ export const mockCollisions: CollisionPoint[] = [
     status: 'confirmed',
     createdAt: '2026-06-08T10:00:00',
     updatedAt: '2026-06-09T15:30:00',
+    componentIds: ['comp-001', 'comp-002'],
+    position: { x: 122.5, y: -79, z: 34.8 },
   },
   {
     id: 'col-002',
@@ -93,6 +221,8 @@ export const mockCollisions: CollisionPoint[] = [
     status: 'pending',
     createdAt: '2026-06-08T10:15:00',
     updatedAt: '2026-06-08T10:15:00',
+    componentIds: ['comp-003', 'comp-004'],
+    position: { x: 140.5, y: -94.5, z: 32.3 },
   },
   {
     id: 'col-003',
@@ -108,11 +238,14 @@ export const mockCollisions: CollisionPoint[] = [
     isDuplicate: true,
     duplicateOf: 'col-001',
     duplicateReason: '不同视角的碰撞检测产生了重复记录，坐标偏差在50mm以内',
+    duplicateEvidence: duplicateEvidence003,
     affectedItems: ['消防工程量统计', '施工进度计划'],
     needsManualReview: true,
-    status: 'pending',
+    status: 'needs_review',
     createdAt: '2026-06-08T14:30:00',
     updatedAt: '2026-06-08T14:30:00',
+    componentIds: ['comp-001', 'comp-002'],
+    position: { x: 123.0, y: -78.5, z: 34.9 },
   },
   {
     id: 'col-004',
@@ -130,6 +263,8 @@ export const mockCollisions: CollisionPoint[] = [
     status: 'supplement',
     createdAt: '2026-06-09T09:00:00',
     updatedAt: '2026-06-10T11:20:00',
+    componentIds: ['comp-005', 'comp-006'],
+    position: { x: 159, y: -109, z: 38.5 },
   },
   {
     id: 'col-005',
@@ -147,6 +282,8 @@ export const mockCollisions: CollisionPoint[] = [
     status: 'returned',
     createdAt: '2026-06-06T14:00:00',
     updatedAt: '2026-06-07T10:00:00',
+    componentIds: ['comp-007', 'comp-008'],
+    position: { x: 79.7, y: -49, z: 25.5 },
   },
 ];
 
@@ -156,11 +293,11 @@ export const mockMaterialChanges: MaterialChange[] = [
     title: 'B2层机电管线碰撞材料变更',
     description: '因B2层消防水管标高调整，相应增加弯头、支架等辅材',
     bimNoteId: 'bn-001',
-    collisionPointIds: ['col-001', 'col-002'],
+    collisionPointIds: ['col-001', 'col-002', 'col-003'],
     sceneAnnotation: 'B2层3-5轴/A-C轴区域，消防水管与通风管碰撞点，调整后管线路由示意',
-    sideNote: '本变更涉及消防水系统整体下调300mm，已与暖通专业确认风管标高不变。结构净高由3.2m降至2.9m，满足最低2.8m的要求。',
-    pageSummary: 'B2层机电碰撞整改共涉及消防水管路由调整1处，新增弯头4个、支架3副，预估增加材料费约1200元。已确认碰撞点2个，待确认1个。',
-    status: 'confirmed',
+    sideNote: '本变更涉及消防水系统整体下调300mm，已与暖通专业确认风管标高不变。结构净高由3.2m降至2.9m，满足最低2.8m的要求。注意：col-003为疑似重复碰撞点，需人工确认后更新数量。',
+    pageSummary: 'B2层机电碰撞整改共涉及消防水管路由调整，新增弯头4个、支架3副。已确认碰撞点2个，待确认1个（含1个疑似重复待人工确认）。预估增加材料费约1200元。',
+    status: 'pending',
     materials: [
       {
         id: 'mat-001',

@@ -1,9 +1,27 @@
-export type TrackingStatus = 'pending' | 'confirmed' | 'supplement' | 'returned' | 'bad_data';
+export type TrackingStatus = 'pending' | 'confirmed' | 'supplement' | 'returned' | 'bad_data' | 'needs_review';
 
 export interface CameraView {
   position: { x: number; y: number; z: number };
   rotation: { x: number; y: number; z: number };
   zoom: number;
+}
+
+export interface BimComponent {
+  id: string;
+  name: string;
+  type: 'pipe' | 'duct' | 'beam' | 'wall' | 'column' | 'floor' | 'other';
+  position: { x: number; y: number; z: number };
+  size: { x: number; y: number; z: number };
+  material?: string;
+  color: string;
+}
+
+export interface DuplicateEvidence {
+  componentIds: string[];
+  spatialDistance: number;
+  sameBimNote?: boolean;
+  similarCameraAngle?: boolean;
+  descriptionMatch?: number;
 }
 
 export interface BimNote {
@@ -17,6 +35,8 @@ export interface BimNote {
   tags: string[];
   isDeleted: boolean;
   deletedReason?: string;
+  componentIds?: string[];
+  location?: { x: number; y: number; z: number };
 }
 
 export interface CollisionPoint {
@@ -29,11 +49,14 @@ export interface CollisionPoint {
   isDuplicate: boolean;
   duplicateOf?: string;
   duplicateReason?: string;
+  duplicateEvidence?: DuplicateEvidence;
   affectedItems?: string[];
   needsManualReview: boolean;
   status: TrackingStatus;
   createdAt: string;
   updatedAt: string;
+  componentIds: string[];
+  position: { x: number; y: number; z: number };
 }
 
 export interface MaterialItem {
@@ -80,3 +103,22 @@ export interface AuditLog {
 }
 
 export type ViewType = 'dashboard' | 'bimNotes' | 'collisions' | 'tracking' | 'review' | 'badData';
+
+export interface ChangeImpactResult {
+  newCollisions: CollisionPoint[];
+  duplicateCollisions: string[];
+  affectedMaterialChanges: string[];
+  newJudgements: string[];
+  updatedSceneAnnotation: string;
+  updatedSideNote: string;
+  updatedPageSummary: string;
+}
+
+export interface ExportConfig {
+  includeFilter: boolean;
+  includeCameraView: boolean;
+  includeReviewStatus: boolean;
+  includeExceptionNotes: boolean;
+  includeOriginalBimNote: boolean;
+  format: 'csv' | 'json' | 'txt';
+}

@@ -1,17 +1,43 @@
 import { useState } from 'react';
 import { CheckCircle, Clock, AlertTriangle, XCircle, Calendar, Download, Filter } from 'lucide-react';
-import type { MaterialChange } from '../types';
+import type { MaterialChange, BimNote, CollisionPoint } from '../types';
 import StatusBadge from './StatusBadge';
+import { generateExportData, exportToCSV, downloadFile } from '../utils/impactAnalysis';
 
 interface ReviewProps {
   materialChanges: MaterialChange[];
+  bimNotes: BimNote[];
+  collisions: CollisionPoint[];
 }
 
 type FilterStatus = 'all' | 'confirmed' | 'pending' | 'supplement' | 'returned';
 
-export default function Review({ materialChanges }: ReviewProps) {
+export default function Review({ materialChanges, bimNotes, collisions }: ReviewProps) {
   const [filter, setFilter] = useState<FilterStatus>('all');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const handleExportReview = () => {
+    const exportItems = selectedIds.size > 0
+      ? materialChanges.filter(m => selectedIds.has(m.id) && !m.isBadData)
+      : filtered;
+
+    const data = generateExportData(exportItems, bimNotes, collisions, {
+      statusFilter: filter,
+      includeCameraView: true,
+      includeOriginalBimNote: true,
+      includeExceptionNotes: true,
+    });
+
+    const csv = exportToCSV(data);
+    const now = new Date().toISOString().slice(0, 10);
+    const filterLabel = filter === 'all' ? '全部' : {
+      confirmed: '已确认',
+      pending: '待确认',
+      supplement: '待补件',
+      returned: '已退回',
+    }[filter];
+    downloadFile(csv, `月底复核表_${filterLabel}_${now}.csv`, 'text/csv');
+  };
 
   const validChanges = materialChanges.filter((m) => !m.isBadData);
 
@@ -72,7 +98,7 @@ export default function Review({ materialChanges }: ReviewProps) {
             筛选
           </button>
           <button
-            onClick={() => {}}
+            onClick={handleExportReview}
             className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Download size={16} />

@@ -1,6 +1,7 @@
-import { Package, AlertTriangle, CheckCircle, Clock, ArrowRight, FileText, Download } from 'lucide-react';
+import { Package, AlertTriangle, CheckCircle, Clock, ArrowRight, FileText, Download, Zap, Layers } from 'lucide-react';
 import type { MaterialChange, BimNote, CollisionPoint } from '../types';
 import StatusBadge from './StatusBadge';
+import { generateExportData, exportToCSV, downloadFile } from '../utils/impactAnalysis';
 
 interface DashboardProps {
   materialChanges: MaterialChange[];
@@ -11,26 +12,52 @@ interface DashboardProps {
 
 export default function Dashboard({ materialChanges, bimNotes, collisions, onViewChange }: DashboardProps) {
   const stats = {
-    total: materialChanges.filter(m => !m.isBadData).length,
-    confirmed: materialChanges.filter(m => m.status === 'confirmed').length,
-    pending: materialChanges.filter(m => m.status === 'pending').length,
-    supplement: materialChanges.filter(m => m.status === 'supplement').length,
-    returned: materialChanges.filter(m => m.status === 'returned').length,
-    badData: materialChanges.filter(m => m.isBadData).length,
+    total: materialChanges.filter((m) => !m.isBadData).length,
+    confirmed: materialChanges.filter((m) => m.status === 'confirmed').length,
+    pending: materialChanges.filter((m) => m.status === 'pending').length,
+    supplement: materialChanges.filter((m) => m.status === 'supplement').length,
+    returned: materialChanges.filter((m) => m.status === 'returned').length,
+    badData: materialChanges.filter((m) => m.isBadData).length,
   };
 
   const totalValue = materialChanges
-    .filter(m => !m.isBadData)
+    .filter((m) => !m.isBadData)
     .reduce((sum, m) => sum + m.materials.length, 0);
 
   const recentChanges = [...materialChanges]
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
     .slice(0, 5);
 
-  const duplicateCollisions = collisions.filter(c => c.isDuplicate).length;
+  const duplicateCollisions = collisions.filter((c) => c.isDuplicate).length;
+  const needsReviewCount = collisions.filter((c) => c.needsManualReview).length;
+
+  const handleExportReport = () => {
+    const data = generateExportData(materialChanges, bimNotes, collisions, {
+      includeCameraView: true,
+      includeOriginalBimNote: true,
+      includeExceptionNotes: true,
+    });
+
+    const csv = exportToCSV(data);
+    const now = new Date().toISOString().slice(0, 10);
+    downloadFile(csv, `施工变更材料追踪报表_${now}.csv`, 'text/csv');
+  };
+
+  const handleQuickExport = () => {
+    const data = generateExportData(materialChanges, bimNotes, collisions, {
+      statusFilter: 'all',
+      includeCameraView: true,
+      includeOriginalBimNote: true,
+      includeExceptionNotes: true,
+    });
+
+    const csv = exportToCSV(data);
+    const now = new Date().toISOString().slice(0, 10);
+    downloadFile(csv, `材料追踪重新导出_${now}.csv`, 'text/csv');
+  };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 overflow-y-auto h-full">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold text-slate-800">项目经理看板</h2>
@@ -45,7 +72,7 @@ export default function Dashboard({ materialChanges, bimNotes, collisions, onVie
             查看全部材料
           </button>
           <button
-            onClick={() => onViewChange('badData')}
+            onClick={handleExportReport}
             className="flex items-center gap-2 px-4 py-2 text-sm border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
           >
             <Download size={16} />
@@ -55,42 +82,12 @@ export default function Dashboard({ materialChanges, bimNotes, collisions, onVie
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <StatCard
-          icon={Package}
-          label="追踪总数"
-          value={stats.total}
-          color="slate"
-        />
-        <StatCard
-          icon={CheckCircle}
-          label="已确认"
-          value={stats.confirmed}
-          color="green"
-        />
-        <StatCard
-          icon={Clock}
-          label="待确认"
-          value={stats.pending}
-          color="amber"
-        />
-        <StatCard
-          icon={FileText}
-          label="待补件"
-          value={stats.supplement}
-          color="blue"
-        />
-        <StatCard
-          icon={AlertTriangle}
-          label="已退回"
-          value={stats.returned}
-          color="red"
-        />
-        <StatCard
-          icon={AlertTriangle}
-          label="坏数据"
-          value={stats.badData}
-          color="slate"
-        />
+        <StatCard icon={Package} label="追踪总数" value={stats.total} color="slate" />
+        <StatCard icon={CheckCircle} label="已确认" value={stats.confirmed} color="green" />
+        <StatCard icon={Clock} label="待确认" value={stats.pending} color="amber" />
+        <StatCard icon={FileText} label="待补件" value={stats.supplement} color="blue" />
+        <StatCard icon={AlertTriangle} label="已退回" value={stats.returned} color="red" />
+        <StatCard icon={AlertTriangle} label="坏数据" value={stats.badData} color="slate" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -121,7 +118,9 @@ export default function Dashboard({ materialChanges, bimNotes, collisions, onVie
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium text-slate-700">{item.materials.length} 项材料</p>
+                  <p className="text-sm font-medium text-slate-700">
+                    {item.materials.length} 项材料
+                  </p>
                 </div>
               </div>
             ))}
@@ -135,7 +134,7 @@ export default function Dashboard({ materialChanges, bimNotes, collisions, onVie
               <QuickAction
                 icon={Package}
                 label="材料库"
-                desc="查看所有变更材料"
+                desc={`${stats.total} 条材料追踪记录`}
                 onClick={() => onViewChange('tracking')}
               />
               <QuickAction
@@ -149,7 +148,13 @@ export default function Dashboard({ materialChanges, bimNotes, collisions, onVie
                 icon={Download}
                 label="重新导出"
                 desc="导出最新追踪报表"
-                onClick={() => {}}
+                onClick={handleQuickExport}
+              />
+              <QuickAction
+                icon={Layers}
+                label="BIM场景视图"
+                desc={`${collisions.length} 处碰撞点`}
+                onClick={() => onViewChange('collisions')}
               />
             </div>
           </div>
@@ -157,10 +162,25 @@ export default function Dashboard({ materialChanges, bimNotes, collisions, onVie
           <div className="bg-white rounded-xl border border-slate-200 p-5">
             <h3 className="font-semibold text-slate-800 mb-4">数据概览</h3>
             <div className="space-y-3">
-              <DataRow label="BIM备注总数" value={bimNotes.length} />
+              <DataRow label="BIM备注总数" value={bimNotes.filter((n) => !n.isDeleted).length} />
               <DataRow label="碰撞点总数" value={collisions.length} />
               <DataRow label="重复碰撞点" value={duplicateCollisions} alert />
+              <DataRow label="待人工确认" value={needsReviewCount} alert />
               <DataRow label="涉及材料种类" value={totalValue} />
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-5">
+            <h3 className="font-semibold text-blue-800 mb-3">本周提醒</h3>
+            <div className="space-y-2 text-sm text-blue-700">
+              <p className="flex items-start gap-2">
+                <Zap size={16} className="flex-shrink-0 mt-0.5" />
+                周一早会：{stats.pending + needsReviewCount} 项待确认
+              </p>
+              <p className="flex items-start gap-2">
+                <FileText size={16} className="flex-shrink-0 mt-0.5" />
+                月底复核：记得分类导出已确认/待补件/退回记录
+              </p>
             </div>
           </div>
         </div>
@@ -169,7 +189,7 @@ export default function Dashboard({ materialChanges, bimNotes, collisions, onVie
   );
 }
 
-function StatCard({ icon: Icon, label, value, color }: { icon: any; label: string; value: number; color: string }) {
+function StatCard({ icon: Icon, label, value, color }: any) {
   const colorMap: Record<string, string> = {
     slate: 'bg-slate-100 text-slate-600',
     green: 'bg-green-100 text-green-600',
@@ -180,7 +200,11 @@ function StatCard({ icon: Icon, label, value, color }: { icon: any; label: strin
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-4">
-      <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${colorMap[color] || colorMap.slate}`}>
+      <div
+        className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${
+          colorMap[color] || colorMap.slate
+        }`}
+      >
         <Icon size={20} />
       </div>
       <p className="text-2xl font-bold text-slate-800">{value}</p>
@@ -195,7 +219,11 @@ function QuickAction({ icon: Icon, label, desc, onClick, alert }: any) {
       onClick={onClick}
       className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors text-left"
     >
-      <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${alert ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'}`}>
+      <div
+        className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+          alert ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'
+        }`}
+      >
         <Icon size={18} />
       </div>
       <div className="flex-1">

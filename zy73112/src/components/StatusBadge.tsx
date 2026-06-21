@@ -10,6 +10,7 @@ const statusConfig: Record<TrackingStatus, { label: string; className: string }>
   supplement: { label: '待补件', className: 'bg-blue-100 text-blue-700 border-blue-200' },
   returned: { label: '已退回', className: 'bg-red-100 text-red-700 border-red-200' },
   bad_data: { label: '坏数据', className: 'bg-slate-200 text-slate-600 border-slate-300' },
+  needs_review: { label: '需人工确认', className: 'bg-purple-100 text-purple-700 border-purple-200' },
 };
 
 export default function StatusBadge({ status }: StatusBadgeProps) {

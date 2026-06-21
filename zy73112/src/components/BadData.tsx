@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { AlertTriangle, Search, Trash2, RotateCcw, Link, FileText } from 'lucide-react';
+import { AlertTriangle, Search, Trash2, RotateCcw, Link, FileText, ExternalLink } from 'lucide-react';
 import type { MaterialChange, BimNote } from '../types';
 import StatusBadge from './StatusBadge';
 
 interface BadDataProps {
   materialChanges: MaterialChange[];
   bimNotes: BimNote[];
+  onViewBimNote?: (noteId: string) => void;
 }
 
-export default function BadData({ materialChanges, bimNotes }: BadDataProps) {
+export default function BadData({ materialChanges, bimNotes, onViewBimNote }: BadDataProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -168,10 +169,21 @@ export default function BadData({ materialChanges, bimNotes }: BadDataProps) {
 
             {originalNote && (
               <div className="bg-white border border-slate-200 rounded-xl p-5">
-                <h4 className="font-medium text-slate-800 mb-4 flex items-center gap-2">
-                  <FileText size={16} className="text-blue-500" />
-                  指向的原始BIM备注
-                </h4>
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-medium text-slate-800 flex items-center gap-2">
+                    <FileText size={16} className="text-blue-500" />
+                    指向的原始BIM备注
+                  </h4>
+                  {onViewBimNote && (
+                    <button
+                      onClick={() => onViewBimNote(originalNote.id)}
+                      className="flex items-center gap-1 px-3 py-1.5 text-xs text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    >
+                      <ExternalLink size={12} />
+                      查看原始备注
+                    </button>
+                  )}
+                </div>
                 <div className="p-4 bg-slate-50 rounded-lg">
                   <p className="font-medium text-slate-800">{originalNote.title}</p>
                   <p className="text-sm text-slate-600 mt-2">{originalNote.content}</p>
