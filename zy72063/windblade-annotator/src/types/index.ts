@@ -21,6 +21,10 @@ export interface SourceInfo {
   sourceType: SourceType;
   sourceRef: string;
   originalData: string;
+  sourceFile?: string;
+  sourceRow?: number;
+  importTime?: string;
+  importOperator?: string;
 }
 
 export interface DiffField {
@@ -96,7 +100,7 @@ export interface AppActions {
   setDiffRecords: (records: { old: CrackRecord; new: CrackRecord }[]) => void;
   toggleLeftPanel: () => void;
   toggleRightPanel: () => void;
-  importRecords: (records: CrackRecord[]) => void;
+  importRecords: (records: Omit<CrackRecord, 'id' | 'createdAt' | 'updatedAt' | 'history'>[]) => void;
   resetToMockData: () => void;
 }
 

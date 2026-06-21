@@ -151,6 +151,19 @@ export const exportReportAsText = (
       report += `\n  处理备注：\n    ${record.remark.split('\n').join('\n    ')}\n`;
     }
     report += `\n  来源追溯：${record.sourceInfo.sourceRef}\n`;
+    if (record.sourceInfo.sourceFile || record.sourceInfo.sourceRow) {
+      report += `  来源文件：${record.sourceInfo.sourceFile || '-'}`;
+      if (record.sourceInfo.sourceRow) {
+        report += `    来源行号：第 ${record.sourceInfo.sourceRow} 行`;
+      }
+      report += '\n';
+    }
+    if (record.sourceInfo.importTime || record.sourceInfo.importOperator) {
+      report += `  导入信息：`;
+      if (record.sourceInfo.importOperator) report += `${record.sourceInfo.importOperator} `;
+      if (record.sourceInfo.importTime) report += `于 ${record.sourceInfo.importTime}`;
+      report += '\n';
+    }
     report += `  创建时间：${record.createdAt}    更新时间：${record.updatedAt}\n`;
     
     if (record.history.length > 0) {

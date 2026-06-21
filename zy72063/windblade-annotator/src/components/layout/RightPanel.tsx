@@ -283,6 +283,39 @@ export const RightPanel = () => {
               <blockquote className="border-l-2 border-primary-500 pl-3 text-sm text-gray-400">
                 {record.sourceInfo.sourceRef}
               </blockquote>
+              
+              {(record.sourceInfo.sourceFile || record.sourceInfo.sourceRow || record.sourceInfo.importTime) && (
+                <div className="mt-3 pt-3 border-t border-white/10 space-y-2">
+                  {record.sourceInfo.sourceFile && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <FileText className="w-3 h-3 text-gray-500" />
+                      <span className="text-gray-500">来源文件：</span>
+                      <span className="text-gray-300 font-mono">{record.sourceInfo.sourceFile}</span>
+                    </div>
+                  )}
+                  {record.sourceInfo.sourceRow && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-gray-500">来源行号：</span>
+                      <span className="text-warning-400 font-mono">第 {record.sourceInfo.sourceRow} 行</span>
+                    </div>
+                  )}
+                  {record.sourceInfo.importTime && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <Clock className="w-3 h-3 text-gray-500" />
+                      <span className="text-gray-500">导入时间：</span>
+                      <span className="text-gray-300">{record.sourceInfo.importTime}</span>
+                    </div>
+                  )}
+                  {record.sourceInfo.importOperator && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <User className="w-3 h-3 text-gray-500" />
+                      <span className="text-gray-500">导入操作人：</span>
+                      <span className="text-gray-300">{record.sourceInfo.importOperator}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+              
               <details className="text-xs">
                 <summary className="cursor-pointer text-gray-500 hover:text-gray-300">
                   查看原始数据快照
