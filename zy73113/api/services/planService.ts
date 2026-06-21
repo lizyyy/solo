@@ -194,6 +194,14 @@ export const planService = {
 
     if (plan.status === 'abnormal') {
       planRepository.updateStatus(id, 'normal');
+      createHistoryVersion(
+        id,
+        'status_change',
+        'abnormal',
+        'normal',
+        `补录材料后自动恢复正常：${supplementReason}`,
+        '系统自动'
+      );
     }
 
     createHistoryVersion(

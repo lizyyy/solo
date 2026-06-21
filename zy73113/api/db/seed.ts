@@ -16,10 +16,22 @@ export function seedDatabase() {
     return;
   }
 
-  const existingCount = db.prepare('SELECT COUNT(*) as count FROM plans').get() as { count: number };
-  if (existingCount.count > 0) {
-    console.log('Database already has data, skipping seed');
-    return;
+  const isDev = process.env.NODE_ENV === 'development';
+  const forceReset = process.env.RESET_DB_ON_START === 'true';
+
+  if (isDev || forceReset) {
+    console.log('Resetting database to clean sample data...');
+    db.exec('DELETE FROM plans');
+    const count = (db.prepare('SELECT COUNT(*) as count FROM plans').get() as { count: number }).count;
+    if (count !== 0) {
+      throw new Error(`Failed to reset database: ${count} plans remaining`);
+    }
+  } else {
+    const existingCount = db.prepare('SELECT COUNT(*) as count FROM plans').get() as { count: number };
+    if (existingCount.count > 0) {
+      console.log('Database already has data, skipping seed');
+      return;
+    }
   }
 
   const rawData = fs.readFileSync(sampleDataPath, 'utf-8');
