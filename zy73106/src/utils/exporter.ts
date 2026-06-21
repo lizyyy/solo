@@ -11,34 +11,167 @@ function csvEscape(v: unknown): string {
   return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
+function truncate(s: string, n: number): string {
+  if (!s) return '';
+  return s.length > n ? s.slice(0, n) + '…' : s;
+}
+
 export function exportCSV(state: AppState, drawingId?: string): string {
   const { drawings, versions, notes, materials, changeLogs } = state;
-  const byDrawing = (id: string) => ({
-    vs: versions.filter(v => v.drawingId === id),
-    ns: notes.filter(n => n.drawingId === id),
-    ms: materials.filter(m => m.drawingId === id),
-    cs: changeLogs.filter(c => c.drawingId === id),
+  const targetDrawings = drawingId
+    ? drawings.filter(d => d.id === drawingId)
+    : drawings;
+
+  const headers = [
+    '图纸编号(项目编号)',
+    '图纸名称',
+    '当前版本',
+    '预审结论(状态)',
+    '异常数量(碰撞+不合格)',
+    '复核原因',
+    '最新备注',
+    '材料批次状态',
+    '变更摘要',
+    '材料缺料数',
+    '楼栋位置',
+    '最后更新时间',
+  ];
+
+  const rows = targetDrawings.map(d => {
+    const dVersions = versions.filter(v => v.drawingId === d.id);
+    const latest = dVersions.find(v => v.isLatest) ?? dVersions[0];
+    const dNotes = notes.filter(n => n.drawingId === d.id).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+    const dMaterials = materials.filter(m => m.drawingId === d.id);
+    const dChanges = changeLogs.filter(c => c.drawingId === d.id).sort(
+      (a, b) => new Date(b.changedAt).getTime() - new Date(a.changedAt).getTime(),
+    );
+
+    const drawingCode = `${d.projectNo}-${d.id.slice(0, 6)}`;
+    const currentVersion = latest?.version ?? '-';
+    const needReview = d.status === 'reviewing' || d.status === 'abnormal';
+    const conclusion = `${STATUS_LABELS[d.status]}${needReview ? '（需复核）' : ''}`;
+    const abnormalCount = d.metrics.collisionPoints + d.metrics.unqualifiedItems;
+
+    const reviewNote = dNotes.find(n => n.tag === 'review');
+    const reviewReason = reviewNote ? truncate(reviewNote.content, 30) : '';
+
+    const latestNoteObj = dNotes[0];
+    const latestNote = latestNoteObj
+      ? `${truncate(latestNoteObj.content, 50)} [${formatDate(latestNoteObj.createdAt)}]`
+      : '';
+
+    const materialStatus = dMaterials.map(m => {
+      const status = m.isMissing
+        ? `缺料:${truncate(m.reviewHint ?? '', 20)}`
+        : '齐备';
+      return `${m.batchNo}(${status})`;
+    }).join(';');
+
+    const changeSummary = dChanges.slice(0, 3).map(c => {
+      const reason = truncate(c.reason, 20);
+      return `${c.fieldLabel}:${c.oldValue}→${c.newValue}:${reason}`;
+    }).join(';');
+
+    const missingCount = dMaterials.filter(m => m.isMissing).length;
+
+    return [
+      drawingCode,
+      d.name,
+      currentVersion,
+      conclusion,
+      abnormalCount,
+      reviewReason,
+      latestNote,
+      materialStatus,
+      changeSummary,
+      missingCount,
+      d.buildingName,
+      formatDateTime(d.updatedAt),
+    ];
   });
 
-  if (drawingId) {
-    const d = drawings.find(x => x.id === drawingId);
-    if (!d) return BOM;
-    const { vs, ns, ms, cs } = byDrawing(drawingId);
-    const latest = vs.find(v => v.isLatest);
-    const nsSum = ns.slice(0, 3).map(n => `[${formatDate(n.createdAt)}]${n.authorName}:${n.content.slice(0, 20)}`).join(' | ');
-    const msDet = ms.map(m => `${m.batchNo}:${m.materialName}${m.isMissing ? '(缺料)' : ''}`).join(' | ');
-    const h = ['项目编号', '图纸名', '楼栋', '版本', '状态', '碰撞点数', '不合格项', '日照阴影风险', '体量偏差(%)', '备注摘要', '材料批次', '变更次数'];
-    const r = [d.projectNo, d.name, d.buildingName, latest?.version ?? '-', STATUS_LABELS[d.status], d.metrics.collisionPoints, d.metrics.unqualifiedItems, d.metrics.sunShadowRisk, d.metrics.volumeDeviation, nsSum, msDet, cs.length];
-    return BOM + [h, r].map(a => a.map(csvEscape).join(',')).join('\n');
-  }
+  return BOM + [headers, ...rows].map(a => a.map(csvEscape).join(',')).join('\n');
+}
 
-  const h = ['项目编号', '图纸名', '楼栋', '版本', '状态', '碰撞点数', '不合格项', '日照风险', '偏差(%)', '备注', '缺料', '变更', '创建', '更新'];
-  const rows = drawings.map(d => {
-    const { vs, ns, ms, cs } = byDrawing(d.id);
-    const latest = vs.find(v => v.isLatest);
-    return [d.projectNo, d.name, d.buildingName, latest?.version ?? '-', STATUS_LABELS[d.status], d.metrics.collisionPoints, d.metrics.unqualifiedItems, d.metrics.sunShadowRisk, d.metrics.volumeDeviation, ns.length, ms.filter(m => m.isMissing).length, cs.length, formatDateTime(d.createdAt), formatDateTime(d.updatedAt)].map(csvEscape).join(',');
+export interface ExportJSONItem {
+  drawingCode: string;
+  drawingName: string;
+  currentVersion: string;
+  conclusion: string;
+  abnormalCount: number;
+  reviewReason: string;
+  latestNote: string;
+  materialStatus: string;
+  changeSummary: string;
+  missingCount: number;
+  building: string;
+  updatedAt: string;
+}
+
+export function exportJSON(state: AppState, drawingId?: string): string {
+  const { drawings, versions, notes, materials, changeLogs } = state;
+  const targetDrawings = drawingId
+    ? drawings.filter(d => d.id === drawingId)
+    : drawings;
+
+  const result: ExportJSONItem[] = targetDrawings.map(d => {
+    const dVersions = versions.filter(v => v.drawingId === d.id);
+    const latest = dVersions.find(v => v.isLatest) ?? dVersions[0];
+    const dNotes = notes.filter(n => n.drawingId === d.id).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+    const dMaterials = materials.filter(m => m.drawingId === d.id);
+    const dChanges = changeLogs.filter(c => c.drawingId === d.id).sort(
+      (a, b) => new Date(b.changedAt).getTime() - new Date(a.changedAt).getTime(),
+    );
+
+    const drawingCode = `${d.projectNo}-${d.id.slice(0, 6)}`;
+    const currentVersion = latest?.version ?? '-';
+    const needReview = d.status === 'reviewing' || d.status === 'abnormal';
+    const conclusion = `${STATUS_LABELS[d.status]}${needReview ? '（需复核）' : ''}`;
+    const abnormalCount = d.metrics.collisionPoints + d.metrics.unqualifiedItems;
+
+    const reviewNote = dNotes.find(n => n.tag === 'review');
+    const reviewReason = reviewNote ? truncate(reviewNote.content, 30) : '';
+
+    const latestNoteObj = dNotes[0];
+    const latestNote = latestNoteObj
+      ? `${truncate(latestNoteObj.content, 50)} [${formatDate(latestNoteObj.createdAt)}]`
+      : '';
+
+    const materialStatus = dMaterials.map(m => {
+      const status = m.isMissing
+        ? `缺料:${truncate(m.reviewHint ?? '', 20)}`
+        : '齐备';
+      return `${m.batchNo}(${status})`;
+    }).join(';');
+
+    const changeSummary = dChanges.slice(0, 3).map(c => {
+      const reason = truncate(c.reason, 20);
+      return `${c.fieldLabel}:${c.oldValue}→${c.newValue}:${reason}`;
+    }).join(';');
+
+    const missingCount = dMaterials.filter(m => m.isMissing).length;
+
+    return {
+      drawingCode,
+      drawingName: d.name,
+      currentVersion,
+      conclusion,
+      abnormalCount,
+      reviewReason,
+      latestNote,
+      materialStatus,
+      changeSummary,
+      missingCount,
+      building: d.buildingName,
+      updatedAt: formatDateTime(d.updatedAt),
+    };
   });
-  return BOM + [h.map(csvEscape).join(','), ...rows].join('\n');
+
+  return JSON.stringify(result, null, 2);
 }
 
 function wrap(doc: jsPDF, t: string, mw: number): string[] {

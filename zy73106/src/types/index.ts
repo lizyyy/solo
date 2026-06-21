@@ -80,7 +80,7 @@ export interface Drawing {
 
 export interface ExportLog {
   id: string;
-  type: 'pdf' | 'csv';
+  type: 'pdf' | 'csv' | 'json';
   drawingId?: string;
   operatorName: string;
   exportedAt: string;

@@ -1,23 +1,28 @@
 import { useMemo, useState } from 'react';
 import {
-  Archive, CheckCircle2, ChevronRight, Download, FileSpreadsheet,
+  Archive, CheckCircle2, ChevronRight, Download, FileJson, FileSpreadsheet,
   FileText, MapPin, Package, ScrollText, Sticker,
 } from 'lucide-react';
 import { useAppStore, getSummary } from '@/store/useAppStore';
 import { useShallow } from 'zustand/react/shallow';
-import { exportCSV, exportPDF, downloadBlob, downloadText } from '@/utils/exporter';
+import { exportCSV, exportJSON, exportPDF, downloadBlob, downloadText } from '@/utils/exporter';
 import { STATUS_LABELS } from '@/types';
+import type { AppState } from '@/types';
 import { formatDate, formatDateTime } from '@/utils/date';
 import { cn } from '@/lib/utils';
+import * as api from '@/services/api';
 
 const CMAP = {
   red: { bg: 'bg-[#C0392B]', ring: 'ring-[#E74C3C]/40', tx: 'text-[#FFE5E0]', sh: 'shadow-[#C0392B]/40' },
-  navy: { bg: 'bg-steel-900', ring: 'ring-[#3498DB]/40', tx: 'text-steel-100', sh: 'shadow-steel-900/40' },
+  navy: { bg: 'bg-[#1A5276]/80', ring: 'ring-[#3498DB]/40', tx: 'text-[#E8F4FD]', sh: 'shadow-[#1A5276]/40' },
+  steel: { bg: 'bg-steel-900', ring: 'ring-steel-500/40', tx: 'text-steel-100', sh: 'shadow-steel-900/40' },
 };
+
+type SealColor = 'red' | 'navy' | 'steel';
 
 function SealButton({ onClick, icon: Icon, label, sub, color, disabled }: {
   onClick: () => void | Promise<void>; icon: typeof FileText;
-  label: string; sub: string; color: 'red' | 'navy'; disabled?: boolean;
+  label: string; sub: string; color: SealColor; disabled?: boolean;
 }) {
   const [stamping, setStamping] = useState(false);
   const c = CMAP[color];
@@ -53,7 +58,7 @@ function Toast({ show }: { show: boolean }) {
 }
 
 export default function ExportCenterPage() {
-  const { drawings, notes, materials, changeLogs, exportLogs, versions, dirtyExport } = useAppStore(
+  const { drawings, notes, materials, changeLogs, exportLogs, versions, dirtyExport, currentUser } = useAppStore(
     useShallow((s) => ({
       drawings: s.drawings,
       notes: s.notes,
@@ -62,13 +67,14 @@ export default function ExportCenterPage() {
       exportLogs: s.exportLogs,
       versions: s.versions,
       dirtyExport: s.dirtyExport,
+      currentUser: s.currentUser,
     })),
   );
   const logExport = useAppStore((s) => s.logExport);
-  const state = { currentUser: useAppStore.getState().currentUser, drawings, versions, notes, materials, changeLogs, exportLogs };
 
   const [selected, setSelected] = useState<string | null>(null);
   const [toast, setToast] = useState(false);
+  const [fetching, setFetching] = useState(false);
   const selD = selected ? drawings.find(d => d.id === selected) ?? null : null;
   const summary = getSummary(useAppStore.getState());
   const today = formatDate(new Date().toISOString()).replace(/-/g, '');
@@ -79,18 +85,68 @@ export default function ExportCenterPage() {
 
   const showT = () => { setToast(true); setTimeout(() => setToast(false), 3000); };
 
+  const buildStateFromLocal = (): AppState => ({
+    currentUser,
+    drawings,
+    versions,
+    notes,
+    materials,
+    changeLogs,
+    exportLogs,
+  });
+
+  const fetchExportState = async (scope: 'all' | string): Promise<AppState> => {
+    setFetching(true);
+    try {
+      const res = await api.getExportData(scope);
+      if (res.ok && res.data && typeof res.data === 'object') {
+        const d = res.data as any;
+        return {
+          currentUser: d.currentUser ?? currentUser,
+          drawings: Array.isArray(d.drawings) ? d.drawings : drawings,
+          versions: Array.isArray(d.versions) ? d.versions : versions,
+          notes: Array.isArray(d.notes) ? d.notes : notes,
+          materials: Array.isArray(d.materials) ? d.materials : materials,
+          changeLogs: Array.isArray(d.changeLogs) ? d.changeLogs : changeLogs,
+          exportLogs: Array.isArray(d.exportLogs) ? d.exportLogs : exportLogs,
+        };
+      }
+    } catch (e) {
+      console.warn('[fetchExportState] API failed, fallback to local:', e);
+    } finally {
+      setFetching(false);
+    }
+    return buildStateFromLocal();
+  };
+
   const doPDF = async () => {
     if (!selD) return;
-    const blob = await exportPDF(selD, notes.filter(n => n.drawingId === selD.id), materials.filter(m => m.drawingId === selD.id), changeLogs.filter(c => c.drawingId === selD.id));
+    const state = await fetchExportState(selD.id);
+    const drawing = state.drawings.find(x => x.id === selD.id) ?? selD;
+    const dNotes = state.notes.filter(n => n.drawingId === selD.id);
+    const dMats = state.materials.filter(m => m.drawingId === selD.id);
+    const dChs = state.changeLogs.filter(c => c.drawingId === selD.id);
+    const blob = await exportPDF(drawing, dNotes, dMats, dChs);
     downloadBlob(blob, `${selD.name.slice(0, 8)}-预审报告-${today}.pdf`);
-    logExport({ type: 'pdf', drawingId: selD.id, fileName: `${selD.name.slice(0, 8)}-预审报告-${today}.pdf` });
+    await logExport({ type: 'pdf', drawingId: selD.id, fileName: `${selD.name.slice(0, 8)}-预审报告-${today}.pdf` });
     showT();
   };
 
-  const doCSV = () => {
-    const fn = `全项目预审汇总-${today}.csv`;
-    downloadText(exportCSV(state), fn, 'text/csv');
-    logExport({ type: 'csv', fileName: fn });
+  const doCSV = async () => {
+    const scope = selected ?? 'all';
+    const state = await fetchExportState(scope);
+    const fn = selected ? `${selD?.name.slice(0, 8) ?? '图纸'}-预审数据-${today}.csv` : `全项目预审汇总-${today}.csv`;
+    downloadText(exportCSV(state, selected ?? undefined), fn, 'text/csv');
+    await logExport({ type: 'csv', drawingId: selected ?? undefined, fileName: fn });
+    showT();
+  };
+
+  const doJSON = async () => {
+    const scope = selected ?? 'all';
+    const state = await fetchExportState(scope);
+    const fn = selected ? `${selD?.name.slice(0, 8) ?? '图纸'}-预审数据-${today}.json` : `全项目预审数据-${today}.json`;
+    downloadText(exportJSON(state, selected ?? undefined), fn, 'application/json');
+    await logExport({ type: 'json', drawingId: selected ?? undefined, fileName: fn });
     showT();
   };
 
@@ -102,6 +158,12 @@ export default function ExportCenterPage() {
     st === 'closed' && 'bg-steel-600 text-steel-100',
   );
 
+  const exportTypeLabel = (t: string) => {
+    if (t === 'pdf') return { cls: 'bg-[#E74C3C]/20 text-[#E74C3C]', label: 'PDF' };
+    if (t === 'json') return { cls: 'bg-[#1A5276]/50 text-[#5DADE2]', label: 'JSON' };
+    return { cls: 'bg-steel-600 text-steel-100', label: 'CSV' };
+  };
+
   return (
     <div className="p-6 max-w-[1400px] mx-auto">
       <div className="flex items-center gap-3 mb-6">
@@ -110,6 +172,7 @@ export default function ExportCenterPage() {
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold text-steel-100">导出中心</h1>
             {dirtyExport && <span className="flex items-center gap-1 text-[10px] bg-[#E74C3C]/20 text-[#E74C3C] px-2 py-0.5 rounded-sm font-bold animate-pulse"><span className="w-1.5 h-1.5 rounded-full bg-[#E74C3C]" />数据已更新</span>}
+            {fetching && <span className="text-[10px] text-steel-400">正在拉取最新数据…</span>}
           </div>
           <p className="text-sm text-steel-300">{summary.total} 张图纸 · {summary.missingMaterials} 项缺料</p>
         </div>
@@ -183,7 +246,9 @@ export default function ExportCenterPage() {
             <div className="flex items-center justify-around">
               <SealButton onClick={doPDF} icon={FileText} label="PDF" sub={selD ? '单图纸报告' : '请选图纸'} color="red" disabled={!selD} />
               <div className="text-xl text-steel-500">·</div>
-              <SealButton onClick={doCSV} icon={FileSpreadsheet} label="CSV" sub="全量汇总表" color="navy" />
+              <SealButton onClick={doJSON} icon={FileJson} label="JSON" sub="结构化数据" color="navy" />
+              <div className="text-xl text-steel-500">·</div>
+              <SealButton onClick={doCSV} icon={FileSpreadsheet} label="CSV" sub={selD ? '单图纸汇总' : '全量汇总表'} color="steel" />
             </div>
           </div>
 
@@ -198,14 +263,17 @@ export default function ExportCenterPage() {
                   <tr className="text-[11px] text-steel-300"><th className="text-left px-4 py-2 font-medium">文件名</th><th className="text-left px-4 py-2 font-medium">类型</th><th className="text-left px-4 py-2 font-medium">操作人</th><th className="text-left px-4 py-2 font-medium">时间</th></tr>
                 </thead>
                 <tbody>
-                  {exportLogs.map((log, i) => (
-                    <tr key={log.id} className={cn(i % 2 === 1 && 'bg-steel-700/30')}>
-                      <td className="px-4 py-2 text-steel-100 truncate max-w-[160px]">{log.fileName}</td>
-                      <td className="px-4 py-2"><span className={cn('text-[10px] px-2 py-0.5 rounded-sm font-bold', log.type === 'pdf' ? 'bg-[#E74C3C]/20 text-[#E74C3C]' : 'bg-steel-600 text-steel-100')}>{log.type.toUpperCase()}</span></td>
-                      <td className="px-4 py-2 text-steel-300 text-xs">{log.operatorName}</td>
-                      <td className="px-4 py-2 text-steel-400 text-xs">{formatDateTime(log.exportedAt)}</td>
-                    </tr>
-                  ))}
+                  {exportLogs.map((log, i) => {
+                    const tt = exportTypeLabel(log.type);
+                    return (
+                      <tr key={log.id} className={cn(i % 2 === 1 && 'bg-steel-700/30')}>
+                        <td className="px-4 py-2 text-steel-100 truncate max-w-[160px]">{log.fileName}</td>
+                        <td className="px-4 py-2"><span className={cn('text-[10px] px-2 py-0.5 rounded-sm font-bold', tt.cls)}>{tt.label}</span></td>
+                        <td className="px-4 py-2 text-steel-300 text-xs">{log.operatorName}</td>
+                        <td className="px-4 py-2 text-steel-400 text-xs">{formatDateTime(log.exportedAt)}</td>
+                      </tr>
+                    );
+                  })}
                   {exportLogs.length === 0 && <tr><td colSpan={4} className="text-center py-10 text-steel-400 text-xs italic">暂无记录</td></tr>}
                 </tbody>
               </table>

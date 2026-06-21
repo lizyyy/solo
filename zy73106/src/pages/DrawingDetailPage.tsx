@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
+import { useDrawingDetail } from '@/hooks/useDrawingDetail';
 import MetricCard from '@/components/MetricCard';
 import StatusBadge from '@/components/StatusBadge';
 import NoteCard from '@/components/NoteCard';
@@ -30,6 +31,8 @@ const statusToneCls: Record<DrawingStatus, string> = {
 export default function DrawingDetailPage() {
   const { id = '' } = useParams();
   const navigate = useNavigate();
+
+  useDrawingDetail(id || undefined);
 
   const drawings = useAppStore((s) => s.drawings);
   const versions = useAppStore((s) => s.versions);
@@ -108,37 +111,38 @@ export default function DrawingDetailPage() {
     setTimeout(() => setToast(''), 2500);
   };
 
-  const handleMetricEdit = (field: keyof DrawingMetrics, newValue: number, reason: string) => {
-    const log = updateMetric({ drawingId: id, field, newValue, reason });
+  const handleMetricEdit = async (field: keyof DrawingMetrics, newValue: number, reason: string) => {
+    const log = await updateMetric({ drawingId: id, field, newValue, reason });
     if (log) {
       showToast(`指标已更新：${METRIC_FIELD_LABELS[field]} ${log.oldValue} → ${log.newValue}`);
     }
     setEditorField(null);
   };
 
-  const handleStatusChange = (st: DrawingStatus) => {
-    const ok = setDrawingStatus(id, st);
+  const handleStatusChange = async (st: DrawingStatus) => {
+    const ok = await setDrawingStatus(id, st);
     if (!ok && (st === 'reviewing' || st === 'closed')) {
       setStatusError('需先有处理记录或复核意见备注');
       setTimeout(() => setStatusError(''), 3500);
-    } else {
+    } else if (ok) {
       setStatusError('');
       showToast(`状态已流转：${STATUS_LABELS[st]}`);
     }
     setStatusOpen(false);
   };
 
-  const handleAddNote = (payload: { content: string; tag: keyof typeof NOTE_TAG_LABELS }) => {
-    const n = addNote({ drawingId: id, ...payload });
+  const handleAddNote = async (payload: { content: string; tag: keyof typeof NOTE_TAG_LABELS }) => {
+    const n = await addNote({ drawingId: id, ...payload });
     if (n) showToast('备注已追加');
   };
 
-  const handleDeleteNote = (nid: string) => {
-    if (deleteNote(nid)) showToast('备注已删除');
+  const handleDeleteNote = async (nid: string) => {
+    const ok = await deleteNote(nid);
+    if (ok) showToast('备注已删除');
   };
 
-  const handleMarkSupplied = (mid: string) => {
-    markMaterialSupplied(mid);
+  const handleMarkSupplied = async (mid: string) => {
+    await markMaterialSupplied(mid);
     showToast('材料已标记到位');
   };
 
@@ -233,14 +237,14 @@ export default function DrawingDetailPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => navigate('/versions')}
+                      onClick={() => navigate(`/drawings/${id}/versions`)}
                       className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-wider border-2 border-steel-600 text-steel-400 hover:bg-steel-700"
                     >
                       <GitCompare className="w-3.5 h-3.5" />
                       版本对比
                     </button>
                     <button
-                      onClick={() => navigate('/trace')}
+                      onClick={() => navigate(`/drawings/${id}/trace`)}
                       className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-wider border-2 border-[#E67E22] text-[#F39C12] bg-[#784212]/20 hover:bg-[#784212]/40"
                     >
                       <History className="w-3.5 h-3.5" />

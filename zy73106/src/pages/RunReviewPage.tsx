@@ -69,11 +69,11 @@ export default function RunReviewPage() {
 
   const next = () => { const nd = new Set(done); nd.add(step); setDone(nd); if (step < 4) setStep(step + 1); };
   const back = () => { if (step > 1) setStep(step - 1); };
-  const doExport = () => {
+  const doExport = async () => {
     const today = formatDate(new Date().toISOString()).replace(/-/g, '');
     const fn = `月度封账报告-${today}.csv`;
     downloadText(exportCSV(state), fn, 'text/csv');
-    logExport({ type: 'csv', fileName: fn });
+    await logExport({ type: 'csv', fileName: fn });
     const nd = new Set(done); nd.add(4); setDone(nd); setTip(true);
   };
   const sc = (st: string) => cn('px-2 py-0.5 rounded-sm text-[10px] font-bold',

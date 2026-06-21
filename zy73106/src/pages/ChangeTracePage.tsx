@@ -1,16 +1,53 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Activity, AlertTriangle, ArrowRight, History, MapPin, ShieldAlert } from 'lucide-react';
+import {
+  Activity, AlertTriangle, ArrowRight, ArrowRightLeft, History,
+  MapPin, Package, ScrollText, ShieldAlert,
+} from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
+import { useDrawingDetail } from '@/hooks/useDrawingDetail';
 import { useShallow } from 'zustand/react/shallow';
-import type { ValueChangeLog, NoteBlock, DrawingMetrics } from '@/types';
+import type { DrawingMetrics, NoteBlock, ValueChangeLog } from '@/types';
 import { METRIC_FIELD_LABELS } from '@/types';
 import { formatDateTime } from '@/utils/date';
 import { cn } from '@/lib/utils';
 
-function MetricBadge({ label, value, count }: { label: string; value: number; count: number }) {
+const METRIC_FIELDS = ['collisionPoints', 'unqualifiedItems', 'sunShadowRisk', 'volumeDeviation'];
+
+type CategoryKey = 'all' | 'metric' | 'note' | 'material' | 'status';
+
+const CATEGORIES: { key: CategoryKey; label: string }[] = [
+  { key: 'all', label: '全部' },
+  { key: 'metric', label: '指标调整' },
+  { key: 'note', label: '备注变更' },
+  { key: 'material', label: '材料补录' },
+  { key: 'status', label: '状态流转' },
+];
+
+function getLogCategory(fieldName: string): CategoryKey {
+  if (METRIC_FIELDS.includes(fieldName)) return 'metric';
+  if (fieldName.toLowerCase().includes('note')) return 'note';
+  if (fieldName.toLowerCase().includes('material')) return 'material';
+  if (fieldName === 'status') return 'status';
+  return 'metric';
+}
+
+function MetricBadge({
+  label, value, count, fieldName, active, onClick,
+}: {
+  label: string; value: number; count: number; fieldName: string;
+  active: boolean; onClick: () => void;
+}) {
   return (
-    <div className="flex-1 bg-steel-800 rounded-sm border border-steel-600 shadow-sm p-4">
+    <button
+      onClick={onClick}
+      className={cn(
+        'flex-1 bg-steel-800 rounded-sm border shadow-sm p-4 text-left transition-all',
+        active
+          ? 'border-2 border-[#3498DB] ring-2 ring-[#3498DB]/20'
+          : 'border-steel-600 hover:border-steel-500',
+      )}
+    >
       <div className="flex items-start justify-between mb-2">
         <span className="text-sm text-steel-300">{label}</span>
         <span className={cn(
@@ -21,7 +58,8 @@ function MetricBadge({ label, value, count }: { label: string; value: number; co
         </span>
       </div>
       <div className="text-2xl font-bold text-steel-100">{value}</div>
-    </div>
+      <input type="hidden" name={fieldName} />
+    </button>
   );
 }
 
@@ -29,15 +67,39 @@ function ChangeLogCard({ log }: { log: ValueChangeLog }) {
   const delta = log.newValue - log.oldValue;
   const isImprove = delta < 0;
   const pct = log.oldValue !== 0 ? Math.abs(delta / log.oldValue) * 100 : 100;
+  const cat = getLogCategory(log.fieldName);
+
+  let Icon = History;
+  let iconBg = 'bg-emerald-900/40';
+  let iconColor = 'text-emerald-400';
+
+  if (cat === 'metric') {
+    Icon = History;
+    iconBg = isImprove ? 'bg-emerald-900/40' : 'bg-[#E74C3C]/20';
+    iconColor = isImprove ? 'text-emerald-400' : 'text-[#E74C3C]';
+  } else if (cat === 'note') {
+    Icon = ScrollText;
+    iconBg = 'bg-purple-900/40';
+    iconColor = 'text-purple-400';
+  } else if (cat === 'material') {
+    Icon = Package;
+    const isMissing = log.fieldName === 'materialMissing';
+    iconBg = isMissing ? 'bg-amber-900/40' : 'bg-emerald-900/40';
+    iconColor = isMissing ? 'text-amber-400' : 'text-emerald-400';
+  } else if (cat === 'status') {
+    Icon = ArrowRightLeft;
+    iconBg = 'bg-[#1A5276]/30';
+    iconColor = 'text-[#5DADE2]';
+  }
 
   return (
     <div className="bg-steel-800 rounded-sm border border-steel-600 shadow-sm overflow-hidden">
       <div className="flex items-center gap-3 px-4 py-3 bg-steel-700 border-b border-steel-600">
         <div className={cn(
           'w-8 h-8 rounded-sm flex items-center justify-center shrink-0',
-          isImprove ? 'bg-emerald-900/40' : 'bg-[#E74C3C]/20',
+          iconBg,
         )}>
-          <History className={cn('w-4 h-4', isImprove ? 'text-emerald-400' : 'text-[#E74C3C]')} />
+          <Icon className={cn('w-4 h-4', iconColor)} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="font-semibold text-sm text-steel-100">{log.fieldLabel}</div>
@@ -47,9 +109,23 @@ function ChangeLogCard({ log }: { log: ValueChangeLog }) {
         </div>
         <div className={cn(
           'text-xs font-bold px-2 py-1 rounded-sm shrink-0',
-          isImprove ? 'bg-emerald-900/40 text-emerald-400' : 'bg-[#E74C3C]/20 text-[#E74C3C]',
+          cat === 'metric'
+            ? (isImprove ? 'bg-emerald-900/40 text-emerald-400' : 'bg-[#E74C3C]/20 text-[#E74C3C]')
+            : cat === 'note'
+              ? 'bg-purple-900/40 text-purple-400'
+              : cat === 'material'
+                ? (log.fieldName === 'materialMissing' ? 'bg-amber-900/40 text-amber-400' : 'bg-emerald-900/40 text-emerald-400')
+                : 'bg-[#1A5276]/30 text-[#5DADE2]',
         )}>
-          {delta > 0 ? '+' : ''}{delta.toFixed(1)} ({pct.toFixed(0)}%)
+          {cat === 'metric' ? (
+            <>{delta > 0 ? '+' : ''}{delta.toFixed(1)} ({pct.toFixed(0)}%)</>
+          ) : cat === 'material' ? (
+            log.fieldName === 'materialMissing' ? '缺料标记' : '材料到位'
+          ) : cat === 'note' ? (
+            log.fieldName.includes('Added') ? '新增备注' : '备注变更'
+          ) : (
+            '状态流转'
+          )}
         </div>
       </div>
       <div className="p-4">
@@ -98,6 +174,7 @@ function BimClueBlock({ note }: { note: NoteBlock }) {
 
 export default function ChangeTracePage() {
   const { id } = useParams<{ id: string }>();
+  useDrawingDetail(id);
   const { drawings, changeLogs, notes } = useAppStore(
     useShallow((s) => ({
       drawings: s.drawings,
@@ -106,6 +183,9 @@ export default function ChangeTracePage() {
     })),
   );
   const drawing = drawings.find(d => d.id === id);
+
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<CategoryKey>('all');
 
   const dChanges = useMemo(() =>
     changeLogs.filter(c => c.drawingId === id).sort(
@@ -121,9 +201,28 @@ export default function ChangeTracePage() {
     const counts: Record<keyof DrawingMetrics, number> = {
       collisionPoints: 0, unqualifiedItems: 0, sunShadowRisk: 0, volumeDeviation: 0,
     };
-    for (const c of dChanges) counts[c.fieldName as keyof DrawingMetrics]++;
+    for (const c of dChanges) {
+      if (c.fieldName in counts) {
+        counts[c.fieldName as keyof DrawingMetrics]++;
+      }
+    }
     return counts;
   }, [dChanges]);
+
+  const filteredChanges = useMemo(() => {
+    let result = dChanges;
+    if (activeCategory !== 'all') {
+      result = result.filter(c => getLogCategory(c.fieldName) === activeCategory);
+    }
+    if (activeFilter) {
+      result = result.filter(c => c.fieldName === activeFilter);
+    }
+    return result;
+  }, [dChanges, activeCategory, activeFilter]);
+
+  const handleMetricClick = (fieldName: string) => {
+    setActiveFilter(prev => prev === fieldName ? null : fieldName);
+  };
 
   if (!drawing) {
     return <div className="p-8 text-center text-steel-300">图纸不存在</div>;
@@ -141,31 +240,74 @@ export default function ChangeTracePage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-4 gap-4 mb-6">
         {(Object.keys(drawing.metrics) as (keyof DrawingMetrics)[]).map(k => (
           <MetricBadge
             key={k}
             label={METRIC_FIELD_LABELS[k]}
             value={drawing.metrics[k]}
             count={changeCounts[k]}
+            fieldName={k}
+            active={activeFilter === k}
+            onClick={() => handleMetricClick(k)}
           />
         ))}
+      </div>
+
+      <div className="flex items-center gap-2 mb-6 flex-wrap">
+        {CATEGORIES.map(cat => (
+          <button
+            key={cat.key}
+            onClick={() => setActiveCategory(cat.key)}
+            className={cn(
+              'px-4 py-1.5 text-xs font-bold rounded-sm border transition-all',
+              activeCategory === cat.key
+                ? 'bg-[#1A5276]/40 border-[#3498DB] text-[#5DADE2]'
+                : 'bg-steel-800/60 border-steel-600 text-steel-300 hover:bg-steel-700/60 hover:border-steel-500',
+            )}
+          >
+            {cat.label}
+          </button>
+        ))}
+        {(activeFilter || activeCategory !== 'all') && (
+          <button
+            onClick={() => { setActiveFilter(null); setActiveCategory('all'); }}
+            className="ml-auto px-3 py-1.5 text-[11px] text-steel-400 hover:text-steel-200 transition-colors"
+          >
+            清除筛选
+          </button>
+        )}
       </div>
 
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-4">
           <History className="w-5 h-5 text-steel-300" />
-          <h2 className="text-base font-bold text-steel-100">变更记录 ({dChanges.length})</h2>
+          <h2 className="text-base font-bold text-steel-100">
+            变更记录 ({filteredChanges.length}
+            {(activeFilter || activeCategory !== 'all') && ` / ${dChanges.length}`})
+          </h2>
           <span className="text-xs text-steel-400">按时间倒序</span>
+          {activeFilter && (
+            <span className="text-[10px] ml-2 px-2 py-0.5 rounded-sm bg-[#1A5276]/30 border border-[#3498DB] text-[#5DADE2] font-bold">
+              字段: {METRIC_FIELD_LABELS[activeFilter as keyof DrawingMetrics] ?? activeFilter}
+            </span>
+          )}
+          {activeCategory !== 'all' && (
+            <span className="text-[10px] ml-2 px-2 py-0.5 rounded-sm bg-steel-700/60 border border-steel-500 text-steel-200 font-bold">
+              分类: {CATEGORIES.find(c => c.key === activeCategory)?.label}
+            </span>
+          )}
         </div>
-        {dChanges.length === 0 ? (
+        {filteredChanges.length === 0 ? (
           <div className="bg-steel-800 rounded-sm border border-dashed border-steel-500 p-12 text-center">
             <History className="w-10 h-10 text-steel-400 mx-auto mb-3" />
-            <div className="text-steel-300 text-sm">暂无变更记录</div>
+            <div className="text-steel-300 text-sm">
+              {dChanges.length === 0 ? '暂无变更记录' : '当前筛选条件下无记录'}
+            </div>
           </div>
         ) : (
           <div className="space-y-4">
-            {dChanges.map(c => <ChangeLogCard key={c.id} log={c} />)}
+            {filteredChanges.map(c => <ChangeLogCard key={c.id} log={c} />)}
           </div>
         )}
       </div>
