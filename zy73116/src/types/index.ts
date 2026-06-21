@@ -1,5 +1,7 @@
 export type CollisionStatus = "confirmed" | "pending" | "rejected";
 
+export type MaterialKind = "visa" | "boundary" | "supplement";
+
 export interface Screenshot {
   id: string;
   url: string;
@@ -18,6 +20,28 @@ export interface VisaLine {
   collisionId?: string;
 }
 
+export interface BoundarySample {
+  id: string;
+  code: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  thresholdMm: number;
+  measuredMm: number;
+  collisionId: string;
+  visaLineNo: number;
+  remark: string;
+}
+
+export interface SupplementNote {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  author: string;
+  collisionId: string;
+}
+
 export interface Collision {
   id: string;
   preReviewId: string;
@@ -29,9 +53,11 @@ export interface Collision {
   isDuplicate: boolean;
   duplicateReason?: string;
   duplicateCount?: number;
+  relatedDuplicateIds?: string[];
   visaLineId: string;
   reviewDate: string;
   screenshot: Screenshot;
+  supplement?: SupplementNote;
 }
 
 export interface PreReviewFilters {

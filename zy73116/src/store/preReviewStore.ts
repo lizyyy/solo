@@ -1,11 +1,13 @@
 import { create } from "zustand";
-import type { Collision, CollisionStatus, PreReviewFilters, ReviewStats, VisaLine } from "@/types";
-import { mockCollisions, mockVisaLines } from "@/data/mockData";
+import type { BoundarySample, Collision, CollisionStatus, PreReviewFilters, ReviewStats, SupplementNote, VisaLine } from "@/types";
+import { mockBoundarySamples, mockCollisions, mockSupplements, mockVisaLines } from "@/data/mockData";
 
 interface PreReviewState {
   filters: PreReviewFilters;
   collisions: Collision[];
   visaLines: VisaLine[];
+  boundarySamples: BoundarySample[];
+  supplements: SupplementNote[];
   expandedCollisionId: string | null;
   setFilters: (f: Partial<PreReviewFilters>) => void;
   resetFilters: () => void;
@@ -17,6 +19,9 @@ interface PreReviewState {
   getCollisionsByStatus: (status: CollisionStatus) => Collision[];
   getVisaLinesByNo: (visaNo: string) => VisaLine[];
   getVisaNos: () => string[];
+  getBoundaryByCollision: (collisionId: string) => BoundarySample | undefined;
+  getSupplementsByCollision: (collisionId: string) => SupplementNote[];
+  getCollisionById: (id: string) => Collision | undefined;
 }
 
 const defaultFilters: PreReviewFilters = {
@@ -31,6 +36,8 @@ export const usePreReviewStore = create<PreReviewState>((set, get) => ({
   filters: defaultFilters,
   collisions: mockCollisions,
   visaLines: mockVisaLines,
+  boundarySamples: mockBoundarySamples,
+  supplements: mockSupplements,
   expandedCollisionId: null,
 
   setFilters: (f) => set((s) => ({ filters: { ...s.filters, ...f } })),
@@ -39,9 +46,7 @@ export const usePreReviewStore = create<PreReviewState>((set, get) => ({
 
   markCollision: (id, status) =>
     set((s) => ({
-      collisions: s.collisions.map((c) =>
-        c.id === id ? { ...c, status, isDuplicate: false, duplicateReason: undefined, duplicateCount: undefined } : c
-      ),
+      collisions: s.collisions.map((c) => (c.id === id ? { ...c, status } : c)),
     })),
 
   filteredCollisions: () => {
@@ -68,10 +73,10 @@ export const usePreReviewStore = create<PreReviewState>((set, get) => ({
   },
 
   getVisaLine: (id) => get().visaLines.find((v) => v.id === id),
-
+  getCollisionById: (id) => get().collisions.find((c) => c.id === id),
   getCollisionsByStatus: (status) => get().collisions.filter((c) => c.status === status),
-
   getVisaLinesByNo: (visaNo) => get().visaLines.filter((v) => v.visaNo === visaNo),
-
   getVisaNos: () => Array.from(new Set(get().visaLines.map((v) => v.visaNo))),
+  getBoundaryByCollision: (collisionId) => get().boundarySamples.find((b) => b.collisionId === collisionId),
+  getSupplementsByCollision: (collisionId) => get().supplements.filter((s) => s.collisionId === collisionId),
 }));

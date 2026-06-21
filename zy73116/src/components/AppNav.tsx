@@ -1,12 +1,13 @@
 import { useMemo } from "react";
 import { NavLink } from "react-router-dom";
-import { FileSearch, FileText, CalendarCheck2, AlertTriangle } from "lucide-react";
+import { FileSearch, FileText, CalendarCheck2, AlertTriangle, FileBarChart } from "lucide-react";
 import { usePreReviewStore } from "@/store/preReviewStore";
 
 const navItems = [
   { to: "/", label: "预审面板", Icon: FileSearch },
   { to: "/review", label: "月底复核", Icon: CalendarCheck2 },
   { to: "/visa", label: "签证单", Icon: FileText },
+  { to: "/report", label: "预审报告", Icon: FileBarChart },
 ];
 
 export default function AppNav() {
