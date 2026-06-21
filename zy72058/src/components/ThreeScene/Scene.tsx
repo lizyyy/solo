@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
@@ -72,6 +72,7 @@ interface ThreeSceneProps {
   cameraState: CameraState;
   onCameraChange: (state: CameraState) => void;
   onSelectComponent: (id: string | null) => void;
+  onCanvasReady: (canvas: HTMLCanvasElement) => void;
 }
 
 export function ThreeScene({
@@ -81,13 +82,22 @@ export function ThreeScene({
   cameraState,
   onCameraChange,
   onSelectComponent,
+  onCanvasReady,
 }: ThreeSceneProps) {
+  const handleCreated = useCallback((state: any) => {
+    const canvas = state.gl?.domElement as HTMLCanvasElement | undefined;
+    if (canvas) {
+      onCanvasReady(canvas);
+    }
+  }, [onCanvasReady]);
+
   return (
     <div className="w-full h-full">
       <Canvas
         camera={{ position: [15, 12, 15], fov: 50 }}
         shadows
         onClick={() => onSelectComponent(null)}
+        onCreated={handleCreated}
         gl={{ 
           antialias: true, 
           alpha: false, 

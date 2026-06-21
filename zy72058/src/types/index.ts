@@ -43,6 +43,17 @@ export interface FilterState {
   status?: ComponentStatus;
 }
 
+export interface ExportRecord {
+  id: string;
+  type: 'screenshot' | 'json' | 'csv';
+  status: 'success' | 'failed';
+  timestamp: string;
+  filename?: string;
+  canvasEngine?: string;
+  canvasSize?: string;
+  reason?: string;
+}
+
 export interface AppState {
   components: HeritageComponent[];
   selectedComponentId: string | null;
@@ -53,6 +64,7 @@ export interface AppState {
   leftPanelOpen: boolean;
   rightPanelOpen: boolean;
   threeCanvasRef: HTMLCanvasElement | null;
+  exportHistory: ExportRecord[];
 }
 
 export interface AppActions {

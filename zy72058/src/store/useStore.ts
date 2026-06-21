@@ -6,6 +6,17 @@ import { exportJSONData, exportReportCSV, calculateStats } from '@/utils/export'
 
 type Store = AppState & AppActions;
 
+export interface ExportRecord {
+  id: string;
+  type: 'screenshot' | 'json' | 'csv';
+  status: 'success' | 'failed';
+  timestamp: string;
+  filename?: string;
+  canvasEngine?: string;
+  canvasSize?: string;
+  reason?: string;
+}
+
 const STORAGE_KEY = 'heritage-component-library-v2';
 
 const initializeComponents = (): HeritageComponent[] => {
@@ -36,6 +47,7 @@ export const useStore = create<Store>()(
       leftPanelOpen: true,
       rightPanelOpen: true,
       threeCanvasRef: null,
+      exportHistory: [],
 
       setSelectedComponent: (id: string | null) => {
         set({ selectedComponentId: id });
@@ -128,30 +140,62 @@ export const useStore = create<Store>()(
       },
 
       exportScreenshot: async () => {
-        const canvas = document.querySelector('canvas[data-engine="three.js"]') as HTMLCanvasElement;
+        const findThreeCanvas = (): HTMLCanvasElement | null => {
+          const ref = get().threeCanvasRef;
+          if (ref && ref instanceof HTMLCanvasElement) {
+            return ref;
+          }
+          const byAttrContains = document.querySelector('canvas[data-engine*="three.js"]') as HTMLCanvasElement | null;
+          if (byAttrContains) {
+            return byAttrContains;
+          }
+          const byWebGL = Array.from(document.querySelectorAll('canvas')).find((c) => {
+            const gl = c.getContext('webgl2') || c.getContext('webgl');
+            return gl !== null;
+          }) as HTMLCanvasElement | null;
+          return byWebGL || null;
+        };
+
+        const canvas = findThreeCanvas();
         if (!canvas) {
-          alert('无法找到3D画布，请确保场景已加载');
-          return;
+          const record: ExportRecord = {
+            id: `export-${Date.now()}`,
+            type: 'screenshot',
+            status: 'failed',
+            reason: '无法找到3D画布，场景可能未加载完成',
+            timestamp: new Date().toISOString(),
+          };
+          set((state) => ({ exportHistory: [...state.exportHistory, record] }));
+          throw new Error(record.reason);
         }
 
         try {
-          const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
-          if (gl) {
-            const preserveDrawingBuffer = gl.getContextAttributes()?.preserveDrawingBuffer;
-            if (!preserveDrawingBuffer) {
-              console.warn('WebGL context does not preserve drawing buffer, trying anyway');
-            }
-          }
-
           const { exportScreenshotFromCanvas } = await import('@/utils/export');
           const stats = calculateStats(get().components);
           await exportScreenshotFromCanvas(canvas, {
             title: '古建筑修缮构件库 - 3D场景截图',
             stats,
           });
-        } catch (e) {
-          console.error('截图导出失败:', e);
-          alert('截图导出失败，请重试');
+          const record: ExportRecord = {
+            id: `export-${Date.now()}`,
+            type: 'screenshot',
+            status: 'success',
+            filename: `古建筑修缮构件库-截图-${new Date().toISOString().slice(0, 10)}.png`,
+            canvasEngine: canvas.getAttribute('data-engine') || 'unknown',
+            canvasSize: `${canvas.width}x${canvas.height}`,
+            timestamp: new Date().toISOString(),
+          };
+          set((state) => ({ exportHistory: [...state.exportHistory, record] }));
+        } catch (e: any) {
+          const record: ExportRecord = {
+            id: `export-${Date.now()}`,
+            type: 'screenshot',
+            status: 'failed',
+            reason: e?.message || String(e),
+            timestamp: new Date().toISOString(),
+          };
+          set((state) => ({ exportHistory: [...state.exportHistory, record] }));
+          throw e;
         }
       },
 
