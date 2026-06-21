@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { CheckCircle, XCircle, Clock, ChevronRight, MessageSquare, History, MapPin } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, ChevronRight, MessageSquare, History, MapPin, Edit3, Save, X, FileText, Camera, StickyNote } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { StatusBadge } from '../components/StatusBadge';
-import { MealPoint } from '../types';
+import { MealPoint, PointType, ManualResolveInput } from '../types';
 
 export function ManualReviewPage() {
-  const { points, confirmPoint, rejectPoint, addNoteToPoint, setCurrentStep } = useApp();
+  const { points, confirmPoint, rejectPoint, addNoteToPoint, setCurrentStep, manuallyResolvePoint } = useApp();
   const [expandedPoint, setExpandedPoint] = useState<string | null>(null);
   const [noteInput, setNoteInput] = useState<string>('');
   const [rejectReason, setRejectReason] = useState<Record<string, string>>({});
   const [showRejectInput, setShowRejectInput] = useState<Record<string, boolean>>({});
+  const [showManualPanel, setShowManualPanel] = useState<Record<string, boolean>>({});
+  const [manualInput, setManualInput] = useState<Record<string, ManualResolveInput & { operationNote: string }>>({});
 
   const pendingPoints = points.filter((p) => p.status === 'pending' || p.status === 'merged');
   const confirmedPoints = points.filter((p) => p.status === 'confirmed');
@@ -25,6 +27,32 @@ export function ManualReviewPage() {
       smooth: '顺利记录',
     };
     return labels[type] || type;
+  };
+
+  const typeOptions: { value: PointType; label: string }[] = [
+    { value: 'smooth', label: '顺利记录' },
+    { value: 'review', label: '需人工确认' },
+    { value: 'legacy', label: '旧口径数据' },
+    { value: 'boundary', label: '边界点位' },
+    { value: 'duplicate', label: '重复项' },
+    { value: 'empty', label: '空值记录' },
+  ];
+
+  const initManualInput = (point: MealPoint) => {
+    if (!manualInput[point.id]) {
+      setManualInput((prev) => ({
+        ...prev,
+        [point.id]: {
+          name: point.name,
+          address: point.address,
+          type: point.type,
+          zhoujieNote: point.zhoujieNote || '',
+          feedback: point.feedback || '',
+          photoNotes: point.photoNotes || '',
+          operationNote: '',
+        },
+      }));
+    }
   };
 
   const handleConfirm = (pointId: string) => {
@@ -48,6 +76,22 @@ export function ManualReviewPage() {
     }
   };
 
+  const handleSaveManual = (point: MealPoint) => {
+    const input = manualInput[point.id];
+    if (!input) return;
+    manuallyResolvePoint(point.id, {
+      name: input.name,
+      address: input.address,
+      type: input.type,
+      zhoujieNote: input.zhoujieNote,
+      feedback: input.feedback,
+      photoNotes: input.photoNotes,
+      operationNote: input.operationNote,
+    });
+    setShowManualPanel((prev) => ({ ...prev, [point.id]: false }));
+    setExpandedPoint(null);
+  };
+
   const allReviewed = pendingPoints.length === 0;
 
   return (
@@ -55,7 +99,7 @@ export function ManualReviewPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-serif font-bold text-primary-700">人工复核</h1>
-          <p className="mt-1 text-sm text-gray-500">逐一审定点位，记录判断过程，确保决策可追溯</p>
+          <p className="mt-1 text-sm text-gray-500">逐一审定点位，手动处理名称/地址/类别冲突，沉淀周姐备注与反馈</p>
         </div>
         {allReviewed && points.length > 0 && (
           <button
@@ -138,7 +182,10 @@ export function ManualReviewPage() {
                       key={point.id}
                       point={point}
                       isExpanded={expandedPoint === point.id}
-                      onToggleExpand={() => setExpandedPoint(expandedPoint === point.id ? null : point.id)}
+                      onToggleExpand={() => {
+                        if (expandedPoint !== point.id) initManualInput(point);
+                        setExpandedPoint(expandedPoint === point.id ? null : point.id);
+                      }}
                       onConfirm={() => handleConfirm(point.id)}
                       onReject={() => handleReject(point.id)}
                       showRejectInput={showRejectInput[point.id] || false}
@@ -152,6 +199,21 @@ export function ManualReviewPage() {
                       noteInput={noteInput}
                       setNoteInput={setNoteInput}
                       onAddNote={() => handleAddNote(point.id)}
+                      showManualPanel={showManualPanel[point.id] || false}
+                      setShowManualPanel={(show) => {
+                        if (show) initManualInput(point);
+                        setShowManualPanel((prev) => ({ ...prev, [point.id]: show }));
+                      }}
+                      manualInput={manualInput[point.id] || { name: point.name, address: point.address, type: point.type, zhoujieNote: '', feedback: '', photoNotes: '', operationNote: '' }}
+                      setManualInputField={(field, value) =>
+                        setManualInput((prev) => ({
+                          ...prev,
+                          [point.id]: { ...(prev[point.id] || { name: point.name, address: point.address, type: point.type, zhoujieNote: '', feedback: '', photoNotes: '', operationNote: '' }), [field]: value },
+                        }))
+                      }
+                      onSaveManual={() => handleSaveManual(point)}
+                      typeOptions={typeOptions}
+                      getTypeLabel={getTypeLabel}
                     />
                   ))}
                 </div>
@@ -205,6 +267,13 @@ interface ReviewPointCardProps {
   noteInput: string;
   setNoteInput: (value: string) => void;
   onAddNote: () => void;
+  showManualPanel: boolean;
+  setShowManualPanel: (show: boolean) => void;
+  manualInput: ManualResolveInput & { operationNote: string };
+  setManualInputField: (field: string, value: any) => void;
+  onSaveManual: () => void;
+  typeOptions: { value: PointType; label: string }[];
+  getTypeLabel: (t: string) => string;
 }
 
 function ReviewPointCard({
@@ -220,7 +289,22 @@ function ReviewPointCard({
   noteInput,
   setNoteInput,
   onAddNote,
+  showManualPanel,
+  setShowManualPanel,
+  manualInput,
+  setManualInputField,
+  onSaveManual,
+  typeOptions,
+  getTypeLabel,
 }: ReviewPointCardProps) {
+  const hasChanges =
+    manualInput.name !== point.name ||
+    manualInput.address !== point.address ||
+    manualInput.type !== point.type ||
+    (manualInput.zhoujieNote && manualInput.zhoujieNote !== (point.zhoujieNote || '')) ||
+    (manualInput.feedback && manualInput.feedback !== (point.feedback || '')) ||
+    (manualInput.photoNotes && manualInput.photoNotes !== (point.photoNotes || ''));
+
   return (
     <div className="hover:bg-gray-50 transition-colors">
       <div
@@ -240,6 +324,11 @@ function ReviewPointCard({
           <div className="flex items-center gap-2 ml-auto">
             <StatusBadge type="source" value={point.source} />
             <StatusBadge type="pointType" value={point.type} />
+            {(point.manualResolveHistory && point.manualResolveHistory.length > 0) && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-indigo-100 text-indigo-700">
+                <Edit3 className="w-3 h-3 mr-1" />人工处理
+              </span>
+            )}
           </div>
         </div>
         <ChevronRight
@@ -258,23 +347,51 @@ function ReviewPointCard({
                 <p><span className="text-gray-500">名称：</span>{point.name || '(空)'}</p>
                 <p><span className="text-gray-500">地址：</span>{point.address}</p>
                 <p><span className="text-gray-500">坐标：</span>{point.lat.toFixed(6)}, {point.lng.toFixed(6)}</p>
+                <p><span className="text-gray-500">类型：</span>{getTypeLabel(point.type)}</p>
+                {point.zhoujieNote && (
+                  <p className="text-amber-700"><StickyNote className="w-3 h-3 inline mr-1" /><span className="text-gray-500">周姐备注：</span>{point.zhoujieNote}</p>
+                )}
+                {point.feedback && (
+                  <p className="text-blue-700"><MessageSquare className="w-3 h-3 inline mr-1" /><span className="text-gray-500">反馈：</span>{point.feedback}</p>
+                )}
+                {point.photoNotes && (
+                  <p className="text-green-700"><Camera className="w-3 h-3 inline mr-1" /><span className="text-gray-500">照片：</span>{point.photoNotes}</p>
+                )}
                 {point.notes && (
                   <p><span className="text-gray-500">备注：</span>{point.notes}</p>
                 )}
                 <p><span className="text-gray-500">来源文件：</span>{point.fileName || '未知'}</p>
                 <p><span className="text-gray-500">原始行号：</span>第 {point.sourceRowNumber} 行</p>
               </div>
+              {point.originalValues && Object.keys(point.originalValues).length > 0 && (
+                <div className="mt-3 p-3 bg-indigo-50 border border-indigo-100 rounded-lg text-xs space-y-1">
+                  <p className="font-medium text-indigo-800 mb-1 flex items-center"><Edit3 className="w-3 h-3 mr-1" />人工处理历史（原值 → 现值）</p>
+                  {point.originalValues.name && (
+                    <p className="text-indigo-700">名称：<span className="line-through text-gray-400">{point.originalValues.name}</span> <span className="mx-1">→</span> <span className="font-medium">{point.name}</span></p>
+                  )}
+                  {point.originalValues.address && (
+                    <p className="text-indigo-700">地址：<span className="line-through text-gray-400">{point.originalValues.address}</span> <span className="mx-1">→</span> <span className="font-medium">{point.address}</span></p>
+                  )}
+                  {point.originalValues.type && (
+                    <p className="text-indigo-700">类型：<span className="line-through text-gray-400">{getTypeLabel(point.originalValues.type)}</span> <span className="mx-1">→</span> <span className="font-medium">{getTypeLabel(point.type)}</span></p>
+                  )}
+                </div>
+              )}
             </div>
             <div>
               <h5 className="text-sm font-medium text-gray-700 mb-2 flex items-center">
                 <History className="w-4 h-4 mr-1" />
                 判断过程留痕 ({point.auditTrail.length} 条)
               </h5>
-              <div className="max-h-32 overflow-y-auto space-y-2">
+              <div className="max-h-40 overflow-y-auto space-y-2">
                 {point.auditTrail.map((record) => (
-                  <div key={record.id} className="text-xs bg-gray-50 p-2 rounded">
+                  <div key={record.id} className={`text-xs p-2 rounded ${
+                    record.action === 'manualResolve' ? 'bg-indigo-50 border border-indigo-100' : 'bg-gray-50'
+                  }`}>
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-gray-700">{record.operator}</span>
+                      <span className="font-medium text-gray-700">
+                        {record.operator} · {record.action === 'manualResolve' ? '✋手动处理' : record.action === 'confirm' ? '✅确认' : record.action === 'reject' ? '❌作废' : record.action === 'note' ? '📝备注' : record.action}
+                      </span>
                       <span className="text-gray-400">
                         {new Date(record.timestamp).toLocaleString('zh-CN')}
                       </span>
@@ -304,22 +421,155 @@ function ReviewPointCard({
             </div>
           )}
 
-          <div className="flex items-center gap-2 mb-4">
-            <input
-              type="text"
-              placeholder="添加备注..."
-              value={noteInput}
-              onChange={(e) => setNoteInput(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-              onClick={(e) => e.stopPropagation()}
-            />
-            <button
-              onClick={(e) => { e.stopPropagation(); onAddNote(); }}
-              className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
-            >
-              <MessageSquare className="w-4 h-4" />
-            </button>
-          </div>
+          {showManualPanel ? (
+            <div className="mb-4 p-4 bg-indigo-50 border border-indigo-200 rounded-xl space-y-4">
+              <div className="flex items-center justify-between">
+                <h5 className="text-sm font-semibold text-indigo-800 flex items-center">
+                  <Edit3 className="w-4 h-4 mr-2" />手动处理：录入人工判定值（将回写到点位正文并留下历史）
+                </h5>
+                {hasChanges && (
+                  <span className="text-xs px-2 py-1 bg-amber-100 text-amber-700 rounded-full">检测到修改</span>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">点位名称 <span className="text-indigo-600">(可编辑)</span></label>
+                  <input
+                    type="text"
+                    value={manualInput.name || ''}
+                    onChange={(e) => setManualInputField('name', e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                    className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                      manualInput.name !== point.name ? 'border-amber-400 bg-amber-50' : 'border-gray-300 bg-white'
+                    }`}
+                  />
+                  {manualInput.name !== point.name && (
+                    <p className="text-xs text-amber-600 mt-1">原值：{point.name || '(空)'}</p>
+                  )}
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">详细地址 <span className="text-indigo-600">(可编辑)</span></label>
+                  <input
+                    type="text"
+                    value={manualInput.address || ''}
+                    onChange={(e) => setManualInputField('address', e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                    className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                      manualInput.address !== point.address ? 'border-amber-400 bg-amber-50' : 'border-gray-300 bg-white'
+                    }`}
+                  />
+                  {manualInput.address !== point.address && (
+                    <p className="text-xs text-amber-600 mt-1">原值：{point.address}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">点位类型 <span className="text-indigo-600">(可编辑)</span></label>
+                  <select
+                    value={manualInput.type || point.type}
+                    onChange={(e) => setManualInputField('type', e.target.value as PointType)}
+                    onClick={(e) => e.stopPropagation()}
+                    className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                      manualInput.type !== point.type ? 'border-amber-400 bg-amber-50' : 'border-gray-300 bg-white'
+                    }`}
+                  >
+                    {typeOptions.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                  {manualInput.type !== point.type && (
+                    <p className="text-xs text-amber-600 mt-1">原类型：{getTypeLabel(point.type)}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-amber-700 mb-1 flex items-center">
+                    <StickyNote className="w-3 h-3 mr-1" />周姐备注
+                  </label>
+                  <textarea
+                    value={manualInput.zhoujieNote || ''}
+                    onChange={(e) => setManualInputField('zhoujieNote', e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                    placeholder="例：此点位已列入整改计划，预计下月完成"
+                    rows={2}
+                    className="w-full px-3 py-2 border border-amber-300 bg-amber-50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-blue-700 mb-1 flex items-center">
+                    <MessageSquare className="w-3 h-3 mr-1" />居民反馈
+                  </label>
+                  <textarea
+                    value={manualInput.feedback || ''}
+                    onChange={(e) => setManualInputField('feedback', e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                    placeholder="居民意见、诉求、问题描述"
+                    rows={2}
+                    className="w-full px-3 py-2 border border-blue-300 bg-blue-50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-green-700 mb-1 flex items-center">
+                    <Camera className="w-3 h-3 mr-1" />巡检照片说明
+                  </label>
+                  <textarea
+                    value={manualInput.photoNotes || ''}
+                    onChange={(e) => setManualInputField('photoNotes', e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                    placeholder="现场拍摄情况、环境、门头照等说明"
+                    rows={2}
+                    className="w-full px-3 py-2 border border-green-300 bg-green-50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">处理说明（可选）</label>
+                <input
+                  type="text"
+                  value={manualInput.operationNote || ''}
+                  onChange={(e) => setManualInputField('operationNote', e.target.value)}
+                  onClick={(e) => e.stopPropagation()}
+                  placeholder="本次手动处理的决策依据、参考材料等，会写入审计留痕"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  onClick={(e) => { e.stopPropagation(); setShowManualPanel(false); }}
+                  className="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
+                >
+                  <X className="w-4 h-4 mr-2" />取消
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); onSaveManual(); }}
+                  className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm shadow-md"
+                >
+                  <Save className="w-4 h-4 mr-2" />保存并确认（回写点位正文 + 留痕）
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 mb-4">
+              <input
+                type="text"
+                placeholder="添加备注..."
+                value={noteInput}
+                onChange={(e) => setNoteInput(e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                onClick={(e) => e.stopPropagation()}
+              />
+              <button
+                onClick={(e) => { e.stopPropagation(); onAddNote(); }}
+                className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
+              >
+                <MessageSquare className="w-4 h-4" />
+              </button>
+            </div>
+          )}
 
           <div className="flex items-center justify-end gap-3">
             {showRejectInput ? (
@@ -354,13 +604,24 @@ function ReviewPointCard({
                   <XCircle className="w-4 h-4 mr-2" />
                   点位作废
                 </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); onConfirm(); }}
-                  className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  确认通过
-                </button>
+                {!showManualPanel && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setShowManualPanel(true); }}
+                    className="inline-flex items-center px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors"
+                  >
+                    <Edit3 className="w-4 h-4 mr-2" />
+                    手动处理
+                  </button>
+                )}
+                {!showManualPanel && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onConfirm(); }}
+                    className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    确认通过
+                  </button>
+                )}
               </>
             )}
           </div>

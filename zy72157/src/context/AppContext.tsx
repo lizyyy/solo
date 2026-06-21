@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
-import { MealPoint, MergeSuggestion, AppState, AppContextType, AuditRecord, DiffRecord, FieldDiff } from '../types';
+import { MealPoint, MergeSuggestion, AppState, AppContextType, AuditRecord, DiffRecord, FieldDiff, ManualResolveInput, ManualResolveSnapshot, PointType } from '../types';
 import { saveToLocalStorage, loadFromLocalStorage, clearLocalStorage, generateId } from '../utils/storage';
 import { calculateSimilarity, getMergeReason, SIMILARITY_THRESHOLDS } from '../utils/similarity';
 import { sampleMealPoints } from '../data/sampleData';
@@ -355,10 +355,85 @@ export function AppProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const manuallyResolvePoint = (pointId: string, input: ManualResolveInput) => {
+    const point = state.points.find((p) => p.id === pointId);
+    if (!point) return;
+
+    const snapshots: ManualResolveSnapshot[] = [];
+    const originalValues: Partial<Record<'name' | 'address' | 'type', string>> = { ...point.originalValues };
+    const fieldLabels: Record<string, string> = { name: '点位名称', address: '详细地址', type: '点位类型' };
+
+    let updatedPoint: any = { ...point };
+
+    if (input.name !== undefined && input.name !== point.name) {
+      if (!originalValues.name) originalValues.name = point.name;
+      snapshots.push({ field: '点位名称', originalValue: point.name, resolvedValue: input.name });
+      updatedPoint.name = input.name;
+    }
+    if (input.address !== undefined && input.address !== point.address) {
+      if (!originalValues.address) originalValues.address = point.address;
+      snapshots.push({ field: '详细地址', originalValue: point.address, resolvedValue: input.address });
+      updatedPoint.address = input.address;
+    }
+    if (input.type !== undefined && input.type !== point.type) {
+      if (!originalValues.type) originalValues.type = point.type;
+      snapshots.push({ field: '点位类型', originalValue: point.type, resolvedValue: input.type });
+      updatedPoint.type = input.type;
+    }
+
+    if (input.zhoujieNote !== undefined) {
+      updatedPoint.zhoujieNote = input.zhoujieNote;
+    }
+    if (input.feedback !== undefined) {
+      updatedPoint.feedback = input.feedback;
+    }
+    if (input.photoNotes !== undefined) {
+      updatedPoint.photoNotes = input.photoNotes;
+    }
+
+    if (snapshots.length > 0) {
+      updatedPoint.manualResolveHistory = [...(point.manualResolveHistory || []), ...snapshots];
+    }
+    updatedPoint.originalValues = originalValues;
+
+    const extraNotes: string[] = [];
+    if (input.zhoujieNote) extraNotes.push(`周姐备注：${input.zhoujieNote}`);
+    if (input.feedback) extraNotes.push(`居民反馈：${input.feedback}`);
+    if (input.photoNotes) extraNotes.push(`照片说明：${input.photoNotes}`);
+    if (extraNotes.length > 0) {
+      updatedPoint.notes = point.notes ? `${point.notes} | ${extraNotes.join(' | ')}` : extraNotes.join(' | ');
+    }
+
+    const remarkParts: string[] = [];
+    if (snapshots.length > 0) {
+      remarkParts.push(`手动处理${snapshots.length}个字段：` + snapshots.map((s) => `${s.field}[${s.originalValue}→${s.resolvedValue}]`).join('，'));
+    }
+    if (input.operationNote) remarkParts.push(input.operationNote);
+    const finalRemark = remarkParts.length > 0 ? remarkParts.join('；') : '手动处理';
+
+    updatedPoint = addAuditRecord(updatedPoint as MealPoint, 'manualResolve', finalRemark);
+    updatedPoint.status = 'confirmed';
+
+    dispatch({ type: 'UPDATE_POINT', payload: updatedPoint as MealPoint });
+  };
+
   const exportToCSV = (): string => {
-    const headers = ['点位名称', '地址', '纬度', '经度', '数据来源', '状态', '类型', '备注', '来源文件', '原始行号', '原始行数据', '审核记录数', '涉及补录差异数'];
+    const headers = [
+      '点位名称', '地址', '纬度', '经度', '数据来源', '状态', '类型',
+      '周姐备注', '居民反馈', '巡检照片说明',
+      '备注', '来源文件', '原始行号', '原始行数据',
+      '原始名称(冲突前)', '原始地址(冲突前)', '原始类型(冲突前)',
+      '人工处理痕迹',
+      '审核记录数', '审核意见历史', '涉及补录差异数'
+    ];
     const rows = state.points.map((p) => {
       const relatedDiffs = state.diffs.filter((d) => d.pointIds.includes(p.id));
+      const manualTraces = (p.manualResolveHistory || [])
+        .map((s) => `${s.field}:${s.originalValue}→${s.resolvedValue}`)
+        .join(' | ');
+      const auditHistory = p.auditTrail
+        .map((r) => `[${new Date(r.timestamp).toLocaleString('zh-CN')}]${r.operator}-${r.action}:${r.remark}`)
+        .join(' || ');
       return [
         p.name || '(空)',
         p.address,
@@ -367,11 +442,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
         p.source,
         p.status,
         p.type,
+        p.zhoujieNote || '',
+        p.feedback || '',
+        p.photoNotes || '',
         p.notes,
         p.fileName,
         p.sourceRowNumber,
         Object.entries(p.sourceRow).map(([k, v]) => `${k}=${v}`).join('; '),
+        p.originalValues?.name || '',
+        p.originalValues?.address || '',
+        p.originalValues?.type || '',
+        manualTraces,
         p.auditTrail.length,
+        auditHistory,
         relatedDiffs.length,
       ];
     });
@@ -382,7 +465,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     if (state.diffs.length > 0) {
       return csvContent + '\n\n===补录差异记录===\n' +
-        ['差异ID', '涉及点位ID', '差异字段数', '状态', '处理备注', '检测时间', '处理时间']
+        ['差异ID', '涉及点位ID', '差异字段数', '状态', '处理备注', '检测时间', '处理时间', '字段明细']
           .map((c) => `"${c}"`).join(',') + '\n' +
         state.diffs.map((d) => [
           d.id,
@@ -392,6 +475,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           d.resolvedNote || '',
           new Date(d.detectedAt).toLocaleString('zh-CN'),
           d.resolvedAt ? new Date(d.resolvedAt).toLocaleString('zh-CN') : '',
+          d.diffFields.map((f) => `${f.field}[A:${f.valueA}|B:${f.valueB}]${f.chosen ? '(取' + (f.chosen === 'custom' ? '自定义:' + f.customValue : f.chosen) + ')' : ''}`).join('；'),
         ].map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
     }
 
@@ -414,6 +498,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     detectDiffs,
     resolveDiff,
     skipDiff,
+    manuallyResolvePoint,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

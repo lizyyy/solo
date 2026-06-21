@@ -6,7 +6,7 @@ export type PointType = 'smooth' | 'review' | 'legacy' | 'boundary' | 'duplicate
 
 export type SuggestionStatus = 'pending' | 'approved' | 'rejected';
 
-export type AuditAction = 'import' | 'merge' | 'confirm' | 'reject' | 'note' | 'split' | 'diff' | 'diffResolve';
+export type AuditAction = 'import' | 'merge' | 'confirm' | 'reject' | 'note' | 'split' | 'diff' | 'diffResolve' | 'manualResolve';
 
 export interface AuditRecord {
   id: string;
@@ -14,6 +14,12 @@ export interface AuditRecord {
   operator: string;
   remark: string;
   timestamp: Date;
+}
+
+export interface ManualResolveSnapshot {
+  field: string;
+  originalValue: string;
+  resolvedValue: string;
 }
 
 export interface MealPoint {
@@ -33,6 +39,11 @@ export interface MealPoint {
   sourceRowNumber: number;
   createdAt: Date;
   updatedAt: Date;
+  feedback?: string;
+  photoNotes?: string;
+  zhoujieNote?: string;
+  originalValues?: Partial<Record<'name' | 'address' | 'type', string>>;
+  manualResolveHistory?: ManualResolveSnapshot[];
 }
 
 export interface SimilarityBreakdown {
@@ -112,6 +123,16 @@ export const SOURCE_ALIASES: Record<string, PointSource> = {
   '街道手改': 'street',
 };
 
+export interface ManualResolveInput {
+  name?: string;
+  address?: string;
+  type?: PointType;
+  zhoujieNote?: string;
+  feedback?: string;
+  photoNotes?: string;
+  operationNote?: string;
+}
+
 export interface AppContextType extends AppState {
   addPoints: (points: MealPoint[]) => void;
   approveSuggestion: (suggestionId: string) => void;
@@ -127,4 +148,5 @@ export interface AppContextType extends AppState {
   detectDiffs: () => void;
   resolveDiff: (diffId: string, resolvedFields: FieldDiff[], note?: string) => void;
   skipDiff: (diffId: string) => void;
+  manuallyResolvePoint: (pointId: string, input: ManualResolveInput) => void;
 }
