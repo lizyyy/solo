@@ -65,12 +65,18 @@ export default {
         "pulse-slow": "pulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "slide-in-right":
           "slideInRight 320ms cubic-bezier(0.22, 1, 0.36, 1) both",
+        "slide-in-down":
+          "slideInDown 280ms cubic-bezier(0.22, 1, 0.36, 1) both",
         "stamp-in": "stampIn 480ms cubic-bezier(0.34, 1.56, 0.64, 1) both",
       },
       keyframes: {
         slideInRight: {
           "0%": { transform: "translateX(16px)", opacity: "0" },
           "100%": { transform: "translateX(0)", opacity: "1" },
+        },
+        slideInDown: {
+          "0%": { transform: "translate(-50%, -8px)", opacity: "0" },
+          "100%": { transform: "translate(-50%, 0)", opacity: "1" },
         },
         stampIn: {
           "0%": { transform: "rotate(-12deg) scale(1.6)", opacity: "0" },
