@@ -4,7 +4,7 @@ export type DataSource = 'cad_export' | 'manual_edit' | 'photo_estimate';
 
 export type AnomalyType = 'coordinate_error' | 'missing_data' | 'outlier' | 'suspicious';
 
-export type ChangeType = 'coordinate' | 'anomaly_status' | 'anomaly_type' | 'note' | 'source';
+export type ChangeType = 'coordinate' | 'anomaly_status' | 'anomaly_type' | 'note' | 'source' | 'import_overwrite' | 'supplement_merge';
 
 export interface CoordinateDiff {
   previous: { x: number; y: number; z: number };
@@ -62,6 +62,7 @@ export interface SkeletonPoint {
   source: DataSource;
   sourceRow?: number;
   sourceFile?: string;
+  importSessionId?: string;
   originalValues: {
     x: number;
     y: number;
@@ -69,7 +70,9 @@ export interface SkeletonPoint {
     source: DataSource;
     sourceRow?: number;
     sourceFile?: string;
+    importSessionId?: string;
   };
+  importHistory: ImportRecord[];
   isAnomaly: boolean;
   anomalyType?: AnomalyType;
   anomalyNote?: string;
@@ -131,7 +134,7 @@ export interface DataQualityReport {
   warnings: string[];
 }
 
-export type ActionType = 'add_note' | 'update_coordinates' | 'toggle_anomaly' | 'import_data' | 'create_snapshot' | 'restore_snapshot' | 'update_filter' | 'change_frame';
+export type ActionType = 'add_note' | 'update_coordinates' | 'toggle_anomaly' | 'import_data' | 'supplement_import' | 'create_snapshot' | 'restore_snapshot' | 'update_filter' | 'change_frame';
 
 export interface ActionLog {
   id: string;
@@ -147,7 +150,55 @@ export interface ActionLog {
     newValue?: any;
     reason?: string;
     snapshotName?: string;
+    importSessionId?: string;
+    fileName?: string;
+    changedPointCount?: number;
+    diffs?: SupplementDiff[];
   };
+}
+
+export interface ImportSession {
+  id: string;
+  fileName: string;
+  importedAt: string;
+  importedBy: string;
+  mode: 'initial' | 'supplement';
+  totalPoints: number;
+  frameCount: number;
+  warnings: string[];
+}
+
+export interface ImportRecord {
+  sessionId: string;
+  fileName: string;
+  importedAt: string;
+  mode: 'initial' | 'supplement';
+  sourceRow?: number;
+  coordinateDiff?: CoordinateDiff;
+  anomalyDiff?: AnomalyStatusDiff;
+  noteDiff?: {
+    previousCount: number;
+    currentCount: number;
+    addedNotes: string[];
+  };
+}
+
+export interface SupplementDiff {
+  pointName: string;
+  frameNumber: number;
+  previousCoordinates: { x: number; y: number; z: number };
+  newCoordinates: { x: number; y: number; z: number };
+  coordinateDistance: number;
+  previousAnomaly: boolean;
+  newAnomaly: boolean;
+  previousAnomalyType?: AnomalyType;
+  newAnomalyType?: AnomalyType;
+  previousSource?: DataSource;
+  newSource?: DataSource;
+  previousSourceFile?: string;
+  newSourceFile?: string;
+  previousSourceRow?: number;
+  newSourceRow?: number;
 }
 
 export interface ImportResult {
@@ -196,6 +247,8 @@ export const CHANGE_TYPE_LABELS: Record<ChangeType, string> = {
   anomaly_type: '异常类型',
   note: '添加备注',
   source: '来源变更',
+  import_overwrite: '导入覆盖',
+  supplement_merge: '补录合并',
 };
 
 export const ANOMALY_TYPE_SUGGESTIONS: Record<AnomalyType, string> = {

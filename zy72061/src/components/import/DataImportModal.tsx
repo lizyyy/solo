@@ -1,8 +1,8 @@
 import { useState, useRef } from 'react';
-import { Upload, X, FileText, AlertTriangle, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, X, FileText, AlertTriangle, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
 import Papa from 'papaparse';
 import { useGaitStore } from '../../store/useGaitStore';
-import { GaitFrame, SkeletonPoint, DataSource, BoneGroup } from '../../types';
+import { GaitFrame, SkeletonPoint, DataSource, BoneGroup, SupplementDiff } from '../../types';
 import { MOCK_FRAMES } from '../../data/mockData';
 
 interface DataImportModalProps {
@@ -23,16 +23,30 @@ interface ParsedPoint {
 }
 
 export default function DataImportModal({ isOpen, onClose }: DataImportModalProps) {
-  const { setFrames, setImportReport, setCurrentFrameIndex, setSelectedPointId } = useGaitStore();
+  const {
+    setFrames,
+    supplementImport,
+    setImportReport,
+    setCurrentFrameIndex,
+    setSelectedPointId,
+    frames,
+    importSessions,
+  } = useGaitStore();
+
   const [isDragging, setIsDragging] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [importMode, setImportMode] = useState<'initial' | 'supplement'>('initial');
+  const [authorName, setAuthorName] = useState('阿乔');
   const [importResult, setImportResult] = useState<{
     success: boolean;
     totalPoints: number;
     warnings: string[];
     errors: string[];
+    diffs?: SupplementDiff[];
+    fileName?: string;
   } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const hasExistingData = frames.length > 0;
 
   const validateData = (points: ParsedPoint[]): { warnings: string[]; errors: string[] } => {
     const warnings: string[] = [];
@@ -79,24 +93,10 @@ export default function DataImportModal({ isOpen, onClose }: DataImportModalProp
     return { warnings, errors };
   };
 
-  const parsePointsToFrames = (points: ParsedPoint[]): GaitFrame[] => {
+  const parsePointsToFrame = (points: ParsedPoint[], frameNumber: number, realFileName: string): GaitFrame => {
     const skeletonPoints: SkeletonPoint[] = points
       .filter((p) => p.point_name)
       .map((point, index) => {
-        const nameToBoneGroup: Record<string, BoneGroup> = {
-          head: 'head',
-          neck: 'head',
-          shoulder: 'spine',
-          elbow: 'leftArm',
-          wrist: 'leftArm',
-          hand: 'leftArm',
-          spine: 'spine',
-          hip: 'spine',
-          knee: 'leftLeg',
-          ankle: 'leftLeg',
-          foot: 'leftLeg',
-        };
-
         let boneGroup: BoneGroup = 'spine';
         const name = point.point_name?.toLowerCase() || '';
         if (name.includes('head') || name.includes('neck')) boneGroup = 'head';
@@ -120,10 +120,9 @@ export default function DataImportModal({ isOpen, onClose }: DataImportModalProp
         const z = parseFloat(point.z as string) || 0;
         const source = sourceMap[point.source?.toLowerCase() || ''] || 'cad_export';
         const sourceRow = parseInt(point.source_row as string) || index + 2;
-        const sourceFile = 'imported.csv';
 
         return {
-          id: `${point.point_name}_frame0`,
+          id: `${point.point_name}_frame${frameNumber}`,
           name: point.point_name || `point_${index}`,
           nameCn: point.point_name || `点位${index + 1}`,
           boneGroup,
@@ -132,8 +131,10 @@ export default function DataImportModal({ isOpen, onClose }: DataImportModalProp
           z,
           source,
           sourceRow,
-          sourceFile,
-          originalValues: { x, y, z, source, sourceRow, sourceFile },
+          sourceFile: realFileName,
+          importSessionId: '',
+          originalValues: { x, y, z, source, sourceRow, sourceFile: realFileName, importSessionId: '' },
+          importHistory: [],
           isAnomaly: point.is_anomaly === '1' || point.is_anomaly === 1,
           anomalyType: point.anomaly_type as any,
           anomalyNote: '',
@@ -149,19 +150,17 @@ export default function DataImportModal({ isOpen, onClose }: DataImportModalProp
           },
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-          processedBy: '当前用户',
+          processedBy: authorName,
         };
       });
 
-    return [
-      {
-        frameId: 'frame_0',
-        frameNumber: 0,
-        timestamp: 0,
-        points: skeletonPoints,
-        source: 'imported',
-      },
-    ];
+    return {
+      frameId: `frame_${frameNumber}`,
+      frameNumber,
+      timestamp: frameNumber * 0.1,
+      points: skeletonPoints,
+      source: 'imported',
+    };
   };
 
   const handleFileUpload = (file: File) => {
@@ -175,6 +174,7 @@ export default function DataImportModal({ isOpen, onClose }: DataImportModalProp
       return;
     }
 
+    const realFileName = file.name;
     setImporting(true);
 
     Papa.parse(file, {
@@ -195,23 +195,44 @@ export default function DataImportModal({ isOpen, onClose }: DataImportModalProp
           return;
         }
 
-        const frames = parsePointsToFrames(parsedPoints);
-        setFrames(frames);
-        setCurrentFrameIndex(0);
-        setSelectedPointId(null);
-        setImportReport({
-          fileName: file.name,
-          importedAt: new Date().toISOString(),
-          totalPoints: parsedPoints.length,
-          warnings,
-        });
+        const newFrame = parsePointsToFrame(parsedPoints, 0, realFileName);
+        const newFrames = [newFrame];
 
-        setImportResult({
-          success: true,
-          totalPoints: parsedPoints.length,
-          warnings,
-          errors: [],
-        });
+        if (importMode === 'initial' || !hasExistingData) {
+          setFrames(newFrames, authorName, realFileName);
+          setCurrentFrameIndex(0);
+          setSelectedPointId(null);
+          setImportReport({
+            fileName: realFileName,
+            importedAt: new Date().toISOString(),
+            totalPoints: parsedPoints.length,
+            warnings,
+          });
+          setImportResult({
+            success: true,
+            totalPoints: parsedPoints.length,
+            warnings,
+            errors: [],
+            fileName: realFileName,
+          });
+        } else {
+          const diffs = supplementImport(newFrames, realFileName, authorName);
+          setImportReport({
+            fileName: realFileName,
+            importedAt: new Date().toISOString(),
+            totalPoints: parsedPoints.length,
+            warnings,
+          });
+          setImportResult({
+            success: true,
+            totalPoints: parsedPoints.length,
+            warnings,
+            errors: [],
+            diffs,
+            fileName: realFileName,
+          });
+        }
+
         setImporting(false);
       },
       error: (error) => {
@@ -227,11 +248,11 @@ export default function DataImportModal({ isOpen, onClose }: DataImportModalProp
   };
 
   const handleLoadDemoData = () => {
-    setFrames(MOCK_FRAMES);
+    setFrames(MOCK_FRAMES, authorName, 'gait_2024_06_15.csv');
     setCurrentFrameIndex(0);
     setSelectedPointId(null);
     setImportReport({
-      fileName: 'demo_data',
+      fileName: 'gait_2024_06_15.csv',
       importedAt: new Date().toISOString(),
       totalPoints: MOCK_FRAMES[0].points.length,
       warnings: [],
@@ -250,7 +271,7 @@ export default function DataImportModal({ isOpen, onClose }: DataImportModalProp
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-[500px] shadow-xl overflow-hidden">
+      <div className="bg-white rounded-xl w-[560px] max-h-[85vh] flex flex-col shadow-xl overflow-hidden">
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
             <Upload size={20} className="text-blue-600" />
@@ -264,7 +285,53 @@ export default function DataImportModal({ isOpen, onClose }: DataImportModalProp
           </button>
         </div>
 
-        <div className="p-6">
+        <div className="flex-1 overflow-y-auto p-6">
+          {hasExistingData && (
+            <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <p className="text-sm text-blue-800 font-medium mb-3">
+                当前已有 {frames.length} 帧数据，请选择导入模式：
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setImportMode('initial')}
+                  className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                    importMode === 'initial'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  首次导入（覆盖）
+                </button>
+                <button
+                  onClick={() => setImportMode('supplement')}
+                  className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                    importMode === 'supplement'
+                      ? 'bg-orange-600 text-white'
+                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  补录导入（合并差异）
+                </button>
+              </div>
+              {importMode === 'supplement' && (
+                <p className="text-xs text-orange-700 mt-2">
+                  补录模式：新数据与现有数据逐点比对，仅更新有变化的点位，并记录坐标差异、来源变更等。
+                </p>
+              )}
+            </div>
+          )}
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">操作人</label>
+            <input
+              type="text"
+              value={authorName}
+              onChange={(e) => setAuthorName(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="您的名字"
+            />
+          </div>
+
           <div
             onDragOver={(e) => {
               e.preventDefault();
@@ -283,7 +350,7 @@ export default function DataImportModal({ isOpen, onClose }: DataImportModalProp
             <p className="text-sm font-medium text-gray-700 mb-1">
               拖拽CSV文件到此处或点击上传
             </p>
-            <p className="text-xs text-gray-500">支持CSV格式的点位数据文件</p>
+            <p className="text-xs text-gray-500">文件名将作为来源标识记录到每个点位</p>
             <input
               ref={fileInputRef}
               type="file"
@@ -296,56 +363,125 @@ export default function DataImportModal({ isOpen, onClose }: DataImportModalProp
           {importing && (
             <div className="mt-4 p-4 bg-blue-50 rounded-lg text-center">
               <div className="animate-spin w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full mx-auto mb-2"></div>
-              <p className="text-sm text-blue-700">正在导入数据...</p>
+              <p className="text-sm text-blue-700">
+                {importMode === 'supplement' ? '正在比对差异...' : '正在导入数据...'}
+              </p>
             </div>
           )}
 
           {importResult && (
-            <div className={`mt-4 p-4 rounded-lg ${
+            <div className={`mt-4 rounded-lg overflow-hidden ${
               importResult.success ? 'bg-green-50' : 'bg-red-50'
             }`}>
-              <div className="flex items-center gap-2 mb-2">
-                {importResult.success ? (
-                  <CheckCircle size={18} className="text-green-600" />
-                ) : (
-                  <AlertCircle size={18} className="text-red-600" />
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  {importResult.success ? (
+                    <CheckCircle size={18} className="text-green-600" />
+                  ) : (
+                    <AlertCircle size={18} className="text-red-600" />
+                  )}
+                  <span className={`font-medium ${
+                    importResult.success ? 'text-green-800' : 'text-red-800'
+                  }`}>
+                    {importResult.success
+                      ? (importMode === 'supplement' && hasExistingData ? '补录导入成功' : '首次导入成功')
+                      : '导入失败'}
+                  </span>
+                </div>
+
+                {importResult.success && importResult.fileName && (
+                  <div className="mt-2 p-2 bg-white rounded border border-green-200">
+                    <p className="text-xs text-green-700">
+                      <strong>来源文件：</strong>{importResult.fileName}
+                    </p>
+                    <p className="text-xs text-green-600">
+                      共 {importResult.totalPoints} 个点位，此文件名已记录到每个点位的数据来源中
+                    </p>
+                  </div>
                 )}
-                <span className={`font-medium ${
-                  importResult.success ? 'text-green-800' : 'text-red-800'
-                }`}>
-                  {importResult.success ? '导入成功' : '导入失败'}
-                </span>
+
+                {importResult.warnings.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-sm font-medium text-orange-700 mb-1 flex items-center gap-1">
+                      <AlertTriangle size={14} />
+                      警告（{importResult.warnings.length}）
+                    </p>
+                    <ul className="text-xs text-orange-600 space-y-1 max-h-24 overflow-y-auto">
+                      {importResult.warnings.slice(0, 5).map((warn, i) => (
+                        <li key={i}>• {warn}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {importResult.errors.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-sm font-medium text-red-700 mb-1">错误：</p>
+                    <ul className="text-xs text-red-600 space-y-1">
+                      {importResult.errors.map((err, i) => (
+                        <li key={i}>• {err}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
-              {importResult.success && (
-                <p className="text-sm text-green-700">共导入 {importResult.totalPoints} 个点位</p>
-              )}
-              {importResult.errors.length > 0 && (
-                <div className="mt-2">
-                  <p className="text-sm font-medium text-red-700 mb-1">错误：</p>
-                  <ul className="text-xs text-red-600 space-y-1">
-                    {importResult.errors.slice(0, 5).map((err, i) => (
-                      <li key={i}>• {err}</li>
+
+              {importResult.diffs && importResult.diffs.length > 0 && (
+                <div className="border-t border-green-200 p-4 bg-white">
+                  <h4 className="text-sm font-medium text-gray-800 mb-3">
+                    补录差异明细（{importResult.diffs.length} 个点位有变化）
+                  </h4>
+                  <div className="max-h-48 overflow-y-auto space-y-2">
+                    {importResult.diffs.map((diff, idx) => (
+                      <div key={idx} className="p-2 bg-gray-50 rounded border border-gray-200 text-xs">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-medium text-gray-800">
+                            {diff.pointName}（帧 {diff.frameNumber}）
+                          </span>
+                        </div>
+                        {diff.coordinateDistance > 0 && (
+                          <div className="flex items-center gap-2 font-mono">
+                            <span className="text-red-600">
+                              ({diff.previousCoordinates.x.toFixed(3)}, {diff.previousCoordinates.y.toFixed(3)}, {diff.previousCoordinates.z.toFixed(3)})
+                            </span>
+                            <ArrowRight size={12} className="text-gray-400" />
+                            <span className="text-green-600">
+                              ({diff.newCoordinates.x.toFixed(3)}, {diff.newCoordinates.y.toFixed(3)}, {diff.newCoordinates.z.toFixed(3)})
+                            </span>
+                            <span className="text-gray-500">偏移: {diff.coordinateDistance.toFixed(4)}</span>
+                          </div>
+                        )}
+                        {diff.previousAnomaly !== diff.newAnomaly && (
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-gray-500">异常：</span>
+                            <span className={diff.previousAnomaly ? 'text-orange-600' : 'text-green-600'}>
+                              {diff.previousAnomaly ? '异常' : '正常'}
+                            </span>
+                            <ArrowRight size={10} className="text-gray-400" />
+                            <span className={diff.newAnomaly ? 'text-orange-600' : 'text-green-600'}>
+                              {diff.newAnomaly ? '异常' : '正常'}
+                            </span>
+                          </div>
+                        )}
+                        {diff.previousSourceFile !== diff.newSourceFile && (
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-gray-500">来源：</span>
+                            <span className="text-gray-600">{diff.previousSourceFile || '-'}</span>
+                            <ArrowRight size={10} className="text-gray-400" />
+                            <span className="text-blue-600 font-medium">{diff.newSourceFile}</span>
+                          </div>
+                        )}
+                      </div>
                     ))}
-                    {importResult.errors.length > 5 && (
-                      <li>...还有 {importResult.errors.length - 5} 条错误</li>
-                    )}
-                  </ul>
+                  </div>
                 </div>
               )}
-              {importResult.warnings.length > 0 && (
-                <div className="mt-2">
-                  <p className="text-sm font-medium text-orange-700 mb-1 flex items-center gap-1">
-                    <AlertTriangle size={14} />
-                    警告（{importResult.warnings.length}）：
+
+              {importResult.diffs && importResult.diffs.length === 0 && importResult.success && (
+                <div className="border-t border-green-200 p-4 bg-white">
+                  <p className="text-sm text-gray-600">
+                    补录比对完成：所有点位数据与现有数据一致，无差异。
                   </p>
-                  <ul className="text-xs text-orange-600 space-y-1 max-h-32 overflow-y-auto">
-                    {importResult.warnings.slice(0, 10).map((warn, i) => (
-                      <li key={i}>• {warn}</li>
-                    ))}
-                    {importResult.warnings.length > 10 && (
-                      <li>...还有 {importResult.warnings.length - 10} 条警告</li>
-                    )}
-                  </ul>
                 </div>
               )}
             </div>
@@ -358,7 +494,7 @@ export default function DataImportModal({ isOpen, onClose }: DataImportModalProp
               className="w-full py-2 px-4 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
             >
               <FileText size={16} />
-              加载示例数据
+              加载示例数据（gait_2024_06_15.csv）
             </button>
           </div>
         </div>

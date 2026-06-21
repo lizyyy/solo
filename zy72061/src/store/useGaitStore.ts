@@ -17,6 +17,9 @@ import {
   ChangeType,
   ActionLog,
   ActionType,
+  ImportSession,
+  ImportRecord,
+  SupplementDiff,
 } from '../types';
 import { MOCK_FRAMES } from '../data/mockData';
 
@@ -32,6 +35,7 @@ interface GaitState {
   playSpeed: number;
   snapshots: Snapshot[];
   actionLogs: ActionLog[];
+  importSessions: ImportSession[];
   importReport: {
     fileName: string;
     importedAt: string;
@@ -39,7 +43,8 @@ interface GaitState {
     warnings: string[];
   } | null;
 
-  setFrames: (frames: GaitFrame[], author?: string) => void;
+  setFrames: (frames: GaitFrame[], author?: string, fileName?: string) => void;
+  supplementImport: (newFrames: GaitFrame[], fileName: string, author: string) => SupplementDiff[];
   setCurrentFrameIndex: (index: number) => void;
   setSelectedPointId: (id: string | null) => void;
   setCameraState: (state: CameraState) => void;
@@ -66,6 +71,7 @@ interface GaitState {
   getStatistics: () => Statistics;
   getPointHistory: (pointName: string) => ProcessNote[];
   getActionLogs: () => ActionLog[];
+  getImportSessions: () => ImportSession[];
 }
 
 const initialCameraState: CameraState = {
@@ -157,13 +163,260 @@ export const useGaitStore = create<GaitState>()(
       playSpeed: 1,
       snapshots: [],
       actionLogs: [],
+      importSessions: [],
       importReport: null,
 
-      setFrames: (frames, author = '系统') =>
-        set((state) => ({
-          frames,
-          actionLogs: addActionLog(state, 'import_data', `导入 ${frames.length} 帧数据`, author),
-        })),
+      setFrames: (frames, author = '系统', fileName = '示例数据') =>
+        set((state) => {
+          const sessionId = generateId();
+          const now = new Date().toISOString();
+          const session: ImportSession = {
+            id: sessionId,
+            fileName,
+            importedAt: now,
+            importedBy: author,
+            mode: 'initial',
+            totalPoints: frames[0]?.points.length || 0,
+            frameCount: frames.length,
+            warnings: [],
+          };
+
+          const framesWithSession = frames.map((frame) => ({
+            ...frame,
+            points: frame.points.map((point) => ({
+              ...point,
+              sourceFile: fileName,
+              importSessionId: sessionId,
+              originalValues: {
+                ...point.originalValues,
+                sourceFile: fileName,
+                importSessionId: sessionId,
+              },
+              importHistory: [
+                {
+                  sessionId,
+                  fileName,
+                  importedAt: now,
+                  mode: 'initial' as const,
+                  sourceRow: point.sourceRow,
+                },
+              ],
+            })),
+          }));
+
+          return {
+            frames: framesWithSession,
+            importSessions: [...state.importSessions, session],
+            actionLogs: addActionLog(
+              state,
+              'import_data',
+              `首次导入 ${frames.length} 帧数据，来源：${fileName}`,
+              author,
+              { importSessionId: sessionId, fileName },
+            ),
+          };
+        }),
+
+      supplementImport: (newFrames, fileName, author) => {
+        const state = get();
+        const sessionId = generateId();
+        const now = new Date().toISOString();
+        const diffs: SupplementDiff[] = [];
+
+        const mergedFrames = state.frames.map((existingFrame, frameIdx) => {
+          const newFrame = newFrames.find((f) => f.frameNumber === existingFrame.frameNumber);
+          if (!newFrame) return existingFrame;
+
+          const mergedPoints = existingFrame.points.map((existingPoint) => {
+            const newPoint = newFrame.points.find((p) => p.name === existingPoint.name);
+            if (!newPoint) return existingPoint;
+
+            const coordChanged =
+              existingPoint.x !== newPoint.x ||
+              existingPoint.y !== newPoint.y ||
+              existingPoint.z !== newPoint.z;
+            const anomalyChanged = existingPoint.isAnomaly !== newPoint.isAnomaly;
+            const sourceChanged = existingPoint.source !== newPoint.source ||
+              existingPoint.sourceFile !== newPoint.sourceFile;
+
+            if (!coordChanged && !anomalyChanged && !sourceChanged) return existingPoint;
+
+            const dx = newPoint.x - existingPoint.x;
+            const dy = newPoint.y - existingPoint.y;
+            const dz = newPoint.z - existingPoint.z;
+            const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+            const diff: SupplementDiff = {
+              pointName: existingPoint.name,
+              frameNumber: existingFrame.frameNumber,
+              previousCoordinates: { x: existingPoint.x, y: existingPoint.y, z: existingPoint.z },
+              newCoordinates: { x: newPoint.x, y: newPoint.y, z: newPoint.z },
+              coordinateDistance: distance,
+              previousAnomaly: existingPoint.isAnomaly,
+              newAnomaly: newPoint.isAnomaly,
+              previousAnomalyType: existingPoint.anomalyType,
+              newAnomalyType: newPoint.anomalyType,
+              previousSource: existingPoint.source,
+              newSource: newPoint.source,
+              previousSourceFile: existingPoint.sourceFile,
+              newSourceFile: fileName,
+              previousSourceRow: existingPoint.sourceRow,
+              newSourceRow: newPoint.sourceRow,
+            };
+            diffs.push(diff);
+
+            const coordDiff: CoordinateDiff | undefined = coordChanged
+              ? {
+                  previous: { x: existingPoint.x, y: existingPoint.y, z: existingPoint.z },
+                  current: { x: newPoint.x, y: newPoint.y, z: newPoint.z },
+                  delta: { x: dx, y: dy, z: dz, distance },
+                }
+              : undefined;
+
+            const anomalyDiff: AnomalyStatusDiff | undefined = anomalyChanged
+              ? {
+                  previous: existingPoint.isAnomaly,
+                  current: newPoint.isAnomaly,
+                  previousType: existingPoint.anomalyType,
+                  currentType: newPoint.anomalyType,
+                }
+              : undefined;
+
+            const changes: ChangeRecord[] = [];
+            if (coordChanged) {
+              changes.push(
+                { field: 'x', previous: existingPoint.x, current: newPoint.x },
+                { field: 'y', previous: existingPoint.y, current: newPoint.y },
+                { field: 'z', previous: existingPoint.z, current: newPoint.z },
+              );
+            }
+            if (anomalyChanged) {
+              changes.push({ field: 'isAnomaly', previous: existingPoint.isAnomaly, current: newPoint.isAnomaly });
+            }
+            if (sourceChanged) {
+              changes.push(
+                { field: 'sourceFile', previous: existingPoint.sourceFile, current: fileName },
+                { field: 'source', previous: existingPoint.source, current: newPoint.source },
+              );
+            }
+
+            const supplementNote: ProcessNote = {
+              id: generateId(),
+              pointId: existingPoint.id,
+              frameNumber: existingFrame.frameNumber,
+              content: `补录更新（来源：${fileName}）：${coordChanged ? `坐标偏移${distance.toFixed(4)}` : ''}${anomalyChanged ? ` 异常状态变更` : ''}${sourceChanged ? ` 来源变更` : ''}`.trim(),
+              author,
+              createdAt: now,
+              changeType: 'supplement_merge',
+              changes,
+              coordinateDiff: coordDiff,
+              anomalyDiff,
+              originalSourceRow: newPoint.sourceRow,
+              originalSourceFile: fileName,
+            };
+
+            const importRecord: ImportRecord = {
+              sessionId,
+              fileName,
+              importedAt: now,
+              mode: 'supplement',
+              sourceRow: newPoint.sourceRow,
+              coordinateDiff: coordDiff,
+              anomalyDiff,
+            };
+
+            return {
+              ...existingPoint,
+              x: newPoint.x,
+              y: newPoint.y,
+              z: newPoint.z,
+              source: newPoint.source,
+              sourceRow: newPoint.sourceRow,
+              sourceFile: fileName,
+              importSessionId: sessionId,
+              isAnomaly: newPoint.isAnomaly,
+              anomalyType: newPoint.anomalyType,
+              anomalyNote: newPoint.anomalyNote || existingPoint.anomalyNote,
+              notes: [...existingPoint.notes, supplementNote],
+              importHistory: [...existingPoint.importHistory, importRecord],
+              modificationStats: {
+                ...existingPoint.modificationStats,
+                totalChanges: existingPoint.modificationStats.totalChanges + 1,
+                sourceChanges: existingPoint.modificationStats.sourceChanges + 1,
+                lastModifiedAt: now,
+                modifiedBy: [...new Set([...existingPoint.modificationStats.modifiedBy, author])],
+              },
+              updatedAt: now,
+              processedBy: author,
+            };
+          });
+
+          return { ...existingFrame, points: mergedPoints };
+        });
+
+        const newPointsFromNewFrames = newFrames.filter(
+          (nf) => !state.frames.some((ef) => ef.frameNumber === nf.frameNumber),
+        );
+
+        let finalFrames = mergedFrames;
+        if (newPointsFromNewFrames.length > 0) {
+          finalFrames = [
+            ...mergedFrames,
+            ...newPointsFromNewFrames.map((nf) => ({
+              ...nf,
+              points: nf.points.map((p) => ({
+                ...p,
+                sourceFile: fileName,
+                importSessionId: sessionId,
+                originalValues: {
+                  ...p.originalValues,
+                  sourceFile: fileName,
+                  importSessionId: sessionId,
+                },
+                importHistory: [
+                  {
+                    sessionId,
+                    fileName,
+                    importedAt: now,
+                    mode: 'supplement' as const,
+                    sourceRow: p.sourceRow,
+                  },
+                ],
+              })),
+            })),
+          ];
+        }
+
+        const session: ImportSession = {
+          id: sessionId,
+          fileName,
+          importedAt: now,
+          importedBy: author,
+          mode: 'supplement',
+          totalPoints: newFrames[0]?.points.length || 0,
+          frameCount: newFrames.length,
+          warnings: [],
+        };
+
+        set({
+          frames: finalFrames,
+          importSessions: [...state.importSessions, session],
+          actionLogs: addActionLog(
+            state,
+            'supplement_import',
+            `补录导入 ${newFrames.length} 帧，来源：${fileName}，${diffs.length} 个点位有变化`,
+            author,
+            {
+              importSessionId: sessionId,
+              fileName,
+              changedPointCount: diffs.length,
+              diffs: diffs.slice(0, 20),
+            },
+          ),
+        });
+
+        return diffs;
+      },
 
       setCurrentFrameIndex: (index) =>
         set((state) => {
@@ -623,9 +876,13 @@ export const useGaitStore = create<GaitState>()(
       getActionLogs: () => {
         return get().actionLogs;
       },
+
+      getImportSessions: () => {
+        return get().importSessions;
+      },
     }),
     {
-      name: 'gait-skeleton-storage-v3',
+      name: 'gait-skeleton-storage-v4',
       partialize: (state) => ({
         frames: state.frames,
         currentFrameIndex: state.currentFrameIndex,
@@ -636,6 +893,7 @@ export const useGaitStore = create<GaitState>()(
         importReport: state.importReport,
         snapshots: state.snapshots,
         actionLogs: state.actionLogs,
+        importSessions: state.importSessions,
       }),
     },
   ),

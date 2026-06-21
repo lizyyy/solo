@@ -299,8 +299,16 @@ export default function DetailPanel() {
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">源文件</span>
-              <span className="font-mono text-gray-800 text-xs">{selectedPoint.sourceFile || '-'}</span>
+              <span className="text-gray-500">当前来源文件</span>
+              <span className="font-mono text-gray-800 text-xs bg-blue-50 px-2 py-0.5 rounded">
+                {selectedPoint.sourceFile || '-'}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-500">首次导入文件</span>
+              <span className="font-mono text-gray-800 text-xs bg-green-50 px-2 py-0.5 rounded">
+                {selectedPoint.originalValues.sourceFile || '-'}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">原始行号</span>
@@ -322,6 +330,63 @@ export default function DetailPanel() {
               <span className="text-gray-800 text-xs">{formatDate(selectedPoint.updatedAt)}</span>
             </div>
           </div>
+
+          {selectedPoint.importHistory && selectedPoint.importHistory.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-gray-200">
+              <p className="text-xs font-medium text-gray-600 mb-2">导入历史（{selectedPoint.importHistory.length} 次）</p>
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {selectedPoint.importHistory.map((record, idx) => (
+                  <div key={idx} className="p-2 bg-gray-50 rounded text-xs">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${
+                        record.mode === 'initial'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-orange-100 text-orange-700'
+                      }`}>
+                        {record.mode === 'initial' ? '首次导入' : '补录更新'}
+                      </span>
+                      <span className="text-gray-400 flex items-center gap-1">
+                        <Clock size={10} />
+                        {formatDate(record.importedAt)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-gray-500">来源：</span>
+                      <span className="font-mono text-blue-700 font-medium">{record.fileName}</span>
+                      {record.sourceRow && (
+                        <span className="text-gray-400">行 {record.sourceRow}</span>
+                      )}
+                    </div>
+                    {record.coordinateDiff && (
+                      <div className="mt-1 pt-1 border-t border-gray-200">
+                        <div className="flex items-center gap-1 font-mono">
+                          <span className="text-red-500">
+                            ({record.coordinateDiff.previous.x.toFixed(3)}, {record.coordinateDiff.previous.y.toFixed(3)}, {record.coordinateDiff.previous.z.toFixed(3)})
+                          </span>
+                          <span className="text-gray-400">→</span>
+                          <span className="text-green-500">
+                            ({record.coordinateDiff.current.x.toFixed(3)}, {record.coordinateDiff.current.y.toFixed(3)}, {record.coordinateDiff.current.z.toFixed(3)})
+                          </span>
+                        </div>
+                        <span className="text-gray-500">偏移: {record.coordinateDiff.delta.distance.toFixed(4)}</span>
+                      </div>
+                    )}
+                    {record.anomalyDiff && (
+                      <div className="mt-1">
+                        <span className={record.anomalyDiff.previous ? 'text-orange-600' : 'text-green-600'}>
+                          {record.anomalyDiff.previous ? '异常' : '正常'}
+                        </span>
+                        <span className="text-gray-400 mx-1">→</span>
+                        <span className={record.anomalyDiff.current ? 'text-orange-600' : 'text-green-600'}>
+                          {record.anomalyDiff.current ? '异常' : '正常'}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="p-4 border-b border-gray-100">

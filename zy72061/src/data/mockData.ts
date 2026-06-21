@@ -147,6 +147,7 @@ export const generateMockFrames = (frameCount: number = 10): GaitFrame[] => {
         source,
         sourceRow,
         sourceFile: 'gait_2024_06_15.csv',
+        importSessionId: 'mock-initial-session',
         originalValues: {
           x: baseX,
           y: baseY,
@@ -154,7 +155,17 @@ export const generateMockFrames = (frameCount: number = 10): GaitFrame[] => {
           source,
           sourceRow,
           sourceFile: 'gait_2024_06_15.csv',
+          importSessionId: 'mock-initial-session',
         },
+        importHistory: [
+          {
+            sessionId: 'mock-initial-session',
+            fileName: 'gait_2024_06_15.csv',
+            importedAt: new Date().toISOString(),
+            mode: 'initial' as const,
+            sourceRow,
+          },
+        ],
         ...anomalyInfo,
         notes: getInitialNotes(config.name, frameIndex),
         modificationStats: createModificationStats(hasNotes, anomalyInfo.isAnomaly),

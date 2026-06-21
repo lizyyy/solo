@@ -17,6 +17,8 @@ export default function Home() {
     if (confirm('确定要重置所有数据吗？这将清除所有标记的异常和备注。')) {
       localStorage.removeItem('gait-skeleton-storage');
       localStorage.removeItem('gait-skeleton-storage-v2');
+      localStorage.removeItem('gait-skeleton-storage-v3');
+      localStorage.removeItem('gait-skeleton-storage-v4');
       window.location.reload();
     }
   };
