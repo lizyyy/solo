@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from datetime import datetime
 
 from matrix_attr import (
@@ -186,9 +187,130 @@ def test_audit_sources_of_change() -> None:
     assert changes[-1]["new_cause"] == "kp2"
 
 
+def _make_param_disjoint() -> ParamVersion:
+    return ParamVersion(
+        version="param_disjoint_v1",
+        created_at=datetime(2026, 6, 20),
+        knowledge_points=["kp1", "kp2"],
+        question_ids=["Q9"],
+        weight_matrix={("Q9", "kp1"): 1.0},
+    )
+
+
+def test_no_intersection_suspends_no_warning() -> None:
+    param = _make_param_disjoint()
+    error_vector = {"kp2": 1.0}
+    dec = MatrixDecomposer()
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        try:
+            dec.decompose(param, "Q9", error_vector)
+        except ZeroDivisionSuspend as exc:
+            assert "无有效归因交集" in exc.detail
+            assert "kp1" in exc.detail
+            assert "kp2" in exc.detail
+        else:
+            raise AssertionError("权重与错误向量无交集时必须挂起")
+    for w in caught:
+        assert "invalid value encountered in divide" not in str(w.message), (
+            f"不应出现 numpy invalid warning: {w.message}"
+        )
+
+    rec = AttributionRecord(record_id="R-DJ", question_id="Q9", student_id="S-DJ")
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        rec = dec.apply_to_record(
+            rec, param, SourceType.PARAM_CURRENT, "param_disjoint_v1", error_vector
+        )
+    for w in caught:
+        assert "invalid value encountered in divide" not in str(w.message)
+
+    assert rec.status == AttrStatus.SUSPENDED, f"必须挂起，实际={rec.status.value}"
+    assert rec.status != AttrStatus.NORMAL
+    assert rec.suspend_reason is not None
+    assert "无有效归因交集" in rec.suspend_reason
+    assert rec.knowledge_weights == {}
+    assert rec.confidence == 0.0
+    assert rec.primary_cause is None or rec.primary_cause == ""
+    assert any(
+        "无有效归因交集" in inf.detail or "除零挂起" in inf.detail
+        for inf in rec.influences
+    )
+
+
+def test_no_intersection_csv_chart_recalc_consistent() -> None:
+    param = _make_param_disjoint()
+    error_vector = {"kp2": 1.0}
+    later = Note(
+        note_id="note-dj-1",
+        source_type=SourceType.LATER_NOTE,
+        author="叶老师",
+        created_at=datetime(2026, 6, 21),
+        content="kp1=0.9",
+        weight=0.5,
+    )
+    ctx = FusionContext()
+    ctx.add_param(param)
+    ctx.add_note(later)
+
+    dec = MatrixDecomposer()
+    fusion = SourceFusion()
+    audit = AuditTrail()
+
+    rec = AttributionRecord(record_id="R-DJ2", question_id="Q9", student_id="S-DJ2")
+    rec = dec.apply_to_record(
+        rec, param, SourceType.PARAM_CURRENT, "param_disjoint_v1", error_vector
+    )
+
+    audit.log(
+        rec,
+        operator="system",
+        source_ref="pipeline:disjoint-check",
+        note="无交集场景检测",
+    )
+
+    applied = [(SourceType.PARAM_CURRENT, "param_disjoint_v1")]
+
+    recalc = RecalcEngine(dec, audit)
+    extra = Note(
+        note_id="note-dj-extra",
+        source_type=SourceType.LATER_NOTE,
+        author="叶老师",
+        created_at=datetime(2026, 6, 22),
+        content="kp2=0.5",
+    )
+    rerun = recalc.rerun_with_note(rec, ctx, extra, operator="叶老师")
+    assert rerun.chart_detail_consistent is True
+
+    result: AttrResult = recalc.make_attr_result(rec, applied)
+    assert result.is_consistent is True
+    assert result.record.status == AttrStatus.SUSPENDED
+
+    csv_txt = TeacherReport([result]).csv_detail()
+    assert "suspended" in csv_txt
+    assert "无有效归因交集" in csv_txt
+    assert "param_disjoint_v1" in csv_txt
+    for row in result.csv_rows:
+        assert row["status"] == "suspended"
+        assert "无有效归因交集" in row["suspend_reason"]
+        assert "param_disjoint_v1" in row["applied_sources"]
+
+    detail_sum = sum(result.record.knowledge_weights.values())
+    assert detail_sum == 0.0
+    chart_sum_expected = 0.0
+    assert abs(chart_sum_expected - detail_sum) < 1e-12
+
+    actions = TeacherReport([result]).material_actions()
+    assert any(a.source_type == "系统挂起" for a in actions)
+    assert any("排班同事先确认" in a.action for a in actions)
+
+
 def run_all() -> None:
     test_empty_param_raises()
     test_zero_division_suspends()
+    test_no_intersection_suspends_no_warning()
+    test_no_intersection_csv_chart_recalc_consistent()
     test_full_pipeline()
     test_audit_sources_of_change()
     print("ALL TESTS PASSED")

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
@@ -80,8 +81,33 @@ class MatrixDecomposer:
                 f"题目 {question_id} 知识点权重之和为零，除零边界，挂起待确认"
             )
 
-        raw_weights = (e_vec * row) / denom
-        weights = raw_weights / raw_weights.sum()
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", RuntimeWarning)
+            try:
+                raw_weights = (e_vec * row) / denom
+            except RuntimeWarning as exc:
+                raise ZeroDivisionSuspend(
+                    f"题目 {question_id} 归因乘积计算触发浮点异常（{exc}），挂起待人工确认"
+                )
+
+        if not np.all(np.isfinite(raw_weights)):
+            nan_kps = [kps[i] for i in np.where(~np.isfinite(raw_weights))[0]]
+            raise ZeroDivisionSuspend(
+                f"题目 {question_id} 归因乘积出现 NaN/Inf（涉及知识点: {nan_kps}），挂起待人工确认"
+            )
+
+        raw_sum = float(raw_weights.sum())
+        if abs(raw_sum) < 1e-12:
+            row_mask = row > 1e-12
+            err_mask = e_vec > 1e-12
+            covered = [kps[i] for i in np.where(row_mask)[0]]
+            errored = [kps[i] for i in np.where(err_mask)[0]]
+            raise ZeroDivisionSuspend(
+                f"题目权重与错误向量无有效归因交集，需要排班同事确认材料。"
+                f"题目覆盖知识点: {covered}，错误向量落在: {errored}"
+            )
+
+        weights = raw_weights / raw_sum
 
         ordered_idx = np.argsort(-weights)
         ordered_kps = [kps[i] for i in ordered_idx if weights[i] > 1e-6]

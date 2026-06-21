@@ -103,6 +103,10 @@ class RecalcEngine:
         detail_agg = _detail_sum(weights)
         chart_detail_consistent = abs(sum(chart_agg.values()) - sum(detail_agg.values())) < 1e-6
 
+        source_label = ";".join(
+            f"{st.value}:{sid}" for st, sid in applied_sources
+        )
+
         csv_rows = []
         for kp, w in sorted(weights.items(), key=lambda x: -x[1]):
             csv_rows.append(
@@ -116,6 +120,23 @@ class RecalcEngine:
                     "status": record.status.value,
                     "confidence": round(record.confidence, 6),
                     "suspend_reason": record.suspend_reason or "",
+                    "applied_sources": source_label,
+                }
+            )
+
+        if not csv_rows:
+            csv_rows.append(
+                {
+                    "record_id": record.record_id,
+                    "question_id": record.question_id,
+                    "student_id": record.student_id,
+                    "knowledge_point": "(挂起/待确认)",
+                    "weight": 0.0,
+                    "primary_cause": False,
+                    "status": record.status.value,
+                    "confidence": round(record.confidence, 6),
+                    "suspend_reason": record.suspend_reason or "",
+                    "applied_sources": source_label,
                 }
             )
 
