@@ -1,8 +1,8 @@
 [
   {
-    "snapshot_id": "snap_380d7460",
-    "snapshot_name": "6月18日初版清洗",
-    "created_at": "2026-06-18T13:01:17.443566",
+    "snapshot_id": "snap_9693e743",
+    "snapshot_name": "初版（全量数据）",
+    "created_at": "2026-06-21T11:24:06.553495",
     "filter_criteria": {},
     "summary": {
       "total_records": 81,
@@ -78,7 +78,7 @@
       },
       "anomaly_details": [
         {
-          "id": "219a6096",
+          "id": "2cecc6f0",
           "station": "南航道",
           "measure_time": "2026-05-19 08:47",
           "silt_depth": 3.05,
@@ -95,7 +95,7 @@
           "raw_value": null
         },
         {
-          "id": "01745902",
+          "id": "2c5c586e",
           "station": "东锚地",
           "measure_time": "2026-05-25 18:42",
           "silt_depth": 1.31,
@@ -112,7 +112,7 @@
           "raw_value": null
         },
         {
-          "id": "6c045f6e",
+          "id": "ef547bb0",
           "station": "南航道",
           "measure_time": "2026-05-31 17:06",
           "silt_depth": 2.81,
@@ -129,7 +129,7 @@
           "raw_value": null
         },
         {
-          "id": "b71f71fe",
+          "id": "1ab4f09c",
           "station": "西码头",
           "measure_time": "2026-06-01 13:14",
           "silt_depth": 2.35,
@@ -146,7 +146,7 @@
           "raw_value": null
         },
         {
-          "id": "14706723",
+          "id": "60e90cb3",
           "station": "西码头",
           "measure_time": "2026-06-15 19:04",
           "silt_depth": 4.24,
@@ -163,7 +163,7 @@
           "raw_value": 4.24
         },
         {
-          "id": "7f45ded8",
+          "id": "7f7524ee",
           "station": "中转池",
           "measure_time": "2026-06-17 12:43",
           "silt_depth": 5.61,
@@ -180,7 +180,7 @@
           "raw_value": 5.61
         },
         {
-          "id": "7e54dcd6",
+          "id": "14bff63b",
           "station": "北防波堤",
           "measure_time": "2026-06-15 15:16",
           "silt_depth": 2.56,
@@ -197,7 +197,7 @@
           "raw_value": 1.96
         },
         {
-          "id": "a3cfca29",
+          "id": "a33c14a5",
           "station": "北防波堤",
           "measure_time": "2026-06-16 17:50",
           "silt_depth": 2.55,
@@ -214,7 +214,7 @@
           "raw_value": 1.95
         },
         {
-          "id": "f73e0b06",
+          "id": "ee918986",
           "station": "东锚地",
           "measure_time": "2026-06-17 15:32",
           "silt_depth": 1.95,
@@ -231,7 +231,7 @@
           "raw_value": null
         },
         {
-          "id": "8c1a6293",
+          "id": "394e0408",
           "station": "北防波堤",
           "measure_time": "2026-06-17 20:36",
           "silt_depth": 2.25,
@@ -252,7 +252,7 @@
     },
     "records": [
       {
-        "id": "09a2fff8",
+        "id": "be8f5b7b",
         "station": "北防波堤",
         "measure_time": "2026-06-10 09:08",
         "silt_depth": 1.82,
@@ -264,10 +264,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259515"
+        "created_at": "2026-06-21T11:24:06.535336"
       },
       {
-        "id": "7b3305a5",
+        "id": "ca65c57d",
         "station": "北防波堤",
         "measure_time": "2026-06-05 15:27",
         "silt_depth": 2.34,
@@ -279,10 +279,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259650"
+        "created_at": "2026-06-21T11:24:06.535374"
       },
       {
-        "id": "cd896928",
+        "id": "1f21d726",
         "station": "北防波堤",
         "measure_time": "2026-06-10 14:38",
         "silt_depth": 1.82,
@@ -294,10 +294,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259673"
+        "created_at": "2026-06-21T11:24:06.535397"
       },
       {
-        "id": "fbb7df60",
+        "id": "f73ed5e6",
         "station": "北防波堤",
         "measure_time": "2026-06-16 09:28",
         "silt_depth": 2.25,
@@ -309,10 +309,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259692"
+        "created_at": "2026-06-21T11:24:06.535417"
       },
       {
-        "id": "fc3c80a0",
+        "id": "8ee58135",
         "station": "中转池",
         "measure_time": "2026-06-08 17:27",
         "silt_depth": 4.12,
@@ -324,10 +324,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259711"
+        "created_at": "2026-06-21T11:24:06.535438"
       },
       {
-        "id": "8e7cf881",
+        "id": "200930d5",
         "station": "东锚地",
         "measure_time": "2026-06-13 07:05",
         "silt_depth": 1.72,
@@ -339,10 +339,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259729"
+        "created_at": "2026-06-21T11:24:06.535457"
       },
       {
-        "id": "0606c74f",
+        "id": "522e76cf",
         "station": "西码头",
         "measure_time": "2026-06-11 18:02",
         "silt_depth": 2.58,
@@ -354,10 +354,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259747"
+        "created_at": "2026-06-21T11:24:06.535474"
       },
       {
-        "id": "ab16d1f2",
+        "id": "f8f0136b",
         "station": "西码头",
         "measure_time": "2026-06-05 14:18",
         "silt_depth": 2.93,
@@ -369,10 +369,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259764"
+        "created_at": "2026-06-21T11:24:06.535491"
       },
       {
-        "id": "5dda098e",
+        "id": "421ac0ce",
         "station": "中转池",
         "measure_time": "2026-06-09 17:04",
         "silt_depth": 4.61,
@@ -384,10 +384,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259782"
+        "created_at": "2026-06-21T11:24:06.535508"
       },
       {
-        "id": "a4a331be",
+        "id": "28652983",
         "station": "北防波堤",
         "measure_time": "2026-06-05 19:14",
         "silt_depth": 2.33,
@@ -399,10 +399,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259800"
+        "created_at": "2026-06-21T11:24:06.535524"
       },
       {
-        "id": "efe37e33",
+        "id": "3679cf2d",
         "station": "北防波堤",
         "measure_time": "2026-06-14 08:23",
         "silt_depth": 2.1,
@@ -414,10 +414,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259817"
+        "created_at": "2026-06-21T11:24:06.535541"
       },
       {
-        "id": "97817ee4",
+        "id": "140047ea",
         "station": "东锚地",
         "measure_time": "2026-06-05 15:40",
         "silt_depth": 1.67,
@@ -429,10 +429,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259835"
+        "created_at": "2026-06-21T11:24:06.535561"
       },
       {
-        "id": "8d6eccca",
+        "id": "8ae215b3",
         "station": "南航道",
         "measure_time": "2026-06-08 13:24",
         "silt_depth": 3.63,
@@ -444,10 +444,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259852"
+        "created_at": "2026-06-21T11:24:06.535578"
       },
       {
-        "id": "8f64cd20",
+        "id": "1fb390ee",
         "station": "东锚地",
         "measure_time": "2026-06-10 16:20",
         "silt_depth": 2.29,
@@ -459,10 +459,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259870"
+        "created_at": "2026-06-21T11:24:06.535594"
       },
       {
-        "id": "d6dbdedf",
+        "id": "519c5478",
         "station": "北防波堤",
         "measure_time": "2026-06-13 12:17",
         "silt_depth": 1.98,
@@ -474,10 +474,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259888"
+        "created_at": "2026-06-21T11:24:06.535611"
       },
       {
-        "id": "c69bd004",
+        "id": "f490ee96",
         "station": "北防波堤",
         "measure_time": "2026-06-13 09:41",
         "silt_depth": 1.97,
@@ -489,10 +489,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259905"
+        "created_at": "2026-06-21T11:24:06.535628"
       },
       {
-        "id": "1c0cff7e",
+        "id": "4a8c5453",
         "station": "西码头",
         "measure_time": "2026-06-17 08:16",
         "silt_depth": 2.82,
@@ -504,10 +504,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259923"
+        "created_at": "2026-06-21T11:24:06.535644"
       },
       {
-        "id": "1de17adc",
+        "id": "d9f7bb10",
         "station": "南航道",
         "measure_time": "2026-06-11 17:37",
         "silt_depth": 3.4,
@@ -519,10 +519,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259941"
+        "created_at": "2026-06-21T11:24:06.535661"
       },
       {
-        "id": "67c4867c",
+        "id": "5f192fc0",
         "station": "西码头",
         "measure_time": "2026-06-14 09:08",
         "silt_depth": 3.22,
@@ -534,10 +534,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259959"
+        "created_at": "2026-06-21T11:24:06.535748"
       },
       {
-        "id": "c6dbf3a1",
+        "id": "93f0f79d",
         "station": "中转池",
         "measure_time": "2026-06-06 08:40",
         "silt_depth": 4.29,
@@ -549,10 +549,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259977"
+        "created_at": "2026-06-21T11:24:06.535783"
       },
       {
-        "id": "c049a47a",
+        "id": "8b9b203a",
         "station": "南航道",
         "measure_time": "2026-06-05 12:24",
         "silt_depth": 3.83,
@@ -564,10 +564,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259994"
+        "created_at": "2026-06-21T11:24:06.535805"
       },
       {
-        "id": "13c55a29",
+        "id": "9bc7e1bd",
         "station": "中转池",
         "measure_time": "2026-06-11 14:55",
         "silt_depth": 4.7,
@@ -579,10 +579,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260012"
+        "created_at": "2026-06-21T11:24:06.535825"
       },
       {
-        "id": "9ec4d25e",
+        "id": "900aa3e6",
         "station": "北防波堤",
         "measure_time": "2026-06-11 18:41",
         "silt_depth": 2.34,
@@ -594,10 +594,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260030"
+        "created_at": "2026-06-21T11:24:06.535844"
       },
       {
-        "id": "31582a3d",
+        "id": "92c0035c",
         "station": "东锚地",
         "measure_time": "2026-06-08 13:00",
         "silt_depth": 1.59,
@@ -609,10 +609,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260047"
+        "created_at": "2026-06-21T11:24:06.535862"
       },
       {
-        "id": "7a18eab9",
+        "id": "2e1c5dc4",
         "station": "东锚地",
         "measure_time": "2026-06-06 19:40",
         "silt_depth": 2.28,
@@ -624,10 +624,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260065"
+        "created_at": "2026-06-21T11:24:06.535880"
       },
       {
-        "id": "f94a10f5",
+        "id": "f4a04ff5",
         "station": "东锚地",
         "measure_time": "2026-06-09 08:23",
         "silt_depth": 2.17,
@@ -639,10 +639,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260085"
+        "created_at": "2026-06-21T11:24:06.535897"
       },
       {
-        "id": "8b7b2408",
+        "id": "d7f57241",
         "station": "南航道",
         "measure_time": "2026-06-03 15:20",
         "silt_depth": 3.63,
@@ -654,10 +654,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260103"
+        "created_at": "2026-06-21T11:24:06.535915"
       },
       {
-        "id": "676f25d3",
+        "id": "f9c13d01",
         "station": "西码头",
         "measure_time": "2026-06-12 09:03",
         "silt_depth": 2.52,
@@ -669,10 +669,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260121"
+        "created_at": "2026-06-21T11:24:06.535932"
       },
       {
-        "id": "6caf7475",
+        "id": "3e1b966a",
         "station": "南航道",
         "measure_time": "2026-06-05 17:31",
         "silt_depth": 3.9,
@@ -684,10 +684,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260139"
+        "created_at": "2026-06-21T11:24:06.535949"
       },
       {
-        "id": "b8616566",
+        "id": "1b4b08d6",
         "station": "北防波堤",
         "measure_time": "2026-06-07 08:42",
         "silt_depth": 2.58,
@@ -699,10 +699,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260157"
+        "created_at": "2026-06-21T11:24:06.535970"
       },
       {
-        "id": "e5b2bf98",
+        "id": "d4a61885",
         "station": "西码头",
         "measure_time": "2026-06-11 14:55",
         "silt_depth": 3.26,
@@ -714,10 +714,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260175"
+        "created_at": "2026-06-21T11:24:06.536060"
       },
       {
-        "id": "6845ca17",
+        "id": "85e687dc",
         "station": "中转池",
         "measure_time": "2026-06-09 17:19",
         "silt_depth": 4.24,
@@ -729,10 +729,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260193"
+        "created_at": "2026-06-21T11:24:06.536099"
       },
       {
-        "id": "89d106df",
+        "id": "98bcbb0e",
         "station": "西码头",
         "measure_time": "2026-06-14 13:57",
         "silt_depth": 3.3,
@@ -744,10 +744,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260210"
+        "created_at": "2026-06-21T11:24:06.536122"
       },
       {
-        "id": "ef3b2681",
+        "id": "2226548b",
         "station": "中转池",
         "measure_time": "2026-06-10 07:21",
         "silt_depth": 4.26,
@@ -759,10 +759,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260231"
+        "created_at": "2026-06-21T11:24:06.536145"
       },
       {
-        "id": "9a97459e",
+        "id": "cbff6e20",
         "station": "北防波堤",
         "measure_time": "2026-06-10 06:04",
         "silt_depth": 2.27,
@@ -774,10 +774,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260250"
+        "created_at": "2026-06-21T11:24:06.536167"
       },
       {
-        "id": "6f949457",
+        "id": "bd962ac0",
         "station": "北防波堤",
         "measure_time": "2026-06-13 07:32",
         "silt_depth": 1.98,
@@ -789,10 +789,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260268"
+        "created_at": "2026-06-21T11:24:06.536188"
       },
       {
-        "id": "c5825f41",
+        "id": "cc4db561",
         "station": "南航道",
         "measure_time": "2026-06-09 14:08",
         "silt_depth": 3.42,
@@ -804,10 +804,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260286"
+        "created_at": "2026-06-21T11:24:06.536207"
       },
       {
-        "id": "62654241",
+        "id": "7dbe3e6a",
         "station": "中转池",
         "measure_time": "2026-06-18 18:26",
         "silt_depth": 4.36,
@@ -819,10 +819,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260303"
+        "created_at": "2026-06-21T11:24:06.536227"
       },
       {
-        "id": "6674a8b2",
+        "id": "4c541712",
         "station": "南航道",
         "measure_time": "2026-06-16 11:27",
         "silt_depth": 3.28,
@@ -834,10 +834,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260321"
+        "created_at": "2026-06-21T11:24:06.536247"
       },
       {
-        "id": "10fdae29",
+        "id": "58a6e4d0",
         "station": "西码头",
         "measure_time": "2026-06-04 16:41",
         "silt_depth": 2.87,
@@ -849,10 +849,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260339"
+        "created_at": "2026-06-21T11:24:06.536267"
       },
       {
-        "id": "3cb3f8ed",
+        "id": "e4f7f804",
         "station": "北防波堤",
         "measure_time": "2026-06-13 18:55",
         "silt_depth": 1.85,
@@ -864,10 +864,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260356"
+        "created_at": "2026-06-21T11:24:06.536286"
       },
       {
-        "id": "d50ecdf1",
+        "id": "34283521",
         "station": "北防波堤",
         "measure_time": "2026-06-17 08:27",
         "silt_depth": 2.0,
@@ -879,10 +879,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260374"
+        "created_at": "2026-06-21T11:24:06.536306"
       },
       {
-        "id": "da4d76f4",
+        "id": "0b7b92f5",
         "station": "南航道",
         "measure_time": "2026-06-05 13:51",
         "silt_depth": 3.42,
@@ -894,10 +894,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260393"
+        "created_at": "2026-06-21T11:24:06.536326"
       },
       {
-        "id": "04a8433d",
+        "id": "6ee81a89",
         "station": "中转池",
         "measure_time": "2026-06-03 07:59",
         "silt_depth": 3.98,
@@ -909,10 +909,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260411"
+        "created_at": "2026-06-21T11:24:06.536345"
       },
       {
-        "id": "64d3fe4a",
+        "id": "45efc69e",
         "station": "南航道",
         "measure_time": "2026-06-18 09:55",
         "silt_depth": 3.33,
@@ -924,10 +924,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260429"
+        "created_at": "2026-06-21T11:24:06.536367"
       },
       {
-        "id": "7d7feb3a",
+        "id": "4087b46f",
         "station": "西码头",
         "measure_time": "2026-06-15 06:24",
         "silt_depth": 3.22,
@@ -939,10 +939,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260446"
+        "created_at": "2026-06-21T11:24:06.536392"
       },
       {
-        "id": "4aa8a53a",
+        "id": "9ec057ad",
         "station": "东锚地",
         "measure_time": "2026-06-12 12:44",
         "silt_depth": 2.24,
@@ -954,10 +954,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260464"
+        "created_at": "2026-06-21T11:24:06.536411"
       },
       {
-        "id": "8fa5e058",
+        "id": "d36830f0",
         "station": "中转池",
         "measure_time": "2026-06-07 09:18",
         "silt_depth": 4.43,
@@ -969,10 +969,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260482"
+        "created_at": "2026-06-21T11:24:06.536430"
       },
       {
-        "id": "40046449",
+        "id": "9b1212a6",
         "station": "南航道",
         "measure_time": "2026-06-04 17:20",
         "silt_depth": 3.97,
@@ -984,10 +984,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260500"
+        "created_at": "2026-06-21T11:24:06.536449"
       },
       {
-        "id": "1ab7903b",
+        "id": "125f49f6",
         "station": "北防波堤",
         "measure_time": "2026-06-08 06:32",
         "silt_depth": 1.84,
@@ -999,10 +999,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260518"
+        "created_at": "2026-06-21T11:24:06.536468"
       },
       {
-        "id": "6ffb4572",
+        "id": "4717f033",
         "station": "北防波堤",
         "measure_time": "2026-06-05 16:55",
         "silt_depth": 2.48,
@@ -1014,10 +1014,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260536"
+        "created_at": "2026-06-21T11:24:06.536490"
       },
       {
-        "id": "db1ce863",
+        "id": "18b7cb5d",
         "station": "南航道",
         "measure_time": "2026-06-10 15:38",
         "silt_depth": 3.52,
@@ -1029,10 +1029,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260554"
+        "created_at": "2026-06-21T11:24:06.536512"
       },
       {
-        "id": "94104bcf",
+        "id": "e1ffb5cd",
         "station": "北防波堤",
         "measure_time": "2026-06-13 20:16",
         "silt_depth": 2.3,
@@ -1044,10 +1044,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260677"
+        "created_at": "2026-06-21T11:24:06.536535"
       },
       {
-        "id": "cbe6a40b",
+        "id": "38f28b2c",
         "station": "南航道",
         "measure_time": "2026-06-10 10:25",
         "silt_depth": 3.74,
@@ -1059,10 +1059,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260699"
+        "created_at": "2026-06-21T11:24:06.536554"
       },
       {
-        "id": "8730e13d",
+        "id": "f74fd544",
         "station": "南航道",
         "measure_time": "2026-06-17 11:59",
         "silt_depth": 3.74,
@@ -1074,10 +1074,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260718"
+        "created_at": "2026-06-21T11:24:06.536573"
       },
       {
-        "id": "02149d96",
+        "id": "a40efddc",
         "station": "北防波堤",
         "measure_time": "2026-06-06 07:34",
         "silt_depth": 1.81,
@@ -1089,10 +1089,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260736"
+        "created_at": "2026-06-21T11:24:06.536593"
       },
       {
-        "id": "bc63a6cc",
+        "id": "9419a46d",
         "station": "南航道",
         "measure_time": "2026-06-14 20:04",
         "silt_depth": 3.6,
@@ -1104,10 +1104,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260753"
+        "created_at": "2026-06-21T11:24:06.536611"
       },
       {
-        "id": "2972958f",
+        "id": "c2a7c509",
         "station": "南航道",
         "measure_time": "2026-06-17 19:34",
         "silt_depth": 3.5,
@@ -1119,10 +1119,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260771"
+        "created_at": "2026-06-21T11:24:06.536630"
       },
       {
-        "id": "d8651400",
+        "id": "9e161adc",
         "station": "东锚地",
         "measure_time": "2026-06-03 16:52",
         "silt_depth": 1.99,
@@ -1134,10 +1134,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260789"
+        "created_at": "2026-06-21T11:24:06.536650"
       },
       {
-        "id": "69b887f3",
+        "id": "c1f521fc",
         "station": "中转池",
         "measure_time": "2026-06-06 20:08",
         "silt_depth": 4.14,
@@ -1149,10 +1149,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260807"
+        "created_at": "2026-06-21T11:24:06.536669"
       },
       {
-        "id": "2c7b8ac7",
+        "id": "e3d58df0",
         "station": "东锚地",
         "measure_time": "2026-06-07 10:18",
         "silt_depth": 1.59,
@@ -1164,10 +1164,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260825"
+        "created_at": "2026-06-21T11:24:06.536689"
       },
       {
-        "id": "4520809b",
+        "id": "86f9f630",
         "station": "中转池",
         "measure_time": "2026-06-09 16:40",
         "silt_depth": 4.07,
@@ -1179,10 +1179,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260842"
+        "created_at": "2026-06-21T11:24:06.536709"
       },
       {
-        "id": "d96ba23c",
+        "id": "3a77f936",
         "station": "东锚地",
         "measure_time": "2026-06-04 07:40",
         "silt_depth": 1.9,
@@ -1194,10 +1194,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260860"
+        "created_at": "2026-06-21T11:24:06.536731"
       },
       {
-        "id": "06b85d23",
+        "id": "b1d00bbd",
         "station": "西码头",
         "measure_time": "2026-06-03 11:49",
         "silt_depth": 3.16,
@@ -1209,10 +1209,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260878"
+        "created_at": "2026-06-21T11:24:06.536751"
       },
       {
-        "id": "93f63588",
+        "id": "90f24212",
         "station": "南航道",
         "measure_time": "2026-06-08 17:28",
         "silt_depth": 3.71,
@@ -1224,10 +1224,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260896"
+        "created_at": "2026-06-21T11:24:06.536772"
       },
       {
-        "id": "572f5ea6",
+        "id": "ff023f13",
         "station": "中转池",
         "measure_time": "2026-06-03 07:04",
         "silt_depth": 4.46,
@@ -1239,10 +1239,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260914"
+        "created_at": "2026-06-21T11:24:06.536792"
       },
       {
-        "id": "b9abe76a",
+        "id": "8264156b",
         "station": "南航道",
         "measure_time": "2026-06-07 12:08",
         "silt_depth": 3.64,
@@ -1254,10 +1254,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260933"
+        "created_at": "2026-06-21T11:24:06.536814"
       },
       {
-        "id": "a34f734a",
+        "id": "53ea765e",
         "station": "北防波堤",
         "measure_time": "2026-06-14 09:43",
         "silt_depth": 2.05,
@@ -1269,10 +1269,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260950"
+        "created_at": "2026-06-21T11:24:06.536834"
       },
       {
-        "id": "2f1e26cc",
+        "id": "0e68a449",
         "station": "南航道",
         "measure_time": "2026-06-16 15:47",
         "silt_depth": 3.73,
@@ -1284,10 +1284,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260969"
+        "created_at": "2026-06-21T11:24:06.536855"
       },
       {
-        "id": "abb3294d",
+        "id": "1a141d8f",
         "station": "南航道",
         "measure_time": "2026-06-08 18:51",
         "silt_depth": 3.94,
@@ -1299,10 +1299,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260987"
+        "created_at": "2026-06-21T11:24:06.536891"
       },
       {
-        "id": "219a6096",
+        "id": "2cecc6f0",
         "station": "南航道",
         "measure_time": "2026-05-19 08:47",
         "silt_depth": 3.05,
@@ -1314,10 +1314,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.261006"
+        "created_at": "2026-06-21T11:24:06.536933"
       },
       {
-        "id": "01745902",
+        "id": "2c5c586e",
         "station": "东锚地",
         "measure_time": "2026-05-25 18:42",
         "silt_depth": 1.31,
@@ -1329,10 +1329,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.261024"
+        "created_at": "2026-06-21T11:24:06.536954"
       },
       {
-        "id": "6c045f6e",
+        "id": "ef547bb0",
         "station": "南航道",
         "measure_time": "2026-05-31 17:06",
         "silt_depth": 2.81,
@@ -1344,10 +1344,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.261041"
+        "created_at": "2026-06-21T11:24:06.536972"
       },
       {
-        "id": "b71f71fe",
+        "id": "1ab4f09c",
         "station": "西码头",
         "measure_time": "2026-06-01 13:14",
         "silt_depth": 2.35,
@@ -1359,10 +1359,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.261058"
+        "created_at": "2026-06-21T11:24:06.536989"
       },
       {
-        "id": "4ede095c",
+        "id": "667d2255",
         "station": "南航道",
         "measure_time": "2026-06-14 09:01",
         "silt_depth": 4.88,
@@ -1374,10 +1374,10 @@
         "override_note": null,
         "drift_reason": "传感器零点漂移",
         "raw_value": 4.88,
-        "created_at": "2026-06-18T13:00:36.261120"
+        "created_at": "2026-06-21T11:24:06.537043"
       },
       {
-        "id": "14706723",
+        "id": "60e90cb3",
         "station": "西码头",
         "measure_time": "2026-06-15 19:04",
         "silt_depth": 4.24,
@@ -1389,10 +1389,10 @@
         "override_note": null,
         "drift_reason": "传感器零点漂移",
         "raw_value": 4.24,
-        "created_at": "2026-06-18T13:00:36.261140"
+        "created_at": "2026-06-21T11:24:06.537061"
       },
       {
-        "id": "7f45ded8",
+        "id": "7f7524ee",
         "station": "中转池",
         "measure_time": "2026-06-17 12:43",
         "silt_depth": 5.61,
@@ -1404,10 +1404,10 @@
         "override_note": null,
         "drift_reason": "传感器零点漂移",
         "raw_value": 5.61,
-        "created_at": "2026-06-18T13:00:36.261158"
+        "created_at": "2026-06-21T11:24:06.537078"
       },
       {
-        "id": "7e54dcd6",
+        "id": "14bff63b",
         "station": "北防波堤",
         "measure_time": "2026-06-15 15:16",
         "silt_depth": 2.56,
@@ -1419,10 +1419,10 @@
         "override_note": "现场复核后修正，原淤积量偏差较大",
         "drift_reason": null,
         "raw_value": 1.96,
-        "created_at": "2026-06-18T13:00:36.261180"
+        "created_at": "2026-06-21T11:24:06.537099"
       },
       {
-        "id": "a3cfca29",
+        "id": "a33c14a5",
         "station": "北防波堤",
         "measure_time": "2026-06-16 17:50",
         "silt_depth": 2.55,
@@ -1434,10 +1434,10 @@
         "override_note": "现场复核后修正，原淤积量偏差较大",
         "drift_reason": null,
         "raw_value": 1.95,
-        "created_at": "2026-06-18T13:00:36.261199"
+        "created_at": "2026-06-21T11:24:06.537116"
       },
       {
-        "id": "f73e0b06",
+        "id": "ee918986",
         "station": "东锚地",
         "measure_time": "2026-06-17 15:32",
         "silt_depth": 1.95,
@@ -1449,10 +1449,10 @@
         "override_note": "老何口头说上周暴雨后北防波堤可能涨了0.2米",
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.261217"
+        "created_at": "2026-06-21T11:24:06.537132"
       },
       {
-        "id": "8c1a6293",
+        "id": "394e0408",
         "station": "北防波堤",
         "measure_time": "2026-06-17 20:36",
         "silt_depth": 2.25,
@@ -1464,7 +1464,7 @@
         "override_note": "调度室电话通知西码头疏浚后数据待核",
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.261234"
+        "created_at": "2026-06-21T11:24:06.537148"
       }
     ],
     "confirmed": false,
@@ -1473,2963 +1473,9 @@
     "delta_vs_previous": null
   },
   {
-    "snapshot_id": "snap_6070f06b",
-    "snapshot_name": "6月18日初版清洗",
-    "created_at": "2026-06-18T13:01:26.416344",
-    "filter_criteria": {},
-    "summary": {
-      "total_records": 81,
-      "valid_records": 73,
-      "anomaly_records": 10,
-      "overall_avg_silt_depth": 3.014,
-      "overall_avg_raw": 3.007,
-      "pull_up_amount": -0.007,
-      "station_stats": {
-        "东锚地": {
-          "count": 10,
-          "avg_silt_depth": 1.944,
-          "max_silt_depth": 2.29,
-          "min_silt_depth": 1.59
-        },
-        "中转池": {
-          "count": 12,
-          "avg_silt_depth": 4.305,
-          "max_silt_depth": 4.7,
-          "min_silt_depth": 3.98
-        },
-        "北防波堤": {
-          "count": 21,
-          "avg_silt_depth": 2.153,
-          "max_silt_depth": 2.58,
-          "min_silt_depth": 1.81
-        },
-        "南航道": {
-          "count": 20,
-          "avg_silt_depth": 3.69,
-          "max_silt_depth": 4.88,
-          "min_silt_depth": 3.28
-        },
-        "西码头": {
-          "count": 10,
-          "avg_silt_depth": 2.988,
-          "max_silt_depth": 3.3,
-          "min_silt_depth": 2.52
-        }
-      },
-      "source_distribution": {
-        "sensor_b": {
-          "count": 26,
-          "label": "B号传感器"
-        },
-        "lab_result": {
-          "count": 21,
-          "label": "实验室结果表"
-        },
-        "sensor_a": {
-          "count": 26,
-          "label": "A号传感器"
-        },
-        "lab_result_old": {
-          "count": 4,
-          "label": "实验室结果表旧版"
-        },
-        "manual_override": {
-          "count": 2,
-          "label": "人工改判"
-        },
-        "verbal_note": {
-          "count": 2,
-          "label": "口头备注"
-        }
-      },
-      "influence_summary": {
-        "lab_result_old": 4,
-        "manual_override": 2,
-        "verbal_note": 2,
-        "sensor_drift": 1,
-        "statistical_outlier": 1
-      },
-      "anomaly_details": [
-        {
-          "id": "219a6096",
-          "station": "南航道",
-          "measure_time": "2026-05-19 08:47",
-          "silt_depth": 3.05,
-          "source": "lab_result_old",
-          "source_label": "实验室结果表旧版",
-          "is_drift": false,
-          "is_outlier": false,
-          "is_override": false,
-          "drift_reason": null,
-          "override_note": null,
-          "influence_tags": [
-            "历史旧版数据"
-          ],
-          "raw_value": null
-        },
-        {
-          "id": "01745902",
-          "station": "东锚地",
-          "measure_time": "2026-05-25 18:42",
-          "silt_depth": 1.31,
-          "source": "lab_result_old",
-          "source_label": "实验室结果表旧版",
-          "is_drift": false,
-          "is_outlier": false,
-          "is_override": false,
-          "drift_reason": null,
-          "override_note": null,
-          "influence_tags": [
-            "历史旧版数据"
-          ],
-          "raw_value": null
-        },
-        {
-          "id": "6c045f6e",
-          "station": "南航道",
-          "measure_time": "2026-05-31 17:06",
-          "silt_depth": 2.81,
-          "source": "lab_result_old",
-          "source_label": "实验室结果表旧版",
-          "is_drift": false,
-          "is_outlier": false,
-          "is_override": false,
-          "drift_reason": null,
-          "override_note": null,
-          "influence_tags": [
-            "历史旧版数据"
-          ],
-          "raw_value": null
-        },
-        {
-          "id": "b71f71fe",
-          "station": "西码头",
-          "measure_time": "2026-06-01 13:14",
-          "silt_depth": 2.35,
-          "source": "lab_result_old",
-          "source_label": "实验室结果表旧版",
-          "is_drift": false,
-          "is_outlier": false,
-          "is_override": false,
-          "drift_reason": null,
-          "override_note": null,
-          "influence_tags": [
-            "历史旧版数据"
-          ],
-          "raw_value": null
-        },
-        {
-          "id": "14706723",
-          "station": "西码头",
-          "measure_time": "2026-06-15 19:04",
-          "silt_depth": 4.24,
-          "source": "sensor_b",
-          "source_label": "B号传感器",
-          "is_drift": true,
-          "is_outlier": false,
-          "is_override": false,
-          "drift_reason": "传感器零点漂移",
-          "override_note": null,
-          "influence_tags": [
-            "传感器漂移"
-          ],
-          "raw_value": 4.24
-        },
-        {
-          "id": "7f45ded8",
-          "station": "中转池",
-          "measure_time": "2026-06-17 12:43",
-          "silt_depth": 5.61,
-          "source": "sensor_b",
-          "source_label": "B号传感器",
-          "is_drift": false,
-          "is_outlier": true,
-          "is_override": false,
-          "drift_reason": "传感器零点漂移",
-          "override_note": null,
-          "influence_tags": [
-            "统计离群"
-          ],
-          "raw_value": 5.61
-        },
-        {
-          "id": "7e54dcd6",
-          "station": "北防波堤",
-          "measure_time": "2026-06-15 15:16",
-          "silt_depth": 2.56,
-          "source": "manual_override",
-          "source_label": "人工改判",
-          "is_drift": false,
-          "is_outlier": false,
-          "is_override": true,
-          "drift_reason": null,
-          "override_note": "现场复核后修正，原淤积量偏差较大",
-          "influence_tags": [
-            "人工改判"
-          ],
-          "raw_value": 1.96
-        },
-        {
-          "id": "a3cfca29",
-          "station": "北防波堤",
-          "measure_time": "2026-06-16 17:50",
-          "silt_depth": 2.55,
-          "source": "manual_override",
-          "source_label": "人工改判",
-          "is_drift": false,
-          "is_outlier": false,
-          "is_override": true,
-          "drift_reason": null,
-          "override_note": "现场复核后修正，原淤积量偏差较大",
-          "influence_tags": [
-            "人工改判"
-          ],
-          "raw_value": 1.95
-        },
-        {
-          "id": "f73e0b06",
-          "station": "东锚地",
-          "measure_time": "2026-06-17 15:32",
-          "silt_depth": 1.95,
-          "source": "verbal_note",
-          "source_label": "口头备注",
-          "is_drift": false,
-          "is_outlier": false,
-          "is_override": false,
-          "drift_reason": null,
-          "override_note": "老何口头说上周暴雨后北防波堤可能涨了0.2米",
-          "influence_tags": [
-            "口头备注"
-          ],
-          "raw_value": null
-        },
-        {
-          "id": "8c1a6293",
-          "station": "北防波堤",
-          "measure_time": "2026-06-17 20:36",
-          "silt_depth": 2.25,
-          "source": "verbal_note",
-          "source_label": "口头备注",
-          "is_drift": false,
-          "is_outlier": false,
-          "is_override": false,
-          "drift_reason": null,
-          "override_note": "调度室电话通知西码头疏浚后数据待核",
-          "influence_tags": [
-            "口头备注"
-          ],
-          "raw_value": null
-        }
-      ],
-      "filter_criteria": {}
-    },
-    "records": [
-      {
-        "id": "09a2fff8",
-        "station": "北防波堤",
-        "measure_time": "2026-06-10 09:08",
-        "silt_depth": 1.82,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259515"
-      },
-      {
-        "id": "7b3305a5",
-        "station": "北防波堤",
-        "measure_time": "2026-06-05 15:27",
-        "silt_depth": 2.34,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259650"
-      },
-      {
-        "id": "cd896928",
-        "station": "北防波堤",
-        "measure_time": "2026-06-10 14:38",
-        "silt_depth": 1.82,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259673"
-      },
-      {
-        "id": "fbb7df60",
-        "station": "北防波堤",
-        "measure_time": "2026-06-16 09:28",
-        "silt_depth": 2.25,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259692"
-      },
-      {
-        "id": "fc3c80a0",
-        "station": "中转池",
-        "measure_time": "2026-06-08 17:27",
-        "silt_depth": 4.12,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259711"
-      },
-      {
-        "id": "8e7cf881",
-        "station": "东锚地",
-        "measure_time": "2026-06-13 07:05",
-        "silt_depth": 1.72,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259729"
-      },
-      {
-        "id": "0606c74f",
-        "station": "西码头",
-        "measure_time": "2026-06-11 18:02",
-        "silt_depth": 2.58,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259747"
-      },
-      {
-        "id": "ab16d1f2",
-        "station": "西码头",
-        "measure_time": "2026-06-05 14:18",
-        "silt_depth": 2.93,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259764"
-      },
-      {
-        "id": "5dda098e",
-        "station": "中转池",
-        "measure_time": "2026-06-09 17:04",
-        "silt_depth": 4.61,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259782"
-      },
-      {
-        "id": "a4a331be",
-        "station": "北防波堤",
-        "measure_time": "2026-06-05 19:14",
-        "silt_depth": 2.33,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259800"
-      },
-      {
-        "id": "efe37e33",
-        "station": "北防波堤",
-        "measure_time": "2026-06-14 08:23",
-        "silt_depth": 2.1,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259817"
-      },
-      {
-        "id": "97817ee4",
-        "station": "东锚地",
-        "measure_time": "2026-06-05 15:40",
-        "silt_depth": 1.67,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259835"
-      },
-      {
-        "id": "8d6eccca",
-        "station": "南航道",
-        "measure_time": "2026-06-08 13:24",
-        "silt_depth": 3.63,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259852"
-      },
-      {
-        "id": "8f64cd20",
-        "station": "东锚地",
-        "measure_time": "2026-06-10 16:20",
-        "silt_depth": 2.29,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259870"
-      },
-      {
-        "id": "d6dbdedf",
-        "station": "北防波堤",
-        "measure_time": "2026-06-13 12:17",
-        "silt_depth": 1.98,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259888"
-      },
-      {
-        "id": "c69bd004",
-        "station": "北防波堤",
-        "measure_time": "2026-06-13 09:41",
-        "silt_depth": 1.97,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259905"
-      },
-      {
-        "id": "1c0cff7e",
-        "station": "西码头",
-        "measure_time": "2026-06-17 08:16",
-        "silt_depth": 2.82,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259923"
-      },
-      {
-        "id": "1de17adc",
-        "station": "南航道",
-        "measure_time": "2026-06-11 17:37",
-        "silt_depth": 3.4,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259941"
-      },
-      {
-        "id": "67c4867c",
-        "station": "西码头",
-        "measure_time": "2026-06-14 09:08",
-        "silt_depth": 3.22,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259959"
-      },
-      {
-        "id": "c6dbf3a1",
-        "station": "中转池",
-        "measure_time": "2026-06-06 08:40",
-        "silt_depth": 4.29,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259977"
-      },
-      {
-        "id": "c049a47a",
-        "station": "南航道",
-        "measure_time": "2026-06-05 12:24",
-        "silt_depth": 3.83,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259994"
-      },
-      {
-        "id": "13c55a29",
-        "station": "中转池",
-        "measure_time": "2026-06-11 14:55",
-        "silt_depth": 4.7,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260012"
-      },
-      {
-        "id": "9ec4d25e",
-        "station": "北防波堤",
-        "measure_time": "2026-06-11 18:41",
-        "silt_depth": 2.34,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260030"
-      },
-      {
-        "id": "31582a3d",
-        "station": "东锚地",
-        "measure_time": "2026-06-08 13:00",
-        "silt_depth": 1.59,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260047"
-      },
-      {
-        "id": "7a18eab9",
-        "station": "东锚地",
-        "measure_time": "2026-06-06 19:40",
-        "silt_depth": 2.28,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260065"
-      },
-      {
-        "id": "f94a10f5",
-        "station": "东锚地",
-        "measure_time": "2026-06-09 08:23",
-        "silt_depth": 2.17,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260085"
-      },
-      {
-        "id": "8b7b2408",
-        "station": "南航道",
-        "measure_time": "2026-06-03 15:20",
-        "silt_depth": 3.63,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260103"
-      },
-      {
-        "id": "676f25d3",
-        "station": "西码头",
-        "measure_time": "2026-06-12 09:03",
-        "silt_depth": 2.52,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260121"
-      },
-      {
-        "id": "6caf7475",
-        "station": "南航道",
-        "measure_time": "2026-06-05 17:31",
-        "silt_depth": 3.9,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260139"
-      },
-      {
-        "id": "b8616566",
-        "station": "北防波堤",
-        "measure_time": "2026-06-07 08:42",
-        "silt_depth": 2.58,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260157"
-      },
-      {
-        "id": "e5b2bf98",
-        "station": "西码头",
-        "measure_time": "2026-06-11 14:55",
-        "silt_depth": 3.26,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260175"
-      },
-      {
-        "id": "6845ca17",
-        "station": "中转池",
-        "measure_time": "2026-06-09 17:19",
-        "silt_depth": 4.24,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260193"
-      },
-      {
-        "id": "89d106df",
-        "station": "西码头",
-        "measure_time": "2026-06-14 13:57",
-        "silt_depth": 3.3,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260210"
-      },
-      {
-        "id": "ef3b2681",
-        "station": "中转池",
-        "measure_time": "2026-06-10 07:21",
-        "silt_depth": 4.26,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260231"
-      },
-      {
-        "id": "9a97459e",
-        "station": "北防波堤",
-        "measure_time": "2026-06-10 06:04",
-        "silt_depth": 2.27,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260250"
-      },
-      {
-        "id": "6f949457",
-        "station": "北防波堤",
-        "measure_time": "2026-06-13 07:32",
-        "silt_depth": 1.98,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260268"
-      },
-      {
-        "id": "c5825f41",
-        "station": "南航道",
-        "measure_time": "2026-06-09 14:08",
-        "silt_depth": 3.42,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260286"
-      },
-      {
-        "id": "62654241",
-        "station": "中转池",
-        "measure_time": "2026-06-18 18:26",
-        "silt_depth": 4.36,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260303"
-      },
-      {
-        "id": "6674a8b2",
-        "station": "南航道",
-        "measure_time": "2026-06-16 11:27",
-        "silt_depth": 3.28,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260321"
-      },
-      {
-        "id": "10fdae29",
-        "station": "西码头",
-        "measure_time": "2026-06-04 16:41",
-        "silt_depth": 2.87,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260339"
-      },
-      {
-        "id": "3cb3f8ed",
-        "station": "北防波堤",
-        "measure_time": "2026-06-13 18:55",
-        "silt_depth": 1.85,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260356"
-      },
-      {
-        "id": "d50ecdf1",
-        "station": "北防波堤",
-        "measure_time": "2026-06-17 08:27",
-        "silt_depth": 2.0,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260374"
-      },
-      {
-        "id": "da4d76f4",
-        "station": "南航道",
-        "measure_time": "2026-06-05 13:51",
-        "silt_depth": 3.42,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260393"
-      },
-      {
-        "id": "04a8433d",
-        "station": "中转池",
-        "measure_time": "2026-06-03 07:59",
-        "silt_depth": 3.98,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260411"
-      },
-      {
-        "id": "64d3fe4a",
-        "station": "南航道",
-        "measure_time": "2026-06-18 09:55",
-        "silt_depth": 3.33,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260429"
-      },
-      {
-        "id": "7d7feb3a",
-        "station": "西码头",
-        "measure_time": "2026-06-15 06:24",
-        "silt_depth": 3.22,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260446"
-      },
-      {
-        "id": "4aa8a53a",
-        "station": "东锚地",
-        "measure_time": "2026-06-12 12:44",
-        "silt_depth": 2.24,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260464"
-      },
-      {
-        "id": "8fa5e058",
-        "station": "中转池",
-        "measure_time": "2026-06-07 09:18",
-        "silt_depth": 4.43,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260482"
-      },
-      {
-        "id": "40046449",
-        "station": "南航道",
-        "measure_time": "2026-06-04 17:20",
-        "silt_depth": 3.97,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260500"
-      },
-      {
-        "id": "1ab7903b",
-        "station": "北防波堤",
-        "measure_time": "2026-06-08 06:32",
-        "silt_depth": 1.84,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260518"
-      },
-      {
-        "id": "6ffb4572",
-        "station": "北防波堤",
-        "measure_time": "2026-06-05 16:55",
-        "silt_depth": 2.48,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260536"
-      },
-      {
-        "id": "db1ce863",
-        "station": "南航道",
-        "measure_time": "2026-06-10 15:38",
-        "silt_depth": 3.52,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260554"
-      },
-      {
-        "id": "94104bcf",
-        "station": "北防波堤",
-        "measure_time": "2026-06-13 20:16",
-        "silt_depth": 2.3,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260677"
-      },
-      {
-        "id": "cbe6a40b",
-        "station": "南航道",
-        "measure_time": "2026-06-10 10:25",
-        "silt_depth": 3.74,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260699"
-      },
-      {
-        "id": "8730e13d",
-        "station": "南航道",
-        "measure_time": "2026-06-17 11:59",
-        "silt_depth": 3.74,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260718"
-      },
-      {
-        "id": "02149d96",
-        "station": "北防波堤",
-        "measure_time": "2026-06-06 07:34",
-        "silt_depth": 1.81,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260736"
-      },
-      {
-        "id": "bc63a6cc",
-        "station": "南航道",
-        "measure_time": "2026-06-14 20:04",
-        "silt_depth": 3.6,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260753"
-      },
-      {
-        "id": "2972958f",
-        "station": "南航道",
-        "measure_time": "2026-06-17 19:34",
-        "silt_depth": 3.5,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260771"
-      },
-      {
-        "id": "d8651400",
-        "station": "东锚地",
-        "measure_time": "2026-06-03 16:52",
-        "silt_depth": 1.99,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260789"
-      },
-      {
-        "id": "69b887f3",
-        "station": "中转池",
-        "measure_time": "2026-06-06 20:08",
-        "silt_depth": 4.14,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260807"
-      },
-      {
-        "id": "2c7b8ac7",
-        "station": "东锚地",
-        "measure_time": "2026-06-07 10:18",
-        "silt_depth": 1.59,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260825"
-      },
-      {
-        "id": "4520809b",
-        "station": "中转池",
-        "measure_time": "2026-06-09 16:40",
-        "silt_depth": 4.07,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260842"
-      },
-      {
-        "id": "d96ba23c",
-        "station": "东锚地",
-        "measure_time": "2026-06-04 07:40",
-        "silt_depth": 1.9,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260860"
-      },
-      {
-        "id": "06b85d23",
-        "station": "西码头",
-        "measure_time": "2026-06-03 11:49",
-        "silt_depth": 3.16,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260878"
-      },
-      {
-        "id": "93f63588",
-        "station": "南航道",
-        "measure_time": "2026-06-08 17:28",
-        "silt_depth": 3.71,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260896"
-      },
-      {
-        "id": "572f5ea6",
-        "station": "中转池",
-        "measure_time": "2026-06-03 07:04",
-        "silt_depth": 4.46,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260914"
-      },
-      {
-        "id": "b9abe76a",
-        "station": "南航道",
-        "measure_time": "2026-06-07 12:08",
-        "silt_depth": 3.64,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260933"
-      },
-      {
-        "id": "a34f734a",
-        "station": "北防波堤",
-        "measure_time": "2026-06-14 09:43",
-        "silt_depth": 2.05,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260950"
-      },
-      {
-        "id": "2f1e26cc",
-        "station": "南航道",
-        "measure_time": "2026-06-16 15:47",
-        "silt_depth": 3.73,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260969"
-      },
-      {
-        "id": "abb3294d",
-        "station": "南航道",
-        "measure_time": "2026-06-08 18:51",
-        "silt_depth": 3.94,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260987"
-      },
-      {
-        "id": "219a6096",
-        "station": "南航道",
-        "measure_time": "2026-05-19 08:47",
-        "silt_depth": 3.05,
-        "source": "lab_result_old",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.261006"
-      },
-      {
-        "id": "01745902",
-        "station": "东锚地",
-        "measure_time": "2026-05-25 18:42",
-        "silt_depth": 1.31,
-        "source": "lab_result_old",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.261024"
-      },
-      {
-        "id": "6c045f6e",
-        "station": "南航道",
-        "measure_time": "2026-05-31 17:06",
-        "silt_depth": 2.81,
-        "source": "lab_result_old",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.261041"
-      },
-      {
-        "id": "b71f71fe",
-        "station": "西码头",
-        "measure_time": "2026-06-01 13:14",
-        "silt_depth": 2.35,
-        "source": "lab_result_old",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.261058"
-      },
-      {
-        "id": "4ede095c",
-        "station": "南航道",
-        "measure_time": "2026-06-14 09:01",
-        "silt_depth": 4.88,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": "传感器零点漂移",
-        "raw_value": 4.88,
-        "created_at": "2026-06-18T13:00:36.261120"
-      },
-      {
-        "id": "14706723",
-        "station": "西码头",
-        "measure_time": "2026-06-15 19:04",
-        "silt_depth": 4.24,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": true,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": "传感器零点漂移",
-        "raw_value": 4.24,
-        "created_at": "2026-06-18T13:00:36.261140"
-      },
-      {
-        "id": "7f45ded8",
-        "station": "中转池",
-        "measure_time": "2026-06-17 12:43",
-        "silt_depth": 5.61,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": true,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": "传感器零点漂移",
-        "raw_value": 5.61,
-        "created_at": "2026-06-18T13:00:36.261158"
-      },
-      {
-        "id": "7e54dcd6",
-        "station": "北防波堤",
-        "measure_time": "2026-06-15 15:16",
-        "silt_depth": 2.56,
-        "source": "manual_override",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": true,
-        "override_note": "现场复核后修正，原淤积量偏差较大",
-        "drift_reason": null,
-        "raw_value": 1.96,
-        "created_at": "2026-06-18T13:00:36.261180"
-      },
-      {
-        "id": "a3cfca29",
-        "station": "北防波堤",
-        "measure_time": "2026-06-16 17:50",
-        "silt_depth": 2.55,
-        "source": "manual_override",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": true,
-        "override_note": "现场复核后修正，原淤积量偏差较大",
-        "drift_reason": null,
-        "raw_value": 1.95,
-        "created_at": "2026-06-18T13:00:36.261199"
-      },
-      {
-        "id": "f73e0b06",
-        "station": "东锚地",
-        "measure_time": "2026-06-17 15:32",
-        "silt_depth": 1.95,
-        "source": "verbal_note",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": "老何口头说上周暴雨后北防波堤可能涨了0.2米",
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.261217"
-      },
-      {
-        "id": "8c1a6293",
-        "station": "北防波堤",
-        "measure_time": "2026-06-17 20:36",
-        "silt_depth": 2.25,
-        "source": "verbal_note",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": "调度室电话通知西码头疏浚后数据待核",
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.261234"
-      }
-    ],
-    "confirmed": false,
-    "confirmed_by": null,
-    "confirmed_at": null,
-    "delta_vs_previous": {
-      "avg_diff": 0.0,
-      "valid_count_diff": 0,
-      "anomaly_count_diff": 0
-    }
-  },
-  {
-    "snapshot_id": "snap_bf53bd9b",
-    "snapshot_name": "6月18日初版",
-    "created_at": "2026-06-18T13:02:20.241449",
-    "filter_criteria": {},
-    "summary": {
-      "total_records": 81,
-      "valid_records": 73,
-      "anomaly_records": 10,
-      "overall_avg_silt_depth": 3.014,
-      "overall_avg_raw": 3.007,
-      "pull_up_amount": -0.007,
-      "station_stats": {
-        "东锚地": {
-          "count": 10,
-          "avg_silt_depth": 1.944,
-          "max_silt_depth": 2.29,
-          "min_silt_depth": 1.59
-        },
-        "中转池": {
-          "count": 12,
-          "avg_silt_depth": 4.305,
-          "max_silt_depth": 4.7,
-          "min_silt_depth": 3.98
-        },
-        "北防波堤": {
-          "count": 21,
-          "avg_silt_depth": 2.153,
-          "max_silt_depth": 2.58,
-          "min_silt_depth": 1.81
-        },
-        "南航道": {
-          "count": 20,
-          "avg_silt_depth": 3.69,
-          "max_silt_depth": 4.88,
-          "min_silt_depth": 3.28
-        },
-        "西码头": {
-          "count": 10,
-          "avg_silt_depth": 2.988,
-          "max_silt_depth": 3.3,
-          "min_silt_depth": 2.52
-        }
-      },
-      "source_distribution": {
-        "sensor_b": {
-          "count": 26,
-          "label": "B号传感器"
-        },
-        "lab_result": {
-          "count": 21,
-          "label": "实验室结果表"
-        },
-        "sensor_a": {
-          "count": 26,
-          "label": "A号传感器"
-        },
-        "lab_result_old": {
-          "count": 4,
-          "label": "实验室结果表旧版"
-        },
-        "manual_override": {
-          "count": 2,
-          "label": "人工改判"
-        },
-        "verbal_note": {
-          "count": 2,
-          "label": "口头备注"
-        }
-      },
-      "influence_summary": {
-        "lab_result_old": 4,
-        "manual_override": 2,
-        "verbal_note": 2,
-        "sensor_drift": 1,
-        "statistical_outlier": 1
-      },
-      "anomaly_details": [
-        {
-          "id": "219a6096",
-          "station": "南航道",
-          "measure_time": "2026-05-19 08:47",
-          "silt_depth": 3.05,
-          "source": "lab_result_old",
-          "source_label": "实验室结果表旧版",
-          "is_drift": false,
-          "is_outlier": false,
-          "is_override": false,
-          "drift_reason": null,
-          "override_note": null,
-          "influence_tags": [
-            "历史旧版数据"
-          ],
-          "raw_value": null
-        },
-        {
-          "id": "01745902",
-          "station": "东锚地",
-          "measure_time": "2026-05-25 18:42",
-          "silt_depth": 1.31,
-          "source": "lab_result_old",
-          "source_label": "实验室结果表旧版",
-          "is_drift": false,
-          "is_outlier": false,
-          "is_override": false,
-          "drift_reason": null,
-          "override_note": null,
-          "influence_tags": [
-            "历史旧版数据"
-          ],
-          "raw_value": null
-        },
-        {
-          "id": "6c045f6e",
-          "station": "南航道",
-          "measure_time": "2026-05-31 17:06",
-          "silt_depth": 2.81,
-          "source": "lab_result_old",
-          "source_label": "实验室结果表旧版",
-          "is_drift": false,
-          "is_outlier": false,
-          "is_override": false,
-          "drift_reason": null,
-          "override_note": null,
-          "influence_tags": [
-            "历史旧版数据"
-          ],
-          "raw_value": null
-        },
-        {
-          "id": "b71f71fe",
-          "station": "西码头",
-          "measure_time": "2026-06-01 13:14",
-          "silt_depth": 2.35,
-          "source": "lab_result_old",
-          "source_label": "实验室结果表旧版",
-          "is_drift": false,
-          "is_outlier": false,
-          "is_override": false,
-          "drift_reason": null,
-          "override_note": null,
-          "influence_tags": [
-            "历史旧版数据"
-          ],
-          "raw_value": null
-        },
-        {
-          "id": "14706723",
-          "station": "西码头",
-          "measure_time": "2026-06-15 19:04",
-          "silt_depth": 4.24,
-          "source": "sensor_b",
-          "source_label": "B号传感器",
-          "is_drift": true,
-          "is_outlier": false,
-          "is_override": false,
-          "drift_reason": "传感器零点漂移",
-          "override_note": null,
-          "influence_tags": [
-            "传感器漂移"
-          ],
-          "raw_value": 4.24
-        },
-        {
-          "id": "7f45ded8",
-          "station": "中转池",
-          "measure_time": "2026-06-17 12:43",
-          "silt_depth": 5.61,
-          "source": "sensor_b",
-          "source_label": "B号传感器",
-          "is_drift": false,
-          "is_outlier": true,
-          "is_override": false,
-          "drift_reason": "传感器零点漂移",
-          "override_note": null,
-          "influence_tags": [
-            "统计离群"
-          ],
-          "raw_value": 5.61
-        },
-        {
-          "id": "7e54dcd6",
-          "station": "北防波堤",
-          "measure_time": "2026-06-15 15:16",
-          "silt_depth": 2.56,
-          "source": "manual_override",
-          "source_label": "人工改判",
-          "is_drift": false,
-          "is_outlier": false,
-          "is_override": true,
-          "drift_reason": null,
-          "override_note": "现场复核后修正，原淤积量偏差较大",
-          "influence_tags": [
-            "人工改判"
-          ],
-          "raw_value": 1.96
-        },
-        {
-          "id": "a3cfca29",
-          "station": "北防波堤",
-          "measure_time": "2026-06-16 17:50",
-          "silt_depth": 2.55,
-          "source": "manual_override",
-          "source_label": "人工改判",
-          "is_drift": false,
-          "is_outlier": false,
-          "is_override": true,
-          "drift_reason": null,
-          "override_note": "现场复核后修正，原淤积量偏差较大",
-          "influence_tags": [
-            "人工改判"
-          ],
-          "raw_value": 1.95
-        },
-        {
-          "id": "f73e0b06",
-          "station": "东锚地",
-          "measure_time": "2026-06-17 15:32",
-          "silt_depth": 1.95,
-          "source": "verbal_note",
-          "source_label": "口头备注",
-          "is_drift": false,
-          "is_outlier": false,
-          "is_override": false,
-          "drift_reason": null,
-          "override_note": "老何口头说上周暴雨后北防波堤可能涨了0.2米",
-          "influence_tags": [
-            "口头备注"
-          ],
-          "raw_value": null
-        },
-        {
-          "id": "8c1a6293",
-          "station": "北防波堤",
-          "measure_time": "2026-06-17 20:36",
-          "silt_depth": 2.25,
-          "source": "verbal_note",
-          "source_label": "口头备注",
-          "is_drift": false,
-          "is_outlier": false,
-          "is_override": false,
-          "drift_reason": null,
-          "override_note": "调度室电话通知西码头疏浚后数据待核",
-          "influence_tags": [
-            "口头备注"
-          ],
-          "raw_value": null
-        }
-      ],
-      "filter_criteria": {}
-    },
-    "records": [
-      {
-        "id": "09a2fff8",
-        "station": "北防波堤",
-        "measure_time": "2026-06-10 09:08",
-        "silt_depth": 1.82,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259515"
-      },
-      {
-        "id": "7b3305a5",
-        "station": "北防波堤",
-        "measure_time": "2026-06-05 15:27",
-        "silt_depth": 2.34,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259650"
-      },
-      {
-        "id": "cd896928",
-        "station": "北防波堤",
-        "measure_time": "2026-06-10 14:38",
-        "silt_depth": 1.82,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259673"
-      },
-      {
-        "id": "fbb7df60",
-        "station": "北防波堤",
-        "measure_time": "2026-06-16 09:28",
-        "silt_depth": 2.25,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259692"
-      },
-      {
-        "id": "fc3c80a0",
-        "station": "中转池",
-        "measure_time": "2026-06-08 17:27",
-        "silt_depth": 4.12,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259711"
-      },
-      {
-        "id": "8e7cf881",
-        "station": "东锚地",
-        "measure_time": "2026-06-13 07:05",
-        "silt_depth": 1.72,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259729"
-      },
-      {
-        "id": "0606c74f",
-        "station": "西码头",
-        "measure_time": "2026-06-11 18:02",
-        "silt_depth": 2.58,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259747"
-      },
-      {
-        "id": "ab16d1f2",
-        "station": "西码头",
-        "measure_time": "2026-06-05 14:18",
-        "silt_depth": 2.93,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259764"
-      },
-      {
-        "id": "5dda098e",
-        "station": "中转池",
-        "measure_time": "2026-06-09 17:04",
-        "silt_depth": 4.61,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259782"
-      },
-      {
-        "id": "a4a331be",
-        "station": "北防波堤",
-        "measure_time": "2026-06-05 19:14",
-        "silt_depth": 2.33,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259800"
-      },
-      {
-        "id": "efe37e33",
-        "station": "北防波堤",
-        "measure_time": "2026-06-14 08:23",
-        "silt_depth": 2.1,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259817"
-      },
-      {
-        "id": "97817ee4",
-        "station": "东锚地",
-        "measure_time": "2026-06-05 15:40",
-        "silt_depth": 1.67,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259835"
-      },
-      {
-        "id": "8d6eccca",
-        "station": "南航道",
-        "measure_time": "2026-06-08 13:24",
-        "silt_depth": 3.63,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259852"
-      },
-      {
-        "id": "8f64cd20",
-        "station": "东锚地",
-        "measure_time": "2026-06-10 16:20",
-        "silt_depth": 2.29,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259870"
-      },
-      {
-        "id": "d6dbdedf",
-        "station": "北防波堤",
-        "measure_time": "2026-06-13 12:17",
-        "silt_depth": 1.98,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259888"
-      },
-      {
-        "id": "c69bd004",
-        "station": "北防波堤",
-        "measure_time": "2026-06-13 09:41",
-        "silt_depth": 1.97,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259905"
-      },
-      {
-        "id": "1c0cff7e",
-        "station": "西码头",
-        "measure_time": "2026-06-17 08:16",
-        "silt_depth": 2.82,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259923"
-      },
-      {
-        "id": "1de17adc",
-        "station": "南航道",
-        "measure_time": "2026-06-11 17:37",
-        "silt_depth": 3.4,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259941"
-      },
-      {
-        "id": "67c4867c",
-        "station": "西码头",
-        "measure_time": "2026-06-14 09:08",
-        "silt_depth": 3.22,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259959"
-      },
-      {
-        "id": "c6dbf3a1",
-        "station": "中转池",
-        "measure_time": "2026-06-06 08:40",
-        "silt_depth": 4.29,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259977"
-      },
-      {
-        "id": "c049a47a",
-        "station": "南航道",
-        "measure_time": "2026-06-05 12:24",
-        "silt_depth": 3.83,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259994"
-      },
-      {
-        "id": "13c55a29",
-        "station": "中转池",
-        "measure_time": "2026-06-11 14:55",
-        "silt_depth": 4.7,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260012"
-      },
-      {
-        "id": "9ec4d25e",
-        "station": "北防波堤",
-        "measure_time": "2026-06-11 18:41",
-        "silt_depth": 2.34,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260030"
-      },
-      {
-        "id": "31582a3d",
-        "station": "东锚地",
-        "measure_time": "2026-06-08 13:00",
-        "silt_depth": 1.59,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260047"
-      },
-      {
-        "id": "7a18eab9",
-        "station": "东锚地",
-        "measure_time": "2026-06-06 19:40",
-        "silt_depth": 2.28,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260065"
-      },
-      {
-        "id": "f94a10f5",
-        "station": "东锚地",
-        "measure_time": "2026-06-09 08:23",
-        "silt_depth": 2.17,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260085"
-      },
-      {
-        "id": "8b7b2408",
-        "station": "南航道",
-        "measure_time": "2026-06-03 15:20",
-        "silt_depth": 3.63,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260103"
-      },
-      {
-        "id": "676f25d3",
-        "station": "西码头",
-        "measure_time": "2026-06-12 09:03",
-        "silt_depth": 2.52,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260121"
-      },
-      {
-        "id": "6caf7475",
-        "station": "南航道",
-        "measure_time": "2026-06-05 17:31",
-        "silt_depth": 3.9,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260139"
-      },
-      {
-        "id": "b8616566",
-        "station": "北防波堤",
-        "measure_time": "2026-06-07 08:42",
-        "silt_depth": 2.58,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260157"
-      },
-      {
-        "id": "e5b2bf98",
-        "station": "西码头",
-        "measure_time": "2026-06-11 14:55",
-        "silt_depth": 3.26,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260175"
-      },
-      {
-        "id": "6845ca17",
-        "station": "中转池",
-        "measure_time": "2026-06-09 17:19",
-        "silt_depth": 4.24,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260193"
-      },
-      {
-        "id": "89d106df",
-        "station": "西码头",
-        "measure_time": "2026-06-14 13:57",
-        "silt_depth": 3.3,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260210"
-      },
-      {
-        "id": "ef3b2681",
-        "station": "中转池",
-        "measure_time": "2026-06-10 07:21",
-        "silt_depth": 4.26,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260231"
-      },
-      {
-        "id": "9a97459e",
-        "station": "北防波堤",
-        "measure_time": "2026-06-10 06:04",
-        "silt_depth": 2.27,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260250"
-      },
-      {
-        "id": "6f949457",
-        "station": "北防波堤",
-        "measure_time": "2026-06-13 07:32",
-        "silt_depth": 1.98,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260268"
-      },
-      {
-        "id": "c5825f41",
-        "station": "南航道",
-        "measure_time": "2026-06-09 14:08",
-        "silt_depth": 3.42,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260286"
-      },
-      {
-        "id": "62654241",
-        "station": "中转池",
-        "measure_time": "2026-06-18 18:26",
-        "silt_depth": 4.36,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260303"
-      },
-      {
-        "id": "6674a8b2",
-        "station": "南航道",
-        "measure_time": "2026-06-16 11:27",
-        "silt_depth": 3.28,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260321"
-      },
-      {
-        "id": "10fdae29",
-        "station": "西码头",
-        "measure_time": "2026-06-04 16:41",
-        "silt_depth": 2.87,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260339"
-      },
-      {
-        "id": "3cb3f8ed",
-        "station": "北防波堤",
-        "measure_time": "2026-06-13 18:55",
-        "silt_depth": 1.85,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260356"
-      },
-      {
-        "id": "d50ecdf1",
-        "station": "北防波堤",
-        "measure_time": "2026-06-17 08:27",
-        "silt_depth": 2.0,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260374"
-      },
-      {
-        "id": "da4d76f4",
-        "station": "南航道",
-        "measure_time": "2026-06-05 13:51",
-        "silt_depth": 3.42,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260393"
-      },
-      {
-        "id": "04a8433d",
-        "station": "中转池",
-        "measure_time": "2026-06-03 07:59",
-        "silt_depth": 3.98,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260411"
-      },
-      {
-        "id": "64d3fe4a",
-        "station": "南航道",
-        "measure_time": "2026-06-18 09:55",
-        "silt_depth": 3.33,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260429"
-      },
-      {
-        "id": "7d7feb3a",
-        "station": "西码头",
-        "measure_time": "2026-06-15 06:24",
-        "silt_depth": 3.22,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260446"
-      },
-      {
-        "id": "4aa8a53a",
-        "station": "东锚地",
-        "measure_time": "2026-06-12 12:44",
-        "silt_depth": 2.24,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260464"
-      },
-      {
-        "id": "8fa5e058",
-        "station": "中转池",
-        "measure_time": "2026-06-07 09:18",
-        "silt_depth": 4.43,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260482"
-      },
-      {
-        "id": "40046449",
-        "station": "南航道",
-        "measure_time": "2026-06-04 17:20",
-        "silt_depth": 3.97,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260500"
-      },
-      {
-        "id": "1ab7903b",
-        "station": "北防波堤",
-        "measure_time": "2026-06-08 06:32",
-        "silt_depth": 1.84,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260518"
-      },
-      {
-        "id": "6ffb4572",
-        "station": "北防波堤",
-        "measure_time": "2026-06-05 16:55",
-        "silt_depth": 2.48,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260536"
-      },
-      {
-        "id": "db1ce863",
-        "station": "南航道",
-        "measure_time": "2026-06-10 15:38",
-        "silt_depth": 3.52,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260554"
-      },
-      {
-        "id": "94104bcf",
-        "station": "北防波堤",
-        "measure_time": "2026-06-13 20:16",
-        "silt_depth": 2.3,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260677"
-      },
-      {
-        "id": "cbe6a40b",
-        "station": "南航道",
-        "measure_time": "2026-06-10 10:25",
-        "silt_depth": 3.74,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260699"
-      },
-      {
-        "id": "8730e13d",
-        "station": "南航道",
-        "measure_time": "2026-06-17 11:59",
-        "silt_depth": 3.74,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260718"
-      },
-      {
-        "id": "02149d96",
-        "station": "北防波堤",
-        "measure_time": "2026-06-06 07:34",
-        "silt_depth": 1.81,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260736"
-      },
-      {
-        "id": "bc63a6cc",
-        "station": "南航道",
-        "measure_time": "2026-06-14 20:04",
-        "silt_depth": 3.6,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260753"
-      },
-      {
-        "id": "2972958f",
-        "station": "南航道",
-        "measure_time": "2026-06-17 19:34",
-        "silt_depth": 3.5,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260771"
-      },
-      {
-        "id": "d8651400",
-        "station": "东锚地",
-        "measure_time": "2026-06-03 16:52",
-        "silt_depth": 1.99,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260789"
-      },
-      {
-        "id": "69b887f3",
-        "station": "中转池",
-        "measure_time": "2026-06-06 20:08",
-        "silt_depth": 4.14,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260807"
-      },
-      {
-        "id": "2c7b8ac7",
-        "station": "东锚地",
-        "measure_time": "2026-06-07 10:18",
-        "silt_depth": 1.59,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260825"
-      },
-      {
-        "id": "4520809b",
-        "station": "中转池",
-        "measure_time": "2026-06-09 16:40",
-        "silt_depth": 4.07,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260842"
-      },
-      {
-        "id": "d96ba23c",
-        "station": "东锚地",
-        "measure_time": "2026-06-04 07:40",
-        "silt_depth": 1.9,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260860"
-      },
-      {
-        "id": "06b85d23",
-        "station": "西码头",
-        "measure_time": "2026-06-03 11:49",
-        "silt_depth": 3.16,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260878"
-      },
-      {
-        "id": "93f63588",
-        "station": "南航道",
-        "measure_time": "2026-06-08 17:28",
-        "silt_depth": 3.71,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260896"
-      },
-      {
-        "id": "572f5ea6",
-        "station": "中转池",
-        "measure_time": "2026-06-03 07:04",
-        "silt_depth": 4.46,
-        "source": "lab_result",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260914"
-      },
-      {
-        "id": "b9abe76a",
-        "station": "南航道",
-        "measure_time": "2026-06-07 12:08",
-        "silt_depth": 3.64,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260933"
-      },
-      {
-        "id": "a34f734a",
-        "station": "北防波堤",
-        "measure_time": "2026-06-14 09:43",
-        "silt_depth": 2.05,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260950"
-      },
-      {
-        "id": "2f1e26cc",
-        "station": "南航道",
-        "measure_time": "2026-06-16 15:47",
-        "silt_depth": 3.73,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260969"
-      },
-      {
-        "id": "abb3294d",
-        "station": "南航道",
-        "measure_time": "2026-06-08 18:51",
-        "silt_depth": 3.94,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260987"
-      },
-      {
-        "id": "219a6096",
-        "station": "南航道",
-        "measure_time": "2026-05-19 08:47",
-        "silt_depth": 3.05,
-        "source": "lab_result_old",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.261006"
-      },
-      {
-        "id": "01745902",
-        "station": "东锚地",
-        "measure_time": "2026-05-25 18:42",
-        "silt_depth": 1.31,
-        "source": "lab_result_old",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.261024"
-      },
-      {
-        "id": "6c045f6e",
-        "station": "南航道",
-        "measure_time": "2026-05-31 17:06",
-        "silt_depth": 2.81,
-        "source": "lab_result_old",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.261041"
-      },
-      {
-        "id": "b71f71fe",
-        "station": "西码头",
-        "measure_time": "2026-06-01 13:14",
-        "silt_depth": 2.35,
-        "source": "lab_result_old",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.261058"
-      },
-      {
-        "id": "4ede095c",
-        "station": "南航道",
-        "measure_time": "2026-06-14 09:01",
-        "silt_depth": 4.88,
-        "source": "sensor_a",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": "传感器零点漂移",
-        "raw_value": 4.88,
-        "created_at": "2026-06-18T13:00:36.261120"
-      },
-      {
-        "id": "14706723",
-        "station": "西码头",
-        "measure_time": "2026-06-15 19:04",
-        "silt_depth": 4.24,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": true,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": "传感器零点漂移",
-        "raw_value": 4.24,
-        "created_at": "2026-06-18T13:00:36.261140"
-      },
-      {
-        "id": "7f45ded8",
-        "station": "中转池",
-        "measure_time": "2026-06-17 12:43",
-        "silt_depth": 5.61,
-        "source": "sensor_b",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": true,
-        "is_override": false,
-        "override_note": null,
-        "drift_reason": "传感器零点漂移",
-        "raw_value": 5.61,
-        "created_at": "2026-06-18T13:00:36.261158"
-      },
-      {
-        "id": "7e54dcd6",
-        "station": "北防波堤",
-        "measure_time": "2026-06-15 15:16",
-        "silt_depth": 2.56,
-        "source": "manual_override",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": true,
-        "override_note": "现场复核后修正，原淤积量偏差较大",
-        "drift_reason": null,
-        "raw_value": 1.96,
-        "created_at": "2026-06-18T13:00:36.261180"
-      },
-      {
-        "id": "a3cfca29",
-        "station": "北防波堤",
-        "measure_time": "2026-06-16 17:50",
-        "silt_depth": 2.55,
-        "source": "manual_override",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": true,
-        "override_note": "现场复核后修正，原淤积量偏差较大",
-        "drift_reason": null,
-        "raw_value": 1.95,
-        "created_at": "2026-06-18T13:00:36.261199"
-      },
-      {
-        "id": "f73e0b06",
-        "station": "东锚地",
-        "measure_time": "2026-06-17 15:32",
-        "silt_depth": 1.95,
-        "source": "verbal_note",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": "老何口头说上周暴雨后北防波堤可能涨了0.2米",
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.261217"
-      },
-      {
-        "id": "8c1a6293",
-        "station": "北防波堤",
-        "measure_time": "2026-06-17 20:36",
-        "silt_depth": 2.25,
-        "source": "verbal_note",
-        "version": "v1",
-        "is_drift": false,
-        "is_outlier": false,
-        "is_override": false,
-        "override_note": "调度室电话通知西码头疏浚后数据待核",
-        "drift_reason": null,
-        "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.261234"
-      }
-    ],
-    "confirmed": false,
-    "confirmed_by": null,
-    "confirmed_at": null,
-    "delta_vs_previous": {
-      "avg_diff": 0.0,
-      "valid_count_diff": 0,
-      "anomaly_count_diff": 0
-    }
-  },
-  {
-    "snapshot_id": "snap_927dcc30",
-    "snapshot_name": "6月18日修正版（排旧版+口头）",
-    "created_at": "2026-06-18T13:02:20.249916",
+    "snapshot_id": "snap_d0a900cd",
+    "snapshot_name": "修正版（排除旧版+口头）",
+    "created_at": "2026-06-21T11:24:06.569692",
     "filter_criteria": {
       "exclude_old": "true",
       "exclude_verbal": "true"
@@ -4500,7 +1546,7 @@
       },
       "anomaly_details": [
         {
-          "id": "14706723",
+          "id": "60e90cb3",
           "station": "西码头",
           "measure_time": "2026-06-15 19:04",
           "silt_depth": 4.24,
@@ -4517,7 +1563,7 @@
           "raw_value": 4.24
         },
         {
-          "id": "7f45ded8",
+          "id": "7f7524ee",
           "station": "中转池",
           "measure_time": "2026-06-17 12:43",
           "silt_depth": 5.61,
@@ -4534,7 +1580,7 @@
           "raw_value": 5.61
         },
         {
-          "id": "7e54dcd6",
+          "id": "14bff63b",
           "station": "北防波堤",
           "measure_time": "2026-06-15 15:16",
           "silt_depth": 2.56,
@@ -4551,7 +1597,7 @@
           "raw_value": 1.96
         },
         {
-          "id": "a3cfca29",
+          "id": "a33c14a5",
           "station": "北防波堤",
           "measure_time": "2026-06-16 17:50",
           "silt_depth": 2.55,
@@ -4575,7 +1621,7 @@
     },
     "records": [
       {
-        "id": "09a2fff8",
+        "id": "be8f5b7b",
         "station": "北防波堤",
         "measure_time": "2026-06-10 09:08",
         "silt_depth": 1.82,
@@ -4587,10 +1633,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259515"
+        "created_at": "2026-06-21T11:24:06.535336"
       },
       {
-        "id": "7b3305a5",
+        "id": "ca65c57d",
         "station": "北防波堤",
         "measure_time": "2026-06-05 15:27",
         "silt_depth": 2.34,
@@ -4602,10 +1648,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259650"
+        "created_at": "2026-06-21T11:24:06.535374"
       },
       {
-        "id": "cd896928",
+        "id": "1f21d726",
         "station": "北防波堤",
         "measure_time": "2026-06-10 14:38",
         "silt_depth": 1.82,
@@ -4617,10 +1663,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259673"
+        "created_at": "2026-06-21T11:24:06.535397"
       },
       {
-        "id": "fbb7df60",
+        "id": "f73ed5e6",
         "station": "北防波堤",
         "measure_time": "2026-06-16 09:28",
         "silt_depth": 2.25,
@@ -4632,10 +1678,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259692"
+        "created_at": "2026-06-21T11:24:06.535417"
       },
       {
-        "id": "fc3c80a0",
+        "id": "8ee58135",
         "station": "中转池",
         "measure_time": "2026-06-08 17:27",
         "silt_depth": 4.12,
@@ -4647,10 +1693,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259711"
+        "created_at": "2026-06-21T11:24:06.535438"
       },
       {
-        "id": "8e7cf881",
+        "id": "200930d5",
         "station": "东锚地",
         "measure_time": "2026-06-13 07:05",
         "silt_depth": 1.72,
@@ -4662,10 +1708,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259729"
+        "created_at": "2026-06-21T11:24:06.535457"
       },
       {
-        "id": "0606c74f",
+        "id": "522e76cf",
         "station": "西码头",
         "measure_time": "2026-06-11 18:02",
         "silt_depth": 2.58,
@@ -4677,10 +1723,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259747"
+        "created_at": "2026-06-21T11:24:06.535474"
       },
       {
-        "id": "ab16d1f2",
+        "id": "f8f0136b",
         "station": "西码头",
         "measure_time": "2026-06-05 14:18",
         "silt_depth": 2.93,
@@ -4692,10 +1738,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259764"
+        "created_at": "2026-06-21T11:24:06.535491"
       },
       {
-        "id": "5dda098e",
+        "id": "421ac0ce",
         "station": "中转池",
         "measure_time": "2026-06-09 17:04",
         "silt_depth": 4.61,
@@ -4707,10 +1753,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259782"
+        "created_at": "2026-06-21T11:24:06.535508"
       },
       {
-        "id": "a4a331be",
+        "id": "28652983",
         "station": "北防波堤",
         "measure_time": "2026-06-05 19:14",
         "silt_depth": 2.33,
@@ -4722,10 +1768,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259800"
+        "created_at": "2026-06-21T11:24:06.535524"
       },
       {
-        "id": "efe37e33",
+        "id": "3679cf2d",
         "station": "北防波堤",
         "measure_time": "2026-06-14 08:23",
         "silt_depth": 2.1,
@@ -4737,10 +1783,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259817"
+        "created_at": "2026-06-21T11:24:06.535541"
       },
       {
-        "id": "97817ee4",
+        "id": "140047ea",
         "station": "东锚地",
         "measure_time": "2026-06-05 15:40",
         "silt_depth": 1.67,
@@ -4752,10 +1798,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259835"
+        "created_at": "2026-06-21T11:24:06.535561"
       },
       {
-        "id": "8d6eccca",
+        "id": "8ae215b3",
         "station": "南航道",
         "measure_time": "2026-06-08 13:24",
         "silt_depth": 3.63,
@@ -4767,10 +1813,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259852"
+        "created_at": "2026-06-21T11:24:06.535578"
       },
       {
-        "id": "8f64cd20",
+        "id": "1fb390ee",
         "station": "东锚地",
         "measure_time": "2026-06-10 16:20",
         "silt_depth": 2.29,
@@ -4782,10 +1828,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259870"
+        "created_at": "2026-06-21T11:24:06.535594"
       },
       {
-        "id": "d6dbdedf",
+        "id": "519c5478",
         "station": "北防波堤",
         "measure_time": "2026-06-13 12:17",
         "silt_depth": 1.98,
@@ -4797,10 +1843,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259888"
+        "created_at": "2026-06-21T11:24:06.535611"
       },
       {
-        "id": "c69bd004",
+        "id": "f490ee96",
         "station": "北防波堤",
         "measure_time": "2026-06-13 09:41",
         "silt_depth": 1.97,
@@ -4812,10 +1858,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259905"
+        "created_at": "2026-06-21T11:24:06.535628"
       },
       {
-        "id": "1c0cff7e",
+        "id": "4a8c5453",
         "station": "西码头",
         "measure_time": "2026-06-17 08:16",
         "silt_depth": 2.82,
@@ -4827,10 +1873,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259923"
+        "created_at": "2026-06-21T11:24:06.535644"
       },
       {
-        "id": "1de17adc",
+        "id": "d9f7bb10",
         "station": "南航道",
         "measure_time": "2026-06-11 17:37",
         "silt_depth": 3.4,
@@ -4842,10 +1888,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259941"
+        "created_at": "2026-06-21T11:24:06.535661"
       },
       {
-        "id": "67c4867c",
+        "id": "5f192fc0",
         "station": "西码头",
         "measure_time": "2026-06-14 09:08",
         "silt_depth": 3.22,
@@ -4857,10 +1903,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259959"
+        "created_at": "2026-06-21T11:24:06.535748"
       },
       {
-        "id": "c6dbf3a1",
+        "id": "93f0f79d",
         "station": "中转池",
         "measure_time": "2026-06-06 08:40",
         "silt_depth": 4.29,
@@ -4872,10 +1918,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259977"
+        "created_at": "2026-06-21T11:24:06.535783"
       },
       {
-        "id": "c049a47a",
+        "id": "8b9b203a",
         "station": "南航道",
         "measure_time": "2026-06-05 12:24",
         "silt_depth": 3.83,
@@ -4887,10 +1933,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.259994"
+        "created_at": "2026-06-21T11:24:06.535805"
       },
       {
-        "id": "13c55a29",
+        "id": "9bc7e1bd",
         "station": "中转池",
         "measure_time": "2026-06-11 14:55",
         "silt_depth": 4.7,
@@ -4902,10 +1948,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260012"
+        "created_at": "2026-06-21T11:24:06.535825"
       },
       {
-        "id": "9ec4d25e",
+        "id": "900aa3e6",
         "station": "北防波堤",
         "measure_time": "2026-06-11 18:41",
         "silt_depth": 2.34,
@@ -4917,10 +1963,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260030"
+        "created_at": "2026-06-21T11:24:06.535844"
       },
       {
-        "id": "31582a3d",
+        "id": "92c0035c",
         "station": "东锚地",
         "measure_time": "2026-06-08 13:00",
         "silt_depth": 1.59,
@@ -4932,10 +1978,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260047"
+        "created_at": "2026-06-21T11:24:06.535862"
       },
       {
-        "id": "7a18eab9",
+        "id": "2e1c5dc4",
         "station": "东锚地",
         "measure_time": "2026-06-06 19:40",
         "silt_depth": 2.28,
@@ -4947,10 +1993,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260065"
+        "created_at": "2026-06-21T11:24:06.535880"
       },
       {
-        "id": "f94a10f5",
+        "id": "f4a04ff5",
         "station": "东锚地",
         "measure_time": "2026-06-09 08:23",
         "silt_depth": 2.17,
@@ -4962,10 +2008,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260085"
+        "created_at": "2026-06-21T11:24:06.535897"
       },
       {
-        "id": "8b7b2408",
+        "id": "d7f57241",
         "station": "南航道",
         "measure_time": "2026-06-03 15:20",
         "silt_depth": 3.63,
@@ -4977,10 +2023,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260103"
+        "created_at": "2026-06-21T11:24:06.535915"
       },
       {
-        "id": "676f25d3",
+        "id": "f9c13d01",
         "station": "西码头",
         "measure_time": "2026-06-12 09:03",
         "silt_depth": 2.52,
@@ -4992,10 +2038,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260121"
+        "created_at": "2026-06-21T11:24:06.535932"
       },
       {
-        "id": "6caf7475",
+        "id": "3e1b966a",
         "station": "南航道",
         "measure_time": "2026-06-05 17:31",
         "silt_depth": 3.9,
@@ -5007,10 +2053,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260139"
+        "created_at": "2026-06-21T11:24:06.535949"
       },
       {
-        "id": "b8616566",
+        "id": "1b4b08d6",
         "station": "北防波堤",
         "measure_time": "2026-06-07 08:42",
         "silt_depth": 2.58,
@@ -5022,10 +2068,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260157"
+        "created_at": "2026-06-21T11:24:06.535970"
       },
       {
-        "id": "e5b2bf98",
+        "id": "d4a61885",
         "station": "西码头",
         "measure_time": "2026-06-11 14:55",
         "silt_depth": 3.26,
@@ -5037,10 +2083,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260175"
+        "created_at": "2026-06-21T11:24:06.536060"
       },
       {
-        "id": "6845ca17",
+        "id": "85e687dc",
         "station": "中转池",
         "measure_time": "2026-06-09 17:19",
         "silt_depth": 4.24,
@@ -5052,10 +2098,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260193"
+        "created_at": "2026-06-21T11:24:06.536099"
       },
       {
-        "id": "89d106df",
+        "id": "98bcbb0e",
         "station": "西码头",
         "measure_time": "2026-06-14 13:57",
         "silt_depth": 3.3,
@@ -5067,10 +2113,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260210"
+        "created_at": "2026-06-21T11:24:06.536122"
       },
       {
-        "id": "ef3b2681",
+        "id": "2226548b",
         "station": "中转池",
         "measure_time": "2026-06-10 07:21",
         "silt_depth": 4.26,
@@ -5082,10 +2128,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260231"
+        "created_at": "2026-06-21T11:24:06.536145"
       },
       {
-        "id": "9a97459e",
+        "id": "cbff6e20",
         "station": "北防波堤",
         "measure_time": "2026-06-10 06:04",
         "silt_depth": 2.27,
@@ -5097,10 +2143,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260250"
+        "created_at": "2026-06-21T11:24:06.536167"
       },
       {
-        "id": "6f949457",
+        "id": "bd962ac0",
         "station": "北防波堤",
         "measure_time": "2026-06-13 07:32",
         "silt_depth": 1.98,
@@ -5112,10 +2158,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260268"
+        "created_at": "2026-06-21T11:24:06.536188"
       },
       {
-        "id": "c5825f41",
+        "id": "cc4db561",
         "station": "南航道",
         "measure_time": "2026-06-09 14:08",
         "silt_depth": 3.42,
@@ -5127,10 +2173,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260286"
+        "created_at": "2026-06-21T11:24:06.536207"
       },
       {
-        "id": "62654241",
+        "id": "7dbe3e6a",
         "station": "中转池",
         "measure_time": "2026-06-18 18:26",
         "silt_depth": 4.36,
@@ -5142,10 +2188,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260303"
+        "created_at": "2026-06-21T11:24:06.536227"
       },
       {
-        "id": "6674a8b2",
+        "id": "4c541712",
         "station": "南航道",
         "measure_time": "2026-06-16 11:27",
         "silt_depth": 3.28,
@@ -5157,10 +2203,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260321"
+        "created_at": "2026-06-21T11:24:06.536247"
       },
       {
-        "id": "10fdae29",
+        "id": "58a6e4d0",
         "station": "西码头",
         "measure_time": "2026-06-04 16:41",
         "silt_depth": 2.87,
@@ -5172,10 +2218,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260339"
+        "created_at": "2026-06-21T11:24:06.536267"
       },
       {
-        "id": "3cb3f8ed",
+        "id": "e4f7f804",
         "station": "北防波堤",
         "measure_time": "2026-06-13 18:55",
         "silt_depth": 1.85,
@@ -5187,10 +2233,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260356"
+        "created_at": "2026-06-21T11:24:06.536286"
       },
       {
-        "id": "d50ecdf1",
+        "id": "34283521",
         "station": "北防波堤",
         "measure_time": "2026-06-17 08:27",
         "silt_depth": 2.0,
@@ -5202,10 +2248,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260374"
+        "created_at": "2026-06-21T11:24:06.536306"
       },
       {
-        "id": "da4d76f4",
+        "id": "0b7b92f5",
         "station": "南航道",
         "measure_time": "2026-06-05 13:51",
         "silt_depth": 3.42,
@@ -5217,10 +2263,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260393"
+        "created_at": "2026-06-21T11:24:06.536326"
       },
       {
-        "id": "04a8433d",
+        "id": "6ee81a89",
         "station": "中转池",
         "measure_time": "2026-06-03 07:59",
         "silt_depth": 3.98,
@@ -5232,10 +2278,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260411"
+        "created_at": "2026-06-21T11:24:06.536345"
       },
       {
-        "id": "64d3fe4a",
+        "id": "45efc69e",
         "station": "南航道",
         "measure_time": "2026-06-18 09:55",
         "silt_depth": 3.33,
@@ -5247,10 +2293,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260429"
+        "created_at": "2026-06-21T11:24:06.536367"
       },
       {
-        "id": "7d7feb3a",
+        "id": "4087b46f",
         "station": "西码头",
         "measure_time": "2026-06-15 06:24",
         "silt_depth": 3.22,
@@ -5262,10 +2308,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260446"
+        "created_at": "2026-06-21T11:24:06.536392"
       },
       {
-        "id": "4aa8a53a",
+        "id": "9ec057ad",
         "station": "东锚地",
         "measure_time": "2026-06-12 12:44",
         "silt_depth": 2.24,
@@ -5277,10 +2323,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260464"
+        "created_at": "2026-06-21T11:24:06.536411"
       },
       {
-        "id": "8fa5e058",
+        "id": "d36830f0",
         "station": "中转池",
         "measure_time": "2026-06-07 09:18",
         "silt_depth": 4.43,
@@ -5292,10 +2338,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260482"
+        "created_at": "2026-06-21T11:24:06.536430"
       },
       {
-        "id": "40046449",
+        "id": "9b1212a6",
         "station": "南航道",
         "measure_time": "2026-06-04 17:20",
         "silt_depth": 3.97,
@@ -5307,10 +2353,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260500"
+        "created_at": "2026-06-21T11:24:06.536449"
       },
       {
-        "id": "1ab7903b",
+        "id": "125f49f6",
         "station": "北防波堤",
         "measure_time": "2026-06-08 06:32",
         "silt_depth": 1.84,
@@ -5322,10 +2368,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260518"
+        "created_at": "2026-06-21T11:24:06.536468"
       },
       {
-        "id": "6ffb4572",
+        "id": "4717f033",
         "station": "北防波堤",
         "measure_time": "2026-06-05 16:55",
         "silt_depth": 2.48,
@@ -5337,10 +2383,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260536"
+        "created_at": "2026-06-21T11:24:06.536490"
       },
       {
-        "id": "db1ce863",
+        "id": "18b7cb5d",
         "station": "南航道",
         "measure_time": "2026-06-10 15:38",
         "silt_depth": 3.52,
@@ -5352,10 +2398,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260554"
+        "created_at": "2026-06-21T11:24:06.536512"
       },
       {
-        "id": "94104bcf",
+        "id": "e1ffb5cd",
         "station": "北防波堤",
         "measure_time": "2026-06-13 20:16",
         "silt_depth": 2.3,
@@ -5367,10 +2413,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260677"
+        "created_at": "2026-06-21T11:24:06.536535"
       },
       {
-        "id": "cbe6a40b",
+        "id": "38f28b2c",
         "station": "南航道",
         "measure_time": "2026-06-10 10:25",
         "silt_depth": 3.74,
@@ -5382,10 +2428,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260699"
+        "created_at": "2026-06-21T11:24:06.536554"
       },
       {
-        "id": "8730e13d",
+        "id": "f74fd544",
         "station": "南航道",
         "measure_time": "2026-06-17 11:59",
         "silt_depth": 3.74,
@@ -5397,10 +2443,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260718"
+        "created_at": "2026-06-21T11:24:06.536573"
       },
       {
-        "id": "02149d96",
+        "id": "a40efddc",
         "station": "北防波堤",
         "measure_time": "2026-06-06 07:34",
         "silt_depth": 1.81,
@@ -5412,10 +2458,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260736"
+        "created_at": "2026-06-21T11:24:06.536593"
       },
       {
-        "id": "bc63a6cc",
+        "id": "9419a46d",
         "station": "南航道",
         "measure_time": "2026-06-14 20:04",
         "silt_depth": 3.6,
@@ -5427,10 +2473,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260753"
+        "created_at": "2026-06-21T11:24:06.536611"
       },
       {
-        "id": "2972958f",
+        "id": "c2a7c509",
         "station": "南航道",
         "measure_time": "2026-06-17 19:34",
         "silt_depth": 3.5,
@@ -5442,10 +2488,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260771"
+        "created_at": "2026-06-21T11:24:06.536630"
       },
       {
-        "id": "d8651400",
+        "id": "9e161adc",
         "station": "东锚地",
         "measure_time": "2026-06-03 16:52",
         "silt_depth": 1.99,
@@ -5457,10 +2503,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260789"
+        "created_at": "2026-06-21T11:24:06.536650"
       },
       {
-        "id": "69b887f3",
+        "id": "c1f521fc",
         "station": "中转池",
         "measure_time": "2026-06-06 20:08",
         "silt_depth": 4.14,
@@ -5472,10 +2518,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260807"
+        "created_at": "2026-06-21T11:24:06.536669"
       },
       {
-        "id": "2c7b8ac7",
+        "id": "e3d58df0",
         "station": "东锚地",
         "measure_time": "2026-06-07 10:18",
         "silt_depth": 1.59,
@@ -5487,10 +2533,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260825"
+        "created_at": "2026-06-21T11:24:06.536689"
       },
       {
-        "id": "4520809b",
+        "id": "86f9f630",
         "station": "中转池",
         "measure_time": "2026-06-09 16:40",
         "silt_depth": 4.07,
@@ -5502,10 +2548,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260842"
+        "created_at": "2026-06-21T11:24:06.536709"
       },
       {
-        "id": "d96ba23c",
+        "id": "3a77f936",
         "station": "东锚地",
         "measure_time": "2026-06-04 07:40",
         "silt_depth": 1.9,
@@ -5517,10 +2563,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260860"
+        "created_at": "2026-06-21T11:24:06.536731"
       },
       {
-        "id": "06b85d23",
+        "id": "b1d00bbd",
         "station": "西码头",
         "measure_time": "2026-06-03 11:49",
         "silt_depth": 3.16,
@@ -5532,10 +2578,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260878"
+        "created_at": "2026-06-21T11:24:06.536751"
       },
       {
-        "id": "93f63588",
+        "id": "90f24212",
         "station": "南航道",
         "measure_time": "2026-06-08 17:28",
         "silt_depth": 3.71,
@@ -5547,10 +2593,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260896"
+        "created_at": "2026-06-21T11:24:06.536772"
       },
       {
-        "id": "572f5ea6",
+        "id": "ff023f13",
         "station": "中转池",
         "measure_time": "2026-06-03 07:04",
         "silt_depth": 4.46,
@@ -5562,10 +2608,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260914"
+        "created_at": "2026-06-21T11:24:06.536792"
       },
       {
-        "id": "b9abe76a",
+        "id": "8264156b",
         "station": "南航道",
         "measure_time": "2026-06-07 12:08",
         "silt_depth": 3.64,
@@ -5577,10 +2623,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260933"
+        "created_at": "2026-06-21T11:24:06.536814"
       },
       {
-        "id": "a34f734a",
+        "id": "53ea765e",
         "station": "北防波堤",
         "measure_time": "2026-06-14 09:43",
         "silt_depth": 2.05,
@@ -5592,10 +2638,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260950"
+        "created_at": "2026-06-21T11:24:06.536834"
       },
       {
-        "id": "2f1e26cc",
+        "id": "0e68a449",
         "station": "南航道",
         "measure_time": "2026-06-16 15:47",
         "silt_depth": 3.73,
@@ -5607,10 +2653,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260969"
+        "created_at": "2026-06-21T11:24:06.536855"
       },
       {
-        "id": "abb3294d",
+        "id": "1a141d8f",
         "station": "南航道",
         "measure_time": "2026-06-08 18:51",
         "silt_depth": 3.94,
@@ -5622,10 +2668,10 @@
         "override_note": null,
         "drift_reason": null,
         "raw_value": null,
-        "created_at": "2026-06-18T13:00:36.260987"
+        "created_at": "2026-06-21T11:24:06.536891"
       },
       {
-        "id": "4ede095c",
+        "id": "667d2255",
         "station": "南航道",
         "measure_time": "2026-06-14 09:01",
         "silt_depth": 4.88,
@@ -5637,10 +2683,10 @@
         "override_note": null,
         "drift_reason": "传感器零点漂移",
         "raw_value": 4.88,
-        "created_at": "2026-06-18T13:00:36.261120"
+        "created_at": "2026-06-21T11:24:06.537043"
       },
       {
-        "id": "14706723",
+        "id": "60e90cb3",
         "station": "西码头",
         "measure_time": "2026-06-15 19:04",
         "silt_depth": 4.24,
@@ -5652,10 +2698,10 @@
         "override_note": null,
         "drift_reason": "传感器零点漂移",
         "raw_value": 4.24,
-        "created_at": "2026-06-18T13:00:36.261140"
+        "created_at": "2026-06-21T11:24:06.537061"
       },
       {
-        "id": "7f45ded8",
+        "id": "7f7524ee",
         "station": "中转池",
         "measure_time": "2026-06-17 12:43",
         "silt_depth": 5.61,
@@ -5667,10 +2713,10 @@
         "override_note": null,
         "drift_reason": "传感器零点漂移",
         "raw_value": 5.61,
-        "created_at": "2026-06-18T13:00:36.261158"
+        "created_at": "2026-06-21T11:24:06.537078"
       },
       {
-        "id": "7e54dcd6",
+        "id": "14bff63b",
         "station": "北防波堤",
         "measure_time": "2026-06-15 15:16",
         "silt_depth": 2.56,
@@ -5682,10 +2728,10 @@
         "override_note": "现场复核后修正，原淤积量偏差较大",
         "drift_reason": null,
         "raw_value": 1.96,
-        "created_at": "2026-06-18T13:00:36.261180"
+        "created_at": "2026-06-21T11:24:06.537099"
       },
       {
-        "id": "a3cfca29",
+        "id": "a33c14a5",
         "station": "北防波堤",
         "measure_time": "2026-06-16 17:50",
         "silt_depth": 2.55,
@@ -5697,12 +2743,12 @@
         "override_note": "现场复核后修正，原淤积量偏差较大",
         "drift_reason": null,
         "raw_value": 1.95,
-        "created_at": "2026-06-18T13:00:36.261199"
+        "created_at": "2026-06-21T11:24:06.537116"
       }
     ],
     "confirmed": true,
     "confirmed_by": "老何",
-    "confirmed_at": "2026-06-18T13:02:20.258963",
+    "confirmed_at": "2026-06-21T11:24:06.584828",
     "delta_vs_previous": {
       "avg_diff": 0.0,
       "valid_count_diff": 0,
