@@ -484,6 +484,19 @@ def rerun_case(case_id):
         is_suspend = 1 if new_judge == 'suspended' else 0
         suspend_reason = judge_note if new_judge == 'suspended' else None
 
+        last_manual_j = conn.execute('''
+            SELECT * FROM judgement_log WHERE case_id=?
+            AND operator IS NOT NULL AND operator != 'system'
+            ORDER BY created_at DESC LIMIT 1
+        ''', (case_id,)).fetchone()
+
+        if new_judge == 'suspended':
+            final_note = judge_note
+        elif last_manual_j and not last_manual_j['reason'].startswith('复核人确认坐标偏移后重新判定'):
+            final_note = case['current_judgement_note']
+        else:
+            final_note = judge_note
+
         new_rerun = case['rerun_count'] + 1
         conn.execute(
             '''UPDATE preaudit_cases SET
@@ -493,7 +506,7 @@ def rerun_case(case_id):
                rerun_count=?, status='rerun', updated_at=?
                WHERE id=?''',
             (new_meeting, new_supp, new_oral,
-             new_judge, judge_note, is_suspend, suspend_reason,
+             new_judge, final_note, is_suspend, suspend_reason,
              new_rerun, now_str(), case_id)
         )
         if old_judge != new_judge:
