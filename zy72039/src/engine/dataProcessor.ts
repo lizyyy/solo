@@ -112,12 +112,19 @@ export function processInput(
     }
   }
 
+  const isTimeout = responseTime !== null && responseTime >= config.slowOperationThreshold;
+  if (isTimeout) {
+    flags.push('timeout');
+    processingNotes.push(`操作超时，响应时间${responseTime}ms，阈值${config.slowOperationThreshold}ms`);
+  }
+
   if (flags.length === 0) {
     flags.push('normal');
   }
 
   const newLoad = currentLoad + config.loadPerRound;
-  const isSuccess = processedValue !== null && processedValue <= config.maxLoad;
+  const isValueValid = processedValue !== null && processedValue <= config.maxLoad;
+  const isSuccess = isValueValid && !isTimeout;
 
   const record: GameRecord = {
     id: generateId(),

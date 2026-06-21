@@ -41,6 +41,7 @@ export const FLAG_COLORS: Record<string, string> = {
   boundary: 'bg-blue-500',
   misoperation: 'bg-purple-500',
   interrupted: 'bg-red-500',
+  timeout: 'bg-rose-600',
 };
 
 export const OPERATOR = '课堂组织者';

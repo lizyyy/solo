@@ -1,6 +1,6 @@
 export type GameStatus = 'idle' | 'playing' | 'paused' | 'ended' | 'playback';
 
-export type DataFlag = 'normal' | 'empty' | 'duplicate' | 'boundary' | 'misoperation' | 'interrupted';
+export type DataFlag = 'normal' | 'empty' | 'duplicate' | 'boundary' | 'misoperation' | 'interrupted' | 'timeout';
 
 export type FailureReason = 'rule_misunderstanding' | 'slow_operation' | 'both' | null;
 
@@ -84,7 +84,7 @@ export type GameAction =
   | { type: 'START'; payload: { config: GameConfig } }
   | { type: 'PAUSE'; payload: { note: string } }
   | { type: 'RESUME' }
-  | { type: 'INPUT'; payload: { value: string | number; note: string; source?: 'manual' | 'import' | 'test' } }
+  | { type: 'INPUT'; payload: { value: string | number; note: string; source?: 'manual' | 'import' | 'test'; responseTime?: number } }
   | { type: 'RESTART' }
   | { type: 'END' }
   | { type: 'PLAYBACK_START' }
@@ -100,6 +100,7 @@ export const DATA_FLAG_LABELS: Record<DataFlag, string> = {
   boundary: '边界',
   misoperation: '误操作',
   interrupted: '中断',
+  timeout: '超时',
 };
 
 export const FAILURE_REASON_LABELS: Record<Exclude<FailureReason, null>, string> = {

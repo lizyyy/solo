@@ -31,8 +31,8 @@ export function useGameEngine() {
     dispatch({ type: 'RESUME' });
   }, []);
 
-  const submitInput = useCallback((value: string | number, note: string = '', source?: 'manual' | 'import' | 'test') => {
-    dispatch({ type: 'INPUT', payload: { value, note, source } });
+  const submitInput = useCallback((value: string | number, note: string = '', source?: 'manual' | 'import' | 'test', responseTime?: number) => {
+    dispatch({ type: 'INPUT', payload: { value, note, source, responseTime } });
   }, []);
 
   const restartGame = useCallback(() => {

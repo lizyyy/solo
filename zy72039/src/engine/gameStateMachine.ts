@@ -120,7 +120,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       if (state.status !== 'playing' || !state.config) return state;
 
       const now = Date.now();
-      const responseTime = state.lastInputTime ? now - state.lastInputTime : null;
+      const providedResponseTime = action.payload.responseTime;
+      const responseTime = providedResponseTime !== undefined
+        ? providedResponseTime
+        : (state.lastInputTime ? now - state.lastInputTime : null);
       const source = action.payload.source || 'manual';
 
       const { record } = processInput(

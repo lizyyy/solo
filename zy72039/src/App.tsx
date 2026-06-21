@@ -120,7 +120,7 @@ function AppContent() {
       tempConfig,
       (record) => {
         testRecords.push(record);
-        actions.submitInput(record.rawValue ?? '', record.note, 'test');
+        actions.submitInput(record.rawValue ?? '', record.note, 'test', record.responseTime ?? undefined);
         setTestProgress(testRecords.length / scenario.inputs.length);
       },
       () => {
