@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>潮汐能站数据清洗 - 交班工具</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: white;
+      border-radius: 12px;
+      padding: 24px 32px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .header h1 {
+      font-size: 28px;
+      color: #1a202c;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      color: #718096;
+      font-size: 14px;
+    }
+
+    .header .subtitle {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .badge-info {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: transform 0.2s;
+      cursor: pointer;
+      border: 3px solid transparent;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .stat-card.active {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .stat-card.active .stat-label,
+    .stat-card.active .stat-icon {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .stat-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: #718096;
+      font-weight: 500;
+    }
+
+    .stat-card.success .stat-value {
+      color: #10b981;
+    }
+
+    .stat-card.warning .stat-value {
+      color: #f59e0b;
+    }
+
+    .stat-card.danger .stat-value {
+      color: #ef4444;
+    }
+
+    .toolbar {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .toolbar-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #059669;
+    }
+
+    .btn-warning {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #d97706;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #4a5568;
+    }
+
+    .btn-secondary:hover {
+      background: #cbd5e0;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .filter-section {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .filter-section h3 {
+      font-size: 16px;
+      color: #2d3748;
+      margin-bottom: 12px;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .filter-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 200px;
+    }
+
+    .filter-item label {
+      font-size: 12px;
+      color: #718096;
+      font-weight: 500;
+    }
+
+    .filter-item input,
+    .filter-item select {
+      padding: 8px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .filter-item input:focus,
+    .filter-item select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .table-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .table-header {
+      padding: 20px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-header h3 {
+      font-size: 18px;
+      color: #2d3748;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: #f7fafc;
+    }
+
+    th {
+      padding: 14px 20px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 600;
+      color: #4a5568;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    td {
+      padding: 14px 20px;
+      font-size: 14px;
+      color: #2d3748;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    tbody tr:hover {
+      background: #f7fafc;
+    }
+
+    tbody tr.suspended {
+      background: #fef2f2;
+    }
+
+    tbody tr.suspended:hover {
+      background: #fee2e2;
+    }
+
+    tbody tr.pending {
+      background: #fffbeb;
+    }
+
+    tbody tr.pending:hover {
+      background: #fef3c7;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-badge::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .status-processed {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-processed::before {
+      background: #10b981;
+    }
+
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-pending::before {
+      background: #f59e0b;
+    }
+
+    .status-suspended {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .status-suspended::before {
+      background: #ef4444;
+    }
+
+    .coord-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .coord-normal {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .coord-error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
+      color: #2d3748;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #718096;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #4a5568;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .detail-section {
+      margin-bottom: 16px;
+      padding: 12px;
+      background: #f7fafc;
+      border-radius: 8px;
+    }
+
+    .detail-section h4 {
+      font-size: 14px;
+      color: #4a5568;
+      margin-bottom: 8px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .detail-item {
+      display: flex;
+      gap: 6px;
+    }
+
+    .detail-label {
+      color: #718096;
+      min-width: 80px;
+    }
+
+    .detail-value {
+      color: #2d3748;
+      font-weight: 500;
+    }
+
+    .evidence-timeline {
+      border-left: 2px solid #e2e8f0;
+      padding-left: 16px;
+      margin-left: 8px;
+    }
+
+    .evidence-item {
+      position: relative;
+      padding-bottom: 12px;
+    }
+
+    .evidence-item::before {
+      content: '';
+      position: absolute;
+      left: -21px;
+      top: 4px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #667eea;
+    }
+
+    .evidence-item:last-child {
+      padding-bottom: 0;
+    }
+
+    .alert {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .alert-warning {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      color: #92400e;
+    }
+
+    .alert-danger {
+      background: #fee2e2;
+      border-left: 4px solid #ef4444;
+      color: #991b1b;
+    }
+
+    .alert-info {
+      background: #e0f2fe;
+      border-left: 4px solid #0284c7;
+      color: #075985;
+    }
+
+    .alert-success {
+      background: #d1fae5;
+      border-left: 4px solid #10b981;
+      color: #065f46;
+    }
+
+    .report-content {
+      background: #f7fafc;
+      padding: 20px;
+      border-radius: 8px;
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .report-content h1 {
+      font-size: 18px;
+      margin-bottom: 12px;
+      color: #2d3748;
+    }
+
+    .report-content h2 {
+      font-size: 15px;
+      margin: 16px 0 8px;
+      color: #4a5568;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      background: #edf2f7;
+      color: #4a5568;
+    }
+
+    .tag-red {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .tag-yellow {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .tag-green {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .tag-blue {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .empty-state {
+      padding: 40px;
+      text-align: center;
+      color: #718096;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #e2e8f0;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      z-index: 2000;
+      animation: slideIn 0.3s ease;
+      max-width: 400px;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .toast-success {
+      background: #10b981;
+    }
+
+    .toast-error {
+      background: #ef4444;
+    }
+
+    .toast-warning {
+      background: #f59e0b;
+    }
+
+    .toast-info {
+      background: #3b82f6;
+    }
+
+    .import-result {
+      background: #f7fafc;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 12px;
+    }
+
+    .import-result-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 13px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .import-result-item:last-child {
+      border-bottom: none;
+    }
+
+    .resolve-options {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .resolve-option {
+      flex: 1;
+      padding: 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .resolve-option:hover {
+      border-color: #667eea;
+      background: #f7fafc;
+    }
+
+    .resolve-option.selected {
+      border-color: #667eea;
+      background: #eef2ff;
+    }
+
+    .resolve-option h4 {
+      font-size: 14px;
+      margin-bottom: 4px;
+      color: #2d3748;
+    }
+
+    .resolve-option p {
+      font-size: 12px;
+      color: #718096;
+    }
+
+    .highlight-coord {
+      background: #fef3c7;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+
+    .highlight-coord .coord-pair {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 8px;
+    }
+
+    .highlight-coord .coord-original,
+    .highlight-coord .coord-suggested {
+      text-align: center;
+    }
+
+    .highlight-coord .coord-value {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .highlight-coord .coord-label {
+      font-size: 12px;
+      color: #718096;
+    }
+
+    .coord-original .coord-value {
+      color: #ef4444;
+      text-decoration: line-through;
+    }
+
+    .coord-suggested .coord-value {
+      color: #10b981;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🌊 潮汐能站数据清洗</h1>
+      <p>科研助理交班工具 · 筛选条件、统计数字、明细表、交班说明同一数据源生成</p>
+      <div class="subtitle">
+        <span class="badge badge-info">同一清洗结果</span>
+        <span class="badge badge-info">分批补录不覆盖</span>
+        <span class="badge badge-info">经纬度异常挂起</span>
+        <span class="badge badge-info">重复导入去重</span>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card success" onclick="filterByStatus('all')">
+        <div class="stat-icon">📊</div>
+        <div class="stat-value" id="stat-total">0</div>
+        <div class="stat-label">总记录数</div>
+      </div>
+      <div class="stat-card success" onclick="filterByStatus('processed')">
+        <div class="stat-icon">✅</div>
+        <div class="stat-value" id="stat-processed">0</div>
+        <div class="stat-label">已处理完成</div>
+      </div>
+      <div class="stat-card warning" onclick="filterByStatus('pending_evidence')">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-value" id="stat-pending">0</div>
+        <div class="stat-label">待补证据</div>
+      </div>
+      <div class="stat-card danger" onclick="filterByStatus('suspended')">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-value" id="stat-suspended">0</div>
+        <div class="stat-label">异常挂起</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <button class="btn btn-primary" onclick="openImportModal()">
+          📥 导入数据</button>
+        <button class="btn btn-success" onclick="testDuplicateImport()">
+          🔄 测试重复导入</button>
+        <button class="btn btn-warning" onclick="openReportModal()">
+          📝 生成交班说明</button>
+      </div>
+      <div class="toolbar-group" style="margin-left: auto;">
+        <span id="filter-info" style="font-size: 13px; color: #718096;"></span>
+        <button class="btn btn-secondary btn-sm" onclick="resetData()">🗑️ 重置数据</button>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <h3>🔍 筛选条件</h3>
+      <div class="filter-row">
+        <div class="filter-item">
+          <label>按状态筛选</label>
+          <select id="filter-status" onchange="applyFilters()">
+            <option value="all">全部状态</option>
+            <option value="processed">已处理完成</option>
+            <option value="pending_evidence">待补证据</option>
+            <option value="suspended">异常挂起</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label>站点名称</label>
+          <input type="text" id="filter-station" placeholder="输入站点名称" oninput="applyFilters()">
+        </div>
+        <div class="filter-item">
+          <label>记录ID</label>
+          <input type="text" id="filter-record-id" placeholder="输入记录ID" oninput="applyFilters()">
+        </div>
+        <div class="filter-item">
+          <label>导入批次</label>
+          <select id="filter-batch" onchange="applyFilters()">
+            <option value="all">全部批次</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <div class="table-header">
+        <h3>📋 数据明细</h3>
+        <span id="table-count" style="font-size: 13px; color: #718096;"></span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>记录ID</th>
+            <th>站点名称</th>
+            <th>经纬度</th>
+            <th>水位(m)</th>
+            <th>发电功率(kW)</th>
+            <th>采样日期</th>
+            <th>状态</th>
+            <th>导入次数</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="records-table">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="import-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>📥 导入实验室结果</h3>
+        <button class="modal-close" onclick="closeModal('import-modal')">×</button>
+      </div>
+      <div class="form-group">
+        <label>批次号</label>
+        <input type="text" id="import-batch" placeholder="例如: BATCH-2026-06-15-C">
+      </div>
+      <div class="form-group">
+        <label>来源文件</label>
+        <input type="text" id="import-source" placeholder="例如: 实验室结果表_第三批.xlsx">
+      </div>
+      <div class="form-group">
+        <label>数据 (JSON格式)</label>
+        <textarea id="import-data" placeholder='[{"record_id": "TIDAL-005", "station_name": "...", "latitude": 30.0, "longitude": 120.0, "water_level": 8.0, "power_output": 1000, "sample_date": "2026-06-16"}]'></textarea>
+      </div>
+      <div id="import-result"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('import-modal')">取消</button>
+        <button class="btn btn-primary" onclick="doImport()">导入</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="detail-modal">
+    <div class="modal" style="max-width: 700px;">
+      <div class="modal-header">
+        <h3 id="detail-title">记录详情</h3>
+        <button class="modal-close" onclick="closeModal('detail-modal')">×</button>
+      </div>
+      <div id="detail-content"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="note-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>📝 编辑人工备注</h3>
+        <button class="modal-close" onclick="closeModal('note-modal')">×</button>
+      </div>
+      <div class="form-group">
+        <label>备注内容</label>
+        <textarea id="note-content" placeholder="请输入备注内容，用于交班说明"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('note-modal')">取消</button>
+        <button class="btn btn-primary" onclick="saveNote()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="suspend-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>⚠️ 处理经纬度异常</h3>
+        <button class="modal-close" onclick="closeModal('suspend-modal')">×</button>
+      </div>
+      <div id="suspend-content"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="report-modal">
+    <div class="modal" style="max-width: 700px;">
+      <div class="modal-header">
+        <h3>📋 交班说明</h3>
+        <button class="modal-close" onclick="closeModal('report-modal')">×</button>
+      </div>
+      <div id="report-content"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('report-modal')">关闭</button>
+        <button class="btn btn-primary" onclick="copyReport()">复制交班说明</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allRecords = [];
+    let currentFilter = { status: 'all', station: '', recordId: '', batch: 'all' };
+    let currentRecordId = null;
+    let currentNoteRecordId = null;
+    let currentSuspendRecordId = null;
+    let currentReport = '';
+
+    async function loadData() {
+      try {
+        const [statsRes, recordsRes] = await Promise.all([
+          fetch('/api/statistics'),
+          fetch('/api/records')
+        ]);
+        const stats = await statsRes.json();
+        const records = await recordsRes.json();
+
+        if (stats.success && records.success) {
+          updateStats(stats.data);
+          allRecords = records.data;
+          updateBatchFilter();
+          renderTable();
+        }
+      } catch (e) {
+        showToast('加载数据失败', 'error');
+      }
+    }
+
+    function updateStats(stats) {
+      document.getElementById('stat-total').textContent = stats.total;
+      document.getElementById('stat-processed').textContent = stats.processed;
+      document.getElementById('stat-pending').textContent = stats.pending;
+      document.getElementById('stat-suspended').textContent = stats.suspended;
+
+      const info = `共 ${stats.total} 条记录，${stats.processed} 条已处理，${stats.pending} 条待补，${stats.suspended} 条挂起，${stats.hasNotes} 条有人工备注，${stats.importBatches} 个导入批次`;
+      document.getElementById('filter-info').textContent = info;
+    }
+
+    function updateBatchFilter() {
+      const batches = [...new Set(allRecords.map(r => r.batch_no).filter(Boolean))];
+      const select = document.getElementById('filter-batch');
+      select.innerHTML = '<option value="all">全部批次</option>';
+      batches.forEach(b => {
+        const option = document.createElement('option');
+        option.value = b;
+        option.textContent = b;
+        select.appendChild(option);
+      });
+    }
+
+    function filterByStatus(status) {
+      document.getElementById('filter-status').value = status;
+      applyFilters();
+
+      document.querySelectorAll('.stat-card').forEach(card => {
+        card.classList.remove('active');
+      });
+      const cardMap = {
+        'all': document.querySelectorAll('.stat-card')[0],
+        'processed': document.querySelectorAll('.stat-card')[1],
+        'pending_evidence': document.querySelectorAll('.stat-card')[2],
+        'suspended': document.querySelectorAll('.stat-card')[3]
+      };
+      if (cardMap[status]) {
+        cardMap[status].classList.add('active');
+      }
+    }
+
+    function applyFilters() {
+      currentFilter.status = document.getElementById('filter-status').value;
+      currentFilter.station = document.getElementById('filter-station').value.trim();
+      currentFilter.recordId = document.getElementById('filter-record-id').value.trim();
+      currentFilter.batch = document.getElementById('filter-batch').value;
+      renderTable();
+    }
+
+    function getFilteredRecords() {
+      return allRecords.filter(r => {
+        if (currentFilter.status !== 'all' && r.status !== currentFilter.status) return false;
+        if (currentFilter.station && !r.station_name.includes(currentFilter.station)) return false;
+        if (currentFilter.recordId && !r.record_id.includes(currentFilter.recordId)) return false;
+        if (currentFilter.batch !== 'all' && r.batch_no !== currentFilter.batch) return false;
+        return true;
+      });
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('records-table');
+      const records = getFilteredRecords();
+
+      document.getElementById('table-count').textContent = `显示 ${records.length} 条记录`;
+
+      if (records.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state">暂无符合条件的记录</div></td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = records.map(r => {
+        const statusClass = r.status === 'processed' ? 'status-processed' :
+                          r.status === 'pending_evidence' ? 'status-pending' : 'status-suspended';
+        const statusText = r.status === 'processed' ? '已处理' :
+                          r.status === 'pending_evidence' ? '待补证据' : '异常挂起';
+        const rowClass = r.status === 'suspended' ? 'suspended' :
+                        r.status === 'pending_evidence' ? 'pending' : '';
+
+        const coordClass = r.coordIssues && r.coordIssues.length > 0 ? 'coord-error' : 'coord-normal';
+        const coordText = r.coordIssues && r.coordIssues.length > 0
+          ? `<span class="coord-badge ${coordClass}" title="${r.coordIssues.join('；')}">⚠️ ${r.latitude}, ${r.longitude}</span>`
+          : `<span class="coord-badge ${coordClass}">${r.latitude}, ${r.longitude}</span>`;
+
+        return `
+          <tr class="${rowClass}">
+            <td><code>${r.record_id}</code></td>
+            <td>${r.station_name}</td>
+            <td>${coordText}</td>
+            <td>${r.water_level !== null && r.water_level !== undefined ? r.water_level : '<span style="color:#cbd5e0;">—</span>'}</td>
+            <td>${r.power_output !== null && r.power_output !== undefined ? r.power_output : '<span style="color:#cbd5e0;">—</span>'}</td>
+            <td>${r.sample_date || '<span style="color:#cbd5e0;">—</span>'}</td>
+            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+            <td>${r.importCount || 1}${r.evidenceHistory && r.evidenceHistory.length > 0 ? ' <span class="tag tag-blue">补过</span>' : ''}${r.manual_note ? ' <span class="tag tag-yellow">有备注</span>' : ''}</td>
+            <td>
+              <div class="actions">
+                <button class="btn btn-secondary btn-sm" onclick="viewDetail('${r.id}')">查看</button>
+                <button class="btn btn-warning btn-sm" onclick="editNote('${r.id}')">备注</button>
+                ${r.status === 'suspended' ? `<button class="btn btn-danger btn-sm" onclick="resolveSuspend('${r.id}')">处理</button>` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openImportModal() {
+      document.getElementById('import-result').innerHTML = '';
+      document.getElementById('import-modal').classList.add('active');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    async function doImport() {
+      const batch = document.getElementById('import-batch').value.trim();
+      const source = document.getElementById('import-source').value.trim();
+      const dataText = document.getElementById('import-data').value.trim();
+
+      if (!dataText) {
+        showToast('请输入数据', 'warning');
+        return;
+      }
+
+      try {
+        let records;
+        try {
+          records = JSON.parse(dataText);
+        } catch (e) {
+          showToast('JSON格式错误', 'error');
+          return;
+        }
+
+        if (!Array.isArray(records)) {
+          showToast('数据必须是数组格式', 'error');
+          return;
+        }
+
+        const res = await fetch('/api/import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ records, batch_no: batch, source_file: source })
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          const resultDiv = document.getElementById('import-result');
+          const r = result.data;
+          let html = '<div class="import-result">';
+          html += `<div style="font-weight:600;margin-bottom:8px;">导入完成</div>`;
+          if (r.created.length > 0) {
+            html += `<div class="import-result-item"><span>✅ 新增记录</span><span>${r.created.length} 条</span></div>`;
+          }
+          if (r.updated.length > 0) {
+            html += `<div class="import-result-item"><span>🔄 更新记录</span><span>${r.updated.length} 条</span></div>`;
+          }
+          if (r.skipped.length > 0) {
+            html += `<div class="import-result-item"><span>⏭️ 跳过重复</span><span>${r.skipped.length} 条</span></div>`;
+          }
+          if (r.suspended.length > 0) {
+            html += `<div class="import-result-item"><span>⚠️ 异常挂起</span><span>${r.suspended.length} 条</span></div>`;
+          }
+          if (r.errors.length > 0) {
+            html += `<div class="import-result-item"><span>❌ 错误</span><span>${r.errors.length} 条</span></div>`;
+          }
+          html += '</div>';
+          resultDiv.innerHTML = html;
+
+          showToast('导入成功', 'success');
+          await loadData();
+        } else {
+          showToast('导入失败', 'error');
+        }
+      } catch (e) {
+        showToast('网络错误', 'error');
+      }
+    }
+
+    async function testDuplicateImport() {
+      const testData = [
+        {
+          record_id: 'TIDAL-001',
+          station_name: '舟山衢山潮汐能站',
+          latitude: 30.532,
+          longitude: 122.218,
+          water_level: 8.5,
+          power_output: 1250,
+          temperature: 16.8,
+          salinity: 28.5,
+          flow_velocity: 2.3,
+          sample_date: '2026-06-15',
+          manual_note: '这是新导入的备注，测试保留原有备注'
+        }
+      ];
+
+      try {
+        const res = await fetch('/api/import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            records: testData,
+            batch_no: 'TEST-DUPLICATE',
+            source_file: '重复导入测试.xlsx'
+          })
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          const r = result.data;
+          let msg = `重复导入测试完成：`;
+          if (r.skipped.length > 0) {
+            msg += ` ${r.skipped.length} 条跳过（含 ${r.skipped[0].reason || '无更新'}`;
+          }
+          if (r.updated.length === 0 && r.created.length === 0) {
+            msg += '，数据未翻倍 ✓';
+          }
+          showToast(msg, 'success');
+          await loadData();
+        }
+      } catch (e) {
+        showToast('测试失败', 'error');
+      }
+    }
+
+    function viewDetail(id) {
+      const record = allRecords.find(r => r.id === id);
+      if (!record) return;
+
+      currentRecordId = id;
+      document.getElementById('detail-title').textContent = `${record.record_id} - ${record.station_name}`;
+
+      const statusClass = record.status === 'processed' ? 'status-processed' :
+                        record.status === 'pending_evidence' ? 'status-pending' : 'status-suspended';
+      const statusText = record.status === 'processed' ? '已处理' :
+                        record.status === 'pending_evidence' ? '待补证据' : '异常挂起';
+
+      let html = '';
+
+      if (record.status === 'suspended') {
+        html += `<div class="alert alert-danger">
+          <strong>⚠️ 异常挂起</strong><br>
+          ${record.suspendReason || '经纬度异常待确认'}
+        </div>`;
+      }
+
+      if (record.evidenceHistory && record.evidenceHistory.length > 0) {
+        html += `<div class="alert alert-info">
+          <strong>📦 补录历史</strong>：该记录经过 ${record.evidenceHistory.length} 次证据补充
+        </div>`;
+      }
+
+      if (record.manual_note) {
+        html += `<div class="alert alert-warning">
+          <strong>📝 人工备注</strong>：${record.manual_note}
+        </div>`;
+      }
+
+      html += `
+        <div class="detail-section">
+          <h4>基本信息</h4>
+          <div class="detail-grid">
+            <div class="detail-item"><span class="detail-label">记录ID：</span><span class="detail-value">${record.record_id}</span></div>
+            <div class="detail-item"><span class="detail-label">状态：</span><span class="status-badge ${statusClass}">${statusText}</span></div>
+            <div class="detail-item"><span class="detail-label">导入批次：</span><span class="detail-value">${record.batch_no || '-'}</span></div>
+            <div class="detail-item"><span class="detail-label">来源文件：</span><span class="detail-value">${record.source_file || '-'}</span></div>
+            <div class="detail-item"><span class="detail-label">导入次数：</span><span class="detail-value">${record.importCount || 1} 次</span></div>
+            <div class="detail-item"><span class="detail-label">采样日期：</span><span class="detail-value">${record.sample_date || '-'}</span></div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4>经纬度信息</h4>
+          <div class="detail-grid">
+            <div class="detail-item"><span class="detail-label">纬度：</span><span class="detail-value">${record.latitude}</span></div>
+            <div class="detail-item"><span class="detail-label">经度：</span><span class="detail-value">${record.longitude}</span></div>
+          </div>
+          ${record.coordIssues && record.coordIssues.length > 0 ? `
+            <div style="margin-top:8px;padding:8px;background:#fee2e2;border-radius:4px;font-size:12px;color:#991b1b;">
+              ⚠️ ${record.coordIssues.join('；')}
+            </div>
+          ` : ''}
+        </div>
+
+        <div class="detail-section">
+          <h4>监测数据</h4>
+          <div class="detail-grid">
+            <div class="detail-item"><span class="detail-label">水位：</span><span class="detail-value">${record.water_level !== null && record.water_level !== undefined ? record.water_level + ' m' : '<span style="color:#cbd5e0;">缺失</span>'}</span></div>
+            <div class="detail-item"><span class="detail-label">发电功率：</span><span class="detail-value">${record.power_output !== null && record.power_output !== undefined ? record.power_output + ' kW' : '<span style="color:#cbd5e0;">缺失</span>'}</span></div>
+            <div class="detail-item"><span class="detail-label">水温：</span><span class="detail-value">${record.temperature !== null && record.temperature !== undefined ? record.temperature + ' °C' : '<span style="color:#cbd5e0;">—</span>'}</span></div>
+            <div class="detail-item"><span class="detail-label">盐度：</span><span class="detail-value">${record.salinity !== null && record.salinity !== undefined ? record.salinity + ' ‰' : '<span style="color:#cbd5e0;">—</span>'}</span></div>
+            <div class="detail-item"><span class="detail-label">流速：</span><span class="detail-value">${record.flow_velocity !== null && record.flow_velocity !== undefined ? record.flow_velocity + ' m/s' : '<span style="color:#cbd5e0;">—</span>'}</span></div>
+          </div>
+        </div>
+      `;
+
+      if (record.evidenceHistory && record.evidenceHistory.length > 0) {
+        html += `
+          <div class="detail-section">
+            <h4>证据补充历史</h4>
+            <div class="evidence-timeline">
+              ${record.evidenceHistory.map(e => `
+                <div class="evidence-item">
+                <div style="font-weight:500;">${new Date(e.timestamp).toLocaleString('zh-CN')}</div>
+                <div style="font-size:12px;color:#718096;">批次：${e.batch}</div>
+                <div style="font-size:12px;margin-top:4px;">补充字段：${e.fields.join('、')}</div>
+              </div>
+              `).join('')}
+            </div>
+          </div>
+          `;
+      }
+
+      if (record.resolvedAt) {
+        html += `
+          <div class="detail-section">
+            <h4>复核处理记录</h4>
+            <div style="font-size:13px;">
+              <div>处理时间：${new Date(record.resolvedAt).toLocaleString('zh-CN')}</div>
+              <div>处理人：${record.resolvedBy || '-'}</div>
+              <div>处理说明：${record.resolveNote || '-'}</div>
+            </div>
+          </div>
+          `;
+      }
+
+      document.getElementById('detail-content').innerHTML = html;
+      document.getElementById('detail-modal').classList.add('active');
+    }
+
+    function editNote(id) {
+      const record = allRecords.find(r => r.id === id);
+      if (!record) return;
+
+      currentNoteRecordId = id;
+      document.getElementById('note-content').value = record.manual_note || '';
+      document.getElementById('note-modal').classList.add('active');
+    }
+
+    async function saveNote() {
+      const note = document.getElementById('note-content').value.trim();
+
+      try {
+        const res = await fetch(`/api/records/${currentNoteRecordId}/note`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ note })
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          showToast('备注保存成功', 'success');
+          closeModal('note-modal');
+          await loadData();
+        } else {
+          showToast('保存失败', 'error');
+        }
+      } catch (e) {
+        showToast('网络错误', 'error');
+      }
+    }
+
+    function resolveSuspend(id) {
+      const record = allRecords.find(r => r.id === id);
+      if (!record) return;
+
+      currentSuspendRecordId = id;
+
+      let suggestedLat = record.longitude;
+      let suggestedLng = record.latitude;
+
+      const html = `
+        <div class="alert alert-danger">
+          <strong>⚠️ 经纬度异常</strong><br>
+          ${record.suspendReason || '经纬度疑似反写'}
+        </div>
+
+        <div class="highlight-coord">
+          <div style="font-weight:500;margin-bottom:8px;">经纬度反写检测：</div>
+          <div class="coord-pair">
+            <div class="coord-original">
+              <div class="coord-value">${record.latitude}, ${record.longitude}</div>
+              <div class="coord-label">当前值（疑似反写）</div>
+            </div>
+            <div style="font-size:24px;color:#718096;">→</div>
+            <div class="coord-suggested">
+              <div class="coord-value">${suggestedLat}, ${suggestedLng}</div>
+              <div class="coord-label">建议互换</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-weight:500;margin-bottom:12px;">请选择处理方式：</div>
+
+        <div class="resolve-options">
+          <div class="resolve-option" onclick="selectResolveOption('confirm_reversed', this)">
+            <h4>🔄 确认反写并互换</h4>
+            <p>经纬度确实写反了，互换数值</p>
+          </div>
+          <div class="resolve-option" onclick="selectResolveOption('accept_correction', this)">
+            <h4>✏️ 手动输入正确值</h4>
+            <p>我知道正确的经纬度</p>
+          </div>
+          <div class="resolve-option" onclick="selectResolveOption('keep_suspended', this)">
+            <h4>⏸️ 继续挂起</h4>
+            <p>暂时不处理，保留挂起状态</p>
+          </div>
+        </div>
+
+        <div id="correction-inputs" style="display:none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label>正确纬度</label>
+              <input type="number" step="0.001" id="corrected-lat" placeholder="例如: 24.479">
+            </div>
+            <div class="form-group">
+              <label>正确经度</label>
+              <input type="number" step="0.001" id="corrected-lng" placeholder="例如: 118.082">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>处理备注</label>
+          <textarea id="resolve-note" placeholder="请输入处理说明，用于交班记录"></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeModal('suspend-modal')">取消</button>
+          <button class="btn btn-primary" onclick="doResolveSuspend()">确认处理</button>
+        </div>
+      `;
+
+      document.getElementById('suspend-content').innerHTML = html;
+      document.getElementById('suspend-modal').classList.add('active');
+    }
+
+    let selectedResolveAction = null;
+
+    function selectResolveOption(action, element) {
+      selectedResolveAction = action;
+
+      document.querySelectorAll('.resolve-option').forEach(el => el.classList.remove('selected'));
+      element.classList.add('selected');
+
+      const correctionInputs = document.getElementById('correction-inputs');
+      if (action === 'accept_correction') {
+        correctionInputs.style.display = 'block';
+      } else {
+        correctionInputs.style.display = 'none';
+      }
+    }
+
+    async function doResolveSuspend() {
+      if (!selectedResolveAction) {
+        showToast('请选择处理方式', 'warning');
+        return;
+      }
+
+      const note = document.getElementById('resolve-note').value.trim();
+      const data = {
+        action: selectedResolveAction,
+        note
+      };
+
+      if (selectedResolveAction === 'accept_correction') {
+        const lat = document.getElementById('corrected-lat').value;
+        const lng = document.getElementById('corrected-lng').value;
+        if (!lat || !lng) {
+          showToast('请输入正确的经纬度', 'warning');
+          return;
+        }
+        data.correctedLat = parseFloat(lat);
+        data.correctedLng = parseFloat(lng);
+      }
+
+      try {
+        const res = await fetch(`/api/records/${currentSuspendRecordId}/resolve-suspend`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          showToast('处理成功', 'success');
+          closeModal('suspend-modal');
+          await loadData();
+        } else {
+          showToast('处理失败', 'error');
+        }
+      } catch (e) {
+        showToast('网络错误', 'error');
+      }
+    }
+
+    async function openReportModal() {
+      try {
+        const res = await fetch('/api/generate-report');
+        const result = await res.json();
+
+        if (result.success) {
+          currentReport = result.data.report;
+          document.getElementById('report-content').innerHTML = `
+            <div class="report-content">${currentReport.replace(/\n/g, '<br>')}</div>
+          `;
+          document.getElementById('report-modal').classList.add('active');
+        } else {
+          showToast('生成失败', 'error');
+        }
+      } catch (e) {
+        showToast('网络错误', 'error');
+      }
+    }
+
+    function copyReport() {
+      navigator.clipboard.writeText(currentReport).then(() => {
+        showToast('交班说明已复制到剪贴板', 'success');
+      }).catch(() => {
+        showToast('复制失败，请手动复制', 'error');
+      });
+    }
+
+    async function resetData() {
+      if (!confirm('确定要重置所有数据吗？此操作不可恢复。')) {
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/reset', { method: 'POST' });
+        const result = await res.json();
+
+        if (result.success) {
+          showToast('数据已重置', 'success');
+          await loadData();
+        } else {
+          showToast('重置失败', 'error');
+        }
+      } catch (e) {
+        showToast('网络错误', 'error');
+      }
+    }
+
+    function showToast(message, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal-overlay')) {
+        e.target.classList.remove('active');
+      }
+    });
+
+    loadData();
+  </script>
+</body>
+</html>

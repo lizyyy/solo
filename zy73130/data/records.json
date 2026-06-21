@@ -1,0 +1,141 @@
+[
+  {
+    "id": "REC_1782010035819_0",
+    "record_id": "TIDAL-001",
+    "station_name": "舟山衢山潮汐能站",
+    "latitude": 30.532,
+    "longitude": 122.218,
+    "water_level": 8.5,
+    "power_output": 1250,
+    "temperature": 16.8,
+    "salinity": 28.5,
+    "flow_velocity": 2.3,
+    "sample_date": "2026-06-15",
+    "batch_no": "BATCH-2026-06-15-A",
+    "source_file": "实验室结果表_第一批.xlsx",
+    "manual_note": "数据完整，初步判定稳定",
+    "status": "processed",
+    "coordIssues": [],
+    "coordReversed": false,
+    "createdAt": "2026-06-20T02:47:15.819Z",
+    "updatedAt": "2026-06-21T02:50:54.247Z",
+    "statusChangedAt": "2026-06-20T02:47:15.819Z",
+    "importCount": 3,
+    "evidenceHistory": [],
+    "updateHistory": [],
+    "suspendReason": null
+  },
+  {
+    "id": "REC_1782010035820_1",
+    "record_id": "TIDAL-002",
+    "station_name": "温岭江厦潮汐能站",
+    "latitude": 28.485,
+    "longitude": 121.256,
+    "water_level": 9.1,
+    "power_output": 1580,
+    "temperature": 17.2,
+    "salinity": 29.1,
+    "flow_velocity": 1.8,
+    "sample_date": "2026-06-15",
+    "batch_no": "BATCH-2026-06-15-A",
+    "source_file": "实验室结果表_第一批.xlsx",
+    "manual_note": "",
+    "status": "processed",
+    "coordIssues": [],
+    "coordReversed": false,
+    "createdAt": "2026-06-20T02:47:15.820Z",
+    "updatedAt": "2026-06-21T01:47:15.820Z",
+    "statusChangedAt": "2026-06-21T01:47:15.820Z",
+    "importCount": 2,
+    "evidenceHistory": [
+      {
+        "fields": [
+          "water_level",
+          "power_output"
+        ],
+        "timestamp": "2026-06-21T01:47:15.820Z",
+        "batch": "BATCH-2026-06-15-B"
+      }
+    ],
+    "updateHistory": [
+      {
+        "fields": [
+          "water_level",
+          "power_output"
+        ],
+        "timestamp": "2026-06-21T01:47:15.820Z"
+      }
+    ],
+    "suspendReason": null
+  },
+  {
+    "id": "REC_1782010035820_2",
+    "record_id": "TIDAL-003",
+    "station_name": "厦门湾潮汐能站",
+    "latitude": 24.479,
+    "longitude": 118.082,
+    "water_level": 7.2,
+    "power_output": 980,
+    "temperature": 21.5,
+    "salinity": 30.2,
+    "flow_velocity": 2,
+    "sample_date": "2026-06-15",
+    "batch_no": "BATCH-2026-06-15-A",
+    "source_file": "实验室结果表_第一批.xlsx",
+    "manual_note": "",
+    "status": "processed",
+    "coordIssues": [],
+    "coordReversed": false,
+    "createdAt": "2026-06-20T02:47:15.820Z",
+    "updatedAt": "2026-06-21T02:53:56.467Z",
+    "statusChangedAt": "2026-06-20T02:47:15.820Z",
+    "importCount": 1,
+    "evidenceHistory": [],
+    "updateHistory": [],
+    "suspendReason": null,
+    "resolvedAt": "2026-06-21T02:53:56.467Z",
+    "resolvedBy": "复核人",
+    "resolveNote": "复核人确认：经纬度确实反写，已互换数值"
+  },
+  {
+    "id": "REC_1782010035820_3",
+    "record_id": "TIDAL-004",
+    "station_name": "青岛黄岛潮汐能站",
+    "latitude": 35.982,
+    "longitude": 120.158,
+    "water_level": 6.8,
+    "power_output": 860,
+    "temperature": 14.3,
+    "salinity": 31,
+    "flow_velocity": 1.5,
+    "sample_date": "2026-06-15",
+    "batch_no": "BATCH-2026-06-15-A",
+    "source_file": "实验室结果表_第一批.xlsx",
+    "manual_note": "发电功率数据缺失，等第二批结果",
+    "status": "processed",
+    "coordIssues": [],
+    "coordReversed": false,
+    "createdAt": "2026-06-20T02:47:15.820Z",
+    "updatedAt": "2026-06-21T01:47:15.820Z",
+    "statusChangedAt": "2026-06-21T01:47:15.820Z",
+    "importCount": 2,
+    "evidenceHistory": [
+      {
+        "fields": [
+          "power_output"
+        ],
+        "timestamp": "2026-06-21T01:47:15.820Z",
+        "batch": "BATCH-2026-06-15-B"
+      }
+    ],
+    "updateHistory": [
+      {
+        "fields": [
+          "power_output"
+        ],
+        "timestamp": "2026-06-21T01:47:15.820Z"
+      }
+    ],
+    "suspendReason": null
+  }
+]

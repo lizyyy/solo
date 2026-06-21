@@ -1,0 +1,71 @@
+[
+  {
+    "type": "create",
+    "record_id": "TIDAL-001",
+    "batch_no": "BATCH-2026-06-15-A",
+    "source_file": "实验室结果表_第一批.xlsx",
+    "status": "processed",
+    "timestamp": "2026-06-20T02:47:15.819Z"
+  },
+  {
+    "type": "create",
+    "record_id": "TIDAL-002",
+    "batch_no": "BATCH-2026-06-15-A",
+    "source_file": "实验室结果表_第一批.xlsx",
+    "status": "pending_evidence",
+    "timestamp": "2026-06-20T02:47:15.820Z"
+  },
+  {
+    "type": "create",
+    "record_id": "TIDAL-003",
+    "batch_no": "BATCH-2026-06-15-A",
+    "source_file": "实验室结果表_第一批.xlsx",
+    "status": "suspended",
+    "timestamp": "2026-06-20T02:47:15.820Z"
+  },
+  {
+    "type": "create",
+    "record_id": "TIDAL-004",
+    "batch_no": "BATCH-2026-06-15-A",
+    "source_file": "实验室结果表_第一批.xlsx",
+    "status": "pending_evidence",
+    "timestamp": "2026-06-20T02:47:15.820Z"
+  },
+  {
+    "type": "update",
+    "record_id": "TIDAL-001",
+    "batch_no": "BATCH-2026-06-15-B",
+    "source_file": "实验室结果表_第二批.xlsx",
+    "timestamp": "2026-06-21T01:47:15.820Z"
+  },
+  {
+    "type": "update",
+    "record_id": "TIDAL-002",
+    "batch_no": "BATCH-2026-06-15-B",
+    "source_file": "实验室结果表_第二批.xlsx",
+    "timestamp": "2026-06-21T01:47:15.820Z"
+  },
+  {
+    "type": "update",
+    "record_id": "TIDAL-004",
+    "batch_no": "BATCH-2026-06-15-B",
+    "source_file": "实验室结果表_第二批.xlsx",
+    "timestamp": "2026-06-21T01:47:15.820Z"
+  },
+  {
+    "type": "update",
+    "record_id": "TIDAL-001",
+    "batch_no": "TEST-DUPLICATE",
+    "source_file": "重复导入测试.xlsx",
+    "updatedFields": [],
+    "evidenceAdded": [],
+    "timestamp": "2026-06-21T02:50:54.247Z"
+  },
+  {
+    "type": "resolve_suspend",
+    "record_id": "TIDAL-003",
+    "action": "confirm_reversed",
+    "note": "复核人确认：经纬度确实反写，已互换数值",
+    "timestamp": "2026-06-21T02:53:56.467Z"
+  }
+]
