@@ -107,9 +107,14 @@ class SortStabilityChecker:
             "    4. 【兜底】导出不稳定位置列表，由数据小孟人工逐条确认最终顺序，",
             "       并将结果回写到清单后再运行回放。",
             "",
-            "  下一步工具：",
-            "    $ graph-path-replay inspect --show-ties   # 列出所有重复 sort_key 的题目组",
-            "    $ graph-path-replay fix-sort --tiebreak id  # 自动用 id 作为二级排序",
+            "  下一步工具（可直接复制运行，入口为 python3 -m graph_path_replay）：",
+            "    $ python3 -m graph_path_replay inspect --input <清单.csv> --show-ties",
+            "        # 重新解析清单并列出所有重复 sort_key 的题目组",
+            "    $ python3 -m graph_path_replay fix-sort --input <清单.csv> \\",
+            "        --output <修复后.csv> --tiebreak question_id",
+            "        # 自动追加 question_id 作为二级排序，写出修复后的 CSV",
+            "    $ python3 -m graph_path_replay run --input <修复后.csv> --work-dir <工作目录>",
+            "        # 用修复后的 CSV 重新跑回放，确认排序稳定",
         ]
         return "\n".join(lines)
 

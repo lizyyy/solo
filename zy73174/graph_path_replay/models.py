@@ -111,6 +111,8 @@ class ReplayRow:
     line_number: int
     raw_line: str
     status: RowStatus
+    question_id: str = ""
+    title: str = ""
     question: Optional[QuestionItem] = None
     error_message: str = ""
     skip_reason: str = ""
@@ -120,6 +122,8 @@ class ReplayRow:
             "line_number": self.line_number,
             "raw_line": self.raw_line,
             "status": self.status.value,
+            "question_id": self.question_id,
+            "title": self.title,
             "question": self.question.to_dict() if self.question else None,
             "error_message": self.error_message,
             "skip_reason": self.skip_reason,

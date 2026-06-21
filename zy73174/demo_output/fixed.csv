@@ -1,0 +1,19 @@
+question_id,title,path_params,tags,sort_key,remark,remark_author,remark_note,screenshots,screenshot_author,status
+GRAPH-001,最短路径入门题,start=1;end=100;weight=2.5;depth=5,"easy,basic",1,2025-03初始版本，路径方向需核对,xiaomeng,初版录入,s3://graph-snap/v1/GRAPH-001-v1.png|s3://graph-snap/v1/GRAPH-001-v1-case2.png,qa-team,active
+GRAPH-002,Dijkstra 进阶应用,start=5;end=50;weight=3.1;k=10;limit=-1,"medium,dijkstra",2,数据小孟补的边界说明，k=10时需要特殊处理,xiaomeng,复核时追加备注,s3://graph-snap/v2/GRAPH-002-after-fix.png,qa-team,active
+GRAPH-003,边界样本：参数越界,start=0;end=99999;weight=999999;depth=-5,"hard,boundary",3,故意留的越界参数用于测试异常检测,duty,演示数据-边界样例,,,active
+GRAPH-004,排序不稳定-A题,nodes=20;edges=50;seed=42,medium,5#GRAPH-004,与 GRAPH-005/006 使用相同 sort_key=5，测试不稳定排序,qa,同组排序键-1,s3://graph-snap/v1/GRAPH-004.png,qa,active
+GRAPH-005,排序不稳定-B题,nodes=25;edges=55;seed=42,medium,5#GRAPH-005,与 GRAPH-004/006 使用相同 sort_key=5，测试不稳定排序,qa,同组排序键-2,s3://graph-snap/v1/GRAPH-005.png,qa,active
+GRAPH-006,排序不稳定-C题,nodes=30;edges=60;seed=42,medium,5#GRAPH-006,与 GRAPH-004/005 使用相同 sort_key=5，测试不稳定排序,qa,同组排序键-3,,,active
+GRAPH-007,难题参数不足样例,start=1;end=10,hard,6,hard标签但参数只有2个，触发异常,duty,演示hard参数不足,,,active
+GRAPH-008,空路径参数样例,,experimental,7,,,,,,active
+GRAPH-009,超长参数样例,note=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA;len=250,debug,8,,,,,,active
+GRAPH-010,草稿题目-应该跳过,a=1;b=2,draft,9,,,,,,draft
+GRAPH-011,包含IGNORE的题目,x=10;y=20,wip,10,这里有IGNORE字样，测试跳过规则匹配,qa,测试跳过,,,active
+GRAPH-012,归档题目-应该跳过,deprecated=yes,old,11,,,,,,archived
+,缺少id的坏行,a=1;b=2,,99,,,,,,active
+GRAPH-BAD2,,a=1;b=2,,100,,,,,,active
+GRAPH-BAD3,参数格式错误缺等号,start1;end2;weight3,broken,101,,,,,,active
+GRAPH-013,JSON格式路径参数,"{""start"": 10, ""end"": 20, ""algo"": ""astar"", ""h_boost"": 1.5}",advanced,12,支持JSON格式的路径参数,xiaomeng,新格式支持测试,s3://graph-snap/v3/GRAPH-013-json-params.png,qa-team,active
+GRAPH-014,带多轮备注的老题目,start=1;end=50;algo=floyd,"classic,reviewed",13,第3轮复核：2025-05-10 小孟补充了Floyd特殊情况的说明,xiaomeng,2025-05最新备注,s3://graph-snap/v1/GRAPH-014.png|s3://graph-snap/v2/GRAPH-014-revised.png|s3://graph-snap/v3/GRAPH-014-final-approved.png,qa-team,active
+GRAPH-015,正常题目收尾,nodes=10;edges=20;type=dense,easy,14,,,,,,active

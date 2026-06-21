@@ -77,11 +77,18 @@ class PathReplayer:
         title = str(row.get("title", "")).strip()
 
         if not qid or not title:
+            missing = []
+            if not qid:
+                missing.append("question_id")
+            if not title:
+                missing.append("title")
             return ReplayRow(
                 line_number=line_number,
                 raw_line=raw_line,
                 status=RowStatus.BAD,
-                error_message="缺少必填字段: question_id 或 title 为空",
+                question_id=qid,
+                title=title,
+                error_message=f"缺少必填字段: {', '.join(missing)} 为空",
             )
 
         skip, reason = self._is_skip_line(row)
@@ -90,19 +97,25 @@ class PathReplayer:
                 line_number=line_number,
                 raw_line=raw_line,
                 status=RowStatus.SKIPPED,
+                question_id=qid,
+                title=title,
                 skip_reason=reason,
             )
 
-        try:
-            path_params = self._parse_path_params(str(row.get("path_params", "")))
-        except ParseError as e:
-            if self.config.strict_mode:
+        raw_params = str(row.get("path_params", "")).strip()
+        if raw_params:
+            try:
+                path_params = self._parse_path_params(raw_params)
+            except ParseError as e:
                 return ReplayRow(
                     line_number=line_number,
                     raw_line=raw_line,
                     status=RowStatus.BAD,
-                    error_message=str(e),
+                    question_id=qid,
+                    title=title,
+                    error_message=f"路径参数解析失败: {e}",
                 )
+        else:
             path_params = {}
 
         question = QuestionItem(
@@ -133,6 +146,8 @@ class PathReplayer:
             line_number=line_number,
             raw_line=raw_line,
             status=RowStatus.PROCESSED,
+            question_id=qid,
+            title=title,
             question=question,
         )
 
@@ -252,14 +267,17 @@ class PathReplayer:
             print("\n⏭️  跳过行清单:", file=out)
             for r in s.break_down:
                 if r.status == RowStatus.SKIPPED:
-                    print(f"  L{r.line_number:>3d} | {r.skip_reason}", file=out)
+                    qid_disp = r.question_id or "(无id)"
+                    print(f"  L{r.line_number:>3d} | {qid_disp:8s} | {r.skip_reason}", file=out)
 
         if s.bad_rows > 0:
-            print("\n❌ 坏行清单:", file=out)
+            print("\n❌ 坏行清单（含题目编号 + 失败原因，可追到具体记录）:", file=out)
             for r in s.break_down:
                 if r.status == RowStatus.BAD:
                     raw = r.raw_line if len(r.raw_line) < 60 else r.raw_line[:57] + "..."
-                    print(f"  L{r.line_number:>3d} | {r.error_message}", file=out)
+                    qid_disp = r.question_id or "(无id)"
+                    title_disp = r.title[:16] if r.title else "(无标题)"
+                    print(f"  L{r.line_number:>3d} | {qid_disp:12s} | {title_disp:16s} | {r.error_message}", file=out)
                     print(f"         原始: {raw}", file=out)
 
         print("\n" + sep, file=out)

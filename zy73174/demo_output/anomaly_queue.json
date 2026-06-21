@@ -5,12 +5,19 @@
     "title": "Dijkstra 进阶应用",
     "anomaly_type": "路径参数越界",
     "description": "参数 limit=-1 超出合理范围 [0, 10000]",
-    "status": "open",
+    "status": "rejudged",
     "params_snapshot": {
       "limit": -1
     },
-    "operation_log": [],
-    "created_at": "2026-06-20T10:27:06"
+    "operation_log": [
+      {
+        "op_type": "改判",
+        "detail": "limit=-1为合法哨兵改判通过",
+        "operator": "lead",
+        "timestamp": "2026-06-22T01:48:21"
+      }
+    ],
+    "created_at": "2026-06-22T01:48:20"
   },
   {
     "anomaly_id": "A002",
@@ -25,12 +32,12 @@
     "operation_log": [
       {
         "op_type": "改判",
-        "detail": "原判定越界，实为题设条件，改判通过",
+        "detail": "end=99999为题设合法上界，原越界判定改判通过",
         "operator": "lead",
-        "timestamp": "2026-06-20T10:27:06"
+        "timestamp": "2026-06-22T01:48:20"
       }
     ],
-    "created_at": "2026-06-20T10:27:06"
+    "created_at": "2026-06-22T01:48:20"
   },
   {
     "anomaly_id": "A003",
@@ -45,12 +52,12 @@
     "operation_log": [
       {
         "op_type": "补充信息",
-        "detail": "补充了边界约束文档，depth=-5为合法场景",
+        "detail": "weight=999999为压力测试上限，补充了权重约束文档",
         "operator": "duty-meng",
-        "timestamp": "2026-06-20T10:27:06"
+        "timestamp": "2026-06-22T01:48:20"
       }
     ],
-    "created_at": "2026-06-20T10:27:06"
+    "created_at": "2026-06-22T01:48:20"
   },
   {
     "anomaly_id": "A004",
@@ -63,7 +70,7 @@
       "depth": -5
     },
     "operation_log": [],
-    "created_at": "2026-06-20T10:27:06"
+    "created_at": "2026-06-22T01:48:20"
   },
   {
     "anomaly_id": "A005",
@@ -79,12 +86,12 @@
     "operation_log": [
       {
         "op_type": "解决",
-        "detail": "超长参数已在后端增加截断处理",
+        "detail": "hard题已补充第三个参数 constraint=strict",
         "operator": "duty-meng",
-        "timestamp": "2026-06-20T10:27:06"
+        "timestamp": "2026-06-22T01:48:20"
       }
     ],
-    "created_at": "2026-06-20T10:27:06"
+    "created_at": "2026-06-22T01:48:20"
   },
   {
     "anomaly_id": "A006",
@@ -92,10 +99,17 @@
     "title": "空路径参数样例",
     "anomaly_type": "空路径参数",
     "description": "该题未解析出任何路径参数，可能格式异常或需要人工补充",
-    "status": "open",
+    "status": "resolved",
     "params_snapshot": {},
-    "operation_log": [],
-    "created_at": "2026-06-20T10:27:06"
+    "operation_log": [
+      {
+        "op_type": "解决",
+        "detail": "已补充路径参数说明",
+        "operator": "duty",
+        "timestamp": "2026-06-22T01:48:21"
+      }
+    ],
+    "created_at": "2026-06-22T01:48:20"
   },
   {
     "anomaly_id": "A007",
@@ -103,22 +117,18 @@
     "title": "超长参数样例",
     "anomaly_type": "路径参数过长",
     "description": "参数 note 长度异常 (250字符)",
-    "status": "open",
+    "status": "supplemented",
     "params_snapshot": {
       "note": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA..."
     },
-    "operation_log": [],
-    "created_at": "2026-06-20T10:27:06"
-  },
-  {
-    "anomaly_id": "A008",
-    "question_id": "GRAPH-BAD3",
-    "title": "参数格式错误缺等号",
-    "anomaly_type": "空路径参数",
-    "description": "该题未解析出任何路径参数，可能格式异常或需要人工补充",
-    "status": "open",
-    "params_snapshot": {},
-    "operation_log": [],
-    "created_at": "2026-06-20T10:27:06"
+    "operation_log": [
+      {
+        "op_type": "补充信息",
+        "detail": "note字段为审计日志已确认合法",
+        "operator": "xiaomeng",
+        "timestamp": "2026-06-22T01:48:21"
+      }
+    ],
+    "created_at": "2026-06-22T01:48:20"
   }
 ]

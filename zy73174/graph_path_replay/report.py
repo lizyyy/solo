@@ -130,6 +130,51 @@ class ReviewReportGenerator:
             for n, v, c in stats_rows
         )
 
+        bad_rows = [r for r in s.break_down if r.status.value == "bad"]
+        skipped_rows = [r for r in s.break_down if r.status.value == "skipped"]
+        empty_bad = '<p style="color:#64748b">本次回放无坏行。</p>'
+        bad_rows_html_parts = []
+        for r in bad_rows:
+            qid_disp = self._escape(r.question_id or "(无id)")
+            title_disp = self._escape(r.title or "(无标题)")
+            raw_disp = self._escape(r.raw_line[:120] + ("..." if len(r.raw_line) > 120 else ""))
+            bad_rows_html_parts.append(
+                f"<div class='bad-row-card'>"
+                f"<div class='bad-row-head'>"
+                f"<span class='bad-row-line'>L{r.line_number}</span>"
+                f"<span class='bad-row-qid'>{qid_disp}</span>"
+                f"<span class='bad-row-title'>{title_disp}</span>"
+                f"</div>"
+                f"<div class='bad-row-reason'>❌ {self._escape(r.error_message)}</div>"
+                f"<div class='bad-row-raw'>原始: <code>{raw_disp}</code></div>"
+                f"</div>"
+            )
+        bad_rows_inner = "".join(bad_rows_html_parts) or empty_bad
+        bad_rows_html = (
+            f"<section class='panel'>"
+            f"<h2>❌ 坏行明细 ({len(bad_rows)} 行) — 含题目编号与失败原因，可追到具体记录</h2>"
+            f"{bad_rows_inner}"
+            f"</section>"
+        ) if bad_rows else ""
+
+        skipped_html_parts = []
+        for r in skipped_rows:
+            qid_disp = self._escape(r.question_id or "(无id)")
+            skipped_html_parts.append(
+                f"<div class='skip-row-card'>"
+                f"<span class='bad-row-line'>L{r.line_number}</span>"
+                f"<span class='bad-row-qid'>{qid_disp}</span>"
+                f"<span class='skip-row-reason'>⏭️ {self._escape(r.skip_reason)}</span>"
+                f"</div>"
+            )
+        skipped_inner = "".join(skipped_html_parts)
+        skipped_html = (
+            f"<section class='panel'>"
+            f"<h2>⏭️ 跳过行明细 ({len(skipped_rows)} 行)</h2>"
+            f"{skipped_inner}"
+            f"</section>"
+        ) if skipped_rows else ""
+
         content = f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -181,6 +226,19 @@ h2 {{ margin: 0 0 12px; font-size: 18px; }}
 .diff-table {{ width: 100%; border-collapse: collapse; font-size: 13px; margin: 8px 0; }}
 .diff-table th, .diff-table td {{ padding: 6px 10px; border: 1px solid #e2e8f0; text-align: left; }}
 .diff-table th {{ background: #f1f5f9; }}
+.bad-row-card {{ background: #fef2f2; border-left: 3px solid #b91c1c; border-radius: 4px;
+               padding: 10px 14px; margin-bottom: 8px; }}
+.bad-row-head {{ display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 4px; }}
+.bad-row-line {{ background: #b91c1c; color: #fff; padding: 1px 8px; border-radius: 3px;
+               font-size: 12px; font-weight: 700; }}
+.bad-row-qid {{ font-weight: 700; color: #991b1b; }}
+.bad-row-title {{ color: #475569; font-size: 14px; }}
+.bad-row-reason {{ font-size: 13px; color: #991b1b; margin: 2px 0; }}
+.bad-row-raw {{ font-size: 12px; color: #64748b; }}
+.bad-row-raw code {{ background: #fee2e2; padding: 1px 5px; border-radius: 3px; word-break: break-all; }}
+.skip-row-card {{ background: #fffbeb; border-left: 3px solid #a16207; border-radius: 4px;
+                padding: 8px 14px; margin-bottom: 6px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }}
+.skip-row-reason {{ color: #854d0e; font-size: 13px; }}
 .footer {{ text-align: center; color: #94a3b8; font-size: 12px; margin-top: 24px; }}
 </style>
 </head>
@@ -195,6 +253,10 @@ h2 {{ margin: 0 0 12px; font-size: 18px; }}
   <h2>📈 一页总览：参数版本 + 关键数据</h2>
   <div class="stats-grid">{stats_html}</div>
 </section>
+
+{bad_rows_html}
+
+{skipped_html}
 
 {sort_html}
 

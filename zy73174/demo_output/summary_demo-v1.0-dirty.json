@@ -1,14 +1,16 @@
 {
   "param_version": "demo-v1.0-dirty",
   "total_rows": 18,
-  "processed_rows": 13,
+  "processed_rows": 12,
   "skipped_rows": 3,
-  "bad_rows": 2,
+  "bad_rows": 3,
   "break_down": [
     {
       "line_number": 2,
       "raw_line": "GRAPH-001,最短路径入门题,start=1;end=100;weight=2.5;depth=5,\"easy,basic\",1,2025-03初始版本，路径方向需核对,xiaomeng,初版录入,s3://graph-snap/v1/GRAPH-001-v1.png|s3://graph-snap/v1/GRAPH-001-v1-case2.png,qa-team,active",
       "status": "processed",
+      "question_id": "GRAPH-001",
+      "title": "最短路径入门题",
       "question": {
         "question_id": "GRAPH-001",
         "title": "最短路径入门题",
@@ -22,7 +24,7 @@
           "history": [
             {
               "value": "2025-03初始版本，路径方向需核对",
-              "timestamp": "2026-06-20T10:27:06",
+              "timestamp": "2026-06-22T01:48:20",
               "author": "xiaomeng",
               "note": "初版录入"
             }
@@ -32,13 +34,13 @@
           "history": [
             {
               "value": "s3://graph-snap/v1/GRAPH-001-v1.png",
-              "timestamp": "2026-06-20T10:27:06",
+              "timestamp": "2026-06-22T01:48:20",
               "author": "qa-team",
               "note": "旧版本截图 #1"
             },
             {
               "value": "s3://graph-snap/v1/GRAPH-001-v1-case2.png",
-              "timestamp": "2026-06-20T10:27:06",
+              "timestamp": "2026-06-22T01:48:20",
               "author": "qa-team",
               "note": "旧版本截图 #2"
             }
@@ -57,6 +59,8 @@
       "line_number": 3,
       "raw_line": "GRAPH-002,Dijkstra 进阶应用,start=5;end=50;weight=3.1;k=10;limit=-1,\"medium,dijkstra\",2,数据小孟补的边界说明，k=10时需要特殊处理,xiaomeng,复核时追加备注,s3://graph-snap/v2/GRAPH-002-after-fix.png,qa-team,active",
       "status": "processed",
+      "question_id": "GRAPH-002",
+      "title": "Dijkstra 进阶应用",
       "question": {
         "question_id": "GRAPH-002",
         "title": "Dijkstra 进阶应用",
@@ -71,7 +75,7 @@
           "history": [
             {
               "value": "数据小孟补的边界说明，k=10时需要特殊处理",
-              "timestamp": "2026-06-20T10:27:06",
+              "timestamp": "2026-06-22T01:48:20",
               "author": "xiaomeng",
               "note": "复核时追加备注"
             }
@@ -81,7 +85,7 @@
           "history": [
             {
               "value": "s3://graph-snap/v2/GRAPH-002-after-fix.png",
-              "timestamp": "2026-06-20T10:27:06",
+              "timestamp": "2026-06-22T01:48:20",
               "author": "qa-team",
               "note": "旧版本截图 #1"
             }
@@ -100,6 +104,8 @@
       "line_number": 4,
       "raw_line": "GRAPH-003,边界样本：参数越界,start=0;end=99999;weight=999999;depth=-5,\"hard,boundary\",3,故意留的越界参数用于测试异常检测,duty,演示数据-边界样例,,,active",
       "status": "processed",
+      "question_id": "GRAPH-003",
+      "title": "边界样本：参数越界",
       "question": {
         "question_id": "GRAPH-003",
         "title": "边界样本：参数越界",
@@ -113,7 +119,7 @@
           "history": [
             {
               "value": "故意留的越界参数用于测试异常检测",
-              "timestamp": "2026-06-20T10:27:06",
+              "timestamp": "2026-06-22T01:48:20",
               "author": "duty",
               "note": "演示数据-边界样例"
             }
@@ -135,6 +141,8 @@
       "line_number": 5,
       "raw_line": "GRAPH-004,排序不稳定-A题,nodes=20;edges=50;seed=42,medium,5,与 GRAPH-005/006 使用相同 sort_key=5，测试不稳定排序,qa,同组排序键-1,s3://graph-snap/v1/GRAPH-004.png,qa,active",
       "status": "processed",
+      "question_id": "GRAPH-004",
+      "title": "排序不稳定-A题",
       "question": {
         "question_id": "GRAPH-004",
         "title": "排序不稳定-A题",
@@ -147,7 +155,7 @@
           "history": [
             {
               "value": "与 GRAPH-005/006 使用相同 sort_key=5，测试不稳定排序",
-              "timestamp": "2026-06-20T10:27:06",
+              "timestamp": "2026-06-22T01:48:20",
               "author": "qa",
               "note": "同组排序键-1"
             }
@@ -157,7 +165,7 @@
           "history": [
             {
               "value": "s3://graph-snap/v1/GRAPH-004.png",
-              "timestamp": "2026-06-20T10:27:06",
+              "timestamp": "2026-06-22T01:48:20",
               "author": "qa",
               "note": "旧版本截图 #1"
             }
@@ -175,6 +183,8 @@
       "line_number": 6,
       "raw_line": "GRAPH-005,排序不稳定-B题,nodes=25;edges=55;seed=42,medium,5,与 GRAPH-004/006 使用相同 sort_key=5，测试不稳定排序,qa,同组排序键-2,s3://graph-snap/v1/GRAPH-005.png,qa,active",
       "status": "processed",
+      "question_id": "GRAPH-005",
+      "title": "排序不稳定-B题",
       "question": {
         "question_id": "GRAPH-005",
         "title": "排序不稳定-B题",
@@ -187,7 +197,7 @@
           "history": [
             {
               "value": "与 GRAPH-004/006 使用相同 sort_key=5，测试不稳定排序",
-              "timestamp": "2026-06-20T10:27:06",
+              "timestamp": "2026-06-22T01:48:20",
               "author": "qa",
               "note": "同组排序键-2"
             }
@@ -197,7 +207,7 @@
           "history": [
             {
               "value": "s3://graph-snap/v1/GRAPH-005.png",
-              "timestamp": "2026-06-20T10:27:06",
+              "timestamp": "2026-06-22T01:48:20",
               "author": "qa",
               "note": "旧版本截图 #1"
             }
@@ -215,6 +225,8 @@
       "line_number": 7,
       "raw_line": "GRAPH-006,排序不稳定-C题,nodes=30;edges=60;seed=42,medium,5,与 GRAPH-004/005 使用相同 sort_key=5，测试不稳定排序,qa,同组排序键-3,,,active",
       "status": "processed",
+      "question_id": "GRAPH-006",
+      "title": "排序不稳定-C题",
       "question": {
         "question_id": "GRAPH-006",
         "title": "排序不稳定-C题",
@@ -227,7 +239,7 @@
           "history": [
             {
               "value": "与 GRAPH-004/005 使用相同 sort_key=5，测试不稳定排序",
-              "timestamp": "2026-06-20T10:27:06",
+              "timestamp": "2026-06-22T01:48:20",
               "author": "qa",
               "note": "同组排序键-3"
             }
@@ -248,6 +260,8 @@
       "line_number": 8,
       "raw_line": "GRAPH-007,难题参数不足样例,start=1;end=10,hard,6,hard标签但参数只有2个，触发异常,duty,演示hard参数不足,,,active",
       "status": "processed",
+      "question_id": "GRAPH-007",
+      "title": "难题参数不足样例",
       "question": {
         "question_id": "GRAPH-007",
         "title": "难题参数不足样例",
@@ -259,7 +273,7 @@
           "history": [
             {
               "value": "hard标签但参数只有2个，触发异常",
-              "timestamp": "2026-06-20T10:27:06",
+              "timestamp": "2026-06-22T01:48:20",
               "author": "duty",
               "note": "演示hard参数不足"
             }
@@ -280,6 +294,8 @@
       "line_number": 9,
       "raw_line": "GRAPH-008,空路径参数样例,,experimental,7,,,,,,active",
       "status": "processed",
+      "question_id": "GRAPH-008",
+      "title": "空路径参数样例",
       "question": {
         "question_id": "GRAPH-008",
         "title": "空路径参数样例",
@@ -302,6 +318,8 @@
       "line_number": 10,
       "raw_line": "GRAPH-009,超长参数样例,note=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA;len=250,debug,8,,,,,,active",
       "status": "processed",
+      "question_id": "GRAPH-009",
+      "title": "超长参数样例",
       "question": {
         "question_id": "GRAPH-009",
         "title": "超长参数样例",
@@ -327,6 +345,8 @@
       "line_number": 11,
       "raw_line": "GRAPH-010,草稿题目-应该跳过,a=1;b=2,draft,9,,,,,,draft",
       "status": "skipped",
+      "question_id": "GRAPH-010",
+      "title": "草稿题目-应该跳过",
       "question": null,
       "error_message": "",
       "skip_reason": "题目状态为草稿/归档/弃用"
@@ -335,6 +355,8 @@
       "line_number": 12,
       "raw_line": "GRAPH-011,包含IGNORE的题目,x=10;y=20,wip,10,这里有IGNORE字样，测试跳过规则匹配,qa,测试跳过,,,active",
       "status": "skipped",
+      "question_id": "GRAPH-011",
+      "title": "包含IGNORE的题目",
       "question": null,
       "error_message": "",
       "skip_reason": "匹配跳过规则: 'IGNORE' 出现在字段 'title'"
@@ -343,6 +365,8 @@
       "line_number": 13,
       "raw_line": "GRAPH-012,归档题目-应该跳过,deprecated=yes,old,11,,,,,,archived",
       "status": "skipped",
+      "question_id": "GRAPH-012",
+      "title": "归档题目-应该跳过",
       "question": null,
       "error_message": "",
       "skip_reason": "题目状态为草稿/归档/弃用"
@@ -351,44 +375,38 @@
       "line_number": 14,
       "raw_line": ",缺少id的坏行,a=1;b=2,,99,,,,,,active",
       "status": "bad",
+      "question_id": "",
+      "title": "缺少id的坏行",
       "question": null,
-      "error_message": "缺少必填字段: question_id 或 title 为空",
+      "error_message": "缺少必填字段: question_id 为空",
       "skip_reason": ""
     },
     {
       "line_number": 15,
       "raw_line": "GRAPH-BAD2,,a=1;b=2,,100,,,,,,active",
       "status": "bad",
+      "question_id": "GRAPH-BAD2",
+      "title": "",
       "question": null,
-      "error_message": "缺少必填字段: question_id 或 title 为空",
+      "error_message": "缺少必填字段: title 为空",
       "skip_reason": ""
     },
     {
       "line_number": 16,
       "raw_line": "GRAPH-BAD3,参数格式错误缺等号,start1;end2;weight3,broken,101,,,,,,active",
-      "status": "processed",
-      "question": {
-        "question_id": "GRAPH-BAD3",
-        "title": "参数格式错误缺等号",
-        "path_params": {},
-        "remark": {
-          "history": []
-        },
-        "screenshots": {
-          "history": []
-        },
-        "tags": [
-          "broken"
-        ],
-        "sort_key": "101"
-      },
-      "error_message": "",
+      "status": "bad",
+      "question_id": "GRAPH-BAD3",
+      "title": "参数格式错误缺等号",
+      "question": null,
+      "error_message": "路径参数解析失败: 路径参数格式错误，缺少'=': 'start1'",
       "skip_reason": ""
     },
     {
       "line_number": 17,
       "raw_line": "GRAPH-013,JSON格式路径参数,\"{\"start\": 10, \"end\": 20, \"algo\": \"astar\", \"h_boost\": 1.5}\",advanced,12,支持JSON格式的路径参数,xiaomeng,新格式支持测试,s3://graph-snap/v3/GRAPH-013-json-params.png,qa-team,active",
       "status": "processed",
+      "question_id": "GRAPH-013",
+      "title": "JSON格式路径参数",
       "question": {
         "question_id": "GRAPH-013",
         "title": "JSON格式路径参数",
@@ -402,7 +420,7 @@
           "history": [
             {
               "value": "支持JSON格式的路径参数",
-              "timestamp": "2026-06-20T10:27:06",
+              "timestamp": "2026-06-22T01:48:20",
               "author": "xiaomeng",
               "note": "新格式支持测试"
             }
@@ -412,7 +430,7 @@
           "history": [
             {
               "value": "s3://graph-snap/v3/GRAPH-013-json-params.png",
-              "timestamp": "2026-06-20T10:27:06",
+              "timestamp": "2026-06-22T01:48:20",
               "author": "qa-team",
               "note": "旧版本截图 #1"
             }
@@ -430,6 +448,8 @@
       "line_number": 18,
       "raw_line": "GRAPH-014,带多轮备注的老题目,start=1;end=50;algo=floyd,\"classic,reviewed\",13,第3轮复核：2025-05-10 小孟补充了Floyd特殊情况的说明,xiaomeng,2025-05最新备注,s3://graph-snap/v1/GRAPH-014.png|s3://graph-snap/v2/GRAPH-014-revised.png|s3://graph-snap/v3/GRAPH-014-final-approved.png,qa-team,active",
       "status": "processed",
+      "question_id": "GRAPH-014",
+      "title": "带多轮备注的老题目",
       "question": {
         "question_id": "GRAPH-014",
         "title": "带多轮备注的老题目",
@@ -442,7 +462,7 @@
           "history": [
             {
               "value": "第3轮复核：2025-05-10 小孟补充了Floyd特殊情况的说明",
-              "timestamp": "2026-06-20T10:27:06",
+              "timestamp": "2026-06-22T01:48:20",
               "author": "xiaomeng",
               "note": "2025-05最新备注"
             }
@@ -452,19 +472,19 @@
           "history": [
             {
               "value": "s3://graph-snap/v1/GRAPH-014.png",
-              "timestamp": "2026-06-20T10:27:06",
+              "timestamp": "2026-06-22T01:48:20",
               "author": "qa-team",
               "note": "旧版本截图 #1"
             },
             {
               "value": "s3://graph-snap/v2/GRAPH-014-revised.png",
-              "timestamp": "2026-06-20T10:27:06",
+              "timestamp": "2026-06-22T01:48:20",
               "author": "qa-team",
               "note": "旧版本截图 #2"
             },
             {
               "value": "s3://graph-snap/v3/GRAPH-014-final-approved.png",
-              "timestamp": "2026-06-20T10:27:06",
+              "timestamp": "2026-06-22T01:48:20",
               "author": "qa-team",
               "note": "旧版本截图 #3"
             }
@@ -483,6 +503,8 @@
       "line_number": 19,
       "raw_line": "GRAPH-015,正常题目收尾,nodes=10;edges=20;type=dense,easy,14,,,,,,active",
       "status": "processed",
+      "question_id": "GRAPH-015",
+      "title": "正常题目收尾",
       "question": {
         "question_id": "GRAPH-015",
         "title": "正常题目收尾",
@@ -518,7 +540,7 @@
         "limit": -1
       },
       "operation_log": [],
-      "created_at": "2026-06-20T10:27:06"
+      "created_at": "2026-06-22T01:48:20"
     },
     {
       "anomaly_id": "A002",
@@ -533,12 +555,12 @@
       "operation_log": [
         {
           "op_type": "改判",
-          "detail": "原判定越界，实为题设条件，改判通过",
+          "detail": "end=99999为题设合法上界，原越界判定改判通过",
           "operator": "lead",
-          "timestamp": "2026-06-20T10:27:06"
+          "timestamp": "2026-06-22T01:48:20"
         }
       ],
-      "created_at": "2026-06-20T10:27:06"
+      "created_at": "2026-06-22T01:48:20"
     },
     {
       "anomaly_id": "A003",
@@ -553,12 +575,12 @@
       "operation_log": [
         {
           "op_type": "补充信息",
-          "detail": "补充了边界约束文档，depth=-5为合法场景",
+          "detail": "weight=999999为压力测试上限，补充了权重约束文档",
           "operator": "duty-meng",
-          "timestamp": "2026-06-20T10:27:06"
+          "timestamp": "2026-06-22T01:48:20"
         }
       ],
-      "created_at": "2026-06-20T10:27:06"
+      "created_at": "2026-06-22T01:48:20"
     },
     {
       "anomaly_id": "A004",
@@ -571,7 +593,7 @@
         "depth": -5
       },
       "operation_log": [],
-      "created_at": "2026-06-20T10:27:06"
+      "created_at": "2026-06-22T01:48:20"
     },
     {
       "anomaly_id": "A005",
@@ -587,12 +609,12 @@
       "operation_log": [
         {
           "op_type": "解决",
-          "detail": "超长参数已在后端增加截断处理",
+          "detail": "hard题已补充第三个参数 constraint=strict",
           "operator": "duty-meng",
-          "timestamp": "2026-06-20T10:27:06"
+          "timestamp": "2026-06-22T01:48:20"
         }
       ],
-      "created_at": "2026-06-20T10:27:06"
+      "created_at": "2026-06-22T01:48:20"
     },
     {
       "anomaly_id": "A006",
@@ -603,7 +625,7 @@
       "status": "open",
       "params_snapshot": {},
       "operation_log": [],
-      "created_at": "2026-06-20T10:27:06"
+      "created_at": "2026-06-22T01:48:20"
     },
     {
       "anomaly_id": "A007",
@@ -616,18 +638,7 @@
         "note": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA..."
       },
       "operation_log": [],
-      "created_at": "2026-06-20T10:27:06"
-    },
-    {
-      "anomaly_id": "A008",
-      "question_id": "GRAPH-BAD3",
-      "title": "参数格式错误缺等号",
-      "anomaly_type": "空路径参数",
-      "description": "该题未解析出任何路径参数，可能格式异常或需要人工补充",
-      "status": "open",
-      "params_snapshot": {},
-      "operation_log": [],
-      "created_at": "2026-06-20T10:27:06"
+      "created_at": "2026-06-22T01:48:20"
     }
   ],
   "sort_detection": {
@@ -642,21 +653,19 @@
       "GRAPH-007",
       "GRAPH-008",
       "GRAPH-009",
-      "GRAPH-BAD3",
       "GRAPH-013",
       "GRAPH-014",
       "GRAPH-015"
     ],
     "after_order": [
       "GRAPH-001",
-      "GRAPH-BAD3",
       "GRAPH-013",
       "GRAPH-014",
       "GRAPH-015",
       "GRAPH-002",
       "GRAPH-003",
-      "GRAPH-004",
       "GRAPH-005",
+      "GRAPH-004",
       "GRAPH-006",
       "GRAPH-007",
       "GRAPH-008",
@@ -664,23 +673,23 @@
     ],
     "diff_indices": [
       [
-        7,
-        "GRAPH-004",
+        6,
+        "GRAPH-005",
         "GRAPH-006"
       ],
       [
-        8,
-        "GRAPH-005",
-        "GRAPH-004"
+        7,
+        "GRAPH-004",
+        "GRAPH-005"
       ],
       [
-        9,
+        8,
         "GRAPH-006",
         "GRAPH-005"
       ]
     ],
-    "action_suggestion": "[排序不稳定] 在 10 次随机洗牌重试中发现 3 处顺序差异。\n  影响：\n    同一排序键下至少 3 个位置结果不唯一，回放批次间顺序可能不同。\n  问题位置（前5条展示）：\n    位置 7: [GRAPH-004|排序不稳定-A题|sort_key=5] ↔ [GRAPH-006|排序不稳定-C题|sort_key=5]\n    位置 8: [GRAPH-005|排序不稳定-B题|sort_key=5] ↔ [GRAPH-004|排序不稳定-A题|sort_key=5]\n    位置 9: [GRAPH-006|排序不稳定-C题|sort_key=5] ↔ [GRAPH-005|排序不稳定-B题|sort_key=5]\n\n  建议人工处理动作（按优先级）：\n    1. 【首选】补充排序键：在题目清单里给这些重复 sort_key 的行增加二级排序字段，\n       例如 difficulty_priority、update_time 等，确保排序键唯一。\n    2. 【快速】在 sort_key 列后追加 question_id 作为 tie-breaker，\n       保证顺序稳定（脚本可自动处理，见 --auto-tiebreak 选项）。\n    3. 【合规】如果顺序本身不影响业务，可在复核页面勾选“忽略排序差异”，\n       但需在备注中记录以留痕。\n    4. 【兜底】导出不稳定位置列表，由数据小孟人工逐条确认最终顺序，\n       并将结果回写到清单后再运行回放。\n\n  下一步工具：\n    $ graph-path-replay inspect --show-ties   # 列出所有重复 sort_key 的题目组\n    $ graph-path-replay fix-sort --tiebreak id  # 自动用 id 作为二级排序"
+    "action_suggestion": "[排序不稳定] 在 10 次随机洗牌重试中发现 3 处顺序差异。\n  影响：\n    同一排序键下至少 3 个位置结果不唯一，回放批次间顺序可能不同。\n  问题位置（前5条展示）：\n    位置 6: [GRAPH-005|排序不稳定-B题|sort_key=5] ↔ [GRAPH-006|排序不稳定-C题|sort_key=5]\n    位置 8: [GRAPH-006|排序不稳定-C题|sort_key=5] ↔ [GRAPH-005|排序不稳定-B题|sort_key=5]\n    位置 7: [GRAPH-004|排序不稳定-A题|sort_key=5] ↔ [GRAPH-005|排序不稳定-B题|sort_key=5]\n\n  建议人工处理动作（按优先级）：\n    1. 【首选】补充排序键：在题目清单里给这些重复 sort_key 的行增加二级排序字段，\n       例如 difficulty_priority、update_time 等，确保排序键唯一。\n    2. 【快速】在 sort_key 列后追加 question_id 作为 tie-breaker，\n       保证顺序稳定（脚本可自动处理，见 --auto-tiebreak 选项）。\n    3. 【合规】如果顺序本身不影响业务，可在复核页面勾选“忽略排序差异”，\n       但需在备注中记录以留痕。\n    4. 【兜底】导出不稳定位置列表，由数据小孟人工逐条确认最终顺序，\n       并将结果回写到清单后再运行回放。\n\n  下一步工具（可直接复制运行，入口为 python3 -m graph_path_replay）：\n    $ python3 -m graph_path_replay inspect --input <清单.csv> --show-ties\n        # 重新解析清单并列出所有重复 sort_key 的题目组\n    $ python3 -m graph_path_replay fix-sort --input <清单.csv> \\\n        --output <修复后.csv> --tiebreak question_id\n        # 自动追加 question_id 作为二级排序，写出修复后的 CSV\n    $ python3 -m graph_path_replay run --input <修复后.csv> --work-dir <工作目录>\n        # 用修复后的 CSV 重新跑回放，确认排序稳定"
   },
-  "started_at": "2026-06-20T10:27:06",
-  "finished_at": "2026-06-20T10:27:06"
+  "started_at": "2026-06-22T01:48:20",
+  "finished_at": "2026-06-22T01:48:20"
 }
