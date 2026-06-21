@@ -1,12 +1,14 @@
 import { useMemo, useState } from 'react';
-import { Camera, Download, Filter, History, Search } from 'lucide-react';
+import { Camera, Download, Filter, History, Search, GitCompare } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
 import { encodeSnapshotId, exportToCSV, triggerDownload } from '../utils/reviewEngine';
 import { cn } from '../lib/utils';
 import type { ExceptionRecord, FilterConditions } from '../types';
 
 export default function Exceptions() {
-  const { exceptions, snapshots, activeSnapshotId, createSnapshot, applySnapshot, recordExport, updateExceptionStatus } = useAppStore();
+  const {
+    exceptions, snapshots, activeSnapshotId, createSnapshot, applySnapshot, recordExport, updateExceptionStatus
+  } = useAppStore();
 
   const [conditions, setConditions] = useState<FilterConditions>({});
   const [snapshotName, setSnapshotName] = useState('');
@@ -37,9 +39,17 @@ export default function Exceptions() {
       if (conditions.status && e.status !== conditions.status) return false;
       if (conditions.severity && e.severity !== conditions.severity) return false;
       if (conditions.paramVersion && String(e.paramVersion) !== conditions.paramVersion) return false;
+      if (conditions.baseVersion && String(e.baseVersion) !== conditions.baseVersion) return false;
+      if (conditions.targetVersion && String(e.targetVersion) !== conditions.targetVersion) return false;
       if (conditions.keyword) {
         const kw = conditions.keyword.toLowerCase();
-        if (!e.sampleName.toLowerCase().includes(kw) && !e.reason.toLowerCase().includes(kw)) return false;
+        if (
+          !e.sampleName.toLowerCase().includes(kw) &&
+          !e.reason.toLowerCase().includes(kw) &&
+          !(e.impactSummary ?? '').toLowerCase().includes(kw) &&
+          !(e.pathBefore ?? '').toLowerCase().includes(kw) &&
+          !(e.pathAfter ?? '').toLowerCase().includes(kw)
+        ) return false;
       }
       if (conditions.dateFrom && e.createdAt < conditions.dateFrom) return false;
       if (conditions.dateTo && e.createdAt > conditions.dateTo + ' 23:59:59') return false;
@@ -62,6 +72,11 @@ export default function Exceptions() {
       ID: e.id,
       样本: e.sampleName,
       原因: e.reason,
+      影响摘要: e.impactSummary ?? '',
+      base版本: `v${e.baseVersion}`,
+      target版本: `v${e.targetVersion}`,
+      路径Before: e.pathBefore ?? '',
+      路径After: e.pathAfter ?? '',
       状态: e.status,
       严重度: e.severity,
       参数版本: `v${e.paramVersion}`,
@@ -117,7 +132,7 @@ export default function Exceptions() {
       </div>
 
       <div className="card p-4">
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-3 flex-wrap">
           <Filter className="w-4 h-4 text-navy-700" />
           <h3 className="font-display text-sm text-navy-800 font-semibold">筛选条件</h3>
           {activeSnapshotId && (
@@ -133,7 +148,7 @@ export default function Exceptions() {
             </div>
           )}
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
           <select className="border border-slate-300 px-2 py-1.5 text-sm" value={conditions.status ?? ''} onChange={(e) => setField('status', e.target.value || undefined)}>
             <option value="">全部状态</option>
             <option value="pending">待处理</option>
@@ -146,13 +161,25 @@ export default function Exceptions() {
             <option value="medium">中</option>
             <option value="low">低</option>
           </select>
-          <select className="border border-slate-300 px-2 py-1.5 text-sm" value={conditions.paramVersion ?? ''} onChange={(e) => setField('paramVersion', e.target.value || undefined)}>
-            <option value="">全部版本</option>
+          <select className="border border-slate-300 px-2 py-1.5 text-sm" value={conditions.baseVersion ?? ''} onChange={(e) => setField('baseVersion', e.target.value || undefined)}>
+            <option value="">base版本</option>
             <option value="1">v1</option>
             <option value="2">v2</option>
             <option value="3">v3</option>
           </select>
-          <input className="border border-slate-300 px-2 py-1.5 text-sm" placeholder="关键词搜索" value={conditions.keyword ?? ''} onChange={(e) => setField('keyword', e.target.value || undefined)} />
+          <select className="border border-slate-300 px-2 py-1.5 text-sm" value={conditions.targetVersion ?? ''} onChange={(e) => setField('targetVersion', e.target.value || undefined)}>
+            <option value="">target版本</option>
+            <option value="1">v1</option>
+            <option value="2">v2</option>
+            <option value="3">v3</option>
+          </select>
+          <select className="border border-slate-300 px-2 py-1.5 text-sm" value={conditions.paramVersion ?? ''} onChange={(e) => setField('paramVersion', e.target.value || undefined)}>
+            <option value="">样本绑定版</option>
+            <option value="1">v1</option>
+            <option value="2">v2</option>
+            <option value="3">v3</option>
+          </select>
+          <input className="border border-slate-300 px-2 py-1.5 text-sm" placeholder="关键词(原因/路径)" value={conditions.keyword ?? ''} onChange={(e) => setField('keyword', e.target.value || undefined)} />
           <input type="date" className="border border-slate-300 px-2 py-1.5 text-sm" value={conditions.dateFrom ?? ''} onChange={(e) => setField('dateFrom', e.target.value || undefined)} />
           <input type="date" className="border border-slate-300 px-2 py-1.5 text-sm" value={conditions.dateTo ?? ''} onChange={(e) => setField('dateTo', e.target.value || undefined)} />
         </div>
@@ -160,7 +187,7 @@ export default function Exceptions() {
         <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2">
           <input
             className="border border-slate-300 px-2 py-1.5 text-sm flex-1 max-w-sm"
-            placeholder="快照名称（如 v3 高严重度待处理）"
+            placeholder="快照名称（如 v2→v3 高严重度待处理）"
             value={snapshotName}
             onChange={(e) => setSnapshotName(e.target.value)}
           />
@@ -174,14 +201,16 @@ export default function Exceptions() {
       </div>
 
       <div className="card overflow-x-auto">
-        <table className="data-table">
+        <table className="data-table text-[12px]">
           <thead>
             <tr>
               <th>状态</th>
               <th>严重度</th>
               <th>样本</th>
               <th>原因</th>
-              <th>参数版本</th>
+              <th>影响摘要</th>
+              <th><GitCompare className="inline w-3 h-3 mr-0.5" />版本对</th>
+              <th>路径变更</th>
               <th>快照 ID</th>
               <th>创建时间</th>
               <th style={{ width: 110 }}>操作</th>
@@ -190,7 +219,7 @@ export default function Exceptions() {
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={8} className="text-center py-10 text-slate-400 text-sm">暂无符合条件的异常记录</td>
+                <td colSpan={10} className="text-center py-10 text-slate-400 text-sm">暂无符合条件的异常记录</td>
               </tr>
             ) : filtered.map((e) => (
               <tr key={e.id}>
@@ -202,7 +231,24 @@ export default function Exceptions() {
                 </td>
                 <td className="font-medium text-navy-800">{e.sampleName}</td>
                 <td className="text-sm text-slate-600 max-w-xs">{e.reason}</td>
-                <td className="font-mono-data">v{e.paramVersion}</td>
+                <td className="text-[11px] font-mono-data text-slate-500 max-w-xs truncate" title={e.impactSummary}>
+                  {e.impactSummary || '—'}
+                </td>
+                <td className="font-mono-data text-[11px] whitespace-nowrap">
+                  <span className="text-emerald-700">v{e.baseVersion}</span>
+                  <span className="text-slate-400">→</span>
+                  <span className="text-navy-700">v{e.targetVersion}</span>
+                </td>
+                <td className="font-mono-data text-[11px] text-slate-600 max-w-[180px]" title={`Before: ${e.pathBefore}\nAfter: ${e.pathAfter}`}>
+                  {e.pathBefore !== e.pathAfter ? (
+                    <div className="space-y-0.5">
+                      <div className="text-emerald-700 truncate">B:{e.pathBefore ?? '—'}</div>
+                      <div className="text-amber-700 truncate">T:{e.pathAfter ?? '—'}</div>
+                    </div>
+                  ) : (
+                    <span className="text-slate-400">{e.pathBefore ?? '—'}</span>
+                  )}
+                </td>
                 <td className="font-mono-data text-xs text-slate-500">{e.snapshotId ?? '—'}</td>
                 <td className="font-mono-data text-xs text-slate-500">{e.createdAt}</td>
                 <td>

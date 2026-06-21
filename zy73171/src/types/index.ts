@@ -5,10 +5,16 @@ export interface ParamVersion {
   createdAt: string;
 }
 
+export type ParamChangeType = 'value' | 'unit' | 'both';
+
 export interface ParamChange {
   id: string;
+  versionNo: number;
+  changeType: ParamChangeType;
   oldValue: string;
   newValue: string;
+  oldUnit?: string | null;
+  newUnit?: string | null;
   changedBy: string;
   changedAt: string;
   batchNo: string;
@@ -34,6 +40,20 @@ export interface ParamTable {
   versions: ParamVersion[];
   rows: ParamRow[];
 }
+
+export interface ParamSnapshotRow {
+  key: string;
+  value: string | null;
+  unit: string | null;
+  sourceRemark: string;
+  isEmptySet: boolean;
+  missingUnit: boolean;
+  introducedAtVersion: number;
+  lastChangedAtVersion: number;
+  batchNo: string;
+}
+
+export type ParamSnapshot = Record<string, ParamSnapshotRow>;
 
 export interface GraphNode {
   id: string;
@@ -61,8 +81,13 @@ export interface GraphData {
 export interface ImpactNode {
   order: number;
   rule: string;
+  ruleCode: 'R-001' | 'R-002' | 'R-003';
   ruleDescription: string;
   paramKey: string;
+  paramSourceRemark: string;
+  versionNo: number;
+  batchNo: string;
+  isPostSupplement: boolean;
   before: string;
   after: string;
   delta: string;
@@ -72,22 +97,40 @@ export interface ImpactNode {
 export interface DetailRow {
   id: string;
   segment: string;
-  chartValue: number;
-  detailValue: number;
-  diff: number;
-  isDiff: boolean;
+  paramKey: string;
+  baseValue: number | null;
+  targetValue: number | null;
+  unit: string | null;
+  sourceRemark: string;
+  introducedAtVersion: number;
+  lastChangedAtVersion: number;
+  onBasePath: boolean;
+  onTargetPath: boolean;
+  isValueChanged: boolean;
+  isEmptySet: boolean;
+  missingUnit: boolean;
+  delta: number;
 }
 
 export interface ReviewResult {
   id: string;
   sampleId: string;
+  baseVersion: number;
+  targetVersion: number;
   graphBefore: GraphData;
   graphAfter: GraphData;
-  chartAggregate: { sum: number; avg: number; count: number };
+  aggregate: {
+    targetSum: number;
+    baseSum: number;
+    diffSum: number;
+    count: number;
+    changedCount: number;
+  };
   detailRows: DetailRow[];
-  calibreDiff: DetailRow[];
   impactChain: ImpactNode[];
   conclusionChanged: boolean;
+  pathChanged: boolean;
+  calibreVerified: boolean;
   reviewedAt: string;
 }
 
@@ -106,6 +149,11 @@ export interface ExceptionRecord {
   sampleId: string;
   sampleName: string;
   reason: string;
+  impactSummary: string;
+  baseVersion: number;
+  targetVersion: number;
+  pathBefore: string;
+  pathAfter: string;
   status: 'pending' | 'reviewing' | 'resolved';
   severity: 'low' | 'medium' | 'high';
   paramVersion: number;
@@ -125,6 +173,8 @@ export interface FilterConditions {
   status?: string;
   severity?: string;
   paramVersion?: string;
+  baseVersion?: string;
+  targetVersion?: string;
   keyword?: string;
   dateFrom?: string;
   dateTo?: string;

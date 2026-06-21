@@ -50,10 +50,24 @@ export const useAppStore = create<AppState>((set, get) => ({
       const row = state.paramTable.rows.find((r) => r.id === rowId);
       if (!row) return {};
       const now = new Date().toISOString().replace('T', ' ').slice(0, 19);
+      const versionNo = state.paramTable.currentVersion;
+      const oldVal = row.value ?? '∅';
+      const newVal = newValue;
+      const oldUnitVal = row.unit;
+      const newUnitVal = newUnit ?? row.unit;
+      const valueChanged = oldVal !== newVal;
+      const unitChanged = (oldUnitVal ?? null) !== (newUnitVal ?? null);
+      let changeType: 'value' | 'unit' | 'both' = 'value';
+      if (valueChanged && unitChanged) changeType = 'both';
+      else if (unitChanged) changeType = 'unit';
       const change = {
         id: `c-${Date.now()}`,
-        oldValue: row.value ?? '∅',
-        newValue,
+        versionNo,
+        changeType,
+        oldValue: oldVal,
+        newValue: newVal,
+        oldUnit: oldUnitVal,
+        newUnit: newUnitVal,
         changedBy,
         changedAt: now,
         batchNo: `BATCH-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}`,
@@ -62,10 +76,10 @@ export const useAppStore = create<AppState>((set, get) => ({
         r.id === rowId
           ? {
               ...r,
-              value: newValue,
-              unit: newUnit ?? r.unit,
-              isEmptySet: newValue === '∅' || newValue === '',
-              missingUnit: !newUnit,
+              value: newVal,
+              unit: newUnitVal,
+              isEmptySet: newVal === '∅' || newVal === '',
+              missingUnit: !newUnitVal,
               changes: [...r.changes, change],
             }
           : r
