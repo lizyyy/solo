@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 import type {
   DisclosureItem,
   StatusFilter,
@@ -48,6 +48,7 @@ interface DisclosureState {
       nextContactPhone: string;
     }
   ) => DisclosureItem | undefined;
+  appendSupplement: (id: string, supplement: string) => DisclosureItem | undefined;
   checkOffsetAndNotify: (id: string) => {
     isBlocker: boolean;
     blockerReason?: string;
@@ -288,6 +289,25 @@ export const useDisclosureStore = create<DisclosureState>()(
         return updated;
       },
 
+      appendSupplement: (id, supplement) => {
+        const item = get().getItemById(id);
+        if (!item) return undefined;
+        if (!supplement || supplement.trim().length < 2) return undefined;
+        const now = new Date().toISOString();
+        const prev = item.supplementContent ? item.supplementContent + '\n\n' : '';
+        const updated: DisclosureItem = {
+          ...item,
+          supplementContent: prev + supplement.trim(),
+          updatedAt: now,
+          operator: get().lastOperator,
+        };
+        set({
+          items: get().items.map((i) => (i.id === id ? updated : i)),
+          lastSyncAt: now,
+        });
+        return updated;
+      },
+
       checkOffsetAndNotify: (id) => {
         const item = get().getItemById(id);
         if (!item) return { isBlocker: false };
@@ -308,8 +328,7 @@ export const useDisclosureStore = create<DisclosureState>()(
     }),
     {
       name: STORAGE_KEY,
-      storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
+      partialize: (state: DisclosureState) => ({
         items: state.items,
         lastOperator: state.lastOperator,
         lastSyncAt: state.lastSyncAt,

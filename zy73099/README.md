@@ -1,57 +1,203 @@
-# React + TypeScript + Vite
+# 消防分区交底清单
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+施工经理阿乔的本地交底管理工具。所有数据存在浏览器 localStorage 中，**导入、确认、撤回、摘要**共用同一份本地数据，刷新页面不丢失。
 
-Currently, two official plugins are available:
+## ✨ 这个工具能做什么
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **小包材料试手**：一键导入 5 条示例交底（含会议纪要原文、人工改判、补充说明三种来源），覆盖所有状态
+- **坐标偏移告警**：碰到模型坐标偏移 ≥ 20mm 时，弹窗写清为什么卡住、下一步找谁补资料（含一键拨号）
+- **人工确认留痕**：确认前后内容差异自动保存，第二天复盘可调出前后对比
+- **撤回退回记录**：确认过的条目可撤回，月底复核三栏看板自动分类
+- **月底复核三栏**：已确认 / 待补件 / 退回记录 三类清晰分开，支持按消防分区筛选
+- **全流程持久化**：所有写入 localStorage，刷新不丢失，导出 JSON 可异地继续
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## ⚙️ 环境要求
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- Node.js >= 18（建议 20 或更高）
+- npm >= 10
+
+> 本项目使用 **npm** 作为包管理器（不使用 pnpm/yarn，避免原生模块构建问题）
+
+---
+
+## 🚀 快速开始
+
+### 1. 安装依赖
+
+在项目根目录执行：
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. 启动开发服务
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm run dev
 ```
+
+启动成功后控制台会显示：
+
+```
+  ➜  Local:   http://localhost:5173/
+```
+
+### 3. 打开浏览器
+
+访问 **http://localhost:5173/**
+
+> 就能看到消防分区交底清单主页。
+
+---
+
+## 📝 操作指南（按 README 从零走一遍完整流程）
+
+### 步骤 1：导入示例材料（小包试手）
+
+打开主页后点击左上的 **「小包材料试手」** 按钮：
+
+- 一键导入 5 条示例交底记录
+- 顶部摘要面板会显示：总数 / 待确认 / 已确认 / 待补件 / 退回 5 个数字
+- 下方 5 个分类 Tab 分别展示不同状态
+
+### 步骤 2：进入详情页
+
+点击卡片标题（例如 **「A 区防火卷帘门安装交底」**，这条有 23mm 坐标偏移）进入详情页。
+
+详情页从左到右：
+
+- 左栏：交底内容 + 意见溯源时间线（会议纪要 → 人工改判 → 补充说明）+ 确认前后差异面板
+- 右栏：基础信息（分区/负责人/电话/坐标偏移）+ 待补件联系人 + 操作时间
+
+### 步骤 3：人工确认（会遇到坐标偏移告警）
+
+在详情页顶部点击 **「人工确认」** 按钮：
+
+- 如果坐标偏移 ≥ 20mm，会弹出 **「模型坐标偏移告警」** 弹窗，两栏信息：
+  - **为什么卡住了？** 写清偏移量、影响分区、风险等级、建议处理方式
+  - **下一步找谁补？** 显示对应联系人（姓名/角色/电话），点击「一键拨号」按钮
+- 弹窗底部 3 个操作：
+  - **先关闭，稍后处理**
+  - **忽略偏移，强制确认**（进入确认对话框，保存前后差异）
+  - **标记为待补件**（归类到月底复核「待补件」栏，联系人信息自动写入）
+
+选择 **「忽略偏移，强制确认」** → 弹出确认对话框：
+
+- 左右分栏：修改前 / 修改后对比
+- 下方备注输入框（可选）
+- 点击 **「确认交底下发」** → 顶部摘要「已确认 +1，待确认 -1」
+
+### 步骤 4：撤回确认
+
+对已确认的条目，详情页顶部会出现 **「撤回确认」** 按钮：
+
+- 点击后弹出撤回对话框，要求填写至少 8 字以上撤回原因
+- 撤回后条目进入月底复核的「退回记录」栏，摘要同步变化
+
+### 步骤 5：追加补充说明
+
+详情页顶部点击 **「追加补充说明」** 按钮：
+
+- 输入至少 2 字以上内容
+- 点击「追加到交底记录」→ 溯源时间线会新增一个「补充说明」节点
+- 写入同一份本地数据，刷新不丢失
+
+### 步骤 6：月底复核三栏
+
+主页点击 **「月底复核」** 按钮（或访问 `/review`）：
+
+- 顶部汇总进度条：已确认 / 待补件 / 退回 三类数量与占比
+- 三栏 Trello 式看板：绿色（已确认）/ 橙色（待补件）/ 红色（退回）
+- 左上角支持按 **消防分区** 筛选
+
+### 步骤 7：刷新页面验证持久化
+
+任意操作后按 `⌘R / Ctrl+R 刷新页面：
+
+- 所有状态、摘要、三栏分类都和刷新前完全一致
+- 因为全部数据存在浏览器 `localStorage` 的 `fire-disclosure-store` 键下
+
+---
+
+## 🔧 其他功能
+
+### 清空本地数据
+
+主页右上角 **「清空数据」** 按钮 → 清空 localStorage 中所有交底记录。
+
+### 从 JSON 文件导入
+
+主页点击 **「导入文件」**（或访问 `/import`）：
+
+- 支持拖拽上传或点击选择 JSON 文件
+- 导入时自动校验格式，不符合会列出具体错误
+- 校验通过后展示预览，确认入库
+
+### 404 异常出口
+
+访问不存在的路由会跳转到异常出口页，三格卡片引导回到：
+1. 回到材料入口 / 2. 坐标偏移卡壳处理 / 3. 操作不可逆说明
+
+---
+
+## 📂 数据结构说明（导入 JSON 格式）
+
+```json
+{
+  "items": [
+    {
+      "id": "item-0001-js8ux5",
+      "sourceType": "combined",
+      "title": "A区防火卷帘门安装交底",
+      "content": "当前内容",
+      "originalContent": "会议纪要原文",
+      "manualChangeContent": "人工改判的内容（可选）",
+      "supplementContent": "后来补上的说明（可选）",
+      "status": "pending",
+      "fireZone": "A区-防火分区1",
+      "responsiblePerson": "阿乔",
+      "contactPhone": "139-0000-8888",
+      "coordinateOffset": 23,
+      "offsetRiskLevel": "high",
+      "createdFrom": "quickstart",
+      "createdAt": "2026-06-10T01:30:00.000Z",
+      "updatedAt": "2026-06-10T01:30:00.000Z"
+    }
+  ]
+}
+```
+
+`status` 可选值：
+
+| 值 | 说明 |
+|---|---|
+| `pending` | 待确认 |
+| `confirmed` | 已确认 |
+| `awaiting_patch` | 待补件 |
+| `reverted` | 已退回 |
+
+---
+
+## 🛠️ 开发命令
+
+| 命令 | 作用 |
+|---|---|
+| `npm run dev` | 启动开发服务器（http://localhost:5173） |
+| `npm run start` | 同上，别名 |
+| `npm run build` | 生产构建，输出到 `dist/` |
+| `npm run check` | TypeScript 类型检查 |
+| `npm run preview` | 预览生产构建（http://localhost:4173） |
+
+---
+
+## 🧩 技术栈
+
+- React 18 + TypeScript
+- Vite 5
+- Zustand 4（localStorage 持久化单一数据源）
+- React Router 6
+- TailwindCSS 3
+- Zod 3（数据校验）
+- Lucide React（图标）

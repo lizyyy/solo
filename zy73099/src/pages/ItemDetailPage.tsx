@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useDisclosureStore } from '@/store/disclosureStore';
-import { shallow } from 'zustand/shallow';
 import { deserializeDiffResult } from '@/lib/diff';
 import type { DisclosureItem, DiffResult } from '@/types';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -10,6 +9,7 @@ import { DiffViewer } from '@/components/DiffViewer';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { RevertDialog } from '@/components/RevertDialog';
 import { OffsetAlertModal } from '@/components/OffsetAlertModal';
+import { Modal } from '@/components/Modal';
 import {
   ArrowLeft,
   MapPin,
@@ -26,6 +26,7 @@ import {
   History,
   Eye,
   ChevronRight,
+  MessageSquarePlus,
 } from 'lucide-react';
 import { cn, formatDateFull } from '@/lib/utils';
 import { formatOffset, OFFSET_THRESHOLD_HIGH } from '@/lib/coordinate';
@@ -40,12 +41,15 @@ export default function ItemDetailPage() {
   const confirmItem = useDisclosureStore((s) => s.confirmItem);
   const revertItem = useDisclosureStore((s) => s.revertItem);
   const flagAwaitingPatch = useDisclosureStore((s) => s.flagAwaitingPatch);
+  const appendSupplement = useDisclosureStore((s) => s.appendSupplement);
   const computeDiff = useDisclosureStore((s) => s.computeDiff);
 
   const [item, setItem] = React.useState<DisclosureItem | undefined>(() => id && getItemById(id));
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [revertOpen, setRevertOpen] = React.useState(false);
   const [offsetOpen, setOffsetOpen] = React.useState(false);
+  const [supplementOpen, setSupplementOpen] = React.useState(false);
+  const [supplementText, setSupplementText] = React.useState('');
   const [offsetInfo, setOffsetInfo] = React.useState<ReturnType<typeof checkOffsetAndNotify> | null>(null);
   const [toast, setToast] = React.useState<string | null>(null);
 
@@ -111,6 +115,16 @@ export default function ItemDetailPage() {
     setTimeout(() => navigate('/'), 1200);
   };
 
+  const handleAppendSupplement = () => {
+    if (!item) return;
+    const text = supplementText.trim();
+    if (text.length < 2) return;
+    appendSupplement(item.id, text);
+    setSupplementText('');
+    setSupplementOpen(false);
+    flashToast('已追加补充说明，写入同一份本地数据');
+  };
+
   if (!item) {
     return (
       <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8 text-center">
@@ -143,6 +157,13 @@ export default function ItemDetailPage() {
           返回清单
         </Link>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => { setSupplementText(''); setSupplementOpen(true); }}
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-sky-300 bg-white px-3.5 text-xs font-semibold text-sky-700 transition hover:bg-sky-50"
+          >
+            <MessageSquarePlus className="h-3.5 w-3.5" strokeWidth={2.2} />
+            追加补充说明
+          </button>
           {item.status !== 'confirmed' && item.status !== 'reverted' && (
             <button
               onClick={handleConfirmClick}
@@ -421,6 +442,54 @@ export default function ItemDetailPage() {
         onFlagAwaiting={handleFlagAwaiting}
         onConfirmAnyway={handleConfirmAnyway}
       />
+
+      <Modal
+        open={supplementOpen}
+        onClose={() => setSupplementOpen(false)}
+        title="追加补充说明"
+        size="md"
+        variant="default"
+        footer={
+          <>
+            <button
+              onClick={() => setSupplementOpen(false)}
+              className="inline-flex h-9 items-center justify-center rounded-lg border border-slate-200 bg-white px-4 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+            >
+              取消
+            </button>
+            <button
+              onClick={handleAppendSupplement}
+              disabled={supplementText.trim().length < 2}
+              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-sky-600 px-4 text-xs font-semibold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <MessageSquarePlus className="h-3.5 w-3.5" strokeWidth={2.2} />
+              追加到交底记录
+            </button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <p className="text-[12.5px] leading-relaxed text-slate-500">
+            补充说明会追加到同一份交底记录中，第二天复盘时可在溯源链路中看到。
+          </p>
+          <div className="space-y-2">
+            <label className="block text-xs font-medium text-slate-700">
+              补充说明内容（至少 2 个字）
+            </label>
+            <textarea
+              autoFocus
+              value={supplementText}
+              onChange={(e) => setSupplementText(e.target.value)}
+              rows={5}
+              placeholder="例如：已与设计院张工再次确认，新增孔洞周边按规范加设阻火圈..."
+              className="w-full rounded-lg border border-slate-200 bg-white p-3 text-sm leading-relaxed text-slate-800 placeholder:text-slate-400 outline-none ring-sky-500/20 transition focus:border-sky-400 focus:ring-4"
+            />
+            <p className="text-[11px] text-slate-500">
+              💡 保存后将写入本地数据，与会议纪要、人工改判一起在溯源链路中展示。
+            </p>
+          </div>
+        </div>
+      </Modal>
 
       {toast && (
         <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 animate-[slideUpFade_0.25s_ease-out] rounded-xl bg-emerald-600 px-4.5 py-3 text-sm font-medium text-white shadow-xl ring-1 ring-emerald-500/30">
