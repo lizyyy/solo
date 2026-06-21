@@ -77,17 +77,17 @@ const sampleRecords = {
             { time: 28, type: 'success', text: '回收「废弃卫星」成功 +10分', tag: 'rework', data: { type: '🛸', fuel: 92, oxygen: 77 } },
             { time: 45, type: 'warning', text: '⚠️ 新手误操作：连点了3次，多扣了燃料', tag: 'rework', data: { fuel: 78, oxygen: 75 } },
             { time: 52, type: 'success', text: '回收「遗失工具」成功 +8分', tag: 'rework', data: { type: '🔧', fuel: 74, oxygen: 73 } },
-            { time: 70, type: 'warning', text: '⏸️ 故意暂停测试：老师中途打断讨论', tag: 'rework', pending: true, pendingId: 'pause_001' },
-            { time: 70, type: 'pending', text: '⏳ 暂停记录待确认：是否扣除暂停时间？', tag: 'pending', pendingId: 'pause_001' },
+            { time: 70, type: 'warning', text: '⏸️ 故意暂停测试：老师中途打断讨论', tag: 'rework', pending: true, pendingId: 'pause_001', data: { pendingId: 'pause_001' } },
+            { time: 70, type: 'pending', text: '⏳ 暂停记录待确认：是否扣除暂停时间？', tag: 'pending', pendingId: 'pause_001', data: { pendingId: 'pause_001' } },
             { time: 85, type: 'success', text: '回收「火箭残骸」成功 +15分', tag: 'rework', data: { type: '🚀', fuel: 66, oxygen: 70 } },
             { time: 95, type: 'warning', text: '⚠️ 氧气降到60以下，进入警戒区', tag: 'rework' },
             { time: 105, type: 'success', text: '回收「太空碎片」成功 +5分', tag: 'rework', data: { type: '☄️', fuel: 63, oxygen: 69 } },
             { time: 120, type: 'error', text: '❌ 资源越界：燃料消耗后变成负数 (-2)', tag: 'rework', data: { fuel: -2, oxygen: 58 } },
-            { time: 120, type: 'pending', text: '⏳ 异常记录待确认：负数燃料怎么算？', tag: 'pending', pendingId: 'fuel_001' },
+            { time: 120, type: 'pending', text: '⏳ 异常记录待确认：负数燃料怎么算？', tag: 'pending', pendingId: 'fuel_001', data: { pendingId: 'fuel_001' } },
             { time: 135, type: 'info', text: '活动继续，等待后台核实分数', tag: 'rework' },
             { time: 145, type: 'success', text: '回收「失联探测器」成功 +20分', tag: 'rework', data: { type: '🛰️', fuel: -12, oxygen: 54 } },
             { time: 160, type: 'warning', text: '⚠️ 边界分数：刚好78分，卡在达标线上', tag: 'rework', data: { score: 78 } },
-            { time: 160, type: 'pending', text: '⏳ 边界情况待确认：78分算达标吗？', tag: 'pending', pendingId: 'score_001' },
+            { time: 160, type: 'pending', text: '⏳ 边界情况待确认：78分算达标吗？', tag: 'pending', pendingId: 'score_001', data: { pendingId: 'score_001' } },
             { time: 180, type: 'warning', text: '⚠️ 氧气快用完了 (12)，结束前最后一次', tag: 'rework' },
             { time: 190, type: 'success', text: '回收「太空碎片」成功 +5分', tag: 'rework', data: { type: '☄️', fuel: -5, oxygen: 51 } },
             { time: 210, type: 'info', text: '活动结束，有3条记录需要人工确认', tag: 'rework' }
@@ -533,8 +533,12 @@ class SpaceRecyclingGame {
         let tagHtml = event.tag ? `<span class="event-tag tag-${event.tag}">${this.getTagLabel(event.tag)}</span>` : '';
         
         let confirmBtnHtml = '';
-        if (event.type === EventType.PENDING && event.data && event.data.pendingId) {
-            confirmBtnHtml = `<br><button class="btn btn-small btn-info confirm-btn" onclick="game.confirmEvent('${event.data.pendingId}')">确认处理</button>`;
+        const effectivePendingId = (event.data && event.data.pendingId) || event.pendingId;
+        if (event.type === EventType.PENDING && effectivePendingId) {
+            const pending = this.pendingConfirmations.find(p => p.id === effectivePendingId);
+            if (!pending || !pending.resolved) {
+                confirmBtnHtml = `<br><button class="btn btn-small btn-info confirm-btn" onclick="game.confirmEvent('${effectivePendingId}')">确认处理</button>`;
+            }
         }
         
         item.innerHTML = `
@@ -644,9 +648,13 @@ class SpaceRecyclingGame {
             'confirmed'
         );
         
-        const pendingEvent = this.eventLog.find(e => e.data && e.data.pendingId === pendingId);
+        const pendingEvent = this.eventLog.find(e =>
+            e.type === EventType.PENDING &&
+            ((e.data && e.data.pendingId === pendingId) || e.pendingId === pendingId)
+        );
         if (pendingEvent) {
-            const eventEl = document.querySelector(`[data-event-id="${pendingEvent.id}"]`);
+            const eventId = pendingEvent.id;
+            const eventEl = eventId ? document.querySelector(`[data-event-id="${eventId}"]`) : null;
             if (eventEl) {
                 eventEl.classList.remove('event-pending');
                 eventEl.classList.add(approved ? 'event-success' : 'event-error');
@@ -665,6 +673,7 @@ class SpaceRecyclingGame {
         }
         
         closeModal();
+        if (this.currentRecord) this.generateReport();
         this.updateUI();
     }
 
@@ -720,8 +729,10 @@ class SpaceRecyclingGame {
     }
 
     buildHumanReadableReport(record) {
-        const { metadata, events, stats, finalResources } = record;
-        const duration = metadata.duration || this.elapsedTime;
+        const { metadata, stats, finalResources } = record;
+        const events = this.eventLog && this.eventLog.length >= record.events.length ? this.eventLog : record.events;
+        const duration = this.elapsedTime || metadata.duration;
+        const effectiveFinalResources = this.state !== GameState.READY ? this.resources : finalResources;
         
         const successEvents = events.filter(e => e.type === EventType.SUCCESS);
         const warningEvents = events.filter(e => e.type === EventType.WARNING);
@@ -750,7 +761,7 @@ class SpaceRecyclingGame {
                     </div>
                     <div class="report-stat">
                         <div class="report-stat-label">最终得分</div>
-                        <div class="report-stat-value" style="color:#a78bfa;">${finalResources?.score || this.resources.score}</div>
+                        <div class="report-stat-value" style="color:#a78bfa;">${effectiveFinalResources?.score}</div>
                     </div>
                     <div class="report-stat">
                         <div class="report-stat-label">总时长</div>
@@ -912,7 +923,15 @@ class SpaceRecyclingGame {
             return;
         }
         
-        const { metadata, events, stats, finalResources } = this.currentRecord;
+        const { metadata, stats, finalResources } = this.currentRecord;
+        const events = this.eventLog && this.eventLog.length >= this.currentRecord.events.length ? this.eventLog : this.currentRecord.events;
+        const duration = this.elapsedTime || metadata.duration;
+        const effectiveFinalResources = this.state !== GameState.READY ? this.resources : finalResources;
+        const unresolvedPending = events.filter(e => e.type === EventType.PENDING);
+        const unresolvedIds = unresolvedPending.map(e => e.pendingId || (e.data && e.data.pendingId));
+        const unresolvedCount = this.pendingConfirmations.length ?
+            this.pendingConfirmations.filter(p => !p.resolved).length :
+            unresolvedPending.length;
         
         let text = `
 ═══════════════════════════════════════
@@ -922,21 +941,21 @@ class SpaceRecyclingGame {
 📅 时间：${new Date(metadata.startTime || Date.now()).toLocaleString('zh-CN')}
 👥 班级：${metadata.className || '待填写'}
 👤 操作：${metadata.operator || '阿蓝'}
-⏱️ 时长：${this.formatTime(metadata.duration || this.elapsedTime)}
-⭐ 得分：${finalResources?.score || this.resources.score}
+⏱️ 时长：${this.formatTime(duration)}
+⭐ 得分：${effectiveFinalResources?.score}
 
 ${metadata.source === 'legacy' ? '📺 【注意】这是从投影大屏导入的旧记录，口径有换算\n' : ''}
 
 ┌───────────── 关键数据 ─────────────┐
 │  成功回收：${String(events.filter(e => e.type === EventType.SUCCESS).length).padEnd(2)} 件              │
-│  剩余燃料：${String((finalResources?.fuel || this.resources.fuel).toFixed(0)).padEnd(3)}                │
-│  剩余氧气：${String((finalResources?.oxygen || this.resources.oxygen).toFixed(0)).padEnd(3)}                │
-│  待确认项：${String(events.filter(e => e.type === EventType.PENDING).length).padEnd(2)} 条              │
+│  剩余燃料：${String((effectiveFinalResources?.fuel).toFixed(0)).padEnd(3)}                │
+│  剩余氧气：${String((effectiveFinalResources?.oxygen).toFixed(0)).padEnd(3)}                │
+│  待确认项：${String(unresolvedCount).padEnd(2)} 条              │
 │  人工备注：${String(events.filter(e => e.type === EventType.NOTE).length).padEnd(2)} 条              │
 └────────────────────────────────────┘
 
 💬 同事总结：
-${this.getPlainTextSummary(this.currentRecord)}
+${this.getPlainTextSummary({ ...this.currentRecord, events })}
 
 ┌───────────── 完整时间线 ─────────────┐
 `;
@@ -1225,7 +1244,18 @@ function loadSample(sampleName) {
     game.stopReplay();
     
     game.currentRecord = JSON.parse(JSON.stringify(sample));
+    
     game.eventLog = JSON.parse(JSON.stringify(sample.events));
+    game.eventLog.forEach((event, idx) => {
+        if (!event.id) {
+            event.id = `sample_evt_${idx}_${Date.now()}`;
+        }
+        if (event.pendingId && (!event.data || !event.data.pendingId)) {
+            event.data = event.data || {};
+            event.data.pendingId = event.pendingId;
+        }
+    });
+    
     game.resources = { ...sample.finalResources };
     game.elapsedTime = sample.metadata.duration;
     game.state = GameState.SETTLED;
@@ -1233,14 +1263,15 @@ function loadSample(sampleName) {
     game.pendingConfirmations = [];
     sample.events.forEach(event => {
         if (event.type === 'pending' && event.pendingId) {
+            const pType = event.pendingId.startsWith('pause') ? 'pause' :
+                          event.pendingId.startsWith('fuel') ? 'negative' :
+                          event.pendingId.startsWith('score') ? 'boundary' : 'manual';
             game.pendingConfirmations.push({
                 id: event.pendingId,
-                type: event.pendingId?.startsWith('pause') ? 'pause' :
-                      event.pendingId?.startsWith('fuel') ? 'negative' :
-                      event.pendingId?.startsWith('score') ? 'boundary' : 'manual',
+                type: pType,
                 time: event.time,
-                message: event.text.replace('⏳ ', '').replace('待确认：', ''),
-                pauseDuration: event.pendingId?.startsWith('pause') ? 5 : 0,
+                message: event.text.replace(/^⏳ /, ''),
+                pauseDuration: pType === 'pause' ? 5 : 0,
                 resolved: false,
                 resourcesBeforePause: { fuel: 78, oxygen: 75, score: 23 },
                 debrisCountBeforePause: 2
@@ -1251,12 +1282,12 @@ function loadSample(sampleName) {
     const eventsList = document.getElementById('eventsList');
     eventsList.innerHTML = '';
     
-    sample.events.forEach(event => game.renderEventItem(event));
+    game.eventLog.forEach(event => game.renderEventItem(event));
     
     game.generateReport();
     game.updateUI();
     
-    game.switchTab('report');
+    game.switchTab('events');
     
     game.showModal(
         '✅ 样例加载完成',
