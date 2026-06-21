@@ -27,6 +27,7 @@ export function buildSummaryHash(
     s.withdrawnRows,
     s.boundaryRows,
     s.missingUnitRows,
+    s.confirmedUnitRows,
     s.highDeviationRows,
     s.formulaLabel,
     s.rSquared.toFixed(6),
@@ -37,6 +38,7 @@ export function buildSummaryHash(
     s.unitNote,
     s.exceptionNote,
     s.handoffNotes.join("|"),
+    (s.unitConfirms || []).map((c) => [c.rowId, c.seqNo, c.studentId, c.confirmedUnits.x || "", c.confirmedUnits.y || "", c.reason, c.scope, c.confirmedAt].join("§")),
   ]);
   return hashString(payload);
 }

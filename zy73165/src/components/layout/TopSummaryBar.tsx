@@ -97,7 +97,13 @@ export default function TopSummaryBar() {
         <span>·</span>
         <span>撤回 <b className="text-ink-200 mx-1">{summary.withdrawnRows}</b></span>
         <span>·</span>
-        <span>单位缺失待处理 <b className="text-ember-300 mx-1">{summary.missingUnitRows}</b></span>
+        {summary.missingUnitRows > 0 ? (
+          <span>单位 <b className="text-red-300 mx-1">待处理 {summary.missingUnitRows}</b>{summary.confirmedUnitRows > 0 && <> / 已确认 <b className="text-emerald-300 mx-1">{summary.confirmedUnitRows}</b></>}</span>
+        ) : summary.confirmedUnitRows > 0 ? (
+          <span>单位 <b className="text-emerald-300 mx-1">已确认 {summary.confirmedUnitRows}</b></span>
+        ) : (
+          <span>单位 <b className="text-ink-200 mx-1">齐全</b></span>
+        )}
         <span>·</span>
         <span>R² <b className="text-ink-200 mx-1 font-mono">{summary.rSquared.toFixed(4)}</b></span>
         <span>·</span>

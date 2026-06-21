@@ -30,6 +30,16 @@ export interface ParamVersion {
   boundaryTable: BoundaryTableEntry[];
 }
 
+export interface UnitConfirmRecord {
+  rowId: string;
+  seqNo: number;
+  studentId: string;
+  confirmedUnits: { x?: string; y?: string };
+  reason: string;
+  scope: string;
+  confirmedAt: string;
+}
+
 export interface DraftRow {
   id: string;
   seqNo: number;
@@ -43,6 +53,7 @@ export interface DraftRow {
   unitConfirmReason?: string | null;
   unitConfirmScope?: string | null;
   confirmedUnit?: { x?: string; y?: string } | null;
+  confirmedAt?: string | null;
 }
 
 export interface FittingIntermediate {
@@ -108,6 +119,7 @@ export interface SummarySnapshot {
   withdrawnRows: number;
   boundaryRows: number;
   missingUnitRows: number;
+  confirmedUnitRows: number;
   highDeviationRows: number;
   formulaLabel: string;
   rSquared: number;
@@ -118,6 +130,7 @@ export interface SummarySnapshot {
   unitNote: string;
   exceptionNote: string;
   handoffNotes: string[];
+  unitConfirms: UnitConfirmRecord[];
   hash: string;
 }
 

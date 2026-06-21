@@ -85,6 +85,7 @@ export function applyUnitConfirmation(
   reason: string,
   scope: string,
 ): DraftRow[] {
+  const now = new Date().toISOString();
   return rows.map((r) => {
     if (r.id !== rowId) return r;
     return {
@@ -94,6 +95,7 @@ export function applyUnitConfirmation(
       confirmedUnit: confirmed,
       unitConfirmReason: reason,
       unitConfirmScope: scope,
+      confirmedAt: now,
       status: "normal",
     };
   });
@@ -103,5 +105,6 @@ export function countExceptions(rows: DraftRow[]) {
   const withdrawn = rows.filter((r) => r.status === "withdrawn").length;
   const boundary = rows.filter((r) => r.status === "boundary").length;
   const missingUnit = rows.filter((r) => r.status === "unit_missing").length;
-  return { withdrawn, boundary, missingUnit, valid: rows.length - withdrawn };
+  const confirmedUnit = rows.filter((r) => !!r.unitConfirmReason && r.status !== "unit_missing").length;
+  return { withdrawn, boundary, missingUnit, confirmedUnit, valid: rows.length - withdrawn };
 }

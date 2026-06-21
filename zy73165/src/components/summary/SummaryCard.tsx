@@ -94,7 +94,16 @@ export default function SummaryCard() {
           <Stat k="有效拟合" v={summary.validRows} accent />
           <Stat k="撤回记录" v={summary.withdrawnRows} />
           <Stat k="边界样本" v={summary.boundaryRows} warn />
-          <Stat k="单位缺失" v={summary.missingUnitRows} alert={summary.missingUnitRows > 0} />
+          <Stat
+            k={summary.confirmedUnitRows > 0 ? "已确认/待处理" : "单位缺失"}
+            v={
+              summary.confirmedUnitRows > 0
+                ? `${summary.confirmedUnitRows}/${summary.missingUnitRows}`
+                : summary.missingUnitRows
+            }
+            alert={summary.missingUnitRows > 0}
+            ok={summary.confirmedUnitRows > 0 && summary.missingUnitRows === 0}
+          />
           <Stat k="偏差>5%" v={summary.highDeviationRows} alert={summary.highDeviationRows > 0} />
         </div>
 
@@ -124,6 +133,40 @@ export default function SummaryCard() {
             <NoteCard icon={<ArrowRightLeft className="w-4 h-4 text-ink-600" />} title="单位确认摘要" body={summary.unitNote} />
             <NoteCard icon={<AlertTriangle className="w-4 h-4 text-amber-600" />} title="异常处理摘要" body={summary.exceptionNote} />
           </section>
+
+          {summary.unitConfirms && summary.unitConfirms.length > 0 && (
+            <section>
+              <SecTitle>单位确认明细（人工补录·不可修改）</SecTitle>
+              <div className="overflow-hidden rounded-sm2 border border-ember-200">
+                <div className="grid grid-cols-12 bg-ember-50/80 text-[11px] text-ink-600 uppercase tracking-wide border-b border-ember-100">
+                  <div className="col-span-1 px-3 py-2">#</div>
+                  <div className="col-span-2 px-3 py-2">学生</div>
+                  <div className="col-span-2 px-3 py-2">补录单位</div>
+                  <div className="col-span-4 px-3 py-2">确认理由</div>
+                  <div className="col-span-3 px-3 py-2">影响范围</div>
+                </div>
+                {summary.unitConfirms.map((c, i) => (
+                  <div key={c.rowId} className={`grid grid-cols-12 text-xs border-b border-ink-50 last:border-b-0 ${i % 2 === 1 ? "bg-ink-50/40" : ""}`}>
+                    <div className="col-span-1 px-3 py-2 font-mono text-ink-500">{c.seqNo}</div>
+                    <div className="col-span-2 px-3 py-2 font-mono text-ink-800">{c.studentId}</div>
+                    <div className="col-span-2 px-3 py-2 font-mono">
+                      {c.confirmedUnits.x && <span className="text-ember-700">x:{c.confirmedUnits.x}</span>}
+                      {c.confirmedUnits.x && c.confirmedUnits.y && <span className="mx-1 text-ink-300">·</span>}
+                      {c.confirmedUnits.y && <span className="text-ember-700">y:{c.confirmedUnits.y}</span>}
+                    </div>
+                    <div className="col-span-4 px-3 py-2 text-ink-700">{c.reason}</div>
+                    <div className="col-span-3 px-3 py-2 text-ink-600">{c.scope}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-1.5 text-[11px] text-ink-400 font-mono flex items-center gap-3 flex-wrap">
+                <span>以上人工确认内容与行级详情、结果面板、导出文本、哈希校验码完全一致。</span>
+                {summary.unitConfirms.length > 0 && (
+                  <span>最近确认时间：{formatDateTime(summary.unitConfirms[summary.unitConfirms.length - 1].confirmedAt)}</span>
+                )}
+              </div>
+            </section>
+          )}
 
           <section>
             <SecTitle>交接备注（接手教练快速理解清单）</SecTitle>
@@ -172,13 +215,13 @@ function SecTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Stat({ k, v, accent, warn, alert }: { k: string; v: string | number; accent?: boolean; warn?: boolean; alert?: boolean }) {
+function Stat({ k, v, accent, warn, alert, ok }: { k: string; v: string | number; accent?: boolean; warn?: boolean; alert?: boolean; ok?: boolean }) {
   return (
     <div className="px-3 py-3 text-center">
       <div className="text-[10px] uppercase tracking-wide text-ink-500">{k}</div>
       <div className={clsx(
         "font-mono text-xl font-semibold mt-0.5",
-        alert ? "text-verdict-fail" : warn ? "text-verdict-warn" : accent ? "text-ember-600" : "text-ink-800",
+        alert ? "text-verdict-fail" : ok ? "text-verdict-pass" : warn ? "text-verdict-warn" : accent ? "text-ember-600" : "text-ink-800",
       )}>{v}</div>
     </div>
   );

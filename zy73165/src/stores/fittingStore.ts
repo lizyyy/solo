@@ -6,6 +6,7 @@ import type {
   FittingSession,
   SummarySnapshot,
   VerdictLevel,
+  UnitConfirmRecord,
 } from "@/types";
 import { demoSession, demoParamVersions, demoDraftRows } from "@/mock/demoDataset";
 import { runFitting, FORMULA_LABELS } from "@/engine/curveFitting";
@@ -20,11 +21,41 @@ import { buildHandoffNotes } from "@/utils/export";
 
 const HIGH_DEVIATION_THRESHOLD = 5;
 
+function buildUnitConfirms(rows: DraftRow[]): UnitConfirmRecord[] {
+  return rows
+    .filter((r) => !!r.unitConfirmReason)
+    .map((r) => ({
+      rowId: r.id,
+      seqNo: r.seqNo,
+      studentId: r.studentId,
+      confirmedUnits: { x: r.confirmedUnit?.x ?? r.xUnit ?? undefined, y: r.confirmedUnit?.y ?? r.yUnit ?? undefined },
+      reason: r.unitConfirmReason!,
+      scope: r.unitConfirmScope ?? "未说明",
+      confirmedAt: r.confirmedAt ?? new Date().toISOString(),
+    }));
+}
+
+function buildUnitNote(missingUnit: number, confirmedUnit: number, confirms: UnitConfirmRecord[]): string {
+  if (missingUnit > 0 && confirmedUnit > 0) {
+    const ids = confirms.map((c) => `${c.studentId}(第${c.seqNo}行)`).join("、");
+    return `${missingUnit} 条仍待处理；${confirmedUnit} 条已人工确认（${ids}），详见下方"单位确认明细"。`;
+  }
+  if (missingUnit > 0) {
+    return `${missingUnit} 条样本单位缺失，等待教练人工确认后进入结果。`;
+  }
+  if (confirmedUnit > 0) {
+    const ids = confirms.map((c) => `${c.studentId}(第${c.seqNo}行)`).join("、");
+    return `全部单位字段已就绪。其中 ${confirmedUnit} 条由教练人工补录（${ids}），确认理由与影响范围见"单位确认明细"。`;
+  }
+  return "所有样本单位字段完整（m / N），无人工补录。";
+}
+
 function computeVerdict(
   rSquared: number,
   missingUnit: number,
   boundary: number,
   highDev: number,
+  confirmedUnit: number,
 ): { level: VerdictLevel; text: string } {
   if (missingUnit > 0) {
     return { level: "fail", text: `待处理·还有 ${missingUnit} 条单位缺失未人工确认` };
@@ -32,8 +63,11 @@ function computeVerdict(
   if (rSquared < 0.95 || highDev > 2) {
     return { level: "warn", text: `需复核·拟合质量 R²=${rSquared.toFixed(3)}，${highDev} 条样本偏差超阈值` };
   }
-  if (boundary > 0) {
-    return { level: "warn", text: `可通过·含 ${boundary} 条边界样本，建议二次核验` };
+  if (boundary > 0 || confirmedUnit > 0) {
+    const parts: string[] = [];
+    if (boundary > 0) parts.push(`${boundary} 条边界`);
+    if (confirmedUnit > 0) parts.push(`${confirmedUnit} 条人工补录单位`);
+    return { level: "warn", text: `可通过·含${parts.join("、")}，建议二次核验` };
   }
   if (rSquared >= 0.99) {
     return { level: "pass", text: "通过·拟合质量优秀，可直接用于汇报" };
@@ -84,10 +118,11 @@ export const useFittingStore = create<FittingState>((set, get) => {
   const initialFitting = runFitting(initRows, initialParam.formula, initialParam.boundaryTable);
 
   const counts = countExceptions(initRows);
+  const unitConfirmsList = buildUnitConfirms(initRows);
   const highDev = initialFitting.perRow.filter(
     (r) => r.usedInFitting && Math.abs(r.deviationPct) > HIGH_DEVIATION_THRESHOLD,
   ).length;
-  const verdict = computeVerdict(initialFitting.quality.rSquared, counts.missingUnit, counts.boundary, highDev);
+  const verdict = computeVerdict(initialFitting.quality.rSquared, counts.missingUnit, counts.boundary, highDev, counts.confirmedUnit);
 
   const formulaLabel = FORMULA_LABELS[initialParam.formula].short;
   const auditedAt = new Date().toISOString();
@@ -95,15 +130,12 @@ export const useFittingStore = create<FittingState>((set, get) => {
     counts.boundary > 0
       ? `${counts.boundary} 条样本位于阈值边界容差带内，已参与拟合但标记为需重点复核；详情见左侧边界阈值表。`
       : "无样本命中边界容差带。";
-  const unitNote =
-    counts.missingUnit > 0
-      ? `${counts.missingUnit} 条样本单位缺失，等待教练人工确认后进入结果。`
-      : "所有样本单位字段完整（m / N）。";
+  const unitNote = buildUnitNote(counts.missingUnit, counts.confirmedUnit, unitConfirmsList);
   const exceptionNote =
     counts.withdrawn > 0 || highDev > 0
       ? `撤回 ${counts.withdrawn} 条（不参与拟合），偏差超阈值 ${highDev} 条。`
       : "无。";
-  const handoff = buildHandoffNotes(counts.boundary, counts.missingUnit, counts.withdrawn, highDev);
+  const handoff = buildHandoffNotes(counts.boundary, counts.missingUnit, counts.confirmedUnit, counts.withdrawn, highDev);
 
   const summaryBase: Omit<SummarySnapshot, "hash"> = {
     sessionId: demoSession.id,
@@ -116,6 +148,7 @@ export const useFittingStore = create<FittingState>((set, get) => {
     withdrawnRows: counts.withdrawn,
     boundaryRows: counts.boundary,
     missingUnitRows: counts.missingUnit,
+    confirmedUnitRows: counts.confirmedUnit,
     highDeviationRows: highDev,
     formulaLabel,
     rSquared: initialFitting.quality.rSquared,
@@ -126,6 +159,7 @@ export const useFittingStore = create<FittingState>((set, get) => {
     unitNote,
     exceptionNote,
     handoffNotes: handoff,
+    unitConfirms: unitConfirmsList,
   };
 
   const initSummary: SummarySnapshot = {
@@ -167,10 +201,11 @@ export const useFittingStore = create<FittingState>((set, get) => {
       const param = st.paramVersions.find((p) => p.id === st.currentParamId)!;
       const f = st.fitting!;
       const counts = countExceptions(st.rows);
+      const unitConfirmsList = buildUnitConfirms(st.rows);
       const highDev = f.perRow.filter(
         (r) => r.usedInFitting && Math.abs(r.deviationPct) > HIGH_DEVIATION_THRESHOLD,
       ).length;
-      const verdict = computeVerdict(f.quality.rSquared, counts.missingUnit, counts.boundary, highDev);
+      const verdict = computeVerdict(f.quality.rSquared, counts.missingUnit, counts.boundary, highDev, counts.confirmedUnit);
       const auditedAt = new Date().toISOString();
       const base: Omit<SummarySnapshot, "hash"> = {
         sessionId: st.session.id,
@@ -183,6 +218,7 @@ export const useFittingStore = create<FittingState>((set, get) => {
         withdrawnRows: counts.withdrawn,
         boundaryRows: counts.boundary,
         missingUnitRows: counts.missingUnit,
+        confirmedUnitRows: counts.confirmedUnit,
         highDeviationRows: highDev,
         formulaLabel: FORMULA_LABELS[param.formula].short,
         rSquared: f.quality.rSquared,
@@ -193,15 +229,13 @@ export const useFittingStore = create<FittingState>((set, get) => {
           counts.boundary > 0
             ? `${counts.boundary} 条样本位于阈值边界容差带内，已参与拟合但标记为需重点复核；详情见左侧边界阈值表。`
             : "无样本命中边界容差带。",
-        unitNote:
-          counts.missingUnit > 0
-            ? `${counts.missingUnit} 条样本单位缺失，等待教练人工确认后进入结果。`
-            : "所有样本单位字段完整（m / N）。",
+        unitNote: buildUnitNote(counts.missingUnit, counts.confirmedUnit, unitConfirmsList),
         exceptionNote:
           counts.withdrawn > 0 || highDev > 0
             ? `撤回 ${counts.withdrawn} 条（不参与拟合），偏差超阈值 ${highDev} 条。`
             : "无。",
-        handoffNotes: buildHandoffNotes(counts.boundary, counts.missingUnit, counts.withdrawn, highDev),
+        handoffNotes: buildHandoffNotes(counts.boundary, counts.missingUnit, counts.confirmedUnit, counts.withdrawn, highDev),
+        unitConfirms: unitConfirmsList,
       };
       set({ summary: { ...base, hash: buildSummaryHash(base) } });
     },
