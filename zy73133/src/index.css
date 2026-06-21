@@ -1,8 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
+  font-family: "Manrope", system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
   color-scheme: dark;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -10,102 +15,50 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-html,
-body,
-#root {
+html, body, #root {
   height: 100%;
-  width: 100%;
   margin: 0;
-  padding: 0;
-  background: #0b1a2b;
-  color: #cfe8ff;
-  font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background: radial-gradient(ellipse at 30% 10%, #0e2a3a 0%, #06141c 45%, #04101a 100%);
+  color: #e6f4f1;
   overflow: hidden;
 }
 
-@layer components {
-  .panel {
-    @apply relative bg-ocean-surface/90 backdrop-blur-sm border border-ocean-line clip-bevel grain;
-  }
-  .btn-bevel {
-    @apply relative inline-flex items-center justify-center gap-2 px-4 py-2
-      bg-ocean-mid border border-glow-cyanDim text-console-text
-      clip-bevel-sm font-medium text-[13px] tracking-wide
-      transition-all duration-150
-      hover:bg-ocean-line hover:shadow-glow hover:border-glow-cyan
-      active:translate-y-[1px] active:shadow-inner
-      disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none;
-  }
-  .btn-bevel-danger {
-    @apply btn-bevel border-buoy-redDim text-buoy-red hover:border-buoy-red hover:shadow-glow-red hover:bg-buoy-red/10;
-  }
-  .btn-bevel-warn {
-    @apply btn-bevel border-buoy-yellowDim text-buoy-yellow hover:border-buoy-yellow hover:shadow-glow-yellow hover:bg-buoy-yellow/10;
-  }
-  .btn-bevel-primary {
-    @apply btn-bevel border-glow-cyan text-glow-cyan bg-glow-cyan/10;
-  }
-  .tab-btn {
-    @apply px-3 py-1.5 text-[12px] font-mono uppercase tracking-wider
-      border-b-2 border-transparent text-console-muted
-      transition-colors;
-  }
-  .tab-btn-active {
-    @apply border-glow-cyan text-glow-cyan;
-  }
-  .mono {
-    font-family: "JetBrains Mono", ui-monospace, monospace;
-  }
-  .divider-v {
-    width: 1px;
-    background: linear-gradient(
-      to bottom,
-      transparent,
-      rgba(37, 208, 192, 0.25),
-      transparent
-    );
-  }
-  .console-scroll::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-  .console-scroll::-webkit-scrollbar-thumb {
-    background: rgba(37, 208, 192, 0.2);
-    border-radius: 4px;
-  }
-  .console-scroll::-webkit-scrollbar-track {
-    background: rgba(15, 47, 82, 0.4);
-  }
-  .badge {
-    @apply inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-mono rounded-sm border;
-  }
-  .badge-normal {
-    @apply border-buoy-greenDim/60 text-buoy-green bg-buoy-green/10;
-  }
-  .badge-pending {
-    @apply border-buoy-yellowDim/60 text-buoy-yellow bg-buoy-yellow/10 animate-breathe;
-  }
-  .badge-exception {
-    @apply border-buoy-redDim/70 text-buoy-red bg-buoy-red/10 animate-blink;
-  }
+/* Bathymetric grid backdrop */
+.abyss-grid {
+  background-image:
+    linear-gradient(rgba(56,225,214,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56,225,214,0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 
-.radial-bg {
-  background:
-    radial-gradient(
-      ellipse 80% 60% at 50% 20%,
-      rgba(37, 208, 192, 0.08),
-      transparent 60%
-    ),
-    radial-gradient(
-      ellipse 60% 80% at 80% 80%,
-      rgba(255, 94, 98, 0.04),
-      transparent 60%
-    ),
-    #0b1a2b;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(6,20,28,0.6);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(31,122,120,0.5);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(56,225,214,0.6);
 }
 
-.label-sprite {
+.text-glow-cyan {
+  text-shadow: 0 0 12px rgba(56,225,214,0.55);
+}
+
+.grain {
+  position: absolute;
+  inset: 0;
   pointer-events: none;
-  user-select: none;
+  opacity: 0.045;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }

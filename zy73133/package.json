@@ -11,16 +11,16 @@
     "check": "tsc -b --noEmit"
   },
   "dependencies": {
-    "@react-three/drei": "^9.121.4",
-    "@react-three/fiber": "^8.18.0",
-    "@react-three/postprocessing": "^2.18.3",
     "clsx": "^2.1.1",
     "lucide-react": "^0.511.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.3.0",
     "tailwind-merge": "^3.0.2",
-    "three": "^0.171.0",
+    "three": "^0.169.0",
+    "@react-three/fiber": "^8.17.10",
+    "@react-three/drei": "^9.114.0",
+    "@react-three/postprocessing": "^2.16.3",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
@@ -28,7 +28,7 @@
     "@types/node": "^22.15.30",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "@types/three": "^0.171.0",
+    "@types/three": "^0.169.0",
     "@vitejs/plugin-react": "^4.4.1",
     "autoprefixer": "^10.4.21",
     "babel-plugin-react-dev-locator": "^1.0.0",

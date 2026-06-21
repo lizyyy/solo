@@ -8,15 +8,6 @@ export default defineConfig({
   build: {
     sourcemap: 'hidden',
   },
-  server: {
-    port: 5173,
-    proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:5001',
-        changeOrigin: true,
-      },
-    },
-  },
   plugins: [
     react({
       babel: {
