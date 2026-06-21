@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { AlertTriangle, Info } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { INSTRUMENT_COLORS, INSTRUMENT_GROUPS } from '@/data/mockData';
@@ -22,6 +22,27 @@ export function SceneVisualization() {
     [points]
   );
   const mainCoordSystem = params.coordinateSystem;
+
+  const getCoordMismatchPointPos = useCallback(
+    (point: SoundFieldPoint) => {
+      const otherSystems = coordSystems.filter((s) => s !== mainCoordSystem);
+      const systemIndex = otherSystems.indexOf(point.coordinateSystem);
+      if (systemIndex === -1) return null;
+
+      const zoneHeight = (CANVAS_HEIGHT - PADDING * 2) / (otherSystems.length + 1);
+      const systemPoints = points.filter((p) => p.coordinateSystem === point.coordinateSystem);
+      const pointIndexInSystem = systemPoints.findIndex((p) => p.id === point.id);
+      const pointsPerRow = 5;
+      const row = Math.floor(pointIndexInSystem / pointsPerRow);
+      const col = pointIndexInSystem % pointsPerRow;
+
+      return {
+        drawY: PADDING + zoneHeight * (systemIndex + 1) + zoneHeight / 2 + row * 30,
+        drawX: PADDING + 50 + col * 80,
+      };
+    },
+    [coordSystems, mainCoordSystem, points]
+  );
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -131,11 +152,11 @@ export function SceneVisualization() {
         let drawY = point.y + PADDING;
 
         if (isCoordMismatch) {
-          const otherSystems = coordSystems.filter((s) => s !== mainCoordSystem);
-          const systemIndex = otherSystems.indexOf(point.coordinateSystem);
-          const zoneHeight = (CANVAS_HEIGHT - PADDING * 2) / (otherSystems.length + 1);
-          drawY = PADDING + zoneHeight * (systemIndex + 1) + zoneHeight / 2;
-          drawX = PADDING + 50 + (otherSystems.indexOf(point.id) % 5) * 80;
+          const pos = getCoordMismatchPointPos(point);
+          if (pos) {
+            drawX = pos.drawX;
+            drawY = pos.drawY;
+          }
         }
 
         if (point.status === 'anomaly' || point.status === 'pending') {
@@ -220,7 +241,7 @@ export function SceneVisualization() {
     drawCoordinateSystemZones();
     drawGroupLabels();
     drawPoints();
-  }, [filteredPoints, coordSystems, mainCoordSystem, selectedPointId]);
+  }, [filteredPoints, coordSystems, mainCoordSystem, selectedPointId, getCoordMismatchPointPos]);
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -238,11 +259,11 @@ export function SceneVisualization() {
       let drawY = point.y + PADDING;
 
       if (isCoordMismatch) {
-        const otherSystems = coordSystems.filter((s) => s !== mainCoordSystem);
-        const systemIndex = otherSystems.indexOf(point.coordinateSystem);
-        const zoneHeight = (CANVAS_HEIGHT - PADDING * 2) / (otherSystems.length + 1);
-        drawY = PADDING + zoneHeight * (systemIndex + 1) + zoneHeight / 2;
-        drawX = PADDING + 50 + (otherSystems.indexOf(point.id) % 5) * 80;
+        const pos = getCoordMismatchPointPos(point);
+        if (pos) {
+          drawX = pos.drawX;
+          drawY = pos.drawY;
+        }
       }
 
       const dist = Math.sqrt((x - drawX) ** 2 + (y - drawY) ** 2);
@@ -272,11 +293,11 @@ export function SceneVisualization() {
       let drawY = point.y + PADDING;
 
       if (isCoordMismatch) {
-        const otherSystems = coordSystems.filter((s) => s !== mainCoordSystem);
-        const systemIndex = otherSystems.indexOf(point.coordinateSystem);
-        const zoneHeight = (CANVAS_HEIGHT - PADDING * 2) / (otherSystems.length + 1);
-        drawY = PADDING + zoneHeight * (systemIndex + 1) + zoneHeight / 2;
-        drawX = PADDING + 50 + (otherSystems.indexOf(point.id) % 5) * 80;
+        const pos = getCoordMismatchPointPos(point);
+        if (pos) {
+          drawX = pos.drawX;
+          drawY = pos.drawY;
+        }
       }
 
       const dist = Math.sqrt((x - drawX) ** 2 + (y - drawY) ** 2);

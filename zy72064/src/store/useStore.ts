@@ -7,7 +7,7 @@ import type {
   AnomalyType,
   PointStatus,
 } from '@/types';
-import { mockPoints, defaultParams, mockOperationLogs } from '@/data/mockData';
+import { mockPoints, defaultParams, mockOperationLogs, INSTRUMENT_GROUPS } from '@/data/mockData';
 import { ANOMALY_LABELS } from '@/types';
 
 interface StoreState {
@@ -180,10 +180,20 @@ export const useStore = create<StoreState>((set, get) => ({
         nameCounts[p.name].push(p.id);
       });
 
-      const instrumentFloors: Record<string, Set<number>> = {};
+      const instrumentToGroup: Record<string, string> = {};
+      Object.entries(INSTRUMENT_GROUPS).forEach(([groupName, instruments]) => {
+        instruments.forEach((inst) => {
+          instrumentToGroup[inst] = groupName;
+        });
+      });
+
+      const groupFloors: Record<string, Set<number>> = {};
       state.points.forEach((p) => {
-        if (!instrumentFloors[p.instrument]) instrumentFloors[p.instrument] = new Set();
-        instrumentFloors[p.instrument].add(p.floor);
+        const groupName = instrumentToGroup[p.instrument];
+        if (groupName) {
+          if (!groupFloors[groupName]) groupFloors[groupName] = new Set();
+          groupFloors[groupName].add(p.floor);
+        }
       });
 
       const updatedPoints = state.points.map((p) => {
@@ -206,10 +216,17 @@ export const useStore = create<StoreState>((set, get) => ({
           judgmentParts.push('photoUrl字段为空，缺少设备照片');
         }
 
-        if (instrumentFloors[p.instrument] && instrumentFloors[p.instrument].size > 1) {
+        const groupName = instrumentToGroup[p.instrument];
+        if (groupName && groupFloors[groupName] && groupFloors[groupName].size > 1) {
           anomalies.push('cross_floor');
-          const floors = Array.from(instrumentFloors[p.instrument]).sort();
-          judgmentParts.push(`${p.instrument}分布在${floors.join('、')}层，跨楼层异常`);
+          const floors = Array.from(groupFloors[groupName]).sort();
+          const groupInstruments = INSTRUMENT_GROUPS[groupName as keyof typeof INSTRUMENT_GROUPS];
+          const sameGroupDiffFloor = state.points.filter(
+            (pp) => groupInstruments.includes(pp.instrument) && pp.floor !== p.floor
+          );
+          judgmentParts.push(
+            `${groupName}分布在${floors.join('、')}层，该点位在${p.floor}层，同组其他设备在${sameGroupDiffFloor.map((pp) => `${pp.name}(${pp.floor}层)`).join('、')}，跨楼层异常，需要确认是否为舞台纵深分层设计`
+          );
         }
 
         if (p.coordinateSystem !== params.coordinateSystem) {
