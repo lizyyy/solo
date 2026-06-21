@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import type { Material, FilterCriteria, TimelineEvent, ExportRecord, FittingResult, JumpCause } from './types';
 import { mockMaterials, mockFilterCriterias, mockTimeline, mockExports, mockHandoverNote } from './mockData';
 import { fitMaterial, analyzeJumpCauses, computeDataHash } from './utils/fitting';
+import { buildReportWorkbook, triggerDownload, parseExcelForVerification, type ExportBundle } from './utils/excelExport';
 import TopBar from './components/TopBar';
 import MaterialsPanel from './components/MaterialsPanel';
 import FittingChart from './components/FittingChart';
@@ -90,17 +91,57 @@ export default function App() {
   }, [filteredMaterials, fittingResults, activeFilter]);
 
   const handleExport = useCallback(() => {
-    const hash = computeDataHash(screenSnapshot);
     const now = Date.now();
-    const dateStr = new Date(now).toISOString().slice(0, 10).replace(/-/g, '');
+    const bundle: ExportBundle = {
+      materials,
+      filteredMaterials,
+      filter: activeFilter,
+      filterHistory: filterCriterias,
+      fittingResults,
+      jumpCauses,
+      timeline,
+      previousExports: exports,
+      handoverNote: mockHandoverNote,
+      operator: '当前用户',
+      generatedAt: now,
+    };
+    const { wb, snapshot, hash, fileName } = buildReportWorkbook(bundle);
+
+    const summary = {
+      filterId: activeFilter.id,
+      filterName: activeFilter.name,
+      fittingDegree: activeFilter.fittingDegree,
+      boundarySampleMinCount: activeFilter.boundarySampleMinCount,
+      materialCount: snapshot.materialCount,
+      totalPoints: snapshot.totalPoints,
+      avgR2: filteredMaterials.length > 0
+        ? Number((Object.values(snapshot.rSquaredValues).reduce((a, b) => a + b, 0) / filteredMaterials.length).toFixed(6))
+        : 0,
+      boundaryWarningCount: snapshot.boundaryWarnings.length,
+      jumpCauseCount: jumpCauses.length,
+      causeBreakdown: {
+        threshold: jumpCauses.filter(j => j.type === 'threshold').length,
+        unit: jumpCauses.filter(j => j.type === 'unit').length,
+        name_mismatch: jumpCauses.filter(j => j.type === 'name_mismatch').length,
+      },
+      statusCounts: {
+        reviewed: filteredMaterials.filter(m => m.status === 'reviewed').length,
+        processed: filteredMaterials.filter(m => m.status === 'processed').length,
+        pending: filteredMaterials.filter(m => m.status === 'pending').length,
+        missing: filteredMaterials.filter(m => m.status === 'missing').length,
+      },
+      materialIds: activeFilter.materialIds,
+    };
+
     const record: ExportRecord = {
       id: 'exp-' + now,
       timestamp: now,
       operator: '当前用户',
       filterCriteriaId: activeFilterId,
       dataHash: hash,
-      onScreenSnapshot: screenSnapshot,
-      fileName: `boundary_review_${dateStr}_${hash}.xlsx`,
+      onScreenSnapshot: snapshot,
+      fileName,
+      summary,
     };
     setExports(prev => [record, ...prev]);
     setTimeline(prev => [{
@@ -108,15 +149,27 @@ export default function App() {
       type: 'export',
       timestamp: now,
       operator: '当前用户',
-      description: `导出报告 - ${record.fileName}`,
-      detail: { hash, pointCount: screenSnapshot.totalPoints },
+      description: `导出报告 - ${fileName}`,
+      detail: {
+        hash,
+        pointCount: snapshot.totalPoints,
+        materialCount: snapshot.materialCount,
+        boundaryWarningCount: snapshot.boundaryWarnings.length,
+        jumpCauseCount: jumpCauses.length,
+        filterId: activeFilter.id,
+        filterName: activeFilter.name,
+        sheets: ['1.数据校验', '2.报告摘要', '3.拟合结果明细', '4.异常跳变分析', '5.学生草稿溯源', '6.历史时间线', '7.交接指引'],
+      },
     }, ...prev]);
+
+    triggerDownload(wb, fileName);
 
     sessionStorage.setItem('prev-fitting', JSON.stringify(fittingResults));
     setPreviousFittingMap({ ...fittingResults });
-
-    alert(`导出成功！\n文件名：${record.fileName}\n数据哈希：${hash}\n\n(绑定屏幕快照，导入时可校验一致性)`);
-  }, [screenSnapshot, activeFilterId, fittingResults]);
+  }, [
+    materials, filteredMaterials, activeFilter, filterCriterias,
+    fittingResults, jumpCauses, timeline, exports, activeFilterId,
+  ]);
 
   const handleRenameMaterial = (materialId: string, newName: string, reason: string) => {
     setMaterials(prev => prev.map(m => {

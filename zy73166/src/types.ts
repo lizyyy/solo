@@ -94,6 +94,20 @@ export interface ExportRecord {
     boundaryWarnings: string[];
   };
   fileName: string;
+  summary?: {
+    filterId: string;
+    filterName: string;
+    fittingDegree: number;
+    boundarySampleMinCount: number;
+    materialCount: number;
+    totalPoints: number;
+    avgR2: number;
+    boundaryWarningCount: number;
+    jumpCauseCount: number;
+    causeBreakdown: { threshold: number; unit: number; name_mismatch: number };
+    statusCounts: { reviewed: number; processed: number; pending: number; missing: number };
+    materialIds: string[];
+  };
 }
 
 export interface HandoverNote {
