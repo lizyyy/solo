@@ -1,15 +1,20 @@
 import { CADLayer, CollisionPoint, ImportRecord, ReviewSession, Point3D, generateFingerprint, generateCollisionKey } from '../types';
 
-export const detectCollisions = (layers: CADLayer[], batchId: string): CollisionPoint[] => {
+export const detectCollisions = (layers: CADLayer[], existingLayers: CADLayer[], batchId: string): CollisionPoint[] => {
   const collisions: CollisionPoint[] = [];
   const collisionKeys = new Set<string>();
+  const allLayers = [...existingLayers, ...layers];
 
-  for (let i = 0; i < layers.length; i++) {
-    for (let j = i + 1; j < layers.length; j++) {
-      const simulatedCollisions = simulateLayerCollisions(layers[i], layers[j], batchId);
+  for (let i = 0; i < allLayers.length; i++) {
+    for (let j = i + 1; j < allLayers.length; j++) {
+      const isNewA = i >= existingLayers.length;
+      const isNewB = j >= existingLayers.length;
+      if (!isNewA && !isNewB) continue;
+
+      const simulatedCollisions = simulateLayerCollisions(allLayers[i], allLayers[j], batchId);
       
       for (const col of simulatedCollisions) {
-        const key = generateCollisionKey(col.position, col.layerIdA, col.layerIdB);
+        const key = generateLogicalCollisionKey(col.position, allLayers[i], allLayers[j]);
         if (!collisionKeys.has(key)) {
           collisionKeys.add(key);
           collisions.push(col);
@@ -19,6 +24,14 @@ export const detectCollisions = (layers: CADLayer[], batchId: string): Collision
   }
 
   return collisions;
+};
+
+const generateLogicalCollisionKey = (pos: Point3D, layerA: CADLayer, layerB: CADLayer): string => {
+  const baseNames = [
+    layerA.name.split(/[-_]/)[0],
+    layerB.name.split(/[-_]/)[0],
+  ].sort();
+  return `${pos.x.toFixed(2)}:${pos.y.toFixed(2)}:${pos.z.toFixed(2)}:${baseNames.join(':')}`;
 };
 
 const simulateLayerCollisions = (layerA: CADLayer, layerB: CADLayer, batchId: string): CollisionPoint[] => {
@@ -45,6 +58,18 @@ const simulateLayerCollisions = (layerA: CADLayer, layerB: CADLayer, batchId: st
   return collisions;
 };
 
+const matchName = (layer: CADLayer, keywords: string[]): boolean => {
+  const name = layer.name.toLowerCase();
+  return keywords.some(k => name.includes(k.toLowerCase()));
+};
+
+const isStructureLayer = (l: CADLayer) => matchName(l, ['承重', '结构', '梁', '柱', '板']);
+const isPipelineLayer = (l: CADLayer) => matchName(l, ['管线', '给排水', '给水', '排水', '水管', '喷淋', '消防']);
+const isWallLayer = (l: CADLayer) => matchName(l, ['墙体', '剪力墙', '墙', '砌体', '隔墙']);
+const isDoorWindowLayer = (l: CADLayer) => matchName(l, ['门窗', '门', '窗', '洞口', '开孔']);
+const isHVACLayer = (l: CADLayer) => matchName(l, ['暖通', '风管', '空调', '通风']);
+const isElectricLayer = (l: CADLayer) => matchName(l, ['电气', '桥架', '电缆', '强电', '弱电']);
+
 const getCollisionPatterns = (layerA: CADLayer, layerB: CADLayer) => {
   const patterns: {
     position: Point3D;
@@ -54,7 +79,8 @@ const getCollisionPatterns = (layerA: CADLayer, layerB: CADLayer) => {
     boundaryReason?: string;
   }[] = [];
 
-  if (layerA.name.includes('承重') && layerB.name.includes('管线')) {
+  if ((isStructureLayer(layerA) && isPipelineLayer(layerB)) ||
+      (isStructureLayer(layerB) && isPipelineLayer(layerA))) {
     patterns.push({
       position: { x: 12.45, y: 8.32, z: 3.15 },
       severity: 'critical',
@@ -70,7 +96,8 @@ const getCollisionPatterns = (layerA: CADLayer, layerB: CADLayer) => {
     });
   }
 
-  if (layerA.name.includes('墙体') && layerB.name.includes('门窗')) {
+  if ((isWallLayer(layerA) && isDoorWindowLayer(layerB)) ||
+      (isWallLayer(layerB) && isDoorWindowLayer(layerA))) {
     patterns.push({
       position: { x: 5.20, y: 15.80, z: 1.20 },
       severity: 'error',
@@ -79,7 +106,8 @@ const getCollisionPatterns = (layerA: CADLayer, layerB: CADLayer) => {
     });
   }
 
-  if (layerA.name.includes('暖通') && layerB.name.includes('电气')) {
+  if ((isHVACLayer(layerA) && isElectricLayer(layerB)) ||
+      (isHVACLayer(layerB) && isElectricLayer(layerA))) {
     patterns.push({
       position: { x: 20.15, y: 3.65, z: 4.50 },
       severity: 'warning',
@@ -138,9 +166,9 @@ export const importLayersWithDeduplication = (
   });
 
   const allLayers = [...session.layers, ...addedLayers];
-  const newCollisions = detectCollisions(addedLayers, batchId);
+  const newCollisions = detectCollisions(addedLayers, session.layers, batchId);
 
-  const dedupedCollisions = deduplicateCollisions(session.collisions, newCollisions);
+  const dedupedCollisions = deduplicateCollisions(session.collisions, newCollisions, allLayers);
   const mergedCollisions = mergeWithManualNotesPreserved(session.collisions, dedupedCollisions);
 
   const importRecord: ImportRecord = {
@@ -175,21 +203,50 @@ export const importLayersWithDeduplication = (
   };
 };
 
+const getLayerBaseName = (layerId: string, allLayers: CADLayer[]): string => {
+  const layer = allLayers.find(l => l.id === layerId);
+  if (!layer) return layerId;
+  const name = layer.name.split(/[-_]/)[0];
+  return name;
+};
+
 const deduplicateCollisions = (
   existing: CollisionPoint[],
-  incoming: CollisionPoint[]
+  incoming: CollisionPoint[],
+  existingLayers: CADLayer[]
 ): CollisionPoint[] => {
-  const existingKeys = new Set(existing.map(c => generateCollisionKey(c.position, c.layerIdA, c.layerIdB)));
+  const existingLogicalKeys = new Set(
+    existing.map(c => {
+      const baseA = getLayerBaseName(c.layerIdA, existingLayers);
+      const baseB = getLayerBaseName(c.layerIdB, existingLayers);
+      const sorted = [baseA, baseB].sort();
+      return `${c.position.x.toFixed(2)}:${c.position.y.toFixed(2)}:${c.position.z.toFixed(2)}:${sorted.join(':')}`;
+    })
+  );
+
+  const allLayers = existingLayers;
 
   return incoming.map(col => {
-    const key = generateCollisionKey(col.position, col.layerIdA, col.layerIdB);
-    if (existingKeys.has(key)) {
-      const original = existing.find(e => generateCollisionKey(e.position, e.layerIdA, e.layerIdB) === key)!;
-      return {
-        ...col,
-        duplicateOf: original.id,
-        status: 'ignored' as const,
-      };
+    const baseA = getLayerBaseName(col.layerIdA, allLayers);
+    const baseB = getLayerBaseName(col.layerIdB, allLayers);
+    const sorted = [baseA, baseB].sort();
+    const logicalKey = `${col.position.x.toFixed(2)}:${col.position.y.toFixed(2)}:${col.position.z.toFixed(2)}:${sorted.join(':')}`;
+
+    if (existingLogicalKeys.has(logicalKey)) {
+      const original = existing.find(e => {
+        const eA = getLayerBaseName(e.layerIdA, existingLayers);
+        const eB = getLayerBaseName(e.layerIdB, existingLayers);
+        const eSorted = [eA, eB].sort();
+        const eKey = `${e.position.x.toFixed(2)}:${e.position.y.toFixed(2)}:${e.position.z.toFixed(2)}:${eSorted.join(':')}`;
+        return eKey === logicalKey;
+      });
+      if (original) {
+        return {
+          ...col,
+          duplicateOf: original.id,
+          status: 'ignored' as const,
+        };
+      }
     }
     return col;
   });
@@ -204,7 +261,11 @@ const mergeWithManualNotesPreserved = (
 
   incoming.forEach(col => {
     if (col.duplicateOf && existingById.has(col.duplicateOf)) {
-      return;
+      const original = existingById.get(col.duplicateOf)!;
+      if (original.manualNote) {
+        col.manualNote = original.manualNote;
+        col.noteUpdatedAt = original.noteUpdatedAt;
+      }
     }
     merged.push(col);
   });

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { ReviewSession, CollisionPoint, CADLayer, generateFingerprint } from '../types';
 import { importLayersWithDeduplication, updateManualNote, attachScreenshot } from '../core/collisionEngine';
-import { createDemoSession, demoLayers } from '../data/demoData';
+import { createDemoSession, demoLayersReimport } from '../data/demoData';
 
 interface ReviewState {
   session: ReviewSession | null;
@@ -99,7 +99,7 @@ export const useReviewStore = create<ReviewState>((set, get) => ({
     const { session } = get();
     if (!session) return { added: 0, skipped: 0, collisions: 0 };
 
-    const result = importLayersWithDeduplication(session, demoLayers, '演示数据_重复导入测试.dwg');
+    const result = importLayersWithDeduplication(session, demoLayersReimport, '施工队竣工重绘+现场放样图_20240328.dwg');
     saveToStorage(result.updatedSession);
     set({ session: result.updatedSession });
     return result.stats;
