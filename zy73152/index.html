@@ -11,11 +11,15 @@
     <header class="app-header">
       <div class="header-left">
         <h1 class="app-title">🌊 海洋牧场时序回放</h1>
-        <span class="app-subtitle">实验室结果复核 · 过程可追溯</span>
+        <span class="app-subtitle">实验室结果复核 · 过程可追溯 · 后端重算</span>
       </div>
       <div class="header-right">
         <button class="btn btn-primary" id="btn-rerun">🔄 补备注重跑</button>
         <button class="btn btn-secondary" id="btn-sample">🧪 试跑样例</button>
+        <span class="server-status" id="server-status" title="后端服务状态">
+          <span class="status-dot"></span>
+          <span class="status-text">连接后端...</span>
+        </span>
       </div>
     </header>
 
@@ -24,21 +28,22 @@
         <div class="nav-icon">📋</div>
         <div class="nav-text">
           <div class="nav-title">页面摘要</div>
-          <div class="nav-desc">当前跑次速览</div>
+          <div class="nav-desc">关键数字速览</div>
         </div>
       </div>
       <div class="nav-card nav-materials" data-nav="materials">
         <div class="nav-icon">📁</div>
         <div class="nav-text">
           <div class="nav-title">材料区</div>
-          <div class="nav-desc">原始数据与附件</div>
+          <div class="nav-desc">上传附件 · 添加晚到样品</div>
         </div>
+        <span class="nav-badge" id="material-badge" style="background:#2563eb;color:white;">上传</span>
       </div>
       <div class="nav-card nav-anomaly" data-nav="anomaly">
         <div class="nav-icon">⚠️</div>
         <div class="nav-text">
           <div class="nav-title">异常区</div>
-          <div class="nav-desc">云遮挡记录</div>
+          <div class="nav-desc">云遮挡 · 可人工覆盖</div>
         </div>
         <span class="nav-badge" id="anomaly-count">3</span>
       </div>
@@ -46,8 +51,19 @@
         <div class="nav-icon">📤</div>
         <div class="nav-text">
           <div class="nav-title">导出区</div>
-          <div class="nav-desc">结果报告下载</div>
+          <div class="nav-desc">HTML/CSV/JSON 报告</div>
         </div>
+      </div>
+    </div>
+
+    <div class="diff-banner" id="diff-banner" style="display:none;">
+      <div class="diff-banner-title">🔄 本版相对上一版的变化（后端重算结果）</div>
+      <div class="diff-banner-items">
+        <span class="diff-chip"><b id="diff-avg-bio">—</b> 平均生物量</span>
+        <span class="diff-chip"><b id="diff-total-bio">—</b> 总生物量</span>
+        <span class="diff-chip"><b id="diff-samples">—</b> 样品数</span>
+        <span class="diff-chip"><b id="diff-clouds">—</b> 剔除云景</span>
+        <span class="diff-chip"><b id="diff-manual">—</b> 人工修正</span>
       </div>
     </div>
 
@@ -66,15 +82,15 @@
             </div>
             <div class="guide-item">
               <span class="guide-dot">2</span>
-              <span>步骤有<mark class="mark-diff">差异标记</mark>的是变化点</span>
+              <span>点"📁材料区"上传或添加晚到样品</span>
             </div>
             <div class="guide-item">
               <span class="guide-dot">3</span>
-              <span>右上角<mark class="mark-btn">补备注重跑</mark>可留痕重跑</span>
+              <span>点坐标/云记录旁"修正"按钮，再点重跑</span>
             </div>
             <div class="guide-item">
               <span class="guide-dot">4</span>
-              <span>异常区单独看云遮挡，不混入正常结果</span>
+              <span>点"📤导出区"下载真实报告文件</span>
             </div>
           </div>
         </div>
@@ -83,10 +99,104 @@
       <section class="content-area">
         <div class="run-header" id="run-header"></div>
 
+        <!-- ========== 页面摘要 ========== -->
+        <div class="summary-panel" id="summary-section">
+          <div class="panel-header" style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border-bottom:1px solid #bfdbfe;">
+            <h3 style="margin:0;color:#1e3a8a;">📋 页面摘要 · 后端计算结果</h3>
+            <div style="display:flex;gap:8px;">
+              <span class="panel-badge" id="summary-gen-time">生成中...</span>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="summary-grid">
+              <div class="summary-card">
+                <div class="summary-label">平均生物量</div>
+                <div class="summary-value" id="sum-avg-bio">—</div>
+                <div class="summary-unit">kg/ha</div>
+                <div class="summary-sub" id="sum-avg-sub">含校正系数</div>
+              </div>
+              <div class="summary-card highlight">
+                <div class="summary-label">总生物量估计</div>
+                <div class="summary-value" id="sum-total-bio">—</div>
+                <div class="summary-unit">kg</div>
+                <div class="summary-sub" id="sum-total-sub">平均 × 样品数</div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-label">有效样品</div>
+                <div class="summary-value" id="sum-labs">—</div>
+                <div class="summary-unit">个</div>
+                <div class="summary-sub" id="sum-labs-sub">晚到 0 个</div>
+              </div>
+              <div class="summary-card warn">
+                <div class="summary-label">剔除云景</div>
+                <div class="summary-value" id="sum-cloud-exc">—</div>
+                <div class="summary-unit">景</div>
+                <div class="summary-sub" id="sum-cloud-sub">纳入 0 景</div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-label">云量阈值</div>
+                <div class="summary-value" id="sum-threshold">—</div>
+                <div class="summary-unit">%</div>
+                <div class="summary-sub">超此值即剔除</div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-label">人工修正</div>
+                <div class="summary-value" id="sum-manual">—</div>
+                <div class="summary-unit">处</div>
+                <div class="summary-sub">坐标/云/阈值</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========== 材料区 ========== -->
+        <div class="panel material-panel" id="material-section">
+          <div class="panel-header">
+            <h3>📁 材料区 · 放材料的地方（可上传/录入）</h3>
+            <span class="panel-badge" style="background:#dbeafe;color:#1e40af;">原始数据与附件</span>
+          </div>
+          <div class="panel-body">
+            <div class="material-grid">
+              <div class="material-action">
+                <h4>⬆️ 上传材料文件</h4>
+                <p class="mat-desc">实验室结果表、晚到数据、补充影像清单等</p>
+                <form id="upload-form" class="mat-form">
+                  <input type="file" id="upload-file" name="file" required>
+                  <select name="material_type" id="mat-type">
+                    <option value="lab_data">实验室数据</option>
+                    <option value="cloud_attachment">云附件</option>
+                    <option value="other">其他材料</option>
+                  </select>
+                  <input type="text" id="mat-note" placeholder="备注（可选）">
+                  <button type="submit" class="btn btn-primary">上传到材料区</button>
+                </form>
+                <div id="upload-result" class="mat-result"></div>
+              </div>
+
+              <div class="material-action">
+                <h4>➕ 录入晚到样品</h4>
+                <p class="mat-desc">收到晚到样品后，录入具体数值触发重算</p>
+                <form id="late-form" class="mat-form">
+                  <input type="text" id="late-sid" placeholder="样品编号 SD-2026-..." required>
+                  <input type="text" id="late-site" placeholder="站点名称" required>
+                  <div class="coord-row">
+                    <input type="text" id="late-lat" placeholder="原始纬度（支持3种格式）" required>
+                    <input type="text" id="late-lon" placeholder="原始经度（支持3种格式）" required>
+                  </div>
+                  <input type="number" id="late-bio" step="0.1" placeholder="生物量 kg/ha" required>
+                  <input type="date" id="late-date" required>
+                  <input type="text" id="late-note" placeholder="晚到原因备注">
+                  <button type="submit" class="btn btn-primary">加入并重算</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="timeline-section" id="timeline-section">
           <h2 class="section-title">
             <span>⏱️ 时序回放</span>
-            <span class="section-tip">点击步骤查看详情，橙色标记为相对上一次的变化</span>
+            <span class="section-tip">点击步骤查看详情，橙色标记为有变化</span>
           </h2>
           <div class="timeline" id="timeline"></div>
         </div>
@@ -94,15 +204,21 @@
         <div class="detail-section" id="step-detail">
           <div class="detail-placeholder">
             <div class="placeholder-icon">👆</div>
-            <p>选择左侧步骤查看详细信息</p>
+            <p>选择上方步骤卡片查看详细信息</p>
+            <p style="font-size:12px;margin-top:8px;color:#9ca3af;">
+              橙色变化步骤、参数差异、人工修正都会显示在这里
+            </p>
           </div>
         </div>
 
         <div class="panels-row">
           <div class="panel coord-panel" id="coord-panel">
             <div class="panel-header">
-              <h3>📍 经纬度标准化对照</h3>
-              <span class="panel-badge">原始写法统一为十进制度</span>
+              <h3>📍 经纬度标准化对照（可点击"修正"）</h3>
+              <div>
+                <span class="panel-badge">原始写法 → 十进制度</span>
+                <button class="mini-btn" id="btn-threshold">⚙️ 调云阈值</button>
+              </div>
             </div>
             <div class="panel-body" id="coord-table"></div>
           </div>
@@ -116,72 +232,174 @@
           </div>
         </div>
 
+        <!-- ========== 异常区 ========== -->
         <div class="panel cloud-panel" id="cloud-panel">
           <div class="panel-header">
-            <h3>☁️ 云遮挡记录（已单独拎出）</h3>
-            <span class="panel-badge warn-badge">未计入正常结果</span>
+            <h3>☁️ 异常区 · 云遮挡记录（已单独拎出，可人工覆盖）</h3>
+            <span class="panel-badge warn-badge">未计入正常反演</span>
           </div>
           <div class="panel-body" id="cloud-table"></div>
+        </div>
+
+        <!-- ========== 导出区 ========== -->
+        <div class="panel export-panel" id="export-section">
+          <div class="panel-header">
+            <h3>📤 导出区 · 结果报告下载（真实文件）</h3>
+            <span class="panel-badge" style="background:#d1fae5;color:#065f46;">可下载验证</span>
+          </div>
+          <div class="panel-body">
+            <div class="export-grid">
+              <div class="export-card" onclick="doExport('html')">
+                <div class="export-icon">🌐</div>
+                <div class="export-name">HTML 报告</div>
+                <div class="export-desc">带样式、表格、对比图</div>
+                <div class="export-ext">.html</div>
+              </div>
+              <div class="export-card" onclick="doExport('csv')">
+                <div class="export-icon">📊</div>
+                <div class="export-name">CSV 数据表</div>
+                <div class="export-desc">适合 Excel 二次处理</div>
+                <div class="export-ext">.csv</div>
+              </div>
+              <div class="export-card" onclick="doExport('json')">
+                <div class="export-icon">📄</div>
+                <div class="export-name">JSON 结构化</div>
+                <div class="export-desc">全量字段，程序可读</div>
+                <div class="export-ext">.json</div>
+              </div>
+            </div>
+            <div id="export-tip" class="export-tip">
+              💡 报告内容包含：输入参数、经纬度清洗前后、云遮挡单独记录、晚到附件痕迹、生物量结果、重算差异、备注、步骤详情
+            </div>
+          </div>
         </div>
       </section>
     </div>
   </div>
 
+  <!-- 重跑弹窗 -->
   <div class="modal" id="rerun-modal">
     <div class="modal-overlay"></div>
-    <div class="modal-content">
+    <div class="modal-content modal-wide">
       <div class="modal-header">
-        <h3>🔄 补备注重跑</h3>
-        <button class="modal-close" id="modal-close">×</button>
+        <h3>🔄 补备注重跑 · 后端重算</h3>
+        <button class="modal-close" data-close="rerun-modal">×</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label>备注说明</label>
-          <textarea id="rerun-remark" rows="3" placeholder="填写这次重跑的原因，例如：调整云阈值、补充晚到数据..."></textarea>
+          <label>✅ 本次准备重算的修正（点击下面的"修正"按钮会自动添加到此处）</label>
+          <div class="correction-list" id="correction-list">
+            <div class="empty-corrections">还没有任何修正，先去点坐标或云记录旁的"修正"按钮吧 👉</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>📝 备注说明</label>
+          <textarea id="rerun-remark" rows="2" placeholder="例如：人工修正经纬度、调整云阈值至25%、补充晚到样品SD-xxx..."></textarea>
+        </div>
+        <div class="form-group" style="display:flex;gap:12px;">
+          <div style="flex:1;">
+            <label>☁️ 云量阈值（可选，留空=不调整）</label>
+            <input type="number" id="rerun-threshold" step="0.5" min="0" max="100" placeholder="例如 25">
+          </div>
+          <div style="flex:1;">
+            <label>👀 包含异常导出</label>
+            <select id="rerun-include-anomaly">
+              <option value="">保持原值</option>
+              <option value="true">是</option>
+              <option value="false">否</option>
+            </select>
+          </div>
         </div>
         <div class="form-hint">
-          <p>💡 重跑后会：</p>
+          <p>💡 提交后由后端重新计算：</p>
           <ul>
-            <li>保留旧记录作为基准版本</li>
-            <li>新记录自动关联上一版</li>
-            <li>每一步参数变化会用橙色标记</li>
-            <li>备注会显示在跑次名称旁</li>
+            <li>经纬度标准化（按人工修正覆盖）</li>
+            <li>云遮挡筛选（按阈值+人工覆盖规则）</li>
+            <li>生物量反演（纳入样品数 × 校正系数）</li>
+            <li>返回：旧结果、新结果、变化步骤、异常原因</li>
           </ul>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" id="modal-cancel">取消</button>
-        <button class="btn btn-primary" id="modal-confirm">确认重跑</button>
+        <button class="btn btn-secondary" id="btn-clear-corrections">清空修正</button>
+        <button class="btn btn-secondary" data-close="rerun-modal">取消</button>
+        <button class="btn btn-primary" id="btn-submit-rerun">⚡ 提交重算</button>
       </div>
     </div>
   </div>
 
+  <!-- 试跑样例弹窗 -->
   <div class="modal" id="sample-modal">
     <div class="modal-overlay"></div>
     <div class="modal-content">
       <div class="modal-header">
         <h3>🧪 试跑样例</h3>
-        <button class="modal-close" id="sample-close">×</button>
+        <button class="modal-close" data-close="sample-modal">×</button>
       </div>
       <div class="modal-body">
-        <p class="sample-intro">这里有3组预置的跑次样例，展示了不同场景下的回放效果：</p>
-        <div class="sample-list">
-          <div class="sample-item" data-run="run-2026-06-15-v1">
-            <div class="sample-title">第1次跑 · 基准版</div>
-            <div class="sample-desc">初始跑，所有数据齐全，无晚到附件，云阈值20%</div>
-          </div>
-          <div class="sample-item" data-run="run-2026-06-17-v2">
-            <div class="sample-title">第2次跑 · 补晚到附件</div>
-            <div class="sample-desc">收到晚到的实验室样品数据后重跑，可对比新增数据的影响</div>
-          </div>
-          <div class="sample-item" data-run="run-2026-06-18-v3">
-            <div class="sample-title">第3次跑 · 调云阈值+补备注</div>
-            <div class="sample-desc">云阈值从20%调到25%，补全备注字段，展示参数变化追踪</div>
-          </div>
+        <p class="sample-intro">3 组预置样例，由后端计算引擎生成，可直接体验完整流程：</p>
+        <div class="sample-list" id="sample-list"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close="sample-modal">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 修正坐标弹窗 -->
+  <div class="modal" id="fix-coord-modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>📍 人工修正经纬度</h3>
+        <button class="modal-close" data-close="fix-coord-modal">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="info-box" id="fix-coord-info"></div>
+        <div class="form-group">
+          <label>新的纬度（十进制度，WGS84）</label>
+          <input type="number" step="0.000001" id="fix-lat" placeholder="例如 37.479167">
+        </div>
+        <div class="form-group">
+          <label>新的经度（十进制度，WGS84）</label>
+          <input type="number" step="0.000001" id="fix-lon" placeholder="例如 122.758333">
+        </div>
+        <div class="form-group">
+          <label>修正说明</label>
+          <input type="text" id="fix-note" placeholder="例如：实验室表抄错，按原始采样记录更正">
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" id="sample-cancel">关闭</button>
+        <button class="btn btn-secondary" data-close="fix-coord-modal">取消</button>
+        <button class="btn btn-primary" id="btn-fix-coord-ok">加入重跑清单</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 调阈值弹窗 -->
+  <div class="modal" id="threshold-modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>⚙️ 调整云量阈值</h3>
+        <button class="modal-close" data-close="threshold-modal">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="info-box">
+          当前阈值 <b id="cur-threshold-badge">—</b>，超此值的影像会从正常结果中剔除。
+        </div>
+        <div class="form-group">
+          <label>新阈值 %</label>
+          <input type="number" step="0.5" min="0" max="100" id="new-threshold" placeholder="例如 25">
+        </div>
+        <div class="form-group">
+          <label>说明</label>
+          <input type="text" id="threshold-note" placeholder="例如：与项目组沟通后确认薄云可接受">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close="threshold-modal">取消</button>
+        <button class="btn btn-primary" id="btn-threshold-ok">加入重跑清单</button>
       </div>
     </div>
   </div>
