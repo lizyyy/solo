@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List, Dict, Optional, Tuple
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 
 from models import (
     ChangeOrder,
@@ -18,6 +18,12 @@ from core_logic import (
     ImpactTracker,
     VersionClassifier,
 )
+
+
+def _clone_dataclass(instance, target_cls):
+    valid_fields = {f.name for f in fields(target_cls)}
+    kwargs = {k: v for k, v in instance.__dict__.items() if k in valid_fields}
+    return target_cls(**kwargs)
 
 
 @dataclass
@@ -56,6 +62,9 @@ class ChangeOrderExporter:
             self.change_order, rerun_material
         )
 
+        self._apply_all_visa_impacts()
+        warnings = self._collect_warnings()
+
         if custom_annotation:
             annotation = custom_annotation
         else:
@@ -77,8 +86,6 @@ class ChangeOrderExporter:
                 annotation.page_summary,
             )
 
-        warnings = self._collect_warnings()
-
         component_markers = self._generate_component_markers(processing_type)
 
         material_hint, smoothness_score = self._check_delivery_smoothness()
@@ -90,10 +97,10 @@ class ChangeOrderExporter:
             scene_annotation=annotation.scene_annotation,
             sidebar_note=annotation.sidebar_note,
             page_summary=annotation.page_summary,
-            judgements=[Judgement(**j.__dict__) for j in self.change_order.judgements],
-            visa_notes=[VisaNote(**v.__dict__) for v in self.change_order.visa_notes],
+            judgements=[_clone_dataclass(j, Judgement) for j in self.change_order.judgements],
+            visa_notes=[_clone_dataclass(v, VisaNote) for v in self.change_order.visa_notes],
             coordinate_offset=(
-                CoordinateOffset(**self.change_order.coordinate_offsets[-1].__dict__)
+                _clone_dataclass(self.change_order.coordinate_offsets[-1], CoordinateOffset)
                 if self.change_order.coordinate_offsets else None
             ),
             warnings=warnings,
@@ -166,9 +173,12 @@ class ChangeOrderExporter:
 
         overridden = [j for j in self.change_order.judgements if j.is_overridden]
         total = len(self.change_order.judgements)
+
+        visa_affected_ids = set()
+        for v in self.change_order.visa_notes:
+            visa_affected_ids.update(v.affected_judgements)
         changed_by_visa = sum(
-            1 for j in self.change_order.judgements
-            if any("依据现场签证" in j.final_judgement for v in self.change_order.visa_notes)
+            1 for j in self.change_order.judgements if j.id in visa_affected_ids
         )
 
         latest_drawing = self.change_order.get_latest_drawing()
@@ -227,6 +237,13 @@ class ChangeOrderExporter:
 
         return annotation
 
+    def _apply_all_visa_impacts(self) -> None:
+        applied_key = "_applied_impacts"
+        for visa in self.change_order.visa_notes:
+            if not hasattr(visa, applied_key) or not getattr(visa, applied_key):
+                ImpactTracker.analyze_visa_impact(self.change_order, visa)
+                setattr(visa, applied_key, True)
+
     def _collect_warnings(self) -> List[str]:
         warnings = []
 
@@ -253,10 +270,25 @@ class ChangeOrderExporter:
 
         if self.change_order.visa_notes:
             for visa in self.change_order.visa_notes:
-                impact = ImpactTracker.analyze_visa_impact(
-                    self.change_order, visa
-                )
-                warnings.append(f"📝 {impact.summary}")
+                affected_codes = []
+                for j in self.change_order.judgements:
+                    if j.id in visa.affected_judgements:
+                        affected_codes.append(j.item_code)
+                changed_count = len(affected_codes)
+                impact_str = ",".join([i.value for i in visa.impacts])
+                codes_str = ", ".join(affected_codes)
+                if changed_count > 0:
+                    summary = (
+                        f"📝 现场签证单改变了 {changed_count} 项判断（{codes_str}）。"
+                        f"影响类型：{impact_str}。来源：{visa.source_doc}。"
+                        f"内容：{visa.content[:40]}"
+                    )
+                else:
+                    summary = (
+                        f"📝 现场签证单已记录，未改变已有判断结论。"
+                        f"来源：{visa.source_doc}。内容：{visa.content[:40]}"
+                    )
+                warnings.append(summary)
 
         return warnings
 

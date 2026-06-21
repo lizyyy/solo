@@ -1,8 +1,17 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, TypeVar, Type
 from uuid import uuid4
+
+
+T = TypeVar("T")
+
+
+def _clone_dataclass(instance: Any, target_cls: Type[T]) -> T:
+    valid_fields = {f.name for f in fields(target_cls)}
+    kwargs = {k: v for k, v in instance.__dict__.items() if k in valid_fields}
+    return target_cls(**kwargs)
 
 
 class ChangeOrderStatus(str, Enum):
@@ -139,10 +148,10 @@ class ChangeOrder:
             timestamp=datetime.now(),
             operator=operator,
             change_summary=change_summary,
-            judgements_snapshot=[Judgement(**j.__dict__) for j in self.judgements],
-            visa_notes_snapshot=[VisaNote(**v.__dict__) for v in self.visa_notes],
+            judgements_snapshot=[_clone_dataclass(j, Judgement) for j in self.judgements],
+            visa_notes_snapshot=[_clone_dataclass(v, VisaNote) for v in self.visa_notes],
             coordinate_offset_snapshot=(
-                CoordinateOffset(**self.coordinate_offsets[-1].__dict__)
+                _clone_dataclass(self.coordinate_offsets[-1], CoordinateOffset)
                 if self.coordinate_offsets else None
             )
         )
