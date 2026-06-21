@@ -6,7 +6,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = 3001;
+const PORT = 3002;
 const DATA_FILE = path.join(__dirname, 'data', 'materials.json');
 
 app.use(cors());
@@ -216,17 +216,17 @@ function generateDemoData() {
             lateReason: ''
           }
         ],
-        remark: '此条记录用于测试重复导入去重',
+        remark: '强电桥架方案已复核，与母线槽间距需按GB50303规范调整，建议复测后再定版',
         importBatch: 'BATCH-003',
-        importTime: '2026-06-05 10:30:00',
+        importTime: '2026-06-06 09:15:00',
         hasManualRemark: true,
         sourceLink: 'material://MAT-2026-005'
       }
     ],
     importBatches: [
-      { id: 'BATCH-001', name: '首次导入', importTime: '2026-06-01 10:05:00', count: 2 },
-      { id: 'BATCH-002', name: '含晚到数据导入', importTime: '2026-06-05 17:00:00', count: 2 },
-      { id: 'BATCH-003', name: '重复导入测试批次', importTime: '2026-06-05 10:30:00', count: 1 }
+      { id: 'BATCH-001', name: '首次导入-给排水+喷淋', importTime: '2026-06-01 10:05:00', count: 2 },
+      { id: 'BATCH-002', name: '第二批-消防+暖通（含晚到数据）', importTime: '2026-06-05 17:00:00', count: 2 },
+      { id: 'BATCH-003', name: '补充导入-强电', importTime: '2026-06-06 09:15:00', count: 1 }
     ]
   };
 }

@@ -800,7 +800,7 @@ const { createApp, ref, computed, onMounted, markRaw } = Vue;
 const { ElMessage, ElMessageBox } = ElementPlus;
 const { Search, Refresh, Upload, Download, Check, InfoFilled } = ElementPlusIconsVue;
 
-const API_BASE = 'http://localhost:3001';
+const API_BASE = 'http://localhost:3002';
 
 async function api(url, options = {}) {
   const res = await fetch(API_BASE + url, {
