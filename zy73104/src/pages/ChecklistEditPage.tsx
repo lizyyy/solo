@@ -170,35 +170,35 @@ export default function ChecklistEditPage() {
     handledBy: currentRole,
   });
 
-  const handleSaveDraft = () => {
+  const handleSaveDraft = async () => {
     if (!projectName.trim()) return;
     if (isNew) {
-      const created = createChecklist(buildPayload("pending"));
+      const created = await createChecklist(buildPayload("pending"));
       navigate(`/checklist/${created.id}`);
     } else if (id) {
-      updateChecklist(id, buildPayload(initialStatus));
+      await updateChecklist(id, buildPayload(initialStatus));
       navigate(`/checklist/${id}`);
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!projectName.trim()) return;
     if (isNew) {
-      const created = createChecklist(buildPayload(initialStatus));
+      const created = await createChecklist(buildPayload(initialStatus));
       navigate(`/checklist/${created.id}`);
     } else if (id) {
-      updateChecklist(id, buildPayload(initialStatus));
+      await updateChecklist(id, buildPayload(initialStatus));
       navigate(`/checklist/${id}`);
     }
   };
 
-  const handleSuspend = () => {
+  const handleSuspend = async () => {
     if (!projectName.trim()) return;
     if (isNew) {
-      const created = createChecklist(buildPayload("suspended"));
+      const created = await createChecklist(buildPayload("suspended"));
       navigate(`/checklist/${created.id}`);
     } else if (id) {
-      updateChecklist(id, buildPayload("suspended"));
+      await updateChecklist(id, buildPayload("suspended"));
       navigate(`/checklist/${id}`);
     }
   };
