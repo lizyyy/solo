@@ -3,7 +3,7 @@ import { Shield, Lock, Database, Eye } from 'lucide-react';
 import { useGameStore } from '@/store/gameStore';
 import { useGameEngine } from '@/hooks/useGameEngine';
 import { TowerType } from '@/types/game';
-import { TOWER_CONFIG, ENEMY_CONFIG } from '@/utils/gameUtils';
+import { ENEMY_CONFIG } from '@/utils/gameUtils';
 
 const towerIcons: Record<TowerType, React.ReactNode> = {
   firewall: <Shield className="w-6 h-6" />,
@@ -23,9 +23,6 @@ export const GameCanvas: React.FC = () => {
     },
     [status, selectedTowerType, buildTower]
   );
-
-  const canvasWidth = GRID_SIZE * CELL_SIZE;
-  const canvasHeight = GRID_SIZE * CELL_SIZE;
 
   return (
     <div className="relative bg-slate-900 rounded-lg overflow-hidden border border-slate-700 shadow-2xl">

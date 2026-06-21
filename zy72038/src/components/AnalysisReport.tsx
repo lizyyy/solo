@@ -47,7 +47,7 @@ const failureReasonConfig: Record<FailureReason, {
 };
 
 export const AnalysisReport: React.FC = () => {
-  const { report, actions, resetGame, importConflicts } = useGameStore();
+  const { report, resetGame, importConflicts } = useGameStore();
 
   const allConflicts = [
     ...(report?.conflicts || []),

@@ -15,7 +15,6 @@ import {
   Clock,
 } from 'lucide-react';
 import { useGameStore } from '@/store/gameStore';
-import { useGameEngine } from '@/hooks/useGameEngine';
 import { TowerType } from '@/types/game';
 import { TOWER_CONFIG, formatTime } from '@/utils/gameUtils';
 
