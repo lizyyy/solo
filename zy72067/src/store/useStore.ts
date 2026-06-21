@@ -133,7 +133,14 @@ export const useStore = create<AppState>((set, get) => ({
       if (!res.ok) throw new Error(`Failed to fetch records: ${res.status}`);
       const json = await res.json();
       const data: HotSpotRecord[] = snakeToCamel(json.data ?? json);
-      set({ records: data, loading: false });
+      set((state) => {
+        let updatedSelected = state.selectedRecord;
+        if (state.selectedRecord) {
+          const found = data.find((r) => r.id === state.selectedRecord?.id);
+          if (found) updatedSelected = found;
+        }
+        return { records: data, selectedRecord: updatedSelected, loading: false };
+      });
     } catch (err) {
       set({ error: (err as Error).message, loading: false });
     }
