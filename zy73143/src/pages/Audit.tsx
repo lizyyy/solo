@@ -52,6 +52,8 @@ const AuditPage = () => {
         return <MapPin className="w-4 h-4 text-ocean-500" />;
       case 'update':
         return <Edit className="w-4 h-4 text-sand-500" />;
+      case 'supplement':
+        return <FileText className="w-4 h-4 text-ocean-500" />;
       case 'mark_abnormal':
         return <AlertTriangle className="w-4 h-4 text-coral-500" />;
       default:
@@ -66,6 +68,7 @@ const AuditPage = () => {
       resolve: '异常处理',
       create: '新增记录',
       update: '更新记录',
+      supplement: '补录材料',
       mark_abnormal: '标记异常',
     };
     return labels[action] || action;
@@ -235,7 +238,7 @@ const AuditPage = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
             <h3 className="font-semibold text-gray-800 mb-3">操作类型</h3>
             <div className="space-y-2">
-              {(['all', 'create', 'update', 'confirm', 'import', 'resolve'] as const).map(
+              {(['all', 'create', 'update', 'supplement', 'confirm', 'import', 'resolve'] as const).map(
                 (action) => (
                   <button
                     key={action}
@@ -300,6 +303,8 @@ const AuditPage = () => {
                                 ? 'bg-seagrass-500'
                                 : log.action === 'create' || log.action === 'import'
                                 ? 'bg-ocean-500'
+                                : log.action === 'supplement'
+                                ? 'bg-ocean-400'
                                 : log.action === 'mark_abnormal'
                                 ? 'bg-coral-500'
                                 : 'bg-sand-500'

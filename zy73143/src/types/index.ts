@@ -14,9 +14,6 @@ export interface BuoyLog {
   confirmer?: string;
   createdAt: string;
   updatedAt: string;
-  _importBatches?: string[];
-  _lastMergedAt?: string;
-  _mergedCount?: number;
 }
 
 export interface SpatialMark {
@@ -51,7 +48,7 @@ export interface Anomaly {
   resolvedAt?: string;
 }
 
-export type ChangeAction = 'create' | 'update' | 'confirm' | 'import' | 'resolve' | 'mark_abnormal';
+export type ChangeAction = 'create' | 'update' | 'confirm' | 'import' | 'resolve' | 'mark_abnormal' | 'supplement';
 export type ChangeSourceType = 'buoy_log' | 'spatial_mark' | 'anomaly';
 
 export interface ChangeLog {
@@ -72,10 +69,9 @@ export interface ImportResult {
   duplicateCount: number;
   anomalyCount: number;
   skippedWithRemark: number;
+  skippedWithConfirm: number;
+  supplementCount: number;
   batchName: string;
-  filledFieldsCount: number;
-  preservedConfirmedCount: number;
-  mergedCount: number;
 }
 
 export type PageType = 'dashboard' | 'buoy-logs' | 'spatial-marking' | 'anomalies' | 'audit';

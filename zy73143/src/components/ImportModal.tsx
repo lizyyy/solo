@@ -10,22 +10,10 @@ const ImportModal = () => {
   const [sampleData, setSampleData] = useState<any[]>([]);
   const [batchName, setBatchName] = useState('');
 
-  const STABLE_DATES: Record<string, string> = {
-    'FB-A04': '2026-06-12T09:30:00.000Z',
-    'FB-B02': '2026-06-17T10:15:00.000Z',
-    'FB-A01': '2026-06-15T14:00:00.000Z',
-    'FB-C02': '2026-06-16T11:45:00.000Z',
-    'FB-D01': '2026-06-14T08:20:00.000Z',
-    'FB-D02': '2026-06-13T15:10:00.000Z',
-  };
+  const generateMockImportData = (hasDuplicate: boolean, hasAnomaly: boolean, isSupplement: boolean) => {
+    const dayMs = 24 * 60 * 60 * 1000;
+    const baseDate = new Date('2024-06-20T00:00:00Z');
 
-  const STABLE_BATCHES: Record<string, string> = {
-    normal: 'batch-2026-0618-补录-A',
-    'with-duplicate': 'batch-2026-0615-复查',
-    'with-anomaly': 'batch-2026-0616-异常排查',
-  };
-
-  const generateMockImportData = (type: 'normal' | 'with-duplicate' | 'with-anomaly') => {
     const data: any[] = [
       {
         buoyId: 'FB-A04',
@@ -34,7 +22,7 @@ const ImportModal = () => {
         temperature: 23.5,
         seagrassCoverage: 72,
         biomass: 148,
-        recordTime: STABLE_DATES['FB-A04'],
+        recordTime: new Date(baseDate.getTime() - 6 * dayMs).toISOString(),
       },
       {
         buoyId: 'FB-B02',
@@ -43,40 +31,60 @@ const ImportModal = () => {
         temperature: 22.8,
         seagrassCoverage: 58,
         biomass: 115,
-        recordTime: STABLE_DATES['FB-B02'],
+        recordTime: new Date(baseDate.getTime() - 4 * dayMs).toISOString(),
       },
     ];
 
-    if (type === 'with-duplicate') {
+    if (hasDuplicate) {
+      const duplicateDate = new Date('2024-06-17T10:30:00Z');
       data.push({
         buoyId: 'FB-A01',
         longitude: 118.7823,
         latitude: 32.0456,
-        temperature: 22.5,
-        seagrassCoverage: 78,
-        biomass: 156,
-        recordTime: STABLE_DATES['FB-A01'],
+        temperature: isSupplement ? 23.2 : 22.5,
+        seagrassCoverage: isSupplement ? 80 : 78,
+        biomass: isSupplement ? 162 : 156,
+        recordTime: duplicateDate.toISOString(),
       });
     }
 
-    if (type === 'with-anomaly') {
+    if (hasAnomaly) {
       data.push({
-        buoyId: 'FB-C02',
+        buoyId: 'FB-D01',
         longitude: 32.0923,
         latitude: 118.8345,
         temperature: 21.2,
         seagrassCoverage: 35,
         biomass: 68,
-        recordTime: STABLE_DATES['FB-C02'],
+        recordTime: new Date(baseDate.getTime() - 2 * dayMs).toISOString(),
       });
     }
 
     return data;
   };
 
-  const handleSimulateImport = (type: 'normal' | 'with-duplicate' | 'with-anomaly') => {
-    const data = generateMockImportData(type);
-    const batch = STABLE_BATCHES[type];
+  const handleSimulateImport = (type: 'normal' | 'with-duplicate' | 'with-anomaly' | 'supplement') => {
+    let data: any[] = [];
+    let batch = '';
+
+    switch (type) {
+      case 'normal':
+        data = generateMockImportData(false, false, false);
+        batch = 'batch-demo-normal-001';
+        break;
+      case 'with-duplicate':
+        data = generateMockImportData(true, false, false);
+        batch = 'batch-demo-duplicate-001';
+        break;
+      case 'with-anomaly':
+        data = generateMockImportData(false, true, false);
+        batch = 'batch-demo-anomaly-001';
+        break;
+      case 'supplement':
+        data = generateMockImportData(true, false, true);
+        batch = 'batch-demo-supplement-001';
+        break;
+    }
 
     setSampleData(data);
     setBatchName(batch);
@@ -165,6 +173,21 @@ const ImportModal = () => {
                     </button>
 
                     <button
+                      onClick={() => handleSimulateImport('supplement')}
+                      className="p-3 bg-ocean-50 hover:bg-ocean-100 rounded-lg text-left transition-colors border border-ocean-100"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-ocean-500 flex items-center justify-center">
+                          <FileText className="w-4 h-4 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-ocean-800 text-sm">补录材料</p>
+                          <p className="text-xs text-ocean-600">重复记录有更新，验证补录变更记录</p>
+                        </div>
+                      </div>
+                    </button>
+
+                    <button
                       onClick={() => handleSimulateImport('with-anomaly')}
                       className="p-3 bg-coral-50 hover:bg-coral-100 rounded-lg text-left transition-colors border border-coral-100"
                     >
@@ -242,24 +265,16 @@ const ImportModal = () => {
                   </div>
                   <div className="bg-sand-50 rounded-lg p-4 text-center">
                     <p className="text-2xl font-bold text-sand-700">{importResult.duplicateCount}</p>
-                    <p className="text-xs text-sand-600 mt-1">重复识别</p>
+                    <p className="text-xs text-sand-600 mt-1">重复记录</p>
                   </div>
                   <div className="bg-coral-50 rounded-lg p-4 text-center">
                     <p className="text-2xl font-bold text-coral-700">{importResult.anomalyCount}</p>
-                    <p className="text-xs text-coral-600 mt-1">异常条目</p>
+                    <p className="text-xs text-coral-600 mt-1">检测到异常</p>
                   </div>
-                  {importResult.mergedCount > 0 && (
-                    <div className="bg-ocean-50 rounded-lg p-4 text-center">
-                      <p className="text-2xl font-bold text-ocean-700">{importResult.mergedCount}</p>
-                      <p className="text-xs text-ocean-600 mt-1">补录合并</p>
-                    </div>
-                  )}
-                  {importResult.filledFieldsCount > 0 && (
-                    <div className="bg-emerald-50 rounded-lg p-4 text-center">
-                      <p className="text-2xl font-bold text-emerald-700">{importResult.filledFieldsCount}</p>
-                      <p className="text-xs text-emerald-600 mt-1">补全字段</p>
-                    </div>
-                  )}
+                  <div className="bg-ocean-50 rounded-lg p-4 text-center">
+                    <p className="text-2xl font-bold text-ocean-700">{importResult.supplementCount}</p>
+                    <p className="text-xs text-ocean-600 mt-1">补录更新</p>
+                  </div>
                 </div>
 
                 {importResult.skippedWithRemark > 0 && (
@@ -267,7 +282,7 @@ const ImportModal = () => {
                     <div className="flex items-start gap-2">
                       <AlertTriangle className="w-5 h-5 text-sand-600 flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="font-medium text-sand-800 text-sm">人工备注已保留</p>
+                        <p className="font-medium text-sand-800 text-sm">备注保留提示</p>
                         <p className="text-xs text-sand-700 mt-1">
                           {importResult.skippedWithRemark} 条重复记录保留了原有人工备注，未被新数据覆盖
                         </p>
@@ -276,14 +291,28 @@ const ImportModal = () => {
                   </div>
                 )}
 
-                {importResult.preservedConfirmedCount > 0 && (
+                {importResult.skippedWithConfirm > 0 && (
+                  <div className="bg-seagrass-100 border border-seagrass-200 rounded-lg p-4">
+                    <div className="flex items-start gap-2">
+                      <Check className="w-5 h-5 text-seagrass-600 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-seagrass-800 text-sm">确认状态保留</p>
+                        <p className="text-xs text-seagrass-700 mt-1">
+                          {importResult.skippedWithConfirm} 条已人工确认的记录保留了原确认状态，未被重置
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {importResult.supplementCount > 0 && (
                   <div className="bg-ocean-100 border border-ocean-200 rounded-lg p-4">
                     <div className="flex items-start gap-2">
-                      <Check className="w-5 h-5 text-ocean-600 flex-shrink-0 mt-0.5" />
+                      <FileText className="w-5 h-5 text-ocean-600 flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="font-medium text-ocean-800 text-sm">人工确认状态保留</p>
+                        <p className="font-medium text-ocean-800 text-sm">补录材料提示</p>
                         <p className="text-xs text-ocean-700 mt-1">
-                          {importResult.preservedConfirmedCount} 条已确认记录保留了确认人、确认时间和确认状态
+                          {importResult.supplementCount} 条记录有字段更新，已记录补录变更日志，可在审计页查看变更前后对比
                         </p>
                       </div>
                     </div>

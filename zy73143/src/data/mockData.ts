@@ -1,23 +1,7 @@
 import type { BuoyLog, SpatialMark, Anomaly, ChangeLog } from '../types';
 
-const now = new Date();
+const baseDate = new Date('2024-06-20T00:00:00Z');
 const dayMs = 24 * 60 * 60 * 1000;
-
-const STABLE_RECORD_TIMES: Record<string, string> = {
-  'FB-A01': '2026-06-15T14:00:00.000Z',
-  'FB-A02': '2026-06-16T10:30:00.000Z',
-  'FB-B01': '2026-06-17T09:15:00.000Z',
-  'FB-A03': '2026-06-13T15:45:00.000Z',
-  'FB-C01': '2026-06-14T13:20:00.000Z',
-};
-
-const STABLE_CREATED_TIMES: Record<string, string> = {
-  'FB-A01': '2026-06-15T14:05:00.000Z',
-  'FB-A02': '2026-06-16T10:35:00.000Z',
-  'FB-B01': '2026-06-17T09:20:00.000Z',
-  'FB-A03': '2026-06-13T15:50:00.000Z',
-  'FB-C01': '2026-06-14T13:25:00.000Z',
-};
 
 export const mockBuoyLogs: BuoyLog[] = [
   {
@@ -28,14 +12,14 @@ export const mockBuoyLogs: BuoyLog[] = [
     temperature: 22.5,
     seagrassCoverage: 78,
     biomass: 156,
-    recordTime: STABLE_RECORD_TIMES['FB-A01'],
+    recordTime: new Date(baseDate.getTime() - 3 * dayMs).toISOString(),
     importBatch: 'batch-2024-0615-01',
     remark: '首次调查，海草生长良好',
     isConfirmed: true,
-    confirmedAt: '2026-06-16T09:00:00.000Z',
+    confirmedAt: new Date(baseDate.getTime() - 2 * dayMs).toISOString(),
     confirmer: '老何',
-    createdAt: STABLE_CREATED_TIMES['FB-A01'],
-    updatedAt: '2026-06-16T09:00:00.000Z',
+    createdAt: new Date(baseDate.getTime() - 3 * dayMs).toISOString(),
+    updatedAt: new Date(baseDate.getTime() - 2 * dayMs).toISOString(),
   },
   {
     id: 'log-002',
@@ -45,12 +29,12 @@ export const mockBuoyLogs: BuoyLog[] = [
     temperature: 23.1,
     seagrassCoverage: 65,
     biomass: 128,
-    recordTime: STABLE_RECORD_TIMES['FB-A02'],
+    recordTime: new Date(baseDate.getTime() - 2 * dayMs).toISOString(),
     importBatch: 'batch-2024-0616-01',
     remark: '',
     isConfirmed: false,
-    createdAt: STABLE_CREATED_TIMES['FB-A02'],
-    updatedAt: STABLE_CREATED_TIMES['FB-A02'],
+    createdAt: new Date(baseDate.getTime() - 2 * dayMs).toISOString(),
+    updatedAt: new Date(baseDate.getTime() - 2 * dayMs).toISOString(),
   },
   {
     id: 'log-003',
@@ -60,12 +44,12 @@ export const mockBuoyLogs: BuoyLog[] = [
     temperature: 21.8,
     seagrassCoverage: 45,
     biomass: 92,
-    recordTime: STABLE_RECORD_TIMES['FB-B01'],
+    recordTime: new Date(baseDate.getTime() - 1 * dayMs).toISOString(),
     importBatch: 'batch-2024-0617-01',
     remark: '',
     isConfirmed: false,
-    createdAt: STABLE_CREATED_TIMES['FB-B01'],
-    updatedAt: STABLE_CREATED_TIMES['FB-B01'],
+    createdAt: new Date(baseDate.getTime() - 1 * dayMs).toISOString(),
+    updatedAt: new Date(baseDate.getTime() - 1 * dayMs).toISOString(),
   },
   {
     id: 'log-004',
@@ -75,14 +59,14 @@ export const mockBuoyLogs: BuoyLog[] = [
     temperature: 24.2,
     seagrassCoverage: 82,
     biomass: 175,
-    recordTime: STABLE_RECORD_TIMES['FB-A03'],
+    recordTime: new Date(baseDate.getTime() - 5 * dayMs).toISOString(),
     importBatch: 'batch-2024-0613-01',
     remark: '高密度海草区，生物量超预期',
     isConfirmed: true,
-    confirmedAt: '2026-06-14T10:00:00.000Z',
+    confirmedAt: new Date(baseDate.getTime() - 4 * dayMs).toISOString(),
     confirmer: '老何',
-    createdAt: STABLE_CREATED_TIMES['FB-A03'],
-    updatedAt: '2026-06-14T10:00:00.000Z',
+    createdAt: new Date(baseDate.getTime() - 5 * dayMs).toISOString(),
+    updatedAt: new Date(baseDate.getTime() - 4 * dayMs).toISOString(),
   },
   {
     id: 'log-005',
@@ -92,14 +76,14 @@ export const mockBuoyLogs: BuoyLog[] = [
     temperature: 20.5,
     seagrassCoverage: 30,
     biomass: 58,
-    recordTime: STABLE_RECORD_TIMES['FB-C01'],
+    recordTime: new Date(baseDate.getTime() - 4 * dayMs).toISOString(),
     importBatch: 'batch-2024-0614-01',
     remark: '近岸区域，覆盖度较低',
     isConfirmed: true,
-    confirmedAt: '2026-06-15T11:00:00.000Z',
+    confirmedAt: new Date(baseDate.getTime() - 3 * dayMs).toISOString(),
     confirmer: '老何',
-    createdAt: STABLE_CREATED_TIMES['FB-C01'],
-    updatedAt: '2026-06-15T11:00:00.000Z',
+    createdAt: new Date(baseDate.getTime() - 4 * dayMs).toISOString(),
+    updatedAt: new Date(baseDate.getTime() - 3 * dayMs).toISOString(),
   },
 ];
 
@@ -114,8 +98,8 @@ export const mockSpatialMarks: SpatialMark[] = [
     buoyLogIds: ['log-001', 'log-004'],
     status: 'normal',
     remark: '保护等级：一级',
-    createdAt: STABLE_CREATED_TIMES['FB-A01'],
-    updatedAt: '2026-06-16T09:00:00.000Z',
+    createdAt: new Date(baseDate.getTime() - 3 * dayMs).toISOString(),
+    updatedAt: new Date(baseDate.getTime() - 2 * dayMs).toISOString(),
   },
   {
     id: 'mark-002',
@@ -127,8 +111,8 @@ export const mockSpatialMarks: SpatialMark[] = [
     buoyLogIds: ['log-003'],
     status: 'abnormal',
     remark: '经纬度疑似反写，需核实',
-    createdAt: STABLE_CREATED_TIMES['FB-B01'],
-    updatedAt: STABLE_CREATED_TIMES['FB-B01'],
+    createdAt: new Date(baseDate.getTime() - 1 * dayMs).toISOString(),
+    updatedAt: new Date(baseDate.getTime() - 1 * dayMs).toISOString(),
   },
   {
     id: 'mark-003',
@@ -140,8 +124,8 @@ export const mockSpatialMarks: SpatialMark[] = [
     buoyLogIds: ['log-005'],
     status: 'normal',
     remark: '受人类活动影响较大',
-    createdAt: STABLE_CREATED_TIMES['FB-C01'],
-    updatedAt: '2026-06-15T11:00:00.000Z',
+    createdAt: new Date(baseDate.getTime() - 4 * dayMs).toISOString(),
+    updatedAt: new Date(baseDate.getTime() - 3 * dayMs).toISOString(),
   },
 ];
 
@@ -154,7 +138,7 @@ export const mockAnomalies: Anomaly[] = [
     description: '经纬度数值疑似反写：经度32.07不在正常范围(73-135)，纬度118.80超出正常范围(-90~90)',
     severity: 'high',
     isResolved: false,
-    detectedAt: STABLE_CREATED_TIMES['FB-B01'],
+    detectedAt: new Date(baseDate.getTime() - 1 * dayMs).toISOString(),
   },
   {
     id: 'anomaly-002',
@@ -166,8 +150,8 @@ export const mockAnomalies: Anomaly[] = [
     isResolved: true,
     resolvedRemark: '经核实为高密度海草区，数据有效',
     resolvedBy: '老何',
-    detectedAt: STABLE_CREATED_TIMES['FB-A03'],
-    resolvedAt: '2026-06-14T10:00:00.000Z',
+    detectedAt: new Date(baseDate.getTime() - 5 * dayMs).toISOString(),
+    resolvedAt: new Date(baseDate.getTime() - 4 * dayMs).toISOString(),
   },
 ];
 
@@ -185,7 +169,7 @@ export const mockChangeLogs: ChangeLog[] = [
     },
     operator: '系统',
     remark: '导入批次 batch-2024-0615-01',
-    createdAt: STABLE_CREATED_TIMES['FB-A01'],
+    createdAt: new Date(baseDate.getTime() - 3 * dayMs).toISOString(),
   },
   {
     id: 'change-002',
@@ -203,7 +187,7 @@ export const mockChangeLogs: ChangeLog[] = [
     },
     operator: '老何',
     remark: '人工确认数据有效',
-    createdAt: '2026-06-16T09:00:00.000Z',
+    createdAt: new Date(baseDate.getTime() - 2 * dayMs).toISOString(),
   },
   {
     id: 'change-003',
@@ -220,7 +204,7 @@ export const mockChangeLogs: ChangeLog[] = [
     },
     operator: '老何',
     remark: '异常核实后处理',
-    createdAt: '2026-06-14T10:00:00.000Z',
+    createdAt: new Date(baseDate.getTime() - 4 * dayMs).toISOString(),
   },
   {
     id: 'change-004',
@@ -235,7 +219,7 @@ export const mockChangeLogs: ChangeLog[] = [
     },
     operator: '系统',
     remark: '根据浮标日志自动创建标注',
-    createdAt: STABLE_CREATED_TIMES['FB-B01'],
+    createdAt: new Date(baseDate.getTime() - 1 * dayMs).toISOString(),
   },
   {
     id: 'change-005',
@@ -250,14 +234,14 @@ export const mockChangeLogs: ChangeLog[] = [
     },
     operator: '老何',
     remark: '补充人工备注',
-    createdAt: STABLE_CREATED_TIMES['FB-A03'],
+    createdAt: new Date(baseDate.getTime() - 4 * dayMs).toISOString(),
   },
 ];
 
 export const getTrendData = () => {
   const data = [];
   for (let i = 6; i >= 0; i--) {
-    const date = new Date(now.getTime() - i * dayMs);
+    const date = new Date(baseDate.getTime() - i * dayMs);
     data.push({
       date: `${date.getMonth() + 1}/${date.getDate()}`,
       coverage: Math.round(60 + Math.random() * 20),
