@@ -75,6 +75,7 @@ export default function DataImport() {
     updateRecord,
     clearAllData,
     loadData,
+    reprocessRecordsBySource,
   } = useStore()
 
   const [csvText, setCsvText] = useState('')
@@ -318,8 +319,14 @@ export default function DataImport() {
         })
       }
     }
-    setImportMessage('字段映射已保存')
-    setTimeout(() => setImportMessage(null), 3000)
+    let processed = 0
+    if (currentSourceId !== null && parsedHeaders.length > 0) {
+      processed = await reprocessRecordsBySource(currentSourceId, fieldMap, unitConvs, parsedHeaders)
+    }
+    setImportMessage(processed > 0
+      ? `字段映射已保存，已重处理 ${processed} 条记录`
+      : '字段映射已保存')
+    setTimeout(() => setImportMessage(null), 5000)
   }
 
   const handleSaveConversion = async () => {

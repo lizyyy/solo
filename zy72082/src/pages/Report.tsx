@@ -1,7 +1,7 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { useStore } from '@/store'
 import type { AllocationResult, AuditLogEntry } from '@/types'
-import { FileBarChart, Download, ChevronDown, ChevronRight, CheckCircle, AlertTriangle } from 'lucide-react'
+import { FileBarChart, Download, ChevronDown, ChevronRight, CheckCircle, AlertTriangle, Image as ImageIcon, FileImage } from 'lucide-react'
 
 type AuditCategory = AuditLogEntry['category'] | 'all'
 const CATEGORIES: { key: AuditCategory; label: string }[] = [
@@ -14,11 +14,14 @@ const CATEGORIES: { key: AuditCategory; label: string }[] = [
 ]
 
 export default function Report() {
-  const { results, calcSteps, records, auditLog, selectedDetailRow, setSelectedDetailRow, exportAuditLog, loadData } = useStore()
+  const { results, calcSteps, records, auditLog, selectedDetailRow, setSelectedDetailRow, exportAuditLog, loadData, addAuditLog } = useStore()
   const [logOpen, setLogOpen] = useState(false)
   const [logFilter, setLogFilter] = useState<AuditCategory>('all')
+  const tempChartRef = useRef<SVGSVGElement>(null)
+  const effChartRef = useRef<SVGSVGElement>(null)
+  const anomalyChartRef = useRef<SVGSVGElement>(null)
 
-  useState(() => { loadData() })
+  useEffect(() => { loadData() }, [loadData])
 
   const anomalyCount = useMemo(() => {
     const ids = new Set(calcSteps.filter((s) => s.isAnomaly).map((s) => s.resultId))
@@ -65,10 +68,91 @@ export default function Report() {
     URL.revokeObjectURL(url)
   }, [exportAuditLog])
 
-  const maxTemp = useMemo(() => Math.max(...results.map((r) => r.assignedTemp), 1), [results])
+  const maxTemp = useMemo(() => Math.max(...results.map((r) => Math.abs(r.assignedTemp)), 1), [results])
   const maxEff = useMemo(() => Math.max(...results.map((r) => r.efficiency), 0.01), [results])
 
   const handleBarClick = useCallback((r: AllocationResult) => setSelectedDetailRow(r.id ?? null), [setSelectedDetailRow])
+
+  const serializeSVG = useCallback((svg: SVGSVGElement): string => {
+    const clone = svg.cloneNode(true) as SVGSVGElement
+    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+    const serializer = new XMLSerializer()
+    return '<?xml version="1.0" encoding="UTF-8"?>\n' + serializer.serializeToString(clone)
+  }, [])
+
+  const downloadFile = useCallback((content: string | Blob, filename: string, mime: string) => {
+    let blob: Blob
+    if (typeof content === 'string') {
+      blob = new Blob([content], { type: mime })
+    } else {
+      blob = content
+    }
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [])
+
+  const exportChartSVG = useCallback(async (svg: SVGSVGElement | null, name: string) => {
+    if (!svg) return
+    const svgContent = serializeSVG(svg)
+    const ts = new Date().toISOString().replace(/[:.]/g, '-')
+    downloadFile(svgContent, `${name}-${ts}.svg`, 'image/svg+xml;charset=utf-8')
+    await addAuditLog('report', '导出图表SVG', `${name}.svg`, '')
+  }, [serializeSVG, downloadFile, addAuditLog])
+
+  const exportChartPNG = useCallback(async (svg: SVGSVGElement | null, name: string) => {
+    if (!svg) return
+    const svgContent = serializeSVG(svg)
+    const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })
+    const url = URL.createObjectURL(svgBlob)
+    const img = new Image()
+    img.onload = () => {
+      const scale = 2
+      const w = svg.viewBox.baseVal.width || svg.clientWidth || 400
+      const h = svg.viewBox.baseVal.height || svg.clientHeight || 300
+      const canvas = document.createElement('canvas')
+      canvas.width = w * scale
+      canvas.height = h * scale
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        ctx.fillStyle = '#ffffff'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        ctx.scale(scale, scale)
+        ctx.drawImage(img, 0, 0, w, h)
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const ts = new Date().toISOString().replace(/[:.]/g, '-')
+            downloadFile(blob, `${name}-${ts}.png`, 'image/png')
+            addAuditLog('report', '导出图表PNG', `${name}.png`, '')
+          }
+          URL.revokeObjectURL(url)
+        }, 'image/png')
+      } else {
+        URL.revokeObjectURL(url)
+      }
+    }
+    img.onerror = () => { URL.revokeObjectURL(url) }
+    img.src = url
+  }, [serializeSVG, downloadFile, addAuditLog])
+
+  const exportAllCharts = useCallback(async (fmt: 'svg' | 'png') => {
+    const charts: { ref: React.RefObject<SVGSVGElement>; name: string }[] = [
+      { ref: tempChartRef, name: 'temperature-chart' },
+      { ref: effChartRef, name: 'efficiency-chart' },
+      { ref: anomalyChartRef, name: 'anomaly-chart' },
+    ]
+    for (const c of charts) {
+      if (fmt === 'svg') {
+        await exportChartSVG(c.ref.current, c.name)
+      } else {
+        await exportChartPNG(c.ref.current, c.name)
+      }
+      await new Promise((r) => setTimeout(r, 150))
+    }
+  }, [exportChartSVG, exportChartPNG])
 
   if (results.length === 0) {
     return (
@@ -81,55 +165,144 @@ export default function Report() {
     )
   }
 
+  const chartW = 480
+  const chartH = 320
+  const padL = 80
+  const padR = 60
+  const padT = 20
+  const padB = 40
+  const innerW = chartW - padL - padR
+  const innerH = chartH - padT - padB
+  const rowH = results.length > 0 ? innerH / results.length : 24
+
   return (
     <div className="p-6 space-y-6">
-      <h2 className="section-title">报告导出</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="section-title">报告导出</h2>
+        <div className="flex items-center gap-2">
+          <button className="btn-secondary text-xs flex items-center gap-1" onClick={() => exportAllCharts('svg')}>
+            <FileImage className="w-3 h-3" />导出全部 SVG
+          </button>
+          <button className="btn-secondary text-xs flex items-center gap-1" onClick={() => exportAllCharts('png')}>
+            <ImageIcon className="w-3 h-3" />导出全部 PNG
+          </button>
+          <button className="btn-secondary text-xs px-2 py-1" onClick={(e) => { e.stopPropagation(); handleExport() }}>
+            <Download className="w-3 h-3 inline mr-1" />导出日志
+          </button>
+        </div>
+      </div>
 
       {/* 图表区 */}
       <div className="grid grid-cols-3 gap-4">
+        {/* 温区分布柱状图 */}
         <div className="card p-4">
-          <p className="label-text mb-3">温区分布柱状图</p>
-          <div className="space-y-2">
-            {results.map((r) => (
-              <div key={r.id} className="flex items-center gap-2 cursor-pointer" onClick={() => handleBarClick(r)}>
-                <span className="text-xs text-slate-500 w-24 truncate">{r.routeId}/{r.warehouseId}</span>
-                <div className="flex-1 bg-slate-100 rounded h-5 relative">
-                  <div className="bg-teal-950 h-5 rounded transition-all" style={{ width: `${(r.assignedTemp / maxTemp) * 100}%` }} />
-                </div>
-                <span className="data-cell text-xs w-14 text-right">{r.assignedTemp}°C</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="card p-4">
-          <p className="label-text mb-3">路线效率散点图</p>
-          <div className="space-y-2">
-            {results.map((r) => (
-              <div key={r.id} className="flex items-center gap-2 cursor-pointer" onClick={() => handleBarClick(r)}>
-                <span className="text-xs text-slate-500 w-24 truncate">{r.routeId}</span>
-                <div className="flex-1 relative h-5">
-                  <div className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-teal-700" style={{ left: `${(r.efficiency / maxEff) * 90}%` }} />
-                  <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-px bg-slate-200" />
-                </div>
-                <span className="data-cell text-xs w-14 text-right">{r.efficiency.toFixed(2)}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="card p-4">
-          <p className="label-text mb-3">异常分布统计</p>
-          <div className="flex gap-4 items-center justify-center h-full">
-            <div className="text-center cursor-pointer" onClick={() => setSelectedDetailRow(null)}>
-              <p className="text-3xl font-bold text-teal-950">{normalCount}</p>
-              <span className="badge-info mt-1">正常</span>
-            </div>
-            <div className="text-center cursor-pointer" onClick={() => setSelectedDetailRow(null)}>
-              <p className="text-3xl font-bold text-amber-600">{anomalyCount}</p>
-              <span className="badge-warning mt-1">异常</span>
+          <div className="flex items-center justify-between mb-3">
+            <p className="label-text">温区分布柱状图</p>
+            <div className="flex items-center gap-1">
+              <button className="text-xs text-teal-700 hover:text-teal-900" title="导出 SVG" onClick={() => exportChartSVG(tempChartRef.current, 'temperature-chart')}>
+                <FileImage className="w-3 h-3" />
+              </button>
+              <button className="text-xs text-teal-700 hover:text-teal-900" title="导出 PNG" onClick={() => exportChartPNG(tempChartRef.current, 'temperature-chart')}>
+                <ImageIcon className="w-3 h-3" />
+              </button>
             </div>
           </div>
+          <svg ref={tempChartRef} viewBox={`0 0 ${chartW} ${chartH}`} className="w-full h-auto">
+            <rect x="0" y="0" width={chartW} height={chartH} fill="#ffffff" />
+            {results.map((r, i) => {
+              const y = padT + i * rowH + 2
+              const h = Math.max(rowH - 6, 4)
+              const ratio = Math.min(Math.abs(r.assignedTemp) / maxTemp, 1)
+              const barW = ratio * (innerW - 50)
+              const isSel = r.id === selectedDetailRow
+              return (
+                <g key={r.id} className="cursor-pointer" onClick={() => handleBarClick(r)}>
+                  <text x={padL - 6} y={y + h / 2 + 4} textAnchor="end" fontSize="10" fill="#64748b">{r.routeId}/{r.warehouseId}</text>
+                  <rect x={padL} y={y} width={innerW - 50} height={h} fill="#f1f5f9" rx="3" />
+                  <rect x={padL} y={y} width={barW} height={h} fill={isSel ? '#0f766e' : '#0F4C5C'} rx="3" />
+                  <text x={padL + innerW - 45} y={y + h / 2 + 4} fontSize="10" fill="#334155">{r.assignedTemp}°C</text>
+                </g>
+              )
+            })}
+          </svg>
+        </div>
+
+        {/* 路线效率散点图 */}
+        <div className="card p-4">
+          <div className="flex items-center justify-between mb-3">
+            <p className="label-text">路线效率散点图</p>
+            <div className="flex items-center gap-1">
+              <button className="text-xs text-teal-700 hover:text-teal-900" title="导出 SVG" onClick={() => exportChartSVG(effChartRef.current, 'efficiency-chart')}>
+                <FileImage className="w-3 h-3" />
+              </button>
+              <button className="text-xs text-teal-700 hover:text-teal-900" title="导出 PNG" onClick={() => exportChartPNG(effChartRef.current, 'efficiency-chart')}>
+                <ImageIcon className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
+          <svg ref={effChartRef} viewBox={`0 0 ${chartW} ${chartH}`} className="w-full h-auto">
+            <rect x="0" y="0" width={chartW} height={chartH} fill="#ffffff" />
+            <line x1={padL} y1={chartH - padB} x2={chartW - padR} y2={chartH - padB} stroke="#e2e8f0" strokeWidth="1" />
+            {results.map((r, i) => {
+              const y = padT + i * rowH + rowH / 2
+              const ratio = Math.min(r.efficiency / maxEff, 1)
+              const x = padL + ratio * (innerW - 20)
+              const isSel = r.id === selectedDetailRow
+              return (
+                <g key={r.id} className="cursor-pointer" onClick={() => handleBarClick(r)}>
+                  <text x={padL - 6} y={y + 4} textAnchor="end" fontSize="10" fill="#64748b">{r.routeId}</text>
+                  <circle cx={x} cy={y} r={isSel ? 7 : 5} fill={isSel ? '#0f766e' : '#0F766E'} stroke="#ffffff" strokeWidth="2" />
+                  <text x={padL + innerW - 45} y={y + 4} fontSize="10" fill="#334155">{r.efficiency.toFixed(2)}</text>
+                </g>
+              )
+            })}
+          </svg>
+        </div>
+
+        {/* 异常分布统计 */}
+        <div className="card p-4">
+          <div className="flex items-center justify-between mb-3">
+            <p className="label-text">异常分布统计</p>
+            <div className="flex items-center gap-1">
+              <button className="text-xs text-teal-700 hover:text-teal-900" title="导出 SVG" onClick={() => exportChartSVG(anomalyChartRef.current, 'anomaly-chart')}>
+                <FileImage className="w-3 h-3" />
+              </button>
+              <button className="text-xs text-teal-700 hover:text-teal-900" title="导出 PNG" onClick={() => exportChartPNG(anomalyChartRef.current, 'anomaly-chart')}>
+                <ImageIcon className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
+          <svg ref={anomalyChartRef} viewBox={`0 0 ${chartW} ${chartH}`} className="w-full h-auto">
+            <rect x="0" y="0" width={chartW} height={chartH} fill="#ffffff" />
+            {(() => {
+              const total = results.length || 1
+              const normRatio = normalCount / total
+              const anomRatio = anomalyCount / total
+              const barX = 60
+              const barY = 80
+              const barW = chartW - 120
+              const barH = 80
+              const normW = normRatio * barW
+              const anomW = anomRatio * barW
+              return (
+                <>
+                  <g className="cursor-pointer" onClick={() => setSelectedDetailRow(null)}>
+                    <rect x={barX} y={barY} width={normW} height={barH} fill="#0F4C5C" rx="6" />
+                    <text x={barX + normW / 2} y={barY + barH / 2 - 2} textAnchor="middle" fontSize="28" fontWeight="bold" fill="#ffffff">{normalCount}</text>
+                    <text x={barX + normW / 2} y={barY + barH / 2 + 22} textAnchor="middle" fontSize="12" fill="#ffffff">正常</text>
+                  </g>
+                  <g className="cursor-pointer" onClick={() => setSelectedDetailRow(null)}>
+                    <rect x={barX + normW} y={barY} width={anomW} height={barH} fill="#E36414" rx="6" />
+                    <text x={barX + normW + anomW / 2} y={barY + barH / 2 - 2} textAnchor="middle" fontSize="28" fontWeight="bold" fill="#ffffff">{anomalyCount}</text>
+                    <text x={barX + normW + anomW / 2} y={barY + barH / 2 + 22} textAnchor="middle" fontSize="12" fill="#ffffff">异常</text>
+                  </g>
+                  <text x={chartW / 2} y={barY + barH + 36} textAnchor="middle" fontSize="14" fill="#475569">
+                    共 {results.length} 条分配结果 — 正常 {normalCount} 条，异常 {anomalyCount} 条
+                  </text>
+                </>
+              )
+            })()}
+          </svg>
         </div>
       </div>
 
