@@ -23,13 +23,13 @@ export const mockCaliberVersions: CaliberVersion[] = [
       }
     ],
     units: [
-      { id: 'u1', name: '百分比', symbol: '%', category: 'ratio', conversionFactor: 0.01 },
+      { id: 'u1', name: '百分比', symbol: '%', category: 'ratio', conversionFactor: 1 },
       { id: 'u2', name: '次', symbol: '次', category: 'count', conversionFactor: 1 },
-      { id: 'u3', name: '万元', symbol: '万元', category: 'currency', conversionFactor: 10000 },
+      { id: 'u3', name: '万元', symbol: '万元', category: 'currency', conversionFactor: 1 },
       { id: 'u4', name: '天', symbol: '天', category: 'time', conversionFactor: 1 }
     ],
     thresholds: [
-      { id: 't1', name: '违约概率阈值', minValue: 0, maxValue: 0.05, unit: '%', description: '正常范围0-5%' },
+      { id: 't1', name: '违约概率阈值', minValue: 0, maxValue: 5, unit: '%', description: '正常范围0-5%' },
       { id: 't2', name: '损失金额阈值', minValue: 0, maxValue: 1000, unit: '万元', description: '单笔损失上限' },
       { id: 't3', name: '逾期天数阈值', minValue: 0, maxValue: 90, unit: '天', description: '正常类贷款上限' }
     ],
@@ -60,14 +60,14 @@ export const mockCaliberVersions: CaliberVersion[] = [
       }
     ],
     units: [
-      { id: 'u1', name: '百分比', symbol: '%', category: 'ratio', conversionFactor: 0.01 },
+      { id: 'u1', name: '百分比', symbol: '%', category: 'ratio', conversionFactor: 1 },
       { id: 'u2', name: '次', symbol: '次', category: 'count', conversionFactor: 1 },
-      { id: 'u3', name: '万元', symbol: '万元', category: 'currency', conversionFactor: 10000 },
+      { id: 'u3', name: '万元', symbol: '万元', category: 'currency', conversionFactor: 1 },
       { id: 'u4', name: '天', symbol: '天', category: 'time', conversionFactor: 1 },
-      { id: 'u5', name: '亿元', symbol: '亿元', category: 'currency', conversionFactor: 100000000 }
+      { id: 'u5', name: '亿元', symbol: '亿元', category: 'currency', conversionFactor: 10000 }
     ],
     thresholds: [
-      { id: 't1-v2', name: '违约概率阈值', minValue: 0, maxValue: 0.03, unit: '%', description: '正常范围0-3%，收紧标准' },
+      { id: 't1-v2', name: '违约概率阈值', minValue: 0, maxValue: 3, unit: '%', description: '正常范围0-3%，收紧标准' },
       { id: 't2-v2', name: '损失金额阈值', minValue: 0, maxValue: 2000, unit: '万元', description: '单笔损失上限提高' },
       { id: 't3-v2', name: '逾期天数阈值', minValue: 0, maxValue: 60, unit: '天', description: '正常类贷款上限收紧' }
     ],

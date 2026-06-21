@@ -1,6 +1,6 @@
 export type ReviewStatus = 'pending' | 'calculating' | 'completed' | 'error' | 'warning';
 
-export type BlockType = 'formula' | 'unit' | 'threshold' | 'extrapolation' | 'alias';
+export type BlockType = 'formula' | 'unit' | 'threshold' | 'extrapolation' | 'alias' | 'consistency' | 'caliber';
 
 export type ExtrapolationDirection = 'up' | 'down' | 'both';
 
@@ -118,15 +118,22 @@ export interface BoundaryRecord {
   inputValue: number;
   inputUnit: string;
   calculatedValue: number;
+  calculatedUnit: string;
   probability: number;
   lowerBound: number;
   upperBound: number;
+  boundUnit: string;
   isWithinBounds: boolean;
   status: ReviewStatus;
   caliberVersionId: string;
   anomalies: AnomalyRecord[];
   extrapolation?: ExtrapolationInfo;
   calculationTrace: CalculationTrace[];
+  sourceIndex: number;
+  sourceName: string;
+  sourceType: MaterialSource['type'];
+  sourceContext: string;
+  isMaterialLevel?: boolean;
   createdAt: string;
   updatedAt: string;
   reviewedBy?: string;

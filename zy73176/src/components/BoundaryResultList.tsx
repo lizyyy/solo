@@ -40,10 +40,10 @@ export function BoundaryResultList({
         <h2 className="text-lg font-semibold text-gray-800">复核结果</h2>
         <div className="flex items-center gap-2 text-sm">
           <span className="text-green-600">
-            ✓ {records.filter(r => r.isWithinBounds).length} 界内
+            ✓ {records.filter(r => r.isWithinBounds && !r.isMaterialLevel).length} 界内
           </span>
           <span className="text-red-600">
-            ✗ {records.filter(r => !r.isWithinBounds).length} 界外
+            ✗ {records.filter(r => !r.isWithinBounds && !r.isMaterialLevel).length} 界外
           </span>
           <span className="text-yellow-600">
             ⚠️ {records.filter(r => r.status === 'warning').length} 警告
@@ -74,6 +74,43 @@ interface BoundaryResultCardProps {
 function BoundaryResultCard({ record, isSelected, onSelect }: BoundaryResultCardProps) {
   const errorCount = record.anomalies.filter(a => a.severity === 'error').length;
   const warningCount = record.anomalies.filter(a => a.severity === 'warning').length;
+
+  if (record.isMaterialLevel) {
+    return (
+      <div
+        className={`p-4 rounded-lg border transition-all cursor-pointer hover:shadow-md ${
+          isSelected
+            ? 'border-indigo-500 bg-indigo-50 shadow-md'
+            : 'border-indigo-200 bg-indigo-50/40 hover:border-indigo-400'
+        }`}
+        onClick={onSelect}
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              <span className="font-medium text-gray-800">{record.canonicalName}</span>
+              <span className="px-2 py-0.5 text-xs rounded bg-indigo-100 text-indigo-700">材料级</span>
+              <StatusBadge status={record.status} />
+            </div>
+            <p className="text-sm text-gray-600 line-clamp-2">
+              {record.anomalies[0]?.message || '材料级异常'}
+            </p>
+            <div className="flex items-center gap-2 flex-wrap mt-2">
+              <span className="text-xs text-gray-500">来源：{record.sourceName}</span>
+              {warningCount > 0 && <span className="text-xs text-yellow-600">⚠️ {warningCount} 个警告</span>}
+              {errorCount > 0 && <span className="text-xs text-red-600">❌ {errorCount} 个错误</span>}
+            </div>
+          </div>
+          <div className="flex flex-col items-end gap-2">
+            <span className="text-2xl">🔗</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const range = record.upperBound - record.lowerBound;
+  const progress = range === 0 ? 0 : Math.min(100, Math.max(0, ((record.calculatedValue - record.lowerBound) / range) * 100));
 
   return (
     <div
@@ -109,6 +146,14 @@ function BoundaryResultCard({ record, isSelected, onSelect }: BoundaryResultCard
                 {record.inputValue}{record.inputUnit}
               </span>
             </div>
+            {record.calculatedUnit && record.calculatedUnit !== record.inputUnit && (
+              <div className="flex items-baseline gap-1">
+                <span className="text-gray-500">换算:</span>
+                <span className="font-mono text-xs text-orange-600">
+                  {record.calculatedValue}{record.calculatedUnit}
+                </span>
+              </div>
+            )}
             <div className="flex items-baseline gap-1">
               <span className="text-gray-500">概率:</span>
               <span className="font-mono font-medium text-blue-600">
@@ -123,16 +168,11 @@ function BoundaryResultCard({ record, isSelected, onSelect }: BoundaryResultCard
                 className={`h-full transition-all duration-500 ${
                   record.isWithinBounds ? 'bg-green-500' : 'bg-red-500'
                 }`}
-                style={{
-                  width: `${Math.min(100, Math.max(0, 
-                    ((record.calculatedValue - record.lowerBound) / 
-                    (record.upperBound - record.lowerBound)) * 100
-                  ))}%`
-                }}
+                style={{ width: `${progress}%` }}
               />
             </div>
             <span className="text-xs text-gray-500 whitespace-nowrap">
-              [{record.lowerBound}, {record.upperBound}]
+              [{record.lowerBound}, {record.upperBound}]{record.boundUnit}
             </span>
           </div>
 
@@ -195,6 +235,40 @@ export function AnomalyList({ record, onResolve }: AnomalyListProps) {
           共 {record.anomalies.length} 条异常
         </span>
       </div>
+
+      <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+          <span>📎 数据来源</span>
+        </div>
+        <div className="text-sm font-medium text-gray-800">{record.sourceName}</div>
+        {record.sourceContext && (
+          <pre className="mt-1 p-2 bg-white rounded text-xs text-gray-600 font-mono whitespace-pre-wrap break-all max-h-24 overflow-y-auto">
+            {record.sourceContext}
+          </pre>
+        )}
+      </div>
+
+      {record.extrapolation && (
+        <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+          <div className="flex items-center gap-2 text-xs text-orange-700 mb-2">
+            <span>📈 外推分析</span>
+            <span className="px-2 py-0.5 rounded bg-orange-100">
+              方向：{record.extrapolation.direction === 'up' ? '向上外推' : record.extrapolation.direction === 'down' ? '向下外推' : '双向外推'}
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-xs text-gray-700 mb-2">
+            <div>建模样本范围：[{record.extrapolation.originalRange[0]}, {record.extrapolation.originalRange[1]}]{record.boundUnit}</div>
+            <div>外推后取值：{record.extrapolation.extrapolatedValue}{record.calculatedUnit}</div>
+            <div className="col-span-2">外推方法：{record.extrapolation.method}</div>
+            {record.extrapolation.impactScope.length > 0 && (
+              <div className="col-span-2">影响范围：{record.extrapolation.impactScope.join('、')}</div>
+            )}
+          </div>
+          <div className="p-2 bg-white/70 rounded text-sm text-orange-800">
+            <span className="font-medium">收尾建议：</span>{record.extrapolation.suggestion}
+          </div>
+        </div>
+      )}
 
       <div className="space-y-3">
         {record.anomalies.map((anomaly) => (

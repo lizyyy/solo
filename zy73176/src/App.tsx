@@ -56,7 +56,8 @@ function App() {
         store.state.boundaryRecords,
         selectedMaterial,
         store.state.activeCaliber,
-        config
+        config,
+        store.state.caliberVersions
       );
       CSVExporter.downloadCSV(content, `明细_${filename}`);
     }

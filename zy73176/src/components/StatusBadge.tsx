@@ -96,6 +96,18 @@ function getBlockTypeConfig(type: BlockType) {
         class: 'bg-blue-100 text-blue-700',
         icon: '🔄'
       };
+    case 'consistency':
+      return {
+        label: '材料一致性',
+        class: 'bg-teal-100 text-teal-700',
+        icon: '🔗'
+      };
+    case 'caliber':
+      return {
+        label: '口径变更',
+        class: 'bg-indigo-100 text-indigo-700',
+        icon: '🔀'
+      };
   }
 }
 

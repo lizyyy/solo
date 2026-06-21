@@ -123,17 +123,18 @@ export function BusinessExplanation({
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">指标名称</th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">输入值</th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">数据来源</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">来源内容</th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">计算公式</th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">结果</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {records.map((record, idx) => {
-                const source = material.materials[record.inputValue ? 0 : 0]?.name || '未知来源';
-                const formula = record.calculationTrace.find(t => t.source === 'probability_calculation')?.formula || '标准公式';
-                
+                const formula = record.calculationTrace.find(t => t.source === 'probability_calculation')?.formula
+                  || (record.isMaterialLevel ? '材料级校验' : '标准公式');
+
                 return (
-                  <tr key={record.id} className={record.isWithinBounds ? '' : 'bg-red-50'}>
+                  <tr key={record.id} className={record.isMaterialLevel ? 'bg-indigo-50' : (record.isWithinBounds ? '' : 'bg-red-50')}>
                     <td className="px-4 py-3 text-gray-500">{idx + 1}</td>
                     <td className="px-4 py-3">
                       <div className="font-medium text-gray-800">{record.canonicalName}</div>
@@ -142,20 +143,36 @@ export function BusinessExplanation({
                           （原始名称：{record.objectName}）
                         </div>
                       )}
+                      {record.isMaterialLevel && (
+                        <span className="inline-block mt-1 px-1.5 py-0.5 text-[10px] rounded bg-indigo-100 text-indigo-700">材料级</span>
+                      )}
                     </td>
                     <td className="px-4 py-3 font-mono text-gray-800">
-                      {record.inputValue}{record.inputUnit}
+                      {record.isMaterialLevel ? '—' : `${record.inputValue}${record.inputUnit}`}
                     </td>
-                    <td className="px-4 py-3 text-gray-600 max-w-[150px] truncate">
-                      {source}
+                    <td className="px-4 py-3 text-gray-600">
+                      <div className="font-medium">{record.sourceName}</div>
+                      <div className="text-xs text-gray-400">{record.sourceType === 'file' ? '文件材料' : record.sourceType === 'remark' ? '评分备注' : '口头说明'}</div>
+                    </td>
+                    <td className="px-4 py-3 text-gray-600 max-w-[220px]">
+                      <details>
+                        <summary className="cursor-pointer text-xs text-blue-600 hover:text-blue-800">查看来源内容</summary>
+                        <pre className="mt-1 p-2 bg-gray-50 rounded text-xs text-gray-600 font-mono whitespace-pre-wrap break-all">
+                          {record.sourceContext || '（无内容）'}
+                        </pre>
+                      </details>
                     </td>
                     <td className="px-4 py-3 font-mono text-xs text-purple-600">
                       {formula}
                     </td>
                     <td className="px-4 py-3">
-                      <span className={record.isWithinBounds ? 'text-green-600' : 'text-red-600'}>
-                        {record.isWithinBounds ? '✅ 界内' : '❌ 界外'}
-                      </span>
+                      {record.isMaterialLevel ? (
+                        <span className="text-indigo-600">🔗 材料级</span>
+                      ) : (
+                        <span className={record.isWithinBounds ? 'text-green-600' : 'text-red-600'}>
+                          {record.isWithinBounds ? '✅ 界内' : '❌ 界外'}
+                        </span>
+                      )}
                     </td>
                   </tr>
                 );

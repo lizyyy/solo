@@ -5,7 +5,8 @@ export class CSVExporter {
     records: BoundaryRecord[],
     material: Material,
     caliber: CaliberVersion,
-    config: CSVExportConfig
+    config: CSVExportConfig,
+    caliberVersions: CaliberVersion[] = []
   ): string {
     const rows: string[][] = [];
 
@@ -42,10 +43,12 @@ export class CSVExporter {
         '标准名称',
         '输入值',
         '输入单位',
-        '计算值',
+        '计算值(换算后)',
+        '计算单位',
         '概率值',
         '阈值下限',
         '阈值上限',
+        '阈值单位',
         '是否在界内',
         '状态',
         '异常数量',
@@ -54,6 +57,7 @@ export class CSVExporter {
         '是否外推',
         '外推方向',
         '外推影响范围',
+        '数据来源',
         '使用口径版本',
         '创建时间'
       ];
@@ -78,9 +82,11 @@ export class CSVExporter {
           record.inputValue.toString(),
           record.inputUnit,
           record.calculatedValue.toString(),
+          record.calculatedUnit,
           (record.probability * 100).toFixed(2) + '%',
           record.lowerBound.toString(),
           record.upperBound.toString(),
+          record.boundUnit,
           record.isWithinBounds ? '是' : '否',
           this.getStatusLabel(record.status),
           record.anomalies.length.toString(),
@@ -89,7 +95,8 @@ export class CSVExporter {
           record.extrapolation ? '是' : '否',
           record.extrapolation?.direction === 'up' ? '向上' : record.extrapolation?.direction === 'down' ? '向下' : '',
           record.extrapolation?.impactScope.join('; ') || '',
-          record.caliberVersionId,
+          record.sourceName,
+          `${caliber.version} - ${caliber.name}`,
           new Date(record.createdAt).toLocaleString('zh-CN')
         ];
 
@@ -141,12 +148,17 @@ export class CSVExporter {
     rows.push([]);
     rows.push(['=== 材料来源说明 ===']);
     rows.push(['来源类型', '名称', '上传时间', '使用口径']);
+    const caliberLabel = (id: string): string => {
+      if (id === caliber.id) return `${caliber.version} - ${caliber.name}`;
+      const found = caliberVersions.find((cv) => cv.id === id);
+      return found ? `${found.version} - ${found.name}` : id;
+    };
     material.materials.forEach((m) => {
       rows.push([
         this.getSourceTypeLabel(m.type),
         m.name,
         new Date(m.uploadTime).toLocaleString('zh-CN'),
-        m.caliberVersionId
+        caliberLabel(m.caliberVersionId)
       ]);
     });
 
@@ -258,21 +270,36 @@ export class CSVExporter {
     rows.push([]);
 
     rows.push(['六、数字来源线索']);
-    rows.push(['序号', '指标名称', '输入值来源', '计算公式', '结果说明']);
+    rows.push(['序号', '指标名称', '输入值', '数据来源', '来源类型', '来源内容', '计算公式', '结果说明']);
     records.forEach((r, idx) => {
-      const sourceIndex = material.items.findIndex(
-        (item) => item.objectName === r.objectName || item.objectName === r.canonicalName
-      );
-      const source = material.materials[sourceIndex >= 0 ? material.items[sourceIndex].sourceIndex : 0]?.name || '未知来源';
-      const formula = r.calculationTrace.find((t) => t.source === 'probability_calculation')?.formula || '标准公式';
-      
+      const formula = r.calculationTrace.find((t) => t.source === 'probability_calculation')?.formula
+        || (r.isMaterialLevel ? '材料级校验' : '标准公式');
+      const sourceTypeLabel = r.sourceType === 'file' ? '文件材料' : r.sourceType === 'remark' ? '评分备注' : '口头说明';
+      const resultNote = r.isMaterialLevel
+        ? '材料级异常，需人工核查'
+        : r.isWithinBounds
+          ? '计算结果在阈值范围内，复核通过'
+          : '计算结果超出阈值范围，需关注';
+
       rows.push([
         (idx + 1).toString(),
         r.canonicalName,
-        source,
+        r.isMaterialLevel ? '—' : `${r.inputValue}${r.inputUnit}`,
+        r.sourceName,
+        sourceTypeLabel,
+        r.sourceContext.replace(/\n/g, ' ').slice(0, 200),
         formula,
-        r.isWithinBounds ? '计算结果在阈值范围内，复核通过' : '计算结果超出阈值范围，需关注'
+        resultNote
       ]);
+    });
+
+    rows.push([]);
+    rows.push(['=== 口径一致性说明 ===']);
+    rows.push(['本文件所有数值均按当前口径输出，与页面展示一致']);
+    rows.push(['当前口径版本', `${caliber.version} - ${caliber.name}`]);
+    rows.push(['百分比单位说明', '阈值与输入值均按百分比语义比较（如 2.5% 与 0-3% 比较）']);
+    caliber.thresholds.forEach((t) => {
+      rows.push([t.name, `[${t.minValue}, ${t.maxValue}]${t.unit}`, t.description]);
     });
 
     return this.rowsToCSV(rows);
@@ -328,7 +355,9 @@ export class CSVExporter {
       unit: '单位',
       threshold: '阈值',
       extrapolation: '外推',
-      alias: '别名'
+      alias: '别名',
+      consistency: '材料一致性',
+      caliber: '口径变更'
     };
     return labels[type] || type;
   }
