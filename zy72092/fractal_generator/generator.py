@@ -44,8 +44,11 @@ class FractalGenerator:
             has_errors = any(i.severity == ValidationSeverity.ERROR for i in validation_issues)
             has_warnings = any(i.severity == ValidationSeverity.WARNING for i in validation_issues)
             complexity = pattern.complexity_score
+            has_unit_issue = self._has_unit_conflict(validation_issues)
 
             if has_errors:
+                status = FractalStatus.NEEDS_REVIEW
+            elif has_unit_issue:
                 status = FractalStatus.NEEDS_REVIEW
             elif complexity is not None and complexity > 85:
                 status = FractalStatus.NEEDS_REVIEW
@@ -162,6 +165,19 @@ class FractalGenerator:
         if not math.isfinite(score):
             return 100.0
         return round(min(max(score, 0.0), 100.0), 2)
+
+    @staticmethod
+    def _has_unit_conflict(issues: List[ValidationIssue]) -> bool:
+        for issue in issues:
+            if issue.severity == ValidationSeverity.ERROR and '单位' in issue.message:
+                return True
+            if issue.severity == ValidationSeverity.WARNING and issue.field == 'unit':
+                return True
+            if issue.severity == ValidationSeverity.WARNING and '单位' in issue.message:
+                return True
+            if issue.severity == ValidationSeverity.ERROR and '冲突' in issue.message:
+                return True
+        return False
 
     @staticmethod
     def _safe_float(value: Any) -> Optional[float]:

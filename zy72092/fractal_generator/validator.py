@@ -1,6 +1,7 @@
-from typing import List, Tuple, Optional, Set
+from typing import List, Tuple, Optional, Set, Dict
 from enum import Enum
 import math
+import re
 
 from .core import FractalPattern, UnitType, ValidationIssue
 
@@ -19,6 +20,39 @@ UNIT_CONVERSION_FACTORS = {
     UnitType.PERCENT: 1.0
 }
 
+LENGTH_UNIT_CONVERSION = {
+    (UnitType.INCH, UnitType.MILLIMETER): 25.4,
+    (UnitType.INCH, UnitType.CENTIMETER): 2.54,
+    (UnitType.MILLIMETER, UnitType.CENTIMETER): 0.1,
+    (UnitType.CENTIMETER, UnitType.MILLIMETER): 10.0,
+    (UnitType.MILLIMETER, UnitType.INCH): 1 / 25.4,
+    (UnitType.CENTIMETER, UnitType.INCH): 1 / 2.54,
+}
+
+UNIT_ALIAS_MAP = {
+    'px': UnitType.PIXEL,
+    'pixel': UnitType.PIXEL,
+    'mm': UnitType.MILLIMETER,
+    'millimeter': UnitType.MILLIMETER,
+    'millimeters': UnitType.MILLIMETER,
+    'cm': UnitType.CENTIMETER,
+    'centimeter': UnitType.CENTIMETER,
+    'centimeters': UnitType.CENTIMETER,
+    'in': UnitType.INCH,
+    'inch': UnitType.INCH,
+    'inches': UnitType.INCH,
+    '%': UnitType.PERCENT,
+    'percent': UnitType.PERCENT,
+    'pct': UnitType.PERCENT,
+}
+
+NUMERIC_FIELDS_WITH_UNITS = [
+    'fractal_dimension',
+    'scale_factor',
+    'rotation_angle',
+    'complexity_score'
+]
+
 FRACTAL_DIMENSION_BOUNDS = (1.0, 3.0)
 ITERATIONS_BOUNDS = (1, 20)
 SCALE_FACTOR_BOUNDS = (0.1, 2.0)
@@ -27,14 +61,6 @@ COMPLEXITY_SCORE_BOUNDS = (0.0, 100.0)
 
 VALID_BASE_SHAPES = ['triangle', 'square', 'pentagon', 'hexagon', 'circle', 'line']
 VALID_COLOR_PALETTES = ['monochrome', 'gradient', 'rainbow', 'earth', 'ocean', 'fire']
-
-UNIT_BOUNDARY_PATTERN = {
-    UnitType.PIXEL: r'(\d+)\s*px\b',
-    UnitType.MILLIMETER: r'(\d+\.?\d*)\s*mm\b',
-    UnitType.CENTIMETER: r'(\d+\.?\d*)\s*cm\b',
-    UnitType.INCH: r'(\d+\.?\d*)\s*in\b',
-    UnitType.PERCENT: r'(\d+\.?\d*)\s*%\b',
-}
 
 
 def _is_finite_number(value) -> bool:
@@ -47,17 +73,73 @@ def _is_finite_number(value) -> bool:
     return False
 
 
+def extract_value_and_unit(raw_value) -> Tuple[Optional[float], Optional[UnitType], Optional[str]]:
+    if raw_value is None:
+        return None, None, None
+    if isinstance(raw_value, (int, float)) and not isinstance(raw_value, bool):
+        if math.isfinite(raw_value):
+            return float(raw_value), None, None
+        return None, None, None
+    if not isinstance(raw_value, str):
+        return None, None, None
+
+    value_str = raw_value.strip()
+    if not value_str:
+        return None, None, None
+
+    match = re.match(
+        r'([-+]?\d*\.?\d+)\s*(px|pixel|mm|millimeter|cm|centimeter|in|inch|%|percent|deg|次)?\b',
+        value_str,
+        re.IGNORECASE
+    )
+    if not match:
+        num_match = re.search(r'[-+]?\d*\.?\d+', value_str)
+        if num_match:
+            try:
+                return float(num_match.group()), None, value_str
+            except ValueError:
+                return None, None, value_str
+        return None, None, value_str
+
+    numeric_val = float(match.group(1))
+    unit_str = match.group(2)
+
+    detected_unit = None
+    if unit_str:
+        unit_lower = unit_str.lower()
+        if unit_lower in UNIT_ALIAS_MAP:
+            detected_unit = UNIT_ALIAS_MAP[unit_lower]
+
+    return numeric_val, detected_unit, value_str
+
+
+def can_convert_length(from_unit: UnitType, to_unit: UnitType) -> bool:
+    return (from_unit, to_unit) in LENGTH_UNIT_CONVERSION
+
+
+def convert_length_value(value: float, from_unit: UnitType, to_unit: UnitType) -> Optional[float]:
+    key = (from_unit, to_unit)
+    if key in LENGTH_UNIT_CONVERSION:
+        return value * LENGTH_UNIT_CONVERSION[key]
+    if from_unit == to_unit:
+        return value
+    return None
+
+
 class FractalValidator:
     _seen_patterns: Set[Tuple] = set()
 
     def __init__(self):
         self.issues: List[ValidationIssue] = []
+        self._field_units: Dict[str, UnitType] = {}
 
     def validate(self, pattern: FractalPattern, raw_input: dict = None) -> List[ValidationIssue]:
         self.issues = []
+        self._field_units = {}
         raw = raw_input if raw_input is not None else {}
 
         self._check_missing_values(pattern, raw)
+        self._extract_field_units(raw)
         self._validate_fractal_dimension(pattern.fractal_dimension)
         self._validate_iterations(pattern.iterations)
         self._validate_scale_factor(pattern.scale_factor)
@@ -66,9 +148,20 @@ class FractalValidator:
         self._validate_color_palette(pattern.color_palette)
         self._validate_complexity_score(pattern.complexity_score)
         self._check_unit_consistency(pattern, raw)
+        self._check_field_unit_conflicts(pattern)
         self._check_duplicate_pattern(pattern)
 
         return self.issues
+
+    def _extract_field_units(self, raw: dict):
+        for field in NUMERIC_FIELDS_WITH_UNITS:
+            if field in raw and raw[field] is not None:
+                _, unit, _ = extract_value_and_unit(raw[field])
+                if unit is not None:
+                    self._field_units[field] = unit
+
+    def get_field_units(self) -> Dict[str, UnitType]:
+        return dict(self._field_units)
 
     def _check_missing_values(self, pattern: FractalPattern, raw: dict):
         required_fields = ['fractal_dimension', 'iterations', 'scale_factor']
@@ -276,23 +369,81 @@ class FractalValidator:
             ))
 
     def _check_unit_consistency(self, pattern: FractalPattern, raw: dict):
-        import re
-        units_in_input = []
+        distinct_units = set()
+        if pattern.unit is not None:
+            distinct_units.add(pattern.unit)
+        for field, unit in self._field_units.items():
+            distinct_units.add(unit)
 
-        for key, value in raw.items():
-            if isinstance(value, str):
-                for unit_type, pattern_re in UNIT_BOUNDARY_PATTERN.items():
-                    if re.search(pattern_re, value, re.IGNORECASE):
-                        units_in_input.append(unit_type)
-
-        if len(units_in_input) > 1 and len(set(units_in_input)) > 1:
-            unit_names = [u.value for u in set(units_in_input)]
+        if len(distinct_units) > 1:
+            unit_names = sorted([u.value for u in distinct_units])
             self.issues.append(ValidationIssue(
                 field='unit',
-                message=f"检测到单位混用: {', '.join(unit_names)}",
+                message=f"检测到多套单位混用: {', '.join(unit_names)}",
                 severity=ValidationSeverity.WARNING,
-                suggestion=f"已统一转换为 {pattern.unit.value if pattern.unit else 'px'}"
+                suggestion="单位不一致可能导致参数含义模糊，请确认或统一单位"
             ))
+
+    def _check_field_unit_conflicts(self, pattern: FractalPattern):
+        global_unit = pattern.unit
+        if global_unit is None:
+            return
+
+        conflict_fields = []
+        convertible_fields = []
+        non_dimension_fields = []
+
+        non_dimension_param_names = {
+            'fractal_dimension', 'scale_factor', 'complexity_score'
+        }
+
+        for field_name, field_unit in self._field_units.items():
+            if field_unit == global_unit:
+                continue
+
+            if field_name in non_dimension_param_names:
+                non_dimension_fields.append((field_name, field_unit))
+                continue
+
+            if can_convert_length(field_unit, global_unit):
+                convertible_fields.append((field_name, field_unit))
+            else:
+                conflict_fields.append((field_name, field_unit))
+
+        for field_name, field_unit in non_dimension_fields:
+            self.issues.append(ValidationIssue(
+                field=field_name,
+                message=f"{field_name} 输入值携带单位 {field_unit.value}，但该参数为无量纲值，单位已被忽略",
+                severity=ValidationSeverity.WARNING,
+                suggestion=f"{field_name} 是无量纲参数，请确认数值 {getattr(pattern, field_name, 'N/A')} 是否正确，无需带单位"
+            ))
+
+        for field_name, field_unit in convertible_fields:
+            self.issues.append(ValidationIssue(
+                field=field_name,
+                message=f"{field_name} 单位为 {field_unit.value}，与全局声明 {global_unit.value} 不一致，已自动换算",
+                severity=ValidationSeverity.INFO,
+                suggestion=f"已将 {field_unit.value} 换算为 {global_unit.value}，换算系数: {LENGTH_UNIT_CONVERSION.get((field_unit, global_unit), 'N/A')}"
+            ))
+
+        for field_name, field_unit in conflict_fields:
+            self.issues.append(ValidationIssue(
+                field=field_name,
+                message=f"{field_name} 单位为 {field_unit.value}，与全局声明 {global_unit.value} 冲突，无法自动换算",
+                severity=ValidationSeverity.ERROR,
+                suggestion="请统一单位后重新生成，或人工确认参数含义"
+            ))
+
+    def has_unit_conflict(self) -> bool:
+        return any(
+            i.severity == ValidationSeverity.WARNING and (
+                i.field == 'unit' or '单位' in i.message
+            )
+            for i in self.issues
+        ) or any(
+            i.severity == ValidationSeverity.ERROR and '冲突' in i.message
+            for i in self.issues
+        )
 
     def _check_duplicate_pattern(self, pattern: FractalPattern):
         sig = (
