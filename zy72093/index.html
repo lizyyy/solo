@@ -126,7 +126,7 @@ tbody tr.old-method-row:hover{background:#e3edf5}
     </div>
 
     <div class="param-panel">
-      <h3>分析参数 <span style="font-weight:400;font-size:11px;color:#e67e22">🔒 锁定项不会被重新运行覆盖</span></h3>
+      <h3>分析参数 <span style="font-weight:400;font-size:11px;color:#e67e22">人工调整即为当前口径，重跑不覆盖</span></h3>
       <div id="paramPanel"></div>
       <div class="run-section">
         <button class="btn btn-warning" onclick="reRunAnalysis()">重新运行分析</button>
@@ -334,38 +334,47 @@ function showToast(msg, isError) {
   setTimeout(function(){ t.classList.remove('show'); }, 2500);
 }
 
+function getEffectiveThreshold(params) {
+  var vt = (params && params.var_threshold && params.var_threshold.value) ? params.var_threshold.value : 2.5;
+  return vt * 1.65;
+}
+
+function isException(record, params) {
+  var threshold = getEffectiveThreshold(params);
+  return record.tail_risk_value > threshold;
+}
+
 function renderSummary() {
   var records = loadData();
+  var params = loadParams();
   var total = records.length;
   var smooth = records.filter(function(r){ return r.status === 'smooth'; }).length;
   var confirm = records.filter(function(r){ return r.status === 'manual_confirm'; }).length;
   var oldM = records.filter(function(r){ return r.status === 'old_methodology'; }).length;
-  var exceptions = records.filter(function(r){ return r.tail_risk_value > getEffectiveThreshold(r); }).length;
+  var exceptions = records.filter(function(r){ return isException(r, params); }).length;
   var maxRisk = Math.max.apply(null, records.map(function(r){ return r.tail_risk_value; }));
+  var threshold = getEffectiveThreshold(params);
 
   document.getElementById('summaryCards').innerHTML =
     '<div class="card"><div class="card-label">总记录数</div><div class="card-value">' + total + '</div><div class="card-sub">顺利 ' + smooth + ' / 人工确认 ' + confirm + ' / 旧口径 ' + oldM + '</div></div>' +
-    '<div class="card"><div class="card-label">越界记录</div><div class="card-value red">' + exceptions + '</div><div class="card-sub">风险值超过有效阈值，不纳入汇总均值</div></div>' +
+    '<div class="card"><div class="card-label">越界记录</div><div class="card-value red">' + exceptions + '</div><div class="card-sub">风险值 > ' + threshold.toFixed(2) + '（当前VaR阈值×1.65）</div></div>' +
     '<div class="card"><div class="card-label">最大尾部风险值</div><div class="card-value orange">' + maxRisk.toFixed(2) + '</div><div class="card-sub">含越界记录，例外未隐藏</div></div>' +
     '<div class="card"><div class="card-label">需人工确认</div><div class="card-value orange">' + confirm + '</div><div class="card-sub">置信度不足或参数已手动调整</div></div>';
 }
 
-function getEffectiveThreshold(record) {
-  var vt = record.parameters.var_threshold || 2.5;
-  return vt * 1.65;
-}
-
 function renderChart() {
   var records = loadData();
+  var params = loadParams();
   var ctx = document.getElementById('riskChart').getContext('2d');
+  var threshold = getEffectiveThreshold(params);
 
   var labels = records.map(function(r){ return r.claim_type; });
   var values = records.map(function(r){ return r.tail_risk_value; });
-  var thresholds = records.map(function(r){ return getEffectiveThreshold(r); });
+  var thresholdLine = records.map(function(){ return threshold; });
   var bgColors = records.map(function(r){
+    if (isException(r, params)) return 'rgba(231,76,60,0.7)';
     if (r.status === 'manual_confirm') return 'rgba(243,156,18,0.7)';
     if (r.status === 'old_methodology') return 'rgba(52,152,219,0.7)';
-    if (r.tail_risk_value > getEffectiveThreshold(r)) return 'rgba(231,76,60,0.7)';
     return 'rgba(39,174,96,0.7)';
   });
 
@@ -377,7 +386,7 @@ function renderChart() {
       labels: labels,
       datasets: [
         { label: '尾部风险值', data: values, backgroundColor: bgColors, borderColor: bgColors.map(function(c){ return c.replace('0.7','1'); }), borderWidth: 1 },
-        { label: '有效VaR阈值', data: thresholds, type: 'line', borderColor: '#e74c3c', borderDash: [5,5], pointRadius: 4, pointBackgroundColor: '#e74c3c', fill: false }
+        { label: 'VaR阈值（' + threshold.toFixed(2) + '）', data: thresholdLine, type: 'line', borderColor: '#e74c3c', borderDash: [5,5], pointRadius: 3, pointBackgroundColor: '#e74c3c', fill: false }
       ]
     },
     options: {
@@ -396,8 +405,8 @@ function renderChart() {
             afterLabel: function(context) {
               if (context.datasetIndex === 0) {
                 var r = records[context.dataIndex];
-                var over = r.tail_risk_value > getEffectiveThreshold(r) ? '⚠ 超过阈值' : '正常';
-                return '状态: ' + statusLabel(r.status) + ' | ' + over;
+                var over = isException(r, params) ? '⚠ 超过阈值' : '正常';
+                return '状态: ' + statusLabel(r.status) + ' | ' + over + ' (阈值: ' + threshold.toFixed(2) + ')';
               }
               return '';
             }
@@ -424,21 +433,30 @@ function sourceLabel(s) {
 
 function renderTable() {
   var records = loadData();
+  var params = loadParams();
   var filterStatus = document.getElementById('filterStatus').value;
   var filterSource = document.getElementById('filterSource').value;
+  var threshold = getEffectiveThreshold(params);
 
   var filtered = records.filter(function(r) {
-    if (filterStatus !== 'all' && r.status !== filterStatus) return false;
+    if (filterStatus !== 'all') {
+      if (filterStatus === 'exception') {
+        if (!isException(r, params)) return false;
+      } else {
+        if (r.status !== filterStatus) return false;
+      }
+    }
     if (filterSource !== 'all' && r.source !== filterSource) return false;
     return true;
   });
 
   var tbody = document.getElementById('detailTableBody');
   tbody.innerHTML = filtered.map(function(r) {
+    var isEx = isException(r, params);
     var rowClass = '';
-    if (r.status === 'manual_confirm') rowClass = 'confirm-row';
+    if (isEx) rowClass = 'exception-row';
+    else if (r.status === 'manual_confirm') rowClass = 'confirm-row';
     else if (r.status === 'old_methodology') rowClass = 'old-method-row';
-    else if (r.tail_risk_value > getEffectiveThreshold(r)) rowClass = 'exception-row';
 
     var adjustedTags = Object.keys(r.param_adjustments || {}).map(function(k) {
       return '<span class="tag tag-adjusted">' + k + '已调</span>';
@@ -448,10 +466,14 @@ function renderTable() {
       return a.text.length > 20 ? a.text.substring(0,20) + '...' : a.text;
     }).join('; ');
 
+    var thresholdTag = isEx
+      ? '<span class="status-badge status-exception" style="margin-left:4px">超阈值 ' + threshold.toFixed(2) + '</span>'
+      : '';
+
     return '<tr class="' + rowClass + '" onclick="openDetail(\'' + r.id + '\')">' +
       '<td>' + r.id + '</td>' +
       '<td>' + r.claim_type + '</td>' +
-      '<td><strong>' + r.tail_risk_value.toFixed(2) + '</strong>' + (r.old_methodology_value ? ' <span style="color:#aaa;font-size:10px">(旧:' + r.old_methodology_value + ')</span>' : '') + '</td>' +
+      '<td><strong>' + r.tail_risk_value.toFixed(2) + '</strong>' + thresholdTag + (r.old_methodology_value ? ' <span style="color:#aaa;font-size:10px">(旧:' + r.old_methodology_value + ')</span>' : '') + '</td>' +
       '<td>' + r.confidence_level + '</td>' +
       '<td><span class="status-badge status-' + r.status + '">' + statusLabel(r.status) + '</span></td>' +
       '<td>' + sourceLabel(r.source) + '</td>' +
@@ -465,7 +487,7 @@ function renderTable() {
 function renderParams() {
   var params = loadParams();
   var panel = document.getElementById('paramPanel');
-  var html = '<div class="param-group"><div class="param-group-title">全局分析参数</div>';
+  var html = '<div class="param-group"><div class="param-group-title">全局分析参数</div><div style="font-size:11px;color:#888;margin-bottom:8px">人工调整即为当前口径，重跑不覆盖；锁定可防误改</div>';
 
   var labels = {
     var_threshold: 'VaR阈值',
@@ -480,18 +502,19 @@ function renderParams() {
     var inputClass = p.manually_adjusted ? 'manually-adjusted' : '';
     var lockClass = p.locked ? 'locked' : 'unlocked';
     var lockSymbol = p.locked ? '🔒' : '🔓';
+    var disabledAttr = p.locked ? ' disabled' : '';
 
     html += '<div class="param-row">' +
       '<label>' + labels[key] + '</label>' +
-      '<input type="number" class="' + inputClass + '" id="param_' + key + '" value="' + p.value + '" step="0.01" onchange="onParamChange(\'' + key + '\')">' +
-      '<button class="lock-btn ' + lockClass + '" onclick="toggleLock(\'' + key + '\')" title="' + (p.locked ? '已锁定：重新运行不会覆盖' : '未锁定：重新运行可能覆盖') + '">' + lockSymbol + '</button>' +
+      '<input type="number" class="' + inputClass + '" id="param_' + key + '" value="' + p.value + '" step="0.01" onchange="onParamChange(\'' + key + '\')"' + disabledAttr + '>' +
+      '<button class="lock-btn ' + lockClass + '" onclick="toggleLock(\'' + key + '\')" title="' + (p.locked ? '已锁定：防止误修改，点击解锁' : '未锁定：可自由修改，点击锁定防误改') + '">' + lockSymbol + '</button>' +
       '</div>';
 
     if (p.manually_adjusted && p.note) {
       html += '<div class="param-note">📐 ' + p.note + '</div>';
     }
     if (p.locked) {
-      html += '<div class="param-note">🔒 此参数已锁定，重新运行不会被默认值覆盖</div>';
+      html += '<div class="param-note">🔒 已锁定，防止误修改</div>';
     }
   }
 
@@ -501,6 +524,11 @@ function renderParams() {
 
 function onParamChange(key) {
   var params = loadParams();
+  if (params[key].locked) {
+    showToast(key + ' 已锁定，需先解锁才能修改', true);
+    renderParams();
+    return;
+  }
   var input = document.getElementById('param_' + key);
   var newVal = parseFloat(input.value);
   if (isNaN(newVal)) return;
@@ -510,7 +538,10 @@ function onParamChange(key) {
   params[key].note = '手动调整为 ' + newVal + '（默认值 ' + params[key].default_value + '）';
   saveParams(params);
   renderParams();
-  showToast('参数 ' + key + ' 已更新为 ' + newVal + '，已标记为手动调整');
+  renderSummary();
+  renderChart();
+  renderTable();
+  showToast('参数 ' + key + ' 已更新为 ' + newVal + '，已标记为手动调整（当前口径）');
 }
 
 function toggleLock(key) {
@@ -518,7 +549,7 @@ function toggleLock(key) {
   params[key].locked = !params[key].locked;
   saveParams(params);
   renderParams();
-  showToast(params[key].locked ? key + ' 已锁定，重新运行不会被覆盖' : key + ' 已解锁');
+  showToast(params[key].locked ? key + ' 已锁定，防止误修改' : key + ' 已解锁，可自由修改');
 }
 
 function reRunAnalysis() {
@@ -568,8 +599,11 @@ function reRunAnalysis() {
 
 function openDetail(id) {
   var records = loadData();
+  var params = loadParams();
   var r = records.find(function(rec){ return rec.id === id; });
   if (!r) return;
+  var threshold = getEffectiveThreshold(params);
+  var isEx = isException(r, params);
 
   document.getElementById('modalTitle').textContent = r.id + ' — ' + r.claim_type;
 
@@ -577,12 +611,17 @@ function openDetail(id) {
 
   html += '<dt>编号</dt><dd>' + r.id + '</dd>';
   html += '<dt>险种</dt><dd>' + r.claim_type + '</dd>';
-  html += '<dt>尾部风险值</dt><dd><strong>' + r.tail_risk_value.toFixed(2) + '</strong>' + (r.tail_risk_value > getEffectiveThreshold(r) ? ' <span style="color:#e74c3c;font-weight:700">⚠ 超过有效阈值 ' + getEffectiveThreshold(r).toFixed(2) + '</span>' : '') + '</dd>';
+  html += '<dt>尾部风险值</dt><dd><strong>' + r.tail_risk_value.toFixed(2) + '</strong>' + (isEx ? ' <span style="color:#e74c3c;font-weight:700">⚠ 超过当前阈值 ' + threshold.toFixed(2) + '</span>' : '') + '</dd>';
+  html += '<dt>当前口径阈值</dt><dd>VaR ' + params.var_threshold.value + ' × 1.65 = ' + threshold.toFixed(2) + ' <span style="color:#888;font-size:11px">（越界筛选用此阈值）</span></dd>';
   if (r.old_methodology_value) {
     html += '<dt>旧口径值</dt><dd>' + r.old_methodology_value + ' <span style="color:#aaa;font-size:11px">(' + r.old_methodology_note + ')</span></dd>';
   }
   html += '<dt>置信度</dt><dd>' + r.confidence_level + '</dd>';
-  html += '<dt>状态</dt><dd><span class="status-badge status-' + r.status + '">' + statusLabel(r.status) + '</span></dd>';
+  html += '<dt>状态</dt><dd><span class="status-badge status-' + r.status + '">' + statusLabel(r.status) + '</span>';
+  if (isEx && r.status !== 'exception') {
+    html += ' <span class="status-badge status-exception">当前口径越界</span>';
+  }
+  html += '</dd>';
   html += '<dt>数据来源</dt><dd>' + r.source_label + '（' + sourceLabel(r.source) + '）</dd>';
   html += '<dt>原始样本期</dt><dd>' + (r.original_data.period || '—') + '</dd>';
   html += '<dt>样本量</dt><dd>' + (r.original_data.sample_count || '—') + ' 条</dd>';
@@ -679,13 +718,16 @@ function exportSingleRecord(id) {
 function exportReport() {
   var records = loadData();
   var params = loadParams();
+  var threshold = getEffectiveThreshold(params);
 
   var summary = {
     total_records: records.length,
     smooth_count: records.filter(function(r){ return r.status === 'smooth'; }).length,
     manual_confirm_count: records.filter(function(r){ return r.status === 'manual_confirm'; }).length,
     old_methodology_count: records.filter(function(r){ return r.status === 'old_methodology'; }).length,
-    exception_count: records.filter(function(r){ return r.tail_risk_value > getEffectiveThreshold(r); }).length,
+    exception_count: records.filter(function(r){ return isException(r, params); }).length,
+    threshold_used: threshold,
+    threshold_note: '按当前VaR阈值 ' + params.var_threshold.value + ' × 1.65 = ' + threshold.toFixed(2) + ' 判定越界',
     note: '越界记录未纳入汇总均值，但保留在明细中不消失'
   };
 
@@ -699,6 +741,8 @@ function exportReport() {
         id: r.id,
         claim_type: r.claim_type,
         tail_risk_value: r.tail_risk_value,
+        is_exception_by_current_params: isException(r, params),
+        threshold_used: threshold,
         old_methodology_value: r.old_methodology_value || null,
         confidence_level: r.confidence_level,
         status: r.status,
