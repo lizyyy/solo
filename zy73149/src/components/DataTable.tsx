@@ -11,10 +11,11 @@ type SortField = 'timestamp' | 'sedimentDepth' | 'id';
 type SortOrder = 'asc' | 'desc';
 
 export default function DataTable() {
-  const { getFilteredRecords, getCurrentParams } = useReportStore();
+  const { getFilteredRecords, getCurrentParams, getCurrentVersion } = useReportStore();
   const navigate = useNavigate();
   const records = getFilteredRecords();
   const params = getCurrentParams();
+  const currentVersion = getCurrentVersion();
 
   const [sortField, setSortField] = useState<SortField>('timestamp');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
@@ -75,7 +76,7 @@ export default function DataTable() {
       className={`border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer ${
         !record.isNormal ? 'bg-warning-50/30' : ''
       }`}
-      onClick={() => navigate(`/record/${record.id}`)}
+      onClick={() => navigate(`/record/${record.id}?version=${currentVersion?.id || 'v3'}`)}
     >
       <td className="px-4 py-3 whitespace-nowrap">
         <span className="font-mono text-sm text-gray-700">{record.id}</span>

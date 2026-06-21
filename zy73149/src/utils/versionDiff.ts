@@ -1,12 +1,26 @@
 import type { ReportParams, ParamDiff, SedimentRecord, RecordDiff } from '@/types';
 
-const paramLabels: Record<string, string> = {
+export const paramLabels: Record<string, string> = {
   sedimentThreshold: '淤积阈值',
   depthUnit: '深度单位',
   coordinateFormat: '坐标格式',
   includeAnomaly: '包含异常数据',
   dataSources: '数据来源',
   baselineDepth: '基准水深',
+};
+
+export const fieldLabels: Record<string, string> = {
+  sedimentDepth: '淤积深度',
+  sedimentLevel: '淤积等级',
+  isNormal: '数据是否正常',
+  anomalyType: '异常类型',
+  anomalyDetail: '异常说明',
+  remark: '备注/后补说明',
+  baselineDepth: '基准水深',
+  measuredDepth: '实测水深',
+  cloudCoverRate: '云覆盖率',
+  versionId: '所属版本',
+  timestamp: '采集时间',
 };
 
 export function compareParams(
@@ -90,7 +104,11 @@ export function compareRecords(
       'sedimentLevel',
       'isNormal',
       'anomalyType',
+      'anomalyDetail',
       'remark',
+      'baselineDepth',
+      'measuredDepth',
+      'cloudCoverRate',
     ];
 
     for (const field of fields) {

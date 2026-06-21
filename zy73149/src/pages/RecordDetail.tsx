@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, MapPin, Clock, Database, AlertCircle, MessageSquare, ChevronRight } from 'lucide-react';
 import { getRecordsByVersion, mockVersions } from '@/data/mockData';
 import { SourceBadge, SedimentLevelBadge, AnomalyBadge } from '@/components/Badges';
@@ -10,17 +10,27 @@ import { useMemo } from 'react';
 export default function RecordDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { getCurrentVersion } = useReportStore();
   const currentVersion = getCurrentVersion();
 
   const record = useMemo(() => {
-    const allRecords: ReturnType<typeof getRecordsByVersion> = [];
-    for (const v of mockVersions) {
-      const recs = getRecordsByVersion(v.id);
-      allRecords.push(...recs);
+    const versionFromUrl = searchParams.get('version');
+    if (versionFromUrl && mockVersions.some((v) => v.id === versionFromUrl)) {
+      const found = getRecordsByVersion(versionFromUrl).find((r) => r.id === id);
+      if (found) return found;
     }
-    return allRecords.find((r) => r.id === id);
-  }, [id]);
+    const cv = getCurrentVersion();
+    if (cv) {
+      const inCurrent = getRecordsByVersion(cv.id).find((r) => r.id === id);
+      if (inCurrent) return inCurrent;
+    }
+    for (const v of mockVersions) {
+      const found = getRecordsByVersion(v.id).find((r) => r.id === id);
+      if (found) return found;
+    }
+    return undefined;
+  }, [id, searchParams, getCurrentVersion]);
 
   if (!record) {
     return (

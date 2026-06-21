@@ -1,12 +1,14 @@
+import React from 'react';
 import { ArrowLeft, GitCompare, Settings, ChevronRight, Plus, Minus, Edit3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useReportStore } from '@/store/reportStore';
 import { compareParams, compareRecords } from '@/utils/versionDiff';
 import { mockVersions, getRecordsByVersion } from '@/data/mockData';
-import { SourceBadge, SedimentLevelBadge } from '@/components/Badges';
-import { formatDepth } from '@/utils/sediment';
+import { SourceBadge, SedimentLevelBadge, AnomalyBadge } from '@/components/Badges';
+import { formatDepth, getSedimentLevelLabel } from '@/utils/sediment';
 import { formatLatLng } from '@/utils/coordinate';
 import { useState } from 'react';
+import { fieldLabels } from '@/utils/versionDiff';
 
 export default function ComparePage() {
   const navigate = useNavigate();
@@ -261,41 +263,88 @@ export default function ComparePage() {
                     }[diff.type];
 
                     return (
-                      <tr key={diff.recordId} className={bgColor}>
-                        <td className="px-4 py-2">
-                          <span className={`text-xs px-2 py-0.5 rounded font-medium ${statusColor}`}>
-                            {statusLabel}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2 font-mono text-gray-700">
-                          {record.id}
-                        </td>
-                        <td className="px-4 py-2">
-                          <SourceBadge source={record.source} />
-                        </td>
-                        <td className="px-4 py-2 font-mono text-gray-600">
-                          {formatLatLng(record.latitude, record.longitude, 'decimal')}
-                        </td>
-                        <td className="px-4 py-2">
-                          {diff.type === 'modified' ? (
-                            <div className="space-y-0.5">
-                              <span className="text-red-500 line-through text-xs">
-                                {formatDepth(diff.oldRecord?.sedimentDepth || 0)}
-                              </span>
-                              <span className="text-green-600 font-medium">
-                                {formatDepth(diff.newRecord?.sedimentDepth || 0)}
-                              </span>
-                            </div>
-                          ) : (
-                            <span className="text-gray-700">
-                              {formatDepth(record.sedimentDepth)}
+                      <React.Fragment key={diff.recordId}>
+                        <tr className={bgColor}>
+                          <td className="px-4 py-2">
+                            <span className={`text-xs px-2 py-0.5 rounded font-medium ${statusColor}`}>
+                              {statusLabel}
                             </span>
-                          )}
-                        </td>
-                        <td className="px-4 py-2">
-                          <SedimentLevelBadge level={record.sedimentLevel} />
-                        </td>
-                      </tr>
+                          </td>
+                          <td className="px-4 py-2 font-mono text-gray-700">
+                            {record.id}
+                          </td>
+                          <td className="px-4 py-2">
+                            <SourceBadge source={record.source} />
+                          </td>
+                          <td className="px-4 py-2 font-mono text-gray-600">
+                            {formatLatLng(record.latitude, record.longitude, 'decimal')}
+                          </td>
+                          <td className="px-4 py-2">
+                            {diff.type === 'modified' ? (
+                              <div className="space-y-0.5">
+                                <span className="text-red-500 line-through text-xs">
+                                  {formatDepth(diff.oldRecord?.sedimentDepth || 0)}
+                                </span>
+                                <span className="text-green-600 font-medium">
+                                  {formatDepth(diff.newRecord?.sedimentDepth || 0)}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-gray-700">
+                                {formatDepth(record.sedimentDepth)}
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-4 py-2">
+                            <SedimentLevelBadge level={record.sedimentLevel} />
+                            {record.anomalyType !== 'none' && (
+                              <span className="ml-1"><AnomalyBadge type={record.anomalyType} /></span>
+                            )}
+                          </td>
+                        </tr>
+                        {diff.type === 'modified' && diff.changedFields && diff.changedFields.length > 0 && (
+                          <tr className={bgColor}>
+                            <td colSpan={6} className="px-4 pb-3 pt-0">
+                              <div className="ml-8 pl-4 border-l-2 border-yellow-300">
+                                <p className="text-xs text-gray-500 mb-1.5">字段变更详情：</p>
+                                <div className="space-y-1">
+                                  {diff.changedFields.map((cf) => {
+                                    const label = fieldLabels[cf.field] || cf.field;
+                                    const formatVal = (v: unknown) => {
+                                      if (v === undefined || v === null) return '(空)';
+                                      if (cf.field === 'sedimentDepth' || cf.field === 'baselineDepth' || cf.field === 'measuredDepth') {
+                                        return formatDepth(Number(v));
+                                      }
+                                      if (cf.field === 'sedimentLevel') {
+                                        return getSedimentLevelLabel(v as never);
+                                      }
+                                      if (cf.field === 'isNormal') {
+                                        return v ? '正常' : '异常';
+                                      }
+                                      if (cf.field === 'cloudCoverRate' && typeof v === 'number') {
+                                        return `${(v * 100).toFixed(0)}%`;
+                                      }
+                                      return String(v) || '(空)';
+                                    };
+                                    return (
+                                      <div key={cf.field} className="flex items-center gap-2 text-xs">
+                                        <span className="text-gray-500 w-24">{label}:</span>
+                                        <span className="text-red-500 line-through font-mono">
+                                          {formatVal(cf.oldValue)}
+                                        </span>
+                                        <span className="text-gray-400">→</span>
+                                        <span className="text-green-600 font-mono font-medium">
+                                          {formatVal(cf.newValue)}
+                                        </span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
                     );
                   })
                 )}
