@@ -7,11 +7,17 @@ function esc(v: unknown): string {
   return s;
 }
 
-export function exportVerdicts(samples: StudentSample[]) {
+export function buildVerdictRows(samples: StudentSample[]): string[][] {
   const needSupplement = samples.filter((s) => s.finalVerdict === '需补材料');
+  const duplicates = samples.filter(
+    (s) => s.isDuplicate && s.finalVerdict !== '需补材料' && s.finalVerdict !== '可放行',
+  );
   const passed = samples.filter((s) => s.finalVerdict === '可放行');
 
-  const header = ['组别', '学号', '姓名', '题目', '结果摘要', '状态', '重复标记', '审核备注', '提交时间'];
+  const header = [
+    '组别', '学号', '姓名', '题目', '结果摘要',
+    '状态', '重复标记', '重复关联样本ID', '审核备注', '提交时间',
+  ];
 
   const buildRow = (group: string, s: StudentSample): string[] => [
     group,
@@ -21,15 +27,21 @@ export function exportVerdicts(samples: StudentSample[]) {
     s.resultSummary,
     s.status,
     s.isDuplicate ? '[重复]' : '',
+    s.duplicateOf || '',
     s.reviewNote || '',
     s.submittedAt,
   ];
 
-  const rows = [
+  return [
     header,
     ...needSupplement.map((s) => buildRow('需补材料', s)),
+    ...duplicates.map((s) => buildRow('重复待确认', s)),
     ...passed.map((s) => buildRow('可放行', s)),
   ];
+}
+
+export function exportVerdicts(samples: StudentSample[]) {
+  const rows = buildVerdictRows(samples);
 
   const csv = rows.map((r) => r.map(esc).join(',')).join('\n');
   const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });

@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, Download, FileText, X } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Copy, Download, FileText, X } from 'lucide-react';
 import { useSampleStore } from '../store/useSampleStore';
 import { exportVerdicts } from '../utils/csvExport';
 import StatusBadge from './StatusBadge';
@@ -13,24 +13,28 @@ function Section({
   title: string;
   subtitle: string;
   icon: any;
-  accent: 'coral' | 'emerald';
+  accent: 'coral' | 'emerald' | 'amber';
   samples: any[];
 }) {
   const openDrawer = useSampleStore((s) => s.openDrawer);
-  const styles =
-    accent === 'coral'
-      ? {
-          head: 'bg-coral-500 text-white',
-          row: 'hover:bg-coral-50',
-          chip: 'bg-coral-50 text-coral-700 border-coral-200',
-          icon: 'text-coral-500',
-        }
-      : {
-          head: 'bg-emerald2-500 text-white',
-          row: 'hover:bg-emerald2-50',
-          chip: 'bg-emerald2-50 text-emerald2-700 border-emerald2-200',
-          icon: 'text-emerald2-500',
-        };
+  const accentMap = {
+    coral: {
+      head: 'bg-coral-500 text-white',
+      row: 'hover:bg-coral-50',
+      icon: 'text-coral-500',
+    },
+    emerald: {
+      head: 'bg-emerald2-500 text-white',
+      row: 'hover:bg-emerald2-50',
+      icon: 'text-emerald2-500',
+    },
+    amber: {
+      head: 'bg-amber2-500 text-white',
+      row: 'hover:bg-amber2-50',
+      icon: 'text-amber2-500',
+    },
+  };
+  const styles = accentMap[accent];
 
   return (
     <section className="card overflow-hidden">
@@ -70,6 +74,11 @@ function Section({
                 <div className="text-xs text-ink-600 truncate mt-0.5">
                   {s.problemTitle} — <span className="font-medium">{s.resultSummary}</span>
                 </div>
+                {s.duplicateOf && (
+                  <div className="mt-1 text-[11px] text-amber2-600">
+                    关联样本：{s.duplicateOf}
+                  </div>
+                )}
                 {s.reviewNote && (
                   <div className="mt-1 text-[11px] text-ink-500 italic truncate">
                     备注：{s.reviewNote}
@@ -91,8 +100,11 @@ export default function VerdictExport() {
   const samples = useSampleStore((s) => s.samples);
 
   const needSupplement = samples.filter((s) => s.finalVerdict === '需补材料');
+  const duplicates = samples.filter(
+    (s) => s.isDuplicate && s.finalVerdict !== '需补材料' && s.finalVerdict !== '可放行',
+  );
   const passed = samples.filter((s) => s.finalVerdict === '可放行');
-  const unreviewed = samples.filter((s) => !s.finalVerdict);
+  const unreviewed = samples.filter((s) => !s.finalVerdict && !s.isDuplicate);
 
   const handleExport = () => exportVerdicts(samples);
 
@@ -131,10 +143,14 @@ export default function VerdictExport() {
         </header>
 
         <div className="flex-1 overflow-y-auto p-5 space-y-5">
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-4 gap-3">
             <div className="card p-3">
               <div className="label">需补材料</div>
               <div className="font-display text-2xl text-coral-600">{needSupplement.length}</div>
+            </div>
+            <div className="card p-3">
+              <div className="label">重复待确认</div>
+              <div className="font-display text-2xl text-amber2-600">{duplicates.length}</div>
             </div>
             <div className="card p-3">
               <div className="label">可放行</div>
@@ -142,21 +158,28 @@ export default function VerdictExport() {
             </div>
             <div className="card p-3">
               <div className="label">未审核</div>
-              <div className="font-display text-2xl text-amber2-600">{unreviewed.length}</div>
+              <div className="font-display text-2xl text-ink-500">{unreviewed.length}</div>
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-3 gap-4">
             <Section
               title="需补材料"
-              subtitle="这些样本需要学生补齐内容或修改后再提交"
+              subtitle="需要学生补齐内容或修改后再提交"
               icon={AlertTriangle}
               accent="coral"
               samples={needSupplement}
             />
             <Section
+              title="重复待确认"
+              subtitle="已标记重复，需人工确认是否放行或忽略"
+              icon={Copy}
+              accent="amber"
+              samples={duplicates}
+            />
+            <Section
               title="可放行"
-              subtitle="这些样本审核通过，可计入本次作业成绩"
+              subtitle="审核通过，可计入本次作业成绩"
               icon={CheckCircle2}
               accent="emerald"
               samples={passed}
@@ -164,12 +187,12 @@ export default function VerdictExport() {
           </div>
 
           {unreviewed.length > 0 && (
-            <div className="card p-4 border border-amber2-200 bg-amber2-50/50">
-              <div className="flex items-center gap-2 text-amber2-700">
+            <div className="card p-4 border border-ink-200 bg-ink-50">
+              <div className="flex items-center gap-2 text-ink-600">
                 <AlertTriangle className="w-4 h-4" />
                 <span className="font-semibold">还有 {unreviewed.length} 条未出具审核结论</span>
               </div>
-              <p className="mt-1 text-xs text-amber2-700/90">
+              <p className="mt-1 text-xs text-ink-500">
                 建议先在主列表中完成所有样本的审核，再导出最终清单用于第二天复盘。
               </p>
             </div>
