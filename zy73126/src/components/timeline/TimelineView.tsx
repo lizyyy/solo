@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Clock, Filter, Tag } from "lucide-react";
+import { Clock, Filter, Tag, RotateCcw } from "lucide-react";
 import { useAppStore } from "../../store/useAppStore";
 import { ANOMALY_LABEL, STATUS_LABEL } from "../../data/types";
 import type { TimelineEventType, FilterSnapshot } from "../../data/types";
@@ -30,13 +30,21 @@ function formatTime(iso: string): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+function formatDateShort(iso?: string) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 function SnapshotTags({ snapshot }: { snapshot: FilterSnapshot }) {
   const items: string[] = [];
   if (snapshot.station) items.push(`站点: ${snapshot.station}`);
   if (snapshot.anomalyType) items.push(`异常: ${ANOMALY_LABEL[snapshot.anomalyType]}`);
   if (snapshot.status) items.push(`状态: ${STATUS_LABEL[snapshot.status]}`);
-  if (snapshot.dateFrom) items.push(`从: ${snapshot.dateFrom}`);
-  if (snapshot.dateTo) items.push(`至: ${snapshot.dateTo}`);
+  if (snapshot.dateFrom) items.push(`从: ${formatDateShort(snapshot.dateFrom)}`);
+  if (snapshot.dateTo) items.push(`至: ${formatDateShort(snapshot.dateTo)}`);
   if (snapshot.keyword) items.push(`关键词: ${snapshot.keyword}`);
   if (items.length === 0) return null;
   return (
@@ -54,6 +62,7 @@ function SnapshotTags({ snapshot }: { snapshot: FilterSnapshot }) {
 
 export default function TimelineView() {
   const timeline = useAppStore((s) => s.timeline);
+  const restoreFilters = useAppStore((s) => s.restoreFilters);
 
   const sorted = useMemo(
     () => [...timeline].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
@@ -88,8 +97,22 @@ export default function TimelineView() {
                   </span>
                   <span className="ml-auto text-xs text-deep-200">{formatTime(ev.createdAt)}</span>
                 </div>
-                <p className="text-sm text-deep-300">{ev.description}</p>
-                {ev.filterSnapshot && <SnapshotTags snapshot={ev.filterSnapshot} />}
+                <div className="flex items-start gap-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-deep-300">{ev.description}</p>
+                    {ev.filterSnapshot && <SnapshotTags snapshot={ev.filterSnapshot} />}
+                  </div>
+                  {ev.filterSnapshot && (
+                    <button
+                      onClick={() => restoreFilters(ev.filterSnapshot!)}
+                      className="shrink-0 inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md bg-reef-400/10 text-reef-600 hover:bg-reef-400/20 transition-colors border border-reef-400/30"
+                      title="还原此筛选口径，列表、统计与导出将同步回到当时的结果"
+                    >
+                      <RotateCcw size={12} />
+                      还原筛选
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}

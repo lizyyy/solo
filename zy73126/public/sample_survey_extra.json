@@ -1,0 +1,66 @@
+[
+  {
+    "id": "json_ext_001",
+    "station": "琛航岛",
+    "sampledAt": "2026-06-10T07:22:00.000Z",
+    "tideLevel": "2.1m",
+    "waterTemp": 28.7,
+    "bleachingRate": 13.5,
+    "status": "pending",
+    "createdBy": "阿宁",
+    "createdAt": "2026-06-11T02:15:00.000Z",
+    "notes": [
+      {
+        "id": "note_json_001",
+        "recordId": "json_ext_001",
+        "content": "从历史 JSON 材料导入，数据完整",
+        "author": "阿宁",
+        "createdAt": "2026-06-11T02:18:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "json_ext_002",
+    "station": "琛航岛",
+    "sampledAt": "2026-06-11T11:05:00.000Z",
+    "tideLevel": "165厘米",
+    "waterTemp": 29.8,
+    "bleachingRate": 22.1,
+    "status": "pending_info",
+    "createdBy": "阿宁",
+    "createdAt": "2026-06-12T04:30:00.000Z",
+    "notes": [
+      {
+        "id": "note_json_002",
+        "recordId": "json_ext_002",
+        "content": "潮位单位写成厘米，需要补当时拍照说明",
+        "author": "阿宁",
+        "createdAt": "2026-06-12T04:35:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "json_ext_003",
+    "station": "金银岛",
+    "sampledAt": "2026-06-12T08:40:00.000Z",
+    "tideLevel": "0.95m",
+    "waterTemp": 27.4,
+    "bleachingRate": null,
+    "status": "pending",
+    "createdBy": "阿宁",
+    "createdAt": "2026-06-13T03:10:00.000Z",
+    "notes": []
+  },
+  {
+    "id": "json_ext_004",
+    "station": "金银岛",
+    "sampledAt": "2026-05-08T06:15:00.000Z",
+    "tideLevel": "2.6ft",
+    "waterTemp": 29.0,
+    "bleachingRate": 45.8,
+    "status": "pending",
+    "createdBy": "阿宁",
+    "createdAt": "2026-06-18T10:00:00.000Z",
+    "notes": []
+  }
+]
