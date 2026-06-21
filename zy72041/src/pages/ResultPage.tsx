@@ -390,7 +390,23 @@ const ResultPage: React.FC = () => {
                       <p className="text-xs text-gray-500 mt-1">{conflict.importedEvidence}</p>
                     </div>
                   </div>
-                  <p className="text-sm text-subway-700 mt-2 bg-subway-100 p-2 rounded-lg">
+                  {(() => {
+                    const presetStr = String(conflict.presetValue);
+                    const importedStr = String(conflict.importedValue);
+                    const diff = Number(importedStr) - Number(presetStr);
+                    let reason = `预设值(${presetStr})与导入值(${importedStr})存在差异`;
+                    if (!isNaN(diff)) {
+                      const diffPercent = ((diff / Number(presetStr)) * 100).toFixed(1);
+                      reason += `，相差${Math.abs(diff)}${diff >= 0 ? '（+' : '（-'}${Math.abs(Number(diffPercent))}%）`;
+                    }
+                    return (
+                      <p className="text-sm text-warning-700 mt-3 bg-warning-50 border-l-2 border-warning-500 p-2 rounded-r-lg">
+                        <span className="font-semibold">差异原因：</span>
+                        {reason}
+                      </p>
+                    );
+                  })()}
+                  <p className="text-sm text-subway-700 mt-3 bg-subway-100 p-2 rounded-lg">
                     <span className="font-semibold">最终生效值：</span>
                     {conflict.resolution === 'use_preset' ? String(conflict.presetValue) : String(conflict.importedValue)}
                   </p>

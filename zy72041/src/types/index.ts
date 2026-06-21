@@ -108,6 +108,7 @@ export interface ConflictResolution {
   effectiveValue: JsonValue;
   presetEvidence: string;
   importedEvidence: string;
+  reason: string;
 }
 
 export interface ExportReport {

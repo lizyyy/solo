@@ -33,15 +33,26 @@ export class ReportExporter {
 
     const conflictResolutions: ConflictResolution[] = (state.conflicts || [])
       .filter(c => c.resolved && c.resolution)
-      .map(c => ({
-        field: c.field,
-        presetValue: c.presetValue,
-        importedValue: c.importedValue,
-        resolution: c.resolution as 'use_preset' | 'use_imported',
-        effectiveValue: c.resolution === 'use_preset' ? c.presetValue : c.importedValue,
-        presetEvidence: c.presetEvidence,
-        importedEvidence: c.importedEvidence,
-      }));
+      .map(c => {
+        const presetStr = String(c.presetValue);
+        const importedStr = String(c.importedValue);
+        const diff = Number(importedStr) - Number(presetStr);
+        let reason = `预设值(${presetStr})与导入值(${importedStr})存在差异`;
+        if (!isNaN(diff)) {
+          const diffPercent = ((diff / Number(presetStr)) * 100).toFixed(1);
+          reason += `，相差${Math.abs(diff)}${diff >= 0 ? '（+' : '（-'}${Math.abs(Number(diffPercent))}%）`;
+        }
+        return {
+          field: c.field,
+          presetValue: c.presetValue,
+          importedValue: c.importedValue,
+          resolution: c.resolution as 'use_preset' | 'use_imported',
+          effectiveValue: c.resolution === 'use_preset' ? c.presetValue : c.importedValue,
+          presetEvidence: c.presetEvidence,
+          importedEvidence: c.importedEvidence,
+          reason,
+        };
+      });
 
     return {
       gameId: state.gameId,
@@ -158,12 +169,15 @@ export class ReportExporter {
       lines.push('            数据冲突解决记录');
       lines.push('----------------------------------------');
       lines.push('');
+      lines.push(`共解决 ${report.conflictResolutions.length} 条数据冲突：`);
+      lines.push('');
       report.conflictResolutions.forEach((cr, index) => {
         lines.push(`${index + 1}. ${cr.field}`);
         lines.push(`   预设值：${JSON.stringify(cr.presetValue)}`);
         lines.push(`   导入值：${JSON.stringify(cr.importedValue)}`);
         lines.push(`   最终选择：${cr.resolution === 'use_preset' ? '使用预设值' : '使用导入值'}`);
         lines.push(`   生效值：${JSON.stringify(cr.effectiveValue)}`);
+        lines.push(`   差异原因：${cr.reason}`);
         lines.push(`   预设证据：${cr.presetEvidence}`);
         lines.push(`   导入证据：${cr.importedEvidence}`);
         lines.push('');

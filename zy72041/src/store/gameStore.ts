@@ -156,7 +156,9 @@ export const useGameStore = create<GameStore>((set, get) => {
     },
     
     startGame: (levelId: string, importData?: ImportedData) => {
-      set({ isLoading: true, warnings: [], errors: [], conflicts: [] });
+      const existingConflicts = get().conflicts;
+      
+      set({ isLoading: true, warnings: [], errors: [] });
       
       try {
         const level = getLevelById(levelId) || getDefaultLevel();
@@ -193,9 +195,9 @@ export const useGameStore = create<GameStore>((set, get) => {
             set(state => ({ warnings: [...state.warnings, ...importValidation.warnings] }));
           }
           
-          const existingConflicts = get().conflicts;
           if (existingConflicts && existingConflicts.length > 0) {
             conflicts = existingConflicts;
+            set({ conflicts });
           } else {
             conflicts = DataValidator.detectConflicts(level, importData);
             set({ conflicts });
@@ -343,7 +345,11 @@ export const useGameStore = create<GameStore>((set, get) => {
       try {
         const savedState = PersistenceManager.loadGameState(gameId);
         if (savedState) {
-          set({ state: savedState, isLoading: false });
+          set({ 
+            state: savedState, 
+            conflicts: savedState.conflicts || [],
+            isLoading: false 
+          });
         } else {
           set({ 
             errors: ['无法找到保存的游戏'],
