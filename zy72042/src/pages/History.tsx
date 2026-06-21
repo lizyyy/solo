@@ -1,9 +1,10 @@
 import { useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { Clock, Trophy, AlertTriangle, Trash2, Edit3 } from 'lucide-react'
+import { Clock, Trophy, AlertTriangle, Trash2, Edit3, PieChart } from 'lucide-react'
 import { useHistoryStore } from '@/stores/historyStore'
 import { useSupplementStore } from '@/stores/supplementStore'
 import { LEVELS } from '@/data/levels'
+import { FUND_ASSETS } from '@/data/funds'
 
 const STATUS_BADGES: Record<string, { label: string; className: string }> = {
   completed: { label: '通关', className: 'bg-safe-green/20 text-safe-green' },
@@ -56,6 +57,15 @@ export default function History() {
             const scoreChanged = hasSupplements && supplemented.currentScore !== raw.currentScore
             const riskChanged = hasSupplements && supplemented.currentRisk !== raw.currentRisk
 
+            const fundMap = new Map(FUND_ASSETS.map((f) => [f.id, f]))
+            const holdingsSummary = supplemented.holdings
+              .map((h) => {
+                const fund = fundMap.get(h.fundId)
+                const name = fund?.name ?? h.fundId
+                return `${name} ${(h.ratio * 100).toFixed(0)}%`
+              })
+              .join(' + ') || '（空持仓）'
+
             return (
               <div key={supplemented.id} className="card-cafe flex items-center justify-between gap-4">
                 <Link
@@ -100,6 +110,10 @@ export default function History() {
                         例外
                       </span>
                     )}
+                  </div>
+                  <div className="mt-1.5 text-xs text-cafe-brown/60 flex items-center gap-1 flex-wrap">
+                    <PieChart className="w-3 h-3 text-cafe-brown/40" />
+                    {holdingsSummary}
                   </div>
                 </Link>
                 <div className="flex items-center gap-1">

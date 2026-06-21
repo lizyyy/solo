@@ -100,6 +100,7 @@ export default function Supplement() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <SupplementForm
             sessionId={currentSession.id}
+            currentHoldings={rawSession.holdings}
             onAdded={() => setRefreshKey((k) => k + 1)}
           />
           <DiffViewer

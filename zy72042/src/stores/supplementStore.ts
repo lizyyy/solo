@@ -1,9 +1,59 @@
 import { create } from 'zustand'
-import type { GameSession, SupplementRecord } from '@/types'
+import type { GameSession, SupplementRecord, FundHolding } from '@/types'
 import { useHistoryStore } from '@/stores/historyStore'
+import { FUND_ASSETS } from '@/data/funds'
+import { calculatePortfolio } from '@/engine/gameEngine'
 
 const SUPPLEMENT_STORAGE_KEY = 'cafe-supplements'
 const BASELINE_STORAGE_KEY = 'cafe-baselines'
+
+export function parseHoldings(value: string): FundHolding[] {
+  try {
+    const parsed = JSON.parse(value)
+    if (Array.isArray(parsed)) {
+      return parsed.filter(
+        (h: unknown) =>
+          typeof h === 'object' &&
+          h !== null &&
+          'fundId' in (h as Record<string, unknown>) &&
+          'ratio' in (h as Record<string, unknown>) &&
+          typeof (h as Record<string, unknown>).fundId === 'string' &&
+          typeof (h as Record<string, unknown>).ratio === 'number'
+      ) as FundHolding[]
+    }
+    return []
+  } catch {
+    return []
+  }
+}
+
+export function serializeHoldings(holdings: FundHolding[]): string {
+  return JSON.stringify(holdings)
+}
+
+export function formatHoldingsHuman(holdings: FundHolding[]): string {
+  if (holdings.length === 0) return '（空持仓）'
+  const fundMap = new Map(FUND_ASSETS.map((f) => [f.id, f]))
+  return holdings
+    .map((h) => {
+      const fund = fundMap.get(h.fundId)
+      const name = fund?.name ?? h.fundId
+      return `${name} ${(h.ratio * 100).toFixed(0)}%`
+    })
+    .join(' + ')
+}
+
+export function recalcAfterHoldingsChange(session: GameSession, newHoldings: FundHolding[]): GameSession {
+  const { score, risk } = calculatePortfolio(newHoldings, FUND_ASSETS)
+  const updatedStatus = session.status
+  return {
+    ...session,
+    holdings: newHoldings,
+    currentScore: score,
+    currentRisk: risk,
+    status: updatedStatus,
+  }
+}
 
 function readSupplementsFromStorage(): Record<string, SupplementRecord[]> {
   try {
@@ -32,7 +82,7 @@ function writeBaselinesToStorage(data: Record<string, GameSession>) {
 }
 
 function applySupplementsToSession(session: GameSession, supplements: SupplementRecord[]): GameSession {
-  const updated = { ...session }
+  let updated: GameSession = { ...session }
   for (const sup of supplements) {
     switch (sup.field) {
       case 'score':
@@ -41,8 +91,13 @@ function applySupplementsToSession(session: GameSession, supplements: Supplement
       case 'risk':
         updated.currentRisk = Number(sup.valueAfter)
         break
+      case 'holdings': {
+        const newHoldings = parseHoldings(sup.valueAfter)
+        updated = recalcAfterHoldingsChange(updated, newHoldings)
+        break
+      }
       case 'failReason':
-        updated.failReason = sup.valueAfter as GameSession['failReason']
+        updated.failReason = (sup.valueAfter as GameSession['failReason']) ?? null
         break
       case 'status':
         updated.status = sup.valueAfter as GameSession['status']
