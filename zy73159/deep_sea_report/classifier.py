@@ -38,7 +38,7 @@ def _judge_status(record: SamplingRecord) -> RecordStatus:
 
     分类规则:
     - 退回: 经纬度完全无法解析（乱写的），且不是反写问题
-    - 待补件: 经纬度反写、缺部分字段，可以补
+    - 待补件: 记录解析失败、经纬度反写、缺部分字段，可以补
     - 已确认: 经纬度正常，关键字段齐全
     """
     has_lat = record.latitude is not None
@@ -55,6 +55,14 @@ def _judge_status(record: SamplingRecord) -> RecordStatus:
         i for i in record.coordinate_issues
         if i.issue_type in ("纬度缺失", "经度缺失")
     ]
+
+    parse_error_issues = [
+        i for i in record.coordinate_issues
+        if i.issue_type == "记录解析失败"
+    ]
+
+    if parse_error_issues:
+        return RecordStatus.PENDING
 
     if record.lat_lon_reversed:
         return RecordStatus.PENDING
