@@ -79,7 +79,7 @@ export const ReplayPlayer: React.FC<ReplayPlayerProps> = ({ onClose }) => {
         }
       }, 2000 / replaySpeed);
     }
-  }, [replaySpeed]);
+  }, [replaySpeed, replayRound, maxRound, stepReplay]);
 
   const handleRoundSelect = (round: number) => {
     startReplay(round);

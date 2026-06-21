@@ -18,7 +18,6 @@ export const ControlBar: React.FC<ControlBarProps> = ({ onPause, onResume }) => 
     restartFromRound,
     settleRound,
     nextRound,
-    endGame,
   } = useGameStore();
 
   const [showRestartModal, setShowRestartModal] = useState(false);
@@ -346,7 +345,15 @@ interface ModalProps {
 const Modal: React.FC<ModalProps> = ({ title, children, onClose }) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
     <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-      <h3 className="text-lg font-bold text-gray-800 mb-4">{title}</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-bold text-gray-800">{title}</h3>
+        <button
+          onClick={onClose}
+          className="text-gray-400 hover:text-gray-600 text-xl leading-none"
+        >
+          ×
+        </button>
+      </div>
       {children}
     </div>
   </div>

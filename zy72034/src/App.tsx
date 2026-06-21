@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, NavLink, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import { LayoutDashboard, Wheat, History as HistoryIcon, FileEdit, PlayCircle, Menu, X } from 'lucide-react';
 import { Dashboard } from './pages/Dashboard';
 import { FarmList } from './pages/FarmList';
@@ -21,7 +21,6 @@ const navItems = [
 ];
 
 function Navbar() {
-  const location = useLocation();
   const { game, isReplaying } = useGameStore();
   const { toasts, removeToast } = useToast();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

@@ -185,27 +185,57 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
           );
           saveGameSnapshot(snapshot);
         });
-      }
 
-      set({
-        loading: false,
-        game: {
-          ...initialGame,
-          currentRound: 7,
-          status: 'paused',
-          createdAt: new Date(Date.now() - 7200000).toISOString(),
-        },
-        farms: sampleFarms,
-        rounds: sampleRounds,
-        currentRoundState: sampleRounds.find((r) => r.roundNumber === 7) || null,
-        farmStates: sampleFarmStates,
-        transactions: sampleTransactions,
-        pauseRecords: samplePauseRecords,
-        supplementRecords: sampleSupplementRecords,
-        lastSettlementReason: '正常回合结算',
-        warnings: validation.warnings,
-        pendingTransactions: sampleTransactions.filter((tx) => tx.status === 'pending'),
-      });
+        set({
+          loading: false,
+          game: {
+            ...initialGame,
+            currentRound: 7,
+            status: 'paused',
+            createdAt: new Date(Date.now() - 7200000).toISOString(),
+          },
+          farms: sampleFarms,
+          rounds: sampleRounds,
+          currentRoundState: sampleRounds.find((r) => r.roundNumber === 7) || null,
+          farmStates: sampleFarmStates,
+          transactions: sampleTransactions,
+          pauseRecords: samplePauseRecords,
+          supplementRecords: sampleSupplementRecords,
+          lastSettlementReason: '正常回合结算',
+          warnings: validation.warnings,
+          pendingTransactions: sampleTransactions.filter((tx) => tx.status === 'pending'),
+        });
+      } else {
+        const latestSnapshot = loadGameSnapshot(7);
+        if (!latestSnapshot) {
+          throw new Error('已有快照但第7回合快照不存在，请重置数据后重试');
+        }
+
+        set({
+          loading: false,
+          game: {
+            ...latestSnapshot.game,
+            createdAt: new Date(Date.now() - 7200000).toISOString(),
+          },
+          farms: sampleFarms,
+          rounds: sampleRounds.map((r) => {
+            const hasSupp = latestSnapshot.supplementRecords.some(
+              (sr) => sr.roundNumber === r.roundNumber
+            );
+            return { ...r, isSupplemented: r.isSupplemented || hasSupp };
+          }),
+          currentRoundState: latestSnapshot.currentRoundState,
+          farmStates: latestSnapshot.farmStates,
+          transactions: latestSnapshot.transactions,
+          pauseRecords: latestSnapshot.pauseRecords,
+          supplementRecords: latestSnapshot.supplementRecords,
+          lastSettlementReason: '正常回合结算',
+          warnings: validation.warnings,
+          pendingTransactions: latestSnapshot.transactions.filter(
+            (tx) => tx.status === 'pending'
+          ),
+        });
+      }
     } catch (error) {
       set({
         loading: false,
@@ -544,7 +574,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     difference: string,
     remark: string
   ) => {
-    const { game, farmStates, rounds, transactions, pauseRecords, supplementRecords, currentRoundState } = get();
+    const { game, farmStates, rounds, supplementRecords, currentRoundState } = get();
     if (!game) return;
 
     const supplementRecord: SupplementRecord = {
@@ -560,15 +590,40 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       confirmedBy: '小林老师',
     };
 
-    const updatedFarmStates = farmStates.map((fs) => {
-      if (fs.roundNumber !== roundNumber || fs.farmId !== farmId) return fs;
+    const parsedNewValue = Number(newValue);
+    const fieldIsNumeric = !isNaN(parsedNewValue);
 
-      const parsedNewValue = Number(newValue);
-      if (!isNaN(parsedNewValue) && fieldName in fs) {
-        return {
-          ...fs,
-          [fieldName]: parsedNewValue,
-        } as FarmState;
+    let previousValue: unknown = undefined;
+    const updatedFarmStates = farmStates.map((fs) => {
+      if (fs.farmId !== farmId) return fs;
+      if (fs.roundNumber < roundNumber) return fs;
+
+      if (fs.roundNumber === roundNumber) {
+        if (fieldIsNumeric && fieldName in fs) {
+          previousValue = (fs as unknown as Record<string, unknown>)[fieldName];
+          return {
+            ...fs,
+            [fieldName]: parsedNewValue,
+          } as FarmState;
+        }
+        if (!fieldIsNumeric && fieldName in fs) {
+          previousValue = (fs as unknown as Record<string, unknown>)[fieldName];
+          return {
+            ...fs,
+            [fieldName]: newValue,
+          } as FarmState;
+        }
+      }
+
+      if (fs.roundNumber > roundNumber) {
+        const currentFieldValue = (fs as unknown as Record<string, unknown>)[fieldName];
+        if (previousValue !== undefined && currentFieldValue === previousValue) {
+          if (fieldIsNumeric) {
+            return { ...fs, [fieldName]: parsedNewValue } as FarmState;
+          } else {
+            return { ...fs, [fieldName]: newValue } as FarmState;
+          }
+        }
       }
       return fs;
     });
@@ -584,15 +639,47 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
     const newSupplementRecords = [...supplementRecords, supplementRecord];
 
-    const snapshot = createSnapshot(
-      game,
-      newCurrentRoundState,
-      updatedFarmStates,
-      transactions,
-      pauseRecords,
-      newSupplementRecords
-    );
-    saveGameSnapshot(snapshot);
+    for (let r = roundNumber; r <= game.currentRound; r++) {
+      const roundSnapshot = loadGameSnapshot(r);
+      if (!roundSnapshot) continue;
+
+      const snapshotFarmStates = roundSnapshot.farmStates.map((fs) => {
+        if (fs.farmId !== farmId || fs.roundNumber < roundNumber) return fs;
+        if (fs.roundNumber === roundNumber) {
+          if (fieldIsNumeric && fieldName in fs) {
+            return { ...fs, [fieldName]: parsedNewValue } as FarmState;
+          }
+          if (!fieldIsNumeric && fieldName in fs) {
+            return { ...fs, [fieldName]: newValue } as FarmState;
+          }
+        }
+        if (fs.roundNumber > roundNumber) {
+          const snapPrev = (roundSnapshot.farmStates.find(
+            (p) => p.farmId === farmId && p.roundNumber === roundNumber
+          ) as unknown as Record<string, unknown>)?.[fieldName];
+          const snapCur = (fs as unknown as Record<string, unknown>)[fieldName];
+          if (snapPrev !== undefined && snapCur === snapPrev) {
+            if (fieldIsNumeric) {
+              return { ...fs, [fieldName]: parsedNewValue } as FarmState;
+            } else {
+              return { ...fs, [fieldName]: newValue } as FarmState;
+            }
+          }
+        }
+        return fs;
+      });
+
+      const snapshotRound = updatedRounds.find((ur) => ur.roundNumber === r);
+      const rebuiltSnapshot = createSnapshot(
+        { ...roundSnapshot.game, currentRound: r },
+        snapshotRound || roundSnapshot.currentRoundState,
+        snapshotFarmStates,
+        roundSnapshot.transactions,
+        roundSnapshot.pauseRecords,
+        newSupplementRecords,
+      );
+      saveGameSnapshot(rebuiltSnapshot);
+    }
 
     set({
       supplementRecords: newSupplementRecords,
@@ -663,7 +750,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   },
 
   stopReplay: () => {
-    const { preReplayState, originalMaxRound } = get();
+    const { preReplayState } = get();
     if (!preReplayState) {
       set({
         isReplaying: false,

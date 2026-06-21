@@ -12,7 +12,6 @@ export const Replay: React.FC = () => {
     farms,
     rounds,
     farmStates,
-    currentRoundState,
     isReplaying,
     replayRound,
     startReplay,

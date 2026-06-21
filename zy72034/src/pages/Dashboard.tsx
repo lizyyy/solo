@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Play, Database, AlertCircle, TrendingUp, Coins, Award, RefreshCw } from 'lucide-react';
 import { useGameStore } from '../store/useGameStore';
 import { AlertBox } from '../components/AlertBox';
@@ -14,7 +14,6 @@ export const Dashboard: React.FC = () => {
     warnings,
     game,
     farms,
-    farmStates,
     currentRoundState,
     initGame,
     startGame,

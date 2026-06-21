@@ -57,7 +57,6 @@ export const Supplement: React.FC = () => {
   const selectedFarmState = currentRoundStates.find(
     (fs) => fs.farmId === selectedFarmId
   );
-  const selectedFarm = farms.find((f) => f.id === selectedFarmId);
 
   const handleOldValueAutoFill = () => {
     if (selectedFarmState && fieldName in selectedFarmState) {
