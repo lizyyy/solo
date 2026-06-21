@@ -1,6 +1,16 @@
 export type RecordStatus = 'smooth' | 'needs_confirmation' | 'old_standard'
 export type RecordSource = 'excel' | 'audio' | 'contract' | 'chat_annotation'
 export type JudgmentType = 'system_auto' | 'manual_override' | 'note_added' | 'diff_detected'
+export type SortField = 'createdAt' | 'revenue' | 'trackName'
+export type SortOrder = 'asc' | 'desc'
+
+export interface AttachmentInfo {
+  id: string
+  fileName: string
+  storedPath: string
+  fileType: string
+  fileSize: number
+}
 
 export interface RevenueRecord {
   id: string
@@ -13,7 +23,7 @@ export interface RevenueRecord {
   source: RecordSource
   originalNote: string
   currentNote: string
-  attachments: string[]
+  attachments: AttachmentInfo[]
   createdAt: string
   updatedAt: string
 }
@@ -39,6 +49,10 @@ export interface ImportResult {
 export interface FilterState {
   status: RecordStatus | ''
   source: RecordSource | ''
+  dateFrom: string
+  dateTo: string
+  sortBy: SortField
+  sortOrder: SortOrder
 }
 
 export const STATUS_LABELS: Record<RecordStatus, string> = {

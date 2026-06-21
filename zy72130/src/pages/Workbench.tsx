@@ -16,6 +16,10 @@ export default function Workbench() {
     const params = new URLSearchParams()
     if (filter.status) params.set('status', filter.status)
     if (filter.source) params.set('source', filter.source)
+    if (filter.dateFrom) params.set('dateFrom', filter.dateFrom)
+    if (filter.dateTo) params.set('dateTo', filter.dateTo)
+    if (filter.sortBy) params.set('sortBy', filter.sortBy)
+    if (filter.sortOrder) params.set('sortOrder', filter.sortOrder)
     window.open(`/api/export?${params.toString()}`, '_blank')
   }
 

@@ -24,7 +24,7 @@ export const useStore = create<AppState>((set, get) => ({
   records: [],
   currentRecord: null,
   judgments: [],
-  filter: { status: '', source: '' },
+  filter: { status: '', source: '', dateFrom: '', dateTo: '', sortBy: 'createdAt', sortOrder: 'desc' },
   loading: false,
   importResult: null,
   editingNoteId: null,
@@ -42,6 +42,10 @@ export const useStore = create<AppState>((set, get) => ({
       const params = new URLSearchParams()
       if (filter.status) params.set('status', filter.status)
       if (filter.source) params.set('source', filter.source)
+      if (filter.dateFrom) params.set('dateFrom', filter.dateFrom)
+      if (filter.dateTo) params.set('dateTo', filter.dateTo)
+      if (filter.sortBy) params.set('sortBy', filter.sortBy)
+      if (filter.sortOrder) params.set('sortOrder', filter.sortOrder)
 
       const res = await fetch(`/api/records?${params.toString()}`)
       const data = await res.json()

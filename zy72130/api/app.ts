@@ -4,16 +4,23 @@ import express, {
   type NextFunction,
 } from 'express'
 import cors from 'cors'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import recordRoutes from './routes/records.js'
 import importRoutes from './routes/import.js'
 import exportRoutes from './routes/export.js'
 import judgmentRoutes from './routes/judgments.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const app: express.Application = express()
 
 app.use(cors())
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
+
+app.use('/api/attachments', express.static(path.join(__dirname, '..', 'data', 'attachments')))
 
 app.use('/api/records', recordRoutes)
 app.use('/api/records', judgmentRoutes)

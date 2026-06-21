@@ -4,10 +4,47 @@ import multer from 'multer'
 import * as xlsx from 'xlsx'
 import fs from 'fs'
 import { getDb } from '../db.js'
+import { saveAttachment, getFileType, ensureAttachmentsDir } from '../lib/attachments.js'
+
+ensureAttachmentsDir()
 
 const upload = multer({ dest: 'uploads/' })
 
 const router = Router()
+
+interface RecordRow {
+  id: string
+  track_name: string
+  artist: string
+  revenue: number
+  share_ratio: number | null
+  share_amount: number | null
+  status: string
+  source: string
+  original_note: string
+  current_note: string
+  attachments: string
+  created_at: string
+  updated_at: string
+}
+
+function rowToApi(row: RecordRow) {
+  return {
+    id: row.id,
+    trackName: row.track_name,
+    artist: row.artist,
+    revenue: row.revenue,
+    shareRatio: row.share_ratio,
+    shareAmount: row.share_amount,
+    status: row.status,
+    source: row.source,
+    originalNote: row.original_note,
+    currentNote: row.current_note,
+    attachments: JSON.parse(row.attachments || '[]'),
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }
+}
 
 function parseExcelFile(filePath: string): { trackName: string; artist: string; revenue: number; shareRatio: number | null; note: string }[] {
   const wb = xlsx.readFile(filePath)
@@ -67,68 +104,81 @@ router.post('/', upload.array('files', 50), (req: Request, res: Response) => {
 
   for (const file of files) {
     try {
-      const ext = file.originalname?.toLowerCase().split('.').pop()
+      const ext = file.originalname?.toLowerCase().split('.').pop() || ''
+      const fullExt = `.${ext}`
+      const fileName = file.originalname || 'unknown'
 
       if (ext === 'xlsx' || ext === 'xls' || ext === 'csv') {
         const parsed = parseExcelFile(file.path)
 
         for (const item of parsed) {
-          const id = uuidv4()
+          const recordId = uuidv4()
+          const attachmentId = uuidv4()
+          const attachment = saveAttachment(file.path, fileName, attachmentId)
+          const attachmentsJson = JSON.stringify([attachment])
           const judgment = determineStatus(item.shareRatio, item.note)
           const shareAmount = item.shareRatio != null ? Math.round(item.revenue * item.shareRatio) : null
 
           db.prepare(`
-            INSERT INTO records (id, track_name, artist, revenue, share_ratio, share_amount, status, source, original_note, current_note, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-          `).run(id, item.trackName, item.artist, item.revenue, item.shareRatio, shareAmount, judgment.status, 'excel', item.note, item.note, now, now)
+            INSERT INTO records (id, track_name, artist, revenue, share_ratio, share_amount, status, source, original_note, current_note, attachments, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `).run(recordId, item.trackName, item.artist, item.revenue, item.shareRatio, shareAmount, judgment.status, 'excel', item.note, item.note, attachmentsJson, now, now)
 
           db.prepare(`
             INSERT INTO judgment_logs (id, record_id, step, type, description, result, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?)
-          `).run(uuidv4(), id, 1, 'system_auto', judgment.description, judgment.result, now)
+          `).run(uuidv4(), recordId, 1, 'system_auto', judgment.description, judgment.result, now)
 
-          const record = db.prepare('SELECT * FROM records WHERE id = ?').get(id)
-          importedRecords.push(record)
+          const record = db.prepare('SELECT * FROM records WHERE id = ?').get(recordId)
+          importedRecords.push(rowToApi(record as RecordRow))
           successCount++
         }
-      } else if (ext === 'mp3' || ext === 'wav' || ext === 'flac') {
-        const id = uuidv4()
-        const fileName = file.originalname || 'unknown'
+      } else if (ext === 'mp3' || ext === 'wav' || ext === 'flac' || ext === 'aac' || ext === 'ogg' || ext === 'm4a') {
+        const recordId = uuidv4()
+        const attachmentId = uuidv4()
+        const attachment = saveAttachment(file.path, fileName, attachmentId)
+        const attachmentsJson = JSON.stringify([attachment])
         const trackName = fileName.replace(/\.[^.]+$/, '')
 
         db.prepare(`
-          INSERT INTO records (id, track_name, artist, revenue, share_ratio, share_amount, status, source, original_note, current_note, created_at, updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `).run(id, trackName, '待补充', 0, null, null, 'needs_confirmation', 'audio', `音频文件：${fileName}`, `音频文件：${fileName}`, now, now)
+          INSERT INTO records (id, track_name, artist, revenue, share_ratio, share_amount, status, source, original_note, current_note, attachments, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(recordId, trackName, '待补充', 0, null, null, 'needs_confirmation', 'audio', `音频文件：${fileName}`, `音频文件：${fileName}`, attachmentsJson, now, now)
 
         db.prepare(`
           INSERT INTO judgment_logs (id, record_id, step, type, description, result, created_at)
           VALUES (?, ?, ?, ?, ?, ?, ?)
-        `).run(uuidv4(), id, 1, 'system_auto', '音频文件导入，缺少分账信息', '标记为待确认，需人工补充分账比例', now)
+        `).run(uuidv4(), recordId, 1, 'system_auto', '音频文件导入，缺少分账信息', '标记为待确认，需人工补充分账比例', now)
 
-        const record = db.prepare('SELECT * FROM records WHERE id = ?').get(id)
-        importedRecords.push(record)
+        const record = db.prepare('SELECT * FROM records WHERE id = ?').get(recordId)
+        importedRecords.push(rowToApi(record as RecordRow))
         successCount++
-      } else if (ext === 'png' || ext === 'jpg' || ext === 'jpeg' || ext === 'pdf') {
-        const id = uuidv4()
-        const fileName = file.originalname || 'unknown'
+      } else if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'pdf'].includes(ext)) {
+        const recordId = uuidv4()
+        const attachmentId = uuidv4()
+        const attachment = saveAttachment(file.path, fileName, attachmentId)
+        const attachmentsJson = JSON.stringify([attachment])
+        const isImage = getFileType(fullExt) === 'image'
+        const label = isImage ? '合同截图' : '合同文件'
 
         db.prepare(`
-          INSERT INTO records (id, track_name, artist, revenue, share_ratio, share_amount, status, source, original_note, current_note, created_at, updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `).run(id, '合同文件', '待补充', 0, null, null, 'needs_confirmation', 'contract', `合同文件：${fileName}`, `合同文件：${fileName}`, now, now)
+          INSERT INTO records (id, track_name, artist, revenue, share_ratio, share_amount, status, source, original_note, current_note, attachments, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(recordId, label, '待补充', 0, null, null, 'needs_confirmation', 'contract', `${label}：${fileName}`, `${label}：${fileName}`, attachmentsJson, now, now)
 
         db.prepare(`
           INSERT INTO judgment_logs (id, record_id, step, type, description, result, created_at)
           VALUES (?, ?, ?, ?, ?, ?, ?)
-        `).run(uuidv4(), id, 1, 'system_auto', '合同截图导入，缺少分账信息', '标记为待确认，需人工提取合同内容', now)
+        `).run(uuidv4(), recordId, 1, 'system_auto', `${label}导入，缺少分账信息`, '标记为待确认，需人工提取合同内容', now)
 
-        const record = db.prepare('SELECT * FROM records WHERE id = ?').get(id)
-        importedRecords.push(record)
+        const record = db.prepare('SELECT * FROM records WHERE id = ?').get(recordId)
+        importedRecords.push(rowToApi(record as RecordRow))
         successCount++
       } else if (ext === 'txt') {
-        const id = uuidv4()
-        const fileName = file.originalname || 'unknown'
+        const recordId = uuidv4()
+        const attachmentId = uuidv4()
+        const attachment = saveAttachment(file.path, fileName, attachmentId)
+        const attachmentsJson = JSON.stringify([attachment])
         const content = fs.readFileSync(file.path, 'utf-8').trim()
         const lines = content.split(/\r?\n/).filter(l => l.trim())
         const firstLine = lines[0] || fileName
@@ -137,20 +187,20 @@ router.post('/', upload.array('files', 50), (req: Request, res: Response) => {
         const judgment = determineStatus(null, note)
 
         db.prepare(`
-          INSERT INTO records (id, track_name, artist, revenue, share_ratio, share_amount, status, source, original_note, current_note, created_at, updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `).run(id, trackName, '待补充', 0, null, null, judgment.status, 'chat_annotation', note, note, now, now)
+          INSERT INTO records (id, track_name, artist, revenue, share_ratio, share_amount, status, source, original_note, current_note, attachments, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(recordId, trackName, '待补充', 0, null, null, judgment.status, 'chat_annotation', note, note, attachmentsJson, now, now)
 
         db.prepare(`
           INSERT INTO judgment_logs (id, record_id, step, type, description, result, created_at)
           VALUES (?, ?, ?, ?, ?, ?, ?)
-        `).run(uuidv4(), id, 1, 'system_auto', judgment.description, judgment.result, now)
+        `).run(uuidv4(), recordId, 1, 'system_auto', judgment.description, judgment.result, now)
 
-        const record = db.prepare('SELECT * FROM records WHERE id = ?').get(id)
-        importedRecords.push(record)
+        const record = db.prepare('SELECT * FROM records WHERE id = ?').get(recordId)
+        importedRecords.push(rowToApi(record as RecordRow))
         successCount++
       } else {
-        failedFiles.push({ fileName: file.originalname || 'unknown', reason: `不支持的文件格式：${ext}` })
+        failedFiles.push({ fileName, reason: `不支持的文件格式：${ext}` })
       }
     } catch (err) {
       failedFiles.push({

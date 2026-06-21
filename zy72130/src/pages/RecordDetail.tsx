@@ -11,6 +11,10 @@ import {
   DollarSign,
   Percent,
   Calendar,
+  Paperclip,
+  Image,
+  Download,
+  ExternalLink,
 } from 'lucide-react'
 import { useStore } from '@/store/useStore'
 import {
@@ -19,6 +23,7 @@ import {
   JUDGMENT_TYPE_LABELS,
   type RecordStatus,
   type JudgmentType,
+  type AttachmentInfo,
 } from '@/types'
 
 const JUDGMENT_ICONS: Record<JudgmentType, typeof Cpu> = {
@@ -120,6 +125,20 @@ export default function RecordDetail() {
             </p>
           </div>
         </div>
+
+        {currentRecord.attachments && currentRecord.attachments.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-surface-border">
+            <div className="flex items-center gap-2 mb-3">
+              <Paperclip className="h-3.5 w-3.5 text-neon" />
+              <span className="text-xs text-muted">附件材料（{currentRecord.attachments.length}）</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {currentRecord.attachments.map((att) => (
+                <AttachmentCard key={att.id} att={att} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="card">
@@ -251,5 +270,74 @@ function InfoItem({
       </div>
       <div className={`text-sm font-medium font-mono ${valueClass}`}>{value}</div>
     </div>
+  )
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function AttachmentCard({ att }: { att: AttachmentInfo }) {
+  const url = `/api/attachments/${encodeURIComponent(att.storedPath)}`
+
+  if (att.fileType === 'image') {
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block group relative rounded-lg overflow-hidden border border-surface-border bg-surface-elevated hover:border-neon/40 transition-colors"
+      >
+        <div className="aspect-video flex items-center justify-center overflow-hidden">
+          <img
+            src={url}
+            alt={att.fileName}
+            className="max-w-full max-h-full object-contain"
+          />
+        </div>
+        <div className="p-2 flex items-center justify-between">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <Image className="h-3 w-3 text-neon flex-shrink-0" />
+            <span className="text-xs text-gray-300 truncate">{att.fileName}</span>
+          </div>
+          <ExternalLink className="h-3 w-3 text-muted flex-shrink-0 group-hover:text-neon transition-colors" />
+        </div>
+      </a>
+    )
+  }
+
+  if (att.fileType === 'audio') {
+    return (
+      <div className="rounded-lg border border-surface-border bg-surface-elevated p-3">
+        <div className="flex items-center gap-2 mb-2">
+          <Music className="h-4 w-4 text-neon" />
+          <span className="text-xs text-gray-300 truncate flex-1">{att.fileName}</span>
+          <span className="text-xs text-muted">{formatFileSize(att.fileSize)}</span>
+        </div>
+        <audio controls src={url} className="w-full h-8" />
+      </div>
+    )
+  }
+
+  const TypeIcon = att.fileType === 'pdf' ? FileText : att.fileType === 'text' ? FileText : Paperclip
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-3 p-3 rounded-lg border border-surface-border bg-surface-elevated hover:border-neon/40 hover:bg-surface-hover transition-colors group"
+    >
+      <div className="w-10 h-10 rounded-lg bg-neon/10 flex items-center justify-center flex-shrink-0">
+        <TypeIcon className="h-5 w-5 text-neon" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-white truncate group-hover:text-neon transition-colors">{att.fileName}</p>
+        <p className="text-xs text-muted mt-0.5">{formatFileSize(att.fileSize)}</p>
+      </div>
+      <Download className="h-4 w-4 text-muted group-hover:text-neon transition-colors flex-shrink-0" />
+    </a>
   )
 }

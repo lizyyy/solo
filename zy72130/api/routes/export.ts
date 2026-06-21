@@ -5,7 +5,7 @@ const router = Router()
 
 router.get('/', (req: Request, res: Response) => {
   const db = getDb()
-  const { status, source, dateFrom, dateTo } = req.query
+  const { status, source, dateFrom, dateTo, sortBy, sortOrder } = req.query
 
   let sql = 'SELECT * FROM records WHERE 1=1'
   const params: unknown[] = []
@@ -19,15 +19,22 @@ router.get('/', (req: Request, res: Response) => {
     params.push(source)
   }
   if (dateFrom) {
-    sql += ' AND created_at >= ?'
+    sql += ' AND date(created_at) >= date(?)'
     params.push(dateFrom)
   }
   if (dateTo) {
-    sql += ' AND created_at <= ?'
+    sql += ' AND date(created_at) <= date(?)'
     params.push(dateTo)
   }
 
-  sql += ' ORDER BY created_at DESC'
+  const sortFieldMap: Record<string, string> = {
+    createdAt: 'created_at',
+    revenue: 'revenue',
+    trackName: 'track_name',
+  }
+  const field = sortFieldMap[String(sortBy)] || 'created_at'
+  const order = String(sortOrder).toLowerCase() === 'asc' ? 'ASC' : 'DESC'
+  sql += ` ORDER BY ${field} ${order}`
 
   const rows = db.prepare(sql).all(...params) as Record<string, unknown>[]
 
