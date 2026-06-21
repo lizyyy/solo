@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { Upload, RefreshCw, FileText, Plus, X } from 'lucide-react'
 import { useProjectStore } from '@/store'
+import { useEnsureProject } from '@/hooks/useEnsureProject'
 import { fetchProjects, fetchPrecheck, seedData, importData } from '@/api'
 import { parseJsonField } from '@/lib/utils'
 
@@ -90,6 +91,7 @@ function emptyRow(): ManualRow {
 
 export default function ImportPage() {
   const { currentProjectId, setCurrentProjectId } = useProjectStore()
+  const { ready, noProject } = useEnsureProject()
   const [projects, setProjects] = useState<any[]>([])
   const [warnings, setWarnings] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -101,36 +103,39 @@ export default function ImportPage() {
   const [fileSource, setFileSource] = useState<'sunlight' | 'ledger'>('sunlight')
   const [manualRows, setManualRows] = useState<ManualRow[]>([emptyRow()])
   const [manualSource, setManualSource] = useState<'sunlight' | 'ledger'>('sunlight')
+  const [error, setError] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => { loadProjects() }, [])
+  const loadPrecheck = useCallback(async () => {
+    if (!currentProjectId) return
+    try {
+      const w = await fetchPrecheck(currentProjectId)
+      setWarnings(w)
+    } catch (e: any) {
+      setError(e?.message || '预检加载失败')
+    }
+  }, [currentProjectId])
+
+  useEffect(() => {
+    async function init() {
+      try {
+        const list = await fetchProjects()
+        setProjects(list)
+        if (!currentProjectId && list.length > 0) {
+          setCurrentProjectId(list[0].id)
+        }
+      } catch (e: any) {
+        setError(e?.message || '项目列表加载失败')
+      } finally {
+        setLoading(false)
+      }
+    }
+    init()
+  }, [currentProjectId, setCurrentProjectId])
 
   useEffect(() => {
     if (currentProjectId) loadPrecheck()
-  }, [currentProjectId])
-
-  async function loadProjects() {
-    try {
-      const list = await fetchProjects()
-      setProjects(list)
-      if (!currentProjectId && list.length > 0) {
-        setCurrentProjectId(list[0].id)
-      }
-    } catch {
-      // ignore
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function loadPrecheck() {
-    try {
-      const w = await fetchPrecheck(currentProjectId!)
-      setWarnings(w)
-    } catch {
-      // ignore
-    }
-  }
+  }, [currentProjectId, loadPrecheck])
 
   async function handleSeed() {
     if (!currentProjectId) return
@@ -220,8 +225,25 @@ export default function ImportPage() {
     setManualRows((prev) => prev.filter((_, i) => i !== idx))
   }
 
-  if (loading) {
+  if (!ready || loading) {
     return <div className="flex items-center justify-center h-full text-slate-400">加载中...</div>
+  }
+
+  if (noProject) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-3">
+        <Upload className="w-10 h-10 text-slate-300" />
+        <p className="text-slate-400">暂无项目，请先到工作台创建项目</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-3">
+        <p className="text-rose-500 text-sm">{error}</p>
+      </div>
+    )
   }
 
   return (

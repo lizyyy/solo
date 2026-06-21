@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { FileOutput, ChevronDown, ChevronUp, Download } from 'lucide-react'
 import { useProjectStore } from '@/store'
-import { fetchExport, fetchProjects, generateExport, downloadCsv } from '@/api'
+import { useEnsureProject } from '@/hooks/useEnsureProject'
+import { fetchExport, generateExport, downloadCsv } from '@/api'
 
 const categoryConfig: Record<string, { label: string; headerCls: string; badgeCls: string }> = {
   processed: {
@@ -23,46 +24,34 @@ const categoryConfig: Record<string, { label: string; headerCls: string; badgeCl
 
 export default function ExportPage() {
   const { currentProjectId, setCurrentProjectId, operator } = useProjectStore()
+  const { ready, noProject } = useEnsureProject()
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [expanded, setExpanded] = useState<Record<string, boolean>>({
     processed: true,
     pending_verification: true,
     needs_field_visit: true,
   })
 
-  useEffect(() => {
-    ensureProject()
-  }, [currentProjectId])
-
-  async function ensureProject() {
-    if (currentProjectId) {
-      await loadExport(currentProjectId)
-      return
-    }
-    try {
-      const projects = await fetchProjects()
-      if (projects.length > 0) {
-        setCurrentProjectId(projects[0].id)
-      } else {
-        setLoading(false)
-      }
-    } catch {
-      setLoading(false)
-    }
-  }
-
-  async function loadExport(projectId = currentProjectId!) {
+  const loadExport = useCallback(async (projectId = currentProjectId) => {
+    if (!projectId) return
+    setLoading(true)
+    setError(null)
     try {
       const result = await fetchExport(projectId)
       setData(result)
-    } catch {
-      // ignore
+    } catch (e: any) {
+      setError(e?.message || '加载失败，请刷新重试')
     } finally {
       setLoading(false)
     }
-  }
+  }, [currentProjectId])
+
+  useEffect(() => {
+    if (currentProjectId) loadExport(currentProjectId)
+  }, [currentProjectId, loadExport])
 
   async function handleGenerate() {
     if (!currentProjectId || !operator) return
@@ -81,8 +70,31 @@ export default function ExportPage() {
     setExpanded((prev) => ({ ...prev, [key]: !prev[key] }))
   }
 
-  if (loading) {
+  if (!ready || loading) {
     return <div className="flex items-center justify-center h-full text-slate-400">加载中...</div>
+  }
+
+  if (noProject) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-3">
+        <FileOutput className="w-10 h-10 text-slate-300" />
+        <p className="text-slate-400">暂无项目，请先到工作台创建或导入项目</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-3">
+        <p className="text-rose-500 text-sm">{error}</p>
+        <button
+          onClick={() => currentProjectId && loadExport(currentProjectId)}
+          className="text-sm px-4 py-1.5 rounded bg-slate-800 text-white hover:bg-slate-900"
+        >
+          重新加载
+        </button>
+      </div>
+    )
   }
 
   const hasData = data && (data.processed?.length > 0 || data.pending_verification?.length > 0 || data.needs_field_visit?.length > 0)

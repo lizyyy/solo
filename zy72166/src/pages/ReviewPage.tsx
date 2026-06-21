@@ -1,32 +1,58 @@
 import { useEffect, useState, useCallback } from 'react'
 import { ClipboardCheck } from 'lucide-react'
-import { useProjectStore } from '@/store'
+import { useEnsureProject } from '@/hooks/useEnsureProject'
 import { fetchReviews } from '@/api'
 import ReviewDetail from '@/components/ReviewDetail'
 
 export default function ReviewPage() {
-  const { currentProjectId } = useProjectStore()
+  const { currentProjectId, ready, noProject } = useEnsureProject()
   const [reviews, setReviews] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const loadReviews = useCallback(async () => {
     if (!currentProjectId) return
+    setLoading(true)
+    setError(null)
     try {
       const data = await fetchReviews(currentProjectId)
       setReviews(data)
-    } catch {
-      // ignore
+    } catch (e: any) {
+      setError(e?.message || '加载失败，请刷新重试')
     } finally {
       setLoading(false)
     }
   }, [currentProjectId])
 
   useEffect(() => {
-    loadReviews()
-  }, [loadReviews])
+    if (currentProjectId) loadReviews()
+  }, [currentProjectId, loadReviews])
 
-  if (loading) {
+  if (!ready || loading) {
     return <div className="flex items-center justify-center h-full text-slate-400">加载中...</div>
+  }
+
+  if (noProject) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-3">
+        <ClipboardCheck className="w-10 h-10 text-slate-300" />
+        <p className="text-slate-400">暂无项目，请先到工作台创建或导入项目</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-3">
+        <p className="text-rose-500 text-sm">{error}</p>
+        <button
+          onClick={loadReviews}
+          className="text-sm px-4 py-1.5 rounded bg-slate-800 text-white hover:bg-slate-900"
+        >
+          重新加载
+        </button>
+      </div>
+    )
   }
 
   if (reviews.length === 0) {
