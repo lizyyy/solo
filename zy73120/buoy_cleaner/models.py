@@ -11,6 +11,8 @@ class BuoyRecord:
     longitude_raw: str
     latitude_std: Optional[float] = None
     longitude_std: Optional[float] = None
+    latitude_suggested: Optional[float] = None
+    longitude_suggested: Optional[float] = None
     water_temp: Optional[float] = None
     wave_height: Optional[float] = None
     wind_speed: Optional[float] = None

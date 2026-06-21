@@ -117,10 +117,18 @@ class BuoyDataCleaner:
                 import_time=import_time
             )
 
-            lat_std, lon_std, fmt = normalize_coordinates(rec.latitude_raw, rec.longitude_raw)
+            lat_std, lon_std, fmt, needs_coord_confirm, coord_confirm_reason, lat_sug, lon_sug = normalize_coordinates(rec.latitude_raw, rec.longitude_raw)
             rec.latitude_std = lat_std
             rec.longitude_std = lon_std
+            rec.latitude_suggested = lat_sug
+            rec.longitude_suggested = lon_sug
             rec.lat_lon_format = fmt
+            if needs_coord_confirm:
+                rec.needs_confirmation = True
+                if rec.confirmation_reason:
+                    rec.confirmation_reason = rec.confirmation_reason + '; ' + coord_confirm_reason
+                else:
+                    rec.confirmation_reason = coord_confirm_reason
 
             new_records.append(rec)
 
@@ -155,15 +163,21 @@ class BuoyDataCleaner:
             all_keys.add(key)
             bottle_groups[rec.sample_bottle_no].append(rec)
 
-            if rec.latitude_std is None or rec.longitude_std is None:
+            has_coord_issue = (rec.latitude_std is None or rec.longitude_std is None) and not (rec.latitude_suggested or rec.longitude_suggested)
+            has_coord_suggestion = rec.latitude_suggested is not None or rec.longitude_suggested is not None
+
+            if has_coord_issue:
                 result.invalid_records += 1
                 rec.needs_confirmation = True
-                rec.confirmation_reason = f"经纬度无法解析: lat={rec.latitude_raw}, lon={rec.longitude_raw}"
+                if not rec.confirmation_reason:
+                    rec.confirmation_reason = f"经纬度无法解析: lat={rec.latitude_raw}, lon={rec.longitude_raw}"
                 result.pending_confirmation.append(rec)
                 result.records.append(rec)
                 continue
 
             result.valid_records += 1
+            if rec.needs_confirmation and rec not in result.pending_confirmation:
+                result.pending_confirmation.append(rec)
             result.records.append(rec)
 
         for bottle_no, records in bottle_groups.items():
@@ -198,11 +212,18 @@ class BuoyDataCleaner:
                 old_confirmed = str(rec.is_confirmed)
                 old_needs_confirm = str(rec.needs_confirmation)
                 old_note = rec.manual_note or ""
+                old_lat_std = str(rec.latitude_std)
+                old_lon_std = str(rec.longitude_std)
+                old_dup = str(rec.is_duplicate)
 
                 rec.is_confirmed = True
                 rec.needs_confirmation = False
 
                 if is_valid:
+                    if rec.latitude_std is None and rec.latitude_suggested is not None:
+                        rec.latitude_std = rec.latitude_suggested
+                    if rec.longitude_std is None and rec.longitude_suggested is not None:
+                        rec.longitude_std = rec.longitude_suggested
                     rec.is_duplicate = False
                     rec.duplicate_reason = None
                     rec.confirmation_reason = None
@@ -218,6 +239,11 @@ class BuoyDataCleaner:
                 self._add_audit_log(rec, 'is_confirmed', old_confirmed, 'True', operator, reason)
                 self._add_audit_log(rec, 'needs_confirmation', old_needs_confirm, 'False', operator, reason)
                 self._add_audit_log(rec, 'manual_note', old_note, rec.manual_note, operator, reason)
+                self._add_audit_log(rec, 'is_duplicate', old_dup, str(rec.is_duplicate), operator, reason)
+                if old_lat_std != str(rec.latitude_std):
+                    self._add_audit_log(rec, 'latitude_std', old_lat_std, str(rec.latitude_std), operator, reason)
+                if old_lon_std != str(rec.longitude_std):
+                    self._add_audit_log(rec, 'longitude_std', old_lon_std, str(rec.longitude_std), operator, reason)
 
                 self._save_state()
                 self._save_audit_log()
@@ -278,6 +304,8 @@ class BuoyDataCleaner:
                 '采样瓶编号': rec.sample_bottle_no,
                 '原始纬度': rec.latitude_raw,
                 '原始经度': rec.longitude_raw,
+                '建议纬度': round(rec.latitude_suggested, 6) if rec.latitude_suggested else None,
+                '建议经度': round(rec.longitude_suggested, 6) if rec.longitude_suggested else None,
                 '标准化纬度': round(rec.latitude_std, 6) if rec.latitude_std else None,
                 '标准化经度': round(rec.longitude_std, 6) if rec.longitude_std else None,
                 '坐标格式': rec.lat_lon_format,
@@ -288,6 +316,7 @@ class BuoyDataCleaner:
                 '是否重复': '是' if rec.is_duplicate else '否',
                 '重复原因': rec.duplicate_reason,
                 '待确认': '是' if rec.needs_confirmation else '否',
+                '待确认原因': rec.confirmation_reason,
                 '已确认': '是' if rec.is_confirmed else '否',
                 '人工备注': rec.manual_note,
                 '来源文件': rec.source_file,

@@ -93,7 +93,9 @@ def pending(ctx):
         click.echo(f"\n【{idx}】记录ID: {rec.record_id}")
         click.echo(f"  采样瓶号: {rec.sample_bottle_no}")
         click.echo(f"  原始坐标: {rec.latitude_raw}, {rec.longitude_raw}")
-        click.echo(f"  标准化坐标: {round(rec.latitude_std, 6) if rec.latitude_std else '无效'}, {round(rec.longitude_std, 6) if rec.longitude_std else '无效'}")
+        if rec.latitude_suggested or rec.longitude_suggested:
+            click.echo(f"  系统建议坐标: {round(rec.latitude_suggested, 6) if rec.latitude_suggested else '无'}, {round(rec.longitude_suggested, 6) if rec.longitude_suggested else '无'}")
+        click.echo(f"  标准化坐标: {round(rec.latitude_std, 6) if rec.latitude_std else '未确认'}, {round(rec.longitude_std, 6) if rec.longitude_std else '未确认'}")
         click.echo(f"  采集时间: {rec.collect_time.strftime('%Y-%m-%d %H:%M:%S') if rec.collect_time else '未知'}")
         click.echo(f"  是否重复: {'是' if rec.is_duplicate else '否'}")
         if rec.duplicate_reason:
@@ -102,6 +104,7 @@ def pending(ctx):
             click.echo(f"  待确认原因: {rec.confirmation_reason}")
         if rec.manual_note:
             click.echo(f"  人工备注: {rec.manual_note}")
+        click.echo(f"  确认命令: python3 run_demo.py confirm {rec.record_id} --operator 姓名 --valid --reason '确认说明'")
 
 
 @cli.command()
