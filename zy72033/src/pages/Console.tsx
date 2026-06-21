@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react"
 import { useMatchStore } from "@/store/useMatchStore"
-import { useNavigate, useParams } from "react-router-dom"
-import { Rocket, Timer, Pause, Play, AlertTriangle, Plus, Monitor, X, ChevronRight, SkipForward } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import { Rocket, Timer, Pause, Play, AlertTriangle, Plus, Monitor, X, ChevronRight, SkipForward, CheckCircle } from "lucide-react"
 
 export default function Console() {
   const navigate = useNavigate()
-  useParams()
   const {
     load, getAllMatches, getMatch, createMatch, startMatch,
     pauseMatch, resumeMatch, submitTeamChoice, endRound, startNextRound,
@@ -27,6 +26,7 @@ export default function Console() {
   const [projRound, setProjRound] = useState(1)
   const [projFuel, setProjFuel] = useState("")
   const [projNote, setProjNote] = useState("")
+  const [projMsg, setProjMsg] = useState<{ type: "success" | "error"; text: string } | null>(null)
 
   useEffect(() => { load() }, [])
 
@@ -85,8 +85,17 @@ export default function Console() {
 
   const handleProjSubmit = () => {
     if (!match) return
-    addProjectionRecord(match.id, projTeamName, projRound, Number(projFuel), projNote)
-    setProjTeamName(""); setProjRound(1); setProjFuel(""); setProjNote("")
+    const result = addProjectionRecord(match.id, projTeamName, projRound, projFuel, projNote)
+    if (result.success) {
+      setProjMsg({ type: "success", text: result.message })
+      setProjTeamName("")
+      setProjRound(1)
+      setProjFuel("")
+      setProjNote("")
+      setTimeout(() => setProjMsg(null), 2500)
+    } else {
+      setProjMsg({ type: "error", text: result.message })
+    }
   }
 
   return (
@@ -294,21 +303,55 @@ export default function Console() {
               <button onClick={() => setShowProjection(false)}><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             <div className="space-y-4">
+              {projMsg && (
+                <div className={`p-3 rounded-lg text-sm flex items-start gap-2 ${
+                  projMsg.type === "success"
+                    ? "bg-ok-500/20 text-ok-400 border border-ok-500/30"
+                    : "bg-alert-500/20 text-alert-400 border border-alert-500/30"
+                }`}>
+                  {projMsg.type === "success"
+                    ? <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    : <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />}
+                  <span>{projMsg.text}</span>
+                </div>
+              )}
               <div>
                 <label className="label-text">队伍名称</label>
-                <input value={projTeamName} onChange={e => setProjTeamName(e.target.value)} className="input-field w-full mt-1" />
+                <input
+                  value={projTeamName}
+                  onChange={e => { setProjTeamName(e.target.value); setProjMsg(null) }}
+                  placeholder="例如：红队"
+                  className="input-field w-full mt-1"
+                />
               </div>
               <div>
                 <label className="label-text">轮次</label>
-                <input type="number" value={projRound} onChange={e => setProjRound(+e.target.value)} className="input-field w-full mt-1" />
+                <input
+                  type="number"
+                  min={1}
+                  value={projRound}
+                  onChange={e => { setProjRound(+e.target.value); setProjMsg(null) }}
+                  className="input-field w-full mt-1"
+                />
               </div>
               <div>
                 <label className="label-text">燃料选择</label>
-                <input type="number" value={projFuel} onChange={e => setProjFuel(e.target.value)} className="input-field w-full mt-1" />
+                <input
+                  type="number"
+                  value={projFuel}
+                  onChange={e => { setProjFuel(e.target.value); setProjMsg(null) }}
+                  placeholder="输入正数，例如 50"
+                  className="input-field w-full mt-1"
+                />
               </div>
               <div>
                 <label className="label-text">备注</label>
-                <input value={projNote} onChange={e => setProjNote(e.target.value)} className="input-field w-full mt-1" />
+                <input
+                  value={projNote}
+                  onChange={e => setProjNote(e.target.value)}
+                  placeholder="原始备注，原样保留"
+                  className="input-field w-full mt-1"
+                />
               </div>
               <button onClick={handleProjSubmit} className="btn-primary w-full">提交补录</button>
             </div>

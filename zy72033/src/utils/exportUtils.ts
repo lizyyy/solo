@@ -1,7 +1,7 @@
-import type { MatchData, TeamRound } from "@/types"
+import type { MatchData } from "@/types"
 
 export function exportCSV(data: MatchData): string {
-  const { match, teams, rounds, teamRounds } = data
+  const { teams, rounds, teamRounds } = data
   const header = ["组名", "总得分", "是否异常", "异常说明", "数据来源", "原始备注"]
   const roundHeaders = rounds.flatMap((r) => [
     `第${r.roundNumber}轮选择`,

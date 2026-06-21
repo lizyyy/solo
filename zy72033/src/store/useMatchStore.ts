@@ -16,7 +16,9 @@ function loadFromStorage(): MatchData[] {
       const parsed = JSON.parse(raw)
       if (Array.isArray(parsed) && parsed.length > 0) return parsed
     }
-  } catch {}
+  } catch {
+    // 解析失败时回退到样例数据
+  }
   const samples = generateSampleData()
   localStorage.setItem(STORAGE_KEY, JSON.stringify(samples))
   return samples
@@ -47,7 +49,7 @@ interface MatchStore {
   settleMatch: (matchId: string) => void
   lockMatch: (matchId: string) => void
   confirmAnomaly: (matchId: string, teamRoundId: string, note: string) => void
-  addProjectionRecord: (matchId: string, teamName: string, roundNumber: number, fuelChoice: number, rawNote: string) => void
+  addProjectionRecord: (matchId: string, teamName: string, roundNumber: number, fuelChoice: number | string, rawNote: string) => { success: boolean; message: string; teamRoundId?: string }
   setTimer: (seconds: number) => void
   setTimerRunning: (running: boolean) => void
   decrementTimer: () => number
@@ -358,28 +360,67 @@ export const useMatchStore = create<MatchStore>((set, get) => ({
   },
 
   addProjectionRecord: (matchId, teamName, roundNumber, fuelChoice, rawNote) => {
+    let result: { success: boolean; message: string; teamRoundId?: string } = {
+      success: false,
+      message: "未知错误",
+    }
+
     set((state) => {
       const updated = state.matches.map((md) => {
         if (md.match.id !== matchId) return md
 
-        let team = md.teams.find((t) => t.name === teamName)
+        const trimmedName = String(teamName ?? "").trim()
+        if (!trimmedName) {
+          result = { success: false, message: "队名不能为空" }
+          return md
+        }
+
         const round = md.rounds.find((r) => r.roundNumber === roundNumber)
-        if (!round) return md
+        if (!round) {
+          result = { success: false, message: `第${roundNumber}轮不存在` }
+          return md
+        }
+
+        const fuelNum = Number(fuelChoice)
+        if (fuelChoice === "" || fuelChoice === null || fuelChoice === undefined || isNaN(fuelNum)) {
+          result = { success: false, message: "燃料选择不能为空且必须是数字" }
+          return md
+        }
+
+        if (!Number.isFinite(fuelNum) || fuelNum <= 0) {
+          result = { success: false, message: "燃料选择必须是大于 0 的正数" }
+          return md
+        }
+
+        if (fuelNum > md.match.resourceLimit * 3) {
+          result = { success: false, message: `燃料选择过大（不能超过资源上限的3倍：${md.match.resourceLimit * 3}）` }
+          return md
+        }
+
+        let team = md.teams.find((t) => t.name === trimmedName)
+
+        const existingRecord = team
+          ? md.teamRounds.find((tr) => tr.teamId === team!.id && tr.roundId === round.id)
+          : null
+        if (existingRecord) {
+          result = { success: false, message: `${trimmedName} 在第${roundNumber}轮已有补录记录，不能重复补录` }
+          return md
+        }
 
         if (!team) {
           team = {
             id: uid(),
             matchId,
-            name: teamName,
+            name: trimmedName,
             totalScore: 100,
             hasAnomaly: false,
             source: "projection_screen" as DataSource,
-            rawNote,
+            rawNote: "",
           }
         }
 
         const previousRounds = md.teamRounds
-          .filter((tr) => tr.teamId === team.id)
+          .filter((tr) => tr.teamId === team!.id)
           .sort((a, b) => {
             const ra = md.rounds.find((r) => r.id === a.roundId)
             const rb = md.rounds.find((r) => r.id === b.roundId)
@@ -387,27 +428,27 @@ export const useMatchStore = create<MatchStore>((set, get) => ({
           })
         const lastRecord = previousRounds[0]
         const currentRemaining = lastRecord ? lastRecord.resourceRemaining : md.match.resourceLimit
-        const resourceUsed = Math.round(fuelChoice * 0.8)
+        const resourceUsed = Math.round(fuelNum * 0.8)
         const resourceRemaining = currentRemaining - resourceUsed
 
-        const result = calculateDeduction(fuelChoice, resourceRemaining, false, OPTIMAL_CHOICE)
+        const deductionResult = calculateDeduction(fuelNum, resourceRemaining, false, OPTIMAL_CHOICE)
 
         const now = new Date()
         const newTr: TeamRound = {
           id: uid(),
           roundId: round.id,
           teamId: team.id,
-          fuelChoice,
+          fuelChoice: fuelNum,
           resourceUsed,
           resourceRemaining,
-          deduction: result.deduction,
-          deductionReason: result.deductionReason,
-          isAnomaly: result.isAnomaly,
-          anomalyNote: result.anomalyNote,
-          needsConfirmation: result.needsConfirmation,
-          confirmationNote: result.confirmationNote,
+          deduction: deductionResult.deduction,
+          deductionReason: deductionResult.deductionReason,
+          isAnomaly: deductionResult.isAnomaly,
+          anomalyNote: deductionResult.anomalyNote,
+          needsConfirmation: deductionResult.needsConfirmation,
+          confirmationNote: deductionResult.confirmationNote,
           source: "projection_screen",
-          rawNote,
+          rawNote: String(rawNote ?? ""),
           recordedAt: now.toISOString(),
           projectionRecordedAt: now.toISOString(),
           projectionOperator: "助教补录",
@@ -415,24 +456,29 @@ export const useMatchStore = create<MatchStore>((set, get) => ({
 
         const newTeamRounds = [...md.teamRounds, newTr]
         const newTotalScore = newTeamRounds
-          .filter((tr) => tr.teamId === team.id)
+          .filter((tr) => tr.teamId === team!.id)
           .reduce((sum, tr) => sum + tr.deduction, 100)
         const hasAnomaly = newTeamRounds.some(
-          (tr) => tr.teamId === team.id && (tr.isAnomaly || tr.needsConfirmation)
+          (tr) => tr.teamId === team!.id && (tr.isAnomaly || tr.needsConfirmation)
         )
 
-        const teamExists = md.teams.some((t) => t.id === team.id)
+        const teamExists = md.teams.some((t) => t.id === team!.id)
         const newTeams = teamExists
           ? md.teams.map((t) =>
-              t.id === team.id ? { ...t, totalScore: newTotalScore, hasAnomaly, rawNote, source: "projection_screen" as DataSource } : t
+              t.id === team!.id ? { ...t, totalScore: newTotalScore, hasAnomaly, rawNote: String(rawNote ?? ""), source: "projection_screen" as DataSource } : t
             )
           : [...md.teams, { ...team, totalScore: newTotalScore, hasAnomaly }]
 
+        result = { success: true, message: "补录成功", teamRoundId: newTr.id }
         return { ...md, teamRounds: newTeamRounds, teams: newTeams }
       })
-      saveToStorage(updated)
+      if (result.success) {
+        saveToStorage(updated)
+      }
       return { matches: updated }
     })
+
+    return result
   },
 
   setTimer: (seconds) => set({ timerSeconds: seconds }),
