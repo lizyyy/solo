@@ -120,6 +120,35 @@
     .session-info strong { color: #333; }
     
     .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+    
+    .import-tabs { display: flex; border-bottom: 1px solid #f0f0f0; margin-bottom: 15px; }
+    .import-tab { padding: 10px 20px; cursor: pointer; font-size: 13px; color: #999; border-bottom: 2px solid transparent; }
+    .import-tab.active { color: #667eea; border-bottom-color: #667eea; font-weight: 500; }
+    
+    textarea { width: 100%; padding: 10px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 12px; font-family: 'Courier New', monospace; resize: vertical; min-height: 120px; }
+    textarea:focus { outline: none; border-color: #667eea; }
+    
+    .value-compare { display: flex; gap: 15px; align-items: center; padding: 10px; background: #fafafa; border-radius: 6px; margin-bottom: 10px; }
+    .value-original { color: #999; text-decoration: line-through; }
+    .value-arrow { color: #667eea; }
+    .value-current { color: #52c41a; font-weight: 500; }
+    
+    .edit-input { width: 100px; padding: 4px 8px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 12px; }
+    .edit-input:focus { outline: none; border-color: #667eea; }
+    
+    .edit-mode { background: #fffbe6; border: 1px solid #ffe58f; }
+    
+    .consistency-result { padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+    .consistency-result.success { background: #f6ffed; border: 1px solid #b7eb8f; }
+    .consistency-result.warning { background: #fffbe6; border: 1px solid #ffe58f; }
+    .consistency-result.error { background: #fff1f0; border: 1px solid #ffa39e; }
+    
+    .mismatch-item { padding: 8px; background: white; border-radius: 4px; margin-bottom: 6px; font-size: 12px; }
+    .mismatch-type { font-weight: 500; margin-right: 8px; }
+    .type-value_mismatch { color: #cf1322; }
+    .type-exclusion_mismatch { color: #d46b08; }
+    .type-status_mismatch { color: #a8071a; }
+    .type-raw_modified { color: #096dd9; }
   </style>
 </head>
 <body>
@@ -182,13 +211,23 @@
         <button class="btn btn-primary" style="width: 100%;" onclick="runFitting()">开始拟合</button>
       </div>
 
+      <div class="card" id="importCard" style="display: none;">
+        <h3><span class="icon"></span>录入学生草稿</h3>
+        <div class="quick-actions">
+          <button class="btn btn-secondary btn-sm" onclick="showImportModal('table')">粘贴表格</button>
+          <button class="btn btn-secondary btn-sm" onclick="showImportModal('json')">粘贴JSON</button>
+          <button class="btn btn-secondary btn-sm" onclick="showImportModal('form')">表单录入</button>
+          <button class="btn btn-secondary btn-sm" onclick="loadDemoData()">加载演示</button>
+        </div>
+      </div>
+
       <div class="card" id="actionsCard" style="display: none;">
         <h3><span class="icon"></span>快捷操作</h3>
         <div class="quick-actions">
-          <button class="btn btn-secondary btn-sm" onclick="addDuplicateSample()">混入重复样本</button>
-          <button class="btn btn-secondary btn-sm" onclick="testWithdrawReplay()">撤回记录复算</button>
-          <button class="btn btn-secondary btn-sm" onclick="verifyConsistency()">校验口径一致</button>
-          <button class="btn btn-secondary btn-sm" onclick="showAllDiffs()">查看变更对比</button>
+          <button class="btn btn-secondary btn-sm" onclick="addDuplicateSample()">混入重复</button>
+          <button class="btn btn-secondary btn-sm" onclick="testWithdrawReplay()">撤回复算</button>
+          <button class="btn btn-secondary btn-sm" onclick="verifyConsistency()">校验口径</button>
+          <button class="btn btn-secondary btn-sm" onclick="showAllDiffs()">变更对比</button>
         </div>
       </div>
     </div>
@@ -268,14 +307,14 @@
       <div style="font-size: 13px; line-height: 1.8;">
         <h3 style="margin-top: 15px; color: #667eea;">三步操作指南</h3>
         <p><strong>1. 创建会话</strong> - 填写名称和操作人，点击创建</p>
-        <p><strong>2. 加载数据</strong> - 点击"加载演示数据"或手动导入学生草稿</p>
+        <p><strong>2. 录入数据</strong> - 粘贴表格/JSON 或手动录入学生草稿</p>
         <p><strong>3. 查看结果</strong> - 选择拟合方法，点击"开始拟合"</p>
         
         <h3 style="margin-top: 20px; color: #ff4d4f;">坏材料来了该看哪里？</h3>
         <p>⚠️ <strong>红色重复样本</strong> - 查看顶部异常统计，点击可追溯原始文件行号</p>
         <p>⚠️ <strong>橙色离群值</strong> - 残差过大的点，查看来源确认是否录入错误</p>
         <p>⚠️ <strong>蓝色边界样本</strong> - 样本量不足5个时全部标记，建议补充数据</p>
-        <p>⚠️ <strong>紫色已撤回</strong> - 点击"撤回记录复算"对比撤回前后参数变化</p>
+        <p>⚠️ <strong>灰色已撤回</strong> - 点击"撤回复算"对比撤回前后参数变化</p>
         
         <h3 style="margin-top: 20px; color: #52c41a;">评审会复盘必备</h3>
         <p>✅ <strong>变更对比</strong> - 查看人工确认前后改了什么，谁改的，什么时候改的</p>
@@ -288,11 +327,130 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="importModal" style="display: none;">
+    <div class="modal" style="width: 600px;">
+      <h2 id="importModalTitle">📝 录入学生草稿</h2>
+      <div class="import-tabs" id="importTabs">
+        <div class="import-tab" onclick="switchImportTab('table')">粘贴表格</div>
+        <div class="import-tab" onclick="switchImportTab('json')">粘贴JSON</div>
+        <div class="import-tab" onclick="switchImportTab('form')">表单录入</div>
+      </div>
+      
+      <div id="tableImport" style="display: none;">
+        <div style="font-size: 12px; color: #999; margin-bottom: 10px;">
+          支持 Tab/逗号/空格/竖线 分隔的表格数据，每行两个数：X Y
+        </div>
+        <textarea id="tableData" placeholder="1 2.1&#10;2 4.2&#10;3 5.8&#10;..."></textarea>
+        <div class="form-row" style="margin-top: 15px;">
+          <div class="form-group">
+            <label>学生ID</label>
+            <input type="text" id="tableStudentId" placeholder="S001">
+          </div>
+          <div class="form-group">
+            <label>草稿ID</label>
+            <input type="text" id="tableDraftId" placeholder="D001">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>文件名</label>
+          <input type="text" id="tableFileName" placeholder="实验报告-张三.docx">
+        </div>
+        <div class="form-group">
+          <label>备注</label>
+          <input type="text" id="tableNotes" placeholder="第一组实验数据">
+        </div>
+      </div>
+      
+      <div id="jsonImport" style="display: none;">
+        <div style="font-size: 12px; color: #999; margin-bottom: 10px;">
+          格式：[{ "x": 1, "y": 2.1, "source": { "studentId": "S001", ... } }]
+        </div>
+        <textarea id="jsonData" placeholder='[{&#10;  "x": 1,&#10;  "y": 2.1,&#10;  "source": {&#10;    "studentId": "S001",&#10;    "draftId": "D001",&#10;    "fileName": "实验报告.docx",&#10;    "originalLine": 5&#10;  }&#10;}]'></textarea>
+      </div>
+      
+      <div id="formImport" style="display: none;">
+        <div class="form-row">
+          <div class="form-group">
+            <label>X坐标</label>
+            <input type="number" id="formX" placeholder="1" step="any">
+          </div>
+          <div class="form-group">
+            <label>Y坐标</label>
+            <input type="number" id="formY" placeholder="2.1" step="any">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>学生ID</label>
+            <input type="text" id="formStudentId" placeholder="S001">
+          </div>
+          <div class="form-group">
+            <label>草稿ID</label>
+            <input type="text" id="formDraftId" placeholder="D001">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>文件名</label>
+          <input type="text" id="formFileName" placeholder="实验报告-张三.docx">
+        </div>
+        <div class="form-group">
+          <label>备注</label>
+          <input type="text" id="formNotes" placeholder="第一组实验数据">
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="hideImportModal()">取消</button>
+        <button class="btn btn-primary" onclick="doImport()">导入数据</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="confirmModal" style="display: none;">
+    <div class="modal" style="width: 400px;">
+      <h2>✅ 确认样本有效</h2>
+      <div class="form-group">
+        <label>确认备注（可选）</label>
+        <input type="text" id="confirmNotes" placeholder="例如：核对原始实验记录，数据有效">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="hideConfirmModal()">取消</button>
+        <button class="btn btn-success" onclick="doConfirm()">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="correctModal" style="display: none;">
+    <div class="modal" style="width: 500px;">
+      <h2>✏️ 人工修正数值</h2>
+      <div id="correctCurrentValues" style="margin-bottom: 15px;"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>修正X坐标</label>
+          <input type="number" id="correctX" step="any" class="edit-input">
+        </div>
+        <div class="form-group">
+          <label>修正Y坐标</label>
+          <input type="number" id="correctY" step="any" class="edit-input">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>修正说明（可选）</label>
+        <input type="text" id="correctNotes" placeholder="例如：对照原始草稿，将2.1修正为2.5">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="hideCorrectModal()">取消</button>
+        <button class="btn btn-primary" onclick="doCorrect()">保存修正</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     let currentSession = null;
     let currentFittingResult = null;
     let selectedSampleId = null;
     let canvas, ctx;
+    let currentImportFormat = 'table';
 
     document.getElementById('fittingMethod').addEventListener('change', function() {
       document.getElementById('degreeGroup').style.display = this.value === 'polynomial' ? 'block' : 'none';
@@ -322,6 +480,7 @@
       if (!currentSession) return;
       document.getElementById('sessionCard').style.display = 'block';
       document.getElementById('fittingCard').style.display = 'block';
+      document.getElementById('importCard').style.display = 'block';
       document.getElementById('actionsCard').style.display = 'block';
       document.getElementById('currentSessionName').textContent = currentSession.name;
       document.getElementById('sampleCount').textContent = currentSession.samples.length;
@@ -610,16 +769,33 @@
       const sample = currentSession.samples.find(s => s.id === sampleId);
       if (!sample) return;
 
+      const hasCorrection = sample.rawX !== sample.x || sample.rawY !== sample.y;
+
       const detail = document.getElementById('sampleDetail');
       detail.innerHTML = `
         <div class="detail-section">
-          <div class="detail-row"><span class="detail-label">X坐标</span><span class="detail-value">${sample.x.toFixed(4)}</span></div>
-          <div class="detail-row"><span class="detail-label">Y坐标</span><span class="detail-value">${sample.y.toFixed(4)}</span></div>
+          <div class="detail-row">
+            <span class="detail-label">X坐标</span>
+            <span>
+              ${hasCorrection ? `<span class="value-original" style="font-family:monospace;">${sample.rawX.toFixed(4)}</span> <span class="value-arrow">→</span> ` : ''}
+              <span class="detail-value ${hasCorrection ? 'value-current' : ''}">${sample.x.toFixed(4)}</span>
+            </span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Y坐标</span>
+            <span>
+              ${hasCorrection ? `<span class="value-original" style="font-family:monospace;">${sample.rawY.toFixed(4)}</span> <span class="value-arrow">→</span> ` : ''}
+              <span class="detail-value ${hasCorrection ? 'value-current' : ''}">${sample.y.toFixed(4)}</span>
+            </span>
+          </div>
           <div class="detail-row"><span class="detail-label">状态</span><span class="sample-status status-${sample.status}" style="padding:2px 8px;border-radius:10px;">${sample.status}</span></div>
           <div class="detail-row"><span class="detail-label">创建时间</span><span style="font-size:12px;">${new Date(sample.createdAt).toLocaleString()}</span></div>
           ${sample.confirmedBy ? `<div class="detail-row"><span class="detail-label">确认人</span><span>${sample.confirmedBy}</span></div>` : ''}
           ${sample.confirmedAt ? `<div class="detail-row"><span class="detail-label">确认时间</span><span style="font-size:12px;">${new Date(sample.confirmedAt).toLocaleString()}</span></div>` : ''}
+          ${sample.confirmedNotes ? `<div class="detail-row"><span class="detail-label">确认备注</span><span style="font-size:12px;color:#667eea;">${sample.confirmedNotes}</span></div>` : ''}
+          ${sample.correctionNotes ? `<div class="detail-row"><span class="detail-label">修正说明</span><span style="font-size:12px;color:#fa8c16;">${sample.correctionNotes}</span></div>` : ''}
           ${sample.withdrawnReason ? `<div class="detail-row"><span class="detail-label">撤回原因</span><span style="color:#ff4d4f;font-size:12px;">${sample.withdrawnReason}</span></div>` : ''}
+          ${sample.withdrawnAt ? `<div class="detail-row"><span class="detail-label">撤回时间</span><span style="font-size:12px;">${new Date(sample.withdrawnAt).toLocaleString()}</span></div>` : ''}
         </div>
         ${sample.anomalies.length > 0 ? `
           <div class="detail-section">
@@ -629,12 +805,14 @@
                 <div style="color:${a.resolved ? '#389e0d' : '#cf1322'};font-weight:500;">${a.type} ${a.resolved ? '(已处理)' : '(待处理)'}</div>
                 <div style="color:#666;margin-top:4px;">${a.description}</div>
                 <div style="color:#999;margin-top:4px;font-size:11px;">${new Date(a.detectedAt).toLocaleString()}</div>
+                ${a.resolvedBy ? `<div style="color:#52c41a;margin-top:4px;font-size:11px;">处理人: ${a.resolvedBy}</div>` : ''}
               </div>
             `).join('')}
           </div>
         ` : ''}
         <div class="action-buttons">
           ${sample.status !== 'confirmed' && sample.status !== 'withdrawn' ? `<button class="btn btn-success btn-sm" onclick="confirmSample('${sample.id}')">确认有效</button>` : ''}
+          ${sample.status !== 'withdrawn' ? `<button class="btn btn-primary btn-sm" onclick="showCorrectModal('${sample.id}')">修正数值</button>` : ''}
           ${sample.status !== 'withdrawn' ? `<button class="btn btn-danger btn-sm" onclick="withdrawSample('${sample.id}')">撤回样本</button>` : ''}
         </div>
       `;
@@ -707,13 +885,179 @@
       document.getElementById('withdrawnCount').textContent = summary.withdrawn || 0;
     }
 
-    async function confirmSample(sampleId) {
+    function showImportModal(format) {
+      currentImportFormat = format;
+      document.getElementById('importModal').style.display = 'flex';
+      switchImportTab(format);
+    }
+
+    function hideImportModal() {
+      document.getElementById('importModal').style.display = 'none';
+    }
+
+    function switchImportTab(format) {
+      currentImportFormat = format;
+      document.querySelectorAll('.import-tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.import-tab')[format === 'table' ? 0 : format === 'json' ? 1 : 2].classList.add('active');
+      document.getElementById('tableImport').style.display = format === 'table' ? 'block' : 'none';
+      document.getElementById('jsonImport').style.display = format === 'json' ? 'block' : 'none';
+      document.getElementById('formImport').style.display = format === 'form' ? 'block' : 'none';
+    }
+
+    async function doImport() {
+      const addedBy = document.getElementById('operatorName').value.trim() || '阿宁';
+      let data, format, source;
+
+      if (currentImportFormat === 'table') {
+        data = document.getElementById('tableData').value;
+        format = 'table';
+        source = {
+          studentId: document.getElementById('tableStudentId').value.trim(),
+          draftId: document.getElementById('tableDraftId').value.trim(),
+          fileName: document.getElementById('tableFileName').value.trim(),
+          notes: document.getElementById('tableNotes').value.trim(),
+        };
+      } else if (currentImportFormat === 'json') {
+        data = document.getElementById('jsonData').value;
+        format = 'json';
+      } else {
+        format = 'form';
+        data = {
+          x: document.getElementById('formX').value,
+          y: document.getElementById('formY').value,
+          studentId: document.getElementById('formStudentId').value.trim(),
+          draftId: document.getElementById('formDraftId').value.trim(),
+          fileName: document.getElementById('formFileName').value.trim(),
+          notes: document.getElementById('formNotes').value.trim(),
+        };
+      }
+
+      try {
+        const result = await api(`/api/sessions/${currentSession.id}/samples/import`, 'POST', {
+          data,
+          format,
+          source,
+          addedBy,
+        });
+
+        currentSession.samples = result.samples;
+        updateSessionUI();
+        updateSampleList();
+        hideImportModal();
+
+        if (currentFittingResult) {
+          await runFitting();
+        }
+
+        alert(`成功导入 ${result.count} 条样本数据！`);
+      } catch (e) {
+        alert('导入失败: ' + e.message);
+      }
+    }
+
+    let pendingConfirmSampleId = null;
+
+    function showConfirmModal(sampleId) {
+      pendingConfirmSampleId = sampleId;
+      document.getElementById('confirmNotes').value = '';
+      document.getElementById('confirmModal').style.display = 'flex';
+    }
+
+    function hideConfirmModal() {
+      pendingConfirmSampleId = null;
+      document.getElementById('confirmModal').style.display = 'none';
+    }
+
+    async function doConfirm() {
+      if (!pendingConfirmSampleId) return;
       const confirmedBy = document.getElementById('operatorName').value.trim() || '阿宁';
-      await api(`/api/sessions/${currentSession.id}/samples/${sampleId}/confirm`, 'POST', { confirmedBy });
-      currentSession = await api(`/api/sessions/${currentSession.id}`);
-      updateSampleList();
-      showSampleDetail(sampleId);
-      alert('样本已确认有效');
+      const notes = document.getElementById('confirmNotes').value.trim();
+
+      try {
+        await api(`/api/sessions/${currentSession.id}/samples/${pendingConfirmSampleId}/confirm`, 'POST', {
+          confirmedBy,
+          notes,
+        });
+        currentSession = await api(`/api/sessions/${currentSession.id}`);
+        updateSampleList();
+        showSampleDetail(pendingConfirmSampleId);
+        hideConfirmModal();
+        alert('样本已确认有效');
+      } catch (e) {
+        alert('确认失败: ' + e.message);
+      }
+    }
+
+    let pendingCorrectSampleId = null;
+
+    function showCorrectModal(sampleId) {
+      const sample = currentSession.samples.find(s => s.id === sampleId);
+      if (!sample) return;
+
+      pendingCorrectSampleId = sampleId;
+      document.getElementById('correctX').value = sample.x;
+      document.getElementById('correctY').value = sample.y;
+      document.getElementById('correctNotes').value = '';
+      document.getElementById('correctCurrentValues').innerHTML = `
+        <div class="value-compare">
+          <div>
+            <div style="font-size:11px;color:#999;">原始值</div>
+            <div>X: <span class="value-original">${sample.rawX.toFixed(4)}</span> → <span class="value-current">${sample.x.toFixed(4)}</span></div>
+            <div>Y: <span class="value-original">${sample.rawY.toFixed(4)}</span> → <span class="value-current">${sample.y.toFixed(4)}</span></div>
+          </div>
+        </div>
+      `;
+      document.getElementById('correctModal').style.display = 'flex';
+    }
+
+    function hideCorrectModal() {
+      pendingCorrectSampleId = null;
+      document.getElementById('correctModal').style.display = 'none';
+    }
+
+    async function doCorrect() {
+      if (!pendingCorrectSampleId) return;
+      const correctedBy = document.getElementById('operatorName').value.trim() || '阿宁';
+      const notes = document.getElementById('correctNotes').value.trim();
+      const newX = parseFloat(document.getElementById('correctX').value);
+      const newY = parseFloat(document.getElementById('correctY').value);
+
+      try {
+        const sample = currentSession.samples.find(s => s.id === pendingCorrectSampleId);
+        if (sample && sample.x !== newX) {
+          await api(`/api/sessions/${currentSession.id}/samples/${pendingCorrectSampleId}/correct`, 'POST', {
+            field: 'x',
+            newValue: newX,
+            correctedBy,
+            notes,
+          });
+        }
+        if (sample && sample.y !== newY) {
+          await api(`/api/sessions/${currentSession.id}/samples/${pendingCorrectSampleId}/correct`, 'POST', {
+            field: 'y',
+            newValue: newY,
+            correctedBy,
+            notes,
+          });
+        }
+
+        currentSession = await api(`/api/sessions/${currentSession.id}`);
+        updateSampleList();
+        showSampleDetail(pendingCorrectSampleId);
+        hideCorrectModal();
+
+        if (currentFittingResult) {
+          await runFitting();
+        }
+
+        alert('数值修正成功！');
+      } catch (e) {
+        alert('修正失败: ' + e.message);
+      }
+    }
+
+    async function confirmSample(sampleId) {
+      showConfirmModal(sampleId);
     }
 
     async function withdrawSample(sampleId) {
@@ -822,12 +1166,54 @@
       }
 
       const result = await api(`/api/sessions/${currentSession.id}/fitting/${currentFittingResult.params.id}/verify`);
+
+      const rawModifiedCount = result.mismatches.filter(m => m.type === 'raw_modified').length;
+      const otherMismatches = result.mismatches.filter(m => m.type !== 'raw_modified');
+      const isWarningOnly = rawModifiedCount > 0 && otherMismatches.length === 0;
+
+      let statusClass, statusIcon, statusText;
       if (result.consistent) {
-        alert('✅ 口径一致性校验通过！图表和明细数据完全一致');
+        statusClass = 'success';
+        statusIcon = '✅';
+        statusText = '口径一致性校验通过！图表和明细数据完全一致';
+      } else if (isWarningOnly) {
+        statusClass = 'warning';
+        statusIcon = '⚠️';
+        statusText = `发现 ${rawModifiedCount} 处人工修正记录，数据口径一致，仅为原始值与修正值差异`;
       } else {
-        alert(`❌ 发现 ${result.mismatches.length} 处数据不一致！`);
-        console.log('不一致详情:', result.mismatches);
+        statusClass = 'error';
+        statusIcon = '❌';
+        statusText = `发现 ${otherMismatches.length} 处数据不一致问题！`;
       }
+
+      const detailHtml = result.mismatches.length > 0 ? `
+        <div style="margin-top:15px;max-height:300px;overflow-y:auto;">
+          ${result.mismatches.map(m => `
+            <div class="mismatch-item">
+              <span class="mismatch-type type-${m.type}">[${m.type}]</span>
+              <span>${m.message}</span>
+              ${m.rawValue !== undefined ? `
+                <div style="margin-top:4px;padding-left:20px;font-size:11px;color:#999;">
+                  原始值: <span class="value-original">${m.rawValue.toFixed(4)}</span> → 当前值: <span class="value-current">${m.currentValue.toFixed(4)}</span>
+                </div>
+              ` : ''}
+            </div>
+          `).join('')}
+        </div>
+      ` : '';
+
+      document.getElementById('withdrawReplayCard').style.display = 'block';
+      document.getElementById('withdrawReplayResult').innerHTML = `
+        <div class="consistency-result ${statusClass}">
+          <div style="font-weight:500;margin-bottom:8px;">${statusIcon} ${statusText}</div>
+          <div style="font-size:12px;color:#666;">
+            参与拟合样本: ${currentFittingResult.params.sampleIds.length} 个<br>
+            排除样本: ${currentFittingResult.params.excludedSampleIds.length} 个<br>
+            校验时间: ${new Date().toLocaleString()}
+          </div>
+          ${detailHtml}
+        </div>
+      `;
     }
 
     async function showAllDiffs() {

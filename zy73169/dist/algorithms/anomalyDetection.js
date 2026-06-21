@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.detectDuplicates = detectDuplicates;
 exports.detectBoundarySamples = detectBoundarySamples;
 exports.detectOutliers = detectOutliers;
+exports.clearDetectionAnomalies = clearDetectionAnomalies;
 exports.detectAllAnomalies = detectAllAnomalies;
 exports.getAnomalySummary = getAnomalySummary;
 exports.isolateAnomalousSamples = isolateAnomalousSamples;
@@ -94,12 +95,21 @@ function detectOutliers(samples, iqrMultiplier = DEFAULT_CONFIG.outlierIqrMultip
     });
     return anomalies;
 }
+function clearDetectionAnomalies(samples) {
+    samples.forEach(s => {
+        s.anomalies = s.anomalies.filter(a => {
+            if (a.type === 'withdrawn')
+                return true;
+            if (a.resolved)
+                return true;
+            return false;
+        });
+    });
+}
 function detectAllAnomalies(samples, config = {}) {
     const fullConfig = { ...DEFAULT_CONFIG, ...config };
     const allAnomalies = [];
-    samples.forEach(s => {
-        s.anomalies = s.anomalies.filter(a => a.type !== 'withdrawn');
-    });
+    clearDetectionAnomalies(samples);
     allAnomalies.push(...detectDuplicates(samples, fullConfig.duplicateTolerance));
     allAnomalies.push(...detectBoundarySamples(samples, fullConfig.boundaryThreshold, fullConfig.minBoundarySamples));
     allAnomalies.push(...detectOutliers(samples, fullConfig.outlierIqrMultiplier));

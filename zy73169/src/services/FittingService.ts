@@ -5,6 +5,7 @@ import { detectAllAnomalies, getAnomalySummary, isolateAnomalousSamples } from '
 import {
   addSample,
   confirmSample,
+  correctSampleValue,
   withdrawSample,
   updateSampleField,
   getSampleChangeHistory,
@@ -13,6 +14,7 @@ import {
   recalculateWithWithdrawn,
   verifyCalibrationConsistency,
   type ConfirmationDiff,
+  type ConsistencyMismatch,
 } from './traceability';
 
 export interface PlaybackResult {
@@ -100,10 +102,23 @@ export class FittingService {
     };
   }
 
-  confirmSample(sessionId: string, sampleId: string, confirmedBy: string): Sample | null {
+  confirmSample(sessionId: string, sampleId: string, confirmedBy: string, notes?: string): Sample | null {
     const session = this.sessions.get(sessionId);
     if (!session) throw new Error('会话不存在');
-    return confirmSample(session, sampleId, confirmedBy);
+    return confirmSample(session, sampleId, confirmedBy, notes);
+  }
+
+  correctSampleValue(
+    sessionId: string,
+    sampleId: string,
+    field: 'x' | 'y',
+    newValue: number,
+    correctedBy: string,
+    notes?: string
+  ): Sample | null {
+    const session = this.sessions.get(sessionId);
+    if (!session) throw new Error('会话不存在');
+    return correctSampleValue(session, sampleId, field, newValue, correctedBy, notes);
   }
 
   withdrawSample(sessionId: string, sampleId: string, withdrawnBy: string, reason: string): Sample | null {

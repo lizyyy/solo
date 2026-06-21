@@ -14,13 +14,17 @@ export interface Sample {
     id: string;
     x: number;
     y: number;
+    rawX: number;
+    rawY: number;
     status: SampleStatus;
     source: SampleSource;
     anomalies: Anomaly[];
     confirmedBy?: string;
     confirmedAt?: number;
+    confirmedNotes?: string;
     withdrawnReason?: string;
     withdrawnAt?: number;
+    correctionNotes?: string;
     createdAt: number;
     updatedAt: number;
 }

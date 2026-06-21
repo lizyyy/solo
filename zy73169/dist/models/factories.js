@@ -12,6 +12,8 @@ function createSample(x, y, source, status = 'raw') {
         id: (0, uuid_1.v4)(),
         x,
         y,
+        rawX: x,
+        rawY: y,
         status,
         source,
         anomalies: [],

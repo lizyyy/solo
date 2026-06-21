@@ -22,6 +22,8 @@ export function createSample(
     id: uuidv4(),
     x,
     y,
+    rawX: x,
+    rawY: y,
     status,
     source,
     anomalies: [],

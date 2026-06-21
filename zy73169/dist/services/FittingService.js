@@ -51,11 +51,17 @@ class FittingService {
             isolatedSamples,
         };
     }
-    confirmSample(sessionId, sampleId, confirmedBy) {
+    confirmSample(sessionId, sampleId, confirmedBy, notes) {
         const session = this.sessions.get(sessionId);
         if (!session)
             throw new Error('会话不存在');
-        return (0, traceability_1.confirmSample)(session, sampleId, confirmedBy);
+        return (0, traceability_1.confirmSample)(session, sampleId, confirmedBy, notes);
+    }
+    correctSampleValue(sessionId, sampleId, field, newValue, correctedBy, notes) {
+        const session = this.sessions.get(sessionId);
+        if (!session)
+            throw new Error('会话不存在');
+        return (0, traceability_1.correctSampleValue)(session, sampleId, field, newValue, correctedBy, notes);
     }
     withdrawSample(sessionId, sampleId, withdrawnBy, reason) {
         const session = this.sessions.get(sessionId);

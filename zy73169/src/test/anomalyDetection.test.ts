@@ -1,11 +1,4 @@
-import {
-  detectDuplicates,
-  detectBoundarySamples,
-  detectOutliers,
-  detectAllAnomalies,
-  getAnomalySummary,
-  isolateAnomalousSamples,
-} from '../algorithms/anomalyDetection';
+import { detectDuplicates, detectBoundarySamples, detectOutliers, detectAllAnomalies, getAnomalySummary, isolateAnomalousSamples, clearDetectionAnomalies } from '../algorithms/anomalyDetection';
 import { createSample } from '../models/factories';
 import type { SampleSource } from '../models/types';
 
@@ -256,6 +249,74 @@ describe('异常检测算法', () => {
 
       expect(summary.duplicate).toBe(1);
       expect(summary.total).toBe(1);
+    });
+
+    it('重算前应该清理旧的duplicate/outlier/boundary标记', () => {
+      const samples = [
+        createSample(1, 2, mockSource),
+        createSample(1, 2, mockSource),
+        createSample(2, 4, mockSource),
+        createSample(3, 100, mockSource),
+        createSample(4, 8, mockSource),
+      ];
+
+      detectAllAnomalies(samples);
+      const summary1 = getAnomalySummary(samples);
+      const duplicateCount1 = samples.filter(s => s.anomalies.some(a => a.type === 'duplicate')).length;
+      const outlierCount1 = samples.filter(s => s.anomalies.some(a => a.type === 'outlier')).length;
+
+      expect(duplicateCount1).toBe(2);
+      expect(outlierCount1).toBe(1);
+      expect(summary1.duplicate).toBe(1);
+      expect(summary1.outlier).toBe(1);
+
+      detectAllAnomalies(samples);
+      const summary2 = getAnomalySummary(samples);
+      const duplicateCount2 = samples.filter(s => s.anomalies.some(a => a.type === 'duplicate')).length;
+      const outlierCount2 = samples.filter(s => s.anomalies.some(a => a.type === 'outlier')).length;
+
+      expect(duplicateCount2).toBe(2);
+      expect(outlierCount2).toBe(1);
+      expect(summary2.duplicate).toBe(1);
+      expect(summary2.outlier).toBe(1);
+
+      samples[0].anomalies.forEach(a => {
+        if (a.type === 'duplicate') a.resolved = true;
+      });
+      detectAllAnomalies(samples);
+      const summary3 = getAnomalySummary(samples);
+      expect(summary3.duplicate).toBe(1);
+    });
+
+    it('应该保留撤回和已解决的异常标记', () => {
+      const samples = [
+        createSample(1, 2, mockSource),
+        createSample(1, 2, mockSource),
+        createSample(2, 4, mockSource),
+      ];
+      samples[2].status = 'withdrawn';
+      samples[2].withdrawnReason = '数据错误';
+
+      detectAllAnomalies(samples);
+      samples[0].anomalies.forEach(a => {
+        if (a.type === 'duplicate') {
+          a.resolved = true;
+          a.resolvedBy = '测试用户';
+        }
+      });
+
+      const withdrawnBefore = samples[2].anomalies.filter(a => a.type === 'withdrawn').length;
+      const resolvedBefore = samples[0].anomalies.filter(a => a.resolved).length;
+
+      clearDetectionAnomalies(samples);
+
+      const withdrawnAfter = samples[2].anomalies.filter(a => a.type === 'withdrawn').length;
+      const resolvedAfter = samples[0].anomalies.filter(a => a.resolved).length;
+
+      expect(withdrawnBefore).toBe(1);
+      expect(withdrawnAfter).toBe(1);
+      expect(resolvedBefore).toBeGreaterThanOrEqual(1);
+      expect(resolvedAfter).toBe(resolvedBefore);
     });
   });
 

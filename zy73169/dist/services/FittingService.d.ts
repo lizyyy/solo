@@ -1,5 +1,5 @@
 import type { FittingSession, FittingMethod, FittingResult, SampleSource, Sample } from '../models/types';
-import { type ConfirmationDiff } from './traceability';
+import { type ConfirmationDiff, type ConsistencyMismatch } from './traceability';
 export interface PlaybackResult {
     session: FittingSession;
     fittingResult: FittingResult;
@@ -42,7 +42,8 @@ export declare class FittingService {
         source: SampleSource;
     }>, addedBy: string): Sample[];
     runFitting(sessionId: string, method: FittingMethod, calculatedBy: string, excludeAnomalies?: boolean, degree?: number): PlaybackResult;
-    confirmSample(sessionId: string, sampleId: string, confirmedBy: string): Sample | null;
+    confirmSample(sessionId: string, sampleId: string, confirmedBy: string, notes?: string): Sample | null;
+    correctSampleValue(sessionId: string, sampleId: string, field: 'x' | 'y', newValue: number, correctedBy: string, notes?: string): Sample | null;
     withdrawSample(sessionId: string, sampleId: string, withdrawnBy: string, reason: string): Sample | null;
     updateSample(sessionId: string, sampleId: string, field: keyof Sample, newValue: unknown, changedBy: string, reason?: string): Sample | null;
     getSampleHistory(sessionId: string, sampleId: string): {
@@ -54,11 +55,7 @@ export declare class FittingService {
     replayWithWithdrawn(sessionId: string, withdrawnSampleId: string, method: FittingMethod, calculatedBy: string, degree?: number): ReplayWithWithdrawnResult | null;
     verifyConsistency(sessionId: string, fittingId: string): {
         consistent: boolean;
-        mismatches: Array<{
-            sampleId: string;
-            chartValue: number;
-            detailValue: number;
-        }>;
+        mismatches: ConsistencyMismatch[];
     };
     getAnomalySummary(sessionId: string): Record<string, number>;
 }

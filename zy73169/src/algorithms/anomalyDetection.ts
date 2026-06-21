@@ -138,6 +138,16 @@ export function detectOutliers(
   return anomalies;
 }
 
+export function clearDetectionAnomalies(samples: Sample[]): void {
+  samples.forEach(s => {
+    s.anomalies = s.anomalies.filter(a => {
+      if (a.type === 'withdrawn') return true;
+      if (a.resolved) return true;
+      return false;
+    });
+  });
+}
+
 export function detectAllAnomalies(
   samples: Sample[],
   config: DetectionConfig = {}
@@ -145,9 +155,7 @@ export function detectAllAnomalies(
   const fullConfig = { ...DEFAULT_CONFIG, ...config };
   const allAnomalies: Anomaly[] = [];
 
-  samples.forEach(s => {
-    s.anomalies = s.anomalies.filter(a => a.type !== 'withdrawn');
-  });
+  clearDetectionAnomalies(samples);
 
   allAnomalies.push(...detectDuplicates(samples, fullConfig.duplicateTolerance));
   allAnomalies.push(...detectBoundarySamples(samples, fullConfig.boundaryThreshold, fullConfig.minBoundarySamples));

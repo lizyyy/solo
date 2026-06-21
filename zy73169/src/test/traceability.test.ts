@@ -1,6 +1,7 @@
 import {
   updateSampleField,
   confirmSample,
+  correctSampleValue,
   withdrawSample,
   addSample,
   getSampleChangeHistory,
@@ -126,6 +127,77 @@ describe('数据溯源与变更管理', () => {
 
       expect(result).not.toBeNull();
       expect(session.changeHistory.length).toBe(0);
+    });
+
+    it('确认时应该支持添加备注', () => {
+      const sample = createSample(1, 2, mockSource);
+      session.samples.push(sample);
+
+      const result = confirmSample(session, sample.id, '负责人', '核对原始实验记录，数据有效');
+
+      expect(result).not.toBeNull();
+      expect(result!.status).toBe('confirmed');
+      expect(result!.confirmedNotes).toBe('核对原始实验记录，数据有效');
+      expect(session.changeHistory[0].reason).toBe('核对原始实验记录，数据有效');
+    });
+  });
+
+  describe('样本修正', () => {
+    it('应该修正样本值并记录变更历史', () => {
+      const sample = createSample(1, 2, mockSource);
+      session.samples.push(sample);
+
+      const result = correctSampleValue(session, sample.id, 'y', 2.5, '阿宁', '对照原始草稿修正');
+
+      expect(result).not.toBeNull();
+      expect(result!.y).toBe(2.5);
+      expect(result!.rawY).toBe(2);
+      expect(result!.status).toBe('dirty');
+      expect(result!.correctionNotes).toBe('对照原始草稿修正');
+      expect(session.changeHistory.length).toBe(1);
+      expect(session.changeHistory[0].field).toBe('y');
+      expect(session.changeHistory[0].oldValue).toBe(2);
+      expect(session.changeHistory[0].newValue).toBe(2.5);
+      expect(session.changeHistory[0].reason).toBe('对照原始草稿修正');
+    });
+
+    it('应该保留原始值不被修改', () => {
+      const sample = createSample(1, 2, mockSource);
+      session.samples.push(sample);
+
+      correctSampleValue(session, sample.id, 'x', 1.5, '阿宁');
+      correctSampleValue(session, sample.id, 'y', 2.5, '阿宁');
+
+      expect(sample.x).toBe(1.5);
+      expect(sample.y).toBe(2.5);
+      expect(sample.rawX).toBe(1);
+      expect(sample.rawY).toBe(2);
+    });
+
+    it('值未变化时不应该记录变更', () => {
+      const sample = createSample(1, 2, mockSource);
+      session.samples.push(sample);
+
+      const result = correctSampleValue(session, sample.id, 'y', 2, '阿宁');
+
+      expect(result).not.toBeNull();
+      expect(session.changeHistory.length).toBe(0);
+    });
+
+    it('修正后应该重新检测异常', () => {
+      const samples = [
+        createSample(1, 2, mockSource),
+        createSample(1, 2, mockSource),
+        createSample(2, 4, mockSource),
+      ];
+      session.samples = samples;
+
+      correctSampleValue(session, samples[1].id, 'x', 3, '阿宁', '消除重复');
+
+      const duplicates = session.samples.filter(s =>
+        s.anomalies.some(a => a.type === 'duplicate' && !a.resolved)
+      );
+      expect(duplicates.length).toBe(0);
     });
   });
 
@@ -268,6 +340,81 @@ describe('数据溯源与变更管理', () => {
 
       expect(result.consistent).toBe(true);
       expect(result.mismatches.length).toBe(0);
+    });
+
+    it('应该检测到人工修正的样本', () => {
+      const samples = [
+        createSample(1, 3, mockSource),
+        createSample(2, 5, mockSource),
+        createSample(3, 7, mockSource),
+      ];
+      session.samples = samples;
+
+      const fittingResult = calculateFitting(samples, 'linear', 'test');
+      session.fittingParams.push(fittingResult.params);
+
+      correctSampleValue(session, samples[0].id, 'y', 4, '阿宁', '修正录入错误');
+
+      const result = verifyCalibrationConsistency(session, fittingResult.params.id);
+
+      expect(result.consistent).toBe(false);
+      const rawModified = result.mismatches.filter(m => m.type === 'raw_modified');
+      expect(rawModified.length).toBe(1);
+      expect(rawModified[0]!.rawValue).toBe(3);
+      expect(rawModified[0]!.currentValue).toBe(4);
+      expect(rawModified[0]!.message).toContain('原始值');
+      expect(rawModified[0]!.message).toContain('当前值');
+    });
+
+    it('应该检测到排除样本不一致', () => {
+      const samples = [
+        createSample(1, 3, mockSource),
+        createSample(2, 5, mockSource),
+        createSample(3, 100, mockSource),
+        createSample(4, 9, mockSource),
+      ];
+      session.samples = samples;
+
+      const fittingResult = calculateFitting(samples, 'linear', 'test', true);
+      session.fittingParams.push(fittingResult.params);
+
+      samples[2].status = 'withdrawn';
+      samples[2].withdrawnReason = '数据错误';
+
+      const result = verifyCalibrationConsistency(session, fittingResult.params.id);
+
+      expect(result.consistent).toBe(false);
+      const exclusionMismatch = result.mismatches.find(m => m.type === 'exclusion_mismatch');
+      expect(exclusionMismatch).toBeDefined();
+    });
+
+    it('应该检测到撤回状态和标记不一致', () => {
+      const samples = [
+        createSample(1, 3, mockSource),
+        createSample(2, 5, mockSource),
+      ];
+      session.samples = samples;
+
+      const fittingResult = calculateFitting(samples, 'linear', 'test');
+      session.fittingParams.push(fittingResult.params);
+
+      samples[0].status = 'withdrawn';
+      samples[0].withdrawnReason = '测试';
+
+      const result = verifyCalibrationConsistency(session, fittingResult.params.id);
+
+      expect(result.consistent).toBe(false);
+      const statusMismatch = result.mismatches.find(m => m.type === 'status_mismatch');
+      expect(statusMismatch).toBeDefined();
+      expect(statusMismatch!.message).toContain('缺少撤回异常标记');
+    });
+
+    it('拟合记录不存在时应该返回错误', () => {
+      const result = verifyCalibrationConsistency(session, 'non-existent-id');
+
+      expect(result.consistent).toBe(false);
+      expect(result.mismatches.length).toBe(1);
+      expect(result.mismatches[0].message).toContain('不存在');
     });
   });
 });

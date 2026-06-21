@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateSampleField = updateSampleField;
 exports.confirmSample = confirmSample;
+exports.correctSampleValue = correctSampleValue;
 exports.withdrawSample = withdrawSample;
 exports.addSample = addSample;
 exports.getSampleChangeHistory = getSampleChangeHistory;
@@ -29,17 +30,18 @@ function updateSampleField(session, sampleId, field, newValue, changedBy, reason
     session.updatedAt = Date.now();
     return sample;
 }
-function confirmSample(session, sampleId, confirmedBy) {
+function confirmSample(session, sampleId, confirmedBy, notes) {
     const sample = session.samples.find(s => s.id === sampleId);
     if (!sample)
         return null;
     const oldStatus = sample.status;
     if (oldStatus === 'confirmed')
         return sample;
-    const changeRecord = (0, factories_1.createChangeRecord)('sample', sampleId, 'status', oldStatus, 'confirmed', confirmedBy, '人工确认样本有效');
+    const changeRecord = (0, factories_1.createChangeRecord)('sample', sampleId, 'status', oldStatus, 'confirmed', confirmedBy, notes || '人工确认样本有效');
     sample.status = 'confirmed';
     sample.confirmedBy = confirmedBy;
     sample.confirmedAt = Date.now();
+    sample.confirmedNotes = notes;
     sample.updatedAt = Date.now();
     sample.anomalies.forEach(a => {
         if (!a.resolved && a.severity !== 'high') {
@@ -50,6 +52,25 @@ function confirmSample(session, sampleId, confirmedBy) {
     });
     session.changeHistory.push(changeRecord);
     session.updatedAt = Date.now();
+    return sample;
+}
+function correctSampleValue(session, sampleId, field, newValue, correctedBy, notes) {
+    const sample = session.samples.find(s => s.id === sampleId);
+    if (!sample)
+        return null;
+    const oldValue = sample[field];
+    if (oldValue === newValue)
+        return sample;
+    const changeRecord = (0, factories_1.createChangeRecord)('sample', sampleId, field, oldValue, newValue, correctedBy, notes || '人工修正数值');
+    sample[field] = newValue;
+    sample.correctionNotes = notes;
+    if (sample.status === 'raw') {
+        sample.status = 'dirty';
+    }
+    sample.updatedAt = Date.now();
+    session.changeHistory.push(changeRecord);
+    session.updatedAt = Date.now();
+    (0, anomalyDetection_1.detectAllAnomalies)(session.samples);
     return sample;
 }
 function withdrawSample(session, sampleId, withdrawnBy, reason) {
@@ -158,17 +179,49 @@ function recalculateWithWithdrawn(session, withdrawnSampleId, method, calculated
 function verifyCalibrationConsistency(session, fittingId) {
     const fitting = session.fittingParams.find(f => f.id === fittingId);
     if (!fitting) {
-        return { consistent: false, mismatches: [] };
+        return { consistent: false, mismatches: [{ sampleId: 'none', type: 'status_mismatch', message: '拟合记录不存在' }] };
     }
     const mismatches = [];
-    fitting.sampleIds.forEach(sampleId => {
-        const sample = session.samples.find(s => s.id === sampleId);
-        if (sample) {
-            const chartValue = sample.y;
-            const detailValue = sample.y;
-            if (Math.abs(chartValue - detailValue) > 1e-10) {
-                mismatches.push({ sampleId, chartValue, detailValue });
-            }
+    const chartIncludedIds = new Set(fitting.sampleIds);
+    const chartExcludedIds = new Set(fitting.excludedSampleIds);
+    session.samples.forEach(sample => {
+        const isIncludedInChart = chartIncludedIds.has(sample.id);
+        const shouldBeExcluded = sample.status === 'withdrawn' ||
+            sample.anomalies.some(a => !a.resolved && a.severity === 'high');
+        if (isIncludedInChart && shouldBeExcluded) {
+            mismatches.push({
+                sampleId: sample.id,
+                type: 'exclusion_mismatch',
+                chartIncluded: true,
+                detailIncluded: false,
+                message: `图表包含了应排除的样本（状态: ${sample.status}，异常: ${sample.anomalies.filter(a => !a.resolved).map(a => a.type).join(', ')}）`,
+            });
+        }
+        if (!isIncludedInChart && !shouldBeExcluded && !chartExcludedIds.has(sample.id)) {
+            mismatches.push({
+                sampleId: sample.id,
+                type: 'exclusion_mismatch',
+                chartIncluded: false,
+                detailIncluded: true,
+                message: '图表未包含应纳入的正常样本',
+            });
+        }
+        if (sample.rawX !== sample.x || sample.rawY !== sample.y) {
+            mismatches.push({
+                sampleId: sample.id,
+                type: 'raw_modified',
+                rawValue: sample.rawY,
+                currentValue: sample.y,
+                message: `原始值(${sample.rawY.toFixed(4)})与当前值(${sample.y.toFixed(4)})不一致，已人工修正`,
+            });
+        }
+        const withdrawnAnomaly = sample.anomalies.find(a => a.type === 'withdrawn');
+        if (sample.status === 'withdrawn' && !withdrawnAnomaly) {
+            mismatches.push({
+                sampleId: sample.id,
+                type: 'status_mismatch',
+                message: '样本状态为撤回但缺少撤回异常标记',
+            });
         }
     });
     return {
