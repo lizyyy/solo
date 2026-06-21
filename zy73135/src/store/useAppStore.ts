@@ -1,8 +1,8 @@
 import { create } from 'zustand';
-import type { WaterQualityRecord, RecordStatus, ParameterScheme, TimelineEvent } from '@/types';
+import type { WaterQualityRecord, RecordStatus, ParameterScheme, TimelineEvent, EventType } from '@/types';
 import { mockRecords, getCleaningStepsByScheme, getCleanedValueByScheme } from '@/data/records';
 import { mockSchemes } from '@/data/schemes';
-import { getTimelineByRecordId } from '@/data/timeline';
+import { generateInitialTimeline, getTimelineByRecordId } from '@/data/timeline';
 
 interface AppState {
   records: WaterQualityRecord[];
@@ -11,6 +11,7 @@ interface AppState {
   activeSchemeId: string;
   compareSchemeId: string | null;
   compareMode: boolean;
+  timelineEvents: TimelineEvent[];
 
   setSelectedRecord: (id: string | null) => void;
   setActiveScheme: (id: string) => void;
@@ -23,6 +24,9 @@ interface AppState {
   getRecordTimeline: (recordId: string) => TimelineEvent[];
   getCleanedValueForScheme: (recordId: string, schemeId: string) => number;
   getCleaningStepsForScheme: (recordId: string, schemeId: string) => { schemeId: string; steps: typeof mockRecords[0]['cleaningSteps'] }[];
+  addTimelineEvent: (event: Omit<TimelineEvent, 'id' | 'eventTime'>) => void;
+  handleDriftSuspend: (recordId: string, reason: string) => void;
+  handleDriftRelease: (recordId: string, reason: string) => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -32,6 +36,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   activeSchemeId: 'scheme-standard',
   compareSchemeId: null,
   compareMode: false,
+  timelineEvents: generateInitialTimeline(),
 
   setSelectedRecord: (id) => set({ selectedRecordId: id }),
 
@@ -62,7 +67,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   getRecordTimeline: (recordId) => {
-    return getTimelineByRecordId(recordId);
+    return getTimelineByRecordId(recordId, get().timelineEvents);
   },
 
   getCleanedValueForScheme: (recordId, schemeId) => {
@@ -84,5 +89,80 @@ export const useAppStore = create<AppState>((set, get) => ({
       schemeId: sid,
       steps: getCleaningStepsByScheme(record, sid),
     }));
+  },
+
+  addTimelineEvent: (event) => {
+    const now = new Date().toISOString();
+    const newEvent: TimelineEvent = {
+      ...event,
+      id: `evt-${Date.now()}`,
+      eventTime: now,
+    };
+    set((state) => ({
+      timelineEvents: [...state.timelineEvents, newEvent],
+    }));
+  },
+
+  handleDriftSuspend: (recordId, reason) => {
+    const { records, addTimelineEvent } = get();
+    const record = records.find((r) => r.id === recordId);
+    if (!record) return;
+
+    const defaultEvidence = ['传感器校准记录', '现场重测数据'];
+    const newMissingEvidence = [...new Set([...record.missingEvidence, ...defaultEvidence])];
+
+    set((state) => ({
+      records: state.records.map((r) =>
+        r.id === recordId
+          ? { ...r, status: 'supplement', missingEvidence: newMissingEvidence }
+          : r
+      ),
+    }));
+
+    addTimelineEvent({
+      recordId,
+      eventType: 'drift' as EventType,
+      operator: '老何',
+      description: `挂起待补：${reason}`,
+      detail: { decision: 'suspend', reason, driftAmount: record.driftAmount },
+    });
+
+    addTimelineEvent({
+      recordId,
+      eventType: 'status_change' as EventType,
+      operator: '老何',
+      description: `状态从${record.status}变更为待补件，需补充：${newMissingEvidence.join('、')}`,
+      detail: { from: record.status, to: 'supplement', missingEvidence: newMissingEvidence },
+    });
+  },
+
+  handleDriftRelease: (recordId, reason) => {
+    const { records, addTimelineEvent } = get();
+    const record = records.find((r) => r.id === recordId);
+    if (!record) return;
+
+    set((state) => ({
+      records: state.records.map((r) =>
+        r.id === recordId
+          ? { ...r, status: 'confirmed', missingEvidence: [] }
+          : r
+      ),
+    }));
+
+    addTimelineEvent({
+      recordId,
+      eventType: 'drift' as EventType,
+      operator: '老何',
+      description: `校正放行：${reason}`,
+      detail: { decision: 'release', reason, driftAmount: record.driftAmount },
+    });
+
+    addTimelineEvent({
+      recordId,
+      eventType: 'status_change' as EventType,
+      operator: '老何',
+      description: `状态从${record.status}变更为已确认，校正后数据有效`,
+      detail: { from: record.status, to: 'confirmed' },
+    });
   },
 }));

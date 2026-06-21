@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { eventTypeLabels, parameterTypeLabels } from '@/types';
 import RecordCard from '@/components/common/RecordCard';
+import { getTimelineByRecordId } from '@/data/timeline';
 import { 
   Clock, FileText, Droplets, ClipboardCheck, 
   AlertTriangle, ArrowRight, MessageSquare, Plus,
@@ -27,12 +28,16 @@ const eventColors: Record<string, string> = {
 };
 
 export default function Handover() {
-  const { records, getRecordTimeline } = useAppStore();
+  const records = useAppStore((state) => state.records);
+  const getRecordTimeline = useAppStore((state) => state.getRecordTimeline);
+  const timelineEvents = useAppStore((state) => state.timelineEvents);
   const [selectedRecordId, setSelectedRecordId] = useState<string>('rec-002');
   const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
 
   const selectedRecord = records.find((r) => r.id === selectedRecordId);
-  const timelineEvents = selectedRecord ? getRecordTimeline(selectedRecord.id) : [];
+  const recordTimeline = selectedRecord 
+    ? getTimelineByRecordId(selectedRecord.id, timelineEvents)
+    : [];
 
   const toggleEventExpand = (eventId: string) => {
     setExpandedEventId(expandedEventId === eventId ? null : eventId);
@@ -152,10 +157,10 @@ export default function Handover() {
               <div className="relative pl-8">
                 <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-gradient-to-b from-ocean-500 via-ocean-600 to-ocean-700" />
 
-                {timelineEvents.map((event, index) => {
+                {recordTimeline.map((event, index) => {
                   const Icon = eventIcons[event.eventType] || FileText;
                   const isExpanded = expandedEventId === event.id;
-                  const isLast = index === timelineEvents.length - 1;
+                  const isLast = index === recordTimeline.length - 1;
 
                   return (
                     <div

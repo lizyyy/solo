@@ -10,8 +10,11 @@ interface RecordDetailProps {
 }
 
 export default function RecordDetail({ onClose }: RecordDetailProps) {
-  const { getSelectedRecord } = useAppStore();
-  const record = getSelectedRecord();
+  const record = useAppStore((state) => 
+    state.records.find((r) => r.id === state.selectedRecordId)
+  );
+  const handleDriftSuspend = useAppStore((state) => state.handleDriftSuspend);
+  const handleDriftRelease = useAppStore((state) => state.handleDriftRelease);
 
   if (!record) {
     return (
@@ -139,6 +142,28 @@ export default function RecordDetail({ onClose }: RecordDetailProps) {
             driftAmount={record.driftAmount}
             unit={record.unit}
             parameterName={parameterTypeLabels[record.parameterType]}
+            onSuspend={() => {
+              const confirmed = window.confirm(
+                `确认将 ${record.recordNo} 挂起待补？\n\n该操作将：\n• 记录状态变更为"待补件"\n• 自动添加缺失证据项\n• 写入处置决策到时间线`
+              );
+              if (confirmed) {
+                handleDriftSuspend(
+                  record.id,
+                  `检测到${parameterTypeLabels[record.parameterType]}传感器漂移 ${record.driftAmount.toFixed(2)} ${record.unit}，需现场重测确认`
+                );
+              }
+            }}
+            onRelease={() => {
+              const confirmed = window.confirm(
+                `确认将 ${record.recordNo} 校正放行？\n\n该操作将：\n• 记录状态变更为"已确认"\n• 清除缺失证据标记\n• 写入处置决策到时间线`
+              );
+              if (confirmed) {
+                handleDriftRelease(
+                  record.id,
+                  `${parameterTypeLabels[record.parameterType]}漂移量 ${record.driftAmount.toFixed(2)} ${record.unit} 在可接受范围内，校正后放行`
+                );
+              }
+            }}
           />
         )}
 
