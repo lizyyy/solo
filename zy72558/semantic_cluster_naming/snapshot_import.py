@@ -95,6 +95,7 @@ class SnapshotImporter:
                 vector_data=vector_data,
                 content_hash=content_hash,
                 status=SnapshotStatus.DUPLICATE_DETECTED.value if duplicate_snapshot else SnapshotStatus.IMPORTED.value,
+                imported_by=self.audit.actor,
                 source_file=source_file,
                 is_duplicate=duplicate_snapshot is not None,
                 duplicate_of_snapshot_id=duplicate_snapshot.snapshot_id if duplicate_snapshot else None,

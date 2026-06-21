@@ -262,27 +262,6 @@ def list_runs(snapshot_id, limit):
     console.print(table)
 
 
-@cluster.command("last-run")
-@click.argument("snapshot_id")
-@click.option("--index", type=int, default=0, help="第几个最新运行，0=最新 1=上一个")
-@click.option("--quiet", "-q", is_flag=True, help="只打印 run_id 纯文本")
-def cluster_last_run(snapshot_id, index, quiet):
-    """获取指定快照最近的训练运行ID（便于脚本连续执行）"""
-    db = get_db()
-    engine = ClusteringEngine(db)
-    runs = engine.list_runs(snapshot_id=snapshot_id, limit=index + 1)
-    valid = [r for r in runs if r.get("exists")]
-    if len(valid) <= index:
-        if not quiet:
-            console.print("[bold red]未找到训练运行[/bold red]")
-        sys.exit(1)
-    run = valid[index]
-    if quiet:
-        print(run["run_id"])
-    else:
-        console.print("run_id=" + run["run_id"] + " status=" + run["status"] + " review=" + run["review_status"] + " dup=" + str(run["is_duplicate_run"]))
-
-
 @cli.group()
 def result():
     """聚类结果管理"""
@@ -662,27 +641,6 @@ def replay(run_id, snapshot_id):
     else:
         console.print("[yellow]请指定 --run-id 或 --snapshot-id[/yellow]")
 
-
-@cli.command("serve")
-@click.option("--host", default="127.0.0.1", help="监听地址")
-@click.option("--port", default=8765, type=int, help="监听端口")
-@click.option("--db", "db_path", default=None, help="数据库路径")
-def serve(host, port, db_path):
-    """启动 HTTP 页面和 API 服务"""
-    from .api import run_server
-    console.print(f"[green]启动语义向量聚类命名服务:[/green] http://{host}:{port}")
-    console.print(f"  页面入口: http://{host}:{port}/")
-    console.print(f"  API 健康检查: http://{host}:{port}/health")
-    console.print(f"  数据库: {db_path or os.environ.get('SCN_DB_PATH', 'semantic_cluster.db')}")
-    run_server(host=host, port=port, db_path=db_path)
-
-
-def main():
-    cli()
-
-
-if __name__ == "__main__":
-    main()
 
 @cli.command("serve")
 @click.option("--host", default="127.0.0.1", help="监听地址")

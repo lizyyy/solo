@@ -54,7 +54,16 @@ class ResultService:
                     "snapshot_id": r["snapshot_id"],
                 })
         
+        cluster_info = {}
+        for cid, info in clusters.items():
+            cluster_info[str(cid)] = {
+                "name": info["cluster_name"],
+                "edited": info["cluster_name_edited"],
+                "count": info["count"],
+            }
+
         return {
+            "_source": "result_service.single_source_for_all",
             "run_id": run_id,
             "snapshot_id": run.snapshot_id,
             "status": run.status,
@@ -62,6 +71,7 @@ class ResultService:
             "is_duplicate_run": run.is_duplicate_run,
             "metrics": run.metrics,
             "total_rows": len(results),
+            "cluster_info": cluster_info,
             "clusters": list(clusters.values()),
             "results": results,
         }

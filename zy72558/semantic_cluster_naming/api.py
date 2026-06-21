@@ -101,6 +101,7 @@ def create_app(db_path: Optional[str] = None):
                 "此处返回的数据与页面展示、CSV/JSON导出均读取同一份ClusteringResult表，"
                 "重复训练记录（is_duplicate_run/duplicate_of_run_id/review_status）三端一致"
             )
+            data["historical_records"] = service.get_audit_trail(run_id=run_id, limit=20)
             return jsonify({"code": 0, "data": data})
         except Exception as e:
             return jsonify({"code": 1, "error": str(e)}), 400

@@ -1,5 +1,6 @@
 pyproject.toml
 semantic_cluster_naming/__init__.py
+semantic_cluster_naming/api.py
 semantic_cluster_naming/audit.py
 semantic_cluster_naming/cli.py
 semantic_cluster_naming/clustering.py

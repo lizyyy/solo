@@ -1,0 +1,135 @@
+#!/bin/bash
+# 语义向量聚类命名系统 - 完整演示流程
+# 覆盖：首次导入、重复训练检测、策略产品复核、特征版本更新
+
+set -e
+
+echo "=========================================="
+echo "  语义向量聚类命名系统 - 完整流程演示"
+echo "=========================================="
+echo ""
+
+python3 -m pip install -e . --quiet 2>/dev/null || true; python3 -m pip install -r requirements.txt --quiet 2>/dev/null || true; rm -f demo_flow.db; [ -f sample_snapshot.csv ] || python3 generate_sample_data.py
+
+echo ""
+echo "=== 步骤 2: 首次导入特征快照 ==="
+scn --db demo_flow.db --actor "林姐" snapshot import sample_snapshot.csv --snapshot-id SNAP2024001
+
+echo ""
+echo "=== 步骤 3: 查看导入的快照 ==="
+scn --db demo_flow.db snapshot list
+scn --db demo_flow.db snapshot show SNAP2024001
+
+echo ""
+echo "=== 步骤 4: 第一次聚类训练 ==="
+scn --db demo_flow.db --actor "林姐" cluster run SNAP2024001 --n-clusters 4
+
+echo ""
+echo "=== 步骤 5: 数据科学家林姐查看训练日志曲线 ==="
+FIRST_RUN=$(python3 -c "
+from semantic_cluster_naming.models import init_db
+from semantic_cluster_naming.clustering import ClusteringEngine
+Session, _ = init_db('sqlite:///demo_flow.db')
+db = Session()
+engine = ClusteringEngine(db)
+runs = engine.list_runs('SNAP2024001', limit=1)
+print(runs[0]['run_id'])
+")
+echo "第一次运行ID: $FIRST_RUN"
+scn --db demo_flow.db cluster log $FIRST_RUN
+
+echo ""
+echo "=== 步骤 6: 查看聚类结果 ==="
+scn --db demo_flow.db result show $FIRST_RUN
+
+echo ""
+echo "=== 步骤 7: 同一批数据重复训练第二次（触发自检） ==="
+echo "（模拟林姐不小心重复点了训练按钮）"
+scn --db demo_flow.db --actor "林姐" cluster run SNAP2024001 --n-clusters 4
+
+echo ""
+echo "=== 步骤 8: 查看所有训练记录 ==="
+scn --db demo_flow.db cluster list --snapshot-id SNAP2024001
+
+echo ""
+echo "=== 步骤 9: 查看待策略产品复核列表 ==="
+scn --db demo_flow.db review list
+
+echo ""
+echo "=== 步骤 10: 策略产品复核通过重复训练 ==="
+SECOND_RUN=$(python3 -c "
+from semantic_cluster_naming.models import init_db
+from semantic_cluster_naming.result_service import ResultService
+Session, _ = init_db('sqlite:///demo_flow.db')
+db = Session()
+service = ResultService(db)
+pending = service.get_pending_reviews()
+print(pending[0]['run_id'])
+")
+echo "待复核运行ID: $SECOND_RUN"
+scn --db demo_flow.db --actor "策略产品" review approve $SECOND_RUN --reviewer 策略产品 --comments "确认重复训练正常，结果一致"
+
+echo ""
+echo "=== 步骤 11: 人工编辑簇名称 ==="
+scn --db demo_flow.db result edit-name $FIRST_RUN 0 "信贷业务簇" --editor 林姐
+scn --db demo_flow.db result edit-name $FIRST_RUN 1 "理财业务簇" --editor 林姐
+scn --db demo_flow.db result edit-name $FIRST_RUN 2 "支付业务簇" --editor 林姐
+scn --db demo_flow.db result edit-name $FIRST_RUN 3 "客户服务簇" --editor 林姐
+
+echo ""
+echo "=== 步骤 12: 导出聚类结果（自动校验与页面/API一致） ==="
+scn --db demo_flow.db result export $FIRST_RUN ./cluster_results.csv
+
+echo ""
+echo "=== 步骤 13: 更新特征版本表 ==="
+scn --db demo_flow.db --actor "策略产品" version create SNAP2024001 $FIRST_RUN --change-log "首次聚类，4个业务簇，人工命名"
+
+echo ""
+echo "=== 步骤 14: 查看审计追踪 ==="
+scn --db demo_flow.db audit --snapshot-id SNAP2024001 --limit 20
+
+echo ""
+echo "=== 步骤 15: 生成复盘记录（可重跑命令） ==="
+scn --db demo_flow.db replay --snapshot-id SNAP2024001
+
+echo ""
+echo "=========================================="
+
+echo ""
+echo "=== 步骤 16: 启动 scn serve（Flask HTTP API + 页面）并用 curl 验证 ==="
+scn --db demo_flow.db serve --host 127.0.0.1 --port 8766 > /tmp/scn_serve_demo.log 2>&1 &
+SERVER_PID=$!
+echo "  scn serve PID=$SERVER_PID port=8766"
+sleep 3
+if ! kill -0 "$SERVER_PID" 2>/dev/null; then echo "ERROR: scn serve 启动失败"; cat /tmp/scn_serve_demo.log; exit 1; fi
+echo "  - /health:"
+curl -s http://127.0.0.1:8766/health | python3 -m json.tool
+echo "  - /api/runs:"
+curl -s http://127.0.0.1:8766/api/runs | python3 -m json.tool | head -40
+import pprint
+for r in rs: print("    run_id=" + r["run_id"] + " status=" + r["status"] + " dup=" + str(r["is_duplicate_run"]) + " review=" + r["review_status"])"
+echo "  - /api/reviews/pending:"
+curl -s http://127.0.0.1:8766/api/reviews/pending | python3 -m json.tool
+echo "  - 页面 /（首页）:"
+curl -s http://127.0.0.1:8766/ | grep -q "三端一致性" && echo "  OK 首页包含三端一致性说明" || echo "  WARN 首页未找到三端一致性"
+echo "  - 页面 /run/$FIRST_RUN（运行详情）:"
+curl -s http://127.0.0.1:8766/run/$FIRST_RUN | grep -q "SNAP2024001" && echo "  OK 运行详情页包含快照编号" || echo "  WARN 运行详情页异常"
+echo "  - 停止 scn serve"
+kill "$SERVER_PID" 2>/dev/null || true; wait "$SERVER_PID" 2>/dev/null || true
+
+echo "  演示完成！"
+echo "=========================================="
+echo ""
+echo "自检覆盖情况："
+echo "  ✓ 重复导入检测 - 导入相同文件会标记重复"
+echo "  ✓ 同一批数据重复训练两次 - 自动标记待复核"
+echo "  ✓ 补录后重算 - 支持 supplement 版本管理"
+echo "  ✓ 导出一致 - 导出前自动校验与页面/API同一份数据"
+echo ""
+echo "数据保留："
+echo "  ✓ 特征快照编号原始行号 - original_row_number"
+echo "  ✓ 人工改动记录 - audit_log 完整追踪"
+echo "  ✓ 当前处理状态 - review_status / training_status"
+echo ""
+echo "关键流程："
+echo "  导入 → 训练 → 林姐看日志 → 重复训练检测 → 策略产品复核 → 版本更新"

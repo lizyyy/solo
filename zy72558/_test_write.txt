@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+echo "=========================================="
+echo "  语义向量聚类命名系统 - 完整流程演示"
+echo "=========================================="
+echo ""
+
+echo "=== 步骤 0: 安装依赖并准备数据 ==="
+pip3 install -e . --quiet
+pip3 install -r requirements.txt --quiet
+rm -f demo_flow.db cluster_results.csv
+[ -f sample_snapshot.csv ] || python3 generate_sample_data.py
+echo "  依赖已安装，数据已就绪"
