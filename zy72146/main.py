@@ -60,10 +60,8 @@ def run_pipeline(excel_path: str, audio_dir: str, report_name: str = None,
     matcher = TrackMatcher(working_tracks, audio_files)
     matched_tracks = matcher.match_all()
     matched_count = sum(1 for t in matched_tracks if t.audio_file)
-    matched_valid_count = sum(1 for t in matched_tracks if t.audio_file and not any(
-        a.value == "文件损坏" for a in t.anomalies))
-    matched_corrupted_count = sum(1 for t in matched_tracks if t.audio_file and any(
-        a.value == "文件损坏" for a in t.anomalies))
+    matched_valid_count = sum(1 for t in matched_tracks if t.matched_audio_valid is True)
+    matched_corrupted_count = sum(1 for t in matched_tracks if t.matched_audio_valid is False)
     print(f"   成功匹配 {matched_count}/{len(matched_tracks)} 条曲目")
     print(f"   其中可用音频: {matched_valid_count} 条, 损坏音频: {matched_corrupted_count} 条")
 
