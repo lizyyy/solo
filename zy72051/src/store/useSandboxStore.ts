@@ -194,8 +194,10 @@ export function useFilteredBuildings(): Building[] {
   }));
 }
 
-export function useUserMarker(buildingId: string): UserMarker | undefined {
-  return useSandboxStore(state => state.userMarkers[buildingId]);
+export function useUserMarker(buildingId: string | undefined): UserMarker | undefined {
+  return useSandboxStore(state =>
+    buildingId ? state.userMarkers[buildingId] : undefined
+  );
 }
 
 export function useCameraState(): CameraState {
