@@ -54,19 +54,12 @@ const severityLabels: Record<string, string> = {
 }
 
 export default function Dashboard() {
-  const { runs, anomalies, snapshots, currentRun, loading, fetchRuns, fetchCurrentRun, fetchAnomalies, fetchSnapshots, executeRun } = useCoralStore()
+  const { runs, anomalies, snapshots, currentRun, loading, fetchRuns, fetchSnapshots, executeRun } = useCoralStore()
 
   useEffect(() => {
     fetchRuns()
-    fetchAnomalies()
     fetchSnapshots()
   }, [])
-
-  useEffect(() => {
-    if (runs.length > 0 && !currentRun) {
-      fetchCurrentRun(runs[0].id)
-    }
-  }, [runs])
 
   const totalRecords = currentRun?.summary_metrics?.total_records ?? currentRun?.total_records ?? 0
   const anomalyCount = currentRun?.summary_metrics?.anomaly_count ?? currentRun?.anomaly_count ?? 0

@@ -1,6 +1,7 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { Home, ClipboardList, GitBranch, AlertTriangle, Download, Shell } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import RunSelector from './RunSelector'
 
 const navItems = [
   { path: '/', label: '报告汇总', icon: Home },
@@ -66,8 +67,10 @@ export default function Layout() {
       </aside>
 
       <main className="flex-1 flex flex-col relative z-10 min-w-0">
-        <header className="h-14 bg-ocean-500/60 backdrop-blur-md border-b border-white/10 flex items-center px-6 shrink-0">
-          <h2 className="font-serif text-white text-lg">{currentTitle}</h2>
+        <header className="h-14 bg-ocean-500/60 backdrop-blur-md border-b border-white/10 flex items-center px-6 shrink-0 gap-4">
+          <h2 className="font-serif text-white text-lg shrink-0">{currentTitle}</h2>
+          <div className="w-px h-5 bg-white/10" />
+          <RunSelector />
           <div className="ml-auto flex items-center gap-2 text-xs text-ocean-100/50">
             <span>首页</span>
             <span>/</span>

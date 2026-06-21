@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 
 interface CoralState {
+  currentRunId: string | null
   currentRun: any | null
   runs: any[]
   records: any[]
@@ -11,9 +12,9 @@ interface CoralState {
   error: string | null
 
   fetchRuns: () => Promise<void>
-  fetchCurrentRun: (runId: string) => Promise<void>
+  selectRun: (runId: string) => Promise<void>
   fetchRecords: () => Promise<void>
-  fetchAnomalies: (filters?: Record<string, string>) => Promise<void>
+  fetchAnomalies: (extraFilters?: Record<string, string>) => Promise<void>
   fetchSnapshots: () => Promise<void>
   fetchMismatchRecords: () => Promise<void>
   executeRun: (parameters: Record<string, any>) => Promise<void>
@@ -36,6 +37,7 @@ async function apiFetch(url: string, options?: RequestInit) {
 }
 
 export const useCoralStore = create<CoralState>((set, get) => ({
+  currentRunId: null,
   currentRun: null,
   runs: [],
   records: [],
@@ -50,16 +52,22 @@ export const useCoralStore = create<CoralState>((set, get) => ({
     try {
       const data = await apiFetch('/api/runs')
       set({ runs: data, loading: false })
+      if (!get().currentRunId && data.length > 0) {
+        await get().selectRun(data[0].id)
+      }
     } catch (e: any) {
       set({ error: e.message, loading: false })
     }
   },
 
-  fetchCurrentRun: async (runId: string) => {
-    set({ loading: true, error: null })
+  selectRun: async (runId: string) => {
+    set({ loading: true, error: null, currentRunId: runId })
     try {
-      const data = await apiFetch(`/api/runs/${runId}`)
-      set({ currentRun: data, loading: false })
+      const [runDetail, _anomalies] = await Promise.all([
+        apiFetch(`/api/runs/${runId}`),
+        apiFetch(`/api/anomalies?run_id=${runId}`),
+      ])
+      set({ currentRun: runDetail, anomalies: _anomalies, loading: false })
     } catch (e: any) {
       set({ error: e.message, loading: false })
     }
@@ -75,9 +83,13 @@ export const useCoralStore = create<CoralState>((set, get) => ({
     }
   },
 
-  fetchAnomalies: async (filters?: Record<string, string>) => {
+  fetchAnomalies: async (extraFilters?: Record<string, string>) => {
     set({ loading: true, error: null })
     try {
+      const { currentRunId } = get()
+      const filters: Record<string, string> = {}
+      if (currentRunId) filters.run_id = currentRunId
+      if (extraFilters) Object.assign(filters, extraFilters)
       const params = new URLSearchParams(filters)
       const url = `/api/anomalies${params.toString() ? `?${params.toString()}` : ''}`
       const data = await apiFetch(url)
@@ -114,8 +126,9 @@ export const useCoralStore = create<CoralState>((set, get) => ({
         method: 'POST',
         body: JSON.stringify({ parameters }),
       })
+      const newRunId = data.id
       await get().fetchRuns()
-      set({ currentRun: data, loading: false })
+      await get().selectRun(newRunId)
     } catch (e: any) {
       set({ error: e.message, loading: false })
     }

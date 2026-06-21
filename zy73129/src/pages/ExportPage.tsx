@@ -23,7 +23,7 @@ const statusLabels: Record<string, string> = {
 }
 
 export default function ExportPage() {
-  const { runs, anomalies, loading, fetchRuns, fetchAnomalies, exportReport } = useCoralStore()
+  const { runs, currentRunId, currentRun, anomalies, loading, fetchRuns, fetchAnomalies, exportReport, selectRun } = useCoralStore()
   const [runId, setRunId] = useState('')
   const [includeAnnotations, setIncludeAnnotations] = useState(true)
   const [includeCoordCorrections, setIncludeCoordCorrections] = useState(true)
@@ -31,15 +31,24 @@ export default function ExportPage() {
   const [preview, setPreview] = useState<any>(null)
 
   useEffect(() => {
-    fetchRuns()
-    fetchAnomalies()
+    if (runs.length === 0) {
+      fetchRuns()
+    } else if (currentRunId && !runId) {
+      setRunId(currentRunId)
+    }
   }, [])
 
   useEffect(() => {
-    if (runs.length > 0 && !runId) {
-      setRunId(runs[0].id)
+    if (currentRunId && !runId) {
+      setRunId(currentRunId)
     }
-  }, [runs])
+  }, [currentRunId])
+
+  useEffect(() => {
+    if (runId && runId !== currentRunId) {
+      selectRun(runId)
+    }
+  }, [runId])
 
   const handleExport = async () => {
     if (!runId) return
@@ -61,7 +70,7 @@ export default function ExportPage() {
     }
   }
 
-  const selectedRun = runs.find((r: any) => r.id === runId)
+  const selectedRun = runs.find((r: any) => r.id === runId) || currentRun || runs[0]
 
   return (
     <div className="space-y-6 animate-fade-in">

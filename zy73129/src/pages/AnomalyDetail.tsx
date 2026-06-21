@@ -35,13 +35,23 @@ const statusColors: Record<string, string> = {
 }
 
 export default function AnomalyDetail() {
-  const { anomalies, loading, fetchAnomalies, updateAnomalyStatus, persistCoordinateCorrection } = useCoralStore()
+  const { runs, currentRun, currentRunId, anomalies, loading, fetchRuns, fetchAnomalies, updateAnomalyStatus, persistCoordinateCorrection } = useCoralStore()
   const [filters, setFilters] = useState<Record<string, string>>({})
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchAnomalies(filters)
+    if (runs.length === 0) {
+      fetchRuns()
+    } else {
+      fetchAnomalies(filters)
+    }
   }, [])
+
+  useEffect(() => {
+    if (currentRunId) {
+      fetchAnomalies(filters)
+    }
+  }, [currentRunId])
 
   const applyFilters = () => {
     fetchAnomalies(filters)
@@ -58,6 +68,26 @@ export default function AnomalyDetail() {
 
   return (
     <div className="space-y-4 animate-fade-in">
+      {currentRun && (
+        <div className="glass-card px-4 py-2.5 flex items-center gap-3 text-xs">
+          <div className="w-2 h-2 rounded-full bg-seafoam-500" />
+          <span className="text-ocean-400">当前跑批口径:</span>
+          <span className="text-ocean-600 font-semibold font-mono">
+            {new Date(currentRun.run_time).toLocaleString('zh-CN')}
+          </span>
+          <span className="text-ocean-300">·</span>
+          <span className="text-ocean-500">
+            总记录 <span className="font-mono text-ocean-600 font-semibold">{currentRun.total_records}</span>
+          </span>
+          <span className="text-ocean-300">·</span>
+          <span className="text-ocean-500">
+            异常 <span className="font-mono text-coral-600 font-semibold">{currentRun.anomaly_count}</span>
+          </span>
+          <span className="ml-auto px-2 py-0.5 rounded-full bg-seafoam-50 text-seafoam-700">
+            状态: {currentRun.status === 'completed' ? '已完成' : currentRun.status}
+          </span>
+        </div>
+      )}
       <div className="glass-card p-4">
         <h3 className="font-serif text-ocean-500 text-sm mb-3 flex items-center gap-2">
           <Filter className="w-4 h-4 text-seafoam-500" />
