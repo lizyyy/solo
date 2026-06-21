@@ -24,13 +24,14 @@ export function computeAnomalies(input: {
       });
     }
     for (const b of result.boundaries) {
+      const isZero = b.severity === 'zero_boundary' || b.severity === 'div_zero';
       items.push({
         id: `anm-bnd-${b.id}`,
-        kind: 'div_zero',
-        severity: b.severity === 'div_zero' ? 'high' : 'medium',
+        kind: isZero ? 'zero_boundary' : 'residual',
+        severity: isZero ? 'high' : 'medium',
         runId: run.runId,
         matrixId: run.matrixId,
-        title: `${b.severity === 'div_zero' ? '除零' : '近零'}边界 · ${b.step}`,
+        title: `${isZero ? '除零' : '近零'}边界 · ${b.step}`,
         detail: b.message,
         sourceLine: b.sourceLine,
         sourceFile: b.sourceFile,

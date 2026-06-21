@@ -19,7 +19,7 @@ export function OverridePanel({ runId }: { runId: string }) {
         <p className="text-sm leading-relaxed text-ink-100">{override.reason}</p>
         <div className="mt-3 flex items-center justify-between text-[11px] text-muted">
           <span>
-            {override.by} · {new Date(override.overriddenAt).toLocaleString('zh-CN')}
+            {override.by} · {new Date(override.updatedAt).toLocaleString('zh-CN')}
           </span>
           <button
             type="button"

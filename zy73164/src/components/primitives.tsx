@@ -165,7 +165,9 @@ export function emptyMeta(flag: EmptySetFlag): { tone: 'ok' | 'alert' | 'neutral
 }
 
 export function severityMeta(s: BoundarySeverity): { tone: 'alert' | 'warn'; label: string } {
-  return s === 'div_zero' ? { tone: 'alert', label: '除零' } : { tone: 'warn', label: '近零' };
+  return s === 'zero_boundary' || s === 'div_zero'
+    ? { tone: 'alert', label: '除零边界' }
+    : { tone: 'warn', label: '近零' };
 }
 
 export function Divider({ className }: { className?: string }) {

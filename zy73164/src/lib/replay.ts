@@ -1,4 +1,5 @@
 import type {
+  BoundarySeverity,
   HistoricalAnswer,
   ManualOverride,
   ReplayRequest,
@@ -18,11 +19,14 @@ export function genRunId(fp: string): string {
 
 export function computeBaseStatus(
   validation: ValidationResult,
-  boundaries: { severity: 'div_zero' | 'near_zero' }[],
+  boundaries: { severity: BoundarySeverity }[],
 ): RunStatus {
   if (validation.verified) return 'pass';
   if (validation.emptySetFlag === 'EMPTY_ANOMALY') return 'pending_review';
-  if (boundaries.some((b) => b.severity === 'div_zero')) return 'pending_review';
+  if (
+    boundaries.some((b) => b.severity === 'zero_boundary' || b.severity === 'div_zero')
+  )
+    return 'pending_review';
   return 'fail';
 }
 
@@ -85,31 +89,106 @@ export function csvRowsForResult(
   override: ManualOverride | undefined,
   note: SupplementaryNote | undefined,
 ): (string | number)[][] {
+  const overrideOrigin = override?.originRunId ?? override?.runId ?? '—';
+  const overrideLabel = override
+    ? override.copiedFromRunId
+      ? `${override.reason}  [同一次改判，origin=${overrideOrigin}]`
+      : override.reason
+    : '—';
+  const noteLabel = note
+    ? note.copiedFromRunId
+      ? `${note.note}  [同一份后补，origin=${note.originRunId ?? note.runId}]`
+      : note.note
+    : '—';
+
   const header = [
-    'runId', 'fingerprint', '类别', '位置', '影响范围行', '影响范围列',
-    '来源行', '来源文件', '严重度', '数值', '说明', '状态', '备注', '改判理由', '后补说明',
+    'runId',
+    'continuityTag',
+    'rerunOf',
+    'fingerprint',
+    '类别',
+    '位置',
+    '影响范围行',
+    '影响范围列',
+    '来源行',
+    '来源文件',
+    '严重度',
+    '数值',
+    '说明',
+    '状态',
+    '运行备注',
+    '改判理由(幂等去重)',
+    '改判人',
+    '改判时间',
+    '后补说明(幂等去重)',
   ];
   const rows: (string | number)[][] = [header];
   rows.push([
-    run.runId, run.fingerprint, '汇总', '—', '—', '—', result.sourceLines.join(';'),
-    'src/lib/decompose.ts', '—', result.reconError.toExponential(2), run.note || '—',
-    run.status, run.note || '—', override?.reason || '—', note?.note || '—',
+    run.runId,
+    run.continuityTag ?? '—',
+    run.rerunOf ?? '—',
+    run.fingerprint,
+    '汇总',
+    '—',
+    '—',
+    '—',
+    result.sourceLines.join(';'),
+    'src/lib/decompose.ts',
+    '—',
+    result.reconError.toExponential(2),
+    historical?.label ?? '—',
+    run.status,
+    run.note || '—',
+    overrideLabel,
+    override?.by ?? '—',
+    override ? new Date(override.updatedAt).toISOString() : '—',
+    noteLabel,
   ]);
   for (const b of result.boundaries) {
     rows.push([
-      run.runId, run.fingerprint, '除零边界',
+      run.runId,
+      run.continuityTag ?? '—',
+      run.rerunOf ?? '—',
+      run.fingerprint,
+      '除零边界',
       `(${b.position.row + 1},${b.position.col + 1})`,
       b.impactRange.rows.map((r) => r + 1).join(';'),
       b.impactRange.cols.map((c) => c + 1).join(';'),
-      b.sourceLine, b.sourceFile, b.severity, b.pivotValue.toExponential(2),
-      b.message, run.status, run.note || '—', override?.reason || '—', note?.note || '—',
+      b.sourceLine,
+      b.sourceFile,
+      b.severity,
+      b.pivotValue.toExponential(2),
+      b.message,
+      run.status,
+      run.note || '—',
+      overrideLabel,
+      override?.by ?? '—',
+      override ? new Date(override.updatedAt).toISOString() : '—',
+      noteLabel,
     ]);
   }
   const traces = historical?.traces ?? [];
   for (const t of traces) {
     rows.push([
-      run.runId, run.fingerprint, '现场痕迹', t.label, '—', '—', historical?.sourceLine ?? '—',
-      'src/lib/seed.ts', '—', '—', t.value, '—', '—', '—', '—',
+      run.runId,
+      run.continuityTag ?? '—',
+      run.rerunOf ?? '—',
+      run.fingerprint,
+      '现场痕迹',
+      t.label,
+      '—',
+      '—',
+      historical?.sourceLine ?? '—',
+      'src/lib/seed.ts',
+      '—',
+      t.value,
+      `${run.status} / 改判:${override ? '是' : '否'}`,
+      '—',
+      '—',
+      overrideLabel,
+      override?.by ?? '—',
+      override ? new Date(override.updatedAt).toISOString() : '—',
+      noteLabel,
     ]);
   }
   return rows;

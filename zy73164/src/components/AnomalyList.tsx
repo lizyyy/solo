@@ -10,6 +10,7 @@ const KIND_META: Record<
   { label: string; icon: typeof AlertTriangle; tone: 'alert' | 'warn' | 'accent' | 'ok' }
 > = {
   empty_set: { label: '空集合历史答案', icon: FileWarning, tone: 'alert' },
+  zero_boundary: { label: '除零边界', icon: Crosshair, tone: 'alert' },
   div_zero: { label: '除零边界', icon: Crosshair, tone: 'alert' },
   pending_review: { label: '改判待复核', icon: ClipboardCheck, tone: 'warn' },
   residual: { label: '误差超阈', icon: Gauge, tone: 'warn' },

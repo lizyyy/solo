@@ -115,8 +115,9 @@ export function createSeedState(): SeedState {
   const override: ManualOverride = {
     runId: seededRunId,
     reason: '奇异矩阵，除零属预期；空集合历史答案已拦截，按人工改判通过',
-    overriddenAt: SEED_TIME + 1000,
+    updatedAt: SEED_TIME + 1000,
     by: '算法值班 · 老叶交接',
+    originRunId: seededRunId,
   };
   const note: SupplementaryNote = {
     runId: seededRunId,

@@ -11,7 +11,7 @@ export interface ReplayRequest {
 
 export type EmptySetFlag = 'EMPTY_ANOMALY' | 'NORMAL_EMPTY' | 'NONE';
 export type RunStatus = 'pass' | 'fail' | 'override' | 'pending_review';
-export type BoundarySeverity = 'div_zero' | 'near_zero';
+export type BoundarySeverity = 'zero_boundary' | 'near_zero' | 'div_zero';
 
 export interface BoundaryEvent {
   id: string;
@@ -52,14 +52,22 @@ export interface ReplayResult {
 export interface ManualOverride {
   runId: string;
   reason: string;
-  overriddenAt: number;
+  updatedAt: number;
   by: string;
+  /** 从哪条 run 原样迁来；存在则说明是同一次改判，不计第二份 */
+  copiedFromRunId?: string;
+  /** 最初发起改判的原始 runId，幂等去重键 */
+  originRunId?: string;
 }
 
 export interface SupplementaryNote {
   runId: string;
   note: string;
   updatedAt: number;
+  /** 从哪条 run 原样迁来 */
+  copiedFromRunId?: string;
+  /** 最初写后补说明的原始 runId */
+  originRunId?: string;
 }
 
 export interface RunRecord {
@@ -71,6 +79,8 @@ export interface RunRecord {
   csvToken: string;
   createdAt: number;
   rerunOf?: string;
+  /** 本次重跑时，从上游 run 整体迁来的改判+后补说明的 origin 标识，用于 CSV 去重展示 */
+  continuityTag?: string;
 }
 
 export interface TraceChip {
@@ -91,9 +101,16 @@ export interface HistoricalAnswer {
   createdAt: number;
 }
 
+export type AnomalyKind =
+  | 'empty_set'
+  | 'zero_boundary'
+  | 'pending_review'
+  | 'residual'
+  | 'div_zero';
+
 export interface AnomalyItem {
   id: string;
-  kind: 'empty_set' | 'div_zero' | 'pending_review' | 'residual';
+  kind: AnomalyKind;
   severity: 'high' | 'medium' | 'low';
   runId?: string;
   matrixId?: string;

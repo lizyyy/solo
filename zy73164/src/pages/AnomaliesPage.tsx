@@ -11,8 +11,12 @@ export function AnomaliesPage() {
   const anomalies = useMemo(() => computeAnomalies({ runs, results }), [runs, results]);
 
   const counts = useMemo(() => {
-    const c = { empty_set: 0, div_zero: 0, pending_review: 0, residual: 0 };
-    for (const a of anomalies) c[a.kind]++;
+    const c = { empty_set: 0, zero_boundary: 0, pending_review: 0, residual: 0 };
+    for (const a of anomalies) {
+      if (a.kind === 'zero_boundary' || a.kind === 'div_zero') c.zero_boundary++;
+      else c[a.kind as 'empty_set' | 'pending_review' | 'residual'] =
+        (c[a.kind as 'empty_set' | 'pending_review' | 'residual'] ?? 0) + 1;
+    }
     return c;
   }, [anomalies]);
 
@@ -44,7 +48,7 @@ export function AnomaliesPage() {
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
         <Stat label="异常总数" value={String(anomalies.length)} tone={anomalies.length ? 'alert' : 'ok'} />
         <Stat label="空集合" value={String(counts.empty_set)} tone={counts.empty_set ? 'alert' : 'ok'} />
-        <Stat label="除零边界" value={String(counts.div_zero)} tone={counts.div_zero ? 'warn' : 'ok'} />
+        <Stat label="除零边界" value={String(counts.zero_boundary)} tone={counts.zero_boundary ? 'warn' : 'ok'} />
         <Stat label="待复核" value={String(counts.pending_review)} tone={counts.pending_review ? 'warn' : 'ok'} />
         <Stat label="误差超阈" value={String(counts.residual)} tone={counts.residual ? 'warn' : 'ok'} />
       </div>

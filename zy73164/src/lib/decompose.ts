@@ -51,7 +51,7 @@ export function decomposeLU(A: number[][], tol: number, pivot: PivotStrategy): D
     }
     const pivVal = U[k][k];
     if (Math.abs(pivVal) <= tol) { // SRC:lu_pivot
-      const sev = pivVal === 0 ? 'div_zero' : 'near_zero';
+      const sev = pivVal === 0 ? 'zero_boundary' : 'near_zero';
       const b: BoundaryEvent = {
         id: nextId(),
         step: 'LU 主元搜索',
@@ -159,7 +159,7 @@ export function decomposeCholesky(A: number[][], tol: number): DecomposeOutput {
             impactRange: { rows: range(i, n), cols: range(i, n) },
             sourceLine: SRC.chol_diag,
             sourceFile: SRC_FILE,
-            severity: sum <= 0 ? 'div_zero' : 'near_zero',
+            severity: sum <= 0 ? 'zero_boundary' : 'near_zero',
             message: `对角元 d_${i + 1} ≈ ${sum.toExponential(2)}（≤ 容差），非正定，无法开方`,
           });
           L[i][i] = 0;
@@ -179,7 +179,7 @@ export function decomposeCholesky(A: number[][], tol: number): DecomposeOutput {
             impactRange: { rows: range(i, n), cols: range(j, j + 1) },
             sourceLine: SRC.chol_offdiag,
             sourceFile: SRC_FILE,
-            severity: 'div_zero',
+            severity: 'zero_boundary',
             message: `L[${i + 1}][${j + 1}] 依赖的 L[${j + 1}][${j + 1}] ≈ 0，除零`,
           });
           L[i][j] = 0;
