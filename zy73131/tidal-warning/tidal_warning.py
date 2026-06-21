@@ -12,7 +12,7 @@ from src.coords import parse_coord
 from src.bottles import detect_duplicates
 from src.names import normalize_station_names, list_standard_names
 from src.dataio import load_csv, export_csv, backup_file, diff_exports
-from src.queue import QueueItem, add_items, read_queue, summary, ensure_queue_files, now_str
+from src.queue import QueueItem, reset_and_write_items, read_queue, summary, ensure_queue_files, now_str
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, 'data')
@@ -94,8 +94,8 @@ def _cmd_run(args):
     lat_format_counts = {}
     lon_format_counts = {}
     coord_bad = 0
-    for i, rec in enumerate(records):
-        ln = i + 2
+    for rec in records:
+        ln = int(rec.get('_original_line', -1))
         lat_raw = rec.get(lat_field, '')
         lon_raw = rec.get(lon_field, '')
         lat_r = parse_coord(lat_raw, 'lat')
@@ -104,12 +104,14 @@ def _cmd_run(args):
             rec['纬度(统一格式)'] = lat_r.normalized
             lat_format_counts[lat_r.source_format] = lat_format_counts.get(lat_r.source_format, 0) + 1
         else:
+            rec['纬度(统一格式)'] = lat_raw
             coord_bad += 1
             coord_issues_lines.append((ln, '纬度', lat_raw, lat_r.issue))
         if lon_r.is_valid:
             rec['经度(统一格式)'] = lon_r.normalized
             lon_format_counts[lon_r.source_format] = lon_format_counts.get(lon_r.source_format, 0) + 1
         else:
+            rec['经度(统一格式)'] = lon_raw
             coord_bad += 1
             coord_issues_lines.append((ln, '经度', lon_raw, lon_r.issue))
 
@@ -127,8 +129,8 @@ def _cmd_run(args):
         f.write("值班员小宋对照遥感截图时可直接参考下面的对应关系：\n\n")
         f.write("| 行号 | 原始纬度 | 原始经度 | 统一后纬度 | 统一后经度 | 备注 |\n")
         f.write("|---|---|---|---|---|---|\n")
-        for i, rec in enumerate(records):
-            ln = i + 2
+        for rec in records:
+            ln = int(rec.get('_original_line', -1))
             lat_n = rec.get('纬度(统一格式)', '')
             lon_n = rec.get('经度(统一格式)', '')
             note = ''
@@ -202,7 +204,7 @@ def _cmd_run(args):
             can_release=False,
             materials_missing='需重新导出原始数据'
         ))
-    add_items(QUEUE_DIR, qitems)
+    reset_and_write_items(QUEUE_DIR, qitems, load_result.source_file)
     s = summary(QUEUE_DIR)
     print(f"  队列总数: {s['total']} 条 | 待处理: {s['pending']} | 可放行: {s['can_release']} | 缺材料: {s['missing']}")
 
@@ -219,15 +221,20 @@ def _cmd_run(args):
     if '经度(统一格式)' not in headers_out and lon_field in headers_out:
         idx = headers_out.index(lon_field) + 1
         headers_out.insert(idx, '经度(统一格式)')
-    export_csv(export_file, records, headers_out)
+    export_records = []
+    for rec in records:
+        clean_rec = {k: v for k, v in rec.items() if k != '_original_line'}
+        export_records.append(clean_rec)
+    export_csv(export_file, export_records, headers_out)
 
     if args.append_note:
-        diff = diff_exports(bak if bak else '', records, headers_out)
+        diff = diff_exports(bak if bak else '', export_records, headers_out)
         diff_log = os.path.join(LOG_DIR, f"diff_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md")
         with open(diff_log, 'w', encoding='utf-8') as f:
             f.write(f"# 本次补录备注: {args.append_note}\n\n")
             f.write(f"补录时间: {now_str()}\n")
-            f.write(f"操作人员: {os.environ.get('USER', '值班员')}\n\n")
+            f.write(f"操作人员: {os.environ.get('USER', '值班员')}\n")
+            f.write(f"原始材料: {os.path.basename(load_result.source_file)}\n\n")
             f.write("## 对导出文件的变更\n\n")
             if not old_exists:
                 f.write("首次导出，无旧版本可比较，全部记录为新增。\n")
@@ -241,7 +248,7 @@ def _cmd_run(args):
                     for rn, field, ov, nv in diff.modified_cells:
                         f.write(f"| {rn} | {field} | {ov} | {nv} |\n")
         print(f"  补录变更追踪已写入: logs/{os.path.basename(diff_log)}")
-    print(f"  → 导出文件: data/exports/{os.path.basename(export_file)} ({len(records)} 行)")
+    print(f"  → 导出文件: data/exports/{os.path.basename(export_file)} ({len(export_records)} 行)")
 
     _print_sep()
     print(f" 处理完成。下一步请执行: python tidal_warning.py status")

@@ -29,25 +29,26 @@ def build_reverse_index() -> Dict[str, str]:
     return idx
 
 
-def normalize_station_names(records: List[dict], field: str = '站点名称') -> Tuple[List[dict], List[NameIssue]]:
+def normalize_station_names(records: List[dict], field: str = '站点名称', line_field: str = '_original_line') -> Tuple[List[dict], List[NameIssue]]:
     idx = build_reverse_index()
     issues = []
     out = []
-    for i, rec in enumerate(records):
+    for rec in records:
         raw = str(rec.get(field, '')).strip()
         new_rec = dict(rec)
+        ln = int(rec.get(line_field, -1))
         if not raw:
-            issues.append(NameIssue(i + 2, raw, None, 'NONE', '站点名称为空'))
+            issues.append(NameIssue(ln, raw, None, 'NONE', '站点名称为空'))
             out.append(new_rec)
             continue
         if raw in STANDARD_NAMES:
-            issues.append(NameIssue(i + 2, raw, raw, 'EXACT', '已标准化'))
+            issues.append(NameIssue(ln, raw, raw, 'EXACT', '已标准化'))
             out.append(new_rec)
             continue
         if raw in idx:
             std = idx[raw]
             new_rec[field] = std
-            issues.append(NameIssue(i + 2, raw, std, 'ALIAS', f'别名匹配，已替换为标准名'))
+            issues.append(NameIssue(ln, raw, std, 'ALIAS', f'别名匹配，已替换为标准名'))
             out.append(new_rec)
             continue
         matched = None
@@ -60,9 +61,9 @@ def normalize_station_names(records: List[dict], field: str = '站点名称') ->
                 break
         if matched:
             new_rec[field] = matched
-            issues.append(NameIssue(i + 2, raw, matched, 'FUZZY', '模糊匹配，请人工确认'))
+            issues.append(NameIssue(ln, raw, matched, 'FUZZY', '模糊匹配，请人工确认'))
         else:
-            issues.append(NameIssue(i + 2, raw, None, 'UNKNOWN', '未知站点，请核对现场记录表'))
+            issues.append(NameIssue(ln, raw, None, 'UNKNOWN', '未知站点，请核对现场记录表'))
         out.append(new_rec)
     return out, issues
 

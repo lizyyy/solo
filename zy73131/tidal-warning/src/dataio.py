@@ -14,6 +14,7 @@ class LoadResult:
     skipped_rows: List[Tuple[int, str]]
     bad_rows: List[Tuple[int, str]]
     total_raw: int
+    source_file: str = ''
 
 
 @dataclass
@@ -25,7 +26,7 @@ class ExportDiff:
 
 
 def _row_hash(rec: dict) -> str:
-    raw = '||'.join(f"{k}={v}" for k, v in sorted(rec.items()))
+    raw = '||'.join(f"{k}={v}" for k, v in sorted(rec.items()) if not k.startswith('_'))
     return hashlib.md5(raw.encode('utf-8')).hexdigest()[:12]
 
 
@@ -61,9 +62,10 @@ def load_csv(path: str) -> LoadResult:
                     break
                 rec[h] = val
             if valid:
+                rec['_original_line'] = line_no
                 records.append(rec)
 
-    return LoadResult(records, headers, skipped, bad, total)
+    return LoadResult(records, headers, skipped, bad, total, source_file=path)
 
 
 def export_csv(path: str, records: List[dict], headers: List[str]) -> None:
@@ -94,9 +96,11 @@ def diff_exports(old_path: str, new_records: List[dict], headers: List[str]) -> 
         diff.note = '首次导出，全部记为新增'
         return diff
 
-    old = load_csv(old_path).records
+    old_raw = load_csv(old_path).records
+    old = [{k: v for k, v in r.items() if not k.startswith('_')} for r in old_raw]
+    new = [{k: v for k, v in r.items() if not k.startswith('_')} for r in new_records]
     old_map = {_row_hash(r): r for r in old}
-    new_map = {_row_hash(r): r for r in new_records}
+    new_map = {_row_hash(r): r for r in new}
 
     for h, r in new_map.items():
         if h not in old_map:
@@ -106,19 +110,21 @@ def diff_exports(old_path: str, new_records: List[dict], headers: List[str]) -> 
             diff.removed_rows.append(r)
 
     old_by_key = {}
-    for r in old:
-        key = f"{r.get('站点名称', '')}__{r.get('采样日期', '')}__{r.get('采样时间', '')}__{r.get('采样瓶编号', '')}"
-        old_by_key[key] = r
-    for r in new_records:
-        key = f"{r.get('站点名称', '')}__{r.get('采样日期', '')}__{r.get('采样时间', '')}__{r.get('采样瓶编号', '')}"
+    for idx, r in enumerate(old):
+        key = f"{r.get('站点名称', '')}__{r.get('采样日期', '')}__{r.get('采样时间', '')}__{r.get('采样瓶编号', '')}__{idx}"
+        old_by_key[key] = (idx + 2, r)
+    for idx, r in enumerate(new):
+        key = f"{r.get('站点名称', '')}__{r.get('采样日期', '')}__{r.get('采样时间', '')}__{r.get('采样瓶编号', '')}__{idx}"
         if key in old_by_key:
-            old_r = old_by_key[key]
+            rn, old_r = old_by_key[key]
             for h in headers:
-                if str(old_r.get(h, '')) != str(r.get(h, '')):
+                ov = str(old_r.get(h, ''))
+                nv = str(r.get(h, ''))
+                if ov != nv:
                     diff.modified_cells.append((
-                        list(old_by_key.keys()).index(key) + 2,
+                        rn,
                         h,
-                        str(old_r.get(h, '')),
-                        str(r.get(h, ''))
+                        ov,
+                        nv
                     ))
     return diff
