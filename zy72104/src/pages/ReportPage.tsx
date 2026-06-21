@@ -1,5 +1,5 @@
 import { useStore } from '@/store'
-import { FileText, Download, Clock, User, Tag } from 'lucide-react'
+import { Download, Clock, User, Tag } from 'lucide-react'
 
 export default function ReportPage() {
   const batch = useStore((s) => s.batches.find((b) => b.id === s.currentBatchId))
@@ -104,6 +104,26 @@ export default function ReportPage() {
                     <span className="text-[#a8d8ea]/40">（{c.reason}）</span>
                   </div>
                 ))}
+              </div>
+            </section>
+          )}
+
+          {batch.timeValidation && (batch.timeValidation.message || batch.timeValidation.intervals.length > 0) && (
+            <section>
+              <h4 className="text-sm font-semibold text-[#a8d8ea] mb-2">
+                （附）采样时间间隔校验
+              </h4>
+              <div className={`text-xs px-3 py-2 rounded border ${
+                batch.timeValidation.valid
+                  ? 'bg-[#0f3460]/20 border-[#0f3460]/30 text-[#a8d8ea]/70'
+                  : 'bg-yellow-900/20 border-yellow-500/40 text-yellow-400'
+              }`}>
+                {batch.timeValidation.message || '采样间隔正常'}
+                {batch.timeValidation.intervals.length > 0 && (
+                  <div className="mt-1 font-mono opacity-80">
+                    相邻间隔（秒）: {batch.timeValidation.intervals.map((s) => s.toFixed(0)).join(' / ')}
+                  </div>
+                )}
               </div>
             </section>
           )}
@@ -268,6 +288,16 @@ function generateTextReport(batch: ReturnType<typeof useStore.getState>['batches
   lines.push(`雷诺数 Re = ${r.reynoldsNumber.toFixed(0)}`)
   lines.push(`摩擦系数 f = ${r.frictionFactor.toFixed(5)}`)
   lines.push('')
+
+  if (batch.timeValidation && (batch.timeValidation.message || batch.timeValidation.intervals.length > 0)) {
+    lines.push('（附）采样时间间隔校验')
+    lines.push('-'.repeat(40))
+    lines.push(batch.timeValidation.message || '采样间隔正常')
+    if (batch.timeValidation.intervals.length > 0) {
+      lines.push(`相邻间隔（秒）: ${batch.timeValidation.intervals.map((s) => s.toFixed(0)).join(' / ')}`)
+    }
+    lines.push('')
+  }
 
   if (batch.alerts.length > 0) {
     lines.push('三、阈值提醒')

@@ -1,9 +1,9 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { CalcBatch, SensorRecord, EquipmentParams, FieldNote, ManualCorrection, ConflictRecord } from '@/types'
+import type { CalcBatch, SensorRecord, EquipmentParams, FieldNote, ManualCorrection } from '@/types'
 import { calculatePumpHead, detectConflicts } from '@/utils/pumpCalc'
 import { checkThresholds, generateSuggestions } from '@/utils/thresholdCheck'
-import { convertToSI } from '@/utils/unitConversion'
+import { convertToSI, validateTimeInterval } from '@/utils/unitConversion'
 
 function toSI(value: number, unit: string, category?: string): number {
   const result = convertToSI(value, unit, category)
@@ -140,6 +140,7 @@ export const useStore = create<StoreState>()(
           alerts: [],
           suggestions: [],
           conflicts: [],
+          timeValidation: null,
         }
         set((s) => ({ batches: [...s.batches, batch], currentBatchId: id }))
         return id
@@ -251,8 +252,8 @@ export const useStore = create<StoreState>()(
         const batch = state.batches.find((b) => b.id === batchId)
         if (!batch) return
 
-        let effectiveParams: EquipmentParams = { ...batch.equipmentParams }
-        let effectiveRecords: SensorRecord[] = batch.sensorRecords.map((r) => ({ ...r }))
+        const effectiveParams: EquipmentParams = { ...batch.equipmentParams }
+        const effectiveRecords: SensorRecord[] = batch.sensorRecords.map((r) => ({ ...r }))
 
         batch.corrections.forEach((corr) => {
           const eqMap = EQUIPMENT_FIELD_MAP[corr.fieldName]
@@ -301,6 +302,21 @@ export const useStore = create<StoreState>()(
 
         const result = calculatePumpHead(effectiveParams, effectiveRecords)
         const alerts = checkThresholds(result)
+        const timeValidation = validateTimeInterval(effectiveRecords.map((r) => r.timestamp).filter(Boolean))
+
+        if (!timeValidation.valid) {
+          alerts.unshift({
+            id: `alert-time-${Date.now()}`,
+            alertType: '时间间隔',
+            level: 'notice',
+            value: 0,
+            threshold: 0,
+            unit: 's',
+            message: timeValidation.message,
+            suggestion: '采样间隔不稳定可能影响趋势判断，请检查采集设备或补充缺失数据',
+          })
+        }
+
         const suggestions = generateSuggestions(result, alerts)
         const conflicts = detectConflicts(effectiveParams, effectiveRecords)
 
@@ -312,6 +328,19 @@ export const useStore = create<StoreState>()(
         })
         const oldUnmatched = batch.conflicts.filter((c) => !conflicts.some((nc) => nc.fieldName === c.fieldName))
 
+        if (!timeValidation.valid) {
+          const hasTimeSuggestion = suggestions.some((sg) => sg.category.includes('采样') || sg.category.includes('时间'))
+          if (!hasTimeSuggestion) {
+            suggestions.push({
+              id: `sug-time-${Date.now()}`,
+              category: '采样质量',
+              action: '检查采集日志，确认是否有跳点或漏采；如持续异常请校准采集器时钟',
+              explanation: timeValidation.message,
+              priority: 'notice',
+            })
+          }
+        }
+
         set((s) => ({
           batches: s.batches.map((b) =>
             b.id === batchId
@@ -321,6 +350,7 @@ export const useStore = create<StoreState>()(
                   alerts,
                   suggestions,
                   conflicts: [...oldUnmatched, ...mergedConflicts],
+                  timeValidation,
                   processTime: new Date().toISOString(),
                 }
               : b
@@ -344,6 +374,7 @@ export const useStore = create<StoreState>()(
           alerts: [],
           suggestions: [],
           conflicts: [],
+          timeValidation: null,
         }
         set((s) => ({ batches: [...s.batches, batch], currentBatchId: id }))
         return id

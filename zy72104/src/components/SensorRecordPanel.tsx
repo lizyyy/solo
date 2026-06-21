@@ -14,14 +14,13 @@ export default function SensorRecordPanel() {
   const updateRecords = useStore((s) => s.updateSensorRecords)
   const [expanded, setExpanded] = useState(true)
 
-  if (!batchId || !batch) return null
-
-  const records = batch.sensorRecords
-
+  const records = useMemo(() => batch?.sensorRecords ?? [], [batch])
   const timeValidation = useMemo(() => {
     const timestamps = records.map((r) => r.timestamp).filter(Boolean)
     return validateTimeInterval(timestamps)
   }, [records])
+
+  if (!batchId || !batch) return null
 
   const handleAdd = () => {
     const r: SensorRecord = {

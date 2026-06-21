@@ -1,7 +1,6 @@
 import { useStore } from '@/store'
-import { calculatePumpHead } from '@/utils/pumpCalc'
-import type { CalcResult, ThresholdAlert, Suggestion, ConflictRecord, AlertLevel } from '@/types'
-import { AlertTriangle, AlertOctagon, Info, CheckCircle, ArrowRightLeft, Clock, FileText, ShieldAlert } from 'lucide-react'
+import type { AlertLevel } from '@/types'
+import { AlertTriangle, AlertOctagon, Info, CheckCircle, ArrowRightLeft, Clock, ShieldAlert, FileText } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 
 const LEVEL_CONFIG: Record<AlertLevel, { bg: string; border: string; text: string; icon: typeof Info }> = {
@@ -244,6 +243,14 @@ export default function DashboardPage() {
                 <span className="text-[#a8d8ea]/40">人工修正：</span>
                 <span className="text-[#e2e8f0]">{batch.corrections.length} 条</span>
               </div>
+              {batch.timeValidation && (batch.timeValidation.message || batch.timeValidation.intervals.length > 0) && (
+                <div>
+                  <span className="text-[#a8d8ea]/40">采样时间：</span>
+                  <span className={batch.timeValidation.valid ? 'text-[#16c79a]' : 'text-[#f08c00]'}>
+                    {batch.timeValidation.message || '间隔正常'}
+                  </span>
+                </div>
+              )}
             </div>
             {batch.corrections.length > 0 && (
               <div className="mt-2 pt-2 border-t border-[#0f3460]/20 space-y-1">

@@ -113,6 +113,12 @@ export interface ConflictRecord {
   chosenSide: 'inspection' | 'imported' | null
 }
 
+export interface TimeValidation {
+  valid: boolean
+  message: string
+  intervals: number[]
+}
+
 export interface CalcBatch {
   id: string
   createTime: string
@@ -127,6 +133,7 @@ export interface CalcBatch {
   alerts: ThresholdAlert[]
   suggestions: Suggestion[]
   conflicts: ConflictRecord[]
+  timeValidation: TimeValidation | null
 }
 
 export interface UnitValidation {

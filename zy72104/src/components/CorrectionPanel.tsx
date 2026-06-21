@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useStore } from '@/store'
 import type { ManualCorrection } from '@/types'
-import { Plus, Trash2, Edit3, ChevronDown, ChevronUp } from 'lucide-react'
+import { Plus, Edit3, ChevronDown, ChevronUp } from 'lucide-react'
 
 export default function CorrectionPanel() {
   const batchId = useStore((s) => s.currentBatchId)

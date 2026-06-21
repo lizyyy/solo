@@ -1,4 +1,4 @@
-import type { UnitDef, UnitValidation } from '@/types'
+import type { UnitDef, UnitValidation, TimeValidation } from '@/types'
 
 const UNITS: UnitDef[] = [
   { name: '米', symbol: 'm', category: 'length', toSI: (v) => v, fromSI: (v) => v },
@@ -139,7 +139,7 @@ export function validateDirection(direction: string): { valid: boolean; message:
   return { valid: false, message: `方向"${direction}"无法识别，请使用：吸入/排出/进口/出口` }
 }
 
-export function validateTimeInterval(timestamps: string[]): { valid: boolean; message: string; intervals: number[] } {
+export function validateTimeInterval(timestamps: string[]): TimeValidation {
   if (timestamps.length < 2) return { valid: true, message: '', intervals: [] }
   const times = timestamps.map((t) => new Date(t).getTime()).filter((t) => !isNaN(t))
   if (times.length < 2) return { valid: true, message: '', intervals: [] }
