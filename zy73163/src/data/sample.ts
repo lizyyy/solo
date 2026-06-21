@@ -152,17 +152,17 @@ export const BOUNDARY_SAMPLES: BoundarySample[] = [
   },
   {
     id: "bs-2",
-    label: "U02 × 充电IC",
+    label: "U03 × 充电IC",
     description: "观测 1 条，口头备注称换了供应商，直觉判定偏低",
     intuitionBased: true,
     noteIds: ["note-2"],
   },
   {
     id: "bs-3",
-    label: "U04 × 外壳",
+    label: "U02 × 外壳",
     description: "单位缺失无法判定，暂不计入正常结果",
     intuitionBased: false,
-    noteIds: ["note-6"],
+    noteIds: ["note-4"],
   },
 ];
 
@@ -206,7 +206,7 @@ export const SCORING_NOTES: ScoringNote[] = [
   },
   {
     id: "note-4",
-    cellKey: "U04:I01",
+    cellKey: "U02:I05",
     content: "外壳评分缺量纲（百分比与计数混用），不能并入正常结果，先隔离。",
     sourceType: "normal",
     sourceLabel: "正常记录-单位缺失",

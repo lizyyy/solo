@@ -23,7 +23,7 @@ import {
 } from "@/data/sample";
 import { computeSummary } from "@/utils/matrix";
 
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 
 export interface FocusState {
   cellKey?: string;

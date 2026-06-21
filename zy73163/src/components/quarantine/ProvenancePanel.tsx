@@ -1,7 +1,7 @@
 import { GitBranch, HelpCircle } from "lucide-react";
 import { useExplanationStore } from "@/store/useExplanationStore";
 import { SOURCE_META, type NoteSourceType } from "@/types";
-import { formatTime } from "@/utils/matrix";
+import { cellKeyOf, formatTime } from "@/utils/matrix";
 import { SectionCard } from "@/components/ui/SectionCard";
 import { ProvenanceChip } from "@/components/ui/ProvenanceChip";
 
@@ -47,7 +47,9 @@ export function ProvenancePanel() {
       label: "单位缺失（隔离中）",
       value: String(activeQuarantine.length),
       trail: "隔离区记录",
-      notes: [],
+      notes: notes.filter((n) =>
+        activeQuarantine.some((u) => n.cellKey === u.cellKey),
+      ),
       plain: "因缺量纲被单独隔离、不计入正常结果的记录数。",
     },
   ];
