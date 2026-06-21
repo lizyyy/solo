@@ -1,13 +1,11 @@
 import type { ExperimentRecord, AuditEntry } from '@/types'
 import { DEFAULT_CONFIG } from '@/types'
-import { generateId, nowISO } from './helpers'
+import { generateId } from './helpers'
 
 export function generateSampleData(): {
   records: ExperimentRecord[]
   audit: AuditEntry[]
 } {
-  const now = nowISO()
-
   const record1: ExperimentRecord = {
     id: generateId(),
     timestamp: '2026-05-20T10:00:00',

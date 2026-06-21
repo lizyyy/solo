@@ -10,7 +10,6 @@ import { useNavigate } from 'react-router-dom'
 
 export default function AuditPage() {
   const records = useStore((s) => s.records)
-  const auditLog = useStore((s) => s.auditLog)
   const validationResults = useStore((s) => s.validationResults)
   const navigate = useNavigate()
 

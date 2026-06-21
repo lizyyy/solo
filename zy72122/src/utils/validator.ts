@@ -1,10 +1,8 @@
-import { generateId } from './helpers'
 import type {
   ExperimentRecord,
   CheckResult,
   ValidationResult,
   ValidationConfig,
-  CheckType,
 } from '@/types'
 
 const DIRECTION_SYMBOLS = ['+', '-']
