@@ -152,34 +152,47 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ isLoading: true });
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    const { samples, currentBatchId } = get();
+    const { samples, calculationRecords, currentBatchId } = get();
     const currentSamples = samples.filter((s) => s.batchId === currentBatchId);
 
-    const newRecords: CalculationRecord[] = [];
+    const otherBatchRecords = calculationRecords.filter((r) => r.batchId !== currentBatchId);
+    const existingLegacyRecords = calculationRecords.filter(
+      (r) => r.batchId === currentBatchId && r.type === 'legacy'
+    );
+
+    const recalculatedRecords: CalculationRecord[] = [];
     let successCount = 0;
     let pendingCount = 0;
-    let legacyCount = 0;
+    const legacyCount = existingLegacyRecords.length;
 
     for (const sample of currentSamples) {
-      const result = calculationEngine.calculate({
-        nodeCount: sample.id === 'SAMPLE-006' ? null : 15 + Math.floor(Math.random() * 10),
-        edgeCount: sample.id === 'SAMPLE-005' ? '35条' : 40 + Math.floor(Math.random() * 20),
+      if (sample.status === 'legacy') continue;
+
+      const raw = sample.rawInput;
+      const hasRawInput =
+        raw !== undefined &&
+        (raw.nodeCount !== undefined || raw.edgeCount !== undefined || raw.avgDegree !== undefined);
+
+      const input = {
+        nodeCount: hasRawInput ? raw.nodeCount : 15 + Math.floor(Math.random() * 10),
+        edgeCount: hasRawInput ? raw.edgeCount : 40 + Math.floor(Math.random() * 20),
         sampleId: sample.id,
         sampleName: sample.name,
         batchId: currentBatchId || '',
-        avgDegree: 5 + Math.random() * 2,
-      });
+        avgDegree: hasRawInput ? (raw.avgDegree ?? undefined) : 5 + Math.random() * 2,
+      };
 
-      newRecords.push(result.record);
+      const result = calculationEngine.calculate(input);
+      recalculatedRecords.push(result.record);
 
-      if (sample.status === 'legacy') {
-        legacyCount++;
-      } else if (result.type === 'success') {
+      if (result.type === 'success') {
         successCount++;
       } else {
         pendingCount++;
       }
     }
+
+    const newRecordsForCurrentBatch = [...existingLegacyRecords, ...recalculatedRecords];
 
     set((state) => {
       const updatedBatches = state.batches.map((b) =>
@@ -196,7 +209,7 @@ export const useAppStore = create<AppState>((set, get) => ({
           : b
       );
       const updated = {
-        calculationRecords: newRecords,
+        calculationRecords: [...otherBatchRecords, ...newRecordsForCurrentBatch],
         isLoading: false,
         batches: updatedBatches,
       };
@@ -209,13 +222,19 @@ export const useAppStore = create<AppState>((set, get) => ({
     const record = get().calculationRecords.find((r) => r.id === recordId);
     if (!record) return;
 
+    const sample = get().samples.find((s) => s.id === record.sampleId);
+    const raw = sample?.rawInput;
+    const hasRaw =
+      raw &&
+      (raw.nodeCount !== undefined || raw.edgeCount !== undefined || raw.avgDegree !== undefined);
+
     const result = calculationEngine.calculate({
-      nodeCount: 15 + Math.floor(Math.random() * 10),
-      edgeCount: 40 + Math.floor(Math.random() * 20),
+      nodeCount: hasRaw ? raw!.nodeCount : record.inputData.nodeCount ?? null,
+      edgeCount: hasRaw ? raw!.edgeCount : record.inputData.edgeCount ?? null,
       sampleId: record.sampleId,
       sampleName: record.sampleName,
       batchId: record.batchId,
-      avgDegree: 5 + Math.random() * 2,
+      avgDegree: hasRaw ? (raw!.avgDegree ?? undefined) : (record.inputData.avgDegree as number | undefined),
     });
 
     set((state) => {

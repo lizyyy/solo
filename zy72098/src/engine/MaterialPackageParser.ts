@@ -207,6 +207,11 @@ export class MaterialPackageParser {
       remark: pkgSample.remark,
       legacySource: pkgSample.legacySource,
       createdAt,
+      rawInput: {
+        nodeCount: pkgSample.nodeCount !== undefined ? pkgSample.nodeCount : null,
+        edgeCount: pkgSample.edgeCount !== undefined ? pkgSample.edgeCount : null,
+        avgDegree: pkgSample.avgDegree !== undefined ? pkgSample.avgDegree : null,
+      },
     };
   }
 

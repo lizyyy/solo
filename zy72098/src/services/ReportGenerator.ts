@@ -97,8 +97,9 @@ export class ReportGenerator {
       actionItems.push('统一所有参数单位规范，去除不必要的单位文字描述');
     }
 
-    if (remarks.length > 0) {
-      const remarkDetails = remarks
+    const currentBatchRemarks = remarks.filter((r) => records.some((rec) => rec.id === r.recordId));
+    if (currentBatchRemarks.length > 0) {
+      const remarkDetails = currentBatchRemarks
         .map((r) => {
           const record = records.find((rec) => rec.id === r.recordId);
           return '• ' + (record?.sampleName || r.recordId) + '：' + r.content + '\n  [' + r.addedBy + ' @ ' + new Date(r.addedAt).toLocaleString('zh-CN') + ']';

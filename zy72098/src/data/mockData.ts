@@ -71,6 +71,7 @@ export const mockSamples: Sample[] = [
     status: 'normal',
     remark: '顺利计算完成，社区结构清晰',
     createdAt: '2024-06-12T08:05:00Z',
+    rawInput: { nodeCount: 15, edgeCount: 42, avgDegree: 5.6 },
   },
   {
     id: 'SAMPLE-002',
@@ -83,6 +84,7 @@ export const mockSamples: Sample[] = [
     status: 'manual',
     remark: '结果接近临界值，需人工确认是否接受',
     createdAt: '2024-06-12T08:08:00Z',
+    rawInput: { nodeCount: 22, edgeCount: 58, avgDegree: 5.27 },
   },
   {
     id: 'SAMPLE-003',
@@ -96,18 +98,20 @@ export const mockSamples: Sample[] = [
     remark: '从复盘图表补录，使用2023口径计算',
     legacySource: '2023年Q4复盘报告-图12',
     createdAt: '2024-06-12T08:10:00Z',
+    rawInput: { nodeCount: 18, edgeCount: 51, avgDegree: 5.67 },
   },
   {
     id: 'SAMPLE-004',
     batchId: 'batch-001',
     name: '社区D-异常离群点',
-    value: 0.23,
+    value:  0.23,
     unit: '模块度',
     expectedRange: { min: 0.6, max: 0.95 },
     isOutOfBounds: true,
     status: 'abnormal',
     remark: '数值明显越界，计算过程异常',
     createdAt: '2024-06-12T08:11:00Z',
+    rawInput: { nodeCount: 8, edgeCount: 5, avgDegree: 1.25 },
   },
   {
     id: 'SAMPLE-005',
@@ -120,6 +124,7 @@ export const mockSamples: Sample[] = [
     status: 'abnormal',
     remark: '参数单位不匹配，需重新核对输入',
     createdAt: '2024-06-12T08:12:00Z',
+    rawInput: { nodeCount: 12, edgeCount: '35条', avgDegree: 5.83 },
   },
   {
     id: 'SAMPLE-006',
@@ -132,6 +137,7 @@ export const mockSamples: Sample[] = [
     status: 'abnormal',
     remark: '关键数据缺失，无法完成计算',
     createdAt: '2024-06-12T08:13:00Z',
+    rawInput: { nodeCount: null, edgeCount: null, avgDegree: null },
   },
 ];
 

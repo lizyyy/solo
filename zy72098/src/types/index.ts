@@ -60,6 +60,11 @@ export interface Sample {
   remark?: string;
   legacySource?: string;
   createdAt: string;
+  rawInput?: {
+    nodeCount: number | string | null;
+    edgeCount: number | string | null;
+    avgDegree?: number | null;
+  };
 }
 
 export interface Remark {
