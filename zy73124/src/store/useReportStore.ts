@@ -172,7 +172,8 @@ const useReportStore = create<ReportState>((set, get) => ({
 
     const updatedReport = updatedReports.find((r) => r.id === reportId)!;
     const reportBottles = updatedBottles.filter((b) => b.reportId === reportId);
-    const newAbnormals = detectAllAbnormals(updatedReport, reportBottles);
+    const reportChangeLogs = updatedChangeLogs.filter((l) => l.reportId === reportId);
+    const newAbnormals = detectAllAbnormals(updatedReport, reportBottles, reportChangeLogs);
 
     const existingAbnormals = state.abnormals.filter(
       (a) => a.reportId !== reportId || a.status === 'resolved'
@@ -242,7 +243,8 @@ const useReportStore = create<ReportState>((set, get) => ({
     const updatedChangeLogs = [...state.changeLogs, ...changeLogs];
 
     const reportBottles = state.bottles.filter((b) => b.reportId === reportId);
-    const newAbnormals = detectAllAbnormals(updatedReport, reportBottles);
+    const reportChangeLogs = updatedChangeLogs.filter((l) => l.reportId === reportId);
+    const newAbnormals = detectAllAbnormals(updatedReport, reportBottles, reportChangeLogs);
     const existingAbnormals = state.abnormals.filter(
       (a) => a.reportId !== reportId || a.status === 'resolved'
     );

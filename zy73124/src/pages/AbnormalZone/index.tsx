@@ -1,24 +1,31 @@
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Table, Tag, Button, Space } from 'antd';
+import { Card, Table, Tag, Button, Space, Select, DatePicker } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { AlertTriangle, Eye, ArrowLeft } from 'lucide-react';
+import { AlertTriangle, Eye, ArrowLeft, FileDown, Filter } from 'lucide-react';
 import useReportStore from '@/store/useReportStore';
 import { SeverityTag, AbnormalStatusTag } from '@/components/StatusTags';
 import { abnormalTypeLabels } from '@/utils/abnormalDetector';
 import { formatDateTime } from '@/utils/storage';
+import { exportAbnormalRecordsCSV } from '@/utils/csvExport';
 import type { AbnormalRecord } from '@/types';
+import dayjs from 'dayjs';
 
 export default function AbnormalZone() {
   const navigate = useNavigate();
   const { abnormals, reports, initData } = useReportStore();
+
+  const [filterType, setFilterType] = useState<string>('');
+  const [filterSeverity, setFilterSeverity] = useState<string>('');
+  const [filterStatus, setFilterStatus] = useState<string>('');
+  const [dateRange, setDateRange] = useState<[dayjs.Dayjs | null, dayjs.Dayjs | null] | null>(null);
 
   useEffect(() => {
     initData();
   }, [initData]);
 
   const dataSource = useMemo(() => {
-    return abnormals.map((abnormal) => {
+    let list = abnormals.map((abnormal) => {
       const report = reports.find((r) => r.id === abnormal.reportId);
       return {
         ...abnormal,
@@ -26,12 +33,43 @@ export default function AbnormalZone() {
         seaArea: report?.seaArea || '-',
       };
     });
-  }, [abnormals, reports]);
+
+    if (filterType) {
+      list = list.filter((a) => a.abnormalType === filterType);
+    }
+    if (filterSeverity) {
+      list = list.filter((a) => a.severity === filterSeverity);
+    }
+    if (filterStatus) {
+      list = list.filter((a) => a.status === filterStatus);
+    }
+    if (dateRange && dateRange[0] && dateRange[1]) {
+      const start = dateRange[0].startOf('day').valueOf();
+      const end = dateRange[1].endOf('day').valueOf();
+      list = list.filter((a) => {
+        const t = new Date(a.detectedAt).getTime();
+        return t >= start && t <= end;
+      });
+    }
+
+    return list;
+  }, [abnormals, reports, filterType, filterSeverity, filterStatus, dateRange]);
 
   const pendingCount = useMemo(
     () => abnormals.filter((a) => a.status === 'pending').length,
     [abnormals]
   );
+
+  const handleExport = () => {
+    exportAbnormalRecordsCSV(dataSource);
+  };
+
+  const handleResetFilters = () => {
+    setFilterType('');
+    setFilterSeverity('');
+    setFilterStatus('');
+    setDateRange(null);
+  };
 
   const columns: ColumnsType<AbnormalRecord & { reportNo: string; seaArea: string }> = [
     {
@@ -112,7 +150,7 @@ export default function AbnormalZone() {
   return (
     <div className="space-y-4">
       {/* 顶部 */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Button
             icon={<ArrowLeft className="w-4 h-4" />}
@@ -131,15 +169,78 @@ export default function AbnormalZone() {
             </p>
           </div>
         </div>
-        <Space>
+        <Space wrap>
           <Tag color="red" className="text-base px-3 py-1">
             待处理：{pendingCount} 项
           </Tag>
           <Tag color="blue" className="text-base px-3 py-1">
-            总计：{abnormals.length} 项
+            总计：{dataSource.length} / {abnormals.length} 项
           </Tag>
+          <Button
+            type="primary"
+            icon={<FileDown className="w-4 h-4" />}
+            onClick={handleExport}
+          >
+            导出CSV
+          </Button>
         </Space>
       </div>
+
+      {/* 筛选栏 */}
+      <Card size="small" className="bg-slate-50">
+        <div className="flex items-center gap-3 flex-wrap">
+          <Filter className="w-4 h-4 text-slate-500" />
+          <span className="text-sm text-slate-500">筛选：</span>
+          <Select
+            placeholder="异常类型"
+            value={filterType || undefined}
+            onChange={setFilterType}
+            allowClear
+            style={{ width: 140 }}
+            options={[
+              { value: 'tide_unit_mixed', label: '潮位单位混写' },
+              { value: 'time_mismatch', label: '采样时间不符' },
+              { value: 'result_mismatch', label: '实验结果不符' },
+              { value: 'other', label: '其他异常' },
+            ]}
+          />
+          <Select
+            placeholder="严重程度"
+            value={filterSeverity || undefined}
+            onChange={setFilterSeverity}
+            allowClear
+            style={{ width: 120 }}
+            options={[
+              { value: 'high', label: '严重' },
+              { value: 'medium', label: '中等' },
+              { value: 'low', label: '轻微' },
+            ]}
+          />
+          <Select
+            placeholder="处理状态"
+            value={filterStatus || undefined}
+            onChange={setFilterStatus}
+            allowClear
+            style={{ width: 120 }}
+            options={[
+              { value: 'pending', label: '待处理' },
+              { value: 'processing', label: '处理中' },
+              { value: 'resolved', label: '已解决' },
+            ]}
+          />
+          <DatePicker.RangePicker
+            value={dateRange}
+            onChange={(dates) => setDateRange(dates as [dayjs.Dayjs | null, dayjs.Dayjs | null] | null)}
+            placeholder={['开始日期', '结束日期']}
+          />
+          <Button size="small" onClick={handleResetFilters}>
+            重置
+          </Button>
+          <span className="text-xs text-slate-400 ml-2">
+            导出的CSV文件与当前屏幕显示的筛选结果完全一致
+          </span>
+        </div>
+      </Card>
 
       {/* 说明卡片 */}
       <Card className="bg-orange-50 border-orange-200">

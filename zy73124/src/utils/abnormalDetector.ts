@@ -1,44 +1,77 @@
-import type { SampleBottle, AbnormalRecord, SeaReport } from '@/types';
+import type { SampleBottle, AbnormalRecord, SeaReport, ChangeLog } from '@/types';
 import { generateId } from './storage';
 
-const STANDARD_UNITS = ['m', 'cm', 'mm', '米', '厘米', '毫米'];
+const STANDARD_TIDE_UNITS = ['m', 'cm', 'mm', '米', '厘米', '毫米'];
+
+function normalizeTideUnit(unit: string): string {
+  const lower = unit.toLowerCase().trim();
+  if (lower === 'm' || lower === '米') return 'm';
+  if (lower === 'cm' || lower === '厘米') return 'cm';
+  if (lower === 'mm' || lower === '毫米') return 'mm';
+  return lower;
+}
 
 export function detectTideUnitMixed(
   report: SeaReport,
-  bottles: SampleBottle[]
+  _bottles: SampleBottle[],
+  changeLogs: ChangeLog[] = []
 ): AbnormalRecord | null {
-  const allUnits = new Set<string>();
-  allUnits.add(report.tideUnit);
-  bottles.forEach((b) => {
-    if (b.resultUnit) {
-      allUnits.add(b.resultUnit);
-    }
-  });
+  const tideUnit = report.tideUnit?.trim() || '';
 
-  const normalizedUnits = new Set<string>();
-  allUnits.forEach((u) => {
-    const lower = u.toLowerCase().trim();
-    if (lower === 'm' || lower === '米') {
-      normalizedUnits.add('m');
-    } else if (lower === 'cm' || lower === '厘米') {
-      normalizedUnits.add('cm');
-    } else if (lower === 'mm' || lower === '毫米') {
-      normalizedUnits.add('mm');
-    } else {
-      normalizedUnits.add(lower);
-    }
-  });
-
-  if (normalizedUnits.size > 1) {
+  if (!tideUnit) {
     return {
       id: generateId(),
       reportId: report.id,
       abnormalType: 'tide_unit_mixed',
-      description: `潮位单位混写：检测到 ${normalizedUnits.size} 种不同单位（${Array.from(allUnits).join('、')}）`,
+      description: '潮位单位为空，请补充填写',
       severity: 'high',
       status: 'pending',
       detectedAt: new Date().toISOString(),
     };
+  }
+
+  const isStandard = STANDARD_TIDE_UNITS.some(
+    (u) => u.toLowerCase() === tideUnit.toLowerCase()
+  );
+  if (!isStandard) {
+    return {
+      id: generateId(),
+      reportId: report.id,
+      abnormalType: 'tide_unit_mixed',
+      description: `潮位单位"${tideUnit}"不是标准单位，请使用 m/cm/mm 或 米/厘米/毫米`,
+      severity: 'high',
+      status: 'pending',
+      detectedAt: new Date().toISOString(),
+    };
+  }
+
+  const tideUnitChanges = changeLogs.filter((log) => log.fieldName === 'tideUnit');
+  if (tideUnitChanges.length > 0) {
+    const allUsedUnits = new Set<string>();
+    tideUnitChanges.forEach((log) => {
+      if (log.oldValue) allUsedUnits.add(normalizeTideUnit(log.oldValue));
+      if (log.newValue) allUsedUnits.add(normalizeTideUnit(log.newValue));
+    });
+    allUsedUnits.add(normalizeTideUnit(tideUnit));
+
+    if (allUsedUnits.size > 1) {
+      const displayUnits = Array.from(
+        new Set([
+          ...tideUnitChanges.map((l) => l.oldValue),
+          ...tideUnitChanges.map((l) => l.newValue),
+          tideUnit,
+        ])
+      ).filter(Boolean);
+      return {
+        id: generateId(),
+        reportId: report.id,
+        abnormalType: 'tide_unit_mixed',
+        description: `潮位单位混用：历史记录中出现过 ${displayUnits.join('、')} 等多种单位，请统一`,
+        severity: 'high',
+        status: 'pending',
+        detectedAt: new Date().toISOString(),
+      };
+    }
   }
 
   return null;
@@ -74,11 +107,12 @@ export function detectResultTimeMismatch(
 
 export function detectAllAbnormals(
   report: SeaReport,
-  bottles: SampleBottle[]
+  bottles: SampleBottle[],
+  changeLogs: ChangeLog[] = []
 ): AbnormalRecord[] {
   const abnormals: AbnormalRecord[] = [];
 
-  const tideUnitAbnormal = detectTideUnitMixed(report, bottles);
+  const tideUnitAbnormal = detectTideUnitMixed(report, bottles, changeLogs);
   if (tideUnitAbnormal) {
     abnormals.push(tideUnitAbnormal);
   }
@@ -109,7 +143,7 @@ export const abnormalStatusLabels: Record<string, string> = {
 };
 
 export function isStandardUnit(unit: string): boolean {
-  return STANDARD_UNITS.some(
+  return STANDARD_TIDE_UNITS.some(
     (u) => u.toLowerCase() === unit.toLowerCase().trim()
   );
 }

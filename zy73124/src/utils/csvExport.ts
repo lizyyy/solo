@@ -30,9 +30,11 @@ export const bottleDetailColumns: CSVColumn[] = [
 
 export const abnormalColumns: CSVColumn[] = [
   { key: 'abnormalType', title: '异常类型', dataIndex: 'abnormalType' },
-  { key: 'description', title: '异常描述', dataIndex: 'description' },
   { key: 'severity', title: '严重程度', dataIndex: 'severity' },
   { key: 'status', title: '处理状态', dataIndex: 'status' },
+  { key: 'reportNo', title: '所属报告', dataIndex: 'reportNo' },
+  { key: 'seaArea', title: '海区', dataIndex: 'seaArea' },
+  { key: 'description', title: '异常描述', dataIndex: 'description' },
   { key: 'detectedAt', title: '发现时间', dataIndex: 'detectedAt' },
 ];
 
@@ -142,5 +144,13 @@ export function exportReportListCSV(
 export function exportBottlesCSV(bottles: SampleBottle[], reportNo: string): void {
   const csv = generateCSV(bottles, bottleDetailColumns);
   const filename = `采样瓶明细_${reportNo}_${formatDate(new Date().toISOString())}.csv`;
+  downloadCSV(csv, filename);
+}
+
+export function exportAbnormalRecordsCSV<T extends Record<string, unknown>>(
+  abnormals: T[]
+): void {
+  const csv = generateCSV(abnormals, abnormalColumns);
+  const filename = `异常记录_${formatDate(new Date().toISOString())}.csv`;
   downloadCSV(csv, filename);
 }
