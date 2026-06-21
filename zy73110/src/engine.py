@@ -41,6 +41,7 @@ class ReviewEngine:
             self._process_material(key, latest)
 
         self._check_batch_continuity(batch_no, items)
+        self._check_all_related_refs()
         self._update_overall_status()
 
         return {
@@ -155,26 +156,42 @@ class ReviewEngine:
                 if reason not in self.suspension_reasons:
                     self.suspension_reasons.append(reason)
 
+    def _check_all_related_refs(self) -> None:
+        all_ids = {ms.material_id for ms in self.state.materials.values()}
+
         all_withdrawals = [
             ms for ms in self.state.materials.values()
             if ms.material_type == "withdrawal"
         ]
+
+        for ms in self.state.materials.values():
+            if "关联缺失" in ms.remarks:
+                ms.remarks = ""
+
         for w_ms in all_withdrawals:
             related_id = w_ms.related_to
             if not related_id:
                 continue
-
-            found = False
             for key, ms in self.state.materials.items():
                 if ms.material_id == related_id and ms.material_type != "withdrawal":
-                    found = True
-                    if ms.status != STATUS_SUSPENDED and not ms.remarks:
+                    if not ms.remarks:
                         ms.remarks = f"被撤回记录({w_ms.material_id})关联，需复核"
                     break
-            if not found:
-                reason = f"撤回记录 {w_ms.material_id} 关联的材料 {related_id} 未找到，需确认"
+
+        for ms in self.state.materials.values():
+            related_id = ms.related_to
+            if not related_id:
+                continue
+            if related_id not in all_ids:
+                type_label = MATERIAL_TYPES.get(ms.material_type, ms.material_type)
+                reason = f"{type_label} {ms.material_id} 关联的材料 {related_id} 未找到，需确认"
                 if reason not in self.suspension_reasons:
                     self.suspension_reasons.append(reason)
+                if ms.remarks:
+                    if "关联缺失" not in ms.remarks:
+                        ms.remarks = f"{ms.remarks}；关联缺失 {related_id}，需确认"
+                else:
+                    ms.remarks = f"关联缺失 {related_id}，需确认"
 
     def _update_overall_status(self) -> None:
         if self.suspension_reasons:

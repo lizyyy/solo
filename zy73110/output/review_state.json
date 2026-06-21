@@ -1,7 +1,7 @@
 {
   "project_name": "施工变更图纸复核",
   "overall_status": "completed",
-  "current_batch": 2,
+  "current_batch": 3,
   "materials": {
     "visa:V-001": {
       "material_id": "V-001",
@@ -9,15 +9,15 @@
       "current_version": 1,
       "latest_batch": 1,
       "status": "confirmed",
-      "signature": "-5353341054695228272",
+      "signature": "-4311231578087878322",
       "title": "主楼基础加深现场签证",
       "related_to": "D-001",
       "history": [
         {
           "version": 1,
           "batch_no": 1,
-          "signature": "-5353341054695228272",
-          "time": "2026-06-11 21:55:45",
+          "signature": "-4311231578087878322",
+          "time": "2026-06-21 08:40:08",
           "action": "新增",
           "title": "主楼基础加深现场签证",
           "related_to": "D-001"
@@ -31,15 +31,15 @@
       "current_version": 2,
       "latest_batch": 2,
       "status": "confirmed",
-      "signature": "7487351768438253972",
+      "signature": "-6541621922898564558",
       "title": "地下车库入口改坡道（修订）",
       "related_to": "D-002",
       "history": [
         {
           "version": 1,
           "batch_no": 1,
-          "signature": "-4234139906766028302",
-          "time": "2026-06-11 21:55:45",
+          "signature": "-2157975970937883832",
+          "time": "2026-06-21 08:40:08",
           "action": "新增",
           "title": "地下车库入口改坡道",
           "related_to": "D-002"
@@ -47,9 +47,9 @@
         {
           "version": 2,
           "batch_no": 2,
-          "old_signature": "-4234139906766028302",
-          "new_signature": "7487351768438253972",
-          "time": "2026-06-11 21:55:45",
+          "old_signature": "-2157975970937883832",
+          "new_signature": "-6541621922898564558",
+          "time": "2026-06-21 08:41:16",
           "action": "版本升级+口径变更",
           "title": "地下车库入口改坡道（修订）",
           "related_to": "D-002"
@@ -63,15 +63,15 @@
       "current_version": 1,
       "latest_batch": 1,
       "status": "confirmed",
-      "signature": "-2880009465590091751",
+      "signature": "6922850933735558736",
       "title": "关于V-003签证的撤回说明",
       "related_to": "V-003",
       "history": [
         {
           "version": 1,
           "batch_no": 1,
-          "signature": "-2880009465590091751",
-          "time": "2026-06-11 21:55:45",
+          "signature": "6922850933735558736",
+          "time": "2026-06-21 08:40:08",
           "action": "新增",
           "title": "关于V-003签证的撤回说明",
           "related_to": "V-003"
@@ -85,15 +85,15 @@
       "current_version": 1,
       "latest_batch": 1,
       "status": "confirmed",
-      "signature": "-3657757243472923127",
+      "signature": "6224463324327499543",
       "title": "3号楼电梯井口头确认",
       "related_to": "D-003",
       "history": [
         {
           "version": 1,
           "batch_no": 1,
-          "signature": "-3657757243472923127",
-          "time": "2026-06-11 21:55:45",
+          "signature": "6224463324327499543",
+          "time": "2026-06-21 08:40:08",
           "action": "新增",
           "title": "3号楼电梯井口头确认",
           "related_to": "D-003"
@@ -107,15 +107,15 @@
       "current_version": 1,
       "latest_batch": 1,
       "status": "confirmed",
-      "signature": "896738435017137753",
+      "signature": "-5887632206039434642",
       "title": "主楼基础加深变更图",
       "related_to": "V-001",
       "history": [
         {
           "version": 1,
           "batch_no": 1,
-          "signature": "896738435017137753",
-          "time": "2026-06-11 21:55:45",
+          "signature": "-5887632206039434642",
+          "time": "2026-06-21 08:40:08",
           "action": "新增",
           "title": "主楼基础加深变更图",
           "related_to": "V-001"
@@ -129,15 +129,15 @@
       "current_version": 2,
       "latest_batch": 2,
       "status": "confirmed",
-      "signature": "5560967048930963723",
+      "signature": "-4229397339398544276",
       "title": "地下车库入口坡道变更图（第二版）",
       "related_to": "V-002",
       "history": [
         {
           "version": 2,
           "batch_no": 2,
-          "signature": "5560967048930963723",
-          "time": "2026-06-11 21:55:45",
+          "signature": "-4229397339398544276",
+          "time": "2026-06-21 08:41:16",
           "action": "新增",
           "title": "地下车库入口坡道变更图（第二版）",
           "related_to": "V-002"
@@ -151,15 +151,15 @@
       "current_version": 1,
       "latest_batch": 2,
       "status": "confirmed",
-      "signature": "731552777585164962",
+      "signature": "-2723022711304198276",
       "title": "外墙保温材料变更",
       "related_to": "D-004",
       "history": [
         {
           "version": 1,
           "batch_no": 2,
-          "signature": "731552777585164962",
-          "time": "2026-06-11 21:55:45",
+          "signature": "-2723022711304198276",
+          "time": "2026-06-21 08:41:16",
           "action": "新增",
           "title": "外墙保温材料变更",
           "related_to": "D-004"
@@ -173,26 +173,48 @@
       "current_version": 1,
       "latest_batch": 2,
       "status": "confirmed",
-      "signature": "1406086426199178175",
+      "signature": "6578359087457002688",
       "title": "外墙保温变更图",
       "related_to": "V-003",
       "history": [
         {
           "version": 1,
           "batch_no": 2,
-          "signature": "1406086426199178175",
-          "time": "2026-06-11 21:55:45",
+          "signature": "6578359087457002688",
+          "time": "2026-06-21 08:41:16",
           "action": "新增",
           "title": "外墙保温变更图",
           "related_to": "V-003"
         }
       ],
       "remarks": ""
+    },
+    "drawing:D-003": {
+      "material_id": "D-003",
+      "material_type": "drawing",
+      "current_version": 1,
+      "latest_batch": 3,
+      "status": "confirmed",
+      "signature": "-1199063702203858946",
+      "title": "3号楼电梯井变更图",
+      "related_to": "O-001",
+      "history": [
+        {
+          "version": 1,
+          "batch_no": 3,
+          "signature": "-1199063702203858946",
+          "time": "2026-06-21 08:41:50",
+          "action": "新增",
+          "title": "3号楼电梯井变更图",
+          "related_to": "O-001"
+        }
+      ],
+      "remarks": ""
     }
   },
   "suspension_reasons": [],
-  "last_run_time": "2026-06-11 21:56:41",
-  "run_count": 2,
-  "csv_export_time": "2026-06-11 21:56:41",
+  "last_run_time": "2026-06-21 08:42:28",
+  "run_count": 3,
+  "csv_export_time": "2026-06-21 08:42:28",
   "notes": ""
 }
