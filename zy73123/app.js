@@ -32,9 +32,9 @@ function parseDMS(str) {
   
   let numStr = str.replace(/[NSEW]/g, '').trim();
   
-  const degMatch = numStr.match(/(\d+)°/);
-  const minMatch = numStr.match(/°[^'′]*['′](\d+(\.\d+)?)/);
-  const secMatch = numStr.match(/['′][^"″]*["″](\d+(\.\d+)?)/);
+  const degMatch = numStr.match(/(\d+)\s*°/);
+  const minMatch = numStr.match(/°\s*(\d+(?:\.\d+)?)\s*['′]/);
+  const secMatch = numStr.match(/['′]\s*(\d+(?:\.\d+)?)\s*["″]/);
   
   if (!degMatch) return null;
   
@@ -214,15 +214,19 @@ function importRecords(newRecords) {
     
     if (existingIndex >= 0) {
       const existing = state.records[existingIndex];
-      if (existing.manualRemark && !newRec.manualRemark) {
-        newRec.manualRemark = existing.manualRemark;
-      }
-      if (existing.reviewed) {
-        newRec.reviewed = existing.reviewed;
-        newRec.reviewTime = existing.reviewTime;
-      }
-      newRec.importCount = (existing.importCount || 1);
-      state.records[existingIndex] = { ...existing, ...newRec };
+      const preserved = {
+        manualRemark: existing.manualRemark || '',
+        reviewed: existing.reviewed,
+        reviewTime: existing.reviewTime,
+        importCount: (existing.importCount || 1) + 1
+      };
+      state.records[existingIndex] = {
+        ...existing,
+        ...newRec,
+        lat: parseCoord(newRec.lat_raw) || newRec.lat || existing.lat,
+        lon: parseCoord(newRec.lon_raw) || newRec.lon || existing.lon,
+        ...preserved
+      };
       updated++;
     } else {
       state.records.push({
