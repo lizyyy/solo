@@ -21,6 +21,7 @@ interface AuditTimelineProps {
 
 const actionIcon: Record<string, typeof Plus> = {
   创建: Plus,
+  编辑: Edit3,
   改判: Edit3,
   补录: FilePlus2,
   标记异常: AlertTriangle,
@@ -31,6 +32,7 @@ const actionIcon: Record<string, typeof Plus> = {
 
 const actionColor: Record<string, string> = {
   创建: 'bg-status-normal text-white',
+  编辑: 'bg-ocean-500 text-white',
   改判: 'bg-status-anomaly text-white',
   补录: 'bg-status-supplement text-white',
   标记异常: 'bg-status-anomaly text-white',

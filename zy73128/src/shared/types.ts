@@ -1,6 +1,6 @@
 export type AnnotationStatus = '正常' | '补录' | '异常' | '云遮挡';
 export type BleachingSeverity = '正常' | '轻度' | '中度' | '严重';
-export type AuditAction = '创建' | '改判' | '补录' | '标记异常' | '确认' | '标记云遮挡' | '导出';
+export type AuditAction = '创建' | '改判' | '编辑' | '补录' | '标记异常' | '确认' | '标记云遮挡' | '导出';
 
 export interface ScreenshotMeta {
   dataSource: string;

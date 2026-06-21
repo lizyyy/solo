@@ -10,6 +10,7 @@ import {
   Check,
   FileText,
   Settings,
+  MessageSquareText,
 } from 'lucide-react';
 import { useAnnotationStore } from '@/store/useAnnotationStore';
 import type { BleachingSeverity, CloudMask } from '@/shared/types';
@@ -23,7 +24,7 @@ import { cn } from '@/lib/utils';
 export default function AnnotationDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getAnnotation, getAuditTrails, updateAnnotation, reviseSeverity, supplementRecord } =
+  const { getAnnotation, getAuditTrails, editWithAudit, markCloudCover, reviseSeverity } =
     useAnnotationStore();
 
   const annotation = getAnnotation(id || '');
@@ -35,20 +36,14 @@ export default function AnnotationDetail() {
   const [localScene, setLocalScene] = useState(annotation?.sceneLabel ?? '');
   const [localSideNote, setLocalSideNote] = useState(annotation?.sideNote ?? '');
   const [localSeverity, setLocalSeverity] = useState<BleachingSeverity>(
-    annotation?.severity ?? '正常',
+    (annotation?.severity as BleachingSeverity) ?? '正常',
   );
   const [localArea, setLocalArea] = useState(annotation?.bleachingArea ?? 0);
+  const [editReason, setEditReason] = useState('');
   const [reviseReason, setReviseReason] = useState('');
   const [screenshotAnchor, setScreenshotAnchor] = useState(annotation?.badDataRef ?? '');
   const [showReviseForm, setShowReviseForm] = useState(false);
-
-  if (!annotation) {
-    return (
-      <div className="min-h-screen bg-ocean-900 flex items-center justify-center text-ocean-300">
-        未找到该记录
-      </div>
-    );
-  }
+  const [saveSuccessFlash, setSaveSuccessFlash] = useState(false);
 
   const handleJumpAnchor = useCallback((anchor: string) => {
     setHighlightRef(anchor);
@@ -58,65 +53,118 @@ export default function AnnotationDetail() {
     setHighlightRef(undefined);
   }, []);
 
-  const handleSaveEdit = () => {
+  const handleStartEdit = useCallback(() => {
     if (!annotation) return;
-    updateAnnotation(annotation.id, {
-      sceneLabel: localScene,
-      sideNote: localSideNote,
-      severity: localSeverity,
-      bleachingArea: localArea,
-    });
-    setIsEditing(false);
-  };
-
-  const handleCancelEdit = () => {
     setLocalScene(annotation.sceneLabel);
     setLocalSideNote(annotation.sideNote);
-    setLocalSeverity(annotation.severity);
+    setLocalSeverity(annotation.severity as BleachingSeverity);
     setLocalArea(annotation.bleachingArea);
-    setIsEditing(false);
-  };
+    setEditReason('');
+    setScreenshotAnchor(annotation.badDataRef ?? '');
+    setIsEditing(true);
+  }, [annotation]);
 
-  const handleRevise = () => {
+  const handleCancelEdit = useCallback(() => {
+    if (!annotation) return;
+    setLocalScene(annotation.sceneLabel);
+    setLocalSideNote(annotation.sideNote);
+    setLocalSeverity(annotation.severity as BleachingSeverity);
+    setLocalArea(annotation.bleachingArea);
+    setEditReason('');
+    setIsEditing(false);
+  }, [annotation]);
+
+  const handleSaveEdit = useCallback(() => {
+    if (!annotation) return;
+
+    const hasSeverityChange = localSeverity !== annotation.severity;
+    const hasAreaChange = localArea !== annotation.bleachingArea;
+    const hasSceneChange = localScene !== annotation.sceneLabel;
+    const hasSideNoteChange = localSideNote !== annotation.sideNote;
+
+    if (!hasSeverityChange && !hasAreaChange && !hasSceneChange && !hasSideNoteChange) {
+      setIsEditing(false);
+      return;
+    }
+
+    const actionType = hasSeverityChange || hasAreaChange ? '改判' : '编辑';
+    const defaultReason = hasSeverityChange
+      ? `白化等级由「${annotation.severity}」调整为「${localSeverity}」`
+      : hasAreaChange
+      ? `白化面积由 ${annotation.bleachingArea.toFixed(2)} km² 调整为 ${localArea.toFixed(2)} km²`
+      : '编辑场景标注或侧边说明';
+
+    const finalReason = editReason.trim() || defaultReason;
+
+    const result = editWithAudit(
+      annotation.id,
+      {
+        severity: localSeverity,
+        bleachingArea: localArea,
+        sceneLabel: localScene,
+        sideNote: localSideNote,
+        ...(actionType === '改判' ? { status: '异常' as const } : {}),
+      },
+      {
+        reason: finalReason,
+        operator: '小宋',
+        action: actionType,
+        screenshotAnchor: screenshotAnchor || annotation.badDataRef || undefined,
+      },
+    );
+
+    if (result.changed) {
+      setSaveSuccessFlash(true);
+      setTimeout(() => setSaveSuccessFlash(false), 2000);
+    }
+    setIsEditing(false);
+  }, [annotation, localSeverity, localArea, localScene, localSideNote, editReason, screenshotAnchor, editWithAudit]);
+
+  const handleRevise = useCallback(() => {
     if (!annotation) return;
     reviseSeverity(
       annotation.id,
-      annotation.severity,
+      annotation.severity as BleachingSeverity,
       localSeverity,
       localArea,
       localScene,
       localSideNote,
       reviseReason || '人工复核改判',
       '小宋',
-      screenshotAnchor || annotation.badDataRef,
+      screenshotAnchor || annotation.badDataRef || undefined,
     );
     setShowReviseForm(false);
     setIsEditing(false);
-  };
+    setSaveSuccessFlash(true);
+    setTimeout(() => setSaveSuccessFlash(false), 2000);
+  }, [annotation, localSeverity, localArea, localScene, localSideNote, reviseReason, screenshotAnchor, reviseSeverity]);
 
-  const handleSaveCloudMask = (mask: CloudMask) => {
-    if (!annotation) return;
-    updateAnnotation(annotation.id, {
-      hasCloudCover: true,
-      status: '云遮挡',
-      cloudMask: mask,
-      sceneLabel: `${annotation.sceneLabel}（已标记云遮挡，影响面积${mask.affectedArea}km²，已从汇总排除）`,
-      sideNote: `${annotation.sideNote}\n\n云遮挡说明：${mask.description}\n补看来源：${mask.reviewSource}`,
-    });
-    setDrawerOpen(false);
-  };
+  const handleSaveCloudMask = useCallback(
+    (mask: CloudMask) => {
+      if (!annotation) return;
+      markCloudCover(annotation.id, mask, {
+        operator: '小宋',
+        reason: '人工标记云遮挡区域，已从正常汇总中排除',
+      });
+      setDrawerOpen(false);
+      setSaveSuccessFlash(true);
+      setTimeout(() => setSaveSuccessFlash(false), 2000);
+    },
+    [annotation, markCloudCover],
+  );
 
-  const handleJumpBadData = () => {
+  const handleJumpBadData = useCallback(() => {
     if (annotation?.badDataRef) {
       setHighlightRef(annotation.badDataRef);
     }
-  };
+  }, [annotation]);
 
-  const handleExportSingle = () => {
+  const handleExportSingle = useCallback(() => {
+    if (!annotation) return;
     triggerExportAll([annotation], trails, '小宋');
-  };
+  }, [annotation, trails]);
 
-  const displayAnnotation = isEditing
+  const displayAnnotation = isEditing && annotation
     ? {
         ...annotation,
         sceneLabel: localScene,
@@ -125,6 +173,14 @@ export default function AnnotationDetail() {
         bleachingArea: localArea,
       }
     : annotation;
+
+  if (!annotation) {
+    return (
+      <div className="min-h-screen bg-ocean-900 flex items-center justify-center text-ocean-300">
+        未找到该记录
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-ocean-900 via-ocean-800 to-ocean-900">
@@ -153,6 +209,11 @@ export default function AnnotationDetail() {
                 >
                   {annotation.status}
                 </span>
+                {saveSuccessFlash && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-status-normal text-white animate-pulse">
+                    ✓ 已保存
+                  </span>
+                )}
               </div>
               <p className="text-[11px] text-ocean-400 font-mono">{annotation.id}</p>
             </div>
@@ -161,13 +222,7 @@ export default function AnnotationDetail() {
           <div className="flex items-center gap-2">
             {!isEditing ? (
               <button
-                onClick={() => {
-                  setLocalScene(annotation.sceneLabel);
-                  setLocalSideNote(annotation.sideNote);
-                  setLocalSeverity(annotation.severity);
-                  setLocalArea(annotation.bleachingArea);
-                  setIsEditing(true);
-                }}
+                onClick={handleStartEdit}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-ocean-700/60 hover:bg-ocean-600/60 text-ocean-100 rounded-lg text-sm transition"
               >
                 <Edit3 size={14} />
@@ -211,10 +266,32 @@ export default function AnnotationDetail() {
         </div>
       </header>
 
-      {showReviseForm && isEditing && (
+      {isEditing && (
         <div className="bg-coral-500/10 border-b border-coral-400/30">
           <div className="max-w-[1600px] mx-auto px-5 py-3 flex items-center gap-4">
-            <AlertTriangle size={18} className="text-coral-400 flex-shrink-0" />
+            <MessageSquareText size={18} className="text-coral-400 flex-shrink-0" />
+            <div className="flex-1">
+              <label className="text-[11px] text-ocean-300 mb-1 block">修改理由（保存后自动写入线索链）</label>
+              <input
+                type="text"
+                value={editReason}
+                onChange={(e) => setEditReason(e.target.value)}
+                placeholder="请简要说明修改原因，如：复核发现西北侧浅礁盘漏判、实验数据更新..."
+                className="w-full bg-ocean-900/60 border border-ocean-600/40 rounded-md px-3 py-1.5 text-sm text-ocean-50 focus:outline-none focus:border-coral-400/60 focus:ring-1 focus:ring-coral-400/30"
+              />
+            </div>
+            <div className="text-right">
+              <div className="text-[10px] text-ocean-400">操作人</div>
+              <div className="text-xs text-ocean-200 font-medium">小宋</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showReviseForm && isEditing && (
+        <div className="bg-status-anomaly/10 border-b border-status-anomaly/30">
+          <div className="max-w-[1600px] mx-auto px-5 py-3 flex items-center gap-4">
+            <AlertTriangle size={18} className="text-status-anomaly flex-shrink-0" />
             <div className="flex-1 grid grid-cols-2 gap-3">
               <div>
                 <label className="text-[11px] text-ocean-300 mb-1 block">改判理由</label>
@@ -239,7 +316,7 @@ export default function AnnotationDetail() {
             </div>
             <button
               onClick={handleRevise}
-              className="flex items-center gap-1.5 px-4 py-2 bg-coral-500 hover:bg-coral-600 text-white rounded-lg text-sm font-medium transition"
+              className="flex items-center gap-1.5 px-4 py-2 bg-status-anomaly hover:bg-status-anomaly/90 text-white rounded-lg text-sm font-medium transition"
             >
               <Check size={14} />
               确认改判
@@ -320,15 +397,17 @@ export default function AnnotationDetail() {
           </div>
 
           <div className="col-span-5">
-            <TripleEditor
-              annotation={displayAnnotation}
-              onSceneChange={setLocalScene}
-              onSideNoteChange={setLocalSideNote}
-              onSeverityChange={setLocalSeverity}
-              onBleachingAreaChange={setLocalArea}
-              editable={isEditing}
-              className="h-full"
-            />
+            {displayAnnotation ? (
+              <TripleEditor
+                annotation={displayAnnotation}
+                onSceneChange={setLocalScene}
+                onSideNoteChange={setLocalSideNote}
+                onSeverityChange={setLocalSeverity}
+                onBleachingAreaChange={setLocalArea}
+                editable={isEditing}
+                className="h-full"
+              />
+            ) : null}
           </div>
 
           <div className="col-span-3">
@@ -351,7 +430,7 @@ export default function AnnotationDetail() {
         onJumpBadData={handleJumpBadData}
         onRevise={() => {
           setDrawerOpen(false);
-          setIsEditing(true);
+          handleStartEdit();
           setShowReviseForm(true);
         }}
       />
