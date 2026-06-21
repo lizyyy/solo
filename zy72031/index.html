@@ -161,10 +161,12 @@ main{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1
   <div class="import-section" id="import-section" style="display:none">
     <div style="font-size:12px;color:var(--dim);margin-bottom:4px">粘贴导入数据（JSON格式，含 materials 数组）</div>
     <textarea id="import-textarea" placeholder='{"materials":[{"category":"frequency","value":"660Hz","label":"660Hz","targetSlot":"s3"}]}'></textarea>
-    <div style="margin-top:6px;display:flex;gap:6px">
+    <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
       <button class="btn" onclick="G.importData()">导入并检查冲突</button>
+      <button class="btn" onclick="G.fillConflictSample()">填充冲突样例</button>
       <button class="btn" onclick="UI.toggleImport()">取消</button>
     </div>
+    <div id="import-hint" style="font-size:11px;color:var(--dim);margin-top:4px"></div>
   </div>
 
   <div class="supplement-section" id="supplement-section" style="display:none">
@@ -638,6 +640,46 @@ var G = {
     diffBox.innerHTML = html;
   },
 
+  fillConflictSample: function() {
+    var self = this;
+    var playHint = '';
+    if (this.state.records.length === 0 || this.state.status === 'idle') {
+      playHint = '⚠ 请先开始游戏并放置至少一个材料产生练习记录，再导入样例触发冲突';
+    }
+    var sampleMat = null;
+    var existingLabel = '';
+    if (this.state.materials.length > 0) {
+      var m = this.state.materials[0];
+      sampleMat = {
+        category: m.category,
+        value: m.value,
+        label: m.label + '（导入覆盖版）',
+        desc: '样例冲突：和学生记录中的标签描述不一致',
+        targetSlot: 's' + (Math.min(this.state.slots.length, 3) + 1)
+      };
+      existingLabel = m.label;
+    } else {
+      sampleMat = {
+        category: 'frequency',
+        value: '440Hz',
+        label: '标准音A4（导入版）',
+        desc: '样例冲突数据：请先开始游戏产生记录后再导入',
+        targetSlot: 's2'
+      };
+    }
+    var sample = {
+      _note: '此为冲突样例数据。导入后会与已存在的练习记录产生冲突，用于测试"采用导入"功能',
+      materials: [sampleMat]
+    };
+    document.getElementById('import-textarea').value = JSON.stringify(sample, null, 2);
+    document.getElementById('import-hint').innerHTML =
+      '样例已填入。' +
+      (existingLabel ? '<br>学生记录中已有材料标签：<b>' + existingLabel + '</b>' : '') +
+      '<br>导入描述：<b>' + sampleMat.label + '</b>' +
+      '<br>两者描述不一致，导入后将产生冲突。' +
+      (playHint ? '<br><span style="color:#e74c3c">' + playHint + '</span>' : '');
+  },
+
   importData: function() {
     var text = document.getElementById('import-textarea').value.trim();
     if (!text) {
@@ -676,20 +718,41 @@ var G = {
       }
 
       var existingRecord = self.state.records.find(function(r){
-        return r.raw.indexOf(im.value) !== -1 || r.raw.indexOf(im.category) !== -1;
+        return r.raw.indexOf(im.value) !== -1 || r.raw.indexOf(im.category) !== -1 || r.raw.indexOf(im.label || '') !== -1;
       });
 
       if (existingRecord) {
         var recordImplies = existingRecord.raw;
         var importImplies = im.category + '=' + im.value + (im.label ? ' (' + im.label + ')' : '');
-        if (recordImplies.indexOf(im.value) === -1 || (im.targetSlot && recordImplies.indexOf(im.targetSlot) === -1 && im.targetSlot)) {
+        var hasMismatch = false;
+        if (recordImplies.indexOf(im.value) === -1 && recordImplies.indexOf(im.category) !== -1) {
+          hasMismatch = true;
+        }
+        if (im.label && recordImplies.indexOf(im.label) === -1 && recordImplies.indexOf(im.value) !== -1) {
+          hasMismatch = true;
+        }
+        if (im.targetSlot) {
+          var slotInRecord = false;
+          self.state.slots.forEach(function(s) {
+            if (s.id.indexOf(im.targetSlot) !== -1 && recordImplies.indexOf(s.label) !== -1) {
+              slotInRecord = true;
+            }
+          });
+          if (!slotInRecord) {
+            var exactSlotMatch = recordImplies.indexOf(im.targetSlot) !== -1;
+            if (!exactSlotMatch && recordImplies.indexOf(im.value) !== -1) {
+              hasMismatch = true;
+            }
+          }
+        }
+        if (hasMismatch) {
           newConflicts.push({
             id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2,4),
             recordId: existingRecord.id,
             recordClaim: recordImplies,
             importClaim: importImplies,
             importMaterial: JSON.parse(JSON.stringify(im)),
-            suggestion: '学生记录与导入数据对材料描述不一致，请确认以哪个为准',
+            suggestion: '学生记录与导入数据对材料描述或放置槽位不一致，请确认以哪个为准',
             resolved: false,
             resolution: null
           });
@@ -833,20 +896,33 @@ var G = {
     var exportSettlements = JSON.stringify(exportData.settlements || []);
     var exportConflicts = JSON.stringify(exportData.conflicts || []);
 
+    var pageRecords = JSON.stringify(this.state.records || []);
+    var pageSettlements = JSON.stringify(this.state.settlements || []);
+    var pageConflicts = JSON.stringify(this.state.conflicts || []);
+
     var issues = [];
     if (type === 'all' || type === 'records') {
       if (snapRecords !== exportRecords) {
-        issues.push('记录数据与导出快照不一致！');
+        issues.push('记录数据与导出快照不一致');
+      }
+      if (snapRecords !== pageRecords) {
+        issues.push('页面记录与导出快照不一致（条数对不上）');
       }
     }
     if (type === 'all' || type === 'settlements') {
       if (snapSettlements !== exportSettlements) {
-        issues.push('结算数据与导出快照不一致！');
+        issues.push('结算数据与导出快照不一致');
+      }
+      if (snapSettlements !== pageSettlements) {
+        issues.push('页面结算与导出快照不一致（条数对不上）');
       }
     }
     if (type === 'all' || type === 'conflicts') {
       if (snapConflicts !== exportConflicts) {
-        issues.push('冲突数据与导出快照不一致！');
+        issues.push('冲突数据与导出快照不一致');
+      }
+      if (snapConflicts !== pageConflicts) {
+        issues.push('页面冲突与导出快照不一致（条数对不上）');
       }
     }
     return issues;
@@ -862,10 +938,11 @@ var G = {
 
     var issues = this._verifyExport(data, snapshot, type);
     var statusEl = document.getElementById('export-status');
+    var recordCount = data.records ? data.records.length : 0;
     if (issues.length === 0) {
-      statusEl.innerHTML = '<span class="ok">✓ 导出数据与快照一致</span>';
+      statusEl.innerHTML = '<span class="ok">✓ 一致：导出文件 ' + recordCount + ' 条 = 页面记录 ' + this.state.records.length + ' 条</span>';
     } else {
-      statusEl.innerHTML = '<span class="warn">⚠ ' + issues.join('; ') + '</span>';
+      statusEl.innerHTML = '<span class="warn">⚠ ' + issues.join('；') + '</span>';
     }
 
     var infoEl = document.getElementById('export-info');
@@ -875,14 +952,8 @@ var G = {
       settlements: '回合结算',
       conflicts: '冲突记录'
     };
-    var recordCount = data.records ? data.records.length : 0;
-    var currentRecordCount = this.state.records.length;
-    var diffNote = '';
-    if (currentRecordCount > recordCount) {
-      diffNote = ' <span class="warn">（页面多' + (currentRecordCount - recordCount) + '条，为导出操作本身的记录，不含在导出文件中）</span>';
-    }
     infoEl.innerHTML = (typeLabels[type] || type) + ' | ' +
-      '导出记录: ' + recordCount + '条' + diffNote + '<br>' +
+      '记录: ' + recordCount + '条 | ' +
       '结算: ' + (data.settlements ? data.settlements.length : 0) + '条 | ' +
       '冲突: ' + (data.conflicts ? data.conflicts.length : 0) + '条 | ' +
       '生成时间: ' + new Date(data.exportedAt).toLocaleString();
@@ -913,8 +984,7 @@ var G = {
       supplementLog: snapshot.supplementLog
     };
     this._setExportData(exportData, 'all', snapshot);
-    this.addRecord('📤 导出全部数据（记录' + snapshot.records.length + '条，结算' + snapshot.settlements.length + '条）', 'normal');
-    this.showToast('已生成完整导出数据', 'info');
+    this.showToast('已生成完整导出数据（' + snapshot.records.length + '条记录）', 'info');
   },
 
   exportRecords: function() {
@@ -971,7 +1041,6 @@ var G = {
     var self = this;
     navigator.clipboard.writeText(text).then(function() {
       self.showToast('已复制到剪贴板（校验和: ' + self._hashString(text) + '）', 'info');
-      self.addRecord('📋 复制导出数据到剪贴板', 'normal');
     }).catch(function() {
       self.showToast('复制失败，请手动复制', 'err');
     });
@@ -993,8 +1062,7 @@ var G = {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    this.showToast('已下载文件', 'info');
-    this.addRecord('💾 下载导出文件: ' + a.download, 'normal');
+    this.showToast('已下载文件: ' + a.download, 'info');
   }
 };
 
