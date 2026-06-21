@@ -217,8 +217,10 @@ function renderList(){
         </div>
         <div style="font-size:12px;color:#555;margin-top:4px">${c.description}</div>
         <div class="meta">构件：${c.component_a_id} / ${c.component_b_id} · 图纸：${c.drawing_version||'—'} · 坐标：(${coord.a?.x??'?'}, ${coord.a?.y??'?'}) / (${coord.b?.x??'?'}, ${coord.b?.y??'?'})</div>
+        ${c.remark?`<div style="font-size:12px;color:#2e7d32;margin-top:6px;background:#e8f5e9;padding:6px 10px;border-radius:4px">✏️ 复核备注：<b>${c.remark}</b></div>`:''}
         <div class="sug">💡 ${c.suggestion||'无'}</div>
         <div class="row">
+          <button class="btn small ghost" style="color:#1565c0;border-color:#bbdefb" onclick="editIssueRemark('collision',${c.id}, ${JSON.stringify(c.remark||'').replace(/"/g,'&quot;')})">备注</button>
           <button class="btn small ok" onclick="setStatus('collision',${c.id},'已处理')">标记已处理</button>
         </div>
       </div>`;
@@ -234,8 +236,10 @@ function renderList(){
         <div class="meta">原坐标：X=${o.original_x} Y=${o.original_y} Z=${o.original_z} · 偏移量 Δ≈${Math.abs(o.offset_x)+Math.abs(o.offset_y)+Math.abs(o.offset_z)||'异常'}</div>
         <div class="meta" style="color:#666">来源：${o.source_file||'—'} · 图纸版次：${o.drawing_version||'—'}</div>
         <div style="font-size:12px;color:#c62828;margin-top:6px">📝 标注：${o.description||'无'}</div>
+        ${o.remark?`<div style="font-size:12px;color:#2e7d32;margin-top:6px;background:#e8f5e9;padding:6px 10px;border-radius:4px">✏️ 复核备注：<b>${o.remark}</b></div>`:''}
         <div class="sug">💡 ${o.suggestion||'无'}</div>
         <div class="row">
+          <button class="btn small ghost" style="color:#1565c0;border-color:#bbdefb" onclick="editIssueRemark('offset',${o.id}, ${JSON.stringify(o.remark||'').replace(/"/g,'&quot;')})">备注</button>
           <button class="btn small ok" onclick="setStatus('offset',${o.id},'已处理')">标记已处理</button>
         </div>
       </div>
@@ -284,6 +288,12 @@ function editRemark(id, val){
   const nv = prompt('编辑人工备注（重复导入时不会被覆盖）：', val);
   if(nv===null) return;
   fetch(`/api/submission/${id}/remark`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({manual_remark:nv})}).then(refresh);
+}
+
+function editIssueRemark(table, id, val){
+  const nv = prompt('编辑复核备注（重新预审时不会被覆盖）：', val);
+  if(nv===null) return;
+  fetch(`/api/issue/${table}/${id}/remark`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({remark:nv})}).then(refresh);
 }
 
 function draw(){

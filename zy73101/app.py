@@ -58,7 +58,15 @@ def update_remark(rid):
 @app.route('/api/status/<table>/<int:rid>', methods=['POST'])
 def update_status(table, rid):
     data = request.get_json() or {}
-    db.update_process_status(table, rid, data.get('status', '待预审'))
+    remark = data.get('remark')
+    db.update_process_status(table, rid, data.get('status', '待预审'), remark=remark)
+    return jsonify({'ok': True})
+
+
+@app.route('/api/issue/<table>/<int:rid>/remark', methods=['POST'])
+def update_issue_remark(table, rid):
+    data = request.get_json() or {}
+    db.update_issue_remark(table, rid, data.get('remark', ''))
     return jsonify({'ok': True})
 
 

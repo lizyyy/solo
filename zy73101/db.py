@@ -1,6 +1,7 @@
 import sqlite3
 import os
 import json
+import re
 from datetime import datetime
 
 DB_PATH = os.path.join(os.path.dirname(__file__), 'roof_drainage.db')
@@ -85,6 +86,7 @@ def init_db():
     cur.execute('''
         CREATE TABLE IF NOT EXISTS collision_issues (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            issue_key TEXT UNIQUE,
             component_a_id TEXT,
             component_b_id TEXT,
             component_a_type TEXT,
@@ -96,14 +98,17 @@ def init_db():
             severity TEXT DEFAULT 'warning',
             drawing_version TEXT,
             process_status TEXT DEFAULT '未处理',
+            remark TEXT,
             created_at TEXT,
-            resolved_at TEXT
+            resolved_at TEXT,
+            last_detected_at TEXT
         )
     ''')
 
     cur.execute('''
         CREATE TABLE IF NOT EXISTS coordinate_offsets (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            issue_key TEXT UNIQUE,
             component_id TEXT,
             component_type TEXT,
             offset_x REAL,
@@ -117,9 +122,24 @@ def init_db():
             source_file TEXT,
             drawing_version TEXT,
             process_status TEXT DEFAULT '未处理',
-            created_at TEXT
+            remark TEXT,
+            created_at TEXT,
+            last_detected_at TEXT
         )
     ''')
+
+    def add_column(table, col, definition):
+        try:
+            cur.execute(f'ALTER TABLE {table} ADD COLUMN {col} {definition}')
+        except Exception:
+            pass
+
+    add_column('collision_issues', 'issue_key', 'TEXT UNIQUE')
+    add_column('collision_issues', 'remark', 'TEXT')
+    add_column('collision_issues', 'last_detected_at', 'TEXT')
+    add_column('coordinate_offsets', 'issue_key', 'TEXT UNIQUE')
+    add_column('coordinate_offsets', 'remark', 'TEXT')
+    add_column('coordinate_offsets', 'last_detected_at', 'TEXT')
 
     cur.execute('''
         CREATE TABLE IF NOT EXISTS import_batches (
@@ -186,26 +206,25 @@ def import_submission(rows, source_file, batch_id=None):
             continue
         mapped['source_file'] = mapped.get('source_file', source_file)
         mapped['source_row'] = idx + 1
-        mapped['process_status'] = '待预审'
         mapped['import_batch'] = batch_id
-        mapped['created_at'] = now
         mapped['updated_at'] = now
 
         old = cur.execute(
-            'SELECT id, manual_remark, process_status FROM submission_records WHERE material_code=? AND drawing_version=? AND specification=?',
+            'SELECT id, manual_remark, process_status, remark, created_at FROM submission_records WHERE material_code=? AND drawing_version=? AND specification=?',
             (mapped.get('material_code', ''), mapped.get('drawing_version', ''), mapped.get('specification', ''))
         ).fetchone()
 
         if old:
             dup_count += 1
-            keep_remark = old['manual_remark'] or mapped.get('remark', '')
-            keep_status = '待预审' if old['process_status'] in ('已处理', '已确认') else old['process_status']
+            keep_manual_remark = old['manual_remark'] if old['manual_remark'] else mapped.get('remark', '')
+            keep_process_status = old['process_status'] if old['process_status'] in ('已处理', '已确认', '已解决') else '待预审'
+            keep_created_at = old['created_at']
             cur.execute(
                 '''UPDATE submission_records SET
                     material_name=?, specification=?, quantity=?, unit=?, supplier=?,
                     drawing_version=?, drawing_no=?, submit_date=?, reviewer=?,
                     source_file=?, source_row=?, remark=?, manual_remark=?,
-                    process_status=?, import_batch=?, updated_at=?
+                    process_status=?, import_batch=?, created_at=?, updated_at=?
                     WHERE id=?''',
                 (
                     mapped.get('material_name'), mapped.get('specification'),
@@ -213,12 +232,15 @@ def import_submission(rows, source_file, batch_id=None):
                     mapped.get('drawing_version'), mapped.get('drawing_no'),
                     mapped.get('submit_date'), mapped.get('reviewer'),
                     mapped['source_file'], mapped['source_row'],
-                    mapped.get('remark'), keep_remark, keep_status, batch_id, now, old['id']
+                    mapped.get('remark'), keep_manual_remark, keep_process_status,
+                    batch_id, keep_created_at, now, old['id']
                 )
             )
         else:
-            cols = list(mapped.keys()) + ['created_at', 'updated_at']
-            vals = [mapped.get(c) for c in mapped.keys()] + [now, now]
+            mapped['process_status'] = '待预审'
+            mapped['created_at'] = now
+            cols = list(mapped.keys())
+            vals = [mapped.get(c) for c in cols]
             placeholders = ','.join(['?'] * len(cols))
             cur.execute(f'INSERT INTO submission_records ({",".join(cols)}) VALUES ({placeholders})', vals)
         total += 1
@@ -282,20 +304,59 @@ def import_model(rows, source_file, batch_id=None):
 def run_collision_detection():
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute('DELETE FROM collision_issues WHERE process_status != "已处理"')
-    cur.execute('DELETE FROM coordinate_offsets WHERE process_status != "已处理"')
     now = datetime.now().isoformat()
 
+    existing_collisions = {}
+    for r in cur.execute('SELECT id, issue_key, process_status, remark, created_at, resolved_at FROM collision_issues').fetchall():
+        existing_collisions[r['issue_key']] = dict(r)
+
+    existing_offsets = {}
+    for r in cur.execute('SELECT id, issue_key, process_status, remark, created_at FROM coordinate_offsets').fetchall():
+        existing_offsets[r['issue_key']] = dict(r)
+
+    def collision_key(a_id, b_id):
+        sorted_ids = sorted([str(a_id or ''), str(b_id or '')])
+        return f'COLL:{sorted_ids[0]}|{sorted_ids[1]}'
+
+    def offset_key(comp_id):
+        return f'OFFSET:{comp_id}'
+
     components = [dict(r) for r in cur.execute('SELECT * FROM model_components').fetchall()]
-    issues = []
-    offsets = []
+    detected_issue_keys = set()
+    detected_offset_keys = set()
+    new_issues = 0
+    new_offsets = 0
+
+    def aabb_overlap(a, b):
+        ax1 = (a.get('x') or 0) - (a.get('width') or 0) / 2
+        ay1 = (a.get('y') or 0) - (a.get('length') or 0) / 2
+        ax2 = (a.get('x') or 0) + (a.get('width') or 0) / 2
+        ay2 = (a.get('y') or 0) + (a.get('length') or 0) / 2
+        bx1 = (b.get('x') or 0) - (b.get('width') or 0) / 2
+        by1 = (b.get('y') or 0) - (b.get('length') or 0) / 2
+        bx2 = (b.get('x') or 0) + (b.get('width') or 0) / 2
+        by2 = (b.get('y') or 0) + (b.get('length') or 0) / 2
+        return ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1
 
     for c in components:
         if c.get('remark') and ('偏移' in str(c['remark']) or 'offset' in str(c['remark']).lower()):
-            offsets.append({
-                'component_id': c.get('component_id'),
+            comp_id = c.get('component_id')
+            key = offset_key(comp_id)
+            detected_offset_keys.add(key)
+
+            offset_x = 0.0
+            try:
+                m = re.search(r'[+-]?\d+\.?\d*', str(c['remark']))
+                if m:
+                    offset_x = float(m.group())
+            except Exception:
+                pass
+
+            off = {
+                'issue_key': key,
+                'component_id': comp_id,
                 'component_type': c.get('component_type'),
-                'offset_x': 0.0,
+                'offset_x': offset_x,
                 'offset_y': 0.0,
                 'offset_z': 0.0,
                 'original_x': c.get('x'),
@@ -305,35 +366,59 @@ def run_collision_detection():
                 'suggestion': generate_offset_suggestion(c),
                 'source_file': c.get('source_file'),
                 'drawing_version': c.get('drawing_version'),
-                'process_status': '未处理',
-                'created_at': now,
-            })
-            try:
-                import re
-                m = re.search(r'[+-]?\d+\.?\d*', str(c['remark']))
-                if m:
-                    offsets[-1]['offset_x'] = float(m.group())
-            except Exception:
-                pass
+                'last_detected_at': now,
+            }
 
-    drains = [c for c in components if '排水' in str(c.get('component_type', '')) or 'drain' in str(c.get('component_type', '')).lower()]
-    others = [c for c in components if c not in drains]
-
-    def aabb_overlap(a, b):
-        ax1, ay1 = (a.get('x') or 0) - (a.get('width') or 0) / 2, (a.get('y') or 0) - (a.get('length') or 0) / 2
-        ax2, ay2 = (a.get('x') or 0) + (a.get('width') or 0) / 2, (a.get('y') or 0) + (a.get('length') or 0) / 2
-        bx1, by1 = (b.get('x') or 0) - (b.get('width') or 0) / 2, (b.get('y') or 0) - (b.get('length') or 0) / 2
-        bx2, by2 = (b.get('x') or 0) + (b.get('width') or 0) / 2, (b.get('y') or 0) + (b.get('length') or 0) / 2
-        return ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1
+            old = existing_offsets.get(key)
+            if old and old['process_status'] in ('已处理', '已解决'):
+                cur.execute(
+                    '''UPDATE coordinate_offsets SET
+                        component_type=?, offset_x=?, offset_y=?, offset_z=?,
+                        original_x=?, original_y=?, original_z=?, description=?,
+                        suggestion=?, source_file=?, drawing_version=?, last_detected_at=?
+                        WHERE issue_key=?''',
+                    (
+                        off['component_type'], off['offset_x'], off['offset_y'], off['offset_z'],
+                        off['original_x'], off['original_y'], off['original_z'], off['description'],
+                        off['suggestion'], off['source_file'], off['drawing_version'], now, key
+                    )
+                )
+            elif old:
+                cur.execute(
+                    '''UPDATE coordinate_offsets SET
+                        component_type=?, offset_x=?, offset_y=?, offset_z=?,
+                        original_x=?, original_y=?, original_z=?, description=?,
+                        suggestion=?, source_file=?, drawing_version=?, process_status=?,
+                        last_detected_at=?
+                        WHERE issue_key=?''',
+                    (
+                        off['component_type'], off['offset_x'], off['offset_y'], off['offset_z'],
+                        off['original_x'], off['original_y'], off['original_z'], off['description'],
+                        off['suggestion'], off['source_file'], off['drawing_version'],
+                        '未处理', now, key
+                    )
+                )
+            else:
+                off['process_status'] = '未处理'
+                off['created_at'] = now
+                cols = list(off.keys())
+                vals = [off[c] for c in cols]
+                cur.execute(f'INSERT INTO coordinate_offsets ({",".join(cols)}) VALUES ({",".join(["?"]*len(cols))})', vals)
+                new_offsets += 1
 
     for i, a in enumerate(components):
         for b in components[i + 1:]:
             if aabb_overlap(a, b):
+                key = collision_key(a.get('component_id'), b.get('component_id'))
+                detected_issue_keys.add(key)
+
                 severity = 'critical' if (
                     any(t in str(a.get('component_type', '')) for t in ['雨水斗', '地漏', '雨水口']) and
                     any(t in str(b.get('component_type', '')) for t in ['梁', '柱', '设备基础'])
                 ) else 'warning'
-                issues.append({
+
+                iss = {
+                    'issue_key': key,
                     'component_a_id': a.get('component_id'),
                     'component_b_id': b.get('component_id'),
                     'component_a_type': a.get('component_type'),
@@ -347,23 +432,57 @@ def run_collision_detection():
                     }, ensure_ascii=False),
                     'severity': severity,
                     'drawing_version': a.get('drawing_version') or b.get('drawing_version'),
-                    'process_status': '未处理',
-                    'created_at': now,
-                })
+                    'last_detected_at': now,
+                }
 
-    for off in offsets:
-        cols = list(off.keys())
-        vals = [off[c] for c in cols]
-        cur.execute(f'INSERT INTO coordinate_offsets ({",".join(cols)}) VALUES ({",".join(["?"]*len(cols))})', vals)
-
-    for iss in issues:
-        cols = list(iss.keys())
-        vals = [iss[c] for c in cols]
-        cur.execute(f'INSERT INTO collision_issues ({",".join(cols)}) VALUES ({",".join(["?"]*len(cols))})', vals)
+                old = existing_collisions.get(key)
+                if old and old['process_status'] in ('已处理', '已解决'):
+                    cur.execute(
+                        '''UPDATE collision_issues SET
+                            component_a_id=?, component_b_id=?, component_a_type=?, component_b_type=?,
+                            description=?, suggestion=?, coordinates=?, severity=?,
+                            drawing_version=?, last_detected_at=?
+                            WHERE issue_key=?''',
+                        (
+                            iss['component_a_id'], iss['component_b_id'],
+                            iss['component_a_type'], iss['component_b_type'],
+                            iss['description'], iss['suggestion'], iss['coordinates'],
+                            iss['severity'], iss['drawing_version'], now, key
+                        )
+                    )
+                elif old:
+                    cur.execute(
+                        '''UPDATE collision_issues SET
+                            component_a_id=?, component_b_id=?, component_a_type=?, component_b_type=?,
+                            description=?, suggestion=?, coordinates=?, severity=?,
+                            drawing_version=?, process_status=?, last_detected_at=?
+                            WHERE issue_key=?''',
+                        (
+                            iss['component_a_id'], iss['component_b_id'],
+                            iss['component_a_type'], iss['component_b_type'],
+                            iss['description'], iss['suggestion'], iss['coordinates'],
+                            iss['severity'], iss['drawing_version'], '未处理', now, key
+                        )
+                    )
+                else:
+                    iss['process_status'] = '未处理'
+                    iss['created_at'] = now
+                    cols = list(iss.keys())
+                    vals = [iss[c] for c in cols]
+                    cur.execute(f'INSERT INTO collision_issues ({",".join(cols)}) VALUES ({",".join(["?"]*len(cols))})', vals)
+                    new_issues += 1
 
     conn.commit()
     conn.close()
-    return {'collisions': len(issues), 'offsets': len(offsets)}
+
+    total_collisions = len(detected_issue_keys)
+    total_offsets = len(detected_offset_keys)
+    return {
+        'collisions': total_collisions,
+        'new_collisions': new_issues,
+        'offsets': total_offsets,
+        'new_offsets': new_offsets,
+    }
 
 
 def generate_collision_suggestion(a, b):
@@ -421,16 +540,34 @@ def update_manual_remark(record_id, manual_remark):
     return True
 
 
-def update_process_status(table, record_id, status):
+def update_process_status(table, record_id, status, remark=None):
     conn = get_connection()
     cur = conn.cursor()
     now = datetime.now().isoformat()
     if table == 'submission':
         cur.execute('UPDATE submission_records SET process_status=?, updated_at=? WHERE id=?', (status, now, record_id))
     elif table == 'collision':
-        cur.execute('UPDATE collision_issues SET process_status=?, resolved_at=? WHERE id=?', (status, now, record_id))
+        if remark is not None:
+            cur.execute('UPDATE collision_issues SET process_status=?, resolved_at=?, remark=? WHERE id=?', (status, now, remark, record_id))
+        else:
+            cur.execute('UPDATE collision_issues SET process_status=?, resolved_at=? WHERE id=?', (status, now, record_id))
     elif table == 'offset':
-        cur.execute('UPDATE coordinate_offsets SET process_status=? WHERE id=?', (status, record_id))
+        if remark is not None:
+            cur.execute('UPDATE coordinate_offsets SET process_status=?, remark=? WHERE id=?', (status, remark, record_id))
+        else:
+            cur.execute('UPDATE coordinate_offsets SET process_status=? WHERE id=?', (status, record_id))
+    conn.commit()
+    conn.close()
+    return True
+
+
+def update_issue_remark(table, record_id, remark):
+    conn = get_connection()
+    cur = conn.cursor()
+    if table == 'collision':
+        cur.execute('UPDATE collision_issues SET remark=? WHERE id=?', (remark, record_id))
+    elif table == 'offset':
+        cur.execute('UPDATE coordinate_offsets SET remark=? WHERE id=?', (remark, record_id))
     conn.commit()
     conn.close()
     return True
