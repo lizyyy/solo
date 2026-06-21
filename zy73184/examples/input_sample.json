@@ -4,29 +4,31 @@
     "from_history_latest": true,
     "value": 50000,
     "unit": "元",
-    "description": "产品A收入"
+    "description": "产品A收入 - 仅最新历史答案，无特殊影响（对照组）"
   },
   {
     "id": "A002",
     "from_history_old": true,
-    "value": 3,
-    "unit": "万元",
-    "description": "产品B收入（旧版答案，单位是万元）"
+    "value": 30000,
+    "unit": "元",
+    "description": "产品B收入 - 使用历史旧版答案，值从30000变为3万（单位不同）"
   },
   {
-    "id": "A006",
+    "id": "B001",
+    "from_history_old": true,
     "from_attachment_late": true,
     "value": 120000,
     "unit": "元",
-    "description": "晚到附件中的数据，插到前面了"
+    "description": "同时受旧版答案和晚到附件影响 - 放在前面导致A003排序回退"
   },
   {
     "id": "A003",
     "formula_name": "revenue_calc",
+    "from_attachment_late": true,
     "price": 100,
     "quantity": 200,
     "unit": "元",
-    "description": "产品C收入（公式计算）"
+    "description": "产品C收入 - 公式算出20000，晚到附件更新为25000，排序会回退"
   },
   {
     "id": "A004",
@@ -34,7 +36,7 @@
     "formula_name": "profit_margin",
     "revenue": 50000,
     "cost": 35000,
-    "description": "产品A利润率"
+    "description": "产品A利润率 - 公式计算，无特殊影响（对照组）"
   },
   {
     "id": "A005",
@@ -42,11 +44,19 @@
     "from_verbal_note": true,
     "value": 8000,
     "unit": "元",
-    "description": "产品D收入（口头备注确认过）"
+    "description": "产品D收入 - 口头备注确认过，备注含'调整'字样，影响判断"
+  },
+  {
+    "id": "A006",
+    "from_attachment_late": true,
+    "from_verbal_note": true,
+    "value": 100000,
+    "unit": "元",
+    "description": "产品F - 晚到附件新增，备注仅作补充说明不改结论"
   },
   {
     "id": "BAD_001",
-    "description": "这是一个坏行，值为None？"
+    "description": "坏行 - 无有效值"
   },
   {
     "id": "",
@@ -67,19 +77,11 @@
     "description": "跳过行 - 草稿状态"
   },
   {
-    "id": "B001",
-    "from_attachment_late": true,
-    "from_history_old": true,
-    "value": 120000,
-    "unit": "元",
-    "description": "同时来自晚到附件和旧版答案"
-  },
-  {
     "id": "UNIT_001",
     "formula_name": "revenue_calc",
     "price": 50,
     "quantity": 100,
     "unit": "元",
-    "description": "单位换算测试"
+    "description": "单位换算测试行 - 公式计算，可用--target-unit验证单位偏差"
   }
 ]

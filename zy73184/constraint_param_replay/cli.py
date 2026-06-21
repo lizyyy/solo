@@ -31,6 +31,13 @@ def print_summary(summary):
     print(f"  排序不稳定: {summary.sort_unstable} 行")
     print()
 
+    print("【影响统计】")
+    print(f"  受晚到附件影响: {summary.affected_by_attachment} 行")
+    print(f"  受口头备注影响: {summary.affected_by_note} 行")
+    print(f"  受旧版答案影响: {summary.affected_by_old_history} 行")
+    print(f"  有单位换算:     {summary.has_unit_conversion} 行")
+    print()
+
     if summary.by_source:
         print("【按来源分布】")
         for src, cnt in sorted(summary.by_source.items()):
@@ -84,6 +91,12 @@ def cmd_replay(args):
     engine.load_unit_conversions(unit_convs)
     engine.load_history_answers(history)
 
+    attach_files = [f for f in os.listdir(attach_dir) if os.path.isfile(os.path.join(attach_dir, f))] if os.path.exists(attach_dir) else []
+    engine.load_attachments(attachments, attach_files)
+
+    notes_files = [f for f in os.listdir(notes_dir) if os.path.isfile(os.path.join(notes_dir, f))] if os.path.exists(notes_dir) else []
+    engine.load_notes(notes, notes_files)
+
     judgment_file = os.path.join(output_dir, "judgment_changes.jsonl")
     if os.path.exists(judgment_file):
         engine.load_judgment_changes(judgment_file)
@@ -135,8 +148,43 @@ def cmd_replay(args):
         print("【判断调整记录】")
         for j in report.judgment_changes:
             print(f"  [{j.timestamp}] {j.operator}")
-            print(f"    {j.old_judgment} -> {j.new_judgment}")
-            print(f"    说明: {j.reason}")
+            print(f"    旧判断: {j.old_judgment}")
+            print(f"    新判断: {j.new_judgment}")
+            print(f"    说明:   {j.reason}")
+        print()
+
+    affected_rows = [r for r in report.rows if r.status.value in ("processed", "sort_unstable") and (
+        r.affected_by_attachment or r.affected_by_note or r.affected_by_old_history
+    )]
+    if affected_rows:
+        print("【受影响记录明细】")
+        for row in affected_rows:
+            print(f"  - {row.row_id}: {row.value} {row.unit}")
+            print(f"    解释: {row.explanation}")
+            if row.value_diff and "无变化" not in row.value_diff:
+                print(f"    变化: {row.value_diff}")
+            if row.affected_by_attachment:
+                print(f"    影响类型: 受晚到附件影响")
+            if row.affected_by_note:
+                print(f"    影响类型: 受口头备注影响")
+            if row.affected_by_old_history:
+                print(f"    影响类型: 使用历史旧版答案")
+            if row.source_details:
+                for sd in row.source_details:
+                    if sd.source_type.value in ("attachment_late", "verbal_note", "history_old"):
+                        affect_type = []
+                        if sd.affects_value:
+                            affect_type.append("改值")
+                        if sd.affects_judgment:
+                            affect_type.append("改判断")
+                        if not affect_type:
+                            affect_type.append("仅说明")
+                        tag = "、".join(affect_type)
+                        file_info = f" [文件: {sd.file_name}]" if sd.file_name else ""
+                        print(f"    · [{sd.source_type.label}, {tag}]{file_info}")
+                        print(f"      摘要: {sd.content_summary}")
+                        if sd.impact_description:
+                            print(f"      影响: {sd.impact_description}")
         print()
 
     generator = ReportGenerator(output_dir=output_dir)

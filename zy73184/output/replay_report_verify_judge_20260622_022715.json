@@ -1,0 +1,963 @@
+{
+  "param_version": "verify_judge",
+  "timestamp": "2026-06-22 02:27:15",
+  "summary": {
+    "总计": 12,
+    "已处理": 8,
+    "坏行": 2,
+    "跳过行": 2,
+    "排序不稳定": 0,
+    "受晚到附件影响": 3,
+    "受口头备注影响": 2,
+    "受旧版答案影响": 2,
+    "有单位换算": 0,
+    "按来源分布": {
+      "历史答案(最新)": 3,
+      "历史答案(旧版)": 2,
+      "晚到附件": 3,
+      "公式计算": 3,
+      "口头备注": 2
+    },
+    "按公式分布": {
+      "revenue_calc": 2,
+      "profit_margin": 1
+    }
+  },
+  "abnormal_points": [],
+  "unit_mismatch_notes": [],
+  "sort_unstable_rows": [],
+  "bad_rows": [
+    {
+      "row_id": "BAD_001",
+      "value": null,
+      "unit": "",
+      "formula_name": "",
+      "formula_version": "",
+      "status": "bad",
+      "base_value": null,
+      "base_unit": "",
+      "base_formula_name": "",
+      "base_source": "",
+      "sources": [
+        "history_latest"
+      ],
+      "source_details": [],
+      "affected_by_attachment": false,
+      "affected_by_note": false,
+      "affected_by_old_history": false,
+      "value_diff": "",
+      "unit_conversion_basis": "",
+      "explanation": "",
+      "error_msg": "无法获取有效值：无公式、无历史答案、也无value字段",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "",
+      "value": null,
+      "unit": "",
+      "formula_name": "",
+      "formula_version": "",
+      "status": "bad",
+      "base_value": null,
+      "base_unit": "",
+      "base_formula_name": "",
+      "base_source": "",
+      "sources": [
+        "history_latest"
+      ],
+      "source_details": [],
+      "affected_by_attachment": false,
+      "affected_by_note": false,
+      "affected_by_old_history": false,
+      "value_diff": "",
+      "unit_conversion_basis": "",
+      "explanation": "",
+      "error_msg": "缺少必填字段: id",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    }
+  ],
+  "skipped_rows": [
+    {
+      "row_id": "SKIP_001",
+      "value": null,
+      "unit": "",
+      "formula_name": "",
+      "formula_version": "",
+      "status": "skipped",
+      "base_value": null,
+      "base_unit": "",
+      "base_formula_name": "",
+      "base_source": "",
+      "sources": [
+        "history_latest"
+      ],
+      "source_details": [],
+      "affected_by_attachment": false,
+      "affected_by_note": false,
+      "affected_by_old_history": false,
+      "value_diff": "",
+      "unit_conversion_basis": "",
+      "explanation": "",
+      "error_msg": "",
+      "skip_reason": "待确认，先跳过",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "SKIP_002",
+      "value": null,
+      "unit": "",
+      "formula_name": "",
+      "formula_version": "",
+      "status": "skipped",
+      "base_value": null,
+      "base_unit": "",
+      "base_formula_name": "",
+      "base_source": "",
+      "sources": [
+        "history_latest"
+      ],
+      "source_details": [],
+      "affected_by_attachment": false,
+      "affected_by_note": false,
+      "affected_by_old_history": false,
+      "value_diff": "",
+      "unit_conversion_basis": "",
+      "explanation": "",
+      "error_msg": "",
+      "skip_reason": "草稿状态",
+      "sort_unstable_reason": "",
+      "judgments": []
+    }
+  ],
+  "processed_rows": [
+    {
+      "row_id": "A001",
+      "value": 50000,
+      "unit": "元",
+      "formula_name": "",
+      "formula_version": "v2",
+      "status": "processed",
+      "base_value": 50000,
+      "base_unit": "元",
+      "base_formula_name": "",
+      "base_source": "history_latest",
+      "sources": [
+        "history_latest"
+      ],
+      "source_details": [
+        {
+          "source_type": "history_latest",
+          "source_label": "历史答案(最新)",
+          "file_name": "",
+          "content_summary": "历史最新答案: 50000 元",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "基准值来自最新历史答案",
+          "version": "v2"
+        }
+      ],
+      "affected_by_attachment": false,
+      "affected_by_note": false,
+      "affected_by_old_history": false,
+      "value_diff": "无变化",
+      "unit_conversion_basis": "",
+      "explanation": "基准值来自历史答案(最新)",
+      "error_msg": "",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "A002",
+      "value": 3,
+      "unit": "万元",
+      "formula_name": "",
+      "formula_version": "v2",
+      "status": "processed",
+      "base_value": 30000,
+      "base_unit": "元",
+      "base_formula_name": "",
+      "base_source": "history_latest",
+      "sources": [
+        "history_old"
+      ],
+      "source_details": [
+        {
+          "source_type": "history_old",
+          "source_label": "历史答案(旧版)",
+          "file_name": "",
+          "content_summary": "旧版答案: 3 万元 (版本: v1)",
+          "affects_value": false,
+          "affects_judgment": false,
+          "impact_description": "使用旧版答案: 值从 30000 元 变为 3 万元",
+          "version": "v1"
+        }
+      ],
+      "affected_by_attachment": false,
+      "affected_by_note": false,
+      "affected_by_old_history": true,
+      "value_diff": "无变化",
+      "unit_conversion_basis": "",
+      "explanation": "基准值来自历史答案(最新)；使用了历史旧版答案替代最新版",
+      "error_msg": "",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "B001",
+      "value": 120000,
+      "unit": "元",
+      "formula_name": "",
+      "formula_version": "",
+      "status": "processed",
+      "base_value": 120000,
+      "base_unit": "元",
+      "base_formula_name": "",
+      "base_source": "input_value",
+      "sources": [
+        "history_old",
+        "attachment_late"
+      ],
+      "source_details": [
+        {
+          "source_type": "history_old",
+          "source_label": "历史答案(旧版)",
+          "file_name": "",
+          "content_summary": "旧版答案: 10 万元 (版本: v1)",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "使用旧版答案: 值从 120000 元 变为 10 万元",
+          "version": "v1"
+        },
+        {
+          "source_type": "attachment_late",
+          "source_label": "晚到附件",
+          "file_name": "late_data.json",
+          "content_summary": "B001: 120000 元 - 补充数据-晚到附件中的新增项",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "数值从 10 万元 变为 120000 元",
+          "version": "v1"
+        }
+      ],
+      "affected_by_attachment": true,
+      "affected_by_note": false,
+      "affected_by_old_history": true,
+      "value_diff": "无变化",
+      "unit_conversion_basis": "",
+      "explanation": "基准值来自输入数据；使用历史旧版答案作为数据源；晚到附件影响了结果",
+      "error_msg": "",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "A003",
+      "value": 25000,
+      "unit": "元",
+      "formula_name": "revenue_calc",
+      "formula_version": "v1",
+      "status": "processed",
+      "base_value": 20000,
+      "base_unit": "元",
+      "base_formula_name": "revenue_calc",
+      "base_source": "formula",
+      "sources": [
+        "attachment_late",
+        "formula"
+      ],
+      "source_details": [
+        {
+          "source_type": "formula",
+          "source_label": "公式计算",
+          "file_name": "",
+          "content_summary": "revenue_calc: price * quantity (元)",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "使用公式 revenue_calc 计算基准值",
+          "version": "v1"
+        },
+        {
+          "source_type": "attachment_late",
+          "source_label": "晚到附件",
+          "file_name": "late_data.json",
+          "content_summary": "A003: 25000 元 - 晚到数据：产品C收入更新为25000元",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "数值从 20000 元 变为 25000 元",
+          "version": "v1.1"
+        }
+      ],
+      "affected_by_attachment": true,
+      "affected_by_note": false,
+      "affected_by_old_history": false,
+      "value_diff": "增加 5000.00 元 (+25.0%)",
+      "unit_conversion_basis": "",
+      "explanation": "计算公式: revenue_calc；晚到附件影响了结果；数值变化: 增加 5000.00 元 (+25.0%)",
+      "error_msg": "",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "A004",
+      "value": 30.0,
+      "unit": "%",
+      "formula_name": "profit_margin",
+      "formula_version": "v1",
+      "status": "processed",
+      "base_value": 30.0,
+      "base_unit": "%",
+      "base_formula_name": "profit_margin",
+      "base_source": "formula",
+      "sources": [
+        "history_latest",
+        "formula"
+      ],
+      "source_details": [
+        {
+          "source_type": "history_latest",
+          "source_label": "历史答案(最新)",
+          "file_name": "",
+          "content_summary": "历史最新答案: 25.5 %",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "基准值来自最新历史答案",
+          "version": "v2"
+        },
+        {
+          "source_type": "formula",
+          "source_label": "公式计算",
+          "file_name": "",
+          "content_summary": "profit_margin: (revenue - cost) / revenue * 100 (%)",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "使用公式 profit_margin 计算基准值",
+          "version": "v1"
+        }
+      ],
+      "affected_by_attachment": false,
+      "affected_by_note": false,
+      "affected_by_old_history": false,
+      "value_diff": "无变化",
+      "unit_conversion_basis": "",
+      "explanation": "计算公式: profit_margin",
+      "error_msg": "",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "A005",
+      "value": 8000,
+      "unit": "元",
+      "formula_name": "",
+      "formula_version": "v2",
+      "status": "processed",
+      "base_value": 8000,
+      "base_unit": "元",
+      "base_formula_name": "",
+      "base_source": "history_latest",
+      "sources": [
+        "history_latest",
+        "verbal_note"
+      ],
+      "source_details": [
+        {
+          "source_type": "history_latest",
+          "source_label": "历史答案(最新)",
+          "file_name": "",
+          "content_summary": "历史最新答案: 8000 元",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "基准值来自最新历史答案",
+          "version": "v2"
+        },
+        {
+          "source_type": "verbal_note",
+          "source_label": "口头备注",
+          "file_name": "verbal_note_01.txt",
+          "content_summary": "小孟口头确认：A005 的数值上周有调整，以最新版本为准。",
+          "affects_value": false,
+          "affects_judgment": true,
+          "impact_description": "口头备注包含调整说明，可能影响判断结论",
+          "version": ""
+        }
+      ],
+      "affected_by_attachment": false,
+      "affected_by_note": true,
+      "affected_by_old_history": false,
+      "value_diff": "无变化",
+      "unit_conversion_basis": "",
+      "explanation": "基准值来自历史答案(最新)；存在相关口头备注",
+      "error_msg": "",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "A006",
+      "value": 95000,
+      "unit": "元",
+      "formula_name": "",
+      "formula_version": "",
+      "status": "processed",
+      "base_value": 100000,
+      "base_unit": "元",
+      "base_formula_name": "",
+      "base_source": "input_value",
+      "sources": [
+        "attachment_late",
+        "verbal_note"
+      ],
+      "source_details": [
+        {
+          "source_type": "attachment_late",
+          "source_label": "晚到附件",
+          "file_name": "late_data.json",
+          "content_summary": "A006: 95000 元 - 晚到数据：产品F收入补充，原估算10万，实测9.5万",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "数值从 100000 元 变为 95000 元",
+          "version": "v1"
+        },
+        {
+          "source_type": "verbal_note",
+          "source_label": "口头备注",
+          "file_name": "verbal_note_02.txt",
+          "content_summary": "A006 是晚到的数据，作为补充参考，不影响主结论。",
+          "affects_value": false,
+          "affects_judgment": false,
+          "impact_description": "备注仅作补充说明，未改变计算结果",
+          "version": ""
+        }
+      ],
+      "affected_by_attachment": true,
+      "affected_by_note": true,
+      "affected_by_old_history": false,
+      "value_diff": "减少 5000.00 元 (-5.0%)",
+      "unit_conversion_basis": "",
+      "explanation": "基准值来自输入数据；晚到附件影响了结果；存在相关口头备注；数值变化: 减少 5000.00 元 (-5.0%)",
+      "error_msg": "",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "UNIT_001",
+      "value": 5000,
+      "unit": "元",
+      "formula_name": "revenue_calc",
+      "formula_version": "v1",
+      "status": "processed",
+      "base_value": 5000,
+      "base_unit": "元",
+      "base_formula_name": "revenue_calc",
+      "base_source": "formula",
+      "sources": [
+        "formula"
+      ],
+      "source_details": [
+        {
+          "source_type": "formula",
+          "source_label": "公式计算",
+          "file_name": "",
+          "content_summary": "revenue_calc: price * quantity (元)",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "使用公式 revenue_calc 计算基准值",
+          "version": "v1"
+        }
+      ],
+      "affected_by_attachment": false,
+      "affected_by_note": false,
+      "affected_by_old_history": false,
+      "value_diff": "无变化",
+      "unit_conversion_basis": "",
+      "explanation": "计算公式: revenue_calc",
+      "error_msg": "",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    }
+  ],
+  "all_rows": [
+    {
+      "row_id": "A001",
+      "value": 50000,
+      "unit": "元",
+      "formula_name": "",
+      "formula_version": "v2",
+      "status": "processed",
+      "base_value": 50000,
+      "base_unit": "元",
+      "base_formula_name": "",
+      "base_source": "history_latest",
+      "sources": [
+        "history_latest"
+      ],
+      "source_details": [
+        {
+          "source_type": "history_latest",
+          "source_label": "历史答案(最新)",
+          "file_name": "",
+          "content_summary": "历史最新答案: 50000 元",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "基准值来自最新历史答案",
+          "version": "v2"
+        }
+      ],
+      "affected_by_attachment": false,
+      "affected_by_note": false,
+      "affected_by_old_history": false,
+      "value_diff": "无变化",
+      "unit_conversion_basis": "",
+      "explanation": "基准值来自历史答案(最新)",
+      "error_msg": "",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "A002",
+      "value": 3,
+      "unit": "万元",
+      "formula_name": "",
+      "formula_version": "v2",
+      "status": "processed",
+      "base_value": 30000,
+      "base_unit": "元",
+      "base_formula_name": "",
+      "base_source": "history_latest",
+      "sources": [
+        "history_old"
+      ],
+      "source_details": [
+        {
+          "source_type": "history_old",
+          "source_label": "历史答案(旧版)",
+          "file_name": "",
+          "content_summary": "旧版答案: 3 万元 (版本: v1)",
+          "affects_value": false,
+          "affects_judgment": false,
+          "impact_description": "使用旧版答案: 值从 30000 元 变为 3 万元",
+          "version": "v1"
+        }
+      ],
+      "affected_by_attachment": false,
+      "affected_by_note": false,
+      "affected_by_old_history": true,
+      "value_diff": "无变化",
+      "unit_conversion_basis": "",
+      "explanation": "基准值来自历史答案(最新)；使用了历史旧版答案替代最新版",
+      "error_msg": "",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "B001",
+      "value": 120000,
+      "unit": "元",
+      "formula_name": "",
+      "formula_version": "",
+      "status": "processed",
+      "base_value": 120000,
+      "base_unit": "元",
+      "base_formula_name": "",
+      "base_source": "input_value",
+      "sources": [
+        "history_old",
+        "attachment_late"
+      ],
+      "source_details": [
+        {
+          "source_type": "history_old",
+          "source_label": "历史答案(旧版)",
+          "file_name": "",
+          "content_summary": "旧版答案: 10 万元 (版本: v1)",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "使用旧版答案: 值从 120000 元 变为 10 万元",
+          "version": "v1"
+        },
+        {
+          "source_type": "attachment_late",
+          "source_label": "晚到附件",
+          "file_name": "late_data.json",
+          "content_summary": "B001: 120000 元 - 补充数据-晚到附件中的新增项",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "数值从 10 万元 变为 120000 元",
+          "version": "v1"
+        }
+      ],
+      "affected_by_attachment": true,
+      "affected_by_note": false,
+      "affected_by_old_history": true,
+      "value_diff": "无变化",
+      "unit_conversion_basis": "",
+      "explanation": "基准值来自输入数据；使用历史旧版答案作为数据源；晚到附件影响了结果",
+      "error_msg": "",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "A003",
+      "value": 25000,
+      "unit": "元",
+      "formula_name": "revenue_calc",
+      "formula_version": "v1",
+      "status": "processed",
+      "base_value": 20000,
+      "base_unit": "元",
+      "base_formula_name": "revenue_calc",
+      "base_source": "formula",
+      "sources": [
+        "attachment_late",
+        "formula"
+      ],
+      "source_details": [
+        {
+          "source_type": "formula",
+          "source_label": "公式计算",
+          "file_name": "",
+          "content_summary": "revenue_calc: price * quantity (元)",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "使用公式 revenue_calc 计算基准值",
+          "version": "v1"
+        },
+        {
+          "source_type": "attachment_late",
+          "source_label": "晚到附件",
+          "file_name": "late_data.json",
+          "content_summary": "A003: 25000 元 - 晚到数据：产品C收入更新为25000元",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "数值从 20000 元 变为 25000 元",
+          "version": "v1.1"
+        }
+      ],
+      "affected_by_attachment": true,
+      "affected_by_note": false,
+      "affected_by_old_history": false,
+      "value_diff": "增加 5000.00 元 (+25.0%)",
+      "unit_conversion_basis": "",
+      "explanation": "计算公式: revenue_calc；晚到附件影响了结果；数值变化: 增加 5000.00 元 (+25.0%)",
+      "error_msg": "",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "A004",
+      "value": 30.0,
+      "unit": "%",
+      "formula_name": "profit_margin",
+      "formula_version": "v1",
+      "status": "processed",
+      "base_value": 30.0,
+      "base_unit": "%",
+      "base_formula_name": "profit_margin",
+      "base_source": "formula",
+      "sources": [
+        "history_latest",
+        "formula"
+      ],
+      "source_details": [
+        {
+          "source_type": "history_latest",
+          "source_label": "历史答案(最新)",
+          "file_name": "",
+          "content_summary": "历史最新答案: 25.5 %",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "基准值来自最新历史答案",
+          "version": "v2"
+        },
+        {
+          "source_type": "formula",
+          "source_label": "公式计算",
+          "file_name": "",
+          "content_summary": "profit_margin: (revenue - cost) / revenue * 100 (%)",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "使用公式 profit_margin 计算基准值",
+          "version": "v1"
+        }
+      ],
+      "affected_by_attachment": false,
+      "affected_by_note": false,
+      "affected_by_old_history": false,
+      "value_diff": "无变化",
+      "unit_conversion_basis": "",
+      "explanation": "计算公式: profit_margin",
+      "error_msg": "",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "A005",
+      "value": 8000,
+      "unit": "元",
+      "formula_name": "",
+      "formula_version": "v2",
+      "status": "processed",
+      "base_value": 8000,
+      "base_unit": "元",
+      "base_formula_name": "",
+      "base_source": "history_latest",
+      "sources": [
+        "history_latest",
+        "verbal_note"
+      ],
+      "source_details": [
+        {
+          "source_type": "history_latest",
+          "source_label": "历史答案(最新)",
+          "file_name": "",
+          "content_summary": "历史最新答案: 8000 元",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "基准值来自最新历史答案",
+          "version": "v2"
+        },
+        {
+          "source_type": "verbal_note",
+          "source_label": "口头备注",
+          "file_name": "verbal_note_01.txt",
+          "content_summary": "小孟口头确认：A005 的数值上周有调整，以最新版本为准。",
+          "affects_value": false,
+          "affects_judgment": true,
+          "impact_description": "口头备注包含调整说明，可能影响判断结论",
+          "version": ""
+        }
+      ],
+      "affected_by_attachment": false,
+      "affected_by_note": true,
+      "affected_by_old_history": false,
+      "value_diff": "无变化",
+      "unit_conversion_basis": "",
+      "explanation": "基准值来自历史答案(最新)；存在相关口头备注",
+      "error_msg": "",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "A006",
+      "value": 95000,
+      "unit": "元",
+      "formula_name": "",
+      "formula_version": "",
+      "status": "processed",
+      "base_value": 100000,
+      "base_unit": "元",
+      "base_formula_name": "",
+      "base_source": "input_value",
+      "sources": [
+        "attachment_late",
+        "verbal_note"
+      ],
+      "source_details": [
+        {
+          "source_type": "attachment_late",
+          "source_label": "晚到附件",
+          "file_name": "late_data.json",
+          "content_summary": "A006: 95000 元 - 晚到数据：产品F收入补充，原估算10万，实测9.5万",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "数值从 100000 元 变为 95000 元",
+          "version": "v1"
+        },
+        {
+          "source_type": "verbal_note",
+          "source_label": "口头备注",
+          "file_name": "verbal_note_02.txt",
+          "content_summary": "A006 是晚到的数据，作为补充参考，不影响主结论。",
+          "affects_value": false,
+          "affects_judgment": false,
+          "impact_description": "备注仅作补充说明，未改变计算结果",
+          "version": ""
+        }
+      ],
+      "affected_by_attachment": true,
+      "affected_by_note": true,
+      "affected_by_old_history": false,
+      "value_diff": "减少 5000.00 元 (-5.0%)",
+      "unit_conversion_basis": "",
+      "explanation": "基准值来自输入数据；晚到附件影响了结果；存在相关口头备注；数值变化: 减少 5000.00 元 (-5.0%)",
+      "error_msg": "",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "BAD_001",
+      "value": null,
+      "unit": "",
+      "formula_name": "",
+      "formula_version": "",
+      "status": "bad",
+      "base_value": null,
+      "base_unit": "",
+      "base_formula_name": "",
+      "base_source": "",
+      "sources": [
+        "history_latest"
+      ],
+      "source_details": [],
+      "affected_by_attachment": false,
+      "affected_by_note": false,
+      "affected_by_old_history": false,
+      "value_diff": "",
+      "unit_conversion_basis": "",
+      "explanation": "",
+      "error_msg": "无法获取有效值：无公式、无历史答案、也无value字段",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "",
+      "value": null,
+      "unit": "",
+      "formula_name": "",
+      "formula_version": "",
+      "status": "bad",
+      "base_value": null,
+      "base_unit": "",
+      "base_formula_name": "",
+      "base_source": "",
+      "sources": [
+        "history_latest"
+      ],
+      "source_details": [],
+      "affected_by_attachment": false,
+      "affected_by_note": false,
+      "affected_by_old_history": false,
+      "value_diff": "",
+      "unit_conversion_basis": "",
+      "explanation": "",
+      "error_msg": "缺少必填字段: id",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "SKIP_001",
+      "value": null,
+      "unit": "",
+      "formula_name": "",
+      "formula_version": "",
+      "status": "skipped",
+      "base_value": null,
+      "base_unit": "",
+      "base_formula_name": "",
+      "base_source": "",
+      "sources": [
+        "history_latest"
+      ],
+      "source_details": [],
+      "affected_by_attachment": false,
+      "affected_by_note": false,
+      "affected_by_old_history": false,
+      "value_diff": "",
+      "unit_conversion_basis": "",
+      "explanation": "",
+      "error_msg": "",
+      "skip_reason": "待确认，先跳过",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "SKIP_002",
+      "value": null,
+      "unit": "",
+      "formula_name": "",
+      "formula_version": "",
+      "status": "skipped",
+      "base_value": null,
+      "base_unit": "",
+      "base_formula_name": "",
+      "base_source": "",
+      "sources": [
+        "history_latest"
+      ],
+      "source_details": [],
+      "affected_by_attachment": false,
+      "affected_by_note": false,
+      "affected_by_old_history": false,
+      "value_diff": "",
+      "unit_conversion_basis": "",
+      "explanation": "",
+      "error_msg": "",
+      "skip_reason": "草稿状态",
+      "sort_unstable_reason": "",
+      "judgments": []
+    },
+    {
+      "row_id": "UNIT_001",
+      "value": 5000,
+      "unit": "元",
+      "formula_name": "revenue_calc",
+      "formula_version": "v1",
+      "status": "processed",
+      "base_value": 5000,
+      "base_unit": "元",
+      "base_formula_name": "revenue_calc",
+      "base_source": "formula",
+      "sources": [
+        "formula"
+      ],
+      "source_details": [
+        {
+          "source_type": "formula",
+          "source_label": "公式计算",
+          "file_name": "",
+          "content_summary": "revenue_calc: price * quantity (元)",
+          "affects_value": true,
+          "affects_judgment": false,
+          "impact_description": "使用公式 revenue_calc 计算基准值",
+          "version": "v1"
+        }
+      ],
+      "affected_by_attachment": false,
+      "affected_by_note": false,
+      "affected_by_old_history": false,
+      "value_diff": "无变化",
+      "unit_conversion_basis": "",
+      "explanation": "计算公式: revenue_calc",
+      "error_msg": "",
+      "skip_reason": "",
+      "sort_unstable_reason": "",
+      "judgments": []
+    }
+  ],
+  "judgment_changes": [
+    {
+      "timestamp": "2026-06-20 11:22:54",
+      "old_judgment": "合格",
+      "new_judgment": "需复核",
+      "reason": "小孟复核发现异常，需重新确认",
+      "operator": "小孟"
+    },
+    {
+      "timestamp": "2026-06-22 02:27:14",
+      "old_judgment": "合格",
+      "new_judgment": "需复核",
+      "reason": "验证测试：数值有偏差",
+      "operator": "自动化测试"
+    }
+  ]
+}

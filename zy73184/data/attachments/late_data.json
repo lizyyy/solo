@@ -1,8 +1,23 @@
 [
   {
+    "id": "A003",
+    "value": 25000,
+    "unit": "元",
+    "description": "晚到数据：产品C收入更新为25000元",
+    "version": "v1.1"
+  },
+  {
+    "id": "A006",
+    "value": 95000,
+    "unit": "元",
+    "description": "晚到数据：产品F收入补充，原估算10万，实测9.5万",
+    "version": "v1"
+  },
+  {
     "id": "B001",
     "value": 120000,
     "unit": "元",
-    "description": "补充数据-晚到附件中的新增项"
+    "description": "补充数据-晚到附件中的新增项",
+    "version": "v1"
   }
 ]

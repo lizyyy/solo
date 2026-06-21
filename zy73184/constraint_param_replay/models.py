@@ -74,6 +74,17 @@ class JudgmentRecord:
 
 
 @dataclass
+class SourceDetail:
+    source_type: SourceType
+    file_name: str = ""
+    content_summary: str = ""
+    affects_value: bool = False
+    affects_judgment: bool = False
+    impact_description: str = ""
+    version: str = ""
+
+
+@dataclass
 class HistoryAnswer:
     id: str
     content: Any
@@ -84,6 +95,7 @@ class HistoryAnswer:
     formula_name: Optional[str] = None
     attachment_name: Optional[str] = None
     note_text: Optional[str] = None
+    description: str = ""
 
     def __post_init__(self):
         if not self.timestamp:
@@ -97,13 +109,25 @@ class ProcessRow:
     value: Any = None
     unit: str = ""
     formula_name: str = ""
+    formula_version: str = ""
     sources: List[SourceType] = field(default_factory=list)
+    source_details: List[SourceDetail] = field(default_factory=list)
     error_msg: str = ""
     skip_reason: str = ""
     sort_order: Optional[int] = None
     sort_unstable_reason: str = ""
     judgments: List[JudgmentRecord] = field(default_factory=list)
     raw_data: Dict[str, Any] = field(default_factory=dict)
+    base_value: Any = None
+    base_unit: str = ""
+    base_formula_name: str = ""
+    base_source: str = ""
+    affected_by_attachment: bool = False
+    affected_by_note: bool = False
+    affected_by_old_history: bool = False
+    value_diff: str = ""
+    unit_conversion_basis: str = ""
+    explanation: str = ""
 
 
 @dataclass
@@ -113,6 +137,10 @@ class ReplaySummary:
     bad: int = 0
     skipped: int = 0
     sort_unstable: int = 0
+    affected_by_attachment: int = 0
+    affected_by_note: int = 0
+    affected_by_old_history: int = 0
+    has_unit_conversion: int = 0
     by_source: Dict[str, int] = field(default_factory=dict)
     by_formula: Dict[str, int] = field(default_factory=dict)
 
@@ -123,6 +151,10 @@ class ReplaySummary:
             "坏行": self.bad,
             "跳过行": self.skipped,
             "排序不稳定": self.sort_unstable,
+            "受晚到附件影响": self.affected_by_attachment,
+            "受口头备注影响": self.affected_by_note,
+            "受旧版答案影响": self.affected_by_old_history,
+            "有单位换算": self.has_unit_conversion,
             "按来源分布": self.by_source,
             "按公式分布": self.by_formula,
         }
