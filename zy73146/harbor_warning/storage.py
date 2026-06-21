@@ -202,6 +202,8 @@ class HarborStorage:
                         sediment_rate=r.get("sediment_rate"),
                         threshold_value=r.get("threshold_value", 0.0),
                         actual_value=r.get("actual_value", 0.0),
+                        warning_threshold=r.get("warning_threshold", 0.0),
+                        critical_threshold=r.get("critical_threshold", 0.0),
                         description=r.get("description", ""),
                         created_at=r.get("created_at", ""),
                     )

@@ -37,14 +37,35 @@ class EngineError(RuntimeError):
         super().__init__(f"[{EngineError.CODE}] {detail}")
 
 
-def _level_from_ratio(ratio: float) -> WarningLevel:
-    if ratio >= 3.0:
-        return WarningLevel.CRITICAL
-    if ratio >= 2.0:
-        return WarningLevel.WARNING
-    if ratio >= 1.2:
-        return WarningLevel.ATTENTION
-    return WarningLevel.NORMAL
+# 低于 warning 阈值且未到 attention 区间 → normal
+# 达到 attention 区间但未到 warning → attention（warning 前的软提醒）
+# 达到 warning 但未到 critical → warning
+# 达到 critical → critical（critical 阈值真正参与判断）
+ATTENTION_FRACTION = 0.8
+
+
+def classify_sediment(
+    sediment_cm: float,
+    sediment_warning_cm: float,
+    sediment_critical_cm: float,
+    attention_fraction: float = ATTENTION_FRACTION,
+) -> tuple[WarningLevel, float]:
+    """按可核对的阈值规则判定淤积级别。
+
+    返回 (级别, 本次命中的阈值)：
+      - critical : sediment >= critical_cm，命中阈值 = critical_cm
+      - warning  : warning_cm <= sediment < critical_cm，命中阈值 = warning_cm
+      - attention: attention_fraction*warning_cm <= sediment < warning_cm，命中阈值 = attention 阈值
+      - normal   : 其余，命中阈值 = 0.0（不产生预警记录）
+    """
+    if sediment_cm >= sediment_critical_cm:
+        return WarningLevel.CRITICAL, sediment_critical_cm
+    if sediment_cm >= sediment_warning_cm:
+        return WarningLevel.WARNING, sediment_warning_cm
+    attention_threshold = sediment_warning_cm * attention_fraction
+    if sediment_cm >= attention_threshold:
+        return WarningLevel.ATTENTION, attention_threshold
+    return WarningLevel.NORMAL, 0.0
 
 
 class HarborWarningEngine:
@@ -156,16 +177,14 @@ class HarborWarningEngine:
         warnings_added: list[str] = []
         for log in usable:
             assert log.sediment_thickness is not None
-            ratio = log.sediment_thickness / max(1e-6, sediment_warning_cm)
-            level = _level_from_ratio(ratio)
+            level, hit_threshold = classify_sediment(
+                sediment_cm=log.sediment_thickness,
+                sediment_warning_cm=sediment_warning_cm,
+                sediment_critical_cm=sediment_critical_cm,
+            )
             if level == WarningLevel.NORMAL:
                 self.storage.update_buoy_log_status(log.log_id, ProcessStatus.COMPLETED)
                 continue
-            threshold = (
-                sediment_critical_cm
-                if level == WarningLevel.CRITICAL
-                else sediment_warning_cm
-            )
             wr = WarningRecord(
                 warning_id=_uid("warn"),
                 buoy_log_id=log.log_id,
@@ -177,11 +196,16 @@ class HarborWarningEngine:
                 water_depth=log.water_depth,
                 sediment_thickness=log.sediment_thickness,
                 sediment_rate=None,
-                threshold_value=threshold,
+                threshold_value=hit_threshold,
                 actual_value=log.sediment_thickness,
+                warning_threshold=sediment_warning_cm,
+                critical_threshold=sediment_critical_cm,
                 description=(
-                    f"淤积厚度 {log.sediment_thickness:.2f} cm 超过阈值 "
-                    f"{threshold:.2f} cm（ratio={ratio:.2f}），来源={log.source.value}"
+                    f"淤积厚度 {log.sediment_thickness:.2f} cm 命中 {level.value} 级别"
+                    f"（命中阈值={hit_threshold:.2f} cm，"
+                    f"warning阈值={sediment_warning_cm:.2f} cm，"
+                    f"critical阈值={sediment_critical_cm:.2f} cm），"
+                    f"来源={log.source.value}"
                 ),
             )
             self.storage.add_warning(wr)
@@ -189,6 +213,10 @@ class HarborWarningEngine:
             warnings_added.append(wr.warning_id)
         result["warnings_added"] = len(warnings_added)
         result["warning_ids"] = warnings_added
+        result["thresholds"] = {
+            "sediment_warning_cm": sediment_warning_cm,
+            "sediment_critical_cm": sediment_critical_cm,
+        }
         return result
 
     # ---------- 人工操作（通过 engine 调用，保证状态机一致） ----------

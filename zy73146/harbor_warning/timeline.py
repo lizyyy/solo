@@ -123,6 +123,8 @@ def build_timeline(
             "process_status": w.process_status.value,
             "sediment_thickness": w.sediment_thickness,
             "threshold_value": w.threshold_value,
+            "warning_threshold": w.warning_threshold,
+            "critical_threshold": w.critical_threshold,
             "actual_value": w.actual_value,
             "description": w.description,
         }

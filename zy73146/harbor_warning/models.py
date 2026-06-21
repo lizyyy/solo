@@ -133,6 +133,8 @@ class WarningRecord:
     sediment_rate: Optional[float] = None
     threshold_value: float = 0.0
     actual_value: float = 0.0
+    warning_threshold: float = 0.0
+    critical_threshold: float = 0.0
     description: str = ""
     created_at: str = field(default_factory=_now)
 

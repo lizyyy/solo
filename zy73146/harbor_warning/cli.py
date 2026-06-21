@@ -26,6 +26,22 @@ EXIT_DATA = 3
 EXIT_RUNTIME = 4
 
 
+# 稳定业务错误码 —— 日常脚本按这些 CODE 前缀判断失败类型。
+# 命名规则：<命令>_<错误类别>，值保持不变。
+ERR_IMPORT_FILE_NOT_FOUND = "IMPORT_FILE_NOT_FOUND"
+ERR_IMPORT_PARSE = "IMPORT_FILE_PARSE_ERROR"
+ERR_IMPORT_FORMAT = "IMPORT_FORMAT_ERROR"
+ERR_REVISE_LEVEL_INVALID = "REVISE_LEVEL_INVALID"
+ERR_TIMELINE_ARG = "TIMELINE_ARG_ERROR"
+ERR_RUNTIME = "RUNTIME_ERROR"
+
+ALLOWED_WARNING_LEVELS = [l.value for l in WarningLevel]
+
+
+def _err(code: str, reason: str) -> str:
+    return f"[{code}] {reason}"
+
+
 def _json_dump(obj: Any) -> str:
     return json.dumps(obj, ensure_ascii=False, indent=2)
 
@@ -33,10 +49,29 @@ def _json_dump(obj: Any) -> str:
 def cmd_import(args: argparse.Namespace) -> int:
     storage = HarborStorage(args.data_dir)
     engine = HarborWarningEngine(storage)
-    with open(args.input, "r", encoding="utf-8") as f:
-        data = json.load(f)
+    try:
+        with open(args.input, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        print(
+            _err(ERR_IMPORT_FILE_NOT_FOUND, f"输入文件不存在: {args.input}"),
+            file=sys.stderr,
+        )
+        return EXIT_DATA
+    except json.JSONDecodeError as exc:
+        print(
+            _err(
+                ERR_IMPORT_PARSE,
+                f"输入文件不是合法 JSON: {args.input}（第 {exc.lineno} 行 {exc.colno} 列: {exc.msg}）",
+            ),
+            file=sys.stderr,
+        )
+        return EXIT_DATA
     if not isinstance(data, list):
-        print(f"[IMPORT_FORMAT_ERROR] 输入文件 {args.input} 必须是 JSON 数组", file=sys.stderr)
+        print(
+            _err(ERR_IMPORT_FORMAT, f"输入文件 {args.input} 必须是 JSON 数组"),
+            file=sys.stderr,
+        )
         return EXIT_DATA
     result = engine.import_raw_records(data)
     print(_json_dump(result))
@@ -71,10 +106,14 @@ def cmd_revise(args: argparse.Namespace) -> int:
         level = WarningLevel(args.new_level)
     except ValueError:
         print(
-            f"[REVISE_LEVEL_ERROR] new_level 必须在 {[l.value for l in WarningLevel]}",
+            _err(
+                ERR_REVISE_LEVEL_INVALID,
+                f"非法人工判断值 --new-level={args.new_level!r}，"
+                f"合法值: {ALLOWED_WARNING_LEVELS}",
+            ),
             file=sys.stderr,
         )
-        return EXIT_USAGE
+        return EXIT_DATA
     ok, msg = engine.revise_warning_level(
         warning_id=args.warning_id,
         new_level=level,
@@ -191,10 +230,12 @@ def build_parser() -> argparse.ArgumentParser:
     # revise
     p_rev = sub.add_parser("revise", help="人工改预警口径（记旧值/新判断/原因）")
     p_rev.add_argument("--warning-id", required=True)
+    # 不使用 argparse choices：非法值由程序返回稳定错误码 REVISE_LEVEL_INVALID，
+    # 避免日常脚本解析到 argparse 的英文 'invalid choice' 提示。
     p_rev.add_argument(
         "--new-level",
         required=True,
-        choices=[l.value for l in WarningLevel],
+        help=f"人工判断值，合法值: {ALLOWED_WARNING_LEVELS}",
     )
     p_rev.add_argument("--reason", required=True, help="改口径原因（必填）")
     p_rev.add_argument("--operator", default="")
@@ -237,7 +278,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         return args.func(args)
     except Exception as exc:  # noqa: BLE001
-        print(f"[RUNTIME_ERROR] {type(exc).__name__}: {exc}", file=sys.stderr)
+        print(_err(ERR_RUNTIME, f"{type(exc).__name__}: {exc}"), file=sys.stderr)
         return EXIT_RUNTIME
 
 
