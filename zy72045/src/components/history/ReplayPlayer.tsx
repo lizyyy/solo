@@ -1,27 +1,40 @@
 import { Play, Pause, SkipBack, SkipForward, RotateCcw } from 'lucide-react';
 import { Timeline } from './Timeline';
-import { useReplay } from '../../hooks/useReplay';
 import type { HistoryRecord } from '../../types/history';
 
 interface ReplayPlayerProps {
   record: HistoryRecord | null;
+  currentRound: number;
+  totalRounds: number;
+  isPlaying: boolean;
+  speed: number;
+  speedOptions: number[];
+  onGoToRound: (round: number) => void;
+  onGoToFirst: () => void;
+  onGoToLast: () => void;
+  onGoToPrev: () => void;
+  onGoToNext: () => void;
+  onTogglePlay: () => void;
+  onSetSpeed: (speed: number) => void;
+  onStop: () => void;
 }
 
-export function ReplayPlayer({ record }: ReplayPlayerProps) {
-  const {
-    currentRound,
-    totalRounds,
-    isPlaying,
-    speed,
-    goToRound,
-    goToFirst,
-    goToLast,
-    togglePlay,
-    stop,
-    setSpeed,
-    speedOptions,
-  } = useReplay(record);
-
+export function ReplayPlayer({
+  record,
+  currentRound,
+  totalRounds,
+  isPlaying,
+  speed,
+  speedOptions,
+  onGoToRound,
+  onGoToFirst,
+  onGoToLast,
+  onGoToPrev,
+  onGoToNext,
+  onTogglePlay,
+  onSetSpeed,
+  onStop,
+}: ReplayPlayerProps) {
   if (!record) return null;
 
   return (
@@ -29,13 +42,13 @@ export function ReplayPlayer({ record }: ReplayPlayerProps) {
       <Timeline
         currentRound={currentRound}
         totalRounds={totalRounds}
-        onRoundChange={goToRound}
+        onRoundChange={onGoToRound}
       />
 
       <div className="card">
         <div className="flex items-center justify-center gap-2">
           <button
-            onClick={goToFirst}
+            onClick={onGoToFirst}
             className="p-2 rounded hover:bg-neutral-100 transition-colors"
             title="回到开始"
           >
@@ -43,7 +56,7 @@ export function ReplayPlayer({ record }: ReplayPlayerProps) {
           </button>
 
           <button
-            onClick={goToFirst}
+            onClick={onGoToPrev}
             className="p-2 rounded hover:bg-neutral-100 transition-colors"
             title="上一回合"
           >
@@ -51,7 +64,7 @@ export function ReplayPlayer({ record }: ReplayPlayerProps) {
           </button>
 
           <button
-            onClick={togglePlay}
+            onClick={onTogglePlay}
             className="p-4 rounded-full bg-primary-500 text-white hover:bg-primary-600 transition-colors shadow-lg"
             title={isPlaying ? '暂停' : '播放'}
           >
@@ -59,7 +72,7 @@ export function ReplayPlayer({ record }: ReplayPlayerProps) {
           </button>
 
           <button
-            onClick={goToLast}
+            onClick={onGoToNext}
             className="p-2 rounded hover:bg-neutral-100 transition-colors"
             title="下一回合"
           >
@@ -67,7 +80,7 @@ export function ReplayPlayer({ record }: ReplayPlayerProps) {
           </button>
 
           <button
-            onClick={goToLast}
+            onClick={onGoToLast}
             className="p-2 rounded hover:bg-neutral-100 transition-colors"
             title="跳到结尾"
           >
@@ -81,8 +94,8 @@ export function ReplayPlayer({ record }: ReplayPlayerProps) {
             <button
               key={s}
               onClick={() => {
-                setSpeed(s);
-                stop();
+                onSetSpeed(s);
+                onStop();
               }}
               className={`px-3 py-1 text-xs rounded font-medium transition-all ${
                 speed === s

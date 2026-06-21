@@ -13,7 +13,22 @@ export default function HistoryDetail() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { loadRecordById, currentRecord } = useHistoryStore();
-  const { currentRound } = useReplay(currentRecord);
+  const {
+    currentRound,
+    totalRounds,
+    isPlaying,
+    speed,
+    currentRoundData: replayRoundData,
+    goToRound,
+    goToFirst,
+    goToLast,
+    goToPrev,
+    goToNext,
+    togglePlay,
+    stop,
+    setSpeed,
+    speedOptions,
+  } = useReplay(currentRecord);
 
   useEffect(() => {
     if (id) {
@@ -95,7 +110,22 @@ export default function HistoryDetail() {
           </div>
         </div>
 
-        <ReplayPlayer record={currentRecord} />
+        <ReplayPlayer
+          record={currentRecord}
+          currentRound={currentRound}
+          totalRounds={totalRounds}
+          isPlaying={isPlaying}
+          speed={speed}
+          speedOptions={speedOptions}
+          onGoToRound={goToRound}
+          onGoToFirst={goToFirst}
+          onGoToLast={goToLast}
+          onGoToPrev={goToPrev}
+          onGoToNext={goToNext}
+          onTogglePlay={togglePlay}
+          onSetSpeed={setSpeed}
+          onStop={stop}
+        />
 
         {currentRoundData && (
           <div className="mt-6 grid grid-cols-12 gap-6">
