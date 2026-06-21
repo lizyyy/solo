@@ -77,6 +77,22 @@ def cmd_attach(args):
     return 0
 
 
+def cmd_export(args):
+    store = RecordStore()
+    records = store.load_all()
+    if not records:
+        print("暂无记录。")
+        return 1
+    md = Reporter.format_meeting_brief(records)
+    if args.output:
+        with open(args.output, "w", encoding="utf-8") as f:
+            f.write(md)
+        print(f"早会说明已导出到: {args.output}")
+    else:
+        print(md)
+    return 0
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="prob-check",
@@ -107,6 +123,10 @@ def main():
     p_attach.add_argument("kind", help="类型，如 草稿备注 / 截图引用 / 补录说明")
     p_attach.add_argument("content", help="内容")
     p_attach.set_defaults(func=cmd_attach)
+
+    p_export = sub.add_parser("export", help="导出周一早会说明（Markdown，可直接粘贴给不看代码的人）")
+    p_export.add_argument("--output", "-o", default=None, help="输出文件路径，缺省打印到终端")
+    p_export.set_defaults(func=cmd_export)
 
     args = parser.parse_args()
     return args.func(args)

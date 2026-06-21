@@ -23,6 +23,29 @@ class VerificationEngine:
             "boundary_issue": None,
         }
 
+        status_val = record.status.value if isinstance(record.status, RecordStatus) else record.status
+        if status_val == RecordStatus.CONFIRMED.value:
+            result["status"] = RecordStatus.CONFIRMED.value
+            override_from_history = None
+            original_calc = None
+            for h in record.history:
+                if h.field_changed == "actual_result":
+                    override_from_history = h.new_value
+                    original_calc = h.old_value
+                    break
+            reason_note = record.confirmation_note or ""
+            who = record.confirmed_by or ""
+            when = record.confirmed_at or ""
+            if override_from_history is not None and original_calc is not None:
+                result["message"] = (
+                    f"人工确认已生效，跳过原始输入重算：原始验算 {original_calc}{record.target_unit} "
+                    f"→ 人工口径 {override_from_history}{record.target_unit}"
+                    f"（{who} @ {when}，原因: {reason_note}）"
+                )
+            else:
+                result["message"] = f"人工确认已生效，跳过原始输入重算（{who} @ {when}，原因: {reason_note}）"
+            return result
+
         tolerance = record.tolerance if hasattr(record, 'tolerance') else self.default_tolerance
 
         converted, ok, unit_msg = convert_unit(

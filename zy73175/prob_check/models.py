@@ -130,7 +130,11 @@ class VerificationRecord:
             d["boundary_info"] = self.boundary_info.to_dict()
         return d
 
-    def add_attachment(self, kind: str, content: str):
+    def add_attachment(self, kind: str, content: str, deduplicate: bool = True):
+        if deduplicate:
+            for a in self.attachments:
+                if a.kind == kind and a.content == content:
+                    return
         self.attachments.append(Attachment(kind=kind, content=content))
         self.last_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 

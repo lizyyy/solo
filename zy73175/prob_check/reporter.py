@@ -89,3 +89,76 @@ class Reporter:
         lines.append(f"  创建: {record.created_at}   更新: {record.last_updated}")
         lines.append("=" * 60)
         return "\n".join(lines)
+
+    @staticmethod
+    def format_meeting_brief(records: List[VerificationRecord]) -> str:
+        from datetime import datetime
+        lines = []
+        lines.append("# 概率模拟批量验算 — 周一早会说明")
+        lines.append(f"生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+        lines.append("")
+        total = len(records)
+        def sv(r):
+            return r.status.value if isinstance(r.status, RecordStatus) else r.status
+        passed = [r for r in records if sv(r) == RecordStatus.VERIFIED.value]
+        confirmed = [r for r in records if sv(r) == RecordStatus.CONFIRMED.value]
+        suspended = [r for r in records if sv(r) == RecordStatus.SUSPENDED.value]
+        rejected = [r for r in records if sv(r) == RecordStatus.REJECTED.value]
+        lines.append(f"## 总览")
+        lines.append(f"- 总记录数: **{total}**")
+        lines.append(f"- 验算通过: {len(passed)} 条")
+        lines.append(f"- 人工已确认: {len(confirmed)} 条（已改口径，复跑不会被覆盖）")
+        lines.append(f"- 挂起待确认: {len(suspended)} 条")
+        lines.append(f"- 验算不通过: {len(rejected)} 条")
+        lines.append("")
+        for group_name, group in [
+            ("人工已确认（改过口径）", confirmed),
+            ("挂起待确认（需要排班同事判断）", suspended),
+            ("验算通过", passed),
+            ("验算不通过", rejected),
+        ]:
+            if not group:
+                continue
+            lines.append(f"## {group_name}（{len(group)} 条）")
+            lines.append("")
+            for r in group:
+                s = sv(r)
+                lines.append(f"### 【{r.id}】{r.student_name}  —  状态: {s}")
+                lines.append(f"- **公式**: {r.formula_desc}")
+                lines.append(f"- **数字来源线索**: {r.source_trace}")
+                lines.append(f"- **输入**: {r.input_value} {r.input_unit} → **目标单位**: {r.target_unit}")
+                lines.append(f"- **期望值**: {r.expected_result} {r.target_unit}")
+                lines.append(f"- **当前结论**: {r.actual_result} {r.target_unit if r.actual_result is not None else '（未生成）'}")
+                if s == RecordStatus.CONFIRMED.value:
+                    lines.append(f"- **人工确认人**: {r.confirmed_by}  @  {r.confirmed_at}")
+                    lines.append(f"- **改口径原因**: {r.confirmation_note}")
+                    changes = [h for h in r.history if h.field_changed == "actual_result"]
+                    if changes:
+                        h0 = changes[-1]
+                        lines.append(
+                            f"- **数值变更轨迹**: 原始验算 {h0.old_value} → 人工判定 {h0.new_value} "
+                            f"（{h0.reason}）"
+                        )
+                if s == RecordStatus.SUSPENDED.value and r.boundary_info:
+                    b = r.boundary_info
+                    lines.append(
+                        f"- **外推越界卡点**: {b.variable}={b.current_value}, "
+                        f"合理区间 [{b.lower_bound}, {b.upper_bound}], {b.direction}"
+                    )
+                    if r.suspension_reason:
+                        sr = r.suspension_reason.value if hasattr(r.suspension_reason, 'value') else r.suspension_reason
+                        lines.append(f"- **挂起原因**: {sr}")
+                notes = [a for a in r.attachments if a.kind == "草稿备注" or a.kind == "验算备注"]
+                if notes:
+                    lines.append("- **草稿/验算备注**:")
+                    for n in notes:
+                        lines.append(f"  - [{n.added_at}] {n.content}")
+                screenshots = [a for a in r.attachments if "截图" in a.kind]
+                if screenshots:
+                    lines.append("- **历史截图**:")
+                    for n in screenshots:
+                        lines.append(f"  - {n.content}")
+                lines.append("")
+        lines.append("---")
+        lines.append("> 说明：人工已确认的记录，复跑不会被原始输入覆盖；所有口径变更都有旧值、新值、原因、操作人、时间记录，周一早会直接引用即可。")
+        return "\n".join(lines)
