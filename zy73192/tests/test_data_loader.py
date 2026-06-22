@@ -101,6 +101,32 @@ ALT002,2024模考,测试题目2,分式递推,a1=1,a(n+1)=a(n)/(a(n)-1),"1, 不�
         terms = loader._parse_terms("a1=0.5, a2=0.25")
         assert terms == [0.5, 0.25]
 
+    def test_parse_terms_fraction(self):
+        """测试解析分数项，1/3 不能拆成 1 和 3 两个数"""
+        loader = DataLoader()
+        terms = loader._parse_terms("a1=1, a2=-1, a3=1/3")
+        assert len(terms) == 3
+        assert abs(terms[0] - 1.0) < 1e-9
+        assert abs(terms[1] - (-1.0)) < 1e-9
+        assert abs(terms[2] - (1.0 / 3.0)) < 1e-9
+
+    def test_parse_terms_negative_fraction(self):
+        """测试解析负分数"""
+        loader = DataLoader()
+        terms = loader._parse_terms("a1=-2/5, a2=3/7")
+        assert len(terms) == 2
+        assert abs(terms[0] - (-2.0 / 5.0)) < 1e-9
+        assert abs(terms[1] - (3.0 / 7.0)) < 1e-9
+
+    def test_parse_terms_no_duplicate(self):
+        """解析分数时不能产生重复项或漏掉后续项"""
+        loader = DataLoader()
+        terms = loader._parse_terms("a1=1/3, a2=2/5, a3=3")
+        assert len(terms) == 3
+        assert abs(terms[0] - 1.0 / 3.0) < 1e-9
+        assert abs(terms[1] - 2.0 / 5.0) < 1e-9
+        assert abs(terms[2] - 3.0) < 1e-9
+
     def test_parse_terms_empty(self):
         """测试解析空字符串"""
         loader = DataLoader()

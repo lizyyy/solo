@@ -32,75 +32,142 @@ class DataLoader:
             col_map[field_name] = self._find_column(df.columns.tolist(), possible_names)
         return col_map
 
+    def _parse_single_number(self, token: str) -> Optional[float]:
+        """解析单个数值 token，支持分数 1/3、-2/5、小数、整数"""
+        if not token:
+            return None
+        token = token.strip()
+        if not token:
+            return None
+        m = re.fullmatch(r'(-?\d+)\s*/\s*(-?\d+)', token)
+        if m:
+            num, den = m.group(1), m.group(2)
+            try:
+                n = float(num)
+                d = float(den)
+                if abs(d) < 1e-20:
+                    return None
+                return n / d
+            except (ValueError, ZeroDivisionError):
+                return None
+        try:
+            return float(token)
+        except (ValueError, TypeError):
+            return None
+
     def _parse_terms(self, terms_str: str) -> List[float]:
-        """解析数列项字符串为数值列表，优先提取等号后的数值"""
+        """解析数列项字符串为数值列表，优先提取等号后的数值，支持分数"""
         if not terms_str or pd.isna(terms_str):
             return []
 
         terms_str = str(terms_str).strip()
-
-        patterns = [
-            r'=\s*(-?\d+\.?\d*)',
-            r':\s*(-?\d+\.?\d*)',
-            r'(-?\d+\.?\d*)\s*[,;，；\s]+(-?\d+\.?\d*)',
-        ]
-
         numbers = []
 
-        for pattern in patterns:
-            matches = re.findall(pattern, terms_str)
-            for match in matches:
-                if isinstance(match, tuple):
-                    for m in match:
-                        if m:
-                            try:
-                                numbers.append(float(m))
-                            except (ValueError, TypeError):
-                                continue
-                else:
-                    try:
-                        numbers.append(float(match))
-                    except (ValueError, TypeError):
-                        continue
-            if numbers:
-                break
+        eq_pattern = r'[=:：]\s*([^,;，；]+)'
+        for m in re.finditer(eq_pattern, terms_str):
+            val_str = m.group(1).strip()
+            if val_str:
+                val = self._parse_single_number(val_str)
+                if val is not None:
+                    numbers.append(val)
+        if numbers:
+            return numbers
 
-        if not numbers:
-            simple_matches = re.findall(r'-?\d+\.?\d*', terms_str)
-            for m in simple_matches:
-                try:
-                    num = float(m)
-                    if num >= 0 or terms_str.count('-') > 0:
-                        numbers.append(num)
-                except (ValueError, TypeError):
+        tokens = re.split(r'[,;，；\s]+', terms_str)
+        for tok in tokens:
+            if not tok:
+                continue
+            tok_clean = tok.strip()
+            if re.search(r'[=:：]', tok_clean):
+                sub_parts = re.split(r'[=:：]', tok_clean, maxsplit=1)
+                if len(sub_parts) == 2:
+                    val = self._parse_single_number(sub_parts[1].strip())
+                    if val is not None:
+                        numbers.append(val)
                     continue
+            val = self._parse_single_number(tok_clean)
+            if val is not None:
+                numbers.append(val)
 
-        unique_numbers = []
+        return numbers
+
+    def _dedupe_preserve_order(self, nums: List[float]) -> List[float]:
         seen = set()
-        for n in numbers:
-            key = str(n)
+        out = []
+        for n in nums:
+            key = repr(n)
             if key not in seen:
                 seen.add(key)
-                unique_numbers.append(n)
+                out.append(n)
+        return out
 
-        return unique_numbers
+    def _extract_rhs_expression(self, formula: str) -> str:
+        """从完整递推等式中拆出右侧表达式。支持 a(n+1)=... 或 a_{n+1}=... 等格式。如果本身就是右侧表达式则原样返回。"""
+        if not formula:
+            return ""
+        s = formula.strip()
+        m = re.search(r'=(.*)', s, re.DOTALL)
+        if m:
+            return m.group(1).strip()
+        return s
+
+    def _normalize_variable_notation(self, expr: str) -> str:
+        """把 a(n), a_n, a_{n}, a_{n+1}, a(n+1), an 等统一替换为内部变量 PREV。
+        注意匹配必须有闭合括号或花括号，避免误吃表达式后面的常数项。
+        """
+        if not expr:
+            return ""
+        s = expr
+        s = re.sub(r'a\s*\(\s*n\s*(?:\+\s*\d+)?\s*\)', 'PREV', s)
+        s = re.sub(r'a\s*_\s*\{\s*n\s*(?:\+\s*\d+)?\s*\}', 'PREV', s)
+        s = re.sub(r'a\s*_\s*n(?![A-Za-z0-9_{])', 'PREV', s)
+        s = re.sub(r'\ban\b', 'PREV', s)
+        return s
+
+    def _parse_denominator(self, expr: str) -> Optional[str]:
+        """从表达式中提取最外层分数的分母表达式（用于除零预检查）。例如 '(a(n)+1)/(a(n)-1)' → 'a(n)-1'。"""
+        if not expr:
+            return None
+        depth = 0
+        slash_idx = -1
+        for i, ch in enumerate(expr):
+            if ch == '(':
+                depth += 1
+            elif ch == ')':
+                depth -= 1
+            elif ch == '/' and depth == 0:
+                slash_idx = i
+                break
+        if slash_idx < 0:
+            return None
+        denom = expr[slash_idx + 1:].strip()
+        if denom.startswith('('):
+            depth2 = 0
+            end = -1
+            for i, ch in enumerate(denom):
+                if ch == '(':
+                    depth2 += 1
+                elif ch == ')':
+                    depth2 -= 1
+                    if depth2 == 0:
+                        end = i
+                        break
+            if end > 0:
+                return denom[1:end].strip()
+        return denom
 
     def _parse_formula(self, formula_str: str) -> Tuple[str, Optional[str]]:
-        """解析递推公式，返回标准化公式和分母表达式（用于除零检测）"""
+        """解析递推公式：保持原始完整公式字符串，仅额外提取分母表达式（用于除零检测）。
+        完整公式形如 "a(n+1)=2*a(n)+1"，归因阶段会自行拆出右侧表达式。
+        返回: (完整原始公式字符串, 分母表达式或None)
+        """
         if not formula_str or pd.isna(formula_str):
             return "", None
 
-        formula = str(formula_str).strip()
-
-        denominator = None
-        if '/' in formula:
-            parts = formula.split('/', 1)
-            if len(parts) == 2:
-                denominator = parts[1].strip()
-                if denominator.startswith('(') and denominator.endswith(')'):
-                    denominator = denominator[1:-1].strip()
-
-        return formula, denominator
+        formula_raw = str(formula_str).strip()
+        rhs = self._extract_rhs_expression(formula_raw)
+        denominator = self._parse_denominator(rhs) if rhs else None
+        return formula_raw, denominator
 
     def load_file(self, file_path: str) -> List[QuestionRecord]:
         """加载题目清单文件，支持CSV和Excel格式"""

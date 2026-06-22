@@ -26,6 +26,8 @@ class StableMessages:
     REVIEW_REASON_DIVISION_BY_ZERO = "除零边界: 递推公式a(n+1)=f(a(n))/g(a(n))中g(a(n))=0"
     REVIEW_REASON_NEGATIVE_INDEX = "索引异常: 出现负项数或零项数"
     REVIEW_REASON_SMALL_SAMPLE = "样本不足: 边界样本量<3，统计结论可靠性低"
+    REVIEW_REASON_FORMULA_PARSE = "公式解析失败: 无法识别递推式结构，需人工复核"
+    REVIEW_REASON_FORMULA_EVAL = "公式计算失败: 递推式代入后无法求值，需人工复核"
 
 
 class FieldMapping(BaseModel):

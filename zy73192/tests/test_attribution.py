@@ -101,9 +101,111 @@ class TestSequenceAttribution:
         assert terms == [2.0, 5.0, 11.0, 23.0]
 
     def test_parse_numeric_answer_with_text(self, attribution):
-        """测试解析包含文字的答案"""
+        """测试解析包含等号赋值的答案"""
         terms = attribution._parse_numeric_answer("a1=2, a2=5, a3=11")
-        assert terms == [1.0, 2.0, 2.0, 5.0, 3.0, 11.0]
+        assert terms == [2.0, 5.0, 11.0]
+
+    def test_parse_numeric_answer_fraction(self, attribution):
+        """测试解析答案中的分数，1/3 不能拆成两个数"""
+        terms = attribution._parse_numeric_answer("1, -1, 1/3")
+        assert len(terms) == 3
+        assert abs(terms[0] - 1.0) < 1e-9
+        assert abs(terms[1] - (-1.0)) < 1e-9
+        assert abs(terms[2] - (1.0 / 3.0)) < 1e-9
+
+    def test_parse_numeric_answer_fraction_with_label(self, attribution):
+        """测试解析带等号标签的分数答案"""
+        terms = attribution._parse_numeric_answer("a1=1, a2=-1, a3=1/3")
+        assert len(terms) == 3
+        assert abs(terms[0] - 1.0) < 1e-9
+        assert abs(terms[1] - (-1.0)) < 1e-9
+        assert abs(terms[2] - (1.0 / 3.0)) < 1e-9
+
+    def test_evaluate_formula_full_equation(self, attribution):
+        """测试传入完整等式 a(n+1)=2*a(n)+1 也能正确拆出右侧并计算"""
+        result, warning = attribution._evaluate_formula("a(n+1)=2*a(n)+1", 2.0)
+        assert abs(result - 5.0) < 1e-6
+        assert warning is None
+
+    def test_evaluate_formula_subscript_notation(self, attribution):
+        """测试 a_{n+1}=3*a_n-1 这种带下标写法"""
+        result, warning = attribution._evaluate_formula("a_{n+1}=3*a_n-1", 2.0)
+        assert abs(result - 5.0) < 1e-6
+        assert warning is None
+
+    def test_calculate_sequence_fractional_formula(self, attribution):
+        """测试分式递推 a(n+1)=a(n)/(a(n)-2) 计算正确"""
+        terms, warnings = attribution._calculate_sequence(
+            [1.0], "a(n+1)=a(n)/(a(n)-2)", n_terms=3
+        )
+        assert len(terms) >= 3
+        assert abs(terms[0] - 1.0) < 1e-9
+        assert abs(terms[1] - (-1.0)) < 1e-9
+        assert abs(terms[2] - (1.0 / 3.0)) < 1e-6
+
+    def test_calculate_sequence_fibonacci(self, attribution):
+        """测试斐波那契 a(n+2)=a(n+1)+a(n) 二阶递推"""
+        terms, warnings = attribution._calculate_sequence(
+            [1.0, 1.0], "a(n+2)=a(n+1)+a(n)", n_terms=6
+        )
+        assert len(terms) == 6
+        assert terms == [1.0, 1.0, 2.0, 3.0, 5.0, 8.0]
+
+    def test_analyze_formula_parse_failure_marks_review(self, attribution):
+        """公式无法解析时必须标记待复核，不能误判为答案正确"""
+        record = QuestionRecord(
+            question_id="Q001",
+            original_terms=[2.0, 5.0, 11.0],
+            recurrence_formula="this_is_not_a_formula",
+            student_answer="2, 5, 11, 23",
+            correct_answer="2, 5, 11, 23",
+        )
+        result = attribution.analyze(record)
+        assert result.needs_review is True, "解析失败必须标记待复核"
+        assert STABLE_MESSAGES.REVIEW_REASON_FORMULA_PARSE in result.review_reason
+
+    def test_analyze_division_by_zero_marks_review_with_detail(self, attribution):
+        """除零边界必须明确标记复核原因，让老叶看得懂"""
+        record = QuestionRecord(
+            question_id="Q006",
+            original_terms=[1.0, 2.0, 3.0],
+            recurrence_formula="a(n+1)=a(n)/(1-a(n))",
+            student_answer="1, 不存在",
+            correct_answer="1, 无穷大",
+        )
+        result = attribution.analyze(record)
+        assert result.needs_review is True
+        assert STABLE_MESSAGES.REVIEW_REASON_DIVISION_BY_ZERO in result.review_reason
+        assert "1.0" in result.review_reason or "第1项" in result.review_reason
+
+    def test_analyze_correct_answer_with_full_equation(self, attribution):
+        """完整等式 + 正确答案场景，应该判定为答案正确且计算项非 nan"""
+        record = QuestionRecord(
+            question_id="Q001",
+            original_terms=[2.0, 5.0, 11.0],
+            recurrence_formula="a(n+1)=2*a(n)+1",
+            student_answer="2, 5, 11, 23",
+            correct_answer="2, 5, 11, 23",
+        )
+        result = attribution.analyze(record)
+        assert result.processing_status == STABLE_MESSAGES.STATUS_SUCCESS
+        assert "答案正确" in result.attribution_result
+        assert result.calculated_terms, "必须生成计算项"
+        assert not any(math.isnan(t) for t in result.calculated_terms), "计算项不能出现 nan"
+
+    def test_analyze_calculation_error_with_full_equation(self, attribution):
+        """完整等式 + 计算错误场景"""
+        record = QuestionRecord(
+            question_id="Q001",
+            original_terms=[2.0, 5.0, 11.0],
+            recurrence_formula="a(n+1)=2*a(n)+1",
+            student_answer="2, 5, 12, 23",
+            correct_answer="2, 5, 11, 23",
+        )
+        result = attribution.analyze(record)
+        assert result.processing_status == STABLE_MESSAGES.STATUS_SUCCESS
+        assert "计算错误" in result.error_category
+        assert "第[3]项" in result.attribution_result
 
     def test_parse_numeric_answer_empty(self, attribution):
         """测试解析空答案"""

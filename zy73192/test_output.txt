@@ -1,0 +1,126 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.9.6, pytest-8.4.2, pluggy-1.6.0
+rootdir: /Users/maca/pro/solo/workspaces/zy73192
+configfile: pyproject.toml
+plugins: anyio-4.12.1, mock-3.15.1, asyncio-1.2.0, cov-7.1.0, hypothesis-6.141.1, flaky-3.8.1, typeguard-4.5.2
+asyncio: mode=strict, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 92 items
+
+tests/test_attribution.py .F...FFFFF..F...F.F...FF....                   [ 30%]
+tests/test_config.py ..........                                          [ 41%]
+tests/test_data_loader.py ..FF.....FFF.........                          [ 64%]
+tests/test_jump_detector.py ...................                          [ 84%]
+tests/test_models.py ..............                                      [100%]
+
+=================================== FAILURES ===================================
+_________ TestSequenceAttribution.test_evaluate_formula_simple_linear __________
+tests/test_attribution.py:27: in test_evaluate_formula_simple_linear
+    assert abs(result - 5.0) < 1e-6
+E   assert 1.0 < 1e-06
+E    +  where 1.0 = abs((4.0 - 5.0))
+_______ TestSequenceAttribution.test_evaluate_formula_different_notation _______
+tests/test_attribution.py:56: in test_evaluate_formula_different_notation
+    assert abs(result3 - 7.0) < 1e-6
+E   assert nan < 1e-06
+E    +  where nan = abs((nan - 7.0))
+_____________ TestSequenceAttribution.test_evaluate_formula_empty ______________
+tests/test_attribution.py:62: in test_evaluate_formula_empty
+    assert warning is None
+E   AssertionError: assert '公式解析失败: 无法识别递推式结构，需人工复核' is None
+____________ TestSequenceAttribution.test_calculate_sequence_linear ____________
+tests/test_attribution.py:66: in test_calculate_sequence_linear
+    terms, warnings = attribution._calculate_sequence(
+E   ValueError: too many values to unpack (expected 2)
+_______ TestSequenceAttribution.test_calculate_sequence_division_by_zero _______
+tests/test_attribution.py:79: in test_calculate_sequence_division_by_zero
+    terms, warnings = attribution._calculate_sequence(
+E   ValueError: too many values to unpack (expected 2)
+_________ TestSequenceAttribution.test_calculate_sequence_empty_terms __________
+tests/test_attribution.py:89: in test_calculate_sequence_empty_terms
+    terms, warnings = attribution._calculate_sequence([], "2*a_n + 1")
+E   ValueError: too many values to unpack (expected 2)
+_________ TestSequenceAttribution.test_parse_numeric_answer_with_text __________
+tests/test_attribution.py:106: in test_parse_numeric_answer_with_text
+    assert terms == [1.0, 2.0, 2.0, 5.0, 3.0, 11.0]
+E   assert [] == [1.0, 2.0, 2.....0, 3.0, 11.0]
+E     
+E     Right contains 6 more items, first extra item: 1.0
+E     Use -v to get more diff
+________________ TestSequenceAttribution.test_check_index_error ________________
+tests/test_attribution.py:138: in test_check_index_error
+    has_error, msg = attribution._check_index_error(student, correct)
+src/sequence_error_attribution/attribution.py:283: in _check_index_error
+    min_len = min(len(student_terms), correct_terms)
+E   TypeError: '<' not supported between instances of 'list' and 'int'
+__________ TestSequenceAttribution.test_check_formula_misapplication ___________
+tests/test_attribution.py:157: in test_check_formula_misapplication
+    assert "应为5.0" in msg
+E   AssertionError: assert '应为5.0' in '递推公式应用错误: 按公式计算应为4，学生得到6'
+_____________ TestSequenceAttribution.test_analyze_correct_answer ______________
+tests/test_attribution.py:207: in test_analyze_correct_answer
+    assert "答案正确" in result.attribution_result
+E   AssertionError: assert '答案正确' in '递推公式应用错误: 按公式计算应为22，学生得到23'
+E    +  where '递推公式应用错误: 按公式计算应为22，学生得到23' = QuestionRecord(question_id='Q001', question_source='', question_content='', sequence_type='', given_terms='', recurren...'[2026-06-22 09:41:02] 处理完成: 递推公式应用错误: 按公式计算应为22，学生得到23', '[2026-06-22 09:41:02] 检测到1类错误: 递推公式应用错误: 按公式计算应为22，学生得到23']).attribution_result
+____________ TestSequenceAttribution.test_analyze_calculation_error ____________
+tests/test_attribution.py:218: in test_analyze_calculation_error
+    result = attribution.analyze(record)
+src/sequence_error_attribution/attribution.py:444: in analyze
+    has_index_error, index_msg = self._check_index_error(student_terms, correct_terms)
+src/sequence_error_attribution/attribution.py:283: in _check_index_error
+    min_len = min(len(student_terms), correct_terms)
+E   TypeError: '<' not supported between instances of 'list' and 'int'
+_____________________ TestDataLoader.test_load_csv_success _____________________
+tests/test_data_loader.py:65: in test_load_csv_success
+    assert records[0].recurrence_formula == "a(n+1)=2*a(n)+1"
+E   AssertionError: assert '2*a(n)+1' == 'a(n+1)=2*a(n)+1'
+E     
+E     - a(n+1)=2*a(n)+1
+E     + 2*a(n)+1
+___________________ TestDataLoader.test_load_csv_alt_fields ____________________
+tests/test_data_loader.py:78: in test_load_csv_alt_fields
+    assert records[0].recurrence_formula == "a(n+1)=2*a(n)+1"
+E   AssertionError: assert '2*a(n)+1' == 'a(n+1)=2*a(n)+1'
+E     
+E     - a(n+1)=2*a(n)+1
+E     + 2*a(n)+1
+______________ TestDataLoader.test_parse_formula_with_denominator ______________
+tests/test_data_loader.py:117: in test_parse_formula_with_denominator
+    assert formula == "a(n+1)=a(n)/(a(n)-1)"
+E   AssertionError: assert 'a(n)/(a(n)-1)' == 'a(n+1)=a(n)/(a(n)-1)'
+E     
+E     - a(n+1)=a(n)/(a(n)-1)
+E     ? -------
+E     + a(n)/(a(n)-1)
+______________ TestDataLoader.test_parse_formula_with_parentheses ______________
+tests/test_data_loader.py:124: in test_parse_formula_with_parentheses
+    assert formula == "a(n+1)=(a(n)+1)/(a(n)-1)"
+E   AssertionError: assert '(a(n)+1)/(a(n)-1)' == 'a(n+1)=(a(n)+1)/(a(n)-1)'
+E     
+E     - a(n+1)=(a(n)+1)/(a(n)-1)
+E     ? -------
+E     + (a(n)+1)/(a(n)-1)
+___________________ TestDataLoader.test_parse_formula_simple ___________________
+tests/test_data_loader.py:131: in test_parse_formula_simple
+    assert formula == "a(n+1)=2*a(n)+1"
+E   AssertionError: assert '2*a(n)+1' == 'a(n+1)=2*a(n)+1'
+E     
+E     - a(n+1)=2*a(n)+1
+E     + 2*a(n)+1
+=========================== short test summary info ============================
+FAILED tests/test_attribution.py::TestSequenceAttribution::test_evaluate_formula_simple_linear
+FAILED tests/test_attribution.py::TestSequenceAttribution::test_evaluate_formula_different_notation
+FAILED tests/test_attribution.py::TestSequenceAttribution::test_evaluate_formula_empty
+FAILED tests/test_attribution.py::TestSequenceAttribution::test_calculate_sequence_linear
+FAILED tests/test_attribution.py::TestSequenceAttribution::test_calculate_sequence_division_by_zero
+FAILED tests/test_attribution.py::TestSequenceAttribution::test_calculate_sequence_empty_terms
+FAILED tests/test_attribution.py::TestSequenceAttribution::test_parse_numeric_answer_with_text
+FAILED tests/test_attribution.py::TestSequenceAttribution::test_check_index_error
+FAILED tests/test_attribution.py::TestSequenceAttribution::test_check_formula_misapplication
+FAILED tests/test_attribution.py::TestSequenceAttribution::test_analyze_correct_answer
+FAILED tests/test_attribution.py::TestSequenceAttribution::test_analyze_calculation_error
+FAILED tests/test_data_loader.py::TestDataLoader::test_load_csv_success - Ass...
+FAILED tests/test_data_loader.py::TestDataLoader::test_load_csv_alt_fields - ...
+FAILED tests/test_data_loader.py::TestDataLoader::test_parse_formula_with_denominator
+FAILED tests/test_data_loader.py::TestDataLoader::test_parse_formula_with_parentheses
+FAILED tests/test_data_loader.py::TestDataLoader::test_parse_formula_simple
+======================== 16 failed, 76 passed in 0.65s =========================
