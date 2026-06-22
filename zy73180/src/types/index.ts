@@ -1,4 +1,4 @@
-export type AnomalyType = 'unit_missing' | 'boundary_sample' | 'bad_data' | 'calculation_error';
+export type AnomalyType = 'unit_missing' | 'unit_invalid' | 'boundary_sample' | 'bad_data' | 'calculation_error';
 
 export type ProcessingStatus = 'pending' | 'reviewing' | 'resolved' | 'ignored';
 
@@ -20,6 +20,13 @@ export interface CalculationResult {
   errorMessage?: string;
 }
 
+export interface FieldMappingInfo {
+  rawFieldName: string;
+  targetFieldName: string;
+  rawValue: any;
+  mappedValue: any;
+}
+
 export interface AnomalyRecord {
   id: string;
   answerId: string;
@@ -29,13 +36,19 @@ export interface AnomalyRecord {
   calculation: CalculationResult;
   isBoundary: boolean;
   boundaryReason?: string;
-  unitMissingFields?: string[];
+  unitIssue?: {
+    type: 'missing' | 'invalid';
+    affectedFields: FieldMappingInfo[];
+    invalidUnits?: { field: string; value: string; allowed: string[] }[];
+  };
+  fieldMappingInfo: FieldMappingInfo[];
   suggestion?: string;
   rawSnapshot: Record<string, any>;
   sourceInfo: {
     source: string;
     sourceBatch: string;
     originalRowIndex: number;
+    originalFieldNames: string[];
   };
   detectedAt: string;
 }
@@ -117,6 +130,7 @@ export interface ComparisonSummary {
 
 export const ANOMALY_TYPE_LABELS: Record<AnomalyType, string> = {
   unit_missing: '单位缺失',
+  unit_invalid: '单位不合法',
   boundary_sample: '边界样本',
   bad_data: '坏数据',
   calculation_error: '计算异常',

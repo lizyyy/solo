@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAppStore } from '@/store/appStore';
 import { autoMapFields, updateMappingField, createNewMapping } from '@/engine/fieldMapper';
 import { TARGET_FIELDS, FIELD_SYNONYMS } from '@/types';
@@ -30,6 +30,14 @@ export default function ImportPage() {
   const [rawFields, setRawFields] = useState<string[]>([]);
   const [previewSourceName, setPreviewSourceName] = useState('');
   const [activeMappingId, setActiveMappingId] = useState<string | null>(null);
+  const [manualMappings, setManualMappings] = useState<Record<string, TargetField | null>>({});
+  const [isModified, setIsModified] = useState(false);
+
+  useEffect(() => {
+    if (rawFields.length > 0 && Object.keys(manualMappings).length === 0) {
+      setManualMappings(autoMapFields(rawFields));
+    }
+  }, [rawFields, manualMappings]);
 
   const handleLoadSample = () => {
     const sample = [
@@ -39,6 +47,8 @@ export default function ImportPage() {
     setRawData(sample);
     setRawFields(Object.keys(sample[0]));
     setPreviewSourceName('样例数据第三组');
+    setManualMappings(autoMapFields(Object.keys(sample[0])));
+    setIsModified(false);
     setStep('mapping');
   };
 
@@ -67,15 +77,12 @@ export default function ImportPage() {
       setRawData(rows);
       setRawFields(headers);
       setPreviewSourceName(file.name);
+      setManualMappings(autoMapFields(headers));
+      setIsModified(false);
       setStep('mapping');
     };
     reader.readAsText(file);
   };
-
-  const autoMappings = useMemo(() => {
-    if (rawFields.length === 0) return {};
-    return autoMapFields(rawFields);
-  }, [rawFields]);
 
   const activeMapping = useMemo<FieldMapping | null>(() => {
     if (activeMappingId) {
@@ -84,11 +91,15 @@ export default function ImportPage() {
     return null;
   }, [activeMappingId, mappings]);
 
-  const currentMappings: Record<string, TargetField | null> = activeMapping
-    ? Object.fromEntries(rawFields.map(f => [f, (activeMapping.mappings[f] as TargetField) || null]))
-    : autoMappings;
+  const currentMappings: Record<string, TargetField | null> = manualMappings;
 
   const handleFieldChange = (rawField: string, target: TargetField | null) => {
+    setManualMappings(prev => ({
+      ...prev,
+      [rawField]: target,
+    }));
+    setIsModified(true);
+
     if (activeMapping) {
       const updated = updateMappingField(activeMapping, rawField, target);
       const newMappings = mappings.map(m => m.id === updated.id ? updated : m);
@@ -97,29 +108,44 @@ export default function ImportPage() {
   };
 
   const handleSaveMapping = () => {
-    if (!activeMapping) {
-      const newMapping = createNewMapping(`映射方案_${Date.now()}`, autoMappings);
-      addMapping(newMapping);
-      setActiveMappingId(newMapping.id);
-    }
+    const newMapping = createNewMapping(`映射方案_${Date.now()}`, manualMappings);
+    addMapping(newMapping);
+    setActiveMappingId(newMapping.id);
+    setIsModified(false);
   };
 
   const handleConfirmImport = () => {
-    const mapping = activeMapping || createNewMapping(`映射方案_${Date.now()}`, autoMappings);
-    if (!activeMapping) {
-      addMapping(mapping);
+    const finalMappings: Record<string, string> = {};
+    for (const [rawField, target] of Object.entries(manualMappings)) {
+      if (target) {
+        finalMappings[rawField] = target;
+      }
     }
+
+    const mapping: FieldMapping = {
+      id: `mapping_${Date.now()}`,
+      name: `${previewSourceName}_映射`,
+      mappings: finalMappings,
+      createdAt: new Date().toISOString(),
+    };
+    addMapping(mapping);
 
     const newAnswers = rawData.map((row, index) => ({
       id: `ans_imported_${Date.now()}_${index}`,
       source: previewSourceName,
       sourceBatch: `batch_${Date.now()}`,
-      rawData: row,
+      rawData: { ...row },
       importedAt: new Date().toISOString(),
       fieldMappingId: mapping.id,
     }));
 
     addAnswers(newAnswers);
+
+    const runCalculation = useAppStore.getState().runCalculation;
+    setTimeout(() => {
+      runCalculation('导入数据复算');
+    }, 100);
+
     setStep('done');
   };
 
@@ -210,7 +236,7 @@ export default function ImportPage() {
               <div className="divide-y divide-ink-100">
                 {rawFields.map(field => {
                   const mapped = currentMappings[field];
-                  const isRecognized = !!autoMappings[field];
+                  const isRecognized = !!mapped;
                   return (
                     <div key={field} className="flex items-center gap-3 px-4 py-3">
                       <div className="w-40 flex-shrink-0">

@@ -40,6 +40,7 @@ export default function ConfigPage() {
     updateParams({
       formula: adjustedCalculationParams.formula,
       boundaryConfig: adjustedCalculationParams.boundaryConfig,
+      unitConfig: adjustedCalculationParams.unitConfig,
       tolerance: adjustedCalculationParams.tolerance,
     });
   };
@@ -52,6 +53,10 @@ export default function ConfigPage() {
         maxValue: 1000,
         percentileThreshold: 0.1,
         sampleSizeThreshold: 5,
+      },
+      unitConfig: {
+        requiredFields: ['value', 'unit'],
+        allowedUnits: ['平方米', 'km/h', '欧姆', '%', '摄氏度', '元', '厘米', '千克', '秒', 'g/cm3'],
       },
       tolerance: 0.01,
     });

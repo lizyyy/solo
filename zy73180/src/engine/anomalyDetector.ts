@@ -5,10 +5,11 @@ import type {
   CalculationRun,
   CalculationParams,
   FieldMapping,
+  FieldMappingInfo,
 } from '@/types';
 import {
   calculateRecord,
-  checkUnitCompleteness,
+  checkUnitCompletenessAndValidity,
   isBoundarySample,
   isBadData,
   generateSuggestion,
@@ -17,6 +18,22 @@ import { applyMapping } from './fieldMapper';
 
 function generateId(prefix: string): string {
   return `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}
+
+function buildFieldMappingInfo(
+  rawData: Record<string, any>,
+  mapping: FieldMapping
+): FieldMappingInfo[] {
+  const infos: FieldMappingInfo[] = [];
+  for (const [rawField, targetField] of Object.entries(mapping.mappings)) {
+    infos.push({
+      rawFieldName: rawField,
+      targetFieldName: targetField,
+      rawValue: rawData[rawField],
+      mappedValue: rawData[rawField],
+    });
+  }
+  return infos;
 }
 
 export function detectAnomalies(
@@ -30,14 +47,22 @@ export function detectAnomalies(
 
   const mappingMap = new Map(mappings.map(m => [m.id, m]));
 
-  const mappedDataList: { data: Record<string, any>; answer: HistoricalAnswer; index: number }[] = [];
+  const mappedDataList: {
+    data: Record<string, any>;
+    answer: HistoricalAnswer;
+    mapping: FieldMapping;
+    index: number;
+    fieldMappingInfo: FieldMappingInfo[];
+  }[] = [];
 
   answers.forEach((answer, index) => {
     const mapping = mappingMap.get(answer.fieldMappingId);
     if (!mapping) return;
 
     const mapped = applyMapping(answer.rawData, mapping);
-    mappedDataList.push({ data: mapped, answer, index });
+    const fieldMappingInfo = buildFieldMappingInfo(answer.rawData, mapping);
+
+    mappedDataList.push({ data: mapped, answer, mapping, index, fieldMappingInfo });
 
     const badCheck = isBadData(mapped);
     if (!badCheck.isBad && mapped.value !== undefined && mapped.value !== null) {
@@ -48,43 +73,73 @@ export function detectAnomalies(
     }
   });
 
-  mappedDataList.forEach(({ data, answer, index }) => {
+  mappedDataList.forEach(({ data, answer, mapping, index, fieldMappingInfo }) => {
+    const unitCheck = checkUnitCompletenessAndValidity(data, mapping.mappings, params);
+
+    if (unitCheck.hasIssues) {
+      const calcResult = calculateRecord(data, params);
+
+      if (unitCheck.missingFields.length > 0) {
+        const missingRawFields = unitCheck.missingFields.map(f => ({
+          rawFieldName: f.rawFieldName,
+          targetFieldName: f.targetFieldName,
+        }));
+
+        anomalies.push(createAnomalyRecord(
+          'unit_missing',
+          answer,
+          data,
+          calcResult,
+          index,
+          fieldMappingInfo,
+          mapping,
+          undefined,
+          unitCheck.missingFields,
+          undefined,
+          undefined,
+          undefined,
+          missingRawFields,
+        ));
+      }
+
+      if (unitCheck.invalidUnits.length > 0) {
+        const invalidDetails = unitCheck.invalidUnits.map(u => ({
+          field: u.field.rawFieldName,
+          value: u.value,
+          allowed: u.allowed,
+        }));
+
+        anomalies.push(createAnomalyRecord(
+          'unit_invalid',
+          answer,
+          data,
+          calcResult,
+          index,
+          fieldMappingInfo,
+          mapping,
+          undefined,
+          undefined,
+          unitCheck.invalidUnits,
+          invalidDetails,
+        ));
+      }
+
+      return;
+    }
+
     const badCheck = isBadData(data);
 
     if (badCheck.isBad) {
+      const calcResult = calculateRecord(data, params);
       anomalies.push(createAnomalyRecord(
         'bad_data',
         answer,
         data,
-        {
-          value: null,
-          unit: data.unit || null,
-          formula: params.formula,
-          variables: {},
-          success: false,
-          errorMessage: badCheck.reason,
-        },
-        index,
-        badCheck.reason,
-        undefined,
-        undefined,
-      ));
-      return;
-    }
-
-    const unitCheck = checkUnitCompleteness(data, params.unitConfig.requiredFields);
-
-    if (!unitCheck.complete) {
-      const calcResult = calculateRecord(data, params);
-      anomalies.push(createAnomalyRecord(
-        'unit_missing',
-        answer,
-        data,
         calcResult,
         index,
-        undefined,
-        unitCheck.missingFields,
-        undefined,
+        fieldMappingInfo,
+        mapping,
+        badCheck.reason,
       ));
       return;
     }
@@ -98,9 +153,9 @@ export function detectAnomalies(
         data,
         calcResult,
         index,
+        fieldMappingInfo,
+        mapping,
         calcResult.errorMessage,
-        undefined,
-        undefined,
       ));
       return;
     }
@@ -114,6 +169,10 @@ export function detectAnomalies(
           data,
           calcResult,
           index,
+          fieldMappingInfo,
+          mapping,
+          undefined,
+          undefined,
           undefined,
           undefined,
           boundaryCheck.reason,
@@ -139,17 +198,42 @@ function createAnomalyRecord(
   data: Record<string, any>,
   calculation: ReturnType<typeof calculateRecord>,
   originalRowIndex: number,
+  fieldMappingInfo: FieldMappingInfo[],
+  mapping: FieldMapping,
   errorMessage?: string,
-  unitMissingFields?: string[],
+  unitMissingFields?: FieldMappingInfo[],
+  unitInvalidUnits?: { field: FieldMappingInfo; value: string; allowed: string[] }[],
+  invalidDetails?: { field: string; value: string; allowed: string[] }[],
   boundaryReason?: string,
+  missingRawFields?: { rawFieldName: string; targetFieldName: string }[],
 ): AnomalyRecord {
   const isBoundary = type === 'boundary_sample';
+
+  let unitIssue: AnomalyRecord['unitIssue'] | undefined;
+  if (type === 'unit_missing' && unitMissingFields) {
+    unitIssue = {
+      type: 'missing',
+      affectedFields: unitMissingFields,
+    };
+  } else if (type === 'unit_invalid' && unitInvalidUnits) {
+    unitIssue = {
+      type: 'invalid',
+      affectedFields: unitInvalidUnits.map(u => u.field),
+      invalidUnits: unitInvalidUnits.map(u => ({
+        field: u.field.rawFieldName,
+        value: u.value,
+        allowed: u.allowed,
+      })),
+    };
+  }
+
   const suggestion = generateSuggestion(
     type,
     data,
-    unitMissingFields,
+    missingRawFields,
     boundaryReason,
     errorMessage,
+    invalidDetails,
   );
 
   return {
@@ -161,13 +245,15 @@ function createAnomalyRecord(
     calculation,
     isBoundary,
     boundaryReason,
-    unitMissingFields,
+    unitIssue,
+    fieldMappingInfo,
     suggestion,
     rawSnapshot: { ...answer.rawData },
     sourceInfo: {
       source: answer.source,
       sourceBatch: answer.sourceBatch,
       originalRowIndex,
+      originalFieldNames: Object.keys(answer.rawData),
     },
     detectedAt: new Date().toISOString(),
   };
@@ -192,6 +278,7 @@ export function getAnomalyStats(run: CalculationRun) {
     anomalyCount: run.anomalyCount,
     byType: {
       unit_missing: 0,
+      unit_invalid: 0,
       boundary_sample: 0,
       bad_data: 0,
       calculation_error: 0,

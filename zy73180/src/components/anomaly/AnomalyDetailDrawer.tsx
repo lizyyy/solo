@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   Eye,
   EyeOff,
+  AlertTriangle,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -160,15 +161,71 @@ function SuggestionTab({ anomaly }: { anomaly: AnomalyRecord }) {
         </div>
       </div>
 
-      {anomaly.unitMissingFields && anomaly.unitMissingFields.length > 0 && (
+      {anomaly.unitIssue && anomaly.unitIssue.type === 'missing' && (
         <div className="card p-3">
           <div className="text-xs font-medium text-ink-500 mb-2 flex items-center gap-1.5">
             <Ruler className="w-3.5 h-3.5" />
-            缺失的单位字段
+            缺失的单位字段（原始字段名）
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            {anomaly.unitMissingFields.map(field => (
-              <span key={field} className="tag-unit">{field}</span>
+          <div className="space-y-2">
+            {anomaly.unitIssue.affectedFields.map((field, idx) => (
+              <div key={idx} className="flex items-center justify-between text-xs bg-red-50 px-2 py-1.5 rounded border border-red-100">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-red-700">{field.rawFieldName}</span>
+                  <span className="text-ink-400">→</span>
+                  <span className="text-ink-500">{field.targetFieldName}</span>
+                </div>
+                <span className="tag-unit text-[10px]">缺失</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {anomaly.unitIssue && anomaly.unitIssue.type === 'invalid' && (
+        <div className="card p-3">
+          <div className="text-xs font-medium text-ink-500 mb-2 flex items-center gap-1.5">
+            <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
+            不合法的单位字段
+          </div>
+          <div className="space-y-2">
+            {anomaly.unitIssue.invalidUnits?.map((u, idx) => (
+              <div key={idx} className="text-xs bg-red-50 px-2 py-2 rounded border border-red-100">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-mono text-red-700 font-medium">{u.field}</span>
+                  <span className="text-red-600 font-medium">= {u.value}</span>
+                </div>
+                <div className="text-ink-500">允许值：{u.allowed.join('、')}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {anomaly.fieldMappingInfo && anomaly.fieldMappingInfo.length > 0 && (
+        <div className="card p-3">
+          <div className="text-xs font-medium text-ink-500 mb-2 flex items-center gap-1.5">
+            <GitBranch className="w-3.5 h-3.5" />
+            字段映射溯源（原始字段 → 标准字段）
+          </div>
+          <div className="space-y-1.5">
+            {anomaly.fieldMappingInfo.map((info, idx) => (
+              <div key={idx} className="flex items-start gap-2 text-xs">
+                <div className="flex-shrink-0 w-20 text-right text-ink-400 truncate font-mono" title={info.rawFieldName}>
+                  {info.rawFieldName}
+                </div>
+                <span className="text-ink-300 flex-shrink-0">→</span>
+                <div className="flex-1 flex items-center gap-2">
+                  <span className="text-ink-600 font-medium">{info.targetFieldName}</span>
+                  <span className="text-ink-400">=</span>
+                  <span className="font-mono text-ink-800 break-all">
+                    {info.rawValue === null || info.rawValue === undefined || info.rawValue === ''
+                      ? <span className="text-red-600 italic">（空）</span>
+                      : String(info.rawValue)
+                    }
+                  </span>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -361,6 +418,7 @@ function reasonLabel(reason: string): string {
 function getAnomalyIcon(type: AnomalyRecord['type']) {
   return {
     unit_missing: Ruler,
+    unit_invalid: AlertTriangle,
     boundary_sample: GitBranch,
     bad_data: FileWarning,
     calculation_error: Calculator,
@@ -370,6 +428,7 @@ function getAnomalyIcon(type: AnomalyRecord['type']) {
 function getSuggestionCardClass(type: AnomalyRecord['type']): string {
   return {
     unit_missing: 'bg-red-50 border-red-200',
+    unit_invalid: 'bg-red-50 border-red-200',
     boundary_sample: 'bg-purple-50 border-purple-200',
     bad_data: 'bg-gray-50 border-gray-200',
     calculation_error: 'bg-amber-50 border-amber-200',
@@ -379,6 +438,7 @@ function getSuggestionCardClass(type: AnomalyRecord['type']): string {
 function getSuggestionIconBg(type: AnomalyRecord['type']): string {
   return {
     unit_missing: 'bg-red-100 text-anomaly-unit',
+    unit_invalid: 'bg-red-100 text-red-700',
     boundary_sample: 'bg-purple-100 text-anomaly-boundary',
     bad_data: 'bg-gray-200 text-anomaly-bad',
     calculation_error: 'bg-amber-100 text-anomaly-calc',

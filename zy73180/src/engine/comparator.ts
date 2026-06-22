@@ -109,7 +109,22 @@ function inferReasons(
     reasons.push('parameter');
   }
 
-  if (JSON.stringify(paramsA.unitConfig) !== JSON.stringify(paramsB.unitConfig)) {
+  const unitConfigChanged = (
+    JSON.stringify(paramsA.unitConfig.requiredFields) !== JSON.stringify(paramsB.unitConfig.requiredFields) ||
+    JSON.stringify(paramsA.unitConfig.allowedUnits) !== JSON.stringify(paramsB.unitConfig.allowedUnits)
+  );
+
+  const unitTypeChanged = (
+    (anomalyA?.type === 'unit_missing' || anomalyA?.type === 'unit_invalid') ||
+    (anomalyB?.type === 'unit_missing' || anomalyB?.type === 'unit_invalid')
+  );
+
+  const unitIssueChanged = (
+    anomalyA?.unitIssue?.type !== anomalyB?.unitIssue?.type ||
+    anomalyA?.unitIssue?.affectedFields?.length !== anomalyB?.unitIssue?.affectedFields?.length
+  );
+
+  if (unitConfigChanged || unitTypeChanged || unitIssueChanged) {
     reasons.push('unit');
   }
 

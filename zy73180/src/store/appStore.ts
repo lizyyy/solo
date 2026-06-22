@@ -55,6 +55,24 @@ export const useAppStore = create<AppState>((set, get) => ({
   filter: defaultFilter,
 
   initDefault: () => {
+    const state = get();
+    
+    if (state.answers.length > 0 && state.mappings.length > 0) {
+      if (state.currentRun) {
+        return;
+      }
+      
+      const run = detectAnomalies(state.answers, state.mappings, state.params, '初始验算');
+      set({
+        currentRun: run,
+        previousRun: null,
+        comparison: null,
+        selectedAnomalyId: null,
+        filter: { ...defaultFilter },
+      });
+      return;
+    }
+    
     const answers = createHistoricalAnswers();
     const mappings = defaultFieldMappings;
     const params = defaultCalculationParams;

@@ -37,6 +37,7 @@ export function filterAnomalies(anomalies: AnomalyRecord[], filter: AnomalyFilte
 export function groupAnomaliesByType(anomalies: AnomalyRecord[]): Record<string, AnomalyRecord[]> {
   const groups: Record<string, AnomalyRecord[]> = {
     unit_missing: [],
+    unit_invalid: [],
     boundary_sample: [],
     bad_data: [],
     calculation_error: [],
@@ -96,30 +97,54 @@ export function exportAnomaliesToCsv(
     '公式',
     '是否边界样本',
     '边界原因',
-    '缺失单位字段',
+    '单位问题类型',
+    '单位缺失字段（原始字段名）',
+    '单位不合法字段',
+    '字段映射信息（原始→标准）',
     '处理建议',
     '原始记录快照',
     '检测时间',
   ];
 
-  const rows = anomalies.map(a => [
-    a.id,
-    a.answerId,
-    a.sourceInfo.source,
-    a.sourceInfo.sourceBatch,
-    a.sourceInfo.originalRowIndex,
-    ANOMALY_TYPE_LABELS[a.type],
-    STATUS_LABELS[a.status],
-    a.calculation.value?.toFixed(4) ?? '',
-    a.calculation.unit ?? '',
-    a.calculation.formula,
-    a.isBoundary ? '是' : '否',
-    a.boundaryReason ?? '',
-    a.unitMissingFields?.join('、') ?? '',
-    a.suggestion ?? '',
-    JSON.stringify(a.rawSnapshot),
-    a.detectedAt,
-  ].map(escapeCsv).join(','));
+  const rows = anomalies.map(a => {
+    const unitIssueType = a.unitIssue?.type === 'missing' ? '单位缺失'
+      : a.unitIssue?.type === 'invalid' ? '单位不合法'
+      : '';
+
+    const missingFields = a.unitIssue?.type === 'missing'
+      ? a.unitIssue.affectedFields.map(f => `${f.rawFieldName}→${f.targetFieldName}`).join('; ')
+      : '';
+
+    const invalidUnits = a.unitIssue?.type === 'invalid' && a.unitIssue.invalidUnits
+      ? a.unitIssue.invalidUnits.map(u => `${u.field}="${u.value}"(允许:${u.allowed.join('/')})`).join('; ')
+      : '';
+
+    const fieldMapping = a.fieldMappingInfo
+      ? a.fieldMappingInfo.map(f => `${f.rawFieldName}→${f.targetFieldName}=${f.rawValue ?? ''}`).join('; ')
+      : '';
+
+    return [
+      a.id,
+      a.answerId,
+      a.sourceInfo.source,
+      a.sourceInfo.sourceBatch,
+      a.sourceInfo.originalRowIndex + 1,
+      ANOMALY_TYPE_LABELS[a.type],
+      STATUS_LABELS[a.status],
+      a.calculation.value?.toFixed(4) ?? '',
+      a.calculation.unit ?? '',
+      a.calculation.formula,
+      a.isBoundary ? '是' : '否',
+      a.boundaryReason ?? '',
+      unitIssueType,
+      missingFields,
+      invalidUnits,
+      fieldMapping,
+      a.suggestion ?? '',
+      JSON.stringify(a.rawSnapshot),
+      a.detectedAt,
+    ].map(escapeCsv).join(',');
+  });
 
   return filterMeta + headers.join(',') + '\n' + rows.join('\n');
 }

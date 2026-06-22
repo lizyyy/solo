@@ -50,7 +50,7 @@ export default function StatsOverview() {
     },
   ];
 
-  const typeOrder: AnomalyType[] = ['unit_missing', 'boundary_sample', 'bad_data', 'calculation_error'];
+  const typeOrder: AnomalyType[] = ['unit_missing', 'unit_invalid', 'boundary_sample', 'bad_data', 'calculation_error'];
 
   return (
     <div className="space-y-4">
@@ -94,6 +94,7 @@ export default function StatsOverview() {
             const width = (count / stats.anomalyCount) * 100;
             const colors: Record<AnomalyType, string> = {
               unit_missing: 'bg-anomaly-unit',
+              unit_invalid: 'bg-red-600',
               boundary_sample: 'bg-anomaly-boundary',
               bad_data: 'bg-anomaly-bad',
               calculation_error: 'bg-anomaly-calc',
@@ -115,6 +116,7 @@ export default function StatsOverview() {
 
 const ANOMALY_TYPE_LABELS_SHORT: Record<AnomalyType, string> = {
   unit_missing: '单位缺失',
+  unit_invalid: '单位不合法',
   boundary_sample: '边界样本',
   bad_data: '坏数据',
   calculation_error: '计算异常',

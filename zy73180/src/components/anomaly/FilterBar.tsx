@@ -6,11 +6,12 @@ import { Search, X, Download } from 'lucide-react';
 import { exportAnomaliesToCsv, downloadFile } from '@/utils/export';
 import { cn } from '@/lib/utils';
 
-const TYPE_OPTIONS: AnomalyType[] = ['unit_missing', 'boundary_sample', 'bad_data', 'calculation_error'];
+const TYPE_OPTIONS: AnomalyType[] = ['unit_missing', 'unit_invalid', 'boundary_sample', 'bad_data', 'calculation_error'];
 const STATUS_OPTIONS: ProcessingStatus[] = ['pending', 'reviewing', 'resolved', 'ignored'];
 
 const typeColorMap: Record<AnomalyType, { dot: string; active: string }> = {
   unit_missing: { dot: 'bg-anomaly-unit', active: 'bg-red-50 border-anomaly-unit text-anomaly-unit' },
+  unit_invalid: { dot: 'bg-red-600', active: 'bg-red-50 border-red-500 text-red-700' },
   boundary_sample: { dot: 'bg-anomaly-boundary', active: 'bg-purple-50 border-anomaly-boundary text-anomaly-boundary' },
   bad_data: { dot: 'bg-anomaly-bad', active: 'bg-gray-100 border-anomaly-bad text-anomaly-bad' },
   calculation_error: { dot: 'bg-anomaly-calc', active: 'bg-amber-50 border-anomaly-calc text-anomaly-calc' },

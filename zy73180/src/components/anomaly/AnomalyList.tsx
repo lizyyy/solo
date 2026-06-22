@@ -7,7 +7,7 @@ import { ChevronDown, ChevronRight, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
-const TYPE_ORDER: AnomalyType[] = ['unit_missing', 'boundary_sample', 'bad_data', 'calculation_error'];
+const TYPE_ORDER: AnomalyType[] = ['unit_missing', 'unit_invalid', 'boundary_sample', 'bad_data', 'calculation_error'];
 
 export default function AnomalyList() {
   const currentRun = useAppStore(s => s.currentRun);
@@ -150,6 +150,7 @@ function AnomalyListItem({
 function typeBgClass(type: AnomalyType): string {
   return {
     unit_missing: 'bg-red-50 text-anomaly-unit',
+    unit_invalid: 'bg-red-50 text-red-700',
     boundary_sample: 'bg-purple-50 text-anomaly-boundary',
     bad_data: 'bg-gray-100 text-anomaly-bad',
     calculation_error: 'bg-amber-50 text-anomaly-calc',
@@ -159,6 +160,7 @@ function typeBgClass(type: AnomalyType): string {
 function typeHint(type: AnomalyType): string {
   return {
     unit_missing: '需补充单位',
+    unit_invalid: '需修正单位',
     boundary_sample: '需确认样本',
     bad_data: '需核对原始记录',
     calculation_error: '需检查公式',

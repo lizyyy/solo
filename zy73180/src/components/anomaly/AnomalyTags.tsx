@@ -9,11 +9,13 @@ import {
   Eye,
   CheckCircle2,
   EyeOff,
+  AlertTriangle,
 } from 'lucide-react';
 
 export function AnomalyTypeTag({ type, count }: { type: AnomalyType; count?: number }) {
   const config = {
     unit_missing: { cls: 'tag-unit', Icon: Ruler },
+    unit_invalid: { cls: 'tag bg-red-50 text-red-700 border border-red-200', Icon: AlertTriangle },
     boundary_sample: { cls: 'tag-boundary', Icon: GitBranch },
     bad_data: { cls: 'tag-bad', Icon: FileX2 },
     calculation_error: { cls: 'tag-calc', Icon: Calculator },
@@ -50,6 +52,7 @@ export function StatusTag({ status }: { status: ProcessingStatus }) {
 
 export const ANOMALY_TYPE_ICONS = {
   unit_missing: Ruler,
+  unit_invalid: AlertTriangle,
   boundary_sample: GitBranch,
   bad_data: FileX2,
   calculation_error: Calculator,

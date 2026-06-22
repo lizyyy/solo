@@ -97,6 +97,30 @@ export const sampleBatch1: Record<string, any>[] = [
     '系数': 1.0,
     '基准值': 0.5,
   },
+  {
+    '编号': 'Q009',
+    '题目': '货物数量',
+    '数值': 25,
+    '单位': '个',
+    '类别': '统计',
+    '描述': '库存商品数量',
+    '约束最小值': 0,
+    '约束最大值': 100,
+    '系数': 1.0,
+    '基准值': 20,
+  },
+  {
+    '编号': 'Q010',
+    '题目': '订单份数',
+    '数值': 150,
+    '单位': '份',
+    '类别': '经济',
+    '描述': '每日订单量',
+    '约束最小值': 0,
+    '约束最大值': 500,
+    '系数': 1.2,
+    '基准值': 100,
+  },
 ];
 
 export const sampleBatch2: Record<string, any>[] = [
@@ -231,7 +255,7 @@ export const defaultCalculationParams: CalculationParams = {
   },
   unitConfig: {
     requiredFields: ['value', 'unit'],
-    allowedUnits: ['平方米', 'km/h', '欧姆', '%', '摄氏度', '元', '厘米', '千克', '秒', 'g/cm3', ''],
+    allowedUnits: ['平方米', 'km/h', '欧姆', '%', '摄氏度', '元', '厘米', '千克', '秒', 'g/cm3'],
   },
   tolerance: 0.01,
 };
@@ -247,7 +271,7 @@ export const adjustedCalculationParams: CalculationParams = {
   },
   unitConfig: {
     requiredFields: ['value', 'unit'],
-    allowedUnits: ['平方米', 'km/h', '欧姆', '%', '摄氏度', '元', '厘米', '千克', '秒', 'g/cm3', ''],
+    allowedUnits: ['平方米', 'km/h', '欧姆', '%', '摄氏度', '元', '厘米', '千克', '秒', 'g/cm3', '个', '份'],
   },
   tolerance: 0.02,
 };
