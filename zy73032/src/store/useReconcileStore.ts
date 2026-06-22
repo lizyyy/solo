@@ -6,6 +6,8 @@ import type {
   SummaryStats,
   AnomalyItem,
   OperationLog,
+  ScheduleDetail,
+  MedicalRecordWithSource,
 } from '../types'
 
 interface ReconcileState {
@@ -18,7 +20,7 @@ interface ReconcileState {
   operator: string
   expandedScheduleId: number | null
   expandedLogId: number | null
-  expandedMedicalForSchedule: Record<number, MedicalRecord[]>
+  scheduleDetails: Record<number, ScheduleDetail>
 
   setOperator: (name: string) => void
   setExpandedSchedule: (id: number | null) => void
@@ -29,6 +31,7 @@ interface ReconcileState {
   fetchSchedules: () => Promise<void>
   fetchAnomalies: () => Promise<void>
   fetchLogs: () => Promise<void>
+  fetchScheduleDetail: (id: number) => Promise<ScheduleDetail>
 
   importCsv: (csvText: string, label: string) => Promise<void>
   addMedicalRecord: (data: {
@@ -56,7 +59,7 @@ export const useReconcileStore = create<ReconcileState>((set, get) => ({
   operator: '小乔',
   expandedScheduleId: null,
   expandedLogId: null,
-  expandedMedicalForSchedule: {},
+  scheduleDetails: {},
 
   setOperator: (name: string) => set({ operator: name }),
   setExpandedSchedule: (id) => set({ expandedScheduleId: id }),
@@ -119,6 +122,14 @@ export const useReconcileStore = create<ReconcileState>((set, get) => ({
     }
   },
 
+  fetchScheduleDetail: async (id: number) => {
+    const cached = get().scheduleDetails[id]
+    if (cached) return cached
+    const detail = await api.getScheduleDetail(id)
+    set({ scheduleDetails: { ...get().scheduleDetails, [id]: detail } })
+    return detail
+  },
+
   importCsv: async (csvText, label) => {
     set({ loading: true, error: null })
     try {
@@ -148,6 +159,7 @@ export const useReconcileStore = create<ReconcileState>((set, get) => ({
   confirmSchedule: async (id, remark = '') => {
     try {
       await api.confirmSchedule(id, get().operator, remark)
+      set({ scheduleDetails: { ...get().scheduleDetails, [id]: undefined as unknown as ScheduleDetail } })
       await get().fetchAll()
     } catch (err) {
       set({ error: (err as Error).message })
@@ -158,6 +170,7 @@ export const useReconcileStore = create<ReconcileState>((set, get) => ({
   withdrawSchedule: async (id, remark = '') => {
     try {
       await api.withdrawSchedule(id, get().operator, remark)
+      set({ scheduleDetails: { ...get().scheduleDetails, [id]: undefined as unknown as ScheduleDetail } })
       await get().fetchAll()
     } catch (err) {
       set({ error: (err as Error).message })
@@ -168,6 +181,7 @@ export const useReconcileStore = create<ReconcileState>((set, get) => ({
   bindAlias: async (aliasName, canonicalName) => {
     try {
       await api.bindAlias(aliasName, canonicalName, get().operator)
+      set({ scheduleDetails: {} })
       await get().fetchAll()
     } catch (err) {
       set({ error: (err as Error).message })
@@ -179,6 +193,7 @@ export const useReconcileStore = create<ReconcileState>((set, get) => ({
     set({ loading: true, error: null })
     try {
       await api.seedDemo()
+      set({ scheduleDetails: {} })
       await get().fetchAll()
     } catch (err) {
       set({ error: (err as Error).message, loading: false })

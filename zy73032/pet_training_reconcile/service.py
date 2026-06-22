@@ -203,7 +203,7 @@ def find_schedule_for_record(conn: sqlite3.Connection, pet_name: str, visit_date
         row = conn.execute(
             """
             SELECT * FROM schedules
-            WHERE pet_id = ? AND course_date = ? AND status != 'withdrawn'
+            WHERE pet_id = ? AND course_date = ? AND status != 'anomaly'
             ORDER BY id DESC LIMIT 1
             """,
             (pet_id, visit_date),
@@ -215,6 +215,47 @@ def find_schedule_for_record(conn: sqlite3.Connection, pet_name: str, visit_date
 def get_schedule(conn: sqlite3.Connection, schedule_id: int) -> dict[str, Any]:
     row = conn.execute("SELECT * FROM schedules WHERE id = ?", (schedule_id,)).fetchone()
     return row_to_dict(row)
+
+
+def list_medical_records_for_schedule(conn: sqlite3.Connection, schedule_id: int) -> list[dict[str, Any]]:
+    schedule = get_schedule(conn, schedule_id)
+    if not schedule:
+        return []
+    rows = conn.execute(
+        """
+        SELECT mr.*, src.label AS source_label, src.imported_at AS imported_at, src.source_type AS source_type
+        FROM medical_records mr
+        JOIN sources src ON src.id = mr.source_id
+        WHERE mr.linked_schedule_id = ?
+           OR mr.pet_name = ?
+           OR (mr.pet_id IS NOT NULL AND mr.pet_id = ?)
+        ORDER BY mr.visit_date, mr.id
+        """,
+        (schedule_id, schedule["pet_name"], schedule.get("pet_id")),
+    ).fetchall()
+    return [row_to_dict(row) for row in rows]
+
+
+def get_schedule_detail(conn: sqlite3.Connection, schedule_id: int) -> dict[str, Any]:
+    schedule = get_schedule(conn, schedule_id)
+    if not schedule:
+        return {}
+    source_row = conn.execute(
+        "SELECT id, source_type, label, imported_by, imported_at, raw_payload FROM sources WHERE id = ?",
+        (schedule["source_id"],),
+    ).fetchone()
+    source = row_to_dict(source_row)
+    if source.get("raw_payload"):
+        try:
+            source["raw_payload"] = json.loads(source["raw_payload"])
+        except (json.JSONDecodeError, TypeError):
+            pass
+    medical_records = list_medical_records_for_schedule(conn, schedule_id)
+    return {
+        "schedule": schedule,
+        "source": source,
+        "medical_records": medical_records,
+    }
 
 
 def get_medical_record(conn: sqlite3.Connection, record_id: int) -> dict[str, Any]:
@@ -297,10 +338,12 @@ def withdraw_schedule(conn: sqlite3.Connection, schedule_id: int, operator: str 
     before = get_schedule(conn, schedule_id)
     if not before:
         raise ValueError(f"排程 {schedule_id} 不存在")
+    if before["status"] != "confirmed":
+        raise ValueError("只有已确认的排程才能撤回")
     conn.execute(
         """
         UPDATE schedules
-        SET status = 'withdrawn', withdrawn_at = CURRENT_TIMESTAMP
+        SET status = 'pending', confirmed_by = '', confirmed_at = NULL, withdrawn_at = CURRENT_TIMESTAMP
         WHERE id = ?
         """,
         (schedule_id,),

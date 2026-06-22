@@ -18,6 +18,27 @@ export interface Schedule {
   created_at: string
 }
 
+export interface SourceInfo {
+  id: number
+  source_type: 'csv' | 'medical_form'
+  label: string
+  imported_by: string
+  imported_at: string
+  raw_payload: unknown
+}
+
+export interface MedicalRecordWithSource extends MedicalRecord {
+  source_label: string
+  imported_at: string
+  source_type: string
+}
+
+export interface ScheduleDetail {
+  schedule: Schedule
+  source: SourceInfo
+  medical_records: MedicalRecordWithSource[]
+}
+
 export type MedicalStatus = 'linked' | 'needs_review'
 
 export interface MedicalRecord {

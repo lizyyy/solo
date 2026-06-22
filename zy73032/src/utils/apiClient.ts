@@ -6,6 +6,7 @@ import type {
   OperationLog,
   CsvImportResult,
   AliasBindResult,
+  ScheduleDetail,
 } from '../types'
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -28,6 +29,9 @@ export const api = {
 
   getSchedules: (includeAnomalies = true): Promise<{ items: Schedule[] }> =>
     request<{ items: Schedule[] }>(`/schedules${includeAnomalies ? '' : '?include_anomalies=false'}`),
+
+  getScheduleDetail: (id: number): Promise<ScheduleDetail> =>
+    request<ScheduleDetail>(`/schedules/${id}`),
 
   confirmSchedule: (id: number, operator: string, remark = ''): Promise<Schedule> =>
     request<Schedule>(`/schedules/${id}/confirm`, {

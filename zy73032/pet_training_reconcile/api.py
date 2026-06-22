@@ -15,6 +15,7 @@ from .service import (
     bind_alias,
     confirm_schedule,
     export_detail_csv,
+    get_schedule_detail,
     import_schedules,
     list_anomalies,
     list_logs,
@@ -105,6 +106,14 @@ def post_medical_record(request: MedicalRecordRequest, conn=Depends(get_conn)):
 @app.get("/schedules")
 def get_schedules(include_anomalies: bool = True, conn=Depends(get_conn)):
     return {"items": list_schedules(conn, include_anomalies=include_anomalies)}
+
+
+@app.get("/schedules/{schedule_id}")
+def get_schedule(schedule_id: int, conn=Depends(get_conn)):
+    detail = get_schedule_detail(conn, schedule_id)
+    if not detail.get("schedule"):
+        raise HTTPException(status_code=404, detail=f"排程 {schedule_id} 不存在")
+    return detail
 
 
 @app.post("/schedules/{schedule_id}/confirm")

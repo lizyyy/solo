@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   ChevronDown,
   ChevronUp,
@@ -8,13 +8,17 @@ import {
   CalendarDays,
   FileText,
   Clock,
+  Stethoscope,
 } from 'lucide-react'
 import { useReconcileStore } from '../store/useReconcileStore'
 import {
   SCHEDULE_STATUS_LABEL,
+  MEDICAL_STATUS_LABEL,
   type Schedule,
   type ScheduleStatus,
   type OperationLog,
+  type ScheduleDetail,
+  type MedicalRecordWithSource,
 } from '../types'
 import { formatDateCN, formatDateTimeCN } from '../utils/helpers'
 import DiffViewer from '../components/DiffViewer'
@@ -31,12 +35,20 @@ const FILTERS: { key: ScheduleStatus | 'all'; label: string }[] = [
 export default function ScheduleList() {
   const schedules = useReconcileStore((s) => s.schedules)
   const logs = useReconcileStore((s) => s.logs)
+  const scheduleDetails = useReconcileStore((s) => s.scheduleDetails)
+  const fetchScheduleDetail = useReconcileStore((s) => s.fetchScheduleDetail)
   const confirmSchedule = useReconcileStore((s) => s.confirmSchedule)
   const withdrawSchedule = useReconcileStore((s) => s.withdrawSchedule)
   const operator = useReconcileStore((s) => s.operator)
   const [filter, setFilter] = useState<ScheduleStatus | 'all'>('all')
   const [keyword, setKeyword] = useState('')
   const [expandedId, setExpandedId] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (expandedId && !scheduleDetails[expandedId]) {
+      fetchScheduleDetail(expandedId)
+    }
+  }, [expandedId, scheduleDetails, fetchScheduleDetail])
 
   const filtered = schedules.filter((s) => {
     if (filter !== 'all' && s.status !== filter) return false
@@ -121,6 +133,7 @@ export default function ScheduleList() {
             <ScheduleRow
               key={schedule.id}
               schedule={schedule}
+              detail={scheduleDetails[schedule.id]}
               expanded={expandedId === schedule.id}
               onToggle={() =>
                 setExpandedId(expandedId === schedule.id ? null : schedule.id)
@@ -148,6 +161,7 @@ export default function ScheduleList() {
 
 interface ScheduleRowProps {
   schedule: Schedule
+  detail?: ScheduleDetail
   expanded: boolean
   onToggle: () => void
   onConfirm: () => void
@@ -158,6 +172,7 @@ interface ScheduleRowProps {
 
 function ScheduleRow({
   schedule,
+  detail,
   expanded,
   onToggle,
   onConfirm,
@@ -166,7 +181,8 @@ function ScheduleRow({
 }: ScheduleRowProps) {
   const isAnomaly = schedule.status === 'anomaly'
   const isConfirmed = schedule.status === 'confirmed'
-  const isWithdrawn = schedule.status === 'withdrawn'
+  const isPending = schedule.status === 'pending'
+  const medicalRecords: MedicalRecordWithSource[] = detail?.medical_records ?? []
 
   return (
     <div
@@ -204,6 +220,15 @@ function ScheduleRow({
               {schedule.duration_min} 分钟
               <span className="text-warm-300">|</span>
               {schedule.trainer}
+              {medicalRecords.length > 0 && (
+                <>
+                  <span className="text-warm-300">|</span>
+                  <span className="text-brand-600">
+                    <Stethoscope size={12} className="inline -mt-0.5 mr-1" />
+                    {medicalRecords.length} 份关联手写单
+                  </span>
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -221,7 +246,7 @@ function ScheduleRow({
 
       {expanded && (
         <div className="mt-4 pt-4 border-t border-warm-200 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <p className="text-sm font-medium text-warm-700 flex items-center gap-1.5">
                 <FileText size={14} /> 来源与状态
@@ -232,9 +257,17 @@ function ScheduleRow({
                   <span className="text-warm-700 font-mono">{schedule.source_row}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-warm-500">来源单据ID</span>
-                  <span className="text-warm-700 font-mono">#{schedule.source_id}</span>
+                  <span className="text-warm-500">来源单据</span>
+                  <span className="text-warm-700 font-mono">
+                    {detail?.source?.label ?? `#${schedule.source_id}`}
+                  </span>
                 </div>
+                {detail?.source?.imported_at && (
+                  <div className="flex justify-between">
+                    <span className="text-warm-500">导入时间</span>
+                    <span className="text-warm-700">{formatDateTimeCN(detail.source.imported_at)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-warm-500">当前状态</span>
                   <span className={`tag-${schedule.status} tag`}>
@@ -258,8 +291,52 @@ function ScheduleRow({
                 {schedule.withdrawn_at && (
                   <div className="pt-1.5 border-t border-warm-200 mt-1">
                     <span className="text-warm-600 text-xs">
-                      ↩️ 于 {formatDateTimeCN(schedule.withdrawn_at)} 撤回
+                      ↩️ 于 {formatDateTimeCN(schedule.withdrawn_at)} 撤回，已恢复至待确认
                     </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-warm-700 flex items-center gap-1.5">
+                <Stethoscope size={14} /> 关联病历手写单
+              </p>
+              <div className="bg-warm-50 rounded-lg p-3 text-sm max-h-64 overflow-y-auto">
+                {!detail ? (
+                  <p className="text-warm-400 text-xs">加载中...</p>
+                ) : medicalRecords.length === 0 ? (
+                  <p className="text-warm-400 text-xs">暂无关联手写单</p>
+                ) : (
+                  <div className="space-y-3">
+                    {medicalRecords.map((mr) => (
+                      <div
+                        key={mr.id}
+                        className="bg-white rounded p-2.5 border border-warm-200"
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-medium text-warm-800 text-xs">
+                            {mr.pet_name} · {formatDateCN(mr.visit_date)}
+                          </span>
+                          <span className={`tag-${mr.status} tag text-[10px]`}>
+                            {MEDICAL_STATUS_LABEL[mr.status]}
+                          </span>
+                        </div>
+                        <div className="text-xs text-warm-600 space-y-0.5">
+                          <div><span className="text-warm-400">医生：</span>{mr.veterinarian}</div>
+                          <div><span className="text-warm-400">诊断：</span>{mr.diagnosis}</div>
+                          <div><span className="text-warm-400">处置：</span>{mr.treatment}</div>
+                        </div>
+                        <div className="text-[10px] text-warm-400 mt-1.5 pt-1.5 border-t border-warm-100">
+                          来源：{mr.source_label} · {formatDateTimeCN(mr.imported_at)}
+                        </div>
+                        {mr.anomaly_reason && (
+                          <div className="text-[11px] text-danger-600 mt-1">
+                            ⚠️ {mr.anomaly_reason}
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -269,7 +346,7 @@ function ScheduleRow({
               <p className="text-sm font-medium text-warm-700 flex items-center gap-1.5">
                 <FileText size={14} /> 操作轨迹
               </p>
-              <div className="bg-warm-50 rounded-lg p-3 text-sm max-h-48 overflow-y-auto">
+              <div className="bg-warm-50 rounded-lg p-3 text-sm max-h-64 overflow-y-auto">
                 {logs.length === 0 ? (
                   <p className="text-warm-400 text-xs">暂无操作记录</p>
                 ) : (
@@ -321,14 +398,14 @@ function ScheduleRow({
           </div>
 
           <div className="flex gap-2 pt-2">
-            {!isConfirmed && !isWithdrawn && !isAnomaly && (
+            {isPending && !isAnomaly && (
               <button className="btn-primary" onClick={onConfirm}>
                 <Check size={14} /> 确认排程
               </button>
             )}
             {isConfirmed && (
               <button className="btn-secondary" onClick={onWithdraw}>
-                <Undo2 size={14} /> 撤回确认
+                <Undo2 size={14} /> 撤回确认（恢复为待确认）
               </button>
             )}
             {isAnomaly && (
@@ -341,9 +418,6 @@ function ScheduleRow({
               >
                 去异常追踪处理 →
               </button>
-            )}
-            {isWithdrawn && (
-              <span className="text-sm text-warm-400">已撤回的排程不能再确认</span>
             )}
           </div>
         </div>
