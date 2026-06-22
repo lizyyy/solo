@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import warnings
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -15,8 +16,45 @@ from .parameter_manager import ParameterManager, ParameterVersion, ParameterChan
 
 
 @dataclass
+class ParamOrigin:
+    """参数来源详情 - 能回到原始参数对象"""
+    param_name: str
+    param_value: Any
+    version_id: str
+    version_name: str
+    source_type: str
+    source_id: str
+    source_name: str
+    created_by: str
+    created_at: str
+    raw_value: Any
+    raw_data: Dict[str, Any]
+    row_hint: str = ""
+    cleaned: bool = False
+    change_from_previous: Optional[Dict[str, Any]] = None
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "param_name": self.param_name,
+            "param_value": self.param_value,
+            "version_id": self.version_id,
+            "version_name": self.version_name,
+            "source_type": self.source_type,
+            "source_id": self.source_id,
+            "source_name": self.source_name,
+            "created_by": self.created_by,
+            "created_at": self.created_at,
+            "raw_value": self.raw_value,
+            "raw_data": self.raw_data,
+            "row_hint": self.row_hint,
+            "cleaned": self.cleaned,
+            "change_from_previous": self.change_from_previous,
+        }
+
+
+@dataclass
 class BoundaryIssue:
-    """边界问题记录 - 如除零等"""
+    """边界问题记录 - 如除零等，直接定位到原始对象"""
     issue_type: str
     severity: str
     location: str
@@ -25,6 +63,10 @@ class BoundaryIssue:
     param_name: Optional[str] = None
     param_value: Optional[Any] = None
     version_id: Optional[str] = None
+    affected_calculations: List[str] = field(default_factory=list)
+    param_origin: Optional[ParamOrigin] = None
+    fallback_version_hint: str = ""
+    fallback_version_id: Optional[str] = None
     
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -36,12 +78,16 @@ class BoundaryIssue:
             "param_name": self.param_name,
             "param_value": self.param_value,
             "version_id": self.version_id,
+            "affected_calculations": self.affected_calculations,
+            "param_origin": self.param_origin.to_dict() if self.param_origin else None,
+            "fallback_version_hint": self.fallback_version_hint,
+            "fallback_version_id": self.fallback_version_id,
         }
 
 
 @dataclass
 class CalculationStep:
-    """计算步骤 - 用于解释数字从哪来"""
+    """计算步骤 - 用于解释数字从哪来，每一步都带溯源链路"""
     step_id: str
     step_name: str
     description: str
@@ -100,34 +146,131 @@ class ChartExplainer:
         self.parameter_manager = parameter_manager
         self._explanations: Dict[str, ChartExplanation] = {}
     
+    def _build_param_origin(
+        self,
+        param_name: str,
+        version: ParameterVersion,
+    ) -> ParamOrigin:
+        """为参数构建完整的来源对象，能回到原始表格行"""
+        history = self.parameter_manager.trace_parameter_origin(param_name)
+        current_entry = history[-1] if history else None
+        first_entry = history[0] if history else None
+        
+        raw_value = version.source.raw_data.get(param_name, version.parameters.get(param_name))
+        current_value = version.parameters.get(param_name)
+        cleaned = raw_value != current_value
+        
+        row_hint = ""
+        if version.source.source_type == "excel":
+            row_hint = f"Excel文件 '{version.source.source_name}' (ID: {version.source.source_id})，参数 '{param_name}' 所在单元格"
+        elif version.source.source_type == "manual":
+            row_hint = f"手动录入记录 '{version.source.source_name}' (ID: {version.source.source_id})，录入人 {version.created_by}"
+        elif version.source.source_type == "api":
+            row_hint = f"API数据源 '{version.source.source_name}' (ID: {version.source.source_id})，字段 '{param_name}'"
+        else:
+            row_hint = f"来源 '{version.source.source_name}' (ID: {version.source.source_id})，参数 '{param_name}'"
+        
+        change_from_previous = None
+        if len(history) >= 2:
+            prev = history[-2]
+            if prev["value"] != current_value:
+                change_from_previous = {
+                    "from_value": prev["value"],
+                    "to_value": current_value,
+                    "from_version": prev["version_name"],
+                    "to_version": current_entry["version_name"] if current_entry else version.version_name,
+                    "changed_by": current_entry["created_by"] if current_entry else version.created_by,
+                }
+        
+        return ParamOrigin(
+            param_name=param_name,
+            param_value=current_value,
+            version_id=version.version_id,
+            version_name=version.version_name,
+            source_type=version.source.source_type,
+            source_id=version.source.source_id,
+            source_name=version.source.source_name,
+            created_by=version.created_by,
+            created_at=version.created_at.isoformat(),
+            raw_value=raw_value,
+            raw_data=version.source.raw_data,
+            row_hint=row_hint,
+            cleaned=cleaned,
+            change_from_previous=change_from_previous,
+        )
+    
+    def _find_last_valid_version(
+        self,
+        param_name: str,
+        current_version_id: str,
+        is_valid_fn,
+    ) -> Tuple[Optional[str], Optional[str]]:
+        """找到参数最后一个有效值所在的版本"""
+        history = self.parameter_manager.trace_parameter_origin(param_name)
+        for entry in reversed(history):
+            if entry["version_id"] == current_version_id:
+                continue
+            if is_valid_fn(entry["value"]):
+                return entry["version_id"], entry["version_name"]
+        return None, None
+    
     def _safe_divide(
         self,
         numerator: float,
         denominator: float,
         param_name: str,
-        version_id: str,
+        version: ParameterVersion,
         epsilon: float = 1e-10,
     ) -> Tuple[float, Optional[BoundaryIssue]]:
         """
         安全除法 - 处理除零边界情况
-        不仅警告，还要告诉接手的人该怎么处理
+        不仅警告，还要告诉接手的人：
+        - 这个参数来自哪个原始对象/表格行
+        - 影响了哪些计算
+        - 建议回退到哪个有效版本
+        - 找谁补录确认
         """
         if abs(denominator) < epsilon:
+            param_origin = self._build_param_origin(param_name, version)
+            
+            fallback_id, fallback_name = self._find_last_valid_version(
+                param_name,
+                version.version_id,
+                lambda v: isinstance(v, (int, float)) and abs(v) >= epsilon,
+            )
+            
+            fallback_hint = ""
+            if fallback_name:
+                fallback_hint = f"建议回退到版本 '{fallback_name}'，该版本中 {param_name}={self.parameter_manager.get_version(fallback_id).parameters.get(param_name)}"
+            else:
+                fallback_hint = f"暂无有效历史版本，请联系 {param_origin.created_by} 补录确认"
+            
             issue = BoundaryIssue(
                 issue_type="除零错误",
                 severity="high",
-                location=f"参数 '{param_name}' 用于除法计算时",
-                message=f"分母值为 {denominator}，接近或等于零，可能导致计算结果异常。",
+                location=f"参数 '{param_name}' 在版本 '{version.version_name}' 中",
+                message=(
+                    f"参数 '{param_name}' 值为 {denominator}，接近或等于零，无法执行除法运算。\n"
+                    f"该值来自：{param_origin.row_hint}\n"
+                    f"录入人：{param_origin.created_by}，录入时间：{version.created_at.strftime('%Y-%m-%d %H:%M')}"
+                ),
                 suggestion=(
-                    f"处理建议：\n"
-                    f"1. 检查参数 '{param_name}' 的来源数据是否正确\n"
-                    f"2. 确认该值为零是否合理，若合理可使用一个极小值（如 {epsilon}）替代\n"
-                    f"3. 若该值不应为零，请追溯参数来源：{version_id}\n"
-                    f"4. 可设置合理的默认值或跳过该指标计算"
+                    f"处理步骤：\n"
+                    f"1. 【定位来源】请检查 {param_origin.row_hint}\n"
+                    f"   原始数据: {param_origin.raw_data}\n"
+                    f"   录入人: {param_origin.created_by}，请与其确认该值是否正确\n"
+                    f"2. 【影响评估】该异常会导致需要 '{param_name}' 作为分母的计算全部失效\n"
+                    f"3. 【修复建议】{fallback_hint}\n"
+                    f"4. 【临时方案】若业务允许，可使用极小值 {epsilon} 作为分母替代，或标记该指标为 '数据待复核'\n"
+                    f"5. 【命令追溯】运行: python -m src.cli trace --param {param_name}"
                 ),
                 param_name=param_name,
                 param_value=denominator,
-                version_id=version_id,
+                version_id=version.version_id,
+                affected_calculations=["计算比例", "计算均值", "计算增长率"],
+                param_origin=param_origin,
+                fallback_version_hint=fallback_hint,
+                fallback_version_id=fallback_id,
             )
             warnings.warn(issue.message)
             return np.nan, issue
@@ -136,46 +279,76 @@ class ChartExplainer:
     
     def _check_boundary_conditions(
         self,
-        parameters: Dict[str, Any],
-        version_id: str,
+        version: ParameterVersion,
     ) -> List[BoundaryIssue]:
-        """检查边界条件，如除零、负数开方等"""
+        """检查边界条件，如除零、负数开方等，直接定位原始对象"""
         issues: List[BoundaryIssue] = []
+        params = version.parameters
         
-        for param_name, value in parameters.items():
+        for param_name, value in params.items():
             if isinstance(value, (int, float)):
                 if value == 0 and param_name in ["分母", "除数", "比例基数"]:
+                    param_origin = self._build_param_origin(param_name, version)
+                    fallback_id, fallback_name = self._find_last_valid_version(
+                        param_name,
+                        version.version_id,
+                        lambda v: isinstance(v, (int, float)) and v != 0,
+                    )
+                    fallback_hint = f"可参考版本 '{fallback_name}'" if fallback_name else "请联系录入人确认"
+                    
                     issues.append(BoundaryIssue(
                         issue_type="零值风险",
                         severity="medium",
-                        location=f"参数 '{param_name}'",
-                        message=f"参数 '{param_name}' 值为 0，可能在后续除法计算中导致问题。",
+                        location=f"参数 '{param_name}' 在版本 '{version.version_name}' 中",
+                        message=(
+                            f"参数 '{param_name}' 值为 0，可能在后续除法计算中导致问题。\n"
+                            f"来源：{param_origin.row_hint}"
+                        ),
                         suggestion=(
                             f"处理建议：\n"
-                            f"1. 确认该参数为0是否合理\n"
-                            f"2. 若合理，考虑在计算时添加极小值偏移\n"
-                            f"3. 追溯该参数的来源：{param_name}"
+                            f"1. 检查来源：{param_origin.row_hint}\n"
+                            f"2. 确认该值为0是否合理，录入人：{param_origin.created_by}\n"
+                            f"3. {fallback_hint}\n"
+                            f"4. 若合理，可在计算时添加极小值偏移避免除零"
                         ),
                         param_name=param_name,
                         param_value=value,
-                        version_id=version_id,
+                        version_id=version.version_id,
+                        param_origin=param_origin,
+                        fallback_version_hint=fallback_hint,
+                        fallback_version_id=fallback_id,
                     ))
                 
                 if value < 0 and param_name in ["样本量", "计数", "频率"]:
+                    param_origin = self._build_param_origin(param_name, version)
+                    fallback_id, fallback_name = self._find_last_valid_version(
+                        param_name,
+                        version.version_id,
+                        lambda v: isinstance(v, (int, float)) and v >= 0,
+                    )
+                    fallback_hint = f"可回退到版本 '{fallback_name}'" if fallback_name else "请联系录入人确认"
+                    
                     issues.append(BoundaryIssue(
                         issue_type="负值异常",
                         severity="high",
-                        location=f"参数 '{param_name}'",
-                        message=f"参数 '{param_name}' 为负值 ({value})，这类参数通常不应为负。",
+                        location=f"参数 '{param_name}' 在版本 '{version.version_name}' 中",
+                        message=(
+                            f"参数 '{param_name}' 为负值 ({value})，这类参数通常不应为负。\n"
+                            f"来源：{param_origin.row_hint}"
+                        ),
                         suggestion=(
                             f"处理建议：\n"
-                            f"1. 检查原始数据录入是否错误\n"
-                            f"2. 追溯该参数来源，确认是否有符号错误\n"
-                            f"3. 若为计算结果，检查上一步计算逻辑"
+                            f"1. 检查原始数据录入是否错误：{param_origin.row_hint}\n"
+                            f"2. 联系录入人 {param_origin.created_by} 确认是否有符号错误\n"
+                            f"3. {fallback_hint}\n"
+                            f"4. 若为计算结果，检查上一步计算逻辑"
                         ),
                         param_name=param_name,
                         param_value=value,
-                        version_id=version_id,
+                        version_id=version.version_id,
+                        param_origin=param_origin,
+                        fallback_version_hint=fallback_hint,
+                        fallback_version_id=fallback_id,
                     ))
         
         return issues
@@ -187,19 +360,39 @@ class ChartExplainer:
         formula: str,
         inputs: Dict[str, Any],
         output: Any,
-        param_manager: ParameterManager,
+        version: ParameterVersion,
     ) -> CalculationStep:
-        """创建计算步骤，包含数据溯源"""
+        """
+        创建计算步骤，包含完整数据溯源链路
+        每个输入都要说明：来自哪份参数表、哪一行/哪个对象、哪个版本、谁录入、原始值、清洗变化
+        """
         data_lineage = []
+        
         for input_name, input_value in inputs.items():
-            if isinstance(input_value, str) and input_value in param_manager.get_active_version().parameters:
-                origin = param_manager.trace_parameter_origin(input_value)
-                if origin:
-                    data_lineage.append({
-                        "input_name": input_name,
-                        "value": input_value,
-                        "origin": origin,
-                    })
+            if input_name in version.parameters:
+                origin = self._build_param_origin(input_name, version)
+                lineage_entry = {
+                    "input_name": input_name,
+                    "input_value": input_value,
+                    "origin": {
+                        "param_name": origin.param_name,
+                        "param_value": origin.param_value,
+                        "version_id": origin.version_id,
+                        "version_name": origin.version_name,
+                        "source_type": origin.source_type,
+                        "source_id": origin.source_id,
+                        "source_name": origin.source_name,
+                        "source_location": origin.row_hint,
+                        "created_by": origin.created_by,
+                        "created_at": origin.created_at,
+                        "raw_value": origin.raw_value,
+                        "raw_data_snapshot": origin.raw_data,
+                        "was_cleaned": origin.cleaned,
+                        "cleaning_note": "原始值与当前值不同，可能经过清洗或修正" if origin.cleaned else "原始值与当前值一致",
+                        "change_from_previous": origin.change_from_previous,
+                    },
+                }
+                data_lineage.append(lineage_entry)
         
         return CalculationStep(
             step_id=str(uuid4()),
@@ -215,14 +408,13 @@ class ChartExplainer:
         self,
         version: ParameterVersion,
     ) -> Tuple[List[CalculationStep], List[BoundaryIssue]]:
-        """计算图表指标，记录每一步"""
+        """计算图表指标，记录每一步，带上完整溯源"""
         steps: List[CalculationStep] = []
         issues: List[BoundaryIssue] = []
         
         params = version.parameters
-        version_id = version.version_id
         
-        boundary_issues = self._check_boundary_conditions(params, version_id)
+        boundary_issues = self._check_boundary_conditions(version)
         issues.extend(boundary_issues)
         
         if "分子" in params and "分母" in params:
@@ -230,18 +422,19 @@ class ChartExplainer:
                 params["分子"],
                 params["分母"],
                 "分母",
-                version_id,
+                version,
             )
             if div_issue:
+                div_issue.affected_calculations = ["计算比例"]
                 issues.append(div_issue)
             
             steps.append(self._create_calculation_step(
                 step_name="计算比例",
-                description="计算分子除以分母的比例值",
+                description="计算分子除以分母的比例值，用于展示占比或通过率等指标",
                 formula="比例 = 分子 / 分母",
                 inputs={"分子": params["分子"], "分母": params["分母"]},
                 output=result,
-                param_manager=self.parameter_manager,
+                version=version,
             ))
         
         if "总数" in params and "样本量" in params:
@@ -249,39 +442,69 @@ class ChartExplainer:
                 params["总数"],
                 params["样本量"],
                 "样本量",
-                version_id,
+                version,
             )
             if div_issue:
+                div_issue.affected_calculations = ["计算均值"]
                 issues.append(div_issue)
             
             steps.append(self._create_calculation_step(
                 step_name="计算均值",
-                description="计算总数除以样本量的平均值",
+                description="计算总数除以样本量的平均值，用于展示单位均值",
                 formula="均值 = 总数 / 样本量",
                 inputs={"总数": params["总数"], "样本量": params["样本量"]},
                 output=result,
-                param_manager=self.parameter_manager,
+                version=version,
             ))
         
         if "A值" in params and "B值" in params:
             steps.append(self._create_calculation_step(
                 step_name="计算差值",
-                description="计算A值与B值的差值",
+                description="计算A值与B值的差值，用于展示两者绝对差异",
                 formula="差值 = A值 - B值",
                 inputs={"A值": params["A值"], "B值": params["B值"]},
                 output=params["A值"] - params["B值"],
-                param_manager=self.parameter_manager,
+                version=version,
             ))
             
             if params["B值"] != 0:
                 growth_rate = ((params["A值"] - params["B值"]) / params["B值"]) * 100
                 steps.append(self._create_calculation_step(
                     step_name="计算增长率",
-                    description="计算相对B值的增长率百分比",
+                    description="计算相对B值的增长率百分比，用于展示相对变化幅度",
                     formula="增长率 = (A值 - B值) / B值 × 100%",
                     inputs={"A值": params["A值"], "B值": params["B值"]},
                     output=f"{growth_rate:.2f}%",
-                    param_manager=self.parameter_manager,
+                    version=version,
+                ))
+            elif params["B值"] == 0:
+                param_origin = self._build_param_origin("B值", version)
+                fallback_id, fallback_name = self._find_last_valid_version(
+                    "B值", version.version_id,
+                    lambda v: isinstance(v, (int, float)) and v != 0,
+                )
+                fallback_hint = f"可回退到版本 '{fallback_name}'" if fallback_name else "请联系录入人确认"
+                issues.append(BoundaryIssue(
+                    issue_type="除零错误",
+                    severity="high",
+                    location=f"参数 'B值' 在版本 '{version.version_name}' 中",
+                    message=(
+                        f"参数 'B值' 为 0，无法计算增长率。\n"
+                        f"来源：{param_origin.row_hint}"
+                    ),
+                    suggestion=(
+                        f"处理建议：\n"
+                        f"1. 检查来源：{param_origin.row_hint}\n"
+                        f"2. 联系录入人 {param_origin.created_by} 确认\n"
+                        f"3. {fallback_hint}"
+                    ),
+                    param_name="B值",
+                    param_value=0,
+                    version_id=version.version_id,
+                    affected_calculations=["计算增长率"],
+                    param_origin=param_origin,
+                    fallback_version_hint=fallback_hint,
+                    fallback_version_id=fallback_id,
                 ))
         
         return steps, issues
@@ -296,6 +519,7 @@ class ChartExplainer:
         """生成通俗易懂的解释，给不看代码的人听"""
         summary_parts = [
             f"本次计算使用的是版本 '{version.version_name}'，由 {version.created_by} 在 {version.created_at.strftime('%Y年%m月%d日 %H:%M')} 创建。",
+            f"数据来源于 '{version.source.source_name}'。",
         ]
         
         if version.change_reason:
@@ -311,22 +535,39 @@ class ChartExplainer:
         
         if steps:
             summary_parts.append("计算过程如下：")
-            for step in steps:
-                summary_parts.append(f"  - {step.description}：{step.formula}")
-                summary_parts.append(f"    输入：{step.inputs}，结果：{step.output}")
+            for i, step in enumerate(steps, 1):
+                summary_parts.append(f"  {i}. {step.description}")
+                summary_parts.append(f"     公式：{step.formula}")
+                summary_parts.append(f"     输入值：{step.inputs}")
+                if isinstance(step.output, float) and np.isnan(step.output):
+                    summary_parts.append(f"     结果：⚠️ 无法计算（存在异常数据）")
+                else:
+                    summary_parts.append(f"     结果：{step.output}")
+                
+                if step.data_lineage:
+                    for dl in step.data_lineage:
+                        o = dl["origin"]
+                        cleaned_note = "（经过清洗修正）" if o["was_cleaned"] else ""
+                        summary_parts.append(
+                            f"       ↳ 参数 '{dl['input_name']}' = {o['param_value']}{cleaned_note}，"
+                            f"来自 {o['source_location']}，录入人 {o['created_by']}"
+                        )
         
         if issues:
             high_issues = [i for i in issues if i.severity == "high"]
             medium_issues = [i for i in issues if i.severity == "medium"]
             if high_issues:
-                summary_parts.append(f"⚠️  发现 {len(high_issues)} 个严重问题需要注意：")
+                summary_parts.append(f"\n⚠️  发现 {len(high_issues)} 个严重问题需要注意：")
                 for issue in high_issues:
-                    summary_parts.append(f"  - {issue.message}")
-                    summary_parts.append(f"    {issue.suggestion}")
+                    summary_parts.append(f"  🔴 {issue.message}")
+                    if issue.param_origin:
+                        summary_parts.append(f"     定位：{issue.param_origin.row_hint}")
+                    if issue.fallback_version_hint:
+                        summary_parts.append(f"     建议：{issue.fallback_version_hint}")
             if medium_issues:
-                summary_parts.append(f"⚡ 发现 {len(medium_issues)} 个潜在风险：")
+                summary_parts.append(f"\n⚡ 发现 {len(medium_issues)} 个潜在风险：")
                 for issue in medium_issues:
-                    summary_parts.append(f"  - {issue.message}")
+                    summary_parts.append(f"  🟡 {issue.message}")
         
         return "\n".join(summary_parts)
     
@@ -341,17 +582,21 @@ class ChartExplainer:
         for step in steps:
             if "比例" in step.step_name:
                 if isinstance(step.output, (int, float)) and not np.isnan(step.output):
-                    findings.append(f"计算得出的比例为 {step.output:.4f}（{step.output*100:.2f}%）")
+                    findings.append(f"比例为 {step.output:.4f}（即 {step.output*100:.2f}%）")
+                else:
+                    findings.append(f"比例：无法计算（分母异常，请检查数据来源）")
             elif "均值" in step.step_name:
                 if isinstance(step.output, (int, float)) and not np.isnan(step.output):
-                    findings.append(f"计算得出的均值为 {step.output:.4f}")
+                    findings.append(f"均值为 {step.output:.4f}")
+                else:
+                    findings.append(f"均值：无法计算（样本量异常，请检查数据来源）")
             elif "差值" in step.step_name:
-                findings.append(f"两者差值为 {step.output}")
+                findings.append(f"差值为 {step.output}")
             elif "增长率" in step.step_name:
                 findings.append(f"增长率为 {step.output}")
         
         if issues:
-            findings.append(f"本次计算发现 {len(issues)} 个边界问题，详见问题列表")
+            findings.append(f"共发现 {len(issues)} 个边界问题，其中 {len([i for i in issues if i.severity=='high'])} 个严重")
         
         return findings
     
@@ -385,20 +630,18 @@ class ChartExplainer:
         data_sources = []
         seen_sources = set()
         for param_name in version.parameters.keys():
-            origin = self.parameter_manager.trace_parameter_origin(param_name)
-            if origin:
-                first = origin[0]
-                source_key = (first["source_type"], first["source_id"])
-                if source_key not in seen_sources:
-                    seen_sources.add(source_key)
-                    data_sources.append({
-                        "source_type": first["source_type"],
-                        "source_id": first["source_id"],
-                        "source_name": first["source_name"],
-                        "first_seen_at": first["created_at"],
-                        "first_seen_by": first["created_by"],
-                        "raw_data": first["raw_data"],
-                    })
+            origin = self._build_param_origin(param_name, version)
+            source_key = (origin.source_type, origin.source_id)
+            if source_key not in seen_sources:
+                seen_sources.add(source_key)
+                data_sources.append({
+                    "source_type": origin.source_type,
+                    "source_id": origin.source_id,
+                    "source_name": origin.source_name,
+                    "first_seen_at": origin.created_at,
+                    "first_seen_by": origin.created_by,
+                    "raw_data": origin.raw_data,
+                })
         
         explanation = ChartExplanation(
             explanation_id=str(uuid4()),
@@ -422,8 +665,9 @@ class ChartExplainer:
         explanation_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
-        追溯坏数据来源
-        坏数据影响结果时，接手的人能顺着提示回到参数表的原始对象
+        追溯坏数据来源 - 校准版
+        区分：首次出现、首次异常、最后一次变更、导致结果变化的关键变更
+        定位到具体的原始对象/表格行，而不是版本编号
         """
         history = self.parameter_manager.trace_parameter_origin(param_name)
         
@@ -434,21 +678,141 @@ class ChartExplainer:
                 "message": f"未找到参数 '{param_name}' 的历史记录",
             }
         
+        def is_abnormal(value):
+            if not isinstance(value, (int, float)):
+                return False
+            if param_name in ["分母", "除数", "比例基数", "B值"]:
+                return abs(value) < 1e-10
+            if param_name in ["样本量", "计数", "频率"]:
+                return value < 0
+            return False
+        
         first_occurrence = history[0]
+        
+        first_abnormal = None
+        for entry in history:
+            if is_abnormal(entry["value"]):
+                first_abnormal = entry
+                break
+        
+        last_change = None
+        if len(history) >= 2:
+            for i in range(len(history) - 1, 0, -1):
+                if history[i]["value"] != history[i-1]["value"]:
+                    last_change = {
+                        "from_value": history[i-1]["value"],
+                        "to_value": history[i]["value"],
+                        "from_version": history[i-1]["version_name"],
+                        "to_version": history[i]["version_name"],
+                        "changed_by": history[i]["created_by"],
+                        "source_name": history[i]["source_name"],
+                        "source_id": history[i]["source_id"],
+                        "row_hint": f"来源 '{history[i]['source_name']}' (ID: {history[i]['source_id']})，参数 '{param_name}'",
+                        "description": f"{history[i-1]['version_name']} ({history[i-1]['value']}) → {history[i]['version_name']} ({history[i]['value']})",
+                    }
+                    break
+        
+        critical_changes = []
+        for i in range(1, len(history)):
+            prev_normal = not is_abnormal(history[i-1]["value"])
+            curr_abnormal = is_abnormal(history[i]["value"])
+            if prev_normal and curr_abnormal:
+                critical_changes.append({
+                    "step": i,
+                    "description": f"正常值 → 异常值：从 {history[i-1]['value']} 变为 {history[i]['value']}",
+                    "from_version": history[i-1]["version_name"],
+                    "to_version": history[i]["version_name"],
+                    "changed_by": history[i]["created_by"],
+                    "source_name": history[i]["source_name"],
+                    "source_id": history[i]["source_id"],
+                    "raw_data": history[i]["raw_data"],
+                    "row_hint": f"来源 '{history[i]['source_name']}' (ID: {history[i]['source_id']})，参数 '{param_name}'，录入人 {history[i]['created_by']}",
+                })
+            elif is_abnormal(history[i-1]["value"]) and not is_abnormal(history[i]["value"]):
+                critical_changes.append({
+                    "step": i,
+                    "description": f"异常值 → 正常值：从 {history[i-1]['value']} 变为 {history[i]['value']}（已修复）",
+                    "from_version": history[i-1]["version_name"],
+                    "to_version": history[i]["version_name"],
+                    "changed_by": history[i]["created_by"],
+                    "source_name": history[i]["source_name"],
+                    "source_id": history[i]["source_id"],
+                    "raw_data": history[i]["raw_data"],
+                    "row_hint": f"来源 '{history[i]['source_name']}' (ID: {history[i]['source_id']})，参数 '{param_name}'，录入人 {history[i]['created_by']}",
+                })
+        
+        current_value = history[-1]["value"]
+        current_is_abnormal = is_abnormal(current_value)
+        
+        suggestion_parts = []
+        suggestion_parts.append(f"📌 参数 '{param_name}' 追溯报告：")
+        suggestion_parts.append(f"")
+        suggestion_parts.append(f"1. 【首次出现】")
+        suggestion_parts.append(f"   版本: {first_occurrence['version_name']}")
+        suggestion_parts.append(f"   初始值: {first_occurrence['value']}")
+        suggestion_parts.append(f"   来源: {first_occurrence['source_name']} (ID: {first_occurrence['source_id']})")
+        suggestion_parts.append(f"   录入人: {first_occurrence['created_by']}，时间: {first_occurrence['created_at']}")
+        suggestion_parts.append(f"   原始数据: {json.dumps(first_occurrence['raw_data'], ensure_ascii=False)}")
+        
+        if first_abnormal:
+            suggestion_parts.append(f"")
+            suggestion_parts.append(f"2. 【首次异常】⚠️")
+            suggestion_parts.append(f"   版本: {first_abnormal['version_name']}")
+            suggestion_parts.append(f"   异常值: {first_abnormal['value']}")
+            suggestion_parts.append(f"   来源: {first_abnormal['source_name']} (ID: {first_abnormal['source_id']})")
+            suggestion_parts.append(f"   录入人: {first_abnormal['created_by']}，时间: {first_abnormal['created_at']}")
+            suggestion_parts.append(f"   定位: '{first_abnormal['source_name']}' 中参数 '{param_name}' 的值为 {first_abnormal['value']}")
+            suggestion_parts.append(f"   建议: 联系 {first_abnormal['created_by']} 确认该条记录是否正确")
+        
+        if last_change:
+            suggestion_parts.append(f"")
+            suggestion_parts.append(f"3. 【最后一次变更】")
+            suggestion_parts.append(f"   {last_change['description']}")
+            suggestion_parts.append(f"   {last_change['row_hint']}")
+            suggestion_parts.append(f"   变更人: {last_change['changed_by']}")
+        
+        if critical_changes:
+            suggestion_parts.append(f"")
+            suggestion_parts.append(f"4. 【导致异常的关键变更】")
+            for j, cc in enumerate(critical_changes, 1):
+                suggestion_parts.append(f"   {j}. {cc['description']}")
+                suggestion_parts.append(f"      定位: {cc['row_hint']}")
+                suggestion_parts.append(f"      原始数据: {json.dumps(cc['raw_data'], ensure_ascii=False)}")
+        
+        suggestion_parts.append(f"")
+        suggestion_parts.append(f"5. 【当前状态】")
+        if current_is_abnormal:
+            suggestion_parts.append(f"   ⚠️ 当前值 {current_value} 仍为异常")
+            valid_versions = [h for h in history if not is_abnormal(h["value"])]
+            if valid_versions:
+                last_valid = valid_versions[-1]
+                suggestion_parts.append(f"   建议: 回退到版本 '{last_valid['version_name']}'，该版本值为 {last_valid['value']}")
+                suggestion_parts.append(f"         或联系录入人 {history[-1]['created_by']} 补录确认")
+            else:
+                suggestion_parts.append(f"   建议: 联系录入人 {history[-1]['created_by']} 补录有效数据")
+        else:
+            suggestion_parts.append(f"   ✓ 当前值 {current_value} 正常")
+        
+        suggestion_parts.append(f"")
+        suggestion_parts.append(f"6. 【命令快速定位】")
+        suggestion_parts.append(f"   python -m src.cli trace --param {param_name}")
+        suggestion_parts.append(f"   python -m src.cli explain --version {history[-1]['version_name']}")
         
         return {
             "param_name": param_name,
             "found": True,
+            "current_value": current_value,
+            "current_is_abnormal": current_is_abnormal,
             "history": history,
             "first_occurrence": first_occurrence,
-            "current_value": history[-1]["value"],
-            "suggestion": (
-                f"追溯路径：\n"
-                f"1. 查看原始数据来源：{first_occurrence['source_name']} (ID: {first_occurrence['source_id']})\n"
-                f"2. 检查首次导入时的原始数据：{first_occurrence['raw_data']}\n"
-                f"3. 联系首次录入人：{first_occurrence['created_by']}\n"
-                f"4. 查看该参数的所有变更记录，确认哪一步引入了问题"
-            ),
+            "first_abnormal": first_abnormal,
+            "last_change": last_change,
+            "critical_changes": critical_changes,
+            "valid_versions": [
+                {"version_name": h["version_name"], "value": h["value"]}
+                for h in history if not is_abnormal(h["value"])
+            ],
+            "suggestion": "\n".join(suggestion_parts),
         }
     
     def compare_explanations(
@@ -489,11 +853,15 @@ class ChartExplainer:
                     "description": f"删除计算步骤 '{step_name}'，原结果为 {s1.output}",
                 })
             elif s1.output != s2.output:
+                causing_params = []
+                for c in changes:
+                    if c.param_name in s2.inputs:
+                        causing_params.append(c.param_name)
                 step_changes.append({
                     "step_name": step_name,
                     "change_type": "结果变化",
                     "description": f"步骤 '{step_name}' 结果从 {s1.output} 变为 {s2.output}",
-                    "reason": "参数变更导致" if changes else "计算逻辑变更",
+                    "caused_by": causing_params if causing_params else ["计算逻辑变更"],
                 })
         
         return {
@@ -520,7 +888,10 @@ class ChartExplainer:
         if step_changes:
             diffs.append(f"计算结果变化 {len(step_changes)} 处：")
             for s in step_changes:
-                diffs.append(f"  - {s['description']}")
+                desc = f"  - {s['description']}"
+                if "caused_by" in s:
+                    desc += f"（由参数 {', '.join(s['caused_by'])} 变更导致）"
+                diffs.append(desc)
         
         if not diffs:
             diffs.append("两个版本的参数和计算结果完全一致")

@@ -1,8 +1,8 @@
 {
-  "package_id": "d01fbab5-650f-4f1c-83d8-e6993e433359",
-  "package_name": "6月调参结果公示",
-  "output_dir": "output/6月调参结果公示_20260620_131830",
-  "generated_at": "2026-06-20T13:18:30.250871",
+  "package_id": "647ff356-08c2-4976-bb1b-0a23115b3f00",
+  "package_name": "6月调参结果公示v2",
+  "output_dir": "output/6月调参结果公示v2_20260622_102127",
+  "generated_at": "2026-06-22T10:21:27.757708",
   "materials": [
     {
       "name": "材料包说明",
@@ -19,6 +19,10 @@
     {
       "name": "图表解释报告",
       "file": "02_图表解释报告.html"
+    },
+    {
+      "name": "图表解释报告(Markdown)",
+      "file": "02_图表解释报告.md"
     },
     {
       "name": "图表解释报告(JSON)",

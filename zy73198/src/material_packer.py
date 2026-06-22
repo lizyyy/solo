@@ -91,6 +91,7 @@ class MaterialPacker:
 | `01_版本时间线.html` | 可视化版本历史时间线（推荐先看） |
 | `01_版本时间线.csv` | 版本时间线（表格格式） |
 | `02_图表解释报告.html` | 图表解释（通俗易懂版） |
+| `02_图表解释报告.md` | 图表解释（Markdown版，含完整数据溯源） |
 | `02_图表解释报告.json` | 图表解释（原始数据） |
 | `03_边界问题处理建议.md` | 所有边界问题及处理建议 |
 | `04_数据溯源报告/` | 各参数溯源报告 |
@@ -225,6 +226,17 @@ python -m src.cli compare --version1 v1 --version2 v2
         .param-table td { padding: 8px; border-bottom: 1px solid #ddd; }
         .param-name { font-weight: bold; width: 150px; }
         code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; }
+        .lineage-section { background: #FAFAFA; border: 1px solid #E0E0E0; border-radius: 6px; padding: 12px; margin-top: 12px; }
+        .lineage-section h4 { margin: 0 0 10px 0; color: #555; }
+        .lineage-item { background: white; border: 1px solid #E8E8E8; border-radius: 4px; padding: 10px; margin: 8px 0; }
+        .lineage-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .lineage-item-header strong { font-size: 15px; }
+        .cleaned-badge { background: #FFF3CD; color: #856404; padding: 2px 8px; border-radius: 10px; font-size: 12px; }
+        .clean-badge { background: #D4EDDA; color: #155724; padding: 2px 8px; border-radius: 10px; font-size: 12px; }
+        .lineage-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .lineage-table td { padding: 4px 8px; vertical-align: top; border-bottom: 1px solid #F0F0F0; }
+        .lineage-table td:first-child { font-weight: bold; color: #666; width: 110px; }
+        .raw-data-box { background: #F5F5F5; padding: 8px; border-radius: 4px; font-family: monospace; font-size: 12px; max-height: 100px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
     </style>
 </head>
 <body>
@@ -282,6 +294,42 @@ python -m src.cli compare --version1 v1 --version2 v2
                 {% endfor %}
             </table>
             <p><strong>结果：</strong><code>{{ step.output }}</code></p>
+            {% if step.data_lineage %}
+            <div class="lineage-section">
+                <h4>📌 数据来源</h4>
+                {% for lineage in step.data_lineage %}
+                <div class="lineage-item">
+                    <div class="lineage-item-header">
+                        <strong>参数「{{ lineage.input_name }}」= {{ lineage.input_value }}</strong>
+                        {% if lineage.origin.was_cleaned %}
+                        <span class="cleaned-badge">⚠️ 经过清洗</span>
+                        {% else %}
+                        <span class="clean-badge">✓ 原始值一致</span>
+                        {% endif %}
+                    </div>
+                    <table class="lineage-table">
+                        <tr><td>当前值</td><td>{{ lineage.origin.param_value }}</td></tr>
+                        <tr><td>来源位置</td><td>{{ lineage.origin.source_location }}</td></tr>
+                        <tr><td>版本号</td><td>{{ lineage.origin.version_name }} ({{ lineage.origin.version_id }})</td></tr>
+                        <tr><td>录入人</td><td>{{ lineage.origin.created_by }}</td></tr>
+                        <tr><td>录入时间</td><td>{{ lineage.origin.created_at }}</td></tr>
+                        <tr><td>原始值</td><td>{{ lineage.origin.raw_value }}</td></tr>
+                        <tr><td>清洗说明</td><td>{{ lineage.origin.cleaning_note }}</td></tr>
+                        {% if lineage.origin.change_from_previous %}
+                        <tr>
+                            <td>版本变更</td>
+                            <td>从「{{ lineage.origin.change_from_previous.from_version }}」的 {{ lineage.origin.change_from_previous.from_value }} → 「{{ lineage.origin.change_from_previous.to_version }}」的 {{ lineage.origin.change_from_previous.to_value }}，变更人：{{ lineage.origin.change_from_previous.changed_by }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td>原始数据快照</td>
+                            <td><div class="raw-data-box">{{ lineage.origin.raw_data_snapshot | tojson(indent=2) }}</div></td>
+                        </tr>
+                    </table>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
         {% endfor %}
     </div>
@@ -324,32 +372,77 @@ python -m src.cli compare --version1 v1 --version2 v2
         explanation: ChartExplanation,
     ) -> None:
         """生成边界问题处理建议"""
+        high_count = len([i for i in explanation.boundary_issues if i.severity == "high"])
+        medium_count = len([i for i in explanation.boundary_issues if i.severity == "medium"])
+        
         content = f"""# 边界问题处理建议
 
 生成时间：{datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')}
 
 ## 问题汇总
 
-共发现 {len(explanation.boundary_issues)} 个边界问题。
+共发现 {len(explanation.boundary_issues)} 个边界问题，其中 🔴 严重 {high_count} 个，🟡 中等 {medium_count} 个。
 
 """
         
         for i, issue in enumerate(explanation.boundary_issues, 1):
-            severity_icon = "🔴 严重" if issue.severity == "high" else "🟡 中等"
+            severity_icon = "🔴" if issue.severity == "high" else "🟡"
+            severity_label = "严重" if issue.severity == "high" else "中等"
             content += f"""
 ---
 
-## 问题 {i}: {severity_icon} {issue.issue_type}
+## 问题 {i}: {severity_icon} {severity_label} - {issue.issue_type}
 
-**位置**：{issue.location}
+### 📍 问题位置
+{issue.location}
 
-**问题描述**：
+### 📝 问题描述
 {issue.message}
 
-**处理建议**：
+### ⚠️ 受影响的计算
+"""
+            if issue.affected_calculations:
+                content += "以下计算依赖该参数，数据异常时无法直接给出可靠结果：\n\n"
+                for calc in issue.affected_calculations:
+                    content += f"- ❌ {calc}\n"
+            else:
+                content += "该问题可能影响后续计算结果的准确性。\n"
+            
+            if issue.param_origin:
+                origin = issue.param_origin
+                content += f"""
+### 📌 参数来源追踪
+
+| 字段 | 值 |
+|------|----|
+| **原始对象位置** | {origin.row_hint} |
+| **来源类型** | {origin.source_type} |
+| **来源ID** | {origin.source_id} |
+| **来源名称** | {origin.source_name} |
+| **录入人** | {origin.created_by} |
+| **录入时间** | {origin.created_at} |
+| **版本号** | {origin.version_name} |
+| **当前值** | {origin.param_value} |
+| **原始值** | {origin.raw_value} |
+| **是否经过清洗** | {'是' if origin.cleaned else '否'} |
+
+#### 📸 原始数据快照
+```json
+{json.dumps(origin.raw_data, ensure_ascii=False, indent=2)}
+```
+"""
+            
+            if issue.fallback_version_hint:
+                content += f"""
+### 🔄 回退建议
+{issue.fallback_version_hint}
+"""
+            
+            content += f"""
+### ✅ 完整处理建议
 {issue.suggestion}
 
-**追溯命令**：
+### 🔍 追溯命令
 ```bash
 python -m src.cli trace --param "{issue.param_name}"
 ```
@@ -357,6 +450,126 @@ python -m src.cli trace --param "{issue.param_name}"
 """
         
         with open(output_dir / "03_边界问题处理建议.md", "w", encoding="utf-8") as f:
+            f.write(content)
+    
+    def _generate_explanation_markdown(
+        self,
+        output_dir: Path,
+        explanation: ChartExplanation,
+    ) -> None:
+        """生成图表解释Markdown版 - 包含完整的数据溯源线索"""
+        content = f"# {explanation.title}\n\n"
+        content += f"**版本**：{explanation.version_name}  \n"
+        content += f"**生成时间**：{explanation.generated_at.strftime('%Y年%m月%d日 %H:%M:%S')}\n\n"
+        
+        content += "## 📝 通俗易懂的解释\n\n"
+        content += f"{explanation.plain_language_summary}\n\n"
+        
+        content += "## 🎯 关键结论\n\n"
+        for finding in explanation.key_findings:
+            content += f"- {finding}\n"
+        content += "\n"
+        
+        if explanation.boundary_issues:
+            content += "## ⚠️ 边界问题\n\n"
+            for i, issue in enumerate(explanation.boundary_issues, 1):
+                severity_icon = "🔴" if issue.severity == "high" else "🟡"
+                severity_label = "严重" if issue.severity == "high" else "中等"
+                content += f"### 问题 {i}: {severity_icon} {severity_label} - {issue.issue_type}\n\n"
+                content += f"**📍 问题位置**：{issue.location}\n\n"
+                content += f"**📝 问题描述**：\n{issue.message}\n\n"
+                
+                if issue.affected_calculations:
+                    content += "**⚠️ 受影响的计算**：\n"
+                    content += "以下计算依赖该参数，数据异常时无法直接给出可靠结果：\n\n"
+                    for calc in issue.affected_calculations:
+                        content += f"- ❌ {calc}\n"
+                    content += "\n"
+                
+                if issue.param_origin:
+                    origin = issue.param_origin
+                    content += "**📌 参数来源追踪**：\n\n"
+                    content += "| 字段 | 值 |\n"
+                    content += "|------|----|\n"
+                    content += f"| 原始对象位置 | {origin.row_hint} |\n"
+                    content += f"| 来源类型 | {origin.source_type} |\n"
+                    content += f"| 来源ID | {origin.source_id} |\n"
+                    content += f"| 来源名称 | {origin.source_name} |\n"
+                    content += f"| 录入人 | {origin.created_by} |\n"
+                    content += f"| 录入时间 | {origin.created_at} |\n"
+                    content += f"| 版本号 | {origin.version_name} |\n"
+                    content += f"| 当前值 | {origin.param_value} |\n"
+                    content += f"| 原始值 | {origin.raw_value} |\n"
+                    content += f"| 是否经过清洗 | {'是' if origin.cleaned else '否'} |\n\n"
+                    content += "**📸 原始数据快照**：\n"
+                    content += "```json\n"
+                    content += json.dumps(origin.raw_data, ensure_ascii=False, indent=2)
+                    content += "\n```\n\n"
+                
+                if issue.fallback_version_hint:
+                    content += f"**🔄 回退建议**：\n{issue.fallback_version_hint}\n\n"
+                
+                content += f"**✅ 完整处理建议**：\n{issue.suggestion}\n\n"
+        
+        content += "## 🔢 计算过程\n\n"
+        for idx, step in enumerate(explanation.calculation_steps, 1):
+            content += f"### 步骤 {idx}: {step.step_name}\n\n"
+            content += f"{step.description}\n\n"
+            content += f"**公式**：`{step.formula}`\n\n"
+            
+            content += "**输入值**：\n\n"
+            content += "| 参数名 | 值 |\n"
+            content += "|--------|----|\n"
+            for key, value in step.inputs.items():
+                content += f"| {key} | {value} |\n"
+            content += "\n"
+            
+            content += f"**结果**：`{step.output}`\n\n"
+            
+            if step.data_lineage:
+                content += "**📌 来源追踪**：\n\n"
+                for lineage in step.data_lineage:
+                    origin = lineage["origin"]
+                    cleaned_note = "⚠️ 经过清洗" if origin["was_cleaned"] else "✓ 原始值一致"
+                    content += f"#### 参数「{lineage['input_name']}」= {lineage['input_value']}（{cleaned_note}）\n\n"
+                    content += "| 字段 | 值 |\n"
+                    content += "|------|----|\n"
+                    content += f"| 参数名 | {origin['param_name']} |\n"
+                    content += f"| 当前值 | {origin['param_value']} |\n"
+                    content += f"| 来源位置 | {origin['source_location']} |\n"
+                    content += f"| 版本号 | {origin['version_name']} ({origin['version_id']}) |\n"
+                    content += f"| 录入人 | {origin['created_by']} |\n"
+                    content += f"| 录入时间 | {origin['created_at']} |\n"
+                    content += f"| 原始值 | {origin['raw_value']} |\n"
+                    content += f"| 清洗说明 | {origin['cleaning_note']} |\n"
+                    if origin.get("change_from_previous"):
+                        cf = origin["change_from_previous"]
+                        content += f"| 版本变更 | 从「{cf['from_version']}」的 {cf['from_value']} → 「{cf['to_version']}」的 {cf['to_value']}，变更人：{cf['changed_by']} |\n"
+                    content += "\n"
+                    content += "**📸 原始数据快照**：\n"
+                    content += "```json\n"
+                    content += json.dumps(origin["raw_data_snapshot"], ensure_ascii=False, indent=2)
+                    content += "\n```\n\n"
+        
+        if explanation.parameter_changes:
+            content += "## 🔄 参数变更\n\n"
+            for change in explanation.parameter_changes:
+                content += f"- {change.get('description', '参数变更')}\n"
+            content += "\n"
+        
+        content += "## 📦 数据来源\n\n"
+        for source in explanation.data_sources:
+            content += f"### {source['source_name']}\n\n"
+            content += f"- **来源类型**：{source['source_type']}\n"
+            content += f"- **来源ID**：{source['source_id']}\n"
+            content += f"- **首次录入时间**：{source['first_seen_at']}\n"
+            content += f"- **首次录入人**：{source['first_seen_by']}\n"
+            content += f"- **原始数据**：\n"
+            content += "```json\n"
+            content += json.dumps(source.get('raw_data', {}), ensure_ascii=False, indent=2)
+            content += "\n```\n\n"
+        
+        with open(output_dir / "02_图表解释报告.md", "w", encoding="utf-8") as f:
             f.write(content)
     
     def _generate_lineage_reports(
@@ -504,7 +717,9 @@ python -m src.cli trace --param "{issue.param_name}"
         materials.append({"name": "版本时间线(CSV)", "file": "01_版本时间线.csv"})
         
         self._generate_explanation_html(package_dir, explanation)
+        self._generate_explanation_markdown(package_dir, explanation)
         materials.append({"name": "图表解释报告", "file": "02_图表解释报告.html"})
+        materials.append({"name": "图表解释报告(Markdown)", "file": "02_图表解释报告.md"})
         materials.append({"name": "图表解释报告(JSON)", "file": "02_图表解释报告.json"})
         
         self._generate_issue_suggestions(package_dir, explanation)

@@ -1,14 +1,14 @@
 {
   "project_name": "优化调参图表解释",
-  "active_version_id": "85d4b9cd-19e3-48cd-bbaa-7ab29e86fd49",
+  "active_version_id": "14705626-a03b-4084-b856-e6604d64c997",
   "version_order": [
-    "a4836ba1-b31b-44a5-82b4-73051c393d3a",
-    "dfb3c07b-747d-4e91-b753-c6a0b6568233",
-    "85d4b9cd-19e3-48cd-bbaa-7ab29e86fd49"
+    "fafe7848-ea7a-48dd-a3d2-3eb5e1b93137",
+    "634312df-2f30-4feb-a54d-472c72b72376",
+    "14705626-a03b-4084-b856-e6604d64c997"
   ],
   "versions": {
-    "a4836ba1-b31b-44a5-82b4-73051c393d3a": {
-      "version_id": "a4836ba1-b31b-44a5-82b4-73051c393d3a",
+    "fafe7848-ea7a-48dd-a3d2-3eb5e1b93137": {
+      "version_id": "fafe7848-ea7a-48dd-a3d2-3eb5e1b93137",
       "version_name": "v1",
       "parameters": {
         "分子": 25,
@@ -26,17 +26,17 @@
           "分母": 100,
           "备注": "原始录入数据，来自Excel表格"
         },
-        "imported_at": "2026-06-20T13:17:55.550203",
+        "imported_at": "2026-06-22T10:32:55.170229",
         "notes": "教研编辑阿宁提供的原始数据"
       },
       "created_by": "阿宁",
-      "created_at": "2026-06-20T13:17:55.550208",
+      "created_at": "2026-06-22T10:32:55.170236",
       "change_description": "初始参数导入",
       "change_reason": "首次录入",
       "param_hash": "5bf47fe111dfdb543a4adbf748664557cff9a2e39fa06e4f5829ff6b1395400b"
     },
-    "dfb3c07b-747d-4e91-b753-c6a0b6568233": {
-      "version_id": "dfb3c07b-747d-4e91-b753-c6a0b6568233",
+    "634312df-2f30-4feb-a54d-472c72b72376": {
+      "version_id": "634312df-2f30-4feb-a54d-472c72b72376",
       "version_name": "v2",
       "parameters": {
         "分子": 30,
@@ -44,7 +44,7 @@
         "总数": 550,
         "样本量": 50
       },
-      "parent_version_id": "a4836ba1-b31b-44a5-82b4-73051c393d3a",
+      "parent_version_id": "fafe7848-ea7a-48dd-a3d2-3eb5e1b93137",
       "source": {
         "source_type": "excel",
         "source_id": "data_20240601.xlsx",
@@ -54,17 +54,17 @@
           "分母": 100,
           "备注": "修正后的数据"
         },
-        "imported_at": "2026-06-20T13:17:55.550214",
+        "imported_at": "2026-06-22T10:32:55.170244",
         "notes": ""
       },
       "created_by": "阿宁",
-      "created_at": "2026-06-20T13:17:55.550215",
+      "created_at": "2026-06-22T10:32:55.170245",
       "change_description": "修正分子和总数",
       "change_reason": "发现原始数据录入错误，分子应为30",
       "param_hash": "8728e3454394fbad099bebf3e940784336fad69d7fab3033afdcf8b9b2bcd867"
     },
-    "85d4b9cd-19e3-48cd-bbaa-7ab29e86fd49": {
-      "version_id": "85d4b9cd-19e3-48cd-bbaa-7ab29e86fd49",
+    "14705626-a03b-4084-b856-e6604d64c997": {
+      "version_id": "14705626-a03b-4084-b856-e6604d64c997",
       "version_name": "v3",
       "parameters": {
         "分子": 30,
@@ -74,7 +74,7 @@
         "A值": 85,
         "B值": 70
       },
-      "parent_version_id": "dfb3c07b-747d-4e91-b753-c6a0b6568233",
+      "parent_version_id": "634312df-2f30-4feb-a54d-472c72b72376",
       "source": {
         "source_type": "manual",
         "source_id": "manual_input_001",
@@ -84,11 +84,11 @@
           "分母": 0,
           "备注": "分母错误地设为0"
         },
-        "imported_at": "2026-06-20T13:17:55.550220",
+        "imported_at": "2026-06-22T10:32:55.170250",
         "notes": "用于测试边界条件"
       },
       "created_by": "排班同事",
-      "created_at": "2026-06-20T13:17:55.550221",
+      "created_at": "2026-06-22T10:32:55.170251",
       "change_description": "添加A值和B值，分母意外设为0",
       "change_reason": "测试除零边界处理",
       "param_hash": "a028afa6885010411101336746162e54a51999dd603cec212cf1540b7c31c945"

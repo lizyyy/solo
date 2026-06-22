@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>6月调参结果公示v2 - 图表解释</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        h1 { color: #333; }
+        .section { background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .section h2 { margin-top: 0; color: #333; }
+        .summary { background: #E3F2FD; border-left: 4px solid #2196F3; padding: 15px; }
+        .finding { background: #E8F5E9; border-left: 4px solid #4CAF50; padding: 10px 15px; margin: 10px 0; border-radius: 4px; }
+        .issue-high { background: #FFEBEE; border-left: 4px solid #F44336; padding: 15px; margin: 10px 0; border-radius: 4px; }
+        .issue-medium { background: #FFF3CD; border-left: 4px solid #FFC107; padding: 15px; margin: 10px 0; border-radius: 4px; }
+        .step { background: white; padding: 15px; margin: 10px 0; border-radius: 4px; border: 1px solid #ddd; }
+        .formula { font-family: monospace; background: #f0f0f0; padding: 5px 10px; border-radius: 4px; display: inline-block; }
+        .source-card { background: white; padding: 10px; margin: 5px 0; border-radius: 4px; border: 1px solid #ddd; }
+        .change-item { padding: 8px 0; border-bottom: 1px solid #eee; }
+        .param-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        .param-table td { padding: 8px; border-bottom: 1px solid #ddd; }
+        .param-name { font-weight: bold; width: 150px; }
+        code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; }
+        .lineage-section { background: #FAFAFA; border: 1px solid #E0E0E0; border-radius: 6px; padding: 12px; margin-top: 12px; }
+        .lineage-section h4 { margin: 0 0 10px 0; color: #555; }
+        .lineage-item { background: white; border: 1px solid #E8E8E8; border-radius: 4px; padding: 10px; margin: 8px 0; }
+        .lineage-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .lineage-item-header strong { font-size: 15px; }
+        .cleaned-badge { background: #FFF3CD; color: #856404; padding: 2px 8px; border-radius: 10px; font-size: 12px; }
+        .clean-badge { background: #D4EDDA; color: #155724; padding: 2px 8px; border-radius: 10px; font-size: 12px; }
+        .lineage-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .lineage-table td { padding: 4px 8px; vertical-align: top; border-bottom: 1px solid #F0F0F0; }
+        .lineage-table td:first-child { font-weight: bold; color: #666; width: 110px; }
+        .raw-data-box { background: #F5F5F5; padding: 8px; border-radius: 4px; font-family: monospace; font-size: 12px; max-height: 100px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
+    </style>
+</head>
+<body>
+    <h1>📊 6月调参结果公示v2 - 图表解释</h1>
+    <p>版本：<strong>v3</strong> | 生成时间：2026年06月22日 10:21:27</p>
+    
+    <div class="section">
+        <h2>📝 通俗易懂的解释</h2>
+        <div class="summary">
+            本次计算使用的是版本 'v3'，由 排班同事 在 2026年06月22日 10:21 创建。<br>数据来源于 '手动录入'。<br>本次调参原因：测试除零边界处理<br>调整内容：添加A值和B值，分母意外设为0<br>本次相比上一版本共有 3 处参数变更：<br>  - 新增参数 'A值'，值为 85<br>  - 新增参数 'B值'，值为 70<br>  - 参数 '分母' 从 100 改为 0<br>计算过程如下：<br>  1. 计算分子除以分母的比例值，用于展示占比或通过率等指标<br>     公式：比例 = 分子 / 分母<br>     输入值：{'分子': 30, '分母': 0}<br>     结果：⚠️ 无法计算（存在异常数据）<br>       ↳ 参数 '分子' = 30，来自 手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事，录入人 排班同事<br>       ↳ 参数 '分母' = 0，来自 手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事，录入人 排班同事<br>  2. 计算总数除以样本量的平均值，用于展示单位均值<br>     公式：均值 = 总数 / 样本量<br>     输入值：{'总数': 550, '样本量': 50}<br>     结果：11.0<br>       ↳ 参数 '总数' = 550，来自 手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事，录入人 排班同事<br>       ↳ 参数 '样本量' = 50，来自 手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事，录入人 排班同事<br>  3. 计算A值与B值的差值，用于展示两者绝对差异<br>     公式：差值 = A值 - B值<br>     输入值：{'A值': 85, 'B值': 70}<br>     结果：15<br>       ↳ 参数 'A值' = 85，来自 手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事，录入人 排班同事<br>       ↳ 参数 'B值' = 70，来自 手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事，录入人 排班同事<br>  4. 计算相对B值的增长率百分比，用于展示相对变化幅度<br>     公式：增长率 = (A值 - B值) / B值 × 100%<br>     输入值：{'A值': 85, 'B值': 70}<br>     结果：21.43%<br>       ↳ 参数 'A值' = 85，来自 手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事，录入人 排班同事<br>       ↳ 参数 'B值' = 70，来自 手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事，录入人 排班同事<br><br>⚠️  发现 1 个严重问题需要注意：<br>  🔴 参数 '分母' 值为 0，接近或等于零，无法执行除法运算。<br>该值来自：手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事<br>录入人：排班同事，录入时间：2026-06-22 10:21<br>     定位：手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事<br>     建议：建议回退到版本 'v2'，该版本中 分母=100<br><br>⚡ 发现 1 个潜在风险：<br>  🟡 参数 '分母' 值为 0，可能在后续除法计算中导致问题。<br>来源：手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>🎯 关键结论</h2>
+        
+        <div class="finding">比例：无法计算（分母异常，请检查数据来源）</div>
+        
+        <div class="finding">均值为 11.0000</div>
+        
+        <div class="finding">差值为 15</div>
+        
+        <div class="finding">增长率为 21.43%</div>
+        
+        <div class="finding">共发现 2 个边界问题，其中 1 个严重</div>
+        
+    </div>
+    
+    
+    <div class="section">
+        <h2>⚠️ 边界问题处理建议</h2>
+        
+            
+            <div class="issue-medium">
+                <strong>零值风险</strong> - 参数 '分母' 在版本 'v3' 中
+                <p>参数 '分母' 值为 0，可能在后续除法计算中导致问题。
+来源：手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事</p>
+                <p><strong>处理建议：</strong></p>
+                <p>处理建议：<br>1. 检查来源：手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事<br>2. 确认该值为0是否合理，录入人：排班同事<br>3. 可参考版本 'v2'<br>4. 若合理，可在计算时添加极小值偏移避免除零</p>
+            </div>
+            
+        
+            
+            <div class="issue-high">
+                <strong>除零错误</strong> - 参数 '分母' 在版本 'v3' 中
+                <p>参数 '分母' 值为 0，接近或等于零，无法执行除法运算。
+该值来自：手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事
+录入人：排班同事，录入时间：2026-06-22 10:21</p>
+                <p><strong>处理建议：</strong></p>
+                <p>处理步骤：<br>1. 【定位来源】请检查 手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事<br>   原始数据: {'分子': 30, '分母': 0, '备注': '分母错误地设为0'}<br>   录入人: 排班同事，请与其确认该值是否正确<br>2. 【影响评估】该异常会导致需要 '分母' 作为分母的计算全部失效<br>3. 【修复建议】建议回退到版本 'v2'，该版本中 分母=100<br>4. 【临时方案】若业务允许，可使用极小值 1e-10 作为分母替代，或标记该指标为 '数据待复核'<br>5. 【命令追溯】运行: python -m src.cli trace --param 分母</p>
+            </div>
+            
+        
+    </div>
+    
+    
+    <div class="section">
+        <h2>🔢 计算过程</h2>
+        
+        <div class="step">
+            <h3>计算比例</h3>
+            <p>计算分子除以分母的比例值，用于展示占比或通过率等指标</p>
+            <p><strong>公式：</strong><span class="formula">比例 = 分子 / 分母</span></p>
+            <p><strong>输入：</strong></p>
+            <table class="param-table">
+                
+                <tr><td class="param-name">分子</td><td>30</td></tr>
+                
+                <tr><td class="param-name">分母</td><td>0</td></tr>
+                
+            </table>
+            <p><strong>结果：</strong><code>nan</code></p>
+            
+            <div class="lineage-section">
+                <h4>📌 数据来源</h4>
+                
+                <div class="lineage-item">
+                    <div class="lineage-item-header">
+                        <strong>参数「分子」= 30</strong>
+                        
+                        <span class="clean-badge">✓ 原始值一致</span>
+                        
+                    </div>
+                    <table class="lineage-table">
+                        <tr><td>当前值</td><td>30</td></tr>
+                        <tr><td>来源位置</td><td>手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事</td></tr>
+                        <tr><td>版本号</td><td>v3 (0c0579f1-41ff-497c-b298-3bec9ac8a72f)</td></tr>
+                        <tr><td>录入人</td><td>排班同事</td></tr>
+                        <tr><td>录入时间</td><td>2026-06-22T10:21:14.716167</td></tr>
+                        <tr><td>原始值</td><td>30</td></tr>
+                        <tr><td>清洗说明</td><td>原始值与当前值一致</td></tr>
+                        
+                        <tr>
+                            <td>原始数据快照</td>
+                            <td><div class="raw-data-box">{
+  "\u5206\u5b50": 30,
+  "\u5206\u6bcd": 0,
+  "\u5907\u6ce8": "\u5206\u6bcd\u9519\u8bef\u5730\u8bbe\u4e3a0"
+}</div></td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="lineage-item">
+                    <div class="lineage-item-header">
+                        <strong>参数「分母」= 0</strong>
+                        
+                        <span class="clean-badge">✓ 原始值一致</span>
+                        
+                    </div>
+                    <table class="lineage-table">
+                        <tr><td>当前值</td><td>0</td></tr>
+                        <tr><td>来源位置</td><td>手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事</td></tr>
+                        <tr><td>版本号</td><td>v3 (0c0579f1-41ff-497c-b298-3bec9ac8a72f)</td></tr>
+                        <tr><td>录入人</td><td>排班同事</td></tr>
+                        <tr><td>录入时间</td><td>2026-06-22T10:21:14.716167</td></tr>
+                        <tr><td>原始值</td><td>0</td></tr>
+                        <tr><td>清洗说明</td><td>原始值与当前值一致</td></tr>
+                        
+                        <tr>
+                            <td>版本变更</td>
+                            <td>从「v2」的 100 → 「v3」的 0，变更人：排班同事</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>原始数据快照</td>
+                            <td><div class="raw-data-box">{
+  "\u5206\u5b50": 30,
+  "\u5206\u6bcd": 0,
+  "\u5907\u6ce8": "\u5206\u6bcd\u9519\u8bef\u5730\u8bbe\u4e3a0"
+}</div></td>
+                        </tr>
+                    </table>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+        <div class="step">
+            <h3>计算均值</h3>
+            <p>计算总数除以样本量的平均值，用于展示单位均值</p>
+            <p><strong>公式：</strong><span class="formula">均值 = 总数 / 样本量</span></p>
+            <p><strong>输入：</strong></p>
+            <table class="param-table">
+                
+                <tr><td class="param-name">总数</td><td>550</td></tr>
+                
+                <tr><td class="param-name">样本量</td><td>50</td></tr>
+                
+            </table>
+            <p><strong>结果：</strong><code>11.0</code></p>
+            
+            <div class="lineage-section">
+                <h4>📌 数据来源</h4>
+                
+                <div class="lineage-item">
+                    <div class="lineage-item-header">
+                        <strong>参数「总数」= 550</strong>
+                        
+                        <span class="clean-badge">✓ 原始值一致</span>
+                        
+                    </div>
+                    <table class="lineage-table">
+                        <tr><td>当前值</td><td>550</td></tr>
+                        <tr><td>来源位置</td><td>手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事</td></tr>
+                        <tr><td>版本号</td><td>v3 (0c0579f1-41ff-497c-b298-3bec9ac8a72f)</td></tr>
+                        <tr><td>录入人</td><td>排班同事</td></tr>
+                        <tr><td>录入时间</td><td>2026-06-22T10:21:14.716167</td></tr>
+                        <tr><td>原始值</td><td>550</td></tr>
+                        <tr><td>清洗说明</td><td>原始值与当前值一致</td></tr>
+                        
+                        <tr>
+                            <td>原始数据快照</td>
+                            <td><div class="raw-data-box">{
+  "\u5206\u5b50": 30,
+  "\u5206\u6bcd": 0,
+  "\u5907\u6ce8": "\u5206\u6bcd\u9519\u8bef\u5730\u8bbe\u4e3a0"
+}</div></td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="lineage-item">
+                    <div class="lineage-item-header">
+                        <strong>参数「样本量」= 50</strong>
+                        
+                        <span class="clean-badge">✓ 原始值一致</span>
+                        
+                    </div>
+                    <table class="lineage-table">
+                        <tr><td>当前值</td><td>50</td></tr>
+                        <tr><td>来源位置</td><td>手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事</td></tr>
+                        <tr><td>版本号</td><td>v3 (0c0579f1-41ff-497c-b298-3bec9ac8a72f)</td></tr>
+                        <tr><td>录入人</td><td>排班同事</td></tr>
+                        <tr><td>录入时间</td><td>2026-06-22T10:21:14.716167</td></tr>
+                        <tr><td>原始值</td><td>50</td></tr>
+                        <tr><td>清洗说明</td><td>原始值与当前值一致</td></tr>
+                        
+                        <tr>
+                            <td>原始数据快照</td>
+                            <td><div class="raw-data-box">{
+  "\u5206\u5b50": 30,
+  "\u5206\u6bcd": 0,
+  "\u5907\u6ce8": "\u5206\u6bcd\u9519\u8bef\u5730\u8bbe\u4e3a0"
+}</div></td>
+                        </tr>
+                    </table>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+        <div class="step">
+            <h3>计算差值</h3>
+            <p>计算A值与B值的差值，用于展示两者绝对差异</p>
+            <p><strong>公式：</strong><span class="formula">差值 = A值 - B值</span></p>
+            <p><strong>输入：</strong></p>
+            <table class="param-table">
+                
+                <tr><td class="param-name">A值</td><td>85</td></tr>
+                
+                <tr><td class="param-name">B值</td><td>70</td></tr>
+                
+            </table>
+            <p><strong>结果：</strong><code>15</code></p>
+            
+            <div class="lineage-section">
+                <h4>📌 数据来源</h4>
+                
+                <div class="lineage-item">
+                    <div class="lineage-item-header">
+                        <strong>参数「A值」= 85</strong>
+                        
+                        <span class="clean-badge">✓ 原始值一致</span>
+                        
+                    </div>
+                    <table class="lineage-table">
+                        <tr><td>当前值</td><td>85</td></tr>
+                        <tr><td>来源位置</td><td>手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事</td></tr>
+                        <tr><td>版本号</td><td>v3 (0c0579f1-41ff-497c-b298-3bec9ac8a72f)</td></tr>
+                        <tr><td>录入人</td><td>排班同事</td></tr>
+                        <tr><td>录入时间</td><td>2026-06-22T10:21:14.716167</td></tr>
+                        <tr><td>原始值</td><td>85</td></tr>
+                        <tr><td>清洗说明</td><td>原始值与当前值一致</td></tr>
+                        
+                        <tr>
+                            <td>原始数据快照</td>
+                            <td><div class="raw-data-box">{
+  "\u5206\u5b50": 30,
+  "\u5206\u6bcd": 0,
+  "\u5907\u6ce8": "\u5206\u6bcd\u9519\u8bef\u5730\u8bbe\u4e3a0"
+}</div></td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="lineage-item">
+                    <div class="lineage-item-header">
+                        <strong>参数「B值」= 70</strong>
+                        
+                        <span class="clean-badge">✓ 原始值一致</span>
+                        
+                    </div>
+                    <table class="lineage-table">
+                        <tr><td>当前值</td><td>70</td></tr>
+                        <tr><td>来源位置</td><td>手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事</td></tr>
+                        <tr><td>版本号</td><td>v3 (0c0579f1-41ff-497c-b298-3bec9ac8a72f)</td></tr>
+                        <tr><td>录入人</td><td>排班同事</td></tr>
+                        <tr><td>录入时间</td><td>2026-06-22T10:21:14.716167</td></tr>
+                        <tr><td>原始值</td><td>70</td></tr>
+                        <tr><td>清洗说明</td><td>原始值与当前值一致</td></tr>
+                        
+                        <tr>
+                            <td>原始数据快照</td>
+                            <td><div class="raw-data-box">{
+  "\u5206\u5b50": 30,
+  "\u5206\u6bcd": 0,
+  "\u5907\u6ce8": "\u5206\u6bcd\u9519\u8bef\u5730\u8bbe\u4e3a0"
+}</div></td>
+                        </tr>
+                    </table>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+        <div class="step">
+            <h3>计算增长率</h3>
+            <p>计算相对B值的增长率百分比，用于展示相对变化幅度</p>
+            <p><strong>公式：</strong><span class="formula">增长率 = (A值 - B值) / B值 × 100%</span></p>
+            <p><strong>输入：</strong></p>
+            <table class="param-table">
+                
+                <tr><td class="param-name">A值</td><td>85</td></tr>
+                
+                <tr><td class="param-name">B值</td><td>70</td></tr>
+                
+            </table>
+            <p><strong>结果：</strong><code>21.43%</code></p>
+            
+            <div class="lineage-section">
+                <h4>📌 数据来源</h4>
+                
+                <div class="lineage-item">
+                    <div class="lineage-item-header">
+                        <strong>参数「A值」= 85</strong>
+                        
+                        <span class="clean-badge">✓ 原始值一致</span>
+                        
+                    </div>
+                    <table class="lineage-table">
+                        <tr><td>当前值</td><td>85</td></tr>
+                        <tr><td>来源位置</td><td>手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事</td></tr>
+                        <tr><td>版本号</td><td>v3 (0c0579f1-41ff-497c-b298-3bec9ac8a72f)</td></tr>
+                        <tr><td>录入人</td><td>排班同事</td></tr>
+                        <tr><td>录入时间</td><td>2026-06-22T10:21:14.716167</td></tr>
+                        <tr><td>原始值</td><td>85</td></tr>
+                        <tr><td>清洗说明</td><td>原始值与当前值一致</td></tr>
+                        
+                        <tr>
+                            <td>原始数据快照</td>
+                            <td><div class="raw-data-box">{
+  "\u5206\u5b50": 30,
+  "\u5206\u6bcd": 0,
+  "\u5907\u6ce8": "\u5206\u6bcd\u9519\u8bef\u5730\u8bbe\u4e3a0"
+}</div></td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="lineage-item">
+                    <div class="lineage-item-header">
+                        <strong>参数「B值」= 70</strong>
+                        
+                        <span class="clean-badge">✓ 原始值一致</span>
+                        
+                    </div>
+                    <table class="lineage-table">
+                        <tr><td>当前值</td><td>70</td></tr>
+                        <tr><td>来源位置</td><td>手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事</td></tr>
+                        <tr><td>版本号</td><td>v3 (0c0579f1-41ff-497c-b298-3bec9ac8a72f)</td></tr>
+                        <tr><td>录入人</td><td>排班同事</td></tr>
+                        <tr><td>录入时间</td><td>2026-06-22T10:21:14.716167</td></tr>
+                        <tr><td>原始值</td><td>70</td></tr>
+                        <tr><td>清洗说明</td><td>原始值与当前值一致</td></tr>
+                        
+                        <tr>
+                            <td>原始数据快照</td>
+                            <td><div class="raw-data-box">{
+  "\u5206\u5b50": 30,
+  "\u5206\u6bcd": 0,
+  "\u5907\u6ce8": "\u5206\u6bcd\u9519\u8bef\u5730\u8bbe\u4e3a0"
+}</div></td>
+                        </tr>
+                    </table>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+    </div>
+    
+    
+    <div class="section">
+        <h2>🔄 相比上一版本的参数变更</h2>
+        
+        <div class="change-item">新增参数 'A值'，值为 85</div>
+        
+        <div class="change-item">新增参数 'B值'，值为 70</div>
+        
+        <div class="change-item">参数 '分母' 从 100 改为 0</div>
+        
+    </div>
+    
+    
+    <div class="section">
+        <h2>📦 数据来源</h2>
+        
+        <div class="source-card">
+            <strong>手动录入</strong> (manual)
+            <p>ID: manual_input_001</p>
+            <p>首次录入：2026-06-22T10:21:14.716167</p>
+            <p>录入人：排班同事</p>
+        </div>
+        
+    </div>
+</body>
+</html>

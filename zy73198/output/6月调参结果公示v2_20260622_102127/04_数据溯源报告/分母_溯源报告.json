@@ -1,17 +1,17 @@
 {
-  "report_id": "08e2276c-2bd5-443f-b8cc-8741653d0f39",
+  "report_id": "a1bab1ec-9770-4b1d-9ed4-de8e967955aa",
   "issue_type": "除零错误",
   "severity": "high",
   "param_name": "分母",
   "current_value": 0,
-  "description": "分母值为 0，接近或等于零，可能导致计算结果异常。",
+  "description": "参数 '分母' 值为 0，接近或等于零，无法执行除法运算。\n该值来自：手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事\n录入人：排班同事，录入时间：2026-06-22 10:21",
   "lineage": [
     {
-      "node_id": "c0c48864-2c1e-4274-a44f-b865fd168d26",
+      "node_id": "2fcfc61f-0a5c-4d75-a615-27065230ac7e",
       "node_type": "parameter",
       "name": "分母",
       "value": 100,
-      "version_id": "a4836ba1-b31b-44a5-82b4-73051c393d3a",
+      "version_id": "e1627b50-df8f-4def-8473-6ac4db90a348",
       "version_name": "v1",
       "source_type": "excel",
       "source_id": "data_20240601.xlsx",
@@ -21,17 +21,17 @@
         "分母": 100,
         "备注": "原始录入数据，来自Excel表格"
       },
-      "created_at": "2026-06-20T13:17:55.550208",
+      "created_at": "2026-06-22T10:21:14.716130",
       "created_by": "阿宁",
       "parent_node_ids": [],
       "transformation": "首次导入"
     },
     {
-      "node_id": "0561683a-dc0f-43d6-bce3-2d2b97c6b210",
+      "node_id": "02bc4ff6-06cf-4dd3-8a9b-931b610f59c6",
       "node_type": "parameter",
       "name": "分母",
       "value": 100,
-      "version_id": "dfb3c07b-747d-4e91-b753-c6a0b6568233",
+      "version_id": "cfdfb29a-0222-4b9c-837d-c5647228edfd",
       "version_name": "v2",
       "source_type": "excel",
       "source_id": "data_20240601.xlsx",
@@ -41,19 +41,19 @@
         "分母": 100,
         "备注": "修正后的数据"
       },
-      "created_at": "2026-06-20T13:17:55.550215",
+      "created_at": "2026-06-22T10:21:14.716150",
       "created_by": "阿宁",
       "parent_node_ids": [
-        "c0c48864-2c1e-4274-a44f-b865fd168d26"
+        "2fcfc61f-0a5c-4d75-a615-27065230ac7e"
       ],
       "transformation": "从版本 v1 变更而来"
     },
     {
-      "node_id": "41657ddb-8920-4945-90fc-1302ed49865c",
+      "node_id": "3c954067-b4e9-46ed-9e98-53fcb797e5da",
       "node_type": "parameter",
       "name": "分母",
       "value": 0,
-      "version_id": "85d4b9cd-19e3-48cd-bbaa-7ab29e86fd49",
+      "version_id": "0c0579f1-41ff-497c-b298-3bec9ac8a72f",
       "version_name": "v3",
       "source_type": "manual",
       "source_id": "manual_input_001",
@@ -63,20 +63,20 @@
         "分母": 0,
         "备注": "分母错误地设为0"
       },
-      "created_at": "2026-06-20T13:17:55.550221",
+      "created_at": "2026-06-22T10:21:14.716167",
       "created_by": "排班同事",
       "parent_node_ids": [
-        "0561683a-dc0f-43d6-bce3-2d2b97c6b210"
+        "02bc4ff6-06cf-4dd3-8a9b-931b610f59c6"
       ],
       "transformation": "从版本 v2 变更而来"
     }
   ],
   "first_occurrence": {
-    "node_id": "c0c48864-2c1e-4274-a44f-b865fd168d26",
+    "node_id": "2fcfc61f-0a5c-4d75-a615-27065230ac7e",
     "node_type": "parameter",
     "name": "分母",
     "value": 100,
-    "version_id": "a4836ba1-b31b-44a5-82b4-73051c393d3a",
+    "version_id": "e1627b50-df8f-4def-8473-6ac4db90a348",
     "version_name": "v1",
     "source_type": "excel",
     "source_id": "data_20240601.xlsx",
@@ -86,16 +86,16 @@
       "分母": 100,
       "备注": "原始录入数据，来自Excel表格"
     },
-    "created_at": "2026-06-20T13:17:55.550208",
+    "created_at": "2026-06-22T10:21:14.716130",
     "created_by": "阿宁",
     "parent_node_ids": [],
     "transformation": "首次导入"
   },
   "suggestions": [
-    "处理建议：\n1. 检查参数 '分母' 的来源数据是否正确\n2. 确认该值为零是否合理，若合理可使用一个极小值（如 1e-10）替代\n3. 若该值不应为零，请追溯参数来源：85d4b9cd-19e3-48cd-bbaa-7ab29e86fd49\n4. 可设置合理的默认值或跳过该指标计算",
+    "处理步骤：\n1. 【定位来源】请检查 手动录入记录 '手动录入' (ID: manual_input_001)，录入人 排班同事\n   原始数据: {'分子': 30, '分母': 0, '备注': '分母错误地设为0'}\n   录入人: 排班同事，请与其确认该值是否正确\n2. 【影响评估】该异常会导致需要 '分母' 作为分母的计算全部失效\n3. 【修复建议】建议回退到版本 'v2'，该版本中 分母=100\n4. 【临时方案】若业务允许，可使用极小值 1e-10 作为分母替代，或标记该指标为 '数据待复核'\n5. 【命令追溯】运行: python -m src.cli trace --param 分母",
     "查看 6月1日数据表格 (ID: data_20240601.xlsx) 中的原始数据",
     "联系首次录入人 阿宁 确认数据准确性",
     "检查版本时间线中第 3 次变更是否引入问题"
   ],
-  "generated_at": "2026-06-20T13:18:30.249546"
+  "generated_at": "2026-06-22T10:21:27.755829"
 }
