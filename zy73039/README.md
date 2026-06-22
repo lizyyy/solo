@@ -5,19 +5,82 @@
 ## 运行
 
 ```bash
+npm install
 npm start
 ```
 
-打开 `http://localhost:8775`。
+服务启动后，打开 `http://localhost:8766/index.html`。
 
-## API
+启动日志会显示：
+```
+🐾 流浪动物救助回访追踪服务已启动
+   页面: http://localhost:8766/index.html
+   API:  http://localhost:8766/api/...
+   数据库: /path/to/data/stray_tracker.sqlite
+```
 
-- `POST /api/records/import`：导入或追加同一主人的新版本材料。
-- `POST /api/records/:id/confirm`：确认放行，挂起记录会留下人工确认痕迹。
-- `POST /api/records/:id/revoke`：撤回记录并保留历史。
-- `PATCH /api/records/:id`：人工补改并生成新版本。
-- `GET /api/summary`：页面摘要。
-- `GET /api/anomalies`：异常出口明细。
-- `GET /api/records`：读取同一份 SQLite 数据。
+## API（围绕必需能力，保持克制）
+
+| 方法 | 路径 | 作用 |
+|------|------|------|
+| POST | `/api/records` | 导入材料，同一主人会自动追加版本并检测口径变更 |
+| GET | `/api/records?filter=all` | 记录列表（filter: all/cleared/pending/hang/revoked/human） |
+| GET | `/api/records/:id` | 单条详情（含版本链 + 异常时间线） |
+| POST | `/api/records/:id/confirm` | 确认放行，需填写 `reason`，状态流转：挂起→已放行（自动打人工改过标记） |
+| POST | `/api/records/:id/revoke` | 撤回确认，需填写 `reason`，状态变为已撤回，保留全部历史 |
+| POST | `/api/records/:id/patch` | 人工补改字段，生成新版本并留痕 |
+| GET | `/api/summary` | 页面摘要（已放行/待补证据/人工改过/挂起/已撤回/总计 + 体重问题数 + 口径变更数） |
+| GET | `/api/anomalies` | 异常时间线（全部记录的异常按时间倒序） |
+
+统一响应格式：`{ ok: true, data: ... }` 或 `{ ok: false, error: ... }`。
+
+## 数据库
 
 SQLite 文件位于 `data/stray_tracker.sqlite`，所有页面和 API 操作都使用这一个本地数据源。
+
+三表结构：
+
+- `records` — 主人记录主表（id / owner_wechat / status / human_edited / created_at / updated_at）
+- `versions` — 版本链（每次导入/人工补改追加一条，记录体重/用药提醒/微信备注/附件/口头说明等字段）
+- `anomalies` — 异常时间线（体重混写/口径变更/人工处理）
+
+## 状态流转
+
+```
+           导入无异常
+pending（待补证据） ──确认（待补证据→已放行）──→ cleared（已放行）
+           │                                                  ↑
+           │ 导入体重混写     （挂起→已放行）                │
+           └───────→ hang（挂起中）──────────────────┘
+           │ （体重单位混写自动挂起）
+           │
+           └── 任何状态 ──撤回（留痕）──→ revoked（已撤回）
+```
+
+已放行记录追加新材料时：
+- 出现体重单位混写 → 自动回到 `hang`（挂起）
+- 出现口径变更 → 自动回到 `pending`（待补证据）
+- 异常时间线会记录"已放行记录追加新材料后发现..."
+
+## 异常检测
+
+- **体重单位混写**：同一份材料里同时出现 kg / g / 斤 / lb 中任意两种及以上 → 自动挂起
+- **跨版本单位不一致**：同一主人不同版本用了不同单位 → 自动挂起
+- **口径变更**：同一主人追加新版本时，关键字段（体重/用药提醒/微信备注/附件/口头说明）有变动 → 标记版本冲突异常
+
+## 完整验收流程
+
+1. **导入多份材料**：
+   - 导入橘子妈微信备注，4.5kg，用药提醒
+   - 导入同主人晚到附件（4.2kg，用药提醒有变化）→ 自动检测口径变更
+   - 导入小黑爸口头说明："4500g 约 9 斤" → 自动挂起（g/斤 两种混写）
+
+2. **确认一条挂起记录**：点击确认 → 弹窗填原因 → 状态变为已放行，打人工改过标记
+
+3. **撤回一条记录**：点击撤回 → 弹窗填原因 → 状态变为已撤回，原因留在异常时间线
+
+4. **给已放行记录追加带体重单位混写的材料**：已放行 → 自动回到挂起状态
+
+5. **刷新页面**：所有数据仍在，状态正确，原因和变动历史可查
+
+6. **摘要数字点击**：点击每张汇总卡片 → 自动筛选对应具体记录并滚动到列表

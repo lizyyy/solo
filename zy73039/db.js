@@ -8,8 +8,12 @@
 
 const Database = require('better-sqlite3');
 const path = require('path');
+const fs = require('fs');
 
-const DB_PATH = path.join(__dirname, 'tracker.db');
+const DATA_DIR = path.join(__dirname, 'data');
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+
+const DB_PATH = path.join(DATA_DIR, 'stray_tracker.sqlite');
 const db = new Database(DB_PATH);
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
@@ -68,12 +72,13 @@ const nowISO = () => new Date().toISOString();
 function parseWeight(raw) {
   if (!raw) return { value: null, unit: null, raw: '' };
   const str = String(raw).trim().toLowerCase();
-  const m = str.match(/^([\d.]+)\s*(kg|kilogram|kilograms|公斤|千克|g|gram|grams|克|lb|lbs|pound|pounds|磅)?$/);
+  const m = str.match(/^([\d.]+)\s*(kg|kilogram|kilograms|公斤|千克|g|gram|grams|克|斤|lb|lbs|pound|pounds|磅)?$/);
   if (!m) return { value: null, unit: null, raw: str };
   const v = parseFloat(m[1]);
   let u = m[2] || '';
   if (['kg', 'kilogram', 'kilograms', '公斤', '千克'].includes(u)) u = 'kg';
   else if (['g', 'gram', 'grams', '克'].includes(u)) u = 'g';
+  else if (['斤'].includes(u)) u = 'jin';
   else if (['lb', 'lbs', 'pound', 'pounds', '磅'].includes(u)) u = 'lb';
   return { value: isNaN(v) ? null : v, unit: u || null, raw: str };
 }
@@ -84,9 +89,10 @@ function detectWeightMix(raw) {
   const has = {
     kg: /(kg|kilogram|公斤|千克)/.test(str),
     g:  /(^|[\d\s.,])(g|克)(?![a-z])/.test(str),
+    jin: /斤/.test(str),
     lb: /(lb|pound|磅)/.test(str),
   };
-  return [has.kg, has.g, has.lb].filter(Boolean).length >= 2;
+  return [has.kg, has.g, has.jin, has.lb].filter(Boolean).length >= 2;
 }
 
 const KEY_FIELDS = ['weight', 'medReminder', 'wechatNote', 'attachment', 'verbalNote'];
@@ -355,14 +361,29 @@ function importRecord(payload) {
       const hasWeightIssue = db.prepare(
         `SELECT COUNT(*) AS cnt FROM anomalies WHERE record_id = ? AND type = 'weight_mix'`
       ).get(recordId).cnt > 0;
+      const hasVersionConflict = versionAnomalies.some(a => a.type === 'version_conflict');
+      const needsAttention = hasWeightIssue || hasVersionConflict;
 
       let newStatus = record.status;
-      if (hasWeightIssue && record.status !== 'cleared' && record.status !== 'revoked') {
-        newStatus = 'hang';
+      if (needsAttention && record.status !== 'revoked') {
+        newStatus = hasWeightIssue ? 'hang' : 'pending';
       }
 
       stmts.updateRecordUpdated.run({ id: recordId, updated_at: now });
       if (newStatus !== record.status) {
+        if (record.status === 'cleared' && needsAttention) {
+          const msg = hasWeightIssue
+            ? '已放行记录追加新材料后发现体重单位问题，重新挂起'
+            : '已放行记录追加新材料后发现口径变更，回到待补证据';
+          stmts.insertAnomaly.run({
+            record_id: recordId,
+            vid: newVid,
+            type: 'human_edit',
+            message: msg,
+            diffs_json: null,
+            created_at: now,
+          });
+        }
         stmts.updateRecordStatus.run({
           id: recordId,
           status: newStatus,
@@ -446,21 +467,34 @@ function confirmRecord(id, options = {}) {
 
   const tx = db.transaction(() => {
     const now = nowISO();
-    let humanEdited = record.human_edited;
+    const humanEdited = 1;
+    const reason = options.reason || options.note || '';
 
+    let msg;
     if (record.status === 'hang') {
-      humanEdited = 1;
-      stmts.insertAnomaly.run({
-        record_id: id,
-        vid: null,
-        type: 'human_edit',
-        message: options.note
-          ? `人工确认放行（挂起）：${options.note}`
-          : '人工确认放行（从挂起状态确认）',
-        diffs_json: null,
-        created_at: now,
-      });
+      msg = reason
+        ? `人工确认放行（从挂起状态确认）：${reason}`
+        : '人工确认放行（从挂起状态确认）';
+    } else if (record.status === 'pending') {
+      msg = reason
+        ? `人工确认放行（待补证据→已放行）：${reason}`
+        : '人工确认放行（待补证据→已放行）';
+    } else if (record.status === 'cleared') {
+      msg = reason
+        ? `再次确认放行（已放行→已放行）：${reason}`
+        : '再次确认放行';
+    } else {
+      msg = reason ? `确认放行：${reason}` : '确认放行';
     }
+
+    stmts.insertAnomaly.run({
+      record_id: id,
+      vid: null,
+      type: 'human_edit',
+      message: msg,
+      diffs_json: null,
+      created_at: now,
+    });
 
     stmts.updateRecordStatus.run({
       id,
@@ -690,6 +724,7 @@ function getSummary() {
 
 module.exports = {
   db,
+  DB_PATH,
   importRecord,
   confirmRecord,
   revokeRecord,

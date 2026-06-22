@@ -7,6 +7,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const {
+  DB_PATH,
   importRecord,
   confirmRecord,
   revokeRecord,
@@ -18,7 +19,7 @@ const {
 } = require('./db');
 
 const app = express();
-const PORT = process.env.PORT || 8765;
+const PORT = process.env.PORT || 8766;
 
 app.use(cors());
 app.use(express.json({ limit: '2mb' }));
@@ -115,4 +116,5 @@ app.listen(PORT, () => {
   console.log(`🐾 流浪动物救助回访追踪服务已启动`);
   console.log(`   页面: http://localhost:${PORT}/index.html`);
   console.log(`   API:  http://localhost:${PORT}/api/...`);
+  console.log(`   数据库: ${DB_PATH}`);
 });

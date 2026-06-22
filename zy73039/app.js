@@ -116,6 +116,31 @@ function renderSummary(s) {
   document.getElementById('sum-hang').textContent    = s.hang;
   document.getElementById('sum-revoked').textContent = s.revoked;
   document.getElementById('sum-total').textContent   = s.total;
+
+  const map = {
+    'sum-cleared': 'cleared',
+    'sum-pending': 'pending',
+    'sum-human':   'human',
+    'sum-hang':    'hang',
+    'sum-revoked': 'revoked',
+    'sum-total':   'all',
+  };
+  Object.keys(map).forEach((id) => {
+    const card = document.getElementById(id)?.closest('.sum-card');
+    if (card) {
+      card.style.cursor = 'pointer';
+      card.onclick = async () => {
+        const filter = map[id];
+        document.querySelectorAll('.filter-bar .chip').forEach((x) => x.classList.remove('active'));
+        const chip = document.querySelector(`.filter-bar .chip[data-filter="${filter}"]`);
+        if (chip) chip.classList.add('active');
+        currentFilter = filter;
+        const records = await listRecords(currentFilter);
+        renderList(records);
+        document.getElementById('record-list').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
+    }
+  });
 }
 
 function statusCls(status) {
@@ -257,12 +282,11 @@ async function handleCardAction(act, id) {
   if (act === 'confirm') {
     try {
       const detail = await getRecordDetail(id);
-      let note = '';
-      if (detail && detail.status === STATUS.HANG) {
-        note = prompt('从挂起状态确认，请输入确认说明（会留痕）：', '体重单位已人工核对');
-        if (note === null) return;
-      }
-      await confirmRecord(id, { note });
+      const statusLabel = detail ? (STATUS_LABEL[detail.status] || detail.status) : '';
+      const reason = prompt(`确认放行（当前状态：${statusLabel}），请填写确认原因或处理说明（会留痕）：`,
+        statusLabel === '挂起中' ? '体重单位已人工核对一致' : '材料完整，信息属实');
+      if (reason === null) return;
+      await confirmRecord(id, { reason });
       flash('已确认放行');
       await refresh();
     } catch (e) { alert(e.message); }
