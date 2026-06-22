@@ -113,6 +113,7 @@ export interface TrackStoreState {
   filterState: FilterState;
   addBatch: (batch: TrackBatch) => void;
   addRun: (run: TrackRun) => void;
+  rerunRun: (sourceRunId: string, remark: string) => TrackRun | null;
   setCurrentBatch: (batchId: string | null) => void;
   setCurrentRun: (runId: string | null) => void;
   getRunsByBatchId: (batchId: string) => TrackRun[];

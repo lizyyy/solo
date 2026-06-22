@@ -255,8 +255,7 @@ function RerunModal({
 export default function RunHistoryPanel() {
   const batches = useTrackStore((s) => s.batches);
   const getRunsByBatchId = useTrackStore((s) => s.getRunsByBatchId);
-  const addRun = useTrackStore((s) => s.addRun);
-  const getMaxRunNumber = useTrackStore((s) => s.getMaxRunNumber);
+  const rerunRun = useTrackStore((s) => s.rerunRun);
 
   const [selectedRunIds, setSelectedRunIds] = useState<string[]>([]);
   const [rerunTarget, setRerunTarget] = useState<TrackRun | null>(null);
@@ -275,21 +274,10 @@ export default function RunHistoryPanel() {
 
   const handleRerunConfirm = (remark: string) => {
     if (!rerunTarget) return;
-    const maxNum = getMaxRunNumber(rerunTarget.batchId);
-    const newRun: TrackRun = {
-      runId: `RUN-${Date.now()}`,
-      batchId: rerunTarget.batchId,
-      runNumber: maxNum + 1,
-      remark,
-      executedAt: new Date().toISOString(),
-      resultStatus: 'success',
-      drawingVersion: rerunTarget.drawingVersion.replace(/V(\d+)\.(\d+)/, (_m, a, b) => `V${a}.${Number(b) + 1}`),
-      materialCount: rerunTarget.materialCount + Math.floor(Math.random() * 5),
-      collisionCount: Math.max(0, rerunTarget.collisionCount + Math.floor(Math.random() * 5) - 2),
-      abnormalCount: Math.max(0, rerunTarget.abnormalCount + Math.floor(Math.random() * 3) - 1),
-    };
-    addRun(newRun);
-    setSelectedRunIds([rerunTarget.runId, newRun.runId]);
+    const newRun = rerunRun(rerunTarget.runId, remark);
+    if (newRun) {
+      setSelectedRunIds([rerunTarget.runId, newRun.runId]);
+    }
     setRerunTarget(null);
   };
 

@@ -50,9 +50,22 @@ export default function Home() {
   const currentRunId = useTrackStore((s) => s.currentRunId);
   const loadSamplePack = useTrackStore((s) => s.loadSamplePack);
 
+  const filterState = useTrackStore((s) => s.filterState);
+
   const summary = useMemo(() => {
-    const activeMaterials = currentRunId ? materials.filter((m) => m.runId === currentRunId) : materials;
-    const activeCollisions = currentRunId ? collisions.filter((c) => c.runId === currentRunId) : collisions;
+    const collisionMaterialIds = new Set(
+      currentRunId
+        ? collisions.filter((c) => c.runId === currentRunId).flatMap((c) => c.involvedMaterialIds)
+        : collisions.flatMap((c) => c.involvedMaterialIds)
+    );
+
+    let activeMaterials = currentRunId ? materials.filter((m) => m.runId === currentRunId) : materials;
+    let activeCollisions = currentRunId ? collisions.filter((c) => c.runId === currentRunId) : collisions;
+
+    if (filterState.collisionOnly) {
+      activeMaterials = activeMaterials.filter((m) => collisionMaterialIds.has(m.materialId));
+    }
+
     const abnormal = activeMaterials.filter((m) => m.processingStatus === 'conflicted' || m.processingStatus === 'pending');
     const latestRun = runs.find((r) => r.runId === currentRunId);
     return {
@@ -61,7 +74,7 @@ export default function Home() {
       abnormalCount: abnormal.length,
       latestVersion: latestRun?.drawingVersion ?? '—',
     };
-  }, [runs, materials, collisions, currentRunId]);
+  }, [runs, materials, collisions, currentRunId, filterState.collisionOnly]);
 
   return (
     <div className="min-h-screen bg-slate-50 p-6">

@@ -3,135 +3,162 @@ import { cn } from '@/lib/utils'
 import CollisionList, { type CollisionItem } from '@/components/collision/CollisionList'
 import OriginalQuoteDrawer, {
   type MeetingMinutes,
+  type MeetingParagraph,
 } from '@/components/collision/OriginalQuoteDrawer'
-import { MapPin, X } from 'lucide-react'
+import { MapPin, X, AlertTriangle, FileText, Package } from 'lucide-react'
 import { useSceneStore } from '@/store/useSceneStore'
+import { useTrackStore } from '@/stores/trackStore'
+import type { CollisionPoint, MeetingNote, MaterialItem, TrackRun } from '@/types'
+import { useNavigate } from 'react-router-dom'
 
-const MOCK_MEETINGS: Record<string, MeetingMinutes> = {
-  'meeting-001': {
-    id: 'meeting-001',
-    title: '屋面排水系统设计评审会议纪要',
-    code: 'MEET-2025-WS-001',
-    date: '2025-03-15',
-    paragraphs: [
-      {
-        id: 'p-001',
-        index: 1,
-        content:
-          '会议首先确认了屋面排水系统的整体设计方案，采用虹吸式排水系统配合重力流辅助设计。',
-        isHit: false,
-        hitFields: [],
-      },
-      {
-        id: 'p-002',
-        index: 2,
-        content:
-          '关于排水材料选型，设计方提出采用HDPE高密度聚乙烯排水管DN200作为主干管，共120米。',
-        isHit: true,
-        hitFields: ['materialName', 'specification', 'quantity'],
-      },
-      {
-        id: 'p-003',
-        index: 3,
-        content:
-          '雨水斗选用87型铸铁雨水斗，共计16个，分布在屋面各排水区域。',
-        isHit: true,
-        hitFields: ['materialName', 'quantity'],
-      },
-      {
-        id: 'p-004',
-        index: 4,
-        content:
-          '各方同意按此方案推进，并要求施工方在进场前提交材料样品及质量证明文件。',
-        isHit: false,
-        hitFields: [],
-      },
-    ],
-  },
-  'meeting-002': {
-    id: 'meeting-002',
-    title: '屋面材料技术交底会议',
-    code: 'MEET-2025-WS-002',
-    date: '2025-03-22',
-    paragraphs: [
-      {
-        id: 'p-101',
-        index: 1,
-        content: '施工方介绍了拟进场的主要材料清单及供应商资质情况。',
-        isHit: false,
-        hitFields: [],
-      },
-      {
-        id: 'p-102',
-        index: 2,
-        content:
-          'HDPE排水管拟采用DN200规格，长度120米，供应商为某知名品牌，已提供检测报告。',
-        isHit: true,
-        hitFields: ['materialName', 'specification', 'quantity'],
-      },
-      {
-        id: 'p-103',
-        index: 3,
-        content:
-          '防水卷材采用SBS改性沥青防水卷材4mm厚，约需2800平方米。',
-        isHit: false,
-        hitFields: [],
-      },
-    ],
-  },
+function transformMeetingNotes(notes: MeetingNote[]): Record<string, MeetingMinutes> {
+  const result: Record<string, MeetingMinutes> = {}
+  for (const note of notes) {
+    const paragraphs: MeetingParagraph[] = note.paragraphs.map((p) => ({
+      id: `${note.noteId}-p-${p.index}`,
+      index: p.index,
+      content: p.rawText,
+      isHit: p.matchedStandards.length > 0,
+      hitFields: p.matchedStandards,
+    }))
+    result[note.noteId] = {
+      id: note.noteId,
+      title: note.title,
+      code: note.noteNumber,
+      date: note.meetingDate,
+      paragraphs,
+    }
+  }
+  return result
 }
 
-const MOCK_COLLISIONS: CollisionItem[] = [
-  {
-    id: 'collision-001',
-    confidence: 'high',
-    materials: [
-      { id: 'mat-001', name: 'HDPE排水管DN200', color: '#3b82f6' },
-      { id: 'mat-002', name: 'HDPE高密度聚乙烯管', color: '#6366f1' },
-    ],
-    duplicateCount: 2,
-    meetingIds: ['meeting-001', 'meeting-002'],
-    hitParagraphIds: ['p-002', 'p-102'],
-    originalQuoteSnippet:
-      '采用HDPE高密度聚乙烯排水管DN200作为主干管，共120米 / HDPE排水管拟采用DN200规格，长度120米',
-  },
-  {
-    id: 'collision-002',
-    confidence: 'medium',
-    materials: [{ id: 'mat-003', name: '87型铸铁雨水斗', color: '#f59e0b' }],
-    duplicateCount: 1,
-    meetingIds: ['meeting-001'],
-    hitParagraphIds: ['p-003'],
-    originalQuoteSnippet: '雨水斗选用87型铸铁雨水斗，共计16个',
-  },
-  {
-    id: 'collision-003',
-    confidence: 'low',
-    materials: [
-      { id: 'mat-004', name: 'SBS改性沥青防水卷材', color: '#10b981' },
-    ],
-    duplicateCount: 1,
-    meetingIds: ['meeting-002'],
-    hitParagraphIds: ['p-103'],
-    originalQuoteSnippet: '防水卷材采用SBS改性沥青防水卷材4mm厚',
-  },
-]
+function transformCollisions(
+  collisions: CollisionPoint[],
+  materials: MaterialItem[],
+  meetings: Record<string, MeetingMinutes>,
+  deduplicated: Map<number, CollisionPoint[]>,
+): CollisionItem[] {
+  const result: CollisionItem[] = []
+
+  for (const [hash, group] of deduplicated) {
+    if (group.length === 0) continue
+
+    const primary = group.reduce((prev, curr) => {
+      const order = { high: 3, medium: 2, low: 1 }
+      return order[curr.confidence] >= order[prev.confidence] ? curr : prev
+    })
+
+    const collisionMaterials = primary.involvedMaterialIds
+      .map((id) => materials.find((m) => m.materialId === id))
+      .filter((m): m is MaterialItem => m !== undefined)
+
+    const allMeetingIds = new Set<string>()
+    const allParagraphIds = new Set<string>()
+    const allQuotes: string[] = []
+
+    for (const c of group) {
+      const note = meetings[c.involvedMaterialIds[0]?.split('-').slice(0, 2).join('-')]
+      const paraId = `${c.noteParagraphRef}-${c.collisionId}`
+      allParagraphIds.add(paraId)
+      allQuotes.push(c.originalQuote)
+      if (collisionMaterials.length > 0) {
+        const sourceNoteId = collisionMaterials[0].sourceNoteId
+        if (sourceNoteId) allMeetingIds.add(sourceNoteId)
+      }
+    }
+
+    if (allMeetingIds.size === 0 && collisionMaterials.length > 0) {
+      const fallbackId = collisionMaterials[0].sourceNoteId
+      if (fallbackId) allMeetingIds.add(fallbackId)
+    }
+
+    result.push({
+      id: primary.collisionId,
+      confidence: primary.confidence,
+      materials: collisionMaterials.map((m) => ({
+        id: m.materialId,
+        name: m.standardName,
+      })),
+      duplicateCount: group.length,
+      meetingIds: Array.from(allMeetingIds),
+      hitParagraphIds: Array.from(allParagraphIds),
+      originalQuoteSnippet: allQuotes.join(' / '),
+    })
+  }
+
+  return result
+}
+
+function buildDeduplicatedGroups(collisions: CollisionPoint[]): Map<number, CollisionPoint[]> {
+  const groups = new Map<number, CollisionPoint[]>()
+  for (const c of collisions) {
+    const key = c.deduplicationHash || Math.abs(c.collisionId.charCodeAt(0))
+    if (!groups.has(key)) groups.set(key, [])
+    groups.get(key)!.push(c)
+  }
+  return groups
+}
 
 export default function CollisionPage() {
+  const navigate = useNavigate()
+  const collisions = useTrackStore((s) => s.collisions)
+  const materials = useTrackStore((s) => s.materials)
+  const meetingNotes = useTrackStore((s) => s.meetingNotes)
+  const currentRunId = useTrackStore((s) => s.currentRunId)
+  const currentBatchId = useTrackStore((s) => s.currentBatchId)
+  const runs = useTrackStore((s) => s.runs)
+  const batches = useTrackStore((s) => s.batches)
+
   const [selectedCollisionId, setSelectedCollisionId] = useState<string | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [activeMeeting, setActiveMeeting] = useState<MeetingMinutes | null>(null)
   const [activeParagraphIds, setActiveParagraphIds] = useState<string[]>([])
   const { focusOnMaterial } = useSceneStore()
 
-  const selectedCollision = useMemo(() => {
-    return MOCK_COLLISIONS.find((c) => c.id === selectedCollisionId) ?? null
-  }, [selectedCollisionId])
+  const currentRun = useMemo(
+    () => runs.find((r) => r.runId === currentRunId) ?? null,
+    [runs, currentRunId]
+  )
+  const currentBatch = useMemo(
+    () => batches.find((b) => b.batchId === currentBatchId) ?? null,
+    [batches, currentBatchId]
+  )
+
+  const activeCollisions = useMemo(
+    () => (currentRunId ? collisions.filter((c) => c.runId === currentRunId) : collisions),
+    [collisions, currentRunId]
+  )
+
+  const meetings = useMemo(() => transformMeetingNotes(meetingNotes), [meetingNotes])
+
+  const deduplicatedGroups = useMemo(
+    () => buildDeduplicatedGroups(activeCollisions),
+    [activeCollisions]
+  )
+
+  const transformedCollisions = useMemo(
+    () => transformCollisions(activeCollisions, materials, meetings, deduplicatedGroups),
+    [activeCollisions, materials, meetings, deduplicatedGroups]
+  )
+
+  const totalDeduplicated = deduplicatedGroups.size
+  const totalMergedDuplicates = activeCollisions.length - totalDeduplicated
+
+  const selectedCollision = useMemo(
+    () => transformedCollisions.find((c) => c.id === selectedCollisionId) ?? null,
+    [transformedCollisions, selectedCollisionId]
+  )
+
+  useEffect(() => {
+    setSelectedCollisionId(null)
+    setActiveMeeting(null)
+    setActiveParagraphIds([])
+  }, [currentRunId])
 
   useEffect(() => {
     if (selectedCollision && selectedCollision.meetingIds.length > 0) {
       const firstMeetingId = selectedCollision.meetingIds[0]
-      const meeting = MOCK_MEETINGS[firstMeetingId]
+      const meeting = meetings[firstMeetingId]
       if (meeting) {
         setActiveMeeting(meeting)
         setActiveParagraphIds(selectedCollision.hitParagraphIds)
@@ -140,13 +167,18 @@ export default function CollisionPage() {
       setActiveMeeting(null)
       setActiveParagraphIds([])
     }
-  }, [selectedCollision])
+  }, [selectedCollision, meetings])
 
   const handleViewOriginal = (meetingId: string, paragraphIds: string[]) => {
-    const meeting = MOCK_MEETINGS[meetingId]
+    const meeting = meetings[meetingId]
     if (meeting) {
       setActiveMeeting(meeting)
       setActiveParagraphIds(paragraphIds)
+      setDrawerOpen(true)
+    } else if (Object.values(meetings).length > 0) {
+      const fallback = Object.values(meetings)[0]
+      setActiveMeeting(fallback)
+      setActiveParagraphIds(fallback.paragraphs.filter((p) => p.isHit).map((p) => p.id))
       setDrawerOpen(true)
     }
   }
@@ -162,6 +194,33 @@ export default function CollisionPage() {
     }
   }
 
+  const handleGotoTracker = () => {
+    navigate('/tracker')
+  }
+
+  if (activeCollisions.length === 0) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-100 p-4">
+        <div className="max-w-md rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50">
+            <AlertTriangle className="h-8 w-8 text-amber-500" />
+          </div>
+          <h2 className="mb-2 text-base font-bold text-slate-800">暂无碰撞数据</h2>
+          <p className="mb-5 text-sm text-slate-500">
+            请先从主页导入样例包，或切换到已执行的图纸版本查看碰撞检测结果。
+          </p>
+          <button
+            onClick={handleGotoTracker}
+            className="inline-flex items-center gap-2 rounded-xl bg-[#1F3A5F] px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:bg-[#182f4d] hover:shadow-lg"
+          >
+            <Package className="h-4 w-4" />
+            前往工作台导入样例
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex h-full w-full min-h-screen bg-slate-100 p-4">
       <div
@@ -170,17 +229,48 @@ export default function CollisionPage() {
           'w-full',
         )}
       >
-        <div className="h-full" style={{ width: '70%' }}>
-          <CollisionList
-            collisions={MOCK_COLLISIONS}
-            meetings={MOCK_MEETINGS}
-            totalDeduplicated={3}
-            totalMergedDuplicates={2}
-            onViewOriginal={handleViewOriginal}
-            selectedCollisionId={selectedCollisionId}
-            onSelectCollision={setSelectedCollisionId}
-            className="h-full"
-          />
+        <div className="flex h-full flex-col gap-3" style={{ width: '70%' }}>
+          <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-3 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50">
+                <AlertTriangle className="h-5 w-5 text-amber-600" />
+              </div>
+              <div>
+                <h1 className="text-sm font-bold text-slate-800" style={{ fontFamily: 'Noto Serif SC, serif' }}>
+                  碰撞中心
+                </h1>
+                <p className="text-[11px] text-slate-500">
+                  {currentBatch ? `${currentBatch.batchId} · ${currentBatch.name}` : '未选择批次'}
+                  {currentRun ? ` · Run #${currentRun.runNumber} · ${currentRun.drawingVersion} · ${currentRun.remark}` : ''}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-[11px]">
+              <span className="rounded bg-blue-50 px-2 py-1 font-medium text-blue-700">
+                {activeCollisions.length} 条原始检测
+              </span>
+              <span className="rounded bg-emerald-50 px-2 py-1 font-medium text-emerald-700">
+                {totalDeduplicated} 条去重
+              </span>
+              {totalMergedDuplicates > 0 && (
+                <span className="rounded bg-indigo-50 px-2 py-1 font-medium text-indigo-700">
+                  合并 {totalMergedDuplicates} 条重复
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex-1">
+            <CollisionList
+              collisions={transformedCollisions}
+              meetings={meetings}
+              totalDeduplicated={totalDeduplicated}
+              totalMergedDuplicates={totalMergedDuplicates}
+              onViewOriginal={handleViewOriginal}
+              selectedCollisionId={selectedCollisionId}
+              onSelectCollision={setSelectedCollisionId}
+              className="h-full"
+            />
+          </div>
         </div>
 
         <div
@@ -209,6 +299,19 @@ export default function CollisionPage() {
                     <h3 className="text-base font-bold text-slate-800 leading-snug">
                       {activeMeeting.title}
                     </h3>
+                    {selectedCollision.materials.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {selectedCollision.materials.map((m) => (
+                          <span
+                            key={m.id}
+                            className="inline-flex items-center gap-1 rounded-md bg-white px-1.5 py-0.5 text-[10px] font-medium text-slate-700 shadow-sm"
+                          >
+                            <FileText className="h-3 w-3 text-[#1F3A5F]" />
+                            {m.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <button
                     type="button"
@@ -271,9 +374,7 @@ export default function CollisionPage() {
 
                         {isHit && paragraph.hitFields.length > 0 && (
                           <div className="mt-3 flex flex-wrap gap-1.5">
-                            <span className="text-xs text-slate-500">
-                              命中字段:
-                            </span>
+                            <span className="text-xs text-slate-500">命中字段:</span>
                             {paragraph.hitFields.map((field) => (
                               <span
                                 key={field}
