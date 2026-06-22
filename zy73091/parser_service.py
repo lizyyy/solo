@@ -72,12 +72,19 @@ def _find_material_name(sentence):
     return uniq[-1]
 
 COORD_PATTERNS = [
-    re.compile(r'([\u4e00-\u9fa5A-Za-z]+(?:系统|管线|桥架|风管))[^\d]{0,10}'
+    re.compile(r'([\u4e00-\u9fa5A-Za-z]+(?:系统|管线|桥架|风管|水管))[^\d]{0,10}'
                r'(?:坐标|原点|基点|定位)[^\d]{0,10}'
                r'X\s*[:：]?\s*([\-+]?\d+\.?\d*)[^\d]{0,6}'
                r'Y\s*[:：]?\s*([\-+]?\d+\.?\d*)[^\d]{0,6}'
                r'Z\s*[:：]?\s*([\-+]?\d+\.?\d*)'),
 ]
+
+COORD_PAIR_PATTERN = re.compile(
+    r'([\u4e00-\u9fa5A-Za-z]+(?:系统|管线|桥架|风管|水管))[^\d]{0,20}'
+    r'原点\s*\(\s*([\-+]?\d+\.?\d*)\s*[,，\s]\s*([\-+]?\d+\.?\d*)\s*[,，\s]\s*([\-+]?\d+\.?\d*)\s*\)'
+    r'[^\d]{0,20}'
+    r'(?:现场复测|复测|实测|现场)\s*\(\s*([\-+]?\d+\.?\d*)\s*[,，\s]\s*([\-+]?\d+\.?\d*)\s*[,，\s]\s*([\-+]?\d+\.?\d*)\s*\)'
+)
 
 REFERENCE_POINT = (0.0, 0.0, 0.0)
 OFFSET_THRESHOLD = 50.0
@@ -235,6 +242,7 @@ def detect_coordinate_offsets(text, supplementary='', oral=''):
     all_text = '\n'.join(filter(None, [text, supplementary, oral]))
     checks = []
     any_offset = False
+    seen = set()
 
     for pattern in COORD_PATTERNS:
         for m in pattern.finditer(all_text):
@@ -245,6 +253,10 @@ def detect_coordinate_offsets(text, supplementary='', oral=''):
                 z = float(m.group(4))
             except (ValueError, TypeError):
                 continue
+            key = (sys_name, 'xyz')
+            if key in seen:
+                continue
+            seen.add(key)
             ox = x - REFERENCE_POINT[0]
             oy = y - REFERENCE_POINT[1]
             oz = z - REFERENCE_POINT[2]
@@ -263,6 +275,42 @@ def detect_coordinate_offsets(text, supplementary='', oral=''):
                 'confirmed': 0,
             })
 
+    for m in COORD_PAIR_PATTERN.finditer(all_text):
+        sys_name = m.group(1)
+        try:
+            ox0 = float(m.group(2))
+            oy0 = float(m.group(3))
+            oz0 = float(m.group(4))
+            rx = float(m.group(5))
+            ry = float(m.group(6))
+            rz = float(m.group(7))
+        except (ValueError, TypeError):
+            continue
+        key = (sys_name, 'pair')
+        if key in seen:
+            continue
+        seen.add(key)
+        dx = rx - ox0
+        dy = ry - oy0
+        dz = rz - oz0
+        offset = abs(dx) > OFFSET_THRESHOLD or abs(dy) > OFFSET_THRESHOLD or abs(dz) > OFFSET_THRESHOLD
+        if offset:
+            any_offset = True
+        checks.append({
+            'system_name': sys_name,
+            'origin_x': ox0,
+            'origin_y': oy0,
+            'origin_z': oz0,
+            'offset_detected': 1 if offset else 0,
+            'offset_value_x': dx,
+            'offset_value_y': dy,
+            'offset_value_z': dz,
+            'confirmed': 0,
+            'measured_x': rx,
+            'measured_y': ry,
+            'measured_z': rz,
+        })
+
     return {
         'checks': checks,
         'any_offset': any_offset,
@@ -276,15 +324,16 @@ def extract_collisions(text, supplementary='', oral=''):
     collisions = []
     levels = {'严重': '严重', '中等': '中等', '轻微': '轻微', '一般': '轻微', '重': '严重'}
 
+    collision_suffixes = '(?:系统|管线|桥架|风管|水管|管道|线槽|母线槽|喷淋头|消火栓|配电箱|风口|阀门|支架|机组|泵组)'
     collision_pat = re.compile(
-        r'([\u4e00-\u9fa5A-Za-z0-9]+(?:系统|管线|桥架|风管|水管))'
+        r'([\u4e00-\u9fa5A-Za-z0-9]*?' + collision_suffixes + ')'
         r'[^\u4e00-\u9fa5A-Za-z0-9]{0,8}'
         r'与'
         r'[^\u4e00-\u9fa5A-Za-z0-9]{0,8}'
-        r'([\u4e00-\u9fa5A-Za-z0-9]+(?:系统|管线|桥架|风管|水管))'
+        r'([\u4e00-\u9fa5A-Za-z0-9]*?' + collision_suffixes + ')'
     )
     level_pat = re.compile(r'(严重|中等|轻微|一般|重)碰撞')
-    loc_pat = re.compile(r'位置[:：]?\s*([\u4e00-\u9fa5A-Za-z0-9\-#]+(?:层|区|段|轴))')
+    loc_pat = re.compile(r'(?:位置|在|位于)[:：]?\s*([\u4e00-\u9fa5A-Za-z0-9\-#]+(?:层|区|段|轴|机房))')
 
     level = '中等'
     lm = level_pat.search(all_text)

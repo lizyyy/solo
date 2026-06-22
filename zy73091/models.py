@@ -60,6 +60,7 @@ def init_db():
             case_id INTEGER NOT NULL,
             system_name TEXT NOT NULL,
             origin_x REAL, origin_y REAL, origin_z REAL,
+            measured_x REAL, measured_y REAL, measured_z REAL,
             offset_detected INTEGER DEFAULT 0,
             offset_value_x REAL DEFAULT 0,
             offset_value_y REAL DEFAULT 0,
@@ -104,6 +105,19 @@ def init_db():
             FOREIGN KEY (case_id) REFERENCES preaudit_cases(id) ON DELETE CASCADE
         );
         ''')
+
+        try:
+            c.execute("ALTER TABLE coordinate_checks ADD COLUMN measured_x REAL")
+        except sqlite3.OperationalError:
+            pass
+        try:
+            c.execute("ALTER TABLE coordinate_checks ADD COLUMN measured_y REAL")
+        except sqlite3.OperationalError:
+            pass
+        try:
+            c.execute("ALTER TABLE coordinate_checks ADD COLUMN measured_z REAL")
+        except sqlite3.OperationalError:
+            pass
 
 def now_str():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S')

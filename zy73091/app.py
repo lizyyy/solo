@@ -161,9 +161,11 @@ def analyze_case():
             conn.execute(
                 '''INSERT INTO coordinate_checks
                    (case_id, system_name, origin_x, origin_y, origin_z,
+                    measured_x, measured_y, measured_z,
                     offset_detected, offset_value_x, offset_value_y, offset_value_z, confirmed)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
                 (case_id, c['system_name'], c['origin_x'], c['origin_y'], c['origin_z'],
+                 c.get('measured_x'), c.get('measured_y'), c.get('measured_z'),
                  c['offset_detected'], c['offset_value_x'], c['offset_value_y'],
                  c['offset_value_z'], c['confirmed'])
             )
@@ -434,9 +436,11 @@ def rerun_case(case_id):
             if old:
                 conn.execute(
                     '''UPDATE coordinate_checks SET origin_x=?, origin_y=?, origin_z=?,
+                       measured_x=?, measured_y=?, measured_z=?,
                        offset_detected=?, offset_value_x=?, offset_value_y=?, offset_value_z=?,
                        confirmed=? WHERE id=?''',
                     (c['origin_x'], c['origin_y'], c['origin_z'],
+                     c.get('measured_x'), c.get('measured_y'), c.get('measured_z'),
                      c['offset_detected'], c['offset_value_x'], c['offset_value_y'],
                      c['offset_value_z'], c['confirmed'], old['id'])
                 )
@@ -444,9 +448,11 @@ def rerun_case(case_id):
                 conn.execute(
                     '''INSERT INTO coordinate_checks
                        (case_id, system_name, origin_x, origin_y, origin_z,
+                        measured_x, measured_y, measured_z,
                         offset_detected, offset_value_x, offset_value_y, offset_value_z, confirmed)
-                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
                     (case_id, c['system_name'], c['origin_x'], c['origin_y'], c['origin_z'],
+                     c.get('measured_x'), c.get('measured_y'), c.get('measured_z'),
                      c['offset_detected'], c['offset_value_x'], c['offset_value_y'],
                      c['offset_value_z'], c['confirmed'])
                 )

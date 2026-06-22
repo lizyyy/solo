@@ -287,7 +287,7 @@ textarea{min-height:88px;line-height:1.6}
 <div class="toast" id="toast"></div>
 
 <script>
-const API = 'http://127.0.0.1:8789';
+const API = window.location.origin;
 let currentCaseId = null;
 let currentCase = null;
 let currentMaterials = [];
@@ -443,10 +443,15 @@ function renderCoords(coords){
         : '<span style="color:#92400e">⚠ 偏移未确认</span>';
     } else { state = '<span style="color:#065f46">✔ 坐标正常</span>'; }
     const offsetStr = `Δ(${fmt(c.offset_value_x)}, ${fmt(c.offset_value_y)}, ${fmt(c.offset_value_z)})mm`;
+    let measuredHtml = '';
+    if (c.measured_x != null && !isNaN(c.measured_x)){
+      measuredHtml = `<span style="color:#7c2d12">现场(${fmt(c.measured_x)},${fmt(c.measured_y)},${fmt(c.measured_z)})</span>`;
+    }
     return `<div class="coord-row ${cls}">
       <div class="coord-info">
         <strong>${escapeHtml(c.system_name)}</strong>
         <span>原点(${fmt(c.origin_x)},${fmt(c.origin_y)},${fmt(c.origin_z)})</span>
+        ${measuredHtml}
         <span style="color:#6b7280">${offsetStr}</span>
       </div>
       <div>${state}</div>
