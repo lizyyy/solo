@@ -11,7 +11,7 @@ interface Props {
   warnings: WarningAlert[];
 }
 
-type FilterLevel = 'all' | WarningLevel | 'pending';
+type FilterLevel = 'all' | WarningLevel | 'pending' | 'voided';
 
 export default function RecordTable({ records, warnings }: Props) {
   const setSelected = useAppStore((s) => s.setSelectedRecordId);
@@ -19,27 +19,29 @@ export default function RecordTable({ records, warnings }: Props) {
 
   const enriched = records.map((r) => {
     const ws = warnings.filter((w) => w.record_id === r.id);
-    const activeWarn = ws.find((w) => w.status !== 'voided') || ws[0];
+    const activeWarn = ws.find((w) => w.status !== 'voided');
     const voidedWarn = ws.find((w) => w.status === 'voided');
     const level: WarningLevel = activeWarn ? activeWarn.level : 'green';
     const pending = isRecordPending(r);
-    return { record: r, level, pending, activeWarn, voidedWarn, relatedWarnings: ws };
+    const voided = !activeWarn && !!voidedWarn;
+    return { record: r, level, pending, voided, activeWarn, voidedWarn, relatedWarnings: ws };
   });
 
   const filtered = enriched.filter((e) => {
     if (levelFilter === 'all') return true;
     if (levelFilter === 'pending') return e.pending;
-    if (e.pending) return false;
-    if (e.voidedWarn && !e.activeWarn) return false;
+    if (levelFilter === 'voided') return e.voided;
+    if (e.pending || e.voided) return false;
     return e.level === levelFilter;
   });
 
   const counts = {
     all: enriched.length,
-    red: enriched.filter((e) => !e.pending && !e.voidedWarn && e.level === 'red').length,
-    yellow: enriched.filter((e) => !e.pending && !e.voidedWarn && e.level === 'yellow').length,
-    green: enriched.filter((e) => !e.pending && !e.voidedWarn && e.level === 'green').length,
+    red: enriched.filter((e) => !e.pending && !e.voided && e.level === 'red').length,
+    yellow: enriched.filter((e) => !e.pending && !e.voided && e.level === 'yellow').length,
+    green: enriched.filter((e) => !e.pending && !e.voided && e.level === 'green').length,
     pending: enriched.filter((e) => e.pending).length,
+    voided: enriched.filter((e) => e.voided).length,
   };
 
   const filterButtons: { key: FilterLevel; label: string; color: string }[] = [
@@ -48,6 +50,7 @@ export default function RecordTable({ records, warnings }: Props) {
     { key: 'yellow', label: `黄警 ${counts.yellow}`, color: 'bg-alert-orange' },
     { key: 'green', label: `绿区 ${counts.green}`, color: 'bg-alert-green' },
     { key: 'pending', label: `待确认 ${counts.pending}`, color: 'bg-alert-yellow' },
+    { key: 'voided', label: `已作废 ${counts.voided}`, color: 'bg-industrial-400' },
   ];
 
   return (
@@ -93,7 +96,7 @@ export default function RecordTable({ records, warnings }: Props) {
             </tr>
           </thead>
           <tbody>
-            {filtered.map(({ record, level, pending, activeWarn, voidedWarn, relatedWarnings }, idx) => {
+            {filtered.map(({ record, level, pending, voided, activeWarn, voidedWarn, relatedWarnings }, idx) => {
               const hasLate = record.attachments.some((a) => a.is_late);
               const hasBackfilled = record.notes.some((n) => n.is_backfilled);
               return (
@@ -105,7 +108,7 @@ export default function RecordTable({ records, warnings }: Props) {
                   } hover:bg-industrial-50/60 ${
                     pending
                       ? 'border-l-4 border-l-alert-yellow'
-                      : voidedWarn
+                      : voided
                         ? 'border-l-4 border-l-industrial-300 opacity-60'
                         : 'border-l-4 border-l-transparent'
                   }`}
@@ -120,12 +123,12 @@ export default function RecordTable({ records, warnings }: Props) {
                   <td className="td-cell">
                     <div className="font-medium text-industrial-700 leading-tight">{record.pipeline_name}</div>
                     <div className="text-xs text-industrial-400 mt-0.5">{record.area}</div>
-                    {activeWarn?.change_reason && !voidedWarn && (
+                    {activeWarn?.change_reason && !voided && (
                       <div className="text-[11px] text-alert-orange mt-1 leading-relaxed">
                         ※ {activeWarn.change_reason}
                       </div>
                     )}
-                    {voidedWarn && (
+                    {voided && voidedWarn && (
                       <div className="text-[11px] text-industrial-400 mt-1 leading-relaxed flex items-start gap-1">
                         <Ban className="w-3 h-3 shrink-0 mt-0.5" />
                         <span>{voidedWarn.voided_reason || '本条预警已作废，移出统计'}</span>
@@ -133,7 +136,7 @@ export default function RecordTable({ records, warnings }: Props) {
                     )}
                   </td>
                   <td className="td-cell">
-                    <div className={`num font-semibold text-industrial-700 ${voidedWarn ? 'line-through' : ''}`}>
+                    <div className={`num font-semibold text-industrial-700 ${voided ? 'line-through' : ''}`}>
                       {record.measured_value.toFixed(2)}
                       <span className="text-xs text-industrial-400 ml-1 font-normal">{record.measure_unit}</span>
                     </div>
@@ -145,7 +148,7 @@ export default function RecordTable({ records, warnings }: Props) {
                     <div className="flex flex-col gap-1">
                       {pending ? (
                         <StatusBadge status="pending" />
-                      ) : voidedWarn ? (
+                      ) : voided ? (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-industrial-100 text-industrial-400 line-through">
                           <Ban className="w-3 h-3" />
                           已作废
