@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360" viewBox="0 0 600 360">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f0f9ff"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="360" fill="url(#bg)" rx="8"/>
+  <rect x="20" y="20" width="560" height="40" fill="#0369a1" rx="6"/>
+  <text x="40" y="46" fill="white" font-family="monospace" font-size="14" font-weight="bold">
+    旧版本截图 · 等差数列 v1（单位：个）
+  </text>
+  <g font-family="monospace" font-size="13">
+    <text x="40" y="90" fill="#0c4a6e">公式: a_n = a_{n-1} + d</text>
+    <text x="40" y="112" fill="#0c4a6e">参数: a0=10, d=3, n=20</text>
+    <text x="40" y="134" fill="#0c4a6e">单位: 个</text>
+  </g>
+  <g transform="translate(40, 160)">
+    <rect width="520" height="160" fill="white" stroke="#7dd3fc" stroke-width="1" rx="4"/>
+    <polyline points="
+      0,140 26,125 52,110 78,95 104,80 130,65 156,50 182,35 208,20
+      234,10 260,0 286,0 312,0 338,0 364,0 390,0 416,0 442,0
+      468,0 494,0 520,0
+    " fill="none" stroke="#0369a1" stroke-width="2"/>
+    <circle cx="0" cy="140" r="3" fill="#0369a1"/>
+    <circle cx="52" cy="110" r="3" fill="#0369a1"/>
+    <circle cx="104" cy="80" r="3" fill="#0369a1"/>
+    <circle cx="156" cy="50" r="3" fill="#0369a1"/>
+    <circle cx="208" cy="20" r="3" fill="#0369a1"/>
+    <text x="0" y="158" font-size="10" fill="#64748b" font-family="monospace">10</text>
+    <text x="52" y="158" font-size="10" fill="#64748b" font-family="monospace">40</text>
+    <text x="104" y="158" font-size="10" fill="#64748b" font-family="monospace">70</text>
+    <text x="200" y="158" font-size="10" fill="#64748b" font-family="monospace">末项: 67 个</text>
+  </g>
+  <text x="40" y="345" fill="#94a3b8" font-size="11" font-family="monospace">
+    截图时间: 2026-06-18 14:32:05 · 操作人: 阿宁
+  </text>
+</svg>

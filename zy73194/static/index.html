@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>数列递推参数回放</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -201,6 +200,20 @@ table tr.divzero-row td { color: #991b1b; font-weight: 500; }
   border: 1px solid #e5e7eb;
   margin-top: 8px;
 }
+.screenshot-missing {
+  margin-top: 8px;
+  padding: 16px;
+  background: #fef2f2;
+  border: 1px dashed #fca5a5;
+  border-radius: 6px;
+  color: #991b1b;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.screenshot-missing .icon { font-size: 18px; }
+.screenshot-missing .path { font-family: monospace; font-size: 11.5px; color: #b91c1c; word-break: break-all; margin-top: 4px; }
 .empty-state {
   text-align: center;
   padding: 40px;
@@ -351,7 +364,10 @@ function renderDetail(r, history) {
 
       ${r.screenshot_url ? `
         <div class="detail-row" style="margin-top:8px;"><div class="label">旧版本截图</div><div class="value"></div></div>
-        <img class="screenshot" src="${r.screenshot_url}" alt="历史截图" onerror="this.style.display='none'">
+        <div id="screenshotWrap">
+          <img class="screenshot" id="mainScreenshot" src="${r.screenshot_url}" alt="历史截图"
+               onerror="handleScreenshotError(this, '${r.screenshot_url.replace(/'/g,"\\'")}')">
+        </div>
       ` : ''}
 
       ${r.attachments.length > 0 ? `
@@ -405,7 +421,7 @@ function renderTabContent(r, history) {
     `;
     drawChart(r.result_details);
   } else if (activeTab === 'history') {
-    tc.innerHTML = history.length ? history.slice().reverse().map(h => `
+    tc.innerHTML = history.length ? history.slice().reverse().map((h, idx) => `
       <div class="history-item">
         <div>
           <span class="version">v${h.version}</span>
@@ -422,7 +438,15 @@ function renderTabContent(r, history) {
         <div style="font-size:12px;margin-top:4px;color:#374151;">
           参数：${Object.entries(h.params).map(([k,v])=>`${k}=${v}`).join(', ')}
         </div>
-        ${h.screenshot_url ? `<div style="margin-top:4px;font-size:12px;color:#4f46e5;">📷 含历史版本截图</div>` : ''}
+        ${h.screenshot_url ? `
+          <div style="margin-top:6px;">
+            <div class="hist-screenshot-wrap" id="histShot_${idx}">
+              <img class="screenshot" style="max-width:320px;"
+                   src="${h.screenshot_url}" alt="v${h.version} 历史截图"
+                   onerror="handleScreenshotError(this, '${h.screenshot_url.replace(/'/g,"\\'")}')">
+            </div>
+          </div>
+        ` : '<div style="font-size:12px;color:#9ca3af;margin-top:4px;">📷 无历史截图</div>'}
         <details style="margin-top:6px;">
           <summary style="cursor:pointer;font-size:12px;color:#4f46e5;">展开当时明细快照</summary>
           <table style="margin-top:6px;font-size:11.5px;">
@@ -446,41 +470,153 @@ function renderTabContent(r, history) {
   }
 }
 
+function handleScreenshotError(img, url) {
+  const wrap = img.parentElement;
+  if (!wrap) return;
+  wrap.outerHTML = `
+    <div class="screenshot-missing">
+      <span class="icon">⚠️</span>
+      <div>
+        <div><strong>证据文件缺失</strong></div>
+        <div class="path">路径: ${escapeHtml(url)}</div>
+      </div>
+    </div>
+  `;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 function drawChart(details) {
-  if (chartInstance) chartInstance.destroy();
+  const canvas = document.getElementById('chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const parent = canvas.parentElement;
+  canvas.width = parent.clientWidth;
+  canvas.height = parent.clientHeight;
+  const w = canvas.width, h = canvas.height;
+  const padL = 50, padR = 20, padT = 30, padB = 40;
+  const plotW = w - padL - padR;
+  const plotH = h - padT - padB;
+
   const finite = details.filter(d => !d.division_by_zero && isFinite(d.value));
-  const divZeroIndices = details.filter(d => d.division_by_zero).map(d => d.index);
-  const ctx = document.getElementById('chart');
-  if (!ctx) return;
-  chartInstance = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: finite.map(d => d.index),
-      datasets: [{
-        label: `递推值 (${details[0]?.unit || ''})`,
-        data: finite.map(d => d.value),
-        borderColor: '#4f46e5',
-        backgroundColor: 'rgba(79,70,229,0.08)',
-        fill: true,
-        tension: 0.2,
-        pointRadius: 3,
-        pointBackgroundColor: '#4f46e5',
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: { display: true, text: '递推结果走势（除零点已在表格中标红，不参与绘图）' },
-        tooltip: {
-          callbacks: {
-            afterLabel: (ctx) => divZeroIndices.includes(ctx.label) ? '⚠️ 除零边界点（原始数据见表格）' : ''
-          }
-        }
-      },
-      scales: { x: { title: { display: true, text: '步数 n' } }, y: { title: { display: true, text: '值' } } }
-    }
+  if (finite.length === 0) {
+    ctx.fillStyle = '#9ca3af';
+    ctx.font = '13px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('无可视化数据（存在除零边界）', w / 2, h / 2);
+    return;
+  }
+
+  const allIndices = details.map(d => d.index);
+  const minX = Math.min(...allIndices);
+  const maxX = Math.max(...allIndices);
+  const values = finite.map(d => d.value);
+  const minY = Math.min(...values);
+  const maxY = Math.max(...values);
+  const yRange = maxY - minY || 1;
+  const xRange = maxX - minX || 1;
+
+  const xScale = v => padL + (v - minX) / xRange * plotW;
+  const yScale = v => padT + plotH - (v - minY) / yRange * plotH;
+
+  ctx.clearRect(0, 0, w, h);
+
+  ctx.fillStyle = '#374151';
+  ctx.font = '13px -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('递推结果走势（除零点已在表格中标红，不参与绘图）', w / 2, 18);
+
+  ctx.strokeStyle = '#e5e7eb';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for (let i = 0; i <= 4; i++) {
+    const y = padT + plotH * i / 4;
+    ctx.moveTo(padL, y);
+    ctx.lineTo(w - padR, y);
+    const val = maxY - yRange * i / 4;
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '11px monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(val.toFixed(1), padL - 6, y + 4);
+  }
+  ctx.stroke();
+
+  for (let i = 0; i <= 5; i++) {
+    const x = padL + plotW * i / 5;
+    const val = Math.round(minX + xRange * i / 5);
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '11px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(String(val), x, h - padB + 16);
+  }
+
+  ctx.fillStyle = '#374151';
+  ctx.font = '12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('步数 n', w / 2, h - 8);
+
+  ctx.save();
+  ctx.translate(14, h / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillStyle = '#374151';
+  ctx.font = '12px sans-serif';
+  ctx.fillText('值', 0, 0);
+  ctx.restore();
+
+  const grad = ctx.createLinearGradient(0, padT, 0, padT + plotH);
+  grad.addColorStop(0, 'rgba(79,70,229,0.25)');
+  grad.addColorStop(1, 'rgba(79,70,229,0.02)');
+  ctx.beginPath();
+  ctx.moveTo(xScale(finite[0].index), padT + plotH);
+  finite.forEach(d => ctx.lineTo(xScale(d.index), yScale(d.value)));
+  ctx.lineTo(xScale(finite[finite.length - 1].index), padT + plotH);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.strokeStyle = '#4f46e5';
+  ctx.lineWidth = 2;
+  finite.forEach((d, i) => {
+    const x = xScale(d.index), y = yScale(d.value);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
   });
+  ctx.stroke();
+
+  finite.forEach(d => {
+    const x = xScale(d.index), y = yScale(d.value);
+    ctx.beginPath();
+    ctx.arc(x, y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#4f46e5';
+    ctx.fill();
+  });
+
+  const divZeroDetails = details.filter(d => d.division_by_zero);
+  divZeroDetails.forEach(d => {
+    const x = xScale(d.index);
+    ctx.setLineDash([3, 3]);
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, padT);
+    ctx.lineTo(x, padT + plotH);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#dc2626';
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('∞ 除零', x + 4, padT + 12);
+  });
+
+  const unit = details[0]?.unit || '';
+  ctx.fillStyle = '#6b7280';
+  ctx.font = '12px sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText(`递推值 (${unit})`, w - padR, padT - 8);
 }
 
 document.getElementById('statusFilter').onchange = loadRecords;

@@ -27,6 +27,9 @@ UNIT_CONVERSIONS = {
     ("米", "毫米"): 1000,
 }
 
+VALUE_PARAM_KEYS = {"a0", "a1", "d", "c"}
+COUNT_PARAM_KEYS = {"n", "k", "r"}
+
 
 class RecurrenceStore:
     def __init__(self):
@@ -35,6 +38,26 @@ class RecurrenceStore:
         self._init_sample_data()
 
     def _init_sample_data(self):
+        sample_mm = self.create_record(
+            title="毫米单位递推回放（单位换算示例）",
+            formula="a_n = a_{n-1} + d",
+            params={"a0": 10, "d": 10, "n": 5},
+            unit="毫米",
+            status=Status.PENDING_EVIDENCE.value,
+            remark="初始版本，单位为毫米，待换算为厘米",
+            operator="阿宁",
+            has_division_by_zero=False,
+            screenshot_url="/static/screenshots/v1_mm.svg",
+        )
+        self.update_record(
+            record_id=sample_mm["id"],
+            unit="厘米",
+            status=Status.MANUALLY_EDITED.value,
+            remark="单位由毫米换算为厘米，参数值自动按比例换算",
+            operator="阿宁",
+            screenshot_url="/static/screenshots/v2_length.svg",
+        )
+
         sample = self.create_record(
             title="等差数列递推回放",
             formula="a_n = a_{n-1} + d",
@@ -51,9 +74,9 @@ class RecurrenceStore:
             params={"a0": 10, "d": 3, "n": 20},
             unit="厘米",
             status=Status.MANUALLY_EDITED.value,
-            remark="单位从'个'改为'厘米'，d的含义由'个数'变为'长度增量'",
+            remark="单位从'个'改为'厘米'，d的含义由'个数'变为'长度增量'（非长度单位换算，数值不变）",
             operator="阿宁",
-            screenshot_url="/static/screenshots/v2_length.png",
+            screenshot_url="/static/screenshots/v2_length.svg",
             unit_changed=True,
             old_unit="个",
             old_result_ref=sample["result_summary"],
@@ -73,10 +96,10 @@ class RecurrenceStore:
             params={"a0": 5, "r": 2, "c": 10, "k": 5, "n": 10},
             unit="个",
             status=Status.PENDING_EVIDENCE.value,
-            remark="存在除零边界，k=5时分母为0",
+            remark="存在除零边界，k=5时分母为0（待补证据说明）",
             operator="阿宁",
             has_division_by_zero=True,
-            screenshot_url="/static/screenshots/div_zero.png",
+            screenshot_url="/static/screenshots/div_zero.svg",
         )
 
         sample3 = self.create_record(
@@ -127,15 +150,30 @@ class RecurrenceStore:
 
     def update_record(self, record_id, params=None, unit=None, status=None,
                       remark=None, operator=None, screenshot_url=None,
-                      unit_changed=False, old_unit=None, old_result_ref=None):
+                      unit_changed=None, old_unit=None, old_result_ref=None):
         if record_id not in self.records:
             return None
         rec = self.records[record_id]
         old_version = rec["current_version"]
+        old_summary = copy.deepcopy(rec["result_summary"])
 
-        if params is not None or unit is not None:
-            new_params = params if params is not None else rec["params"]
-            new_unit = unit if unit is not None else rec["unit"]
+        effective_params = params
+        effective_unit = unit
+        auto_converted = False
+
+        if unit is not None and params is None and unit != rec["unit"]:
+            effective_params = self._convert_params_for_unit(rec["params"], rec["unit"], unit)
+            auto_converted = True
+            if unit_changed is None:
+                unit_changed = True
+            if old_unit is None:
+                old_unit = rec["unit"]
+            if old_result_ref is None:
+                old_result_ref = old_summary
+
+        if effective_params is not None or effective_unit is not None:
+            new_params = effective_params if effective_params is not None else rec["params"]
+            new_unit = effective_unit if effective_unit is not None else rec["unit"]
             details = self._compute_details(rec["formula"], new_params, new_unit)
             summary = self._summarize(details, new_unit)
             rec["params"] = copy.deepcopy(new_params)
@@ -148,6 +186,11 @@ class RecurrenceStore:
             rec["current_version"] = old_version + 1
 
             if unit_changed and old_unit:
+                conversion_note = ""
+                if auto_converted:
+                    ratio = UNIT_CONVERSIONS.get((old_unit, new_unit))
+                    if ratio is not None:
+                        conversion_note = f"（自动换算，比例 {ratio}）"
                 rec["unit_change_log"].append({
                     "from_unit": old_unit,
                     "to_unit": new_unit,
@@ -155,7 +198,8 @@ class RecurrenceStore:
                     "new_result_ref": summary,
                     "operator": operator,
                     "time": datetime.now().isoformat(),
-                    "remark": remark or "单位变更",
+                    "remark": (remark or "单位变更") + conversion_note,
+                    "auto_converted": auto_converted,
                 })
 
         if status is not None:
@@ -203,6 +247,21 @@ class RecurrenceStore:
             remark=f"晚到附件【{attachment_name}】触发复算",
             operator=operator or "系统",
         )
+
+    def _convert_params_for_unit(self, params, from_unit, to_unit):
+        ratio = UNIT_CONVERSIONS.get((from_unit, to_unit))
+        if ratio is None:
+            return copy.deepcopy(params)
+        new_params = {}
+        for key, val in params.items():
+            if key in VALUE_PARAM_KEYS and isinstance(val, (int, float)):
+                new_val = val * ratio
+                if isinstance(val, int) and new_val == int(new_val):
+                    new_val = int(new_val)
+                new_params[key] = new_val
+            else:
+                new_params[key] = val
+        return new_params
 
     def _compute_details(self, formula, params, unit):
         details = []
@@ -316,13 +375,16 @@ class RecurrenceStore:
 
         main_rows.append([
             "回放ID", "标题", "公式", "当前版本", "状态",
-            "单位", "总步数", "除零步数", "创建时间", "更新时间"
+            "单位", "总步数", "除零步数", "是否有截图证据", "截图路径",
+            "创建时间", "更新时间"
         ])
         main_rows.append([
             rec["id"], rec["title"], rec["formula"],
             rec["current_version"], status,
             rec["unit"], rec["result_summary"]["total_steps"],
             rec["result_summary"]["division_by_zero_steps"],
+            "有" if rec["screenshot_url"] else "无",
+            rec["screenshot_url"] or "",
             rec["created_at"], rec["updated_at"],
         ])
         main_rows.append([])
@@ -353,7 +415,8 @@ class RecurrenceStore:
         rows.append([
             "回放ID", "标题", "公式", "状态", "单位",
             "当前版本", "总步数", "除零步数",
-            "是否含除零边界", "最近操作人", "更新时间", "记录分类标签"
+            "是否含除零边界", "是否有截图证据", "截图路径",
+            "最近操作人", "更新时间", "记录分类标签"
         ])
         for rec in records:
             div = "是" if rec["has_division_by_zero"] else "否"
@@ -363,7 +426,10 @@ class RecurrenceStore:
                 rec["unit"], rec["current_version"],
                 rec["result_summary"]["total_steps"],
                 rec["result_summary"]["division_by_zero_steps"],
-                div, last_op, rec["updated_at"], rec["status"],
+                div,
+                "有" if rec["screenshot_url"] else "无",
+                rec["screenshot_url"] or "",
+                last_op, rec["updated_at"], rec["status"],
             ])
         return rows
 
