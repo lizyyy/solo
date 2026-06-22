@@ -334,6 +334,22 @@ function buildDemoData() {
 
 let DB = loadData();
 
+(function repairSummariesOnBoot() {
+  let changed = 0;
+  DB.schedules.forEach(sched => {
+    const expected = generateSummary(sched);
+    if (sched.summary !== expected) {
+      console.log(`[摘要修复] ${sched.deviceCode}: "${sched.summary}" → "${expected}"`);
+      sched.summary = expected;
+      changed++;
+    }
+  });
+  if (changed > 0) {
+    console.log(`[摘要修复] 已更新 ${changed} 条排程的当前摘要`);
+    saveData(DB);
+  }
+})();
+
 function detectDuplicates() {
   const map = {};
   DB.schedules.forEach(s => {
@@ -359,6 +375,72 @@ function detectDuplicates() {
       }
     }
   });
+}
+
+function generateSummary(sched) {
+  const parts = sched.currentParts || [];
+  const win = sched.shutdownWindow;
+  const status = sched.status;
+  const verdict = sched.currentVerdict;
+  const latestNote = sched.notes && sched.notes.length ? sched.notes[sched.notes.length - 1] : null;
+
+  const partsText = [];
+  parts.forEach(p => {
+    partsText.push(`${p.name} ×${p.qty}`);
+  });
+  const partsJoin = partsText.length ? partsText.join('、') : null;
+
+  const latestEta = parts.length
+    ? parts.reduce((acc, p) => (p.eta > acc ? p.eta : acc), parts[0].eta)
+    : null;
+
+  const winText = win
+    ? `${win.start.split(' ')[0]} ${win.start.split(' ')[1] || ''}~${win.end.split(' ')[1] || ''}`.trim()
+    : null;
+
+  const statusMap = {
+    '待排程': '待排程',
+    '已排程': '已排程',
+    '备件已到货': '备件已到货',
+    '维修中': '维修中',
+    '已完成': '已完成',
+    '到货滞后': '到货滞后'
+  };
+  const statusZh = statusMap[status] || status;
+
+  let base = '';
+  if (status === '到货滞后' && latestEta && winText) {
+    base = `${verdict}，备件预计${latestEta}到货，较原停机窗口${winText}滞后`;
+  } else if (status === '备件已到货' && winText) {
+    base = `${verdict}，备件已到库，计划${winText}施工`;
+  } else if (status === '备件已到货' && !winText) {
+    base = `${verdict}，备件已到库，待协调停机窗口`;
+  } else if (status === '已完成' && winText) {
+    base = `${verdict}，已于${winText}完成施工`;
+  } else if (status === '维修中' && winText) {
+    base = `${verdict}，正在${winText}施工中`;
+  } else if (latestEta && winText) {
+    base = `${verdict}，预计${latestEta}到货，${winText}施工`;
+  } else if (latestEta && !winText) {
+    base = `${verdict}，预计${latestEta}到货，待排程`;
+  } else if (!latestEta && winText) {
+    base = `${verdict}，计划${winText}施工`;
+  } else {
+    base = verdict;
+  }
+
+  if (partsJoin && !base.includes(partsJoin.split('、')[0])) {
+    base += `（${partsJoin}）`;
+  }
+
+  if (latestNote && latestNote.content && latestNote.content.length > 0 && !statusZh.includes('初判')) {
+    const noteSrc = latestNote.source || sched.source;
+    if (noteSrc && noteSrc !== '自动巡检判读') {
+      base += ` · 来源：${noteSrc}`;
+    }
+  }
+
+  return base;
 }
 
 app.get('/api/schedules', (req, res) => {
@@ -458,10 +540,15 @@ app.post('/api/schedules/:id/rejudge', (req, res) => {
   if (status !== undefined) sched.status = status;
   sched.source = source;
   sched.updatedAt = nowISO();
+  const oldSummary = sched.summary;
+  sched.summary = generateSummary(sched);
 
   if (noteRecord) {
     if (!sched.notes) sched.notes = [];
     sched.notes.push(noteRecord);
+    if (sched.summary !== oldSummary && !noteRecord.affectedFields.includes('summary')) {
+      noteRecord.affectedFields.push('summary');
+    }
   }
 
   const historyRecord = {
