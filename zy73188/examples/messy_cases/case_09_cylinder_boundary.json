@@ -1,0 +1,27 @@
+{
+  "case_id": "CYLINDER-001",
+  "title": "计算水杯容积（边界样本）",
+  "formula": "圆柱体体积",
+  "description": "用普通直尺粗略测量水杯底面半径，相对不确定度达66.7%超过50%阈值，属于边界样本",
+  "variables": [
+    {
+      "name": "底面半径",
+      "symbol": "r",
+      "value": 3.0,
+      "uncertainty": 2.0,
+      "unit": "cm",
+      "evidence_source": "普通直尺（无校准证书）",
+      "evidence_status": "pending",
+      "evidence_notes": "直尺精度约1mm，测量时未对准圆心，相对不确定度=2.0/3.0=66.7%"
+    },
+    {
+      "name": "水杯高度",
+      "symbol": "h",
+      "value": 15.0,
+      "uncertainty": 0.1,
+      "unit": "cm",
+      "evidence_source": "游标卡尺校准证书 #CAL-2024-001",
+      "evidence_status": "confirmed"
+    }
+  ]
+}

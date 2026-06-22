@@ -1,0 +1,22 @@
+{
+  "case_id": "PARSE-002",
+  "title": "使用了旧说法的公式名称",
+  "formula": "面积公式",
+  "description": "这个文件使用了不存在的旧公式名称'面积公式'，既不在已知列表也不在别名映射中，用于测试旧说法解析失败",
+  "variables": [
+    {
+      "name": "书的长度",
+      "symbol": "a",
+      "value": 21.0,
+      "uncertainty": 0.05,
+      "unit": "cm"
+    },
+    {
+      "name": "书的宽度",
+      "symbol": "b",
+      "value": 14.8,
+      "uncertainty": 0.05,
+      "unit": "cm"
+    }
+  ]
+}

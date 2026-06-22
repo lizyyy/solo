@@ -1,0 +1,81 @@
+================================================================================
+🚨 误差传播分析 - 异常队列 (独立于汇总)
+================================================================================
+生成时间: 2026-06-22 07:37:46
+异常总数: 7
+
+--- 异常分类统计 ---
+  boundary_sample: 1 条
+  duplicate_conflict: 2 条
+  duplicate_identical: 1 条
+  empty_input: 1 条
+  missing_field: 1 条
+  unknown_formula: 1 条
+
+--- 详细异常记录 ---
+
+[1] 🔴 MISSING_FIELD (error)
+    消息: 文件 case_02_missing_uncertainty.json 第 1 个变量缺少字段: 'uncertainty'
+    文件: case_02_missing_uncertainty.json
+    详情:
+      variable_index: 0
+      missing_field: uncertainty
+    建议: 请为该变量添加 'uncertainty' 字段
+
+[2] 🔴 UNKNOWN_FORMULA (error)
+    消息: 文件 case_03_old_formula_name.json (题目 PARSE-002) 使用了未知公式名称: '面积公式'
+    题目: PARSE-002
+    文件: case_03_old_formula_name.json
+    详情:
+      raw_formula: 面积公式
+    建议: 请检查公式名称是否正确，或查看可用公式列表
+
+[3] 🔴 EMPTY_INPUT (error)
+    消息: 文件 case_04_empty_variables.json (题目 EMPTY-001) 的变量列表为空，无法计算
+    题目: EMPTY-001
+    文件: case_04_empty_variables.json
+    建议: 空集合不能作为正常输入，请至少提供一个测量变量
+
+[4] 🔵 DUPLICATE_IDENTICAL (info)
+    消息: 题目 DENSITY-001 的重复样本内容完全一致，已合并到主记录 case_05_density_first.json
+    题目: DENSITY-001
+    文件: case_06_density_identical_dup.json
+    详情:
+      merged_from: case_06_density_identical_dup.json
+      merged_into: case_05_density_first.json
+      action: merged
+    建议: 内容一致已自动合并，无需额外处理
+
+[5] 🟡 DUPLICATE_CONFLICT (warning)
+    消息: 题目 PERIOD-001 的重复样本数值不一致，已挂起
+    题目: PERIOD-001
+    文件: case_07_period_first.json
+    详情:
+      action: suspended
+      differences: [{"file": "case_07_period_first.json", "variables": {"L": {"value": 1.0, "uncertainty": 0.01, "unit": "m"}, "g": {"value": 9.8, "uncertainty": 0.05, "unit": "m/s²"}}}, {"file": "case_08_period_conflict_dup.json", "variables": {"L": {"value": 1.2, "uncertainty": 0.01, "unit": "m"}, "g": {"value": 9.8, "uncertainty": 0.05, "unit": "m/s²"}}}]
+      file: case_07_period_first.json
+    建议: 重复样本数值不一致会改变误差传播结果，请核实哪条记录正确后放行，或删除错误记录后重新运行
+
+[6] 🟡 DUPLICATE_CONFLICT (warning)
+    消息: 题目 PERIOD-001 的重复样本数值不一致，已挂起
+    题目: PERIOD-001
+    文件: case_08_period_conflict_dup.json
+    详情:
+      action: suspended
+      differences: [{"file": "case_07_period_first.json", "variables": {"L": {"value": 1.0, "uncertainty": 0.01, "unit": "m"}, "g": {"value": 9.8, "uncertainty": 0.05, "unit": "m/s²"}}}, {"file": "case_08_period_conflict_dup.json", "variables": {"L": {"value": 1.2, "uncertainty": 0.01, "unit": "m"}, "g": {"value": 9.8, "uncertainty": 0.05, "unit": "m/s²"}}}]
+      file: case_08_period_conflict_dup.json
+    建议: 重复样本数值不一致会改变误差传播结果，请核实哪条记录正确后放行，或删除错误记录后重新运行
+
+[7] 🟡 BOUNDARY_SAMPLE (warning)
+    消息: 题目 CYLINDER-001 的变量 底面半径(r) 相对不确定度 66.7% 超过阈值 50%
+    题目: CYLINDER-001
+    文件: case_09_cylinder_boundary.json
+    详情:
+      variable: r
+      value: 3.0
+      uncertainty: 2.0
+      relative_uncertainty_pct: 66.67
+      threshold_pct: 50.0
+    建议: 建议重新测量或核查该样本的测量方法和仪器精度
+
+================================================================================

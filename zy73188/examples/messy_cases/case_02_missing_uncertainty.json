@@ -1,0 +1,21 @@
+{
+  "case_id": "PARSE-001",
+  "title": "缺少不确定度字段的记录",
+  "formula": "矩形面积",
+  "description": "这个文件故意缺少 uncertainty 字段，用于测试缺字段解析失败",
+  "variables": [
+    {
+      "name": "书的长度",
+      "symbol": "a",
+      "value": 21.0,
+      "unit": "cm"
+    },
+    {
+      "name": "书的宽度",
+      "symbol": "b",
+      "value": 14.8,
+      "uncertainty": 0.05,
+      "unit": "cm"
+    }
+  ]
+}

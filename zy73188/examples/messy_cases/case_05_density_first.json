@@ -1,0 +1,27 @@
+{
+  "case_id": "DENSITY-001",
+  "title": "计算书的纸张密度（第一条记录）",
+  "formula": "密度计算",
+  "description": "用电子天平测量书的质量，用排水法测量体积，计算密度",
+  "variables": [
+    {
+      "name": "书的质量",
+      "symbol": "m",
+      "value": 385.0,
+      "uncertainty": 0.5,
+      "unit": "g",
+      "evidence_source": "电子天平校准证书 #CAL-2024-045",
+      "evidence_status": "confirmed",
+      "evidence_notes": "天平型号: FA2004"
+    },
+    {
+      "name": "书的体积",
+      "symbol": "V",
+      "value": 294.0,
+      "uncertainty": 2.0,
+      "unit": "cm³",
+      "evidence_source": "量筒读数记录 #M-2024-012",
+      "evidence_status": "confirmed"
+    }
+  ]
+}

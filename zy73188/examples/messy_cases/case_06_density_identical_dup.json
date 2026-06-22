@@ -1,0 +1,27 @@
+{
+  "case_id": "DENSITY-001",
+  "title": "计算书的纸张密度（重复录入，内容一致）",
+  "formula": "密度计算",
+  "description": "与 case_05 完全相同的测量数据被重复录入，用于测试内容一致的重复样本会被自动合并",
+  "variables": [
+    {
+      "name": "书的质量",
+      "symbol": "m",
+      "value": 385.0,
+      "uncertainty": 0.5,
+      "unit": "g",
+      "evidence_source": "电子天平校准证书 #CAL-2024-045",
+      "evidence_status": "confirmed",
+      "evidence_notes": "天平型号: FA2004"
+    },
+    {
+      "name": "书的体积",
+      "symbol": "V",
+      "value": 294.0,
+      "uncertainty": 2.0,
+      "unit": "cm³",
+      "evidence_source": "量筒读数记录 #M-2024-012",
+      "evidence_status": "confirmed"
+    }
+  ]
+}

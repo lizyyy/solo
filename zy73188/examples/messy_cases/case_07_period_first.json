@@ -1,0 +1,27 @@
+{
+  "case_id": "PERIOD-001",
+  "title": "计算单摆周期（第一条记录）",
+  "formula": "单摆周期",
+  "description": "用米尺测量摆长，计算单摆周期。摆长 L=1.0m",
+  "variables": [
+    {
+      "name": "摆长",
+      "symbol": "L",
+      "value": 1.0,
+      "uncertainty": 0.01,
+      "unit": "m",
+      "evidence_source": "米尺测量记录 #R-2024-003",
+      "evidence_status": "confirmed"
+    },
+    {
+      "name": "重力加速度",
+      "symbol": "g",
+      "value": 9.8,
+      "uncertainty": 0.05,
+      "unit": "m/s²",
+      "evidence_source": "国家标准 GB/T 10184-2015",
+      "evidence_status": "confirmed",
+      "evidence_notes": "本地重力加速度"
+    }
+  ]
+}

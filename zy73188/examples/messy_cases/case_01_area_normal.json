@@ -1,0 +1,27 @@
+{
+  "case_id": "AREA-001",
+  "title": "计算书的封面面积",
+  "formula": "矩形面积",
+  "description": "用游标卡尺测量平装书的长和宽，计算封面面积",
+  "variables": [
+    {
+      "name": "书的长度",
+      "symbol": "a",
+      "value": 21.0,
+      "uncertainty": 0.05,
+      "unit": "cm",
+      "evidence_source": "游标卡尺校准证书 #CAL-2024-001",
+      "evidence_status": "confirmed",
+      "evidence_notes": "校准有效期至 2025-12-31"
+    },
+    {
+      "name": "书的宽度",
+      "symbol": "b",
+      "value": 14.8,
+      "uncertainty": 0.05,
+      "unit": "cm",
+      "evidence_source": "游标卡尺校准证书 #CAL-2024-001",
+      "evidence_status": "confirmed"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "total_files": 9,
+  "total_cases": 9,
+  "success_count": 3,
+  "suspended_count": 2,
+  "failed_count": 3,
+  "merged_count": 1,
+  "boundary_count": 1,
+  "duplicate_groups": 2,
+  "confirmed_evidence_count": 10,
+  "pending_evidence_count": 1,
+  "missing_evidence_count": 0,
+  "total_anomalies": 7,
+  "key_findings": [
+    "题目 AREA-001 计算完成: 结果 = 310.8000 ± 1.2846 cm·cm",
+    "题目 CYLINDER-001 计算完成: 结果 = 424.1150 ± 565.4937 cm³",
+    "题目 DENSITY-001 计算完成: 结果 = 1.3095 ± 0.0091 g/cm³",
+    "⚠️ 1 组重复样本因数值不一致已挂起: PERIOD-001",
+    "❌ 3 道题目解析失败，请检查输入文件格式",
+    "🔀 1 条重复记录内容一致已合并到 1 组主记录",
+    "⚠️ 1 个题目包含边界样本（相对不确定度 > 50%）: CYLINDER-001",
+    "⏳ 1 条证据待确认，请相关责任人核实"
+  ]
+}

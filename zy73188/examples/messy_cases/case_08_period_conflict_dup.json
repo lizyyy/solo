@@ -1,0 +1,26 @@
+{
+  "case_id": "PERIOD-001",
+  "title": "计算单摆周期（重复样本，数值不一致）",
+  "formula": "单摆周期",
+  "description": "与 case_07 同一题目但摆长数值不同 L=1.2m，用于测试数值不一致的重复样本会被挂起并进入异常队列",
+  "variables": [
+    {
+      "name": "摆长",
+      "symbol": "L",
+      "value": 1.2,
+      "uncertainty": 0.01,
+      "unit": "m",
+      "evidence_source": "米尺测量记录 #R-2024-004",
+      "evidence_status": "confirmed"
+    },
+    {
+      "name": "重力加速度",
+      "symbol": "g",
+      "value": 9.8,
+      "uncertainty": 0.05,
+      "unit": "m/s²",
+      "evidence_source": "国家标准 GB/T 10184-2015",
+      "evidence_status": "confirmed"
+    }
+  ]
+}
