@@ -84,6 +84,7 @@
   <h1>📊 数列递推图表解释 · 建模教学助教工作台</h1>
   <div class="btns">
     <button onclick="loadSample()">🔄 载入样例（小岑题目清单）</button>
+    <button onclick="exportReport()">📄 导出分析报告</button>
     <button class="primary" onclick="refreshAll()">刷新全部分析</button>
   </div>
 </header>
@@ -303,10 +304,22 @@ function collectParam(which) {
 async function recomputeChart() {
   renderParamForm("A"); renderParamForm("B");
   const a = collectParam("A"); const b = collectParam("B");
-  state.seqResultA = await postJSON(API + "/analysis/compute", {...a, param_set_id: "psA"});
-  state.seqResultB = await postJSON(API + "/analysis/compute", {...b, param_set_id: "psB"});
+  const pidA = document.getElementById("psAselect").value;
+  const pidB = document.getElementById("psBselect").value;
+  const psA = state.paramSets.find(p => p.pid === pidA) || {};
+  const psB = state.paramSets.find(p => p.pid === pidB) || {};
+  state.seqResultA = await postJSON(API + "/analysis/compute", {
+    ...a, param_set_id: pidA, ps_index: "A",
+    qid: psA.qid || "", aid: psA.aid || "",
+    param_set_name: psA.name || pidA
+  });
+  state.seqResultB = await postJSON(API + "/analysis/compute", {
+    ...b, param_set_id: pidB, ps_index: "B",
+    qid: psB.qid || "", aid: psB.aid || "",
+    param_set_name: psB.name || pidB
+  });
   state.compareResult = await postJSON(API + "/analysis/compare",
-    {param_set_ids: ["psA","psB"]});
+    {param_set_ids: [pidA, pidB]});
   drawChart();
   renderCompare();
   renderBridge();
@@ -368,21 +381,36 @@ function drawChart() {
 function selectPoint(dsIdx, idx) {
   state.selectedPoint = { dsIdx, idx };
   const ds = dsIdx === 0 ? state.seqResultA : state.seqResultB;
+  const otherDs = dsIdx === 0 ? state.seqResultB : state.seqResultA;
   const p = ds.points[idx];
+  const otherP = otherDs && otherDs.points && otherDs.points[idx];
   document.getElementById("pointIdxLabel").textContent =
-    `(${dsIdx===0?"A":"B"}) 第 ${idx} 项`;
+    `(${ds.param_set_name || (dsIdx===0?"A":"B")}) 第 ${idx} 项`;
   const traces = ds.calc_traces[idx] || {steps: []};
   const dirty = ds.dirty_points.find(d=>d.index===idx);
+
+  const q = ds.question;
+  const a = ds.answer;
+  const m = ds.material;
+  const notesAll = (ds.notes || []).concat(otherDs.notes || []);
+  const noteMap = {};
+  notesAll.forEach(n => { noteMap[n.nid] = n; });
+  const distinctNotes = Object.values(noteMap);
+
   document.getElementById("pointDetail").innerHTML = `
     <div class="detail-box">
-      <h3>📦 数据点</h3>
+      <h3>📦 数据点 · ${ds.param_set_name || ''}</h3>
+      <div><b>参数组 ID:</b> ${ds.param_set_id}</div>
       <div><b>值:</b> ${p.value} ${p.unit?"("+p.unit+")":""}</div>
       <div><b>原始值:</b> ${p.raw_value}</div>
-      <div><b>来源题目:</b> ${p.source_qid||'—'} · 答案 ${p.source_aid||'—'}</div>
+      <div><b>题目:</b> ${q ? q.qid+' ('+q.version+')' : p.source_qid||'—'}</div>
+      <div><b>答案:</b> ${a ? a.aid+' ('+a.version+')' : p.source_aid||'—'}</div>
+      ${otherP ? `<div><b>对照值(${otherDs.param_set_name||''}):</b> ${otherP.value}${otherP.unit?" ("+otherP.unit+")":""}</div>`:""}
       ${p.is_anomaly ? `<div class="tag danger">${p.anomaly_type}</div><div class="muted">${p.anomaly_detail}</div>`:""}
     </div>
     ${dirty ? `<div class="detail-box">
-      <h3 style="color:var(--danger)">⚠️ 脏数据检测</h3>
+      <h3 style="color:var(--danger)">⚠️ 脏数据检测 (共 ${ds.dirty_summary.total} 处)</h3>
+      <div class="muted" style="margin-bottom:6px;">按类型: ${Object.entries(ds.dirty_summary.by_type).map(([k,v])=>`<span class="tag danger">${k}: ${v}</span>`).join(" ")}</div>
       ${dirty.issues.map(it=>`<div class="trace-step danger">
         <b>[${it.severity}]</b> ${it.type} — ${it.detail}
       </div>`).join("")}
@@ -401,35 +429,80 @@ function selectPoint(dsIdx, idx) {
       </div>`).join("")}
     </div>
     <div class="detail-box">
-      <h3>🔙 溯源材料</h3>
-      ${renderTraceBack(p)}
+      <h3>🔙 溯源 · 原始说法与双版本答案</h3>
+      ${renderTraceBack(ds, otherDs, idx)}
     </div>
+    ${distinctNotes.length ? `<div class="detail-box">
+      <h3>📝 相关备注 (${distinctNotes.length} 条)</h3>
+      ${distinctNotes.map(n => `
+        <div class="note-card ${n.note_type==='verbal'?'verbal':''}">
+          <div><span class="pill">${n.note_type||''}</span>
+               <span class="pill">${n.target_type||''}:${n.target_id||''}</span></div>
+          <div style="margin-top:4px;">${n.content}</div>
+          <div class="meta">${n.author||''} · ${n.timestamp||''}</div>
+        </div>
+      `).join("")}
+    </div>`:""}
   `;
   document.getElementById("noteTargetType").value = "point";
-  document.getElementById("noteTargetId").value = `${dsIdx===0?"A":"B"}_${idx}`;
+  document.getElementById("noteTargetId").value = `${ds.param_set_id}_${idx}`;
 }
 
-function renderTraceBack(p) {
-  const q = state.questions.find(q=>q.qid===p.source_qid);
-  const a = state.answers.find(a=>a.aid===p.source_aid);
-  const m = a ? state.materials.find(m=>m.mid===a.material_mid) : null;
-  const relNotes = state.notes.filter(n =>
-    (n.target_type==="question" && n.target_id===p.source_qid) ||
-    (n.target_type==="answer" && n.target_id===p.source_aid) ||
-    (n.target_type==="material" && n.target_id=== (m&&m.mid))
-  );
-  return `
-    ${q ? `<div><b>题目 ${q.qid}</b> (${q.version||""})<br/>
-      <span class="muted">${q.original_text||''}</span></div>`:""}
-    ${a ? `<div style="margin-top:6px;"><b>答案 ${a.aid}</b> (${a.version||""})<br/>
-      <span class="muted">处理结果: ${a.processed_result||''}</span><br/>
-      <span class="muted">单位换算: ${a.unit_conversion||''}</span></div>`:""}
-    ${m ? `<div style="margin-top:6px;"><b>材料 ${m.mid}</b>: ${m.current_name}
-      ${m.is_temporary_rename?' <span class="tag warn">临时改名</span>':''}
-      ${(m.previous_names||[]).length?`<br/><span class="muted">曾用: ${m.previous_names.join(" → ")}</span>`:""}</div>`:""}
-    ${relNotes.length ? `<div style="margin-top:6px;"><b>相关备注</b><br/>
-      ${relNotes.map(n=>`<span class="pill">${n.note_type||''}</span>${n.content} <span class="muted">(${n.timestamp||''})</span><br/>`).join("")}</div>`:""}
-  `;
+function renderTraceBack(ds, otherDs, idx) {
+  const q = ds.question;
+  const a = ds.answer;
+  const m = ds.material;
+  const otherA = otherDs && otherDs.answer;
+  const otherQ = otherDs && otherDs.question;
+
+  const bothVersionsSameQ = q && otherQ && (q.title === otherQ.title) && (q.version !== otherQ.version);
+
+  let html = '';
+  if (q) {
+    html += `<div style="margin-bottom:8px;">
+      <div><b>📜 原始题目说法</b> <span class="tag">${q.version}</span> <span class="muted">(${q.source_file||''})</span></div>
+      <div class="muted" style="background:#0d1117;padding:6px;border-radius:4px;margin-top:4px;">${q.original_text||''}</div>
+    </div>`;
+  }
+
+  const renderAnswerBlock = (ans, qv, label) => {
+    if (!ans) return '';
+    const mat = ans._material || m;
+    return `<div style="margin-bottom:8px;border-left:3px solid ${label==='A'?'#58a6ff':'#3fb950'};padding-left:8px;">
+      <div><b>📝 ${label} 答案版本</b> <span class="tag ok">${ans.version||''}</span> ${qv?`<span class="muted">(题目 ${qv})</span>`:''}</div>
+      <div class="muted">答案原文: ${ans.answer_text||''}</div>
+      <div class="muted">处理结果: <span style="color:var(--ok)">${ans.processed_result||''}</span></div>
+      ${ans.unit_conversion ? `<div class="muted">单位换算: ${ans.unit_conversion}</div>`:""}
+      ${mat ? `<div class="muted">材料: <b>${mat.current_name||''}</b>${mat.is_temporary_rename?' <span class="tag warn">临时改名</span>':''}${(mat.previous_names||[]).length?`<br/>曾用: ${mat.previous_names.join(" → ")}`:''}</div>`:""}
+    </div>`;
+  };
+
+  if (bothVersionsSameQ) {
+    html += `<div class="two-col" style="margin-top:8px;">
+      ${renderAnswerBlock(a, q.version, 'A')}
+      ${renderAnswerBlock(otherA, otherQ.version, 'B')}
+    </div>`;
+    if (a && otherA && a.processed_result !== otherA.processed_result) {
+      html += `<div class="tag danger" style="margin-top:6px;">⚠️ 版本答案不一致</div>
+        <div class="muted">A版结果: ${a.processed_result}<br/>B版结果: ${otherA.processed_result}</div>`;
+    }
+  } else {
+    html += renderAnswerBlock(a, q ? q.version : '', '当前');
+    if (otherA && otherQ && otherQ.qid !== q.qid) {
+      html += renderAnswerBlock(otherA, otherQ.version, '对照');
+    }
+  }
+
+  if (m) {
+    html += `<div style="margin-top:8px;">
+      <div><b>📎 材料来源</b></div>
+      <div>名称: ${m.current_name||''} ${m.is_temporary_rename?'<span class="tag warn">临时改名</span>':''}</div>
+      ${(m.previous_names||[]).length ? `<div class="muted">曾用名: ${m.previous_names.join(" → ")}</div>`:""}
+      ${m.rename_time ? `<div class="muted">改名时间: ${m.rename_time} · ${m.renamed_by||''}</div>`:""}
+      ${m.content ? `<div class="muted">内容: ${m.content}</div>`:""}
+    </div>`;
+  }
+  return html || '<div class="muted">无溯源信息</div>';
 }
 
 function renderCompare() {
@@ -525,6 +598,28 @@ async function addNote() {
   renderInfluencers();
   if (state.selectedPoint) selectPoint(state.selectedPoint.dsIdx, state.selectedPoint.idx);
   renderBridge();
+}
+
+async function exportReport() {
+  const pidA = document.getElementById("psAselect").value;
+  const pidB = document.getElementById("psBselect").value;
+  if (!pidA || !pidB) {
+    alert("请先选择两个参数组再导出");
+    return;
+  }
+  const resp = await postJSON(API + "/analysis/export", {
+    param_set_ids: [pidA, pidB]
+  });
+  const blob = new Blob([resp.content], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = resp.filename || "数列递推分析报告.txt";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  alert("报告已导出：" + resp.filename);
 }
 
 refreshAll();

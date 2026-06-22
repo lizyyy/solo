@@ -410,20 +410,25 @@ def build_param_comparison(param_sets_data: List[Dict]) -> Dict:
     max_len = max(len(seq1), len(seq2))
     diff_rows = []
     for i in range(max_len):
-        v1 = seq1[i]["value"] if i < len(seq1) and seq1[i].get("value") is not None else None
-        v2 = seq2[i]["value"] if i < len(seq2) and seq2[i].get("value") is not None else None
-        if v1 is not None and v2 is not None:
-            rel_diff = abs(v1 - v2) / (abs(v1) + 1e-12)
+        value_a = seq1[i]["value"] if i < len(seq1) and seq1[i].get("value") is not None else None
+        value_b = seq2[i]["value"] if i < len(seq2) and seq2[i].get("value") is not None else None
+        if value_a is not None and value_b is not None:
+            abs_diff = abs(value_a - value_b)
+            rel_diff = abs_diff / (abs(value_a) + 1e-12)
+            is_significant_diff = rel_diff > 1e-6
         else:
+            abs_diff = None
             rel_diff = None
+            is_significant_diff = False
         diff_rows.append({
             "index": i,
-            "v1": v1,
-            "v2": v2,
-            "abs_diff": None if (v1 is None or v2 is None) else abs(v1 - v2),
+            "value_a": value_a,
+            "value_b": value_b,
+            "abs_diff": abs_diff,
             "rel_diff": rel_diff,
-            "anomaly_1": seq1[i].get("is_anomaly", False) if i < len(seq1) else False,
-            "anomaly_2": seq2[i].get("is_anomaly", False) if i < len(seq2) else False
+            "is_significant_diff": is_significant_diff,
+            "anomaly_a": seq1[i].get("is_anomaly", False) if i < len(seq1) else False,
+            "anomaly_b": seq2[i].get("is_anomaly", False) if i < len(seq2) else False
         })
     params_diff = {}
     keys = set(list(ps1.get("params", {}).keys()) + list(ps2.get("params", {}).keys()))
@@ -441,9 +446,8 @@ def build_param_comparison(param_sets_data: List[Dict]) -> Dict:
         "diff_rows": diff_rows,
         "summary": {
             "total_points": max_len,
-            "points_with_difference": sum(1 for r in diff_rows
-                                         if r.get("rel_diff") is not None and r["rel_diff"] > 1e-6),
-            "anomalies_set1": sum(1 for r in diff_rows if r["anomaly_1"]),
-            "anomalies_set2": sum(1 for r in diff_rows if r["anomaly_2"])
+            "points_with_difference": sum(1 for r in diff_rows if r["is_significant_diff"]),
+            "anomalies_set1": sum(1 for r in diff_rows if r["anomaly_a"]),
+            "anomalies_set2": sum(1 for r in diff_rows if r["anomaly_b"])
         }
     }
