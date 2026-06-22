@@ -20,12 +20,17 @@ class ReviewService:
     def __init__(self):
         self._records: Dict[str, ReviewRecord] = {}
 
-    def submit_work(self, work: StudentWork) -> ReviewRecord:
+    def submit_work(
+        self, work: StudentWork, submission_notes: Optional[str] = None,
+        anomaly_flags: Optional[List[str]] = None,
+    ) -> ReviewRecord:
         record = ReviewRecord(
             work_id=work.id,
             work=work,
             current_status=ReviewStatus.SUBMITTED,
         )
+        if anomaly_flags:
+            record.anomaly_flags = list(anomaly_flags)
         history = ReviewHistory(
             id=_generate_id("h_"),
             work_id=work.id,
@@ -35,6 +40,7 @@ class ReviewService:
             reason="学生提交作业",
             source="submit",
             params_snapshot=record.current_params.to_dict(),
+            notes=submission_notes,
         )
         record.history.append(history)
         self._records[work.id] = record

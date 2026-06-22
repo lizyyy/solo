@@ -1,23 +1,73 @@
 from datetime import datetime
 from flask import Flask, request, jsonify
+import json
 
 from models import StudentWork, BoundaryParams, ReviewStatus
 from review_service import ReviewService
-from calculation_engine import CalculationEngine
+from calculation_engine import CalculationEngine, _json_safe_value
 
 app = Flask(__name__)
 service = ReviewService()
 engine = CalculationEngine()
 
 
+class _SafeEncoder(json.JSONEncoder):
+    def default(self, o):
+        try:
+            return _json_safe_value(o)
+        except TypeError:
+            return str(o)
+
+
+app.json_encoder = _SafeEncoder
+
+
+def _anomaly_summary(anomalies):
+    parts = []
+    for a in anomalies:
+        line = f"[{a.get('severity', '?')}] {a.get('type')}: {a.get('message')}"
+        if a.get("source"):
+            line += f" (source={a['source']})"
+        parts.append(line)
+    return "\n".join(parts) if parts else None
+
+
 def _record_to_dict(record):
-    return {
+    work = record.work
+    input_type = work.detect_input_type(record.current_params)
+    anomaly_details = []
+    if record.last_calc_result:
+        anomaly_details = record.last_calc_result.get("anomalies", [])
+    d = {
         "work_id": record.work_id,
-        "student": record.work.student_name,
-        "problem_id": record.work.problem_id,
+        "student": work.student_name,
+        "problem_id": work.problem_id,
         "status": record.current_status.value,
-        "input_type": record.work.detect_input_type(record.current_params).value,
+        "input_type": input_type.value,
+        "student_answer": {
+            "value": _json_safe_value(work.answer),
+            "unit": work.unit,
+            "is_draft": work.is_draft,
+            "raw_content": work.raw_content,
+        },
+        "draft_source": (
+            "student_draft" if work.is_draft else None
+        ),
+        "empty_set_source": (
+            "student_submit" if work.answer is None or (
+                isinstance(work.answer, list) and len(work.answer) == 0
+            ) else None
+        ),
         "anomaly_flags": record.anomaly_flags,
+        "anomaly_details": anomaly_details,
+        "current_status_hint": (
+            record.last_calc_result.get("current_status_hint")
+            if record.last_calc_result else None
+        ),
+        "is_correct": (
+            record.last_calc_result.get("is_correct")
+            if record.last_calc_result else None
+        ),
         "created_at": record.created_at.isoformat(),
         "updated_at": record.updated_at.isoformat(),
         "current_params": record.current_params.to_dict(),
@@ -26,6 +76,7 @@ def _record_to_dict(record):
         "withdrawal_record": record.withdrawal_record,
         "history_count": len(record.history),
     }
+    return _json_safe_value(d)
 
 
 def _history_to_dict(h):
@@ -45,7 +96,7 @@ def _history_to_dict(h):
 
 @app.route("/api/works", methods=["POST"])
 def submit_work():
-    data = request.json
+    data = request.json or {}
     work = StudentWork(
         id=data["id"],
         student_name=data["student_name"],
@@ -55,14 +106,23 @@ def submit_work():
         is_draft=data.get("is_draft", False),
         raw_content=data.get("raw_content", ""),
     )
-    record = service.submit_work(work)
-    calc_result = engine.calculate(work, record.current_params)
+    params = BoundaryParams()
+    calc_result = engine.calculate(work, params)
+    anomalies = calc_result.get("anomalies", [])
+    flags = [a["type"] for a in anomalies]
+    submission_notes = _anomaly_summary(anomalies)
+
+    record = service.submit_work(
+        work,
+        submission_notes=submission_notes,
+        anomaly_flags=flags,
+    )
+    record.current_params = params
     record.last_calc_result = calc_result
-    record.anomaly_flags = [a["type"] for a in calc_result.get("anomalies", [])]
     return jsonify({
         "success": True,
         "record": _record_to_dict(record),
-        "calc_result": calc_result,
+        "calc_result": _json_safe_value(calc_result),
     }), 201
 
 
@@ -104,7 +164,7 @@ def get_history(work_id):
 
 @app.route("/api/works/<work_id>/review/start", methods=["POST"])
 def start_review(work_id):
-    data = request.json
+    data = request.json or {}
     reviewer = data.get("reviewer", "unknown")
     try:
         record = service.start_review(work_id, reviewer)
@@ -115,7 +175,7 @@ def start_review(work_id):
 
 @app.route("/api/works/<work_id>/review/approve", methods=["POST"])
 def approve(work_id):
-    data = request.json
+    data = request.json or {}
     reviewer = data.get("reviewer", "unknown")
     reason = data.get("reason", "")
     try:
@@ -127,7 +187,7 @@ def approve(work_id):
 
 @app.route("/api/works/<work_id>/review/reject", methods=["POST"])
 def reject(work_id):
-    data = request.json
+    data = request.json or {}
     reviewer = data.get("reviewer", "unknown")
     reason = data.get("reason", "")
     try:
@@ -139,7 +199,7 @@ def reject(work_id):
 
 @app.route("/api/works/<work_id>/review/revise", methods=["POST"])
 def revise(work_id):
-    data = request.json
+    data = request.json or {}
     reviewer = data.get("reviewer", "unknown")
     new_status = ReviewStatus(data["new_status"])
     reason = data.get("reason", "")
@@ -154,7 +214,7 @@ def revise(work_id):
 
 @app.route("/api/works/<work_id>/review/withdraw", methods=["POST"])
 def withdraw(work_id):
-    data = request.json
+    data = request.json or {}
     reviewer = data.get("reviewer", "unknown")
     reason = data.get("reason", "")
     try:
@@ -166,7 +226,7 @@ def withdraw(work_id):
 
 @app.route("/api/works/<work_id>/notes", methods=["POST"])
 def add_note(work_id):
-    data = request.json
+    data = request.json or {}
     reviewer = data.get("reviewer", "unknown")
     note = data.get("note", "")
     try:
@@ -178,7 +238,7 @@ def add_note(work_id):
 
 @app.route("/api/works/<work_id>/recalc", methods=["POST"])
 def recalc(work_id):
-    data = request.json
+    data = request.json or {}
     record = service.get_record(work_id)
     if not record:
         return jsonify({"success": False, "error": "未找到记录"}), 404
@@ -191,12 +251,25 @@ def recalc(work_id):
         strict_mode=data.get("strict_mode", record.current_params.strict_mode),
     )
     result = engine.recalculate_with_new_params(record, new_params)
-    return jsonify({"success": True, **result})
+    return jsonify(_json_safe_value({"success": True, **result}))
 
 
 @app.route("/api/anomalies", methods=["GET"])
 def list_anomalies():
-    return jsonify({"success": True, "anomalies": service.list_anomalies()})
+    anomalies = service.list_anomalies()
+    enriched = []
+    for a in anomalies:
+        record = service.get_record(a["work_id"])
+        if record and record.last_calc_result:
+            a2 = dict(a)
+            a2["anomaly_details"] = record.last_calc_result.get("anomalies", [])
+            a2["current_status_hint"] = record.last_calc_result.get(
+                "current_status_hint"
+            )
+            enriched.append(a2)
+        else:
+            enriched.append(a)
+    return jsonify({"success": True, "anomalies": enriched})
 
 
 @app.route("/api/reviewers/<reviewer>/daily", methods=["GET"])
@@ -207,8 +280,14 @@ def reviewer_daily(reviewer):
     return jsonify({
         "success": True,
         "reviewer": reviewer,
+        "date": (date.date().isoformat() if date else datetime.now().date().isoformat()),
         "changes": [_history_to_dict(h) for h in changes],
     })
+
+
+@app.route("/api/health", methods=["GET"])
+def health():
+    return jsonify({"success": True, "status": "ok"})
 
 
 if __name__ == "__main__":
