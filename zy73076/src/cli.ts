@@ -12,7 +12,11 @@ import {
   InspectionRecord,
   FilterCriteria,
   WarningLevel,
+  WarningResultSet,
+  AnomalyStatusLog,
+  DuplicateIdConfirmationLog,
 } from './index';
+import { AppStateStore } from './state-store';
 
 // ============================================================
 // 盾构刀盘阈值预警 — 命令行交接入口
@@ -23,13 +27,20 @@ import {
 //   overview -p <P-001>   项目预警汇总
 //   details  -p <P-001>   异常明细 (--level warning/critical/...)
 //   queue    -p <P-001>   异常队列（含挂起）
-//   changes  -p <P-001>   判断变更清单
-//   remark   --record <id> --text "..."  补充巡检备注
-//   confirm  <queueId> --canonical <SD-001>  项目经理确认设备编号
-//   manager  -p <P-001>   项目经理视图（汇总 + 待确认 + 证据缺口）
-//   handover -p <P-001>   小林交接清单
-//   demo                  跑完整验收场景演示
-// ============================================================
+//   dc       -p <P-001>   设备编号重复待确认事项（整合维度，整合同一组重复写法）
+//   changes  -p <P-001>   判断变更（供评审会粘贴到巡检表备注）
+//   remark   --record R004 --text "现场观测..."
+//                         小林补巡检备注，即时展示哪些判断变了
+//   confirm  <DC-20260622-001> --canonical SD-001
+//                         项目经理确认设备编号归属（传的是 dc 命令看到的事项ID，不是队列ID）
+//   manager  -p <P-001>   项目经理视图：汇总+待确认+证据缺口
+//   handover -p <P-001>   小林交接清单：7 步 checklist + 巡检表索引
+//   reset                 重置为初始状态（演示用，会清空 .shield-warning-state.json）
+//   demo                  跑完整验收流程
+//   help                  显示帮助
+//
+// 状态持久化: 所有修改保存在 .shield-warning-state.json
+//             多命令之间（remark / confirm / queue / changes）会共享同一份状态
 
 // ---------- 初始数据 ----------
 
@@ -65,50 +76,70 @@ function initialInspections(): InspectionRecord[] {
   return [
     // === P-001 项目 ===
     // SD-001 的 3 种写法（会被识别为 duplicate → 挂起）
-    { id: 'R001', inspectionDate: '2026-06-01', rawEquipmentId: 'SD001',
+    { id: 'R001', inspectionDate: '2026-06-01', rawEquipmentId: 'SD001', projectId: 'P-001',
       inspector: '张工', itemName: '刀盘磨损量', measuredValue: 6, unit: 'mm',
       remark: '', createdAt: ts },
-    { id: 'R002', inspectionDate: '2026-06-02', rawEquipmentId: '盾构1号',
+    { id: 'R002', inspectionDate: '2026-06-02', rawEquipmentId: '盾构1号', projectId: 'P-001',
       inspector: '张工', itemName: '刀盘磨损量', measuredValue: 10, unit: 'mm',
       remark: '', createdAt: ts },
-    { id: 'R003', inspectionDate: '2026-06-03', rawEquipmentId: 'SD-001',
+    { id: 'R003', inspectionDate: '2026-06-03', rawEquipmentId: 'SD-001', projectId: 'P-001',
       inspector: '李工', itemName: '刀盘磨损量', measuredValue: 18, unit: 'mm',
       remark: '发现偏磨', createdAt: ts },
-    { id: 'R004', inspectionDate: '2026-06-03', rawEquipmentId: 'SD-001',
+    { id: 'R004', inspectionDate: '2026-06-03', rawEquipmentId: 'SD-001', projectId: 'P-001',
       inspector: '李工', itemName: '主驱动油温', measuredValue: 78, unit: '℃',
       remark: '', createdAt: ts },
     // SD-002
-    { id: 'R005', inspectionDate: '2026-06-02', rawEquipmentId: '盾构2号',
+    { id: 'R005', inspectionDate: '2026-06-02', rawEquipmentId: '盾构2号', projectId: 'P-001',
       inspector: '王工', itemName: '刀盘磨损量', measuredValue: 28, unit: 'mm',
       remark: '多把滚刀超限', createdAt: ts },
-    { id: 'R006', inspectionDate: '2026-06-03', rawEquipmentId: 'SD-002',
+    { id: 'R006', inspectionDate: '2026-06-03', rawEquipmentId: 'SD-002', projectId: 'P-001',
       inspector: '王工', itemName: '主驱动油温', measuredValue: 68, unit: '℃',
       remark: '', createdAt: ts },
 
     // === P-002 项目 ===
-    { id: 'R101', inspectionDate: '2026-06-02', rawEquipmentId: 'SD-003',
+    { id: 'R101', inspectionDate: '2026-06-02', rawEquipmentId: 'SD-003', projectId: 'P-002',
       inspector: '赵工', itemName: '刀盘磨损量', measuredValue: 12, unit: 'mm',
       remark: '', createdAt: ts },
-    { id: 'R102', inspectionDate: '2026-06-03', rawEquipmentId: '盾构3号',
+    { id: 'R102', inspectionDate: '2026-06-03', rawEquipmentId: '盾构3号', projectId: 'P-002',
       inspector: '赵工', itemName: '刀盘磨损量', measuredValue: 22, unit: 'mm',
       remark: '', createdAt: ts },
-    { id: 'R103', inspectionDate: '2026-06-03', rawEquipmentId: 'SD-004',
+    { id: 'R103', inspectionDate: '2026-06-03', rawEquipmentId: 'SD-004', projectId: 'P-002',
       inspector: '钱工', itemName: '主驱动油温', measuredValue: 82, unit: '℃',
       remark: '高温报警', createdAt: ts },
-    { id: 'R104', inspectionDate: '2026-06-04', rawEquipmentId: 'SD-004',
+    { id: 'R104', inspectionDate: '2026-06-04', rawEquipmentId: 'SD-004', projectId: 'P-002',
       inspector: '钱工', itemName: '刀盘转速', measuredValue: 0.3, unit: 'rpm',
       remark: '', createdAt: ts },
   ];
 }
 
-// ---------- 应用状态 ----------
-
-let inspections: InspectionRecord[] = initialInspections();
+// ---------- 核心依赖（进程内共享，只读） ----------
 const normalizer = new EquipmentNormalizer(MAPPINGS);
 const engine = new CutterheadWarningEngine(normalizer, THRESHOLDS);
+const managerBuilder = new ManagerViewBuilder();
 const queueWf = new AnomalyQueueWorkflow();
+const changeReporter = new JudgmentChangeReporter();
+const handoverBuilder = new HandoverPackager();
 
-function currentResult(criteria: Partial<FilterCriteria> = {}) {
+// ---------- 持久化状态 ----------
+const store = new AppStateStore();
+
+// 确保状态初始化（如果文件不存在则创建）
+store.initIfEmpty(initialInspections());
+
+// ---------- 核心：基于当前持久化状态重新生成预警结果 ----------
+// 每次命令都调用这个，保证读取最新状态（包括其他进程/命令的修改）
+function regenerate(): void {
+  const state = store.read();
+  const result = engine.generate(state.inspections);
+  // 把新生成的队列和待确认事项合并到持久化状态（保留已确认的状态）
+  store.update(s => {
+    store.replaceComputedState(s, result.anomalyQueue, result.duplicateConfirmations);
+  });
+}
+
+// 获取当前筛选后的结果（自动重新生成）
+function currentResult(criteria: Partial<FilterCriteria> = {}): WarningResultSet {
+  regenerate();
   const full: FilterCriteria = {
     dateRange: criteria.dateRange ?? null,
     projectId: criteria.projectId ?? null,
@@ -116,7 +147,36 @@ function currentResult(criteria: Partial<FilterCriteria> = {}) {
     warningLevels: criteria.warningLevels ?? null,
     includeSuspended: criteria.includeSuspended ?? true,
   };
-  return engine.generate(inspections, full);
+  const state = store.read();
+
+  // 用持久化的 inspections 生成基础 details（不含队列和 DC）
+  const baseResult = engine.generate(state.inspections, { ...full, includeSuspended: true });
+
+  // 用持久化的 queue 和 dc（包含已确认状态）进行筛选
+  const filtered = engine.applyFullFilter(
+    baseResult.details,
+    state.anomalyQueue,
+    state.duplicateConfirmations,
+    baseResult.judgmentChanges,
+    full
+  );
+
+  // 重新计算统计
+  const statistics = engine.computeStatistics(
+    filtered.details,
+    filtered.queue,
+    full
+  );
+
+  return {
+    generatedAt: new Date().toISOString(),
+    filterCriteria: full,
+    statistics,
+    details: filtered.details,
+    anomalyQueue: filtered.queue,
+    duplicateConfirmations: filtered.confirmations,
+    judgmentChanges: filtered.changes,
+  };
 }
 
 // ---------- 命令解析 ----------
@@ -335,65 +395,220 @@ function cmdChanges(projectId: string | null): void {
 }
 
 function cmdRemark(recordId: string, text: string): void {
-  section(`补充巡检备注 → ${recordId}`);
-  const idx = inspections.findIndex(r => r.id === recordId);
-  if (idx === -1) {
+  section(`小林补巡检备注 → ${recordId}`);
+
+  // 1. 先基于当前状态计算"补备注前"的结果
+  regenerate();
+  const stateBefore = store.read();
+  const recBefore = store.findInspection(stateBefore, recordId);
+  if (!recBefore) {
     console.log(`  ❌ 未找到记录 ${recordId}`);
     return;
   }
-  const before = inspections[idx];
-  const oldRemark = before.remark ?? '';
-  const beforeLevel = engine.generate([before]).details[0]?.level ?? 'normal';
+  // 计算这条记录补备注前的预警详情（单独跑引擎）
+  const resultBefore = engine.generate([recBefore]);
+  const detailBefore = resultBefore.details.find(d => d.recordId === recordId);
 
-  inspections[idx] = {
-    ...before,
-    remark: text,
-  };
+  // 2. 更新备注到持久化状态
+  store.update(s => {
+    store.updateRemark(s, recordId, text);
+  });
 
-  const afterLevel = engine.generate([inspections[idx]]).details[0]?.level ?? 'normal';
+  // 3. 重新生成"补备注后"的结果
+  regenerate();
+  const stateAfter = store.read();
+  const recAfter = store.findInspection(stateAfter, recordId)!;
+  const resultAfter = engine.generate([recAfter]);
+  const detailAfter = resultAfter.details.find(d => d.recordId === recordId);
 
+  // 4. 展示变化
   console.log(`  ✅ 已更新 ${recordId} 的备注`);
-  console.log(`     旧备注: "${oldRemark}"`);
+  console.log(`     旧备注: "${recBefore.remark ?? ''}"`);
   console.log(`     新备注: "${text}"`);
-  console.log(`     级别: ${beforeLevel} → ${afterLevel}${beforeLevel === afterLevel ? '（未变）' : ''}`);
   console.log();
-  console.log('  提示: 可运行 changes 命令查看本批次所有判断变更。');
+
+  if (detailBefore && detailAfter) {
+    console.log(`  ── 预警判断变化 ──`);
+    const levelChanged = detailBefore.level !== detailAfter.level;
+    console.log(`     级别: ${levelBadge(detailBefore.level)} → ${levelBadge(detailAfter.level)}${levelChanged ? ' ⚠ 变化了' : '（未变）'}`);
+
+    // 证据缺口变化
+    const gapsBefore = new Set(detailBefore.evidenceGap.map(g => g.type));
+    const gapsAfter = new Set(detailAfter.evidenceGap.map(g => g.type));
+    const removedGaps = Array.from(gapsBefore).filter(g => !gapsAfter.has(g));
+    const addedGaps = Array.from(gapsAfter).filter(g => !gapsBefore.has(g));
+
+    if (removedGaps.length > 0) {
+      console.log(`     ✅ 补齐的证据缺口: ${removedGaps.join('、')}`);
+    }
+    if (addedGaps.length > 0) {
+      console.log(`     ⚠  新增的证据缺口: ${addedGaps.join('、')}`);
+    }
+
+    // 相关判断变更
+    const fullResult = currentResult();
+    const relatedChanges = fullResult.judgmentChanges.filter(jc =>
+      jc.affectedRecordIds.includes(recordId)
+    );
+    if (relatedChanges.length > 0) {
+      console.log();
+      console.log(`  ── 影响的判断变更（${relatedChanges.length} 条） ──`);
+      for (const jc of relatedChanges) {
+        console.log(`     • ${jc.id}: ${jc.remarkForReview}`);
+      }
+    }
+  }
+
+  console.log();
+  console.log(`  💾 状态已保存到 ${store.getFilePath()}`);
+  console.log(`  提示: 可运行 "changes -p ${recBefore.projectId}" 查看该项目所有判断变更。`);
 }
 
-function cmdConfirm(queueId: string, canonical: string): void {
-  section(`项目经理确认设备编号 → ${queueId}`);
-  const r = currentResult();
-  const q = r.anomalyQueue.find(x => x.id === queueId);
-  if (!q) {
-    console.log(`  ❌ 未找到队列 ${queueId}`);
-    return;
-  }
-  if (q.status !== 'pending_confirmation') {
-    console.log(`  ⚠ 队列状态为 ${q.status}，无需再确认`);
-    return;
-  }
+function cmdConfirmDC(dcId: string, canonical: string): void {
+  section(`项目经理确认设备编号 → ${dcId}`);
 
-  // 验证规范编号存在
+  // 1. 验证规范编号存在
   const projs = normalizer.getProjectOfCanonical(canonical);
   if (!projs) {
     console.log(`  ❌ 规范编号 ${canonical} 不存在于设备映射中`);
     return;
   }
 
-  const updated = queueWf.confirmEquipment(
-    q,
-    '项目经理',
-    canonical,
-    'CLI 交互确认'
-  );
-  console.log(`  ✅ 已确认`);
-  console.log(`     队列: ${updated.id}`);
-  console.log(`     状态: ${q.status} → ${updated.status}`);
-  console.log(`     分配给: ${updated.assignedTo}`);
-  console.log(`     最新日志: ${updated.history[updated.history.length - 1].comment}`);
+  // 2. 读取当前状态
+  regenerate();
+  const state = store.read();
+  const dc = store.findDuplicateConfirmation(state, dcId);
+  if (!dc) {
+    console.log(`  ❌ 未找到待确认事项 ${dcId}`);
+    console.log();
+    console.log('  提示: 先运行 "dc -p <项目ID>" 查看待确认事项列表。');
+    return;
+  }
+  if (dc.status !== 'pending') {
+    console.log(`  ⚠  待确认事项状态为 ${dc.status}，无需再确认`);
+    return;
+  }
+
+  // 3. 持久化状态变更
+  const ts = new Date().toISOString();
+  store.update(s => {
+    // 更新 DuplicateConfirmation 状态
+    store.updateDuplicateConfirmation(s, dcId, oldDc => {
+      const historyLog: DuplicateIdConfirmationLog = {
+        timestamp: ts,
+        from: oldDc.status,
+        to: 'confirmed',
+        operator: 'project_manager',
+        comment: `项目经理确认规范编号为 ${canonical}，原始写法 ${oldDc.rawVariants.length} 种 → 统一归集`,
+      };
+      return {
+        ...oldDc,
+        status: 'confirmed',
+        confirmedCanonicalId: canonical,
+        updatedAt: ts,
+        history: [...oldDc.history, historyLog],
+      };
+    });
+
+    // 同步更新关联的 AnomalyQueue 状态
+    for (let i = 0; i < s.anomalyQueue.length; i++) {
+      const q = s.anomalyQueue[i];
+      if (q.duplicateConfirmationId === dcId && q.status === 'pending_confirmation') {
+        const log: AnomalyStatusLog = {
+          timestamp: ts,
+          from: q.status,
+          to: 'confirmed_warning',
+          operator: 'project_manager',
+          comment: `设备编号已确认为 ${canonical}，待确认状态解除`,
+        };
+        s.anomalyQueue[i] = {
+          ...q,
+          equipmentId: canonical,
+          status: 'confirmed_warning',
+          assignedTo: 'assistant_xiaolin',
+          suspensionReason: undefined,
+          duplicateConfirmationId: dcId,
+          updatedAt: ts,
+          history: [...q.history, log],
+        };
+      }
+    }
+
+    // 记录操作日志
+    store.log(
+      s,
+      'project_manager',
+      'dc_confirm',
+      dcId,
+      { confirmedCanonical: canonical }
+    );
+  });
+
+  // 4. 重新生成并展示结果
+  regenerate();
+  const newState = store.read();
+  const updatedDc = store.findDuplicateConfirmation(newState, dcId)!;
+
+  console.log(`  ✅ 已确认 ${dcId}`);
+  console.log(`     候选规范编号: ${dc.candidateCanonicalId}`);
+  console.log(`     最终确认: ${canonical}`);
+  console.log(`     原始写法: ${dc.rawVariants.join('、')}`);
+  console.log(`     涉及巡检记录: ${dc.affectedRecordIds.length} 条（其中预警 ${dc.affectedWarningCount} 条）`);
+  console.log(`     状态: pending → confirmed`);
+  console.log(`     分配给: assistant_xiaolin（小林跟进处置）`);
   console.log();
-  console.log('  说明: 此处仅展示状态流转结果，实际引擎生成结果以重新计算为准。');
-  console.log('        若要持久化确认结果，请将对应巡检记录的 rawEquipmentId 统一为规范写法。');
+  console.log(`  💾 状态已保存到 ${store.getFilePath()}`);
+  console.log(`  提示: 可运行 "queue -p ${dc.projectId}" 查看队列状态是否已更新。`);
+}
+
+// 设备编号重复待确认事项列表
+function cmdDC(projectId: string | null): void {
+  const title = projectId
+    ? `设备编号重复待确认事项 — 项目 ${projectId}`
+    : '设备编号重复待确认事项 — 全量';
+  section(title);
+
+  regenerate();
+  const state = store.read();
+  let dcs = state.duplicateConfirmations;
+  if (projectId) {
+    dcs = dcs.filter(dc => dc.projectId === projectId);
+  }
+
+  if (dcs.length === 0) {
+    console.log('  （无待确认事项）');
+    console.log();
+    console.log('  说明: 所有设备编号均已规范化，无需项目经理追加确认。');
+    return;
+  }
+
+  console.log(`  共 ${dcs.length} 组待确认事项：`);
+  console.log();
+  for (const dc of dcs) {
+    const statusBadge = dc.status === 'pending' ? '⏳ 待确认 ' :
+                        dc.status === 'confirmed' ? '✅ 已确认 ' : '❌ 已拒绝 ';
+    console.log(`  ${statusBadge} ${dc.id}`);
+    console.log(`     项目: ${dc.projectId}  候选规范编号: ${dc.candidateCanonicalId}`);
+    console.log(`     原始写法: ${dc.rawVariants.join('、')}`);
+    console.log(`     涉及记录: ${dc.affectedRecordIds.length} 条（其中预警 ${dc.affectedWarningCount} 条）`);
+    if (dc.status === 'confirmed' && dc.confirmedCanonicalId) {
+      console.log(`     最终确认: ${dc.confirmedCanonicalId}`);
+    }
+    console.log(`     风险: ${dc.riskOfFalseStability}`);
+    console.log();
+  }
+  console.log(`  项目经理确认命令: confirm <DC-ID> --canonical <规范编号>`);
+}
+
+// 重置状态
+function cmdReset(): void {
+  section('重置状态');
+  store.reset(initialInspections());
+  regenerate();
+  console.log(`  ✅ 已重置为初始状态`);
+  console.log(`  💾 状态文件: ${store.getFilePath()}`);
+  console.log();
+  console.log('  所有巡检记录、备注、确认操作均已清空。');
 }
 
 function cmdManager(projectId: string | null): void {
@@ -402,7 +617,7 @@ function cmdManager(projectId: string | null): void {
     : '项目经理视图 — 全量';
   section(title);
   const r = currentResult({ projectId });
-  const view = new ManagerViewBuilder().build(r);
+  const view = managerBuilder.build(r);
 
   // 1. 概览
   const s = view.overview;
@@ -415,19 +630,24 @@ function cmdManager(projectId: string | null): void {
     console.log(`     ${levelBadge(row.level)} ${pad(row.count, 3)} 条 / ${pad(row.equipmentCount, 2)} 台设备  |  ${gaps}`);
   }
 
-  // 2. 待确认清单
+  // 2. 设备编号重复待确认事项（整合维度，推荐用这个）
   console.log();
-  console.log('  ⏳ 待确认清单（不确认的假稳定风险）');
-  if (view.pendingConfirmations.length === 0) {
+  console.log('  ⏳ 待确认清单（按项目+重复组整合）');
+  if (view.duplicateConfirmations.length === 0) {
     console.log('     （无待确认项）');
   }
-  for (let i = 0; i < view.pendingConfirmations.length; i++) {
-    const pc = view.pendingConfirmations[i];
-    console.log(`     [${i + 1}] 队列: ${pc.queueId}`);
-    console.log(`         原始写法: [${pc.rawEquipmentIds.join(', ')}]`);
-    console.log(`         候选规范编号: ${pc.candidateCanonicalIds.join(' / ')}`);
-    console.log(`         受影响预警: ${pc.affectedWarningCount} 条`);
-    console.log(`         ⚠ 假稳定风险: ${pc.riskOfFalseStability.slice(0, 80)}...`);
+  for (let i = 0; i < view.duplicateConfirmations.length; i++) {
+    const dc = view.duplicateConfirmations[i];
+    const statusBadge = dc.status === 'pending' ? '⏳ 待确认 ' :
+                        dc.status === 'confirmed' ? '✅ 已确认 ' : '❌ 已拒绝 ';
+    console.log(`     [${i + 1}] ${statusBadge} ${dc.confirmationId}`);
+    console.log(`         候选规范编号: ${dc.candidateCanonicalId}`);
+    console.log(`         原始写法: ${dc.rawVariants.join('、')}`);
+    console.log(`         涉及记录: ${dc.affectedRecordIds.length} 条（其中预警 ${dc.affectedWarningCount} 条）`);
+    console.log(`         ⚠ 假稳定风险: ${dc.riskOfFalseStability.slice(0, 80)}...`);
+    if (dc.status === 'confirmed') {
+      console.log(`         ✅ 最终确认: ${dc.confirmedCanonicalId || dc.candidateCanonicalId}`);
+    }
   }
 
   // 3. 证据缺口
@@ -445,6 +665,7 @@ function cmdManager(projectId: string | null): void {
 
   console.log();
   console.log('  🔍 下钻提示: 用 details --level <级别> 可查看对应明细，与汇总口径一致。');
+  console.log('     用 dc 命令查看完整待确认事项列表。');
 }
 
 function cmdHandover(projectId: string | null): void {
@@ -453,7 +674,14 @@ function cmdHandover(projectId: string | null): void {
     : '小林交接清单 — 全量';
   section(title);
   const r = currentResult({ projectId });
-  const pkg = new HandoverPackager().build(r);
+  const state = store.read();
+
+  // 按 projectId 过滤原始巡检记录（如果指定了项目）
+  let allInspections = state.inspections;
+  if (projectId) {
+    allInspections = allInspections.filter(rec => rec.projectId === projectId);
+  }
+  const pkg = handoverBuilder.build(r, allInspections);
 
   console.log(`  总步骤: ${pkg.checklist.length}`);
   console.log(`  已完成前置: ${pkg.completedActionCount}`);
@@ -466,28 +694,34 @@ function cmdHandover(projectId: string | null): void {
     if (step.relatedAnomalyQueueIds.length > 0) {
       console.log(`     关联队列: ${step.relatedAnomalyQueueIds.join(', ')}`);
     }
+    if (step.relatedDuplicateConfirmationIds && step.relatedDuplicateConfirmationIds.length > 0) {
+      console.log(`     关联待确认: ${step.relatedDuplicateConfirmationIds.join(', ')}`);
+    }
     console.log();
   }
 
-  console.log('  📋 巡检表 → 异常队列 索引（顺着巡检表就能找到对应队列）');
-  console.log('  ' + '─'.repeat(100));
+  console.log('  📋 巡检表 → 异常队列/待确认 索引（顺着巡检表就能找到所有待办）');
+  console.log('  ' + '─'.repeat(120));
   const header =
     pad('记录ID', 8) + ' ' +
     pad('原始写法', 12) + ' ' +
     pad('规范编号', 14) + ' ' +
-    pad('队列', 20) + ' ' +
+    pad('队列', 22) + ' ' +
+    pad('待确认', 22) + ' ' +
     pad('判断变更', 8);
   console.log('  ' + header);
   for (const idx of pkg.inspectionIndex) {
     const canonical = idx.canonicalEquipmentId ?? '⚠未确认';
     const queues = idx.anomalyQueueIds.join(',') || '-';
+    const dcs = idx.duplicateConfirmationIds.join(',') || '-';
     const changes = idx.judgmentChangeIds.length > 0 ? String(idx.judgmentChangeIds.length) : '-';
     console.log(
       '  ' +
       pad(idx.inspectionRecordId, 8) + ' ' +
       pad(idx.rawEquipmentId, 12) + ' ' +
       pad(canonical, 14) + ' ' +
-      pad(queues, 20) + ' ' +
+      pad(queues, 22) + ' ' +
+      pad(dcs, 22) + ' ' +
       pad(changes, 8)
     );
   }
@@ -496,8 +730,10 @@ function cmdHandover(projectId: string | null): void {
   console.log('     1) 打开 manager 视图看还有哪些证据没补齐');
   console.log('     2) 用 remark 命令补巡检备注');
   console.log('     3) 找项目经理用 confirm 确认重复设备编号');
-  console.log('     4) 顺着本清单的队列逐一闭环');
+  console.log('     4) 顺着本清单的队列和待确认事项逐一闭环');
   console.log('     5) 全部完成后，本交接包即可作为归档凭证');
+  console.log();
+  console.log(`  💾 状态文件: ${store.getFilePath()}`);
 }
 
 function cmdDemo(): void {
@@ -568,17 +804,22 @@ function cmdHelp(): void {
   console.log('    overview  -p P-001    项目预警汇总');
   console.log('    details   -p P-001 [--level warning]  异常明细');
   console.log('    queue     -p P-001    异常队列（含挂起）');
+  console.log('    dc        -p P-001    设备编号重复待确认事项（整合同一组重复写法）');
   console.log('    changes   -p P-001    判断变更清单（评审会备注）');
-  console.log('    remark    --record R004 --text "..."   补充巡检备注');
-  console.log('    confirm   <queueId>  --canonical SD-001  项目经理确认设备');
+  console.log('    remark    --record R004 --text "..."   小林补巡检备注，即时展示判断变化');
+  console.log('    confirm   <DC-ID>    --canonical SD-001  项目经理确认设备编号（事项ID从 dc 命令获取）');
   console.log('    manager   -p P-001    项目经理视图（汇总+待确认+证据缺口）');
   console.log('    handover  -p P-001    小林交接清单');
+  console.log('    reset                 重置为初始状态（演示用）');
   console.log('    demo                  跑完整验收场景');
   console.log();
+  console.log('  状态持久化: ./.shield-warning-state.json');
+  console.log('    多命令（remark/confirm/queue/changes）共享同一份状态。');
+  console.log();
   console.log('  设计原则:');
-  console.log('    · 筛选 / 统计 / 明细 / 队列 / 变更 同源生成，口径一致');
+  console.log('    · 筛选 / 统计 / 明细 / 队列 / 变更 / 待确认 同源生成，口径一致');
   console.log('    · 设备编号重复 → 一律挂起等项目经理确认，不给假稳定结论');
-  console.log('    · 顺着巡检表 → 异常队列 → 判断变更 → 证据缺口 可完成全流程交接');
+  console.log('    · 顺着巡检表 → 异常队列 → 待确认事项 → 判断变更 → 证据缺口 可完成交接');
   console.log();
 }
 
@@ -601,6 +842,9 @@ switch (cmd) {
   case 'queue':
     cmdQueue(projectId);
     break;
+  case 'dc':
+    cmdDC(projectId);
+    break;
   case 'changes':
     cmdChanges(projectId);
     break;
@@ -615,12 +859,13 @@ switch (cmd) {
     break;
   }
   case 'confirm': {
-    const queueId = opts.get('__arg1') ?? '';
+    const dcId = opts.get('__arg1') ?? '';
     const canonical = opts.get('canonical') ?? '';
-    if (!queueId || !canonical) {
-      console.log('  ❌ 用法: confirm <队列ID> --canonical <规范编号>');
+    if (!dcId || !canonical) {
+      console.log('  ❌ 用法: confirm <待确认事项ID> --canonical <规范编号>');
+      console.log('     事项ID从 "dc -p <项目ID>" 命令获取，格式如 DC-20260622-001');
     } else {
-      cmdConfirm(queueId, canonical);
+      cmdConfirmDC(dcId, canonical);
     }
     break;
   }
@@ -629,6 +874,9 @@ switch (cmd) {
     break;
   case 'handover':
     cmdHandover(projectId);
+    break;
+  case 'reset':
+    cmdReset();
     break;
   case 'demo':
     cmdDemo();

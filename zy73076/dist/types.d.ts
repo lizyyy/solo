@@ -16,6 +16,7 @@ export interface InspectionRecord {
     id: string;
     inspectionDate: string;
     rawEquipmentId: string;
+    projectId: string;
     inspector: string;
     itemName: string;
     measuredValue: number;
@@ -38,6 +39,7 @@ export interface ThresholdRule {
 export interface WarningDetail {
     recordId: string;
     inspectionDate: string;
+    projectId: string;
     equipmentId: string;
     rawEquipmentId: string;
     itemName: string;
@@ -55,14 +57,6 @@ export interface EvidenceGap {
     type: 'no_previous_record' | 'equipment_not_confirmed' | 'threshold_not_defined' | 'inspection_remark_missing' | 'followup_needed';
     description: string;
     priority: 'high' | 'medium' | 'low';
-}
-export interface WarningResultSet {
-    generatedAt: string;
-    filterCriteria: FilterCriteria;
-    statistics: WarningStatistics;
-    details: WarningDetail[];
-    anomalyQueue: AnomalyQueueItem[];
-    judgmentChanges: JudgmentChange[];
 }
 export interface FilterCriteria {
     dateRange: {
@@ -91,6 +85,7 @@ export interface AnomalyQueueItem {
     level: WarningLevel;
     status: AnomalyStatus;
     suspensionReason?: 'duplicate_equipment' | 'ambiguous_equipment' | 'judgment_change_review';
+    duplicateConfirmationId?: string;
     assignedTo: 'project_manager' | 'assistant_xiaolin' | 'developer';
     createdAt: string;
     updatedAt: string;
@@ -100,6 +95,27 @@ export interface AnomalyStatusLog {
     timestamp: string;
     from: AnomalyStatus | null;
     to: AnomalyStatus;
+    operator: string;
+    comment?: string;
+}
+export interface DuplicateIdConfirmation {
+    id: string;
+    projectId: string;
+    candidateCanonicalId: string;
+    rawVariants: string[];
+    affectedRecordIds: string[];
+    affectedWarningCount: number;
+    status: 'pending' | 'confirmed' | 'rejected';
+    confirmedCanonicalId?: string;
+    riskOfFalseStability: string;
+    createdAt: string;
+    updatedAt: string;
+    history: DuplicateIdConfirmationLog[];
+}
+export interface DuplicateIdConfirmationLog {
+    timestamp: string;
+    from: DuplicateIdConfirmation['status'] | null;
+    to: DuplicateIdConfirmation['status'];
     operator: string;
     comment?: string;
 }
@@ -121,6 +137,15 @@ export interface JudgmentChange {
     affectedRecordIds: string[];
     remarkForReview?: string;
 }
+export interface WarningResultSet {
+    generatedAt: string;
+    filterCriteria: FilterCriteria;
+    statistics: WarningStatistics;
+    details: WarningDetail[];
+    anomalyQueue: AnomalyQueueItem[];
+    duplicateConfirmations: DuplicateIdConfirmation[];
+    judgmentChanges: JudgmentChange[];
+}
 export interface ManagerDashboardView {
     overview: WarningStatistics;
     summaryBreakdown: {
@@ -140,6 +165,17 @@ export interface ManagerDashboardView {
         affectedWarningCount: number;
         riskOfFalseStability: string;
     }[];
+    duplicateConfirmations: {
+        confirmationId: string;
+        projectId: string;
+        candidateCanonicalId: string;
+        rawVariants: string[];
+        affectedRecordIds: string[];
+        affectedWarningCount: number;
+        status: DuplicateIdConfirmation['status'];
+        confirmedCanonicalId?: string;
+        riskOfFalseStability: string;
+    }[];
     outstandingEvidenceGaps: {
         gapType: EvidenceGap['type'];
         count: number;
@@ -153,6 +189,7 @@ export interface HandoverChecklistItem {
     completed: boolean;
     relatedInspectionRecordIds: string[];
     relatedAnomalyQueueIds: string[];
+    relatedDuplicateConfirmationIds?: string[];
     evidence?: string;
 }
 export interface HandoverPackage {
@@ -164,6 +201,7 @@ export interface HandoverPackage {
         rawEquipmentId: string;
         canonicalEquipmentId: string | null;
         anomalyQueueIds: string[];
+        duplicateConfirmationIds: string[];
         judgmentChangeIds: string[];
     }[];
     pendingActionCount: number;

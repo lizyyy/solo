@@ -43,20 +43,20 @@ const THRESHOLDS: ThresholdRule[] = [
 function data(): InspectionRecord[] {
   const ts = new Date().toISOString();
   return [
-    { id: 'R01', inspectionDate: '2026-06-01', rawEquipmentId: 'SD001',
+    { id: 'R01', inspectionDate: '2026-06-01', rawEquipmentId: 'SD001', projectId: 'P-001',
       inspector: '张三', itemName: '刀盘磨损量', measuredValue: 6, unit: 'mm', createdAt: ts },
-    { id: 'R02', inspectionDate: '2026-06-02', rawEquipmentId: '盾构1号',
+    { id: 'R02', inspectionDate: '2026-06-02', rawEquipmentId: '盾构1号', projectId: 'P-001',
       inspector: '张三', itemName: '刀盘磨损量', measuredValue: 10, unit: 'mm', createdAt: ts },
-    { id: 'R03', inspectionDate: '2026-06-03', rawEquipmentId: 'SD-001',
+    { id: 'R03', inspectionDate: '2026-06-03', rawEquipmentId: 'SD-001', projectId: 'P-001',
       inspector: '李四', itemName: '刀盘磨损量', measuredValue: 18, unit: 'mm',
       remark: '发现偏磨，计划换刀', createdAt: ts },
-    { id: 'R04', inspectionDate: '2026-06-03', rawEquipmentId: 'SD-001',
+    { id: 'R04', inspectionDate: '2026-06-03', rawEquipmentId: 'SD-001', projectId: 'P-001',
       inspector: '李四', itemName: '主驱动油温', measuredValue: 78, unit: '℃',
       createdAt: ts },
-    { id: 'R05', inspectionDate: '2026-06-03', rawEquipmentId: '盾构2号',
+    { id: 'R05', inspectionDate: '2026-06-03', rawEquipmentId: '盾构2号', projectId: 'P-001',
       inspector: '王五', itemName: '刀盘磨损量', measuredValue: 28, unit: 'mm',
       remark: '多把滚刀超限', createdAt: ts },
-    { id: 'R06', inspectionDate: '2026-06-04', rawEquipmentId: 'SD-X',
+    { id: 'R06', inspectionDate: '2026-06-04', rawEquipmentId: 'SD-X', projectId: 'P-001',
       inspector: '新人', itemName: '刀盘磨损量', measuredValue: 22, unit: 'mm', createdAt: ts },
   ];
 }
@@ -191,7 +191,7 @@ function main() {
 
   // ---- 7. 交接清单（小林用）----
   section('⑦ 交接清单（小林视角）— 顺着巡检表 → 异常队列就能完成收尾');
-  const pkg = new HandoverPackager().build(result);
+  const pkg = new HandoverPackager().build(result, inspections);
   console.log(
     `  总步骤: ${pkg.checklist.length}  ` +
     `已完成前置: ${pkg.completedActionCount}  ` +

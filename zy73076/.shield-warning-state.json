@@ -1,0 +1,411 @@
+{
+  "version": 1,
+  "inspections": [
+    {
+      "id": "R001",
+      "inspectionDate": "2026-06-01",
+      "rawEquipmentId": "SD001",
+      "projectId": "P-001",
+      "inspector": "张工",
+      "itemName": "刀盘磨损量",
+      "measuredValue": 6,
+      "unit": "mm",
+      "remark": "",
+      "createdAt": "2026-06-22T04:19:56.652Z"
+    },
+    {
+      "id": "R002",
+      "inspectionDate": "2026-06-02",
+      "rawEquipmentId": "盾构1号",
+      "projectId": "P-001",
+      "inspector": "张工",
+      "itemName": "刀盘磨损量",
+      "measuredValue": 10,
+      "unit": "mm",
+      "remark": "",
+      "createdAt": "2026-06-22T04:19:56.652Z"
+    },
+    {
+      "id": "R003",
+      "inspectionDate": "2026-06-03",
+      "rawEquipmentId": "SD-001",
+      "projectId": "P-001",
+      "inspector": "李工",
+      "itemName": "刀盘磨损量",
+      "measuredValue": 18,
+      "unit": "mm",
+      "remark": "发现偏磨",
+      "createdAt": "2026-06-22T04:19:56.652Z"
+    },
+    {
+      "id": "R004",
+      "inspectionDate": "2026-06-03",
+      "rawEquipmentId": "SD-001",
+      "projectId": "P-001",
+      "inspector": "李工",
+      "itemName": "主驱动油温",
+      "measuredValue": 78,
+      "unit": "℃",
+      "remark": "",
+      "createdAt": "2026-06-22T04:19:56.652Z"
+    },
+    {
+      "id": "R005",
+      "inspectionDate": "2026-06-02",
+      "rawEquipmentId": "盾构2号",
+      "projectId": "P-001",
+      "inspector": "王工",
+      "itemName": "刀盘磨损量",
+      "measuredValue": 28,
+      "unit": "mm",
+      "remark": "多把滚刀超限",
+      "createdAt": "2026-06-22T04:19:56.652Z"
+    },
+    {
+      "id": "R006",
+      "inspectionDate": "2026-06-03",
+      "rawEquipmentId": "SD-002",
+      "projectId": "P-001",
+      "inspector": "王工",
+      "itemName": "主驱动油温",
+      "measuredValue": 68,
+      "unit": "℃",
+      "remark": "",
+      "createdAt": "2026-06-22T04:19:56.652Z"
+    },
+    {
+      "id": "R101",
+      "inspectionDate": "2026-06-02",
+      "rawEquipmentId": "SD-003",
+      "projectId": "P-002",
+      "inspector": "赵工",
+      "itemName": "刀盘磨损量",
+      "measuredValue": 12,
+      "unit": "mm",
+      "remark": "",
+      "createdAt": "2026-06-22T04:19:56.652Z"
+    },
+    {
+      "id": "R102",
+      "inspectionDate": "2026-06-03",
+      "rawEquipmentId": "盾构3号",
+      "projectId": "P-002",
+      "inspector": "赵工",
+      "itemName": "刀盘磨损量",
+      "measuredValue": 22,
+      "unit": "mm",
+      "remark": "",
+      "createdAt": "2026-06-22T04:19:56.652Z"
+    },
+    {
+      "id": "R103",
+      "inspectionDate": "2026-06-03",
+      "rawEquipmentId": "SD-004",
+      "projectId": "P-002",
+      "inspector": "钱工",
+      "itemName": "主驱动油温",
+      "measuredValue": 82,
+      "unit": "℃",
+      "remark": "高温报警",
+      "createdAt": "2026-06-22T04:19:56.652Z"
+    },
+    {
+      "id": "R104",
+      "inspectionDate": "2026-06-04",
+      "rawEquipmentId": "SD-004",
+      "projectId": "P-002",
+      "inspector": "钱工",
+      "itemName": "刀盘转速",
+      "measuredValue": 0.3,
+      "unit": "rpm",
+      "remark": "",
+      "createdAt": "2026-06-22T04:19:56.652Z"
+    }
+  ],
+  "anomalyQueue": [
+    {
+      "id": "AQ-P-001-SD-001-attention",
+      "warningDetailId": "R002",
+      "equipmentId": "SD-001",
+      "rawEquipmentIds": [
+        "盾构1号"
+      ],
+      "level": "attention",
+      "status": "confirmed_warning",
+      "duplicateConfirmationId": "DC-P-001-SD-001",
+      "assignedTo": "assistant_xiaolin",
+      "createdAt": "2026-06-22T04:19:56.709Z",
+      "updatedAt": "2026-06-22T04:20:20.103Z",
+      "history": [
+        {
+          "timestamp": "2026-06-22T04:19:56.709Z",
+          "from": null,
+          "to": "pending_confirmation",
+          "operator": "system",
+          "comment": "自动挂起：同一物理设备对应多种原始写法（设备编号重复），未确认前不得给出假稳定结论"
+        },
+        {
+          "timestamp": "2026-06-22T04:19:56.716Z",
+          "from": "pending_confirmation",
+          "to": "confirmed_warning",
+          "operator": "project_manager",
+          "comment": "设备编号已确认为 SD-001，待确认状态解除"
+        }
+      ]
+    },
+    {
+      "id": "AQ-P-001-SD-001-warning",
+      "warningDetailId": "R003,R004",
+      "equipmentId": "SD-001",
+      "rawEquipmentIds": [
+        "SD-001"
+      ],
+      "level": "warning",
+      "status": "confirmed_warning",
+      "duplicateConfirmationId": "DC-P-001-SD-001",
+      "assignedTo": "assistant_xiaolin",
+      "createdAt": "2026-06-22T04:19:56.709Z",
+      "updatedAt": "2026-06-22T04:20:20.103Z",
+      "history": [
+        {
+          "timestamp": "2026-06-22T04:19:56.709Z",
+          "from": null,
+          "to": "pending_confirmation",
+          "operator": "system",
+          "comment": "自动挂起：同一物理设备对应多种原始写法（设备编号重复），未确认前不得给出假稳定结论"
+        },
+        {
+          "timestamp": "2026-06-22T04:19:56.716Z",
+          "from": "pending_confirmation",
+          "to": "confirmed_warning",
+          "operator": "project_manager",
+          "comment": "设备编号已确认为 SD-001，待确认状态解除"
+        }
+      ]
+    },
+    {
+      "id": "AQ-P-001-SD-002-critical",
+      "warningDetailId": "R005",
+      "equipmentId": "SD-002",
+      "rawEquipmentIds": [
+        "盾构2号"
+      ],
+      "level": "critical",
+      "status": "pending_confirmation",
+      "suspensionReason": "duplicate_equipment",
+      "duplicateConfirmationId": "DC-P-001-SD-002",
+      "assignedTo": "project_manager",
+      "createdAt": "2026-06-22T04:20:20.103Z",
+      "updatedAt": "2026-06-22T04:20:20.103Z",
+      "history": [
+        {
+          "timestamp": "2026-06-22T04:20:20.103Z",
+          "from": null,
+          "to": "pending_confirmation",
+          "operator": "system",
+          "comment": "自动挂起：同一物理设备对应多种原始写法（设备编号重复），未确认前不得给出假稳定结论"
+        }
+      ]
+    },
+    {
+      "id": "AQ-P-001-SD-002-attention",
+      "warningDetailId": "R006",
+      "equipmentId": "SD-002",
+      "rawEquipmentIds": [
+        "SD-002"
+      ],
+      "level": "attention",
+      "status": "pending_confirmation",
+      "suspensionReason": "duplicate_equipment",
+      "duplicateConfirmationId": "DC-P-001-SD-002",
+      "assignedTo": "project_manager",
+      "createdAt": "2026-06-22T04:20:20.103Z",
+      "updatedAt": "2026-06-22T04:20:20.103Z",
+      "history": [
+        {
+          "timestamp": "2026-06-22T04:20:20.103Z",
+          "from": null,
+          "to": "pending_confirmation",
+          "operator": "system",
+          "comment": "自动挂起：同一物理设备对应多种原始写法（设备编号重复），未确认前不得给出假稳定结论"
+        }
+      ]
+    },
+    {
+      "id": "AQ-P-002-SD-003-attention",
+      "warningDetailId": "R101",
+      "equipmentId": "SD-003",
+      "rawEquipmentIds": [
+        "SD-003"
+      ],
+      "level": "attention",
+      "status": "pending_confirmation",
+      "suspensionReason": "duplicate_equipment",
+      "duplicateConfirmationId": "DC-P-002-SD-003",
+      "assignedTo": "project_manager",
+      "createdAt": "2026-06-22T04:20:20.103Z",
+      "updatedAt": "2026-06-22T04:20:20.103Z",
+      "history": [
+        {
+          "timestamp": "2026-06-22T04:20:20.103Z",
+          "from": null,
+          "to": "pending_confirmation",
+          "operator": "system",
+          "comment": "自动挂起：同一物理设备对应多种原始写法（设备编号重复），未确认前不得给出假稳定结论"
+        }
+      ]
+    },
+    {
+      "id": "AQ-P-002-SD-003-warning",
+      "warningDetailId": "R102",
+      "equipmentId": "SD-003",
+      "rawEquipmentIds": [
+        "盾构3号"
+      ],
+      "level": "warning",
+      "status": "pending_confirmation",
+      "suspensionReason": "duplicate_equipment",
+      "duplicateConfirmationId": "DC-P-002-SD-003",
+      "assignedTo": "project_manager",
+      "createdAt": "2026-06-22T04:20:20.103Z",
+      "updatedAt": "2026-06-22T04:20:20.103Z",
+      "history": [
+        {
+          "timestamp": "2026-06-22T04:20:20.103Z",
+          "from": null,
+          "to": "pending_confirmation",
+          "operator": "system",
+          "comment": "自动挂起：同一物理设备对应多种原始写法（设备编号重复），未确认前不得给出假稳定结论"
+        }
+      ]
+    },
+    {
+      "id": "AQ-P-002-SD-004-warning",
+      "warningDetailId": "R103,R104",
+      "equipmentId": "SD-004",
+      "rawEquipmentIds": [
+        "SD-004"
+      ],
+      "level": "warning",
+      "status": "confirmed_warning",
+      "assignedTo": "assistant_xiaolin",
+      "createdAt": "2026-06-22T04:19:56.652Z",
+      "updatedAt": "2026-06-22T04:20:20.103Z",
+      "history": [
+        {
+          "timestamp": "2026-06-22T04:19:56.652Z",
+          "from": null,
+          "to": "confirmed_warning",
+          "operator": "system",
+          "comment": "系统自动入队"
+        }
+      ]
+    }
+  ],
+  "duplicateConfirmations": [
+    {
+      "id": "DC-P-001-SD-001",
+      "projectId": "P-001",
+      "candidateCanonicalId": "SD-001",
+      "rawVariants": [
+        "SD-001",
+        "SD001",
+        "盾构1号"
+      ],
+      "affectedRecordIds": [
+        "R001",
+        "R002",
+        "R003",
+        "R004"
+      ],
+      "affectedWarningCount": 3,
+      "status": "confirmed",
+      "riskOfFalseStability": "该项目下 SD-001 有 3 种不同写法，3 条预警数据。若不确认，可能导致预警分散归集、责任不清、隐患被漏判。",
+      "createdAt": "2026-06-22T04:19:56.709Z",
+      "updatedAt": "2026-06-22T04:20:20.103Z",
+      "history": [
+        {
+          "timestamp": "2026-06-22T04:19:56.709Z",
+          "from": null,
+          "to": "pending",
+          "operator": "system",
+          "comment": "自动识别：3 种不同写法 → 挂起待确认"
+        },
+        {
+          "timestamp": "2026-06-22T04:19:56.716Z",
+          "from": "pending",
+          "to": "confirmed",
+          "operator": "project_manager",
+          "comment": "项目经理确认规范编号为 SD-001，原始写法 3 种 → 统一归集"
+        }
+      ],
+      "confirmedCanonicalId": "SD-001"
+    },
+    {
+      "id": "DC-P-001-SD-002",
+      "projectId": "P-001",
+      "candidateCanonicalId": "SD-002",
+      "rawVariants": [
+        "SD-002",
+        "盾构2号"
+      ],
+      "affectedRecordIds": [
+        "R005",
+        "R006"
+      ],
+      "affectedWarningCount": 2,
+      "status": "pending",
+      "riskOfFalseStability": "该项目下 SD-002 有 2 种不同写法，2 条预警数据。若不确认，可能导致预警分散归集、责任不清、隐患被漏判。",
+      "createdAt": "2026-06-22T04:20:20.103Z",
+      "updatedAt": "2026-06-22T04:20:20.103Z",
+      "history": [
+        {
+          "timestamp": "2026-06-22T04:20:20.103Z",
+          "from": null,
+          "to": "pending",
+          "operator": "system",
+          "comment": "自动识别：2 种不同写法 → 挂起待确认"
+        }
+      ]
+    },
+    {
+      "id": "DC-P-002-SD-003",
+      "projectId": "P-002",
+      "candidateCanonicalId": "SD-003",
+      "rawVariants": [
+        "SD-003",
+        "盾构3号"
+      ],
+      "affectedRecordIds": [
+        "R101",
+        "R102"
+      ],
+      "affectedWarningCount": 2,
+      "status": "pending",
+      "riskOfFalseStability": "该项目下 SD-003 有 2 种不同写法，2 条预警数据。若不确认，可能导致预警分散归集、责任不清、隐患被漏判。",
+      "createdAt": "2026-06-22T04:20:20.103Z",
+      "updatedAt": "2026-06-22T04:20:20.103Z",
+      "history": [
+        {
+          "timestamp": "2026-06-22T04:20:20.103Z",
+          "from": null,
+          "to": "pending",
+          "operator": "system",
+          "comment": "自动识别：2 种不同写法 → 挂起待确认"
+        }
+      ]
+    }
+  ],
+  "operationLog": [
+    {
+      "timestamp": "2026-06-22T04:19:56.716Z",
+      "operator": "project_manager",
+      "action": "dc_confirm",
+      "targetId": "DC-P-001-SD-001",
+      "payload": {
+        "confirmedCanonical": "SD-001"
+      }
+    }
+  ],
+  "updatedAt": "2026-06-22T04:20:20.108Z"
+}

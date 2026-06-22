@@ -1,4 +1,4 @@
-import { InspectionRecord, ThresholdRule, WarningDetail, WarningResultSet, FilterCriteria } from './types';
+import { InspectionRecord, ThresholdRule, WarningDetail, WarningResultSet, WarningStatistics, FilterCriteria, AnomalyQueueItem, JudgmentChange, DuplicateIdConfirmation } from './types';
 import { EquipmentNormalizer } from './equipment-normalizer';
 export declare class CutterheadWarningEngine {
     private normalizer;
@@ -10,10 +10,16 @@ export declare class CutterheadWarningEngine {
     private findRule;
     private evaluateLevel;
     private buildThresholdBreach;
+    private buildDuplicateConfirmations;
     private buildAnomalyQueue;
     private buildJudgmentChanges;
-    private applyFullFilter;
-    private computeStatistics;
+    applyFullFilter(details: WarningDetail[], queue: AnomalyQueueItem[], confirmations: DuplicateIdConfirmation[], changes: JudgmentChange[], criteria: FilterCriteria): {
+        details: WarningDetail[];
+        queue: AnomalyQueueItem[];
+        confirmations: DuplicateIdConfirmation[];
+        changes: JudgmentChange[];
+    };
+    computeStatistics(details: WarningDetail[], queue: AnomalyQueueItem[], criteria: FilterCriteria): WarningStatistics;
     private levelLabel;
     private describeEquipmentIssue;
     private describeSuspension;

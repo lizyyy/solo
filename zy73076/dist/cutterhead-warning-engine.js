@@ -108,6 +108,7 @@ class CutterheadWarningEngine {
             const detail = {
                 recordId: rec.id,
                 inspectionDate: rec.inspectionDate,
+                projectId: rec.projectId,
                 equipmentId: norm.canonical ?? `PENDING(${rec.rawEquipmentId})`,
                 rawEquipmentId: rec.rawEquipmentId,
                 itemName: rec.itemName,
@@ -121,13 +122,16 @@ class CutterheadWarningEngine {
             };
             intermediateDetails.push(detail);
         }
-        // ===== 步骤 3：生成异常队列 =====
-        const anomalyQueue = this.buildAnomalyQueue(intermediateDetails, duplicateCanonicals, rawToDuplicateCanonical, normMap, ts);
-        // ===== 步骤 4：生成判断变更记录 =====
+        // ===== 步骤 3：生成设备编号重复待确认事项 =====
+        // 必须在 buildAnomalyQueue 之前，因为队列需要关联到待确认事项
+        const duplicateConfirmations = this.buildDuplicateConfirmations(inspections, intermediateDetails, duplicateGroups, rawToDuplicateCanonical, ts);
+        // ===== 步骤 4：生成异常队列 =====
+        const anomalyQueue = this.buildAnomalyQueue(intermediateDetails, duplicateCanonicals, rawToDuplicateCanonical, normMap, duplicateConfirmations, ts);
+        // ===== 步骤 5：生成判断变更记录 =====
         const judgmentChanges = this.buildJudgmentChanges(intermediateDetails, inspections, ts);
-        // ===== 步骤 5：应用筛选条件（details / queue / changes 同步过滤，口径一致）=====
-        const filtered = this.applyFullFilter(intermediateDetails, anomalyQueue, judgmentChanges, criteria);
-        // ===== 步骤 6：统计数字（从过滤后的数据生成，口径一致） =====
+        // ===== 步骤 6：应用筛选条件（details / queue / confirmations / changes 同步过滤，口径一致）=====
+        const filtered = this.applyFullFilter(intermediateDetails, anomalyQueue, duplicateConfirmations, judgmentChanges, criteria);
+        // ===== 步骤 7：统计数字（从过滤后的数据生成，口径一致） =====
         const statistics = this.computeStatistics(filtered.details, filtered.queue, criteria);
         return {
             generatedAt: ts,
@@ -135,6 +139,7 @@ class CutterheadWarningEngine {
             statistics,
             details: filtered.details,
             anomalyQueue: filtered.queue,
+            duplicateConfirmations: filtered.confirmations,
             judgmentChanges: filtered.changes,
         };
     }
@@ -198,8 +203,78 @@ class CutterheadWarningEngine {
             direction,
         };
     }
+    // ---------- 内部：构建设备编号重复待确认事项 ----------
+    // 同一项目 + 同一候选规范编号 → 一个待确认事项
+    // 涵盖该项目下所有使用了这组重复写法的巡检记录（含 normal 级别）
+    buildDuplicateConfirmations(inspections, details, duplicateGroups, rawToDuplicateCanonical, ts) {
+        const confirmations = [];
+        let seq = 0;
+        // 按 (projectId + canonicalId) 分组重复组
+        const projectGroups = new Map();
+        for (const g of duplicateGroups) {
+            if (!g.pendingConfirmation)
+                continue; // 已确认的跳过
+            const canonical = g.canonicalId;
+            for (const raw of g.rawVariants) {
+                // 这个原始写法对应的所有巡检记录（可能多个项目）
+                const records = inspections.filter(r => r.rawEquipmentId === raw);
+                for (const rec of records) {
+                    const key = rec.projectId + '|' + canonical;
+                    if (!projectGroups.has(key)) {
+                        projectGroups.set(key, {
+                            canonicalId: canonical,
+                            projectId: rec.projectId,
+                            rawVariants: new Set(),
+                            affectedRecordIds: [],
+                            affectedWarningCount: 0,
+                        });
+                    }
+                    const p = projectGroups.get(key);
+                    p.rawVariants.add(raw);
+                    p.affectedRecordIds.push(rec.id);
+                    // 统计非 normal 条数
+                    const detail = details.find(d => d.recordId === rec.id);
+                    if (detail && detail.level !== 'normal') {
+                        p.affectedWarningCount++;
+                    }
+                }
+            }
+        }
+        for (const [, info] of projectGroups) {
+            seq++;
+            // 确定性 ID：基于 projectId + canonicalId，保证每次重新生成都匹配
+            const id = `DC-${info.projectId}-${info.canonicalId}`;
+            // 假稳定风险描述
+            const risk = info.affectedWarningCount > 0
+                ? `该项目下 ${info.canonicalId} 有 ${info.rawVariants.size} 种不同写法，${info.affectedWarningCount} 条预警数据。` +
+                    `若不确认，可能导致预警分散归集、责任不清、隐患被漏判。`
+                : `该项目下 ${info.canonicalId} 有 ${info.rawVariants.size} 种不同写法，${info.affectedRecordIds.length} 条巡检记录。` +
+                    `若不确认，后续出现预警时无法准确归集。`;
+            confirmations.push({
+                id,
+                projectId: info.projectId,
+                candidateCanonicalId: info.canonicalId,
+                rawVariants: Array.from(info.rawVariants).sort(),
+                affectedRecordIds: Array.from(new Set(info.affectedRecordIds)).sort(),
+                affectedWarningCount: info.affectedWarningCount,
+                status: 'pending',
+                riskOfFalseStability: risk,
+                createdAt: ts,
+                updatedAt: ts,
+                history: [{
+                        timestamp: ts,
+                        from: null,
+                        to: 'pending',
+                        operator: 'system',
+                        comment: `自动识别：${info.rawVariants.size} 种不同写法 → 挂起待确认`,
+                    }],
+            });
+        }
+        return confirmations;
+    }
     // ---------- 内部：构建异常队列 ----------
-    buildAnomalyQueue(details, duplicateCanonicals, rawToDuplicateCanonical, normMap, ts) {
+    buildAnomalyQueue(details, duplicateCanonicals, rawToDuplicateCanonical, normMap, duplicateConfirmations, // 新增：用于关联
+    ts) {
         const queue = [];
         let seq = 0;
         // 先按 (规范设备编号 + 严重级别) 归集，一个组一条队列记录
@@ -216,6 +291,10 @@ class CutterheadWarningEngine {
             seq++;
             const first = groupDetails[0];
             const rawIds = Array.from(new Set(groupDetails.map(d => d.rawEquipmentId)));
+            // 提取 canonical 形式（去掉 PENDING 前缀），用于确定性 ID（确认前后一致）
+            const canonicalId = first.equipmentId.startsWith('PENDING(')
+                ? first.equipmentId.slice(8, -1)
+                : first.equipmentId;
             // ==== 判断是否挂起 ====
             // 策略：只要该组涉及的规范编号在 duplicateCanonicals 中，
             //       或任一原始写法是 ambiguous/unknown → 挂起，等项目经理确认
@@ -237,6 +316,15 @@ class CutterheadWarningEngine {
                 suspensionReason = 'ambiguous_equipment';
                 assignedTo = 'project_manager';
             }
+            // 关联设备编号重复待确认事项（如果有）
+            let duplicateConfirmationId;
+            if (suspensionReason === 'duplicate_equipment') {
+                // 找第一个涉及的 duplicateConfirmation
+                const affectedRecIds = groupDetails.map(d => d.recordId);
+                const dc = duplicateConfirmations.find(c => c.affectedRecordIds.some(rid => affectedRecIds.includes(rid)));
+                if (dc)
+                    duplicateConfirmationId = dc.id;
+            }
             // 判断变更导致的挂起（本批次有 judgment_change 且级别上升 → 标记需评审）
             // 这里不在这里判断，judgmentChanges 单独记录
             const initialLog = {
@@ -249,13 +337,14 @@ class CutterheadWarningEngine {
                     : '系统自动入队',
             };
             queue.push({
-                id: `AQ-${ts.slice(0, 10).replace(/-/g, '')}-${String(seq).padStart(3, '0')}`,
+                id: `AQ-${first.projectId}-${canonicalId}-${first.level}`,
                 warningDetailId: groupDetails.map(d => d.recordId).join(','),
                 equipmentId: first.equipmentId,
                 rawEquipmentIds: rawIds,
                 level: first.level,
                 status,
                 suspensionReason,
+                duplicateConfirmationId,
                 assignedTo,
                 createdAt: ts,
                 updatedAt: ts,
@@ -346,8 +435,8 @@ class CutterheadWarningEngine {
         }
         return changes;
     }
-    // ---------- 内部：统一应用筛选（details / queue / changes 同源过滤） ----------
-    applyFullFilter(details, queue, changes, criteria) {
+    // ---------- 统一应用筛选（details / queue / confirmations / changes 同源过滤） ----------
+    applyFullFilter(details, queue, confirmations, changes, criteria) {
         // 构造一个 detailId → 是否保留 的 Set，供 queue 和 changes 复用
         const keptRecordIds = new Set();
         let outDetails = details;
@@ -371,8 +460,6 @@ class CutterheadWarningEngine {
             outDetails = outDetails.filter(d => set.has(d.level));
         }
         // 5. 挂起项过滤（includeSuspended=false 时，排除涉及 pending_confirmation 队列的 detail）
-        //    注意：这里要基于"过滤后 queue"的概念，所以先从原始 queue 中找出挂起的设备，
-        //    再把对应 details 去掉
         if (!criteria.includeSuspended) {
             const suspendedEquipmentIds = new Set(queue
                 .filter(q => q.status === 'pending_confirmation')
@@ -386,11 +473,19 @@ class CutterheadWarningEngine {
             const detailIds = q.warningDetailId.split(',');
             return detailIds.some(id => keptRecordIds.has(id));
         });
+        // ---- 过滤 duplicateConfirmations：
+        //      1) 按 projectId 过滤（如果有）
+        //      2) 只要 affectedRecordIds 中有被保留的记录，就保留
+        let outConfirmations = confirmations;
+        if (criteria.projectId) {
+            outConfirmations = outConfirmations.filter(c => c.projectId === criteria.projectId);
+        }
+        outConfirmations = outConfirmations.filter(c => c.affectedRecordIds.some(id => keptRecordIds.has(id)));
         // ---- 过滤 judgmentChanges：只要 affectedRecordIds 中有被保留的，就保留 ----
         const outChanges = changes.filter(c => c.affectedRecordIds.some(id => keptRecordIds.has(id)));
-        return { details: outDetails, queue: outQueue, changes: outChanges };
+        return { details: outDetails, queue: outQueue, confirmations: outConfirmations, changes: outChanges };
     }
-    // ---------- 内部：统计（从筛选后的 details 生成，口径一致） ----------
+    // ---------- 统计（从筛选后的 details 生成，口径一致） ----------
     computeStatistics(details, queue, criteria) {
         const byLevel = {
             normal: 0, attention: 0, warning: 0, critical: 0,

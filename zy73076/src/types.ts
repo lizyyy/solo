@@ -32,6 +32,7 @@ export interface InspectionRecord {
   id: string;                    // 巡检记录ID
   inspectionDate: string;        // 巡检日期 YYYY-MM-DD
   rawEquipmentId: string;        // 巡检表上填写的原始设备编号
+  projectId: string;             // 所属项目（用于按项目分组、筛选）
   inspector: string;             // 巡检人
   itemName: string;              // 巡检项（如"刀盘磨损量"、"油温"）
   measuredValue: number;         // 测量值
@@ -59,6 +60,7 @@ export interface ThresholdRule {
 export interface WarningDetail {
   recordId: string;              // 关联巡检记录ID
   inspectionDate: string;
+  projectId: string;             // 所属项目
   equipmentId: string;           // 此处为规范编号（若能规范化）
   rawEquipmentId: string;        // 原始写法，便于追溯
   itemName: string;
@@ -84,16 +86,7 @@ export interface EvidenceGap {
   priority: 'high' | 'medium' | 'low';
 }
 
-// ---------- 统一预警结果（筛选/统计/明细/异常队列共用同一数据源） ----------
-
-export interface WarningResultSet {
-  generatedAt: string;
-  filterCriteria: FilterCriteria;   // 生成时使用的筛选条件
-  statistics: WarningStatistics;    // 统计数字
-  details: WarningDetail[];         // 明细表
-  anomalyQueue: AnomalyQueueItem[]; // 异常队列
-  judgmentChanges: JudgmentChange[]; // 本批次预警改变了哪些判断（供评审会备注）
-}
+// ---------- 筛选 & 统计（与 WarningResultSet 同源） ----------
 
 export interface FilterCriteria {
   dateRange: { start: string; end: string } | null;
@@ -132,6 +125,7 @@ export interface AnomalyQueueItem {
     | 'duplicate_equipment'      // 设备编号重复：同一物理设备多种写法未确认
     | 'ambiguous_equipment'      // 写法歧义
     | 'judgment_change_review';  // 判断变更需评审
+  duplicateConfirmationId?: string; // 关联的设备编号待确认事项ID
   assignedTo: 'project_manager' | 'assistant_xiaolin' | 'developer';
   createdAt: string;
   updatedAt: string;
@@ -142,6 +136,34 @@ export interface AnomalyStatusLog {
   timestamp: string;
   from: AnomalyStatus | null;
   to: AnomalyStatus;
+  operator: string;
+  comment?: string;
+}
+
+// ---------- 设备编号重复待确认事项（独立维度，整合同一组重复写法） ----------
+// 设计意图：把同一项目、同一物理设备（候选规范编号）的所有不同原始写法，
+// 归集到同一个待确认事项里。无论对应巡检记录阈值判断是 normal 还是 warning，
+// 只要属于这个重复组，就能从巡检表索引查到这个待确认事项。
+
+export interface DuplicateIdConfirmation {
+  id: string;                              // 如 "DC-20260622-001"
+  projectId: string;                       // 所属项目（用于筛选）
+  candidateCanonicalId: string;            // 候选规范编号
+  rawVariants: string[];                   // 所有不同的原始写法（重复证据链）
+  affectedRecordIds: string[];             // 所有关联的巡检记录ID（含 normal）
+  affectedWarningCount: number;            // 其中有多少条是非 normal 的（便于判断风险）
+  status: 'pending' | 'confirmed' | 'rejected';
+  confirmedCanonicalId?: string;           // 项目经理确认后的最终规范编号
+  riskOfFalseStability: string;            // 不确认的假稳定风险描述
+  createdAt: string;
+  updatedAt: string;
+  history: DuplicateIdConfirmationLog[];
+}
+
+export interface DuplicateIdConfirmationLog {
+  timestamp: string;
+  from: DuplicateIdConfirmation['status'] | null;
+  to: DuplicateIdConfirmation['status'];
   operator: string;
   comment?: string;
 }
@@ -171,7 +193,17 @@ export interface JudgmentChange {
   remarkForReview?: string;        // 评审会备注内容
 }
 
-// ---------- 项目经理视图 ----------
+// ---------- 统一预警结果（筛选/统计/明细/异常队列共用同一数据源） ----------
+
+export interface WarningResultSet {
+  generatedAt: string;
+  filterCriteria: FilterCriteria;          // 生成时使用的筛选条件
+  statistics: WarningStatistics;           // 统计数字
+  details: WarningDetail[];                // 明细表
+  anomalyQueue: AnomalyQueueItem[];        // 异常队列（按级别+设备分组）
+  duplicateConfirmations: DuplicateIdConfirmation[]; // 设备编号重复待确认事项（整合维度）
+  judgmentChanges: JudgmentChange[];       // 本批次预警改变了哪些判断
+}
 
 export interface ManagerDashboardView {
   overview: WarningStatistics;
@@ -184,12 +216,24 @@ export interface ManagerDashboardView {
     drillDownFilter: Partial<FilterCriteria>; // 点击下钻时携带的筛选条件
   }[];
   pendingConfirmations: {
-    // 项目经理待确认清单（设备编号重复/歧义）
+    // 项目经理待确认清单（来自 anomalyQueue，按预警级别拆分）
     queueId: string;
     rawEquipmentIds: string[];
     candidateCanonicalIds: string[];
     affectedWarningCount: number;
     riskOfFalseStability: string; // 描述：若不确认可能导致什么假稳定结论
+  }[];
+  duplicateConfirmations: {
+    // 设备编号重复待确认事项（整合同一组，来自 duplicateConfirmations）
+    confirmationId: string;
+    projectId: string;
+    candidateCanonicalId: string;
+    rawVariants: string[];
+    affectedRecordIds: string[];
+    affectedWarningCount: number;
+    status: DuplicateIdConfirmation['status'];
+    confirmedCanonicalId?: string;
+    riskOfFalseStability: string;
   }[];
   outstandingEvidenceGaps: {
     // 还剩哪些证据没补齐（项目经理最关心）
@@ -208,6 +252,7 @@ export interface HandoverChecklistItem {
   completed: boolean;
   relatedInspectionRecordIds: string[];
   relatedAnomalyQueueIds: string[];
+  relatedDuplicateConfirmationIds?: string[];
   evidence?: string;              // 交接凭证（链接/编号）
 }
 
@@ -216,11 +261,12 @@ export interface HandoverPackage {
   generatedFor: 'assistant_xiaolin';
   checklist: HandoverChecklistItem[];
   inspectionIndex: {
-    // 巡检表 → 异常队列 索引（小林顺着巡检表就能找到对应队列）
+    // 巡检表 → 异常队列 + 待确认事项 索引（小林顺着巡检表就能找到所有待办）
     inspectionRecordId: string;
     rawEquipmentId: string;
     canonicalEquipmentId: string | null;
     anomalyQueueIds: string[];
+    duplicateConfirmationIds: string[]; // 关联的设备编号待确认事项（即使是 normal 也可能有）
     judgmentChangeIds: string[];
   }[];
   pendingActionCount: number;

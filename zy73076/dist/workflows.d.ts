@@ -1,4 +1,4 @@
-import { WarningResultSet, AnomalyQueueItem, ManagerDashboardView, HandoverPackage, JudgmentChange } from './types';
+import { WarningResultSet, AnomalyQueueItem, ManagerDashboardView, HandoverPackage, JudgmentChange, InspectionRecord } from './types';
 export declare class ManagerViewBuilder {
     build(resultSet: WarningResultSet): ManagerDashboardView;
     private buildSummaryBreakdown;
@@ -20,6 +20,6 @@ export declare class JudgmentChangeReporter {
     toReviewBriefing(changes: JudgmentChange[]): string;
 }
 export declare class HandoverPackager {
-    build(resultSet: WarningResultSet): HandoverPackage;
+    build(resultSet: WarningResultSet, allInspections: InspectionRecord[]): HandoverPackage;
     private buildChecklist;
 }

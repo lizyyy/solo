@@ -10,19 +10,31 @@ exports.HandoverPackager = exports.JudgmentChangeReporter = exports.AnomalyQueue
 // ============================================================
 class ManagerViewBuilder {
     build(resultSet) {
-        const { statistics, details, anomalyQueue, judgmentChanges } = resultSet;
+        const { statistics, details, anomalyQueue, duplicateConfirmations, judgmentChanges } = resultSet;
         // ---- 1. 汇总口径下钻（按级别分解 + 证据缺口聚合 + 下钻筛选条件） ----
         const summaryBreakdown = this.buildSummaryBreakdown(statistics, details, resultSet.filterCriteria);
-        // ---- 2. 项目经理待确认清单（设备编号重复/歧义） ----
+        // ---- 2. 项目经理待确认清单（从 anomalyQueue 来，按预警级别拆分） ----
         const pendingConfirmations = anomalyQueue
             .filter(q => q.status === 'pending_confirmation')
             .map(q => this.buildPendingConfirmation(q, details));
+        // ---- 2b. 设备编号重复待确认事项（整合同一组） ----
+        const dcView = duplicateConfirmations.map(dc => ({
+            confirmationId: dc.id,
+            projectId: dc.projectId,
+            candidateCanonicalId: dc.candidateCanonicalId,
+            rawVariants: dc.rawVariants,
+            affectedRecordIds: dc.affectedRecordIds,
+            affectedWarningCount: dc.affectedWarningCount,
+            status: dc.status,
+            riskOfFalseStability: dc.riskOfFalseStability,
+        }));
         // ---- 3. 证据缺口清单（还剩哪些证据没补齐）----
         const outstandingEvidenceGaps = this.buildOutstandingGaps(details);
         return {
             overview: statistics,
             summaryBreakdown,
             pendingConfirmations,
+            duplicateConfirmations: dcView,
             outstandingEvidenceGaps,
         };
     }
@@ -290,24 +302,38 @@ exports.JudgmentChangeReporter = JudgmentChangeReporter;
 // 核心：顺着巡检表 → 异常队列 → 判断变更 就能完成交接，不靠开发者
 // ============================================================
 class HandoverPackager {
-    build(resultSet) {
+    build(resultSet, allInspections // 原始全量巡检记录（含 normal，用于构建完整索引）
+    ) {
         const ts = new Date().toISOString();
-        const { details, anomalyQueue, judgmentChanges, statistics } = resultSet;
-        // 构建巡检表 → 队列/变更 的索引（小林顺着巡检表就能查到所有关联）
-        const inspectionIndex = details.map(d => {
+        const { details, anomalyQueue, duplicateConfirmations, judgmentChanges, filterCriteria } = resultSet;
+        // 按筛选条件（特别是 projectId）过滤原始记录，保证索引与明细同源
+        const filteredInspections = allInspections.filter(rec => {
+            if (filterCriteria.projectId && rec.projectId !== filterCriteria.projectId)
+                return false;
+            return true;
+        });
+        // 构建巡检表 → 队列/待确认事项/变更 的完整索引
+        // 注意：从 filteredInspections 构建，不是 details，这样 normal 级别但属于重复证据链的记录也会出现
+        const inspectionIndex = filteredInspections.map(rec => {
+            // 这条记录对应的 detail（如果达到预警级别就有）
+            const detail = details.find(d => d.recordId === rec.id);
             const relatedQueueIds = anomalyQueue
-                .filter(q => q.warningDetailId.includes(d.recordId))
+                .filter(q => q.warningDetailId.includes(rec.id))
                 .map(q => q.id);
+            const relatedDCIds = duplicateConfirmations
+                .filter(dc => dc.affectedRecordIds.includes(rec.id))
+                .map(dc => dc.id);
             const relatedJCIds = judgmentChanges
-                .filter(jc => jc.affectedRecordIds.includes(d.recordId))
+                .filter(jc => jc.affectedRecordIds.includes(rec.id))
                 .map(jc => jc.id);
             return {
-                inspectionRecordId: d.recordId,
-                rawEquipmentId: d.rawEquipmentId,
-                canonicalEquipmentId: d.equipmentId.startsWith('PENDING(')
-                    ? null
-                    : d.equipmentId,
+                inspectionRecordId: rec.id,
+                rawEquipmentId: rec.rawEquipmentId,
+                canonicalEquipmentId: detail
+                    ? (detail.equipmentId.startsWith('PENDING(') ? null : detail.equipmentId)
+                    : null, // normal 记录暂时没有规范化结果（只有预警过的才会算）
                 anomalyQueueIds: relatedQueueIds,
+                duplicateConfirmationIds: relatedDCIds,
                 judgmentChangeIds: relatedJCIds,
             };
         });
@@ -327,21 +353,20 @@ class HandoverPackager {
     buildChecklist(rs, index) {
         const items = [];
         const { anomalyQueue, judgmentChanges } = rs;
-        // Step 1: 设备编号待确认项（duplicate / ambiguous / unknown 都算，即所有 pending_confirmation 且与设备编号相关的）
-        const equipmentPendingQueues = anomalyQueue.filter(q => q.status === 'pending_confirmation' &&
-            (q.suspensionReason === 'duplicate_equipment' ||
-                q.suspensionReason === 'ambiguous_equipment'));
-        const step1RecIds = Array.from(new Set(equipmentPendingQueues.flatMap(q => q.warningDetailId.split(','))));
+        // Step 1: 设备编号重复待确认事项（整合同一组，用 duplicateConfirmations）
+        const pendingDCs = rs.duplicateConfirmations.filter(dc => dc.status === 'pending');
+        const step1RecIds = Array.from(new Set(pendingDCs.flatMap(dc => dc.affectedRecordIds)));
         items.push({
             step: 1,
-            description: equipmentPendingQueues.length === 0
+            description: pendingDCs.length === 0
                 ? '[完成前置] 所有设备编号均已确认（无重复/歧义），无需项目经理追加确认。'
-                : `[待办] 请项目经理确认 ${equipmentPendingQueues.length} 条挂起队列的设备编号归属` +
-                    `（涉及 ${step1RecIds.length} 条巡检记录；队列：${equipmentPendingQueues.map(q => q.id).slice(0, 3).join('、')}${equipmentPendingQueues.length > 3 ? '...' : ''}）。` +
+                : `[待办] 请项目经理确认 ${pendingDCs.length} 组设备编号待确认事项` +
+                    `（涉及 ${step1RecIds.length} 条巡检记录；事项：${pendingDCs.map(dc => dc.id).join('、')}）。` +
                     ' 方法：打开项目经理视图 → "待确认清单" → 逐条确认规范编号。',
-            completed: equipmentPendingQueues.length === 0,
+            completed: pendingDCs.length === 0,
             relatedInspectionRecordIds: step1RecIds,
-            relatedAnomalyQueueIds: equipmentPendingQueues.map(q => q.id),
+            relatedAnomalyQueueIds: [], // 队列是独立的处置维度，这里走待确认事项维度
+            relatedDuplicateConfirmationIds: pendingDCs.map(dc => dc.id),
         });
         // Step 2: 巡检表备注补充（达到 warning/critical 但没备注的）
         const remarkMissingRecs = rs.details.filter(d => (d.level === 'warning' || d.level === 'critical') &&

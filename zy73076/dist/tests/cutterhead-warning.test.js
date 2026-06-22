@@ -58,6 +58,7 @@ function mkInspections() {
         id: 'R-001',
         inspectionDate: '2026-06-01',
         rawEquipmentId: 'SD001', // 别名
+        projectId: 'P-001',
         inspector: '张三',
         itemName: '刀盘磨损量',
         measuredValue: 6,
@@ -68,6 +69,7 @@ function mkInspections() {
         id: 'R-002',
         inspectionDate: '2026-06-02',
         rawEquipmentId: '盾构1号', // 别名
+        projectId: 'P-001',
         inspector: '张三',
         itemName: '刀盘磨损量',
         measuredValue: 10, // attention
@@ -78,6 +80,7 @@ function mkInspections() {
         id: 'R-003',
         inspectionDate: '2026-06-03',
         rawEquipmentId: 'SD-001', // 规范写法
+        projectId: 'P-001',
         inspector: '李四',
         itemName: '刀盘磨损量',
         measuredValue: 18, // warning（且有 3 种写法 → 归集后 warning；但挂起不给出结论）
@@ -89,6 +92,7 @@ function mkInspections() {
         id: 'R-004',
         inspectionDate: '2026-06-03',
         rawEquipmentId: 'SD-001',
+        projectId: 'P-001',
         inspector: '李四',
         itemName: '主驱动油温',
         measuredValue: 78, // warning
@@ -101,6 +105,7 @@ function mkInspections() {
         id: 'R-005',
         inspectionDate: '2026-06-01',
         rawEquipmentId: 'SD-002',
+        projectId: 'P-001',
         inspector: '王五',
         itemName: '刀盘磨损量',
         measuredValue: 4,
@@ -111,6 +116,7 @@ function mkInspections() {
         id: 'R-006',
         inspectionDate: '2026-06-03',
         rawEquipmentId: '盾构2号',
+        projectId: 'P-001',
         inspector: '王五',
         itemName: '刀盘磨损量',
         measuredValue: 28, // critical
@@ -123,6 +129,7 @@ function mkInspections() {
         id: 'R-007',
         inspectionDate: '2026-06-04',
         rawEquipmentId: '盾构-X99',
+        projectId: 'P-001',
         inspector: '新人',
         itemName: '刀盘磨损量',
         measuredValue: 30,
@@ -134,6 +141,7 @@ function mkInspections() {
         id: 'R-008',
         inspectionDate: '2026-06-05',
         rawEquipmentId: 'SD-002',
+        projectId: 'P-001',
         inspector: '王五',
         itemName: '刀盘振动幅值',
         measuredValue: 3.5,
@@ -256,6 +264,7 @@ function mkInspections() {
     const previousDetail = {
         recordId: 'OLD-R',
         inspectionDate: '2026-05-20',
+        projectId: 'P-001',
         equipmentId: 'SD-001',
         rawEquipmentId: 'SD001',
         itemName: '刀盘磨损量',
@@ -366,7 +375,7 @@ function mkInspections() {
     const engine = new index_1.CutterheadWarningEngine(normalizer, TEST_THRESHOLDS);
     const result = engine.generate(mkInspections());
     const packager = new index_1.HandoverPackager();
-    const pkg = packager.build(result);
+    const pkg = packager.build(result, mkInspections());
     (0, node_test_1.it)('checklist 包含 7 步标准流程', () => {
         strict_1.default.equal(pkg.checklist.length, 7);
         for (let i = 0; i < 7; i++) {
@@ -375,7 +384,8 @@ function mkInspections() {
     });
     (0, node_test_1.it)('Step 1 必须是设备编号确认（当前未完成，因为有 duplicate）', () => {
         strict_1.default.equal(pkg.checklist[0].completed, false);
-        strict_1.default.ok(pkg.checklist[0].relatedAnomalyQueueIds.length > 0);
+        strict_1.default.ok(pkg.checklist[0].relatedDuplicateConfirmationIds &&
+            pkg.checklist[0].relatedDuplicateConfirmationIds.length > 0);
     });
     (0, node_test_1.it)('每条巡检记录在 inspectionIndex 中都能找到', () => {
         strict_1.default.equal(pkg.inspectionIndex.length, result.details.length);
@@ -426,20 +436,20 @@ function mkInspections() {
         const ts = new Date().toISOString();
         return [
             // --- P-001 ---
-            { id: 'P1-01', inspectionDate: '2026-06-01', rawEquipmentId: 'SD-001',
+            { id: 'P1-01', inspectionDate: '2026-06-01', rawEquipmentId: 'SD-001', projectId: 'P-001',
                 inspector: '张', itemName: '刀盘磨损量', measuredValue: 12, unit: 'mm',
                 remark: '', createdAt: ts },
-            { id: 'P1-02', inspectionDate: '2026-06-02', rawEquipmentId: '盾构2号',
+            { id: 'P1-02', inspectionDate: '2026-06-02', rawEquipmentId: '盾构2号', projectId: 'P-001',
                 inspector: '李', itemName: '刀盘磨损量', measuredValue: 20, unit: 'mm',
                 remark: '磨损较快', createdAt: ts },
-            { id: 'P1-03', inspectionDate: '2026-06-03', rawEquipmentId: 'SD-001',
+            { id: 'P1-03', inspectionDate: '2026-06-03', rawEquipmentId: 'SD-001', projectId: 'P-001',
                 inspector: '张', itemName: '主驱动油温', measuredValue: 70, unit: '℃',
                 createdAt: ts },
             // --- P-002 ---
-            { id: 'P2-01', inspectionDate: '2026-06-02', rawEquipmentId: 'SD-003',
+            { id: 'P2-01', inspectionDate: '2026-06-02', rawEquipmentId: 'SD-003', projectId: 'P-002',
                 inspector: '王', itemName: '刀盘磨损量', measuredValue: 30, unit: 'mm',
                 remark: '超限', createdAt: ts },
-            { id: 'P2-02', inspectionDate: '2026-06-03', rawEquipmentId: '盾构3号',
+            { id: 'P2-02', inspectionDate: '2026-06-03', rawEquipmentId: '盾构3号', projectId: 'P-002',
                 inspector: '王', itemName: '主驱动油温', measuredValue: 80, unit: '℃',
                 createdAt: ts },
         ];
@@ -525,8 +535,9 @@ function mkInspections() {
             dateRange: null, projectId: 'P-002', equipmentIds: null,
             warningLevels: null, includeSuspended: true,
         });
-        const pkg = new index_1.HandoverPackager().build(r);
-        strict_1.default.equal(pkg.inspectionIndex.length, r.details.length);
+        const all = mkMixedInspections();
+        const pkg = new index_1.HandoverPackager().build(r, all);
+        strict_1.default.equal(pkg.inspectionIndex.length, 2);
         for (const idx of pkg.inspectionIndex) {
             const projs = normalizer.getProjectsOfRaw(idx.rawEquipmentId);
             strict_1.default.ok(projs.includes('P-002'));
