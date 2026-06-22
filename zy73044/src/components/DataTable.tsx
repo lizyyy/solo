@@ -353,7 +353,6 @@ function FilterSelect({
   options: [string, string][];
   onChange: (v: string) => void;
 }) {
-  const labelOf = (v: string) => options.find((o) => o[0] === v)?.[1] ?? v;
   return (
     <label className="flex items-center gap-1.5">
       <span className="text-[10px] font-sans text-slate-500 tracking-widest uppercase">{label}</span>

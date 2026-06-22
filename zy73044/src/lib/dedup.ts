@@ -1,8 +1,8 @@
 import type { SpareRecord, MergeResult, RecordStatus } from "./types";
 import { STATUS_LABEL } from "./mapping";
 
-function dedupKey(partNo: string, sourceFile: string): string {
-  return `${partNo.trim().toLowerCase()}::${sourceFile.trim().toLowerCase()}`;
+function dedupKey(partNo: string): string {
+  return partNo.trim().toLowerCase();
 }
 
 function genId(): string {
@@ -31,7 +31,7 @@ export interface IncomingRecord {
 }
 
 export interface MergeFieldDecision {
-  field: "status" | "remark" | "partDesc" | "sampling";
+  field: "status" | "remark" | "partDesc" | "sampling" | "sourceFile";
   action: "overwrite" | "keep_old" | "append_history";
   reason: string;
 }
@@ -42,7 +42,7 @@ export function mergeRecords(
 ): MergeResult & { decisions: Map<string, MergeFieldDecision[]> } {
   const existingMap = new Map<string, SpareRecord>();
   for (const r of existing) {
-    existingMap.set(dedupKey(r.partNo, r.sourceFile), { ...r });
+    existingMap.set(dedupKey(r.partNo), { ...r });
   }
 
   let createdCount = 0;
@@ -56,7 +56,7 @@ export function mergeRecords(
       skippedCount++;
       continue;
     }
-    const key = dedupKey(inc.partNo, inc.sourceFile);
+    const key = dedupKey(inc.partNo);
     const old = existingMap.get(key);
 
     if (!old) {
@@ -157,6 +157,14 @@ export function mergeRecords(
 
       old.mappedFields = { ...old.mappedFields, ...inc.mappedFields };
       old.sourceBatch = inc.sourceBatch;
+      if (inc.sourceFile && inc.sourceFile !== old.sourceFile) {
+        old.sourceFile = inc.sourceFile;
+        recordDecisions.push({
+          field: "sourceFile",
+          action: "overwrite",
+          reason: "更新为最新导入来源文件（仅作展示，不影响合并判定）",
+        });
+      }
       old.updatedAt = now;
 
       if (!old.rawRowHistory.includes(inc.rawRow)) {

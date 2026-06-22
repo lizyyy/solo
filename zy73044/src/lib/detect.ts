@@ -67,7 +67,6 @@ export function detectAnomalies(input: SpareRecord[]): DetectResult {
 
   const statusByPartSource = new Map<string, Map<string, SpareRecord["status"]>>();
   for (const r of records) {
-    const key = r.partNo + "::" + r.sourceFile;
     const inner = statusByPartSource.get(r.partNo) ?? new Map();
     const prev = inner.get(r.sourceFile);
     if (prev && prev !== r.status && !r.anomalies.includes("conflict")) {
