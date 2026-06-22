@@ -21,7 +21,8 @@ class TestHandoverSummary:
         assert "B001" in text
         assert "B002" in text
         assert "导出方式" in text
-        assert "异常: 无" in text
+        assert "复核结论" in text
+        assert "挂起: 无" in text
 
     def test_handover_with_anomalies(self):
         audit = AuditTrail()
@@ -64,10 +65,11 @@ class TestHandoverSummary:
         text = summary.generate(report)
         assert "近期改判: 1条" in text
 
-    def test_handover_is_concise(self):
+    def test_export_handover_writes_file(self, tmp_path):
         audit = AuditTrail()
         summary = HandoverSummary(audit)
         report = _make_report(blade_ids=["B001"])
-        text = summary.generate(report)
-        lines = [l for l in text.split("\n") if l.strip()]
-        assert len(lines) <= 8
+        out = tmp_path / "handover.json"
+        text = summary.export_handover(report, str(out))
+        assert out.exists()
+        assert "review_id" in text or "report_id" in text

@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "blade-review"
+version = "0.1.0"
+description = "风机叶片报告复核：去重 / 口径变更追踪 / 断档挂起 / 人工备注保留 / 交接班导出"
+requires-python = ">=3.8"
+readme = "README.md"
+authors = [{ name = "现场调度小宋" }]
+license = { text = "MIT" }
+
+[project.scripts]
+blade-review = "blade_review.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["blade_review*"]
+
+[tool.setuptools.package-data]
+blade_review = ["examples/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

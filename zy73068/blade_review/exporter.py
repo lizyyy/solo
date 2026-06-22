@@ -83,6 +83,7 @@ class ReportExporter:
     def export_text(
         self,
         report: BladeReport,
+        out_path: Optional[str] = None,
         audit_trail: Optional[AuditTrail] = None,
     ) -> str:
         payload = self.build_payload(report, audit_trail=audit_trail)
@@ -139,7 +140,11 @@ class ReportExporter:
         else:
             lines.append("  无")
 
-        return "\n".join(lines)
+        text = "\n".join(lines)
+        if out_path:
+            with open(out_path, "w", encoding="utf-8") as f:
+                f.write(text)
+        return text
 
     def _locate_samples(self, report: BladeReport) -> dict[str, Any]:
         return {

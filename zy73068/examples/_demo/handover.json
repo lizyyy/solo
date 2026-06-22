@@ -1,0 +1,146 @@
+{
+  "report_id": "49e7a742ca14",
+  "title": "风机叶片报告复核-演示",
+  "status": "suspended",
+  "operator": "小宋",
+  "sample_location": {
+    "blade_ids": [
+      "B001",
+      "B002"
+    ],
+    "record_count": 20,
+    "material_count": 2
+  },
+  "conclusion": "发现 6 项严重异常，需现场确认",
+  "is_stable": false,
+  "anomalies": [
+    {
+      "kind": "single_point_spike",
+      "blade_id": "B001",
+      "metric_name": "vibration",
+      "timestamp": "2026-06-12T08:00:00",
+      "value": 5.5,
+      "explanation": "单点突变：值 5.5 偏离中位数 1.100 (稳健z=59.36)，被序列均值掩盖",
+      "severity": "major"
+    },
+    {
+      "kind": "single_point_spike",
+      "blade_id": "B002",
+      "metric_name": "vibration",
+      "timestamp": "2026-06-12T08:00:00",
+      "value": 4.8,
+      "explanation": "单点突变：值 4.8 偏离中位数 1.050 (稳健z=50.59)，被序列均值掩盖",
+      "severity": "major"
+    },
+    {
+      "kind": "single_point_spike",
+      "blade_id": "B002",
+      "metric_name": "vibration",
+      "timestamp": "2026-06-12T16:00:00",
+      "value": 4.6,
+      "explanation": "单点突变：值 4.6 偏离中位数 1.050 (稳健z=47.89)，被序列均值掩盖",
+      "severity": "major"
+    },
+    {
+      "kind": "single_point_spike",
+      "blade_id": "B002",
+      "metric_name": "vibration",
+      "timestamp": "2026-06-13T00:00:00",
+      "value": 4.9,
+      "explanation": "单点突变：值 4.9 偏离中位数 1.050 (稳健z=51.94)，被序列均值掩盖",
+      "severity": "major"
+    },
+    {
+      "kind": "single_point_spike",
+      "blade_id": "B002",
+      "metric_name": "vibration",
+      "timestamp": "2026-06-13T08:00:00",
+      "value": 4.7,
+      "explanation": "单点突变：值 4.7 偏离中位数 1.050 (稳健z=49.24)，被序列均值掩盖",
+      "severity": "major"
+    },
+    {
+      "kind": "single_point_spike",
+      "blade_id": "B002",
+      "metric_name": "vibration",
+      "timestamp": "2026-06-13T16:00:00",
+      "value": 4.85,
+      "explanation": "单点突变：值 4.85 偏离中位数 1.050 (稳健z=51.26)，被序列均值掩盖",
+      "severity": "major"
+    }
+  ],
+  "suspensions": [
+    {
+      "suspension_id": "44d80f590d97",
+      "reason": "sampling_gap_major",
+      "gap_start": "2026-06-12T08:00:00",
+      "gap_end": "2026-06-14T08:00:00",
+      "resolved": false,
+      "resolved_by": "",
+      "resolution_note": ""
+    }
+  ],
+  "manual_notes": [
+    {
+      "record_id": "16f3b4913e57",
+      "blade_id": "B001",
+      "metric_name": "vibration",
+      "timestamp": "2026-06-10T08:00:00",
+      "note": "现场正常"
+    },
+    {
+      "record_id": "a59ca21089e6",
+      "blade_id": "B001",
+      "metric_name": "vibration",
+      "timestamp": "2026-06-12T08:00:00",
+      "note": "单点突变，需关注"
+    },
+    {
+      "record_id": "034f61f5b369",
+      "blade_id": "B001",
+      "metric_name": "vibration",
+      "timestamp": "2026-06-14T08:00:00",
+      "note": "采样断档两天"
+    },
+    {
+      "record_id": "0eb985790413",
+      "blade_id": "B002",
+      "metric_name": "vibration",
+      "timestamp": "2026-06-12T08:00:00",
+      "note": "B002 异常，均值看起来正常但该点偏高"
+    }
+  ],
+  "judgment_changes": [
+    {
+      "field_name": "content",
+      "old_value": "超声检测报告 v1：\n- B001 叶片未见明显裂纹\n- B002 振动正常\n结论：整体稳定，可出具合格报告。\n",
+      "new_value": "超声检测报告 v2：\n- B001 叶片未见明显裂纹\n- B002 根部存在 2cm 微裂纹，需关注后续发展\n结论：B002 需标记异常，整体暂缓出具稳定结论，待现场复核。\n",
+      "changed_at": "2026-06-22T11:22:00.639065",
+      "changed_by": "小宋",
+      "reason": "stance_changed_same_name"
+    }
+  ],
+  "materials": [
+    {
+      "material_id": "664f147939fc",
+      "current_name": "超声检测报告",
+      "original_name": "超声检测报告",
+      "version": 2,
+      "name_changed": false,
+      "stance_changed": true,
+      "previous_stance": "超声检测报告 v1：\n- B001 叶片未见明显裂纹\n- B002 振动正常\n结论：整体稳定，可出具合格报告。\n",
+      "current_stance": "超声检测报告 v2：\n- B001 叶片未见明显裂纹\n- B002 根部存在 2cm 微裂纹，需关注后续发展\n结论：B002 需标记异常，整体暂缓出具稳定结论，待现场复核。\n"
+    },
+    {
+      "material_id": "245aa812b736",
+      "current_name": "现场口头说明",
+      "original_name": "现场口头说明",
+      "version": 1,
+      "name_changed": false,
+      "stance_changed": false,
+      "previous_stance": "",
+      "current_stance": "B002 下午巡检发现轻微异响，待补充检测"
+    }
+  ],
+  "generated_at": "2026-06-22T11:22:00.776710"
+}

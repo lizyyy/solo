@@ -1,0 +1,32 @@
+== 风机叶片报告复核导出 ==
+报告ID: 49e7a742ca14
+标题: 风机叶片报告复核-演示
+状态: suspended
+操作人: 小宋
+样例位置: blade_ids=['B001', 'B002']
+复核结论: 发现 6 项严重异常，需现场确认
+是否稳定: 否（待现场确认）
+异常点:
+  - [major] single_point_spike | blade=B001 metric=vibration | 单点突变：值 5.5 偏离中位数 1.100 (稳健z=59.36)，被序列均值掩盖
+  - [major] single_point_spike | blade=B002 metric=vibration | 单点突变：值 4.8 偏离中位数 1.050 (稳健z=50.59)，被序列均值掩盖
+  - [major] single_point_spike | blade=B002 metric=vibration | 单点突变：值 4.6 偏离中位数 1.050 (稳健z=47.89)，被序列均值掩盖
+  - [major] single_point_spike | blade=B002 metric=vibration | 单点突变：值 4.9 偏离中位数 1.050 (稳健z=51.94)，被序列均值掩盖
+  - [major] single_point_spike | blade=B002 metric=vibration | 单点突变：值 4.7 偏离中位数 1.050 (稳健z=49.24)，被序列均值掩盖
+  - [major] single_point_spike | blade=B002 metric=vibration | 单点突变：值 4.85 偏离中位数 1.050 (稳健z=51.26)，被序列均值掩盖
+挂起项:
+  - 44d80f590d97 [待确认] sampling_gap_major
+人工备注:
+  - blade=B001 metric=vibration ts=2026-06-10T08:00:00 | 现场正常
+  - blade=B001 metric=vibration ts=2026-06-12T08:00:00 | 单点突变，需关注
+  - blade=B001 metric=vibration ts=2026-06-14T08:00:00 | 采样断档两天
+  - blade=B002 metric=vibration ts=2026-06-12T08:00:00 | B002 异常，均值看起来正常但该点偏高
+改判前后差异:
+  - content: '超声检测报告 v1：
+- B001 叶片未见明显裂纹
+- B002 振动正常
+结论：整体稳定，可出具合格报告。
+' -> '超声检测报告 v2：
+- B001 叶片未见明显裂纹
+- B002 根部存在 2cm 微裂纹，需关注后续发展
+结论：B002 需标记异常，整体暂缓出具稳定结论，待现场复核。
+' | by 小宋 | 原因: stance_changed_same_name

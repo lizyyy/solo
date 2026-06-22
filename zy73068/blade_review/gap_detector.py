@@ -26,23 +26,29 @@ class GapDetector:
     ) -> list[GapInfo]:
         if len(records) < 2:
             return []
-        sorted_recs = sorted(records, key=lambda r: r.timestamp)
+        groups: dict[str, list[InspectionRecord]] = {}
+        for r in records:
+            groups.setdefault(r.blade_id or "_", []).append(r)
         gaps: list[GapInfo] = []
-        for i in range(1, len(sorted_recs)):
-            prev = sorted_recs[i - 1]
-            curr = sorted_recs[i]
-            delta = curr.timestamp - prev.timestamp
-            if delta > self.max_gap:
-                severity = self._classify_severity(delta)
-                gaps.append(
-                    GapInfo(
-                        blade_id=curr.blade_id,
-                        gap_start=prev.timestamp,
-                        gap_end=curr.timestamp,
-                        duration=delta,
-                        severity=severity,
+        for blade_id, recs in groups.items():
+            if len(recs) < 2:
+                continue
+            sorted_recs = sorted(recs, key=lambda r: r.timestamp)
+            for i in range(1, len(sorted_recs)):
+                prev = sorted_recs[i - 1]
+                curr = sorted_recs[i]
+                delta = curr.timestamp - prev.timestamp
+                if delta > self.max_gap:
+                    severity = self._classify_severity(delta)
+                    gaps.append(
+                        GapInfo(
+                            blade_id=curr.blade_id,
+                            gap_start=prev.timestamp,
+                            gap_end=curr.timestamp,
+                            duration=delta,
+                            severity=severity,
+                        )
                     )
-                )
         return gaps
 
     def check_and_suspend(
@@ -51,17 +57,25 @@ class GapDetector:
         gaps = self.detect_gaps(report.records)
         if not gaps:
             return []
+        existing_keys = {
+            (s.reason, s.gap_start, s.gap_end) for s in report.suspensions
+        }
         suspensions: list[SuspensionRecord] = []
         for gap in gaps:
+            key = (f"sampling_gap_{gap.severity}", gap.gap_start, gap.gap_end)
+            if key in existing_keys:
+                continue
             suspension = SuspensionRecord(
                 report_id=report.report_id,
-                reason=f"sampling_gap_{gap.severity}",
+                reason=key[0],
                 gap_start=gap.gap_start,
                 gap_end=gap.gap_end,
             )
             suspensions.append(suspension)
             report.suspensions.append(suspension)
-        report.status = ReviewStatus.SUSPENDED
+            existing_keys.add(key)
+        if suspensions:
+            report.status = ReviewStatus.SUSPENDED
         return suspensions
 
     def resolve_suspension(
