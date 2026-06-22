@@ -27,12 +27,15 @@ let dbPromise: Promise<IDBPDatabase> | null = null;
 
 async function getDB(): Promise<IDBPDatabase> {
   if (!dbPromise) {
+    console.log('[Persistence] Opening IndexedDB...');
     dbPromise = openDB(DB_NAME, DB_VERSION, {
       upgrade(db) {
+        console.log('[Persistence] Upgrading IndexedDB...');
         if (!db.objectStoreNames.contains(STORES.SESSIONS)) {
           const sessionStore = db.createObjectStore(STORES.SESSIONS, { keyPath: 'id' });
           sessionStore.createIndex('createdAt', 'createdAt');
           sessionStore.createIndex('status', 'status');
+          console.log('[Persistence] Created sessions store');
         }
 
         if (!db.objectStoreNames.contains(STORES.MATERIALS)) {
@@ -40,12 +43,14 @@ async function getDB(): Promise<IDBPDatabase> {
           materialStore.createIndex('sessionId', 'sessionId');
           materialStore.createIndex('type', 'type');
           materialStore.createIndex('contentHash', 'contentHash');
+          console.log('[Persistence] Created materials store');
         }
 
         if (!db.objectStoreNames.contains(STORES.COMPUTATION_STEPS)) {
           const stepStore = db.createObjectStore(STORES.COMPUTATION_STEPS, { keyPath: 'id' });
           stepStore.createIndex('sessionId', 'sessionId');
           stepStore.createIndex('stepOrder', 'stepOrder');
+          console.log('[Persistence] Created computation_steps store');
         }
 
         if (!db.objectStoreNames.contains(STORES.AUDIT_LOGS)) {
@@ -53,6 +58,7 @@ async function getDB(): Promise<IDBPDatabase> {
           logStore.createIndex('sessionId', 'sessionId');
           logStore.createIndex('timestamp', 'timestamp');
           logStore.createIndex('actionType', 'actionType');
+          console.log('[Persistence] Created audit_logs store');
         }
 
         if (!db.objectStoreNames.contains(STORES.SUSPENDED_TASKS)) {
@@ -60,14 +66,21 @@ async function getDB(): Promise<IDBPDatabase> {
           taskStore.createIndex('sessionId', 'sessionId');
           taskStore.createIndex('status', 'status');
           taskStore.createIndex('reason', 'reason');
+          console.log('[Persistence] Created suspended_tasks store');
         }
 
         if (!db.objectStoreNames.contains(STORES.REPORTS)) {
           const reportStore = db.createObjectStore(STORES.REPORTS, { keyPath: 'id' });
           reportStore.createIndex('sessionId', 'sessionId');
           reportStore.createIndex('createdAt', 'createdAt');
+          console.log('[Persistence] Created reports store');
         }
       },
+    });
+    dbPromise.then(() => {
+      console.log('[Persistence] IndexedDB opened successfully');
+    }).catch((err) => {
+      console.error('[Persistence] Failed to open IndexedDB:', err);
     });
   }
   return dbPromise;
@@ -244,43 +257,40 @@ export const persistenceService = {
   },
 
   async saveFullSession(data: StoredSession): Promise<void> {
-    const tx = (await getDB()).transaction(
-      [STORES.SESSIONS, STORES.MATERIALS, STORES.COMPUTATION_STEPS, STORES.AUDIT_LOGS, STORES.SUSPENDED_TASKS, STORES.REPORTS],
-      'readwrite'
-    );
-
-    await tx.objectStore(STORES.SESSIONS).put(data.session);
-
-    for (const material of data.materials) {
-      await tx.objectStore(STORES.MATERIALS).put(material);
+    console.log('[Persistence] saveFullSession starting, sessionId=', data.session.id);
+    
+    try {
+      console.log('[Persistence] saving session');
+      await this.saveSession(data.session);
+      console.log('[Persistence] session saved');
+      
+      console.log('[Persistence] saving', data.materials.length, 'materials');
+      await Promise.all(data.materials.map(m => this.saveMaterial(m)));
+      console.log('[Persistence] materials saved');
+      
+      console.log('[Persistence] saving', data.computationSteps.length, 'computation steps');
+      await Promise.all(data.computationSteps.map(s => this.saveComputationStep(s)));
+      console.log('[Persistence] computation steps saved');
+      
+      console.log('[Persistence] saving', data.auditLogs.length, 'audit logs');
+      await Promise.all(data.auditLogs.map(l => this.saveAuditLog(l)));
+      console.log('[Persistence] audit logs saved');
+      
+      console.log('[Persistence] saving', data.suspendedTasks.length, 'suspended tasks');
+      await Promise.all(data.suspendedTasks.map(t => this.saveSuspendedTask(t)));
+      console.log('[Persistence] suspended tasks saved');
+      
+      if (data.report) {
+        console.log('[Persistence] saving report');
+        await this.saveReport(data.report);
+        console.log('[Persistence] report saved');
+      }
+      
+      console.log('[Persistence] saveFullSession COMPLETED');
+    } catch (err) {
+      console.error('[Persistence] saveFullSession FAILED:', err?.stack || err);
+      throw err;
     }
-
-    for (const step of data.computationSteps) {
-      await tx.objectStore(STORES.COMPUTATION_STEPS).put(step);
-    }
-
-    for (const log of data.auditLogs) {
-      await tx.objectStore(STORES.AUDIT_LOGS).put(log);
-    }
-
-    for (const task of data.suspendedTasks) {
-      await tx.objectStore(STORES.SUSPENDED_TASKS).put(task);
-    }
-
-    if (data.report) {
-      await tx.objectStore(STORES.REPORTS).put(data.report);
-    }
-
-    await tx.done;
-
-    localStorage.setItem(
-      LS_CURRENT_SESSION_KEY,
-      JSON.stringify({
-        sessionId: data.session.id,
-        step: data.session.currentStep,
-        timestamp: Date.now(),
-      })
-    );
   },
 
   async createNewSession(title?: string): Promise<Session> {

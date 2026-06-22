@@ -20,7 +20,7 @@ const WorkbenchPage: React.FC = () => {
     setCurrentStep,
     updateProgress,
   } = useSessionStore();
-  const { materials, addMaterial } = useMaterialStore();
+  const { materials, addMaterial, updateMaterialContent } = useMaterialStore();
   const { steps, expandedSteps, toggleStep, updateStepResult, computeErrorPropagation } = useComputationStore();
   const { createSuspendedTask } = useAuditStore();
   const [showCompareMode, setShowCompareMode] = useState(false);
@@ -142,6 +142,13 @@ const WorkbenchPage: React.FC = () => {
                 sessionId={currentSession.id}
                 materials={sessionMaterials}
                 onUpload={handleUploadMaterial}
+                onUpdateMaterial={async (materialId, newContent, operator) => {
+                  const result = await updateMaterialContent(materialId, newContent, operator);
+                  if (result && result.hasCaliberChanged) {
+                    await updateSessionStatus('suspended');
+                  }
+                  return result;
+                }}
                 onCreateSuspendedTask={createSuspendedTask}
                 disabled={currentSession.status === 'suspended' || currentSession.status === 'completed'}
               />
@@ -157,6 +164,7 @@ const WorkbenchPage: React.FC = () => {
                 }}
                 onSetCompareMode={handleSetCompareMode}
                 sessionId={currentSession.id}
+                materials={sessionMaterials}
                 disabled={currentSession.status === 'suspended' || currentSession.status === 'completed'}
               />
             </div>

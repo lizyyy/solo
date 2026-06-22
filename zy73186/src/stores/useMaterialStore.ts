@@ -21,8 +21,9 @@ interface MaterialState {
   ) => Promise<{ material: Material; duplicateCheck: { isDuplicate: boolean; similarity: number; existingSessionId?: string } }>;
   updateMaterialContent: (
     materialId: string,
-    newContent: string
-  ) => Promise<Material | null>;
+    newContent: string,
+    operator?: string
+  ) => Promise<{ material: Material; hasCaliberChanged: boolean } | null>;
   deleteMaterial: (materialId: string) => Promise<void>;
   getMaterialById: (materialId: string) => Material | undefined;
   getMaterialsByType: (type: MaterialType) => Material[];
@@ -38,9 +39,66 @@ export const useMaterialStore = create<MaterialState>((set, get) => ({
   loadMaterials: async (sessionId: string) => {
     set({ isLoading: true, error: null });
     try {
-      const materials = await persistenceService.getMaterialsBySession(sessionId);
-      set({ materials, isLoading: false });
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('getMaterialsBySession timeout')), 5000);
+      });
+      const materials = await Promise.race([
+        persistenceService.getMaterialsBySession(sessionId),
+        timeoutPromise,
+      ]);
+      if (materials && materials.length > 0) {
+        set({ materials, isLoading: false });
+        return;
+      }
+      const { materials: existingMaterials } = get();
+      const sessionMaterials = existingMaterials.filter((m) => m.sessionId === sessionId);
+      if (sessionMaterials.length > 0) {
+        console.log('[MaterialStore] Store already has session materials, keeping:', sessionMaterials.length);
+        set({ isLoading: false });
+        return;
+      }
+      try {
+        const lsBackup = localStorage.getItem('ep_boundary_backup_v1');
+        if (lsBackup) {
+          const backup = JSON.parse(lsBackup);
+          if (backup.materials && backup.materials.length > 0) {
+            const filtered = backup.materials.filter((m: Material) => m.sessionId === sessionId);
+            if (filtered.length > 0) {
+              console.log('[MaterialStore] Falling back to localStorage session materials:', filtered.length);
+              set({ materials: filtered, isLoading: false });
+              return;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('[MaterialStore] Failed to load from localStorage backup:', e);
+      }
+      set({ isLoading: false });
     } catch (error) {
+      console.warn('[MaterialStore] loadMaterials failed:', error);
+      const { materials: existingMaterials } = get();
+      const sessionMaterials = existingMaterials.filter((m) => m.sessionId === sessionId);
+      if (sessionMaterials.length > 0) {
+        console.log('[MaterialStore] Store already has hydrated session materials, keeping:', sessionMaterials.length);
+        set({ error: (error as Error).message, isLoading: false });
+        return;
+      }
+      try {
+        const lsBackup = localStorage.getItem('ep_boundary_backup_v1');
+        if (lsBackup) {
+          const backup = JSON.parse(lsBackup);
+          if (backup.materials && backup.materials.length > 0) {
+            const filtered = backup.materials.filter((m: Material) => m.sessionId === sessionId);
+            if (filtered.length > 0) {
+              console.log('[MaterialStore] Falling back to localStorage session materials:', filtered.length);
+              set({ materials: filtered, error: (error as Error).message, isLoading: false });
+              return;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('[MaterialStore] Failed to load from localStorage backup:', e);
+      }
       set({ error: (error as Error).message, isLoading: false });
     }
   },
@@ -48,9 +106,58 @@ export const useMaterialStore = create<MaterialState>((set, get) => ({
   loadAllMaterials: async () => {
     set({ isLoading: true, error: null });
     try {
-      const materials = await persistenceService.getAllMaterials();
-      set({ materials, isLoading: false });
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('getAllMaterials timeout')), 5000);
+      });
+      const materials = await Promise.race([
+        persistenceService.getAllMaterials(),
+        timeoutPromise,
+      ]);
+      if (materials && materials.length > 0) {
+        set({ materials, isLoading: false });
+        return;
+      }
+      const { materials: existingMaterials } = get();
+      if (existingMaterials.length > 0) {
+        console.log('[MaterialStore] Store already has hydrated materials, keeping:', existingMaterials.length);
+        set({ isLoading: false });
+        return;
+      }
+      try {
+        const lsBackup = localStorage.getItem('ep_boundary_backup_v1');
+        if (lsBackup) {
+          const backup = JSON.parse(lsBackup);
+          if (backup.materials && backup.materials.length > 0) {
+            console.log('[MaterialStore] Falling back to localStorage materials:', backup.materials.length);
+            set({ materials: backup.materials, isLoading: false });
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('[MaterialStore] Failed to load from localStorage backup:', e);
+      }
+      set({ isLoading: false });
     } catch (error) {
+      console.warn('[MaterialStore] loadAllMaterials failed:', error);
+      const { materials: existingMaterials } = get();
+      if (existingMaterials.length > 0) {
+        console.log('[MaterialStore] Store already has hydrated materials, keeping:', existingMaterials.length);
+        set({ error: (error as Error).message, isLoading: false });
+        return;
+      }
+      try {
+        const lsBackup = localStorage.getItem('ep_boundary_backup_v1');
+        if (lsBackup) {
+          const backup = JSON.parse(lsBackup);
+          if (backup.materials && backup.materials.length > 0) {
+            console.log('[MaterialStore] Falling back to localStorage materials:', backup.materials.length);
+            set({ materials: backup.materials, error: (error as Error).message, isLoading: false });
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('[MaterialStore] Failed to load from localStorage backup:', e);
+      }
       set({ error: (error as Error).message, isLoading: false });
     }
   },
@@ -83,7 +190,7 @@ export const useMaterialStore = create<MaterialState>((set, get) => ({
     }
   },
 
-  updateMaterialContent: async (materialId, newContent) => {
+  updateMaterialContent: async (materialId, newContent, operator) => {
     const { materials } = get();
     const material = materials.find((m) => m.id === materialId);
 
@@ -94,8 +201,32 @@ export const useMaterialStore = create<MaterialState>((set, get) => ({
 
     set({ isLoading: true, error: null });
     try {
+      const oldContent = material.content;
       const updatedMaterial = await versionHashService.updateMaterialContent(material, newContent);
       await persistenceService.saveMaterial(updatedMaterial);
+
+      const hasCaliberChanged = versionHashService.detectCaliberChange(oldContent, newContent);
+      
+      const log = auditLogger.logUpdateMaterial(
+        material.sessionId,
+        materialId,
+        material.type,
+        material.name,
+        operator
+      );
+      if (hasCaliberChanged) {
+        log.diff = {
+          before: oldContent,
+          after: newContent,
+          changeSummary: [{
+            field: 'content',
+            oldValue: oldContent.substring(0, 100) + '...',
+            newValue: newContent.substring(0, 100) + '...',
+          }],
+        };
+        log.description += '（检测到口径变更）';
+      }
+      await persistenceService.saveAuditLog(log);
 
       set((state) => ({
         materials: state.materials.map((m) =>
@@ -104,7 +235,10 @@ export const useMaterialStore = create<MaterialState>((set, get) => ({
         isLoading: false,
       }));
 
-      return updatedMaterial;
+      return {
+        material: updatedMaterial,
+        hasCaliberChanged,
+      };
     } catch (error) {
       set({ error: (error as Error).message, isLoading: false });
       return null;

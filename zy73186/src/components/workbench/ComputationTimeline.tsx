@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
-import { Play, RotateCcw, GitCompare, Calculator } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Play, RotateCcw, GitCompare, Calculator, Wand2, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { ComputationStep } from '@/types';
+import type { ComputationStep, Material, BoundaryCondition } from '@/types';
 import { StepDetail } from './StepDetail';
 import { Button } from '@/components/common/Button';
 import { Modal } from '@/components/common/Modal';
+import { Tooltip } from '@/components/common/Tooltip';
 import { errorPropagationEngine } from '@/services/errorPropagation';
+import { materialParser } from '@/services/materialParser';
+import { boundaryChecker } from '@/services/boundaryChecker';
 
 interface ComputationTimelineProps {
   steps: ComputationStep[];
@@ -14,6 +17,7 @@ interface ComputationTimelineProps {
   onUpdateStepResult: (stepId: string, newResult: number, reason: string) => Promise<void>;
   onSetCompareMode: () => void;
   sessionId: string;
+  materials?: Material[];
   disabled?: boolean;
 }
 
@@ -28,6 +32,7 @@ interface ComputeFormData {
   }>;
   resultUnit: string;
   description: string;
+  boundaryConditions: BoundaryCondition[];
 }
 
 export const ComputationTimeline: React.FC<ComputationTimelineProps> = ({
@@ -37,6 +42,7 @@ export const ComputationTimeline: React.FC<ComputationTimelineProps> = ({
   onUpdateStepResult,
   onSetCompareMode,
   sessionId,
+  materials = [],
   disabled,
 }) => {
   const [showComputeModal, setShowComputeModal] = useState(false);
@@ -48,7 +54,24 @@ export const ComputationTimeline: React.FC<ComputationTimelineProps> = ({
     ],
     resultUnit: 'm²',
     description: '面积计算',
+    boundaryConditions: [],
   });
+  const [autoExtractInfo, setAutoExtractInfo] = useState<{
+    hasParsedData: boolean;
+    formulaCount: number;
+    boundaryCount: number;
+  }>({ hasParsedData: false, formulaCount: 0, boundaryCount: 0 });
+
+  useEffect(() => {
+    if (materials.length > 0) {
+      const parsed = materialParser.parseAllMaterials(materials);
+      setAutoExtractInfo({
+        hasParsedData: parsed.formulas.length > 0 || parsed.boundaryConditions.length > 0,
+        formulaCount: parsed.formulas.length,
+        boundaryCount: parsed.boundaryConditions.length,
+      });
+    }
+  }, [materials]);
   const [isComputing, setIsComputing] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -119,30 +142,18 @@ export const ComputationTimeline: React.FC<ComputationTimelineProps> = ({
 
     setIsComputing(true);
     try {
-      const result = errorPropagationEngine.compute({
-        formula: formData.formula,
-        variables: formData.variables.map((v) => ({
-          ...v,
-          targetUnit: v.targetUnit || v.unit,
-        })),
-        resultUnit: formData.resultUnit,
-        description: formData.description,
-      });
-
       const { useComputationStore } = await import('@/stores/useComputationStore');
       const store = useComputationStore.getState();
 
-      for (const step of result.steps) {
-        const stepWithSession = { ...step, sessionId };
-        await store.computeErrorPropagation(
-          sessionId,
-          step.formula,
-          formData.variables,
-          formData.resultUnit,
-          formData.description
-        );
-        break;
-      }
+      await store.computeErrorPropagation(
+        sessionId,
+        formData.formula,
+        formData.variables,
+        formData.resultUnit,
+        formData.description,
+        '现场老师',
+        formData.boundaryConditions
+      );
 
       setShowComputeModal(false);
       setValidationError(null);
@@ -153,12 +164,27 @@ export const ComputationTimeline: React.FC<ComputationTimelineProps> = ({
     }
   };
 
+  const handleAutoExtract = () => {
+    const suggestion = materialParser.suggestComputationFromMaterials(materials);
+    if (suggestion) {
+      setFormData({
+        formula: suggestion.formula,
+        variables: suggestion.variables,
+        resultUnit: suggestion.resultUnit,
+        description: suggestion.description,
+        boundaryConditions: suggestion.boundaryConditions,
+      });
+      setValidationError(null);
+    }
+  };
+
   const handleReset = () => {
     setFormData({
       formula: '',
-      variables: [{ name: '', value: 0, unit: '', error: 0 }],
+      variables: [{ name: '', value: 0, unit: '', error: 0, targetUnit: '' }],
       resultUnit: '',
       description: '',
+      boundaryConditions: [],
     });
     setValidationError(null);
   };
@@ -166,7 +192,17 @@ export const ComputationTimeline: React.FC<ComputationTimelineProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-2">
-        <h3 className="font-mono text-sm text-[#e2e8f0] tracking-wide">计算过程</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="font-mono text-sm text-[#e2e8f0] tracking-wide">计算过程</h3>
+          {autoExtractInfo.hasParsedData && (
+            <Tooltip content={`检测到 ${autoExtractInfo.formulaCount} 个公式, ${autoExtractInfo.boundaryCount} 个边界条件`}>
+              <span className="px-1.5 py-0.5 text-xs bg-[#3182ce]/20 text-[#63b3ed] rounded flex items-center gap-1">
+                <Wand2 className="w-3 h-3" />
+                可自动提取
+              </span>
+            </Tooltip>
+          )}
+        </div>
         <div className="flex gap-2">
           {steps.length >= 2 && (
             <Button
@@ -245,14 +281,26 @@ export const ComputationTimeline: React.FC<ComputationTimelineProps> = ({
         size="xl"
         footer={
           <div className="flex justify-between">
-            <Button
-              variant="ghost"
-              icon={<RotateCcw className="w-3.5 h-3.5" />}
-              onClick={handleReset}
-              disabled={isComputing}
-            >
-              重置
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                icon={<RotateCcw className="w-3.5 h-3.5" />}
+                onClick={handleReset}
+                disabled={isComputing}
+              >
+                重置
+              </Button>
+              {autoExtractInfo.hasParsedData && (
+                <Button
+                  variant="secondary"
+                  icon={<Wand2 className="w-3.5 h-3.5" />}
+                  onClick={handleAutoExtract}
+                  disabled={isComputing}
+                >
+                  自动提取
+                </Button>
+              )}
+            </div>
             <div className="flex gap-2">
               <Button
                 variant="ghost"
@@ -399,6 +447,61 @@ export const ComputationTimeline: React.FC<ComputationTimelineProps> = ({
               />
             </div>
           </div>
+
+          {formData.boundaryConditions.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-mono text-[#a0aec0]">
+                  边界条件（自动提取）
+                </label>
+                <span className="text-xs text-[#38a169] font-mono">
+                  {formData.boundaryConditions.length} 个条件
+                </span>
+              </div>
+              <div className="space-y-2 max-h-40 overflow-auto">
+                {formData.boundaryConditions.map((bc, index) => (
+                  <div
+                    key={index}
+                    className="p-2 bg-[#0d1117] rounded border border-[#4a5568] text-sm font-mono"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-[#63b3ed]">{bc.variable}</span>
+                      <span className="text-[#a0aec0]">
+                        {bc.lowerBound === -Infinity
+                          ? `≤ ${bc.upperBound}`
+                          : bc.upperBound === Infinity
+                          ? `≥ ${bc.lowerBound}`
+                          : `∈ [${bc.lowerBound}, ${bc.upperBound}]`}
+                      </span>
+                      <span className="text-[#718096]">({bc.unit})</span>
+                    </div>
+                    {bc.sourceAnchor && (
+                      <div className="text-xs text-[#718096] mt-1 truncate">
+                        来源: {bc.sourceAnchor}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {formData.boundaryConditions.length > 0 &&
+            formData.boundaryConditions.some(
+              (bc) => bc.lowerBound === -Infinity || bc.upperBound === Infinity
+            ) && (
+            <div className="p-3 bg-[#dd6b20]/10 border border-[#dd6b20]/30 rounded">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-[#dd6b20] flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm text-[#dd6b20] font-mono">部分边界条件可能不完整</p>
+                  <p className="text-xs text-[#a0aec0] mt-1">
+                    单侧边界（仅上限或仅下限）可能影响最终判断的准确性
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {validationError && (
             <div className="p-3 bg-[#c53030]/10 border border-[#c53030]/30 rounded text-sm text-[#fc8181] font-mono">

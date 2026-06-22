@@ -3,9 +3,12 @@ import type {
   ComputationResult,
   InputValue,
   UnitConversion,
+  BoundaryCondition,
+  BoundaryCheckResult,
 } from '../types';
 import { generateId } from '../utils/hash';
 import { convertUnit, createUnitConversion } from '../utils/unitConversion';
+import { boundaryChecker } from './boundaryChecker';
 
 interface VariableWithError {
   name: string;
@@ -20,24 +23,38 @@ interface ComputationConfig {
   variables: VariableWithError[];
   resultUnit: string;
   description: string;
+  boundaryConditions?: BoundaryCondition[];
 }
 
 function parseFormula(formula: string): string[] {
-  const variableRegex = /[a-zA-Z_][a-zA-Z0-9_]*/g;
+  const variableRegex = /[a-zA-Z_][a-zA-Z0-9_\u2080-\u2089\u00B9\u00B2\u00B3\u2070\u2074-\u207F]*/g;
   const matches = formula.match(variableRegex);
   return matches ? [...new Set(matches)] : [];
 }
 
 function evaluateFormula(formula: string, values: Record<string, number>): number {
   const safeFormula = formula.replace(/\^/g, '**');
-  const vars = Object.keys(values);
-  const varValues = Object.values(values);
+  const varNames = Object.keys(values).sort((a, b) => b.length - a.length);
+
+  let processedFormula = safeFormula;
+  const params: string[] = [];
+  const paramValues: number[] = [];
+  const boundaryChars = 'a-zA-Z0-9_\\u2080-\\u2089\\u00B9\\u00B2\\u00B3\\u2070\\u2074-\\u207F';
+  
+  varNames.forEach((name, index) => {
+    const safeName = `__var_${index}_safe_`;
+    params.push(safeName);
+    paramValues.push(values[name]);
+    const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(^|[^${boundaryChars}])${escapedName}(?![${boundaryChars}])`, 'g');
+    processedFormula = processedFormula.replace(regex, (match, prefix) => `${prefix}${safeName}`);
+  });
 
   try {
-    const fn = new Function(...vars, `return ${safeFormula};`);
-    return fn(...varValues);
+    const fn = new Function(...params, `return ${processedFormula};`);
+    return fn(...paramValues);
   } catch (error) {
-    throw new Error(`公式计算错误: ${(error as Error).message}`);
+    throw new Error(`公式计算错误: ${(error as Error).message}, processedFormula="${processedFormula}", params=${JSON.stringify(params)}`);
   }
 }
 
@@ -212,11 +229,42 @@ export const errorPropagationEngine = {
     };
     steps.push(finalStep);
 
+    let boundaryChecks: BoundaryCheckResult[] | undefined;
+    let boundaryPassed: boolean | undefined;
+
+    if (config.boundaryConditions && config.boundaryConditions.length > 0) {
+      const boundaryResult = boundaryChecker.checkAllBoundaries(steps, config.boundaryConditions);
+      boundaryChecks = boundaryResult.checks;
+      boundaryPassed = boundaryResult.passed;
+
+      const boundaryStep: ComputationStep = {
+        id: generateId(),
+        sessionId: '',
+        stepOrder: stepOrder++,
+        formula: boundaryChecks.map((c) => boundaryChecker.formatBoundaryCheck(c)).join('\n'),
+        inputValues,
+        unitConversion: null,
+        result: boundaryPassed ? 1 : 0,
+        resultUnit: 'pass/fail',
+        description: `边界条件检查\n${boundaryChecks
+          .map((c) => `  ${boundaryChecker.formatBoundaryCheck(c)}`)
+          .join('\n')}`,
+        manuallyModified: false,
+        partialDerivatives,
+        errorContribution: errorContributions,
+        createdAt: now,
+        updatedAt: now,
+      };
+      steps.push(boundaryStep);
+    }
+
     return {
       steps,
       finalResult,
       finalResultUnit: resultUnit,
       totalError,
+      boundaryChecks,
+      boundaryPassed,
     };
   },
 
@@ -280,13 +328,15 @@ export function generateErrorPropagationSteps(
   formula: string,
   variables: VariableWithError[],
   resultUnit: string,
-  description: string
+  description: string,
+  boundaryConditions?: BoundaryCondition[]
 ): ComputationStep[] {
   const result = errorPropagationEngine.compute({
     formula,
     variables,
     resultUnit,
     description,
+    boundaryConditions,
   });
 
   return result.steps.map((step) => ({

@@ -14,7 +14,7 @@ const HistoryPage: React.FC = () => {
   const { sessions, loadAllSessions, setCurrentSession } = useSessionStore();
   const { materials } = useMaterialStore();
   const { steps } = useComputationStore();
-  const { auditLogs, loadAllAuditLogs } = useAuditStore();
+  const { logs: auditLogs, loadAllAuditLogs } = useAuditStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);

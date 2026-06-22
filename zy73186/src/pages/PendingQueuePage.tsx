@@ -32,7 +32,7 @@ const PendingQueuePage: React.FC = () => {
     notes: string
   ) => {
     const resolution = action === 'reject' ? 'rejected' : 'confirmed';
-    await resolveSuspendedTask(taskId, resolution, '现场老师', notes);
+    await resolveSuspendedTask(taskId, resolution, '现场老师', notes, action);
     await loadAllSuspendedTasks();
   };
 

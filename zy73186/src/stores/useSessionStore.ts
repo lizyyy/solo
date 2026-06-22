@@ -20,7 +20,7 @@ interface SessionState {
   updateCurrentStep: (step: number) => Promise<void>;
   setCurrentStep: (step: number) => Promise<void>;
   setSessionStatus: (status: Session['status']) => Promise<void>;
-  updateSessionStatus: (status: Session['status']) => Promise<void>;
+  updateSessionStatus: (statusOrSessionId: Session['status'] | string, status?: Session['status']) => Promise<void>;
   updateProgress: (progress: Partial<Session['progress']>) => Promise<void>;
   saveFullSession: (data: StoredSession) => Promise<void>;
   getCurrentProgress: () => Promise<{ sessionId: string; step: number } | null>;
@@ -36,9 +36,50 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   loadSessions: async () => {
     set({ isLoading: true, error: null });
     try {
-      const sessions = await persistenceService.getAllSessions();
-      set({ sessions, isLoading: false });
+      const sessionsPromise = Promise.race([
+        persistenceService.getAllSessions(),
+        new Promise<Session[]>((_, reject) => setTimeout(() => reject(new Error('getAllSessions timeout')), 5000)),
+      ]);
+      const sessions = await sessionsPromise;
+      if (sessions && sessions.length > 0) {
+        set({ sessions, isLoading: false });
+      } else {
+        try {
+          const lsBackup = localStorage.getItem('ep_boundary_backup_v1');
+          if (lsBackup) {
+            const backup = JSON.parse(lsBackup);
+            if (backup.sessions && backup.sessions.length > 0) {
+              set({ sessions: backup.sessions, isLoading: false });
+              return;
+            }
+          }
+        } catch (e) {
+          console.warn('[SessionStore] Failed to load from localStorage backup:', e);
+        }
+        const { sessions: currentSessions } = get();
+        set({ sessions: currentSessions, isLoading: false });
+      }
     } catch (error) {
+      console.warn('[SessionStore] loadSessions failed:', error);
+      const { sessions: hydratedSessions } = get();
+      if (hydratedSessions && hydratedSessions.length > 0) {
+        console.log('[SessionStore] Store already has hydrated data, keeping:', hydratedSessions.length);
+        set({ error: (error as Error).message, isLoading: false });
+        return;
+      }
+      try {
+        const lsBackup = localStorage.getItem('ep_boundary_backup_v1');
+        if (lsBackup) {
+          const backup = JSON.parse(lsBackup);
+          if (backup.sessions && backup.sessions.length > 0) {
+            console.log('[SessionStore] Falling back to localStorage sessions:', backup.sessions.length);
+            set({ sessions: backup.sessions, isLoading: false, error: (error as Error).message });
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('[SessionStore] Failed to load from localStorage backup:', e);
+      }
       set({ error: (error as Error).message, isLoading: false });
     }
   },
@@ -153,8 +194,35 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     await get().updateSession({ status });
   },
 
-  updateSessionStatus: async (status: Session['status']) => {
-    await get().updateSession({ status });
+  updateSessionStatus: async (statusOrSessionId: Session['status'] | string, status?: Session['status']) => {
+    if (status && typeof statusOrSessionId === 'string') {
+      const sessionId = statusOrSessionId;
+      const { sessions } = get();
+      const sessionIndex = sessions.findIndex((s) => s.id === sessionId);
+      
+      if (sessionIndex === -1) {
+        const session = await persistenceService.getSession(sessionId);
+        if (session) {
+          const updatedSession = { ...session, status, updatedAt: Date.now() };
+          await persistenceService.saveSession(updatedSession);
+          set((state) => ({
+            sessions: [...state.sessions, updatedSession],
+            currentSession: state.currentSession?.id === sessionId ? updatedSession : state.currentSession,
+          }));
+        }
+      } else {
+        const updatedSession = { ...sessions[sessionIndex], status, updatedAt: Date.now() };
+        await persistenceService.saveSession(updatedSession);
+        set((state) => ({
+          sessions: state.sessions.map((s, i) =>
+            i === sessionIndex ? updatedSession : s
+          ),
+          currentSession: state.currentSession?.id === sessionId ? updatedSession : state.currentSession,
+        }));
+      }
+    } else {
+      await get().updateSession({ status: statusOrSessionId as Session['status'] });
+    }
   },
 
   setCurrentStep: async (step: number) => {

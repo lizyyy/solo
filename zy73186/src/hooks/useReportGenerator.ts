@@ -4,32 +4,35 @@ import { useSessionStore } from '../stores/useSessionStore';
 import { useMaterialStore } from '../stores/useMaterialStore';
 import { useComputationStore } from '../stores/useComputationStore';
 import { useAuditStore } from '../stores/useAuditStore';
+import { useReportStore } from '../stores/useReportStore';
 import { reportGenerator } from '../services/reportGenerator';
 import { persistenceService } from '../services/persistence';
 import { auditLogger } from '../services/auditLogger';
 
 export function useReportGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [currentReport, setCurrentReport] = useState<Report | null>(null);
-  const [reports, setReports] = useState<Report[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  const { reports, currentReport, loadAllReports, loadReport, loadReportsForSession, addReport, setCurrentReport } = useReportStore();
 
   const { currentSession, setSessionStatus } = useSessionStore();
   const { materials } = useMaterialStore();
   const { steps } = useComputationStore();
-  const { logs, addLog } = useAuditStore();
+  const { logs, addLog, suspendedTasks } = useAuditStore();
 
   const generateReport = useCallback(async (
     session?: typeof currentSession,
     materialList?: typeof materials,
     stepList?: typeof steps,
     logList?: typeof logs,
-    operator?: string
+    operator?: string,
+    suspendedTaskList?: typeof suspendedTasks
   ) => {
     const targetSession = session || currentSession;
     const targetMaterials = materialList || materials;
     const targetSteps = stepList || steps;
     const targetLogs = logList || logs;
+    const targetSuspendedTasks = suspendedTaskList || suspendedTasks;
 
     if (!targetSession) {
       setError('请先创建或选择一个会话');
@@ -40,12 +43,17 @@ export function useReportGenerator() {
     setError(null);
 
     try {
+      const sessionSuspendedTasks = targetSuspendedTasks.filter(
+        (t) => t.sessionId === targetSession.id
+      );
+
       const report = reportGenerator.generate(
         targetSession,
         targetMaterials,
         targetSteps,
         targetLogs,
-        operator
+        operator,
+        sessionSuspendedTasks
       );
 
       await persistenceService.saveReport(report);
@@ -58,8 +66,7 @@ export function useReportGenerator() {
 
       await setSessionStatus('completed');
 
-      setCurrentReport(report);
-      setReports((prev) => [report, ...prev]);
+      addReport(report);
       return report;
     } catch (err) {
       setError((err as Error).message);
@@ -67,7 +74,7 @@ export function useReportGenerator() {
     } finally {
       setIsGenerating(false);
     }
-  }, [currentSession, materials, steps, logs, addLog, setSessionStatus]);
+  }, [currentSession, materials, steps, logs, addLog, setSessionStatus, suspendedTasks, addReport]);
 
   const downloadReport = useCallback(
     (reportOrFormat?: Report | 'md' | 'json', format: 'md' | 'json' = 'md') => {
@@ -88,58 +95,8 @@ export function useReportGenerator() {
     [currentReport]
   );
 
-  const loadReport = useCallback(async (reportId: string) => {
-    setIsGenerating(true);
-    try {
-      const report = await persistenceService.getReport(reportId);
-      setCurrentReport(report);
-      return report;
-    } catch (err) {
-      setError((err as Error).message);
-      return null;
-    } finally {
-      setIsGenerating(false);
-    }
-  }, []);
-
-  const loadReportsForSession = useCallback(async (sessionId: string) => {
-    setIsGenerating(true);
-    try {
-      const sessionReports = await persistenceService.getReportsBySession(sessionId);
-      if (sessionReports.length > 0) {
-        setCurrentReport(sessionReports[0]);
-      }
-      setReports(sessionReports);
-      return sessionReports;
-    } catch (err) {
-      setError((err as Error).message);
-      return [];
-    } finally {
-      setIsGenerating(false);
-    }
-  }, []);
-
-  const loadAllReports = useCallback(async () => {
-    setIsGenerating(true);
-    try {
-      const sessions = await persistenceService.getAllSessions();
-      const allReports: Report[] = [];
-      for (const session of sessions) {
-        const sessionReports = await persistenceService.getReportsBySession(session.id);
-        allReports.push(...sessionReports);
-      }
-      setReports(allReports);
-      return allReports;
-    } catch (err) {
-      setError((err as Error).message);
-      return [];
-    } finally {
-      setIsGenerating(false);
-    }
-  }, []);
-
   const clearError = useCallback(() => setError(null), []);
-  const clearReport = useCallback(() => setCurrentReport(null), []);
+  const clearReport = useCallback(() => setCurrentReport(null), [setCurrentReport]);
 
   return {
     isGenerating,

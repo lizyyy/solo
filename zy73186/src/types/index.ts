@@ -203,11 +203,35 @@ export interface Report {
   createdAt: number;
 }
 
+export interface BoundaryCondition {
+  variable: string;
+  lowerBound: number;
+  upperBound: number;
+  unit: string;
+  sourceMaterialId?: string;
+  sourceAnchor?: string;
+}
+
+export interface BoundaryCheckResult {
+  variable: string;
+  value: number;
+  error: number;
+  lowerBound: number;
+  upperBound: number;
+  unit: string;
+  isWithinBounds: boolean;
+  violationType?: 'below_lower' | 'above_upper' | 'error_exceeds';
+  margin?: number;
+  sourceMaterialId?: string;
+}
+
 export interface ComputationResult {
   steps: ComputationStep[];
   finalResult: number;
   finalResultUnit: string;
   totalError: number;
+  boundaryChecks?: BoundaryCheckResult[];
+  boundaryPassed?: boolean;
 }
 
 export interface StoredSession {

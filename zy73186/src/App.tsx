@@ -60,12 +60,20 @@ const AppContent: React.FC = () => {
   const { showRecoveryDialog, recoverableSessions, recoverSession, dismissRecovery, pendingCount } = useProgressRecovery();
 
   useEffect(() => {
-    const hasInitialized = localStorage.getItem('epc_demo_initialized');
-    if (!hasInitialized) {
-      initializeDemoData().then(() => {
-        localStorage.setItem('epc_demo_initialized', 'true');
-      });
-    }
+    window.onerror = (msg, src, lineno, colno, err) => {
+      console.error('[Global Error]', msg, src, lineno, colno, err?.stack);
+    };
+    window.addEventListener('unhandledrejection', (event) => {
+      console.error('[Unhandled Promise Rejection]', event.reason?.stack || event.reason);
+    });
+
+    console.log('[App] useEffect running, about to init demo data');
+    initializeDemoData(false).then(() => {
+      console.log('[App] Demo data initialization completed');
+      localStorage.setItem('epc_demo_initialized', 'true');
+    }).catch((err) => {
+      console.error('[App] Demo data init error:', err?.stack || err);
+    });
   }, []);
 
   return (
@@ -105,7 +113,7 @@ const AppContent: React.FC = () => {
                       #{storedSession.session.id.slice(0, 8)}
                     </span>
                     <span className="text-xs px-2 py-0.5 bg-[#1a365d] text-[#63b3ed] rounded">
-                      {storedSession.session.progress.completionPercentage.toFixed(0)}%
+                      {storedSession.session.progress?.completionPercentage?.toFixed(0) ?? '0'}%
                     </span>
                   </div>
                   <div className="text-xs text-[#718096]">
@@ -114,7 +122,7 @@ const AppContent: React.FC = () => {
                   <div className="mt-2 h-1.5 bg-[#2d3748] rounded-full overflow-hidden">
                     <div
                       className="h-full bg-[#3182ce]"
-                      style={{ width: `${storedSession.session.progress.completionPercentage}%` }}
+                      style={{ width: `${storedSession.session.progress?.completionPercentage ?? 0}%` }}
                     />
                   </div>
                 </button>

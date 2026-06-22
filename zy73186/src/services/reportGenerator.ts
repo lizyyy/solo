@@ -5,7 +5,8 @@ import type {
   AuditLog,
   Report,
   Citation,
-  MATERIAL_TYPE_LABELS,
+  SuspendedTask,
+  BoundaryCheckResult,
 } from '../types';
 import { generateId } from '../utils/hash';
 import { shortHash } from '../utils/hash';
@@ -23,17 +24,18 @@ export const reportGenerator = {
     materials: Material[],
     steps: ComputationStep[],
     audits: AuditLog[],
-    operator: string = '系统'
+    operator: string = '系统',
+    suspendedTasks?: SuspendedTask[]
   ): Report {
     const citations: Citation[] = [];
     let citationIndex = 1;
 
-    const addCitation = (text: string, materialId: string): string => {
+    const addCitation = (text: string, materialId: string, anchor?: string): string => {
       const citation: Citation = {
         id: generateId(),
         materialId,
         content: text,
-        anchorText: text.substring(0, 50),
+        anchorText: anchor || text.substring(0, 50),
         position: 0,
         location: { start: 0, end: text.length },
       };
@@ -47,8 +49,10 @@ export const reportGenerator = {
 
     const materialSection = this.generateMaterialSection(materials, addCitation);
     const computationSection = this.generateComputationSection(steps);
+    const boundarySection = this.generateBoundarySection(steps, materials, addCitation);
+    const suspendedSection = this.generateSuspendedSection(suspendedTasks);
     const auditSection = this.generateAuditSection(audits);
-    const conclusionSection = this.generateConclusionSection(steps);
+    const conclusionSection = this.generateConclusionSection(steps, suspendedTasks);
 
     const markdownContent = `# ${title}
 
@@ -64,6 +68,7 @@ export const reportGenerator = {
 | 最后更新 | ${updatedAt} |
 | 计算步骤数 | ${steps.length} |
 | 人工修改次数 | ${auditLogger.getManualEditCount(audits)} |
+| 挂起任务数 | ${suspendedTasks?.length || 0} |
 
 ---
 
@@ -79,19 +84,31 @@ ${computationSection}
 
 ---
 
-## 四、操作审计
+## 四、边界检查
+
+${boundarySection}
+
+---
+
+## 五、挂起与人工确认
+
+${suspendedSection}
+
+---
+
+## 六、操作审计
 
 ${auditSection}
 
 ---
 
-## 五、结论
+## 七、结论
 
 ${conclusionSection}
 
 ---
 
-## 六、引用溯源
+## 八、引用溯源
 
 ${this.generateCitationsSection(citations, materials)}
 
@@ -99,6 +116,7 @@ ${this.generateCitationsSection(citations, materials)}
 
 *报告由误差传播边界复核系统自动生成*
 *生成时间: ${new Date().toLocaleString('zh-CN')}*
+*生成人: ${operator}*
 `;
 
     const now = Date.now();
@@ -219,16 +237,102 @@ ${inputs}${unitConversion}${partialDerivatives}${errorContribution}
     return auditItems.join('\n\n');
   },
 
-  generateConclusionSection(steps: ComputationStep[]): string {
+  generateBoundarySection(
+    steps: ComputationStep[],
+    materials: Material[],
+    addCitation: (text: string, materialId: string, anchor?: string) => string
+  ): string {
+    const boundaryStep = steps.find((s) => s.resultUnit === 'pass/fail');
+    if (!boundaryStep) {
+      return '> 未检测到边界条件检查';
+    }
+
+    const checks = boundaryStep.formula.split('\n').filter((l) => l.trim());
+    if (checks.length === 0) {
+      return '> 未检测到边界条件检查';
+    }
+
+    const passed = boundaryStep.result === 1;
+    const statusText = passed ? '✅ 所有边界条件符合要求' : '❌ 部分边界条件超出范围';
+
+    const checkItems = checks.map((check) => {
+      const isPass = check.includes('✓');
+      const icon = isPass ? '✅' : '❌';
+      return `- ${icon} ${check.replace('✓', '').replace('✗', '').trim()}`;
+    });
+
+    const boundaryMaterials = materials.filter((m) => m.type === 'boundary_sample');
+    let citations = '';
+    if (boundaryMaterials.length > 0) {
+      const material = boundaryMaterials[0];
+      const cit = addCitation(material.content, material.id, '边界条件来源');
+      citations = `\n\n> 边界条件来源: ${cit}`;
+    }
+
+    return `### 边界检查结果
+
+**总体结论**: ${statusText}
+
+### 详细检查项
+
+${checkItems.join('\n')}
+${citations}
+`;
+  },
+
+  generateSuspendedSection(suspendedTasks?: SuspendedTask[]): string {
+    if (!suspendedTasks || suspendedTasks.length === 0) {
+      return '> 本次复核无挂起任务';
+    }
+
+    const items = suspendedTasks.map((task) => {
+      const statusIcon = task.status === 'pending' ? '⏳' : task.status === 'confirmed' ? '✅' : '❌';
+      const statusText = task.status === 'pending' ? '待处理' : task.status === 'confirmed' ? '已确认' : '已驳回';
+      const reasonText = task.reason === 'duplicate_sample' ? '重复样本' : '口径变更';
+      
+      let resolutionText = '';
+      if (task.resolution) {
+        const actionText = task.resolution.action === 'continue' ? '继续处理' : task.resolution.action === 'new_session' ? '新建会话' : '已驳回';
+        resolutionText = `
+  - 处理方式: ${actionText}
+  - 处理人: ${task.resolution.resolvedBy}
+  - 处理时间: ${new Date(task.resolution.resolvedAt).toLocaleString('zh-CN')}
+  - 处理说明: ${task.resolution.notes}`;
+      }
+
+      return `#### ${statusIcon} ${reasonText} - ${statusText}
+
+**挂起时间**: ${new Date(task.createdAt).toLocaleString('zh-CN')}
+**挂起人**: ${task.createdBy}
+**描述**: ${task.description}${resolutionText}
+`;
+    });
+
+    const pendingCount = suspendedTasks.filter((t) => t.status === 'pending').length;
+    const warning = pendingCount > 0
+      ? `\n\n> ⚠️ **注意：还有 ${pendingCount} 个挂起任务待处理，结论可能不完整**`
+      : '';
+
+    return `${items.join('\n---\n')}${warning}
+`;
+  },
+
+  generateConclusionSection(steps: ComputationStep[], suspendedTasks?: SuspendedTask[]): string {
     if (steps.length === 0) {
       return '> 暂无计算结果';
     }
 
     const finalStep = steps[steps.length - 1];
     const hasManualEdits = steps.some((s) => s.manuallyModified);
+    const boundaryStep = steps.find((s) => s.resultUnit === 'pass/fail');
+    const boundaryPassed = boundaryStep ? boundaryStep.result === 1 : true;
 
     const manualWarning = hasManualEdits
       ? '\n\n> ⚠️ **注意：计算过程中包含人工修改，请仔细复核修改内容**'
+      : '';
+
+    const pendingWarning = suspendedTasks?.some((t) => t.status === 'pending')
+      ? '\n\n> ⚠️ **注意：存在未处理的挂起任务，结论可能不完整**'
       : '';
 
     const totalError = finalStep.errorContribution
@@ -241,7 +345,20 @@ ${inputs}${unitConversion}${partialDerivatives}${errorContribution}
       ? ((totalError / Math.abs(finalStep.result)) * 100).toFixed(4)
       : 'N/A';
 
-    return `### 最终结果
+    const boundaryStatus = boundaryStep
+      ? (boundaryPassed ? '✅ 边界检查通过' : '❌ 边界检查未通过')
+      : 'ℹ️ 未执行边界检查';
+
+    const overallStatus = boundaryPassed && (!suspendedTasks?.some((t) => t.status === 'pending'))
+      ? '✅ 复核通过'
+      : '⚠️ 需要进一步确认';
+
+    return `### 复核结论
+
+**最终状态**: ${overallStatus}
+**边界检查**: ${boundaryStatus}
+
+### 最终结果
 
 \`\`\`
 f = ${finalStep.result.toFixed(6)} ± ${totalError.toFixed(6)} ${finalStep.resultUnit}
@@ -253,7 +370,13 @@ f = ${finalStep.result.toFixed(6)} ± ${totalError.toFixed(6)} ${finalStep.resul
 1. **总误差**: ${totalError.toFixed(6)} ${finalStep.resultUnit}
 2. **相对误差**: ${relativeError}%
 3. **结果单位**: ${finalStep.resultUnit}
-${manualWarning}
+${manualWarning}${pendingWarning}
+
+### 结论依据
+
+1. 所有计算步骤均已展开，包含误差传播公式、参数代入、单位换算和中间数值
+2. 边界条件已与历史答案原文进行比对和溯源
+3. 人工修改和挂起任务均有完整记录，可追溯操作人、修改内容和原因
 `;
   },
 

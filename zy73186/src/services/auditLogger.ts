@@ -112,6 +112,18 @@ export const auditLogger = {
     });
   },
 
+  logUpdateMaterial(
+    sessionId: string,
+    materialId: string,
+    materialType: string,
+    materialName: string,
+    operator?: string
+  ): AuditLog {
+    return this.createLog(sessionId, 'material_update', operator, {
+      afterValue: { materialId, materialType, materialName },
+    });
+  },
+
   logResumeSession(
     sessionId: string,
     operator?: string
@@ -176,6 +188,20 @@ export const auditLogger = {
           description: `${time} - ${log.operator} 上传了材料`,
           icon: 'upload',
           color: '#3182ce',
+        };
+      case 'material_update':
+        return {
+          title: '更新材料',
+          description: `${time} - ${log.operator} 更新了材料${log.diff ? '（检测到口径变更）' : ''}`,
+          icon: 'edit-3',
+          color: '#dd6b20',
+        };
+      case 'material_delete':
+        return {
+          title: '删除材料',
+          description: `${time} - ${log.operator} 删除了材料`,
+          icon: 'trash-2',
+          color: '#c53030',
         };
       case 'resume_session':
         return {

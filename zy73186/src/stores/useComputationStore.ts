@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { ComputationStep } from '../types';
+import type { ComputationStep, BoundaryCondition } from '../types';
 import { persistenceService } from '../services/persistence';
 import { errorPropagationEngine, generateErrorPropagationSteps } from '../services/errorPropagation';
 import { auditLogger } from '../services/auditLogger';
@@ -24,7 +24,8 @@ interface ComputationState {
     }>,
     resultUnit: string,
     description: string,
-    operator?: string
+    operator?: string,
+    boundaryConditions?: BoundaryCondition[]
   ) => Promise<ComputationStep[]>;
   updateStepResult: (
     stepId: string,
@@ -53,9 +54,66 @@ export const useComputationStore = create<ComputationState>((set, get) => ({
   loadSteps: async (sessionId: string) => {
     set({ isLoading: true, error: null });
     try {
-      const steps = await persistenceService.getComputationStepsBySession(sessionId);
-      set({ steps, isLoading: false });
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('getComputationStepsBySession timeout')), 5000);
+      });
+      const steps = await Promise.race([
+        persistenceService.getComputationStepsBySession(sessionId),
+        timeoutPromise,
+      ]);
+      if (steps && steps.length > 0) {
+        set({ steps, isLoading: false });
+        return;
+      }
+      const { steps: existingSteps } = get();
+      const sessionSteps = existingSteps.filter((s) => s.sessionId === sessionId);
+      if (sessionSteps.length > 0) {
+        console.log('[ComputationStore] Store already has session steps, keeping:', sessionSteps.length);
+        set({ isLoading: false });
+        return;
+      }
+      try {
+        const lsBackup = localStorage.getItem('ep_boundary_backup_v1');
+        if (lsBackup) {
+          const backup = JSON.parse(lsBackup);
+          if (backup.computationSteps && backup.computationSteps.length > 0) {
+            const filtered = backup.computationSteps.filter((s: ComputationStep) => s.sessionId === sessionId);
+            if (filtered.length > 0) {
+              console.log('[ComputationStore] Falling back to localStorage session steps:', filtered.length);
+              set({ steps: filtered, isLoading: false });
+              return;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('[ComputationStore] Failed to load from localStorage backup:', e);
+      }
+      set({ isLoading: false });
     } catch (error) {
+      console.warn('[ComputationStore] loadSteps failed:', error);
+      const { steps: existingSteps } = get();
+      const sessionSteps = existingSteps.filter((s) => s.sessionId === sessionId);
+      if (sessionSteps.length > 0) {
+        console.log('[ComputationStore] Store already has hydrated session steps, keeping:', sessionSteps.length);
+        set({ error: (error as Error).message, isLoading: false });
+        return;
+      }
+      try {
+        const lsBackup = localStorage.getItem('ep_boundary_backup_v1');
+        if (lsBackup) {
+          const backup = JSON.parse(lsBackup);
+          if (backup.computationSteps && backup.computationSteps.length > 0) {
+            const filtered = backup.computationSteps.filter((s: ComputationStep) => s.sessionId === sessionId);
+            if (filtered.length > 0) {
+              console.log('[ComputationStore] Falling back to localStorage session steps:', filtered.length);
+              set({ steps: filtered, error: (error as Error).message, isLoading: false });
+              return;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('[ComputationStore] Failed to load from localStorage backup:', e);
+      }
       set({ error: (error as Error).message, isLoading: false });
     }
   },
@@ -66,7 +124,8 @@ export const useComputationStore = create<ComputationState>((set, get) => ({
     variables,
     resultUnit,
     description,
-    operator
+    operator,
+    boundaryConditions
   ) => {
     set({ isLoading: true, error: null });
     try {
@@ -75,7 +134,8 @@ export const useComputationStore = create<ComputationState>((set, get) => ({
         formula,
         variables,
         resultUnit,
-        description
+        description,
+        boundaryConditions
       );
 
       for (const step of steps) {
