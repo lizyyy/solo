@@ -265,24 +265,48 @@ def _diff_section(diffs, any_confirmed):
     for d in diffs:
         qid = _esc(d["question_id"])
         ver = _esc(d["version"])
+        title = _esc(d["title"])
+        status = _esc(d["status"])
         note = _esc(d["确认说明"])
         who = _esc(d["确认人"])
-        before = "%s ± %s" % (_fmt(d["before_value"]), _fmt(d["before_uncertainty"]))
-        after = "%s ± %s" % (_fmt(d["after_value"]), _fmt(d["after_uncertainty"]))
-        delta = ("Δ值 %s / Δ不确定度 %s"
-                 % (_fmt(d["value_delta"]), _fmt(d["uncertainty_delta"])))
+        # 确认前
+        before_v = _fmt(d["before_value"])
+        before_u = _fmt(d["before_uncertainty"])
+        # 确认后
+        after_v = _fmt(d["after_value"])
+        after_u = _fmt(d["after_uncertainty"])
+        # 差值
+        v_delta = _fmt(d["value_delta"])
+        u_delta = _fmt(d["uncertainty_delta"])
         if d["changed"]:
-            row = ("<tr class='warn'><td>%s</td><td>%s</td><td>%s</td>"
-                   "<td>%s</td><td>%s</td><td><span class='delta'>%s</span></td>"
-                   "<td>%s</td></tr>" % (
-                       qid, ver, _esc(d["status"]), note, who, delta, before))
+            cls = "warn"
+            status_badge = '<span class="badge" style="background:#9a6700">已调整</span>'
+            v_delta_html = '<span class="delta">%s</span>' % v_delta
+            u_delta_html = '<span class="delta">%s</span>' % u_delta
         else:
-            row = ("<tr><td>%s</td><td>%s</td><td>确认无误</td>"
-                   "<td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (
-                       qid, ver, note, who, "—", after))
+            cls = ""
+            status_badge = '<span class="badge" style="background:#1a7f37">确认无误</span>'
+            v_delta_html = v_delta
+            u_delta_html = u_delta
+        row = ("<tr class='%s'><td>%s<br><small>%s</small></td>"
+               "<td>%s</td><td>%s</td>"
+               "<td>%s ± %s</td>"
+               "<td>%s ± %s</td>"
+               "<td>Δ值 %s<br><small>Δ不确定度 %s</small></td>"
+               "<td>%s</td><td>%s</td></tr>" % (
+                   cls, qid, title, ver, status_badge,
+                   before_v, before_u,
+                   after_v, after_u,
+                   v_delta_html, u_delta_html,
+                   note, who))
         rows.append(row)
     return """<h2 id='diff'>人工确认前后差异</h2>
-<p class='muted'>排班同事复盘：下表列出"计算值 → 确认值"的改动，红色 Δ 为确认后调整量（计算值→确认值）。</p>
-<table><tr><th>题目ID</th><th>版本</th><th>状态</th><th>确认说明</th><th>确认人</th>
-<th>Δ（计算→确认）</th><th>计算值 ± 不确定度</th></tr>
+<p class='muted'>排班同事复盘：一表对照"计算前是什么、确认后是什么、改动幅度是多少、确认依据是什么"。
+黄色高亮行表示人工调整过的条目，绿色为确认无误条目。</p>
+<table>
+<tr><th>题目</th><th>版本</th><th>状态</th>
+<th>确认前（计算值）<br><small>值 ± 不确定度</small></th>
+<th>确认后（人工值）<br><small>值 ± 不确定度</small></th>
+<th>差值 Δ<br><small>（确认后 − 确认前）</small></th>
+<th>确认说明</th><th>确认人</th></tr>
 %s</table></div>""" % "".join(rows)
