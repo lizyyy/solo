@@ -1,7 +1,3 @@
-// ============================================================
-// 后端 API：FastAPI + SQLite 持久化入口
-// ============================================================
-
 const Api = {
   enabled: false,
 
@@ -25,43 +21,39 @@ const Api = {
   },
 
   async loadWorkorders(filter = 'all', keyword = '') {
-    const params = new URLSearchParams({ filter, keyword });
+    const params = new URLSearchParams({ status: filter, keyword });
     const res = await this.request(`/api/workorders?${params.toString()}`);
-    return { workorders: res.data || [] };
+    return { workorders: res.data || [], counts: res.counts || {} };
   },
 
   async submitWorkorder(payload) {
-    const res = await this.request('/api/workorders', {
+    const res = await this.request('/api/workorders/submit', {
       method: 'POST',
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ workorder: payload }),
     });
     return {
-      workorder: res.data,
-      duplicate: !!res.duplicated,
-      existingWorkorder: res.data,
-      hash: res.dedupHash,
+      workorder: res.workorder,
+      duplicate: !!res.duplicate,
+      hash: res.hash,
+      submitCount: res.submitCount,
       message: res.message,
     };
   },
 
   async addRemark(workorderId, partId, content, author = '宋建国', role = '现场调度') {
-    const res = await this.request(`/api/workorders/${encodeURIComponent(workorderId)}/remarks`, {
+    const res = await this.request(`/api/workorders/${encodeURIComponent(workorderId)}/parts/${encodeURIComponent(partId)}/remarks`, {
       method: 'POST',
-      body: JSON.stringify({ partId, content, author, role }),
+      body: JSON.stringify({ content, author, role }),
     });
-    const parts = res.data.parts.find(p => p.id === partId);
-    const version = parts?.remarkVersions?.[0];
-    return { workorder: res.data, version };
+    return { version: res.version, workorder: res.workorder };
   },
 
-  async addScreenshot(workorderId, partId, item, author = '宋建国') {
-    const res = await this.request(`/api/workorders/${encodeURIComponent(workorderId)}/screenshots`, {
+  async addScreenshot(workorderId, partId, name, preview = '📷', author = '宋建国', role = '现场调度') {
+    const res = await this.request(`/api/workorders/${encodeURIComponent(workorderId)}/parts/${encodeURIComponent(partId)}/screenshots`, {
       method: 'POST',
-      body: JSON.stringify({ partId, name: item.name, preview: item.preview, author }),
+      body: JSON.stringify({ name, preview, author, role }),
     });
-    const parts = res.data.parts.find(p => p.id === partId);
-    const version = parts?.screenshotVersions?.[0];
-    return { workorder: res.data, version };
+    return { version: res.version, workorder: res.workorder };
   },
 
   async addSampling(workorderId, sampling) {
@@ -69,7 +61,7 @@ const Api = {
       method: 'POST',
       body: JSON.stringify(sampling),
     });
-    return { workorder: res.data };
+    return { workorder: res.workorder };
   },
 
   async updateStatus(workorderId, status, operator = '宋建国', operatorRole = '现场调度', note = '') {
@@ -77,35 +69,35 @@ const Api = {
       method: 'PATCH',
       body: JSON.stringify({ status, operator, operatorRole, note }),
     });
-    return { workorder: res.data };
+    return { workorder: res.workorder };
   },
 
-  async exportView(filter, keyword) {
-    const res = await this.request(`/api/summary`);
-    const summary = res.data || {};
-    const abnormalRes = await this.request(`/api/abnormal`);
-    const abnormals = abnormalRes.data || [];
-    const workordersRes = await this.request(`/api/workorders`);
-    const workorders = workordersRes.data || [];
-    const filtered = filter === 'all' ? workorders : workorders.filter(
-      w => w.status === filter
-    );
-    return {
-      exportMeta: {
-        exportedAt: new Date().toLocaleString('zh-CN'),
-        filter,
-        keyword,
-        totalCount: filtered.length,
-      },
-      summary,
-      workorders: filtered,
-      abnormalRecords: abnormals,
-    };
+  async overrideWorkorder(workorderId, reason, operator = '张总监', operatorRole = '运维负责人') {
+    const res = await this.request(`/api/workorders/${encodeURIComponent(workorderId)}/override`, {
+      method: 'POST',
+      body: JSON.stringify({ reason, operator, operatorRole }),
+    });
+    return { workorder: res.workorder };
+  },
+
+  async getSummary() {
+    const res = await this.request('/api/summary');
+    return res.data || {};
+  },
+
+  async getAbnormal() {
+    const res = await this.request('/api/abnormal');
+    return res.data || [];
+  },
+
+  async getHistory(workorderId) {
+    const res = await this.request(`/api/workorders/${encodeURIComponent(workorderId)}/history`);
+    return res;
   },
 
   triggerDownload() {
     const a = document.createElement('a');
-    a.href = `/api/export`;
+    a.href = '/api/export';
     a.click();
   },
 

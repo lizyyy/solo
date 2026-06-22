@@ -464,6 +464,7 @@ const UI = {
     if (partsEl) partsEl.innerHTML = '';
     if (samEl) samEl.innerHTML = '';
 
+    document.getElementById('f_workorderId').value = '';
     document.getElementById('f_craneId').value = '';
     document.getElementById('f_craneName').value = '';
     document.getElementById('f_title').value = '';
@@ -485,12 +486,15 @@ const UI = {
     const row = document.createElement('div');
     row.className = 'dyn-row';
     row.innerHTML = `
-      <div class="form-item"><label>备件名称</label><input type="text" class="fp_name" placeholder="如 工业齿轮油 L-CKD 320"/></div>
+      <div class="form-item"><label>备件名称 <span class="req">*</span></label><input type="text" class="fp_name" placeholder="如 工业齿轮油 L-CKD 320"/></div>
       <div class="form-item"><label>规格型号</label><input type="text" class="fp_spec" placeholder="如 20L/桶"/></div>
       <div class="form-item"><label>数量</label><input type="number" class="fp_qty" value="1" step="0.1"/></div>
       <div class="form-item"><label>单位</label><input type="text" class="fp_unit" placeholder="桶"/></div>
+      <div class="form-item"><label>备件批次 <span class="req">*</span></label><input type="text" class="fp_batch" placeholder="如 BH-2026-0608-A（去重关键字段）"/></div>
       <div class="form-item"><label>计划到货</label><input type="datetime-local" class="fp_pa"/></div>
       <div class="form-item"><label>实际到货</label><input type="datetime-local" class="fp_aa"/></div>
+      <div class="form-item"><label>补录备注</label><input type="text" class="fp_remark" placeholder="如 常规齿轮油更换，需2桶"/></div>
+      <div class="form-item"><label>旧截图名称/链接</label><input type="text" class="fp_screenshot" placeholder="如 物流实时位置截图"/></div>
       <button class="btn-remove-row" type="button" title="删除此备件">×</button>
     `;
     row.querySelector('.btn-remove-row').addEventListener('click', () => row.remove());
@@ -524,13 +528,14 @@ const UI = {
   },
 
   collectFormData() {
+    const workorderId = document.getElementById('f_workorderId').value.trim();
     const craneId = document.getElementById('f_craneId').value.trim();
     const title = document.getElementById('f_title').value.trim();
     const dtStart = document.getElementById('f_dtStart').value;
     const dtEnd = document.getElementById('f_dtEnd').value;
 
-    if (!craneId || !title || !dtStart || !dtEnd) {
-      return { error: '塔吊编号、工单标题、停机窗口起止为必填项' };
+    if (!workorderId || !craneId || !title || !dtStart || !dtEnd) {
+      return { error: '工单号、塔吊编号、工单标题、停机窗口起止为必填项' };
     }
 
     const parts = [];
@@ -540,12 +545,15 @@ const UI = {
       const spec = row.querySelector('.fp_spec').value.trim();
       const qty = parseFloat(row.querySelector('.fp_qty').value) || 1;
       const unit = row.querySelector('.fp_unit').value.trim();
+      const batchNo = row.querySelector('.fp_batch').value.trim();
       const plannedArrival = this._dtLocalToStr(row.querySelector('.fp_pa').value) || this._dtLocalToStr(dtStart);
       const actualArrival = this._dtLocalToStr(row.querySelector('.fp_aa').value) || plannedArrival;
+      const remark = row.querySelector('.fp_remark').value.trim();
+      const screenshotName = row.querySelector('.fp_screenshot').value.trim();
       parts.push({
-        name, spec, qty, unit,
+        name, spec, qty, unit, batchNo,
         plannedArrival, actualArrival,
-        remark: '', screenshotName: '',
+        remark, screenshotName,
         author: document.getElementById('f_operator').value.trim() || '提交人',
       });
     });
@@ -566,6 +574,7 @@ const UI = {
 
     return {
       data: {
+        id: workorderId,
         craneId,
         craneName: document.getElementById('f_craneName').value.trim() || craneId,
         title,

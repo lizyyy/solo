@@ -10,11 +10,12 @@
     "maintainer": "李师傅班组",
     "downtimeWindow": { "start": "2026-06-08 08:00", "end": "2026-06-08 14:00" },
     "createdAt": "2026-06-05 09:20",
-    "hasAbnormalSampling": false,
+    "hasAbnormalSampling": true,
     "hasLateParts": true,
     "parts": [
       {
         "id": "P-001",
+        "batchNo": "BH-2026-0601-A",
         "name": "工业齿轮油 L-CKD 320",
         "spec": "20L/桶 · ISO VG 320",
         "qty": 2,
@@ -36,6 +37,7 @@
       },
       {
         "id": "P-002",
+        "batchNo": "BH-2026-0601-B",
         "name": "齿轮箱密封垫组件",
         "spec": "型号 GX-MJ-180 · NBR橡胶",
         "qty": 1,
@@ -54,6 +56,7 @@
       },
       {
         "id": "P-003",
+        "batchNo": "BH-2026-0601-C",
         "name": "强磁排油堵头",
         "spec": "M24×1.5 · 带O型圈",
         "qty": 2,
@@ -104,6 +107,7 @@
     "parts": [
       {
         "id": "P-101",
+        "batchNo": "BH-2026-0602-A",
         "name": "钢丝绳专用润滑脂",
         "spec": "5kg/罐 · 含二硫化钼",
         "qty": 1,
@@ -122,6 +126,7 @@
       },
       {
         "id": "P-102",
+        "batchNo": "BH-2026-0602-B",
         "name": "绳端固定压板螺栓",
         "spec": "M20×80 · 8.8级高强螺栓",
         "qty": 8,
@@ -171,6 +176,7 @@
     "parts": [
       {
         "id": "P-201",
+        "batchNo": "BH-2026-0528-A",
         "name": "回转大齿圈润滑脂",
         "spec": "开式齿轮润滑脂 · 黑色高粘度",
         "qty": 3,
@@ -220,6 +226,7 @@
     "parts": [
       {
         "id": "P-301",
+        "batchNo": "BH-2026-0603-A",
         "name": "制动摩擦片",
         "spec": "型号 ZDP-220 · 耐磨型",
         "qty": 4,
@@ -267,6 +274,7 @@
     "parts": [
       {
         "id": "P-401",
+        "batchNo": "BH-2026-0606-A",
         "name": "电气柜防尘滤网",
         "spec": "320×240×20mm · G4级初效",
         "qty": 2,
@@ -308,6 +316,7 @@
     "parts": [
       {
         "id": "P-501",
+        "batchNo": "BH-2026-0604-A",
         "name": "标准砝码借用",
         "spec": "1t × 4块 · 第三方计量所",
         "qty": 4,

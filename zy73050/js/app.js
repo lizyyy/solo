@@ -218,7 +218,7 @@ const App = {
         if (resp.duplicate) {
           UI.showToast(`⚠️ ${resp.message}（哈希：${resp.hash}），仅追加提交历史`, 'warn');
           this.showDuplicateModal({
-            isDuplicate: true, existingWo: resp.workorder, hash: resp.hash,
+            isDuplicate: true, existingWo: resp.workorder, hash: resp.hash, submitCount: resp.submitCount,
           });
         } else {
           UI.showToast(`✅ 新工单已入库（${resp.workorder.id}）`, 'success');
