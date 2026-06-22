@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const PORT = 3001;
+const PORT = parseInt(process.env.BACKEND_PORT || 3002);
 
 console.log('Starting server...');
 

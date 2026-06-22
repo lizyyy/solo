@@ -4,17 +4,17 @@ import json
 import urllib.request
 import ssl
 import os
+import sys
 
-# 彻底清除代理
-for k in list(os.environ.keys()):
-    if 'proxy' in k.lower():
-        del os.environ[k]
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from config import API_BASE, apply_no_proxy
 
-# 创建无代理的opener
+apply_no_proxy()
+
 proxy_handler = urllib.request.ProxyHandler({})
 opener = urllib.request.build_opener(proxy_handler)
 
-API = "http://localhost:3001"
+API = API_BASE
 
 def test_api(path, method='GET', data=None):
     url = API + path

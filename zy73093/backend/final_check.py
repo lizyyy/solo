@@ -2,14 +2,14 @@
 import json
 import urllib.request
 import os
+import sys
 
-# 禁用代理
-for k in ['http_proxy', 'https_proxy', 'HTTP_PROXY', 'HTTPS_PROXY', 'all_proxy', 'ALL_PROXY']:
-    os.environ.pop(k, None)
-os.environ['NO_PROXY'] = '*'
-os.environ['no_proxy'] = '*'
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from config import API_BASE, apply_no_proxy
 
-API = "http://localhost:3001"
+apply_no_proxy()
+
+API = API_BASE
 
 def GET(path):
     with urllib.request.urlopen(API + path) as r:

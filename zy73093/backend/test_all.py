@@ -2,8 +2,15 @@
 import json
 import urllib.request
 import subprocess
+import os
+import sys
 
-API = "http://localhost:3001"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from config import API_BASE, apply_no_proxy
+
+apply_no_proxy()
+
+API = API_BASE
 
 def GET(path):
     with urllib.request.urlopen(API + path) as r:

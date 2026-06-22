@@ -3,14 +3,15 @@
 import json
 import urllib.request
 import os
+import sys
 
-# 禁用代理
-for k in list(os.environ.keys()):
-    if 'proxy' in k.lower():
-        del os.environ[k]
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from config import API_BASE, apply_no_proxy
+
+apply_no_proxy()
 
 opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
-API = "http://localhost:3002"
+API = API_BASE
 
 passed = 0
 failed = 0
