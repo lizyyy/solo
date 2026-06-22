@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "..", "..", "data", "curtain_wall.db")
+DB_PATH = os.path.join(BASE_DIR, "..", "data", "curtain_wall.db")
 os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 
 SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"

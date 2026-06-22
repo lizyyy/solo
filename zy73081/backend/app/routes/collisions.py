@@ -174,7 +174,10 @@ def export_csv(
 ):
     q = db.query(CollisionRecord)
     if status and status != "ALL":
-        q = q.filter(CollisionRecord.status == status)
+        if status == "MANUAL_REJUDGED":
+            q = q.filter(CollisionRecord.rejudge_count > 0)
+        else:
+            q = q.filter(CollisionRecord.status == status)
     if coordinateOffsetOnly:
         q = q.filter(CollisionRecord.is_coordinate_offset == True)
     if keyword:
@@ -202,8 +205,9 @@ def export_csv(
     writer = csv.writer(output)
     writer.writerow([
         "碰撞编号", "是否样例", "项目", "楼层", "节点编号",
-        "碰撞类型", "构件A", "构件B", "状态分类", "改判次数",
-        "坐标偏移异常", "异常说明", "负责人", "初判结论",
+        "碰撞类型", "构件A", "构件B", "当前状态", "改判次数",
+        "坐标偏移异常", "异常说明", "负责人", "初判结论（原始结论）",
+        "最近改判原因", "最近改判人", "最近改判时间",
         "创建时间", "修改时间", "历史操作摘要"
     ])
 
@@ -214,6 +218,7 @@ def export_csv(
             .order_by(CollisionHistory.created_at.desc())
             .all()
         )
+        latest = history[0] if history else None
         hist_summary = "; ".join(
             [f"{h.operator}→{STATUS_LABEL.get(h.new_status, h.new_status)}({h.reason[:20]})" for h in history[:3]]
         ) if history else "无改判记录"
@@ -232,7 +237,10 @@ def export_csv(
             "是" if r.is_coordinate_offset else "否",
             r.coordinate_offset_note or "",
             r.responsible_person,
-            r.initial_conclusion,
+            r.initial_conclusion or "",
+            latest.reason if latest else "",
+            latest.operator if latest else "",
+            _fmt_dt(latest.created_at) if latest else "",
             _fmt_dt(r.created_at),
             _fmt_dt(r.updated_at),
             hist_summary,
