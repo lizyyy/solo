@@ -58,10 +58,18 @@ export function recalculateSample(
   paramVersion: ParamVersion,
   allSamples: Sample[]
 ): Sample {
-  const actual = calculateNextTerm(sample.sequence, paramVersion.params);
-  const deviation = calculateDeviation(actual, sample.expected);
+  const deviation = calculateDeviation(sample.actual, sample.expected);
   const duplicateOf = checkDuplicate(sample, allSamples);
-  const status = determineStatus(deviation, paramVersion.threshold, duplicateOf.length > 0);
+
+  let status: SampleStatus;
+  if (sample.status === 'pending') {
+    status = 'pending';
+  } else if (sample.status === 'duplicate') {
+    status = 'duplicate';
+  } else {
+    status = determineStatus(deviation, paramVersion.threshold, false);
+  }
+
   const calculationTrace = generateCalculationTrace(
     sample.sequence,
     paramVersion.params,
@@ -71,7 +79,6 @@ export function recalculateSample(
   return {
     ...sample,
     paramVersionId: paramVersion.id,
-    actual,
     deviation,
     status,
     duplicateOf,

@@ -33,6 +33,32 @@ interface ChartPoint {
   sample: Sample;
 }
 
+function getPointStyle(status: string) {
+  switch (status) {
+    case 'abnormal':
+      return 'circle' as const;
+    case 'duplicate':
+      return 'triangle' as const;
+    case 'pending':
+      return 'rect' as const;
+    default:
+      return 'circle' as const;
+  }
+}
+
+function getPointColor(status: string, deviation: number, threshold: number) {
+  switch (status) {
+    case 'abnormal':
+      return `rgba(214, 69, 69, ${0.6 + (deviation - threshold) * 0.04})`;
+    case 'duplicate':
+      return 'rgba(243, 156, 18, 0.85)';
+    case 'pending':
+      return 'rgba(52, 152, 219, 0.85)';
+    default:
+      return `rgba(39, 174, 96, ${0.6 + (5 - deviation) * 0.08})`;
+  }
+}
+
 export function ScatterChart() {
   const chartRef = useRef<ChartJS<'scatter'>>(null);
 
@@ -73,32 +99,6 @@ export function ScatterChart() {
 
   const threshold = currentVersion?.threshold || 5;
 
-  const getPointStyle = (status: string) => {
-    switch (status) {
-      case 'abnormal':
-        return 'circle' as const;
-      case 'duplicate':
-        return 'triangle' as const;
-      case 'pending':
-        return 'rect' as const;
-      default:
-        return 'circle' as const;
-    }
-  };
-
-  const getPointColor = (status: string, deviation: number) => {
-    switch (status) {
-      case 'abnormal':
-        return `rgba(214, 69, 69, ${0.6 + (deviation - threshold) * 0.04})`;
-      case 'duplicate':
-        return 'rgba(243, 156, 18, 0.85)';
-      case 'pending':
-        return 'rgba(52, 152, 219, 0.85)';
-      default:
-        return `rgba(39, 174, 96, ${0.6 + (5 - deviation) * 0.08})`;
-    }
-  };
-
   const { normalData, abnormalData, duplicateData, pendingData, allPoints } = useMemo(() => {
     const normalData: ChartPoint[] = [];
     const abnormalData: ChartPoint[] = [];
@@ -134,32 +134,32 @@ export function ScatterChart() {
         {
           label: '正常',
           data: normalData as Point[],
-          backgroundColor: normalData.map((p) => getPointColor('normal', p.y)),
-          pointStyle: 'circle',
+          backgroundColor: normalData.map((p) => getPointColor('normal', p.y, threshold)),
+          pointStyle: getPointStyle('normal'),
           pointRadius: 8,
           pointHoverRadius: 12,
         },
         {
           label: '异常',
           data: abnormalData as Point[],
-          backgroundColor: abnormalData.map((p) => getPointColor('abnormal', p.y)),
-          pointStyle: 'circle',
+          backgroundColor: abnormalData.map((p) => getPointColor('abnormal', p.y, threshold)),
+          pointStyle: getPointStyle('abnormal'),
           pointRadius: 10,
           pointHoverRadius: 14,
         },
         {
           label: '重复',
           data: duplicateData as Point[],
-          backgroundColor: '#F39C12',
-          pointStyle: 'triangle',
+          backgroundColor: duplicateData.map((p) => getPointColor('duplicate', p.y, threshold)),
+          pointStyle: getPointStyle('duplicate'),
           pointRadius: 10,
           pointHoverRadius: 14,
         },
         {
           label: '待确认',
           data: pendingData as Point[],
-          backgroundColor: '#3498DB',
-          pointStyle: 'rect',
+          backgroundColor: pendingData.map((p) => getPointColor('pending', p.y, threshold)),
+          pointStyle: getPointStyle('pending'),
           pointRadius: 10,
           pointHoverRadius: 14,
         },
