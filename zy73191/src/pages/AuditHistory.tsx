@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { SectionHeading } from "@/components/SectionHeading";
 import { AuditTimeline } from "@/components/AuditTimeline";
 import { useReviewStore, boundarySafetyFactKey } from "@/store/useReviewStore";
@@ -6,6 +7,9 @@ import { formatTs } from "@/lib/utils";
 export default function AuditHistory() {
   const audit = useReviewStore((s) => s.audit);
   const judgments = useReviewStore((s) => s.judgments);
+  const refreshAll = useReviewStore((s) => s.refreshAll);
+
+  useEffect(() => { refreshAll(); }, []);
 
   const current = judgments.find((j) => j.factKey === boundarySafetyFactKey);
   const latestEntry = [...audit]

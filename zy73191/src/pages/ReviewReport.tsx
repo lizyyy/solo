@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { SectionHeading } from "@/components/SectionHeading";
 import { StepperTable } from "@/components/StepperTable";
@@ -12,6 +13,9 @@ import { ArrowRight, AlertTriangle } from "lucide-react";
 export default function ReviewReport() {
   const review = useReviewStore((s) => s.review);
   const materials = useReviewStore((s) => s.materials);
+  const refreshAll = useReviewStore((s) => s.refreshAll);
+
+  useEffect(() => { refreshAll(); }, []);
 
   if (!review) {
     return (

@@ -1,57 +1,145 @@
-# React + TypeScript + Vite
+# 数列递推边界复核 · 复核档案
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+纯前端 + Node 后端 · SQLite 持久化 · 打开即跑
 
-Currently, two official plugins are available:
+## 快速开始
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 前置条件
 
-## Expanding the ESLint configuration
+- Node.js ≥ 18
+- pnpm ≥ 8
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 1. 安装依赖
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+# 前端
+pnpm install
+
+# 后端
+cd server && pnpm install && cd ..
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. 启动后端服务
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+cd server && pnpm start
 ```
+
+后端默认监听 `http://localhost:3001`，SQLite 数据库文件位于 `data/review.db`。
+
+### 3. 启动前端（另开终端）
+
+```bash
+pnpm dev
+```
+
+前端默认监听 `http://localhost:5173`，`/api` 请求自动代理到后端。
+
+### 4. 打开浏览器
+
+访问 `http://localhost:5173`，点击【重置为演示数据】→【一键复核】即可完成一次完整复核。
+
+---
+
+## 后端 API
+
+所有接口前缀 `/api`，请求/响应均为 JSON。
+
+### 材料
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| `POST` | `/api/materials` | 提交材料（自动去重） |
+| `GET` | `/api/materials` | 列出所有材料 |
+| `POST` | `/api/seed` | 写入演示数据 |
+
+**提交材料请求体：**
+
+```json
+{
+  "type": "历史答案",
+  "version": "v1（旧版）",
+  "source": "历史答案库",
+  "content": "数列递推 a_n = a_{n-1} / (a_{n-2} - 3)；边界 a_0 = 5, a_1 = 3。",
+  "quote": "边界 a_0 = 5, a_1 = 3"
+}
+```
+
+- `type`：必填，可选 `历史答案`、`后补备注`、`口头备注`
+- `content`：必填，后端自动从内容中提取递推式、边界值
+- 重复提交同一 `type+version+content` 不会重复入库（`duplicated: true`）
+
+### 复核
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| `POST` | `/api/review` | 执行复核（从数据库读材料，双版推演） |
+| `GET` | `/api/review` | 获取最近一次复核结果 |
+
+**复核请求体：**
+
+```json
+{ "primary": "old", "steps": 6 }
+```
+
+### 判断与审计
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| `POST` | `/api/judgment` | 改判（必须带 reason） |
+| `GET` | `/api/judgment` | 查当前判断 |
+| `GET` | `/api/audit` | 查审计时间线 |
+
+**改判请求体：**
+
+```json
+{
+  "value": "按后补备注修正，边界安全",
+  "reason": "已逐项核对到n=6；旧版a1=3在n=3除零，后补备注已修正为a1=2，不再除零。",
+  "actor": "小岑"
+}
+```
+
+`value`、`reason`、`actor` 均必填。每次改判自动写入审计时间线。
+
+---
+
+## SQLite 数据库
+
+- 文件位置：`data/review.db`
+- 环境变量覆盖：`SEQ_DB_PATH=/path/to/review.db`
+- 重置：删除 `data/review.db` 后重启后端即可
+
+### 表结构
+
+- `materials`：材料（含 content_hash 去重索引）
+- `review_runs`：复核结果（JSON payload）
+- `judgments`：当前判断值
+- `audit_entries`：审计时间线（含改判原因、操作人、前后值）
+
+---
+
+## 复跑步骤（不看代码也能跑）
+
+1. 打开两个终端
+2. 终端 1：`cd server && pnpm start`
+3. 终端 2：`pnpm dev`
+4. 浏览器打开 `http://localhost:5173`
+5. 点击【重置为演示数据】→ 材料台出现 3 份材料
+6. 点底部【一键复核 →】→ 跳转复核报告，可看到除零定位、结论溯源、通俗解读
+7. 在「临时改判断」处输入原因后提交 → 跳转判断历史可看到变更链
+8. 关闭浏览器再打开，数据仍在（SQLite 持久化）
+9. 重启后端服务，数据仍在
+
+---
+
+## 验收要点
+
+| 需求 | 验证方式 |
+|------|----------|
+| 幂等去重 | 重复提交同一后补备注，数据库不增条目 |
+| 结论溯源 | 结论卡片显示来源徽标 + 原始说法引文 |
+| 除零具体化 | 除零卡片指向 n=3、分母=0、根源 a₁=3（来自历史答案 v1） |
+| 讲给不看代码的人 | 通俗解读板块用自然语言讲清递推式、旧版代入、除零、修正 |
+| 判断留原因 | 审计时间线每次变更含原因、操作人、前后值 |
+| 自助可跑 | 材料台顶部说明 + 一键复核，不必问材料放哪 |

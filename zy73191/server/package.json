@@ -1,0 +1,19 @@
+{
+  "name": "seq-boundary-review-server",
+  "version": "1.0.0",
+  "description": "数列递推边界复核 · 后端服务（Express + SQLite）",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "sql.js": "^1.14.1"
+  }
+}

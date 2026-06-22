@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SectionHeading } from "@/components/SectionHeading";
 import { MaterialCard } from "@/components/MaterialCard";
@@ -18,7 +18,9 @@ export default function MaterialsDesk() {
   const ingest = useReviewStore((s) => s.ingestMaterial);
   const submitDup = useReviewStore((s) => s.submitDuplicateNote);
   const runReview = useReviewStore((s) => s.runReview);
-  const reseed = useReviewStore((s) => s.reseedDemo);
+  const seedDemo = useReviewStore((s) => s.seedDemo);
+  const refreshAll = useReviewStore((s) => s.refreshAll);
+  const loading = useReviewStore((s) => s.loading);
 
   const [type, setType] = useState<MaterialType>("后补备注");
   const [version, setVersion] = useState("v2");
@@ -28,6 +30,10 @@ export default function MaterialsDesk() {
   const [primary, setPrimary] = useState<"old" | "fixed">("old");
 
   const previewHash = contentHash(type, version, content);
+
+  useEffect(() => {
+    refreshAll();
+  }, []);
 
   return (
     <div>
@@ -124,7 +130,8 @@ export default function MaterialsDesk() {
                 <button
                   type="button"
                   onClick={() => submitDup()}
-                  className="inline-flex items-center gap-1.5 rounded-sm border border-rule px-3 py-2 text-xs text-inkSoft transition hover:bg-paperDeep"
+                  disabled={loading}
+                  className="inline-flex items-center gap-1.5 rounded-sm border border-rule px-3 py-2 text-xs text-inkSoft transition hover:bg-paperDeep disabled:opacity-50"
                 >
                   <Copy className="h-3.5 w-3.5" />
                   测试幂等（重提后补备注）
@@ -132,7 +139,8 @@ export default function MaterialsDesk() {
                 <button
                   type="button"
                   onClick={() => ingest({ type, version, source, content, quote: quote || undefined })}
-                  className="inline-flex items-center gap-1.5 rounded-sm bg-ink px-4 py-2 text-xs font-medium text-paper transition hover:bg-inkSoft"
+                  disabled={loading}
+                  className="inline-flex items-center gap-1.5 rounded-sm bg-ink px-4 py-2 text-xs font-medium text-paper transition hover:bg-inkSoft disabled:opacity-50"
                 >
                   <Check className="h-3.5 w-3.5" />
                   录入并去重判定
@@ -166,8 +174,9 @@ export default function MaterialsDesk() {
             </h3>
             <button
               type="button"
-              onClick={reseed}
-              className="inline-flex items-center gap-1.5 rounded-sm border border-rule px-2.5 py-1 text-[11px] text-inkSoft transition hover:bg-paperDeep"
+              onClick={seedDemo}
+              disabled={loading}
+              className="inline-flex items-center gap-1.5 rounded-sm border border-rule px-2.5 py-1 text-[11px] text-inkSoft transition hover:bg-paperDeep disabled:opacity-50"
             >
               <RotateCcw className="h-3 w-3" />
               重置为演示数据
@@ -214,11 +223,12 @@ export default function MaterialsDesk() {
         </div>
         <button
           type="button"
-          onClick={() => {
-            runReview(primary);
+          onClick={async () => {
+            await runReview(primary);
             navigate("/report");
           }}
-          className="w-full rounded-sm bg-vermilion px-6 py-2.5 text-sm font-bold text-paper transition hover:bg-vermilion-deep sm:w-auto"
+          disabled={loading}
+          className="w-full rounded-sm bg-vermilion px-6 py-2.5 text-sm font-bold text-paper transition hover:bg-vermilion-deep sm:w-auto disabled:opacity-50"
         >
           一键复核 →
         </button>

@@ -1,13 +1,4 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { contentHash } from "@/lib/hash";
-import { buildReviewPair } from "@/lib/review";
-import {
-  boundarySafetyFactKey,
-  seedAudit,
-  seedJudgments,
-  seedMaterials,
-} from "@/lib/demo";
 import type {
   AuditEntry,
   IngestResult,
@@ -17,8 +8,6 @@ import type {
   MaterialType,
   ReviewPair,
 } from "@/lib/types";
-
-const seedReview = buildReviewPair(seedMaterials, 6);
 
 export interface IngestInput {
   type: MaterialType;
@@ -42,137 +31,166 @@ interface ReviewState {
   judgments: Judgment[];
   audit: AuditEntry[];
   lastIngest: IngestResult | null;
-  hydrated: boolean;
-  reseedDemo: () => void;
-  ingestMaterial: (input: IngestInput) => IngestResult;
-  submitDuplicateNote: () => IngestResult;
-  runReview: (primary: "old" | "fixed") => void;
-  setPrimary: (primary: "old" | "fixed") => void;
-  recordJudgment: (input: JudgmentInput) => void;
+  loading: boolean;
+  error: string | null;
+  fetchMaterials: () => Promise<void>;
+  fetchReview: () => Promise<void>;
+  fetchJudgment: () => Promise<void>;
+  fetchAudit: () => Promise<void>;
+  seedDemo: () => Promise<void>;
+  ingestMaterial: (input: IngestInput) => Promise<IngestResult>;
+  submitDuplicateNote: () => Promise<IngestResult>;
+  runReview: (primary: "old" | "fixed") => Promise<void>;
+  recordJudgment: (input: JudgmentInput) => Promise<void>;
+  refreshAll: () => Promise<void>;
 }
 
-function makeId(prefix: string): string {
-  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+async function api<T = unknown>(
+  method: string,
+  path: string,
+  body?: unknown,
+): Promise<T> {
+  const opts: RequestInit = {
+    method,
+    headers: { "Content-Type": "application/json" },
+  };
+  if (body !== undefined) opts.body = JSON.stringify(body);
+  const res = await fetch(path, opts);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(err.error || `API ${res.status}`);
+  }
+  return res.json() as Promise<T>;
 }
 
-export const useReviewStore = create<ReviewState>()(
-  persist(
-    (set, get) => ({
-      materials: seedMaterials,
-      review: seedReview,
-      judgments: seedJudgments,
-      audit: seedAudit,
-      lastIngest: null,
-      hydrated: false,
+export const boundarySafetyFactKey = "boundary-safety";
 
-      reseedDemo: () => {
-        const review = buildReviewPair(seedMaterials, 6);
-        set({
-          materials: seedMaterials,
-          review,
-          judgments: seedJudgments,
-          audit: seedAudit,
-          lastIngest: null,
-        });
-      },
+export const useReviewStore = create<ReviewState>()((set, get) => ({
+  materials: [],
+  review: null,
+  judgments: [],
+  audit: [],
+  lastIngest: null,
+  loading: false,
+  error: null,
 
-      ingestMaterial: (input) => {
-        const hash = contentHash(input.type, input.version, input.content);
-        const existing = get().materials.find((m) => m.contentHash === hash);
-        if (existing) {
-          const res: IngestResult = {
-            duplicated: true,
-            refId: existing.id,
-            submittedId: existing.id,
-          };
-          set({ lastIngest: res });
-          return res;
-        }
-        const id = makeId("m");
-        const material: Material = {
-          id,
+  fetchMaterials: async () => {
+    const materials = await api<Material[]>("GET", "/api/materials");
+    set({ materials });
+  },
+
+  fetchReview: async () => {
+    const review = await api<ReviewPair | null>("GET", "/api/review");
+    set({ review });
+  },
+
+  fetchJudgment: async () => {
+    const j = await api<{ value: string; factKey: string; ts: number | null }>(
+      "GET",
+      "/api/judgment",
+    );
+    set({
+      judgments: j.ts ? [{ factKey: j.factKey, value: j.value, ts: j.ts }] : [],
+    });
+  },
+
+  fetchAudit: async () => {
+    const audit = await api<AuditEntry[]>("GET", "/api/audit");
+    set({ audit });
+  },
+
+  seedDemo: async () => {
+    set({ loading: true, error: null });
+    try {
+      await api("POST", "/api/seed");
+      await get().refreshAll();
+    } catch (e) {
+      set({ error: String(e) });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  ingestMaterial: async (input) => {
+    set({ loading: true, error: null });
+    try {
+      const result = await api<IngestResult & { material?: Material }>(
+        "POST",
+        "/api/materials",
+        {
           type: input.type,
           version: input.version,
           source: input.source,
           content: input.content,
-          contentHash: hash,
-          contributes: input.contributes,
-          quote: input.quote ?? input.content.slice(0, 24),
-        };
-        set((state) => ({
-          materials: [...state.materials, material],
-          lastIngest: {
-            duplicated: false,
-            refId: id,
-            submittedId: id,
-          },
-        }));
-        return { duplicated: false, refId: id, submittedId: id };
-      },
+          quote: input.quote,
+        },
+      );
+      set({ lastIngest: result });
+      await get().fetchMaterials();
+      return result;
+    } catch (e) {
+      set({ error: String(e) });
+      return { duplicated: false, refId: "", submittedId: "" };
+    } finally {
+      set({ loading: false });
+    }
+  },
 
-      submitDuplicateNote: () => {
-        const note = get().materials.find((m) => m.type === "后补备注");
-        if (!note) {
-          return { duplicated: false, refId: "", submittedId: "" };
-        }
-        return get().ingestMaterial({
-          type: note.type,
-          version: note.version,
-          source: note.source,
-          content: note.content,
-          quote: note.quote,
-          contributes: note.contributes,
-        });
-      },
+  submitDuplicateNote: async () => {
+    const note = get().materials.find((m) => m.type === "后补备注");
+    if (!note) return { duplicated: false, refId: "", submittedId: "" };
+    return get().ingestMaterial({
+      type: note.type,
+      version: note.version,
+      source: note.source,
+      content: note.content,
+      quote: note.quote,
+      contributes: note.contributes,
+    });
+  },
 
-      runReview: (primary) => {
-        const pair = buildReviewPair(get().materials, 6);
-        if (pair) {
-          pair.primary = primary;
-          set({ review: pair });
-        }
-      },
+  runReview: async (primary) => {
+    set({ loading: true, error: null });
+    try {
+      const pair = await api<ReviewPair>("POST", "/api/review", { primary });
+      set({ review: pair });
+      await Promise.all([get().fetchJudgment(), get().fetchAudit()]);
+    } catch (e) {
+      set({ error: String(e) });
+    } finally {
+      set({ loading: false });
+    }
+  },
 
-      setPrimary: (primary) => {
-        const review = get().review;
-        if (review) set({ review: { ...review, primary } });
-      },
+  recordJudgment: async ({ nextValue, reason, actor }) => {
+    set({ loading: true, error: null });
+    try {
+      await api("POST", "/api/judgment", {
+        value: nextValue,
+        reason,
+        actor,
+      });
+      await Promise.all([get().fetchJudgment(), get().fetchAudit()]);
+    } catch (e) {
+      set({ error: String(e) });
+    } finally {
+      set({ loading: false });
+    }
+  },
 
-      recordJudgment: ({ factKey, nextValue, reason, actor }) => {
-        const prev =
-          get().judgments.find((j) => j.factKey === factKey)?.value ?? "—（未复核）";
-        const entry: AuditEntry = {
-          id: makeId("a"),
-          factKey,
-          prevValue: prev,
-          nextValue,
-          reason,
-          actor,
-          ts: Date.now(),
-        };
-        set((state) => ({
-          audit: [entry, ...state.audit],
-          judgments: [
-            ...state.judgments.filter((j) => j.factKey !== factKey),
-            { factKey, value: nextValue, ts: Date.now() },
-          ],
-        }));
-      },
-    }),
-    {
-      name: "seq-boundary-review-v1",
-      version: 1,
-      partialize: (state) => ({
-        materials: state.materials,
-        review: state.review,
-        judgments: state.judgments,
-        audit: state.audit,
-      }),
-      onRehydrateStorage: () => (state) => {
-        if (state) state.hydrated = true;
-      },
-    },
-  ),
-);
-
-export { boundarySafetyFactKey };
+  refreshAll: async () => {
+    set({ loading: true, error: null });
+    try {
+      await Promise.all([
+        get().fetchMaterials(),
+        get().fetchReview(),
+        get().fetchJudgment(),
+        get().fetchAudit(),
+      ]);
+    } catch (e) {
+      set({ error: String(e) });
+    } finally {
+      set({ loading: false });
+    }
+  },
+}));

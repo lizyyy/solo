@@ -21,9 +21,9 @@ export function JudgmentChanger() {
 
   const canSubmit = value.trim().length > 0 && reason.trim().length > 0;
 
-  const submit = () => {
+  const submit = async () => {
     if (!canSubmit) return;
-    record({
+    await record({
       factKey: boundarySafetyFactKey,
       nextValue: value.trim(),
       reason: reason.trim(),
