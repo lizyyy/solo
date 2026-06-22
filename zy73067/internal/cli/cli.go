@@ -82,14 +82,14 @@ func cmdInit(args []string) int {
 		}
 	}
 	files := map[string]string{
-		"normal/spare_parts.csv":   sampleNormalSpare,
-		"normal/downtime.csv":      sampleNormalDowntime,
-		"normal/arrivals.csv":      sampleNormalArrivals,
-		"normal/remarks.csv":       sampleNormalRemarks,
-		"anomaly/spare_parts.csv":  sampleAnomalySpare,
-		"anomaly/downtime.csv":     sampleAnomalyDowntime,
-		"anomaly/arrivals.csv":     sampleAnomalyArrivals,
-		"anomaly/remarks.csv":      sampleAnomalyRemarks,
+		"normal/spare_parts.csv":  sampleNormalSpare,
+		"normal/downtime.csv":     sampleNormalDowntime,
+		"normal/arrivals.csv":     sampleNormalArrivals,
+		"normal/remarks.csv":      sampleNormalRemarks,
+		"anomaly/spare_parts.csv": sampleAnomalySpare,
+		"anomaly/downtime.csv":    sampleAnomalyDowntime,
+		"anomaly/arrivals.csv":    sampleAnomalyArrivals,
+		"anomaly/remarks.csv":     sampleAnomalyRemarks,
 	}
 	for name, body := range files {
 		fp := filepath.Join(*workdir, name)
@@ -158,6 +158,14 @@ func cmdRun(args []string, isRerun bool) int {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "写入 runs 表失败: %v\n", err)
 		return 1
+	}
+
+	if len(res.Remarks) > 0 {
+		if err := store.SaveRemarks(res.Remarks); err != nil {
+			fmt.Fprintf(os.Stderr, "写入备注状态失败: %v\n", err)
+			return 1
+		}
+		fmt.Printf("📝 已加载 %d 条备注状态（已存在的人工信息未被覆盖）\n", len(res.Remarks))
 	}
 
 	for i := range res.Records {
@@ -290,7 +298,18 @@ func cmdShow(args []string) int {
 	fmt.Println("───────────────────────────────────────────────────")
 	sort.Slice(anomalies, func(i, j int) bool { return anomalies[i].ID < anomalies[j].ID })
 	for i, a := range anomalies {
-		fmt.Printf("\n  [%d] %s\n", i+1, a.UnifiedName)
+		fmt.Printf("\n  [%d] %s  (需求%d / 到货%d)\n", i+1, a.UnifiedName, a.RequiredQty, a.ArrivedQty)
+		makeWin := "✔ 赶得上停机窗口"
+		if a.WillMakeWindow == 0 {
+			makeWin = "✗ 晚于停机窗口"
+			if a.DaysLate > 0 {
+				makeWin = fmt.Sprintf("✗ 晚于停机窗口 %d 天", a.DaysLate)
+			}
+		}
+		fmt.Printf("      排程结论      : %s\n", makeWin)
+		if a.ETA != "" {
+			fmt.Printf("      ETA/停机开始  : %s / %s\n", a.ETA, a.DowntimeStart)
+		}
 		fmt.Printf("      异常原因      : %s\n", a.Reasons)
 		if a.RawSourceQuote != "" {
 			fmt.Printf("      原始清单原话  : %s\n", a.RawSourceQuote)
@@ -365,4 +384,32 @@ func printSummary(res *scheduler.RunResult) {
 			r.UnifiedName, r.RequiredQty, r.ArrivedQty, eta, ds, status, days, anom)
 	}
 	tw.Flush()
+	withMeta := false
+	for _, r := range res.Records {
+		if r.Status != "" || r.Remark != "" || r.ScreenshotRef != "" {
+			withMeta = true
+			break
+		}
+	}
+	if withMeta {
+		fmt.Println()
+		fmt.Println("───────────────────────────────────────────────────")
+		fmt.Println(" 备注 / 状态 / 截图引用")
+		fmt.Println("───────────────────────────────────────────────────")
+		for _, r := range res.Records {
+			if r.Status == "" && r.Remark == "" && r.ScreenshotRef == "" {
+				continue
+			}
+			fmt.Printf("  %s\n", r.UnifiedName)
+			if r.Status != "" {
+				fmt.Printf("      当前状态      : %s\n", r.Status)
+			}
+			if r.Remark != "" {
+				fmt.Printf("      备注          : %s\n", r.Remark)
+			}
+			if r.ScreenshotRef != "" {
+				fmt.Printf("      截图说明引用  : %s\n", r.ScreenshotRef)
+			}
+		}
+	}
 }

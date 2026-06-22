@@ -80,13 +80,19 @@ func (s *Store) SaveRecord(r *model.ScheduleResult) (int64, error) {
 		return 0, fmt.Errorf("insert record %s: %w", r.UnifiedName, err)
 	}
 	id, _ := res.LastInsertId()
+	if err := s.upsertNote(r); err != nil {
+		return id, err
+	}
 	if isAnom == 1 {
-		if err := s.upsertNote(r); err != nil {
-			return id, err
-		}
 		delta := ""
 		if r.PrevStatus != "" && r.PrevStatus != r.Status {
 			delta = fmt.Sprintf("status %s→%s", r.PrevStatus, r.Status)
+		}
+		if r.PrevRemark != "" && r.PrevRemark != r.Remark {
+			if delta != "" {
+				delta += "; "
+			}
+			delta += "remark 更新"
 		}
 		if _, err := s.DB.Exec(`INSERT INTO anomalies(run_id, record_id, unified_name, reasons, raw_source_quote, status, remark, screenshot_ref, delta_from_prev) VALUES(?,?,?,?,?,?,?,?,?)`,
 			r.RunID, id, r.UnifiedName, string(reasonJSON), r.RawSourceQuote, r.Status, r.Remark, r.ScreenshotRef, delta); err != nil {
@@ -109,13 +115,25 @@ func (s *Store) upsertNote(r *model.ScheduleResult) error {
 		if existingStatus != "" && existingStatus != "pending" {
 			status = existingStatus
 		}
+		if status == "" {
+			status = existingStatus
+		}
 		if existingRemark != "" {
+			remark = existingRemark
+		}
+		if remark == "" {
 			remark = existingRemark
 		}
 		if existingShot != "" {
 			shot = existingShot
 		}
+		if shot == "" {
+			shot = existingShot
+		}
 		if existingThr != "" {
+			thr = existingThr
+		}
+		if thr == "" {
 			thr = existingThr
 		}
 		_, err = s.DB.Exec(`UPDATE notes SET status=?, remark=?, screenshot_ref=?, threshold_note=?, updated_at=? WHERE unified_name=? AND spec_model=?`,
@@ -125,6 +143,58 @@ func (s *Store) upsertNote(r *model.ScheduleResult) error {
 			r.UnifiedName, r.SpecModel, status, remark, shot, thr, now)
 	}
 	return err
+}
+
+func (s *Store) SaveRemarks(rs []model.RemarkStatus) error {
+	now := time.Now().Format(time.RFC3339)
+	for _, r := range rs {
+		var existingStatus, existingRemark, existingShot, existingThr string
+		err := s.DB.QueryRow(`SELECT status, remark, screenshot_ref, threshold_note FROM notes WHERE unified_name=? AND spec_model=?`,
+			r.UnifiedName, r.SpecModel).Scan(&existingStatus, &existingRemark, &existingShot, &existingThr)
+		status := r.Status
+		remark := r.Remark
+		shot := r.ScreenshotRef
+		thr := r.ThresholdNote
+		upd := now
+		if !r.UpdatedAt.IsZero() {
+			upd = r.UpdatedAt.Format(time.RFC3339)
+		}
+		if err == nil {
+			if existingStatus != "" && existingStatus != "pending" {
+				status = existingStatus
+			}
+			if status == "" {
+				status = existingStatus
+			}
+			if existingRemark != "" {
+				remark = existingRemark
+			}
+			if remark == "" {
+				remark = existingRemark
+			}
+			if existingShot != "" {
+				shot = existingShot
+			}
+			if shot == "" {
+				shot = existingShot
+			}
+			if existingThr != "" {
+				thr = existingThr
+			}
+			if thr == "" {
+				thr = existingThr
+			}
+			_, err = s.DB.Exec(`UPDATE notes SET status=?, remark=?, screenshot_ref=?, threshold_note=?, updated_at=? WHERE unified_name=? AND spec_model=?`,
+				status, remark, shot, thr, upd, r.UnifiedName, r.SpecModel)
+		} else {
+			_, err = s.DB.Exec(`INSERT INTO notes(unified_name, spec_model, status, remark, screenshot_ref, threshold_note, updated_at) VALUES(?,?,?,?,?,?,?)`,
+				r.UnifiedName, r.SpecModel, status, remark, shot, thr, upd)
+		}
+		if err != nil {
+			return fmt.Errorf("upsert remark %s/%s: %w", r.UnifiedName, r.SpecModel, err)
+		}
+	}
+	return nil
 }
 
 func (s *Store) GetNote(unified, spec string) (*model.RemarkStatus, error) {
@@ -190,10 +260,22 @@ type AnomalyRow struct {
 	Remark         string
 	ScreenshotRef  string
 	DeltaFromPrev  string
+	DaysLate       int64
+	WillMakeWindow int
+	ETA            string
+	DowntimeStart  string
+	RequiredQty    int64
+	ArrivedQty     int64
 }
 
 func (s *Store) ListAnomalies(runID int64) ([]AnomalyRow, error) {
-	rows, err := s.DB.Query(`SELECT id, unified_name, reasons, raw_source_quote, status, remark, screenshot_ref, delta_from_prev FROM anomalies WHERE run_id=? ORDER BY id`, runID)
+	rows, err := s.DB.Query(`SELECT a.id, a.unified_name, a.reasons, a.raw_source_quote,
+		a.status, a.remark, a.screenshot_ref, a.delta_from_prev,
+		sr.days_late, sr.will_make_window, sr.eta, sr.downtime_start,
+		sr.required_qty, sr.arrived_qty
+	FROM anomalies a
+	INNER JOIN schedule_records sr ON sr.id = a.record_id
+	WHERE a.run_id=? ORDER BY a.id`, runID)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +283,10 @@ func (s *Store) ListAnomalies(runID int64) ([]AnomalyRow, error) {
 	var out []AnomalyRow
 	for rows.Next() {
 		var r AnomalyRow
-		if err := rows.Scan(&r.ID, &r.UnifiedName, &r.Reasons, &r.RawSourceQuote, &r.Status, &r.Remark, &r.ScreenshotRef, &r.DeltaFromPrev); err != nil {
+		if err := rows.Scan(&r.ID, &r.UnifiedName, &r.Reasons, &r.RawSourceQuote,
+			&r.Status, &r.Remark, &r.ScreenshotRef, &r.DeltaFromPrev,
+			&r.DaysLate, &r.WillMakeWindow, &r.ETA, &r.DowntimeStart,
+			&r.RequiredQty, &r.ArrivedQty); err != nil {
 			return nil, err
 		}
 		out = append(out, r)

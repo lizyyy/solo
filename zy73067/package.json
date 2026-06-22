@@ -4,10 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "blade:build": "export PATH=$HOME/.local/go/bin:$PATH && go build -o blade-schedule ./cmd/blade-schedule",
+    "blade:init": "./blade-schedule init --workdir ./data",
+    "blade:run-normal": "./blade-schedule run --spare-parts ./data/normal/spare_parts.csv --downtime ./data/normal/downtime.csv --arrivals ./data/normal/arrivals.csv --remarks ./data/normal/remarks.csv --tag normal-run",
+    "blade:rerun-anomaly": "./blade-schedule rerun --spare-parts ./data/anomaly/spare_parts.csv --downtime ./data/anomaly/downtime.csv --arrivals ./data/anomaly/arrivals.csv --remarks ./data/anomaly/remarks.csv --tag anomaly-rerun",
+    "blade:show": "./blade-schedule show",
     "lint": "eslint .",
-    "preview": "vite preview",
     "check": "tsc -b --noEmit"
   },
   "dependencies": {

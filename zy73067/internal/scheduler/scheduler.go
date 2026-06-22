@@ -177,7 +177,8 @@ func (s *Scheduler) LoadDowntime(path string) ([]model.DowntimeWindow, error) {
 		})
 	}
 	if len(out) == 0 {
-		return nil, &ParseError{File: path, Line: 0, Msg: "找不到任何停机窗口记录，排程无法判断备件是否延误"}
+		return nil, &ParseError{File: path, Line: 0,
+			Msg: fmt.Sprintf("停机窗口文件 [%s] 为空或无有效数据行（表头需包含 [风机编号]、[开始日期]、[结束日期]），排程无法判断备件是否延误", path)}
 	}
 	return out, nil
 }
@@ -219,7 +220,11 @@ func (s *Scheduler) LoadArrivals(path string) ([]model.ArrivalPlan, error) {
 			continue
 		}
 		origName := safeGet(row, nameIdx)
-		unified, _ := s.Norm.Normalize(origName)
+		unified, ok := s.Norm.Normalize(origName)
+		if !ok || unified == "" {
+			return nil, &ParseError{File: path, Line: lineNum,
+				Msg: fmt.Sprintf("到货计划中的备件名称 [%s] 无法归并到统一编号，请在 normalizer 中补充对应映射，或核对原始清单写法", origName)}
+		}
 		eta, err := parseDate(safeGet(row, etaIdx))
 		if err != nil {
 			return nil, &ParseError{File: path, Line: lineNum,
@@ -250,7 +255,10 @@ func (s *Scheduler) LoadRemarks(path string) ([]model.RemarkStatus, error) {
 	}
 	f, err := os.Open(path)
 	if err != nil {
-		return nil, nil
+		if os.IsNotExist(err) {
+			return nil, &ParseError{File: path, Line: 0, Msg: "备注状态文件不存在，请使用 --remarks 指定正确路径，或运行 blade init 生成样例"}
+		}
+		return nil, &ParseError{File: path, Line: 0, Msg: fmt.Sprintf("打开备注状态文件失败: %v", err)}
 	}
 	defer f.Close()
 	reader := csv.NewReader(f)
@@ -307,6 +315,7 @@ func (s *Scheduler) LoadRemarks(path string) ([]model.RemarkStatus, error) {
 
 type RunResult struct {
 	Records      []model.ScheduleResult
+	Remarks      []model.RemarkStatus
 	SummaryStats struct {
 		Total         int
 		OnTime        int
@@ -334,7 +343,6 @@ func (s *Scheduler) Compute(in InputSet) (*RunResult, error) {
 	if err != nil {
 		return nil, err
 	}
-	_ = remarks
 
 	byUnified := make(map[string][]model.SparePart)
 	for _, sp := range spares {
@@ -437,6 +445,34 @@ func (s *Scheduler) Compute(in InputSet) (*RunResult, error) {
 			fmt.Sprintf("%s %s~%s %s", d.TurbineID,
 				d.StartDate.Format("2006-01-02"), d.EndDate.Format("2006-01-02"), d.Reason))
 	}
+	rmap := make(map[string]map[string]*model.RemarkStatus)
+	for i := range remarks {
+		r := &remarks[i]
+		if _, ok := rmap[r.UnifiedName]; !ok {
+			rmap[r.UnifiedName] = make(map[string]*model.RemarkStatus)
+		}
+		rmap[r.UnifiedName][r.SpecModel] = r
+	}
+	for i := range result.Records {
+		if specMap, ok := rmap[result.Records[i].UnifiedName]; ok {
+			if r, ok := specMap[result.Records[i].SpecModel]; ok {
+				result.Records[i].Status = r.Status
+				result.Records[i].Remark = r.Remark
+				result.Records[i].ScreenshotRef = r.ScreenshotRef
+				if result.Records[i].ThresholdText == "" {
+					result.Records[i].ThresholdText = r.ThresholdNote
+				}
+			} else if r, ok := specMap[""]; ok && len(specMap) == 1 {
+				result.Records[i].Status = r.Status
+				result.Records[i].Remark = r.Remark
+				result.Records[i].ScreenshotRef = r.ScreenshotRef
+				if result.Records[i].ThresholdText == "" {
+					result.Records[i].ThresholdText = r.ThresholdNote
+				}
+			}
+		}
+	}
+	result.Remarks = remarks
 	return result, nil
 }
 
