@@ -1,6 +1,6 @@
 import type { Point } from '@/types';
 import { mockPoints } from '@/mocks/points';
-import { findMergeCandidates, mergePoints as mergePointsUtil } from '@/utils/merge';
+import { findMergeCandidates, mergePoints as mergePointsUtil, shouldMerge } from '@/utils/merge';
 import { feedbackService } from '@/services/feedbackService';
 import { planService } from '@/services/planService';
 
@@ -35,20 +35,29 @@ export const pointService = {
 
   async getMergeCandidates(): Promise<Point[][]> {
     await delay(300);
-    const unmergedPoints = pointsData.filter(p => !p.isMerged);
-    return findMergeCandidates(unmergedPoints);
+    return findMergeCandidates(pointsData);
   },
 
   async mergePoints(pointIds: string[], targetName: string): Promise<Point> {
     await delay(500);
-    const pointsToMerge = pointsData.filter(p => pointIds.includes(p.id));
-    if (pointsToMerge.length < 2) {
+    const directPoints = pointsData.filter(p => pointIds.includes(p.id));
+    if (directPoints.length < 2) {
       throw new Error('需要至少两个点位才能合并');
     }
-    const mergedPoint = mergePointsUtil(pointsToMerge, targetName);
-    pointsData = pointsData.filter(p => !pointIds.includes(p.id));
+    const allRelatedIds = new Set<string>(pointIds);
+    for (const dp of directPoints) {
+      for (const p of pointsData) {
+        if (allRelatedIds.has(p.id)) continue;
+        if (shouldMerge(dp, p)) {
+          allRelatedIds.add(p.id);
+        }
+      }
+    }
+    const allRelatedPoints = pointsData.filter(p => allRelatedIds.has(p.id));
+    const mergedPoint = mergePointsUtil(allRelatedPoints, targetName);
+    pointsData = pointsData.filter(p => !allRelatedIds.has(p.id));
     pointsData.push(mergedPoint);
-    for (const oldId of pointIds) {
+    for (const oldId of Array.from(allRelatedIds)) {
       await feedbackService.reassignPointId(oldId, mergedPoint.id);
       await planService.reassignPointId(oldId, mergedPoint.id);
     }

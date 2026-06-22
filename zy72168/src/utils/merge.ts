@@ -76,28 +76,58 @@ export function calculateCoordinateDistance(
   return R * c;
 }
 
+export function shouldMerge(p1: Point, p2: Point): boolean {
+  if (p1.id === p2.id) return false;
+  const similarity = calculateNameSimilarity(p1.name, p2.name);
+  const distance = calculateCoordinateDistance(
+    p1.coordinates.lat,
+    p1.coordinates.lng,
+    p2.coordinates.lat,
+    p2.coordinates.lng
+  );
+  if (similarity > 0.85 && distance < 200) return true;
+  const p1NameInP2Aliases = p2.aliases.some(a =>
+    calculateNameSimilarity(p1.name, a) > 0.85
+  );
+  const p2NameInP1Aliases = p1.aliases.some(a =>
+    calculateNameSimilarity(p2.name, a) > 0.85
+  );
+  if ((p1NameInP2Aliases || p2NameInP1Aliases) && distance < 200) return true;
+  if (p1.mergedFrom?.includes(p2.id) || p2.mergedFrom?.includes(p1.id)) {
+    if (distance < 200) return true;
+  }
+  return false;
+}
+
 export function findMergeCandidates(points: Point[]): Point[][] {
   const candidates: Point[][] = [];
   const processed = new Set<string>();
-  for (let i = 0; i < points.length; i++) {
-    if (processed.has(points[i].id)) continue;
-    const group: Point[] = [points[i]];
-    processed.add(points[i].id);
-    for (let j = i + 1; j < points.length; j++) {
-      if (processed.has(points[j].id)) continue;
-      const similarity = calculateNameSimilarity(points[i].name, points[j].name);
-      const distance = calculateCoordinateDistance(
-        points[i].coordinates.lat,
-        points[i].coordinates.lng,
-        points[j].coordinates.lat,
-        points[j].coordinates.lng
-      );
-      if (similarity > 0.85 && distance < 200) {
-        group.push(points[j]);
-        processed.add(points[j].id);
+  const allPoints = [...points];
+
+  for (let i = 0; i < allPoints.length; i++) {
+    if (processed.has(allPoints[i].id)) continue;
+    const group: Point[] = [allPoints[i]];
+    processed.add(allPoints[i].id);
+    for (let j = i + 1; j < allPoints.length; j++) {
+      if (processed.has(allPoints[j].id)) continue;
+      if (shouldMerge(allPoints[i], allPoints[j])) {
+        group.push(allPoints[j]);
+        processed.add(allPoints[j].id);
       }
     }
     if (group.length > 1) {
+      const hasUnmerged = group.some(p => !p.isMerged);
+      if (hasUnmerged) {
+        const mergedMasters = allPoints.filter(p =>
+          p.isMerged &&
+          !processed.has(p.id) &&
+          group.some(gp => shouldMerge(gp, p))
+        );
+        for (const master of mergedMasters) {
+          group.push(master);
+          processed.add(master.id);
+        }
+      }
       candidates.push(group);
     }
   }
@@ -115,6 +145,14 @@ export function isAdjacentPoint(point1: Point, point2: Point): boolean {
   return distance >= 50 && distance < 200 && similarity > 0.6;
 }
 
+const STATUS_PRIORITY: Record<string, number> = {
+  completed: 5,
+  verified: 4,
+  processing: 3,
+  pending: 2,
+  review: 1,
+};
+
 export function mergePoints(points: Point[], targetName: string): Point {
   if (points.length < 2) {
     throw new Error('需要至少两个点位才能合并');
@@ -123,22 +161,42 @@ export function mergePoints(points: Point[], targetName: string): Point {
   const avgLat = points.reduce((sum, p) => sum + p.coordinates.lat, 0) / points.length;
   const avgLng = points.reduce((sum, p) => sum + p.coordinates.lng, 0) / points.length;
   const timePeriods = [...new Set(points.flatMap(p => p.timePeriods))];
+  const mergedFrom = [...new Set(points.flatMap(p => [p.id, ...(p.mergedFrom || [])]))];
+  const sortedByStatus = [...points].sort((a, b) =>
+    (STATUS_PRIORITY[b.status] || 0) - (STATUS_PRIORITY[a.status] || 0)
+  );
+  const bestStatus = sortedByStatus[0].status;
+  const hasOffset = points.some(p => p.coordinates.offset);
+  const isAdjacent = points.some(p => p.isAdjacent);
+  const adjacentPointIds = [...new Set(points.flatMap(p => p.adjacentPointIds || []))];
   const now = new Date().toISOString();
+  const earliestCreatedAt = points.reduce((earliest, p) =>
+    p.createdAt < earliest ? p.createdAt : earliest, points[0].createdAt);
+  const latestUpdatedAt = points.reduce((latest, p) =>
+    (p.updatedAt || p.createdAt) > latest ? (p.updatedAt || p.createdAt) : latest, points[0].updatedAt || points[0].createdAt);
+  const basePoint = sortedByStatus[0];
   return {
     id: `merged-${Date.now()}`,
     name: targetName,
     aliases: aliases.filter(a => a !== targetName),
-    address: points[0].address,
-    coordinates: {
+    address: basePoint.address,
+    coordinates: hasOffset ? {
+      lat: avgLat,
+      lng: avgLng,
+      offset: true,
+      originalLat: basePoint.coordinates.originalLat || basePoint.coordinates.lat,
+      originalLng: basePoint.coordinates.originalLng || basePoint.coordinates.lng,
+    } : {
       lat: avgLat,
       lng: avgLng,
     },
-    status: 'processing',
+    status: bestStatus,
     isMerged: true,
-    mergedFrom: points.map(p => p.id),
+    mergedFrom,
+    isAdjacent,
+    adjacentPointIds: adjacentPointIds.length > 0 ? adjacentPointIds : undefined,
     timePeriods,
-    createdAt: points.reduce((earliest, p) =>
-      p.createdAt < earliest ? p.createdAt : earliest, points[0].createdAt),
-    updatedAt: now,
+    createdAt: earliestCreatedAt,
+    updatedAt: latestUpdatedAt > now ? latestUpdatedAt : now,
   };
 }
