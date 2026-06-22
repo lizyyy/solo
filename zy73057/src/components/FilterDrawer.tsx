@@ -2,8 +2,17 @@ import { useState, useMemo } from 'react';
 import { X, RotateCcw, Check, Filter, ChevronDown, ChevronUp } from 'lucide-react';
 import { useScheduleStore } from '@/store/scheduleStore';
 import { cn } from '@/lib/utils';
+import type { ScheduleBatch } from '../../shared/types';
 
 type TriState = 'all' | 'yes' | 'no';
+
+const STATUS_OPTIONS: { value: ScheduleBatch['status']; label: string; className: string }[] = [
+  { value: 'draft', label: '草稿', className: 'bg-ink-600 text-ink-100 border-ink-400' },
+  { value: 'pending_review', label: '待复核', className: 'bg-warn-400/20 text-warn-100 border-warn-400' },
+  { value: 'overridden', label: '已改判', className: 'bg-rust-400/20 text-rust-300 border-rust-400' },
+  { value: 'rerun', label: '已重跑', className: 'bg-mint-400/20 text-mint-200 border-mint-300' },
+  { value: 'exported', label: '已导出', className: 'bg-ink-700 text-ink-200 border-ink-500' },
+];
 
 export default function FilterDrawer() {
   const { filters, setFilters, resetFilters, loadList, items, loading } = useScheduleStore();
@@ -36,6 +45,12 @@ export default function FilterDrawer() {
       ...localFilters,
       isOverridden: s === 'all' ? undefined : s === 'yes',
     });
+  };
+
+  const toggleStatus = (status: ScheduleBatch['status']) => {
+    const cur = localFilters.statuses || [];
+    const next = cur.includes(status) ? cur.filter((x) => x !== status) : [...cur, status];
+    setLocalFilters({ ...localFilters, statuses: next.length ? next : undefined });
   };
 
   const toggleBatch = (id: string) => {
@@ -102,6 +117,52 @@ export default function FilterDrawer() {
               className="w-full bg-ink-700 border border-ink-500 rounded-sm px-3 py-2 text-sm text-ink-100 focus:outline-none focus:border-warn-400"
             />
           </div>
+        </div>
+
+        <div>
+          <label className="block text-xs text-ink-300 mb-2 font-medium">状态筛选</label>
+          <div className="space-y-1">
+            {STATUS_OPTIONS.map((opt) => {
+              const selected = (localFilters.statuses || []).includes(opt.value);
+              return (
+                <button
+                  key={opt.value}
+                  onClick={() => toggleStatus(opt.value)}
+                  className={cn(
+                    'w-full text-left px-3 py-1.5 text-xs rounded-sm transition-colors flex items-center gap-2 border-2',
+                    selected
+                      ? opt.className
+                      : 'bg-ink-700/60 text-ink-300 border-transparent hover:border-ink-400 hover:text-ink-100'
+                  )}
+                >
+                  {selected && <Check className="w-3 h-3" />}
+                  <span>{opt.label}</span>
+                  <span className="ml-auto font-mono text-[10px] opacity-60">{opt.value}</span>
+                </button>
+              );
+            })}
+          </div>
+          {localFilters.statuses && localFilters.statuses.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1">
+              {localFilters.statuses.map((s) => {
+                const opt = STATUS_OPTIONS.find((o) => o.value === s);
+                return (
+                  <span
+                    key={s}
+                    className={cn(
+                      'inline-flex items-center gap-1 px-2 py-0.5 text-xs border rounded-sm',
+                      opt?.className || 'bg-ink-700 text-ink-200 border-ink-500'
+                    )}
+                  >
+                    {opt?.label || s}
+                    <button onClick={() => toggleStatus(s)} className="opacity-70 hover:opacity-100">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <div>

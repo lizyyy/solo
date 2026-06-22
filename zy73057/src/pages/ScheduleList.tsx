@@ -329,7 +329,7 @@ export default function ScheduleList() {
 
   useEffect(() => {
     loadList();
-  }, [loadList, filters.dateFrom, filters.dateTo, filters.isOverridden]);
+  }, [loadList, filters.dateFrom, filters.dateTo, filters.isOverridden, filters.statuses]);
 
   const itemsByBatch = useMemo(() => {
     const map = new Map<string, ScheduleItem[]>();
