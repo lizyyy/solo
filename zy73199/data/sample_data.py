@@ -93,14 +93,14 @@ def generate_sample_data(draft_manager: DraftManager) -> List[str]:
 
     rid = draft_manager.add_draft(
         problem_id="area_002",
-        problem_title="操场面积（边界样本）",
+        problem_title="操场面积（边界卡点）",
         parameters=[
-            Parameter(name="长度", value=999.5, unit="m", source="题目已知"),
-            Parameter(name="宽度", value=999.0, unit="m", source="题目已知"),
+            Parameter(name="长度", value=1000.5, unit="m", source="题目已知"),
+            Parameter(name="宽度", value=1000.0, unit="m", source="题目已知"),
         ],
         created_by="学生草稿-赵六",
         is_boundary=True,
-        remark="边界样本：面积接近阈值上限，用来验证校验逻辑",
+        remark="边界卡点：长度1000.5m × 宽度1000m = 1000500.0m²，超出面积阈值1000000.0m²，需复核是否参数录入错误或阈值需调整",
     )
     record_ids.append(rid.record_id)
 

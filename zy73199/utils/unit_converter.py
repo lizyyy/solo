@@ -48,9 +48,21 @@ UNIT_CONVERSIONS = {
 }
 
 
+UNIT_ALIASES = {
+    "m²": "m2",
+    "cm²": "cm2",
+    "mm²": "mm2",
+    "km²": "km2",
+    "m³": "m3",
+    "cm³": "cm3",
+    "kg/m³": "kg/m3",
+}
+
+
 def get_unit_category(unit: str) -> Optional[str]:
+    canonical = UNIT_ALIASES.get(unit, unit)
     for category, units in UNIT_CONVERSIONS.items():
-        if unit in units:
+        if canonical in units:
             return category
     return None
 

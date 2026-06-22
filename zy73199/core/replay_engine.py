@@ -47,11 +47,22 @@ class ReplayEngine:
             record.fail_detail = str(e)
 
         if record.is_boundary:
-            if record.status == ReplayStatus.SUCCESS:
+            if record.status == ReplayStatus.FAILED_UNIT:
+                record.boundary_type = "单位缺失"
+                record.boundary_evidence = self._build_unit_missing_evidence(record)
+            elif record.status == ReplayStatus.FAILED_FORMULA:
+                record.boundary_type = "公式缺项"
+                record.boundary_evidence = self._build_formula_error_evidence(record)
+            elif record.status == ReplayStatus.FAILED_THRESHOLD:
+                record.boundary_type = "阈值未过"
+                record.boundary_evidence = self._build_threshold_evidence(record)
+            elif record.status == ReplayStatus.SUCCESS:
                 if self._is_boundary_value(record.final_result, record.final_unit):
-                    record.boundary_type = "临界值"
+                    record.boundary_type = "阈值临界"
+                    record.boundary_evidence = self._build_threshold_boundary_evidence(record)
                 else:
-                    record.boundary_type = "边界输入"
+                    record.boundary_type = "阈值临界"
+                    record.boundary_evidence = self._build_threshold_boundary_evidence(record)
             record.status = ReplayStatus.BOUNDARY
 
         return record
@@ -340,6 +351,99 @@ class ReplayEngine:
                 return True
 
         return False
+
+    def _build_unit_missing_evidence(self, record: ReplayRecord) -> str:
+        missing = [p for p in record.parameters if not p.unit or p.unit.strip() == ""]
+        present = [p for p in record.parameters if p.unit and p.unit.strip() != ""]
+        lines = []
+        lines.append(f"卡点分类：单位缺失")
+        lines.append(f"判定依据：参数缺少有效单位，无法完成单位换算与计算")
+        for p in missing:
+            lines.append(f"  缺失单位参数：{p.name}={p.value}(单位为空)")
+        for p in present:
+            lines.append(f"  正常参数：{p.name}={p.value} {p.unit}")
+        if record.steps:
+            for s in record.steps:
+                if s.error_msg:
+                    lines.append(f"  错误信息：{s.error_msg}")
+        lines.append(f"复核建议：补充缺失单位后重新回放")
+        return "\n".join(lines)
+
+    def _build_formula_error_evidence(self, record: ReplayRecord) -> str:
+        lines = []
+        lines.append(f"卡点分类：公式缺项")
+        lines.append(f"判定依据：公式计算过程中出现错误，缺少必要项或参数不匹配")
+        lines.append(f"失败原因：{record.fail_reason or '未知'}")
+        lines.append(f"失败详情：{record.fail_detail or '未知'}")
+        param_strs = [f"{p.name}={p.value} {p.unit}" for p in record.parameters]
+        lines.append(f"输入参数：{', '.join(param_strs)}")
+        for s in record.steps:
+            if s.error_msg:
+                lines.append(f"  步骤[{s.step_name}] 错误：{s.error_msg}")
+                if s.input_values:
+                    vals = "; ".join(f"{k}={v}" for k, v in s.input_values.items())
+                    lines.append(f"    输入值：{vals}")
+                if s.input_units:
+                    units = "; ".join(f"{k}={v}" for k, v in s.input_units.items())
+                    lines.append(f"    输入单位：{units}")
+        lines.append(f"复核建议：检查公式完整性和参数匹配")
+        return "\n".join(lines)
+
+    def _build_threshold_evidence(self, record: ReplayRecord) -> str:
+        lines = []
+        lines.append(f"卡点分类：阈值未过")
+        lines.append(f"判定依据：计算结果超出合理阈值范围")
+        param_strs = [f"{p.name}={p.value} {p.unit}" for p in record.parameters]
+        lines.append(f"输入参数：{', '.join(param_strs)}")
+        for s in record.steps:
+            if s.result_value is not None:
+                lines.append(f"  步骤[{s.step_name}]：{s.result_value} {s.result_unit or ''}")
+            if s.error_msg:
+                lines.append(f"  步骤[{s.step_name}] 错误：{s.error_msg}")
+                if s.input_values:
+                    vals = "; ".join(f"{k}={v}" for k, v in s.input_values.items())
+                    lines.append(f"    对比值：{vals}")
+                if s.input_units:
+                    units = "; ".join(f"{k}={v}" for k, v in s.input_units.items())
+                    lines.append(f"    单位：{units}")
+        lines.append(f"复核建议：确认输入参数是否正确，或阈值是否需要调整")
+        return "\n".join(lines)
+
+    def _build_threshold_boundary_evidence(self, record: ReplayRecord) -> str:
+        lines = []
+        lines.append(f"卡点分类：阈值临界")
+        category = get_unit_category(record.final_unit) if record.final_unit else None
+        threshold_key = f"{category}_max" if category else None
+        max_val = self.threshold_config.get(threshold_key) if threshold_key else None
+
+        if record.final_result is not None and max_val is not None and max_val > 0:
+            ratio = record.final_result / max_val * 100
+            diff = max_val - record.final_result
+            lines.append(f"判定依据：结果值{record.final_result}{record.final_unit}距阈值上限{max_val}{record.final_unit}仅差{diff:.2f}{record.final_unit}，占比{ratio:.2f}%，接近{self.boundary_tolerance*100:.0f}%容差线")
+        else:
+            lines.append(f"判定依据：计算结果接近阈值边界，需人工复核")
+
+        param_strs = [f"{p.name}={p.value} {p.unit}" for p in record.parameters]
+        lines.append(f"输入参数：{', '.join(param_strs)}")
+
+        for s in record.steps:
+            step_info = f"  步骤[{s.step_name}]"
+            if s.formula:
+                step_info += f" 公式：{s.formula}"
+            if s.input_values:
+                vals = "; ".join(f"{k}={v}" for k, v in s.input_values.items())
+                lines.append(f"{step_info}")
+                lines.append(f"    输入值：{vals}")
+            if s.input_units:
+                units = "; ".join(f"{k}={v}" for k, v in s.input_units.items())
+                lines.append(f"    单位：{units}")
+            if s.result_value is not None:
+                lines.append(f"    结果：{s.result_value} {s.result_unit or ''}")
+            if s.error_msg:
+                lines.append(f"    错误：{s.error_msg}")
+
+        lines.append(f"复核建议：确认参数取值是否合理，是否需要调整阈值或补充约束条件")
+        return "\n".join(lines)
 
     def compare_records(self, record_a: ReplayRecord, record_b: ReplayRecord) -> Dict:
         comparison = {

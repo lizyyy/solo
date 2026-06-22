@@ -48,8 +48,8 @@ class PersistenceManager:
         fieldnames = [
             "记录ID", "题目ID", "题目名称", "版本", "状态",
             "最终结果", "结果单位", "失败原因", "失败详情",
-            "是否边界样本", "边界类型", "创建人",
-            "创建时间", "更新时间", "备注",
+            "是否边界样本", "边界类型", "边界判定依据",
+            "创建人", "创建时间", "更新时间", "备注",
         ]
 
         with open(filepath, "w", newline="", encoding="utf-8-sig") as f:
@@ -69,6 +69,7 @@ class PersistenceManager:
                     "失败详情": r.fail_detail if r.fail_detail else "",
                     "是否边界样本": "是" if r.is_boundary else "否",
                     "边界类型": r.boundary_type if r.boundary_type else "",
+                    "边界判定依据": r.boundary_evidence if r.boundary_evidence else "",
                     "创建人": r.created_by,
                     "创建时间": r.created_at.strftime("%Y-%m-%d %H:%M:%S"),
                     "更新时间": r.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
@@ -97,6 +98,7 @@ class PersistenceManager:
             writer.writerow(["失败详情", record.fail_detail if record.fail_detail else ""])
             writer.writerow(["是否边界样本", "是" if record.is_boundary else "否"])
             writer.writerow(["边界类型", record.boundary_type if record.boundary_type else ""])
+            writer.writerow(["边界判定依据", record.boundary_evidence if record.boundary_evidence else ""])
             writer.writerow(["创建人", record.created_by])
             writer.writerow(["创建时间", record.created_at.strftime("%Y-%m-%d %H:%M:%S")])
             writer.writerow(["更新时间", record.updated_at.strftime("%Y-%m-%d %H:%M:%S")])
@@ -123,6 +125,13 @@ class PersistenceManager:
                     s.error_msg if s.error_msg else "",
                 ])
             writer.writerow([])
+
+            if record.is_boundary and record.boundary_evidence:
+                writer.writerow(["【边界分析】"])
+                writer.writerow(["卡点分类", record.boundary_type if record.boundary_type else ""])
+                for line in record.boundary_evidence.split("\n"):
+                    writer.writerow([line])
+                writer.writerow([])
 
             writer.writerow(["【备注记录】"])
             if record.remark:
@@ -217,9 +226,54 @@ class PersistenceManager:
                 if csv_result and abs(csv_result - record.final_result) > 0.0001:
                     issues.append(f"记录 {record.record_id} 结果不一致: 内存={record.final_result}, CSV={csv_result}")
 
+            csv_remark = csv_row.get("备注", "")
+            if csv_remark != record.remark:
+                issues.append(f"记录 {record.record_id} 备注不一致: 内存='{record.remark}', CSV='{csv_remark}'")
+
+            csv_boundary_type = csv_row.get("边界类型", "")
+            expected_boundary_type = record.boundary_type if record.boundary_type else ""
+            if csv_boundary_type != expected_boundary_type:
+                issues.append(f"记录 {record.record_id} 边界分类不一致: 内存='{expected_boundary_type}', CSV='{csv_boundary_type}'")
+
+            csv_boundary_evidence = csv_row.get("边界判定依据", "")
+            expected_evidence = record.boundary_evidence if record.boundary_evidence else ""
+            if csv_boundary_evidence != expected_evidence:
+                issues.append(f"记录 {record.record_id} 边界判定依据不一致")
+
+            detail_filename = f"{record.record_id}_detail.csv"
+            detail_path = os.path.join(self.output_dir, detail_filename)
+            if os.path.exists(detail_path):
+                detail_issues = self._verify_detail_csv_consistency(record, detail_path)
+                issues.extend(detail_issues)
+
         return {
             "consistent": len(issues) == 0,
             "total_records": len(records),
             "csv_records": len(csv_records),
             "issues": issues,
         }
+
+    def _verify_detail_csv_consistency(self, record: ReplayRecord, detail_path: str) -> List[str]:
+        issues = []
+        try:
+            with open(detail_path, "r", encoding="utf-8-sig") as f:
+                content = f.read()
+
+            if record.is_boundary and record.boundary_type:
+                if record.boundary_type not in content:
+                    issues.append(f"记录 {record.record_id} 明细CSV中缺少边界分类'{record.boundary_type}'")
+
+            if record.boundary_evidence:
+                first_evidence_line = record.boundary_evidence.split("\n")[0]
+                if first_evidence_line not in content:
+                    issues.append(f"记录 {record.record_id} 明细CSV中缺少边界判定依据")
+
+            if record.remark:
+                first_remark_line = record.remark.split("\n")[0]
+                if first_remark_line not in content:
+                    issues.append(f"记录 {record.record_id} 明细CSV中备注内容不一致")
+
+        except Exception as e:
+            issues.append(f"记录 {record.record_id} 明细CSV读取失败: {str(e)}")
+
+        return issues

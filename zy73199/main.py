@@ -103,6 +103,13 @@ def cmd_detail(engine, draft_manager, persistence, args):
     print(f"更新时间:   {record.updated_at.strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"边界样本:   {'是 (' + record.boundary_type + ')' if record.is_boundary else '否'}")
 
+    if record.is_boundary and record.boundary_type:
+        print(f"卡点分类:   {record.boundary_type}")
+    if record.boundary_evidence:
+        print("\n【边界判定依据】")
+        for line in record.boundary_evidence.split("\n"):
+            print(f"  {line}")
+
     if record.fail_reason:
         print(f"失败原因:   {record.fail_reason}")
         print(f"失败详情:   {record.fail_detail}")
@@ -247,9 +254,13 @@ def cmd_remark(engine, draft_manager, persistence, args):
 
     if draft_manager.add_remark(record_id, remark_text):
         record = draft_manager.get_record(record_id)
-        persistence.save_records_json(draft_manager.list_all_records())
+        all_records = draft_manager.list_all_records()
+        persistence.save_records_json(all_records)
+        persistence.export_summary_csv(all_records)
+        persistence.export_detail_csv(record)
         print(f"备注已添加到 {record_id}")
         print(f"当前备注:\n{record.remark}")
+        print(f"汇总CSV + 明细CSV 已同步更新")
     else:
         print(f"记录不存在: {record_id}")
 
@@ -326,24 +337,54 @@ def cmd_filter(engine, draft_manager, persistence, args):
     elif "--boundary" in args:
         records = draft_manager.get_boundary_records()
         filter_name = "边界样本"
-    elif "--failed" in args:
-        all_records = draft_manager.list_all_records()
-        records = [r for r in all_records if r.status in
-                   [ReplayStatus.FAILED_FORMULA, ReplayStatus.FAILED_UNIT, ReplayStatus.FAILED_THRESHOLD]]
-        filter_name = "失败记录"
 
     if not records:
         print(f"没有符合条件的记录（{filter_name}）")
         return
 
-    print(f"【{filter_name}】共 {len(records)} 条")
-    print(f"{'记录ID':<30} {'题目':<20} {'失败原因':<10} {'详情'}")
-    print("-" * 80)
-
-    for r in records:
-        reason = r.fail_reason if r.fail_reason else r.status.value
-        detail = r.fail_detail if r.fail_detail else ""
-        print(f"{r.record_id:<30} {r.problem_title:<20} {reason:<10} {detail}")
+    if "--boundary" in args:
+        print(f"【{filter_name}】共 {len(records)} 条")
+        for r in records:
+            print_separator(f"{r.problem_title} ({r.record_id})")
+            category = r.boundary_type if r.boundary_type else "(未分类)"
+            print(f"  卡点分类: {category}")
+            evidence_summary = ""
+            if r.boundary_evidence:
+                for line in r.boundary_evidence.split("\n"):
+                    if line.startswith("判定依据："):
+                        evidence_summary = line.replace("判定依据：", "")
+            fail_info = r.fail_detail if r.fail_detail else ""
+            print(f"  判定依据: {evidence_summary if evidence_summary else fail_info}")
+            if r.final_result is not None:
+                print(f"  计算结果: {r.final_result} {r.final_unit}")
+            elif r.fail_reason:
+                print(f"  失败原因: {r.fail_reason}")
+            print(f"  参数: {', '.join(f'{p.name}={p.value}{p.unit}' for p in r.parameters)}")
+            if r.steps:
+                calc_steps = [s for s in r.steps if s.result_value is not None]
+                if calc_steps:
+                    print("  关键计算:")
+                    for s in calc_steps:
+                        vals = "; ".join(f"{k}={v}{u}" for k, v in s.input_values.items()
+                                         for kk, u in s.input_units.items() if k == kk)
+                        if not vals:
+                            vals = "; ".join(f"{k}={v}" for k, v in s.input_values.items())
+                            units = "; ".join(f"{k}={u}" for k, u in s.input_units.items())
+                            if units:
+                                vals += f" [{units}]"
+                        print(f"    {s.step_name}: {s.formula} → {s.result_value} {s.result_unit or ''}")
+                        print(f"      输入: {vals}")
+                        if s.error_msg:
+                            print(f"      错误: {s.error_msg}")
+            print()
+    else:
+        print(f"【{filter_name}】共 {len(records)} 条")
+        print(f"{'记录ID':<30} {'题目':<20} {'失败原因':<10} {'详情'}")
+        print("-" * 80)
+        for r in records:
+            reason = r.fail_reason if r.fail_reason else r.status.value
+            detail = r.fail_detail if r.fail_detail else ""
+            print(f"{r.record_id:<30} {r.problem_title:<20} {reason:<10} {detail}")
 
 
 def cmd_verify(engine, draft_manager, persistence, args):
@@ -356,19 +397,84 @@ def cmd_verify(engine, draft_manager, persistence, args):
     if os.path.exists(csv_file):
         result = persistence.verify_csv_consistency(records, csv_file)
         print(f"CSV记录数: {result['csv_records']}")
-        print(f"一致性: {'通过 ✓' if result['consistent'] else '不通过 ✗'}")
+
+        remark_ok = True
+        boundary_ok = True
+        detail_ok = True
+
         if result["issues"]:
-            print("问题列表:")
+            stale_detail_ids = set()
             for issue in result["issues"]:
                 print(f"  - {issue}")
+                if "备注不一致" in issue:
+                    remark_ok = False
+                if "边界分类不一致" in issue or "边界判定依据不一致" in issue:
+                    boundary_ok = False
+                if "明细CSV" in issue:
+                    detail_ok = False
+                if "备注内容不一致" in issue or "边界分类" in issue or "判定依据" in issue:
+                    rid = issue.split(" ")[1] if len(issue.split(" ")) > 1 else ""
+                    stale_detail_ids.add(rid)
+
+            print(f"\n  备注字段一致性: {'通过 ✓' if remark_ok else '不一致 ✗'}")
+            print(f"  边界卡点分类一致性: {'通过 ✓' if boundary_ok else '不一致 ✗'}")
+            print(f"  明细CSV与汇总一致性: {'通过 ✓' if detail_ok else '不一致 ✗'}")
+
+            all_records = draft_manager.list_all_records()
+            persistence.export_summary_csv(all_records)
+            print(f"\n  已重新导出汇总CSV以修复不一致")
+            for record in all_records:
+                detail_filename = f"{record.record_id}_detail.csv"
+                detail_path = os.path.join("output", detail_filename)
+                if os.path.exists(detail_path) or record.is_boundary:
+                    persistence.export_detail_csv(record)
+            print(f"  已重新导出所有明细CSV以修复不一致")
+
+            result2 = persistence.verify_csv_consistency(all_records, csv_file)
+            if result2["consistent"]:
+                print(f"\n  修复后一致性: 通过 ✓")
+            else:
+                print(f"\n  修复后仍有问题:")
+                for issue in result2["issues"]:
+                    print(f"    - {issue}")
+        else:
+            print(f"一致性: 通过 ✓")
+            print(f"  备注字段: 一致 ✓")
+            print(f"  边界卡点分类: 一致 ✓")
+            print(f"  边界判定依据: 一致 ✓")
+            print(f"  明细CSV与汇总CSV: 一致 ✓")
     else:
-        print("CSV文件不存在，请先运行 export summary")
+        print("CSV文件不存在，请先运行 init")
 
     json_file = os.path.join("data", "replay_records.json")
     if os.path.exists(json_file):
         loaded = persistence.load_records_json()
         print(f"\nJSON文件记录数: {len(loaded)}")
-        print(f"与内存一致: {'是 ✓' if len(loaded) == len(records) else '否 ✗'}")
+        print(f"与内存数量一致: {'是 ✓' if len(loaded) == len(records) else '否 ✗'}")
+
+        json_issues = []
+        json_remark_ok = True
+        json_boundary_ok = True
+        for mem_rec in records:
+            for json_rec in loaded:
+                if json_rec.record_id == mem_rec.record_id:
+                    if json_rec.remark != mem_rec.remark:
+                        json_remark_ok = False
+                        json_issues.append(f"记录 {mem_rec.record_id} 备注: 内存='{mem_rec.remark[:50]}...', JSON='{json_rec.remark[:50]}...'")
+                    if json_rec.boundary_type != mem_rec.boundary_type:
+                        json_boundary_ok = False
+                        json_issues.append(f"记录 {mem_rec.record_id} 边界分类: 内存='{mem_rec.boundary_type}', JSON='{json_rec.boundary_type}'")
+                    if json_rec.boundary_evidence != mem_rec.boundary_evidence:
+                        json_issues.append(f"记录 {mem_rec.record_id} 边界判定依据不一致")
+                    break
+        if json_issues:
+            print("JSON与内存字段差异:")
+            for issue in json_issues:
+                print(f"  - {issue}")
+        else:
+            print(f"JSON与内存备注: 一致 ✓")
+            print(f"JSON与内存边界分类: 一致 ✓")
+            print(f"JSON与内存边界判定依据: 一致 ✓")
 
 
 def cmd_help(engine, draft_manager, persistence, args):

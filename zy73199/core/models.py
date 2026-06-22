@@ -48,6 +48,7 @@ class ReplayRecord:
     fail_detail: Optional[str] = None
     is_boundary: bool = False
     boundary_type: Optional[str] = None
+    boundary_evidence: Optional[str] = None
     remark: str = ""
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: datetime = field(default_factory=datetime.now)
@@ -82,6 +83,7 @@ class ReplayRecord:
             "fail_detail": self.fail_detail,
             "is_boundary": self.is_boundary,
             "boundary_type": self.boundary_type,
+            "boundary_evidence": self.boundary_evidence,
             "remark": self.remark,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
@@ -104,6 +106,7 @@ class ReplayRecord:
             fail_detail=data.get("fail_detail"),
             is_boundary=data.get("is_boundary", False),
             boundary_type=data.get("boundary_type"),
+            boundary_evidence=data.get("boundary_evidence"),
             remark=data.get("remark", ""),
             created_by=data.get("created_by", "学生草稿"),
         )
