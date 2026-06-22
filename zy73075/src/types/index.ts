@@ -51,7 +51,11 @@ export interface RecallRecord {
   correct_example: string;
   process_status: ProcessStatus;
   process_remark: string;
+  process_by?: string;
+  process_time?: string;
   safety_confirmed: boolean;
+  safety_by?: string;
+  safety_time?: string;
 }
 
 export interface ExceptionCheckResult {

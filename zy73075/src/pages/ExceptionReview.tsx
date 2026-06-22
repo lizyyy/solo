@@ -1,13 +1,22 @@
 import { useMemo, useState } from 'react';
-import { ShieldCheck, Clock, AlertCircle } from 'lucide-react';
-import type { RecallRecord, ExceptionCategory } from '@/types';
+import { ShieldCheck, AlertCircle, Users, Clock, CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 import { useWorkorderStore } from '@/store/workorderStore';
 import { cn } from '@/lib/utils';
-import { CATEGORY_EMOJI, CATEGORY_COLOR } from '@/constants/enums';
+import { CATEGORY_EMOJI } from '@/constants/enums';
+import ExceptionCard from '@/components/exception/ExceptionCard';
 
 type TabKey = '全部' | '公式问题' | '单位问题' | '阈值问题';
+type StatusTabKey = '全部状态' | '待处理' | '处理中' | '已修正' | '需人工确认' | '已确认';
 
 const TABS: readonly TabKey[] = ['全部', '公式问题', '单位问题', '阈值问题'] as const;
+const STATUS_TABS: readonly StatusTabKey[] = [
+  '全部状态',
+  '待处理',
+  '处理中',
+  '已修正',
+  '需人工确认',
+  '已确认',
+] as const;
 
 const TAB_BORDER: Record<'公式问题' | '单位问题' | '阈值问题', string> = {
   公式问题: 'border-rose-500',
@@ -15,141 +24,56 @@ const TAB_BORDER: Record<'公式问题' | '单位问题' | '阈值问题', strin
   阈值问题: 'border-violet-500',
 };
 
-interface ExceptionCardProps {
-  recall: RecallRecord;
-  onToggleConfirm: (id: string, confirmed: boolean) => void;
-}
-
-function ExceptionCard({ recall, onToggleConfirm }: ExceptionCardProps) {
-  const workorder = useWorkorderStore(s =>
-    s.workorders.find(w => w.id === recall.workorder_id),
-  );
-
-  return (
-    <div
-      className={cn(
-        'card p-4 flex flex-col gap-3 relative overflow-hidden',
-        CATEGORY_COLOR[recall.category],
-      )}
-    >
-      <div
-        className={cn(
-          'absolute top-0 left-0 w-1 h-full',
-          recall.category === '公式问题'
-            ? 'bg-rose-500'
-            : recall.category === '单位问题'
-              ? 'bg-orange-500'
-              : recall.category === '阈值问题'
-                ? 'bg-violet-500'
-                : 'bg-yellow-500',
-        )}
-      />
-      <div className="pl-2 flex flex-col gap-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-lg">{CATEGORY_EMOJI[recall.category]}</span>
-            <span className={cn('badge border-none bg-transparent p-0 text-sm font-medium')}>
-              {recall.category}
-            </span>
-          </div>
-          <button
-            onClick={() => onToggleConfirm(recall.id, !recall.safety_confirmed)}
-            className={cn(
-              'shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm text-xs font-medium border transition-all',
-              recall.safety_confirmed
-                ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30'
-                : 'bg-slate-800 border-slate-600 text-slate-300 hover:bg-slate-700',
-            )}
-          >
-            {recall.safety_confirmed ? (
-              <>
-                <ShieldCheck className="w-3.5 h-3.5" />
-                已确认
-              </>
-            ) : (
-              <>
-                <Clock className="w-3.5 h-3.5" />
-                待确认
-              </>
-            )}
-          </button>
-        </div>
-
-        <p className="text-sm text-slate-200 leading-relaxed">{recall.detail}</p>
-
-        <div className="grid grid-cols-2 gap-2 text-xs">
-          <div>
-            <p className="text-slate-500 mb-0.5">原始值</p>
-            <p className="text-slate-300 font-mono bg-slate-800/80 rounded px-2 py-1 truncate">
-              {recall.original_value}
-            </p>
-          </div>
-          <div>
-            <p className="text-slate-500 mb-0.5">正确示例</p>
-            <p className="text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded px-2 py-1">
-              {recall.correct_example}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 pt-1 border-t border-slate-700/50">
-          {workorder && (
-            <span className="font-mono text-shield-300">{workorder.id}</span>
-          )}
-          <span>{recall.fields_involved}</span>
-          <span className="text-slate-600">{recall.recall_time}</span>
-        </div>
-
-        <div className="flex items-center gap-2 text-xs">
-          <span
-            className={cn(
-              'badge',
-              recall.process_status === '已修正'
-                ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300'
-                : recall.process_status === '处理中'
-                  ? 'border-shield-500/40 bg-shield-500/10 text-shield-300'
-                  : recall.process_status === '需人工确认'
-                    ? 'border-amber-500/40 bg-amber-500/10 text-amber-300'
-                    : 'border-slate-600 bg-slate-800 text-slate-300',
-            )}
-          >
-            {recall.process_status}
-          </span>
-          {recall.process_remark && (
-            <span className="text-slate-400 truncate">{recall.process_remark}</span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
+const STATUS_STAT: Record<Exclude<StatusTabKey, '全部状态' | '已确认'>, {
+  label: string;
+  icon: typeof Clock;
+  className: string;
+}> = {
+  待处理: { label: '待处理', icon: XCircle, className: 'text-slate-300 bg-slate-500/20 border-slate-500/40' },
+  处理中: { label: '处理中', icon: Clock, className: 'text-blue-300 bg-blue-500/20 border-blue-500/40' },
+  已修正: { label: '已修正待确认', icon: CheckCircle2, className: 'text-emerald-300 bg-emerald-500/10 border-emerald-500/30' },
+  需人工确认: { label: '需项目经理介入', icon: AlertTriangle, className: 'text-amber-300 bg-amber-500/20 border-amber-500/40' },
+};
 
 export default function ExceptionReview() {
   const [activeTab, setActiveTab] = useState<TabKey>('全部');
+  const [statusTab, setStatusTab] = useState<StatusTabKey>('全部状态');
   const recallRecords = useWorkorderStore(s => s.recall_records);
-  const updateRecall = useWorkorderStore(s => s.updateRecall);
 
   const filtered = useMemo(() => {
-    if (activeTab === '全部') return recallRecords;
-    return recallRecords.filter(r => r.category === activeTab);
-  }, [recallRecords, activeTab]);
+    let list = recallRecords;
+    if (activeTab !== '全部') {
+      list = list.filter(r => r.category === activeTab);
+    }
+    if (statusTab === '已确认') {
+      list = list.filter(r => r.safety_confirmed);
+    } else if (statusTab !== '全部状态') {
+      list = list.filter(r => r.process_status === statusTab);
+    }
+    return list;
+  }, [recallRecords, activeTab, statusTab]);
 
   const confirmedCount = useMemo(
     () => recallRecords.filter(r => r.safety_confirmed).length,
     [recallRecords],
   );
 
-  const handleToggleConfirm = (id: string, confirmed: boolean) => {
-    updateRecall(id, { safety_confirmed: confirmed });
-  };
+  const statusStats = useMemo(() => {
+    return {
+      待处理: recallRecords.filter(r => r.process_status === '待处理').length,
+      处理中: recallRecords.filter(r => r.process_status === '处理中').length,
+      已修正: recallRecords.filter(r => r.process_status === '已修正' && !r.safety_confirmed).length,
+      需人工确认: recallRecords.filter(r => r.process_status === '需人工确认').length,
+    };
+  }, [recallRecords]);
 
   return (
-    <div className="min-h-screen p-6 space-y-6 max-w-[1600px] mx-auto">
+    <div className="min-h-screen p-6 space-y-6 max-w-[1700px] mx-auto">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">异常复核</h1>
+          <h1 className="text-2xl font-bold text-white">异常复核工作台</h1>
           <p className="text-sm text-slate-400 mt-1">
-            公式 / 单位 / 阈值异常，安全员确认
+            公式 / 单位 / 阈值异常 → 标记处理 → 安全员确认 → 联动交接放行
           </p>
         </div>
         <div className="flex items-center gap-2 text-sm">
@@ -170,7 +94,32 @@ export default function ExceptionReview() {
         </div>
       </header>
 
-      <section className="card p-1 inline-flex items-center gap-1">
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {(Object.keys(STATUS_STAT) as Array<keyof typeof STATUS_STAT>).map(key => {
+          const stat = STATUS_STAT[key];
+          const Icon = stat.icon;
+          const count = statusStats[key];
+          return (
+            <div
+              key={key}
+              className={cn(
+                'card p-4 flex items-start gap-3 border',
+                stat.className,
+              )}
+            >
+              <div className={cn('shrink-0 w-10 h-10 rounded-sm flex items-center justify-center border', stat.className)}>
+                <Icon className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-xs uppercase tracking-wider opacity-70">{stat.label}</div>
+                <div className="text-2xl font-mono font-bold mt-0.5 tabular-nums">{count}</div>
+              </div>
+            </div>
+          );
+        })}
+      </section>
+
+      <section className="card p-1 inline-flex flex-wrap items-center gap-1">
         {TABS.map(tab => {
           const isActive = activeTab === tab;
           const activeCategory = tab !== '全部' ? TAB_BORDER[tab] : 'border-shield-400';
@@ -183,7 +132,9 @@ export default function ExceptionReview() {
                 isActive ? 'text-white' : 'text-slate-400 hover:text-slate-200',
               )}
             >
-              <span className="relative z-10">{tab}</span>
+              <span className="relative z-10">
+                {tab !== '全部' && CATEGORY_EMOJI[tab as '公式问题' | '单位问题' | '阈值问题']} {tab}
+              </span>
               {isActive && (
                 <span
                   className={cn(
@@ -207,24 +158,41 @@ export default function ExceptionReview() {
         })}
       </section>
 
+      <section className="card p-1 inline-flex flex-wrap items-center gap-1">
+        <Users className="w-4 h-4 text-slate-500 ml-2 mr-1" />
+        {STATUS_TABS.map(tab => {
+          const isActive = statusTab === tab;
+          return (
+            <button
+              key={tab}
+              onClick={() => setStatusTab(tab)}
+              className={cn(
+                'px-3 py-1.5 text-xs font-medium transition-colors rounded-sm',
+                isActive
+                  ? 'bg-shield-500/20 text-shield-200 border border-shield-500/40'
+                  : 'text-slate-400 hover:text-slate-200 border border-transparent',
+              )}
+            >
+              {tab}
+            </button>
+          );
+        })}
+      </section>
+
       {filtered.length > 0 ? (
         <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filtered.map(recall => (
-            <ExceptionCard
-              key={recall.id}
-              recall={recall}
-              onToggleConfirm={handleToggleConfirm}
-            />
+            <ExceptionCard key={recall.id} recall={recall} />
           ))}
         </section>
       ) : (
         <div className="card p-16 flex flex-col items-center justify-center text-center gap-3">
           <AlertCircle className="w-10 h-10 text-slate-600" />
-          <p className="text-slate-400">当前分类下暂无异常记录</p>
+          <p className="text-slate-400">当前筛选下暂无异常记录</p>
           <p className="text-xs text-slate-600">
             {recallRecords.length === 0
               ? '请先导入或加载工单数据，系统将自动检测异常'
-              : '切换其他标签查看其他类别异常'}
+              : '切换分类或状态标签查看其他异常'}
           </p>
         </div>
       )}

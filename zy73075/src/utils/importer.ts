@@ -135,6 +135,10 @@ function buildRecall(
     correct_example: corrects[category],
     process_status: '待处理',
     process_remark: '',
+    process_by: '',
+    process_time: '',
     safety_confirmed: false,
+    safety_by: '',
+    safety_time: '',
   };
 }

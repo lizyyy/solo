@@ -201,7 +201,11 @@ export const SAMPLE_DATA: FullDataset = {
       correct_example: '单位=个，申报数量=8（正常范围）',
       process_status: '需人工确认',
       process_remark: '安全员老唐已标记异常，待班组长核实后修正',
+      process_by: '安全员·老唐',
+      process_time: '2026-06-08 14:50',
       safety_confirmed: false,
+      safety_by: '',
+      safety_time: '',
     },
     {
       id: 'RR-0603-02',
@@ -214,7 +218,11 @@ export const SAMPLE_DATA: FullDataset = {
       correct_example: '常规申报 2-5 个，最大不超 50；出库 ≤ 申报 × 1.5',
       process_status: '处理中',
       process_remark: '疑似数据录入多敲了 0，实际应为 15 个？需仓库和使用现场双重核对',
+      process_by: '安全员·老唐',
+      process_time: '2026-06-08 15:10',
       safety_confirmed: false,
+      safety_by: '',
+      safety_time: '',
     },
   ],
 };

@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, FileText, Wrench, ShieldAlert, CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
+import { ArrowLeft, FileText, Wrench, ShieldAlert, CheckCircle2, AlertTriangle, XCircle, RefreshCw } from 'lucide-react';
 import { useWorkorderStore } from '@/store/workorderStore';
 import SparePartTable from '@/components/table/SparePartTable';
 import RecallTimeline from '@/components/exception/RecallTimeline';
 import StatusBadge from '@/components/status/StatusBadge';
-import { handoverSuggestion } from '@/utils/handover';
+import { handoverSuggestion, summarizeRecalls } from '@/utils/handover';
 import { CATEGORY_EMOJI, STATUS_COLOR_MAP } from '@/constants/enums';
 
 export default function WorkorderDetail() {
@@ -29,17 +29,28 @@ export default function WorkorderDetail() {
     );
   }
 
-  const suggestion = handoverSuggestion(workorder, parts);
+  const suggestion = handoverSuggestion(workorder, parts, recalls);
   const statusColor = STATUS_COLOR_MAP[workorder.handover_status];
   const totalAmount = parts.reduce((s, p) => s + (p.req_qty || 0) * (p.price || 0), 0);
   const tempCount = parts.filter(p => p.is_temp).length;
   const exceptionCount = recalls.length;
+  const recallSummary = summarizeRecalls(recalls);
 
   const changeStatus = (status: '可放行' | '缺材料待补' | '异常待核' | '待交接') => {
     if (!id) return;
     updateWorkorder(id, { handover_status: status });
+  };
+
+  const rejudgeStatus = () => {
+    if (!id) return;
     refreshHandoverStatus(id);
   };
+
+  const canRelease =
+    recallSummary.blocking.length === 0 &&
+    parts.every(p => p.material_status !== '缺料') &&
+    parts.length > 0 &&
+    !parts.some(p => p.is_temp);
 
   return (
     <div className="space-y-5 animate-slide-up">
@@ -59,7 +70,7 @@ export default function WorkorderDetail() {
           )}
         </div>
         <Link to="/review" className="btn-ghost">
-          <ShieldAlert className="w-4 h-4" /> 异常复核
+          <ShieldAlert className="w-4 h-4" /> 异常复核工作台
         </Link>
       </div>
 
@@ -129,8 +140,9 @@ export default function WorkorderDetail() {
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
               <button
-                className={`btn !py-1.5 text-xs ${workorder.handover_status === '可放行' ? 'btn-primary' : 'btn-ghost'}`}
+                className={`btn !py-1.5 text-xs ${workorder.handover_status === '可放行' ? 'btn-primary' : 'btn-ghost'} ${!canRelease && workorder.handover_status !== '可放行' ? 'opacity-60' : ''}`}
                 onClick={() => changeStatus('可放行')}
+                title={canRelease ? '系统判定可放行' : '仍有未处理异常/缺料/临时材料，项目经理仍可手动放行'}
               >✅ 可放行</button>
               <button
                 className={`btn !py-1.5 text-xs ${workorder.handover_status === '缺材料待补' ? 'btn-primary' : 'btn-ghost'}`}
@@ -144,7 +156,31 @@ export default function WorkorderDetail() {
                 className={`btn !py-1.5 text-xs ${workorder.handover_status === '待交接' ? 'btn-primary' : 'btn-ghost'}`}
                 onClick={() => changeStatus('待交接')}
               >⏳ 待交接</button>
+              <button
+                className="btn-ghost !py-1.5 text-xs w-full mt-1"
+                onClick={rejudgeStatus}
+              >
+                <RefreshCw className="w-3 h-3 inline-block mr-1" /> 按异常复核结果重算
+              </button>
             </div>
+            {!canRelease && workorder.handover_status !== '可放行' && (
+              <div className="mt-3 text-[11px] text-amber-400 leading-relaxed p-2 border border-amber-500/30 bg-amber-500/5 rounded-sm">
+                ⚠️ 当前仍有阻塞项：
+                {recallSummary.needManual.length > 0 && <div>· {recallSummary.needManual.length} 条需人工确认（项目经理介入）</div>}
+                {recallSummary.processing.length > 0 && <div>· {recallSummary.processing.length} 条处理中</div>}
+                {recallSummary.pendingConfirm.length > 0 && <div>· {recallSummary.pendingConfirm.length} 条已修正但待安全员确认</div>}
+                {recallSummary.blocking.length > 0 &&
+                  !(recallSummary.needManual.length > 0 || recallSummary.processing.length > 0 || recallSummary.pendingConfirm.length > 0) && (
+                    <div>· {recallSummary.blocking.length} 条待处理</div>
+                  )}
+                {parts.some(p => p.material_status === '缺料') && (
+                  <div>· 缺料：{parts.filter(p => p.material_status === '缺料').map(p => p.part_name).join('、')}</div>
+                )}
+                {parts.some(p => p.is_temp) && (
+                  <div>· 临时材料：{parts.filter(p => p.is_temp).map(p => p.part_name).join('、')}</div>
+                )}
+              </div>
+            )}
           </section>
 
           <section className="card p-5">
@@ -165,7 +201,7 @@ export default function WorkorderDetail() {
                 {CATEGORY_EMOJI.公式问题} 公式 &nbsp;
                 {CATEGORY_EMOJI.单位问题} 单位 &nbsp;
                 {CATEGORY_EMOJI.阈值问题} 阈值 &nbsp;
-                三类问题分别留痕，未藏在备注中
+                三类问题分别留痕，未藏在备注中；每条下方可直接标处理状态
               </div>
             )}
           </section>
@@ -197,3 +233,4 @@ function InfoItem({
     </div>
   );
 }
+
