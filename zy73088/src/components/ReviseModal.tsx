@@ -9,49 +9,11 @@ import {
   FileText,
 } from 'lucide-react';
 import { useWorkbenchStore } from '@/store';
-import type { Conclusion } from '@/shared/types';
+import { ConclusionOptions, type Conclusion } from '@/shared/types';
 
 interface ReviseModalProps {
   onClose: () => void;
 }
-
-const CONCLUSION_OPTIONS: Array<{
-  value: Conclusion;
-  label: string;
-  desc: string;
-  color: string;
-}> = [
-  {
-    value: 'scheme_a',
-    label: '方案A',
-    desc: '粘贴碳纤维布加固',
-    color: 'bg-blue-500',
-  },
-  {
-    value: 'scheme_b',
-    label: '方案B',
-    desc: '外包型钢加固',
-    color: 'bg-purple-500',
-  },
-  {
-    value: 'scheme_c',
-    label: '方案C',
-    desc: '增大截面加固',
-    color: 'bg-cyan-500',
-  },
-  {
-    value: 'needs_inspection',
-    label: '需检测',
-    desc: '进一步检测确认',
-    color: 'bg-amber-500',
-  },
-  {
-    value: 'rejected',
-    label: '不通过',
-    desc: '材料/施工不满足要求',
-    color: 'bg-red-500',
-  },
-];
 
 export default function ReviseModal({ onClose }: ReviseModalProps) {
   const record = useWorkbenchStore((s) => s.record);
@@ -120,19 +82,19 @@ export default function ReviseModal({ onClose }: ReviseModalProps) {
               <span className="text-slate-400 text-sm flex-shrink-0">原结论</span>
               <span
                 className={`px-3 py-1 rounded-md text-sm text-white ${
-                  CONCLUSION_OPTIONS.find(
+                  ConclusionOptions.find(
                     (o) => o.value === record.conclusion
                   )?.color || 'bg-slate-600'
                 }`}
               >
                 {
-                  CONCLUSION_OPTIONS.find(
+                  ConclusionOptions.find(
                     (o) => o.value === record.conclusion
                   )?.label
                 }{' '}
                 ·{' '}
                 {
-                  CONCLUSION_OPTIONS.find(
+                  ConclusionOptions.find(
                     (o) => o.value === record.conclusion
                   )?.desc
                 }
@@ -149,7 +111,7 @@ export default function ReviseModal({ onClose }: ReviseModalProps) {
               新结论
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {CONCLUSION_OPTIONS.map((opt) => {
+              {ConclusionOptions.map((opt) => {
                 const selected = newConclusion === opt.value;
                 return (
                   <label

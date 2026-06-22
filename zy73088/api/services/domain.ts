@@ -55,22 +55,23 @@ export class CollisionDedupService {
   static analyzeImpact(
     record: SchemeComparisonRecord,
     dupIds: string[],
-  ): { impactAnalysis: string; affected: string[] } {
-    const affected: string[] = [];
+  ): { impactAnalysis: string; affected: Conclusion[] } {
+    const affectedSet = new Set<Conclusion>();
     const reasons: string[] = [];
+    let hasHigh = false;
+    let hasMedium = false;
 
     for (const dupId of dupIds) {
       for (const mat of record.materials) {
         for (const cp of mat.collision_points) {
           if (cp.collision_id === dupId) {
-            affected.push(
-              `材料:${mat.material_name}(${mat.item_id})-碰撞:${cp.description}`,
-            );
             if (cp.severity === 'high') {
+              hasHigh = true;
               reasons.push(
                 `高危碰撞点 [${cp.description}] 重复，直接影响材料用量核算`,
               );
             } else if (cp.severity === 'medium') {
+              hasMedium = true;
               reasons.push(
                 `中危碰撞点 [${cp.description}] 重复，可能影响方案承载力校核`,
               );
@@ -85,6 +86,14 @@ export class CollisionDedupService {
     }
 
     if (record.conclusion) {
+      affectedSet.add(record.conclusion);
+      if (hasHigh) {
+        affectedSet.add('needs_inspection');
+        affectedSet.add('scheme_a');
+        affectedSet.add('scheme_c');
+      } else if (hasMedium) {
+        affectedSet.add('scheme_a');
+      }
       reasons.push(
         `当前结论为「${conclusionDisplay(record.conclusion)}」，待确认后可能发生改判`,
       );
@@ -94,7 +103,7 @@ export class CollisionDedupService {
       impactAnalysis: reasons.length
         ? reasons.join('；')
         : '暂无明确牵动影响，需人工复核',
-      affected,
+      affected: Array.from(affectedSet),
     };
   }
 }
@@ -646,6 +655,7 @@ export class ReconciliationView {
           pending_id: string;
           status: string;
           impact_analysis: string;
+          affected: Conclusion[];
           suspended_by: string;
           suspended_at: string;
           resolved_by: string | undefined;
@@ -727,6 +737,11 @@ export class ReconciliationView {
             `挂起人:${p.suspended_by} @ ${p.suspended_at}`,
         );
         buf.push(`      影响分析：${p.impact_analysis}`);
+        if (p.affected.length > 0) {
+          buf.push(
+            `      牵动结论：${p.affected.map((c) => conclusionDisplay(c)).join(' / ')}`,
+          );
+        }
         if (p.resolution) {
           buf.push(`      解决：${p.resolved_by} — ${p.resolution}`);
         }

@@ -232,8 +232,10 @@ function buildDemoRecord(): SchemeComparisonRecord {
     impact_analysis:
       '高危碰撞点 [柱脚北侧主受力钢筋保护层不足，存在锈蚀风险] 重复，直接影响材料用量核算；当前结论为「方案B（碳纤维布加固）」，待确认后可能发生改判',
     affected_conclusions: [
-      '材料:碳纤维布（一级 300g/㎡）(MAT-000000000001)-碰撞:柱脚北侧主受力钢筋保护层不足，存在锈蚀风险',
-      '材料:碳纤维布（一级 300g/㎡）(MAT-000000000001)-碰撞:柱脚北侧主受力钢筋保护层不足，存在锈蚀风险',
+      'scheme_b',
+      'needs_inspection',
+      'scheme_a',
+      'scheme_c',
     ],
     suspended_at: '2026-01-15T10:45:00',
     suspended_by: '系统（自动查重）',

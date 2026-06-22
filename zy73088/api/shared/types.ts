@@ -36,6 +36,35 @@ export const ConclusionDisplay: Record<Conclusion, string> = {
   rejected: '不通过',
 };
 
+export const ConclusionColors: Record<Conclusion, string> = {
+  scheme_a: 'bg-blue-500',
+  scheme_b: 'bg-purple-500',
+  scheme_c: 'bg-cyan-500',
+  needs_inspection: 'bg-amber-500',
+  rejected: 'bg-red-500',
+};
+
+export const ConclusionDesc: Record<Conclusion, string> = {
+  scheme_a: '外包粘钢，钢板 + 结构胶，整体承载力提升明显',
+  scheme_b: '碳纤维布粘贴，施工便捷，适合受弯受剪加固',
+  scheme_c: '增大构件截面，配筋补强，整体刚度同步提升',
+  needs_inspection: '现场情况不足以判断，需补测/复检',
+  rejected: '材料或工艺不满足规范要求，不予通过',
+};
+
+export const ConclusionOptions: Array<{
+  value: Conclusion;
+  label: string;
+  desc: string;
+  color: string;
+}> = [
+  { value: 'scheme_a', label: ConclusionDisplay.scheme_a, desc: ConclusionDesc.scheme_a, color: ConclusionColors.scheme_a },
+  { value: 'scheme_b', label: ConclusionDisplay.scheme_b, desc: ConclusionDesc.scheme_b, color: ConclusionColors.scheme_b },
+  { value: 'scheme_c', label: ConclusionDisplay.scheme_c, desc: ConclusionDesc.scheme_c, color: ConclusionColors.scheme_c },
+  { value: 'needs_inspection', label: ConclusionDisplay.needs_inspection, desc: ConclusionDesc.needs_inspection, color: ConclusionColors.needs_inspection },
+  { value: 'rejected', label: ConclusionDisplay.rejected, desc: ConclusionDesc.rejected, color: ConclusionColors.rejected },
+];
+
 export type OperationType =
   | 'create'
   | 'update'
@@ -139,7 +168,7 @@ export interface PendingConfirmItem {
   material_item_id: string;
   duplicate_collision_ids: string[];
   impact_analysis: string;
-  affected_conclusions: string[];
+  affected_conclusions: Conclusion[];
   suspended_at: string;
   suspended_by: string;
   resolved_at?: string;

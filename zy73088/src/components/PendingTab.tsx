@@ -10,7 +10,13 @@ import {
   Clock,
 } from 'lucide-react';
 import { useWorkbenchStore } from '@/store';
-import type { PendingConfirmItem, CollisionPoint } from '@/shared/types';
+import {
+  ConclusionDisplay,
+  ConclusionColors,
+  type PendingConfirmItem,
+  type CollisionPoint,
+  type Conclusion,
+} from '@/shared/types';
 
 interface PendingWithDetails {
   pending: PendingConfirmItem;
@@ -78,18 +84,19 @@ function PendingCard({ item }: { item: PendingWithDetails }) {
       <div className="bg-slate-800/60 rounded-lg p-3 border border-slate-700">
         <div className="text-xs text-slate-500 mb-2 flex items-center gap-1">
           <GitBranch size={12} />
-          牵动结论清单
+          牵动的加固结论
         </div>
         <div className="flex flex-wrap gap-1.5">
           {pending.affected_conclusions.length === 0 ? (
-            <span className="text-slate-500 text-xs italic">无牵动结论</span>
+            <span className="text-slate-500 text-xs italic">暂不牵动方案结论</span>
           ) : (
-            pending.affected_conclusions.map((c, i) => (
+            pending.affected_conclusions.map((c: Conclusion, i) => (
               <span
                 key={i}
-                className="px-2 py-0.5 bg-slate-700/50 text-slate-300 text-xs rounded border border-slate-600"
+                className={`px-2 py-0.5 text-white text-xs rounded border border-white/10 ${ConclusionColors[c]}`}
+                title={ConclusionDisplay[c]}
               >
-                {c}
+                {ConclusionDisplay[c]}
               </span>
             ))
           )}

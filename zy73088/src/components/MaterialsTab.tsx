@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   ChevronDown,
   ChevronRight,
@@ -9,6 +9,8 @@ import {
   Plus,
   History,
   Send,
+  XCircle,
+  Loader2,
 } from 'lucide-react';
 import { useWorkbenchStore } from '@/store';
 import type { MaterialReviewItem, CollisionPoint } from '@/shared/types';
@@ -37,16 +39,50 @@ function CollisionCard({
   const replaceScreenshot = useWorkbenchStore((s) => s.replaceScreenshot);
   const [appendOld, setAppendOld] = useState(true);
   const [imageUrl, setImageUrl] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const isSelected = selectedId === collision.collision_id;
 
-  const handleReplace = () => {
-    if (!imageUrl.trim()) return;
-    replaceScreenshot(itemId, collision.collision_id, {
-      image_url: imageUrl.trim(),
-      append: appendOld,
-    });
-    setImageUrl('');
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setSubmitError('请选择图片文件');
+      return;
+    }
+    setSubmitError('');
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImageUrl(reader.result as string);
+    };
+    reader.onerror = () => {
+      setSubmitError('图片读取失败');
+    };
+    reader.readAsDataURL(file);
   };
+
+  const handleReplace = async () => {
+    if (!imageUrl.trim() || uploading) return;
+    setUploading(true);
+    setSubmitError('');
+    try {
+      await replaceScreenshot(itemId, collision.collision_id, {
+        image_url: imageUrl.trim(),
+        append: appendOld,
+      });
+      setImageUrl('');
+      setImgError(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    } catch (e: any) {
+      setSubmitError(e?.message || '替换失败');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const hasScreenshot = collision.screenshot_path && !imgError;
 
   return (
     <div
@@ -59,18 +95,26 @@ function CollisionCard({
     >
       <div className="flex gap-4">
         <div className="w-32 h-24 rounded-md overflow-hidden bg-slate-800 border border-slate-600 flex-shrink-0 relative">
-          {collision.screenshot_path ? (
+          {hasScreenshot ? (
             <img
               src={collision.screenshot_path}
               alt={collision.description}
               className="w-full h-full object-cover"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-              }}
+              onError={() => setImgError(true)}
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <ImageIcon size={24} className="text-slate-500" />
+            <div className="w-full h-full flex flex-col items-center justify-center gap-1 text-slate-500">
+              {imgError ? (
+                <>
+                  <XCircle size={20} className="text-red-400" />
+                  <span className="text-[10px] text-red-400">图片加载失败</span>
+                </>
+              ) : (
+                <>
+                  <ImageIcon size={20} />
+                  <span className="text-[10px]">暂无截图</span>
+                </>
+              )}
             </div>
           )}
           {collision.historical_screenshots.length > 0 && (
@@ -111,27 +155,32 @@ function CollisionCard({
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="截图 URL..."
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                className="flex-1 bg-slate-800 border border-slate-600 text-white text-xs px-2 py-1.5 rounded outline-none focus:border-blue-500"
+                placeholder="截图 URL 或上传本地图片..."
+                value={imageUrl.startsWith('data:image') ? '[本地图片] ' + imageUrl.length + ' bytes' : imageUrl}
+                onChange={(e) => {
+                  setImageUrl(e.target.value);
+                  setSubmitError('');
+                }}
+                className="flex-1 bg-slate-800 border border-slate-600 text-white text-xs px-2 py-1.5 rounded outline-none focus:border-blue-500 placeholder-slate-500 font-mono"
               />
-              <label className="px-2 py-1.5 bg-slate-600 hover:bg-slate-500 text-white text-xs rounded cursor-pointer flex items-center gap-1 transition-colors">
+              <label className="px-2 py-1.5 bg-slate-600 hover:bg-slate-500 text-white text-xs rounded cursor-pointer flex items-center gap-1 transition-colors flex-shrink-0">
                 <Upload size={12} />
                 上传
                 <input
+                  ref={fileInputRef}
                   type="file"
                   className="hidden"
                   accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      setImageUrl(`/mock-img/${collision.collision_id}-${Date.now()}.png`);
-                    }
-                  }}
+                  onChange={handleFileChange}
                 />
               </label>
             </div>
+            {submitError && (
+              <div className="text-red-400 text-[10px] flex items-center gap-1">
+                <XCircle size={10} />
+                {submitError}
+              </div>
+            )}
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 text-xs text-slate-400 cursor-pointer">
                 <input
@@ -140,14 +189,21 @@ function CollisionCard({
                   onChange={(e) => setAppendOld(e.target.checked)}
                   className="rounded border-slate-600 bg-slate-800"
                 />
-                追加旧版本
+                追加旧版到历史
               </label>
               <button
                 onClick={handleReplace}
-                disabled={!imageUrl.trim()}
-                className="px-3 py-1 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-600 disabled:cursor-not-allowed text-white text-xs rounded transition-colors"
+                disabled={!imageUrl.trim() || uploading}
+                className="px-3 py-1 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-600 disabled:cursor-not-allowed text-white text-xs rounded transition-colors flex items-center gap-1"
               >
-                替换截图
+                {uploading ? (
+                  <>
+                    <Loader2 size={12} className="animate-spin" />
+                    替换中
+                  </>
+                ) : (
+                  '替换截图'
+                )}
               </button>
             </div>
           </div>

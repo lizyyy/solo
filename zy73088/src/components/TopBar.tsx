@@ -13,17 +13,9 @@ import {
   Clock,
 } from 'lucide-react';
 import { useWorkbenchStore } from '@/store';
-import { ConclusionDisplay, type Conclusion, type RecordStatus } from '@/shared/types';
+import { ConclusionDisplay, ConclusionColors, type Conclusion, type RecordStatus } from '@/shared/types';
 import ReviseModal from './ReviseModal';
 import ReconciliationModal from './ReconciliationModal';
-
-const CONCLUSION_COLORS: Record<Conclusion, string> = {
-  scheme_a: 'bg-blue-500',
-  scheme_b: 'bg-purple-500',
-  scheme_c: 'bg-cyan-500',
-  needs_inspection: 'bg-amber-500',
-  rejected: 'bg-red-500',
-};
 
 const STATUS_LABELS: Record<RecordStatus, { label: string; cls: string; icon: any }> = {
   active: { label: '进行中', cls: 'bg-blue-500/20 text-blue-400 border-blue-500/30', icon: Clock },
@@ -85,7 +77,7 @@ export default function TopBar() {
             <div className="flex flex-col">
               <span className="text-slate-400 text-xs">当前结论</span>
               <div className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${CONCLUSION_COLORS[record.conclusion]}`} />
+                <span className={`w-2 h-2 rounded-full ${ConclusionColors[record.conclusion]}`} />
                 <span className="text-white text-sm font-medium">
                   {ConclusionDisplay[record.conclusion]}
                 </span>
@@ -150,4 +142,4 @@ export default function TopBar() {
   );
 }
 
-export { CONCLUSION_COLORS };
+

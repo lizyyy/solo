@@ -5,7 +5,7 @@
     "project_code": "PRJ-DEMO",
     "structural_element": "四层框架柱 FZ-4（轴网 C/3，截面 600×600）",
     "status": "confirmed",
-    "conclusion": "scheme_a",
+    "conclusion": "scheme_b",
     "confidence": 0.88,
     "materials": [
       {
@@ -67,17 +67,17 @@
           {
             "content": "复检报告已上传至资料室共享盘 /PRJ-DEMO/Material/CFRP-20260108/",
             "operator": "质量工程师小李",
-            "timestamp": "2026-06-21T00:21:05"
+            "timestamp": "2026-06-22T04:06:05"
           },
           {
             "content": "2026/6/21 早班复核：保护层实际 18mm（设计 25mm），需提级",
             "operator": "施工经理阿乔",
-            "timestamp": "2026-06-21T00:21:21"
+            "timestamp": "2026-06-22T04:06:24"
           },
           {
             "content": "2026/6/21 中班：现场取样碳布，抗拉实测 3620MPa，合格但裕度不足",
             "operator": "施工经理阿乔",
-            "timestamp": "2026-06-21T00:21:21"
+            "timestamp": "2026-06-22T04:06:24"
           }
         ],
         "created_at": "2026-01-15T08:30:00",
@@ -418,7 +418,7 @@
         "affected_conclusion_ids": []
       },
       {
-        "version_id": "HIS-c3ef96107818",
+        "version_id": "HIS-6d48e9e49040",
         "version_no": 3,
         "parent_id": "HIS-000000000002",
         "snapshot_material": {
@@ -506,12 +506,12 @@
                 {
                   "content": "复检报告已上传至资料室共享盘 /PRJ-DEMO/Material/CFRP-20260108/",
                   "operator": "质量工程师小李",
-                  "timestamp": "2026-06-21T00:21:05"
+                  "timestamp": "2026-06-22T04:06:05"
                 },
                 {
                   "content": "2026/6/21 早班复核：保护层实际 18mm（设计 25mm），需提级",
                   "operator": "施工经理阿乔",
-                  "timestamp": "2026-06-21T00:21:21"
+                  "timestamp": "2026-06-22T04:06:24"
                 }
               ],
               "created_at": "2026-01-15T08:30:00",
@@ -569,18 +569,18 @@
           {
             "content": "2026/6/21 早班复核：保护层实际 18mm（设计 25mm），需提级",
             "operator": "施工经理阿乔",
-            "timestamp": "2026-06-21T00:21:21"
+            "timestamp": "2026-06-22T04:06:24"
           }
         ],
         "revise_reason": "补录备注（材料 MAT-000000000001）",
         "operator": "施工经理阿乔",
-        "operated_at": "2026-06-21T00:21:21",
+        "operated_at": "2026-06-22T04:06:24",
         "affected_conclusion_ids": []
       },
       {
-        "version_id": "HIS-894080512a52",
+        "version_id": "HIS-310560c4e137",
         "version_no": 4,
-        "parent_id": "HIS-c3ef96107818",
+        "parent_id": "HIS-6d48e9e49040",
         "snapshot_material": {
           "materials": [
             {
@@ -666,17 +666,17 @@
                 {
                   "content": "复检报告已上传至资料室共享盘 /PRJ-DEMO/Material/CFRP-20260108/",
                   "operator": "质量工程师小李",
-                  "timestamp": "2026-06-21T00:21:05"
+                  "timestamp": "2026-06-22T04:06:05"
                 },
                 {
                   "content": "2026/6/21 早班复核：保护层实际 18mm（设计 25mm），需提级",
                   "operator": "施工经理阿乔",
-                  "timestamp": "2026-06-21T00:21:21"
+                  "timestamp": "2026-06-22T04:06:24"
                 },
                 {
                   "content": "2026/6/21 中班：现场取样碳布，抗拉实测 3620MPa，合格但裕度不足",
                   "operator": "施工经理阿乔",
-                  "timestamp": "2026-06-21T00:21:21"
+                  "timestamp": "2026-06-22T04:06:24"
                 }
               ],
               "created_at": "2026-01-15T08:30:00",
@@ -734,18 +734,18 @@
           {
             "content": "2026/6/21 中班：现场取样碳布，抗拉实测 3620MPa，合格但裕度不足",
             "operator": "施工经理阿乔",
-            "timestamp": "2026-06-21T00:21:21"
+            "timestamp": "2026-06-22T04:06:24"
           }
         ],
         "revise_reason": "补录备注（材料 MAT-000000000001）",
         "operator": "施工经理阿乔",
-        "operated_at": "2026-06-21T00:21:21",
+        "operated_at": "2026-06-22T04:06:24",
         "affected_conclusion_ids": []
       },
       {
-        "version_id": "HIS-be9e36df7883",
+        "version_id": "HIS-6cb7833c14bf",
         "version_no": 5,
-        "parent_id": "HIS-894080512a52",
+        "parent_id": "HIS-310560c4e137",
         "snapshot_material": {
           "materials": [
             {
@@ -836,17 +836,17 @@
                 {
                   "content": "复检报告已上传至资料室共享盘 /PRJ-DEMO/Material/CFRP-20260108/",
                   "operator": "质量工程师小李",
-                  "timestamp": "2026-06-21T00:21:05"
+                  "timestamp": "2026-06-22T04:06:05"
                 },
                 {
                   "content": "2026/6/21 早班复核：保护层实际 18mm（设计 25mm），需提级",
                   "operator": "施工经理阿乔",
-                  "timestamp": "2026-06-21T00:21:21"
+                  "timestamp": "2026-06-22T04:06:24"
                 },
                 {
                   "content": "2026/6/21 中班：现场取样碳布，抗拉实测 3620MPa，合格但裕度不足",
                   "operator": "施工经理阿乔",
-                  "timestamp": "2026-06-21T00:21:21"
+                  "timestamp": "2026-06-22T04:06:24"
                 }
               ],
               "created_at": "2026-01-15T08:30:00",
@@ -903,13 +903,13 @@
         "new_remarks": [],
         "revise_reason": "更新碰撞点截图（材料 MAT-000000000001，碰撞 COL-000000000001）",
         "operator": "施工经理阿乔",
-        "operated_at": "2026-06-21T00:21:21",
+        "operated_at": "2026-06-22T04:06:24",
         "affected_conclusion_ids": []
       },
       {
-        "version_id": "HIS-9c9c5b2f3eb2",
+        "version_id": "HIS-5ec0eab2d951",
         "version_no": 6,
-        "parent_id": "HIS-be9e36df7883",
+        "parent_id": "HIS-6cb7833c14bf",
         "snapshot_material": {
           "materials": [
             {
@@ -971,17 +971,17 @@
                 {
                   "content": "复检报告已上传至资料室共享盘 /PRJ-DEMO/Material/CFRP-20260108/",
                   "operator": "质量工程师小李",
-                  "timestamp": "2026-06-21T00:21:05"
+                  "timestamp": "2026-06-22T04:06:05"
                 },
                 {
                   "content": "2026/6/21 早班复核：保护层实际 18mm（设计 25mm），需提级",
                   "operator": "施工经理阿乔",
-                  "timestamp": "2026-06-21T00:21:21"
+                  "timestamp": "2026-06-22T04:06:24"
                 },
                 {
                   "content": "2026/6/21 中班：现场取样碳布，抗拉实测 3620MPa，合格但裕度不足",
                   "operator": "施工经理阿乔",
-                  "timestamp": "2026-06-21T00:21:21"
+                  "timestamp": "2026-06-22T04:06:24"
                 }
               ],
               "created_at": "2026-01-15T08:30:00",
@@ -1045,7 +1045,144 @@
         "new_conclusion": "scheme_a",
         "revise_reason": "保护层磨损超预期 (18mm<25mm)，原碳布方案强度裕度不足，改粘钢",
         "operator": "施工经理阿乔",
-        "operated_at": "2026-06-21T00:21:21",
+        "operated_at": "2026-06-22T04:06:24",
+        "affected_conclusion_ids": []
+      },
+      {
+        "version_id": "HIS-f78b63c92e0b",
+        "version_no": 7,
+        "parent_id": "HIS-5ec0eab2d951",
+        "snapshot_material": {
+          "materials": [
+            {
+              "item_id": "MAT-000000000001",
+              "material_name": "碳纤维布（一级 300g/㎡）",
+              "specification": "300g/㎡，幅宽 500mm，抗拉强度 ≥3400MPa",
+              "supplier": "上海固邦复合材料有限公司",
+              "batch_no": "GB-CFRP-20260108-A2",
+              "quantity": 120,
+              "unit": "㎡",
+              "collision_points": [
+                {
+                  "collision_id": "COL-000000000001",
+                  "element_id": "FZ-4",
+                  "description": "柱脚北侧主受力钢筋保护层不足，存在锈蚀风险",
+                  "screenshot_path": "/screenshots/FZ-4-20260621-reshoot-46.jpg",
+                  "viewpoint": {
+                    "camera_position": {
+                      "x": 12.5,
+                      "y": -8.3,
+                      "z": 6.2
+                    },
+                    "camera_target": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2.4
+                    },
+                    "camera_up": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 1
+                    },
+                    "zoom": 1.15,
+                    "fov": 50
+                  },
+                  "severity": "high",
+                  "detected_at": "2026-01-15T10:30:00",
+                  "supplement_note": "现场回弹实测保护层厚度 12mm，设计要求 30mm",
+                  "historical_screenshots": [
+                    {
+                      "path": "s3://demo-archive/2025-Q4/FZ-4/crack-before-repair.jpg",
+                      "captured_at": "2025-11-03T09:12:40",
+                      "viewpoint_fingerprint": "VP:x:12.5000|y:-8.3000|z:6.2000||VT:x:0.0000|y:0.0000|z:2.4000||Z:1.15||F:50"
+                    },
+                    {
+                      "path": "/screenshots/FZ-4-N-base-20260115.png",
+                      "captured_at": "2026-01-15T10:30:00",
+                      "viewpoint_fingerprint": "VP:x:12.5000|y:-8.3000|z:6.2000||VT:x:0.0000|y:0.0000|z:2.4000||Z:1.15||F:50"
+                    }
+                  ]
+                }
+              ],
+              "remarks": [
+                {
+                  "content": "本批碳纤维布已通过进场复检，强度指标满足 GB 50367-2013 要求",
+                  "operator": "材料员小王",
+                  "timestamp": "2026-01-15T09:00:00"
+                },
+                {
+                  "content": "复检报告已上传至资料室共享盘 /PRJ-DEMO/Material/CFRP-20260108/",
+                  "operator": "质量工程师小李",
+                  "timestamp": "2026-06-22T04:06:05"
+                },
+                {
+                  "content": "2026/6/21 早班复核：保护层实际 18mm（设计 25mm），需提级",
+                  "operator": "施工经理阿乔",
+                  "timestamp": "2026-06-22T04:06:24"
+                },
+                {
+                  "content": "2026/6/21 中班：现场取样碳布，抗拉实测 3620MPa，合格但裕度不足",
+                  "operator": "施工经理阿乔",
+                  "timestamp": "2026-06-22T04:06:24"
+                }
+              ],
+              "created_at": "2026-01-15T08:30:00",
+              "created_by": "材料员小王"
+            },
+            {
+              "item_id": "MAT-000000000002",
+              "material_name": "粘钢胶（A级结构胶）",
+              "specification": "JGN-A 型，触变性好，25kg/桶",
+              "supplier": "北京冶建特种材料有限公司",
+              "batch_no": "YJ-JGN-A-20260110",
+              "quantity": 50,
+              "unit": "kg",
+              "collision_points": [
+                {
+                  "collision_id": "COL-000000000003",
+                  "element_id": "FZ-4",
+                  "description": "柱中截面环向箍筋间距偏大，抗剪承载力待校核",
+                  "screenshot_path": "/screenshots/FZ-4-mid-stirrups.png",
+                  "viewpoint": {
+                    "camera_position": {
+                      "x": -10,
+                      "y": 10,
+                      "z": 5
+                    },
+                    "camera_target": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2.4
+                    },
+                    "camera_up": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 1
+                    },
+                    "zoom": 1,
+                    "fov": 50
+                  },
+                  "severity": "medium",
+                  "detected_at": "2026-01-15T11:10:00",
+                  "supplement_note": "箍筋间距 200mm，计算所需 150mm",
+                  "historical_screenshots": []
+                }
+              ],
+              "remarks": [],
+              "created_at": "2026-01-15T08:45:00",
+              "created_by": "材料员小王"
+            }
+          ],
+          "conclusion": "scheme_a",
+          "confidence": 0.88,
+          "status": "confirmed"
+        },
+        "new_remarks": [],
+        "old_conclusion": "scheme_a",
+        "new_conclusion": "scheme_b",
+        "revise_reason": "复核确认保护层厚度满足规范最低要求，原方案A过度加固，改回碳纤维布方案更经济；附 20260622 第三方检测报告 RPT-CR-20260622-003",
+        "operator": "施工经理阿乔",
+        "operated_at": "2026-06-22T04:15:27",
         "affected_conclusion_ids": []
       }
     ],
@@ -1104,30 +1241,39 @@
         }
       },
       {
-        "log_id": "LOG-e8580a3150f8",
+        "log_id": "LOG-3ff2c5d5e60d",
+        "record_id": "PRJ-DEMO",
+        "operator": "匿名导出",
+        "operation_type": "export",
+        "operation_detail": "导出记录（含待确认警告）",
+        "timestamp": "2026-06-22T04:06:24",
+        "field_changes": {}
+      },
+      {
+        "log_id": "LOG-04c02865a77f",
         "record_id": "PRJ-DEMO",
         "operator": "施工经理阿乔",
         "operation_type": "supplement",
         "operation_detail": "材料 MAT-000000000001 补录备注：2026/6/21 早班复核：保护层实际 18mm（设计 25mm），需提级",
-        "timestamp": "2026-06-21T00:21:21",
+        "timestamp": "2026-06-22T04:06:24",
         "field_changes": {}
       },
       {
-        "log_id": "LOG-0549a0999225",
+        "log_id": "LOG-938054a4969b",
         "record_id": "PRJ-DEMO",
         "operator": "施工经理阿乔",
         "operation_type": "supplement",
         "operation_detail": "材料 MAT-000000000001 补录备注：2026/6/21 中班：现场取样碳布，抗拉实测 3620MPa，合格但裕度不足",
-        "timestamp": "2026-06-21T00:21:21",
+        "timestamp": "2026-06-22T04:06:24",
         "field_changes": {}
       },
       {
-        "log_id": "LOG-75e1aa277ac8",
+        "log_id": "LOG-9d851d2b04d0",
         "record_id": "PRJ-DEMO",
         "operator": "施工经理阿乔",
         "operation_type": "update",
         "operation_detail": "碰撞点 COL-000000000001 截图更新为 /screenshots/FZ-4-20260621-reshoot-46.jpg",
-        "timestamp": "2026-06-21T00:21:21",
+        "timestamp": "2026-06-22T04:06:24",
         "field_changes": {
           "screenshot": {
             "collision_id": "COL-000000000001",
@@ -1136,12 +1282,12 @@
         }
       },
       {
-        "log_id": "LOG-dcda7544e0ac",
+        "log_id": "LOG-bbbe7d3f9aaa",
         "record_id": "PRJ-DEMO",
         "operator": "施工经理阿乔",
         "operation_type": "confirm",
         "operation_detail": "待确认项 PND-000000000001 已解决：2026/6/21 阿乔复核：保留COL-000000000001（主视角高清图），删除另一张重复拍摄",
-        "timestamp": "2026-06-21T00:21:21",
+        "timestamp": "2026-06-22T04:06:24",
         "field_changes": {
           "pending_id": {
             "value": "PND-000000000001"
@@ -1152,12 +1298,12 @@
         }
       },
       {
-        "log_id": "LOG-f888d28786d7",
+        "log_id": "LOG-9d9b59021a56",
         "record_id": "PRJ-DEMO",
         "operator": "施工经理阿乔",
         "operation_type": "revise_conclusion",
         "operation_detail": "结论改判：方案B（碳纤维布加固） → 方案A（粘钢加固）；原因：保护层磨损超预期 (18mm<25mm)，原碳布方案强度裕度不足，改粘钢",
-        "timestamp": "2026-06-21T00:21:21",
+        "timestamp": "2026-06-22T04:06:24",
         "field_changes": {
           "conclusion": {
             "old": "scheme_b",
@@ -1170,12 +1316,48 @@
         }
       },
       {
-        "log_id": "LOG-d7d7f471ff5d",
+        "log_id": "LOG-1c2c23d963f1",
         "record_id": "PRJ-DEMO",
         "operator": "匿名导出",
         "operation_type": "export",
         "operation_detail": "导出记录",
-        "timestamp": "2026-06-21T00:21:21",
+        "timestamp": "2026-06-22T04:06:24",
+        "field_changes": {}
+      },
+      {
+        "log_id": "LOG-2e8fef1eeaf4",
+        "record_id": "PRJ-DEMO",
+        "operator": "施工经理阿乔",
+        "operation_type": "revise_conclusion",
+        "operation_detail": "结论改判：方案A（粘钢加固） → 方案B（碳纤维布加固）；原因：复核确认保护层厚度满足规范最低要求，原方案A过度加固，改回碳纤维布方案更经济；附 20260622 第三方检测报告 RPT-CR-20260622-003",
+        "timestamp": "2026-06-22T04:15:27",
+        "field_changes": {
+          "conclusion": {
+            "old": "scheme_a",
+            "new": "scheme_b"
+          },
+          "confidence": {
+            "old": 0.88,
+            "new": 0.88
+          }
+        }
+      },
+      {
+        "log_id": "LOG-0f13a436fe75",
+        "record_id": "PRJ-DEMO",
+        "operator": "匿名导出",
+        "operation_type": "export",
+        "operation_detail": "导出记录",
+        "timestamp": "2026-06-22T04:18:48",
+        "field_changes": {}
+      },
+      {
+        "log_id": "LOG-45417b11f434",
+        "record_id": "PRJ-DEMO",
+        "operator": "匿名导出",
+        "operation_type": "export",
+        "operation_detail": "导出记录",
+        "timestamp": "2026-06-22T04:18:48",
         "field_changes": {}
       }
     ],
@@ -1190,18 +1372,20 @@
         ],
         "impact_analysis": "高危碰撞点 [柱脚北侧主受力钢筋保护层不足，存在锈蚀风险] 重复，直接影响材料用量核算；当前结论为「方案B（碳纤维布加固）」，待确认后可能发生改判",
         "affected_conclusions": [
-          "材料:碳纤维布（一级 300g/㎡）(MAT-000000000001)-碰撞:柱脚北侧主受力钢筋保护层不足，存在锈蚀风险",
-          "材料:碳纤维布（一级 300g/㎡）(MAT-000000000001)-碰撞:柱脚北侧主受力钢筋保护层不足，存在锈蚀风险"
+          "scheme_b",
+          "needs_inspection",
+          "scheme_a",
+          "scheme_c"
         ],
         "suspended_at": "2026-01-15T10:45:00",
         "suspended_by": "系统（自动查重）",
-        "resolved_at": "2026-06-21T00:21:21",
+        "resolved_at": "2026-06-22T04:06:24",
         "resolved_by": "施工经理阿乔",
         "resolution": "2026/6/21 阿乔复核：保留COL-000000000001（主视角高清图），删除另一张重复拍摄"
       }
     ],
     "scene_annotations": "【某产业园标准厂房 3#楼结构加固项目】四层框架柱 FZ-4（轴网 C/3，截面 600×600）\n[HIGH] 柱脚北侧主受力钢筋保护层不足，存在锈蚀风险 (元素:FZ-4)  [VP:VP:x:12.5000|y:-8.30...]\n[MEDIUM] 柱中截面环向箍筋间距偏大，抗剪承载力待校核 (元素:FZ-4)  [VP:VP:x:-10.0000|y:10.0...]",
-    "side_notes": "方案比选版本 V7  |  状态：confirmed\n结论：方案A（粘钢加固）  （置信度 88%）\n\n材料送审项：2 项\n  · 碳纤维布（一级 300g/㎡） 300g/㎡，幅宽 500mm，抗拉强度 ≥3400MPa — 碰撞点 1 处，备注 4 条\n  · 粘钢胶（A级结构胶） JGN-A 型，触变性好，25kg/桶 — 碰撞点 1 处，备注 0 条\n\n碰撞点总数：2\n  · [high] 柱脚北侧主受力钢筋保护层不足，存在锈蚀风险  截图：/screenshots/FZ-4-20260621-reshoot-46.jpg\n  · [medium] 柱中截面环向箍筋间距偏大，抗剪承载力待校核  截图：/screenshots/FZ-4-mid-stirrups.png",
+    "side_notes": "方案比选版本 V8  |  状态：confirmed\n结论：方案B（碳纤维布加固）  （置信度 88%）\n\n材料送审项：2 项\n  · 碳纤维布（一级 300g/㎡） 300g/㎡，幅宽 500mm，抗拉强度 ≥3400MPa — 碰撞点 1 处，备注 4 条\n  · 粘钢胶（A级结构胶） JGN-A 型，触变性好，25kg/桶 — 碰撞点 1 处，备注 0 条\n\n碰撞点总数：2\n  · [high] 柱脚北侧主受力钢筋保护层不足，存在锈蚀风险  截图：/screenshots/FZ-4-20260621-reshoot-46.jpg\n  · [medium] 柱中截面环向箍筋间距偏大，抗剪承载力待校核  截图：/screenshots/FZ-4-mid-stirrups.png",
     "api_response": {
       "code": 200,
       "message": "ok",
@@ -1215,9 +1399,9 @@
           "element": "四层框架柱 FZ-4（轴网 C/3，截面 600×600）"
         },
         "status": "confirmed",
-        "conclusion": "scheme_a",
+        "conclusion": "scheme_b",
         "confidence": 0.88,
-        "version": 7,
+        "version": 8,
         "materials": [
           {
             "item_id": "MAT-000000000001",
@@ -1287,13 +1471,13 @@
           }
         ],
         "pending_count": 0,
-        "generated_at": "2026-06-21T00:21:21"
+        "generated_at": "2026-06-22T04:18:48"
       }
     },
     "render_source_id": "RS-PRJ-DEMO",
     "created_at": "2026-01-15T08:00:00",
     "created_by": "结构工程师阿强",
-    "updated_at": "2026-06-21T00:21:21",
-    "current_version": 7
+    "updated_at": "2026-06-22T04:18:48",
+    "current_version": 8
   }
 ]

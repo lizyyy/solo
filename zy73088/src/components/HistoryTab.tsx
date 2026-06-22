@@ -11,14 +11,13 @@ import {
   GitCommit,
 } from 'lucide-react';
 import { useWorkbenchStore } from '@/store';
-import { ConclusionDisplay, type HistoryVersion, type Conclusion } from '@/shared/types';
-import { CONCLUSION_COLORS } from './TopBar';
+import { ConclusionDisplay, ConclusionColors, type HistoryVersion, type Conclusion } from '@/shared/types';
 
 function ConclusionBadge({ conclusion }: { conclusion: Conclusion }) {
   return (
     <span
       className={`px-2 py-0.5 rounded text-xs text-white inline-flex items-center gap-1 ${
-        CONCLUSION_COLORS[conclusion]
+        ConclusionColors[conclusion]
       }`}
     >
       {ConclusionDisplay[conclusion]}

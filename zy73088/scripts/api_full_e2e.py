@@ -2,6 +2,15 @@
 import json, urllib.request, urllib.parse, sys
 BASE = "http://localhost:3001/api/records/PRJ-DEMO"
 
+# 结论显示名（与 api/shared/types.ts ConclusionDisplay 保持一致）
+CONCLUSION_DISPLAY = {
+    "scheme_a": "方案A（粘钢加固）",
+    "scheme_b": "方案B（碳纤维布加固）",
+    "scheme_c": "方案C（增大截面）",
+    "needs_inspection": "需进一步检测",
+    "rejected": "不通过",
+}
+
 def req(method, url, data=None):
     body = None
     headers = {"Content-Type": "application/json"}
@@ -35,6 +44,31 @@ rec = d0["data"]
 orig_pending = len([p for p in rec["pending_queue"] if not p.get("resolved_at")])
 print(f"[0] 初始：{rec['project_name']}, 状态={rec['status']}, 待确认={orig_pending}, 结论={rec['conclusion']}")
 truthy("初始有统一渲染源", rec["render_source_id"] and rec["scene_annotations"] and rec["side_notes"] and rec["api_response"].get("source_id") == rec["render_source_id"])
+
+# 初始：待确认项的 affected_conclusions 是 Conclusion 枚举值，不是字符串描述
+pending_items = [p for p in rec["pending_queue"] if not p.get("resolved_at")]
+if pending_items:
+    p0 = pending_items[0]
+    aff = p0.get("affected_conclusions", [])
+    print(f"   初始待确认牵动结论：{aff}")
+    truthy("牵动结论是 Conclusion 枚举值（全小写 + 下划线命名）",
+           all(k in CONCLUSION_DISPLAY for k in aff))
+    truthy("高危重复牵动 4 个结论（当前 + 需检测 + 方案A + 方案C）",
+           len(aff) == 4 and "scheme_b" in aff and "needs_inspection" in aff and "scheme_a" in aff and "scheme_c" in aff)
+    truthy("影响分析包含高危与改判提示",
+           "高危碰撞点" in p0.get("impact_analysis", "") and "可能发生改判" in p0.get("impact_analysis", ""))
+
+# [0.5] 初始状态导出一次，验证牵动结论的业务名称出现在对账单文本里
+print("\n[0.5] 初始导出对账：验证牵动结论显示业务名称")
+c, d0x = req("GET", f"{BASE}/export")
+text0 = d0x["data"]["reconciliation_text"]
+rview0 = d0x["data"].get("reconciliation_view") or {}
+pending_in_view = (rview0.get("middle_processing") or {}).get("pending_queue") or []
+truthy("导出视图里 pending 有牵动结论字段",
+       all("affected" in p for p in pending_in_view if p.get("status") == "待处理"))
+truthy("对账单文本含「牵动结论」字样", "牵动结论" in text0)
+truthy("对账单里牵动结论显示业务名称（方案A/方案B等），不是枚举值",
+       "方案B（碳纤维布加固）" in text0 and "需进一步检测" in text0)
 
 # [1] 补录 2 条备注（碳纤维布第一条）
 print("\n[1] 补录 2 条备注到碳纤维布")
@@ -104,6 +138,9 @@ print(f"   V{latest['version_no']} by {latest['operator']}: {latest['old_conclus
 print(f"   改判原因：{latest['revise_reason'][:60]}")
 assert_eq("改判三元组：旧材料快照有", latest["snapshot_material"] is not None and len(latest["snapshot_material"]) > 0, True)
 assert_eq("改判三元组：附带新备注数 >= 1", len(latest["new_remarks"]) >= 1, True)
+# 原始 history 里存枚举值（scheme_b / scheme_a）
+assert_eq("改判旧结论枚举值正确", latest["old_conclusion"], old_concl)
+assert_eq("改判新结论枚举值正确", latest["new_conclusion"], "scheme_a")
 rec = d4["data"]
 
 # [5] 审计筛选：阿乔所有操作
@@ -131,6 +168,18 @@ assert_eq("reconciliation_view 有三栏",
           bool(rview.get("left_material_review")) and bool(rview.get("middle_processing")) and bool(rview.get("right_api_response")),
           True)
 text = exd["reconciliation_text"]
+# 导出视图里的历史结论文案必须和共享 ConclusionDisplay 完全一致
+mid = rview.get("middle_processing") or {}
+hist_in_view = mid.get("history_chain") or []
+# 找到改判节点（改判的 old/new 不同）
+revise_nodes = [h for h in hist_in_view if h.get("old_conclusion") != h.get("new_conclusion")]
+truthy("导出视图里有改判节点", len(revise_nodes) > 0)
+for h in revise_nodes[-2:]:
+    old_disp_old = h["old_conclusion"]
+    disp_new = h["new_conclusion"]
+    # 确保显示名都是 ConclusionDisplay 里的业务文案（不在 DISPLAY 值中
+    truthy(f"历史节点显示名在 ConclusionDisplay 中（不是枚举值",
+           old_disp_old in CONCLUSION_DISPLAY.values() and disp_new in CONCLUSION_DISPLAY.values())
 assert_eq("对账单含左栏", "左栏" in text, True)
 assert_eq("对账单含中栏", "中栏" in text, True)
 assert_eq("对账单含右栏", "右栏" in text, True)
