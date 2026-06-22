@@ -11,6 +11,7 @@ import type {
   DiffItem,
   ReportData,
   ReviewContext,
+  UIState,
 } from '@/types';
 import {
   MOCK_ANOMALIES,
@@ -27,10 +28,12 @@ import { computeSnapshotDiff } from '@/utils/diffEngine';
 
 const STORAGE_KEY = 'cwr_review_store_v1';
 
-const DEFAULT_UI = {
+const DEFAULT_UI: UIState = {
   openRemarkModal: false,
   openDiffModal: false,
   previousSnapshot: null,
+  currentSnapshot: null,
+  lastRemarkDiff: [],
   diffBeforeEventId: null,
   diffAfterEventId: null,
   defaultLinkedComponentId: null,
@@ -96,7 +99,10 @@ const initialState: Omit<
   uiState: { ...DEFAULT_UI },
 };
 
-function makeActions(set: (partial: any) => void, get: () => ReviewStoreState) {
+function makeActions(
+  set: (partial: Partial<ReviewStoreState> | ((state: ReviewStoreState) => Partial<ReviewStoreState>)) => void,
+  get: () => ReviewStoreState,
+) {
   return {
     loadMockData: () => {
       const saved = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
@@ -194,22 +200,18 @@ function makeActions(set: (partial: any) => void, get: () => ReviewStoreState) {
     closeRemark: () => set({ uiState: { ...get().uiState, openRemarkModal: false } }),
 
     addRemark: (remark: Omit<Remark, 'id' | 'createdAt'>) => {
+      const s0 = get();
+      const beforeSnapshot = s0.uiState.previousSnapshot;
+      const selectedComponentId = s0.selectedComponentId;
+      const activeRevisionId = s0.activeRevisionId;
+
       const newRemark: Remark = {
         ...remark,
         id: uid('rmk'),
         createdAt: new Date().toISOString(),
       };
-      const event: TimelineEvent = {
-        id: uid('evt'),
-        type: '备注',
-        timestamp: new Date().toISOString(),
-        title: `${newRemark.type}备注：${(newRemark.content.slice(0, 12))}`,
-        description: `${newRemark.author} 新增`,
-        linkedObjectId: newRemark.id,
-        operator: newRemark.author,
-      };
-      // 关联材料标记已修正
-      let updatedMaterials = get().materialItems;
+
+      let updatedMaterials = s0.materialItems;
       if (newRemark.linkedMaterialId) {
         updatedMaterials = updatedMaterials.map((m) =>
           m.id === newRemark.linkedMaterialId
@@ -217,20 +219,76 @@ function makeActions(set: (partial: any) => void, get: () => ReviewStoreState) {
             : m,
         );
       }
-      const updatedEvents = [...get().timelineEvents, event].sort(
+
+      const remarkEvent: TimelineEvent = {
+        id: uid('evt'),
+        type: '备注',
+        timestamp: new Date().toISOString(),
+        title: `${newRemark.type}备注：${newRemark.content.slice(0, 12)}`,
+        description: `${newRemark.author} 补录备注，影响 ${newRemark.affectsConclusion ? '复核结论' : '记录'}`,
+        linkedObjectId: newRemark.id,
+        operator: newRemark.author,
+      };
+
+      const updatedRemarks = [...s0.remarks, newRemark];
+      const updatedEvents = [...s0.timelineEvents, remarkEvent].sort(
         (a, b) => a.timestamp.localeCompare(b.timestamp),
       );
+
+      const now = new Date().toISOString();
+      const reviewEvent: TimelineEvent = {
+        id: uid('evt'),
+        type: '复核',
+        timestamp: now,
+        title: '补录备注后重新复核',
+        description: `新增${newRemark.type}备注后自动重新计算结论`,
+        operator: newRemark.author,
+      };
+
+      const activeMaterials = activeRevisionId
+        ? updatedMaterials.filter((m) => m.revisionId === activeRevisionId)
+        : updatedMaterials;
+      const reRemarks = updatedRemarks.map((r) => ({
+        ...r,
+        reappliedAt: r.reappliedAt ?? now,
+      }));
+      const newConclusion = buildConclusion(
+        activeMaterials,
+        reRemarks,
+        s0.anomalies,
+        reviewEvent.id,
+      );
+      reviewEvent.linkedObjectId = newConclusion.id;
+
+      const afterSnapshot: Snapshot = {
+        materialItems: JSON.parse(JSON.stringify(activeMaterials)),
+        remarks: JSON.parse(JSON.stringify(reRemarks)),
+        conclusions: [newConclusion],
+        activeRevisionId,
+      };
+
+      const diffItems = beforeSnapshot
+        ? computeSnapshotDiff(beforeSnapshot, afterSnapshot)
+        : [];
+
       set({
-        remarks: [...get().remarks, newRemark],
-        timelineEvents: updatedEvents,
+        remarks: reRemarks,
+        timelineEvents: [...updatedEvents, reviewEvent].sort(
+          (a, b) => a.timestamp.localeCompare(b.timestamp),
+        ),
         materialItems: updatedMaterials,
-        currentEventId: event.id,
-        uiState: { ...get().uiState, openRemarkModal: false, diffAfterEventId: event.id },
+        conclusions: [...s0.conclusions, newConclusion],
+        currentEventId: reviewEvent.id,
+        selectedComponentId,
+        uiState: {
+          ...get().uiState,
+          openRemarkModal: false,
+          openDiffModal: true,
+          previousSnapshot: beforeSnapshot,
+          currentSnapshot: afterSnapshot,
+          lastRemarkDiff: diffItems,
+        },
       });
-      const s = get();
-      if (s.uiState.previousSnapshot) {
-        set({ uiState: { ...get().uiState, openDiffModal: true } });
-      }
     },
 
     openDiff: (beforeId: string, afterId: string) =>
@@ -281,75 +339,57 @@ function makeActions(set: (partial: any) => void, get: () => ReviewStoreState) {
     exportReport: (): ReportData => {
       const s = get();
       const ctx = s.getReviewContext();
-      const sortedConclusions = [...s.conclusions].sort((a, b) => b.generatedAt.localeCompare(a.generatedAt));
-      const latestConclusion = sortedConclusions[0];
-      const previousConclusion = sortedConclusions[1];
 
-      const chain = s.computeInfluenceChain(latestConclusion?.id);
-      const remarkEvents = s.timelineEvents.filter((e) => e.type === '备注').sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-      const lastRemarkEvent = remarkEvents[0];
+      const currentConclusion = ctx.currentConclusion;
+      const previousConclusion = ctx.previousConclusion;
+
+      const chain = currentConclusion
+        ? s.computeInfluenceChain(currentConclusion.id)
+        : [];
+
       const previousSnapshot = s.uiState.previousSnapshot;
 
       const currentSnapshot: Snapshot = {
-        materialItems: s.materialItems,
-        remarks: s.remarks,
-        conclusions: s.conclusions,
+        materialItems: ctx.filteredMaterials,
+        remarks: ctx.filteredRemarks,
+        conclusions: currentConclusion ? [currentConclusion] : [],
         activeRevisionId: s.activeRevisionId,
       };
 
       let diffSinceLastRemark: DiffItem[] = [];
-      if (previousSnapshot) {
+      if (previousSnapshot && currentConclusion) {
         diffSinceLastRemark = computeSnapshotDiff(previousSnapshot, currentSnapshot);
       }
 
       let diffSinceLastReview: DiffItem[] = [];
-      if (previousConclusion && latestConclusion) {
+      if (previousConclusion && currentConclusion) {
+        const prevCtxMats = s.materialItems.filter(
+          (m) => m.revisionId === s.activeRevisionId,
+        );
+        const prevCtxRmks = s.remarks.filter(
+          (r) => new Date(r.createdAt) < new Date(previousConclusion.generatedAt),
+        );
         const before: Snapshot = {
-          materialItems: s.materialItems,
-          remarks: s.remarks.filter((r) => new Date(r.createdAt) < new Date(previousConclusion.generatedAt)),
-          conclusions: sortedConclusions.filter((c) => c.id !== latestConclusion.id),
+          materialItems: prevCtxMats,
+          remarks: prevCtxRmks,
+          conclusions: [previousConclusion],
           activeRevisionId: s.activeRevisionId,
         };
         diffSinceLastReview = computeSnapshotDiff(before, currentSnapshot);
       }
 
-      const anomaliesWithMeta = s.anomalies.map((a) => {
+      const anomaliesWithMeta = ctx.filteredAnomalies.map((a) => {
         const cmp = s.components.find((c) => c.id === a.componentId);
         return {
           ...a,
           componentName: cmp?.name,
-          componentPosition: cmp ? { x: cmp.positionX, y: cmp.positionY, z: cmp.positionZ } : undefined,
+          componentPosition: cmp
+            ? { x: cmp.positionX, y: cmp.positionY, z: cmp.positionZ }
+            : undefined,
         };
       });
 
-      const relevantEventIds = new Set<string>();
-      latestConclusion?.affectedMaterialIds.forEach((id) => {
-        const mat = s.materialItems.find((m) => m.id === id);
-        if (mat?.componentId) relevantEventIds.add(mat.componentId);
-        relevantEventIds.add(id);
-      });
-      latestConclusion?.affectedRemarkIds.forEach((id) => {
-        relevantEventIds.add(id);
-        const rmk = s.remarks.find((r) => r.id === id);
-        if (rmk?.linkedComponentId) relevantEventIds.add(rmk.linkedComponentId);
-        if (rmk?.linkedTimelineEventId) relevantEventIds.add(rmk.linkedTimelineEventId);
-      });
-      latestConclusion?.affectedAnomalyIds.forEach((id) => {
-        relevantEventIds.add(id);
-        const anom = s.anomalies.find((a) => a.id === id);
-        if (anom?.componentId) relevantEventIds.add(anom.componentId);
-        if (anom?.linkedTimelineEventId) relevantEventIds.add(anom.linkedTimelineEventId);
-      });
-      s.timelineEvents.forEach((e) => {
-        if (e.linkedObjectId && relevantEventIds.has(e.linkedObjectId)) {
-          relevantEventIds.add(e.id);
-        }
-      });
-
-      const relevantTimelineEvents = s.timelineEvents
-        .filter((e) => relevantEventIds.has(e.id))
-        .sort((a, b) => a.timestamp.localeCompare(b.timestamp));
-
+      const relevantTimelineEvents = ctx.filteredTimelineEvents;
       const historicalRemarks = s.remarks.filter((r) => r.reappliedAt !== undefined);
 
       return {
@@ -360,10 +400,10 @@ function makeActions(set: (partial: any) => void, get: () => ReviewStoreState) {
           currentEvent: ctx.currentEvent,
           filters: s.filters,
         },
-        conclusion: latestConclusion,
+        conclusion: currentConclusion,
         previousConclusion,
-        materialMismatches: s.materialItems.filter((m) => m.isMismatch),
-        remarks: s.remarks,
+        materialMismatches: ctx.materialMismatches,
+        remarks: ctx.filteredRemarks,
         historicalRemarks,
         anomalies: anomaliesWithMeta,
         influenceChain: chain,
@@ -371,8 +411,9 @@ function makeActions(set: (partial: any) => void, get: () => ReviewStoreState) {
         diffSinceLastReview,
         snapshotBeforeLastRemark: previousSnapshot,
         snapshotCurrent: currentSnapshot,
-        timelineSummary: s.timelineEvents.map(
-          (e) => `${new Date(e.timestamp).toLocaleString('zh-CN')} · ${e.type} · ${e.title}（${e.operator}）`,
+        timelineSummary: relevantTimelineEvents.map(
+          (e) =>
+            `${new Date(e.timestamp).toLocaleString('zh-CN')} · ${e.type} · ${e.title}（${e.operator}）`,
         ),
         relevantTimelineEvents,
       };
@@ -419,18 +460,34 @@ function makeActions(set: (partial: any) => void, get: () => ReviewStoreState) {
       const s = get();
 
       const activeRevision = s.materialRevisions.find((r) => r.id === s.activeRevisionId);
-      const currentConclusion = [...s.conclusions].sort((a, b) => b.generatedAt.localeCompare(a.generatedAt))[0];
       const currentEvent = s.timelineEvents.find((e) => e.id === s.currentEventId);
       const selectedComponent = s.components.find((c) => c.id === s.selectedComponentId);
+
+      const sortedConclusions = [...s.conclusions].sort((a, b) => b.generatedAt.localeCompare(a.generatedAt));
+      let currentConclusion: ReviewConclusion | undefined;
+      if (currentEvent && currentEvent.type === '复核') {
+        currentConclusion = s.conclusions.find((c) => c.timelineEventId === currentEvent.id);
+      }
+      if (!currentConclusion) {
+        currentConclusion = sortedConclusions[0];
+      }
+      let previousConclusion: ReviewConclusion | undefined;
+      if (currentConclusion) {
+        const idx = sortedConclusions.findIndex((c) => c.id === currentConclusion?.id);
+        if (idx >= 0 && idx < sortedConclusions.length - 1) {
+          previousConclusion = sortedConclusions[idx + 1];
+        }
+      }
 
       const activeRevisionMaterials = s.activeRevisionId
         ? s.materialItems.filter((m) => m.revisionId === s.activeRevisionId)
         : s.materialItems;
 
-      const materialMismatches = activeRevisionMaterials.filter((m) => m.isMismatch);
+      const materialMismatches = activeRevisionMaterials.filter(
+        (m) => m.isMismatch && !m.matchedRemarkId,
+      );
 
       const anomalyComponentIds = s.anomalies.map((a) => a.componentId);
-      const mismatchComponentIds = materialMismatches.map((m) => m.componentId).filter(Boolean) as string[];
 
       let filteredMaterials = activeRevisionMaterials;
       let filteredComponents = s.components;
@@ -439,23 +496,32 @@ function makeActions(set: (partial: any) => void, get: () => ReviewStoreState) {
 
       if (s.filters.mismatchOnly) {
         filteredMaterials = filteredMaterials.filter((m) => m.isMismatch);
-        const relatedCompIds = new Set(mismatchComponentIds);
+        const relatedCompIds = new Set(
+          filteredMaterials
+            .map((m) => m.componentId)
+            .filter(Boolean) as string[],
+        );
         filteredComponents = filteredComponents.filter((c) => relatedCompIds.has(c.id));
-        filteredRemarks = filteredRemarks.filter((r) => r.linkedMaterialId && materialMismatches.some((m) => m.id === r.linkedMaterialId));
+        filteredRemarks = filteredRemarks.filter(
+          (r) =>
+            (r.linkedMaterialId &&
+              filteredMaterials.some((m) => m.id === r.linkedMaterialId)) ||
+            (r.linkedComponentId &&
+              filteredComponents.some((c) => c.id === r.linkedComponentId)),
+        );
       }
 
       if (s.filters.anomalyOnly) {
         filteredMaterials = filteredMaterials.filter((m) => m.componentId && anomalyComponentIds.includes(m.componentId));
         const relatedCompIds = new Set(anomalyComponentIds);
         filteredComponents = filteredComponents.filter((c) => relatedCompIds.has(c.id));
-        filteredAnomalies = filteredAnomalies;
         filteredRemarks = filteredRemarks.filter((r) => r.linkedComponentId && anomalyComponentIds.includes(r.linkedComponentId));
       }
 
       if (s.selectedComponentId) {
         filteredMaterials = filteredMaterials.filter((m) => m.componentId === s.selectedComponentId);
         filteredComponents = filteredComponents.filter((c) => c.id === s.selectedComponentId);
-        filteredRemarks = filteredRemarks.filter((r) => r.linkedComponentId === s.selectedComponentId);
+        filteredRemarks = filteredRemarks.filter((r) => r.linkedComponentId === s.selectedComponentId || (r.linkedMaterialId && filteredMaterials.some((m) => m.id === r.linkedMaterialId)));
         filteredAnomalies = filteredAnomalies.filter((a) => a.componentId === s.selectedComponentId);
       }
 
@@ -496,6 +562,7 @@ function makeActions(set: (partial: any) => void, get: () => ReviewStoreState) {
         filteredTimelineEvents,
         activeRevision,
         currentConclusion,
+        previousConclusion,
         currentEvent,
         selectedComponent,
         activeRevisionMaterials,

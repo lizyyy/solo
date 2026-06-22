@@ -133,6 +133,7 @@ export interface ReviewContext {
   filteredTimelineEvents: TimelineEvent[];
   activeRevision: MaterialRevision | undefined;
   currentConclusion: ReviewConclusion | undefined;
+  previousConclusion: ReviewConclusion | undefined;
   currentEvent: TimelineEvent | undefined;
   selectedComponent: Component | undefined;
   activeRevisionMaterials: MaterialItem[];
@@ -167,6 +168,8 @@ export interface UIState {
   openRemarkModal: boolean;
   openDiffModal: boolean;
   previousSnapshot: Snapshot | null;
+  currentSnapshot?: Snapshot | null;
+  lastRemarkDiff?: DiffItem[];
   diffBeforeEventId: string | null;
   diffAfterEventId: string | null;
   defaultLinkedComponentId: string | null;

@@ -10,7 +10,6 @@ import {
   Clock,
   Activity,
   FileText,
-  User,
   ChevronDown,
   Search,
   Filter,
@@ -29,13 +28,7 @@ import RemarkModal from '../components/Modals/RemarkModal';
 import DiffModal from '../components/Modals/DiffModal';
 import type {
   Component,
-  MaterialItem,
-  Anomaly,
-  TimelineEvent,
   InfluenceNode,
-  MaterialRevision,
-  Remark,
-  ReviewConclusion,
   ComponentCategory,
 } from '@/types';
 
@@ -63,10 +56,8 @@ const EVENT_TYPE_COLORS: Record<string, string> = {
 function Header() {
   const runReview = useReviewStore((s) => s.runReview);
   const exportReport = useReviewStore((s) => s.exportReport);
-  const conclusions = useReviewStore((s) => s.conclusions);
   const filters = useReviewStore((s) => s.filters);
   const selectedComponentId = useReviewStore((s) => s.selectedComponentId);
-  const components = useReviewStore((s) => s.components);
   const activeRevisionId = useReviewStore((s) => s.activeRevisionId);
 
   const ctx = useMemo(() => {
@@ -74,10 +65,9 @@ function Header() {
     return store.getReviewContext();
   }, [activeRevisionId, filters, selectedComponentId]);
 
-  const sortedConclusions = [...conclusions].sort((a, b) => b.generatedAt.localeCompare(a.generatedAt));
-  const latestConclusion = sortedConclusions[0];
-  const previousConclusion = sortedConclusions[1];
-  const selectedComponent = components.find((c) => c.id === selectedComponentId);
+  const latestConclusion = ctx.currentConclusion;
+  const previousConclusion = ctx.previousConclusion;
+  const selectedComponent = ctx.selectedComponent;
 
   const conclusionStyle = useMemo(() => {
     if (!latestConclusion) return { text: 'text-metal', label: '未复核' };
@@ -165,13 +155,11 @@ function MaterialPanel() {
   const setActiveRevision = useReviewStore((s) => s.setActiveRevision);
   const components = useReviewStore((s) => s.components);
   const filters = useReviewStore((s) => s.filters);
-  const toggleFilterType = useReviewStore((s) => s.toggleFilterType);
   const setMismatchOnly = useReviewStore((s) => s.setMismatchOnly);
   const setAnomalyOnly = useReviewStore((s) => s.setAnomalyOnly);
   const selectedComponentId = useReviewStore((s) => s.selectedComponentId);
   const flyToComponent = useReviewStore((s) => s.flyToComponent);
   const openRemark = useReviewStore((s) => s.openRemark);
-  const remarks = useReviewStore((s) => s.remarks);
 
   const ctx = useMemo(() => {
     const store = useReviewStore.getState();
@@ -182,7 +170,7 @@ function MaterialPanel() {
   const activeRevisionMaterials = ctx.activeRevisionMaterials;
 
   const getComponent = (cid?: string) => components.find((c) => c.id === cid);
-  const getMatchedRemark = (mid: string) => remarks.find((r) => r.linkedMaterialId === mid);
+  const getMatchedRemark = (mid: string) => ctx.filteredRemarks.find((r) => r.linkedMaterialId === mid);
 
   return (
     <div className="panel flex flex-col col-span-2 overflow-hidden">
@@ -232,7 +220,7 @@ function MaterialPanel() {
       </div>
 
       <div className="flex-1 overflow-y-auto scrollbar-thin">
-        {activeMaterials.map((m, idx) => {
+        {activeMaterials.map((m) => {
           const cmp = getComponent(m.componentId);
           const remark = getMatchedRemark(m.id);
           const isSelected = selectedComponentId === m.componentId;
@@ -396,8 +384,6 @@ function Scene3D() {
   const components = useReviewStore((s) => s.components);
   const selectedComponentId = useReviewStore((s) => s.selectedComponentId);
   const selectComponent = useReviewStore((s) => s.selectComponent);
-  const anomalies = useReviewStore((s) => s.anomalies);
-  const remarks = useReviewStore((s) => s.remarks);
   const activeRevisionId = useReviewStore((s) => s.activeRevisionId);
   const filters = useReviewStore((s) => s.filters);
   const ctx = useMemo(() => {
@@ -541,7 +527,6 @@ function Scene3D() {
 function InfluenceNodeCard({ node, depth = 0 }: { node: InfluenceNode; depth?: number }) {
   const flyToComponent = useReviewStore((s) => s.flyToComponent);
   const materialItems = useReviewStore((s) => s.materialItems);
-  const components = useReviewStore((s) => s.components);
 
   const statusStyle = useMemo(() => {
     switch (node.status) {
@@ -611,7 +596,6 @@ function InfluencePanel() {
   const activeRevisionId = useReviewStore((s) => s.activeRevisionId);
   const selectedComponentId = useReviewStore((s) => s.selectedComponentId);
   const filters = useReviewStore((s) => s.filters);
-  const components = useReviewStore((s) => s.components);
 
   const ctx = useMemo(() => {
     const store = useReviewStore.getState();
